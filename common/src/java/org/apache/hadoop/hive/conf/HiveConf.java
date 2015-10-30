@@ -2310,7 +2310,7 @@ public class HiveConf extends Configuration {
         "calendar. Hybrid is the default."),
     HIVE_AVRO_TIMESTAMP_LEGACY_CONVERSION_ENABLED("hive.avro.timestamp.legacy.conversion.enabled", true,
         "Whether to use former Java date/time APIs to convert between timezones when reading timestamps from " +
-        "Avro files. The property has no effect when the file contains explicit metadata about the conversion " + 
+        "Avro files. The property has no effect when the file contains explicit metadata about the conversion " +
         "used to write the data; in this case reading conversion is based on the metadata."),
     HIVE_AVRO_TIMESTAMP_WRITE_LEGACY_CONVERSION_ENABLED("hive.avro.timestamp.write.legacy.conversion.enabled", false,
         "Whether to use former Java date/time APIs to convert between timezones when writing timestamps in " +
@@ -3112,7 +3112,7 @@ public class HiveConf extends Configuration {
     HIVE_ACID_TRUNCATE_USE_BASE("hive.acid.truncate.usebase", true,
         "If enabled, truncate for transactional tables will not delete the data directories,\n" +
         "rather create a new base directory with no datafiles."),
-    
+
     HIVE_ACID_DROP_PARTITION_USE_BASE("hive.acid.droppartition.usebase", false,
         "Enables non-blocking DROP PARTITION operation.\n" +
         "If enabled, drop for transactional tables will not delete the data directories,\n" +

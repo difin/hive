@@ -416,6 +416,10 @@ public class HiveSessionImpl implements HiveSession {
     }
     // set the thread name with the logging prefix.
     sessionState.updateThreadName();
+    String logPrefix = getHiveConf().getLogIdVar(sessionState.getSessionId());
+    LOG.info(
+            "Prefixing the thread name (" + Thread.currentThread().getName() + ") with " + logPrefix);
+    Thread.currentThread().setName(logPrefix + Thread.currentThread().getName());
 
     try {
       setSessionHive();
@@ -446,6 +450,17 @@ public class HiveSessionImpl implements HiveSession {
       // can be null in-case of junit tests. skip reset.
       // reset thread name at release time.
       sessionState.resetThreadName();
+      String[] names = Thread.currentThread().getName()
+              .split(getHiveConf().getLogIdVar(sessionState.getSessionId()));
+      String threadName = null;
+      if (names.length > 1) {
+        threadName = names[names.length - 1];
+      } else if (names.length == 1) {
+        threadName = names[0];
+      } else {
+        threadName = "";
+      }
+      Thread.currentThread().setName(threadName);
     }
 
     SessionState.detachSession();
