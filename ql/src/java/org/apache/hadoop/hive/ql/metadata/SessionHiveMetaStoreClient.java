@@ -195,7 +195,7 @@ public class SessionHiveMetaStoreClient extends HiveMetaStoreClientWithLocalCach
         deleteTempTableColumnStatsForTable(dbname, name);
       } catch (NoSuchObjectException err){
         // No stats to delete, forgivable error.
-        LOG.info("Object not found in metastore", err);
+        LOG.info(err.getMessage());
       }
       dropTempTable(table, deleteData, envContext);
       return;
@@ -722,7 +722,7 @@ public class SessionHiveMetaStoreClient extends HiveMetaStoreClientWithLocalCach
         deleteTempTableColumnStatsForTable(dbname, tbl_name);
       } catch (NoSuchObjectException err){
         // No stats to delete, forgivable error.
-        LOG.info("Object not found in metastore",err);
+        LOG.info(err.getMessage());
       }
     }
   }
