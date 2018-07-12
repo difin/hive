@@ -20,9 +20,9 @@ package org.apache.hive.testutils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.InterruptedIOException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.net.BindException;
@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.zookeeper.common.ClientX509Util;
@@ -41,6 +39,8 @@ import org.apache.zookeeper.common.X509Util;
 import org.apache.zookeeper.server.ServerCnxnFactory;
 import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.persistence.FileTxnLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -52,7 +52,7 @@ import com.google.common.annotations.VisibleForTesting;
  *XXX: copied from the only used class by qtestutil from hbase-tests
  */
 public class MiniZooKeeperCluster {
-  private static final Log LOG = LogFactory.getLog(MiniZooKeeperCluster.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MiniZooKeeperCluster.class);
 
   private static final int TICK_TIME = 2000;
   private static final int DEFAULT_CONNECTION_TIMEOUT = 30000;

@@ -24,18 +24,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.llap.cli.status.ExitCode;
 import org.apache.hadoop.hive.llap.cli.status.LlapStatusServiceCommandLine;
 import org.apache.hadoop.hive.llap.cli.status.LlapStatusServiceDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public class LlapServlet extends HttpServlet {
 
-  private static final Log LOG = LogFactory.getLog(JMXJsonServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(JMXJsonServlet.class);
 
   /**
    * Initialize this servlet.

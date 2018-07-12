@@ -17,13 +17,12 @@
  */
 package org.apache.hadoop.hive.shims;
 
-import org.apache.hadoop.util.VersionInfo;
-import org.apache.log4j.AppenderSkeleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.hadoop.util.VersionInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ShimLoader.
@@ -35,8 +34,6 @@ public abstract class ShimLoader {
   public static final String HADOOP2VERSIONNAME = "0.20";
 
   private static volatile HadoopShims hadoopShims;
-  private static JettyShims jettyShims;
-  private static AppenderSkeleton eventCounter;
 
   /**
    * The names of the classes for shimming Hadoop for each major version.
@@ -98,14 +95,6 @@ public abstract class ShimLoader {
     }
     return hadoopShims;
   }
-
-  public static synchronized AppenderSkeleton getEventCounter() {
-    if (eventCounter == null) {
-      eventCounter = loadShims(EVENT_COUNTER_SHIM_CLASSES, AppenderSkeleton.class);
-    }
-    return eventCounter;
-  }
-
 
   private static <T> T loadShims(Map<String, String> classMap, Class<T> xface) {
     String vers = getMajorVersion();
