@@ -169,18 +169,7 @@ import org.apache.hadoop.hive.ql.metadata.NotNullConstraint;
 import org.apache.hadoop.hive.ql.metadata.PrimaryKeyInfo;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
-import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteSemanticException;
-import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteViewSemanticException;
-import org.apache.hadoop.hive.ql.optimizer.calcite.CommonTableExpressionSuggester;
-import org.apache.hadoop.hive.ql.optimizer.calcite.CommonTableExpressionSuggesterFactory;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveCalciteUtil;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveConfPlannerContext;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveTypeFactory;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveDefaultRelMetadataProvider;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveMaterializedViewASTSubQueryRewriteShuttle;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveSqlTypeUtil;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveTezModelRelMetadataProvider;
-import org.apache.hadoop.hive.ql.optimizer.calcite.RuleEventLogger;
+import org.apache.hadoop.hive.ql.optimizer.calcite.*;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.CteRuleConfig;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateSortLimitRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveJoinSwapConstraintsRule;
@@ -191,16 +180,9 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSemiJoinProjectTran
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.RemoveInfrequentCteRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.jdbc.JDBCAggregateProjectMergeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializationRelMetadataProvider;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HivePlannerContext;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelDistribution;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelOptMaterializationValidator;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelOptUtil;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveTezModelRelMetadataProvider;
-import org.apache.hadoop.hive.ql.optimizer.calcite.RelOptHiveTable;
 import org.apache.hadoop.hive.ql.optimizer.calcite.RelOptHiveTable.TableType;
 import org.apache.hadoop.hive.ql.optimizer.calcite.RuleEventLogger;
-import org.apache.hadoop.hive.ql.optimizer.calcite.TraitsUtil;
 import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteSemanticException.UnsupportedFeature;
 import org.apache.hadoop.hive.ql.optimizer.calcite.cost.HiveAlgorithmsConf;
 import org.apache.hadoop.hive.ql.optimizer.calcite.cost.HiveVolcanoPlanner;
@@ -3699,65 +3681,69 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
     private boolean genSubQueryRelNode(QB qb, ASTNode node, RelNode srcRel, boolean forHavingClause,
             Map<ASTNode, QBSubQueryParseInfo> subQueryToRelNode)
-            throws SemanticException {
+            throws CalciteSubquerySemanticException {
 
       Set<ASTNode> corrScalarQueriesWithAgg = new HashSet<ASTNode>();
       boolean isSubQuery = false;
       boolean enableJoinReordering = false;
-      Deque<ASTNode> stack = new ArrayDeque<ASTNode>();
-      stack.push(node);
+      try {
+        Deque<ASTNode> stack = new ArrayDeque<ASTNode>();
+        stack.push(node);
 
-      while (!stack.isEmpty()) {
-        ASTNode next = stack.pop();
+        while (!stack.isEmpty()) {
+          ASTNode next = stack.pop();
 
-        switch (next.getType()) {
-        case HiveParser.TOK_SUBQUERY_EXPR:
+          switch (next.getType()) {
+          case HiveParser.TOK_SUBQUERY_EXPR:
 
-          QBSubQueryParseInfo parseInfo = QBSubQueryParseInfo.parse(next);
-          if (parseInfo.hasFullAggregate() && (
-                  parseInfo.getOperator().getType() == QBSubQuery.SubQueryType.EXISTS ||
-                          parseInfo.getOperator().getType() == QBSubQuery.SubQueryType.NOT_EXISTS)) {
-            subQueryToRelNode.put(next, parseInfo);
+            QBSubQueryParseInfo parseInfo = QBSubQueryParseInfo.parse(next);
+            if (parseInfo.hasFullAggregate() && (
+                    parseInfo.getOperator().getType() == QBSubQuery.SubQueryType.EXISTS ||
+                            parseInfo.getOperator().getType() == QBSubQuery.SubQueryType.NOT_EXISTS)) {
+              subQueryToRelNode.put(next, parseInfo);
+              isSubQuery = true;
+              break;
+            }
+
+            //disallow subqueries which HIVE doesn't currently support
+            SubQueryUtils.subqueryRestrictionCheck(qb, next, srcRel, forHavingClause,
+                corrScalarQueriesWithAgg, ctx, this.relToHiveRR);
+
+            String sbQueryAlias = "sq_" + qb.incrNumSubQueryPredicates();
+            QB qbSQ = new QB(qb.getId(), sbQueryAlias, true);
+            qbSQ.setInsideView(qb.isInsideView());
+            Phase1Ctx ctx1 = initPhase1Ctx();
+            ASTNode subQueryRoot = (ASTNode) next.getChild(1);
+            doPhase1(subQueryRoot, qbSQ, ctx1, null);
+            getMetaData(qbSQ);
+            this.subqueryId++;
+            RelNode subQueryRelNode =
+                genLogicalPlan(qbSQ, false, relToHiveColNameCalcitePosMap.get(srcRel), relToHiveRR.get(srcRel));
+
+            if (subQueryRelNode instanceof HiveProject) {
+              subQueryMap.put(subQueryRelNode, subQueryRoot);
+            }
+
+            subQueryToRelNode.put(next, parseInfo.setSubQueryRelNode(subQueryRelNode));
+            // keep track of subqueries which are scalar, correlated and contains aggregate
+            // subquery expression. This will later be special cased in Subquery remove rule
+            // for correlated scalar queries with aggregate we have take care of the case where
+            // inner aggregate happens on empty result
+            if (corrScalarQueriesWithAgg.contains(next)) {
+              corrScalarRexSQWithAgg.add(subQueryRelNode);
+            }
             isSubQuery = true;
+            enableJoinReordering = true;
             break;
-          }
-
-          //disallow subqueries which HIVE doesn't currently support
-          SubQueryUtils.subqueryRestrictionCheck(qb, next, srcRel, forHavingClause,
-              corrScalarQueriesWithAgg, ctx, this.relToHiveRR);
-
-          String sbQueryAlias = "sq_" + qb.incrNumSubQueryPredicates();
-          QB qbSQ = new QB(qb.getId(), sbQueryAlias, true);
-          qbSQ.setInsideView(qb.isInsideView());
-          Phase1Ctx ctx1 = initPhase1Ctx();
-          ASTNode subQueryRoot = (ASTNode) next.getChild(1);
-          doPhase1(subQueryRoot, qbSQ, ctx1, null);
-          getMetaData(qbSQ);
-          this.subqueryId++;
-          RelNode subQueryRelNode =
-              genLogicalPlan(qbSQ, false, relToHiveColNameCalcitePosMap.get(srcRel), relToHiveRR.get(srcRel));
-
-          if (subQueryRelNode instanceof HiveProject) {
-            subQueryMap.put(subQueryRelNode, subQueryRoot);
-          }
-
-          subQueryToRelNode.put(next, parseInfo.setSubQueryRelNode(subQueryRelNode));
-          // keep track of subqueries which are scalar, correlated and contains aggregate
-          // subquery expression. This will later be special cased in Subquery remove rule
-          // for correlated scalar queries with aggregate we have take care of the case where
-          // inner aggregate happens on empty result
-          if (corrScalarQueriesWithAgg.contains(next)) {
-            corrScalarRexSQWithAgg.add(subQueryRelNode);
-          }
-          isSubQuery = true;
-          enableJoinReordering = true;
-          break;
-        default:
-          int childCount = next.getChildCount();
-          for (int i = childCount - 1; i >= 0; i--) {
-            stack.push((ASTNode) next.getChild(i));
+          default:
+            int childCount = next.getChildCount();
+            for (int i = childCount - 1; i >= 0; i--) {
+              stack.push((ASTNode) next.getChild(i));
+            }
           }
         }
+      } catch (SemanticException e) {
+        throw new CalciteSubquerySemanticException(e.getMessage());
       }
       if (enableJoinReordering) {
         // since subqueries will later be rewritten into JOINs we want join reordering logic to trigger
