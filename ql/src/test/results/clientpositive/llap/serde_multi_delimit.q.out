@@ -3,7 +3,7 @@ PREHOOK: query: CREATE TABLE t1_multi_delimit(colA int,
   colC timestamp,
   colD smallint,
   colE smallint)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MultiDelimitSerDe'
 WITH SERDEPROPERTIES ("field.delim"="^,")STORED AS TEXTFILE
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
@@ -13,7 +13,7 @@ POSTHOOK: query: CREATE TABLE t1_multi_delimit(colA int,
   colC timestamp,
   colD smallint,
   colE smallint)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MultiDelimitSerDe'
 WITH SERDEPROPERTIES ("field.delim"="^,")STORED AS TEXTFILE
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
@@ -117,7 +117,7 @@ PREHOOK: query: CREATE TABLE t2_multi_delimit(colA int,
   colC timestamp,
   colD smallint,
   colE smallint)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MultiDelimitSerDe'
 WITH SERDEPROPERTIES ("field.delim"="^,")STORED AS TEXTFILE
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
@@ -127,7 +127,7 @@ POSTHOOK: query: CREATE TABLE t2_multi_delimit(colA int,
   colC timestamp,
   colD smallint,
   colE smallint)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MultiDelimitSerDe'
 WITH SERDEPROPERTIES ("field.delim"="^,")STORED AS TEXTFILE
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
@@ -157,7 +157,7 @@ PREHOOK: query: CREATE TABLE t3_multi_delimit(colA int,
   colC timestamp,
   colD smallint,
   colE smallint)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MultiDelimitSerDe'
 WITH SERDEPROPERTIES ("field.delim"="^^^^^")STORED AS TEXTFILE
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
@@ -167,7 +167,7 @@ POSTHOOK: query: CREATE TABLE t3_multi_delimit(colA int,
   colC timestamp,
   colD smallint,
   colE smallint)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MultiDelimitSerDe'
 WITH SERDEPROPERTIES ("field.delim"="^^^^^")STORED AS TEXTFILE
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default

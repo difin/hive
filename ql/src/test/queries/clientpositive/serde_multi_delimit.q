@@ -4,7 +4,7 @@ CREATE TABLE t1_multi_delimit(colA int,
   colC timestamp,
   colD smallint,
   colE smallint)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MultiDelimitSerDe'
 WITH SERDEPROPERTIES ("field.delim"="^,")STORED AS TEXTFILE;
 
 LOAD DATA LOCAL INPATH "../../data/files/t1_multi_delimit.csv" INTO TABLE t1_multi_delimit;
@@ -38,7 +38,7 @@ CREATE TABLE t2_multi_delimit(colA int,
   colC timestamp,
   colD smallint,
   colE smallint)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MultiDelimitSerDe'
 WITH SERDEPROPERTIES ("field.delim"="^,")STORED AS TEXTFILE;
 
 LOAD DATA LOCAL INPATH "../../data/files/t2_multi_delimit.csv" INTO TABLE t2_multi_delimit;
@@ -51,7 +51,7 @@ CREATE TABLE t3_multi_delimit(colA int,
   colC timestamp,
   colD smallint,
   colE smallint)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MultiDelimitSerDe'
 WITH SERDEPROPERTIES ("field.delim"="^^^^^")STORED AS TEXTFILE;
 
 LOAD DATA LOCAL INPATH "../../data/files/t3_multi_delimit.csv" INTO TABLE t3_multi_delimit;
