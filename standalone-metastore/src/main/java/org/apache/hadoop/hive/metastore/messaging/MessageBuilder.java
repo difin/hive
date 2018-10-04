@@ -19,10 +19,13 @@
 
 package org.apache.hadoop.hive.metastore.messaging;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.Nullable;
 
@@ -74,6 +77,7 @@ import org.apache.hadoop.hive.metastore.messaging.json.JSONUpdateTableColumnStat
 import org.apache.hadoop.hive.metastore.messaging.json.JSONUpdatePartitionColumnStatMessage;
 import org.apache.hadoop.hive.metastore.messaging.json.JSONDeleteTableColumnStatMessage;
 import org.apache.hadoop.hive.metastore.messaging.json.JSONDeletePartitionColumnStatMessage;
+import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
@@ -81,6 +85,8 @@ import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.filterMapkeys;
 
 public class MessageBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(MessageBuilder.class);
@@ -137,12 +143,27 @@ public class MessageBuilder {
       synchronized (lock) {
         if (instance == null) {
           instance = new MessageBuilder();
+          instance.init();
         }
       }
     }
     return instance;
   }
 
+  private static List<Predicate<String>> paramsFilter;
+
+  public void init() {
+    List<String> excludePatterns = Arrays.asList(MetastoreConf
+        .getTrimmedStringsVar(conf,
+            MetastoreConf.ConfVars.EVENT_NOTIFICATION_PARAMETERS_EXCLUDE_PATTERNS));
+    try {
+        paramsFilter = MetaStoreUtils.compilePatternsToPredicates(excludePatterns);
+    } catch (PatternSyntaxException e) {
+    LOG.error("Regex pattern compilation failed. Verify that "
+          + "metastore.notification.parameters.exclude.patterns has valid patterns.");
+      throw new IllegalStateException("Regex pattern compilation failed. " + e.getMessage());
+    }
+  }
   public CreateDatabaseMessage buildCreateDatabaseMessage(Database db) {
     return new JSONCreateDatabaseMessage(MS_SERVER_URL, MS_SERVICE_PRINCIPAL, db, now());
   }
@@ -326,11 +347,17 @@ public class MessageBuilder {
   }
 
   public static String createTableObjJson(Table tableObj) throws TException {
+    //Note: The parameters of the Table object will be removed in the filter if it matches
+    // any pattern provided through EVENT_NOTIFICATION_PARAMETERS_EXCLUDE_PATTERNS
+    filterMapkeys(tableObj.getParameters(), paramsFilter);
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
     return serializer.toString(tableObj, "UTF-8");
   }
 
   public static String createPartitionObjJson(Partition partitionObj) throws TException {
+    //Note: The parameters of the Partition object will be removed in the filter if it matches
+    // any pattern provided through EVENT_NOTIFICATION_PARAMETERS_EXCLUDE_PATTERNS
+    filterMapkeys(partitionObj.getParameters(), paramsFilter);
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
     return serializer.toString(partitionObj, "UTF-8");
   }
