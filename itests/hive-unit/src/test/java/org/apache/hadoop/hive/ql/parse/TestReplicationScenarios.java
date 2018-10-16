@@ -220,7 +220,7 @@ public class TestReplicationScenarios {
     driverMirror = DriverFactory.newDriver(hconfMirror);
     metaStoreClientMirror = new HiveMetaStoreClient(hconfMirror);
 
-    ObjectStore.setTwoMetastoreTesting(true);
+    PersistenceManagerProvider.setTwoMetastoreTesting(true);
   }
 
   @AfterClass
