@@ -201,7 +201,7 @@ class MetastoreDirectSqlUtils {
     loopJoinOrderedResult(pm, partitions, queryText, queryParams.toArray(), 0, new ApplyFunc<Partition>() {
       @Override
       public void apply(Partition t, Object[] fields) {
-        t.putToParameters((String) fields[1], (String) fields[2]);
+        t.putToParameters((String) fields[1], extractSqlClob(fields[2]));
       }
     });
     // Perform conversion of null map values
