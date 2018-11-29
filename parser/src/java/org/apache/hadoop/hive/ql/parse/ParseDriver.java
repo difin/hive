@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ParseDriver {
 
-  private static final Logger LOG = LoggerFactory.getLogger("hive.ql.parse.ParseDriver");
+  private static final Logger LOG = LoggerFactory.getLogger(ParseDriver.class);
 
   /**
    * Tree adaptor for making antlr return ASTNodes instead of CommonTree nodes
@@ -124,7 +124,6 @@ public class ParseDriver {
     try {
       r = parser.statement();
     } catch (RecognitionException e) {
-      e.printStackTrace();
       throw new ParseException(parser.errors);
     }
 
@@ -145,7 +144,7 @@ public class ParseDriver {
    * Parse a string as a query hint.
    */
   public ASTNode parseHint(String command) throws ParseException {
-    LOG.info("Parsing hint: " + command);
+    LOG.debug("Parsing hint: {}", command);
 
     GenericHiveLexer lexer = GenericHiveLexer.of(command, null);
     TokenRewriteStream tokens = new TokenRewriteStream(lexer);
@@ -155,12 +154,11 @@ public class ParseDriver {
     try {
       r = parser.hint();
     } catch (RecognitionException e) {
-      e.printStackTrace();
       throw new ParseException(parser.errors);
     }
 
     if (lexer.getErrors().size() == 0 && parser.errors.size() == 0) {
-      LOG.info("Parse Completed");
+      LOG.debug("Parse Completed");
     } else if (lexer.getErrors().size() != 0) {
       throw new ParseException(lexer.getErrors());
     } else {
@@ -181,9 +179,7 @@ public class ParseDriver {
    * translation process.
    */
   public ParseResult parseSelect(String command, Configuration configuration) throws ParseException {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Parsing command: " + command);
-    }
+    LOG.debug("Parsing command: {}", command);
 
     GenericHiveLexer lexer = GenericHiveLexer.of(command, configuration);
     TokenRewriteStream tokens = new TokenRewriteStream(lexer);
@@ -194,7 +190,6 @@ public class ParseDriver {
     try {
       r = parser.selectClause();
     } catch (RecognitionException e) {
-      e.printStackTrace();
       throw new ParseException(parser.errors);
     }
 
@@ -209,7 +204,7 @@ public class ParseDriver {
   }
 
   public ASTNode parseExpression(String command) throws ParseException {
-    LOG.info("Parsing expression: " + command);
+    LOG.debug("Parsing expression: {}", command);
 
     GenericHiveLexer lexer = GenericHiveLexer.of(command, null);
     TokenRewriteStream tokens = new TokenRewriteStream(lexer);
@@ -219,12 +214,11 @@ public class ParseDriver {
     try {
       r = parser.expression();
     } catch (RecognitionException e) {
-      e.printStackTrace();
       throw new ParseException(parser.errors);
     }
 
     if (lexer.getErrors().size() == 0 && parser.errors.size() == 0) {
-      LOG.info("Parse Completed");
+      LOG.debug("Parse Completed");
     } else if (lexer.getErrors().size() != 0) {
       throw new ParseException(lexer.getErrors());
     } else {
@@ -243,7 +237,6 @@ public class ParseDriver {
     try {
       r = parser.triggerExpressionStandalone();
     } catch (RecognitionException e) {
-      e.printStackTrace();
       throw new ParseException(parser.errors);
     }
     if (lexer.getErrors().size() != 0) {
@@ -264,7 +257,6 @@ public class ParseDriver {
     try {
       r = parser.triggerActionExpressionStandalone();
     } catch (RecognitionException e) {
-      e.printStackTrace();
       throw new ParseException(parser.errors);
     }
     if (lexer.getErrors().size() != 0) {
