@@ -23,6 +23,8 @@ public class MetricsConstants {
   public static final String COMPACTION_STATUS_PREFIX = "compaction_num_";
   public static final String COMPACTION_OLDEST_ENQUEUE_AGE = "compaction_oldest_enqueue_age_in_sec";
 
+  public static final String TOTAL_API_CALLS = "total_api_calls";
+
   public static final String CREATE_TOTAL_DATABASES = "create_total_count_dbs";
   public static final String CREATE_TOTAL_TABLES = "create_total_count_tables";
   public static final String CREATE_TOTAL_PARTITIONS = "create_total_count_partitions";
