@@ -1137,6 +1137,7 @@ public class TestDbNotificationListener {
     data.setInsertData(insertData);
     insertData.addToFilesAdded(fileAdded);
     insertData.addToFilesAddedChecksum(checksumAdded);
+    insertData.setReplace(false);
     FireEventRequest rqst = new FireEventRequest(true, data);
     rqst.setDbName(defaultDbName);
     rqst.setTableName(tblName);
@@ -1164,6 +1165,7 @@ public class TestDbNotificationListener {
     assertEquals(defaultDbName, insertMessage.getDB());
     assertEquals(tblName, insertMessage.getTable());
     assertEquals(TableType.MANAGED_TABLE.toString(), insertMessage.getTableType());
+    assertFalse(insertMessage.isReplace());
 
     // Verify the eventID was passed to the non-transactional listener
     MockMetaStoreEventListener.popAndVerifyLastEventId(EventType.INSERT, firstEventId + 2);
@@ -1400,6 +1402,8 @@ public class TestDbNotificationListener {
     assertEquals(EventType.INSERT.toString(), event.getEventType());
     // Parse the message field
     verifyInsert(event, defaultDbName, tblName);
+    InsertMessage insertMsg = md.getInsertMessage(event.getMessage());
+    assertFalse(insertMsg.isReplace());
 
     event = rsp.getEvents().get(5);
     assertEquals(firstEventId + 6, event.getEventId());
@@ -1527,7 +1531,9 @@ public class TestDbNotificationListener {
     assertEquals(EventType.INSERT.toString(), event.getEventType());
     // Parse the message field
     verifyInsert(event, null, tblName);
-
+    // Verify the replace flag.
+    InsertMessage insertMsg = md.getInsertMessage(event.getMessage());
+    assertFalse(insertMsg.isReplace());
     event = rsp.getEvents().get(8);
     assertEquals(firstEventId + 9, event.getEventId());
     assertEquals(EventType.INSERT.toString(), event.getEventType());
@@ -1573,6 +1579,9 @@ public class TestDbNotificationListener {
     event = rsp.getEvents().get(28);
     assertEquals(firstEventId + 29, event.getEventId());
     assertEquals(EventType.INSERT.toString(), event.getEventType());
+    // Verify the replace flag.
+    insertMsg = md.getInsertMessage(event.getMessage());
+    assertTrue(insertMsg.isReplace());
     // replace-overwrite introduces no new files
     // the insert overwrite creates an empty file with the current change
     //assertTrue(event.getMessage().matches(".*\"files\":\\[\\].*"));
