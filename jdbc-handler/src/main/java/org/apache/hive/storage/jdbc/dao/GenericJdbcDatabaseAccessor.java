@@ -15,7 +15,7 @@
 package org.apache.hive.storage.jdbc.dao;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.dbcp.BasicDataSourceFactory;
+import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
