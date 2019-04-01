@@ -1,0 +1,49 @@
+PREHOOK: query: SELECT NOT (key <=> key) from src tablesample (1 rows)
+PREHOOK: type: QUERY
+PREHOOK: Input: default@src
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT NOT (key <=> key) from src tablesample (1 rows)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@src
+#### A masked pattern was here ####
+false
+PREHOOK: query: CREATE TABLE IF NOT EXISTS t1(c0 DOUBLE PRIMARY KEY DISABLE NOVALIDATE, c1 integer )
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@t1
+POSTHOOK: query: CREATE TABLE IF NOT EXISTS t1(c0 DOUBLE PRIMARY KEY DISABLE NOVALIDATE, c1 integer )
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@t1
+PREHOOK: query: CREATE VIEW v0 AS (SELECT DISTINCT t1.c1 AS cv0 FROM t1 WHERE (((t1.c0)<(t1.c1))) IS TRUE)
+PREHOOK: type: CREATEVIEW
+PREHOOK: Input: default@t1
+PREHOOK: Output: database:default
+PREHOOK: Output: default@v0
+POSTHOOK: query: CREATE VIEW v0 AS (SELECT DISTINCT t1.c1 AS cv0 FROM t1 WHERE (((t1.c0)<(t1.c1))) IS TRUE)
+POSTHOOK: type: CREATEVIEW
+POSTHOOK: Input: default@t1
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@v0
+POSTHOOK: Lineage: v0.cv0 SIMPLE [(t1)t1.FieldSchema(name:c1, type:int, comment:null), ]
+PREHOOK: query: INSERT INTO t1 VALUES(0, 1)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@t1
+POSTHOOK: query: INSERT INTO t1 VALUES(0, 1)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@t1
+POSTHOOK: Lineage: t1.c0 SCRIPT []
+POSTHOOK: Lineage: t1.c1 SCRIPT []
+PREHOOK: query: SELECT cast((('F' LIKE '') OR (12 IS DISTINCT FROM v0.cv0)) AS int) AS count FROM v0
+PREHOOK: type: QUERY
+PREHOOK: Input: default@t1
+PREHOOK: Input: default@v0
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT cast((('F' LIKE '') OR (12 IS DISTINCT FROM v0.cv0)) AS int) AS count FROM v0
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@t1
+POSTHOOK: Input: default@v0
+#### A masked pattern was here ####
+1
