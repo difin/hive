@@ -108,6 +108,9 @@ public class Context {
   // Keeps track of scratch directories created for different scheme/authority
   private final Map<String, Path> fsScratchDirs = new HashMap<String, Path>();
 
+  // keeps track of result cache dir for the query, later cleaned up by context cleanup
+  private Path fsResultCacheDirs = null;
+
   private Configuration conf;
   protected int pathid = 10000;
   private int moveTaskId = 0;
@@ -480,6 +483,7 @@ public class Context {
     this.localScratchDir = ctx.localScratchDir;
     this.scratchDirPermission = ctx.scratchDirPermission;
     this.fsScratchDirs.putAll(ctx.fsScratchDirs);
+    this.fsResultCacheDirs = ctx.fsResultCacheDirs;
     this.conf = ctx.conf;
     this.pathid = ctx.pathid;
     this.explainConfig = ctx.explainConfig;
@@ -510,6 +514,14 @@ public class Context {
 
   public Map<String, Path> getFsScratchDirs() {
     return fsScratchDirs;
+  }
+
+  public void setFsResultCacheDirs(Path fsResultCacheDirs) {
+    this.fsResultCacheDirs = fsResultCacheDirs;
+  }
+
+  public Path getFsResultCacheDirs() {
+    return this.fsResultCacheDirs;
   }
 
   public Map<LoadTableDesc, WriteEntity> getLoadTableOutputMap() {
@@ -768,8 +780,29 @@ public class Context {
   /**
    * Remove any created scratch directories.
    */
+  public void removeResultCacheDir() {
+    if(this.fsResultCacheDirs != null) {
+      try {
+        Path p = this.fsResultCacheDirs;
+        FileSystem fs = p.getFileSystem(conf);
+        LOG.debug("Deleting result cache dir: {}", p);
+        fs.delete(p, true);
+        fs.cancelDeleteOnExit(p);
+      } catch (Exception e) {
+        LOG.warn("Error Removing result cache dir: "
+                     + StringUtils.stringifyException(e));
+      }
+    }
+  }
+
+  /**
+   * Remove any created scratch directories.
+   */
   public void removeScratchDir() {
-    SessionState sessionState = SessionState.get();
+    String resultCacheDir = null;
+    if(this.fsResultCacheDirs != null) {
+      resultCacheDir = this.fsResultCacheDirs.toUri().getPath();
+    }
     for (Path p: fsScratchDirs.values()) {
       try {
         if (p.toUri().getPath().contains(stagingDir) && subDirOf(p, fsScratchDirs.values())  ) {
@@ -778,10 +811,14 @@ public class Context {
           fs.cancelDeleteOnExit(p);
           continue; // staging dir is deleted when deleting the scratch dir
         }
-        FileSystem fs = p.getFileSystem(conf);
-        LOG.debug("Deleting scratch dir: {}",  p);
-        fs.delete(p, true);
-        fs.cancelDeleteOnExit(p);
+        if(resultCacheDir == null || !p.toUri().getPath().contains(resultCacheDir)) {
+          // delete only the paths which aren't result cache dir path
+          // because that will be taken care by removeResultCacheDir
+          FileSystem fs = p.getFileSystem(conf);
+          LOG.debug("Deleting scratch dir: {}",  p);
+          fs.delete(p, true);
+          fs.cancelDeleteOnExit(p);
+        }
       } catch (Exception e) {
         LOG.warn("Error Removing Scratch: "
             + StringUtils.stringifyException(e));
@@ -939,7 +976,11 @@ public class Context {
     resDirPaths = null;
   }
 
-  public void clear() throws IOException {
+  public void clear() throws IOException{
+    this.clear(true);
+  }
+
+  public void clear(boolean deleteResultDir) throws IOException {
     // First clear the other contexts created by this query
     for (Context subContext : subContexts) {
       subContext.clear();
@@ -963,6 +1004,9 @@ public class Context {
       } catch (IOException e) {
         LOG.info("Context clear error: " + StringUtils.stringifyException(e));
       }
+    }
+    if(deleteResultDir) {
+      removeResultCacheDir();
     }
     removeMaterializedCTEs();
     removeScratchDir();

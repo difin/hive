@@ -67,6 +67,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -7564,6 +7565,23 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     }
   }
 
+  private Path getDestinationFilePath(final String destinationFile, boolean isMmTable)
+      throws SemanticException {
+    if (this.isResultsCacheEnabled() && this.queryTypeCanUseCache()) {
+      assert (!isMmTable);
+      QueryResultsCache instance = QueryResultsCache.getInstance();
+      // QueryResultsCache should have been initialized by now
+      if (instance != null) {
+        Path resultCacheTopDir = instance.getCacheDirPath();
+        String dirName = UUID.randomUUID().toString();
+        Path resultDir = new Path(resultCacheTopDir, dirName);
+        this.ctx.setFsResultCacheDirs(resultDir);
+        return resultDir;
+      }
+    }
+    return new Path(destinationFile);
+  }
+
   @SuppressWarnings("nls")
   protected Operator genFileSinkPlan(String dest, QB qb, Operator input) throws SemanticException {
 
@@ -7943,7 +7961,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       }
     case QBMetaData.DEST_DFS_FILE: {
       if (!isStreaming) {
-        destinationPath = new Path(qbm.getDestFileForAlias(dest));
+        destinationPath = getDestinationFilePath(qbm.getDestFileForAlias(dest), isMmTable);
       }
       // CTAS case: the file output format and serde are defined by the create
       // table command rather than taking the default value
@@ -8303,7 +8321,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     inputRR = opParseCtx.get(input).getRowResolver();
 
     List<ColumnInfo> vecCol = new ArrayList<ColumnInfo>();
-    
+
     if (updating(dest) || deleting(dest) || merging(dest)) {
       if (AcidUtils.isNonNativeAcidTable(destinationTable)) {
         destinationTable.getStorageHandler().acidVirtualColumns().stream()
@@ -9191,7 +9209,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     if (dynPart && dpCtx != null && !alreadyContainsPartCols) {
       outColumnCnt += dpCtx.getNumDPCols();
     }
-    
+
     // The numbers of input columns and output columns should match for regular query
     // Impala partial width inserts are handled later by ImpalaPlanner
     if (inColumnCnt != outColumnCnt &&
@@ -14903,7 +14921,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         // iceberg CTAS has it's own locking mechanism, therefore we should exclude them
         && (t.getStorageHandler() == null || !t.getStorageHandler().directInsert()) ?
       WriteType.CTAS : WriteType.DDL_NO_LOCK;
-    
+
     outputs.add(new WriteEntity(t, lockType));
   }
 
@@ -16149,7 +16167,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
   private Context.Operation getWriteOperation(String destination) {
     return deleting(destination) ? Context.Operation.DELETE :
-        updating(destination) ? Context.Operation.UPDATE : 
+        updating(destination) ? Context.Operation.UPDATE :
         merging(destination) ? Context.Operation.MERGE : Context.Operation.OTHER;
   }
 
@@ -16177,7 +16195,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
   private boolean deleting(String destination) {
     return destination.startsWith(Context.DestClausePrefix.DELETE.toString());
   }
-  
+
   private boolean inserting(String destination) {
     return destination.startsWith(Context.DestClausePrefix.INSERT.toString());
   }
@@ -16352,6 +16370,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
    * Some initial checks for a query to see if we can look this query up in the results cache.
    */
   private boolean queryTypeCanUseCache() {
+    if(this.qb == null || this.qb.getParseInfo() == null) {
+      return false;
+    }
     if (this instanceof ColumnStatsSemanticAnalyzer) {
       // Column stats generates "select compute_stats() .." queries.
       // Disable caching for these.
