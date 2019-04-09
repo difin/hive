@@ -283,17 +283,6 @@ public class CompactorMR {
         dirsToSearch.add(baseDir);
       }
     }
-    if (parsedDeltas.size() == 0 && dir.getOriginalFiles().size() == 0) {
-      // Skip compaction if there's no delta files AND there's no original files
-      String minOpenInfo = ".";
-      if(writeIds.getMinOpenWriteId() != null) {
-        minOpenInfo = " with min Open " + JavaUtils.writeIdToString(writeIds.getMinOpenWriteId()) +
-          ".  Compaction cannot compact above this writeId";
-      }
-      LOG.error("No delta files or original files found to compact in " + sd.getLocation() +
-        " for compactionId=" + ci.id + minOpenInfo);
-      return;
-    }
 
     launchCompactionJob(job, baseDir, ci.type, dirsToSearch, dir.getCurrentDirectories(),
       dir.getCurrentDirectories().size(), dir.getObsolete().size(), conf, msc, ci.id, jobName);

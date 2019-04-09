@@ -313,8 +313,7 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
    * @param sd resolved storage descriptor
    * @return true, if compaction can run.
    */
-  static boolean isEnoughToCompact(boolean isMajorCompaction, AcidDirectory dir,
-      StorageDescriptor sd) {
+  static boolean isEnoughToCompact(boolean isMajorCompaction, AcidDirectory dir, StorageDescriptor sd) {
     int deltaCount = dir.getCurrentDirectories().size();
     int origCount = dir.getOriginalFiles().size();
 
@@ -323,16 +322,16 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
 
     if (isMajorCompaction) {
       isEnoughToCompact =
-          (origCount > 0 || deltaCount + (dir.getBaseDirectory() == null ? 0 : 1) > 1);
+          origCount > 0 || deltaCount + (dir.getBaseDirectory() == null ? 0 : 1) > 1;
 
     } else {
-      isEnoughToCompact = (deltaCount > 1);
+      isEnoughToCompact = deltaCount > 1;
 
       if (deltaCount == 2) {
-        Map<String, Long> deltaByType = dir.getCurrentDirectories().stream().collect(Collectors
-                                                                                         .groupingBy(delta -> (delta
-                                                                                                                   .isDeleteDelta() ? AcidUtils.DELETE_DELTA_PREFIX : AcidUtils.DELTA_PREFIX),
-                                                                                             Collectors.counting()));
+        Map<String, Long> deltaByType = dir.getCurrentDirectories().stream()
+          .collect(Collectors.groupingBy(delta ->
+              delta.isDeleteDelta() ? AcidUtils.DELETE_DELTA_PREFIX : AcidUtils.DELTA_PREFIX,
+              Collectors.counting()));
 
         isEnoughToCompact = (deltaByType.size() != deltaCount);
         deltaInfo.append(" ").append(deltaByType);
