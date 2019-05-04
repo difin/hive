@@ -261,7 +261,7 @@ public class TestMsckCreatePartitionsInBatches {
     Set<PartitionResult> partsNotInMs = createPartsNotInMs(23);
     IMetaStoreClient spyDb = Mockito.spy(db);
     // first call to createPartitions should throw exception
-    Mockito.doThrow(HiveException.class).doCallRealMethod().doCallRealMethod().when(spyDb)
+    Mockito.doThrow(MetaException.class).doCallRealMethod().doCallRealMethod().when(spyDb)
       .add_partitions(Mockito.anyObject(), Mockito.anyBoolean(),
         Mockito.anyBoolean());
 
@@ -300,7 +300,7 @@ public class TestMsckCreatePartitionsInBatches {
   public void testRetriesExhaustedBatchSize() throws Exception {
     Set<PartitionResult> partsNotInMs = createPartsNotInMs(17);
     IMetaStoreClient spyDb = Mockito.spy(db);
-    Mockito.doThrow(HiveException.class).when(spyDb)
+    Mockito.doThrow(MetaException.class).when(spyDb)
       .add_partitions(Mockito.anyObject(), Mockito.anyBoolean(), Mockito.anyBoolean());
     // batch size of 5 and decaying factor of 2
     Exception ex = null;
@@ -347,7 +347,7 @@ public class TestMsckCreatePartitionsInBatches {
   public void testMaxRetriesReached() throws Exception {
     Set<PartitionResult> partsNotInMs = createPartsNotInMs(17);
     IMetaStoreClient spyDb = Mockito.spy(db);
-    Mockito.doThrow(HiveException.class).when(spyDb)
+    Mockito.doThrow(MetaException.class).when(spyDb)
       .add_partitions(Mockito.anyObject(), Mockito.anyBoolean(), Mockito.anyBoolean());
     // batch size of 5 and decaying factor of 2
     Exception ex = null;
@@ -383,7 +383,7 @@ public class TestMsckCreatePartitionsInBatches {
   public void testOneMaxRetries() throws Exception {
     Set<PartitionResult> partsNotInMs = createPartsNotInMs(17);
     IMetaStoreClient spyDb = Mockito.spy(db);
-    Mockito.doThrow(HiveException.class).when(spyDb)
+    Mockito.doThrow(MetaException.class).when(spyDb)
       .add_partitions(Mockito.anyObject(), Mockito.anyBoolean(), Mockito.anyBoolean());
     // batch size of 5 and decaying factor of 2
     Exception ex = null;

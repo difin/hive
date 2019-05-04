@@ -79,7 +79,7 @@ public class TestSparkUtilities {
     }).when(fsOp).getConf();
 
     doAnswer(invocationOnMock -> {
-      assertEquals(expectedPathRef.value, invocationOnMock.getArgumentAt(0, Path.class));
+      assertEquals(expectedPathRef.value, invocationOnMock.getArgument(0, Path.class));
       return null;
     }).when(fileSinkDesc).setDirName(any(Path.class));
 

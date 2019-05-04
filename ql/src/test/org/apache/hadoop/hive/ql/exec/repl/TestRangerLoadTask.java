@@ -24,7 +24,7 @@ import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.exec.repl.ranger.RangerExportPolicyList;
 import org.apache.hadoop.hive.ql.exec.repl.ranger.RangerPolicy;
 import org.apache.hadoop.hive.ql.exec.repl.ranger.RangerRestClientImpl;
-import org.apache.hadoop.hive.ql.parse.repl.ReplState;
+import org.apache.hadoop.hive.ql.parse.repl.dump.log.state.AtlasDumpBegin;
 import org.apache.hadoop.hive.ql.parse.repl.metric.ReplicationMetricCollector;
 import org.junit.Assert;
 import org.junit.Before;
@@ -124,7 +124,6 @@ public class TestRangerLoadTask {
   @Test
   public void testSuccessRangerDumpMetrics() throws Exception {
     Logger logger = Mockito.mock(Logger.class);
-    Whitebox.setInternalState(ReplState.class, logger);
     String rangerResponse = "{\"metaDataInfo\":{\"Host name\":\"ranger.apache.org\","
         + "\"Exported by\":\"hive\",\"Export time\":\"May 5, 2020, 8:55:03 AM\",\"Ranger apache version\""
         + ":\"2.0.0.7.2.0.0-61\"},\"policies\":[{\"service\":\"cm_hive\",\"name\":\"db-level\",\"policyType\":0,"
@@ -144,6 +143,7 @@ public class TestRangerLoadTask {
     Mockito.when(work.getCurrentDumpPath()).thenReturn(rangerDumpPath);
     Mockito.when(mockClient.readRangerPoliciesFromJsonFile(Mockito.any(), Mockito.any())).thenReturn(rangerPolicyList);
     Mockito.when(work.getRangerConfigResource()).thenReturn(new URL("file://ranger.xml"));
+    Whitebox.setInternalState(new AtlasDumpBegin("").getClass(), logger);
     int status = task.execute();
     Assert.assertEquals(0, status);
     ArgumentCaptor<String> replStateCaptor = ArgumentCaptor.forClass(String.class);

@@ -83,7 +83,7 @@
     <libfb303.version>0.9.3</libfb303.version>
     <libthrift.version>0.13.0</libthrift.version>
     <log4j2.version>2.17.1</log4j2.version>
-    <mockito-all.version>1.10.19</mockito-all.version>
+    <mockito-core.version>3.4.4</mockito-core.version>
     <orc.version>1.5.1.2022.0.7.0-SNAPSHOT</orc.version>
     <protobuf.version>2.5.0</protobuf.version>
     <sqlline.version>1.9.0</sqlline.version>
@@ -482,7 +482,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>${mockito-all.version}</version>
+      <version>${mockito-core.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

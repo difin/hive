@@ -145,13 +145,13 @@ public class TestQueryHooks {
     verify(mockHook, never()).afterExecution(any(), anyBoolean());
   }
 
-  private Driver createDriver() throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+  private Driver createDriver() {
     SessionState.start(conf);
     Driver driver = new Driver(conf);
     return driver;
   }
 
-  private static final class QueryLifeTimeHookContextMatcher extends ArgumentMatcher<QueryLifeTimeHookContext> {
+  private static final class QueryLifeTimeHookContextMatcher implements ArgumentMatcher<QueryLifeTimeHookContext> {
 
     private final String command;
 
@@ -160,8 +160,8 @@ public class TestQueryHooks {
     }
 
     @Override
-    public boolean matches(Object o) {
-      return ((QueryLifeTimeHookContext) o).getCommand().equals(this.command);
+    public boolean matches(QueryLifeTimeHookContext o) {
+      return o.getCommand().equals(this.command);
     }
   }
 }

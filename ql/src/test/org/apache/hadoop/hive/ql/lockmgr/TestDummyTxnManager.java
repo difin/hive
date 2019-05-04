@@ -114,7 +114,6 @@ public class TestDummyTxnManager {
     LockException lEx = new LockException(ErrorMsg.LOCK_ACQUIRE_CANCELLED.getMsg());
     when(mockLockManager.lock(anyListOf(HiveLockObj.class), eq(false), eq(driverState))).thenReturn(expectedLocks);
     when(mockLockManager.lock(anyListOf(HiveLockObj.class), eq(false), eq(driverInterrupted))).thenThrow(lEx);
-    doNothing().when(mockLockManager).setContext(any(HiveLockManagerCtx.class));
     doNothing().when(mockLockManager).close();
     ArgumentCaptor<List> lockObjsCaptor = ArgumentCaptor.forClass(List.class);
 

@@ -34,7 +34,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -87,8 +86,6 @@ public class TestLdapAuthenticationProviderImpl {
         "cn=%s,ou=Users,dc=mycorp,dc=com:cn=%s,ou=PowerUsers,dc=mycorp,dc=com");
 
     DirSearchFactory factory = mock(DirSearchFactory.class);
-
-    when(search.findUserDn("user1")).thenReturn("cn=user1,ou=PowerUsers,dc=mycorp,dc=com");
 
     when(factory.getInstance(conf, "cn=user1,ou=PowerUsers,dc=mycorp,dc=com", "Blah")).thenReturn(search);
     when(factory.getInstance(conf, "cn=user1,ou=Users,dc=mycorp,dc=com", "Blah")).thenThrow(AuthenticationException.class);
@@ -221,11 +218,6 @@ public class TestLdapAuthenticationProviderImpl {
 
     when(search.findUserDn("user3")).thenReturn("cn=user3,ou=PowerUsers,dc=mycorp,dc=com");
 
-    when(search.findGroupsForUser("cn=user3,ou=PowerUsers,dc=mycorp,dc=com"))
-        .thenReturn(Arrays.asList(
-            "cn=testGroup,ou=Groups,dc=mycorp,dc=com",
-            "cn=group3,ou=Groups,dc=mycorp,dc=com"));
-
     authenticateUserAndCheckSearchIsClosed("user3");
   }
 
@@ -251,7 +243,6 @@ public class TestLdapAuthenticationProviderImpl {
         "(&(objectClass=person)(|(memberOf=CN=Domain Admins,CN=Users,DC=apache,DC=org)(memberOf=CN=Administrators,CN=Builtin,DC=apache,DC=org)))");
     conf.setVar(HiveConf.ConfVars.HIVE_SERVER2_PLAIN_LDAP_USERFILTER, "user3");
 
-    when(search.findUserDn("user3")).thenReturn("cn=user3,ou=PowerUsers,dc=mycorp,dc=com");
     when(search.executeCustomQuery(anyString())).thenReturn(Arrays.asList(
         "cn=user1,ou=PowerUsers,dc=mycorp,dc=com",
         "cn=user2,ou=PowerUsers,dc=mycorp,dc=com"));

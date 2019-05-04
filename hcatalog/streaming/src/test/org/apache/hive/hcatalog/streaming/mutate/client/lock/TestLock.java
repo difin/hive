@@ -24,6 +24,8 @@ import static org.apache.hadoop.hive.metastore.api.LockState.WAITING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.AdditionalMatchers.or;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -53,7 +55,6 @@ import org.apache.hadoop.hive.metastore.api.NoSuchLockException;
 import org.apache.hadoop.hive.metastore.api.NoSuchTxnException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.TxnAbortedException;
-import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -100,7 +101,8 @@ public class TestLock {
     when(mockLockResponse.getLockid()).thenReturn(LOCK_ID);
     when(mockLockResponse.getState()).thenReturn(ACQUIRED);
     when(
-        mockHeartbeatFactory.newInstance(any(IMetaStoreClient.class), any(LockFailureListener.class), any(Long.class),
+        mockHeartbeatFactory.newInstance(any(IMetaStoreClient.class), any(LockFailureListener.class),
+            or(any(Long.class), isNull()),
             any(Collection.class), anyLong(), anyInt())).thenReturn(mockHeartbeat);
 
     readLock = new Lock(mockMetaStoreClient, mockHeartbeatFactory, configuration, mockListener, USER, SOURCES,
@@ -138,7 +140,7 @@ public class TestLock {
     configuration.set("hive.txn.timeout", "100s");
     readLock.acquire();
 
-    verify(mockHeartbeatFactory).newInstance(eq(mockMetaStoreClient), eq(mockListener), any(Long.class), eq(SOURCES),
+    verify(mockHeartbeatFactory).newInstance(eq(mockMetaStoreClient), eq(mockListener), isNull(), eq(SOURCES),
         eq(LOCK_ID), eq(75));
   }
 
@@ -320,8 +322,6 @@ public class TestLock {
 
   @Test
   public void testHeartbeatContinuesTException() throws Exception {
-    Throwable t = new TException();
-    doThrow(t).when(mockMetaStoreClient).heartbeat(0, LOCK_ID);
     HeartbeatTimerTask task = new HeartbeatTimerTask(mockMetaStoreClient, mockListener, TRANSACTION_ID, SOURCES,
         LOCK_ID);
     task.run();

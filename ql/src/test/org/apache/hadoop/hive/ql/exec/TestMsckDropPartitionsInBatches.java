@@ -34,10 +34,10 @@ import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.Msck;
 import org.apache.hadoop.hive.metastore.PartitionDropOptions;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.hadoop.hive.metastore.utils.MetastoreException;
 import org.apache.hadoop.hive.metastore.utils.RetryUtilities;
 import org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat;
 import org.apache.hadoop.hive.ql.session.SessionState;
@@ -204,7 +204,7 @@ public class TestMsckDropPartitionsInBatches {
         expectedCallCount++;
 
         // only first call throws exception
-        Mockito.doThrow(MetastoreException.class).doCallRealMethod().doCallRealMethod().when(spyDb)
+        Mockito.doThrow(MetaException.class).doCallRealMethod().doCallRealMethod().when(spyDb)
           .dropPartitions(Mockito.eq(table.getCatName()), Mockito.eq(table.getDbName()),
             Mockito.eq(table.getTableName()),
             Mockito.any(List.class), Mockito.any(PartitionDropOptions.class));
@@ -242,7 +242,7 @@ public class TestMsckDropPartitionsInBatches {
         expectedBatchSizes[i] = Integer.min(partCount, actualBatchSize);
       }
       // all calls fail
-      Mockito.doThrow(MetastoreException.class).when(spyDb)
+      Mockito.doThrow(MetaException.class).when(spyDb)
         .dropPartitions(Mockito.eq(table.getCatName()), Mockito.eq(table.getDbName()), Mockito.eq(table.getTableName()),
           Mockito.any(List.class), Mockito.any(PartitionDropOptions.class));
 

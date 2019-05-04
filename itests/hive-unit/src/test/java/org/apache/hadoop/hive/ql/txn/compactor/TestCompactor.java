@@ -250,7 +250,7 @@ public class TestCompactor {
     worker.setThreadId((int) worker.getId());
     worker.setConf(conf);
     worker.init(new AtomicBoolean(true));
-    new FieldSetter(worker, RemoteCompactorThread.class.getDeclaredField("msc")).set(mockedClient);
+    FieldSetter.setField(worker, RemoteCompactorThread.class.getDeclaredField("msc"), mockedClient);
 
     worker.run();
 

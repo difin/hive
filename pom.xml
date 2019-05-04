@@ -162,9 +162,8 @@
     <oracle.version>21.3.0.0</oracle.version>
     <opencsv.version>2.3</opencsv.version>
     <orc.version>1.5.1.2022.0.7.0-SNAPSHOT</orc.version>
-    <mockito-all.version>1.10.19</mockito-all.version>
     <mockito-core.version>3.4.4</mockito-core.version>
-    <powermock.version>1.7.4</powermock.version>
+    <powermock.version>2.0.2</powermock.version>
     <mina.version>2.0.0-M5</mina.version>
     <netty.version>4.1.51.Final</netty.version>
     <netty3.version>3.10.5.Final</netty3.version> <!-- used by druid storage handler -->
@@ -775,13 +774,24 @@
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
-        <artifactId>mockito-all</artifactId>
-        <version>${mockito-all.version}</version>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito-core.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>${mockito-all.version}</version>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-module-junit4</artifactId>
+        <version>${powermock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-api-mockito2</artifactId>
+        <version>${powermock.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -1094,10 +1104,10 @@
         <groupId>org.apache.hbase</groupId>
         <artifactId>hbase-server</artifactId>
         <version>${hbase.version}</version>
-	<exclusions>
+	      <exclusions>
             <exclusion>
-        	<groupId>org.glassfish</groupId>
-		<artifactId>javax.el</artifactId>
+              <groupId>org.glassfish</groupId>
+              <artifactId>javax.el</artifactId>
             </exclusion>
         </exclusions>
       </dependency>
@@ -1229,18 +1239,21 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.eclipse.jetty</groupId>
-          <artifactId>jetty-util</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito2</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>junit</groupId>

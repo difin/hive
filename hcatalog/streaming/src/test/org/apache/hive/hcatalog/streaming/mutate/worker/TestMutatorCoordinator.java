@@ -92,7 +92,6 @@ public class TestMutatorCoordinator {
         mockMutator);
     when(mockPartitionHelper.getPathForPartition(any(List.class))).thenReturn(PATH_A);
     when(mockRecordInspector.extractRecordIdentifier(RECORD)).thenReturn(ROW__ID_INSERT);
-    when(mockSequenceValidator.isInSequence(any(RecordIdentifier.class))).thenReturn(true);
     when(mockGroupingValidator.isInSequence(any(List.class), anyInt())).thenReturn(true);
 
     coordinator = new MutatorCoordinator(configuration, mockMutatorFactory, mockPartitionHelper, mockGroupingValidator,

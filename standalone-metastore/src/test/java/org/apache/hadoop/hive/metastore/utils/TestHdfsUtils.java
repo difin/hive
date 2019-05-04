@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -222,7 +223,7 @@ public class TestHdfsUtils {
     doThrow(RuntimeException.class).when(fs).setOwner(any(Path.class), any(String.class), any(String.class));
 
     HdfsUtils.setFullFileStatus(conf, mockHadoopFileStatus, "fakeGroup2", fs, new Path("fakePath"), false);
-    verify(fs).setOwner(any(Path.class), any(String.class), any(String.class));
+    verify(fs).setOwner(any(Path.class), isNull(), any(String.class));
   }
 
   /**
@@ -320,7 +321,7 @@ public class TestHdfsUtils {
     doThrow(RuntimeException.class).when(mockFsShell).run(any(String[].class));
 
     HdfsUtils.setFullFileStatus(conf, mockHadoopFileStatus, "", mock(FileSystem.class), fakeTarget, true, mockFsShell);
-    verify(mockFsShell).run(new String[]{"-setfacl", "-R", "--set", any(String.class), fakeTarget.toString()});
+    verify(mockFsShell).run(new String[]{"-setfacl", "-R", "--set", "user::r--,group::--x,other::--x", fakeTarget.toString()});
   }
 
   /**
@@ -343,6 +344,6 @@ public class TestHdfsUtils {
 
     HdfsUtils.setFullFileStatus(conf, mockHadoopFileStatus, "", mock(FileSystem.class), fakeTarget,
         true, mockFsShell);
-    verify(mockFsShell).run(new String[]{"-chmod", "-R", any(String.class), fakeTarget.toString()});
+    verify(mockFsShell).run(new String[]{"-chmod", "-R", "1411", fakeTarget.toString()});
   }
 }

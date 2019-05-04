@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -142,7 +143,7 @@ public class TestAtlasDumpTask {
     AtlasExportRequest exportRequest = mock(AtlasExportRequest.class);
     String exportResponseData = "dumpExportContent";
     InputStream exportedMetadataIS = new ByteArrayInputStream(exportResponseData.getBytes(StandardCharsets.UTF_8));
-    when(atlasClientV2.exportData(Mockito.any(AtlasExportRequest.class))).thenReturn(exportedMetadataIS);
+    when(atlasClientV2.exportData(any(AtlasExportRequest.class))).thenReturn(exportedMetadataIS);
     when(exportRequest.toString()).thenReturn("dummyExportRequest");
     when(conf.getTimeVar(HiveConf.ConfVars.REPL_RETRY_TOTAL_DURATION, TimeUnit.SECONDS)).thenReturn(60L);
     when(conf.getTimeVar(HiveConf.ConfVars.REPL_RETRY_INTIAL_DELAY, TimeUnit.SECONDS)).thenReturn(1L);
@@ -164,7 +165,7 @@ public class TestAtlasDumpTask {
     AtlasExportRequest exportRequest = mock(AtlasExportRequest.class);
     AtlasServiceException atlasServiceException = mock(AtlasServiceException.class);
     when(atlasServiceException.getMessage()).thenReturn("import or export is in progress");
-    when(atlasClientV2.exportData(Mockito.any(AtlasExportRequest.class))).thenThrow(atlasServiceException);
+    when(atlasClientV2.exportData(any(AtlasExportRequest.class))).thenThrow(atlasServiceException);
     when(exportRequest.toString()).thenReturn("dummyExportRequest");
     setupConfForRetry();
     AtlasRestClient atlasClient = new AtlasRestClientImpl(atlasClientV2, conf);
@@ -239,7 +240,9 @@ public class TestAtlasDumpTask {
     AtlasRestClient atlasClient = atlasRestCleintBuilder.getClient(conf);
     Assert.assertTrue(atlasClient != null);
     ArgumentCaptor<Properties> propsCaptor = ArgumentCaptor.forClass(Properties.class);
-    PowerMockito.verifyStatic();
+    PowerMockito.verifyStatic(UserGroupInformation.class);
+    UserGroupInformation.getLoginUser();
+    PowerMockito.verifyStatic(ConfigurationConverter.class);
     ConfigurationConverter.getConfiguration(propsCaptor.capture());
     Assert.assertEquals("20", propsCaptor.getValue().getProperty(
             AtlasRestClientBuilder.ATLAS_PROPERTY_CONNECT_TIMEOUT_IN_MS));
@@ -252,7 +255,7 @@ public class TestAtlasDumpTask {
     List<String> listOfTable = Arrays.asList(new String [] {"t1", "t2"});
     AtlasRequestBuilder atlasRequestBuilder = Mockito.spy(AtlasRequestBuilder.class);
     Mockito.doReturn(listOfTable).when(atlasRequestBuilder)
-            .getFileAsList(Mockito.any(Path.class), Mockito.any(HiveConf.class));
+            .getFileAsList(any(Path.class), any(HiveConf.class));
     AtlasReplInfo atlasReplInfo = new AtlasReplInfo("http://localhost:31000", "srcDb", "tgtDb",
             "src","tgt", new Path("/tmp/staging"), new Path("/tmp/list"), conf);
     AtlasExportRequest atlasExportRequest = atlasRequestBuilder.createExportRequest(atlasReplInfo);
@@ -270,8 +273,8 @@ public class TestAtlasDumpTask {
   public void testGetFileAsListRetry() throws Exception {
     AtlasRequestBuilder atlasRequestBuilder = Mockito.spy(AtlasRequestBuilder.class);
     FileSystem fs = Mockito.mock(FileSystem.class);
-    Mockito.doReturn(fs).when(atlasRequestBuilder).getFileSystem(Mockito.any(Path.class), Mockito.any(HiveConf.class));
-    when(fs.getFileStatus(Mockito.any(Path.class))).thenThrow(new IOException("Unable to connect"));
+    Mockito.doReturn(fs).when(atlasRequestBuilder).getFileSystem(any(Path.class), any(HiveConf.class));
+    when(fs.getFileStatus(any(Path.class))).thenThrow(new IOException("Unable to connect"));
     Path tableListPath = new Path("/tmp/list");
     AtlasReplInfo atlasReplInfo = new AtlasReplInfo("http://localhost:31000", "srcDb", "tgtDb",
             "src","tgt", new Path("/tmp/staging"), tableListPath, conf);

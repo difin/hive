@@ -21,6 +21,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.ql.exec.repl.atlas.AtlasReplInfo;
 import org.apache.hadoop.hive.ql.parse.repl.ReplState;
+import org.apache.hadoop.hive.ql.parse.repl.dump.log.state.AtlasDumpBegin;
 import org.apache.hadoop.hive.ql.parse.repl.metric.ReplicationMetricCollector;
 import org.junit.Assert;
 import org.junit.Before;

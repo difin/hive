@@ -81,7 +81,6 @@ public class TestHivePointLookupOptimizerRule {
     RelDataType rowTypeMock = typeFactory.createStructType(MyRecord.class);
     Mockito.doReturn(rowTypeMock).when(tableMock).getRowType();
     Mockito.doReturn(tableMock).when(schemaMock).getTableForMember(Matchers.any());
-    Mockito.doReturn(hiveTableMDMock).when(tableMock).getHiveTableMD();
 
     builder = HiveRelFactories.HIVE_BUILDER.create(optCluster, schemaMock);
 

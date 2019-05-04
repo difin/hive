@@ -20,7 +20,7 @@ package org.apache.hadoop.hive.ql.exec.tez;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.*;
+import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.Mockito.*;
 
 import org.apache.hadoop.yarn.api.records.URL;
@@ -93,7 +93,7 @@ public class TestTezTask {
     when(path.getFileSystem(any(Configuration.class))).thenReturn(fs);
     when(utils.getTezDir(any(Path.class))).thenReturn(path);
     when(
-        utils.createVertex(any(HiveConf.class), any(JobConf.class), any(BaseWork.class), any(Path.class),
+        utils.createVertex(any(HiveConf.class), or(any(JobConf.class), isNull()), any(BaseWork.class), any(Path.class),
             any(TezWork.class), any(Map.class))).thenAnswer(
         new Answer<Vertex>() {
 
@@ -105,7 +105,7 @@ public class TestTezTask {
           }
         });
 
-    when(utils.createEdge(any(JobConf.class), any(Vertex.class), any(Vertex.class),
+    when(utils.createEdge(or(any(JobConf.class), isNull()), any(Vertex.class), any(Vertex.class),
             any(TezEdgeProperty.class), any(BaseWork.class), any(TezWork.class)))
             .thenAnswer(new Answer<Edge>() {
           @Override

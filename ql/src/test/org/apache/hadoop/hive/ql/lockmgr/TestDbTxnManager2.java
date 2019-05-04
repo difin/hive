@@ -3367,7 +3367,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
 
     HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
     driver = Mockito.spy(driver);
-    new FieldSetter(obj, obj.getClass().getDeclaredField("driver")).set(driver);
+    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
     changer.safelyDisableAccess(validTxnManager);
 
     validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
@@ -3376,7 +3376,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
 
     HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_DROP_PARTITION_USE_BASE, !blocking);
     driver2 = Mockito.spy(driver2);
-    new FieldSetter(obj, obj.getClass().getDeclaredField("driver")).set(driver2);
+    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
     changer.safelyDisableAccess(validTxnManager);
 
     driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
@@ -3411,7 +3411,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       driver.getFetchTask().fetch(res);
       swapTxnManager(txnMgr2);
 
-      new FieldSetter(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements")).set(0);
+      FieldSetter.setField(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements"), 0);
       txnMgr2.getMS().unlock(checkLock.getLockid());
     }
     driver2.lockAndRespond();
@@ -3475,7 +3475,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
     
     driver = Mockito.spy(driver);
-    new FieldSetter(obj, obj.getClass().getDeclaredField("driver")).set(driver);
+    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
     changer.safelyDisableAccess(validTxnManager);
     
     validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
@@ -3484,7 +3484,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
 
     HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_CREATE_TABLE_USE_SUFFIX, !blocking);
     driver2 = Mockito.spy(driver2);
-    new FieldSetter(obj, obj.getClass().getDeclaredField("driver")).set(driver2);
+    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
     changer.safelyDisableAccess(validTxnManager);
 
     driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
@@ -3518,8 +3518,8 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       
       driver.getFetchTask().fetch(res);
       swapTxnManager(txnMgr2);
-      
-      new FieldSetter(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements")).set(0);
+
+      FieldSetter.setField(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements"), 0);
       txnMgr2.getMS().unlock(checkLock.getLockid());
     }
     driver2.lockAndRespond();

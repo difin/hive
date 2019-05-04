@@ -38,6 +38,8 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.AdditionalMatchers.or;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
@@ -82,7 +84,7 @@ public class TestLlapMetricsCollector {
           .thenReturn(MockListener.class.getName());
     when(mockClientFactory.create(any(LlapServiceInstance.class))).thenReturn(mockClient);
     when(mockClient.getDaemonMetrics(
-            any(RpcController.class),
+            or(any(RpcController.class),isNull()),
             any(LlapDaemonProtocolProtos.GetDaemonMetricsRequestProto.class))).thenReturn(TEST_RESPONSE);
     collector = new LlapMetricsCollector(mockConf, mockExecutor, mockClientFactory);
   }

@@ -81,6 +81,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class TestOrcRawRecordMerger {
@@ -222,7 +223,7 @@ public class TestOrcRawRecordMerger {
     setRow(row4, OrcRecordUpdater.INSERT_OPERATION, 40, 50, 60, 130, "fourth");
     OrcStruct row5 = new OrcStruct(OrcRecordUpdater.FIELDS);
     setRow(row5, OrcRecordUpdater.INSERT_OPERATION, 40, 50, 61, 140, "fifth");
-    Mockito.when(reader.rowsOptions(Mockito.any(Reader.Options.class), Mockito.any(HiveConf.class)))
+    Mockito.when(reader.rowsOptions(any(Reader.Options.class), any()))
         .thenReturn(recordReader);
 
     Mockito.when(recordReader.hasNext()).
@@ -332,7 +333,7 @@ public class TestOrcRawRecordMerger {
     OrcStruct row4 = createOriginalRow("fourth");
     OrcStruct row5 = createOriginalRow("fifth");
 
-    Mockito.when(reader.rowsOptions(Mockito.any(Reader.Options.class), Mockito.any(HiveConf.class)))
+    Mockito.when(reader.rowsOptions(any(Reader.Options.class), any()))
         .thenReturn(recordReader);
     Mockito.when(recordReader.hasNext()).
         thenReturn(true, true, true, true, true, false);
@@ -420,7 +421,7 @@ public class TestOrcRawRecordMerger {
     RecordReader recordReader = Mockito.mock(RecordReader.class, settings);
 
     when(reader.getTypes()).thenReturn(buildReaderTypes(columnNames, columnKinds));
-    when(reader.rowsOptions(Mockito.any(Reader.Options.class), Mockito.any()))
+    when(reader.rowsOptions(any(Reader.Options.class), any()))
         .thenReturn(recordReader);
 
     OrcStruct row1 = new OrcStruct(OrcRecordUpdater.FIELDS);

@@ -153,7 +153,7 @@ public class TestReplDumpTask {
       task.bootStrapDump(new Path("mock"), new DumpMetaData(new Path("mock"), conf),
         mock(Path.class), hive);
     } finally {
-      verifyStatic();
+      verifyStatic(Utils.class);
       Utils.resetDbBootstrapDumpState(same(hive), eq("default"), eq(dbRandomKey));
     }
   }

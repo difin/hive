@@ -19,6 +19,8 @@
 package org.apache.hadoop.hive.ql.security.authorization.plugin;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.AdditionalMatchers.or;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Matchers.any;
 
 import java.util.ArrayList;
@@ -72,7 +74,7 @@ public class TestHiveAuthorizerShowFilters {
    * filterArguments
    */
   protected static class MockedHiveAuthorizerFactory implements HiveAuthorizerFactory {
-    protected abstract class AuthorizerWithFilterCmdImpl implements HiveAuthorizer {
+    public abstract class AuthorizerWithFilterCmdImpl implements HiveAuthorizer {
       @Override
       public List<HivePrivilegeObject> filterListCmdObjects(List<HivePrivilegeObject> listObjs,
           HiveAuthzContext context) throws HiveAuthzPluginException, HiveAccessControlException {
@@ -98,8 +100,8 @@ public class TestHiveAuthorizerShowFilters {
 
       try {
         Mockito.when(
-            mockedAuthorizer.filterListCmdObjects((List<HivePrivilegeObject>) any(),
-                (HiveAuthzContext) any())).thenCallRealMethod();
+            mockedAuthorizer.filterListCmdObjects(or(any(), isNull()),
+                or(any(), isNull()))).thenCallRealMethod();
       } catch (Exception e) {
         org.junit.Assert.fail("Caught exception " + e);
       }
