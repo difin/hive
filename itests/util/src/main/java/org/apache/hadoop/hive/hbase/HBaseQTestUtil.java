@@ -22,6 +22,7 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.ql.QTestArguments;
+import org.apache.hadoop.hive.ql.QTestMiniClusters.MiniClusterType;
 import org.apache.hadoop.hive.ql.QTestUtil;
 
 /**
@@ -64,7 +65,7 @@ public class HBaseQTestUtil extends QTestUtil {
 
     conf.setBoolean("hive.test.init.phase", true);
 
-    initDataset(HBASE_SRC_NAME);
+    datasetHandler.initDataset(HBASE_SRC_NAME, getCliDriver());
 
     // create a snapshot
     Admin admin = null;

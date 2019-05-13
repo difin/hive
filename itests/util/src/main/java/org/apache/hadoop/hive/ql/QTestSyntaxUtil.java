@@ -48,26 +48,26 @@ import org.apache.hive.common.util.HiveStringUtils;
  */
 public class QTestSyntaxUtil {
 
-  private QTestUtil qUtil;
+  private QTestUtil qTestUtil;
   private HiveConf conf;
   private ParseDriver pd;
 
   public QTestSyntaxUtil(QTestUtil qTestUtil, HiveConf conf, ParseDriver pd) {
-    qUtil = qTestUtil;
+    this.qTestUtil = qTestUtil;
     this.conf = conf;
     this.pd = pd;
   }
 
   public void checkQFileSyntax(List<String> cmds) {
     String command = "";
-    if (shouldCheckSyntax()) {
+    if (QTestSystemProperties.shouldCheckSyntax()) {
       //check syntax first
       for (String oneCmd : cmds) {
         if (StringUtils.endsWith(oneCmd, "\\")) {
           command += StringUtils.chop(oneCmd) + "\\;";
           continue;
         } else {
-          if (qUtil.isHiveCommand(oneCmd)) {
+          if (qTestUtil.isHiveCommand(oneCmd)) {
             command = oneCmd;
           } else {
             command += oneCmd;
@@ -80,10 +80,6 @@ public class QTestSyntaxUtil {
         command = "";
       }
     }
-  }
-
-  private boolean shouldCheckSyntax() {
-    return "true".equalsIgnoreCase(System.getProperty("test.check.syntax"));
   }
 
   private boolean checkSyntax(String cmd) {
@@ -106,7 +102,7 @@ public class QTestSyntaxUtil {
       if (proc instanceof IDriver) {
         try {
           ParseResult parseResult = pd.parse(cmd, conf);
-          qUtil.analyzeAST(parseResult.getTree());
+          qTestUtil.analyzeAST(parseResult.getTree());
         } catch (Exception e) {
           return false;
         }

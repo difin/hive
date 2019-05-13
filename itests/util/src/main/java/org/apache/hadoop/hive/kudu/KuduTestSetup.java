@@ -19,7 +19,7 @@ package org.apache.hadoop.hive.kudu;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.ql.QTestUtil;
+import org.apache.hadoop.hive.ql.QTestMiniClusters;
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.Type;
@@ -36,7 +36,7 @@ import java.util.Arrays;
 /**
  * Start and stop a Kudu MiniCluster for testing purposes.
  */
-public class KuduTestSetup extends QTestUtil.QTestSetup {
+public class KuduTestSetup extends QTestMiniClusters.QTestSetup {
 
   public static final String KV_TABLE_NAME = "default.kudu_kv";
   public static final String ALL_TYPES_TABLE_NAME = "default.kudu_all_types";
