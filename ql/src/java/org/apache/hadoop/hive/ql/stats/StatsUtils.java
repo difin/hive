@@ -287,7 +287,7 @@ public class StatsUtils {
       long ds = basicStats.getDataSize();
       long nr = basicStats.getNumRows();
       long fs = basicStats.getTotalFileSize();
-      List<ColStatistics> colStats = Lists.newArrayList();
+      List<ColStatistics> colStats = Collections.emptyList();
 
       long numErasureCodedFiles = getErasureCodedFiles(table);
 
@@ -332,11 +332,6 @@ public class StatsUtils {
 
       BasicStats bbs = BasicStats.buildFrom(partStats);
 
-      List<Long> rowCounts = Lists.newArrayList();
-      for (BasicStats basicStats : partStats) {
-        rowCounts.add(basicStats.getNumRows());
-      }
-
       long nr = bbs.getNumRows();
       long ds = bbs.getDataSize();
       long fs = bbs.getTotalFileSize();
@@ -346,7 +341,7 @@ public class StatsUtils {
       long numErasureCodedFiles = getSumIgnoreNegatives(erasureCodedFiles);
 
       if (nr == 0) {
-        nr=1;
+        nr = 1;
       }
       stats = new Statistics(nr, ds, fs, numErasureCodedFiles);
       stats.setBasicStatsState(bbs.getState());
@@ -383,48 +378,9 @@ public class StatsUtils {
         List<String> partitionCols = getPartitionColumns(schema, neededColumns, referencedColumns);
 
         // We will retrieve stats from the metastore only for columns that are not cached
-        List<String> neededColsToRetrieve;
-        List<String> partitionColsToRetrieve;
         List<ColStatistics> columnStats = new ArrayList<>();
-        if (colStatsCache != null) {
-          neededColsToRetrieve = new ArrayList<>(neededColumns.size());
-          for (String colName : neededColumns) {
-            ColStatistics colStats = colStatsCache.getColStats().get(colName);
-            if (colStats == null) {
-              neededColsToRetrieve.add(colName);
-              if (LOG.isDebugEnabled()) {
-                LOG.debug("Stats for column " + colName +
-                    " in table " + table.getCompleteName() + " could not be retrieved from cache");
-              }
-            } else {
-              columnStats.add(colStats);
-              if (LOG.isDebugEnabled()) {
-                LOG.debug("Stats for column " + colName +
-                    " in table " + table.getCompleteName() + " retrieved from cache");
-              }
-            }
-          }
-          partitionColsToRetrieve = new ArrayList<>(partitionCols.size());
-          for (String colName : partitionCols) {
-            ColStatistics colStats = colStatsCache.getColStats().get(colName);
-            if (colStats == null) {
-              partitionColsToRetrieve.add(colName);
-              if (LOG.isDebugEnabled()) {
-                LOG.debug("Stats for column " + colName +
-                    " in table " + table.getCompleteName() + " could not be retrieved from cache");
-              }
-            } else {
-              columnStats.add(colStats);
-              if (LOG.isDebugEnabled()) {
-                LOG.debug("Stats for column " + colName +
-                    " in table " + table.getCompleteName() + " retrieved from cache");
-              }
-            }
-          }
-        } else {
-          neededColsToRetrieve = neededColumns;
-          partitionColsToRetrieve = partitionCols;
-        }
+        List<String> neededColsToRetrieve = extractColumnStates(table, neededColumns, colStatsCache, columnStats);
+        List<String> partitionColsToRetrieve = extractColumnStates(table, partitionCols, colStatsCache, columnStats);
 
         // List of partitions
         List<String> partNames = new ArrayList<>(partList.getNotDeniedPartns().size());
@@ -492,7 +448,7 @@ public class StatsUtils {
           }
         }
 
-        if (rowCounts.isEmpty()) {
+        if (partStats.isEmpty()) {
           // all partitions are filtered by partition pruning
           stats.setBasicStatsState(State.COMPLETE);
         }
@@ -510,6 +466,26 @@ public class StatsUtils {
       }
     }
     return stats;
+  }
+
+  private static List<String> extractColumnStates(Table table, List<String> columns,
+      ColumnStatsList colStatsCache, List<ColStatistics> columnStats) {
+    if (colStatsCache == null) {
+      return columns;
+    }
+    List<String> neededColsToRetrieve = new ArrayList<>(columns.size());
+    for (String colName : columns) {
+      ColStatistics colStats = colStatsCache.getColStats().get(colName);
+      if (colStats == null) {
+        neededColsToRetrieve.add(colName);
+        LOG.debug("Stats for column {} in table {} could not be retrieved from cache", colName,
+            table.getCompleteName());
+      } else {
+        columnStats.add(colStats);
+        LOG.debug("Stats for column {} in table {} retrieved from cache", colName, table.getCompleteName());
+      }
+    }
+    return neededColsToRetrieve;
   }
 
 
