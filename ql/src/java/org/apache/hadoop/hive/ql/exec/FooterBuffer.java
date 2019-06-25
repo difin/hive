@@ -29,7 +29,7 @@ import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.util.ReflectionUtils;
 
 public class FooterBuffer {
-  private ArrayList<Pair> buffer;
+  private ArrayList<Pair<WritableComparable, Writable>> buffer;
   private int cur;
 
   public FooterBuffer() {
@@ -64,7 +64,7 @@ public class FooterBuffer {
       int footerCount, WritableComparable key, Writable value) throws IOException {
 
     // Fill the buffer with key value pairs.
-    this.buffer = new ArrayList<Pair>();
+    this.buffer = new ArrayList<>();
     while (buffer.size() < footerCount) {
       boolean notEOF = recordreader.next(key, value);
       if (!notEOF) {
