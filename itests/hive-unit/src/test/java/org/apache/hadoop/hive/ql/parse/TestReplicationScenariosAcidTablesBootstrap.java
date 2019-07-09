@@ -32,7 +32,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.BeforeClass;
 
@@ -236,7 +235,6 @@ public class TestReplicationScenariosAcidTablesBootstrap
     verifyCompactionQueue(tables, replicatedDbName, replicaConf);
   }
 
-  @Ignore("CDPD-9135 Ignore TestReplicationScenariosAcidTablesBootstrap.testBootstrapAcidTablesDuringIncrementalWithConcurrentWrites as it is flaky")
   @Test
   public void testBootstrapAcidTablesDuringIncrementalWithConcurrentWrites() throws Throwable {
     // Dump and load bootstrap without ACID tables.

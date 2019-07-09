@@ -2879,6 +2879,15 @@ class MetaStoreDirectSql {
     }
   }
 
+  public void lockDbTable(String tableName) throws MetaException {
+    String lockCommand = "lock table \"" + tableName + "\" in exclusive mode";
+    try {
+      executeNoResult(lockCommand);
+    } catch (SQLException sqle) {
+      throw new MetaException("Error while locking table " + tableName + ": " + sqle.getMessage());
+    }
+  }
+
   public Map<String, Map<String, String>> updatePartitionColumnStatisticsBatch(
           Map<String, ColumnStatistics> partColStatsMap,
           Table tbl,

@@ -9779,7 +9779,7 @@ public class ObjectStore implements RawStore, Configurable {
 
     List<ColumnStatisticsObj> statsObjs = colStats.getStatsObj();
     ColumnStatisticsDesc statsDesc = colStats.getStatsDesc();
-    
+
     Lock tableLock = getTableLockFor(statsDesc.getDbName(), statsDesc.getTableName());
     tableLock.lock();
     try {
@@ -11691,20 +11691,26 @@ public class ObjectStore implements RawStore, Configurable {
     }
   }
 
-  private void lockForUpdate() throws MetaException {
-    String selectQuery = "select \"NEXT_EVENT_ID\" from \"NOTIFICATION_SEQUENCE\"";
-    String selectForUpdateQuery = sqlGenerator.addForUpdateClause(selectQuery);
-    new RetryingExecutor(conf, () -> {
-      prepareQuotes();
-      Query query = pm.newQuery("javax.jdo.query.SQL", selectForUpdateQuery);
-      try {
+  private void lockNotificationSequenceForUpdate() throws MetaException {
+    if (sqlGenerator.getDbProduct() == DatabaseProduct.DERBY && directSql != null) {
+      // Derby doesn't allow FOR UPDATE to lock the row being selected (See https://db.apache
+      // .org/derby/docs/10.1/ref/rrefsqlj31783.html) . So lock the whole table. Since there's
+      // only one row in the table, this shouldn't cause any performance degradation.
+      new RetryingExecutor(conf, () -> {
+        directSql.lockDbTable("NOTIFICATION_SEQUENCE");
+      }).run();
+    } else {
+      String selectQuery = "select \"NEXT_EVENT_ID\" from \"NOTIFICATION_SEQUENCE\"";
+      String lockingQuery = sqlGenerator.addForUpdateClause(selectQuery);
+      new RetryingExecutor(conf, () -> {
+        prepareQuotes();
+        Query query = pm.newQuery("javax.jdo.query.SQL", lockingQuery);
         query.setUnique(true);
         // only need to execute it to get db Lock
         query.execute();
-      } finally {
         query.closeAll();
-      }
-    }).run();
+      }).run();
+    }
   }
 
   static class RetryingExecutor {
@@ -11769,7 +11775,7 @@ public class ObjectStore implements RawStore, Configurable {
     try {
       pm.flush();
       openTransaction();
-      lockForUpdate();
+      lockNotificationSequenceForUpdate();
       query = pm.newQuery(MNotificationNextId.class);
       Collection<MNotificationNextId> ids = (Collection) query.execute();
       MNotificationNextId mNotificationNextId = null;
