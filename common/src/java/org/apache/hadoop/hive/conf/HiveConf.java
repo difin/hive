@@ -5338,7 +5338,8 @@ public class HiveConf extends Configuration {
         + ",hive.zookeeper.ssl.keystore.location"
         + ",hive.zookeeper.ssl.keystore.password"
         + ",hive.zookeeper.ssl.truststore.location"
-        + ",hive.zookeeper.ssl.truststore.password",
+        + ",hive.zookeeper.ssl.truststore.password"
+        + ",fs.azure.account.oauth2.client.secret",
         "Comma separated list of configuration options which should not be read by normal user like passwords"),
     HIVE_CONF_INTERNAL_VARIABLE_LIST("hive.conf.internal.variable.list",
         "hive.added.files.path,hive.added.jars.path,hive.added.archives.path",
