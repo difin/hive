@@ -24,16 +24,8 @@ import org.apache.hadoop.hive.ql.QTestUtil;
  */
 public interface QTestOptionHandler {
 
-  /**
-   * For a matching option; the arguments are supplied to the handler by this method. 
-   */
   void processArguments(String arguments);
 
-  /**
-   * Invoked before the actual test is executed.
-   * 
-   * At the time of this call all the options for the actual test is already processed.
-   */
   void beforeTest(QTestUtil qt) throws Exception;
 
   /**

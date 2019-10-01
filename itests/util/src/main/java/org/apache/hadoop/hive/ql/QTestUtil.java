@@ -228,13 +228,13 @@ public class QTestUtil {
 
     conf.setVar(ConfVars.HIVE_QUERY_RESULTS_CACHE_DIRECTORY, "/tmp/hive/_resultscache_" + ProcessUtils.getPid());
 
-    datasetHandler = new QTestDatasetHandler(this, conf);
+    datasetHandler = new QTestDatasetHandler(conf);
     testFiles = datasetHandler.getDataDir(conf);
     conf.set("test.data.dir", datasetHandler.getDataDir(conf));
 
     conf.setVar(ConfVars.HIVE_QUERY_RESULTS_CACHE_DIRECTORY, "/tmp/hive/_resultscache_" + ProcessUtils.getPid());
     dispatcher.register("disabled", new QTestDisabledHandler());
-    dispatcher.register("dataset", new FakeDatasetHandler());
+    dispatcher.register("dataset", datasetHandler);
     dispatcher.register("replace", replaceHandler);
     dispatcher.register("sysdb", new QTestSysDbHandler());
     dispatcher.register("transactional", new QTestTransactional());
@@ -728,7 +728,6 @@ public class QTestUtil {
   public String cliInit(File file) throws Exception {
     String fileName = file.getName();
 
-    datasetHandler.initDataSetForTest(file, getCliDriver());
     dispatcher.process(file);
     dispatcher.beforeTest(this);
 
