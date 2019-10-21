@@ -69,7 +69,6 @@ import org.apache.hadoop.hive.ql.parse.type.ExprNodeTypeCheck;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.AbstractSerDe;
-import org.apache.hadoop.hive.serde2.DelimitedJSONSerDe;
 import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hadoop.hive.serde2.binarysortable.BinarySortableSerDe;
 import org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe;
@@ -237,26 +236,18 @@ public final class PlanUtils {
         columnTypes, lastColumnTakesRestOfTheLine);
   }
 
-  public static TableDesc getTableDesc(
-      Class<? extends Deserializer> serdeClass, String separatorCode,
-      String columns, String columnTypes, boolean lastColumnTakesRestOfTheLine) {
+  public static TableDesc getTableDesc(Class<? extends Deserializer> serdeClass,
+      String separatorCode, String columns, String columnTypes,
+      boolean lastColumnTakesRestOfTheLine) {
+
     return getTableDesc(serdeClass, separatorCode, columns, columnTypes,
-        lastColumnTakesRestOfTheLine, false);
+        lastColumnTakesRestOfTheLine, "TextFile");
   }
 
   public static TableDesc getTableDesc(
       Class<? extends Deserializer> serdeClass, String separatorCode,
       String columns, String columnTypes, boolean lastColumnTakesRestOfTheLine,
-      boolean useDelimitedJSON) {
-
-    return getTableDesc(serdeClass, separatorCode, columns, columnTypes,
-        lastColumnTakesRestOfTheLine, useDelimitedJSON, "TextFile");
-  }
-
-  public static TableDesc getTableDesc(
-      Class<? extends Deserializer> serdeClass, String separatorCode,
-      String columns, String columnTypes, boolean lastColumnTakesRestOfTheLine,
-      boolean useDelimitedJSON, String fileFormat) {
+      String fileFormat) {
 
     Properties properties = Utilities.makeProperties(
         serdeConstants.SERIALIZATION_FORMAT, separatorCode, serdeConstants.LIST_COLUMNS,
@@ -273,15 +264,6 @@ public final class PlanUtils {
     if (lastColumnTakesRestOfTheLine) {
       properties.setProperty(serdeConstants.SERIALIZATION_LAST_COLUMN_TAKES_REST,
           "true");
-    }
-
-    // It is not a very clean way, and should be modified later - due to
-    // compatibility reasons,
-    // user sees the results as json for custom scripts and has no way for
-    // specifying that.
-    // Right now, it is hard-coded in the code
-    if (useDelimitedJSON) {
-      serdeClass = DelimitedJSONSerDe.class;
     }
 
     Class inputFormat, outputFormat;
@@ -312,7 +294,7 @@ public final class PlanUtils {
   public static TableDesc getDefaultQueryOutputTableDesc(String cols, String colTypes,
       String fileFormat, Class<? extends Deserializer> serdeClass) {
     TableDesc tblDesc =
-        getTableDesc(serdeClass, "" + Utilities.ctrlaCode, cols, colTypes, false, false, fileFormat);
+        getTableDesc(serdeClass, "" + Utilities.ctrlaCode, cols, colTypes, false, fileFormat);
     // enable escaping
     tblDesc.getProperties().setProperty(serdeConstants.ESCAPE_CHAR, "\\");
     tblDesc.getProperties().setProperty(serdeConstants.SERIALIZATION_ESCAPE_CRLF, "true");
@@ -355,7 +337,7 @@ public final class PlanUtils {
       }
 
       ret = getTableDesc(serdeClass, separatorCode, columns, columnTypes,
-          lastColumnTakesRestOfTheLine, false);
+          lastColumnTakesRestOfTheLine);
 
       // set other table properties
       Properties properties = ret.getProperties();
@@ -452,7 +434,7 @@ public final class PlanUtils {
       }
 
       ret = getTableDesc(serdeClass, separatorCode, columns, columnTypes,
-          lastColumnTakesRestOfTheLine, false);
+          lastColumnTakesRestOfTheLine);
 
       // set other table properties
       Properties properties = ret.getProperties();
