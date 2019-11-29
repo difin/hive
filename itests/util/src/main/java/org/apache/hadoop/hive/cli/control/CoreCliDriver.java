@@ -58,7 +58,7 @@ public class CoreCliDriver extends CliAdapter {
     LOG.info(message);
     System.err.println(message);
 
-    MiniClusterType miniMR =cliConfig.getClusterType();
+    MiniClusterType miniMR = cliConfig.getClusterType();
     String hiveConfDir = cliConfig.getHiveConfDir();
     String initScript = cliConfig.getInitScript();
     String cleanupScript = cliConfig.getCleanupScript();
@@ -80,25 +80,6 @@ public class CoreCliDriver extends CliAdapter {
                 .build());
         }
       }.invoke("QtestUtil instance created", LOG, true);
-
-      // do a one time initialization
-      new ElapsedTimeLoggingWrapper<Void>() {
-        @Override
-        public Void invokeInternal() throws Exception {
-          qt.newSession();
-          qt.cleanUp(); // I don't think this is neccessary...
-          return null;
-        }
-      }.invoke("Initialization cleanup done.", LOG, true);
-
-      new ElapsedTimeLoggingWrapper<Void>() {
-        @Override
-        public Void invokeInternal() throws Exception {
-          qt.createSources();
-          return null;
-        }
-      }.invoke("Initialization createSources done.", LOG, true);
-
     } catch (Exception e) {
       System.err.println("Exception: " + e.getMessage());
       e.printStackTrace();
@@ -166,6 +147,11 @@ public class CoreCliDriver extends CliAdapter {
       System.err.flush();
       fail("Unexpected exception in shutdown");
     }
+  }
+
+  @Override
+  protected QTestUtil getQt() {
+    return qt;
   }
 
   @Override

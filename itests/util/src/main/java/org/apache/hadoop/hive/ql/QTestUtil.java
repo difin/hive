@@ -215,9 +215,9 @@ public class QTestUtil {
     // For testing configurations set by System.setProperties
     System.setProperty("hive.query.max.length", "100Mb");
 
-    QueryState queryState = new QueryState.Builder().withHiveConf(new HiveConf(IDriver.class)).build();
+    conf = new HiveConf(IDriver.class);
+    setMetaStoreProperties();
 
-    conf = queryState.getConf();
     qSkipSet = new HashSet<String>();
     qJavaVersionSpecificOutput = new HashSet<String>();
 
@@ -227,8 +227,6 @@ public class QTestUtil {
     initConf();
 
     conf.setVar(ConfVars.HIVE_QUERY_RESULTS_CACHE_DIRECTORY, "/tmp/hive/_resultscache_" + ProcessUtils.getPid());
-
-    sem = new SemanticAnalyzer(queryState);
 
     datasetHandler = new QTestDatasetHandler(this, conf);
     testFiles = datasetHandler.getDataDir(conf);
@@ -248,7 +246,7 @@ public class QTestUtil {
 
     this.initScript = scriptsDir + File.separator + testArgs.getInitScript();
     this.cleanupScript = scriptsDir + File.separator + testArgs.getCleanupScript();
-    postInit();
+    
     savedConf = new HiveConf(conf);
   }
 
@@ -256,6 +254,19 @@ public class QTestUtil {
     String classpath = System.getProperty("java.class.path");
     String[] classpathEntries = classpath.split(File.pathSeparator);
     LOG.info("QTestUtil classpath: " + String.join("\n", Arrays.asList(classpathEntries)));
+  }
+
+  private void setMetaStoreProperties() {
+    setMetastoreConfPropertyFromSystemProperty(MetastoreConf.ConfVars.CONNECT_URL_KEY);
+    setMetastoreConfPropertyFromSystemProperty(MetastoreConf.ConfVars.CONNECTION_DRIVER);
+    setMetastoreConfPropertyFromSystemProperty(MetastoreConf.ConfVars.CONNECTION_USER_NAME);
+    setMetastoreConfPropertyFromSystemProperty(MetastoreConf.ConfVars.PWD);
+  }
+
+  private void setMetastoreConfPropertyFromSystemProperty(MetastoreConf.ConfVars var) {
+    if (System.getProperty(var.getVarname()) != null) {
+      MetastoreConf.setVar(conf, var, System.getProperty(var.getVarname()));
+    }
   }
 
   private boolean shouldOverwriteResults() {
@@ -581,11 +592,13 @@ public class QTestUtil {
     }
     conf.setBoolean("hive.test.shutdown.phase", true);
 
-    clearTablesCreatedDuringTests();
-    clearUDFsCreatedDuringTests();
     clearKeysCreatedInTests();
 
-    cleanupFromFile();
+    String metastoreDb = QTestSystemProperties.getMetaStoreDb();
+    if (metastoreDb == null || "derby".equalsIgnoreCase(metastoreDb)) {
+      // otherwise, the docker container is already destroyed by this time
+      cleanupFromFile();
+    }
 
     // delete any contents in the warehouse dir
     Path p = new Path(testWarehouse);
@@ -670,8 +683,10 @@ public class QTestUtil {
     }
   }
 
-  private void postInit() throws Exception {
+  public void postInit() throws Exception {
     miniClusters.postInit(conf);
+
+    sem = new SemanticAnalyzer(new QueryState.Builder().withHiveConf(conf).build());
 
     testWarehouse = conf.getVar(HiveConf.ConfVars.METASTOREWAREHOUSE);
     TestTxnDbUtil.prepDb(conf);

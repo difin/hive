@@ -38,6 +38,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConfUtil;
 import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.QTestProcessExecResult;
+import org.apache.hadoop.hive.ql.QTestUtil;
 import org.apache.hadoop.hive.ql.dataset.Dataset;
 import org.apache.hadoop.hive.ql.dataset.DatasetCollection;
 import org.apache.hadoop.hive.ql.dataset.DatasetParser;
@@ -201,6 +202,11 @@ public class CoreBeeLineDriver extends CliAdapter {
     if (miniHS2 != null) {
       miniHS2.stop();
     }
+  }
+
+  @Override
+  protected QTestUtil getQt() {
+    return null;
   }
 
   private void runTest(QFile qFile, List<Callable<Void>> preCommands) throws Exception {

@@ -80,9 +80,6 @@ public abstract class AbstractCoreBlobstoreCliDriver extends CliAdapter {
 
       // do a one time initialization
       setupUniqueTestPath();
-      qt.newSession();
-      qt.cleanUp();
-      qt.createSources();
 
     } catch (Exception e) {
       System.err.println("Exception: " + e.getMessage());
@@ -135,6 +132,11 @@ public abstract class AbstractCoreBlobstoreCliDriver extends CliAdapter {
       System.err.flush();
       fail("Unexpected exception in shutdown");
     }
+  }
+
+  @Override
+  protected QTestUtil getQt() {
+    return qt;
   }
 
   private static String debugHint = "\nSee ./itests/hive-blobstore/target/tmp/log/hive.log, "

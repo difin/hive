@@ -49,6 +49,7 @@ import com.google.common.base.Strings;
  */
 public class CorePerfCliDriver extends CliAdapter {
 
+  private static final Logger LOG = LoggerFactory.getLogger(CorePerfCliDriver.class);
   private static QTestUtil qt;
 
   public CorePerfCliDriver(AbstractCliConfig testCliConfig) {
@@ -70,16 +71,6 @@ public class CorePerfCliDriver extends CliAdapter {
           .withOutDir(cliConfig.getResultsDir()).withLogDir(cliConfig.getLogDir())
           .withClusterType(miniMR).withConfDir(hiveConfDir).withInitScript(initScript)
           .withCleanupScript(cleanupScript).withLlapIo(false).build());
-
-      // do a one time initialization
-      qt.newSession();
-      qt.cleanUp();
-      qt.createSources();
-      // Manually modify the underlying metastore db to reflect statistics corresponding to
-      // the 30TB TPCDS scale set. This way the optimizer will generate plans for a 30 TB set.
-      MetaStoreDumpUtility.setupMetaStoreTableColumnStatsFor30TBTPCDSWorkload(qt.getConf(),
-          QTestSystemProperties.getTempDir());
-
     } catch (Exception e) {
       System.err.println("Exception: " + e.getMessage());
       e.printStackTrace();
@@ -87,6 +78,18 @@ public class CorePerfCliDriver extends CliAdapter {
       throw new RuntimeException("Unexpected exception in static initialization: " + e.getMessage(),
           e);
     }
+  }
+
+  @Override
+  protected void beforeClassSpec() {
+    overrideStatsInMetastore();
+  }
+
+  private void overrideStatsInMetastore() {
+    // Manually modify the underlying metastore db to reflect statistics corresponding to
+    // the 30TB TPCDS scale set. This way the optimizer will generate plans for a 30 TB set.
+    MetaStoreDumpUtility.setupMetaStoreTableColumnStatsFor30TBTPCDSWorkload(qt.getConf(),
+        QTestSystemProperties.getTempDir());
   }
 
   @Override
@@ -99,7 +102,6 @@ public class CorePerfCliDriver extends CliAdapter {
   public void setUp() {
     try {
       qt.newSession();
-
     } catch (Exception e) {
       System.err.println("Exception: " + e.getMessage());
       e.printStackTrace();
@@ -113,7 +115,6 @@ public class CorePerfCliDriver extends CliAdapter {
   public void tearDown() {
     try {
       qt.clearPostTestEffects();
-
     } catch (Exception e) {
       System.err.println("Exception: " + e.getMessage());
       e.printStackTrace();
@@ -123,9 +124,15 @@ public class CorePerfCliDriver extends CliAdapter {
   }
 
   @Override
+  protected QTestUtil getQt() {
+    return qt;
+  }
+
+  @Override
   public void runTest(String name, String fname, String fpath) {
     long startTime = System.currentTimeMillis();
     try {
+      LOG.info("Begin query: " + fname);
       System.err.println("Begin query: " + fname);
 
       qt.addFile(fpath);
@@ -155,7 +162,9 @@ public class CorePerfCliDriver extends CliAdapter {
     }
 
     long elapsedTime = System.currentTimeMillis() - startTime;
-    System.err.println("Done query: " + fname + " elapsedTime=" + elapsedTime / 1000 + "s");
+    String message = "Done query: " + fname + " elapsedTime=" + elapsedTime / 1000 + "s";
+    LOG.info(message);
+    System.err.println(message);
     assertTrue("Test passed", true);
   }
 
