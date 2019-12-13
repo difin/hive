@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.ql;
 import java.io.File;
 
 import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Suite for testing running of queries in multi-threaded mode.
@@ -35,6 +36,7 @@ public class TestMTQueries extends BaseTestQueries {
     }
   }
 
+  @Test
   public void testMTQueries1() throws Exception {
     String[] testNames = new String[] {"join2.q", "groupby1.q", "input1.q", "input19.q"};
 
