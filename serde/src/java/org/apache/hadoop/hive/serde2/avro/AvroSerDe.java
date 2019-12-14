@@ -93,7 +93,7 @@ public class AvroSerDe extends AbstractSerDe {
       LOG.debug("Resetting already initialized AvroSerDe");
     }
 
-    LOG.info("AvroSerde::initialize(): Preset value of avro.schema.literal == "
+    LOG.debug("AvroSerde::initialize(): Preset value of avro.schema.literal == "
         + properties.get(AvroSerdeUtils.AvroTableProperties.SCHEMA_LITERAL.getPropName()));
 
     schema = null;
