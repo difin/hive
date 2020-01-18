@@ -60,10 +60,10 @@ public class TestVectorMapJoinFastRowHashMap extends CommonFastHashTable {
   }
 
   private void addAndVerifyRows(VectorRandomRowSource valueSource, Object[][] rows,
-      VectorMapJoinFastHashTableContainerBase map, HashTableKeyType hashTableKeyType,
-      VerifyFastRowHashMap verifyTable, String[] keyTypeNames,
-      boolean doClipping, boolean useExactBytes)
-      throws HiveException, IOException {
+                                VectorMapJoinFastHashTableContainerBase map, HashTableKeyType hashTableKeyType,
+                                VerifyFastRowHashMap verifyTable, String[] keyTypeNames,
+                                boolean doClipping, boolean useExactBytes)
+                                throws HiveException, IOException {
 
     final int keyCount = keyTypeNames.length;
     PrimitiveTypeInfo[] keyPrimitiveTypeInfos = new PrimitiveTypeInfo[keyCount];

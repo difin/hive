@@ -57,16 +57,16 @@ public abstract class OrcProbeHashTable {
     if (vc.mapJoinDesc().getHashTableKeyType() == VectorMapJoinDesc.HashTableKeyType.MULTI_KEY) {
       switch (vc.mapJoinDesc().getHashTableKind()) {
       case HASH_MAP:
-        currProbeHashTable =
-            new OrcProbeMultiKeyHashMap(vc.vectorMapJoinHashTable(), vc.mapJoinDesc().getVectorMapJoinInfo());
+        currProbeHashTable = new OrcProbeMultiKeyHashMap(
+            vc.vectorMapJoinHashTable(), vc.mapJoinDesc().getVectorMapJoinInfo(), vc.keyTableProperties());
         break;
       case HASH_MULTISET:
-        currProbeHashTable =
-            new OrcProbeMultiKeyHashMultiSet(vc.vectorMapJoinHashTable(), vc.mapJoinDesc().getVectorMapJoinInfo());
+        currProbeHashTable = new OrcProbeMultiKeyHashMultiSet(
+            vc.vectorMapJoinHashTable(), vc.mapJoinDesc().getVectorMapJoinInfo(), vc.keyTableProperties());
         break;
       case HASH_SET:
-        currProbeHashTable =
-            new OrcProbeMultiKeyHashSet(vc.vectorMapJoinHashTable(), vc.mapJoinDesc().getVectorMapJoinInfo());
+        currProbeHashTable = new OrcProbeMultiKeyHashSet(
+            vc.vectorMapJoinHashTable(), vc.mapJoinDesc().getVectorMapJoinInfo(), vc.keyTableProperties());
         break;
       }
     } else if (vc.mapJoinDesc().getHashTableKeyType() == VectorMapJoinDesc.HashTableKeyType.STRING) {

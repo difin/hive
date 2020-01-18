@@ -35,7 +35,7 @@ STAGE PLANS:
                       Statistics: Num rows: 12 Data size: 2100 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string), _col1 (type: string)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 12 Data size: 2100 Basic stats: COMPLETE Column stats: COMPLETE
@@ -135,7 +135,7 @@ STAGE PLANS:
                       Statistics: Num rows: 250 Data size: 23750 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 250 Data size: 23750 Basic stats: COMPLETE Column stats: COMPLETE
@@ -163,7 +163,7 @@ STAGE PLANS:
                     Statistics: Num rows: 125 Data size: 1000 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col0 (type: bigint)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: bigint)
                       Statistics: Num rows: 125 Data size: 1000 Basic stats: COMPLETE Column stats: COMPLETE
@@ -197,10 +197,10 @@ POSTHOOK: query: select distinct count(value) from src group by key
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src
 #### A masked pattern was here ####
-5
-1
 2
 3
+5
+1
 4
 PREHOOK: query: explain select distinct count(*) from src1 where key in (128,146,150)
 PREHOOK: type: QUERY
@@ -465,7 +465,7 @@ STAGE PLANS:
                       Statistics: Num rows: 500 Data size: 89000 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 500 Data size: 89000 Basic stats: COMPLETE Column stats: COMPLETE
@@ -487,7 +487,7 @@ STAGE PLANS:
                       Statistics: Num rows: 25 Data size: 4375 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 25 Data size: 4375 Basic stats: COMPLETE Column stats: COMPLETE
@@ -588,7 +588,7 @@ STAGE PLANS:
                       Statistics: Num rows: 6 Data size: 564 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 6 Data size: 564 Basic stats: COMPLETE Column stats: COMPLETE
@@ -616,7 +616,7 @@ STAGE PLANS:
                     Statistics: Num rows: 3 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col0 (type: bigint)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: bigint)
                       Statistics: Num rows: 3 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
@@ -688,7 +688,7 @@ STAGE PLANS:
                       Statistics: Num rows: 12 Data size: 1032 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 12 Data size: 1032 Basic stats: COMPLETE Column stats: COMPLETE
@@ -725,21 +725,21 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src1
 #### A masked pattern was here ####
 
-128
-150
-213
-255
-401
-66
 146
-224
-238
+213
 273
-278
 311
 369
 406
+66
 98
+128
+150
+224
+238
+255
+278
+401
 PREHOOK: query: explain select distinct * from src1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@src1
@@ -777,7 +777,7 @@ STAGE PLANS:
                       Statistics: Num rows: 12 Data size: 2100 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string), _col1 (type: string)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: string), _col1 (type: string)
                         Statistics: Num rows: 12 Data size: 2100 Basic stats: COMPLETE Column stats: COMPLETE
@@ -813,25 +813,25 @@ POSTHOOK: query: select distinct * from src1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src1
 #### A masked pattern was here ####
-	val_165
-	val_265
+	
+	val_27
 	val_409
+	val_484
 128	
+150	val_150
 213	val_213
 224	
+238	val_238
 273	val_273
+278	val_278
 401	val_401
 406	val_406
 98	val_98
-	
+	val_165
 	val_193
-	val_27
-	val_484
+	val_265
 146	val_146
-150	val_150
-238	val_238
 255	val_255
-278	val_278
 311	val_311
 369	
 66	val_66
@@ -874,7 +874,7 @@ STAGE PLANS:
                       Statistics: Num rows: 6 Data size: 564 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 6 Data size: 564 Basic stats: COMPLETE Column stats: COMPLETE
@@ -902,7 +902,7 @@ STAGE PLANS:
                     Statistics: Num rows: 3 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col0 (type: bigint)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: bigint)
                       Statistics: Num rows: 3 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
@@ -975,7 +975,7 @@ STAGE PLANS:
                       Statistics: Num rows: 6 Data size: 564 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 6 Data size: 564 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1013,9 +1013,9 @@ POSTHOOK: query: select distinct key, count(*) from src1 where key in (128,146,1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src1
 #### A masked pattern was here ####
+146	1
 128	1
 150	1
-146	1
 PREHOOK: query: explain select distinct * from (select * from src1) as T
 PREHOOK: type: QUERY
 PREHOOK: Input: default@src1
@@ -1053,7 +1053,7 @@ STAGE PLANS:
                       Statistics: Num rows: 12 Data size: 2100 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string), _col1 (type: string)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: string), _col1 (type: string)
                         Statistics: Num rows: 12 Data size: 2100 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1089,25 +1089,25 @@ POSTHOOK: query: select distinct * from (select * from src1) as T
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src1
 #### A masked pattern was here ####
-	val_165
-	val_265
+	
+	val_27
 	val_409
+	val_484
 128	
+150	val_150
 213	val_213
 224	
+238	val_238
 273	val_273
+278	val_278
 401	val_401
 406	val_406
 98	val_98
-	
+	val_165
 	val_193
-	val_27
-	val_484
+	val_265
 146	val_146
-150	val_150
-238	val_238
 255	val_255
-278	val_278
 311	val_311
 369	
 66	val_66
@@ -1175,7 +1175,7 @@ STAGE PLANS:
                       Statistics: Num rows: 6 Data size: 1050 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string), _col1 (type: string)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: string), _col1 (type: string)
                         Statistics: Num rows: 6 Data size: 1050 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1212,8 +1212,8 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src1
 #### A masked pattern was here ####
 128	
-146	val_146
 150	val_150
+146	val_146
 PREHOOK: query: explain select distinct key from (select * from src1 where key in (128,146,150)) as T
 PREHOOK: type: QUERY
 PREHOOK: Input: default@src1
@@ -1251,7 +1251,7 @@ STAGE PLANS:
                       Statistics: Num rows: 6 Data size: 516 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 6 Data size: 516 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1287,9 +1287,9 @@ POSTHOOK: query: select distinct key from (select * from src1 where key in (128,
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src1
 #### A masked pattern was here ####
+146
 128
 150
-146
 PREHOOK: query: explain select distinct * from (select count(*) from src1 where key in (128,146,150)) as T
 PREHOOK: type: QUERY
 PREHOOK: Input: default@src1
@@ -1439,7 +1439,7 @@ STAGE PLANS:
                       Statistics: Num rows: 12 Data size: 96 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: double)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: double)
                         Statistics: Num rows: 12 Data size: 96 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1548,7 +1548,7 @@ STAGE PLANS:
                       Statistics: Num rows: 12 Data size: 96 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: double)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: double)
                         Statistics: Num rows: 12 Data size: 96 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1657,7 +1657,7 @@ STAGE PLANS:
                       Statistics: Num rows: 12 Data size: 2196 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string), _col1 (type: string), _col2 (type: bigint)
-                        null sort order: aaa
+                        null sort order: zzz
                         sort order: +++
                         Map-reduce partition columns: _col0 (type: string), _col1 (type: string), _col2 (type: bigint)
                         Statistics: Num rows: 12 Data size: 2196 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1691,18 +1691,10 @@ POSTHOOK: query: select distinct value, key, count(1) over (partition by value) 
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src1
 #### A masked pattern was here ####
-val_165		1
-val_213	213	1
-val_27		1
-val_406	406	1
-val_484		1
-val_66	66	1
-		7
 	128	7
-	224	7
 	369	7
-val_146	146	1
 val_150	150	1
+val_165		1
 val_193		1
 val_238	238	1
 val_255	255	1
@@ -1711,8 +1703,16 @@ val_273	273	1
 val_278	278	1
 val_311	311	1
 val_401	401	1
-val_409		1
+val_484		1
+val_66	66	1
 val_98	98	1
+		7
+	224	7
+val_146	146	1
+val_213	213	1
+val_27		1
+val_406	406	1
+val_409		1
 PREHOOK: query: explain select value, key, count(1) over (partition by value) from src1 group by value, key
 PREHOOK: type: QUERY
 PREHOOK: Input: default@src1
@@ -1751,7 +1751,7 @@ STAGE PLANS:
                       Statistics: Num rows: 12 Data size: 2100 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string), _col1 (type: string)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: string), _col1 (type: string)
                         Statistics: Num rows: 12 Data size: 2100 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1825,10 +1825,10 @@ POSTHOOK: query: select value, key, count(1) over (partition by value) from src1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src1
 #### A masked pattern was here ####
+	369	4
+		4
 	128	4
 	224	4
-		4
-	369	4
 val_146	146	1
 val_150	150	1
 val_213	213	1
@@ -1998,7 +1998,7 @@ STAGE PLANS:
                       Statistics: Num rows: 12 Data size: 1128 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 12 Data size: 1128 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2026,7 +2026,7 @@ STAGE PLANS:
                     Statistics: Num rows: 6 Data size: 48 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col0 (type: double)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: double)
                       Statistics: Num rows: 6 Data size: 48 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2061,21 +2061,21 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src1
 #### A masked pattern was here ####
 67.0
-147.0
+129.0
 151.0
+214.0
 225.0
 239.0
-256.0
-274.0
 279.0
-370.0
-NULL
-99.0
-129.0
-214.0
-312.0
 402.0
 407.0
+NULL
+99.0
+147.0
+256.0
+274.0
+312.0
+370.0
 PREHOOK: query: explain select distinct count(a.value), count(b.value) from src a join src1 b on a.key=b.key group by a.key
 PREHOOK: type: QUERY
 PREHOOK: Input: default@src
@@ -2115,7 +2115,7 @@ STAGE PLANS:
                       Statistics: Num rows: 500 Data size: 89000 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 500 Data size: 89000 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2137,7 +2137,7 @@ STAGE PLANS:
                       Statistics: Num rows: 25 Data size: 4375 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 25 Data size: 4375 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2164,7 +2164,7 @@ STAGE PLANS:
                   Statistics: Num rows: 2 Data size: 206 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
                     key expressions: _col0 (type: string)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: string)
                     Statistics: Num rows: 2 Data size: 206 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2190,7 +2190,7 @@ STAGE PLANS:
                     Statistics: Num rows: 1 Data size: 16 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col0 (type: bigint), _col1 (type: bigint)
-                      null sort order: aa
+                      null sort order: zz
                       sort order: ++
                       Map-reduce partition columns: _col0 (type: bigint), _col1 (type: bigint)
                       Statistics: Num rows: 1 Data size: 16 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2268,7 +2268,7 @@ STAGE PLANS:
                       Statistics: Num rows: 12 Data size: 2100 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string), _col1 (type: string)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: string), _col1 (type: string)
                         Statistics: Num rows: 12 Data size: 2100 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2304,25 +2304,25 @@ POSTHOOK: query: select distinct * from (select distinct * from src1) as T
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src1
 #### A masked pattern was here ####
-	val_165
-	val_265
+	
+	val_27
 	val_409
+	val_484
 128	
+150	val_150
 213	val_213
 224	
+238	val_238
 273	val_273
+278	val_278
 401	val_401
 406	val_406
 98	val_98
-	
+	val_165
 	val_193
-	val_27
-	val_484
+	val_265
 146	val_146
-150	val_150
-238	val_238
 255	val_255
-278	val_278
 311	val_311
 369	
 66	val_66

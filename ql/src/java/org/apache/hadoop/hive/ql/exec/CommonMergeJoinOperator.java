@@ -29,6 +29,8 @@ import java.util.TreeSet;
 import org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.FloatWritable;
+import org.apache.hadoop.hive.ql.util.NullOrdering;
+import org.apache.hadoop.hive.serde.serdeConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -95,7 +97,9 @@ public class CommonMergeJoinOperator extends AbstractMapJoinOperator<CommonMerge
   // A field because we cannot multi-inherit.
   transient InterruptibleProcessing interruptChecker;
 
+  transient NullOrdering nullOrdering;
   transient private boolean shortcutUnmatchedRows;
+
   /** Kryo ctor. */
   protected CommonMergeJoinOperator() {
     super();
@@ -174,12 +178,24 @@ public class CommonMergeJoinOperator extends AbstractMapJoinOperator<CommonMerge
     sources = ((TezContext) MapredContext.get()).getRecordSources();
     interruptChecker = new InterruptibleProcessing();
 
-    if (sources[0] instanceof ReduceRecordSource &&
-        parentOperators != null && !parentOperators.isEmpty()) {
-      // Tell ReduceRecordSource to flush last record as this is a reduce
-      // side SMB
-      for (RecordSource source : sources) {
-        ((ReduceRecordSource) source).setFlushLastRecord(true);
+    nullOrdering = NullOrdering.NULLS_FIRST;
+    if (sources[0] instanceof ReduceRecordSource) {
+      ReduceRecordSource reduceRecordSource = (ReduceRecordSource) sources[0];
+      if (reduceRecordSource.getKeyTableDesc() != null &&
+              reduceRecordSource.getKeyTableDesc().getProperties() != null) {
+        String nullSortOrder = reduceRecordSource.getKeyTableDesc().getProperties()
+                .getProperty(serdeConstants.SERIALIZATION_NULL_SORT_ORDER);
+        if (nullOrdering != null && !nullSortOrder.isEmpty()) {
+          nullOrdering = NullOrdering.fromSign(nullSortOrder.charAt(0));
+        }
+      }
+      nullOrdering = NullOrdering.defaultNullOrder(hconf);
+      if (parentOperators != null && !parentOperators.isEmpty()) {
+        // Tell ReduceRecordSource to flush last record as this is a reduce
+        // side SMB
+        for (RecordSource source : sources) {
+          ((ReduceRecordSource) source).setFlushLastRecord(true);
+        }
       }
     }
   }
@@ -684,9 +700,9 @@ public class CommonMergeJoinOperator extends AbstractMapJoinOperator<CommonMerge
         return -1;
       }
     } else if (key_1 == null) {
-      return -1;
+      return nullOrdering.getNullValueOption().getCmpReturnValue();
     } else if (key_2 == null) {
-      return 1;
+      return -nullOrdering.getNullValueOption().getCmpReturnValue();
     }
 
     // The IEEE 754 floating point spec specifies that signed -0.0 and 0.0 should be treated as equal.

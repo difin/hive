@@ -89,8 +89,8 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@t1
 #### A masked pattern was here ####
 10	15
-42	42
 2	52
+42	42
 PREHOOK: query: SELECT t1.ROW__ID, t1.ROW__ID.writeId, a, b FROM t1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@t1
@@ -144,5 +144,5 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@t1
 #### A masked pattern was here ####
 10	15
-42	42
 2	52
+42	42

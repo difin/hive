@@ -64,7 +64,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 946 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1))
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 2 Data size: 946 Basic stats: COMPLETE Column stats: COMPLETE
@@ -106,5 +106,5 @@ POSTHOOK: query: select category, count(distinct id) from sketch_input group by 
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 #### A masked pattern was here ####
-b	10
 a	10
+b	10

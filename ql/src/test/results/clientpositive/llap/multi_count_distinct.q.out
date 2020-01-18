@@ -60,7 +60,7 @@ STAGE PLANS:
                       Statistics: Num rows: 13 Data size: 1313 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: int), _col1 (type: varchar(10)), _col2 (type: int), _col3 (type: bigint)
-                        null sort order: aaaa
+                        null sort order: zzzz
                         sort order: ++++
                         Map-reduce partition columns: _col0 (type: int), _col1 (type: varchar(10)), _col2 (type: int), _col3 (type: bigint)
                         Statistics: Num rows: 13 Data size: 1313 Basic stats: COMPLETE Column stats: COMPLETE
@@ -192,7 +192,7 @@ STAGE PLANS:
                       Statistics: Num rows: 22 Data size: 2222 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: varchar(10)), _col1 (type: int), _col2 (type: int), _col3 (type: bigint)
-                        null sort order: aaaa
+                        null sort order: zzzz
                         sort order: ++++
                         Map-reduce partition columns: _col0 (type: varchar(10)), _col1 (type: int), _col2 (type: int), _col3 (type: bigint)
                         Statistics: Num rows: 22 Data size: 2222 Basic stats: COMPLETE Column stats: COMPLETE
@@ -285,22 +285,22 @@ group by department_id, gender, education_level grouping sets
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@employee_n1
 #### A masked pattern was here ####
-5	NULL	M	NULL
 2	1	NULL	1
 2	2	NULL	1
 2	2	NULL	3
-3	3	NULL	NULL
+2	3	NULL	2
+2	4	NULL	1
+3	4	NULL	NULL
+5	NULL	M	NULL
 6	NULL	NULL	1
 6	NULL	NULL	2
 6	NULL	NULL	3
-5	NULL	F	NULL
-3	1	NULL	NULL
 2	1	NULL	2
 2	1	NULL	3
+3	1	NULL	NULL
 3	2	NULL	NULL
-2	3	NULL	2
-3	4	NULL	NULL
-2	4	NULL	1
+3	3	NULL	NULL
+5	NULL	F	NULL
 PREHOOK: query: create table test_count (c0 string, c1 string, c2 string, c3 string, c4 string, c5 string, c6 string, c7 string,
                          c8 string, c9 string, c10 string, c11 string, c12 string, c13 string, c14 string, c15 string,
                          c16 string, c17 string, c18 string, c19 string, c20 string, c21 string, c22 string, c23 string,
@@ -459,7 +459,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: string), _col1 (type: string), _col2 (type: string), _col3 (type: string), _col4 (type: string), _col5 (type: string), _col6 (type: string), _col7 (type: string), _col8 (type: string), _col9 (type: string), _col10 (type: string), _col11 (type: string), _col12 (type: string), _col13 (type: string), _col14 (type: string), _col15 (type: string), _col16 (type: string), _col17 (type: string), _col18 (type: string), _col19 (type: string), _col20 (type: string), _col21 (type: string), _col22 (type: string), _col23 (type: string), _col24 (type: string), _col25 (type: string), _col26 (type: string), _col27 (type: string), _col28 (type: string), _col29 (type: string), _col30 (type: string), _col31 (type: string), _col32 (type: string)
-                        null sort order: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                        null sort order: zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
                         numBuckets: -1
                         sort order: +++++++++++++++++++++++++++++++++
                         Map-reduce partition columns: _col0 (type: string), _col1 (type: string), _col2 (type: string), _col3 (type: string), _col4 (type: string), _col5 (type: string), _col6 (type: string), _col7 (type: string), _col8 (type: string), _col9 (type: string), _col10 (type: string), _col11 (type: string), _col12 (type: string), _col13 (type: string), _col14 (type: string), _col15 (type: string), _col16 (type: string), _col17 (type: string), _col18 (type: string), _col19 (type: string), _col20 (type: string), _col21 (type: string), _col22 (type: string), _col23 (type: string), _col24 (type: string), _col25 (type: string), _col26 (type: string), _col27 (type: string), _col28 (type: string), _col29 (type: string), _col30 (type: string), _col31 (type: string), _col32 (type: string)
@@ -518,7 +518,7 @@ STAGE PLANS:
                 Reduce Output Operator
                   bucketingVersion: 2
                   key expressions: _col0 (type: string), _col1 (type: string), _col2 (type: string), _col3 (type: string), _col4 (type: string), _col5 (type: string), _col6 (type: string), _col7 (type: string), _col8 (type: string), _col9 (type: string), _col10 (type: string), _col11 (type: string), _col12 (type: string), _col13 (type: string), _col14 (type: string), _col15 (type: string), _col16 (type: string), _col17 (type: string), _col18 (type: string), _col19 (type: string), _col20 (type: string), _col21 (type: string), _col22 (type: string), _col23 (type: string), _col24 (type: string), _col25 (type: string), _col26 (type: string), _col27 (type: string), _col28 (type: string), _col29 (type: string), _col30 (type: string), _col31 (type: string), _col32 (type: string), _col33 (type: bigint)
-                  null sort order: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                  null sort order: zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
                   numBuckets: -1
                   sort order: ++++++++++++++++++++++++++++++++++
                   Map-reduce partition columns: _col0 (type: string), _col1 (type: string), _col2 (type: string), _col3 (type: string), _col4 (type: string), _col5 (type: string), _col6 (type: string), _col7 (type: string), _col8 (type: string), _col9 (type: string), _col10 (type: string), _col11 (type: string), _col12 (type: string), _col13 (type: string), _col14 (type: string), _col15 (type: string), _col16 (type: string), _col17 (type: string), _col18 (type: string), _col19 (type: string), _col20 (type: string), _col21 (type: string), _col22 (type: string), _col23 (type: string), _col24 (type: string), _col25 (type: string), _col26 (type: string), _col27 (type: string), _col28 (type: string), _col29 (type: string), _col30 (type: string), _col31 (type: string), _col32 (type: string), _col33 (type: bigint)
@@ -674,7 +674,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: string), _col1 (type: string), _col2 (type: string), _col3 (type: string), _col4 (type: string), _col5 (type: string), _col6 (type: string), _col7 (type: string), _col8 (type: string), _col9 (type: string), _col10 (type: string), _col11 (type: string), _col12 (type: string), _col13 (type: string), _col14 (type: string), _col15 (type: string), _col16 (type: string), _col17 (type: string), _col18 (type: string), _col19 (type: string), _col20 (type: string), _col21 (type: string), _col22 (type: string), _col23 (type: string), _col24 (type: string), _col25 (type: string), _col26 (type: string), _col27 (type: string), _col28 (type: string), _col29 (type: string), _col30 (type: string), _col31 (type: string), _col32 (type: string), _col33 (type: string), _col34 (type: string), _col35 (type: string), _col36 (type: string), _col37 (type: string), _col38 (type: string), _col39 (type: string), _col40 (type: string), _col41 (type: string), _col42 (type: string), _col43 (type: string), _col44 (type: string), _col45 (type: string), _col46 (type: string), _col47 (type: string), _col48 (type: string), _col49 (type: string), _col50 (type: string), _col51 (type: string), _col52 (type: string), _col53 (type: string), _col54 (type: string), _col55 (type: string), _col56 (type: string), _col57 (type: string), _col58 (type: string), _col59 (type: string), _col60 (type: string), _col61 (type: string), _col62 (type: string), _col63 (type: string)
-                        null sort order: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                        null sort order: zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
                         numBuckets: -1
                         sort order: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                         Statistics: Num rows: 1 Data size: 6070 Basic stats: COMPLETE Column stats: COMPLETE

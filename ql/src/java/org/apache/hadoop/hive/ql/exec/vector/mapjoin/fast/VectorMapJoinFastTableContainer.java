@@ -18,6 +18,7 @@
 package org.apache.hadoop.hive.ql.exec.vector.mapjoin.fast;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.hadoop.hive.ql.exec.vector.mapjoin.hashtable.VectorMapJoinNonMatchedIterator;
 import org.apache.hadoop.conf.Configuration;
@@ -82,6 +83,11 @@ public class VectorMapJoinFastTableContainer implements VectorMapJoinTableContai
   @Override
   public VectorMapJoinDesc mapJoinDesc() {
     return (VectorMapJoinDesc) desc.getVectorDesc();
+  }
+
+  @Override
+  public Properties keyTableProperties() {
+    return desc.getKeyTblDesc().getProperties();
   }
 
   private VectorMapJoinFastHashTableContainerBase createHashTables(int newThreshold) {

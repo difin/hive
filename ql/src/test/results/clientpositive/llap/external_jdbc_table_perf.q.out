@@ -1676,7 +1676,7 @@ WHERE "ca_state" IN ('CO', 'IL', 'MN') AND "ca_address_sk" IS NOT NULL) AS "t4" 
                     Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
@@ -1711,7 +1711,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
@@ -1739,7 +1739,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
@@ -1774,7 +1774,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
@@ -1793,7 +1793,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                 Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
                 Reduce Output Operator
                   key expressions: _col0 (type: int)
-                  null sort order: a
+                  null sort order: z
                   sort order: +
                   Map-reduce partition columns: _col0 (type: int)
                   Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
@@ -1818,7 +1818,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                     Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
@@ -2160,7 +2160,7 @@ WHERE "ca_state" IN ('CO', 'IL', 'MN') AND "ca_address_sk" IS NOT NULL) AS "t4" 
                     Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
@@ -2195,7 +2195,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
@@ -2223,7 +2223,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
@@ -2258,7 +2258,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
@@ -2277,7 +2277,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                 Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
                 Reduce Output Operator
                   key expressions: _col0 (type: int)
-                  null sort order: a
+                  null sort order: z
                   sort order: +
                   Map-reduce partition columns: _col0 (type: int)
                   Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
@@ -2302,7 +2302,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                     Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
@@ -2603,7 +2603,7 @@ STAGE PLANS:
                       Statistics: Num rows: 3 Data size: 846 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(30)), _col1 (type: char(20)), _col2 (type: date)
-                        null sort order: aaa
+                        null sort order: zzz
                         sort order: +++
                         Map-reduce partition columns: _col0 (type: char(30)), _col1 (type: char(20)), _col2 (type: date)
                         Statistics: Num rows: 3 Data size: 846 Basic stats: COMPLETE Column stats: NONE
@@ -2628,7 +2628,7 @@ STAGE PLANS:
                       Statistics: Num rows: 3 Data size: 846 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(30)), _col1 (type: char(20)), _col2 (type: date)
-                        null sort order: aaa
+                        null sort order: zzz
                         sort order: +++
                         Map-reduce partition columns: _col0 (type: char(30)), _col1 (type: char(20)), _col2 (type: date)
                         Statistics: Num rows: 3 Data size: 846 Basic stats: COMPLETE Column stats: NONE
@@ -2653,7 +2653,7 @@ STAGE PLANS:
                       Statistics: Num rows: 3 Data size: 846 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(30)), _col1 (type: char(20)), _col2 (type: date)
-                        null sort order: aaa
+                        null sort order: zzz
                         sort order: +++
                         Map-reduce partition columns: _col0 (type: char(30)), _col1 (type: char(20)), _col2 (type: date)
                         Statistics: Num rows: 3 Data size: 846 Basic stats: COMPLETE Column stats: NONE
@@ -3013,7 +3013,7 @@ WHERE "d_year" = 2000 AND ("d_moy" = 1 AND "d_date_sk" IS NOT NULL)) AS "t6" ON 
                     Statistics: Num rows: 1 Data size: 212 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col65 (type: char(16))
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col65 (type: char(16))
                       Statistics: Num rows: 1 Data size: 212 Basic stats: COMPLETE Column stats: NONE
@@ -3048,7 +3048,7 @@ WHERE "d_year" = 2000 AND ("d_moy" = 1 AND "d_date_sk" IS NOT NULL)) AS "t6" ON 
                     Statistics: Num rows: 1 Data size: 212 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col76 (type: char(16))
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col76 (type: char(16))
                       Statistics: Num rows: 1 Data size: 212 Basic stats: COMPLETE Column stats: NONE
@@ -3083,7 +3083,7 @@ WHERE "d_year" = 2000 AND ("d_moy" = 1 AND "d_date_sk" IS NOT NULL)) AS "t6" ON 
                     Statistics: Num rows: 1 Data size: 212 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col76 (type: char(16))
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col76 (type: char(16))
                       Statistics: Num rows: 1 Data size: 212 Basic stats: COMPLETE Column stats: NONE
@@ -3114,19 +3114,19 @@ WHERE "i_color" IN ('orchid              ', 'chiffon             ', 'lace       
                       Statistics: Num rows: 1 Data size: 100 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(16))
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: char(16))
                         Statistics: Num rows: 1 Data size: 100 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(16))
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: char(16))
                         Statistics: Num rows: 1 Data size: 100 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(16))
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: char(16))
                         Statistics: Num rows: 1 Data size: 100 Basic stats: COMPLETE Column stats: NONE
@@ -3152,7 +3152,7 @@ WHERE "i_color" IN ('orchid              ', 'chiffon             ', 'lace       
                   Statistics: Num rows: 1 Data size: 233 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 1 Data size: 233 Basic stats: COMPLETE Column stats: NONE
@@ -3175,7 +3175,7 @@ WHERE "i_color" IN ('orchid              ', 'chiffon             ', 'lace       
                   Statistics: Num rows: 3 Data size: 699 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 3 Data size: 699 Basic stats: COMPLETE Column stats: NONE
@@ -3200,7 +3200,7 @@ WHERE "i_color" IN ('orchid              ', 'chiffon             ', 'lace       
                   Statistics: Num rows: 1 Data size: 233 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 1 Data size: 233 Basic stats: COMPLETE Column stats: NONE
@@ -3223,7 +3223,7 @@ WHERE "i_color" IN ('orchid              ', 'chiffon             ', 'lace       
                   Statistics: Num rows: 3 Data size: 699 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 3 Data size: 699 Basic stats: COMPLETE Column stats: NONE
@@ -3286,7 +3286,7 @@ WHERE "i_color" IN ('orchid              ', 'chiffon             ', 'lace       
                   Statistics: Num rows: 1 Data size: 233 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 1 Data size: 233 Basic stats: COMPLETE Column stats: NONE
@@ -3309,7 +3309,7 @@ WHERE "i_color" IN ('orchid              ', 'chiffon             ', 'lace       
                   Statistics: Num rows: 3 Data size: 699 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 3 Data size: 699 Basic stats: COMPLETE Column stats: NONE
@@ -3708,7 +3708,7 @@ WHERE "d_date" IS NOT NULL AND "d_date_sk" IS NOT NULL) AS "t4" ON "t2"."sr_retu
                     Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col44 (type: date)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col44 (type: date)
                       Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
@@ -3740,7 +3740,7 @@ WHERE "d_date" IS NOT NULL AND "d_date_sk" IS NOT NULL) AS "t4" ON "t0"."cr_retu
                     Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col51 (type: date)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col51 (type: date)
                       Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
@@ -3765,7 +3765,7 @@ WHERE "d_week_seq" IS NOT NULL AND "d_date" IS NOT NULL
                     Statistics: Num rows: 1 Data size: 60 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col4 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col4 (type: int)
                       Statistics: Num rows: 1 Data size: 60 Basic stats: COMPLETE Column stats: NONE
@@ -3797,7 +3797,7 @@ WHERE "d_date" IS NOT NULL AND "d_date_sk" IS NOT NULL) AS "t4" ON "t0"."wr_retu
                     Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col48 (type: date)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col48 (type: date)
                       Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
@@ -3822,7 +3822,7 @@ WHERE "d_date" IS NOT NULL AND "d_week_seq" IS NOT NULL
                     Statistics: Num rows: 1 Data size: 60 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col4 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col4 (type: int)
                       Statistics: Num rows: 1 Data size: 60 Basic stats: COMPLETE Column stats: NONE
@@ -3853,13 +3853,13 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
@@ -3888,13 +3888,13 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                     Statistics: Num rows: 1 Data size: 66 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: date)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: date)
                       Statistics: Num rows: 1 Data size: 66 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: date)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: date)
                       Statistics: Num rows: 1 Data size: 66 Basic stats: COMPLETE Column stats: NONE
@@ -3918,7 +3918,7 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                   Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
@@ -3938,7 +3938,7 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                   Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
@@ -3963,7 +3963,7 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                   Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
@@ -3983,7 +3983,7 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                   Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
@@ -4008,7 +4008,7 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                   Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
@@ -4028,7 +4028,7 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                   Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(16))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(16))
                     Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
@@ -4046,7 +4046,7 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                 Statistics: Num rows: 1 Data size: 193 Basic stats: COMPLETE Column stats: NONE
                 Reduce Output Operator
                   key expressions: _col0 (type: char(16))
-                  null sort order: a
+                  null sort order: z
                   sort order: +
                   Map-reduce partition columns: _col0 (type: char(16))
                   Statistics: Num rows: 1 Data size: 193 Basic stats: COMPLETE Column stats: NONE
@@ -4118,7 +4118,7 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                     Statistics: Num rows: 1 Data size: 66 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: date)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: date)
                       Statistics: Num rows: 1 Data size: 66 Basic stats: COMPLETE Column stats: NONE
@@ -4338,7 +4338,7 @@ WHERE "d_year" = 1999 AND ("d_moy" = 3 AND "d_date_sk" IS NOT NULL)) AS "t6" ON 
                     Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col77 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col77 (type: int)
                       Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
@@ -4373,7 +4373,7 @@ WHERE "d_year" = 1999 AND ("d_moy" = 3 AND "d_date_sk" IS NOT NULL)) AS "t6" ON 
                     Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col88 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col88 (type: int)
                       Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
@@ -4408,7 +4408,7 @@ WHERE "d_year" = 1999 AND ("d_moy" = 3 AND "d_date_sk" IS NOT NULL)) AS "t6" ON 
                     Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col88 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col88 (type: int)
                       Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
@@ -4439,19 +4439,19 @@ WHERE "i_category" = 'Books                                             ' AND "i
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
@@ -4477,7 +4477,7 @@ WHERE "i_category" = 'Books                                             ' AND "i
                   Statistics: Num rows: 1 Data size: 127 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: int)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: int)
                     Statistics: Num rows: 1 Data size: 127 Basic stats: COMPLETE Column stats: NONE
@@ -4500,7 +4500,7 @@ WHERE "i_category" = 'Books                                             ' AND "i
                   Statistics: Num rows: 3 Data size: 381 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: int)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: int)
                     Statistics: Num rows: 3 Data size: 381 Basic stats: COMPLETE Column stats: NONE
@@ -4525,7 +4525,7 @@ WHERE "i_category" = 'Books                                             ' AND "i
                   Statistics: Num rows: 1 Data size: 127 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: int)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: int)
                     Statistics: Num rows: 1 Data size: 127 Basic stats: COMPLETE Column stats: NONE
@@ -4548,7 +4548,7 @@ WHERE "i_category" = 'Books                                             ' AND "i
                   Statistics: Num rows: 3 Data size: 381 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: int)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: int)
                     Statistics: Num rows: 3 Data size: 381 Basic stats: COMPLETE Column stats: NONE
@@ -4611,7 +4611,7 @@ WHERE "i_category" = 'Books                                             ' AND "i
                   Statistics: Num rows: 1 Data size: 127 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: int)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: int)
                     Statistics: Num rows: 1 Data size: 127 Basic stats: COMPLETE Column stats: NONE
@@ -4634,7 +4634,7 @@ WHERE "i_category" = 'Books                                             ' AND "i
                   Statistics: Num rows: 3 Data size: 381 Basic stats: COMPLETE Column stats: NONE
                   Reduce Output Operator
                     key expressions: _col0 (type: int)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: int)
                     Statistics: Num rows: 3 Data size: 381 Basic stats: COMPLETE Column stats: NONE
@@ -6411,7 +6411,7 @@ WHERE "ca_state" IN ('CO', 'IL', 'MN') AND "ca_address_sk" IS NOT NULL) AS "t4" 
                     Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
@@ -6446,7 +6446,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
@@ -6475,7 +6475,7 @@ GROUP BY "t0"."ws_bill_customer_sk"
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
@@ -6505,7 +6505,7 @@ GROUP BY "t0"."cs_ship_customer_sk"
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
@@ -6525,7 +6525,7 @@ GROUP BY "t0"."cs_ship_customer_sk"
                 Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
                 Reduce Output Operator
                   key expressions: _col0 (type: int)
-                  null sort order: a
+                  null sort order: z
                   sort order: +
                   Map-reduce partition columns: _col0 (type: int)
                   Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
@@ -6550,7 +6550,7 @@ GROUP BY "t0"."cs_ship_customer_sk"
                     Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
@@ -6899,7 +6899,7 @@ WHERE "ca_state" IN ('CO', 'IL', 'MN') AND "ca_address_sk" IS NOT NULL) AS "t4" 
                     Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
@@ -6934,7 +6934,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL))
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
@@ -6963,7 +6963,7 @@ GROUP BY "t0"."ws_bill_customer_sk"
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
@@ -6993,7 +6993,7 @@ GROUP BY "t0"."cs_ship_customer_sk"
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
@@ -7013,7 +7013,7 @@ GROUP BY "t0"."cs_ship_customer_sk"
                 Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
                 Reduce Output Operator
                   key expressions: _col0 (type: int)
-                  null sort order: a
+                  null sort order: z
                   sort order: +
                   Map-reduce partition columns: _col0 (type: int)
                   Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
@@ -7038,7 +7038,7 @@ GROUP BY "t0"."cs_ship_customer_sk"
                     Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE

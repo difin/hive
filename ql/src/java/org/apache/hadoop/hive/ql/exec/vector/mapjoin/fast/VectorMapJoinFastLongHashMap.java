@@ -21,6 +21,10 @@ package org.apache.hadoop.hive.ql.exec.vector.mapjoin.fast;
 import java.io.IOException;
 
 import org.apache.hadoop.hive.common.MemoryEstimate;
+import org.apache.hadoop.hive.ql.plan.TableDesc;
+import org.apache.hadoop.hive.ql.util.JavaDataModel;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.JoinUtil;
 import org.apache.hadoop.hive.ql.exec.persistence.MatchTracker;
 import org.apache.hadoop.hive.ql.exec.vector.mapjoin.hashtable.VectorMapJoinHashMapResult;
@@ -253,10 +257,10 @@ public class VectorMapJoinFastLongHashMap
       boolean isFullOuter,
       boolean minMaxEnabled,
       HashTableKeyType hashTableKeyType,
-      int initialCapacity, float loadFactor, int writeBuffersSize, long estimatedKeyCount) {
+      int initialCapacity, float loadFactor, int writeBuffersSize, long estimatedKeyCount, TableDesc tableDesc) {
     super(
         isFullOuter, minMaxEnabled, hashTableKeyType,
-        initialCapacity, loadFactor, writeBuffersSize, estimatedKeyCount);
+        initialCapacity, loadFactor, writeBuffersSize, estimatedKeyCount, tableDesc);
     valueStore = new VectorMapJoinFastValueStore(writeBuffersSize);
     fullOuterNullKeyValueRef = 0;
   }

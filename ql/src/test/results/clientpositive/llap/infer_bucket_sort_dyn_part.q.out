@@ -161,7 +161,7 @@ Partition Parameters:
 	numFiles            	2                   
 	numRows             	309                 
 	rawDataSize         	1173                
-	totalSize           	1425                
+	totalSize           	1427                
 #### A masked pattern was here ####
 	 	 
 # Storage Information	 	 
@@ -263,7 +263,7 @@ Partition Parameters:
 	numFiles            	2                   
 	numRows             	155                 
 	rawDataSize         	586                 
-	totalSize           	799                 
+	totalSize           	796                 
 #### A masked pattern was here ####
 	 	 
 # Storage Information	 	 
@@ -454,7 +454,7 @@ STAGE PLANS:
                       Statistics: Num rows: 316 Data size: 30020 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 316 Data size: 30020 Basic stats: COMPLETE Column stats: COMPLETE
@@ -495,7 +495,7 @@ STAGE PLANS:
                       Statistics: Num rows: 1 Data size: 652 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string), _col1 (type: string)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: string), _col1 (type: string)
                         Statistics: Num rows: 1 Data size: 652 Basic stats: COMPLETE Column stats: COMPLETE

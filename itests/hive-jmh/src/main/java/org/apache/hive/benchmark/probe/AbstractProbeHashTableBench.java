@@ -24,6 +24,7 @@ import org.apache.hadoop.hive.ql.exec.vector.mapjoin.hashtable.VectorMapJoinHash
 import org.apache.hadoop.hive.ql.exec.vector.mapjoin.hashtable.VectorMapJoinHashTable;
 import org.apache.hadoop.hive.ql.exec.vector.mapjoin.hashtable.VectorMapJoinLongHashMap;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc;
 import org.apache.hadoop.hive.serde2.ByteStream.Output;
 import org.apache.hadoop.hive.serde2.binarysortable.fast.BinarySortableSerializeWrite;
@@ -43,6 +44,7 @@ import org.openjdk.jmh.annotations.Warmup;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -82,7 +84,7 @@ public abstract class AbstractProbeHashTableBench {
   protected VectorMapJoinHashTable getLongHashMap(LongColumnVector lcv) throws HiveException, IOException {
     VectorMapJoinHashTable ht =
         new VectorMapJoinFastLongHashMap(false, false, VectorMapJoinDesc.HashTableKeyType.LONG,
-            INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1);
+            INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1, createTableDesc());
     Random random = new Random();
     byte[] value = new byte[random.nextInt(1000)];
 
@@ -102,10 +104,16 @@ public abstract class AbstractProbeHashTableBench {
     return ht;
   }
 
+  private TableDesc createTableDesc() {
+    TableDesc tableDesc = new TableDesc();
+    tableDesc.setProperties(new Properties());
+    return tableDesc;
+  }
+
   protected VectorMapJoinHashTable getLongHashSet(LongColumnVector lcv) throws HiveException, IOException {
     VectorMapJoinHashTable ht =
         new VectorMapJoinFastLongHashSet(false, false, VectorMapJoinDesc.HashTableKeyType.LONG,
-            INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1);
+            INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1, createTableDesc());
     Random random = new Random();
     byte[] value = new byte[random.nextInt(1000)];
 
@@ -128,7 +136,7 @@ public abstract class AbstractProbeHashTableBench {
   protected VectorMapJoinHashTable getLongHashMultiSet(LongColumnVector lcv) throws HiveException, IOException {
     VectorMapJoinHashTable ht =
         new VectorMapJoinFastLongHashMultiSet(false, false, VectorMapJoinDesc.HashTableKeyType.LONG,
-            INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1);
+            INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1, createTableDesc());
     Random random = new Random();
     byte[] value = new byte[random.nextInt(1000)];
 
@@ -164,8 +172,8 @@ public abstract class AbstractProbeHashTableBench {
   }
 
   protected VectorMapJoinHashTable getBytesHashMap(BytesColumnVector bcv) throws HiveException, IOException {
-    VectorMapJoinHashTable ht =
-        new VectorMapJoinFastStringHashMap(false, INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1);
+    VectorMapJoinHashTable ht = new VectorMapJoinFastStringHashMap(
+        false, INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1, createTableDesc());
     Random random = new Random();
     byte[] strRandValue = new byte[10];
     for (int i = 0; i < 10; i++) {
@@ -200,8 +208,8 @@ public abstract class AbstractProbeHashTableBench {
   }
 
   protected VectorMapJoinHashTable getBytesHashSet(BytesColumnVector bcv) throws HiveException, IOException {
-    VectorMapJoinHashTable ht =
-        new VectorMapJoinFastStringHashSet(false, INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1);
+    VectorMapJoinHashTable ht = new VectorMapJoinFastStringHashSet(
+        false, INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1, createTableDesc());
     Random random = new Random();
     byte[] strRandValue = new byte[10];
     for (int i = 0; i < 10; i++) {
@@ -236,8 +244,8 @@ public abstract class AbstractProbeHashTableBench {
   }
 
   protected VectorMapJoinHashTable getBytesHashMultiSet(BytesColumnVector bcv) throws HiveException, IOException {
-    VectorMapJoinHashTable ht =
-        new VectorMapJoinFastStringHashMultiSet(false, INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1);
+    VectorMapJoinHashTable ht = new VectorMapJoinFastStringHashMultiSet(
+        false, INIT_CAPACITY, LOAD_FACTOR, WBUFFER_SIZE, -1, createTableDesc());
     Random random = new Random();
     byte[] strRandValue = new byte[10];
     for (int i = 0; i < 10; i++) {

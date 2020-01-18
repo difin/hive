@@ -137,7 +137,7 @@ Table:              	test_table_n14
 #### A masked pattern was here ####
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
-	numFiles            	70                  
+	numFiles            	71                  
 	numRows             	1028                
 	rawDataSize         	10968               
 	totalSize           	11996               
@@ -186,7 +186,7 @@ Table:              	test_table_n14
 #### A masked pattern was here ####
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
-	numFiles            	84                  
+	numFiles            	88                  
 	numRows             	2654                
 	rawDataSize         	28466               
 	totalSize           	31120               

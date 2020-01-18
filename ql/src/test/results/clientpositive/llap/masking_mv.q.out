@@ -285,7 +285,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
@@ -323,10 +323,10 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@masking_test_n_mv
 POSTHOOK: Input: default@masking_test_view_n_mv
 #### A masked pattern was here ####
-8
 0
 2
 4
+8
 PREHOOK: query: explain
 select value from `masking_test_n_mv` group by value
 PREHOOK: type: QUERY
@@ -372,7 +372,7 @@ STAGE PLANS:
                         Statistics: Num rows: 2 Data size: 368 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: _col0 (type: string)
-                          null sort order: a
+                          null sort order: z
                           sort order: +
                           Map-reduce partition columns: _col0 (type: string)
                           Statistics: Num rows: 2 Data size: 368 Basic stats: COMPLETE Column stats: COMPLETE
@@ -410,10 +410,10 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@masking_test_n_mv
 POSTHOOK: Input: default@masking_test_view_n_mv_3
 #### A masked pattern was here ####
-0_lav
-8_lav
 2_lav
 4_lav
+0_lav
+8_lav
 PREHOOK: query: explain
 select value, sum(key) from `masking_test_n_mv` group by value
 PREHOOK: type: QUERY
@@ -460,7 +460,7 @@ STAGE PLANS:
                         Statistics: Num rows: 2 Data size: 384 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: _col0 (type: string)
-                          null sort order: a
+                          null sort order: z
                           sort order: +
                           Map-reduce partition columns: _col0 (type: string)
                           Statistics: Num rows: 2 Data size: 384 Basic stats: COMPLETE Column stats: COMPLETE
@@ -500,10 +500,10 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@masking_test_n_mv
 POSTHOOK: Input: default@masking_test_view_n_mv_3
 #### A masked pattern was here ####
-0_lav	0
-8_lav	8
 2_lav	2
 4_lav	4
+0_lav	0
+8_lav	8
 PREHOOK: query: create materialized view `masking_test_view_n_mv_4` as
 select key, value from `masking_test_n_mv`
 PREHOOK: type: CREATE_MATERIALIZED_VIEW
@@ -565,7 +565,7 @@ STAGE PLANS:
                         Statistics: Num rows: 2 Data size: 368 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: _col0 (type: string)
-                          null sort order: a
+                          null sort order: z
                           sort order: +
                           Map-reduce partition columns: _col0 (type: string)
                           Statistics: Num rows: 2 Data size: 368 Basic stats: COMPLETE Column stats: COMPLETE
@@ -605,10 +605,10 @@ POSTHOOK: Input: default@masking_test_n_mv
 POSTHOOK: Input: default@masking_test_view_n_mv_3
 POSTHOOK: Input: default@masking_test_view_n_mv_4
 #### A masked pattern was here ####
-0_lav
-8_lav
 2_lav
 4_lav
+0_lav
+8_lav
 PREHOOK: query: explain
 select value, sum(key) from `masking_test_n_mv` group by value
 PREHOOK: type: QUERY
@@ -657,7 +657,7 @@ STAGE PLANS:
                         Statistics: Num rows: 2 Data size: 384 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: _col0 (type: string)
-                          null sort order: a
+                          null sort order: z
                           sort order: +
                           Map-reduce partition columns: _col0 (type: string)
                           Statistics: Num rows: 2 Data size: 384 Basic stats: COMPLETE Column stats: COMPLETE
@@ -699,10 +699,10 @@ POSTHOOK: Input: default@masking_test_n_mv
 POSTHOOK: Input: default@masking_test_view_n_mv_3
 POSTHOOK: Input: default@masking_test_view_n_mv_4
 #### A masked pattern was here ####
-0_lav	0
-8_lav	8
 2_lav	2
 4_lav	4
+0_lav	0
+8_lav	8
 PREHOOK: query: create table `srcTnx` stored as orc TBLPROPERTIES ('transactional'='true') as
 select cast(key as int) as key, value from src
 PREHOOK: type: CREATETABLE_AS_SELECT

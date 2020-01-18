@@ -1338,7 +1338,7 @@ STAGE PLANS:
                       Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
@@ -1931,7 +1931,7 @@ STAGE PLANS:
                       Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
@@ -1975,21 +1975,21 @@ POSTHOOK: Input: default@decimal_udf
 #### A masked pattern was here ####
 -1255	0.0	0.0
 -1	0.0	0.0
-1	0.05928102563215448	0.003514240000000157
+0	0.22561046704494161	0.05090008284023669
+3	0.0	0.0
 10	0.0	0.0
-124	0.0	0.0
-125	0.0	0.0
+100	0.0	0.0
 200	0.0	0.0
-4400	0.0	0.0
-1234567890	0.0	0.0
 -1234567890	0.0	0.0
 -11	0.0	0.0
-0	0.22561046704494161	0.05090008284023669
+1	0.05928102563215448	0.003514240000000157
 2	0.0	0.0
-3	0.0	0.0
 4	0.0	0.0
 20	0.0	0.0
-100	0.0	0.0
+124	0.0	0.0
+125	0.0	0.0
+4400	0.0	0.0
+1234567890	0.0	0.0
 PREHOOK: query: EXPLAIN SELECT value, stddev_samp(key), var_samp(key) FROM DECIMAL_UDF GROUP BY value
 PREHOOK: type: QUERY
 PREHOOK: Input: default@decimal_udf
@@ -2028,7 +2028,7 @@ STAGE PLANS:
                       Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
@@ -2072,21 +2072,21 @@ POSTHOOK: Input: default@decimal_udf
 #### A masked pattern was here ####
 -1255	NULL	NULL
 -1	0.0	0.0
-1	0.06627820154470243	0.0043928000000001965
+0	0.23482281918556472	0.05514175641025642
+3	0.0	0.0
 10	NULL	NULL
-124	NULL	NULL
-125	NULL	NULL
+100	NULL	NULL
 200	NULL	NULL
-4400	NULL	NULL
-1234567890	NULL	NULL
 -1234567890	NULL	NULL
 -11	NULL	NULL
-0	0.23482281918556472	0.05514175641025642
+1	0.06627820154470243	0.0043928000000001965
 2	0.0	0.0
-3	0.0	0.0
 4	NULL	NULL
 20	NULL	NULL
-100	NULL	NULL
+124	NULL	NULL
+125	NULL	NULL
+4400	NULL	NULL
+1234567890	NULL	NULL
 PREHOOK: query: EXPLAIN SELECT histogram_numeric(key, 3) FROM DECIMAL_UDF
 PREHOOK: type: QUERY
 PREHOOK: Input: default@decimal_udf

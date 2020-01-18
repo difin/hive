@@ -95,8 +95,8 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@mv_1
 POSTHOOK: Input: default@sketch_input
 #### A masked pattern was here ####
-b	10.0
 a	10.0
+b	10.0
 PREHOOK: query: explain
 select round(ds_hll_estimate(ds_hll_sketch(id))) from sketch_input
 PREHOOK: type: QUERY

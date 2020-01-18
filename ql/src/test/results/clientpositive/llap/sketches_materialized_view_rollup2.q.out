@@ -95,8 +95,8 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@mv_1
 POSTHOOK: Input: default@sketch_input
 #### A masked pattern was here ####
-rewrite; mv matching	b	10
 rewrite; mv matching	a	10
+rewrite; mv matching	b	10
 PREHOOK: query: explain
 select 'no rewrite; no mv usage', category, count(distinct id) from sketch_input group by category
 PREHOOK: type: QUERY
@@ -136,7 +136,7 @@ STAGE PLANS:
                       Statistics: Num rows: 11 Data size: 979 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1)), _col1 (type: int)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 11 Data size: 979 Basic stats: COMPLETE Column stats: COMPLETE
@@ -242,7 +242,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 946 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1))
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 2 Data size: 946 Basic stats: COMPLETE Column stats: COMPLETE
@@ -284,8 +284,8 @@ POSTHOOK: query: select 'rewrite; but no mv usage', category, count(distinct id)
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 #### A masked pattern was here ####
-rewrite; but no mv usage	b	10
 rewrite; but no mv usage	a	10
+rewrite; but no mv usage	b	10
 PREHOOK: query: explain
 alter materialized view mv_1 rebuild
 PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
@@ -338,7 +338,7 @@ STAGE PLANS:
                         Statistics: Num rows: 2 Data size: 962 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: _col0 (type: char(1))
-                          null sort order: a
+                          null sort order: z
                           sort order: +
                           Map-reduce partition columns: _col0 (type: char(1))
                           Statistics: Num rows: 2 Data size: 962 Basic stats: COMPLETE Column stats: COMPLETE
@@ -363,7 +363,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 962 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1))
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 2 Data size: 962 Basic stats: COMPLETE Column stats: COMPLETE
@@ -388,7 +388,7 @@ STAGE PLANS:
                   Statistics: Num rows: 2 Data size: 962 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(1))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(1))
                     Statistics: Num rows: 2 Data size: 962 Basic stats: COMPLETE Column stats: COMPLETE
@@ -546,8 +546,8 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@mv_1
 POSTHOOK: Input: default@sketch_input
 #### A masked pattern was here ####
-rewrite; mv matching	b	10
 rewrite; mv matching	a	10
+rewrite; mv matching	b	10
 PREHOOK: query: explain
 select 'rewrite;mv matching with rollup',count(distinct id) from sketch_input
 PREHOOK: type: QUERY

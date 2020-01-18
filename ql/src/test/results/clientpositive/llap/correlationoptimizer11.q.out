@@ -80,7 +80,7 @@ STAGE PLANS:
                       Statistics: Num rows: 100 Data size: 8700 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 100 Data size: 8700 Basic stats: COMPLETE Column stats: COMPLETE
@@ -101,7 +101,7 @@ STAGE PLANS:
                       Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
@@ -127,7 +127,7 @@ STAGE PLANS:
                   Statistics: Num rows: 7 Data size: 665 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
                     key expressions: _col0 (type: string)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: string)
                     Statistics: Num rows: 7 Data size: 665 Basic stats: COMPLETE Column stats: COMPLETE
@@ -175,9 +175,9 @@ POSTHOOK: Input: default@part_table_n1
 POSTHOOK: Input: default@part_table_n1@partitionid=1
 POSTHOOK: Input: default@part_table_n1@partitionid=2
 #### A masked pattern was here ####
+146	2
 128	3
 150	1
-146	2
 PREHOOK: query: EXPLAIN
 SELECT x.key AS key, count(1) AS cnt
 FROM part_table_n1 x JOIN part_table_n1 y ON (x.key = y.key)
@@ -228,7 +228,7 @@ STAGE PLANS:
                       Statistics: Num rows: 100 Data size: 8700 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 100 Data size: 8700 Basic stats: COMPLETE Column stats: COMPLETE
@@ -249,7 +249,7 @@ STAGE PLANS:
                       Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
@@ -275,7 +275,7 @@ STAGE PLANS:
                   Statistics: Num rows: 7 Data size: 665 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
                     key expressions: _col0 (type: string)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: string)
                     Statistics: Num rows: 7 Data size: 665 Basic stats: COMPLETE Column stats: COMPLETE
@@ -323,9 +323,9 @@ POSTHOOK: Input: default@part_table_n1
 POSTHOOK: Input: default@part_table_n1@partitionid=1
 POSTHOOK: Input: default@part_table_n1@partitionid=2
 #### A masked pattern was here ####
+146	2
 128	3
 150	1
-146	2
 PREHOOK: query: EXPLAIN
 SELECT x.key AS key, count(1) AS cnt
 FROM part_table_n1 x JOIN part_table_n1 y ON (x.key = y.key)
@@ -374,7 +374,7 @@ STAGE PLANS:
                       Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
@@ -395,7 +395,7 @@ STAGE PLANS:
                       Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
@@ -421,7 +421,7 @@ STAGE PLANS:
                   Statistics: Num rows: 16 Data size: 1504 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
                     key expressions: _col0 (type: string)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: string)
                     Statistics: Num rows: 16 Data size: 1504 Basic stats: COMPLETE Column stats: COMPLETE
@@ -468,21 +468,21 @@ POSTHOOK: Input: default@part_table_n1
 POSTHOOK: Input: default@part_table_n1@partitionid=2
 #### A masked pattern was here ####
 	100
-128	1
-150	1
-213	1
-255	1
-401	1
-66	1
 146	1
-224	1
-238	1
+213	1
 273	1
-278	1
 311	1
 369	1
 406	1
+66	1
 98	1
+128	1
+150	1
+224	1
+238	1
+255	1
+278	1
+401	1
 PREHOOK: query: EXPLAIN
 SELECT x.key AS key, count(1) AS cnt
 FROM part_table_n1 x JOIN part_table_n1 y ON (x.key = y.key)
@@ -531,7 +531,7 @@ STAGE PLANS:
                       Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
@@ -552,7 +552,7 @@ STAGE PLANS:
                       Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 25 Data size: 2150 Basic stats: COMPLETE Column stats: COMPLETE
@@ -578,7 +578,7 @@ STAGE PLANS:
                   Statistics: Num rows: 16 Data size: 1504 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
                     key expressions: _col0 (type: string)
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: string)
                     Statistics: Num rows: 16 Data size: 1504 Basic stats: COMPLETE Column stats: COMPLETE
@@ -625,18 +625,18 @@ POSTHOOK: Input: default@part_table_n1
 POSTHOOK: Input: default@part_table_n1@partitionid=2
 #### A masked pattern was here ####
 	100
-128	1
-150	1
-213	1
-255	1
-401	1
-66	1
 146	1
-224	1
-238	1
+213	1
 273	1
-278	1
 311	1
 369	1
 406	1
+66	1
 98	1
+128	1
+150	1
+224	1
+238	1
+255	1
+278	1
+401	1

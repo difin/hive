@@ -233,7 +233,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 480 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: date)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: date)
                         Reduce Sink Vectorization:
@@ -278,8 +278,8 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@item_dim_dt
 POSTHOOK: Input: default@orders_fact_dt
 #### A masked pattern was here ####
-2002-01-30	2002-01-30	Item 102	2012-04-30 00:00:00
 2001-01-30	2001-01-30	Item 101	2011-01-30 00:00:00
+2002-01-30	2002-01-30	Item 102	2012-04-30 00:00:00
 PREHOOK: query: CREATE TABLE item_dim_str (key1 string, name string) stored as ORC
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
@@ -515,7 +515,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 736 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Reduce Sink Vectorization:
@@ -560,8 +560,8 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@item_dim_str
 POSTHOOK: Input: default@orders_fact_str
 #### A masked pattern was here ####
-2002-01-30 00:00:00	2002-01-30 00:00:00	Item 102	2012-04-30 00:00:00
 2001-01-30 00:00:00	2001-01-30 00:00:00	Item 101	2011-01-30 00:00:00
+2002-01-30 00:00:00	2002-01-30 00:00:00	Item 102	2012-04-30 00:00:00
 PREHOOK: query: CREATE TABLE item_dim_ts (key1 timestamp, name string) stored as ORC
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
@@ -797,7 +797,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 448 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: timestamp)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: timestamp)
                         Reduce Sink Vectorization:
@@ -842,5 +842,5 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@item_dim_ts
 POSTHOOK: Input: default@orders_fact_ts
 #### A masked pattern was here ####
-2002-01-30 09:10:11	2002-01-30 09:10:11	Item 102	2012-04-30 00:00:00
 2001-01-30 10:11:12	2001-01-30 10:11:12	Item 101	2011-01-30 00:00:00
+2002-01-30 09:10:11	2002-01-30 09:10:11	Item 102	2012-04-30 00:00:00

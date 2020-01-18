@@ -46,8 +46,8 @@ POSTHOOK: query: select category, ds_hll_estimate(sketch) from sketch_intermedia
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_intermediate
 #### A masked pattern was here ####
-b	10.000000223517425
 a	10.000000223517425
+b	10.000000223517425
 PREHOOK: query: select ds_hll_estimate(ds_hll_union(sketch)) from sketch_intermediate
 PREHOOK: type: QUERY
 PREHOOK: Input: default@sketch_intermediate

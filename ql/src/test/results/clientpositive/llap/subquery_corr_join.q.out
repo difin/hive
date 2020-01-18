@@ -111,8 +111,8 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@alltypesagg
 POSTHOOK: Input: default@alltypestiny
 #### A masked pattern was here ####
-NULL	NULL	false
 5	6	true
+NULL	NULL	false
 Warning: Shuffle Join MERGEJOIN[58][tables = [$hdt$_1, $hdt$_2]] in Stage 'Reducer 4' is a cross product
 Warning: Shuffle Join MERGEJOIN[60][tables = [$hdt$_2, $hdt$_3]] in Stage 'Reducer 6' is a cross product
 PREHOOK: query: explain cbo select *
@@ -281,5 +281,5 @@ POSTHOOK: Input: default@ta
 POSTHOOK: Input: default@tb
 POSTHOOK: Input: default@tc
 #### A masked pattern was here ####
-NULL	a3
 2	a2
+NULL	a3

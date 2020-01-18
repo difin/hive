@@ -46,8 +46,8 @@ POSTHOOK: query: select category, ds_theta_estimate(sketch) from sketch_intermed
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_intermediate
 #### A masked pattern was here ####
-b	10.0
 a	10.0
+b	10.0
 PREHOOK: query: select ds_theta_estimate(ds_theta_union(sketch)) from sketch_intermediate
 PREHOOK: type: QUERY
 PREHOOK: Input: default@sketch_intermediate

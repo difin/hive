@@ -21,11 +21,14 @@ package org.apache.hadoop.hive.ql.exec.vector.mapjoin.hashtable;
 import org.apache.hadoop.hive.ql.exec.persistence.MapJoinTableContainer;
 import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc;
 
+import java.util.Properties;
+
 public interface VectorMapJoinTableContainer extends MapJoinTableContainer {
 
   VectorMapJoinHashTable vectorMapJoinHashTable();
 
   VectorMapJoinDesc mapJoinDesc();
 
+  Properties keyTableProperties();
   // com.esotericsoftware.kryo.io.Output getHybridBigTableSpillOutput(int partitionId);
 }

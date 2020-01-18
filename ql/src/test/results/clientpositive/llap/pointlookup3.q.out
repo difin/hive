@@ -421,7 +421,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
@@ -491,7 +491,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
@@ -665,7 +665,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
@@ -735,7 +735,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
@@ -1813,7 +1813,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
@@ -1883,7 +1883,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
@@ -2057,7 +2057,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
@@ -2127,7 +2127,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: int)
-                        null sort order: a
+                        null sort order: z
                         numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)

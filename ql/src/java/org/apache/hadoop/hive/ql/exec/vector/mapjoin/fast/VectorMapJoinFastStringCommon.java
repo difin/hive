@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.ql.exec.vector.mapjoin.fast;
 import java.io.IOException;
 
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.serde2.binarysortable.fast.BinarySortableDeserializeRead;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
@@ -77,11 +78,9 @@ public class VectorMapJoinFastStringCommon {
             keyBinarySortableDeserializeRead.currentBytesLength);
   }
 
-  public VectorMapJoinFastStringCommon() {
+  public VectorMapJoinFastStringCommon(TableDesc tableDesc) {
     PrimitiveTypeInfo[] primitiveTypeInfos = { TypeInfoFactory.stringTypeInfo };
-    keyBinarySortableDeserializeRead =
-        new BinarySortableDeserializeRead(
-            primitiveTypeInfos,
-            /* useExternalBuffer */ false);
+    keyBinarySortableDeserializeRead = BinarySortableDeserializeRead.with(
+            primitiveTypeInfos, false, tableDesc.getProperties());
   }
 }

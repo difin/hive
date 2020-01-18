@@ -297,7 +297,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         numBuckets: -1
                         sort order: +
                         Statistics: Num rows: 1 Data size: 192 Basic stats: PARTIAL Column stats: COMPLETE
@@ -596,7 +596,7 @@ STAGE PLANS:
                     Reduce Output Operator
                       bucketingVersion: 2
                       key expressions: _col0 (type: string)
-                      null sort order: a
+                      null sort order: z
                       numBuckets: -1
                       sort order: +
                       Map-reduce partition columns: _col0 (type: string)
@@ -864,7 +864,7 @@ STAGE PLANS:
                   Reduce Output Operator
                     bucketingVersion: 2
                     key expressions: _col0 (type: string)
-                    null sort order: a
+                    null sort order: z
                     numBuckets: -1
                     sort order: +
                     Map-reduce partition columns: _col0 (type: string)
@@ -985,7 +985,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: string), _col1 (type: string)
-                        null sort order: aa
+                        null sort order: zz
                         numBuckets: -1
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: string)
@@ -1215,7 +1215,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
@@ -1597,8 +1597,8 @@ POSTHOOK: Input: default@srcpart@ds=2008-04-08/hr=12
 POSTHOOK: Input: default@srcpart@ds=2008-04-09/hr=11
 POSTHOOK: Input: default@srcpart@ds=2008-04-09/hr=12
 #### A masked pattern was here ####
-2008-04-09
 2008-04-08
+2008-04-09
 PREHOOK: query: select min(ds),max(ds) from srcpart
 PREHOOK: type: QUERY
 PREHOOK: Input: default@srcpart
@@ -1683,7 +1683,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: string), _col1 (type: string)
-                        null sort order: aa
+                        null sort order: zz
                         numBuckets: -1
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: string)

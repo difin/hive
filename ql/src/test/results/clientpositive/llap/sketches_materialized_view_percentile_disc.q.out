@@ -136,7 +136,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 1746 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1))
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 2 Data size: 1746 Basic stats: COMPLETE Column stats: COMPLETE
@@ -178,8 +178,8 @@ POSTHOOK: query: select 'no rewrite; no mv usage', category, percentile_disc(0.2
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 #### A masked pattern was here ####
-no rewrite; no mv usage	b	7.0
 no rewrite; no mv usage	a	2.0
+no rewrite; no mv usage	b	7.0
 PREHOOK: query: insert into table sketch_input values
   (1,'a'),(1, 'a'), (2, 'a'), (3, 'a'), (4, 'a'), (5, 'a'), (6, 'a'), (7, 'a'), (8, 'a'), (9, 'a'), (10, 'a'),
   (6,'b'),(6, 'b'), (7, 'b'), (8, 'b'), (9, 'b'), (10, 'b'), (11, 'b'), (12, 'b'), (13, 'b'), (14, 'b'), (15, 'b')
@@ -234,7 +234,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 458 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1))
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 2 Data size: 458 Basic stats: COMPLETE Column stats: COMPLETE
@@ -276,8 +276,8 @@ POSTHOOK: query: select 'rewrite; but no mv usage', category, percentile_disc(0.
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 #### A masked pattern was here ####
-rewrite; but no mv usage	b	7.0
 rewrite; but no mv usage	a	2.0
+rewrite; but no mv usage	b	7.0
 PREHOOK: query: explain
 alter materialized view mv_1 rebuild
 PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
@@ -330,7 +330,7 @@ STAGE PLANS:
                         Statistics: Num rows: 2 Data size: 458 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: _col0 (type: char(1))
-                          null sort order: a
+                          null sort order: z
                           sort order: +
                           Map-reduce partition columns: _col0 (type: char(1))
                           Statistics: Num rows: 2 Data size: 458 Basic stats: COMPLETE Column stats: COMPLETE
@@ -355,7 +355,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 458 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1))
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 2 Data size: 458 Basic stats: COMPLETE Column stats: COMPLETE
@@ -380,7 +380,7 @@ STAGE PLANS:
                   Statistics: Num rows: 2 Data size: 458 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
                     key expressions: _col0 (type: char(1))
-                    null sort order: a
+                    null sort order: z
                     sort order: +
                     Map-reduce partition columns: _col0 (type: char(1))
                     Statistics: Num rows: 2 Data size: 458 Basic stats: COMPLETE Column stats: COMPLETE
@@ -533,8 +533,8 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@mv_1
 POSTHOOK: Input: default@sketch_input
 #### A masked pattern was here ####
-rewrite; mv matching	b	7.0
 rewrite; mv matching	a	2.0
+rewrite; mv matching	b	7.0
 PREHOOK: query: explain
 select 'rewrite;mv matching with rollup',percentile_disc(0.2) within group (order by id) from sketch_input
 PREHOOK: type: QUERY

@@ -58,7 +58,7 @@ public class VectorMapJoinFastStringHashSetContainer extends VectorMapJoinFastHa
     for (int i = 0; i < numHTs; ++i) {
       vectorMapJoinFastStringHashSets[i] = new VectorMapJoinFastStringHashSet(
           isFullOuter,
-          initialCapacity, loadFactor, writeBuffersSize, estimatedKeyCount);
+          initialCapacity, loadFactor, writeBuffersSize, estimatedKeyCount, tableDesc);
     }
     PrimitiveTypeInfo[] primitiveTypeInfos = { TypeInfoFactory.stringTypeInfo };
     this.keyBinarySortableDeserializeRead =

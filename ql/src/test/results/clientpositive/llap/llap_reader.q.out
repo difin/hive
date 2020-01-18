@@ -24,7 +24,7 @@ PREHOOK: Input: default@test_n7
 #### A masked pattern was here ####
 Stage-1 FILE SYSTEM COUNTERS:
 Stage-1 HIVE COUNTERS:
-   CREATED_FILES: 1
+   CREATED_FILES: 2
    DESERIALIZE_ERRORS: 0
    RECORDS_IN_Map_1: 4
    RECORDS_OUT_0: 4
@@ -65,7 +65,7 @@ PREHOOK: Input: default@test_n7
 #### A masked pattern was here ####
 Stage-1 FILE SYSTEM COUNTERS:
 Stage-1 HIVE COUNTERS:
-   CREATED_FILES: 1
+   CREATED_FILES: 2
    DESERIALIZE_ERRORS: 0
    RECORDS_IN_Map_1: 4
    RECORDS_OUT_0: 4
@@ -124,7 +124,7 @@ PREHOOK: Input: default@test_bigint
 #### A masked pattern was here ####
 Stage-1 FILE SYSTEM COUNTERS:
 Stage-1 HIVE COUNTERS:
-   CREATED_FILES: 1
+   CREATED_FILES: 2
    DESERIALIZE_ERRORS: 0
    RECORDS_IN_Map_1: 4
    RECORDS_OUT_0: 4
@@ -155,7 +155,7 @@ PREHOOK: Input: default@test_bigint
 #### A masked pattern was here ####
 Stage-1 FILE SYSTEM COUNTERS:
 Stage-1 HIVE COUNTERS:
-   CREATED_FILES: 1
+   CREATED_FILES: 2
    DESERIALIZE_ERRORS: 0
    RECORDS_IN_Map_1: 4
    RECORDS_OUT_0: 4

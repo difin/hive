@@ -92,7 +92,7 @@ srcpart
         outputColumnNames: _col0, _col1
         Reduce Output Operator (RS_4)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           value expressions: _col1 (type: bigint)
@@ -133,7 +133,7 @@ src
         outputColumnNames: _col0, _col1
         Reduce Output Operator (RS_3)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           value expressions: _col1 (type: bigint)
@@ -212,7 +212,7 @@ $hdt$_0:s1
         outputColumnNames: _col0
         Reduce Output Operator (RS_6)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           Join Operator (JOIN_8)
@@ -242,7 +242,7 @@ $hdt$_1:s2
         outputColumnNames: _col0, _col1
         Reduce Output Operator (RS_7)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           value expressions: _col1 (type: string)
@@ -333,7 +333,7 @@ $hdt$_0:srcpart
         outputColumnNames: _col0
         Reduce Output Operator (RS_6)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           Join Operator (JOIN_8)
@@ -365,7 +365,7 @@ $hdt$_1:src2
         outputColumnNames: _col0, _col1
         Reduce Output Operator (RS_7)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           value expressions: _col1 (type: string)
@@ -407,7 +407,7 @@ $hdt$_0:srcpart
         outputColumnNames: _col0, _col1
         Reduce Output Operator (RS_9)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           value expressions: _col1 (type: string)
@@ -420,7 +420,7 @@ $hdt$_0:srcpart
             outputColumnNames: _col0, _col1, _col2
             Reduce Output Operator (RS_12)
               key expressions: _col0 (type: string)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: _col0 (type: string)
               value expressions: _col1 (type: string), _col2 (type: string)
@@ -453,7 +453,7 @@ $hdt$_1:src
         outputColumnNames: _col0
         Reduce Output Operator (RS_10)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           Join Operator (JOIN_11)
@@ -476,7 +476,7 @@ $hdt$_2:src3
         outputColumnNames: _col0, _col1
         Reduce Output Operator (RS_13)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           value expressions: _col1 (type: string)
@@ -549,7 +549,7 @@ $hdt$_0:src
         outputColumnNames: _col0, _col1
         Reduce Output Operator (RS_4)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           value expressions: _col1 (type: bigint)
@@ -560,7 +560,7 @@ $hdt$_0:src
             outputColumnNames: _col0, _col1
             Reduce Output Operator (RS_10)
               key expressions: _col0 (type: string)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: _col0 (type: string)
               value expressions: _col1 (type: bigint)
@@ -599,7 +599,7 @@ $hdt$_1:s2
         outputColumnNames: _col0, _col1
         Reduce Output Operator (RS_11)
           key expressions: _col0 (type: string)
-          null sort order: a
+          null sort order: z
           sort order: +
           Map-reduce partition columns: _col0 (type: string)
           value expressions: _col1 (type: string)

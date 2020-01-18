@@ -18,6 +18,9 @@
 
 package org.apache.hadoop.hive.serde2.binarysortable.fast;
 
+import static org.apache.hadoop.hive.serde2.binarysortable.BinarySortableSerDe.ONE;
+import static org.apache.hadoop.hive.serde2.binarysortable.BinarySortableSerDe.ZERO;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -93,9 +96,9 @@ public final class BinarySortableSerializeWrite implements SerializeWrite {
     columnSortOrderIsDesc = new boolean[fieldCount];
     Arrays.fill(columnSortOrderIsDesc, false);
     columnNullMarker = new byte[fieldCount];
-    Arrays.fill(columnNullMarker, BinarySortableSerDe.ZERO);
+    Arrays.fill(columnNullMarker, ZERO);
     columnNotNullMarker = new byte[fieldCount];
-    Arrays.fill(columnNotNullMarker, BinarySortableSerDe.ONE);
+    Arrays.fill(columnNotNullMarker, ONE);
   }
 
   // Not public since we must have the field count or column sort order information.

@@ -60,7 +60,7 @@ public class VectorMapJoinFastLongHashSetContainer extends VectorMapJoinFastHash
     for (int i = 0; i < numHTs; ++i) {
       vectorMapJoinFastLongHashSets[i] =
           new VectorMapJoinFastLongHashSet(isFullOuter, minMaxEnabled, hashTableKeyType, initialCapacity,
-              loadFactor, writeBuffersSize, estimatedKeyCount);
+              loadFactor, writeBuffersSize, estimatedKeyCount, tableDesc);
     }
     PrimitiveTypeInfo[] primitiveTypeInfos = { hashTableKeyType.getPrimitiveTypeInfo() };
     this.keyBinarySortableDeserializeRead =

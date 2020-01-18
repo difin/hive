@@ -1109,8 +1109,12 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: bigint), _col1 (type: timestamp), _col2 (type: binary)
+<<<<<<< HEAD
                         null sort order: aaa
                         numBuckets: -1
+=======
+                        null sort order: zzz
+>>>>>>> 541ed18bfaa (HIVE-22489: Reduce Sink operator should order nulls by parameter (Krisztian Kasa, reviewed by Jesus Camacho Rodriguez))
                         sort order: +++
                         Map-reduce partition columns: _col0 (type: bigint), _col1 (type: timestamp), _col2 (type: binary)
                         Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
@@ -1442,8 +1446,12 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: bigint), _col1 (type: timestamp), _col2 (type: binary)
+<<<<<<< HEAD
                         null sort order: aaa
                         numBuckets: -1
+=======
+                        null sort order: zzz
+>>>>>>> 541ed18bfaa (HIVE-22489: Reduce Sink operator should order nulls by parameter (Krisztian Kasa, reviewed by Jesus Camacho Rodriguez))
                         sort order: +++
                         Map-reduce partition columns: _col0 (type: bigint), _col1 (type: timestamp), _col2 (type: binary)
                         Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE

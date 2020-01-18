@@ -223,7 +223,7 @@ Table Type:         	MANAGED_TABLE
 Table Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	bucketing_version   	2                   
-	numFiles            	4                   
+	numFiles            	3                   
 	numPartitions       	3                   
 	numRows             	6                   
 	rawDataSize         	0                   
@@ -284,7 +284,7 @@ Table Type:         	MANAGED_TABLE
 Table Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	bucketing_version   	2                   
-	numFiles            	5                   
+	numFiles            	4                   
 	numPartitions       	3                   
 	numRows             	8                   
 	rawDataSize         	0                   
@@ -441,7 +441,7 @@ Table Type:         	MANAGED_TABLE
 Table Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	bucketing_version   	2                   
-	numFiles            	5                   
+	numFiles            	4                   
 	numPartitions       	3                   
 	numRows             	8                   
 	rawDataSize         	0                   
@@ -526,7 +526,7 @@ Table Type:         	MANAGED_TABLE
 Table Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	bucketing_version   	2                   
-	numFiles            	5                   
+	numFiles            	4                   
 	numPartitions       	3                   
 	numRows             	8                   
 	rawDataSize         	0                   

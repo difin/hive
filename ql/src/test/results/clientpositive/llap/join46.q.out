@@ -79,7 +79,7 @@ STAGE PLANS:
                     Statistics: Num rows: 6 Data size: 572 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 6 Data size: 572 Basic stats: COMPLETE Column stats: COMPLETE
@@ -101,7 +101,7 @@ STAGE PLANS:
                       Statistics: Num rows: 3 Data size: 285 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col1 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col1 (type: int)
                         Statistics: Num rows: 3 Data size: 285 Basic stats: COMPLETE Column stats: COMPLETE
@@ -147,14 +147,14 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@test1_n2
 POSTHOOK: Input: default@test2_n0
 #### A masked pattern was here ####
-NULL	NULL	None	NULL	NULL	NULL
-98	NULL	None	NULL	NULL	NULL
 99	0	Alice	NULL	NULL	NULL
 100	1	Bob	NULL	NULL	NULL
 99	2	Mat	102	2	Del
 99	2	Mat	103	2	Ema
 101	2	Car	102	2	Del
 101	2	Car	103	2	Ema
+NULL	NULL	None	NULL	NULL	NULL
+98	NULL	None	NULL	NULL	NULL
 PREHOOK: query: EXPLAIN
 SELECT *
 FROM test1_n2 LEFT OUTER JOIN test2_n0
@@ -198,7 +198,7 @@ STAGE PLANS:
                     Statistics: Num rows: 6 Data size: 620 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 6 Data size: 620 Basic stats: COMPLETE Column stats: COMPLETE
@@ -220,7 +220,7 @@ STAGE PLANS:
                       Statistics: Num rows: 1 Data size: 95 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col1 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col1 (type: int)
                         Statistics: Num rows: 1 Data size: 95 Basic stats: COMPLETE Column stats: COMPLETE
@@ -277,11 +277,11 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@test1_n2
 POSTHOOK: Input: default@test2_n0
 #### A masked pattern was here ####
-NULL	NULL	None	NULL	NULL	NULL
-98	NULL	None	NULL	NULL	NULL
 99	0	Alice	NULL	NULL	NULL
 99	2	Mat	NULL	NULL	NULL
 100	1	Bob	NULL	NULL	NULL
+NULL	NULL	None	NULL	NULL	NULL
+98	NULL	None	NULL	NULL	NULL
 101	2	Car	102	2	Del
 Warning: Shuffle Join MERGEJOIN[11][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: EXPLAIN
@@ -448,7 +448,7 @@ STAGE PLANS:
                       Statistics: Num rows: 4 Data size: 384 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col1 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col1 (type: int)
                         Statistics: Num rows: 4 Data size: 384 Basic stats: COMPLETE Column stats: COMPLETE
@@ -466,7 +466,7 @@ STAGE PLANS:
                     Statistics: Num rows: 4 Data size: 380 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 4 Data size: 380 Basic stats: COMPLETE Column stats: COMPLETE
@@ -512,12 +512,12 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@test1_n2
 POSTHOOK: Input: default@test2_n0
 #### A masked pattern was here ####
-NULL	NULL	NULL	105	NULL	None
 99	2	Mat	102	2	Del
 99	2	Mat	103	2	Ema
 101	2	Car	102	2	Del
 101	2	Car	103	2	Ema
 NULL	NULL	NULL	104	3	Fli
+NULL	NULL	NULL	105	NULL	None
 Warning: Shuffle Join MERGEJOIN[9][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: EXPLAIN
 SELECT *
@@ -1049,7 +1049,7 @@ STAGE PLANS:
                     Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1071,7 +1071,7 @@ STAGE PLANS:
                       Statistics: Num rows: 3 Data size: 297 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col1 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col1 (type: int)
                         Statistics: Num rows: 3 Data size: 297 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1126,13 +1126,13 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@test1_n2
 POSTHOOK: Input: default@test2_n0
 #### A masked pattern was here ####
-NULL	NULL	None	NULL	NULL	NULL
-98	NULL	None	NULL	NULL	NULL
 99	0	Alice	NULL	NULL	NULL
 100	1	Bob	NULL	NULL	NULL
 99	2	Mat	102	2	Del
 101	2	Car	102	2	Del
 101	2	Car	103	2	Ema
+NULL	NULL	None	NULL	NULL	NULL
+98	NULL	None	NULL	NULL	NULL
 Warning: Shuffle Join MERGEJOIN[9][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: EXPLAIN
 SELECT col_1, col_2
@@ -1665,7 +1665,7 @@ STAGE PLANS:
                       Statistics: Num rows: 4 Data size: 400 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col1 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col1 (type: int)
                         Statistics: Num rows: 4 Data size: 400 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1683,7 +1683,7 @@ STAGE PLANS:
                     Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1738,11 +1738,11 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@test1_n2
 POSTHOOK: Input: default@test2_n0
 #### A masked pattern was here ####
-NULL	NULL	NULL	105	NULL	None
 99	2	Mat	102	2	Del
 101	2	Car	102	2	Del
 101	2	Car	103	2	Ema
 NULL	NULL	NULL	104	3	Fli
+NULL	NULL	NULL	105	NULL	None
 Warning: Shuffle Join MERGEJOIN[9][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: EXPLAIN
 SELECT *
@@ -2156,7 +2156,7 @@ STAGE PLANS:
                     Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2174,7 +2174,7 @@ STAGE PLANS:
                     Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2229,15 +2229,15 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@test1_n2
 POSTHOOK: Input: default@test2_n0
 #### A masked pattern was here ####
-NULL	NULL	NULL	105	NULL	None
-NULL	NULL	None	NULL	NULL	NULL
-98	NULL	None	NULL	NULL	NULL
 99	0	Alice	NULL	NULL	NULL
 100	1	Bob	NULL	NULL	NULL
 99	2	Mat	102	2	Del
 101	2	Car	102	2	Del
 101	2	Car	103	2	Ema
 NULL	NULL	NULL	104	3	Fli
+NULL	NULL	NULL	105	NULL	None
+NULL	NULL	None	NULL	NULL	NULL
+98	NULL	None	NULL	NULL	NULL
 Warning: Shuffle Join MERGEJOIN[38][tables = [$hdt$_0, $hdt$_1, $hdt$_2]] in Stage 'Reducer 3' is a cross product
 PREHOOK: query: EXPLAIN
 SELECT *
@@ -2310,7 +2310,7 @@ STAGE PLANS:
                     Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2324,7 +2324,7 @@ STAGE PLANS:
                       Statistics: Num rows: 4 Data size: 400 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col1 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col1 (type: int)
                         Statistics: Num rows: 4 Data size: 400 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2345,7 +2345,7 @@ STAGE PLANS:
                       Statistics: Num rows: 3 Data size: 297 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col1 (type: int)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col1 (type: int)
                         Statistics: Num rows: 3 Data size: 297 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2356,7 +2356,7 @@ STAGE PLANS:
                     Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2476,26 +2476,26 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@test1_n2
 POSTHOOK: Input: default@test2_n0
 #### A masked pattern was here ####
-NULL	NULL	NULL	105	NULL	None	NULL	NULL	None	NULL	NULL	NULL
-NULL	NULL	NULL	104	3	Fli	NULL	NULL	None	NULL	NULL	NULL
-NULL	NULL	NULL	105	NULL	None	98	NULL	None	NULL	NULL	NULL
-NULL	NULL	NULL	104	3	Fli	98	NULL	None	NULL	NULL	NULL
-NULL	NULL	NULL	105	NULL	None	99	0	Alice	NULL	NULL	NULL
 99	2	Mat	102	2	Del	99	0	Alice	NULL	NULL	NULL
 101	2	Car	102	2	Del	99	0	Alice	NULL	NULL	NULL
 101	2	Car	103	2	Ema	99	0	Alice	NULL	NULL	NULL
 NULL	NULL	NULL	104	3	Fli	99	0	Alice	NULL	NULL	NULL
-NULL	NULL	NULL	105	NULL	None	100	1	Bob	NULL	NULL	NULL
+NULL	NULL	NULL	105	NULL	None	99	0	Alice	NULL	NULL	NULL
 99	2	Mat	102	2	Del	100	1	Bob	NULL	NULL	NULL
 101	2	Car	102	2	Del	100	1	Bob	NULL	NULL	NULL
 101	2	Car	103	2	Ema	100	1	Bob	NULL	NULL	NULL
 NULL	NULL	NULL	104	3	Fli	100	1	Bob	NULL	NULL	NULL
-NULL	NULL	NULL	105	NULL	None	99	2	Mat	102	2	Del
+NULL	NULL	NULL	105	NULL	None	100	1	Bob	NULL	NULL	NULL
 NULL	NULL	NULL	104	3	Fli	99	2	Mat	102	2	Del
-NULL	NULL	NULL	105	NULL	None	101	2	Car	102	2	Del
+NULL	NULL	NULL	105	NULL	None	99	2	Mat	102	2	Del
 NULL	NULL	NULL	104	3	Fli	101	2	Car	102	2	Del
-NULL	NULL	NULL	105	NULL	None	101	2	Car	103	2	Ema
+NULL	NULL	NULL	105	NULL	None	101	2	Car	102	2	Del
 NULL	NULL	NULL	104	3	Fli	101	2	Car	103	2	Ema
+NULL	NULL	NULL	105	NULL	None	101	2	Car	103	2	Ema
+NULL	NULL	NULL	104	3	Fli	NULL	NULL	None	NULL	NULL	NULL
+NULL	NULL	NULL	105	NULL	None	NULL	NULL	None	NULL	NULL	NULL
+NULL	NULL	NULL	104	3	Fli	98	NULL	None	NULL	NULL	NULL
+NULL	NULL	NULL	105	NULL	None	98	NULL	None	NULL	NULL	NULL
 PREHOOK: query: CREATE TABLE table1 (a INT, b INT)
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default

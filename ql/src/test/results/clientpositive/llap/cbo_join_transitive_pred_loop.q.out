@@ -57,7 +57,7 @@ STAGE PLANS:
                       Statistics: Num rows: 1 Data size: 56 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: date), _col0 (type: date)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: date), _col0 (type: date)
                         Statistics: Num rows: 1 Data size: 56 Basic stats: COMPLETE Column stats: NONE
@@ -81,7 +81,7 @@ STAGE PLANS:
                         Statistics: Num rows: 1 Data size: 56 Basic stats: COMPLETE Column stats: NONE
                         Reduce Output Operator
                           key expressions: _col1 (type: date), _col0 (type: date)
-                          null sort order: aa
+                          null sort order: zz
                           sort order: ++
                           Map-reduce partition columns: _col1 (type: date), _col0 (type: date)
                           Statistics: Num rows: 1 Data size: 56 Basic stats: COMPLETE Column stats: NONE

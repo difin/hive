@@ -92,14 +92,14 @@ POSTHOOK: Input: default@masking_test_n_mv
 POSTHOOK: Input: default@masking_test_view_n_mv
 POSTHOOK: Input: default@masking_test_view_n_mv_masked
 #### A masked pattern was here ####
-0_lav
-8_lav
-0
-2
 2_lav
 4
 4_lav
+0
+0_lav
+2
 8
+8_lav
 PREHOOK: query: drop materialized view `masking_test_view_n_mv`
 PREHOOK: type: DROP_MATERIALIZED_VIEW
 PREHOOK: Input: default@masking_test_view_n_mv

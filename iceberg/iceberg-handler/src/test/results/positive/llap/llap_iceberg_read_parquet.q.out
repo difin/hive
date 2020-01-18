@@ -397,8 +397,8 @@ POSTHOOK: Input: default@llap_orders_parquet
 #### A masked pattern was here ####
 München	Cybertruck	50000	4.5	99
 NULL	Model 3	50000	NULL	42
-NULL	Model S	83000	NULL	185
 Venezia	Model S	123000	NULL	89
+NULL	Model S	83000	NULL	185
 NULL	Model Y	55000	NULL	76
 PREHOOK: query: SELECT i.name, i.description, SUM(o.quantity) FROM llap_items_parquet i JOIN llap_orders_parquet o ON i.itemid = o.itemid  WHERE region = 'EU' and i.cost >= 50000 GROUP BY i.name, i.description
 PREHOOK: type: QUERY

@@ -72,7 +72,7 @@ STAGE PLANS:
                       Statistics: Num rows: 11 Data size: 979 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1)), _col1 (type: int)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 11 Data size: 979 Basic stats: COMPLETE Column stats: COMPLETE
@@ -247,7 +247,7 @@ STAGE PLANS:
                       Statistics: Num rows: 22 Data size: 1958 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1)), _col1 (type: int)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 22 Data size: 1958 Basic stats: COMPLETE Column stats: COMPLETE
@@ -395,7 +395,7 @@ STAGE PLANS:
                       Statistics: Num rows: 2 Data size: 946 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1))
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 2 Data size: 946 Basic stats: COMPLETE Column stats: COMPLETE
@@ -437,8 +437,8 @@ POSTHOOK: query: select 'rewritten;mv not used',category, count(distinct id) fro
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 #### A masked pattern was here ####
-rewritten;mv not used	b	10
 rewritten;mv not used	a	10
+rewritten;mv not used	b	10
 PREHOOK: query: explain
 select 'mv used',category, count(distinct id) from sketch_input group by category
 PREHOOK: type: QUERY
@@ -478,7 +478,7 @@ STAGE PLANS:
                       Statistics: Num rows: 22 Data size: 1958 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: char(1)), _col1 (type: int)
-                        null sort order: aa
+                        null sort order: zz
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: char(1))
                         Statistics: Num rows: 22 Data size: 1958 Basic stats: COMPLETE Column stats: COMPLETE

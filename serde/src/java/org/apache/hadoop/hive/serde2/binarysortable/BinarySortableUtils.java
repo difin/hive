@@ -19,6 +19,7 @@ package org.apache.hadoop.hive.serde2.binarysortable;
 
 import static org.apache.hadoop.hive.serde2.binarysortable.BinarySortableSerDe.ONE;
 import static org.apache.hadoop.hive.serde2.binarysortable.BinarySortableSerDe.ZERO;
+
 import java.util.Objects;
 import java.util.Properties;
 
@@ -29,12 +30,13 @@ import org.apache.hadoop.hive.serde.serdeConstants;
  */
 public final class BinarySortableUtils {
   public static void fillOrderArrays(
-          Properties inputProperties,
-          boolean[] columnSortOrderIsDesc, byte[] columnNullMarker, byte[] columnNotNullMarker) {
+      Properties inputProperties,
+      boolean[] columnSortOrderIsDesc, byte[] columnNullMarker, byte[] columnNotNullMarker) {
     Objects.requireNonNull(inputProperties, "inputProperties can not be null");
     Objects.requireNonNull(columnSortOrderIsDesc, "columnSortOrderIsDesc can not be null");
     Objects.requireNonNull(columnNullMarker, "columnNullMarker can not be null");
     Objects.requireNonNull(columnNotNullMarker, "columnNotNullMarker can not be null");
+
     if (columnSortOrderIsDesc.length != columnNullMarker.length ||
         columnSortOrderIsDesc.length != columnNotNullMarker.length) {
       throw new IllegalArgumentException(

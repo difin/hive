@@ -271,7 +271,7 @@ Table Type:         	MANAGED_TABLE
 Table Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	bucketing_version   	2                   
-	numFiles            	5                   
+	numFiles            	6                   
 	numPartitions       	3                   
 	numRows             	6                   
 	rawDataSize         	0                   
@@ -368,7 +368,7 @@ Table Type:         	MANAGED_TABLE
 Table Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	bucketing_version   	2                   
-	numFiles            	6                   
+	numFiles            	8                   
 	numPartitions       	3                   
 	numRows             	8                   
 	rawDataSize         	0                   
@@ -593,7 +593,7 @@ Table:              	stats_part
 #### A masked pattern was here ####
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"key\":\"true\",\"value\":\"true\"}}
-	numFiles            	2                   
+	numFiles            	4                   
 	numRows             	4                   
 	rawDataSize         	0                   
 	totalSize           	#Masked#                
@@ -799,7 +799,7 @@ Table:              	stats_part
 #### A masked pattern was here ####
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"key\":\"true\",\"value\":\"true\"}}
-	numFiles            	2                   
+	numFiles            	4                   
 	numRows             	4                   
 	rawDataSize         	0                   
 	totalSize           	#Masked#                
@@ -935,7 +935,7 @@ Table:              	stats_part
 #### A masked pattern was here ####
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"key\":\"true\",\"value\":\"true\"}}
-	numFiles            	2                   
+	numFiles            	4                   
 	numRows             	4                   
 	rawDataSize         	0                   
 	totalSize           	#Masked#                
@@ -1073,7 +1073,7 @@ Table:              	stats_part
 #### A masked pattern was here ####
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"key\":\"true\",\"value\":\"true\"}}
-	numFiles            	2                   
+	numFiles            	4                   
 	numRows             	4                   
 	rawDataSize         	0                   
 	totalSize           	#Masked#                

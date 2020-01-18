@@ -32,6 +32,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  * This test measures the performance of probedecode MJ HashSet filtering on LLAP.
@@ -115,7 +116,8 @@ public class ProbeHashSetBench {
       VectorMapJoinInfo vectorMapJoinInfo = new VectorMapJoinInfo();
       vectorMapJoinInfo.setBigTableKeyColumnMap(new int[]{0});
       vectorMapJoinInfo.setBigTableKeyTypeInfos(new TypeInfo[]{TypeInfoFactory.timestampTypeInfo});
-      this.probeLongHashTable = new OrcProbeMultiKeyHashSet(getTimestampHashSet((TimestampColumnVector) filterColumnVector), vectorMapJoinInfo);
+      this.probeLongHashTable = new OrcProbeMultiKeyHashSet(
+          getTimestampHashSet((TimestampColumnVector) filterColumnVector), vectorMapJoinInfo, new Properties());
       this.probeLongHashTable.init();
     }
   }

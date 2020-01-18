@@ -243,7 +243,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                        null sort order: aa
+                        null sort order: zz
                         numBuckets: -1
                         sort order: ++
                         Map-reduce partition columns: _col1 (type: decimal(38,0))
@@ -474,7 +474,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                        null sort order: aa
+                        null sort order: zz
                         numBuckets: -1
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: date), _col1 (type: decimal(38,0))
@@ -537,7 +537,7 @@ STAGE PLANS:
                 Reduce Output Operator
                   bucketingVersion: 2
                   key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                  null sort order: aa
+                  null sort order: zz
                   numBuckets: -1
                   sort order: ++
                   Map-reduce partition columns: _col1 (type: decimal(38,0))
@@ -719,7 +719,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                        null sort order: aa
+                        null sort order: zz
                         numBuckets: -1
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: date), _col1 (type: decimal(38,0))
@@ -949,7 +949,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                        null sort order: aa
+                        null sort order: zz
                         numBuckets: -1
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: date), _col1 (type: decimal(38,0))
@@ -1012,7 +1012,7 @@ STAGE PLANS:
                 Reduce Output Operator
                   bucketingVersion: 2
                   key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                  null sort order: aa
+                  null sort order: zz
                   numBuckets: -1
                   sort order: ++
                   Map-reduce partition columns: _col0 (type: date), _col1 (type: decimal(38,0))
@@ -1195,7 +1195,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                        null sort order: aa
+                        null sort order: zz
                         numBuckets: -1
                         sort order: ++
                         Map-reduce partition columns: _col1 (type: decimal(38,0))
@@ -1426,7 +1426,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                        null sort order: aa
+                        null sort order: zz
                         numBuckets: -1
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: date), _col1 (type: decimal(38,0))
@@ -1489,7 +1489,7 @@ STAGE PLANS:
                 Reduce Output Operator
                   bucketingVersion: 2
                   key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                  null sort order: aa
+                  null sort order: zz
                   numBuckets: -1
                   sort order: ++
                   Map-reduce partition columns: _col1 (type: decimal(38,0))
@@ -1671,7 +1671,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                        null sort order: aa
+                        null sort order: zz
                         numBuckets: -1
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: date), _col1 (type: decimal(38,0))
@@ -1901,7 +1901,7 @@ STAGE PLANS:
                       Reduce Output Operator
                         bucketingVersion: 2
                         key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                        null sort order: aa
+                        null sort order: zz
                         numBuckets: -1
                         sort order: ++
                         Map-reduce partition columns: _col0 (type: date), _col1 (type: decimal(38,0))
@@ -1964,7 +1964,7 @@ STAGE PLANS:
                 Reduce Output Operator
                   bucketingVersion: 2
                   key expressions: _col0 (type: date), _col1 (type: decimal(38,0))
-                  null sort order: aa
+                  null sort order: zz
                   numBuckets: -1
                   sort order: ++
                   Map-reduce partition columns: _col0 (type: date), _col1 (type: decimal(38,0))

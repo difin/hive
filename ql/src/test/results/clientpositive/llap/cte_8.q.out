@@ -109,8 +109,8 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@t1
 #### A masked pattern was here ####
 cte1.c1	cte1.c2
-1	2
 3	4
+1	2
 PREHOOK: query: with cte1(c1, c2) as (
     select int_col x, bigint_col y from t1 where int_col = 1
     union all

@@ -43,7 +43,7 @@ STAGE PLANS:
                     Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
-                      null sort order: aa
+                      null sort order: zz
                       sort order: ++
                       Map-reduce partition columns: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
                       Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -71,7 +71,7 @@ STAGE PLANS:
                         Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
-                          null sort order: aa
+                          null sort order: zz
                           sort order: ++
                           Map-reduce partition columns: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
                           Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -645,7 +645,7 @@ STAGE PLANS:
                     Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
-                      null sort order: aa
+                      null sort order: zz
                       sort order: ++
                       Map-reduce partition columns: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
                       Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -673,7 +673,7 @@ STAGE PLANS:
                         Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
-                          null sort order: aa
+                          null sort order: zz
                           sort order: ++
                           Map-reduce partition columns: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
                           Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1244,7 +1244,7 @@ STAGE PLANS:
                     Statistics: Num rows: 500 Data size: 2000 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
-                      null sort order: aa
+                      null sort order: zz
                       sort order: ++
                       Map-reduce partition columns: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
                       Statistics: Num rows: 500 Data size: 2000 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1272,7 +1272,7 @@ STAGE PLANS:
                         Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
-                          null sort order: aa
+                          null sort order: zz
                           sort order: ++
                           Map-reduce partition columns: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
                           Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1843,7 +1843,7 @@ STAGE PLANS:
                     Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
-                      null sort order: aa
+                      null sort order: zz
                       sort order: ++
                       Map-reduce partition columns: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
                       Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1871,7 +1871,7 @@ STAGE PLANS:
                         Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
-                          null sort order: aa
+                          null sort order: zz
                           sort order: ++
                           Map-reduce partition columns: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
                           Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2457,7 +2457,7 @@ STAGE PLANS:
                     Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
-                      null sort order: aa
+                      null sort order: zz
                       sort order: ++
                       Map-reduce partition columns: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
                       Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2485,7 +2485,7 @@ STAGE PLANS:
                         Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
-                          null sort order: aa
+                          null sort order: zz
                           sort order: ++
                           Map-reduce partition columns: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
                           Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2502,7 +2502,7 @@ STAGE PLANS:
                     Statistics: Num rows: 2000 Data size: 1092000 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: UDFToDouble(key) (type: double)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: UDFToDouble(key) (type: double)
                       Statistics: Num rows: 2000 Data size: 1092000 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2522,7 +2522,7 @@ STAGE PLANS:
                 Statistics: Num rows: 412 Data size: 39140 Basic stats: COMPLETE Column stats: COMPLETE
                 Reduce Output Operator
                   key expressions: UDFToDouble(_col0) (type: double)
-                  null sort order: a
+                  null sort order: z
                   sort order: +
                   Map-reduce partition columns: UDFToDouble(_col0) (type: double)
                   Statistics: Num rows: 412 Data size: 39140 Basic stats: COMPLETE Column stats: COMPLETE
@@ -6721,7 +6721,7 @@ STAGE PLANS:
                     Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
-                      null sort order: aa
+                      null sort order: zz
                       sort order: ++
                       Map-reduce partition columns: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
                       Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -6749,7 +6749,7 @@ STAGE PLANS:
                         Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
-                          null sort order: aa
+                          null sort order: zz
                           sort order: ++
                           Map-reduce partition columns: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
                           Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -7320,7 +7320,7 @@ STAGE PLANS:
                     Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
-                      null sort order: aa
+                      null sort order: zz
                       sort order: ++
                       Map-reduce partition columns: UDFToDouble(key) (type: double), UDFToDouble(key) (type: double)
                       Statistics: Num rows: 500 Data size: 47500 Basic stats: COMPLETE Column stats: COMPLETE
@@ -7348,7 +7348,7 @@ STAGE PLANS:
                         Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           key expressions: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
-                          null sort order: aa
+                          null sort order: zz
                           sort order: ++
                           Map-reduce partition columns: UDFToDouble(_col0) (type: double), UDFToDouble(_col1) (type: double)
                           Statistics: Num rows: 250 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE

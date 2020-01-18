@@ -33,6 +33,7 @@ import org.apache.hadoop.hive.serde2.binarysortable.fast.BinarySortableSerialize
 import org.apache.hadoop.hive.serde2.fast.SerializeWrite;
 
 import java.io.IOException;
+import java.util.Properties;
 
 public class OrcProbeMultiKeyHashSet extends OrcProbeHashTable {
 
@@ -44,11 +45,13 @@ public class OrcProbeMultiKeyHashSet extends OrcProbeHashTable {
   private Output currKeyOutput;
   private Output saveKeyOutput;
 
-  public OrcProbeMultiKeyHashSet(VectorMapJoinHashTable vTable, VectorMapJoinInfo vInfo) throws HiveException {
+  public OrcProbeMultiKeyHashSet(VectorMapJoinHashTable vTable, VectorMapJoinInfo vInfo, Properties keyTableProperties)
+      throws HiveException {
     super(vTable, vInfo);
     this.probeHashMultiHashSet = (VectorMapJoinBytesHashSet) probeDecodeMapJoinTable;
     this.hashMultiHashSetResult =  probeHashMultiHashSet.createHashSetResult();
-    this.multiKeySerializeWrite = new BinarySortableSerializeWrite(vInfo.getBigTableKeyColumnMap().length);
+    this.multiKeySerializeWrite = BinarySortableSerializeWrite.with(
+        keyTableProperties, vInfo.getBigTableKeyColumnMap().length);
     this.multiKeyVectorSerializeRow = new VectorSerializeRow(multiKeySerializeWrite);
     this.currKeyOutput = new Output();
     this.saveKeyOutput = new Output();

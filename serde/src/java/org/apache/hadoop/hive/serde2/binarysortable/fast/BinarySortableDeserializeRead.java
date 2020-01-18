@@ -68,7 +68,7 @@ public final class BinarySortableDeserializeRead extends DeserializeRead {
     BinarySortableUtils.fillOrderArrays(tbl, columnSortOrderIsDesc, columnNullMarker, columnNotNullMarker);
 
     return new BinarySortableDeserializeRead(
-        typeInfos, useExternalBuffer, columnSortOrderIsDesc, columnNullMarker, columnNotNullMarker);
+            typeInfos, useExternalBuffer, columnSortOrderIsDesc, columnNullMarker, columnNotNullMarker);
   }
 
   /*
@@ -90,7 +90,7 @@ public final class BinarySortableDeserializeRead extends DeserializeRead {
     }
 
     return new BinarySortableDeserializeRead(
-        typeInfos, useExternalBuffer, columnSortOrderIsDesc, columnNullMarker, columnNotNullMarker);
+            typeInfos, useExternalBuffer, columnSortOrderIsDesc, columnNullMarker, columnNotNullMarker);
   }
 
   // The sort order (ascending/descending) for each field. Set to true when descending (invert).
@@ -130,13 +130,6 @@ public final class BinarySortableDeserializeRead extends DeserializeRead {
     int tag;
   }
 
-  /*
-   * Use this constructor when only ascending sort order is used.
-   */
-  public BinarySortableDeserializeRead(TypeInfo[] typeInfos, boolean useExternalBuffer) {
-    this(typeInfos, useExternalBuffer, null, null, null);
-  }
-
   public BinarySortableDeserializeRead(TypeInfo[] typeInfos, boolean useExternalBuffer,
       boolean[] columnSortOrderIsDesc, byte[] columnNullMarker, byte[] columnNotNullMarker) {
     this(typeInfos, null, useExternalBuffer, columnSortOrderIsDesc, columnNullMarker,
@@ -153,33 +146,9 @@ public final class BinarySortableDeserializeRead extends DeserializeRead {
     root.children = createFields(typeInfos);
     root.count = count;
     stack = new ArrayDeque<>();
-
-    if (columnSortOrderIsDesc != null) {
-      this.columnSortOrderIsDesc = columnSortOrderIsDesc;
-    } else {
-      this.columnSortOrderIsDesc = new boolean[count];
-      Arrays.fill(this.columnSortOrderIsDesc, false);
-    }
-    if (columnNullMarker != null) {
-      this.columnNullMarker = columnNullMarker;
-      this.columnNotNullMarker = columnNotNullMarker;
-    } else {
-      this.columnNullMarker = new byte[count];
-      this.columnNotNullMarker = new byte[count];
-      for (int i = 0; i < count; i++) {
-        if (this.columnSortOrderIsDesc[i]) {
-          // Descending
-          // Null last (default for descending order)
-          this.columnNullMarker[i] = BinarySortableSerDe.ZERO;
-          this.columnNotNullMarker[i] = BinarySortableSerDe.ONE;
-        } else {
-          // Ascending
-          // Null first (default for ascending order)
-          this.columnNullMarker[i] = BinarySortableSerDe.ZERO;
-          this.columnNotNullMarker[i] = BinarySortableSerDe.ONE;
-        }
-      }
-    }
+    this.columnSortOrderIsDesc = columnSortOrderIsDesc;
+    this.columnNullMarker = columnNullMarker;
+    this.columnNotNullMarker = columnNotNullMarker;
     inputByteBuffer = new InputByteBuffer();
     internalBufferLen = -1;
   }

@@ -47,7 +47,7 @@ STAGE PLANS:
                       Statistics: Num rows: 83 Data size: 8217 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 83 Data size: 8217 Basic stats: COMPLETE Column stats: COMPLETE
@@ -75,7 +75,7 @@ STAGE PLANS:
                     Statistics: Num rows: 27 Data size: 5184 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col0 (type: bigint)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: bigint)
                       Statistics: Num rows: 27 Data size: 5184 Basic stats: COMPLETE Column stats: COMPLETE
@@ -123,10 +123,10 @@ GROUP BY src1.c2
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src
 #### A masked pattern was here ####
-val_348	5
-val_4	1
 val_399	2
 val_396	3
+val_348	5
+val_4	1
 val_277	4
 PREHOOK: query: EXPLAIN
 SELECT max(src1.c1), src1.c2 
@@ -177,7 +177,7 @@ STAGE PLANS:
                       Statistics: Num rows: 83 Data size: 8217 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: string)
-                        null sort order: a
+                        null sort order: z
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 83 Data size: 8217 Basic stats: COMPLETE Column stats: COMPLETE
@@ -205,7 +205,7 @@ STAGE PLANS:
                     Statistics: Num rows: 27 Data size: 5184 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col0 (type: bigint)
-                      null sort order: a
+                      null sort order: z
                       sort order: +
                       Map-reduce partition columns: _col0 (type: bigint)
                       Statistics: Num rows: 27 Data size: 5184 Basic stats: COMPLETE Column stats: COMPLETE
@@ -253,8 +253,8 @@ GROUP BY src1.c2
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src
 #### A masked pattern was here ####
-val_348	5
-val_4	1
 val_399	2
 val_396	3
+val_348	5
+val_4	1
 val_277	4

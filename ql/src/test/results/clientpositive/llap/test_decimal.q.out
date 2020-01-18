@@ -34,7 +34,7 @@ POSTHOOK: query: select distinct(value) from test_sp_chars_decimal
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@test_sp_chars_decimal
 #### A masked pattern was here ####
-2
-3
 0
+2
 1
+3
