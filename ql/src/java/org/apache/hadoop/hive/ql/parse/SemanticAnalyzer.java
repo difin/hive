@@ -7096,7 +7096,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         sortCols = getPartitionColsFromBucketColsForUpdateDelete(input, false);
         createSortOrderForUpdateDelete(sortCols, order, nullOrder);
       } else {
-        partnCols = getPartitionColsFromBucketCols(dest, qb, dest_tab, table_desc, input, true);
+        partnCols = getPartitionColsFromBucketCols(dest, qb, dest_tab, table_desc, input, false);
       }
     } else {
       if (updating(dest) || deleting(dest)) {
@@ -7497,6 +7497,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       // Add NOT NULL constraint check
       input = genConstraintsPlan(dest, qb, input);
 
+      if (!qb.getIsQuery()) {
+        input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx);
+      }
+
       if (destinationTable.isMaterializedView() &&
           mvRebuildMode == MaterializationRebuildMode.INSERT_OVERWRITE_REBUILD) {
         // Data organization (DISTRIBUTED, SORTED, CLUSTERED) for materialized view
@@ -7642,6 +7646,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
       // Add NOT NULL constraint check
       input = genConstraintsPlan(dest, qb, input);
+
+      if (!qb.getIsQuery()) {
+        input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx);
+      }
 
       if (destinationTable.isMaterializedView() &&
           mvRebuildMode == MaterializationRebuildMode.INSERT_OVERWRITE_REBUILD) {
@@ -8009,9 +8017,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       throw new SemanticException("Unknown destination type: " + destType);
     }
 
-    if (!(destType == QBMetaData.DEST_DFS_FILE && qb.getIsQuery())) {
-      input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx);
-    }
 
     inputRR = opParseCtx.get(input).getRowResolver();
 
@@ -9085,7 +9090,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       }
     }
 
-    return genConvertCol(dest, qb, tab, table_desc, input, posns, convert);
+    return genConvertCol(dest, qb, tab, table_desc, input, posns, false);
   }
 
   private void getSortOrders(Table tab, StringBuilder order, StringBuilder nullOrder) {
