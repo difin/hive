@@ -27,6 +27,9 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.math.IntMath;
 import com.google.common.math.LongMath;
+
+import static java.util.Objects.nonNull;
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.DYNAMICPARTITIONCONVERT;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_DEFAULT_STORAGE_HANDLER;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVESTATSDBCLASS;
 import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.DEFAULT_TABLE_TYPE;
@@ -8025,6 +8028,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       throw new SemanticException("Unknown destination type: " + destType);
     }
 
+    if (!(destType == QBMetaData.DEST_DFS_FILE && qb.getIsQuery())) {
+      input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx, destinationTable);
+    }
 
     inputRR = opParseCtx.get(input).getRowResolver();
 
@@ -8707,6 +8713,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
   private Operator genConversionSelectOperator(String dest, QB qb, Operator input,
       TableDesc table_desc, DynamicPartitionCtx dpCtx, Table table)
       throws SemanticException {
+    List<FieldSchema> parts =
+        table != null ? table.getPartitionKeys() : null;
     StructObjectInspector oi = null;
     try {
       Deserializer deserializer = table_desc.getDeserializerClass()
@@ -8793,18 +8801,51 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           expressions.add(column);
         }
       }
-    }
 
-    // deal with dynamic partition columns: convert ExprNodeDesc type to String??
-    if (dynPart && dpCtx != null && dpCtx.getNumDPCols() > 0) {
-      // DP columns starts with tableFields.size()
-      for (int i = tableFields.size() + (updating(dest) ? 1 : 0); i < rowFields.size(); ++i) {
-        TypeInfo rowFieldTypeInfo = rowFields.get(i).getType();
-        ExprNodeDesc column = new ExprNodeColumnDesc(
-            rowFieldTypeInfo, rowFields.get(i).getInternalName(), "", true);
-        expressions.add(column);
+      // deal with dynamic partition columns
+      if (dynPart && dpCtx != null && dpCtx.getNumDPCols() > 0) {
+        // rowFields contains non-partitioned columns (tableFields) followed by DP columns
+        int extraColOffset = tableFields.size() + (updating(dest) ? 1 : 0);
+        for (int dpColIdx = 0; dpColIdx < rowFields.size() - extraColOffset; ++dpColIdx) {
+
+          // create ExprNodeDesc
+          ColumnInfo inputColumn = rowFields.get(dpColIdx + extraColOffset);
+          TypeInfo inputTypeInfo = inputColumn.getType();
+          ExprNodeDesc column =
+              new ExprNodeColumnDesc(inputTypeInfo, inputColumn.getInternalName(), "", true);
+
+          // Cast input column to destination column type if necessary.
+          if (conf.getBoolVar(DYNAMICPARTITIONCONVERT)) {
+            if (parts != null && !parts.isEmpty()) {
+              String destPartitionName = dpCtx.getDPColNames().get(dpColIdx);
+              FieldSchema destPartitionFieldSchema = parts.stream()
+                  .filter(dynamicPartition -> dynamicPartition.getName().equals(destPartitionName))
+                  .findFirst().orElse(null);
+              if (destPartitionFieldSchema == null) {
+                throw new IllegalStateException("Partition schema for dynamic partition " +
+                    destPartitionName + " not found in DynamicPartitionCtx.");
+              }
+              String partitionType = destPartitionFieldSchema.getType();
+              if (partitionType == null) {
+                throw new IllegalStateException("Couldn't get FieldSchema for partition" +
+                    destPartitionFieldSchema.getName());
+              }
+              PrimitiveTypeInfo partitionTypeInfo =
+                  TypeInfoFactory.getPrimitiveTypeInfo(partitionType);
+              if (!partitionTypeInfo.equals(inputTypeInfo)) {
+                column = ExprNodeTypeCheck.getExprNodeDefaultExprProcessor()
+                    .createConversionCast(column, partitionTypeInfo);
+                converted.set(true);
+              }
+            } else {
+              LOG.warn("Partition schema for dynamic partition " + inputColumn.getAlias() + " ("
+                  + inputColumn.getInternalName() + ") not found in DynamicPartitionCtx. "
+                  + "This is expected with a CTAS.");
+            }
+          }
+          expressions.add(column);
+        }
       }
-      // converted = true; // [TODO]: should we check & convert type to String and set it to true?
     }
 
     if (converted.get()) {

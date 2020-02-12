@@ -742,7 +742,7 @@ STAGE PLANS:
                   alias: emps_hive
                   Statistics: Num rows: 1 Data size: 348 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: empid (type: int), deptno (type: int), name (type: varchar(256))
+                    expressions: empid (type: int), deptno (type: int), CAST( name AS STRING) (type: string)
                     outputColumnNames: _col0, _col1, _col2
                     Statistics: Num rows: 1 Data size: 348 Basic stats: COMPLETE Column stats: NONE
                     File Output Operator
@@ -755,7 +755,7 @@ STAGE PLANS:
                           name: default.tab1_hive_part
                       Write Type: INSERT
                     Select Operator
-                      expressions: _col0 (type: int), _col1 (type: int), CAST( _col2 AS STRING) (type: string)
+                      expressions: _col0 (type: int), _col1 (type: int), _col2 (type: string)
                       outputColumnNames: empid, deptno, partcol
                       Statistics: Num rows: 1 Data size: 348 Basic stats: COMPLETE Column stats: NONE
                       Group By Operator
@@ -878,7 +878,7 @@ STAGE PLANS:
                 Number of rows: 10
                 Statistics: Num rows: 1 Data size: 348 Basic stats: COMPLETE Column stats: NONE
                 Select Operator
-                  expressions: VALUE._col0 (type: int), VALUE._col1 (type: int), VALUE._col2 (type: varchar(256))
+                  expressions: VALUE._col0 (type: int), VALUE._col1 (type: int), CAST( VALUE._col2 AS STRING) (type: string)
                   outputColumnNames: _col0, _col1, _col2
                   Statistics: Num rows: 1 Data size: 348 Basic stats: COMPLETE Column stats: NONE
                   File Output Operator
@@ -891,7 +891,7 @@ STAGE PLANS:
                         name: default.tab1_hive_part
                     Write Type: INSERT
                   Select Operator
-                    expressions: _col0 (type: int), _col1 (type: int), CAST( _col2 AS STRING) (type: string)
+                    expressions: _col0 (type: int), _col1 (type: int), _col2 (type: string)
                     outputColumnNames: empid, deptno, partcol
                     Statistics: Num rows: 1 Data size: 348 Basic stats: COMPLETE Column stats: NONE
                     Group By Operator
