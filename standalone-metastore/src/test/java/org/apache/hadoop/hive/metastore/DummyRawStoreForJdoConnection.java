@@ -1295,6 +1295,11 @@ public class DummyRawStoreForJdoConnection implements RawStore {
   }
 
   @Override
+  public List<String> isPartOfMaterializedView(String catName, String dbName, String tblName) {
+    throw new RuntimeException("unimplemented");
+  }
+
+  @Override
   public ScheduledQueryPollResponse scheduledQueryPoll(ScheduledQueryPollRequest request) {
     throw new RuntimeException("unimplemented");
   }
