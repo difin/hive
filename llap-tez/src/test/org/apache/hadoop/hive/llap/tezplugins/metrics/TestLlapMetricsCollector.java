@@ -15,7 +15,6 @@
 package org.apache.hadoop.hive.llap.tezplugins.metrics;
 
 import com.google.common.collect.Lists;
-import com.google.protobuf.RpcController;
 import com.google.protobuf.ServiceException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -38,9 +37,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.AdditionalMatchers.or;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -84,7 +81,7 @@ public class TestLlapMetricsCollector {
           .thenReturn(MockListener.class.getName());
     when(mockClientFactory.create(any(LlapServiceInstance.class))).thenReturn(mockClient);
     when(mockClient.getDaemonMetrics(
-            or(any(RpcController.class),isNull()),
+            any(), // can be NULL
             any(LlapDaemonProtocolProtos.GetDaemonMetricsRequestProto.class))).thenReturn(TEST_RESPONSE);
     collector = new LlapMetricsCollector(mockConf, mockExecutor, mockClientFactory);
   }
@@ -94,6 +91,8 @@ public class TestLlapMetricsCollector {
     // Given
     LlapServiceInstance mockService = mock(LlapServiceInstance.class);
     when(mockService.getWorkerIdentity()).thenReturn(TEST_IDENTITY_1);
+
+    assertTrue(collector != null);
 
     // When
     collector.onCreate(mockService, TEST_SEQ_VERSION);

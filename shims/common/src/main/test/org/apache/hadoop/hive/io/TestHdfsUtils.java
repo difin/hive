@@ -33,8 +33,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 
 import org.junit.Test;
 
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -60,7 +59,7 @@ public class TestHdfsUtils {
     doThrow(RuntimeException.class).when(fs).setOwner(any(Path.class), any(String.class), any(String.class));
 
     HdfsUtils.setFullFileStatus(conf, mockHadoopFileStatus, "fakeGroup2", fs, new Path("fakePath"), false);
-    verify(fs).setOwner(any(Path.class), isNull(), any(String.class));
+    verify(fs).setOwner(any(Path.class), any(), any(String.class));
   }
 
   /**

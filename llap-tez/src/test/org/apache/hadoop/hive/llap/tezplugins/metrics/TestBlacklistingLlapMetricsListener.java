@@ -40,10 +40,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.AdditionalMatchers.or;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -74,6 +73,9 @@ public class TestBlacklistingLlapMetricsListener {
   @Mock
   private LlapServiceInstanceSet mockInstanceSet;
 
+  @Mock
+  private LlapServiceInstance mockLlapServiceInstance;
+
   @Before
   public void setUp() throws Exception {
     initMocks(this);
@@ -82,9 +84,10 @@ public class TestBlacklistingLlapMetricsListener {
     when(mockRegistry.getInstances()).thenReturn(mockInstanceSet);
     when(mockRegistry.lockForConfigChange(anyLong(), anyLong())).thenReturn(
         new ConfigChangeLockResult(true, Long.MIN_VALUE));
-    when(mockClientFactory.create(or(any(LlapServiceInstance.class), isNull()))).thenReturn(mockClient);
+    when(mockRegistry.getInstances().getInstance(anyString())).thenReturn(mockLlapServiceInstance);
+    when(mockClientFactory.create(any(LlapServiceInstance.class))).thenReturn(mockClient);
     when(mockClient.setCapacity(
-        or(any(RpcController.class), isNull()),
+        any(),
         any(SetCapacityRequestProto.class))).thenReturn(TEST_RESPONSE);
 
     listener = new BlacklistingLlapMetricsListener();
@@ -99,7 +102,7 @@ public class TestBlacklistingLlapMetricsListener {
     // Then
     ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
 
-    verify(mockClient, times(1)).setCapacity(isNull(), any(SetCapacityRequestProto.class));
+    verify(mockClient, times(1)).setCapacity(any(), any(SetCapacityRequestProto.class));
     verify(mockInstanceSet, times(1)).getInstance(argumentCaptor.capture());
     assertEquals("3", argumentCaptor.getValue());
   }
@@ -160,7 +163,7 @@ public class TestBlacklistingLlapMetricsListener {
     listener.newClusterMetrics(data);
 
     ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
-    verify(mockClient, times(1)).setCapacity(isNull(), any(SetCapacityRequestProto.class));
+    verify(mockClient, times(1)).setCapacity(any(), any(SetCapacityRequestProto.class));
     verify(mockInstanceSet, times(1)).getInstance(argumentCaptor.capture());
     assertEquals("3", argumentCaptor.getValue());
   }

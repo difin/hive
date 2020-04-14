@@ -21,7 +21,7 @@ package org.apache.hadoop.hive.ql.security.authorization.plugin;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +73,10 @@ public class TestHiveAuthorizerShowFilters {
    * HiveAuthorizer.filterListCmdObjects, and stores the list argument in
    * filterArguments
    */
-  protected static class MockedHiveAuthorizerFactory implements HiveAuthorizerFactory {
+  public static class MockedHiveAuthorizerFactory implements HiveAuthorizerFactory {
+    /**
+     * Abstracts HiveAuthorizer interface for hive authorization plugins
+     */
     public abstract class AuthorizerWithFilterCmdImpl implements HiveAuthorizer {
       @Override
       public List<HivePrivilegeObject> filterListCmdObjects(List<HivePrivilegeObject> listObjs,

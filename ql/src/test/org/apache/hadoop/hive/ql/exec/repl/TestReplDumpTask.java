@@ -44,11 +44,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
@@ -153,7 +152,6 @@ public class TestReplDumpTask {
       task.bootStrapDump(new Path("mock"), new DumpMetaData(new Path("mock"), conf),
         mock(Path.class), hive);
     } finally {
-      verifyStatic(Utils.class);
       Utils.resetDbBootstrapDumpState(same(hive), eq("default"), eq(dbRandomKey));
     }
   }

@@ -27,7 +27,7 @@ import org.apache.tez.dag.api.client.VertexStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,10 +39,9 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.AdditionalMatchers.or;
-import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -87,8 +86,8 @@ public class TestTezProgressMonitor {
   @Test
   public void setupInternalStateOnObjectCreation() throws IOException, TezException {
     when(dagStatus.getState()).thenReturn(DAGStatus.State.RUNNING);
-    when(dagClient.getVertexStatus(eq(MAPPER), or(anySet(), isNull()))).thenReturn(succeeded);
-    when(dagClient.getVertexStatus(eq(REDUCER), or(anySet(), isNull()))).thenReturn(running);
+    when(dagClient.getVertexStatus(eq(MAPPER), any())).thenReturn(succeeded);
+    when(dagClient.getVertexStatus(eq(REDUCER), any())).thenReturn(running);
 
     TezProgressMonitor monitor =
         new TezProgressMonitor(dagClient, dagStatus, new ArrayList<BaseWork>(), progressMap(), console,

@@ -37,6 +37,7 @@ import org.mockito.internal.util.reflection.FieldSetter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
@@ -48,14 +49,43 @@ public class TestVectorDeserializeOrcWriter {
 
   private static final int TEST_NUM_COLS = 2;
 
+  private static Field reflectField(Class<?> classToReflect, String fieldNameValueToFetch) {
+    try {
+      Field reflectField = null;
+      Class<?> classForReflect = classToReflect;
+      do {
+        try {
+          reflectField = classForReflect.getDeclaredField(fieldNameValueToFetch);
+        } catch (NoSuchFieldException e) {
+          classForReflect = classForReflect.getSuperclass();
+        }
+      } while (reflectField == null || classForReflect == null);
+      reflectField.setAccessible(true);
+      return reflectField;
+    } catch (Exception e) {
+      fail("Failed to reflect " + fieldNameValueToFetch + " from " + classToReflect);
+    }
+    return null;
+  }
+
+  private static void reflectSetValue(Object objToReflect, String fieldNameToSet, Object valueToSet) {
+    try {
+      Field reflectField = reflectField(objToReflect.getClass(), fieldNameToSet);
+      reflectField.set(objToReflect, valueToSet);
+    } catch (Exception e) {
+      fail("Failed to reflectively set " + fieldNameToSet + "=" + valueToSet);
+    }
+  }
+
   @Test
   public void testConcurrencyIssueWhileWriting() throws Exception {
 
     //Setup////////////////////////////////////////////////////////////////////////////////////////
     EncodedDataConsumer consumer = createBlankEncodedDataConsumer();
-    Field field = EncodedDataConsumer.class.getDeclaredField("cvbPool");
-    field.setAccessible(true);
-    FixedSizedObjectPool<ColumnVectorBatch> cvbPool = (FixedSizedObjectPool<ColumnVectorBatch>)field.get(consumer);
+    Field cvbPoolField = EncodedDataConsumer.class.getDeclaredField("cvbPool");
+    cvbPoolField.setAccessible(true);
+    FixedSizedObjectPool<ColumnVectorBatch> cvbPool = (FixedSizedObjectPool<ColumnVectorBatch>)
+      cvbPoolField.get(consumer);
 
     ColumnVectorBatch cvb = new ColumnVectorBatch(TEST_NUM_COLS);
     VectorizedRowBatch vrb = new VectorizedRowBatch(TEST_NUM_COLS);
@@ -106,11 +136,11 @@ public class TestVectorDeserializeOrcWriter {
           Queue<VectorDeserializeOrcWriter.WriteOperation> writeOpQueue, VectorizedRowBatch vrb) throws NoSuchFieldException {
     VectorDeserializeOrcWriter orcWriter = mock(VectorDeserializeOrcWriter.class,
             withSettings().defaultAnswer(CALLS_REAL_METHODS));
-    FieldSetter.setField(orcWriter, VectorDeserializeOrcWriter.class.getDeclaredField("sourceBatch"), vrb);
-    FieldSetter.setField(orcWriter, VectorDeserializeOrcWriter.class.getDeclaredField("destinationBatch"), vrb);
-    FieldSetter.setField(orcWriter, VectorDeserializeOrcWriter.class.getDeclaredField("currentBatches"), new ArrayList<VectorizedRowBatch>());
-    FieldSetter.setField(orcWriter, VectorDeserializeOrcWriter.class.getDeclaredField("queue"), writeOpQueue);
-    FieldSetter.setField(orcWriter, VectorDeserializeOrcWriter.class.getDeclaredField("isAsync"), true);
+    reflectSetValue(orcWriter, "sourceBatch", vrb);
+    reflectSetValue(orcWriter, "destinationBatch", vrb);
+    reflectSetValue(orcWriter, "currentBatches", new ArrayList<VectorizedRowBatch>());
+    reflectSetValue(orcWriter, "queue", writeOpQueue);
+    reflectSetValue(orcWriter, "isAsync", true);
     return orcWriter;
   }
 
