@@ -121,6 +121,10 @@ public class MiniHS2 extends AbstractHiveService {
       this.miniClusterType = MiniClusterType.MR;
       return this;
     }
+    public Builder withMiniTez() {
+      this.miniClusterType = MiniClusterType.TEZ;
+      return this;
+    }
 
     public Builder withMiniKdc(String serverPrincipal, String serverKeytab) {
       this.useMiniKdc = true;

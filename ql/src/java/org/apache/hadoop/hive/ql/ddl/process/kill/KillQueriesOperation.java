@@ -33,6 +33,8 @@ public class KillQueriesOperation extends DDLOperation<KillQueriesDesc> {
     super(context, desc);
   }
 
+  public static final String KILL_QUERY_MESSAGE = "User invoked KILL QUERY";
+
   @Override
   public int execute() throws HiveException {
     SessionState sessionState = SessionState.get();
@@ -40,9 +42,9 @@ public class KillQueriesOperation extends DDLOperation<KillQueriesDesc> {
       // For now, get the config setting here; we can only have one type of the session present.
       // Ideally we should check each session separately.
       boolean isExternal = HiveConf.getBoolVar(context.getDb().getConf(),
-          ConfVars.HIVE_SERVER2_TEZ_USE_EXTERNAL_SESSIONS);
-       sessionState.getKillQuery().killQuery(queryId, "User invoked KILL QUERY", context.getDb().getConf(),
-           !isExternal);
+              ConfVars.HIVE_SERVER2_TEZ_USE_EXTERNAL_SESSIONS);
+      sessionState.getKillQuery().killQuery(queryId, KILL_QUERY_MESSAGE, context.getDb().getConf(),
+              !isExternal);
     }
     LOG.info("kill query called ({})", desc.getQueryIds());
     return 0;
