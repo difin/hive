@@ -1,4 +1,4 @@
---! qt:dataset:alltypesorc,alltypesparquet,part,src,src1,srcbucket,srcbucket2,src_cbo,src_json,src_sequencefile,src_thrift,srcpart,cbo_t1,cbo_t2,cbo_t3,lineitem
+--! qt:dataset:src,part,srcbucket:ONLY
 --! qt:sysdb
 -- Mask the enqueue time which is based on current time
 --! qt:replace:/(initiated\s+NULL\s+NULL\s+NULL\s+)[0-9]*(\s+NULL)/$1#Masked#$2/

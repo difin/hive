@@ -35,12 +35,25 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Datasets are provided by this handler.
+ *
+ * An invocation of:
+ *
+ * <pre>
+ * --! qt:dataset:sample
+ * --! qt:dataset:sample:ONLY
+ * </pre>
+ *
+ * will make sure that the dataset named sample is loaded prior to executing the test.
+ */
 public class QTestDatasetHandler implements QTestOptionHandler {
   private static final Logger LOG = LoggerFactory.getLogger("QTestDatasetHandler");
 
   private File datasetDir;
   private static Set<String> srcTables;
   private static Set<String> missingTables = new HashSet<>();
+  Set<String> tablesToUnload = new HashSet<>();
 
   public QTestDatasetHandler(HiveConf conf) {
     // Use path relative to dataDir directory if it is not specified
@@ -79,6 +92,17 @@ public class QTestDatasetHandler implements QTestOptionHandler {
     return true;
   }
 
+  public boolean unloadDataset(String table, CliDriver cliDriver) throws Exception {
+    try {
+      CommandProcessorResponse result = cliDriver.processLine("drop table " + table);
+      LOG.info("Result from cliDrriver.processLine in initFromDatasets=" + result);
+    } catch (CommandProcessorException e) {
+      Assert.fail("Failed during initFromDatasets processLine with code=" + e);
+    }
+
+    return true;
+  }
+
   public static Set<String> getSrcTables() {
     if (srcTables == null) {
       initSrcTables();
@@ -88,6 +112,11 @@ public class QTestDatasetHandler implements QTestOptionHandler {
 
   public static void addSrcTable(String table) {
     getSrcTables().add(table);
+    storeSrcTables();
+  }
+
+  private void removeSrcTable(String table) {
+    srcTables.remove(table);
     storeSrcTables();
   }
 
@@ -122,33 +151,53 @@ public class QTestDatasetHandler implements QTestOptionHandler {
 
   @Override
   public void processArguments(String arguments) {
-    String[] tables = arguments.split(",");
+    String[] args = arguments.split(":");
+    Set<String> tableNames = getTableNames(args[0]);
     synchronized (QTestUtil.class) {
-      for (String string : tables) {
-        string = string.trim();
-        if(string.length()==0) {
-          continue;
+      if (args.length > 1) {
+        if (args.length > 2 || !args[1].equalsIgnoreCase("ONLY")) {
+          throw new RuntimeException("unknown option: " + args[1]);
         }
-        if (srcTables == null || !srcTables.contains(string)) {
-          missingTables.add(string);
-        }
+        tablesToUnload.addAll(getSrcTables());
+        tablesToUnload.removeAll(tableNames);
       }
+      tableNames.removeAll(getSrcTables());
+      missingTables.addAll(tableNames);
     }
+  }
+
+  private Set<String> getTableNames(String arguments) {
+    Set<String> ret = new HashSet<String>();
+    String[] tables = arguments.split(",");
+    for (String string : tables) {
+      string = string.trim();
+      if(string.length()==0) {
+        continue;
+      }
+      ret.add(string);
+    }
+    return ret;
   }
 
   @Override
   public void beforeTest(QTestUtil qt) throws Exception {
-    if (!missingTables.isEmpty()) {
-      synchronized (QTestUtil.class) {
-        qt.newSession(true);
-        for (String table : missingTables) {
-          if (initDataset(table, qt.getCliDriver())) {
-            addSrcTable(table);
-          }
+    if (missingTables.isEmpty() && tablesToUnload.isEmpty()) {
+      return;
+    }
+    synchronized (QTestUtil.class) {
+      qt.newSession(true);
+      for (String table : missingTables) {
+        if (initDataset(table, qt.getCliDriver())) {
+          addSrcTable(table);
         }
-        missingTables.clear();
-        qt.newSession(true);
       }
+      for (String table : tablesToUnload) {
+        removeSrcTable(table);
+        unloadDataset(table, qt.getCliDriver());
+      }
+      missingTables.clear();
+      tablesToUnload.clear();
+      qt.newSession(true);
     }
   }
 
