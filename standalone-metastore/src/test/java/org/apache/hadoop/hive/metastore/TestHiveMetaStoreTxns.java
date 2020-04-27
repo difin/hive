@@ -46,6 +46,7 @@ import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Rule;
 import org.junit.experimental.categories.Category;
@@ -74,8 +75,8 @@ import java.util.List;
 @Category(MetastoreUnitTest.class)
 public class TestHiveMetaStoreTxns {
 
-  private Configuration conf;
-  private IMetaStoreClient client;
+  private static Configuration conf = MetastoreConf.newMetastoreConf();
+  private static IMetaStoreClient client;
   private Connection conn;
 
   @Rule
@@ -444,16 +445,18 @@ public class TestHiveMetaStoreTxns {
     Assert.assertEquals(CompactionType.MINOR, lci.getType());
   }
 
-  @Before
-  public void setUp() throws Exception {
-    conf = MetastoreConf.newMetastoreConf();
+  @BeforeClass
+  public static void setUpDb() throws Exception {
     MetastoreConf.setVar(conf, ConfVars.METASTORE_METADATA_TRANSFORMER_CLASS, " ");
     conf.setBoolean(ConfVars.HIVE_IN_TEST.getVarname(), true);
     MetaStoreTestUtils.setConfForStandloneMode(conf);
     TestTxnDbUtil.setConfValues(conf);
     TestTxnDbUtil.prepDb(conf);
     client = new HiveMetaStoreClient(conf);
+  }
 
+  @Before
+  public void setup() throws Exception {
     String connectionStr = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.CONNECT_URL_KEY);
     conn = DriverManager.getConnection(connectionStr);
   }

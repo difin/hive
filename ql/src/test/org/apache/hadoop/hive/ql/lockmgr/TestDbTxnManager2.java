@@ -50,6 +50,7 @@ import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
 import org.apache.hadoop.hive.ql.session.SessionState;
+import org.junit.BeforeClass;
 import org.junit.ComparisonFailure;
 import org.junit.Rule;
 import org.junit.Test;
@@ -2049,14 +2050,20 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       Assert.assertNotNull("Didn't get exception", expectedException);
       try {
         Assert.assertEquals("Transaction manager has aborted the transaction txnid:11.  Reason: " +
-            "Aborting [txnid:11,11] due to a write conflict on default/target/p=1/q=3 " +
-            "committed by [txnid:10,11] u/u", expectedException.getMessage());
-      } catch (ComparisonFailure ex) {
-        //the 2 txns have 2 conflicts between them so check for either failure since which one is
-        //reported (among the 2) is not deterministic
-        Assert.assertEquals("Transaction manager has aborted the transaction txnid:11.  Reason: " +
             "Aborting [txnid:11,11] due to a write conflict on default/target/p=1/q=2 " +
             "committed by [txnid:10,11] d/d", expectedException.getMessage());
+      } catch (ComparisonFailure ex) {
+        //the 2 txns have 3 conflicts between them so check for either failure since which one is
+        //reported (among the 3) is not deterministic
+        try {
+          Assert.assertEquals("Transaction manager has aborted the transaction txnid:11.  Reason: "
+              + "Aborting [txnid:11,11] due to a write conflict on default/target/p=2/q=2 "
+              + "committed by [txnid:10,11] d/d", expectedException.getMessage());
+        } catch (ComparisonFailure ex2) {
+          Assert.assertEquals("Transaction manager has aborted the transaction txnid:11.  Reason: " +
+              "Aborting [txnid:11,11] due to a write conflict on default/target/p=1/q=3 " +
+              "committed by [txnid:10,11] u/u", expectedException.getMessage());
+        }
       }
       Assert.assertEquals(
           "COMPLETED_TXN_COMPONENTS mismatch(" + JavaUtils.txnIdToString(txnId2) + "): " +

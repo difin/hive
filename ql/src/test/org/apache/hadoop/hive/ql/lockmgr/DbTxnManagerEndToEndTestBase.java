@@ -32,6 +32,7 @@ import org.apache.hadoop.hive.ql.session.SessionState;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 import java.io.File;
 
@@ -63,7 +64,12 @@ public abstract class DbTxnManagerEndToEndTestBase {
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_CLEANER_ON, true);
     TestTxnDbUtil.setConfValues(conf);
   }
-  
+
+  @BeforeClass
+  public static void setUpDB() throws Exception{
+    TestTxnDbUtil.prepDb(conf);
+  }
+
   @Before
   public void setUp() throws Exception {
     // set up metastore client cache
@@ -82,7 +88,6 @@ public abstract class DbTxnManagerEndToEndTestBase {
     driver2 = new Driver(new QueryState.Builder().withHiveConf(conf).build(), null);
     
     TestTxnDbUtil.cleanDb(conf);
-    TestTxnDbUtil.prepDb(conf);
     SessionState ss = SessionState.get();
     ss.initTxnMgr(conf);
     txnMgr = ss.getTxnMgr();

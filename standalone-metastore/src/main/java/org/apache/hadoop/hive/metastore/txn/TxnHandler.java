@@ -311,8 +311,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       "SELECT \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\" FROM \"TXN_COMPONENTS\" " +
           "INNER JOIN \"TXNS\" ON \"TC_TXNID\" = \"TXN_ID\" WHERE \"TXN_STATE\" = " + TxnStatus.ABORTED +
       " GROUP BY \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\" HAVING COUNT(\"TXN_ID\") > ?";
-  
-  private static final String  EXCL_CTAS_ERR_MSG = 
+
+  private static final String  EXCL_CTAS_ERR_MSG =
       "Failed to initiate a concurrent CTAS operation with the same table name, lockInfo : %s";
   private static final String ZERO_WAIT_READ_ERR_MSG = "Unable to acquire read lock due to an existing exclusive lock {%s}";
 

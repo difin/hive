@@ -370,7 +370,7 @@ public class MiniHS2 extends AbstractHiveService {
   public void start(Map<String, String> confOverlay) throws Exception {
     if (isMetastoreRemote) {
       hmsPort = MetaStoreTestUtils.startMetaStoreWithRetry(HadoopThriftAuthBridge.getBridge(), getHiveConf(),
-              false, false, false, createTransactionalTables);
+              false, false, false, false, createTransactionalTables);
       setWareHouseDir(MetastoreConf.getVar(getHiveConf(), MetastoreConf.ConfVars.WAREHOUSE));
     }
 

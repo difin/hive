@@ -145,4 +145,19 @@ public enum DatabaseProduct {
     }
   }
 
+
+  public static String getHiveSchemaPostfix(DatabaseProduct dbType) {
+    switch (dbType) {
+    case SQLSERVER:
+      return "mssql";
+    case DERBY:
+    case MYSQL:
+    case POSTGRES:
+    case ORACLE:
+      return dbType.name().toLowerCase();
+    case OTHER:
+    default:
+      return null;
+    }
+  }
 }

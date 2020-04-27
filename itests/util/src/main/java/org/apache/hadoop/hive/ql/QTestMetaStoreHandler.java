@@ -108,7 +108,6 @@ public class QTestMetaStoreHandler {
     // special qtest logic, which doesn't fit quite well into Derby.after()
     if (isDerby()) {
       TestTxnDbUtil.cleanDb(qt.getConf());
-      TestTxnDbUtil.prepDb(qt.getConf());
     }
   }
 

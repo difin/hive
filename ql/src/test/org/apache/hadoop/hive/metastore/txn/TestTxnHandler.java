@@ -120,10 +120,12 @@ public class TestTxnHandler {
 
   public TestTxnHandler() throws Exception {
     TestTxnDbUtil.setConfValues(conf);
+    TestTxnDbUtil.prepDb(conf);
     LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
     Configuration conf = ctx.getConfiguration();
     conf.getLoggerConfig(CLASS_NAME).setLevel(Level.DEBUG);
     ctx.updateLoggers(conf);
+    tearDown();
   }
 
   @Test
@@ -1959,7 +1961,6 @@ public class TestTxnHandler {
 
   @Before
   public void setUp() throws Exception {
-    TestTxnDbUtil.prepDb(conf);
     txnHandler = TxnUtils.getTxnStore(conf);
   }
 
