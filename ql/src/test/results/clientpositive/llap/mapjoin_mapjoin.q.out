@@ -81,6 +81,7 @@ STAGE PLANS:
                           Position of Big Table: 0
                           Statistics: Num rows: 2420 Data size: 25709 Basic stats: COMPLETE Column stats: NONE
                           File Output Operator
+                            bucketingVersion: 2
                             compressed: false
                             GlobalTableId: 0
 #### A masked pattern was here ####
@@ -91,6 +92,7 @@ STAGE PLANS:
                                 input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                                 output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                                 properties:
+                                  bucketing_version -1
                                   columns _col0
                                   columns.types string
                                   escape.delim \
@@ -276,8 +278,10 @@ STAGE PLANS:
                       outputColumnNames: _col0
                       Statistics: Num rows: 25 Data size: 191 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: string)
                         null sort order: a
+                        numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 25 Data size: 191 Basic stats: COMPLETE Column stats: NONE
@@ -338,8 +342,10 @@ STAGE PLANS:
                       outputColumnNames: _col0
                       Statistics: Num rows: 500 Data size: 5312 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: string)
                         null sort order: a
+                        numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: string)
                         Statistics: Num rows: 500 Data size: 5312 Basic stats: COMPLETE Column stats: NONE

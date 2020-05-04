@@ -171,7 +171,9 @@ STAGE PLANS:
                         outputColumnNames: _col0
                         Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
+                          bucketingVersion: 2
                           null sort order: 
+                          numBuckets: -1
                           sort order: 
                           Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                           tag: -1
@@ -268,6 +270,7 @@ STAGE PLANS:
                 outputColumnNames: _col0
                 Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -278,6 +281,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0
                         columns.types bigint
                         escape.delim \
@@ -356,7 +360,9 @@ STAGE PLANS:
                         outputColumnNames: _col0
                         Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
+                          bucketingVersion: 2
                           null sort order: 
+                          numBuckets: -1
                           sort order: 
                           Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                           tag: -1
@@ -453,6 +459,7 @@ STAGE PLANS:
                 outputColumnNames: _col0
                 Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -463,6 +470,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0
                         columns.types bigint
                         escape.delim \

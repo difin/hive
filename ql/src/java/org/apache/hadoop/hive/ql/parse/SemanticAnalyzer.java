@@ -11552,9 +11552,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         topToTableProps.put(top, properties);
         tsDesc.setOpProps(properties);
       }
-
-      // Set the bucketing Version
-      top.setBucketingVersion(tsDesc.getTableMetadata().getBucketingVersion());
     } else {
       rwsch = opParseCtx.get(top).getRowResolver();
       top.setChildOperators(null);

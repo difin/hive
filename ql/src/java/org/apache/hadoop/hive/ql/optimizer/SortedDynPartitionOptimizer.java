@@ -45,7 +45,6 @@ import org.apache.hadoop.hive.ql.exec.SelectOperator;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.exec.Utilities.ReduceField;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
-import org.apache.hadoop.hive.ql.io.RecordIdentifier;
 import org.apache.hadoop.hive.ql.lib.DefaultGraphWalker;
 import org.apache.hadoop.hive.ql.lib.DefaultRuleDispatcher;
 import org.apache.hadoop.hive.ql.lib.SemanticDispatcher;
@@ -223,7 +222,7 @@ public class SortedDynPartitionOptimizer extends Transform {
         /**
          * ROW__ID is always the 1st column of Insert representing Update/Delete operation
          * (set up in {@link org.apache.hadoop.hive.ql.parse.UpdateDeleteSemanticAnalyzer})
-         * and we wrap it in UDFToInteger 
+         * and we wrap it in UDFToInteger
          * (in {@link org.apache.hadoop.hive.ql.parse.SemanticAnalyzer#getPartitionColsFromBucketColsForUpdateDelete(Operator, boolean)})
          * which extracts bucketId from it
          * see {@link org.apache.hadoop.hive.ql.udf.UDFToInteger#evaluate(RecordIdentifier)}*/
@@ -287,6 +286,7 @@ public class SortedDynPartitionOptimizer extends Transform {
       ReduceSinkOperator rsOp = getReduceSinkOp(partitionPositions, sortPositions, sortOrder, sortNullOrder,
                                                   allRSCols, bucketColumns, numBuckets,
                                                  fsParent, fsOp.getConf().getWriteType());
+      rsOp.getConf().setBucketingVersion(fsOp.getConf().getBucketingVersion());
       // we have to make sure not to reorder the child operators as it might cause weird behavior in the tasks at
       // the same level. when there is auto stats gather at the same level as another operation then it might
       // cause unnecessary preemption. Maintaining the order here to avoid such preemption and possible errors

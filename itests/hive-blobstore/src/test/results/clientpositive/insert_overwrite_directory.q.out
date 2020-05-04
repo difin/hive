@@ -90,6 +90,7 @@ STAGE PLANS:
               outputColumnNames: _col0, _col1
               Statistics: Num rows: 2 Data size: 180 Basic stats: COMPLETE Column stats: COMPLETE
               File Output Operator
+                bucketingVersion: 2
                 compressed: false
                 GlobalTableId: 1
                 directory: ### BLOBSTORE_STAGING_PATH ###
@@ -100,6 +101,7 @@ STAGE PLANS:
                     input format: org.apache.hadoop.mapred.TextInputFormat
                     output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
                     properties:
+                      bucketing_version -1
                       columns _col0,_col1
                       columns.types int:string
                       serialization.format 1
@@ -165,6 +167,7 @@ STAGE PLANS:
           TableScan
             GatherStats: false
             File Output Operator
+              bucketingVersion: -1
               compressed: false
               GlobalTableId: 0
               directory: ### BLOBSTORE_STAGING_PATH ###
@@ -173,6 +176,7 @@ STAGE PLANS:
                   input format: org.apache.hadoop.mapred.TextInputFormat
                   output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
                   properties:
+                    bucketing_version -1
                     columns _col0,_col1
                     columns.types int:string
                     serialization.format 1
@@ -190,6 +194,7 @@ STAGE PLANS:
             input format: org.apache.hadoop.mapred.TextInputFormat
             output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
             properties:
+              bucketing_version -1
               columns _col0,_col1
               columns.types int:string
               serialization.format 1
@@ -199,6 +204,7 @@ STAGE PLANS:
               input format: org.apache.hadoop.mapred.TextInputFormat
               output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
               properties:
+                bucketing_version -1
                 columns _col0,_col1
                 columns.types int:string
                 serialization.format 1
@@ -220,6 +226,7 @@ STAGE PLANS:
           TableScan
             GatherStats: false
             File Output Operator
+              bucketingVersion: -1
               compressed: false
               GlobalTableId: 0
               directory: ### BLOBSTORE_STAGING_PATH ###
@@ -228,6 +235,7 @@ STAGE PLANS:
                   input format: org.apache.hadoop.mapred.TextInputFormat
                   output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
                   properties:
+                    bucketing_version -1
                     columns _col0,_col1
                     columns.types int:string
                     serialization.format 1
@@ -245,6 +253,7 @@ STAGE PLANS:
             input format: org.apache.hadoop.mapred.TextInputFormat
             output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
             properties:
+              bucketing_version -1
               columns _col0,_col1
               columns.types int:string
               serialization.format 1
@@ -254,6 +263,7 @@ STAGE PLANS:
               input format: org.apache.hadoop.mapred.TextInputFormat
               output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
               properties:
+                bucketing_version -1
                 columns _col0,_col1
                 columns.types int:string
                 serialization.format 1
@@ -311,6 +321,7 @@ STAGE PLANS:
               outputColumnNames: _col0
               Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
               File Output Operator
+                bucketingVersion: 2
                 compressed: false
                 GlobalTableId: 1
                 directory: ### BLOBSTORE_STAGING_PATH ###
@@ -321,6 +332,7 @@ STAGE PLANS:
                     input format: org.apache.hadoop.mapred.TextInputFormat
                     output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
                     properties:
+                      bucketing_version -1
                       columns _col0
                       columns.types int
                       serialization.format 1
@@ -334,6 +346,7 @@ STAGE PLANS:
               outputColumnNames: _col0
               Statistics: Num rows: 2 Data size: 172 Basic stats: COMPLETE Column stats: COMPLETE
               File Output Operator
+                bucketingVersion: 2
                 compressed: false
                 GlobalTableId: 2
                 directory: ### BLOBSTORE_STAGING_PATH ###
@@ -344,6 +357,7 @@ STAGE PLANS:
                     input format: org.apache.hadoop.mapred.TextInputFormat
                     output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
                     properties:
+                      bucketing_version -1
                       columns _col0
                       columns.types string
                       serialization.format 1
@@ -409,6 +423,7 @@ STAGE PLANS:
           TableScan
             GatherStats: false
             File Output Operator
+              bucketingVersion: -1
               compressed: false
               GlobalTableId: 0
               directory: ### BLOBSTORE_STAGING_PATH ###
@@ -417,6 +432,7 @@ STAGE PLANS:
                   input format: org.apache.hadoop.mapred.TextInputFormat
                   output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
                   properties:
+                    bucketing_version -1
                     columns _col0
                     columns.types int
                     serialization.format 1
@@ -434,6 +450,7 @@ STAGE PLANS:
             input format: org.apache.hadoop.mapred.TextInputFormat
             output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
             properties:
+              bucketing_version -1
               columns _col0
               columns.types int
               serialization.format 1
@@ -443,6 +460,7 @@ STAGE PLANS:
               input format: org.apache.hadoop.mapred.TextInputFormat
               output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
               properties:
+                bucketing_version -1
                 columns _col0
                 columns.types int
                 serialization.format 1
@@ -464,6 +482,7 @@ STAGE PLANS:
           TableScan
             GatherStats: false
             File Output Operator
+              bucketingVersion: -1
               compressed: false
               GlobalTableId: 0
               directory: ### BLOBSTORE_STAGING_PATH ###
@@ -472,6 +491,7 @@ STAGE PLANS:
                   input format: org.apache.hadoop.mapred.TextInputFormat
                   output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
                   properties:
+                    bucketing_version -1
                     columns _col0
                     columns.types int
                     serialization.format 1
@@ -489,6 +509,7 @@ STAGE PLANS:
             input format: org.apache.hadoop.mapred.TextInputFormat
             output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
             properties:
+              bucketing_version -1
               columns _col0
               columns.types int
               serialization.format 1
@@ -498,6 +519,7 @@ STAGE PLANS:
               input format: org.apache.hadoop.mapred.TextInputFormat
               output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
               properties:
+                bucketing_version -1
                 columns _col0
                 columns.types int
                 serialization.format 1
@@ -529,6 +551,7 @@ STAGE PLANS:
           TableScan
             GatherStats: false
             File Output Operator
+              bucketingVersion: -1
               compressed: false
               GlobalTableId: 0
               directory: ### BLOBSTORE_STAGING_PATH ###
@@ -537,6 +560,7 @@ STAGE PLANS:
                   input format: org.apache.hadoop.mapred.TextInputFormat
                   output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
                   properties:
+                    bucketing_version -1
                     columns _col0
                     columns.types string
                     serialization.format 1
@@ -554,6 +578,7 @@ STAGE PLANS:
             input format: org.apache.hadoop.mapred.TextInputFormat
             output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
             properties:
+              bucketing_version -1
               columns _col0
               columns.types string
               serialization.format 1
@@ -563,6 +588,7 @@ STAGE PLANS:
               input format: org.apache.hadoop.mapred.TextInputFormat
               output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
               properties:
+                bucketing_version -1
                 columns _col0
                 columns.types string
                 serialization.format 1
@@ -584,6 +610,7 @@ STAGE PLANS:
           TableScan
             GatherStats: false
             File Output Operator
+              bucketingVersion: -1
               compressed: false
               GlobalTableId: 0
               directory: ### BLOBSTORE_STAGING_PATH ###
@@ -592,6 +619,7 @@ STAGE PLANS:
                   input format: org.apache.hadoop.mapred.TextInputFormat
                   output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
                   properties:
+                    bucketing_version -1
                     columns _col0
                     columns.types string
                     serialization.format 1
@@ -609,6 +637,7 @@ STAGE PLANS:
             input format: org.apache.hadoop.mapred.TextInputFormat
             output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
             properties:
+              bucketing_version -1
               columns _col0
               columns.types string
               serialization.format 1
@@ -618,6 +647,7 @@ STAGE PLANS:
               input format: org.apache.hadoop.mapred.TextInputFormat
               output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
               properties:
+                bucketing_version -1
                 columns _col0
                 columns.types string
                 serialization.format 1

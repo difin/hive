@@ -135,7 +135,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
       final List<ExprNodeDesc> partitionCols, final DynamicPartitionCtx dpCtx, Path destPath,
       Long mmWriteId, boolean isMmCtas, boolean isInsertOverwrite, boolean isQuery, boolean isCTASorCM, boolean isDirectInsert) {
     this.dirName = dirName;
-    this.tableInfo = tableInfo;
+    setTableInfo(tableInfo);
     this.partition = partition;
     this.compressed = compressed;
     this.destTableId = destTableId;
@@ -159,7 +159,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
       final boolean compressed) {
 
     this.dirName = dirName;
-    this.tableInfo = tableInfo;
+    setTableInfo(tableInfo);
     this.compressed = compressed;
     destTableId = 0;
     this.multiFileSpray = false;
@@ -287,6 +287,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
 
   public void setTableInfo(final TableDesc tableInfo) {
     this.tableInfo = tableInfo;
+    bucketingVersion = tableInfo.getBucketingVersion();
   }
 
   @Explain(displayName = "compressed")
@@ -635,6 +636,10 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
     return isMmCtas;
   }
 
+  @Explain(displayName = "bucketingVersion", explainLevels = { Level.EXTENDED })
+  public int getBucketingVersionForExplain() {
+    return getBucketingVersion();
+  }
   /**
    * Whether this is CREATE TABLE SELECT or CREATE MATERIALIZED VIEW statemet
    * Set by semantic analyzer this is required because CTAS/CM requires some special logic

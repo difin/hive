@@ -91,6 +91,7 @@ STAGE PLANS:
                   expressions: true (type: boolean), _col0 (type: string), _col1 (type: string)
                   outputColumnNames: _col0, _col1, _col2
                   Statistics: Num rows: 83 Data size: 15106 Basic stats: COMPLETE Column stats: COMPLETE
+                  Dummy Store
             Execution mode: llap
             Reduce Operator Tree:
               Group By Operator

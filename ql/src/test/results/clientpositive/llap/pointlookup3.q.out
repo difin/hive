@@ -92,8 +92,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2, _col3
                       Statistics: Num rows: 6 Data size: 2772 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int), _col1 (type: string), _col2 (type: string), _col3 (type: string)
                         null sort order: zzzz
+                        numBuckets: -1
                         sort order: ++++
                         Statistics: Num rows: 6 Data size: 2772 Basic stats: COMPLETE Column stats: COMPLETE
                         tag: -1
@@ -189,6 +191,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col3
                 Statistics: Num rows: 6 Data size: 2772 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -199,6 +202,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0,_col1,_col2,_col3
                         columns.types int:string:string:string
                         escape.delim \
@@ -268,8 +272,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 2 Data size: 556 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int), _col1 (type: string), _col2 (type: string)
                         null sort order: zzz
+                        numBuckets: -1
                         sort order: +++
                         Statistics: Num rows: 2 Data size: 556 Basic stats: COMPLETE Column stats: COMPLETE
                         tag: -1
@@ -327,6 +333,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col3
                 Statistics: Num rows: 2 Data size: 744 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -337,6 +344,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0,_col1,_col2,_col3
                         columns.types int:string:string:string
                         escape.delim \
@@ -411,8 +419,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int)
                         null sort order: a
+                        numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
@@ -479,8 +489,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int)
                         null sort order: a
+                        numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
@@ -545,8 +557,10 @@ STAGE PLANS:
                 Position of Big Table: 0
                 Statistics: Num rows: 30 Data size: 16680 Basic stats: COMPLETE Column stats: COMPLETE
                 Reduce Output Operator
+                  bucketingVersion: 2
                   key expressions: _col3 (type: int), _col4 (type: string)
                   null sort order: zz
+                  numBuckets: -1
                   sort order: ++
                   Statistics: Num rows: 30 Data size: 16680 Basic stats: COMPLETE Column stats: COMPLETE
                   tag: -1
@@ -561,6 +575,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5, _col6, _col7
                 Statistics: Num rows: 30 Data size: 22320 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -571,6 +586,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0,_col1,_col2,_col3,_col4,_col5,_col6,_col7
                         columns.types int:string:string:string:int:string:string:string
                         escape.delim \
@@ -647,8 +663,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int)
                         null sort order: a
+                        numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
@@ -715,8 +733,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int)
                         null sort order: a
+                        numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
@@ -781,8 +801,10 @@ STAGE PLANS:
                 Position of Big Table: 0
                 Statistics: Num rows: 30 Data size: 16680 Basic stats: COMPLETE Column stats: COMPLETE
                 Reduce Output Operator
+                  bucketingVersion: 2
                   key expressions: _col3 (type: int), _col4 (type: string)
                   null sort order: zz
+                  numBuckets: -1
                   sort order: ++
                   Statistics: Num rows: 30 Data size: 16680 Basic stats: COMPLETE Column stats: COMPLETE
                   tag: -1
@@ -797,6 +819,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5, _col6, _col7
                 Statistics: Num rows: 30 Data size: 22320 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -807,6 +830,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0,_col1,_col2,_col3,_col4,_col5,_col6,_col7
                         columns.types int:string:string:string:int:string:string:string
                         escape.delim \
@@ -881,7 +905,9 @@ STAGE PLANS:
                     outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5
                     Statistics: Num rows: 40 Data size: 18800 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
+                      bucketingVersion: 2
                       null sort order: 
+                      numBuckets: -1
                       sort order: 
                       Statistics: Num rows: 40 Data size: 18800 Basic stats: COMPLETE Column stats: COMPLETE
                       tag: 0
@@ -985,7 +1011,9 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5
                       Statistics: Num rows: 10 Data size: 4700 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         null sort order: 
+                        numBuckets: -1
                         sort order: 
                         Statistics: Num rows: 10 Data size: 4700 Basic stats: COMPLETE Column stats: COMPLETE
                         tag: 1
@@ -1130,8 +1158,10 @@ STAGE PLANS:
                   outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5, _col6, _col7
                   Statistics: Num rows: 200 Data size: 184800 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
+                    bucketingVersion: 2
                     key expressions: _col4 (type: int), _col5 (type: string), _col2 (type: string)
                     null sort order: zzz
+                    numBuckets: -1
                     sort order: +++
                     Statistics: Num rows: 200 Data size: 184800 Basic stats: COMPLETE Column stats: COMPLETE
                     tag: -1
@@ -1146,6 +1176,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5, _col6, _col7
                 Statistics: Num rows: 200 Data size: 184800 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -1156,6 +1187,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0,_col1,_col2,_col3,_col4,_col5,_col6,_col7
                         columns.types int:string:string:string:int:string:string:string
                         escape.delim \
@@ -1452,8 +1484,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2, _col3
                       Statistics: Num rows: 20 Data size: 9240 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int), _col1 (type: string), _col2 (type: string), _col3 (type: string)
                         null sort order: zzzz
+                        numBuckets: -1
                         sort order: ++++
                         Statistics: Num rows: 20 Data size: 9240 Basic stats: COMPLETE Column stats: COMPLETE
                         tag: -1
@@ -1549,6 +1583,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col3
                 Statistics: Num rows: 20 Data size: 9240 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -1559,6 +1594,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0,_col1,_col2,_col3
                         columns.types int:string:string:string
                         escape.delim \
@@ -1628,8 +1664,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 10 Data size: 2780 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int), _col1 (type: string), _col2 (type: string)
                         null sort order: zzz
+                        numBuckets: -1
                         sort order: +++
                         Statistics: Num rows: 10 Data size: 2780 Basic stats: COMPLETE Column stats: COMPLETE
                         tag: -1
@@ -1687,6 +1725,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col3
                 Statistics: Num rows: 10 Data size: 3720 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -1697,6 +1736,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0,_col1,_col2,_col3
                         columns.types int:string:string:string
                         escape.delim \
@@ -1771,8 +1811,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int)
                         null sort order: a
+                        numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1839,8 +1881,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int)
                         null sort order: a
+                        numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1905,8 +1949,10 @@ STAGE PLANS:
                 Position of Big Table: 0
                 Statistics: Num rows: 30 Data size: 16680 Basic stats: COMPLETE Column stats: COMPLETE
                 Reduce Output Operator
+                  bucketingVersion: 2
                   key expressions: _col3 (type: int), _col4 (type: string)
                   null sort order: zz
+                  numBuckets: -1
                   sort order: ++
                   Statistics: Num rows: 30 Data size: 16680 Basic stats: COMPLETE Column stats: COMPLETE
                   tag: -1
@@ -1921,6 +1967,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5, _col6, _col7
                 Statistics: Num rows: 30 Data size: 22320 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -1931,6 +1978,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0,_col1,_col2,_col3,_col4,_col5,_col6,_col7
                         columns.types int:string:string:string:int:string:string:string
                         escape.delim \
@@ -2007,8 +2055,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int)
                         null sort order: a
+                        numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2075,8 +2125,10 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         key expressions: _col0 (type: int)
                         null sort order: a
+                        numBuckets: -1
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 20 Data size: 5560 Basic stats: COMPLETE Column stats: COMPLETE
@@ -2141,8 +2193,10 @@ STAGE PLANS:
                 Position of Big Table: 0
                 Statistics: Num rows: 30 Data size: 16680 Basic stats: COMPLETE Column stats: COMPLETE
                 Reduce Output Operator
+                  bucketingVersion: 2
                   key expressions: _col3 (type: int), _col4 (type: string)
                   null sort order: zz
+                  numBuckets: -1
                   sort order: ++
                   Statistics: Num rows: 30 Data size: 16680 Basic stats: COMPLETE Column stats: COMPLETE
                   tag: -1
@@ -2157,6 +2211,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5, _col6, _col7
                 Statistics: Num rows: 30 Data size: 22320 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -2167,6 +2222,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0,_col1,_col2,_col3,_col4,_col5,_col6,_col7
                         columns.types int:string:string:string:int:string:string:string
                         escape.delim \
@@ -2233,7 +2289,9 @@ STAGE PLANS:
                     outputColumnNames: _col0, _col1, _col2, _col3
                     Statistics: Num rows: 40 Data size: 18480 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
+                      bucketingVersion: 2
                       null sort order: 
+                      numBuckets: -1
                       sort order: 
                       Statistics: Num rows: 40 Data size: 18480 Basic stats: COMPLETE Column stats: COMPLETE
                       tag: 0
@@ -2337,7 +2395,9 @@ STAGE PLANS:
                       outputColumnNames: _col0, _col1, _col2, _col3
                       Statistics: Num rows: 9 Data size: 4158 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
+                        bucketingVersion: 2
                         null sort order: 
+                        numBuckets: -1
                         sort order: 
                         Statistics: Num rows: 9 Data size: 4158 Basic stats: COMPLETE Column stats: COMPLETE
                         tag: 1
@@ -2478,8 +2538,10 @@ STAGE PLANS:
                 residual filter predicates: {(struct(_col2,_col4)) IN (const struct('2000-04-08',1), const struct('2000-04-09',2))}
                 Statistics: Num rows: 180 Data size: 166320 Basic stats: COMPLETE Column stats: COMPLETE
                 Reduce Output Operator
+                  bucketingVersion: 2
                   key expressions: _col4 (type: int), _col5 (type: string), _col2 (type: string)
                   null sort order: zzz
+                  numBuckets: -1
                   sort order: +++
                   Statistics: Num rows: 180 Data size: 166320 Basic stats: COMPLETE Column stats: COMPLETE
                   tag: -1
@@ -2494,6 +2556,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5, _col6, _col7
                 Statistics: Num rows: 180 Data size: 166320 Basic stats: COMPLETE Column stats: COMPLETE
                 File Output Operator
+                  bucketingVersion: 2
                   compressed: false
                   GlobalTableId: 0
 #### A masked pattern was here ####
@@ -2504,6 +2567,7 @@ STAGE PLANS:
                       input format: org.apache.hadoop.mapred.SequenceFileInputFormat
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       properties:
+                        bucketing_version -1
                         columns _col0,_col1,_col2,_col3,_col4,_col5,_col6,_col7
                         columns.types int:string:string:string:int:string:string:string
                         escape.delim \

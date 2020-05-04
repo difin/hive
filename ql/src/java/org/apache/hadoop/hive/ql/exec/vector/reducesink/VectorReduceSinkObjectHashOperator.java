@@ -186,7 +186,7 @@ public class VectorReduceSinkObjectHashOperator extends VectorReduceSinkCommonOp
     }
 
     // Set hashFunc
-    hashFunc = bucketingVersion == 2 && !vectorDesc.getIsAcidChange() ?
+    hashFunc = getConf().getBucketingVersion() == 2 && !vectorDesc.getIsAcidChange() ?
       ObjectInspectorUtils::getBucketHashCode :
       ObjectInspectorUtils::getBucketHashCodeOld;
 
@@ -234,21 +234,21 @@ public class VectorReduceSinkObjectHashOperator extends VectorReduceSinkCommonOp
           ve.evaluate(batch);
         }
       }
-  
+
       // Perform any value expressions.  Results will go into scratch columns.
       if (reduceSinkValueExpressions != null) {
         for (VectorExpression ve : reduceSinkValueExpressions) {
           ve.evaluate(batch);
         }
       }
-  
+
       // Perform any bucket expressions.  Results will go into scratch columns.
       if (reduceSinkBucketExpressions != null) {
         for (VectorExpression ve : reduceSinkBucketExpressions) {
           ve.evaluate(batch);
         }
       }
-  
+
       // Perform any partition expressions.  Results will go into scratch columns.
       if (reduceSinkPartitionExpressions != null) {
         for (VectorExpression ve : reduceSinkPartitionExpressions) {
@@ -298,7 +298,9 @@ public class VectorReduceSinkObjectHashOperator extends VectorReduceSinkCommonOp
 
   private void processKey(VectorizedRowBatch batch, int batchIndex, int tag)
   throws HiveException{
-    if (isEmptyKey) return;
+    if (isEmptyKey) {
+      return;
+    }
 
     try {
       keyBinarySortableSerializeWrite.reset();
@@ -320,7 +322,9 @@ public class VectorReduceSinkObjectHashOperator extends VectorReduceSinkCommonOp
   }
 
   private void processValue(VectorizedRowBatch batch, int batchIndex)  throws HiveException {
-    if (isEmptyValue) return;
+    if (isEmptyValue) {
+      return;
+    }
 
     try {
       valueLazyBinarySerializeWrite.reset();

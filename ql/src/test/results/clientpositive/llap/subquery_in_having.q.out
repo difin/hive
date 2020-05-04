@@ -354,6 +354,7 @@ STAGE PLANS:
                       mode: hash
                       outputColumnNames: _col0
                       Statistics: Num rows: 1 Data size: 188 Basic stats: COMPLETE Column stats: NONE
+                      Dummy Store
             Execution mode: llap
             Reduce Operator Tree:
               Group By Operator
@@ -497,6 +498,7 @@ STAGE PLANS:
                       mode: hash
                       outputColumnNames: _col0
                       Statistics: Num rows: 1 Data size: 188 Basic stats: COMPLETE Column stats: NONE
+                      Dummy Store
             Execution mode: llap
             Reduce Operator Tree:
               Group By Operator

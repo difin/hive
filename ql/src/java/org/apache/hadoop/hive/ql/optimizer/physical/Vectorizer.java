@@ -4092,9 +4092,6 @@ public class Vectorizer implements PhysicalPlanResolver {
 
     LOG.info("Vectorizer vectorizeOperator reduce sink class " + opClass.getSimpleName());
 
-    // Get the bucketing version
-    int bucketingVersion = ((ReduceSinkOperator)op).getBucketingVersion();
-
     Operator<? extends OperatorDesc> vectorOp = null;
     try {
       vectorOp = OperatorFactory.getVectorOperator(
@@ -4106,9 +4103,7 @@ public class Vectorizer implements PhysicalPlanResolver {
       throw new HiveException(e);
     }
 
-    // Set the bucketing version
     Preconditions.checkArgument(vectorOp instanceof VectorReduceSinkCommonOperator);
-    vectorOp.setBucketingVersion(bucketingVersion);
 
     return vectorOp;
   }
