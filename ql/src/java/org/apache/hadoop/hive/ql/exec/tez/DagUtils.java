@@ -1162,7 +1162,9 @@ public class DagUtils {
     String addedFiles = Utilities.getLocalResourceFiles(conf, SessionState.ResourceType.FILE);
     String addedJars = Utilities.getLocalResourceFiles(conf, SessionState.ResourceType.JAR);
     String auxJars = HiveConf.getVar(conf, HiveConf.ConfVars.HIVEAUXJARS);
-    String allFiles = auxJars + "," + addedJars + "," + addedFiles;
+    String reloadableAuxJars = SessionState.get() == null ? null : SessionState.get().getReloadableAuxJars();
+    String allFiles =
+        HiveStringUtils.joinIgnoringEmpty(new String[]{auxJars, reloadableAuxJars, addedJars, addedFiles}, ',');
     return allFiles.split(",");
   }
 
@@ -1179,10 +1181,12 @@ public class DagUtils {
       HiveConf.setVar(conf, ConfVars.HIVEADDEDJARS, addedJars);
     }
     String auxJars = HiveConf.getVar(conf, HiveConf.ConfVars.HIVEAUXJARS);
+    String reloadableAuxJars = SessionState.get() == null ? null : SessionState.get().getReloadableAuxJars();
 
     // need to localize the additional jars and files
     // we need the directory on hdfs to which we shall put all these files
-    String allFiles = auxJars + "," + addedJars + "," + addedFiles;
+    String allFiles =
+        HiveStringUtils.joinIgnoringEmpty(new String[]{auxJars, reloadableAuxJars, addedJars, addedFiles}, ',');
     return allFiles.split(",");
   }
 
