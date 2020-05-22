@@ -90,7 +90,6 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>${joda.version}</version>
     </dependency>
     <dependency>
       <groupId>io.netty</groupId>
@@ -335,7 +334,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>${maven.shade.plugin.version}</version>
             <executions>
               <!-- we need to shade netty, as there is a conflict between versions
               used by Hadoop (3.6.2.Final) and Druid (3.10.4.Final) -->
@@ -407,6 +405,7 @@
                         <exclude>META-INF/*.SF</exclude>
                         <exclude>META-INF/*.DSA</exclude>
                         <exclude>META-INF/*.RSA</exclude>
+                        <exclude>META-INF/versions/**</exclude>
                         <exclude>static/</exclude>
                       </excludes>
                     </filter>

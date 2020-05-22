@@ -166,8 +166,11 @@
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>${protobuf.version}</version>
     </dependency>
+      <dependency>
+        <groupId>org.apache.hbase</groupId>
+        <artifactId>hbase-common</artifactId>
+      </dependency>
     <dependency>
       <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-common</artifactId>
@@ -176,12 +179,10 @@
     <dependency>
       <groupId>org.apache.parquet</groupId>
       <artifactId>parquet-hadoop-bundle</artifactId>
-      <version>${parquet.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>${commons-codec.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-collections</groupId>
@@ -191,7 +192,6 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>${commons-io.version}</version>
     </dependency>
     <dependency>
        <groupId>org.apache.commons</groupId>
@@ -206,7 +206,6 @@
     <dependency>
       <groupId>javolution</groupId>
       <artifactId>javolution</artifactId>
-      <version>${javolution.version}</version>
     </dependency>
     <dependency>
       <groupId>org.cloudera.logredactor</groupId>
@@ -226,18 +225,15 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <version>${log4j2.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.avro</groupId>
       <artifactId>avro</artifactId>
-      <version>${avro.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.avro</groupId>
       <artifactId>avro-mapred</artifactId>
       <classifier>hadoop2</classifier>
-      <version>${avro.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.mortbay.jetty</groupId>
@@ -253,17 +249,14 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
-      <version>${commons-compress.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.thrift</groupId>
       <artifactId>libfb303</artifactId>
-      <version>${libfb303.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
-      <version>${hadoop.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -273,7 +266,7 @@
           <groupId>commmons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
-	<exclusion>
+       <exclusion>
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>
         </exclusion>
@@ -289,18 +282,15 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-yarn-registry</artifactId>
-      <version>${hadoop.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-mapreduce-client-core</artifactId>
-      <version>${hadoop.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-mapreduce-client-common</artifactId>
-      <version>${hadoop.version}</version>
       <optional>true</optional>
       <scope>test</scope>
         <exclusions>
@@ -317,7 +307,6 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-hdfs</artifactId>
-      <version>${hadoop.version}</version>
       <exclusions>
         <exclusion>
           <groupId>javax.servlet</groupId>
@@ -329,12 +318,10 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-yarn-api</artifactId>
-      <version>${hadoop.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-yarn-common</artifactId>
-      <version>${hadoop.version}</version>
       <exclusions>
         <exclusion>
           <groupId>javax.servlet</groupId>
@@ -346,7 +333,6 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-yarn-client</artifactId>
-      <version>${hadoop.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -363,20 +349,17 @@
     <dependency>
       <groupId>org.apache.thrift</groupId>
       <artifactId>libthrift</artifactId>
-      <version>${libthrift.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.zookeeper</groupId>
       <artifactId>zookeeper</artifactId>
-      <version>${zookeeper.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.curator</groupId>
       <artifactId>curator-framework</artifactId>
-      <version>${curator.version}</version>
     </dependency>
     <dependency>
-    <groupId>org.apache.curator</groupId>
+      <groupId>org.apache.curator</groupId>
       <artifactId>apache-curator</artifactId>
       <version>${curator.version}</version>
       <type>pom</type>
@@ -401,7 +384,6 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
-      <version>${groovy.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jodd</groupId>
@@ -423,7 +405,6 @@
     <dependency>
       <groupId>org.datanucleus</groupId>
       <artifactId>datanucleus-core</artifactId>
-      <version>${datanucleus-core.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.calcite</groupId>
@@ -516,7 +497,6 @@
     <dependency>
       <groupId>com.googlecode.javaewah</groupId>
       <artifactId>JavaEWAH</artifactId>
-      <version>${javaewah.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -530,7 +510,6 @@
     <dependency>
       <groupId>stax</groupId>
       <artifactId>stax-api</artifactId>
-      <version>${stax.version}</version>
     </dependency>
     <dependency>
       <groupId>net.sf.opencsv</groupId>
@@ -549,7 +528,7 @@
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-standalone-metastore</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
+      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <!-- test inter-project -->
@@ -562,13 +541,11 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.tez</groupId>
       <artifactId>tez-api</artifactId>
-      <version>${tez.version}</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -604,7 +581,6 @@
     <dependency>
       <groupId>org.apache.tez</groupId>
       <artifactId>tez-runtime-library</artifactId>
-      <version>${tez.version}</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -644,7 +620,6 @@
     <dependency>
       <groupId>org.apache.tez</groupId>
       <artifactId>tez-runtime-internals</artifactId>
-      <version>${tez.version}</version>
       <optional>true</optional>
       <exclusions>
               <exclusion>
@@ -692,7 +667,6 @@
     <dependency>
       <groupId>org.apache.tez</groupId>
       <artifactId>tez-mapreduce</artifactId>
-      <version>${tez.version}</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -724,7 +698,6 @@
     <dependency>
       <groupId>org.apache.tez</groupId>
       <artifactId>tez-dag</artifactId>
-      <version>${tez.version}</version>
       <optional>true</optional>
       <scope>test</scope>
       <exclusions>

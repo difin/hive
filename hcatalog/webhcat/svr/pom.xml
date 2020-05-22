@@ -77,22 +77,18 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-rewrite</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-core</artifactId>
-      <version>${jersey.version}</version>
       <exclusions>
         <exclusion>
           <groupId>javax.ws.rs</groupId>
@@ -103,7 +99,6 @@
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
-      <version>${jersey.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.sun.jersey</groupId>
@@ -114,7 +109,6 @@
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-servlet</artifactId>
-      <version>${jersey.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.sun.jersey</groupId>
@@ -125,7 +119,6 @@
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>wadl-resourcedoc-doclet</artifactId>
-      <version>${wadl-resourcedoc-doclet.version}</version>
       <exclusions>
         <exclusion>
           <groupId>com.sun.jersey</groupId>
@@ -136,17 +129,14 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-exec</artifactId>
-      <version>${commons-exec.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.curator</groupId>
       <artifactId>curator-framework</artifactId>
-       <version>${curator.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.zookeeper</groupId>
       <artifactId>zookeeper</artifactId>
-      <version>${zookeeper.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -173,7 +163,6 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-auth</artifactId>
-      <version>${hadoop.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>
@@ -188,7 +177,6 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
-      <version>${hadoop.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.eclipse.jetty</groupId>
@@ -203,7 +191,6 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-hdfs</artifactId>
-      <version>${hadoop.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.eclipse.jetty</groupId>
@@ -218,7 +205,6 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-mapreduce-client-core</artifactId>
-      <version>${hadoop.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.mortbay.jetty</groupId>
@@ -236,13 +222,12 @@
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-standalone-metastore</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
+      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -258,7 +243,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${maven.javadoc.plugin.version}</version>
         <executions>
           <execution>
             <id>resourcesdoc.xml</id>
@@ -292,7 +276,10 @@
                   <version>${xerces.version}</version>
                 </docletArtifact>
               </docletArtifacts>
-              <additionalparam>-output ${project.build.outputDirectory}/resourcedoc.xml</additionalparam>
+              <additionalOptions>
+                <additionalOption>-output ${project.build.outputDirectory}/resourcedoc.xml</additionalOption>
+              </additionalOptions>
+              <useStandardDocletOptions>false</useStandardDocletOptions>
             </configuration>
           </execution>
         </executions>
