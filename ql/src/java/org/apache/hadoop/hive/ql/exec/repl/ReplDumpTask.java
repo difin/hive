@@ -97,6 +97,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
@@ -663,8 +664,10 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
         Path bootstrapRoot = new Path(dumpRoot, ReplUtils.INC_BOOTSTRAP_ROOT_DIR_NAME);
         Path metadataPath = new Path(bootstrapRoot, EximUtil.METADATA_PATH_NAME);
         FileSystem fs = FileSystem.get(metadataPath.toUri(), conf);
-        if (fs.exists(metadataPath)) {
+        try {
           fs.delete(metadataPath, true);
+        } catch (FileNotFoundException e) {
+          // no worries
         }
         Path dbRootMetadata = new Path(metadataPath, dbName);
         Path dbRootData = new Path(bootstrapRoot, EximUtil.DATA_PATH_NAME + File.separator + dbName);
@@ -765,8 +768,10 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
     try {
       retryable.executeCallable((Callable<Void>) () -> {
         FileSystem fs = FileSystem.get(nextEventRoot.toUri(), conf);
-        if (fs.exists(nextEventRoot))  {
+        try {
           fs.delete(nextEventRoot, true);
+        } catch (FileNotFoundException e) {
+          // no worries
         }
         return null;
       });
