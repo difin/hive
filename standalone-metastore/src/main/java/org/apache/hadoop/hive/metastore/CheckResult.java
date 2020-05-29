@@ -17,6 +17,10 @@
  */
 package org.apache.hadoop.hive.metastore;
 
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.metastore.api.MetaException;
+
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -33,6 +37,7 @@ public class CheckResult {
   private Set<PartitionResult> expiredPartitions = new TreeSet<>();
   private long maxWriteId;
   private long maxTxnId;
+  private Set<PartitionResult> correctPartitions = new TreeSet<>();
 
   /**
    * @return a list of tables not found on the filesystem.
@@ -119,6 +124,14 @@ public class CheckResult {
     this.maxTxnId = maxTxnId;
   }
 
+  public Set<PartitionResult> getCorrectPartitions() {
+    return this.correctPartitions;
+  }
+
+  public void setCorrectPartitions(final Set<PartitionResult> correctPartitions) {
+    this.correctPartitions = correctPartitions;
+  }
+
   /**
    * A basic description of a partition that is missing from either the fs or
    * the ms.
@@ -128,6 +141,7 @@ public class CheckResult {
     private String tableName;
     private long maxWriteId;
     private long maxTxnId;
+    private Path path;
 
     /**
      * @return name of partition
@@ -175,9 +189,36 @@ public class CheckResult {
       this.maxTxnId = maxTxnId;
     }
 
+    public void setPath(Path path) {
+      this.path = path;
+    }
+
+    public Path getLocation(Path tablePath, Map<String, String> partSpec) throws MetaException {
+      if (this.path == null) {
+        return new Path(tablePath, Warehouse.makePartPath(partSpec));
+      }
+
+      return this.path;
+    }
+
     @Override
     public String toString() {
       return tableName + ":" + partitionName;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (other instanceof PartitionResult) {
+        if (0 == compareTo((PartitionResult)other)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
     }
 
     public int compareTo(PartitionResult o) {
