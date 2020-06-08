@@ -11410,11 +11410,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
       }
 
-      Lock startLock = new ReentrantLock();
-      Condition startCondition = startLock.newCondition();
-      AtomicBoolean startedServing = new AtomicBoolean();
-      startMetaStore(cli.getPort(), HadoopThriftAuthBridge.getBridge(), conf, startLock,
-          startCondition, startedServing);
+      startMetaStore(cli.getPort(), HadoopThriftAuthBridge.getBridge(), conf, true, null);
     } catch (Throwable t) {
       // Catch the exception, log it and rethrow it.
       HMSHandler.LOG
@@ -11634,6 +11630,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       protocolFactory = new TBinaryProtocol.Factory();
       inputProtoFactory = new TBinaryProtocol.Factory(true, true, maxMessageSize, maxMessageSize);
     }
+
+    msHost = MetastoreConf.getVar(conf, ConfVars.THRIFT_BIND_HOST);
+    if (msHost != null && !msHost.trim().isEmpty()) {
+      LOG.info("Binding host " + msHost + " for metastore server");
+    }
+
     IHMSHandler handler = newRetryingHMSHandler(baseHandler, conf);
 
     TCustomServerSocket serverSocket;
@@ -11651,11 +11653,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         processor = new TSetIpAddressProcessor<>(handler);
         LOG.info("Starting DB backed MetaStore Server");
       }
-    }
-
-    msHost = MetastoreConf.getVar(conf, ConfVars.THRIFT_BIND_HOST);
-    if (msHost != null && !msHost.trim().isEmpty()) {
-      LOG.info("Binding host " + msHost + " for metastore server");
     }
 
     if (!useSSL) {
@@ -11750,7 +11747,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
    */
   public static void startMetaStore(int port, HadoopThriftAuthBridge bridge)
       throws Throwable {
-    startMetaStore(port, bridge, MetastoreConf.newMetastoreConf(), null, null, null);
+    startMetaStore(port, bridge, MetastoreConf.newMetastoreConf(), false, null);
   }
 
   /**
@@ -11762,21 +11759,23 @@ public class HiveMetaStore extends ThriftHiveMetastore {
    */
   public static void startMetaStore(int port, HadoopThriftAuthBridge bridge,
                                     Configuration conf) throws Throwable {
-    startMetaStore(port, bridge, conf, null, null, null);
+    startMetaStore(port, bridge, conf, false, null);
   }
 
   /**
-   * Start Metastore based on a passed {@link HadoopThriftAuthBridge}
+   * Start Metastore based on a passed {@link HadoopThriftAuthBridge}.
    *
-   * @param port
+   * @param port The port on which the Thrift server will start to serve
    * @param bridge
-   * @param conf
-   *          configuration overrides
+   * @param conf Configuration overrides
+   * @param startMetaStoreThreads Start the background threads (initiator, cleaner, statsupdater, etc.)
+   * @param startedBackgroundThreads If startMetaStoreThreads is true, this AtomicBoolean will be switched to true,
+   *  when all of the background threads are scheduled. Useful for testing purposes to wait
+   *  until the MetaStore is fully initialized.
    * @throws Throwable
    */
-  public static void  startMetaStore(int port, HadoopThriftAuthBridge bridge,
-      Configuration conf, Lock startLock, Condition startCondition,
-      AtomicBoolean startedServing) throws Throwable {
+  public static void startMetaStore(int port, HadoopThriftAuthBridge bridge,
+      Configuration conf, boolean startMetaStoreThreads, AtomicBoolean startedBackgroundThreads) throws Throwable {
     try {
       isMetaStoreRemote = true;
       String transportMode = MetastoreConf.getVar(conf, ConfVars.THRIFT_TRANSPORT_MODE, "binary");
@@ -11792,10 +11791,13 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       boolean directSqlEnabled = MetastoreConf.getBoolVar(conf, ConfVars.TRY_DIRECT_SQL);
       HMSHandler.LOG.info("Direct SQL optimization = {}",  directSqlEnabled);
 
-      if (startLock != null) {
-        startMetaStoreThreads(conf, startLock, startCondition, startedServing,
-                isMetaStoreHousekeepingLeader(conf));
-        signalOtherThreadsToStart(thriftServer, startLock, startCondition, startedServing);
+      if (startMetaStoreThreads) {
+        Lock metaStoreThreadsLock = new ReentrantLock();
+        Condition startCondition = metaStoreThreadsLock.newCondition();
+        AtomicBoolean startedServing = new AtomicBoolean();
+        startMetaStoreThreads(conf, metaStoreThreadsLock, startCondition, startedServing,
+            isMetaStoreHousekeepingLeader(conf), startedBackgroundThreads);
+        signalOtherThreadsToStart(thriftServer, metaStoreThreadsLock, startCondition, startedServing);
       }
 
       // If dynamic service discovery through ZooKeeper is enabled, add this server to the ZooKeeper.
@@ -11940,7 +11942,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
    */
   private static void startMetaStoreThreads(final Configuration conf, final Lock startLock,
                                             final Condition startCondition, final
-                                            AtomicBoolean startedServing, boolean isLeader) {
+                                            AtomicBoolean startedServing, boolean isLeader,
+                                            final AtomicBoolean startedBackGroundThreads) {
     // A thread is spun up to start these other threads.  That's because we can't start them
     // until after the TServer has started, but once TServer.serve is called we aren't given back
     // control.
@@ -11993,6 +11996,9 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
         if (isLeader) {
           ReplChangeManager.scheduleCMClearer(conf);
+        }
+        if (startedBackGroundThreads != null) {
+          startedBackGroundThreads.set(true);
         }
       }
     };
