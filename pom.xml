@@ -64,6 +64,7 @@
     <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
     <maven.build-helper.plugin.version>1.12</maven.build-helper.plugin.version>
     <maven.eclipse.plugin.version>2.10</maven.eclipse.plugin.version>
+    <maven.surefire.plugin.version>3.0.0-M4</maven.surefire.plugin.version>
 
     <!-- Library Dependency Versions -->
     <accumulo.version>1.7.0.7.2.11.0-233</accumulo.version>
@@ -131,7 +132,9 @@
     <joda.version>2.9.9</joda.version>
     <jodd.version>6.0.0</jodd.version>
     <json.version>1.8</json.version>
-    <junit.version>4.11</junit.version>
+    <junit.version>4.13</junit.version>
+    <junit.jupiter.version>5.6.2</junit.jupiter.version>
+    <junit.vintage.version>5.6.2</junit.vintage.version>
     <kafka.version>2.5.0.7.2.11.0-233</kafka.version>
     <kryo.version>5.0.3</kryo.version>
     <reflectasm.version>1.11.9</reflectasm.version>
@@ -412,6 +415,21 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${junit.jupiter.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-params</artifactId>
+        <version>${junit.jupiter.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.vintage</groupId>
+        <artifactId>junit-vintage-engine</artifactId>
+        <version>${junit.vintage.version}</version>
       </dependency>
       <dependency>
         <groupId>log4j</groupId>
@@ -1504,6 +1522,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven.surefire.plugin.version}</version>
         <configuration>
           <excludes>
             <exclude>**/TestSerDe.java</exclude>
