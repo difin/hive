@@ -48,6 +48,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -198,7 +199,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
   static long TEST_TIMEOUT_VALUE = -1;
 
   private static ShutdownHookManager shutdownHookMgr;
-  
+
   public static final String ADMIN = "admin";
   public static final String PUBLIC = "public";
   /** MM write states. */
@@ -1413,48 +1414,56 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             madeExternalDir = true;
           }
         } else {
-          final Path mgdPath = dbMgdPath != null ? dbMgdPath : defaultDbMgdPath;
-          try {
-            // Since this may be done as random user (if doAs=true) he may not have access
-            // to the managed directory. We run this as an admin user
-            madeManagedDir = UserGroupInformation.getLoginUser().doAs(new PrivilegedExceptionAction<Boolean>() {
-              @Override public Boolean run() throws MetaException {
-                if (!wh.isDir(mgdPath)) {
-                  LOG.info("Creating database path in managed directory " + mgdPath);
-                  if (!wh.mkdirs(mgdPath)) {
-                    throw new MetaException("Unable to create database managed path " + mgdPath + ", failed to create database " + db.getName());
+          if (dbMgdPath != null) {
+            try {
+              // Since this may be done as random user (if doAs=true) he may not have access
+              // to the managed directory. We run this as an admin user
+              madeManagedDir = UserGroupInformation.getLoginUser().doAs(new PrivilegedExceptionAction<Boolean>() {
+                @Override public Boolean run() throws MetaException {
+                  if (!wh.isDir(dbMgdPath)) {
+                    LOG.info("Creating database path in managed directory " + dbMgdPath);
+                    if (!wh.mkdirs(dbMgdPath)) {
+                      throw new MetaException("Unable to create database managed path " + dbMgdPath + ", failed to create database " + db.getName());
+                    }
+                    return true;
                   }
-                  return true;
+                  return false;
                 }
-                return false;
+              });
+              if (madeManagedDir) {
+                LOG.info("Created database path in managed directory " + dbMgdPath);
+              } else {
+                throw new MetaException(
+                    "Unable to create database managed directory " + dbMgdPath + ", failed to create database " + db.getName());
               }
-            });
-            if (madeManagedDir) {
-              LOG.info("Created database path in managed directory " + mgdPath);
+            } catch (IOException | InterruptedException e) {
+              throw new MetaException(
+                  "Unable to create database managed directory " + dbMgdPath + ", failed to create database " + db.getName() + ":" + e.getMessage());
             }
-          } catch (IOException | InterruptedException e) {
-            throw new MetaException(
-                "Unable to create database managed directory " + mgdPath + ", failed to create database " + db.getName());
           }
-          try {
-            madeExternalDir = UserGroupInformation.getCurrentUser().doAs(new PrivilegedExceptionAction<Boolean>() {
-              @Override public Boolean run() throws MetaException {
-                if (!wh.isDir(dbExtPath)) {
-                  LOG.info("Creating database path in external directory " + dbExtPath);
-                  return wh.mkdirs(dbExtPath);
+          if (dbExtPath != null) {
+            try {
+              madeExternalDir = UserGroupInformation.getCurrentUser().doAs(new PrivilegedExceptionAction<Boolean>() {
+                @Override public Boolean run() throws MetaException {
+                  if (!wh.isDir(dbExtPath)) {
+                    LOG.info("Creating database path in external directory " + dbExtPath);
+                    return wh.mkdirs(dbExtPath);
+                  }
+                  return false;
                 }
-                return false;
+              });
+              if (madeExternalDir) {
+                LOG.info("Created database path in external directory " + dbExtPath);
+              } else {
+                LOG.warn("Failed to create external path " + dbExtPath + " for database " + db.getName() + ". This may result in access not being allowed if the "
+                    + "StorageBasedAuthorizationProvider is enabled");
               }
-            });
-            if (madeExternalDir) {
-              LOG.info("Created database path in external directory " + dbExtPath);
-            } else {
-              LOG.warn("Failed to create external path " + dbExtPath + " for database " + db.getName() + ". This may result in access not being allowed if the "
-                  + "StorageBasedAuthorizationProvider is enabled ");
+            } catch (IOException | InterruptedException | UndeclaredThrowableException e) {
+              throw new MetaException("Failed to create external path " + dbExtPath + " for database " + db.getName() + ". This may result in access not being allowed if the "
+                  + "StorageBasedAuthorizationProvider is enabled: " + e.getMessage());
             }
-          } catch (IOException | InterruptedException | UndeclaredThrowableException e) {
-            LOG.warn("Failed to create external path " + dbExtPath + " for database " + db.getName() + ". This may result in access not being allowed if the "
-                + "StorageBasedAuthorizationProvider is enabled: " + e.getMessage());
+          } else {
+            LOG.info("Database external path won't be created since the external warehouse directory is not defined");
           }
         }
 
@@ -1475,11 +1484,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
           if (db.getCatalogName() != null && !db.getCatalogName().
               equals(Warehouse.DEFAULT_CATALOG_NAME)) {
-            if (madeManagedDir && dbMgdPath != null) {
+            if (madeManagedDir) {
               wh.deleteDir(dbMgdPath, true, db);
             }
           } else {
-            if (madeManagedDir && dbMgdPath != null) {
+            if (madeManagedDir) {
               try {
                 UserGroupInformation.getLoginUser().doAs(new PrivilegedExceptionAction<Void>() {
                   @Override public Void run() throws Exception {
@@ -1493,7 +1502,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
               }
             }
 
-            if (madeExternalDir && dbExtPath != null) {
+            if (madeExternalDir) {
               try {
                 UserGroupInformation.getCurrentUser().doAs(new PrivilegedExceptionAction<Void>() {
                   @Override public Void run() throws Exception {
@@ -1518,7 +1527,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
       }
     }
-    
+
     @Override
     public void create_database(final Database db)
         throws AlreadyExistsException, InvalidObjectException, MetaException {
@@ -1778,7 +1787,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           if (materializedViews != null && !materializedViews.isEmpty()) {
             for (Table materializedView : materializedViews) {
               boolean isSoftDelete = TxnUtils.isTableSoftDeleteEnabled(materializedView, req.isSoftDelete());
-              
+
               if (materializedView.getSd().getLocation() != null && !isSoftDelete) {
                 Path materializedViewPath = wh.getDnsPath(new Path(materializedView.getSd().getLocation()));
                 if (!wh.isWritable(materializedViewPath.getParent())) {
@@ -1809,7 +1818,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         // drop tables before dropping db
         List<String> allTables = new ArrayList<>(uniqueTableNames);
         startIndex = 0;
-        
+
         // retrieve the tables from the metastore in batches to alleviate memory constraints
         while (startIndex < allTables.size()) {
           int endIndex = Math.min(startIndex + tableBatchSize, allTables.size());
@@ -1827,7 +1836,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
               // add it's locations to the list of paths to delete
               boolean isSoftDelete = TxnUtils.isTableSoftDeleteEnabled(table, req.isSoftDelete());
               Path tablePath = null;
-              
+
               boolean tableDataShouldBeDeleted = checkTableDataShouldBeDeleted(table, req.isDeleteData())
                 && !isSoftDelete;
               if (table.getSd().getLocation() != null && tableDataShouldBeDeleted) {
@@ -1888,42 +1897,22 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             deleteTableData(tablePath, false, db);
           }
           // Delete the data in the database
-
-          if (db.getCatalogName() != null && !db.getCatalogName().
-              equals(Warehouse.DEFAULT_CATALOG_NAME)) {
-            try {
-              wh.deleteDir(new Path(db.getLocationUri()), true, db);
-            } catch (Exception e) {
-              LOG.error("Failed to delete database directory: " + db.getLocationUri() +
-                  " " + e.getMessage());
+          try {
+            if (db.getManagedLocationUri() != null) {
+              wh.deleteDir(new Path(db.getManagedLocationUri()), true, db);
             }
-            // it is not a terrible thing even if the data is not deleted
-          } else {
-            final Database dbFinal = db;
-            final Path path = (dbFinal.getManagedLocationUri() != null) ?
-                new Path(dbFinal.getManagedLocationUri()) : wh.getDatabaseManagedPath(dbFinal);
-            if (req.isDeleteManagedDir()) {
-              try {
-                Boolean deleted = UserGroupInformation.getLoginUser().doAs((PrivilegedExceptionAction<Boolean>) 
-                  () -> wh.deleteDir(path, true, dbFinal));
-                if (!deleted) {
-                  LOG.error("Failed to delete database's managed warehouse directory: " + path);
-                }
-              } catch (Exception e) {
-                LOG.error("Failed to delete database's managed warehouse directory: " + path + " " + e.getMessage());
-              }
-            }
-            try {
-              Boolean deleted = UserGroupInformation.getCurrentUser().doAs((PrivilegedExceptionAction<Boolean>) 
-                () -> wh.deleteDir(new Path(dbFinal.getLocationUri()), true, dbFinal));
-              if (!deleted) {
-                LOG.error("Failed to delete database external warehouse directory " + db.getLocationUri());
-              }
-            } catch (IOException | InterruptedException | UndeclaredThrowableException e) {
-              LOG.error("Failed to delete the database external warehouse directory: " + db.getLocationUri() + " " + e
-                  .getMessage());
-            }
+          } catch (Exception e) {
+            LOG.error("Failed to delete database directory: " + db.getManagedLocationUri() +
+                " " + e.getMessage());
           }
+          // Delete the data in the database's location only if it is a legacy db path?
+          try {
+            wh.deleteDir(new Path(db.getLocationUri()), true, db);
+          } catch (Exception e) {
+            LOG.error("Failed to delete database directory: " + db.getLocationUri() +
+                " " + e.getMessage());
+          }
+          // it is not a terrible thing even if the data is not deleted
         }
 
         if (!listeners.isEmpty()) {
@@ -1963,7 +1952,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public void drop_database_req(final DropDatabaseRequest req)
         throws NoSuchObjectException, InvalidOperationException, MetaException {
       startFunction("drop_database", ": " + req.getName());
-      
+
       if (DEFAULT_CATALOG_NAME.equalsIgnoreCase(req.getCatalogName())
             && DEFAULT_DATABASE_NAME.equalsIgnoreCase(req.getName())) {
         endFunction("drop_database", false, null);
@@ -1986,7 +1975,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         endFunction("drop_database", success, ex);
       }
     }
-    
+
     @Override
     public List<String> get_databases(final String pattern) throws MetaException {
       startFunction("get_databases", ": " + pattern);
@@ -2496,7 +2485,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       if (transformer != null) {
         tbl = transformer.transformCreateTable(tbl, processorCapabilities, processorId);
       }
-      
+
       Map<String, String> params = tbl.getParameters();
       if (params != null) {
         params.remove(TABLE_IS_CTAS);
@@ -2772,7 +2761,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           && Boolean.parseBoolean(tbl.getParameters().get(SOFT_DELETE_TABLE)) ?
         SOFT_DELETE_PATH_SUFFIX + String.format(DELTA_DIGITS, tbl.getTxnId()) : "";
     }
-    
+
     @Override
     public void create_table(final Table tbl) throws AlreadyExistsException,
         MetaException, InvalidObjectException, InvalidInputException {
@@ -3788,7 +3777,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         throws MetaException {
       if (location == null)
         return;
-      
+
       Path basePath = new Path(location, AcidConstants.baseDir(writeId));
       try {
         FileSystem fs = location.getFileSystem(conf);
@@ -3806,13 +3795,13 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       boolean isAutopurge = (tbl.isSetParameters() && "true".equalsIgnoreCase(tbl.getParameters().get("auto.purge")));
       Database db = get_database_core(parsedDbName[CAT_NAME], parsedDbName[DB_NAME]);
       FileSystem fs = location.getFileSystem(getConf());
-      
+
       if (!HdfsUtils.isPathEncrypted(getConf(), fs.getUri(), location) &&
           !FileUtils.pathHasSnapshotSubDir(location, fs)) {
         HdfsUtils.HadoopFileStatus status = new HdfsUtils.HadoopFileStatus(getConf(), fs, location);
         FileStatus targetStatus = fs.getFileStatus(location);
         String targetGroup = targetStatus == null ? null : targetStatus.getGroup();
-        
+
         wh.deleteDir(location, true, isAutopurge, ReplChangeManager.shouldEnableCm(db, tbl));
         fs.mkdirs(location);
         HdfsUtils.setFullFileStatus(getConf(), status, targetGroup, fs, location, false);
@@ -5358,7 +5347,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
     }
 
-    private boolean drop_partition_common(RawStore ms, String catName, String db_name, String tbl_name, 
+    private boolean drop_partition_common(RawStore ms, String catName, String db_name, String tbl_name,
         List<String> part_vals, boolean deleteData, final EnvironmentContext envContext)
         throws MetaException, NoSuchObjectException, IOException, InvalidObjectException, InvalidInputException {
       Path partPath = null;
@@ -5370,10 +5359,10 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       Partition part = null;
       boolean mustPurge = false;
       long writeId = 0;
-    
+
       Map<String, String> transactionalListenerResponses = Collections.emptyMap();
       boolean needsCm = false;
-      
+
       if (db_name == null) {
         throw new MetaException("The DB name cannot be null.");
       }
@@ -5386,11 +5375,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
       try {
         ms.openTransaction();
-      
+
         part = ms.getPartition(catName, db_name, tbl_name, part_vals);
         tbl = get_table_core(catName, db_name, tbl_name, null);
         firePreEvent(new PreDropPartitionEvent(tbl, part, deleteData, this));
-      
+
         mustPurge = isMustPurge(envContext, tbl);
         writeId = getWriteId(envContext);
 
@@ -5425,13 +5414,13 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       } finally {
         if (!success) {
           ms.rollbackTransaction();
-        } else if (checkTableDataShouldBeDeleted(tbl, deleteData) && 
+        } else if (checkTableDataShouldBeDeleted(tbl, deleteData) &&
             (partPath != null || archiveParentDir != null)) {
 
           LOG.info(mustPurge ?
             "dropPartition() will purge " + partPath + " directly, skipping trash." :
             "dropPartition() will move " + partPath + " to trash-directory.");
-          
+
           // Archived partitions have har:/to_har_file as their location.
           // The original directory was saved in params
           if (isArchived) {
@@ -5444,7 +5433,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         } else if (TxnUtils.isTransactionalTable(tbl) && writeId > 0) {
           addTruncateBaseFile(partPath, writeId, conf, DataFormat.DROPPED);
         }
-    
+
         if (!listeners.isEmpty()) {
           MetaStoreListenerNotifier.notifyEvent(listeners,
                                                 EventType.DROP_PARTITION,
@@ -5477,7 +5466,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         .map(Long::parseLong)
         .orElse(0L);
     }
-    
+
     private void throwUnsupportedExceptionIfRemoteDB(String dbName, String operationName) throws MetaException {
       if (isDatabaseRemote(dbName)) {
         throw new MetaException("Operation " + operationName + " not supported for REMOTE database " + dbName);
@@ -5530,23 +5519,23 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       RawStore ms = getMS();
       String dbName = request.getDbName(), tblName = request.getTblName();
       String catName = request.isSetCatName() ? request.getCatName() : getDefaultCatalog(conf);
-    
+
       boolean ifExists = request.isSetIfExists() && request.isIfExists();
       boolean deleteData = request.isSetDeleteData() && request.isDeleteData();
       boolean ignoreProtection = request.isSetIgnoreProtection() && request.isIgnoreProtection();
       boolean needResult = !request.isSetNeedResult() || request.isNeedResult();
-      
+
       List<PathAndPartValSize> dirsToDelete = new ArrayList<>();
       List<Path> archToDelete = new ArrayList<>();
-      EnvironmentContext envContext = 
+      EnvironmentContext envContext =
           request.isSetEnvironmentContext() ? request.getEnvironmentContext() : null;
       boolean success = false;
-    
+
       Table tbl = null;
       List<Partition> parts = null;
       boolean mustPurge = false;
       long writeId = 0;
-    
+
       Map<String, String> transactionalListenerResponses = null;
       boolean needsCm = false;
 
@@ -5557,11 +5546,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         tbl = get_table_core(catName, dbName, tblName);
         mustPurge = isMustPurge(envContext, tbl);
         writeId = getWriteId(envContext);
-      
+
         int minCount = 0;
         RequestPartsSpec spec = request.getParts();
         List<String> partNames = null;
-      
+
         if (spec.isSetExprs()) {
           // Dropping by expressions.
           parts = new ArrayList<>(spec.getExprs().size());
@@ -5643,7 +5632,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
         success = ms.commitTransaction();
         needsCm = ReplChangeManager.shouldEnableCm(ms.getDatabase(catName, dbName), tbl);
-      
+
         DropPartitionsResult result = new DropPartitionsResult();
         if (needResult) {
           result.setPartitions(parts);
@@ -6548,7 +6537,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       List<String> ret = null;
       Exception ex = null;
       try {
-        ret = getMS().getTables(catName, dbname, pattern, TableType.valueOf(tableType), -1);  
+        ret = getMS().getTables(catName, dbname, pattern, TableType.valueOf(tableType), -1);
       } catch (MetaException e) {
         ex = e;
         throw e;
@@ -6597,7 +6586,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           return DataConnectorProviderFactory.getDataConnectorProvider(db).getTableNames();
         }
       } catch (Exception e) { /* ignore */ }
-      
+
       try {
         if (getIfServerFilterenabled()) {
           List<TableMeta> filteredTableMetas = get_table_meta(dbname, "*", null);
@@ -9314,7 +9303,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public void add_write_ids_to_min_history(long txnId, Map<String, Long> validWriteIds) throws TException {
       getTxnHandler().addWriteIdsToMinHistory(txnId, validWriteIds);
     }
-    
+
     @Override
     public void set_hadoop_jobid(String jobId, long cqId) throws MetaException {
       getTxnHandler().setHadoopJobId(jobId, cqId);

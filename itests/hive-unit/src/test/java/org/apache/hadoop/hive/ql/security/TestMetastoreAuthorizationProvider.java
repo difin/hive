@@ -172,7 +172,6 @@ public class TestMetastoreAuthorizationProvider extends TestCase {
     String userName = setupUser();
     String loc = clientHiveConf.get(HiveConf.ConfVars.HIVE_METASTORE_WAREHOUSE_EXTERNAL.varname) + "/" + dbName;
     String mLoc = clientHiveConf.get(HiveConf.ConfVars.METASTOREWAREHOUSE.varname) + "/" + dbName;
-
     allowCreateDatabase(userName);
     driver.run("create database " + dbName + " location '" + loc + "' managedlocation '" + mLoc + "'");
     Database db = msc.getDatabase(dbName);

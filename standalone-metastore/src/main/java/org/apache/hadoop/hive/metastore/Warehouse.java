@@ -371,7 +371,7 @@ public class Warehouse {
   @Deprecated
   public Path getDefaultTablePath(Database db, String tableName)
       throws MetaException {
-    return getDefaultTablePath(db, tableName, false);
+    return getDefaultTablePath(db, tableName, true);
   }
 
   public Path getDefaultTablePath(Database db, String tableName, boolean isExternal) throws MetaException {
