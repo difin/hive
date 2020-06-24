@@ -267,6 +267,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveUnionPullUpConstant
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveWindowingFixRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.MarkEventRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.RuleStatisticsListener;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveWindowingLastValueRewrite;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.jdbc.JDBCAbstractSplitFilterRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.jdbc.JDBCAggregationPushDownRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.jdbc.JDBCExpandExpressionsRule;
@@ -2452,8 +2453,9 @@ public class CalcitePlanner extends SemanticAnalyzer {
       if (profilesCBO.contains(ExtendedCBOProfile.WINDOWING_POSTPROCESSING)) {
         generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
             HiveWindowingFixRule.INSTANCE);
+        generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
+            HiveWindowingLastValueRewrite.INSTANCE);
       }
-
       // 6. Sort predicates in filter expressions
       if (conf.getBoolVar(HiveConf.ConfVars.HIVE_OPTIMIZE_SORT_PREDS_WITH_STATS)) {
         generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
