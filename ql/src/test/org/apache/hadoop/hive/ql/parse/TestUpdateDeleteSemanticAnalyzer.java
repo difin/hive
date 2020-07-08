@@ -31,6 +31,7 @@ import org.apache.hadoop.hive.common.ValidReadTxnList;
 import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
+import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryPlan;
 import org.apache.hadoop.hive.ql.QueryState;
@@ -225,7 +226,7 @@ public class TestUpdateDeleteSemanticAnalyzer {
   }
 
   @Before
-  public void setup() {
+  public void setup() throws Exception {
     queryState = new QueryState.Builder().build();
     conf = queryState.getConf();
     conf
@@ -237,6 +238,7 @@ public class TestUpdateDeleteSemanticAnalyzer {
     conf.setBoolVar(HiveConf.ConfVars.HIVE_IN_TEST, true);
     conf.set(ValidTxnList.VALID_TXNS_KEY,
         new ValidReadTxnList(new long[0], new BitSet(), 1000, Long.MAX_VALUE).writeToString());
+    TxnDbUtil.prepDb(conf);
   }
 
   public void cleanupTables() throws HiveException {

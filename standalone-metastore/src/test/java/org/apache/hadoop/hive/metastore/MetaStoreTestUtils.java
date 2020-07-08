@@ -44,6 +44,7 @@ import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.apache.hadoop.hive.metastore.events.EventCleanerTask;
 import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
+import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,6 +147,12 @@ public class MetaStoreTestUtils {
     return MetaStoreTestUtils.startMetaStoreWithRetry(bridge, conf, false, false, withHouseKeepingThreads);
   }
 
+  public static int startMetaStoreWithRetry(HadoopThriftAuthBridge bridge, Configuration conf, boolean keepJdbcUri,
+                                            boolean keepWarehousePath, boolean withHouseKeepingThreads) throws Exception {
+    return startMetaStoreWithRetry(bridge, conf, keepJdbcUri, keepWarehousePath, withHouseKeepingThreads,
+            true);
+  }
+
   /**
    * Starts a MetaStore instance with the given configuration and given bridge.
    * Tries to find a free port, and use it. If failed tries another port so the tests will not
@@ -162,7 +169,8 @@ public class MetaStoreTestUtils {
   public static int startMetaStoreWithRetry(HadoopThriftAuthBridge bridge,
                                             Configuration conf, boolean keepJdbcUri,
                                             boolean keepWarehousePath,
-                                            boolean withHouseKeepingThreads) throws Exception {
+                                            boolean withHouseKeepingThreads,
+                                            boolean createTransactionalTables) throws Exception {
     Exception metaStoreException = null;
     String warehouseDir = MetastoreConf.getVar(conf, ConfVars.WAREHOUSE);
 
@@ -190,6 +198,14 @@ public class MetaStoreTestUtils {
           MetastoreConf.setVar(conf, ConfVars.THRIFT_URIS, "thrift://localhost:" + metaStorePort);
         }
 
+        if (createTransactionalTables) {
+          // Some tests may have dummy txn manager. There is no harm in creating the transactional tables but
+          // we should not change the test config in case they purposefully do not use transactions
+          Configuration txnInitConf = new Configuration(conf);
+          TxnDbUtil.setConfValues(txnInitConf);
+          TxnDbUtil.prepDb(txnInitConf);
+        }
+
         MetaStoreTestUtils.startMetaStore(metaStorePort, bridge, conf, withHouseKeepingThreads);
 
         // Creating warehouse dir, if not exists
@@ -205,6 +221,7 @@ public class MetaStoreTestUtils {
 
         LOG.info("MetaStore Thrift Server started on port: {} with warehouse dir: {} with " +
             "jdbcUrl: {}", metaStorePort, warehouseDir, jdbcUrl);
+
         return metaStorePort;
       } catch (ConnectException ce) {
         metaStoreException = ce;
