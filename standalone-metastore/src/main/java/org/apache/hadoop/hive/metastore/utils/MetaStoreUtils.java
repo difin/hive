@@ -852,6 +852,19 @@ public class MetaStoreUtils {
     return ListUtils.isEqualList(oldCols, newCols);
   }
 
+  /**
+   * Returns true if p is a prefix of s.
+   */
+  public static boolean arePrefixColumns(List<FieldSchema> p, List<FieldSchema> s) {
+    if (p == s) {
+      return true;
+    }
+    if (p.size() > s.size()) {
+      return false;
+    }
+    return ListUtils.isEqualList(p, s.subList(0, p.size()));
+  }
+
   public static void updateBasicState(EnvironmentContext environmentContext, Map<String,String>
       params) {
     if (params == null) {
