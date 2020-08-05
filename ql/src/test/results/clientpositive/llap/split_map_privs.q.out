@@ -20,15 +20,15 @@ Example:
 Function class:org.apache.hadoop.hive.ql.udf.generic.GenericUDFStringToPrivilege
 Function type:BUILTIN
 PREHOOK: query: EXPLAIN SELECT
-split_map_privs('1 0 0 0 0 0 0 0 0 0'),
-split_map_privs('1 0 0 1 0 0 0 0 0 0')
+  split_map_privs('1 0 0 0 0 0 0 0 0 0'),
+  split_map_privs('1 0 0 1 0 0 0 0 0 0')
 FROM src tablesample (1 rows)
 PREHOOK: type: QUERY
 PREHOOK: Input: default@src
 #### A masked pattern was here ####
 POSTHOOK: query: EXPLAIN SELECT
-split_map_privs('1 0 0 0 0 0 0 0 0 0'),
-split_map_privs('1 0 0 1 0 0 0 0 0 0')
+  split_map_privs('1 0 0 0 0 0 0 0 0 0'),
+  split_map_privs('1 0 0 1 0 0 0 0 0 0')
 FROM src tablesample (1 rows)
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src
@@ -50,15 +50,15 @@ STAGE PLANS:
             ListSink
 
 PREHOOK: query: SELECT
-split_map_privs('1 0 0 0 0 0 0 0 0 0'),
-split_map_privs('1 0 0 1 0 0 0 0 0 0')
+  split_map_privs('1 0 0 0 0 0 0 0 0 0'),
+  split_map_privs('1 0 0 1 0 0 0 0 0 0')
 FROM src tablesample (1 rows)
 PREHOOK: type: QUERY
 PREHOOK: Input: default@src
 #### A masked pattern was here ####
 POSTHOOK: query: SELECT
-split_map_privs('1 0 0 0 0 0 0 0 0 0'),
-split_map_privs('1 0 0 1 0 0 0 0 0 0')
+  split_map_privs('1 0 0 0 0 0 0 0 0 0'),
+  split_map_privs('1 0 0 1 0 0 0 0 0 0')
 FROM src tablesample (1 rows)
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src

@@ -39,8 +39,8 @@ import java.util.List;
  */
 
 @Description(name = "split_map_privs", value = "_FUNC_(str) - Splits binary str and maps to privilege type "
-        + "regex", extended = "Example:\n" + "  > SELECT _FUNC_('0 1 1 0 1 1 0 0 0') FROM src LIMIT 1;\n"
-        + "  [\"UPDATE\", \"CREATE\", \"ALTER\", \"INDEX\"]")
+    + "regex", extended = "Example:\n" + "  > SELECT _FUNC_('0 1 1 0 1 1 0 0 0') FROM src LIMIT 1;\n"
+    + "  [\"UPDATE\", \"CREATE\", \"ALTER\", \"INDEX\"]")
 
 /**
  * GenericUDFStringToPrivs.
@@ -49,53 +49,56 @@ import java.util.List;
  *     output: "  ["UPDATE", "CREATE", "ALTER", "INDEX"]"
  */
 public class GenericUDFStringToPrivilege extends GenericUDF {
-    private transient ObjectInspectorConverters.Converter[] converters = new ObjectInspectorConverters.Converter[1];
+  private transient ObjectInspectorConverters.Converter[] converters = new ObjectInspectorConverters.Converter[1];
 
-    //private PrivilegeMap privsMap = new PrivilegeMap();
-    private List<HiveResourceACLs.Privilege> privilegesList = Arrays.asList(HiveResourceACLs.Privilege.values());
+  //private PrivilegeMap privsMap = new PrivilegeMap();
+  private List<HiveResourceACLs.Privilege> privilegesList = Arrays.asList(HiveResourceACLs.Privilege.values());
 
-    @Override
-    public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
-        checkArgsSize(arguments, 1, 1);
-        checkArgPrimitive(arguments, 0);
+  @Override
+  public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
+    checkArgsSize(arguments, 1, 1);
+    checkArgPrimitive(arguments, 0);
 
-        converters[0] = ObjectInspectorConverters
-                .getConverter(arguments[0], PrimitiveObjectInspectorFactory.writableStringObjectInspector);
+    converters[0] = ObjectInspectorConverters
+        .getConverter(arguments[0], PrimitiveObjectInspectorFactory.writableStringObjectInspector);
 
-        return ObjectInspectorFactory
-                .getStandardListObjectInspector(PrimitiveObjectInspectorFactory.writableStringObjectInspector);
+    return ObjectInspectorFactory
+        .getStandardListObjectInspector(PrimitiveObjectInspectorFactory.writableStringObjectInspector);
+  }
+
+  @Override public Object evaluate(DeferredObject[] arguments) throws HiveException {
+    assert (arguments.length == 1);
+
+    if (arguments[0].get() == null) {
+      return null;
     }
 
-    @Override public Object evaluate(DeferredObject[] arguments) throws HiveException {
-        assert (arguments.length == 1);
+    Text s = (Text) converters[0].convert(arguments[0].get());
+    ArrayList<Text> result = new ArrayList<Text>();
+    int index = 0;
 
-        if (arguments[0].get() == null) {
-            return null;
+    if(privilegesList.contains(s)){
+      result.add(s);
+    }
+    else{
+      for (String str : s.toString().split(" ", -1)) {
+        if ("1".equals(str)) {
+          result.add(new Text(String.valueOf(privilegesList.get(index))));
         }
-
-        Text s = (Text) converters[0].convert(arguments[0].get());
-        ArrayList<Text> result = new ArrayList<Text>();
-        int index = 0;
-        //Map<Integer, String> privs = privsMap.getPrivilegeMap();
-
-        for (String str : s.toString().split(" ", -1)) {
-            if ("1".equals(str)) {
-                result.add(new Text(String.valueOf(privilegesList.get(index))));
-                //result.add(new Text(privs.get(index)));
-            }
-            index++;
-        }
-
-        return result;
+        index++;
+      }
     }
 
-    @Override protected String getFuncName() {
-        return "split_map_privs";
-    }
+    return result;
+  }
 
-    @Override public String getDisplayString(String[] children) {
-        assert (children.length == 1);
-        return getStandardDisplayString("split_map_privs", children);
-    }
+  @Override protected String getFuncName() {
+    return "split_map_privs";
+  }
+
+  @Override public String getDisplayString(String[] children) {
+    assert (children.length == 1);
+    return getStandardDisplayString("split_map_privs", children);
+  }
 
 }
