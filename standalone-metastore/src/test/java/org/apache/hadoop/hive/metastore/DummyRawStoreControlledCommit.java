@@ -1413,4 +1413,10 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
         throws MetaException, InvalidObjectException, NoSuchObjectException, InvalidInputException {
     return objectStore.updatePartitionColumnStatisticsInBatch(partColStatsMap, tbl, listeners, validWriteIds, writeId);
   }
+
+  @Override
+  public void deleteAllPartitionColumnStatistics(TableName tn, String w) {
+    objectStore.deleteAllPartitionColumnStatistics(tn, w);
+  }
+
 }

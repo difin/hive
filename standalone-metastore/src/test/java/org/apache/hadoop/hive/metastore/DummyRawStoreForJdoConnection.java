@@ -1396,4 +1396,10 @@ public class DummyRawStoreForJdoConnection implements RawStore {
           throws MetaException, InvalidObjectException {
     return null;
   }
+
+  @Override
+  public void deleteAllPartitionColumnStatistics(TableName tableName, String w) {
+    throw new RuntimeException("unimplemented");
+  }
+
 }

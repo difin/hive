@@ -3278,4 +3278,10 @@ public class CachedStore implements RawStore, Configurable {
   public void dropPackage(DropPackageRequest request) {
     rawStore.dropPackage(request);
   }
+
+  @Override
+  public void deleteAllPartitionColumnStatistics(TableName tn, String w) {
+    rawStore.deleteAllPartitionColumnStatistics(tn, w);
+  }
+
 }

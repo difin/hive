@@ -1463,4 +1463,9 @@ public class DummyRawStoreFailEvent implements RawStore, Configurable {
           throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
     return objectStore.updatePartitionColumnStatisticsInBatch(partColStatsMap, tbl, listeners, validWriteIds, writeId);
   }
+
+  public void deleteAllPartitionColumnStatistics(TableName tn,String s) {
+    objectStore.deleteAllPartitionColumnStatistics(tn,s);
+  }
+
 }

@@ -47,6 +47,7 @@ import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.common.StatsSetupConst;
 import org.apache.hadoop.hive.metastore.AggregateStatsCache.AggrColStats;
 import org.apache.hadoop.hive.metastore.api.AggrStats;
 import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
@@ -192,7 +193,9 @@ class MetaStoreDirectSql {
         new ImmutableMap.Builder<>();
 
     for (java.lang.reflect.Field f : this.getClass().getDeclaredFields()) {
-      if (f.getAnnotation(TableName.class) == null) continue;
+      if (f.getAnnotation(TableName.class) == null) {
+        continue;
+      }
       try {
         String value = getFullyQualifiedName(schema, f.getName());
         f.set(this, value);
@@ -842,8 +845,12 @@ class MetaStoreDirectSql {
       part.setCatName(catName);
       part.setDbName(dbName);
       part.setTableName(tblName);
-      if (fields[4] != null) part.setCreateTime(extractSqlInt(fields[4]));
-      if (fields[5] != null) part.setLastAccessTime(extractSqlInt(fields[5]));
+      if (fields[4] != null) {
+        part.setCreateTime(extractSqlInt(fields[4]));
+      }
+      if (fields[5] != null) {
+        part.setLastAccessTime(extractSqlInt(fields[5]));
+      }
       Long writeId = MetastoreDirectSqlUtils.extractSqlLong(fields[14]);
       if (writeId != null) {
         part.setWriteId(writeId);
@@ -851,7 +858,9 @@ class MetaStoreDirectSql {
       partitions.put(partitionId, part);
 
 
-      if (sdId == null) continue; // Probably a view.
+      if (sdId == null) {
+        continue; // Probably a view.
+      }
       assert serdeId != null;
 
       // We assume each partition has an unique SD.
@@ -868,11 +877,17 @@ class MetaStoreDirectSql {
           new ArrayList<List<String>>(), new HashMap<List<String>, String>()));
       sd.setInputFormat((String)fields[6]);
       Boolean tmpBoolean = MetastoreDirectSqlUtils.extractSqlBoolean(fields[7]);
-      if (tmpBoolean != null) sd.setCompressed(tmpBoolean);
+      if (tmpBoolean != null) {
+        sd.setCompressed(tmpBoolean);
+      }
       tmpBoolean = MetastoreDirectSqlUtils.extractSqlBoolean(fields[8]);
-      if (tmpBoolean != null) sd.setStoredAsSubDirectories(tmpBoolean);
+      if (tmpBoolean != null) {
+        sd.setStoredAsSubDirectories(tmpBoolean);
+      }
       sd.setLocation((String)fields[9]);
-      if (fields[10] != null) sd.setNumBuckets(extractSqlInt(fields[10]));
+      if (fields[10] != null) {
+        sd.setNumBuckets(extractSqlInt(fields[10]));
+      }
       sd.setOutputFormat((String)fields[11]);
       sdSb.append(sdId).append(",");
       part.setSd(sd);
@@ -1133,7 +1148,9 @@ class MetaStoreDirectSql {
       }
       int partColCount = partitionKeys.size();
       int partColIndex = node.getPartColIndexForFilter(partitionKeys, filterBuffer);
-      if (filterBuffer.hasError()) return;
+      if (filterBuffer.hasError()) {
+        return;
+      }
 
       String colTypeStr = partitionKeys.get(partColIndex).getType();
       // We skipped 'like', other ops should all work as long as the types are right.
@@ -2007,7 +2024,9 @@ class MetaStoreDirectSql {
    * effect will apply to the connection that is executing the queries otherwise.
    */
   public void prepareTxn() throws MetaException {
-    if (dbType != DatabaseProduct.MYSQL) return;
+    if (dbType != DatabaseProduct.MYSQL) {
+      return;
+    }
     try {
       assert pm.currentTransaction().isActive(); // must be inside tx together with queries
       executeNoResult("SET @@session.sql_mode=ANSI_QUOTES");
@@ -2784,5 +2803,22 @@ class MetaStoreDirectSql {
     }
     long csId = updateStat.getNextCSIdForMPartitionColumnStatistics(numStats);
     return updateStat.updatePartitionColumnStatistics(partColStatsMap, tbl, csId, validWriteIds, writeId, listeners);
+  }
+
+  public void deleteColumnStatsState(long tbl_id) throws MetaException {
+    // @formatter:off
+    String queryText = ""
+        + "delete from " + PARTITION_PARAMS + " "
+            + " where "
+            + "   \"PART_ID\" in (select p.\"PART_ID\"  from " + PARTITIONS + " p where"
+            + "   p.\"TBL_ID\" =  " + tbl_id + ")"
+            + "  and \"PARAM_KEY\" = '"+StatsSetupConst.COLUMN_STATS_ACCURATE + "'";
+    // @formatter:on
+
+    try {
+      executeNoResult(queryText);
+    } catch (SQLException e) {
+      throw new MetaException("Error removing column stat states:" + e.getMessage());
+    }
   }
 }
