@@ -18,10 +18,10 @@
 package org.apache.hadoop.hive.impala.calcite.rules;
 
 import com.google.common.collect.ImmutableList;
-
 import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.plan.RelOptRuleCall;
 import org.apache.calcite.rel.RelNode;
+import org.apache.calcite.rel.core.Join;
 import org.apache.calcite.rex.RexCall;
 import org.apache.calcite.rex.RexLiteral;
 import org.apache.calcite.rex.RexNode;
@@ -210,14 +210,14 @@ public class HiveImpalaRules {
   public static class ImpalaFilterJoinRule extends RelOptRule {
 
     public ImpalaFilterJoinRule(RelBuilderFactory relBuilderFactory) {
-      super(operand(HiveFilter.class, operand(HiveJoin.class, none())),
+      super(operand(HiveFilter.class, operand(Join.class, none())),
               relBuilderFactory, null);
     }
 
     @Override
     public void onMatch(RelOptRuleCall call) {
       final HiveFilter filter = call.rel(0);
-      final HiveJoin join = call.rel(1);
+      final Join join = call.rel(1);
 
       ImpalaJoinRel newJoin = new ImpalaJoinRel(join, filter);
 
@@ -279,31 +279,13 @@ public class HiveImpalaRules {
   public static class ImpalaJoinRule extends RelOptRule {
 
     public ImpalaJoinRule(RelBuilderFactory relBuilderFactory) {
-      super(operand(HiveJoin.class, any()),
+      super(operand(Join.class, any()),
           relBuilderFactory, "ImpalaJoinRule");
     }
 
     @Override
     public void onMatch(RelOptRuleCall call) {
-      final HiveJoin join = call.rel(0);
-
-      // here we create the intermediate join rel; final physical join such as
-      // hash join, nested loop join will be created at the end by ImpalaJoinRel
-      ImpalaJoinRel newJoin = new ImpalaJoinRel(join);
-      call.transformTo(newJoin);
-    }
-  }
-
-  public static class ImpalaSemiJoinRule extends RelOptRule {
-
-    public ImpalaSemiJoinRule(RelBuilderFactory relBuilderFactory) {
-      super(operand(HiveSemiJoin.class, any()),
-          relBuilderFactory, "ImpalaSemiJoinRule");
-    }
-
-    @Override
-    public void onMatch(RelOptRuleCall call) {
-      final HiveSemiJoin join = call.rel(0);
+      final Join join = call.rel(0);
 
       // here we create the intermediate join rel; final physical join such as
       // hash join, nested loop join will be created at the end by ImpalaJoinRel

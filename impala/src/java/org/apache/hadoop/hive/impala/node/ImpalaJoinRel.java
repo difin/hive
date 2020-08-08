@@ -38,6 +38,7 @@ import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveAntiJoin;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveFilter;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveJoin;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSemiJoin;
@@ -245,7 +246,7 @@ public class ImpalaJoinRel extends ImpalaPlanRel {
     List<Expr> rhs2 = Lists.newArrayList();
 
     // For (left) semi joins don't project the right input's output exprs
-    if (!(join instanceof HiveSemiJoin)) {
+    if (!(join instanceof HiveSemiJoin) && !(join instanceof HiveAntiJoin)) {
       int sizeLeft = leftInputRel.numOutputExprs();
       for (Map.Entry<Integer, Expr> e : rightInputRel.getOutputExprsMap().entrySet()) {
         int newKey = e.getKey() + sizeLeft;
@@ -430,6 +431,8 @@ public class ImpalaJoinRel extends ImpalaPlanRel {
       // sense since it is unclear when we would need a
       // Right Semi Join
       return JoinOperator.LEFT_SEMI_JOIN;
+    case ANTI:
+      return JoinOperator.LEFT_ANTI_JOIN;
     }
     throw new HiveException("Unsupported join type: " + join.getJoinType());
   }

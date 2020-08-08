@@ -2157,7 +2157,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       // Needs to be done before ProjectRemoveRule as it expect a project over filter.
       // This is done before join re-ordering as join re-ordering is converting the left outer
       // to right join in some cases before converting back again to left outer.
-      if (conf.getBoolVar(ConfVars.HIVE_CONVERT_ANTI_JOIN) && !isImpalaPlan(conf)) {
+      if (conf.getBoolVar(ConfVars.HIVE_CONVERT_ANTI_JOIN)) {
         generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
                 HiveAntiSemiJoinRule.INSTANCE);
       }

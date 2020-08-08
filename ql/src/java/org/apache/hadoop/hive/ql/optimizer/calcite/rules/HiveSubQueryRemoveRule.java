@@ -447,7 +447,7 @@ public class HiveSubQueryRemoveRule extends RelOptRule {
       // null keys we do not need to generate count(*), count(c)
       if (e.getKind() == SqlKind.EXISTS) {
         logic = RelOptUtil.Logic.TRUE_FALSE;
-        if (conf.getBoolVar(HiveConf.ConfVars.HIVE_CONVERT_ANTI_JOIN) && conf.getEngine() != Engine.IMPALA) {
+        if (conf.getBoolVar(HiveConf.ConfVars.HIVE_CONVERT_ANTI_JOIN)) {
           //TODO : As of now anti join is first converted to left outer join
           // and then converted to anti join.
           //logic = RelOptUtil.Logic.FALSE;

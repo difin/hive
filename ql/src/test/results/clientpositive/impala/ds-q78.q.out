@@ -148,7 +148,7 @@ ImpalaProjectPassthroughRel(ss_customer_sk=[$0], ratio=[$1], store_qty=[$2], sto
           ImpalaAggregateRel(group=[{0, 1}], agg#0=[sum($5)], agg#1=[sum($2)], agg#2=[sum($3)])
             ImpalaJoinRel(condition=[=($4, $6)], joinType=[inner])
               ImpalaProjectPassthroughRel(ss_item_sk=[$0], ss_customer_sk=[$1], ss_wholesale_cost=[$4], ss_sales_price=[$5], ss_sold_date_sk=[$6], EXPR$0=[CAST($3):BIGINT])
-                ImpalaJoinRel(condition=[AND(=($8, $2), =($0, $7))], joinType=[left])
+                ImpalaJoinRel(condition=[AND(=($8, $2), =($0, $7))], joinType=[anti])
                   ImpalaProjectPassthroughRel(ss_item_sk=[$1], ss_customer_sk=[$2], ss_ticket_number=[$8], ss_quantity=[$9], ss_wholesale_cost=[$10], ss_sales_price=[$12], ss_sold_date_sk=[$22])
                     ImpalaHdfsScanRel(table=[[default, impala_tpcds_store_sales]], condition=[IS NOT NULL($22)])
                   ImpalaProjectPassthroughRel(sr_item_sk=[$2], sr_ticket_number=[$9])
@@ -158,7 +158,7 @@ ImpalaProjectPassthroughRel(ss_customer_sk=[$0], ratio=[$1], store_qty=[$2], sto
           ImpalaAggregateRel(group=[{1, 2}], agg#0=[sum($5)], agg#1=[sum($3)], agg#2=[sum($4)])
             ImpalaJoinRel(condition=[=($0, $6)], joinType=[inner])
               ImpalaProjectPassthroughRel(ws_sold_date_sk=[$0], ws_item_sk=[$1], ws_bill_customer_sk=[$2], ws_wholesale_cost=[$5], ws_sales_price=[$6], EXPR$0=[CAST($4):BIGINT])
-                ImpalaJoinRel(condition=[AND(=($8, $3), =($1, $7))], joinType=[left])
+                ImpalaJoinRel(condition=[AND(=($8, $3), =($1, $7))], joinType=[anti])
                   ImpalaProjectPassthroughRel(ws_sold_date_sk=[$0], ws_item_sk=[$3], ws_bill_customer_sk=[$4], ws_order_number=[$17], ws_quantity=[$18], ws_wholesale_cost=[$19], ws_sales_price=[$21])
                     ImpalaHdfsScanRel(table=[[default, impala_tpcds_web_sales]], condition=[AND(IS NOT NULL($3), IS NOT NULL($4), IS NOT NULL($0))])
                   ImpalaProjectPassthroughRel(wr_item_sk=[$2], wr_order_number=[$13])
@@ -169,7 +169,7 @@ ImpalaProjectPassthroughRel(ss_customer_sk=[$0], ratio=[$1], store_qty=[$2], sto
           ImpalaAggregateRel(group=[{1, 2}], agg#0=[sum($5)], agg#1=[sum($3)], agg#2=[sum($4)])
             ImpalaJoinRel(condition=[=($0, $6)], joinType=[inner])
               ImpalaProjectPassthroughRel(cs_sold_date_sk=[$0], cs_bill_customer_sk=[$1], cs_item_sk=[$2], cs_wholesale_cost=[$5], cs_sales_price=[$6], EXPR$0=[CAST($4):BIGINT])
-                ImpalaJoinRel(condition=[AND(=($8, $3), =($2, $7))], joinType=[left])
+                ImpalaJoinRel(condition=[AND(=($8, $3), =($2, $7))], joinType=[anti])
                   ImpalaProjectPassthroughRel(cs_sold_date_sk=[$0], cs_bill_customer_sk=[$3], cs_item_sk=[$15], cs_order_number=[$17], cs_quantity=[$18], cs_wholesale_cost=[$19], cs_sales_price=[$21])
                     ImpalaHdfsScanRel(table=[[default, impala_tpcds_catalog_sales]], condition=[AND(IS NOT NULL($15), IS NOT NULL($3), IS NOT NULL($0))])
                   ImpalaProjectPassthroughRel(cr_item_sk=[$2], cr_order_number=[$16])
@@ -406,7 +406,7 @@ Per-Host Resources: mem-estimate=132.09MB mem-reservation=37.88MB thread-reserva
   |  hash predicates: default.impala_tpcds_store_sales.ss_sold_date_sk = default.impala_tpcds_date_dim.d_date_sk
   |  fk/pk conjuncts: assumed fk/pk
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=0,1N,3 row-size=60B cardinality=0
+  |  tuple-ids=0,3 row-size=44B cardinality=0
   |  in pipelines: 01(GETNEXT), 04(OPEN)
   |
   |--23:EXCHANGE [BROADCAST]
@@ -414,12 +414,10 @@ Per-Host Resources: mem-estimate=132.09MB mem-reservation=37.88MB thread-reserva
   |     tuple-ids=3 row-size=8B cardinality=0
   |     in pipelines: 04(GETNEXT)
   |
-  03:HASH JOIN [LEFT OUTER JOIN, BROADCAST]
+  03:HASH JOIN [LEFT ANTI JOIN, BROADCAST]
   |  hash predicates: default.impala_tpcds_store_sales.ss_item_sk = default.impala_tpcds_store_returns.sr_item_sk, default.impala_tpcds_store_sales.ss_ticket_number = default.impala_tpcds_store_returns.sr_ticket_number
-  |  fk/pk conjuncts: assumed fk/pk
-  |  other predicates: default.impala_tpcds_store_returns.sr_ticket_number IS NULL
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=0,1N row-size=52B cardinality=0
+  |  tuple-ids=0 row-size=36B cardinality=0
   |  in pipelines: 01(GETNEXT), 02(OPEN)
   |
   |--22:EXCHANGE [BROADCAST]
@@ -504,7 +502,7 @@ Per-Host Resources: mem-estimate=132.09MB mem-reservation=37.88MB thread-reserva
   |  hash predicates: default.impala_tpcds_web_sales.ws_sold_date_sk = default.impala_tpcds_date_dim_0.d_date_sk
   |  fk/pk conjuncts: assumed fk/pk
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=6,8N,10 row-size=60B cardinality=0
+  |  tuple-ids=6,10 row-size=44B cardinality=0
   |  in pipelines: 07(GETNEXT), 10(OPEN)
   |
   |--27:EXCHANGE [BROADCAST]
@@ -512,12 +510,10 @@ Per-Host Resources: mem-estimate=132.09MB mem-reservation=37.88MB thread-reserva
   |     tuple-ids=10 row-size=8B cardinality=0
   |     in pipelines: 10(GETNEXT)
   |
-  09:HASH JOIN [LEFT OUTER JOIN, BROADCAST]
+  09:HASH JOIN [LEFT ANTI JOIN, BROADCAST]
   |  hash predicates: default.impala_tpcds_web_sales.ws_item_sk = default.impala_tpcds_web_returns.wr_item_sk, default.impala_tpcds_web_sales.ws_order_number = default.impala_tpcds_web_returns.wr_order_number
-  |  fk/pk conjuncts: assumed fk/pk
-  |  other predicates: default.impala_tpcds_web_returns.wr_order_number IS NULL
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=6,8N row-size=52B cardinality=0
+  |  tuple-ids=6 row-size=36B cardinality=0
   |  in pipelines: 07(GETNEXT), 08(OPEN)
   |
   |--26:EXCHANGE [BROADCAST]
@@ -601,7 +597,7 @@ Per-Host Resources: mem-estimate=132.09MB mem-reservation=37.88MB thread-reserva
   |  hash predicates: default.impala_tpcds_catalog_sales.cs_sold_date_sk = default.impala_tpcds_date_dim_1.d_date_sk
   |  fk/pk conjuncts: assumed fk/pk
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=13,15N,17 row-size=60B cardinality=0
+  |  tuple-ids=13,17 row-size=44B cardinality=0
   |  in pipelines: 14(GETNEXT), 17(OPEN)
   |
   |--32:EXCHANGE [BROADCAST]
@@ -609,12 +605,10 @@ Per-Host Resources: mem-estimate=132.09MB mem-reservation=37.88MB thread-reserva
   |     tuple-ids=17 row-size=8B cardinality=0
   |     in pipelines: 17(GETNEXT)
   |
-  16:HASH JOIN [LEFT OUTER JOIN, BROADCAST]
+  16:HASH JOIN [LEFT ANTI JOIN, BROADCAST]
   |  hash predicates: default.impala_tpcds_catalog_sales.cs_item_sk = default.impala_tpcds_catalog_returns.cr_item_sk, default.impala_tpcds_catalog_sales.cs_order_number = default.impala_tpcds_catalog_returns.cr_order_number
-  |  fk/pk conjuncts: assumed fk/pk
-  |  other predicates: default.impala_tpcds_catalog_returns.cr_order_number IS NULL
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=13,15N row-size=52B cardinality=0
+  |  tuple-ids=13 row-size=36B cardinality=0
   |  in pipelines: 14(GETNEXT), 15(OPEN)
   |
   |--31:EXCHANGE [BROADCAST]
