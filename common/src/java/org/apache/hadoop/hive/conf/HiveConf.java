@@ -6616,6 +6616,7 @@ public class HiveConf extends Configuration {
     "hive\\.parquet\\..*",
     "hive\\.ppd\\..*",
     "hive\\.prewarm\\..*",
+    "hive\\.query\\.name",
     "hive\\.query\\.redaction\\..*",
     "hive\\.server2\\.thrift\\.resultset\\.default\\.fetch\\.size",
     "hive\\.server2\\.proxy\\.user",
