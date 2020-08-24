@@ -17,6 +17,13 @@
  */
 package org.apache.hadoop.hive.ql.optimizer.topnkey;
 
+import static org.apache.hadoop.hive.ql.optimizer.topnkey.TopNKeyProcessor.copyDown;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 import org.apache.hadoop.hive.ql.exec.CommonJoinOperator;
 import org.apache.hadoop.hive.ql.exec.GroupByOperator;
 import org.apache.hadoop.hive.ql.exec.Operator;
@@ -37,13 +44,6 @@ import org.apache.hadoop.hive.ql.plan.TopNKeyDesc;
 import org.apache.hadoop.hive.ql.plan.api.OperatorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
-import static org.apache.hadoop.hive.ql.optimizer.topnkey.TopNKeyProcessor.copyDown;
 
 /**
  * Implementation of TopNKey operator pushdown.
@@ -161,7 +161,7 @@ public class TopNKeyPushdownProcessor implements SemanticNodeProcessor {
 
     LOG.debug("Pushing a copy of {} through {}", topNKey.getName(), groupBy.getName());
     final TopNKeyDesc newTopNKeyDesc = topNKeyDesc.combine(commonKeyPrefix);
-    pushdown(copyDown(groupBy, newTopNKeyDesc));
+    pushdown((TopNKeyOperator) copyDown(groupBy, newTopNKeyDesc));
 
     if (topNKeyDesc.getKeyColumns().size() == commonKeyPrefix.size()) {
       LOG.debug("Removing {} above {}", topNKey.getName(), groupBy.getName());
@@ -190,7 +190,7 @@ public class TopNKeyPushdownProcessor implements SemanticNodeProcessor {
 
     LOG.debug("Pushing a copy of {} through {}", topNKey.getName(), reduceSink.getName());
     final TopNKeyDesc newTopNKeyDesc = topNKeyDesc.combine(commonKeyPrefix);
-    pushdown(copyDown(reduceSink, newTopNKeyDesc));
+    pushdown((TopNKeyOperator) copyDown(reduceSink, newTopNKeyDesc));
 
     if (topNKeyDesc.getKeyColumns().size() == commonKeyPrefix.size()) {
       LOG.debug("Removing {} above {}", topNKey.getName(), reduceSink.getName());
@@ -248,7 +248,7 @@ public class TopNKeyPushdownProcessor implements SemanticNodeProcessor {
     LOG.debug("Pushing a copy of {} through {} and {}",
             topNKey.getName(), join.getName(), reduceSinkOperator.getName());
     final TopNKeyDesc newTopNKeyDesc = topNKeyDesc.combine(commonKeyPrefix);
-    pushdown(copyDown(reduceSinkOperator, newTopNKeyDesc));
+    pushdown((TopNKeyOperator) copyDown(reduceSinkOperator, newTopNKeyDesc));
 
     if (topNKeyDesc.getKeyColumns().size() == commonKeyPrefix.size()) {
       LOG.debug("Removing {} above {}", topNKey.getName(), join.getName());
@@ -337,22 +337,22 @@ public class TopNKeyPushdownProcessor implements SemanticNodeProcessor {
     return opDesc.isSame(desc);
   }
 
-  private static void moveDown(TopNKeyOperator topNKey) throws SemanticException {
+  public static void moveDown(Operator<? extends OperatorDesc> operator) throws SemanticException {
 
-    assert topNKey.getNumParent() == 1;
-    final Operator<? extends OperatorDesc> parent = topNKey.getParentOperators().get(0);
+    assert operator.getNumParent() == 1;
+    final Operator<? extends OperatorDesc> parent = operator.getParentOperators().get(0);
     final List<Operator<? extends OperatorDesc>> grandParents = parent.getParentOperators();
-    parent.removeChildAndAdoptItsChildren(topNKey);
+    parent.removeChildAndAdoptItsChildren(operator);
     for (Operator<? extends OperatorDesc> grandParent : grandParents) {
-      grandParent.replaceChild(parent, topNKey);
+      grandParent.replaceChild(parent, operator);
     }
-    topNKey.getParentOperators().clear();
-    topNKey.getParentOperators().addAll(grandParents);
+    operator.getParentOperators().clear();
+    operator.getParentOperators().addAll(grandParents);
 
-    topNKey.getChildOperators().clear();
-    topNKey.getChildOperators().add(parent);
+    operator.getChildOperators().clear();
+    operator.getChildOperators().add(parent);
 
     parent.getParentOperators().clear();
-    parent.getParentOperators().add(topNKey);
+    parent.getParentOperators().add(operator);
   }
 }

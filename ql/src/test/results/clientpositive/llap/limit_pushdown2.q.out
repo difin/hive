@@ -64,12 +64,12 @@ STAGE PLANS:
                 mode: mergepartial
                 outputColumnNames: _col0, _col1, _col2, _col3
                 Statistics: Num rows: 250 Data size: 48500 Basic stats: COMPLETE Column stats: COMPLETE
-                Select Operator
-                  expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
-                  outputColumnNames: _col0, _col1, _col2
-                  Statistics: Num rows: 250 Data size: 46500 Basic stats: COMPLETE Column stats: COMPLETE
-                  Limit
-                    Number of rows: 20
+                Limit
+                  Number of rows: 20
+                  Statistics: Num rows: 20 Data size: 3880 Basic stats: COMPLETE Column stats: COMPLETE
+                  Select Operator
+                    expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
+                    outputColumnNames: _col0, _col1, _col2
                     Statistics: Num rows: 20 Data size: 3720 Basic stats: COMPLETE Column stats: COMPLETE
                     File Output Operator
                       compressed: false
@@ -183,12 +183,12 @@ STAGE PLANS:
                 mode: mergepartial
                 outputColumnNames: _col0, _col1, _col2, _col3
                 Statistics: Num rows: 250 Data size: 48500 Basic stats: COMPLETE Column stats: COMPLETE
-                Select Operator
-                  expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
-                  outputColumnNames: _col0, _col1, _col2
-                  Statistics: Num rows: 250 Data size: 46500 Basic stats: COMPLETE Column stats: COMPLETE
-                  Limit
-                    Number of rows: 20
+                Limit
+                  Number of rows: 20
+                  Statistics: Num rows: 20 Data size: 3880 Basic stats: COMPLETE Column stats: COMPLETE
+                  Select Operator
+                    expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
+                    outputColumnNames: _col0, _col1, _col2
                     Statistics: Num rows: 20 Data size: 3720 Basic stats: COMPLETE Column stats: COMPLETE
                     File Output Operator
                       compressed: false
@@ -302,12 +302,12 @@ STAGE PLANS:
                 mode: mergepartial
                 outputColumnNames: _col0, _col1, _col2, _col3
                 Statistics: Num rows: 250 Data size: 48500 Basic stats: COMPLETE Column stats: COMPLETE
-                Select Operator
-                  expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
-                  outputColumnNames: _col0, _col1, _col2
-                  Statistics: Num rows: 250 Data size: 46500 Basic stats: COMPLETE Column stats: COMPLETE
-                  Limit
-                    Number of rows: 20
+                Limit
+                  Number of rows: 20
+                  Statistics: Num rows: 20 Data size: 3880 Basic stats: COMPLETE Column stats: COMPLETE
+                  Select Operator
+                    expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
+                    outputColumnNames: _col0, _col1, _col2
                     Statistics: Num rows: 20 Data size: 3720 Basic stats: COMPLETE Column stats: COMPLETE
                     File Output Operator
                       compressed: false
@@ -421,12 +421,12 @@ STAGE PLANS:
                 mode: mergepartial
                 outputColumnNames: _col0, _col1, _col2, _col3
                 Statistics: Num rows: 250 Data size: 48500 Basic stats: COMPLETE Column stats: COMPLETE
-                Select Operator
-                  expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
-                  outputColumnNames: _col0, _col1, _col2
-                  Statistics: Num rows: 250 Data size: 46500 Basic stats: COMPLETE Column stats: COMPLETE
-                  Limit
-                    Number of rows: 20
+                Limit
+                  Number of rows: 20
+                  Statistics: Num rows: 20 Data size: 3880 Basic stats: COMPLETE Column stats: COMPLETE
+                  Select Operator
+                    expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
+                    outputColumnNames: _col0, _col1, _col2
                     Statistics: Num rows: 20 Data size: 3720 Basic stats: COMPLETE Column stats: COMPLETE
                     File Output Operator
                       compressed: false
@@ -540,12 +540,12 @@ STAGE PLANS:
                 mode: mergepartial
                 outputColumnNames: _col0, _col1, _col2, _col3
                 Statistics: Num rows: 250 Data size: 48500 Basic stats: COMPLETE Column stats: COMPLETE
-                Select Operator
-                  expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
-                  outputColumnNames: _col0, _col1, _col2
-                  Statistics: Num rows: 250 Data size: 46500 Basic stats: COMPLETE Column stats: COMPLETE
-                  Limit
-                    Number of rows: 20
+                Limit
+                  Number of rows: 20
+                  Statistics: Num rows: 20 Data size: 3880 Basic stats: COMPLETE Column stats: COMPLETE
+                  Select Operator
+                    expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
+                    outputColumnNames: _col0, _col1, _col2
                     Statistics: Num rows: 20 Data size: 3720 Basic stats: COMPLETE Column stats: COMPLETE
                     File Output Operator
                       compressed: false
@@ -659,12 +659,12 @@ STAGE PLANS:
                 mode: mergepartial
                 outputColumnNames: _col0, _col1, _col2, _col3
                 Statistics: Num rows: 250 Data size: 48500 Basic stats: COMPLETE Column stats: COMPLETE
-                Select Operator
-                  expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
-                  outputColumnNames: _col0, _col1, _col2
-                  Statistics: Num rows: 250 Data size: 46500 Basic stats: COMPLETE Column stats: COMPLETE
-                  Limit
-                    Number of rows: 20
+                Limit
+                  Number of rows: 20
+                  Statistics: Num rows: 20 Data size: 3880 Basic stats: COMPLETE Column stats: COMPLETE
+                  Select Operator
+                    expressions: _col0 (type: string), _col1 (type: string), (_col2 / _col3) (type: double)
+                    outputColumnNames: _col0, _col1, _col2
                     Statistics: Num rows: 20 Data size: 3720 Basic stats: COMPLETE Column stats: COMPLETE
                     File Output Operator
                       compressed: false

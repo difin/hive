@@ -99,7 +99,7 @@ public class TopNKeyProcessor implements SemanticNodeProcessor {
     return null;
   }
 
-  static TopNKeyOperator copyDown(Operator<? extends OperatorDesc> child, OperatorDesc operatorDesc) {
+  public static Operator<? extends OperatorDesc> copyDown(Operator<? extends OperatorDesc> child, OperatorDesc operatorDesc) {
     final List<Operator<? extends OperatorDesc>> parents = child.getParentOperators();
 
     final Operator<? extends OperatorDesc> newOperator =
@@ -115,6 +115,6 @@ public class TopNKeyProcessor implements SemanticNodeProcessor {
     child.getParentOperators().clear();
     child.getParentOperators().add(newOperator);
 
-    return (TopNKeyOperator) newOperator;
+    return newOperator;
   }
 }

@@ -851,11 +851,11 @@ STAGE PLANS:
       Processor Tree:
         TableScan
           alias: cbo_t2
-          Select Operator
-            expressions: key (type: string), value (type: string), c_float (type: float), c_boolean (type: boolean), dt (type: string)
-            outputColumnNames: key, value, c_float, c_boolean, dt
-            Limit
-              Number of rows: 0
+          Limit
+            Number of rows: 0
+            Select Operator
+              expressions: key (type: string), value (type: string), c_float (type: float), c_boolean (type: boolean), dt (type: string)
+              outputColumnNames: key, value, c_float, c_boolean, dt
               Select Operator
                 expressions: key (type: string), value (type: string), null (type: int), c_float (type: float), c_boolean (type: boolean), dt (type: string)
                 outputColumnNames: key, value, c_int, c_float, c_boolean, dt

@@ -54,12 +54,12 @@ STAGE PLANS:
           TableScan
             alias: tbl_n1
             Statistics: Num rows: 2 Data size: 174 Basic stats: COMPLETE Column stats: COMPLETE
-            Select Operator
-              expressions: t (type: string)
-              outputColumnNames: _col0
-              Statistics: Num rows: 2 Data size: 174 Basic stats: COMPLETE Column stats: COMPLETE
-              Limit
-                Number of rows: 0
+            Limit
+              Number of rows: 0
+              Statistics: Num rows: 1 Data size: 87 Basic stats: COMPLETE Column stats: COMPLETE
+              Select Operator
+                expressions: t (type: string)
+                outputColumnNames: _col0
                 Statistics: Num rows: 1 Data size: 87 Basic stats: COMPLETE Column stats: COMPLETE
                 Select Operator
                   expressions: 1L (type: bigint), _col0 (type: string)
@@ -151,12 +151,12 @@ STAGE PLANS:
           TableScan
             alias: tbl_n1
             Statistics: Num rows: 2 Data size: 174 Basic stats: COMPLETE Column stats: COMPLETE
-            Select Operator
-              expressions: t (type: string)
-              outputColumnNames: _col0
-              Statistics: Num rows: 2 Data size: 174 Basic stats: COMPLETE Column stats: COMPLETE
-              Limit
-                Number of rows: 0
+            Limit
+              Number of rows: 0
+              Statistics: Num rows: 1 Data size: 87 Basic stats: COMPLETE Column stats: COMPLETE
+              Select Operator
+                expressions: t (type: string)
+                outputColumnNames: _col0
                 Statistics: Num rows: 1 Data size: 87 Basic stats: COMPLETE Column stats: COMPLETE
                 Select Operator
                   expressions: 2L (type: bigint), _col0 (type: string)

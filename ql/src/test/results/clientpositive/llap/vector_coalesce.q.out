@@ -268,13 +268,13 @@ STAGE PLANS:
                         className: VectorFilterOperator
                         native: true
                         predicateExpression: FilterExprAndExpr(children: SelectColumnIsNull(col 4:float), SelectColumnIsNull(col 3:bigint))
-                      Select Vectorization:
-                          className: VectorSelectOperator
+                      Limit Vectorization:
+                          className: VectorLimitOperator
                           native: true
-                          projectedOutputColumnNums: []
-                        Limit Vectorization:
-                            className: VectorLimitOperator
+                        Select Vectorization:
+                            className: VectorSelectOperator
                             native: true
+                            projectedOutputColumnNums: []
                           Reduce Sink Vectorization:
                               className: VectorReduceSinkEmptyKeyOperator
                               native: true
@@ -489,13 +489,13 @@ STAGE PLANS:
                         className: VectorFilterOperator
                         native: true
                         predicateExpression: FilterExprAndExpr(children: SelectColumnIsNull(col 4:float), SelectColumnIsNull(col 3:bigint))
-                      Select Vectorization:
-                          className: VectorSelectOperator
+                      Limit Vectorization:
+                          className: VectorLimitOperator
                           native: true
-                          projectedOutputColumnNums: []
-                        Limit Vectorization:
-                            className: VectorLimitOperator
+                        Select Vectorization:
+                            className: VectorSelectOperator
                             native: true
+                            projectedOutputColumnNums: []
                           Reduce Sink Vectorization:
                               className: VectorReduceSinkEmptyKeyOperator
                               native: true
@@ -595,14 +595,14 @@ STAGE PLANS:
                         className: VectorFilterOperator
                         native: true
                         predicateExpression: SelectColumnIsNull(col 3:bigint)
-                      Select Vectorization:
-                          className: VectorSelectOperator
+                      Limit Vectorization:
+                          className: VectorLimitOperator
                           native: true
-                          projectedOutputColumnNums: [14, 0, 0]
-                          selectExpressions: ConstantVectorExpression(val null) -> 14:bigint
-                        Limit Vectorization:
-                            className: VectorLimitOperator
+                        Select Vectorization:
+                            className: VectorSelectOperator
                             native: true
+                            projectedOutputColumnNums: [14, 0, 0]
+                            selectExpressions: ConstantVectorExpression(val null) -> 14:bigint
                           File Sink Vectorization:
                               className: VectorFileSinkOperator
                               native: false
