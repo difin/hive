@@ -1,0 +1,22 @@
+#!/bin/bash
+# Copyright (c) 2020 Cloudera, Inc. All rights reserved.
+
+# retrieve ec2 instance's public hostname and ip via metadata API
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html
+RESP=`curl --connect-timeout 2 -s -f http://169.254.169.254/latest/meta-data/public-hostname`
+exit_status=$?
+FQDN=`hostname -f`
+if [ $exit_status -eq 0 ]; then
+    export PUBLIC_HOSTNAME=$RESP
+    echo "Public hostname of ${FQDN} is ${PUBLIC_HOSTNAME}"
+fi
+
+RESP=`curl --connect-timeout 2 -s -f http://169.254.169.254/latest/meta-data/public-ipv4`
+exit_status=$?
+if [ $exit_status -eq 0 ]; then
+    export PUBLIC_HOST_IP=$RESP
+    echo "Public ip address of ${FQDN} is ${PUBLIC_HOST_IP}"
+fi
+
+export LLAP_DAEMON_USER_CLASSPATH=${HIVE_HOME}/lib/*:`${HADOOP_HOME}/bin/hadoop classpath`:${TEZ_HOME}/*:${TEZ_HOME}/lib/*
+exec ${HIVE_HOME}/scripts/llap/bin/llapDaemon.sh start

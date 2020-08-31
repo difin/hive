@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -12,9 +11,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.hive</groupId>
@@ -28,8 +25,13 @@
   <name>Hive Packaging</name>
 
   <properties>
+    <docker.ubi7.minimal.version>7.8-328</docker.ubi7.minimal.version>
     <hive.path.to.root>..</hive.path.to.root>
     <hive.jdbc.driver.jar>apache-hive-${project.version}-jdbc.jar</hive.jdbc.driver.jar>
+    <atlas.version>2.1.0.7.2.11.0-SNAPSHOT</atlas.version>
+    <oozie.version>5.1.0.7.2.13.0-SNAPSHOT</oozie.version>
+    <ranger.version>2.1.0.7.2.11.0-SNAPSHOT</ranger.version>
+    <solr.version>8.4.1.7.2.11.0-SNAPSHOT</solr.version>
   </properties>
 
   <profiles>
@@ -434,6 +436,87 @@
           <artifactId>hive-exec</artifactId>
           <version>${project.version}</version>
           <classifier>core-shaded</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>docker</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.33.0</version>
+            <configuration>
+              <imagePullPolicy>IfNotPresent</imagePullPolicy>
+              <images>
+                <image>
+                  <alias>hive</alias>
+                  <name>hive</name>
+                  <build>
+                    <contextDir>${project.basedir}/src/docker</contextDir>
+                    <args>
+                      <CDH_VERSION>${project.version}</CDH_VERSION>
+                      <HADOOP_VERSION>${hadoop.version}</HADOOP_VERSION>
+                      <RANGER_VERSION>${ranger.version}</RANGER_VERSION>
+                      <TEZ_VERSION>${tez.version}</TEZ_VERSION>
+                      <ATLAS_VERSION>${atlas.version}</ATLAS_VERSION>
+                      <SOLR_VERSION>${solr.version}</SOLR_VERSION>
+                    </args>
+                    <tags>
+                      <tag>${project.version}</tag>
+                    </tags>
+                    <assembly>
+                      <mode>dir</mode>
+                      <descriptor>${project.basedir}/src/main/assembly/bin.xml</descriptor>
+                    </assembly>
+                  </build>
+                </image>
+              </images>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.tez</groupId>
+          <artifactId>tez-api</artifactId>
+          <version>${tez.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tez</groupId>
+          <artifactId>tez-runtime-library</artifactId>
+          <version>${tez.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tez</groupId>
+          <artifactId>tez-runtime-internals</artifactId>
+          <version>${tez.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tez</groupId>
+          <artifactId>tez-mapreduce</artifactId>
+          <version>${tez.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tez</groupId>
+          <artifactId>tez-dag</artifactId>
+          <version>${tez.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.ranger</groupId>
+          <artifactId>ranger-hive-plugin</artifactId>
+          <version>${ranger.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.atlas</groupId>
+          <artifactId>hive-bridge</artifactId>
+          <version>${atlas.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.oozie</groupId>
+          <artifactId>oozie-client</artifactId>
+          <version>${oozie.version}</version>
         </dependency>
       </dependencies>
     </profile>
