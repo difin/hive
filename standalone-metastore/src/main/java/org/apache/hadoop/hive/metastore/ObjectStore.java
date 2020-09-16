@@ -10788,9 +10788,41 @@ public class ObjectStore implements RawStore, Configurable {
       int tooOld = (tmp > Integer.MAX_VALUE) ? 0 : (int) tmp;
       query = pm.newQuery(MTxnWriteNotificationLog.class, "eventTime < tooOld");
       query.declareParameters("java.lang.Integer tooOld");
-      Collection<MTxnWriteNotificationLog> toBeRemoved = (Collection) query.execute(tooOld);
-      if (CollectionUtils.isNotEmpty(toBeRemoved)) {
+
+      int max_events = MetastoreConf.getIntVar(conf, MetastoreConf.ConfVars.EVENT_CLEAN_MAX_EVENTS);
+      max_events = max_events > 0 ? max_events : Integer.MAX_VALUE;
+      query.setRange(0, max_events);
+      query.setOrdering("txnId ascending");
+
+      List<MTxnWriteNotificationLog> toBeRemoved = (List) query.execute(tooOld);
+      int iteration = 0;
+      int eventCount = 0;
+      long minTxnId = 0;
+      long minEventTime = 0;
+      long maxTxnId = 0;
+      long maxEventTime = 0;
+      while (CollectionUtils.isNotEmpty(toBeRemoved)) {
+        int listSize = toBeRemoved.size();
+        if (iteration == 0) {
+          MTxnWriteNotificationLog firstNotification = toBeRemoved.get(0);
+          minTxnId = firstNotification.getTxnId();
+          minEventTime = firstNotification.getEventTime();
+        }
+        MTxnWriteNotificationLog lastNotification = toBeRemoved.get(listSize - 1);
+        maxTxnId = lastNotification.getTxnId();
+        maxEventTime = lastNotification.getEventTime();
+
         pm.deletePersistentAll(toBeRemoved);
+        eventCount += listSize;
+        iteration++;
+        toBeRemoved = (List) query.execute(tooOld);
+      }
+      if (iteration == 0) {
+        LOG.info("No WriteNotification events found to be cleaned with eventTime < {}.", tooOld);
+      } else {
+        LOG.info("WriteNotification Cleaned {} events with eventTime < {} in {} iteration, " +
+            "minimum txnId {} (with eventTime {}) and maximum txnId {} (with eventTime {})",
+            eventCount, tooOld, iteration, minTxnId, minEventTime, maxTxnId, maxEventTime);
       }
       commited = commitTransaction();
     } finally {
