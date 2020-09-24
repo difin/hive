@@ -19,7 +19,7 @@ create table test_mm(empno int, name string) partitioned by(dept string) stored 
 desc formatted test_mm;
 
 -- Conversion from MM to External
-create external table test_external like test_mm;
+create external table test_external like test_mm LOCATION '${system:test.tmp.dir}/create_like_mm_to_external';
 desc formatted test_external;
 
 -- Conversion from External to MM

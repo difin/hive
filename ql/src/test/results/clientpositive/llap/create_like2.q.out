@@ -57,8 +57,6 @@ Bucket Columns:     	[]
 Sort Columns:       	[]                  	 
 Storage Desc Params:	 	 
 	serialization.format	1                   
-<<<<<<< HEAD
-=======
 PREHOOK: query: create table test_mm(empno int, name string) partitioned by(dept string) stored as orc tblproperties('transactional'='true', 'transactional_properties'='default')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
@@ -436,4 +434,3 @@ POSTHOOK: query: drop table default.dbscopy
 POSTHOOK: type: DROPTABLE
 POSTHOOK: Input: default@dbscopy
 POSTHOOK: Output: default@dbscopy
->>>>>>> 3d3e6da204 (CDPD-46589: HIVE-25813: Create Table x Like commands based storage handlers fail over is fixed (#3627))
