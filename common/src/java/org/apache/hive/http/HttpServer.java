@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -151,6 +152,8 @@ public class HttpServer {
     private final Map<String, Object> contextAttrs = new HashMap<String, Object>();
     private String keyStorePassword;
     private String keyStorePath;
+    private String keyStoreType;
+    private String keyManagerFactoryAlgorithm;
     private String spnegoPrincipal;
     private String spnegoKeytab;
     private boolean useSPNEGO;
@@ -214,6 +217,16 @@ public class HttpServer {
 
     public Builder setKeyStorePath(String keyStorePath) {
       this.keyStorePath = keyStorePath;
+      return this;
+    }
+
+    public Builder setKeyStoreType(String keyStoreType) {
+      this.keyStoreType = keyStoreType;
+      return this;
+    }
+
+    public Builder setKeyManagerFactoryAlgorithm(String keyManagerFactoryAlgorithm) {
+      this.keyManagerFactoryAlgorithm = keyManagerFactoryAlgorithm;
       return this;
     }
 
@@ -516,7 +529,11 @@ public class HttpServer {
     } else {
       SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
       sslContextFactory.setKeyStorePath(b.keyStorePath);
-      sslContextFactory.setKeyStoreType(KeyStore.getDefaultType());
+      sslContextFactory.setKeyStoreType(b.keyStoreType == null || b.keyStoreType.isEmpty() ?
+          KeyStore.getDefaultType(): b.keyStoreType);
+      sslContextFactory.setKeyManagerFactoryAlgorithm(
+          b.keyManagerFactoryAlgorithm == null || b.keyManagerFactoryAlgorithm.isEmpty()?
+          KeyManagerFactory.getDefaultAlgorithm() : b.keyManagerFactoryAlgorithm);
       Set<String> excludedSSLProtocols = Sets.newHashSet(
         Splitter.on(",").trimResults().omitEmptyStrings().split(
           Strings.nullToEmpty(b.conf.getVar(ConfVars.HIVE_SSL_PROTOCOL_BLACKLIST))));
