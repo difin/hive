@@ -14,7 +14,9 @@
 
 package org.apache.hadoop.hive.ql.exec.tez;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -46,8 +48,9 @@ public class TestDynamicPartitionPruner {
       SerDeException {
     InputInitializerContext mockInitContext = mock(InputInitializerContext.class);
     MapWork mapWork = mock(MapWork.class);
-    DynamicPartitionPruner pruner =
-        new DynamicPartitionPrunerForEventTesting(mockInitContext, mapWork);
+    DynamicPartitionPrunerForEventTesting pruner =
+        new DynamicPartitionPrunerForEventTesting();
+    pruner.initialize(mockInitContext, mapWork, new JobConf());
 
     PruneRunnable pruneRunnable = new PruneRunnable(pruner);
     Thread t = new Thread(pruneRunnable);
@@ -56,6 +59,8 @@ public class TestDynamicPartitionPruner {
       pruneRunnable.start();
       pruneRunnable.awaitEnd();
       // Return immediately. No entries found for pruning. Verified via the timeout.
+      assertEquals(0, pruner.eventsProceessed.intValue());
+      assertEquals(0, pruner.filteredSources.intValue());
     } finally {
       t.interrupt();
       t.join();
@@ -69,8 +74,9 @@ public class TestDynamicPartitionPruner {
     doReturn(1).when(mockInitContext).getVertexNumTasks("v1");
 
     MapWork mapWork = createMockMapWork(new TestSource("v1", 1));
-    DynamicPartitionPruner pruner =
-        new DynamicPartitionPrunerForEventTesting(mockInitContext, mapWork);
+    DynamicPartitionPrunerForEventTesting pruner =
+        new DynamicPartitionPrunerForEventTesting();
+    pruner.initialize(mockInitContext, mapWork, new JobConf());
 
 
     PruneRunnable pruneRunnable = new PruneRunnable(pruner);
@@ -87,7 +93,9 @@ public class TestDynamicPartitionPruner {
       pruner.processVertex("v1");
 
       pruneRunnable.awaitEnd();
-      assertFalse(pruneRunnable.inError.get());
+      assertNoError(pruneRunnable);
+      assertEquals(1, pruner.eventsProceessed.intValue());
+      assertEquals(1, pruner.filteredSources.intValue());
     } finally {
       t.interrupt();
       t.join();
@@ -101,8 +109,9 @@ public class TestDynamicPartitionPruner {
     doReturn(1).when(mockInitContext).getVertexNumTasks("v1");
 
     MapWork mapWork = createMockMapWork(new TestSource("v1", 1));
-    DynamicPartitionPruner pruner =
-        new DynamicPartitionPrunerForEventTesting(mockInitContext, mapWork);
+    DynamicPartitionPrunerForEventTesting pruner =
+        new DynamicPartitionPrunerForEventTesting();
+    pruner.initialize(mockInitContext, mapWork, new JobConf());
 
 
     PruneRunnable pruneRunnable = new PruneRunnable(pruner);
@@ -119,7 +128,9 @@ public class TestDynamicPartitionPruner {
       pruner.addEvent(event);
 
       pruneRunnable.awaitEnd();
-      assertFalse(pruneRunnable.inError.get());
+      assertNoError(pruneRunnable);
+      assertEquals(1, pruner.eventsProceessed.intValue());
+      assertEquals(1, pruner.filteredSources.intValue());
     } finally {
       t.interrupt();
       t.join();
@@ -132,8 +143,9 @@ public class TestDynamicPartitionPruner {
     doReturn(2).when(mockInitContext).getVertexNumTasks("v1");
 
     MapWork mapWork = createMockMapWork(new TestSource("v1", 2));
-    DynamicPartitionPruner pruner =
-        new DynamicPartitionPrunerForEventTesting(mockInitContext, mapWork);
+    DynamicPartitionPrunerForEventTesting pruner =
+        new DynamicPartitionPrunerForEventTesting();
+    pruner.initialize(mockInitContext, mapWork, new JobConf());
 
     PruneRunnable pruneRunnable = new PruneRunnable(pruner);
     Thread t = new Thread(pruneRunnable);
@@ -152,7 +164,9 @@ public class TestDynamicPartitionPruner {
       pruner.processVertex("v1");
 
       pruneRunnable.awaitEnd();
-      assertFalse(pruneRunnable.inError.get());
+      assertNoError(pruneRunnable);
+      assertEquals(4, pruner.eventsProceessed.intValue());
+      assertEquals(2, pruner.filteredSources.intValue());
     } finally {
       t.interrupt();
       t.join();
@@ -165,8 +179,9 @@ public class TestDynamicPartitionPruner {
     doReturn(2).when(mockInitContext).getVertexNumTasks("v1");
 
     MapWork mapWork = createMockMapWork(new TestSource("v1", 2));
-    DynamicPartitionPruner pruner =
-        new DynamicPartitionPrunerForEventTesting(mockInitContext, mapWork);
+    DynamicPartitionPrunerForEventTesting pruner =
+        new DynamicPartitionPrunerForEventTesting();
+    pruner.initialize(mockInitContext, mapWork, new JobConf());
 
     PruneRunnable pruneRunnable = new PruneRunnable(pruner);
     Thread t = new Thread(pruneRunnable);
@@ -185,7 +200,9 @@ public class TestDynamicPartitionPruner {
       pruner.addEvent(event);
 
       pruneRunnable.awaitEnd();
-      assertFalse(pruneRunnable.inError.get());
+      assertNoError(pruneRunnable);
+      assertEquals(4, pruner.eventsProceessed.intValue());
+      assertEquals(2, pruner.filteredSources.intValue());
     } finally {
       t.interrupt();
       t.join();
@@ -199,8 +216,9 @@ public class TestDynamicPartitionPruner {
     doReturn(3).when(mockInitContext).getVertexNumTasks("v2");
 
     MapWork mapWork = createMockMapWork(new TestSource("v1", 2), new TestSource("v2", 1));
-    DynamicPartitionPruner pruner =
-        new DynamicPartitionPrunerForEventTesting(mockInitContext, mapWork);
+    DynamicPartitionPrunerForEventTesting pruner =
+        new DynamicPartitionPrunerForEventTesting();
+    pruner.initialize(mockInitContext, mapWork, new JobConf());
 
     PruneRunnable pruneRunnable = new PruneRunnable(pruner);
     Thread t = new Thread(pruneRunnable);
@@ -229,7 +247,9 @@ public class TestDynamicPartitionPruner {
       pruner.processVertex("v2");
 
       pruneRunnable.awaitEnd();
-      assertFalse(pruneRunnable.inError.get());
+      assertNoError(pruneRunnable);
+      assertEquals(7, pruner.eventsProceessed.intValue());
+      assertEquals(3, pruner.filteredSources.intValue());
     } finally {
       t.interrupt();
       t.join();
@@ -243,8 +263,9 @@ public class TestDynamicPartitionPruner {
     doReturn(3).when(mockInitContext).getVertexNumTasks("v2");
 
     MapWork mapWork = createMockMapWork(new TestSource("v1", 2), new TestSource("v2", 1));
-    DynamicPartitionPruner pruner =
-        new DynamicPartitionPrunerForEventTesting(mockInitContext, mapWork);
+    DynamicPartitionPrunerForEventTesting pruner =
+        new DynamicPartitionPrunerForEventTesting();
+    pruner.initialize(mockInitContext, mapWork, new JobConf());
 
     PruneRunnable pruneRunnable = new PruneRunnable(pruner);
     Thread t = new Thread(pruneRunnable);
@@ -273,7 +294,9 @@ public class TestDynamicPartitionPruner {
       pruner.addEvent(eventV2);
 
       pruneRunnable.awaitEnd();
-      assertFalse(pruneRunnable.inError.get());
+      assertNoError(pruneRunnable);
+      assertEquals(7, pruner.eventsProceessed.intValue());
+      assertEquals(3, pruner.filteredSources.intValue());
     } finally {
       t.interrupt();
       t.join();
@@ -287,8 +310,9 @@ public class TestDynamicPartitionPruner {
     doReturn(3).when(mockInitContext).getVertexNumTasks("v2");
 
     MapWork mapWork = createMockMapWork(new TestSource("v1", 2), new TestSource("v2", 1));
-    DynamicPartitionPruner pruner =
-        new DynamicPartitionPrunerForEventTesting(mockInitContext, mapWork);
+    DynamicPartitionPrunerForEventTesting pruner =
+        new DynamicPartitionPrunerForEventTesting();
+    pruner.initialize(mockInitContext, mapWork, new JobConf());
 
     PruneRunnable pruneRunnable = new PruneRunnable(pruner);
     Thread t = new Thread(pruneRunnable);
@@ -316,22 +340,25 @@ public class TestDynamicPartitionPruner {
       pruner.addEvent(eventV2);
 
       pruneRunnable.awaitEnd();
-      assertFalse(pruneRunnable.inError.get());
+      assertNoError(pruneRunnable);
+      assertEquals(7, pruner.eventsProceessed.intValue());
+      assertEquals(3, pruner.filteredSources.intValue());
     } finally {
       t.interrupt();
       t.join();
     }
   }
 
-  @Test(timeout = 20000, expected = IllegalStateException.class)
+  @Test(timeout = 20000)
   public void testExtraEvents() throws InterruptedException, IOException, HiveException,
       SerDeException {
     InputInitializerContext mockInitContext = mock(InputInitializerContext.class);
     doReturn(1).when(mockInitContext).getVertexNumTasks("v1");
 
     MapWork mapWork = createMockMapWork(new TestSource("v1", 1));
-    DynamicPartitionPruner pruner =
-        new DynamicPartitionPrunerForEventTesting(mockInitContext, mapWork);
+    DynamicPartitionPrunerForEventTesting pruner =
+        new DynamicPartitionPrunerForEventTesting();
+    pruner.initialize(mockInitContext, mapWork, new JobConf());
 
 
     PruneRunnable pruneRunnable = new PruneRunnable(pruner);
@@ -349,7 +376,10 @@ public class TestDynamicPartitionPruner {
       pruner.processVertex("v1");
 
       pruneRunnable.awaitEnd();
-      assertFalse(pruneRunnable.inError.get());
+      assertTrue(pruneRunnable.inError.get());
+      assertTrue(pruneRunnable.exception instanceof IllegalStateException);
+      assertEquals(2, pruner.eventsProceessed.intValue());
+      assertEquals(0, pruner.filteredSources.intValue());
     } finally {
       t.interrupt();
       t.join();
@@ -363,8 +393,9 @@ public class TestDynamicPartitionPruner {
     doReturn(1).when(mockInitContext).getVertexNumTasks("v1");
 
     MapWork mapWork = createMockMapWork(new TestSource("v1", 1));
-    DynamicPartitionPruner pruner =
-        new DynamicPartitionPrunerForEventTesting(mockInitContext, mapWork);
+    DynamicPartitionPrunerForEventTesting pruner =
+        new DynamicPartitionPrunerForEventTesting();
+    pruner.initialize(mockInitContext, mapWork, new JobConf());
 
 
     PruneRunnable pruneRunnable = new PruneRunnable(pruner);
@@ -381,10 +412,18 @@ public class TestDynamicPartitionPruner {
       Thread.sleep(3000l);
       // The pruner should not have completed.
       assertFalse(pruneRunnable.ended.get());
-      assertFalse(pruneRunnable.inError.get());
+      assertNoError(pruneRunnable);
+      assertEquals(0, pruner.eventsProceessed.intValue());
+      assertEquals(0, pruner.filteredSources.intValue());
     } finally {
       t.interrupt();
       t.join();
+    }
+  }
+
+  private void assertNoError(PruneRunnable pruneRunnable) {
+    if (pruneRunnable.inError.get()) {
+      throw new AssertionError(pruneRunnable.exception);
     }
   }
 
@@ -397,6 +436,7 @@ public class TestDynamicPartitionPruner {
     final AtomicBoolean started = new AtomicBoolean(false);
     final AtomicBoolean ended = new AtomicBoolean(false);
     final AtomicBoolean inError = new AtomicBoolean(false);
+    Exception exception;
 
     private PruneRunnable(DynamicPartitionPruner pruner) {
       this.pruner = pruner;
@@ -434,17 +474,18 @@ public class TestDynamicPartitionPruner {
         } finally {
           lock.unlock();
         }
-
         pruner.prune();
-        lock.lock();
+      } catch (Exception e) {
+        inError.set(true);
+        exception = e;
+      } finally {
         try {
+          lock.lock();
           ended.set(true);
           endCondition.signal();
         } finally {
           lock.unlock();
         }
-      } catch (SerDeException | IOException | InterruptedException | HiveException e) {
-        inError.set(true);
       }
     }
   }
@@ -523,11 +564,7 @@ public class TestDynamicPartitionPruner {
   private static class DynamicPartitionPrunerForEventTesting extends DynamicPartitionPruner {
 
     LongAdder filteredSources = new LongAdder();
-
-    public DynamicPartitionPrunerForEventTesting(
-        InputInitializerContext context, MapWork work) throws SerDeException {
-      super(context, work, new JobConf());
-    }
+    LongAdder eventsProceessed = new LongAdder();
 
     @Override
     protected SourceInfo createSourceInfo(TableDesc t, ExprNodeDesc partKeyExpr, ExprNodeDesc predicate, String columnName, String columnType,
@@ -539,14 +576,13 @@ public class TestDynamicPartitionPruner {
     @Override
     protected String processPayload(ByteBuffer payload, String sourceName) throws SerDeException,
         IOException {
-      // No-op: testing events only
+      eventsProceessed.increment();
       return sourceName;
     }
 
     @Override
     protected ExprNodeDesc prunePartitionSingleSource(JobConf conf, String source, SourceInfo si)
         throws HiveException {
-      // No-op: testing events only
       filteredSources.increment();
       return null;
     }
