@@ -434,7 +434,9 @@ class MetaStoreDirectSql {
       db.setOwnerType(
           (null == type || type.trim().isEmpty()) ? null : PrincipalType.valueOf(type));
       db.setCatalogName(extractSqlString(dbline[6]));
-      db.setCreateTime(extractSqlInt(dbline[7]));
+      if (dbline[7] != null) {
+        db.setCreateTime(extractSqlInt(dbline[7]));
+      }
       db.setManagedLocationUri(extractSqlString(dbline[8]));
       db.setParameters(MetaStoreUtils.trimMapNulls(dbParams,convertMapNullsToEmptyStrings));
       if (LOG.isDebugEnabled()){
