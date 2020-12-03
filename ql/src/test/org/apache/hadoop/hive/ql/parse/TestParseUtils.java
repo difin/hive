@@ -21,15 +21,20 @@ package org.apache.hadoop.hive.ql.parse;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.TxnType;
+import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
-
+import org.apache.hadoop.hive.ql.session.SessionState;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -47,6 +52,16 @@ public class TestParseUtils {
     this.query = query;
     this.txnType = txnType;
     this.conf = new HiveConf();
+  }
+
+  @Before
+  public void before() {
+    SessionState.start((HiveConf) conf);
+  }
+
+  @After
+  public void after() throws Exception {
+    SessionState.get().close();
   }
 
   @Parameters
@@ -107,28 +122,28 @@ public class TestParseUtils {
   @Test
   public void testTxnTypeWithEnabledReadOnlyFeature() throws Exception {
     enableReadOnlyTxnFeature(true);
-    Assert.assertEquals(AcidUtils.getTxnType(conf, ParseUtils.parse(query)), txnType);
+    Assert.assertEquals(AcidUtils.getTxnType(conf, ParseUtils.parse(query,new Context(conf))), txnType);
   }
 
   @Test
   public void testTxnTypeWithDisabledReadOnlyFeature() throws Exception {
     enableReadOnlyTxnFeature(false);
-    Assert.assertEquals(AcidUtils.getTxnType(conf, ParseUtils.parse(query)),
+    Assert.assertEquals(AcidUtils.getTxnType(conf, ParseUtils.parse(query,new Context(conf))),
         txnType == TxnType.READ_ONLY ? TxnType.DEFAULT : txnType);
   }
 
   @Test
   public void testTxnTypeWithLocklessReadsEnabled() throws Exception {
     enableLocklessReadsFeature(true);
-    Assert.assertEquals(AcidUtils.getTxnType(conf, ParseUtils.parse(query)), txnType);
+    Assert.assertEquals(AcidUtils.getTxnType(conf, ParseUtils.parse(query, new Context(conf))), txnType);
   }
 
   @Test
   public void testTxnTypeWithLocklessReadsDisabled() throws Exception {
     enableLocklessReadsFeature(false);
-    Assert.assertEquals(AcidUtils.getTxnType(conf, ParseUtils.parse(query)), TxnType.DEFAULT);
+    Assert.assertEquals(AcidUtils.getTxnType(conf, ParseUtils.parse(query, new Context(conf))), TxnType.DEFAULT);
   }
-  
+
   private void enableReadOnlyTxnFeature(boolean featureFlag) {
     Assume.assumeTrue(txnType == TxnType.READ_ONLY || txnType == TxnType.DEFAULT);
     HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_TXN_READONLY_ENABLED, featureFlag);

@@ -56,7 +56,7 @@ public class AlterMaterializedViewRewriteOperation extends DDLOperation<AlterMat
         planner.initCtx(ctx);
         planner.init(false);
 
-        final RelNode plan = planner.genLogicalPlan(ParseUtils.parse(mv.getViewExpandedText()));
+        final RelNode plan = planner.genLogicalPlan(ParseUtils.parse(mv.getViewExpandedText(), ctx));
         if (plan == null) {
           String msg = "Cannot enable automatic rewriting for materialized view.";
           if (ctx.getCboInfo() != null) {
