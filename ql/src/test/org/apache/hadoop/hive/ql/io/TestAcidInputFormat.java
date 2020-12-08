@@ -50,7 +50,7 @@ public class TestAcidInputFormat {
 
   @Mock
   private DataInput mockDataInput;
-
+  
   @Test
   public void testDeltaMetaDataReadFieldsNoStatementIds() throws Exception {
     when(mockDataInput.readLong()).thenReturn(1L, 2L);

@@ -2107,7 +2107,8 @@ public class OrcInputFormat implements InputFormat<NullWritable, OrcStruct>,
       throw new IllegalStateException("Expected SpliUpdate table: " + split.getPath());
     }
 
-    final Path[] deltas = VectorizedOrcAcidRowBatchReader.getDeleteDeltaDirsFromSplit(split);
+    Map<String, AcidInputFormat.DeltaMetaData> pathToDeltaMetaData = new HashMap<>();
+    final Path[] deltas = VectorizedOrcAcidRowBatchReader.getDeleteDeltaDirsFromSplit(split, pathToDeltaMetaData);
     final Configuration conf = options.getConfiguration();
 
     final Reader reader = OrcInputFormat.createOrcReaderForSplit(conf, split);
@@ -2139,14 +2140,15 @@ public class OrcInputFormat implements InputFormat<NullWritable, OrcStruct>,
       LOG.debug("Creating merger for {} and {}", split.getPath(), Arrays.toString(deltas));
     }
     boolean fetchDeletedRows = acidOperationalProperties.isFetchDeletedRows();
+    Map<String, Integer> deltaToAttemptId = AcidUtils.getDeltaToAttemptIdMap(pathToDeltaMetaData, deltas, bucket);
 
     final OrcRawRecordMerger records;
     if (!fetchDeletedRows) {
       records = new OrcRawRecordMerger(conf, true, reader, split.isOriginal(), bucket,
-              validWriteIdList, readOptions, deltas, mergerOptions);
+              validWriteIdList, readOptions, deltas, mergerOptions, deltaToAttemptId);
     } else {
       records = new OrcRawRecordMerger(conf, true, reader, split.isOriginal(), bucket,
-              validWriteIdList, readOptions, deltas, mergerOptions) {
+              validWriteIdList, readOptions, deltas, mergerOptions, deltaToAttemptId) {
         @Override
         protected boolean collapse(RecordIdentifier recordIdentifier) {
           ((ReaderKey) recordIdentifier).setValues(
@@ -2455,7 +2457,7 @@ public class OrcInputFormat implements InputFormat<NullWritable, OrcStruct>,
                                            ValidWriteIdList validWriteIdList,
                                            Path baseDirectory,
                                            Path[] deltaDirectory,
-                                           Map<String, String> deltasToAttemptId
+                                           Map<String, Integer> deltasToAttemptId
                                            ) throws IOException {
     boolean isOriginal = false;
     OrcRawRecordMerger.Options mergerOptions = new OrcRawRecordMerger.Options().isCompacting(true)

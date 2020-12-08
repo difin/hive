@@ -322,7 +322,7 @@ public final class HiveFileFormatUtils {
   public static RecordUpdater getAcidRecordUpdater(JobConf jc, TableDesc tableInfo, int bucket,
                                                    FileSinkDesc conf, Path outPath,
                                                    ObjectInspector inspector,
-                                                   Reporter reporter, int rowIdColNum, String attemptId)
+                                                   Reporter reporter, int rowIdColNum, Integer attemptId)
       throws HiveException, IOException {
     HiveOutputFormat<?, ?> hiveOutputFormat = getHiveOutputFormat(jc, tableInfo);
     AcidOutputFormat<?, ?> acidOutputFormat = null;
@@ -348,7 +348,7 @@ public final class HiveFileFormatUtils {
                                                 Reporter reporter,
                                                 int rowIdColNum,
                                                 FileSinkDesc conf,
-                                                String attemptId) throws IOException {
+                                                Integer attemptId) throws IOException {
     return acidOutputFormat.getRecordUpdater(outPath, new AcidOutputFormat.Options(jc)
         .isCompressed(conf.getCompressed())
         .tableProperties(tableProp)

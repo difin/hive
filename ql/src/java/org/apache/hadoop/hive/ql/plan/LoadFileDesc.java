@@ -41,6 +41,7 @@ public class LoadFileDesc extends LoadDesc implements Serializable {
   private transient CreateViewDesc createViewDesc;
   private boolean isMmCtas;
   private boolean isStreaming;
+  private String moveTaskId;
 
   public LoadFileDesc(final LoadFileDesc o) {
     super(o.getSourcePath(), o.getWriteType());
@@ -162,5 +163,13 @@ public class LoadFileDesc extends LoadDesc implements Serializable {
       writeId = createViewDesc.getInitialMmWriteId();
     }
     return (writeId == null) ? -1 : writeId;
+  }
+  
+  public String getMoveTaskId() {
+    return moveTaskId;
+  }
+
+  public void setMoveTaskId(String moveTaskId) {
+    this.moveTaskId = moveTaskId;
   }
 }

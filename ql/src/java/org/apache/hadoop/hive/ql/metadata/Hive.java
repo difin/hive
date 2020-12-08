@@ -2654,11 +2654,16 @@ public class Hive {
     return destPath;
   }
 
-  public static void listFilesInsideAcidDirectory(Path acidDir, FileSystem srcFs, List<FileStatus> newFiles)
+  public static void listFilesInsideAcidDirectory(Path acidDir, FileSystem srcFs, List<FileStatus> newFiles, PathFilter filter)
           throws IOException {
     // list out all the files/directory in the path
-    FileStatus[] acidFiles;
-    acidFiles = srcFs.listStatus(acidDir);
+    FileStatus[] acidFiles = null;
+    if (filter != null) {
+      acidFiles = srcFs.listStatus(acidDir, filter);
+    } else {
+      acidFiles = srcFs.listStatus(acidDir);
+    }
+
     if (acidFiles == null) {
       LOG.debug("No files added by this query in: " + acidDir);
       return;
@@ -2669,23 +2674,19 @@ public class Hive {
       if (!acidFile.isDirectory()) {
         newFiles.add(acidFile);
       } else {
-        listFilesInsideAcidDirectory(acidFile.getPath(), srcFs, newFiles);
+        listFilesInsideAcidDirectory(acidFile.getPath(), srcFs, newFiles, null);
       }
     }
   }
 
-  private void listFilesCreatedByQuery(Path loadPath, long writeId, int stmtId,
-                                           boolean isInsertOverwrite, List<FileStatus> newFiles) throws HiveException {
-    Path acidDir = new Path(loadPath, AcidUtils.baseOrDeltaSubdir(isInsertOverwrite, writeId, writeId, stmtId));
+  private void listFilesCreatedByQuery(Path loadPath, long writeId, int stmtId, boolean isInsertOverwrite,
+                                           List<FileStatus> newFiles) throws HiveException {
     try {
       FileSystem srcFs = loadPath.getFileSystem(conf);
-      if (srcFs.exists(acidDir) && srcFs.isDirectory(acidDir)){
-        // list out all the files in the path
-        listFilesInsideAcidDirectory(acidDir, srcFs, newFiles);
-      } else {
-        LOG.info("directory does not exist: " + acidDir);
-        return;
-      }
+      PathFilter filter = new AcidUtils.IdPathFilter(writeId, stmtId);
+      listFilesInsideAcidDirectory(loadPath, srcFs, newFiles, filter);
+    } catch (FileNotFoundException e) {
+      LOG.info("directory does not exist: " + loadPath);
     } catch (IOException e) {
       LOG.error("Error listing files", e);
       throw new HiveException(e);
@@ -2845,9 +2846,9 @@ private void constructOneLBLocationMap(FileStatus fSta,
    * @return Set of valid partitions
    * @throws HiveException
    */
-  private Set<Path> getValidPartitionsInPath(
-      int numDP, int numLB, Path loadPath, Long writeId, int stmtId,
-      boolean isMmTable, boolean isInsertOverwrite, boolean isDirectInsert) throws HiveException {
+  private Set<Path> getValidPartitionsInPath(int numDP, int numLB, Path loadPath, Long writeId, int stmtId,
+      boolean isMmTable, boolean isInsertOverwrite, boolean isDirectInsert, AcidUtils.Operation operation,
+      Set<String> dynamiPartitionSpecs) throws HiveException {
     Set<Path> validPartitions = new HashSet<Path>();
     try {
       FileSystem fs = loadPath.getFileSystem(conf);
@@ -2869,14 +2870,26 @@ private void constructOneLBLocationMap(FileStatus fSta,
         //       we have multiple statements anyway is union.
         Utilities.FILE_OP_LOGGER.trace(
             "Looking for dynamic partitions in {} ({} levels)", loadPath, numDP);
+        int stmtIdToUse = -1;
+        if (isDirectInsert) {
+          stmtIdToUse = stmtId;
+        }
         Path[] leafStatus = Utilities.getDirectInsertDirectoryCandidates(
-            fs, loadPath, numDP, null, writeId, -1, conf, isInsertOverwrite);
+            fs, loadPath, numDP, null, writeId, stmtIdToUse, conf, isInsertOverwrite, operation);
         for (Path p : leafStatus) {
           Path dpPath = p.getParent(); // Skip the MM directory that we have found.
           if (Utilities.FILE_OP_LOGGER.isTraceEnabled()) {
             Utilities.FILE_OP_LOGGER.trace("Found DP " + dpPath);
           }
-          validPartitions.add(dpPath);
+          String partitionSpec = dpPath.toString().substring(loadPath.toString().length() + 1);
+          if (isInsertOverwrite) {
+            if (dynamiPartitionSpecs == null || dynamiPartitionSpecs.contains(partitionSpec)) {
+              validPartitions.add(dpPath);
+            }
+          }
+          else {
+            validPartitions.add(dpPath);
+          }
         }
       }
     } catch (IOException e) {
@@ -2917,7 +2930,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
       final String tableName, final Map<String, String> partSpec, final LoadFileType loadFileType,
       final int numDP, final int numLB, final boolean isAcid, final long writeId, final int stmtId,
       final boolean resetStatistics, final AcidUtils.Operation operation,
-      boolean isInsertOverwrite, boolean isDirectInsert) throws HiveException {
+      boolean isInsertOverwrite, boolean isDirectInsert, Set<String> dynamiPartitionSpecs) throws HiveException {
 
     PerfLogger perfLogger = SessionState.getPerfLogger();
     perfLogger.PerfLogBegin("MoveTask", PerfLogger.LOAD_DYNAMIC_PARTITIONS);
@@ -2925,7 +2938,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
     // Get all valid partition paths and existing partitions for them (if any)
     final Table tbl = getTable(tableName);
     final Set<Path> validPartitions = getValidPartitionsInPath(numDP, numLB, loadPath, writeId, stmtId,
-        AcidUtils.isInsertOnlyTable(tbl.getParameters()), isInsertOverwrite, isDirectInsert);
+        AcidUtils.isInsertOnlyTable(tbl.getParameters()), isInsertOverwrite, isDirectInsert, operation, dynamiPartitionSpecs);
 
     final int partsToLoad = validPartitions.size();
     final AtomicInteger partitionsLoaded = new AtomicInteger(0);
@@ -3808,7 +3821,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
     }
     return names;
   }
- 
+
   /**
    * get all the partitions that the table has
    *

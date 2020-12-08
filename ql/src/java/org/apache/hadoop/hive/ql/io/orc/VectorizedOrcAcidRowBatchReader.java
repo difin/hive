@@ -87,7 +87,9 @@ import java.util.stream.IntStream;
 import static java.util.stream.Collectors.toList;
 import static org.apache.hadoop.hive.ql.io.sarg.ConvertAstToSearchArg.sargToKryo;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A fast vectorized batch reader class for ACID. Insert events are read directly
  * from the base files/insert_only deltas in vectorized row batches. The deleted
@@ -850,7 +852,9 @@ public class VectorizedOrcAcidRowBatchReader
     }
     return false;
   }
-  static Path[] getDeleteDeltaDirsFromSplit(OrcSplit orcSplit) throws IOException {
+
+  static Path[] getDeleteDeltaDirsFromSplit(OrcSplit orcSplit,
+      Map<String, AcidInputFormat.DeltaMetaData> pathToDeltaMetaData) throws IOException {
     Path path = orcSplit.getPath();
     Path root;
     if (orcSplit.hasBase()) {
@@ -864,7 +868,7 @@ public class VectorizedOrcAcidRowBatchReader
     } else {
       throw new IllegalStateException("Split w/o base w/Acid 2.0??: " + path);
     }
-    return AcidUtils.deserializeDeleteDeltas(root, orcSplit.getDeltas());
+    return AcidUtils.deserializeDeleteDeltas(root, orcSplit.getDeltas(), pathToDeltaMetaData);
   }
 
   /**
@@ -1213,18 +1217,19 @@ public class VectorizedOrcAcidRowBatchReader
     SortMergedDeleteEventRegistry(JobConf conf, OrcSplit orcSplit,
         Reader.Options readerOptions, boolean fetchDeletedRows) throws IOException {
       this.fetchDeletedRows = fetchDeletedRows;
-      final Path[] deleteDeltas = getDeleteDeltaDirsFromSplit(orcSplit);
+      Map<String, AcidInputFormat.DeltaMetaData> pathToDeltaMetaData = new HashMap<>();
+      final Path[] deleteDeltas = getDeleteDeltaDirsFromSplit(orcSplit, pathToDeltaMetaData);
       if (deleteDeltas.length > 0) {
         int bucket = AcidUtils.parseBucketId(orcSplit.getPath());
         String txnString = conf.get(ValidWriteIdList.VALID_WRITEIDS_KEY);
         this.validWriteIdList
                 = (txnString == null) ? new ValidReaderWriteIdList() : new ValidReaderWriteIdList(txnString);
         LOG.debug("Using SortMergedDeleteEventRegistry");
+        Map<String, Integer> deltaToAttemptId = AcidUtils.getDeltaToAttemptIdMap(pathToDeltaMetaData, deleteDeltas, bucket);
         OrcRawRecordMerger.Options mergerOptions = new OrcRawRecordMerger.Options().isDeleteReader(true);
         assert !orcSplit.isOriginal() : "If this now supports Original splits, set up mergeOptions properly";
-        this.deleteRecords = new OrcRawRecordMerger(conf, true, null, false, bucket,
-                                                    validWriteIdList, readerOptions, deleteDeltas,
-                                                    mergerOptions, null);
+        this.deleteRecords = new OrcRawRecordMerger(conf, true, null, false, bucket, validWriteIdList, readerOptions,
+            deleteDeltas, mergerOptions, deltaToAttemptId);
         this.deleteRecordKey = new OrcRawRecordMerger.ReaderKey();
         this.deleteRecordValue = this.deleteRecords.createValue();
         // Initialize the first value in the delete reader.
@@ -1366,7 +1371,7 @@ public class VectorizedOrcAcidRowBatchReader
       /**
        * see {@link BucketCodec}
        */
-      private int bucketProperty; 
+      private int bucketProperty;
       private long rowId;
       DeleteRecordKey() {
         this.originalWriteId = -1;

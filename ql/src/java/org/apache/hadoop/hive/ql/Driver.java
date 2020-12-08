@@ -332,6 +332,19 @@ public class Driver implements IDriver {
       //sorting makes tests easier to write since file names and ROW__IDs depend on statementId
       //so this makes (file name -> data) mapping stable
       acidSinks.sort(Comparator.comparing(FileSinkDesc::getDirName));
+      
+      // If the direct insert is on, sort the FSOs by moveTaskId as well because the dir is the same for all except the union use cases.
+      boolean isDirectInsertOn = false;
+      for (FileSinkDesc acidSink : acidSinks) {
+        if (acidSink.isDirectInsert()) {
+          isDirectInsertOn = true;
+          break;
+        }
+      }
+      if (isDirectInsertOn) {
+        acidSinks.sort((FileSinkDesc fsd1, FileSinkDesc fsd2) -> fsd1.getMoveTaskId().compareTo(fsd2.getMoveTaskId()));
+      }
+      
       for (FileSinkDesc desc : acidSinks) {
         TableDesc tableInfo = desc.getTableInfo();
         final TableName tn = HiveTableName.ofNullable(tableInfo.getTableName());

@@ -172,7 +172,7 @@ public class TestWorker extends CompactorTest {
     deltas[1] = new Path(delta2);
 
     CompactorMR.CompactorInputSplit split =
-        new CompactorMR.CompactorInputSplit(conf, 3, files, new Path(basename), deltas, new HashMap<String, String>());
+        new CompactorMR.CompactorInputSplit(conf, 3, files, new Path(basename), deltas, new HashMap<String, Integer>());
 
     Assert.assertEquals(520L, split.getLength());
     String[] locations = split.getLocations();
@@ -217,7 +217,7 @@ public class TestWorker extends CompactorTest {
     deltas[1] = new Path(delta2);
 
     CompactorMR.CompactorInputSplit split =
-        new CompactorMR.CompactorInputSplit(conf, 3, files, null, deltas, new HashMap<String, String>());
+        new CompactorMR.CompactorInputSplit(conf, 3, files, null, deltas, new HashMap<String, Integer>());
 
     ByteArrayOutputStream buf = new ByteArrayOutputStream();
     DataOutput out = new DataOutputStream(buf);
