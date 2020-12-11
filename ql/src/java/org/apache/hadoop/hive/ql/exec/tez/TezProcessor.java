@@ -23,6 +23,7 @@ import java.nio.IntBuffer;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.hadoop.hive.conf.Constants;
@@ -32,7 +33,11 @@ import org.apache.tez.runtime.api.events.CustomProcessorEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.ql.exec.LimitOperator;
+import org.apache.hadoop.hive.ql.exec.ObjectCacheFactory;
 import org.apache.hadoop.hive.ql.log.PerfLogger;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputCollector;
@@ -191,7 +196,6 @@ public class TezProcessor extends AbstractLogicalIOProcessor {
     perfLogger.PerfLogEnd(CLASS_NAME, PerfLogger.TEZ_INITIALIZE_PROCESSOR);
   }
 
-
   private void initTezAttributes() {
     jobConf.set(HIVE_TEZ_VERTEX_NAME, processorContext.getTaskVertexName());
     jobConf.setInt(HIVE_TEZ_VERTEX_INDEX, processorContext.getTaskVertexIndex());
@@ -240,6 +244,15 @@ public class TezProcessor extends AbstractLogicalIOProcessor {
     }
 
     synchronized (this) {
+      boolean limitReached = checkLimitReached();
+      if (limitReached) {
+        LOG.info(
+            "TezProcessor exits early as query limit already reached, vertex: {}, task: {}, attempt: {}",
+            jobConf.get(HIVE_TEZ_VERTEX_NAME), jobConf.get(HIVE_TEZ_TASK_INDEX),
+            jobConf.get(HIVE_TEZ_TASK_ATTEMPT_NUMBER));
+        aborted.set(true);
+      }
+
       // This check isn't absolutely mandatory, given the aborted check outside of the
       // Processor creation.
       if (aborted.get()) {
@@ -248,7 +261,6 @@ public class TezProcessor extends AbstractLogicalIOProcessor {
 
       // leverage TEZ-3437: Improve synchronization and the progress report behavior.
       progressHelper = new ReflectiveProgressHelper(jobConf, inputs, getContext(), this.getClass().getSimpleName());
-
 
       // There should be no blocking operation in RecordProcessor creation,
       // otherwise the abort operation will not register since they are synchronized on the same
@@ -265,6 +277,23 @@ public class TezProcessor extends AbstractLogicalIOProcessor {
       initializeAndRunProcessor(inputs, outputs);
     }
     // TODO HIVE-14042. In case of an abort request, throw an InterruptedException
+  }
+
+  private boolean checkLimitReached() {
+    String queryId = HiveConf.getVar(jobConf, HiveConf.ConfVars.HIVEQUERYID);
+    String limitReachedKey = LimitOperator.getLimitReachedKey(jobConf);
+
+    try {
+      return ObjectCacheFactory.getCache(jobConf, queryId, false, true)
+          .retrieve(limitReachedKey, new Callable<AtomicBoolean>() {
+            @Override
+            public AtomicBoolean call() {
+              return new AtomicBoolean(false);
+            }
+          }).get();
+    } catch (HiveException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   protected void initializeAndRunProcessor(Map<String, LogicalInput> inputs,
