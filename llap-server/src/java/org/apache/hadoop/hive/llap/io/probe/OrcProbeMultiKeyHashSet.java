@@ -74,7 +74,7 @@ public class OrcProbeMultiKeyHashSet extends OrcProbeHashTable {
         } else {
           multiKeyVectorSerializeRow.setOutput(currKeyOutput);
           multiKeySerializeWrite.reset();
-          multiKeyVectorSerializeRow.serializePrimitiveWrite(probeCol, multiKeyVectorSerializeRow.getFields()[0], 0);
+          multiKeyVectorSerializeRow.serializeWrite(probeCol, multiKeyVectorSerializeRow.getFields()[0], 0);
           if (probeHashMultiHashSet.contains(currKeyOutput.getData(), 0, currKeyOutput.getLength(),
               hashMultiHashSetResult) == JoinUtil.JoinResult.MATCH) {
             // If repeating and match, next CVs of batch are read FULLY
@@ -96,7 +96,7 @@ public class OrcProbeMultiKeyHashSet extends OrcProbeHashTable {
             // MultiKey to binary sortable
             multiKeyVectorSerializeRow.setOutput(currKeyOutput);
             multiKeySerializeWrite.reset();
-            multiKeyVectorSerializeRow.serializePrimitiveWrite(probeCol, multiKeyVectorSerializeRow.getFields()[0], row);
+            multiKeyVectorSerializeRow.serializeWrite(probeCol, multiKeyVectorSerializeRow.getFields()[0], row);
             // Equal key series checking.
             if (!haveSaveKey || !saveKeyOutput.arraysEquals(currKeyOutput)) {
               // New key -- swap Output Buffers

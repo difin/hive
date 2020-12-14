@@ -70,7 +70,7 @@ public class OrcDummyProbeMultiKeyHashMultiSet extends OrcProbeHashTable {
         // Repeating values case
         multiKeyVectorSerializeRow.setOutput(currKeyOutput);
         multiKeySerializeWrite.reset();
-        multiKeyVectorSerializeRow.serializePrimitiveWrite(probeCol, multiKeyVectorSerializeRow.getFields()[0], 0);
+        multiKeyVectorSerializeRow.serializeWrite(probeCol, multiKeyVectorSerializeRow.getFields()[0], 0);
         newSize = probeHashMultiHashMultiSet
             .contains(currKeyOutput.getData(), 0, currKeyOutput.getLength(), hashMultiHashSetResult)
             == JoinUtil.JoinResult.MATCH ? batchSize : 0;
@@ -80,7 +80,7 @@ public class OrcDummyProbeMultiKeyHashMultiSet extends OrcProbeHashTable {
           multiKeyVectorSerializeRow.setOutput(currKeyOutput);
           multiKeySerializeWrite.reset();
           // MultiKey to binary sortable
-          multiKeyVectorSerializeRow.serializePrimitiveWrite(probeCol, multiKeyVectorSerializeRow.getFields()[0], row);
+          multiKeyVectorSerializeRow.serializeWrite(probeCol, multiKeyVectorSerializeRow.getFields()[0], row);
           newSize += probeHashMultiHashMultiSet
               .contains(saveKeyOutput.getData(), 0, saveKeyOutput.getLength(), hashMultiHashSetResult)
               == JoinUtil.JoinResult.MATCH ? 1 : 0;
