@@ -1317,7 +1317,7 @@ public class TestCompactor {
     driver.getFetchTask().fetch(res);
     Assert.assertEquals(4, res.size());
 
-    int count = TxnDbUtil.countQueryAgent(conf, "select count(*) from TXN_COMPONENTS");
+    int count = TestTxnDbUtil.countQueryAgent(conf, "select count(*) from TXN_COMPONENTS");
     Assert.assertEquals("There should be 2 record for two aborted transaction", 2, count);
 
     // Start a compaction, that will be skipped, because only one valid delta is there
@@ -1326,7 +1326,7 @@ public class TestCompactor {
     // Cleaner should not delete info about aborted txn 2
     runCleaner(conf);
     txnHandler.cleanEmptyAbortedTxns();
-    count = TxnDbUtil.countQueryAgent(conf, "select count(*) from TXN_COMPONENTS");
+    count = TestTxnDbUtil.countQueryAgent(conf, "select count(*) from TXN_COMPONENTS");
     Assert.assertEquals("There should be 1 record for the second aborted transaction", 1, count);
 
     driver.run("select * from cws");
