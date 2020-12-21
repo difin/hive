@@ -68,9 +68,9 @@ import org.apache.hadoop.hive.metastore.api.TxnInfo;
 import org.apache.hadoop.hive.metastore.api.TxnState;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.metastore.txn.AcidHouseKeeperService;
-import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.DriverFactory;
 import org.apache.hadoop.hive.ql.IDriver;
 import org.apache.hadoop.hive.ql.io.AcidDirectory;
@@ -213,7 +213,7 @@ public class TestStreaming {
     conf
     .setVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
         "org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory");
-    TxnDbUtil.setConfValues(conf);
+    TestTxnDbUtil.setConfValues(conf);
     if (metaStoreURI!=null) {
       conf.setVar(HiveConf.ConfVars.METASTOREURIS, metaStoreURI);
     }
@@ -223,8 +223,8 @@ public class TestStreaming {
 
 
     //1) Start from a clean slate (metastore)
-    TxnDbUtil.cleanDb(conf);
-    TxnDbUtil.prepDb(conf);
+    TestTxnDbUtil.cleanDb(conf);
+    TestTxnDbUtil.prepDb(conf);
 
     //2) obtain metastore clients
     msClient = new HiveMetaStoreClient(conf);

@@ -44,9 +44,9 @@ import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.hive.ql.io.HiveInputFormat;
@@ -116,9 +116,9 @@ public class TestHiveMetaTool extends TestCase {
       HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.MERGE_SPLIT_UPDATE, true);
       hiveConf.setBoolVar(HiveConf.ConfVars.HIVESTATSCOLAUTOGATHER, false);
       hiveConf.setBoolean("mapred.input.dir.recursive", true);
-      TxnDbUtil.setConfValues(hiveConf);
+      TestTxnDbUtil.setConfValues(hiveConf);
       txnHandler = TxnUtils.getTxnStore(hiveConf);
-      TxnDbUtil.prepDb(hiveConf);
+      TestTxnDbUtil.prepDb(hiveConf);
       File f = new File(getWarehouseDir());
       if (f.exists()) {
         FileUtil.fullyDelete(f);
@@ -450,7 +450,7 @@ public class TestHiveMetaTool extends TestCase {
           d = null;
         }
       } finally {
-        TxnDbUtil.cleanDb(hiveConf);
+        TestTxnDbUtil.cleanDb(hiveConf);
         FileUtils.deleteDirectory(new File(getTestDataDir()));
       }
       client.close();

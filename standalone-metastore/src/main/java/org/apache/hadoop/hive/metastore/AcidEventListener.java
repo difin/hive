@@ -126,7 +126,7 @@ public class AcidEventListener extends TransactionalMetaStoreEventListener {
     String origTxnMgr = null;
     boolean origConcurrency = false;
 
-    // Since TxnUtils.getTxnStore calls TxnHandler.setConf -> checkQFileTestHack -> TxnDbUtil.setConfValues,
+    // Since TxnUtils.getTxnStore calls TxnHandler.setConf -> checkQFileTestHack -> TestTxnDbUtil.setConfValues,
     // which may change the values of below two entries, we need to avoid polluting the original values
     if (hackOn) {
       origTxnMgr = MetastoreConf.getVar(conf, ConfVars.HIVE_TXN_MANAGER);

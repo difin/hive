@@ -36,6 +36,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConfUtil;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.QTestProcessExecResult;
 import org.apache.hadoop.hive.ql.dataset.Dataset;
 import org.apache.hadoop.hive.ql.dataset.DatasetCollection;
@@ -108,6 +109,7 @@ public class CoreBeeLineDriver extends CliAdapter {
         .cleanupLocalDirOnStartup(true)
         .build();
 
+    TestTxnDbUtil.prepDb(hiveConf);
     miniHS2.start(new HashMap<String, String>());
 
     System.err.println(HiveConfUtil.dumpConfig(miniHS2.getHiveConf()));
@@ -173,7 +175,7 @@ public class CoreBeeLineDriver extends CliAdapter {
           + "\nCheck the following logs for details:\n - " + beeLineOutput + "\n - " + log, e);
     }
   }
-  
+
   protected void runInfraScript(String[] commands, File beeLineOutput, File log)
       throws IOException, SQLException {
     try (QFileBeeLineClient beeLineClient = clientBuilder.getClient(beeLineOutput)) {
@@ -241,9 +243,9 @@ public class CoreBeeLineDriver extends CliAdapter {
       throw new Exception("Exception running or analyzing the results of the query file: " + qFile
           + "\n" + qFile.getDebugHint(), e);
     }
-    
+
   }
-  
+
   public void runTest(QFile qFile) throws Exception {
     runTest(qFile, null);
   }

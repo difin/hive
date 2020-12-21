@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static org.apache.hadoop.hive.metastore.txn.TxnUtils.getEpochFn;
+
 /**
  * Extends the transaction handler with methods needed only by the compactor threads.  These
  * methods are not available through the thrift interface.
@@ -296,7 +298,7 @@ class CompactionTxnHandler extends TxnHandler {
           s = s + " AND (\"CQ_NEXT_TXN_ID\" < " + minOpenTxnWaterMark + " OR \"CQ_NEXT_TXN_ID\" IS NULL)";
         }
         if (retentionTime > 0) {
-          s = s + " AND \"CQ_COMMIT_TIME\" < (" + TxnDbUtil.getEpochFn(dbProduct) + " - " + retentionTime + ")";
+          s = s + " AND \"CQ_COMMIT_TIME\" < (" + getEpochFn(dbProduct) + " - " + retentionTime + ")";
         }
         s = s + " ORDER BY \"CQ_COMMIT_TIME\"";
         LOG.debug("Going to execute query <" + s + ">");
@@ -356,7 +358,7 @@ class CompactionTxnHandler extends TxnHandler {
             + "\"CC_HADOOP_JOB_ID\", \"CC_ERROR_MESSAGE\", \"CC_ENQUEUE_TIME\") "
           + "SELECT \"CQ_ID\", \"CQ_DATABASE\", \"CQ_TABLE\", \"CQ_PARTITION\", "
             + quoteChar(SUCCEEDED_STATE) + ", \"CQ_TYPE\", \"CQ_TBLPROPERTIES\", \"CQ_WORKER_ID\", \"CQ_START\", "
-            + TxnDbUtil.getEpochFn(dbProduct) + ", \"CQ_RUN_AS\", \"CQ_HIGHEST_WRITE_ID\", \"CQ_META_INFO\", "
+            + getEpochFn(dbProduct) + ", \"CQ_RUN_AS\", \"CQ_HIGHEST_WRITE_ID\", \"CQ_META_INFO\", "
             + "\"CQ_HADOOP_JOB_ID\", \"CQ_ERROR_MESSAGE\", "
             + "\"CQ_ENQUEUE_TIME\" "
             + "FROM \"COMPACTION_QUEUE\" WHERE \"CQ_ID\" = ?";
@@ -1215,7 +1217,7 @@ class CompactionTxnHandler extends TxnHandler {
     if (txnType == TxnType.COMPACTION) {
       stmt.executeUpdate(
           "UPDATE \"COMPACTION_QUEUE\" SET \"CQ_NEXT_TXN_ID\" = " + commitId + ", \"CQ_COMMIT_TIME\" = " +
-              TxnDbUtil.getEpochFn(dbProduct) + " WHERE \"CQ_TXN_ID\" = " + txnid);
+              getEpochFn(dbProduct) + " WHERE \"CQ_TXN_ID\" = " + txnid);
     }
   }
 }

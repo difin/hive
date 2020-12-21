@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.metastore.txn;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.api.*;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +44,7 @@ public class TestAcidTxnCleanerService {
   public void setUp() throws Exception {
     conf = MetastoreConf.newMetastoreConf();
     txnHandler = TxnUtils.getTxnStore(conf);
-    TxnDbUtil.prepDb(conf);
+    TestTxnDbUtil.prepDb(conf);
 
     underTest = new AcidTxnCleanerService();
     underTest.setConf(conf);
@@ -51,7 +52,7 @@ public class TestAcidTxnCleanerService {
 
   @After
   public void tearDown() throws Exception {
-    TxnDbUtil.cleanDb(conf);
+    TestTxnDbUtil.cleanDb(conf);
   }
 
   @Test

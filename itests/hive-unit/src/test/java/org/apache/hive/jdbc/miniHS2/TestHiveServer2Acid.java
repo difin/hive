@@ -20,7 +20,7 @@ package org.apache.hive.jdbc.miniHS2;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
-import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hive.service.cli.CLIServiceClient;
 import org.apache.hive.service.cli.HiveSQLException;
@@ -48,8 +48,8 @@ public class TestHiveServer2Acid {
   @BeforeClass
   public static void beforeTest() throws Exception {
     HiveConf conf = new HiveConf();
-    TxnDbUtil.setConfValues(conf);
-    TxnDbUtil.prepDb(conf);
+    TestTxnDbUtil.setConfValues(conf);
+    TestTxnDbUtil.prepDb(conf);
     miniHS2 = new MiniHS2(conf, MiniHS2.MiniClusterType.TEZ);
     confOverlay.put(ConfVars.HIVE_SERVER2_ENABLE_DOAS.varname, "false");
     miniHS2.start(confOverlay);

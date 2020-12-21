@@ -162,9 +162,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 
 import static org.apache.hadoop.hive.metastore.DatabaseProduct.MYSQL;
-import static org.apache.hadoop.hive.metastore.txn.TxnDbUtil.executeQueriesInBatch;
-import static org.apache.hadoop.hive.metastore.txn.TxnDbUtil.executeQueriesInBatchNoCount;
-import static org.apache.hadoop.hive.metastore.txn.TxnDbUtil.getEpochFn;
+import static org.apache.hadoop.hive.metastore.txn.TxnUtils.getEpochFn;
+import static org.apache.hadoop.hive.metastore.txn.TxnUtils.executeQueriesInBatchNoCount;
+import static org.apache.hadoop.hive.metastore.txn.TxnUtils.executeQueriesInBatch;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCatalog;
 import static org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdentifier;
 
@@ -2018,7 +2018,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           throw new MetaException(MessageFormat
               .format("Invalid txnId seed {}, the highWaterMark is {}", rqst.getSeedTxnId(), highWaterMark));
         }
-        TxnDbUtil.seedTxnSequence(dbConn, stmt, rqst.getSeedTxnId());
+        TxnUtils.seedTxnSequence(dbConn, stmt, rqst.getSeedTxnId());
         dbConn.commit();
 
       } catch (SQLException e) {

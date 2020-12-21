@@ -29,7 +29,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.FileUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -474,10 +474,10 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     // There should be 2 delta directories
     verifyDirAndResult(2);
 
-    Assert.assertEquals(TxnDbUtil.queryToString(hiveConf, "select * from COMPLETED_TXN_COMPONENTS"),
-            2, TxnDbUtil.countQueryAgent(hiveConf, "select count(*) from COMPLETED_TXN_COMPONENTS"));
-    Assert.assertEquals(TxnDbUtil.queryToString(hiveConf, "select * from TXNS"),
-            0, TxnDbUtil.countQueryAgent(hiveConf, "select count(*) from TXNS"));
+    Assert.assertEquals(TestTxnDbUtil.queryToString(hiveConf, "select * from COMPLETED_TXN_COMPONENTS"),
+            2, TestTxnDbUtil.countQueryAgent(hiveConf, "select count(*) from COMPLETED_TXN_COMPONENTS"));
+    Assert.assertEquals(TestTxnDbUtil.queryToString(hiveConf, "select * from TXNS"),
+            0, TestTxnDbUtil.countQueryAgent(hiveConf, "select count(*) from TXNS"));
 
     // Initiate a major compaction request on the table.
     runStatementOnDriver("alter table " + TableExtended.MMTBL  + " compact 'MAJOR'");
@@ -488,11 +488,11 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
 
     // Run Cleaner.
     runCleaner(hiveConf);
-    Assert.assertEquals(TxnDbUtil.queryToString(hiveConf, "select * from COMPLETED_TXN_COMPONENTS"),
+    Assert.assertEquals(TestTxnDbUtil.queryToString(hiveConf, "select * from COMPLETED_TXN_COMPONENTS"),
             0,
-            TxnDbUtil.countQueryAgent(hiveConf, "select count(*) from COMPLETED_TXN_COMPONENTS"));
-    Assert.assertEquals(TxnDbUtil.queryToString(hiveConf, "select * from TXNS"),
-            0, TxnDbUtil.countQueryAgent(hiveConf, "select count(*) from TXNS"));
+            TestTxnDbUtil.countQueryAgent(hiveConf, "select count(*) from COMPLETED_TXN_COMPONENTS"));
+    Assert.assertEquals(TestTxnDbUtil.queryToString(hiveConf, "select * from TXNS"),
+            0, TestTxnDbUtil.countQueryAgent(hiveConf, "select count(*) from TXNS"));
     verifyDirAndResult(0, true);
   }
 

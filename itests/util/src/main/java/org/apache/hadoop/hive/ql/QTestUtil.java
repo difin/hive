@@ -54,7 +54,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClientWithLocalCache;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.QTestMiniClusters.FsType;
 import org.apache.hadoop.hive.ql.cache.results.QueryResultsCache;
 import org.apache.hadoop.hive.ql.dataset.QTestDatasetHandler;
@@ -85,7 +85,6 @@ import org.apache.hadoop.hive.ql.qoption.QTestReplaceHandler;
 import org.apache.hadoop.hive.ql.qoption.QTestSysDbHandler;
 import org.apache.hadoop.hive.ql.qoption.QTestTransactional;
 import org.apache.hadoop.hive.ql.qoption.QTestTimezoneHandler;
-import org.apache.hadoop.hive.ql.qoption.QTestTransactional;
 import org.apache.hadoop.hive.ql.scheduled.QTestScheduledQueryCleaner;
 import org.apache.hadoop.hive.ql.scheduled.QTestScheduledQueryServiceProvider;
 import org.apache.hadoop.hive.ql.session.SessionState;
@@ -250,7 +249,6 @@ public class QTestUtil {
 
     postInit();
     savedConf = new HiveConf(conf);
-
   }
 
   private void logClassPath() {
@@ -538,7 +536,6 @@ public class QTestUtil {
 
     File outf = new File(logDir, "initialize.log");
     setSessionOutputs("that_shouldnt_happen_there", ss, outf);
-
   }
 
   /**
@@ -559,8 +556,8 @@ public class QTestUtil {
     clearUDFsCreatedDuringTests();
     clearKeysCreatedInTests();
     StatsSources.clearGlobalStats();
-    TxnDbUtil.cleanDb(conf);
-    TxnDbUtil.prepDb(conf);
+    TestTxnDbUtil.cleanDb(conf);
+    TestTxnDbUtil.prepDb(conf);
     dispatcher.afterTest(this);
   }
 
@@ -624,16 +621,6 @@ public class QTestUtil {
     }
   }
 
-  protected void runCreateTableCmd(String createTableCmd) throws Exception {
-    try {
-      drv.run(createTableCmd);
-    } catch (CommandProcessorException e) {
-      throw new Exception("create table command: " + createTableCmd + " failed with exit code= " + e.getErrorCode());
-    }
-
-    return;
-  }
-
   protected void runCmd(String cmd) throws Exception {
     try {
       drv.run(cmd);
@@ -685,6 +672,7 @@ public class QTestUtil {
     miniClusters.postInit(conf);
 
     testWarehouse = conf.getVar(HiveConf.ConfVars.METASTOREWAREHOUSE);
+    TestTxnDbUtil.prepDb(conf);
 
     db = Hive.get(conf);
     drv = DriverFactory.newDriver(conf);
@@ -993,7 +981,7 @@ public class QTestUtil {
     String outFileExtension = getOutFileExtension(tname);
 
     File qf = new File(outDir, tname);
-    String expf = outPath(outDir.toString(), tname.concat(outFileExtension));
+    String expf = outPath(outDir, tname.concat(outFileExtension));
 
     File outf = null;
     outf = new File(logDir);
@@ -1022,11 +1010,10 @@ public class QTestUtil {
   }
 
   public QTestProcessExecResult checkNegativeResults(String tname, Error e) throws Exception {
-
     String outFileExtension = getOutFileExtension(tname);
 
     File qf = new File(outDir, tname);
-    String expf = outPath(outDir.toString(), tname.concat(outFileExtension));
+    String expf = outPath(outDir, tname.concat(outFileExtension));
 
     File outf = null;
     outf = new File(logDir);

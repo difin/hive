@@ -24,8 +24,10 @@ import org.apache.hadoop.hive.common.ValidReadTxnList;
 import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
+import org.apache.hadoop.hive.metastore.DatabaseProduct;
 import org.apache.hadoop.hive.metastore.TransactionalValidationListener;
 import org.apache.hadoop.hive.metastore.api.GetOpenTxnsResponse;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.TableValidWriteIds;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
@@ -35,17 +37,45 @@ import org.apache.hadoop.hive.metastore.utils.JavaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.apache.hadoop.hive.metastore.DatabaseProduct.*;
+
 public class TxnUtils {
   private static final Logger LOG = LoggerFactory.getLogger(TxnUtils.class);
+
+  private static final EnumMap<DatabaseProduct, String> DB_EPOCH_FN =
+      new EnumMap<DatabaseProduct, String>(DatabaseProduct.class) {{
+        put(DERBY, "{ fn timestampdiff(sql_tsi_frac_second, timestamp('" + new Timestamp(0) +
+            "'), current_timestamp) } / 1000000");
+        put(MYSQL, "round(unix_timestamp(now(3)) * 1000)");
+        put(POSTGRES, "round(extract(epoch from current_timestamp) * 1000)");
+        put(ORACLE, "(cast(systimestamp at time zone 'UTC' as date) - date '1970-01-01')*24*60*60*1000 " +
+            "+ cast(mod( extract( second from systimestamp ), 1 ) * 1000 as int)");
+        put(SQLSERVER, "datediff_big(millisecond, '19700101', sysutcdatetime())");
+      }};
+
+  private static final EnumMap<DatabaseProduct, String> DB_SEED_FN =
+      new EnumMap<DatabaseProduct, String>(DatabaseProduct.class) {{
+        put(DERBY, "UPDATE \"NEXT_TXN_ID\" SET \"NTXN_NEXT\" = %s");
+        put(MYSQL, "UPDATE \"NEXT_TXN_ID\" SET \"NTXN_NEXT\" = %s");
+        put(POSTGRES, "UPDATE \"NEXT_TXN_ID\" SET \"NTXN_NEXT\" = %s");
+        put(ORACLE, "UPDATE \"NEXT_TXN_ID\" SET \"NTXN_NEXT\" = %s");
+        put(SQLSERVER, "UPDATE \"NEXT_TXN_ID\" SET \"NTXN_NEXT\" = %s");
+      }};
 
   public static ValidTxnList createValidTxnListForCleaner(GetOpenTxnsResponse txns, long minOpenTxnGLB) {
     long highWaterMark = minOpenTxnGLB - 1;
@@ -495,5 +525,103 @@ public class TxnUtils {
     }
 
     return size;
+  }
+
+  /**
+   * Get database specific function which returns the milliseconds value after the epoch.
+   * @param dbProduct The type of the db which is used
+   * @throws MetaException For unknown database type.
+   */
+  public static String getEpochFn(DatabaseProduct dbProduct) throws MetaException {
+    String epochFn = DB_EPOCH_FN.get(dbProduct);
+    if (epochFn != null) {
+      return epochFn;
+    } else {
+      String msg = "Unknown database product: " + dbProduct.toString();
+      LOG.error(msg);
+      throw new MetaException(msg);
+    }
+  }
+
+  /**
+   * Calls queries in batch, but does not return affected row numbers. Same as executeQueriesInBatch,
+   * with the only difference when the db is Oracle. In this case it is called as an anonymous stored
+   * procedure instead of batching, since batching is not optimized. See:
+   * https://docs.oracle.com/cd/E11882_01/java.112/e16548/oraperf.htm#JJDBC28752
+   * @param dbProduct The type of the db which is used
+   * @param stmt Statement which will be used for batching and execution.
+   * @param queries List of sql queries to execute in a Statement batch.
+   * @param batchSize maximum number of queries in a single batch
+   * @throws SQLException Thrown if an execution error occurs.
+   */
+  public static void executeQueriesInBatchNoCount(DatabaseProduct dbProduct, Statement stmt, List<String> queries, int batchSize) throws SQLException {
+    if (dbProduct == ORACLE) {
+      int queryCounter = 0;
+      StringBuilder sb = new StringBuilder();
+      sb.append("begin ");
+      for (String query : queries) {
+        LOG.debug("Adding query to batch: <" + query + ">");
+        queryCounter++;
+        sb.append(query).append(";");
+        if (queryCounter % batchSize == 0) {
+          sb.append("end;");
+          String batch = sb.toString();
+          LOG.debug("Going to execute queries in oracle anonymous statement. " + batch);
+          stmt.execute(batch);
+          sb.setLength(0);
+          sb.append("begin ");
+        }
+      }
+      if (queryCounter % batchSize != 0) {
+        sb.append("end;");
+        String batch = sb.toString();
+        LOG.debug("Going to execute queries in oracle anonymous statement. " + batch);
+        stmt.execute(batch);
+      }
+    } else {
+      executeQueriesInBatch(stmt, queries, batchSize);
+    }
+  }
+
+  /**
+   * @param stmt Statement which will be used for batching and execution.
+   * @param queries List of sql queries to execute in a Statement batch.
+   * @param batchSize maximum number of queries in a single batch
+   * @return A list with the number of rows affected by each query in queries.
+   * @throws SQLException Thrown if an execution error occurs.
+   */
+  public static List<Integer> executeQueriesInBatch(Statement stmt, List<String> queries, int batchSize) throws SQLException {
+    List<Integer> affectedRowsByQuery = new ArrayList<>();
+    int queryCounter = 0;
+    for (String query : queries) {
+      LOG.debug("Adding query to batch: <" + query + ">");
+      queryCounter++;
+      stmt.addBatch(query);
+      if (queryCounter % batchSize == 0) {
+        LOG.debug("Going to execute queries in batch. Batch size: " + batchSize);
+        int[] affectedRecordsByQuery = stmt.executeBatch();
+        Arrays.stream(affectedRecordsByQuery).forEach(affectedRowsByQuery::add);
+      }
+    }
+    if (queryCounter % batchSize != 0) {
+      LOG.debug("Going to execute queries in batch. Batch size: " + queryCounter % batchSize);
+      int[] affectedRecordsByQuery = stmt.executeBatch();
+      Arrays.stream(affectedRecordsByQuery).forEach(affectedRowsByQuery::add);
+    }
+    return affectedRowsByQuery;
+  }
+
+  /**
+   * Restarts the txnId sequence with the given seed value.
+   * It is the responsibility of the caller to not set the sequence backward.
+   * @param conn database connection
+   * @param stmt sql statement
+   * @param seedTxnId the seed value for the sequence
+   * @throws SQLException ex
+   */
+  public static void seedTxnSequence(Connection conn, Statement stmt, long seedTxnId) throws SQLException {
+    String dbProduct = conn.getMetaData().getDatabaseProductName();
+    DatabaseProduct databaseProduct = determineDatabaseProduct(dbProduct);
+    stmt.execute(String.format(DB_SEED_FN.get(databaseProduct), seedTxnId));
   }
 }

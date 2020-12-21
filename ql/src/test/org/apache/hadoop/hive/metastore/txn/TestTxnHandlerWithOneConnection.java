@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.metastore.txn;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.GetValidWriteIdsRequest;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -37,19 +38,16 @@ import java.util.Collections;
  */
 public class TestTxnHandlerWithOneConnection {
   static final private String CLASS_NAME = TxnHandler.class.getName();
-  private static final Logger LOG = LoggerFactory.getLogger(CLASS_NAME);
 
   private HiveConf conf = new HiveConf();
   private TxnStore txnHandler;
 
-  public TestTxnHandlerWithOneConnection() throws Exception {
-    TxnDbUtil.setConfValues(conf);
-    TxnDbUtil.prepDb(conf);
+  public TestTxnHandlerWithOneConnection() {
+    TestTxnDbUtil.setConfValues(conf);
     LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
     Configuration conf = ctx.getConfiguration();
     conf.getLoggerConfig(CLASS_NAME).setLevel(Level.DEBUG);
     ctx.updateLoggers(conf);
-    tearDown();
   }
 
   @Test
@@ -66,11 +64,12 @@ public class TestTxnHandlerWithOneConnection {
     // set the connection timeout to the minimum accepted value
     String CONNECTION_TIMEOUT_PROPERTY = "hikaricp.connectionTimeout";
     conf.setLong(CONNECTION_TIMEOUT_PROPERTY, 250L);
+    TestTxnDbUtil.prepDb(conf);
     txnHandler = TxnUtils.getTxnStore(conf);
   }
 
   @After
   public void tearDown() throws Exception {
-    TxnDbUtil.cleanDb(conf);
+    TestTxnDbUtil.cleanDb(conf);
   }
 }

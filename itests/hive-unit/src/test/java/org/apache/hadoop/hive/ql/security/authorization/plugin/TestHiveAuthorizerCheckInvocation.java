@@ -38,7 +38,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
-import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 import org.apache.hadoop.hive.ql.security.HiveAuthenticationProvider;
@@ -101,7 +101,7 @@ public class TestHiveAuthorizerCheckInvocation {
     conf.setVar(ConfVars.HIVE_TXN_MANAGER, DbTxnManager.class.getName());
     conf.setVar(HiveConf.ConfVars.HIVEMAPREDMODE, "nonstrict");
 
-    TxnDbUtil.prepDb(conf);
+    TestTxnDbUtil.prepDb(conf);
 
     SessionState.start(conf);
     driver = new Driver(conf);

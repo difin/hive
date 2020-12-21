@@ -38,7 +38,7 @@ import org.apache.hadoop.hive.metastore.client.builder.DatabaseBuilder;
 import org.apache.hadoop.hive.metastore.client.builder.TableBuilder;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
-import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.thrift.TException;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
@@ -441,8 +441,8 @@ public class TestHiveMetaStoreTxns {
   public void setUp() throws Exception {
     conf.setBoolean(ConfVars.HIVE_IN_TEST.getVarname(), true);
     MetaStoreTestUtils.setConfForStandloneMode(conf);
-    TxnDbUtil.setConfValues(conf);
-    TxnDbUtil.prepDb(conf);
+    TestTxnDbUtil.setConfValues(conf);
+    TestTxnDbUtil.prepDb(conf);
     client = new HiveMetaStoreClient(conf);
 
     String connectionStr = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.CONNECT_URL_KEY);
@@ -452,6 +452,6 @@ public class TestHiveMetaStoreTxns {
   @After
   public void tearDown() throws Exception {
     conn.close();
-    TxnDbUtil.cleanDb(conf);
+    TestTxnDbUtil.cleanDb(conf);
   }
 }

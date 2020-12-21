@@ -22,6 +22,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 import org.apache.hadoop.hive.ql.security.HiveAuthenticationProvider;
@@ -60,13 +61,13 @@ public class TestHivePrivilegeObjectOwnerNameAndType {
       TestHivePrivilegeObjectOwnerNameAndType.mockedAuthorizer = Mockito.mock(HiveAuthorizer.class);
       return TestHivePrivilegeObjectOwnerNameAndType.mockedAuthorizer;
     }
-
   }
 
   @BeforeClass
   public static void beforeTest() throws Exception {
     UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser("hive"));
     conf = new HiveConf();
+    TestTxnDbUtil.prepDb(conf);
 
     // Turn on mocked authorization
     conf.setVar(ConfVars.HIVE_AUTHORIZATION_MANAGER, MockedHiveAuthorizerFactory.class.getName());

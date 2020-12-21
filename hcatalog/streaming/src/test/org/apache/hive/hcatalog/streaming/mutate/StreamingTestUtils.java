@@ -44,7 +44,7 @@ import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.io.orc.OrcInputFormat;
 import org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat;
 import org.apache.hadoop.hive.ql.io.orc.OrcSerde;
@@ -65,9 +65,9 @@ public class StreamingTestUtils {
   }
 
   public void prepareTransactionDatabase(HiveConf conf) throws Exception {
-    TxnDbUtil.setConfValues(conf);
-    TxnDbUtil.cleanDb(conf);
-    TxnDbUtil.prepDb(conf);
+    TestTxnDbUtil.setConfValues(conf);
+    TestTxnDbUtil.cleanDb(conf);
+    TestTxnDbUtil.prepDb(conf);
   }
 
   public IMetaStoreClient newMetaStoreClient(HiveConf conf) throws Exception {

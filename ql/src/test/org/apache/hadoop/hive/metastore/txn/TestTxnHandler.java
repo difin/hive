@@ -58,6 +58,7 @@ import org.apache.hadoop.hive.metastore.api.TxnOpenException;
 import org.apache.hadoop.hive.metastore.api.TxnState;
 import org.apache.hadoop.hive.metastore.api.UnlockRequest;
 import org.apache.hadoop.hive.metastore.api.TxnToWriteId;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.util.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -102,13 +103,11 @@ public class TestTxnHandler {
   private TxnStore txnHandler;
 
   public TestTxnHandler() throws Exception {
-    TxnDbUtil.setConfValues(conf);
-    TxnDbUtil.prepDb(conf);
+    TestTxnDbUtil.setConfValues(conf);
     LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
     Configuration conf = ctx.getConfiguration();
     conf.getLoggerConfig(CLASS_NAME).setLevel(Level.DEBUG);
     ctx.updateLoggers(conf);
-    tearDown();
   }
 
   @Test
@@ -1539,7 +1538,7 @@ public class TestTxnHandler {
    *      conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, "hive");
    *      conf.setVar(HiveConf.ConfVars.METASTOREPWD, "hive");
    *      conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, "com.mysql.jdbc.Driver");
-   * 3. Remove TxnDbUtil.prepDb(); in TxnHandler.checkQFileTestHack()
+   * 3. Remove TestTxnDbUtil.prepDb(); in TxnHandler.checkQFileTestHack()
    *
    */
   @Ignore("multiple threads wedge Derby")
@@ -1645,7 +1644,7 @@ public class TestTxnHandler {
     OpenTxnsResponse openedTxns = txnHandler.openTxns(rqst);
     List<Long> txnList = openedTxns.getTxn_ids();
     assertEquals(txnList.size(), numTxn);
-    int numTxnPresentNow = TxnDbUtil.countQueryAgent(conf, "SELECT COUNT(*) FROM \"TXNS\" WHERE \"TXN_ID\" >= " +
+    int numTxnPresentNow = TestTxnDbUtil.countQueryAgent(conf, "SELECT COUNT(*) FROM \"TXNS\" WHERE \"TXN_ID\" >= " +
             txnList.get(0) + " and \"TXN_ID\" <= " + txnList.get(numTxn - 1));
     assertEquals(numTxn, numTxnPresentNow);
 
@@ -1665,7 +1664,7 @@ public class TestTxnHandler {
 
   private void checkReplTxnForTest(Long startTxnId, Long endTxnId, String replPolicy, List<Long> targetTxnId)
           throws Exception {
-    String[] output = TxnDbUtil.queryToString(conf, "SELECT \"RTM_TARGET_TXN_ID\" FROM \"REPL_TXN_MAP\" WHERE " +
+    String[] output = TestTxnDbUtil.queryToString(conf, "SELECT \"RTM_TARGET_TXN_ID\" FROM \"REPL_TXN_MAP\" WHERE " +
             " \"RTM_SRC_TXN_ID\" >=  " + startTxnId + "AND \"RTM_SRC_TXN_ID\" <=  " + endTxnId +
             " AND \"RTM_REPL_POLICY\" = \'" + replPolicy + "\'").split("\n");
     assertEquals(output.length - 1, targetTxnId.size());
@@ -1678,7 +1677,7 @@ public class TestTxnHandler {
   @Test
   public void testReplOpenTxn() throws Exception {
     int numTxn = 50000;
-    String[] output = TxnDbUtil.queryToString(conf, "SELECT \"NTXN_NEXT\" FROM \"NEXT_TXN_ID\"").split("\n");
+    String[] output = TestTxnDbUtil.queryToString(conf, "SELECT \"NTXN_NEXT\" FROM \"NEXT_TXN_ID\"").split("\n");
     long startTxnId = Long.parseLong(output[1].trim());
     List<Long> txnList = replOpenTxnForTest(startTxnId, numTxn, "default.*");
     assert(txnList.size() == numTxn);
@@ -1688,7 +1687,7 @@ public class TestTxnHandler {
   @Test
   public void testReplAllocWriteId() throws Exception {
     int numTxn = 2;
-    String[] output = TxnDbUtil.queryToString(conf, "SELECT \"NTXN_NEXT\" FROM \"NEXT_TXN_ID\"").split("\n");
+    String[] output = TestTxnDbUtil.queryToString(conf, "SELECT \"NTXN_NEXT\" FROM \"NEXT_TXN_ID\"").split("\n");
     long startTxnId = Long.parseLong(output[1].trim());
     List<Long> srcTxnIdList = LongStream.rangeClosed(startTxnId, numTxn+startTxnId-1)
             .boxed().collect(Collectors.toList());
@@ -1814,13 +1813,13 @@ public class TestTxnHandler {
 
   @Before
   public void setUp() throws Exception {
-    TxnDbUtil.prepDb(conf);
+    TestTxnDbUtil.prepDb(conf);
     txnHandler = TxnUtils.getTxnStore(conf);
   }
 
   @After
   public void tearDown() throws Exception {
-    TxnDbUtil.cleanDb(conf);
+    TestTxnDbUtil.cleanDb(conf);
   }
 
   private long openTxn() throws MetaException {
