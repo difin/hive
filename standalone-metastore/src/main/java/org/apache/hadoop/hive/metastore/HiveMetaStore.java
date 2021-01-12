@@ -24,6 +24,7 @@ import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_NAME;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_CATALOG_NAME;
 import static org.apache.hadoop.hive.metastore.Warehouse.getCatalogQualifiedTableName;
 import static org.apache.hadoop.hive.metastore.api.FireEventRequestData._Fields.INSERT_DATA;
+import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.TABLE_IS_CTAS;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCatalog;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.parseDbName;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.CAT_NAME;
@@ -2213,6 +2214,9 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
       if (transformer != null && !isInTest) {
         tbl = transformer.transformCreateTable(tbl, processorCapabilities, processorId);
+      }
+      if (tbl.getParameters() != null) {
+        tbl.getParameters().remove(TABLE_IS_CTAS);
       }
 
       // If the given table has column statistics, save it here. We will update it later.
