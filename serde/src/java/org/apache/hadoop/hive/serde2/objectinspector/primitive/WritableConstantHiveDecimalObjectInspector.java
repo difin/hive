@@ -54,13 +54,4 @@ implements ConstantObjectInspector {
     }
     return result;
   }
-
-  @Override
-  public int scale() {
-    if (value == null) {
-      return super.scale();
-    }
-    return value.getHiveDecimal().scale();
-  }
-
 }
