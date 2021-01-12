@@ -1169,7 +1169,8 @@ SELECT
   CC_TABLE,
   CC_PARTITION,
   CASE WHEN CC_TYPE = 'i' THEN 'minor' WHEN CC_TYPE = 'a' THEN 'major' ELSE 'UNKNOWN' END,
-  CASE WHEN CC_STATE = 'f' THEN 'failed' WHEN CC_STATE = 's' THEN 'succeeded' WHEN CC_STATE = 'a' THEN 'attempted' ELSE 'UNKNOWN' END,
+  CASE WHEN CC_STATE = 'f' THEN 'failed' WHEN CC_STATE = 's' THEN 'succeeded'
+   WHEN CC_STATE = 'a' THEN 'did not initiate' ELSE 'UNKNOWN' END,
   CASE WHEN CC_WORKER_ID IS NULL THEN cast (null as string) ELSE split(CC_WORKER_ID,"-")[0] END,
   CASE WHEN CC_WORKER_ID IS NULL THEN cast (null as string) ELSE split(CC_WORKER_ID,"-")[1] END,
   CC_ENQUEUE_TIME,
@@ -1838,13 +1839,13 @@ JOIN
 WHERE
   SE.SCHEDULED_QUERY_ID=SQ.SCHEDULED_QUERY_ID;
 
-SELECT 'Upgrading MetaStore schema from 3.1.3000 to 3.1.3000.7.1.0.0';
+SELECT 'Upgrading MetaStore schema from 3.1.3000 to 3.1.3000.7.2.12.0';
 
 USE SYS;
 
-CREATE OR REPLACE VIEW `CDH_VERSION` AS SELECT 1 AS `VER_ID`, '3.1.3000.7.2.8.0' AS `SCHEMA_VERSION`,
-  'Hive release version 3.1.3000 for CDH 7.2.8.0' AS `VERSION_COMMENT`;
+CREATE OR REPLACE VIEW `CDH_VERSION` AS SELECT 1 AS `VER_ID`, '3.1.3000.7.2.12.0' AS `SCHEMA_VERSION`,
+  'Hive release version 3.1.3000 for CDH 7.2.12.0' AS `VERSION_COMMENT`;
 
-SELECT 'Finished initializing schema to 3.1.3000.7.2.8.0';
+SELECT 'Finished initializing schema to 3.1.3000.7.2.12.0';
 
 
