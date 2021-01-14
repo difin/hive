@@ -538,11 +538,7 @@ public class ColumnStatsSemanticAnalyzer extends SemanticAnalyzer {
 
   private ASTNode genRewrittenTree(String rewrittenQuery) throws SemanticException {
     // Parse the rewritten query string
-    try {
-      ctx = new Context(conf);
-    } catch (IOException e) {
-      throw new SemanticException(ErrorMsg.COLUMNSTATSCOLLECTOR_IO_ERROR.getMsg(), e);
-    }
+    ctx = new Context(conf);
     ctx.setCmd(rewrittenQuery);
     ctx.setHDFSCleanup(true);
 

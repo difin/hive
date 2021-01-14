@@ -391,7 +391,7 @@ public class Context {
     return destClausePrefix;
   }
 
-  public Context(Configuration conf) throws IOException {
+  public Context(Configuration conf) {
     this(conf, generateExecutionId());
   }
 
@@ -407,7 +407,7 @@ public class Context {
    * Create a Context with a given executionId.  ExecutionId, together with
    * user name and conf, will determine the temporary directory locations.
    */
-  private Context(Configuration conf, String executionId)  {
+  private Context(Configuration conf, String executionId) {
     this.conf = conf;
     this.executionId = executionId;
     this.subContexts = Lists.newArrayList();

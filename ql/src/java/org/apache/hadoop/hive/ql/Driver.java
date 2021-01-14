@@ -278,13 +278,9 @@ public class Driver implements IDriver {
       }
     }
 
-    try {
-      if (context == null) {
-        context = new Context(driverContext.getConf());
-        context.setCboInfo(originalCboInfo);
-      }
-    } catch (IOException e) {
-      throw new CommandProcessorException(e);
+    if (context == null) {
+      context = new Context(driverContext.getConf());
+      context.setCboInfo(originalCboInfo);
     }
 
     context.setTimeline(driverContext.getTimeline());

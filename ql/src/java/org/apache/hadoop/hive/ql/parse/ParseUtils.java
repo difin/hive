@@ -561,7 +561,7 @@ public final class ParseUtils {
     }
 
   public static CBOPlan parseQuery(HiveConf conf, String viewQuery)
-      throws SemanticException, IOException, ParseException {
+      throws SemanticException, ParseException {
     final Context ctx = new Context(conf);
     ctx.setIsLoadingMaterializedView(true);
     final ASTNode ast = parse(viewQuery, ctx);
@@ -571,7 +571,7 @@ public final class ParseUtils {
   }
 
   public static List<FieldSchema> parseQueryAndGetSchema(HiveConf conf, String viewQuery)
-      throws SemanticException, IOException, ParseException {
+      throws SemanticException, ParseException {
     final Context ctx = new Context(conf);
     ctx.setIsLoadingMaterializedView(true);
     final ASTNode ast = parse(viewQuery, ctx);

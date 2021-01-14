@@ -38,7 +38,7 @@ public class TestLineageInfo extends TestCase {
   private Context ctx;
 
   @Override
-  public void setUp() throws Exception {
+  public void setUp() {
     HiveConf conf = new HiveConf();
     SessionState.start(conf);
     ctx = new Context(conf);
