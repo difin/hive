@@ -22,6 +22,7 @@
  */
 package org.apache.hive.beeline;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -163,7 +164,8 @@ abstract class Rows implements Iterator {
         if (o == null) {
           value = nullStr;
         } else if (o instanceof Number) {
-          value = numberFormat != null ? numberFormat.format(o) : o.toString();
+          value = numberFormat != null ? numberFormat.format(o) :
+                  o instanceof BigDecimal ? ((BigDecimal)o).toPlainString() : o.toString();
         } else if (o instanceof byte[]) {
           value = convertBinaryArray ? new String((byte[])o) : Arrays.toString((byte[])o);
         } else {
