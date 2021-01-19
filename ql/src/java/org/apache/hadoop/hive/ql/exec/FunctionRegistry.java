@@ -551,6 +551,7 @@ public final class FunctionRegistry {
     system.registerUDAF("percentile", UDAFPercentile.class);
     system.registerGenericUDAF("percentile_cont", new GenericUDAFPercentileCont());
     system.registerGenericUDAF("percentile_disc", new GenericUDAFPercentileDisc());
+    system.registerGenericUDAF("exception_in_vertex_udaf", new GenericUDAFExceptionInVertex());
 
     system.registerUDFPlugin(DataSketchesFunctions.INSTANCE);
 
@@ -558,6 +559,7 @@ public final class FunctionRegistry {
     system.registerGenericUDF("reflect", GenericUDFReflect.class);
     system.registerGenericUDF("reflect2", GenericUDFReflect2.class);
     system.registerGenericUDF("java_method", GenericUDFReflect.class);
+    system.registerGenericUDF("exception_in_vertex_udf", GenericUDFExceptionInVertex.class);
 
     system.registerGenericUDF("array", GenericUDFArray.class);
     system.registerGenericUDF("assert_true", GenericUDFAssertTrue.class);

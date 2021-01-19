@@ -171,6 +171,8 @@ e
 elt
 encode
 enforce_constraint
+exception_in_vertex_udaf
+exception_in_vertex_udf
 exp
 explode
 extract_union
@@ -768,6 +770,8 @@ e
 elt
 encode
 enforce_constraint
+exception_in_vertex_udaf
+exception_in_vertex_udf
 exp
 explode
 extract_union
