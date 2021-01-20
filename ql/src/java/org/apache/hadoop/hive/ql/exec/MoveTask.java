@@ -52,7 +52,9 @@ import org.apache.hadoop.hive.ql.io.HiveFileFormatUtils;
 import org.apache.hadoop.hive.ql.io.merge.MergeFileTask;
 import org.apache.hadoop.hive.ql.lockmgr.HiveLock;
 import org.apache.hadoop.hive.ql.lockmgr.HiveLockManager;
+import org.apache.hadoop.hive.ql.lockmgr.HiveLockMode;
 import org.apache.hadoop.hive.ql.lockmgr.HiveLockObj;
+import org.apache.hadoop.hive.ql.lockmgr.HiveLockObject;
 import org.apache.hadoop.hive.ql.lockmgr.LockException;
 import org.apache.hadoop.hive.ql.log.PerfLogger;
 import org.apache.hadoop.hive.ql.metadata.Hive;
@@ -82,6 +84,7 @@ import org.apache.hadoop.util.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -92,6 +95,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Properties;
 
@@ -399,15 +403,11 @@ public class MoveTask extends Task<MoveWork> implements Serializable {
         + work.getLoadMultiFilesWork());
     }
 
-    try {
-      if (context.getExplainAnalyze() == AnalyzeState.RUNNING) {
-        return 0;
-      }
+    if (context.getExplainAnalyze() == AnalyzeState.RUNNING) {
+      return 0;
+    }
 
-      if (checkAndCommitNatively(work, conf)) {
-        return 0;
-      }
-
+    try (LocalTableLock lock = acquireLockForFileMove(work.getLoadTableWork())) {
       Hive db = getHive();
 
       // Do any hive related operations like moving tables and files
@@ -671,7 +671,8 @@ public class MoveTask extends Task<MoveWork> implements Serializable {
     Map<Path, Utilities.PartitionDetails> dps = Utilities.getFullDPSpecs(conf, dpCtx, dynamicPartitionSpecs);
 
     console.printInfo(System.getProperty("line.separator"));
-    long startTime = Time.monotonicNow();
+    long startTime = System.currentTimeMillis();
+
     // load the list of DP partitions and return the list of partition specs
     // TODO: In a follow-up to HIVE-1361, we should refactor loadDynamicPartitions
     // to use Utilities.getFullDPSpecs() to get the list of full partSpecs.
@@ -873,9 +874,100 @@ public class MoveTask extends Task<MoveWork> implements Serializable {
     }
   }
 
+  class LocalTableLock  implements Closeable{
+
+    private Optional<HiveLockObject> lock;
+    private HiveLock lockObj;
+
+    public LocalTableLock(HiveLockObject lock) throws LockException {
+      this.lock = Optional.of(lock);
+      LOG.debug("LocalTableLock; locking: " + lock);
+      HiveLockManager lockMgr = context.getHiveTxnManager().getLockManager();
+      lockObj = lockMgr.lock(lock, HiveLockMode.SEMI_SHARED, true);
+      LOG.debug("LocalTableLock; locked: " + lock);
+    }
+
+    public LocalTableLock() {
+      lock = Optional.empty();
+    }
+
+    @Override
+    public void close() throws IOException {
+      if(!lock.isPresent()) {
+        return;
+      }
+      LOG.debug("LocalTableLock; unlocking: " + lock);
+      HiveLockManager lockMgr;
+      try {
+        lockMgr = context.getHiveTxnManager().getLockManager();
+        lockMgr.unlock(lockObj);
+      } catch (LockException e1) {
+        throw new IOException(e1);
+      }
+      LOG.debug("LocalTableLock; unlocked: " + lock);
+    }
+
+  }
+
+  static enum LockFileMoveMode {
+    NONE, DP, ALL;
+
+    public static LockFileMoveMode fromConf(HiveConf conf) {
+      if (!conf.getBoolVar(HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY)) {
+        return NONE;
+      }
+      String lockFileMoveMode = conf.getVar(HiveConf.ConfVars.HIVE_LOCK_FILE_MOVE_MODE).toUpperCase();
+      return valueOf(lockFileMoveMode);
+    }
+  }
+
+  private LocalTableLock acquireLockForFileMove(LoadTableDesc loadTableWork) throws HiveException {
+    LockFileMoveMode mode = LockFileMoveMode.fromConf(conf);
+
+    if (mode == LockFileMoveMode.NONE) {
+      return new LocalTableLock();
+    }
+    if (mode == LockFileMoveMode.DP && loadTableWork.getDPCtx() == null) {
+      return new LocalTableLock();
+    }
+
+    WriteEntity output = context.getLoadTableOutputMap().get(loadTableWork);
+    List<HiveLockObj> lockObjects = context.getOutputLockObjects().get(output);
+    if (lockObjects == null) {
+      return new LocalTableLock();
+    }
+    TableDesc table = loadTableWork.getTable();
+    if (table == null) {
+      return new LocalTableLock();
+    }
+
+    Hive db = getHive();
+    Table baseTable = db.getTable(loadTableWork.getTable().getTableName());
+
+    HiveLockObject.HiveLockObjectData lockData =
+        new HiveLockObject.HiveLockObjectData(queryPlan.getQueryId(),
+                               String.valueOf(System.currentTimeMillis()),
+                               "IMPLICIT",
+                               queryPlan.getQueryStr(),
+                               conf);
+
+    HiveLockObject lock = new HiveLockObject(baseTable, lockData);
+
+    for (HiveLockObj hiveLockObj : lockObjects) {
+      if (Arrays.equals(hiveLockObj.getObj().getPaths(), lock.getPaths())) {
+        HiveLockMode l = hiveLockObj.getMode();
+        if (l == HiveLockMode.EXCLUSIVE || l == HiveLockMode.SEMI_SHARED) {
+          // no need to lock ; already owns a more powerful one
+          return new LocalTableLock();
+        }
+      }
+    }
+
+    return new LocalTableLock(lock);
+  }
+
   private boolean isSkewedStoredAsDirs(LoadTableDesc tbd) {
-    return (tbd.getLbCtx() == null) ? false : tbd.getLbCtx()
-        .isSkewedStoredAsDir();
+    return tbd.getLbCtx() != null && tbd.getLbCtx().isSkewedStoredAsDir();
   }
 
   /**
