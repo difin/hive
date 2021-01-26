@@ -36,13 +36,12 @@ import org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
 import org.apache.hadoop.hive.ql.hooks.LineageInfo.DataContainer;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
-import org.apache.hadoop.hive.ql.metadata.Hive;
+import org.apache.hadoop.hive.ql.io.HdfsUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.parse.ReplicationSpec;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -156,9 +155,9 @@ public class CreateTableOperation extends DDLOperation<CreateTableDesc> {
       if (!createdTable.isPartitioned() && AcidUtils.isTransactionalTable(createdTable)) {
         org.apache.hadoop.hive.metastore.api.Table tTable = createdTable.getTTable();
         Path tabLocation = new Path(tTable.getSd().getLocation());
-        List<FileStatus> newFilesList = new ArrayList<>();
+        List<FileStatus> newFilesList;
         try {
-          Hive.listFilesInsideAcidDirectory(tabLocation, tabLocation.getFileSystem(context.getConf()), newFilesList, null);
+          newFilesList = HdfsUtils.listLocatedFileStatus(tabLocation.getFileSystem(context.getConf()), tabLocation, null, true);
         } catch (IOException e) {
           LOG.error("Error listing files", e);
           throw new HiveException(e);

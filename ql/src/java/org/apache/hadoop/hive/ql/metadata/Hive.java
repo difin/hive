@@ -109,8 +109,8 @@ import org.apache.hadoop.hive.common.log.InPlaceUpdate;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.ql.io.HdfsUtils;
 import org.apache.hadoop.hive.conf.HiveConf.Engine;
-import org.apache.hadoop.hive.io.HdfsUtils;
 import org.apache.hadoop.hive.metastore.HiveMetaException;
 import org.apache.hadoop.hive.metastore.HiveMetaHook;
 import org.apache.hadoop.hive.metastore.HiveMetaHookLoader;
@@ -1267,7 +1267,7 @@ public class Hive {
         || HiveConf.getBoolVar(conf, ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED))
       && AcidUtils.isTransactionalTable(table)
       && Boolean.parseBoolean(table.getProperty(SOFT_DELETE_TABLE));
-    
+
     long txnId = Optional.ofNullable(SessionState.get())
       .map(ss -> ss.getTxnMgr().getCurrentTxnId()).orElse(0L);
     table.getTTable().setTxnId(txnId);
@@ -1345,7 +1345,7 @@ public class Hive {
     }
   }
 
-  public void dropTable(org.apache.hadoop.hive.metastore.api.Table table, 
+  public void dropTable(org.apache.hadoop.hive.metastore.api.Table table,
       boolean deleteData, boolean ignoreUnknownTab, boolean ifPurge) throws HiveException {
     try {
       getMSC().dropTable(table, deleteData, ignoreUnknownTab, ifPurge);
@@ -2409,7 +2409,10 @@ public class Hive {
     // If config is set, table is not temporary and partition being inserted exists, capture
     // the list of files added. For not yet existing partitions (insert overwrite to new partition
     // or dynamic partition inserts), the add partition event will capture the list of files added.
-    List<FileStatus> newFiles = Collections.synchronizedList(new ArrayList<>());
+    List<FileStatus> newFiles = null;
+    if (conf.getBoolVar(ConfVars.FIRE_EVENTS_FOR_DML) && !tbl.isTemporary()) {
+      newFiles = Collections.synchronizedList(new ArrayList<>());
+    }
 
     Partition newTPart = loadPartitionInternal(loadPath, tbl, partSpec, oldPart,
             loadFileType, inheritTableSpecs,
@@ -2490,6 +2493,7 @@ public class Hive {
     boolean isMmTableWrite = AcidUtils.isInsertOnlyTable(tbl.getParameters());
     assert tbl.getPath() != null : "null==getPath() for " + tbl.getTableName();
     boolean isFullAcidTable = AcidUtils.isFullAcidTable(tbl);
+    List<FileStatus> newFileStatuses = null;
     try {
       PerfLogger perfLogger = SessionState.getPerfLogger();
 
@@ -2540,10 +2544,8 @@ public class Hive {
               + ", Direct insert = " + isDirectInsert + ")");
         }
         if (newFiles != null) {
-          if (!isMmTableWrite && !isDirectInsert) {
-            isInsertOverwrite = false;
-          }
-          listFilesCreatedByQuery(loadPath, writeId, stmtId, isInsertOverwrite, newFiles);
+          newFileStatuses = listFilesCreatedByQuery(loadPath, writeId, stmtId);
+          newFiles.addAll(newFileStatuses);
         }
         if (Utilities.FILE_OP_LOGGER.isTraceEnabled()) {
           Utilities.FILE_OP_LOGGER.trace("maybe deleting stuff from " + oldPartPath
@@ -2629,12 +2631,14 @@ public class Hive {
         }
         // Note: we are creating a brand new the partition, so this is going to be valid for ACID.
         List<FileStatus> filesForStats = null;
-        if (isTxnTable) {
-          filesForStats = AcidUtils.getAcidFilesForStats(
-              newTPart.getTable(), newPartPath, conf, null);
+        if (newFileStatuses != null && !newFileStatuses.isEmpty()) {
+          filesForStats = newFileStatuses;
         } else {
-          filesForStats = HiveStatsUtils.getFileStatusRecurse(
-              newPartPath, -1, newPartPath.getFileSystem(conf));
+          if (isTxnTable) {
+            filesForStats = AcidUtils.getAcidFilesForStats(newTPart.getTable(), newPartPath, conf, null);
+          } else {
+            filesForStats = HiveStatsUtils.getFileStatusRecurse(newPartPath, -1, newPartPath.getFileSystem(conf));
+          }
         }
         if (filesForStats != null) {
           MetaStoreUtils.populateQuickStats(filesForStats, newTPart.getParameters());
@@ -2643,7 +2647,6 @@ public class Hive {
           MetaStoreUtils.clearQuickStats(newTPart.getParameters());
         }
       }
-
       return newTPart;
     } catch (IOException | MetaException | InvalidOperationException e) {
       LOG.error(StringUtils.stringifyException(e));
@@ -2803,19 +2806,18 @@ public class Hive {
     }
   }
 
-  private void listFilesCreatedByQuery(Path loadPath, long writeId, int stmtId, boolean isInsertOverwrite,
-                                           List<FileStatus> newFiles) throws HiveException {
+  private List<FileStatus> listFilesCreatedByQuery(Path loadPath, long writeId, int stmtId) throws HiveException {
     try {
       FileSystem srcFs = loadPath.getFileSystem(conf);
-      PathFilter filter = new AcidUtils.IdPathFilter(writeId, stmtId);
-      listFilesInsideAcidDirectory(loadPath, srcFs, newFiles, filter);
+      PathFilter filter = new AcidUtils.IdFullPathFiler(writeId, stmtId, loadPath);
+      return HdfsUtils.listLocatedFileStatus(srcFs, loadPath, filter, true);
     } catch (FileNotFoundException e) {
       LOG.info("directory does not exist: " + loadPath);
     } catch (IOException e) {
       LOG.error("Error listing files", e);
       throw new HiveException(e);
     }
-    return;
+    return Collections.EMPTY_LIST;
   }
 
   private void setStatsPropAndAlterPartition(boolean resetStatistics, Table tbl,
@@ -3346,10 +3348,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
 
       //new files list is required only for event notification.
       if (newFiles != null) {
-        if (!isMmTable && !isDirectInsert) {
-          isInsertOverwrite = false;
-        }
-        listFilesCreatedByQuery(loadPath, writeId, stmtId, isInsertOverwrite, newFiles);
+        newFiles.addAll(listFilesCreatedByQuery(loadPath, writeId, stmtId));
       }
     } else {
       // Either a non-MM query, or a load into MM table from an external source.
@@ -4443,16 +4442,15 @@ private void constructOneLBLocationMap(FileStatus fSta,
             final List<Path> newFiles, boolean acidRename, boolean isManaged,
             boolean isCompactionTable) throws HiveException {
 
-    final HdfsUtils.HadoopFileStatus fullDestStatus;
     try {
-      fullDestStatus = new HdfsUtils.HadoopFileStatus(conf, destFs, destf);
+      FileStatus fullDestStatus = destFs.getFileStatus(destf);
+      if (!fullDestStatus.isDirectory()) {
+        throw new HiveException(destf + " is not a directory.");
+      }
     } catch (IOException e1) {
       throw new HiveException(e1);
     }
 
-    if (!fullDestStatus.getFileStatus().isDirectory()) {
-      throw new HiveException(destf + " is not a directory.");
-    }
     final List<Future<Pair<Path, Path>>> futures = new LinkedList<>();
     final ExecutorService pool = conf.getInt(ConfVars.HIVE_MOVE_FILES_THREAD_COUNT.varname, 25) > 0 ?
         Executors.newFixedThreadPool(conf.getInt(ConfVars.HIVE_MOVE_FILES_THREAD_COUNT.varname, 25),
@@ -5274,8 +5272,8 @@ private void constructOneLBLocationMap(FileStatus fSta,
         }
 
         // Add file paths of the files that will be moved to the destination if the caller needs it
-        if (null != newFiles) {
-          listNewFilesRecursively(destFs, destf, newFiles);
+        if (newFiles != null) {
+          newFiles.addAll(HdfsUtils.listLocatedFileStatus(destFs, destf, null, true));
         }
       } else {
         // its either a file or glob
