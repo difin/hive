@@ -1,4 +1,6 @@
 -- Test table in parquet format with non-standard partition locations in blobstore
+-- Remove this conf when fully backporting HIVE-20915
+SET hive.merge.mapfiles=false;
 
 DROP TABLE src_events;
 CREATE TABLE src_events

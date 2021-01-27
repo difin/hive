@@ -1,4 +1,6 @@
 -- Test INSERT INTO and INSERT OVERWRITE on partitioned rcfile table in blobstore
+-- Remove this conf when fully backporting HIVE-20915
+SET hive.merge.mapfiles=false;
 
 DROP TABLE src_events;
 CREATE TABLE src_events

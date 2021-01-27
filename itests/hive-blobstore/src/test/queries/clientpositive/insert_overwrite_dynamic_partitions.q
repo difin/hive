@@ -1,6 +1,8 @@
 SET hive.blobstore.optimizations.enabled=true;
 SET hive.exec.dynamic.partition.mode=nonstrict;
 -- SORT_QUERY_RESULTS
+-- Remove this conf when fully backporting HIVE-20915
+SET hive.merge.mapfiles=false;
 
 -- Single partition with buckets
 DROP TABLE table1;

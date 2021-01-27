@@ -38,8 +38,8 @@ POSTHOOK: query: INSERT OVERWRITE DIRECTORY '### test.blobstore.path ###/table1.
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@table1
 POSTHOOK: Output: ### test.blobstore.path ###/table1.dir
-2k2
 1k1
+2k2
 PREHOOK: query: FROM table1
 INSERT OVERWRITE DIRECTORY '### test.blobstore.path ###/table1.dir/' SELECT id
 INSERT OVERWRITE DIRECTORY '### test.blobstore.path ###/table2.dir/' SELECT key
@@ -54,10 +54,10 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@table1
 POSTHOOK: Output: ### test.blobstore.path ###/table1.dir
 POSTHOOK: Output: ### test.blobstore.path ###/table2.dir
-2
 1
-k2
+2
 k1
+k2
 PREHOOK: query: EXPLAIN EXTENDED INSERT OVERWRITE DIRECTORY '### test.blobstore.path ###/table1.dir/' SELECT * FROM table1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@table1

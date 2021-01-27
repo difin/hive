@@ -4,6 +4,8 @@ SET hive.exec.dynamic.partition.mode=nonstrict;
 SET mapreduce.input.fileinputformat.split.maxsize=10;
 SET hive.merge.mapfiles=true;
 set hive.optimize.sort.dynamic.partition=false;
+-- Remove this conf when fully backporting HIVE-20915
+SET hive.merge.mapfiles=false;
 
 CREATE TABLE tmp_table_move (id string, name string, dt string, pid int);
 

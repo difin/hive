@@ -144,7 +144,7 @@ POSTHOOK: query: SELECT COUNT(*) FROM parquet_events
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@parquet_events
 #### A masked pattern was here ####
-0
+200
 PREHOOK: query: SELECT COUNT(*) FROM parquet_events WHERE run_date=20120921
 PREHOOK: type: QUERY
 PREHOOK: Input: default@parquet_events
@@ -153,7 +153,7 @@ POSTHOOK: query: SELECT COUNT(*) FROM parquet_events WHERE run_date=20120921
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@parquet_events
 #### A masked pattern was here ####
-0
+50
 PREHOOK: query: SELECT COUNT(*) FROM parquet_events WHERE run_date=20121121
 PREHOOK: type: QUERY
 PREHOOK: Input: default@parquet_events
@@ -162,7 +162,7 @@ POSTHOOK: query: SELECT COUNT(*) FROM parquet_events WHERE run_date=20121121
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@parquet_events
 #### A masked pattern was here ####
-0
+100
 PREHOOK: query: INSERT OVERWRITE TABLE parquet_events PARTITION (run_date=201211, game_id, event_name)
 SELECT log_id,`time`,uid,user_id,type,event_data,session_id,full_uid,game_id,event_name FROM src_events
 WHERE SUBSTR(run_date,1,6)='201211'
@@ -201,7 +201,7 @@ POSTHOOK: query: SELECT COUNT(*) FROM parquet_events
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@parquet_events
 #### A masked pattern was here ####
-0
+300
 PREHOOK: query: INSERT INTO TABLE parquet_events PARTITION (run_date=201209, game_id=39, event_name)
 SELECT log_id,`time`,uid,user_id,type,event_data,session_id,full_uid,event_name FROM src_events
 WHERE SUBSTR(run_date,1,6)='201209' AND game_id=39
@@ -230,7 +230,7 @@ POSTHOOK: query: SELECT COUNT(*) FROM parquet_events
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@parquet_events
 #### A masked pattern was here ####
-0
+350
 PREHOOK: query: INSERT INTO TABLE parquet_events PARTITION (run_date=201209, game_id=39, event_name='hq_change')
 SELECT log_id,`time`,uid,user_id,type,event_data,session_id,full_uid FROM src_events
 WHERE SUBSTR(run_date,1,6)='201209' AND game_id=39 AND event_name='hq_change'
@@ -259,7 +259,7 @@ POSTHOOK: query: SELECT COUNT(*) FROM parquet_events
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@parquet_events
 #### A masked pattern was here ####
-50
+400
 PREHOOK: query: INSERT OVERWRITE TABLE parquet_events PARTITION (run_date=201209, game_id=39, event_name='hq_change')
 SELECT log_id,`time`,uid,user_id,type,event_data,session_id,full_uid FROM src_events
 WHERE SUBSTR(run_date,1,6)='201209' AND game_id=39 AND event_name='hq_change'
@@ -288,4 +288,4 @@ POSTHOOK: query: SELECT COUNT(*) FROM parquet_events
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@parquet_events
 #### A masked pattern was here ####
-50
+350
