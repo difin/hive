@@ -71,8 +71,8 @@ public class Oracle extends DatabaseRule {
   }
 
   @Override
-  public boolean isContainerReady(String logOutput) {
-    return logOutput.contains("Oracle started successfully!");
+  public boolean isContainerReady(ProcessResults pr) {
+    return pr.stdout.contains("Oracle started successfully!");
   }
 
   @Override
