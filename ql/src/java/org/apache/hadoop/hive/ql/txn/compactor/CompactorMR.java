@@ -1028,16 +1028,13 @@ public class CompactorMR {
       AcidOutputFormat.Options options = new AcidOutputFormat.Options(conf);
       //minor compaction may actually have delta_x_y and delete_delta_x_y
       for (FileStatus fileStatus : contents) {
+        Path tmpPath = fileStatus.getPath();
         //newPath is the base/delta dir
-        Path newPath = new Path(finalLocation, fileStatus.getPath().getName());
-        /*rename(A, B) has "interesting" behavior if A and B are directories. If  B doesn't exist,
-        * it does the expected operation and everything that was in A is now in B.  If B exists,
-        * it will make A a child of B...  thus make sure the rename() is done before creating the
-        * meta files which will create base_x/ (i.e. B)...*/
-        fs.rename(fileStatus.getPath(), newPath);
+        Path newPath = new Path(finalLocation, tmpPath.getName());
         if (options.isWriteVersionFile()) {
-          AcidUtils.OrcAcidVersion.writeVersionFile(newPath, fs);
+          AcidUtils.OrcAcidVersion.writeVersionFile(tmpPath, fs);
         }
+        fs.rename(tmpPath, newPath);
       }
       fs.delete(tmpLocation, true);
     }
