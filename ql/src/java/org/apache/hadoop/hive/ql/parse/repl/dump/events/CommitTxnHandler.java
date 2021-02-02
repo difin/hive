@@ -21,8 +21,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.HiveMetaStore;
-import org.apache.hadoop.hive.metastore.RawStore;
 import org.apache.hadoop.hive.metastore.ReplChangeManager;
 import org.apache.hadoop.hive.metastore.api.GetAllWriteEventInfoRequest;
 import org.apache.hadoop.hive.metastore.api.MetaException;
@@ -192,7 +190,7 @@ class CommitTxnHandler extends AbstractEventHandler<CommitTxnMessage> {
                   .orElse(Collections.emptyList())
                   .stream()
                   .map(StringUtils::normalizeIdentifier)
-                  .toList();
+                  .collect(Collectors.toList());
 
 //                                        Truth Table
 //     Operation                | writeIds | writeEventInfoList | databases | allWriteEventInfoExceptMV  | Output

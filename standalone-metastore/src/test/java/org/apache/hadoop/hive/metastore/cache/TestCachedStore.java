@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.ndv.hll.HyperLogLog;
-import org.apache.hadoop.hive.metastore.HiveMetaStore;
+import org.apache.hadoop.hive.metastore.HMSHandler;
 import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
 import org.apache.hadoop.hive.metastore.ObjectStore;
 import org.apache.hadoop.hive.metastore.TableType;
@@ -91,7 +91,7 @@ public class TestCachedStore {
     sharedCache.getSdCache().clear();
 
     // Create the 'hive' catalog
-    HiveMetaStore.HMSHandler.createDefaultCatalog(objectStore, new Warehouse(conf));
+    HMSHandler.createDefaultCatalog(objectStore, new Warehouse(conf));
   }
 
   /**********************************************************************************************

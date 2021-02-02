@@ -19,8 +19,8 @@
 
 package org.apache.hadoop.hive.ql.security.authorization.plugin.metastore;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.hive.metastore.HiveMetaStore;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hive.metastore.HMSHandler;
 import org.apache.hadoop.hive.metastore.events.PreEventContext;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthzContext;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveOperationType;
@@ -108,7 +108,7 @@ public class HiveMetaStoreAuthzInfo {
       // TODO: refer to SessionManager/HiveSessionImpl for details on getting ipAddress and forwardedAddresses
       builder.setForwardedAddresses(new ArrayList<>());
 
-      String ipAddress = HiveMetaStore.HMSHandler.getIPAddress();
+      String ipAddress = HMSHandler.getIPAddress();
 
       builder.setUserIpAddress(ipAddress);
 

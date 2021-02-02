@@ -19,7 +19,7 @@
 
 package org.apache.hadoop.hive.ql.security.authorization.plugin.metastore;
 
-import org.apache.hadoop.hive.metastore.HiveMetaStore;
+import org.apache.hadoop.hive.metastore.HMSHandler;
 import org.apache.hadoop.hive.metastore.api.DataConnector;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
@@ -54,7 +54,7 @@ public abstract class HiveMetaStoreAuthorizableEvent {
     // TODO: refer to SessionManager/HiveSessionImpl for details on getting ipAddress and forwardedAddresses
     builder.setForwardedAddresses(new ArrayList<>());
 
-    String ipAddress = HiveMetaStore.HMSHandler.getIPAddress();
+    String ipAddress = HMSHandler.getIPAddress();
     builder.setUserIpAddress(ipAddress);
 
     Map<String, Object> clientConfig = HiveMetaStoreAuthorizer.getClientConfig();

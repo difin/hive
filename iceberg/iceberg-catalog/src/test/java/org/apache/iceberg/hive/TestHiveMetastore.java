@@ -28,7 +28,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.HiveMetaStore;
+import org.apache.hadoop.hive.metastore.HMSHandler;
 import org.apache.hadoop.hive.metastore.IHMSHandler;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.RetryingHMSHandler;
@@ -61,9 +61,9 @@ public class TestHiveMetastore {
 
   // create the metastore handlers based on whether we're working with Hive2 or Hive3 dependencies
   // we need to do this because there is a breaking API change between Hive2 and Hive3
-  private static final DynConstructors.Ctor<HiveMetaStore.HMSHandler> HMS_HANDLER_CTOR = DynConstructors.builder()
-          .impl(HiveMetaStore.HMSHandler.class, String.class, Configuration.class)
-          .impl(HiveMetaStore.HMSHandler.class, String.class, HiveConf.class)
+  private static final DynConstructors.Ctor<HMSHandler> HMS_HANDLER_CTOR = DynConstructors.builder()
+          .impl(HMSHandler.class, String.class, Configuration.class)
+          .impl(HMSHandler.class, String.class, HiveConf.class)
           .build();
 
   private static final DynMethods.StaticMethod GET_BASE_HMS_HANDLER = DynMethods.builder("getProxy")
@@ -116,7 +116,7 @@ public class TestHiveMetastore {
   private HiveConf hiveConf;
   private ExecutorService executorService;
   private TServer server;
-  private HiveMetaStore.HMSHandler baseHandler;
+  private HMSHandler baseHandler;
   private HiveClientPool clientPool;
 
   /**

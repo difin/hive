@@ -22,7 +22,6 @@ import static org.apache.hadoop.hive.common.AcidConstants.DELETE_DELTA_PREFIX;
 import static org.apache.hadoop.hive.common.AcidConstants.DELTA_PREFIX;
 import static org.apache.hadoop.hive.common.AcidConstants.VISIBILITY_PREFIX;
 import static org.apache.hadoop.hive.metastore.PartFilterExprUtil.createExpressionProxy;
-import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getAllPartitionsOf;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDataLocation;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getPartColNames;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getPartCols;

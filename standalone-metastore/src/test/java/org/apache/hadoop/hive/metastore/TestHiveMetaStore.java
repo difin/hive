@@ -3120,7 +3120,7 @@ public abstract class TestHiveMetaStore {
   @Test
   public void testDBOwner() throws TException {
     Database db = client.getDatabase(Warehouse.DEFAULT_DATABASE_NAME);
-    assertEquals(db.getOwnerName(), HiveMetaStore.PUBLIC);
+    assertEquals(db.getOwnerName(), HMSHandler.PUBLIC);
     assertEquals(db.getOwnerType(), PrincipalType.ROLE);
   }
 

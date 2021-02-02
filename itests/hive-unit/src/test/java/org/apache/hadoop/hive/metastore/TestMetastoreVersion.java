@@ -31,6 +31,7 @@ import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
 import org.apache.hive.common.util.HiveStringUtils;
+import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +44,9 @@ public class TestMetastoreVersion extends TestCase {
   private String testMetastoreDB;
   private IMetaStoreSchemaInfo metastoreSchemaInfo;
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    Field defDb = HiveMetaStore.HMSHandler.class.getDeclaredField("currentUrl");
+  @Before
+  public void setUp() throws Exception {
+    Field defDb = HMSHandler.class.getDeclaredField("currentUrl");
     defDb.setAccessible(true);
     defDb.set(null, null);
     // reset defaults
@@ -212,7 +212,7 @@ public class TestMetastoreVersion extends TestCase {
 
   // Load the version stored in the metastore db
   public String getMetaStoreVersion() throws HiveMetaException, MetaException {
-    RawStore ms = HiveMetaStore.HMSHandler.getMSForConf(hiveConf);
+    RawStore ms = HMSHandler.getMSForConf(hiveConf);
     try {
       return ms.getMetaStoreSchemaVersion();
     } catch (MetaException e) {
@@ -223,7 +223,7 @@ public class TestMetastoreVersion extends TestCase {
   // Store the given version and comment in the metastore
   public void setMetaStoreVersion(String newVersion, String comment)
       throws HiveMetaException, MetaException {
-    RawStore ms = HiveMetaStore.HMSHandler.getMSForConf(hiveConf);
+    RawStore ms = HMSHandler.getMSForConf(hiveConf);
     try {
       ms.setMetaStoreSchemaVersion(newVersion, comment);
     } catch (MetaException e) {

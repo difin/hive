@@ -27,8 +27,7 @@ import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.hadoop.hive.conf.Constants;
-import org.apache.hadoop.hive.metastore.HiveMetaStore;
+import org.apache.hadoop.hive.metastore.HMSHandler;
 import org.apache.hadoop.hive.metastore.IHMSHandler;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.ql.hooks.ReadEntity;
@@ -187,7 +186,7 @@ public class StorageBasedAuthorizationProvider extends HiveAuthorizationProvider
   private static boolean userHasProxyPrivilege(String user, Configuration conf) {
     try {
       if (MetaStoreUtils.checkUserHasHostProxyPrivileges(user, conf,
-              HiveMetaStore.HMSHandler.getIPAddress())) {
+              HMSHandler.getIPAddress())) {
         LOG.info("user {} has host proxy privilege.", user);
         return true;
       }

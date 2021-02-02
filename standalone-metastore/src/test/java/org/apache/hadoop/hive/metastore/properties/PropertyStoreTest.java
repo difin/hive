@@ -19,7 +19,7 @@ package org.apache.hadoop.hive.metastore.properties;
 
 import com.google.common.base.Supplier;
 import org.apache.hadoop.conf.Configuration;
-import static org.apache.hadoop.hive.metastore.HiveMetaStore.HMSHandler;
+import org.apache.hadoop.hive.metastore.HMSHandler;
 import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
 import org.apache.hadoop.hive.metastore.ObjectStore;
 import org.apache.hadoop.hive.metastore.TestObjectStore;

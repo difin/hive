@@ -98,11 +98,11 @@ public class PropertyServlet extends HttpServlet {
     return "";
   }
   private RawStore getMS() throws ServletException {
-    try {
-      return HiveMetaStore.HMSHandler.newRawStoreForConf(configuration);
-    } catch(MetaException exception) {
-      throw new ServletException(exception);
-    }
+      try {
+        return HMSHandler.newRawStoreForConf(configuration);
+      } catch(MetaException exception) {
+        throw new ServletException(exception);
+      }
   }
 
   private PropertyManager getPropertyManager(RawStore store, String ns) throws ServletException {

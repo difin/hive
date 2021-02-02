@@ -67,7 +67,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import static org.apache.hadoop.hive.common.StatsSetupConst.COLUMN_STATS_ACCURATE;
-import static org.apache.hadoop.hive.metastore.HiveMetaStore.HMSHandler.getPartValsFromName;
+import static org.apache.hadoop.hive.metastore.HMSHandler.getPartValsFromName;
 import static org.apache.hadoop.hive.metastore.MetastoreDirectSqlUtils.executeWithArray;
 import static org.apache.hadoop.hive.metastore.MetastoreDirectSqlUtils.extractSqlClob;
 import static org.apache.hadoop.hive.metastore.MetastoreDirectSqlUtils.extractSqlInt;

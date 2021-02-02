@@ -68,7 +68,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.apache.hadoop.hive.metastore.HiveMetaStore.HMSHandler.addTruncateBaseFile;
+import static org.apache.hadoop.hive.metastore.HMSHandler.addTruncateBaseFile;
 import static org.apache.hadoop.hive.metastore.HiveMetaHook.ALTERLOCATION;
 import static org.apache.hadoop.hive.metastore.HiveMetaHook.ALTER_TABLE_OPERATION_TYPE;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_CATALOG_NAME;
@@ -205,7 +205,7 @@ public class HiveAlterHandler implements AlterHandler {
 
       // On a replica this alter table will be executed only if old and new both the databases are
       // available and being replicated into. Otherwise, it will be either create or drop of table.
-      isReplicated = HiveMetaStore.HMSHandler.isDbReplicationTarget(olddb);
+      isReplicated = HMSHandler.isDbReplicationTarget(olddb);
       if (oldt.getPartitionKeysSize() != 0) {
         isPartitionedTable = true;
       }
@@ -294,7 +294,7 @@ public class HiveAlterHandler implements AlterHandler {
             srcFs = wh.getFs(srcPath);
 
             // get new location
-            assert(isReplicated == HiveMetaStore.HMSHandler.isDbReplicationTarget(db));
+            assert(isReplicated == HMSHandler.isDbReplicationTarget(db));
             if (renamedTranslatedToExternalTable) {
               if (!tableInSpecifiedLoc) {
                 destPath = new Path(newt.getSd().getLocation());
@@ -430,7 +430,7 @@ public class HiveAlterHandler implements AlterHandler {
         // operations other than table rename
         if (MetaStoreUtils.requireCalStats(null, null, newt, environmentContext) &&
             !isPartitionedTable) {
-          assert(isReplicated == HiveMetaStore.HMSHandler.isDbReplicationTarget(db));
+          assert(isReplicated == HMSHandler.isDbReplicationTarget(db));
           // Update table stats. For partitioned table, we update stats in alterPartition()
           MetaStoreUtils.updateTableStatsSlow(db, newt, wh, false, true, environmentContext);
         }

@@ -22,7 +22,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.MetaStoreFilterHook;
-import org.apache.hadoop.hive.metastore.HiveMetaStore;
+import org.apache.hadoop.hive.metastore.HMSHandler;
 import org.apache.hadoop.hive.metastore.MetaStorePreEventListener;
 import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.InvalidOperationException;
@@ -640,7 +640,7 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
 
   boolean isSuperUser(String userName) {
     Configuration conf      = getConf();
-    String        ipAddress = HiveMetaStore.HMSHandler.getIPAddress();
+    String        ipAddress = HMSHandler.getIPAddress();
     return (MetaStoreUtils.checkUserHasHostProxyPrivileges(userName, conf, ipAddress));
   }
 

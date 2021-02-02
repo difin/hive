@@ -60,7 +60,7 @@ public class TestCachedStoreUpdateUsingEvents {
   private RawStore rawStore;
   private SharedCache sharedCache;
   private Configuration conf;
-  private HiveMetaStore.HMSHandler hmsHandler;
+  private HMSHandler hmsHandler;
   private String[] colType = new String[] {"double", "string"};
 
   @Before
@@ -83,7 +83,7 @@ public class TestCachedStoreUpdateUsingEvents {
 
     TestTxnDbUtil.prepDb(conf);
 
-    hmsHandler = new HiveMetaStore.HMSHandler("testCachedStore", conf, true);
+    hmsHandler = new HMSHandler("testCachedStore", conf, true);
 
     rawStore = new ObjectStore();
     rawStore.setConf(hmsHandler.getConf());
@@ -93,7 +93,7 @@ public class TestCachedStoreUpdateUsingEvents {
     CachedStore.stopCacheUpdateService(1);
 
     // Create the 'hive' catalog with new warehouse directory
-    HiveMetaStore.HMSHandler.createDefaultCatalog(rawStore, new Warehouse(conf));
+    HMSHandler.createDefaultCatalog(rawStore, new Warehouse(conf));
   }
 
   private Database createTestDb(String dbName, String dbOwner) {

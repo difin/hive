@@ -61,8 +61,8 @@ public class TestHiveMetaStoreTimeout {
 
   @Before
   public void setup() throws MetaException {
-    HiveMetaStore.TEST_TIMEOUT_ENABLED = false;
-    HiveMetaStore.TEST_TIMEOUT_VALUE = -1;
+    HMSHandler.TEST_TIMEOUT_ENABLED = false;
+    HMSHandler.TEST_TIMEOUT_VALUE = -1;
     client = new HiveMetaStoreClient(conf);
   }
 
@@ -83,8 +83,8 @@ public class TestHiveMetaStoreTimeout {
 
   @Test
   public void testTimeout() throws Exception {
-    HiveMetaStore.TEST_TIMEOUT_ENABLED = true;
-    HiveMetaStore.TEST_TIMEOUT_VALUE = 4000;
+    HMSHandler.TEST_TIMEOUT_ENABLED = true;
+    HMSHandler.TEST_TIMEOUT_VALUE = 4000;
 
     Database db = new DatabaseBuilder()
         .setName(dbName)
@@ -111,8 +111,8 @@ public class TestHiveMetaStoreTimeout {
     client.dropDatabase(dbName, true, true);
 
     // reset
-    HiveMetaStore.TEST_TIMEOUT_ENABLED = true;
-    HiveMetaStore.TEST_TIMEOUT_VALUE = 4000;
+    HMSHandler.TEST_TIMEOUT_ENABLED = true;
+    HMSHandler.TEST_TIMEOUT_VALUE = 4000;
 
     // timeout after reset
     try {

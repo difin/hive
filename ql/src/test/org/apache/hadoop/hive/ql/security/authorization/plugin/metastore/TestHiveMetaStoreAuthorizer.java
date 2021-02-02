@@ -92,7 +92,7 @@ public class TestHiveMetaStoreAuthorizer {
   private static final String TEST_DATA_DIR = new File("file:///testdata").getPath();
   private RawStore rawStore;
   private Configuration conf;
-  private HiveMetaStore.HMSHandler hmsHandler;
+  private HMSHandler hmsHandler;
   private static final List<String> PARTCOL_SCHEMA = Lists.newArrayList("yyyy", "mm", "dd");
   static HiveAuthorizer mockHiveAuthorizer;
   static final List<String> allowedUsers = Arrays.asList("sam", "rob");
@@ -116,12 +116,11 @@ public class TestHiveMetaStoreAuthorizer {
 
     MetaStoreTestUtils.setConfForStandloneMode(conf);
 
-    hmsHandler = new HiveMetaStore.HMSHandler("test", conf);
-    hmsHandler.init();
-    rawStore = new ObjectStore();
+    hmsHandler = new HMSHandler("test", conf, true);
+    rawStore   = new ObjectStore();
     rawStore.setConf(hmsHandler.getConf());
     // Create the 'hive' catalog with new warehouse directory
-    HiveMetaStore.HMSHandler.createDefaultCatalog(rawStore, new Warehouse(conf));
+    HMSHandler.createDefaultCatalog(rawStore, new Warehouse(conf));
     try {
       hmsHandler.drop_dataconnector(dcName, true, true);
       hmsHandler.drop_table(dbName, tblName, true);
