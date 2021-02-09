@@ -27,14 +27,6 @@ public class LlapConstants {
   public static final String LLAP_HADOOP_METRICS2_PROPERTIES_FILE = "hadoop-metrics2-llapdaemon.properties";
   public static final String HADOOP_METRICS2_PROPERTIES_FILE = "hadoop-metrics2.properties";
 
-  // Note: Do not change without changing the corresponding reference in llap-daemon-log4j2.properties
-  public static final String LLAP_LOG4j2_PURGE_POLICY_NAME_DAG_ROUTING =
-      "llapLogPurgerDagRouting";
-  // Note: Do not change without changing the corresponding reference in llap-daemon-log4j2.properties
-  public static final String LLAP_LOG4j2_PURGE_POLICY_NAME_QUERY_ROUTING =
-      "llapLogPurgerQueryRouting";
-
-
   public static void main(String[] args) throws Exception {
     Socket s = new Socket();
     s.connect(new InetSocketAddress("127.0.0.1", 1019));
