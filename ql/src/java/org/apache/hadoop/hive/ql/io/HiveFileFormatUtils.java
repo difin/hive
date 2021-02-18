@@ -360,6 +360,7 @@ public final class HiveFileFormatUtils {
         .inspector(inspector)
         .recordIdColumn(rowIdColNum)
         .statementId(conf.getStatementId())
+        .maxStmtId(conf.getMaxStmtId())
         .finalDestination(conf.getDestPath())
         .attemptId(attemptId));
   }

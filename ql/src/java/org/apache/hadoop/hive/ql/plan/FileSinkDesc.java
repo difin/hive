@@ -100,6 +100,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   private Context.Operation writeOperation = Context.Operation.OTHER;
   private long tableWriteId = 0;  // table write id for this operation
   private int statementId = -1;
+  private int maxStmtId = -1;
 
   private transient Table table;
   // This is used by Impala planner to determine various partition paths.
@@ -631,6 +632,15 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   public int getStatementId() {
     return statementId;
   }
+
+  public void setMaxStmtId(int maxStmtId) {
+    this.maxStmtId = maxStmtId;
+  }
+
+  public int getMaxStmtId() {
+    return maxStmtId;
+  }
+
   public Path getDestPath() {
     return destPath;
   }
