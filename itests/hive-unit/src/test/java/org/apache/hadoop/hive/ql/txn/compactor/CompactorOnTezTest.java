@@ -34,6 +34,8 @@ import org.apache.hadoop.hive.ql.session.SessionState;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.util.Collections;
@@ -57,10 +59,15 @@ public class CompactorOnTezTest {
           .getCanonicalName() + "-" + System.currentTimeMillis() + "_" + RANDOM_INT
           .getAndIncrement()).getPath().replaceAll("\\\\", "/");
   private static final String TEST_WAREHOUSE_DIR = TEST_DATA_DIR + "/warehouse";
+  static final String CUSTOM_COMPACTION_QUEUE = "my_compaction_test_queue";
+
   protected HiveConf conf;
   protected IMetaStoreClient msClient;
   protected IDriver driver;
   protected boolean mmCompaction = false;
+
+  @Rule
+  public TemporaryFolder folder = new TemporaryFolder();
 
   @Before
   // Note: we create a new conf and driver object before every test
