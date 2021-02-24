@@ -88,6 +88,7 @@ public class TestReplicationScenariosIncrementalLoadAcidTables {
         put("mapred.input.dir.recursive", "true");
         put("hive.metastore.disallow.incompatible.col.type.changes", "false");
         put("hive.stats.autogather", "false");
+        put("hive.acid.direct.update.and.delete.enabled", "true");
     }};
 
     acidConfs.putAll(overrides);
