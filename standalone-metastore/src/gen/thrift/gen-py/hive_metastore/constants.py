@@ -10,7 +10,7 @@ from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 from ttypes import *
 
 DDL_TIME = "transient_lastDdlTime"
-HMS_API = "1.2.10"
+HMS_API = "1.2.11"
 ACCESSTYPE_NONE = 1
 ACCESSTYPE_READONLY = 2
 ACCESSTYPE_WRITEONLY = 4
@@ -41,3 +41,4 @@ TABLE_TRANSACTIONAL_PROPERTIES = "transactional_properties"
 TABLE_BUCKETING_VERSION = "bucketing_version"
 DRUID_CONFIG_PREFIX = "druid."
 JDBC_CONFIG_PREFIX = "hive.sql."
+TABLE_IS_CTAS = "created_with_ctas"

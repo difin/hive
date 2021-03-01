@@ -9,7 +9,7 @@ require 'hive_metastore_types'
 
 DDL_TIME = %q"transient_lastDdlTime"
 
-HMS_API = %q"1.2.10"
+HMS_API = %q"1.2.11"
 
 ACCESSTYPE_NONE = 1
 
@@ -70,4 +70,6 @@ TABLE_BUCKETING_VERSION = %q"bucketing_version"
 DRUID_CONFIG_PREFIX = %q"druid."
 
 JDBC_CONFIG_PREFIX = %q"hive.sql."
+
+TABLE_IS_CTAS = %q"created_with_ctas"
 

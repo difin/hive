@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
   public static final String DDL_TIME = "transient_lastDdlTime";
 
-  public static final String HMS_API = "1.2.10";
+  public static final String HMS_API = "1.2.11";
 
   public static final byte ACCESSTYPE_NONE = (byte)1;
 
@@ -99,5 +99,7 @@ import org.slf4j.LoggerFactory;
   public static final String DRUID_CONFIG_PREFIX = "druid.";
 
   public static final String JDBC_CONFIG_PREFIX = "hive.sql.";
+
+  public static final String TABLE_IS_CTAS = "created_with_ctas";
 
 }

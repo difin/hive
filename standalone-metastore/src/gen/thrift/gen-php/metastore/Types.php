@@ -43443,13 +43443,14 @@ final class Constant extends \Thrift\Type\TConstant {
   static protected $TABLE_BUCKETING_VERSION;
   static protected $DRUID_CONFIG_PREFIX;
   static protected $JDBC_CONFIG_PREFIX;
+  static protected $TABLE_IS_CTAS;
 
   static protected function init_DDL_TIME() {
     return "transient_lastDdlTime";
   }
 
   static protected function init_HMS_API() {
-    return "1.2.10";
+    return "1.2.11";
   }
 
   static protected function init_ACCESSTYPE_NONE() {
@@ -43570,6 +43571,10 @@ final class Constant extends \Thrift\Type\TConstant {
 
   static protected function init_JDBC_CONFIG_PREFIX() {
     return "hive.sql.";
+  }
+
+  static protected function init_TABLE_IS_CTAS() {
+    return "created_with_ctas";
   }
 }
 
