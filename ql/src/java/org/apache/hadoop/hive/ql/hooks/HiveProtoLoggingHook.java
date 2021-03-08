@@ -167,7 +167,7 @@ public class HiveProtoLoggingHook implements ExecuteWithHookContext {
 
   public enum OtherInfoType {
     QUERY, STATUS, TEZ, MAPRED, INVOKER_INFO, SESSION_ID, THREAD_NAME, VERSION, CLIENT_IP_ADDRESS,
-    HIVE_ADDRESS, HIVE_INSTANCE_TYPE, CONF, PERF, LLAP_APP_ID, ERROR_MESSAGE
+    HIVE_ADDRESS, HIVE_INSTANCE_TYPE, CONF, PERF, LLAP_APP_ID, ERROR_MESSAGE, GROUP_ID
   }
 
   public enum ExecutionMode {
@@ -184,6 +184,7 @@ public class HiveProtoLoggingHook implements ExecuteWithHookContext {
     private ProtoMessageWriter<HiveHookEventProto> writer;
     private LocalDate writerDate;
     private boolean eventPerFile;
+    private final String group_identifier = System.getProperty("Group_ID","local");
 
     EventLogger(HiveConf conf, Clock clock) {
       this.clock = clock;
@@ -411,6 +412,7 @@ public class HiveProtoLoggingHook implements ExecuteWithHookContext {
       if (llapId != null) {
         addMapEntry(builder, OtherInfoType.LLAP_APP_ID, llapId.toString());
       }
+      addMapEntry(builder, OtherInfoType.GROUP_ID, group_identifier);
 
       conf.stripHiddenConfigurations(conf);
       JSONObject confObj = new JSONObject();
@@ -441,6 +443,7 @@ public class HiveProtoLoggingHook implements ExecuteWithHookContext {
         perfObj.put(key, hookContext.getPerfLogger().getDuration(key));
       }
       addMapEntry(builder, OtherInfoType.PERF, perfObj.toString());
+      addMapEntry(builder, OtherInfoType.GROUP_ID, group_identifier);
 
       return builder.build();
     }

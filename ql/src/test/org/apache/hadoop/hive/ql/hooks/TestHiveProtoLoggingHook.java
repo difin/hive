@@ -96,6 +96,7 @@ public class TestHiveProtoLoggingHook {
   @Test
   public void testPreEventLog() throws Exception {
     context.setHookType(HookType.PRE_EXEC_HOOK);
+    System.clearProperty("Group_ID");
     EventLogger evtLogger = new EventLogger(conf, SystemClock.getInstance());
     evtLogger.handle(context);
     evtLogger.shutdown();
@@ -120,6 +121,7 @@ public class TestHiveProtoLoggingHook {
     assertOtherInfo(event, OtherInfoType.HIVE_ADDRESS, "hive_addr");
     assertOtherInfo(event, OtherInfoType.CONF, null);
     assertOtherInfo(event, OtherInfoType.QUERY, null);
+    assertOtherInfo(event, OtherInfoType.GROUP_ID, "local");
   }
 
   @Test
@@ -211,6 +213,7 @@ public class TestHiveProtoLoggingHook {
     context.getPerfLogger().PerfLogBegin("test", "LogTest");
     context.getPerfLogger().PerfLogEnd("test", "LogTest");
 
+    System.setProperty("Group_ID","compute_wxb1234");
     EventLogger evtLogger = new EventLogger(conf, SystemClock.getInstance());
     evtLogger.handle(context);
     evtLogger.shutdown();
@@ -223,6 +226,7 @@ public class TestHiveProtoLoggingHook {
     Assert.assertEquals("test_op_id", event.getOperationId());
 
     assertOtherInfo(event, OtherInfoType.STATUS, Boolean.TRUE.toString());
+    assertOtherInfo(event, OtherInfoType.GROUP_ID, "compute_wxb1234");
     String val = findOtherInfo(event, OtherInfoType.PERF);
     Map<String, Long> map = new ObjectMapper().readValue(val,
         new TypeReference<Map<String, Long>>() {});
