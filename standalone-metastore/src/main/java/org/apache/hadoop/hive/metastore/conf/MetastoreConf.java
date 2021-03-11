@@ -73,6 +73,8 @@ public class MetastoreConf {
   private static final Logger LOG = LoggerFactory.getLogger(MetastoreConf.class);
   private static final Pattern TIME_UNIT_SUFFIX = Pattern.compile("([0-9]+)([a-zA-Z]+)");
 
+  static final String ACID_METRICS_TASK_CLASS =
+          "org.apache.hadoop.hive.metastore.metrics.AcidMetricService";
   public static final String METASTORE_AUTHENTICATION_LDAP_USERMEMBERSHIPKEY_NAME =
           "metastore.authentication.ldap.userMembershipKey";
 
@@ -411,6 +413,13 @@ public class MetastoreConf {
             "Set this to true on one instance of the Thrift metastore service as part of turning\n" +
             "on Hive transactions. For a complete list of parameters required for turning on\n" +
             "transactions, see hive.txn.manager."),
+    METASTORE_ACIDMETRICS_THREAD_ON("metastore.acidmetrics.thread.on",
+        "hive.metastore.acidmetrics.thread.on", true,
+        "Whether to run acid related metrics collection on this metastore instance."),
+    METASTORE_ACIDMETRICS_CHECK_INTERVAL("metastore.acidmetrics.check.interval",
+        "hive.metastore.acidmetrics.check.interval", 300,
+        TimeUnit.SECONDS,
+        "Time in seconds between acid related metric collection runs."),
     COMPACTOR_INITIATOR_ON("metastore.compactor.initiator.on", "hive.compactor.initiator.on", false,
         "Whether to run the initiator and cleaner threads on this metastore instance or not.\n" +
             "Set this to true on one instance of the Thrift metastore service as part of turning\n" +
@@ -1100,6 +1109,7 @@ public class MetastoreConf {
             + " quoted table names.\nThe default value is true."),
     TASK_THREADS_ALWAYS("metastore.task.threads.always", "metastore.task.threads.always",
         EventCleanerTask.class.getName() + "," + RuntimeStatsCleanerTask.class.getName() + "," +
+            ACID_METRICS_TASK_CLASS + "," +
             "org.apache.hadoop.hive.metastore.HiveProtoEventsCleanerTask" + ","
             + "org.apache.hadoop.hive.metastore.ScheduledQueryExecutionsMaintTask" + ","
             + "org.apache.hadoop.hive.metastore.ReplicationMetricsMaintTask",
