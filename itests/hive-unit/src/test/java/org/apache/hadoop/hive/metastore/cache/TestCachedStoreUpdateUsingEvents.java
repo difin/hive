@@ -262,6 +262,8 @@ public class TestCachedStoreUpdateUsingEvents {
     Table newTable = new Table(tbl);
     newTable.setOwner(tblOwner);
     newTable.setOwnerType(PrincipalType.ROLE);
+    Deadline.registerIfNot(100_000);
+    Deadline.startTimer("alter_table");
     hmsHandler.alter_table(dbName, tblName, newTable);
     newTable = rawStore.getTable(DEFAULT_CATALOG_NAME, dbName, tblName);
 
