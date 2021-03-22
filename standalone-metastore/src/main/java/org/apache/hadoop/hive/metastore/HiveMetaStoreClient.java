@@ -93,11 +93,12 @@ import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.THttpClient;
+import org.apache.thrift.transport.layered.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
+import org.apache.thrift.TConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.metastore.utils.LogUtils;
@@ -657,9 +658,11 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
               System.identityHashCode(this)));
         }
       } else {
-        int bufferSize = MetastoreConf.getIntVar(conf, ConfVars.THRIFT_SOCKET_BUFFER_SIZE);
-        binaryTransport = new TCustomSocket(store.getHost(), store.getPort(),
-            clientSocketTimeout, clientSocketTimeout, bufferSize);
+        try {
+          binaryTransport = new TSocket(new TConfiguration(), store.getHost(), store.getPort(), clientSocketTimeout);
+        } catch(TTransportException ex) {
+          throw new MetaException(ex.toString());
+        }
       }
       binaryTransport = createAuthBinaryTransport(store, binaryTransport);
     } catch (Exception e) {
@@ -846,6 +849,8 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
         // IOException covers SaslException
         LOG.error("Couldn't create client transport", sasle);
         throw new MetaException(sasle.toString());
+      } catch (TTransportException ex){
+        throw new MetaException(ex.toString());
       }
     } else if (useSasl) {
       // Wrap thrift connection with SASL for secure connection.
@@ -882,7 +887,11 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
       }
     } else {
       if (useFramedTransport) {
-        transport = new TFramedTransport(transport);
+        try {
+          transport = new TFramedTransport(transport);
+        }catch (TTransportException ex){
+          throw new MetaException(ex.toString());
+        }
       }
     }
     return transport;

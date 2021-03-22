@@ -131,6 +131,11 @@ public class TBinarySortableProtocol extends TProtocol implements
   }
 
   @Override
+  public int getMinSerializedSize(byte type){
+    return -1;
+  }
+
+  @Override
   public void writeMessageBegin(TMessage message) throws TException {
   }
 

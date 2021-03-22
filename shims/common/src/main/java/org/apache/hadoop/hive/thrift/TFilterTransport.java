@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.thrift;
 
+import org.apache.thrift.TConfiguration;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 
@@ -96,4 +97,13 @@ import org.apache.thrift.transport.TTransportException;
    public void consumeBuffer(int len) {
      wrapped.consumeBuffer(len);
    }
+
+   @Override
+   public void checkReadBytesAvailable(long numBytes) throws TTransportException { wrapped.checkReadBytesAvailable(numBytes); }
+
+   @Override
+   public void updateKnownMessageSize(long size) throws TTransportException { wrapped.updateKnownMessageSize(size); }
+
+   @Override
+   public TConfiguration getConfiguration(){ return wrapped.getConfiguration(); }
  }

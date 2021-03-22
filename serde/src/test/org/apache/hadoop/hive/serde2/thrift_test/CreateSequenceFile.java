@@ -40,6 +40,7 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TIOStreamTransport;
+import org.apache.thrift.transport.TTransportException;
 
 /**
  * CreateSequenceFile.
@@ -65,7 +66,7 @@ public final class CreateSequenceFile {
     private ByteStream.Output bos;
     private TProtocol outProtocol;
 
-    public ThriftSerializer() {
+    public ThriftSerializer() throws TTransportException{
       bos = new ByteStream.Output();
       TIOStreamTransport outTransport = new TIOStreamTransport(bos);
       TProtocolFactory outFactory = new TBinaryProtocol.Factory();

@@ -336,7 +336,11 @@ public class ImpalaSessionImpl implements EngineSession {
     }
 
     private void connectClient() throws HiveException {
-        connection = new ImpalaConnection(socketBufferSize, address, connectionTimeout);
+        try {
+            connection = new ImpalaConnection(socketBufferSize, address, connectionTimeout);
+        } catch (TTransportException ex) {
+            throw new HiveException(ex);
+        }
         client = connection.getClient();
     }
     /* Retrieve BackendConfig from impalad */

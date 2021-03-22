@@ -31,6 +31,7 @@ import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.parse.repl.PathBuilder;
 import org.apache.hadoop.hive.ql.parse.repl.dump.Utils;
 import org.apache.thrift.TException;
+import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TJSONProtocol;
 
@@ -56,7 +57,12 @@ public class FunctionSerializer implements JsonWriter.Serializer {
   @Override
   public void writeTo(JsonWriter writer, ReplicationSpec additionalPropertiesProvider)
       throws SemanticException, IOException, MetaException {
-    TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
+    TSerializer serializer = null;
+    try{
+      serializer = new TSerializer(new TJSONProtocol.Factory());
+    }catch (TTransportException ex){
+      throw new MetaException(ex.toString());
+    }
     List<ResourceUri> resourceUris = new ArrayList<>();
     if (function.getResourceUris() != null) {
       for (ResourceUri uri : function.getResourceUris()) {
@@ -96,7 +102,7 @@ public class FunctionSerializer implements JsonWriter.Serializer {
       writer.jsonGenerator.writeStringField(ReplicationSpec.KEY.CURR_STATE_ID.toString(),
           additionalPropertiesProvider.getCurrentReplicationState());
       writer.jsonGenerator
-          .writeStringField(FIELD_NAME, serializer.toString(copyObj, UTF_8));
+          .writeStringField(FIELD_NAME, serializer.toString(copyObj));
     } catch (TException e) {
       throw new SemanticException(ErrorMsg.ERROR_SERIALIZE_METASTORE.getMsg(), e);
     }

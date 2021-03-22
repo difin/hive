@@ -32,6 +32,7 @@ import org.apache.thrift.TBase;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TJSONProtocol;
+import org.apache.thrift.transport.TTransportException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,7 +48,11 @@ public class MetadataJson {
   private final String tableDesc;
 
   public MetadataJson(String message) throws JSONException, SemanticException {
-    deserializer = new TDeserializer(new TJSONProtocol.Factory());
+    try {
+      deserializer = new TDeserializer(new TJSONProtocol.Factory());
+    }catch(TTransportException ex){
+      throw new SemanticException(ex.toString());
+    }
     json = new JSONObject(message);
     checkCompatibility();
     tableDesc = jsonEntry(TableSerializer.FIELD_NAME);

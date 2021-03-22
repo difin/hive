@@ -214,12 +214,16 @@ public abstract class HadoopThriftAuthBridge {
       case DIGEST:
         Token<DelegationTokenIdentifier> t= new Token<>();
         t.decodeFromUrlString(tokenStrForm);
-        saslTransport = new TSaslClientTransport(
-            method.getMechanismName(),
-            null,
-            null, SaslRpcServer.SASL_DEFAULT_REALM,
-            saslProps, new SaslClientCallbackHandler(t),
-            underlyingTransport);
+        try {
+          saslTransport = new TSaslClientTransport(
+                  method.getMechanismName(),
+                  null,
+                  null, SaslRpcServer.SASL_DEFAULT_REALM,
+                  saslProps, new SaslClientCallbackHandler(t),
+                  underlyingTransport);
+        }catch(TTransportException ex){
+          throw new IOException("Could not open SASL transport", ex);
+        }
         return new TUGIAssumingTransport(saslTransport, UserGroupInformation.getCurrentUser());
 
       case KERBEROS:
@@ -235,13 +239,17 @@ public abstract class HadoopThriftAuthBridge {
               new PrivilegedExceptionAction<TUGIAssumingTransport>() {
                 @Override
                 public TUGIAssumingTransport run() throws IOException {
-                  TTransport saslTransport = new TSaslClientTransport(
-                    method.getMechanismName(),
-                    null,
-                    names[0], names[1],
-                    saslProps, null,
-                    underlyingTransport);
-                  return new TUGIAssumingTransport(saslTransport, UserGroupInformation.getCurrentUser());
+                  try {
+                    TTransport saslTransport = new TSaslClientTransport(
+                            method.getMechanismName(),
+                            null,
+                            names[0], names[1],
+                            saslProps, null,
+                            underlyingTransport);
+                    return new TUGIAssumingTransport(saslTransport, UserGroupInformation.getCurrentUser());
+                  }catch(TTransportException ex){
+                    throw new IOException("Could not open SASL transport", ex);
+                  }
                 }
               });
         } catch (InterruptedException | SaslException se) {
@@ -702,7 +710,12 @@ public abstract class HadoopThriftAuthBridge {
         return ugi.doAs(new PrivilegedAction<TTransport>() {
           @Override
           public TTransport run() {
-            return wrapped.getTransport(trans);
+            try {
+              return wrapped.getTransport(trans);
+            }catch(TTransportException ex){
+              ex.printStackTrace();
+              return null;
+            }
           }
         });
       }

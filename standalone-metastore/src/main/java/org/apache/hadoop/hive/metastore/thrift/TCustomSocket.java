@@ -23,6 +23,7 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.thrift.TConfiguration;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+
 
 /**
  * Socket implementation of the TTransport interface.
@@ -88,8 +90,8 @@ public class TCustomSocket extends TSocket {
    * @param bufferSize     buffer size for socket input stream
    */
   public TCustomSocket(String host, int port, int socketTimeout,
-      int connectTimeout, int bufferSize) {
-    super(host, port, socketTimeout, connectTimeout);
+      int connectTimeout, int bufferSize) throws TTransportException {
+    super(new TConfiguration(), host, port, socketTimeout, connectTimeout);
     this.bufferSize = bufferSize;
     // CDPD-20183: change to debug
     LOGGER.info("Buffer size for TSocket is: " + bufferSize);

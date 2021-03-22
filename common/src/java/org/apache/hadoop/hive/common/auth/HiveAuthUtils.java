@@ -33,8 +33,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
-
-import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.thrift.TConfiguration;
 import org.apache.thrift.transport.TSSLTransportFactory;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TSocket;
@@ -50,8 +49,8 @@ import org.slf4j.LoggerFactory;
 public class HiveAuthUtils {
   private static final Logger LOG = LoggerFactory.getLogger(HiveAuthUtils.class);
 
-  public static TTransport getSocketTransport(String host, int port, int loginTimeout) {
-    return new TSocket(host, port, loginTimeout);
+  public static TTransport getSocketTransport(String host, int port, int loginTimeout) throws TTransportException{
+    return new TSocket(new TConfiguration(), host, port, loginTimeout);
   }
 
   public static TTransport getSSLSocket(String host, int port, int loginTimeout)

@@ -327,34 +327,34 @@ public class MessageBuilder {
 
   public static String createPrimaryKeyObjJson(SQLPrimaryKey primaryKeyObj) throws TException {
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-    return serializer.toString(primaryKeyObj, "UTF-8");
+    return serializer.toString(primaryKeyObj);
   }
 
   public static String createForeignKeyObjJson(SQLForeignKey foreignKeyObj) throws TException {
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-    return serializer.toString(foreignKeyObj, "UTF-8");
+    return serializer.toString(foreignKeyObj);
   }
 
   public static String createUniqueConstraintObjJson(SQLUniqueConstraint uniqueConstraintObj)
       throws TException {
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-    return serializer.toString(uniqueConstraintObj, "UTF-8");
+    return serializer.toString(uniqueConstraintObj);
   }
 
   public static String createNotNullConstraintObjJson(SQLNotNullConstraint notNullConstaintObj)
       throws TException {
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-    return serializer.toString(notNullConstaintObj, "UTF-8");
+    return serializer.toString(notNullConstaintObj);
   }
 
   public static String createDatabaseObjJson(Database dbObj) throws TException {
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-    return serializer.toString(dbObj, "UTF-8");
+    return serializer.toString(dbObj);
   }
 
   public static String createCatalogObjJson(Catalog catObj) throws TException {
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-    return serializer.toString(catObj, "UTF-8");
+    return serializer.toString(catObj);
   }
 
   public static String createTableObjJson(Table tableObj) throws TException {
@@ -362,7 +362,7 @@ public class MessageBuilder {
     // any pattern provided through EVENT_NOTIFICATION_PARAMETERS_EXCLUDE_PATTERNS
     filterMapkeys(tableObj.getParameters(), paramsFilter);
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-    return serializer.toString(tableObj, "UTF-8");
+    return serializer.toString(tableObj);
   }
 
   public static String createPartitionObjJson(Partition partitionObj) throws TException {
@@ -370,12 +370,12 @@ public class MessageBuilder {
     // any pattern provided through EVENT_NOTIFICATION_PARAMETERS_EXCLUDE_PATTERNS
     filterMapkeys(partitionObj.getParameters(), paramsFilter);
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-    return serializer.toString(partitionObj, "UTF-8");
+    return serializer.toString(partitionObj);
   }
 
   public static String createFunctionObjJson(Function functionObj) throws TException {
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-    return serializer.toString(functionObj, "UTF-8");
+    return serializer.toString(functionObj);
   }
 
   public static Table getTableObj(ObjectNode jsonTree) throws Exception {
@@ -388,7 +388,7 @@ public class MessageBuilder {
 
   public static String createTableColumnStatJson(ColumnStatistics tableColumnStat) throws TException {
     TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
-    return serializer.toString(tableColumnStat, "UTF-8");
+    return serializer.toString(tableColumnStat);
   }
 
   /*

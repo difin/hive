@@ -30,6 +30,7 @@ import javax.security.auth.login.LoginException;
 import javax.security.sasl.AuthenticationException;
 import javax.security.sasl.AuthorizeCallback;
 import javax.security.sasl.SaslException;
+import org.apache.thrift.transport.TTransportException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.MetaStoreAuthenticationProviderFactory.AuthMethods;
@@ -75,7 +76,7 @@ public final class MetaStorePlainSaslHelper {
   }
 
   public static TTransport getPlainTransport(String username, String password,
-    TTransport underlyingTransport) throws SaslException {
+    TTransport underlyingTransport) throws SaslException, TTransportException {
     return new TSaslClientTransport("PLAIN", null, null, null, new HashMap<String, String>(),
       new PlainCallbackHandler(username, password), underlyingTransport);
   }

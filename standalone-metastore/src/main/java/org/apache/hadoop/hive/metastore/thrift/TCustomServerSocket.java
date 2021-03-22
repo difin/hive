@@ -63,7 +63,7 @@ public class TCustomServerSocket extends TServerSocket {
     this.timeout = 0;
   }
 
-  @Override
+
   protected TSocket acceptImpl() throws TTransportException {
     ServerSocket serverSocket = getServerSocket();
     if (serverSocket == null) {

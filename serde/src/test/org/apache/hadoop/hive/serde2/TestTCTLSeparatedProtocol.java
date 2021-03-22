@@ -32,6 +32,7 @@ import org.apache.thrift.protocol.TStruct;
 import org.apache.thrift.transport.TMemoryBuffer;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
+import org.apache.thrift.TConfiguration;
 
 /**
  * TestTCTLSeparatedProtocol.
@@ -158,7 +159,7 @@ public class TestTCTLSeparatedProtocol extends TestCase {
 
     prot.writeStructEnd();
     trans.flush();
-    byte[] b = new byte[3 * 1024];
+    byte[] b = new byte[1024];
     int len = trans.read(b, 0, b.length);
     String test = new String(b, 0, len);
 
@@ -418,7 +419,7 @@ public class TestTCTLSeparatedProtocol extends TestCase {
 
     prot.writeStructEnd();
 
-    byte b[] = new byte[3 * 1024];
+    byte b[] = new byte[1024];
     int len = trans.read(b, 0, b.length);
     String written = new String(b, 0, len);
 
@@ -499,6 +500,17 @@ public class TestTCTLSeparatedProtocol extends TestCase {
       @Override
       public void write(byte[] buf, int off, int len) throws TTransportException {
       }
+
+      @Override
+      public void checkReadBytesAvailable(long size) throws TTransportException{
+      }
+
+      @Override
+      public void updateKnownMessageSize(long size) throws TTransportException{
+      }
+
+      @Override
+      public TConfiguration getConfiguration(){ return null; }
     });
     separatedProtocol.initialize(null, new Properties());
     try {

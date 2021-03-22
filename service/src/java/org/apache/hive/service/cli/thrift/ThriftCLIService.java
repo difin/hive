@@ -27,6 +27,7 @@ import org.apache.hive.service.rpc.thrift.TSetClientInfoResp;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -154,6 +155,24 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
 
     public SessionHandle getSessionHandle() {
       return sessionHandle;
+    }
+
+    @Override
+    public boolean isWrapperFor(Class<?> iface){
+      if (iface.equals(ServerContext.class)) {
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public <T> T unwrap(Class<T> iface){
+      if(iface.isInstance(sessionHandle)) {
+        return iface.cast(sessionHandle);
+      }else if (iface.equals(ServerContext.class)) {
+        return iface.cast(ServerContext.class);
+      }
+      return null;
     }
   }
 

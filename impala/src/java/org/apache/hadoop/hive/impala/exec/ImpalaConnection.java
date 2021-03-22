@@ -24,6 +24,7 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.impala.thrift.ImpalaHiveServer2Service;
+import org.apache.thrift.transport.TTransportException;
 
 import java.net.InetSocketAddress;
 
@@ -39,7 +40,7 @@ class ImpalaConnection {
      * @param address Address in the form of "host:port" to a Impala coordinator. Host may be a hostname or IP.
      * @throws HiveException
      */
-    ImpalaConnection(int socketBufferSize, String address, int timeout) throws HiveException {
+    ImpalaConnection(int socketBufferSize, String address, int timeout) throws HiveException, TTransportException {
         String[] addr = address.split(":");
 
         if (addr.length != 2) {

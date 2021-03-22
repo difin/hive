@@ -17,6 +17,7 @@
  */
 package org.apache.hadoop.hive.ql.parse.repl.dump.io;
 
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils;
@@ -25,6 +26,7 @@ import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TJSONProtocol;
+import org.apache.thrift.transport.TTransportException;
 
 import java.io.IOException;
 import java.util.Map;
@@ -40,7 +42,12 @@ public class PartitionSerializer implements JsonWriter.Serializer {
   @Override
   public void writeTo(JsonWriter writer, ReplicationSpec additionalPropertiesProvider)
       throws SemanticException, IOException {
-    TSerializer serializer = new TSerializer(new TJSONProtocol.Factory());
+    TSerializer serializer = null;
+    try{
+      serializer = new TSerializer(new TJSONProtocol.Factory());
+    }catch (TTransportException ex){
+      throw new SemanticException(ex.toString());
+    }
     try {
       // Remove all the entries from the parameters which are added by repl tasks internally.
       Map<String, String> parameters = partition.getParameters();
@@ -59,7 +66,7 @@ public class PartitionSerializer implements JsonWriter.Serializer {
                   additionalPropertiesProvider.getCurrentReplicationState());
         }
       }
-      writer.jsonGenerator.writeString(serializer.toString(partition, UTF_8));
+      writer.jsonGenerator.writeString(serializer.toString(partition));
       writer.jsonGenerator.flush();
     } catch (TException e) {
       throw new SemanticException(ErrorMsg.ERROR_SERIALIZE_METASTORE.getMsg(), e);

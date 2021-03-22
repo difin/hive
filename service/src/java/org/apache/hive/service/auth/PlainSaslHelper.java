@@ -38,11 +38,7 @@ import org.apache.hive.service.cli.thrift.ThriftCLIService;
 import org.apache.hive.service.rpc.thrift.TCLIService.Iface;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.TProcessorFactory;
-import org.apache.thrift.transport.TSaslClientTransport;
-import org.apache.thrift.transport.TSaslServerTransport;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
-import org.apache.thrift.transport.TTransportFactory;
+import org.apache.thrift.transport.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +75,7 @@ public final class PlainSaslHelper {
   }
 
   public static TTransport getPlainTransport(String username, String password,
-    TTransport underlyingTransport) throws SaslException {
+    TTransport underlyingTransport) throws SaslException, TTransportException {
     return new TSaslClientTransport("PLAIN", null, null, null, new HashMap<String, String>(),
       new PlainCallbackHandler(username, password), underlyingTransport);
   }
@@ -122,10 +118,18 @@ public final class PlainSaslHelper {
       if (remoteHost != null && isHostFromTrustedDomain(remoteHost, trustedDomain)) {
         LOG.info("No authentication performed because the connecting host " + remoteHost + " is " +
                 "from the trusted domain " + trustedDomain);
-        return noAuthFactory.getTransport(trans);
+        try {
+          return noAuthFactory.getTransport(trans);
+        }catch(TTransportException ex){
+          ex.printStackTrace();
+        }
       }
-
-      return otherFactory.getTransport(trans);
+      try {
+        return otherFactory.getTransport(trans);
+      }catch(TTransportException ex){
+        ex.printStackTrace();
+      }
+      return null;
     }
   }
 

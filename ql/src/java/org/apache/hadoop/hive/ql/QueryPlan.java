@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -63,6 +64,7 @@ import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.transport.TMemoryBuffer;
+import org.apache.thrift.transport.TTransportException;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -732,7 +734,7 @@ public class QueryPlan implements Serializable {
     }
   }
 
-  public String toThriftJSONString() throws IOException {
+  public String toThriftJSONString() throws IOException, TTransportException {
     org.apache.hadoop.hive.ql.plan.api.Query q = getQueryPlan();
     TMemoryBuffer tmb = new TMemoryBuffer(q.toString().length() * 5);
     TJSONProtocol oprot = new TJSONProtocol(tmb);
@@ -746,7 +748,7 @@ public class QueryPlan implements Serializable {
     return tmb.toString(StandardCharsets.UTF_8);
   }
 
-  public String toBinaryString() throws IOException {
+  public String toBinaryString() throws IOException, TTransportException {
     org.apache.hadoop.hive.ql.plan.api.Query q = getQueryPlan();
     TMemoryBuffer tmb = new TMemoryBuffer(q.toString().length() * 5);
     TBinaryProtocol oprot = new TBinaryProtocol(tmb);
