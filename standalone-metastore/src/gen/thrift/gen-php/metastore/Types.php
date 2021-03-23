@@ -22934,6 +22934,14 @@ class CompactionRequest {
    * @var array
    */
   public $properties = null;
+  /**
+   * @var string
+   */
+  public $initiatorId = null;
+  /**
+   * @var string
+   */
+  public $initiatorVersion = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -22970,6 +22978,14 @@ class CompactionRequest {
             'type' => TType::STRING,
             ),
           ),
+        7 => array(
+          'var' => 'initiatorId',
+          'type' => TType::STRING,
+          ),
+        8 => array(
+          'var' => 'initiatorVersion',
+          'type' => TType::STRING,
+          ),
         );
     }
     if (is_array($vals)) {
@@ -22990,6 +23006,12 @@ class CompactionRequest {
       }
       if (isset($vals['properties'])) {
         $this->properties = $vals['properties'];
+      }
+      if (isset($vals['initiatorId'])) {
+        $this->initiatorId = $vals['initiatorId'];
+      }
+      if (isset($vals['initiatorVersion'])) {
+        $this->initiatorVersion = $vals['initiatorVersion'];
       }
     }
   }
@@ -23068,6 +23090,20 @@ class CompactionRequest {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 7:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->initiatorId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 8:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->initiatorVersion);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -23122,6 +23158,16 @@ class CompactionRequest {
         }
         $output->writeMapEnd();
       }
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->initiatorId !== null) {
+      $xfer += $output->writeFieldBegin('initiatorId', TType::STRING, 7);
+      $xfer += $output->writeString($this->initiatorId);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->initiatorVersion !== null) {
+      $xfer += $output->writeFieldBegin('initiatorVersion', TType::STRING, 8);
+      $xfer += $output->writeString($this->initiatorVersion);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -23842,6 +23888,18 @@ class ShowCompactResponseElement {
    * @var int
    */
   public $enqueueTime = null;
+  /**
+   * @var string
+   */
+  public $workerVersion = null;
+  /**
+   * @var string
+   */
+  public $initiatorId = null;
+  /**
+   * @var string
+   */
+  public $initiatorVersion = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -23906,6 +23964,18 @@ class ShowCompactResponseElement {
           'var' => 'enqueueTime',
           'type' => TType::I64,
           ),
+        16 => array(
+          'var' => 'workerVersion',
+          'type' => TType::STRING,
+          ),
+        17 => array(
+          'var' => 'initiatorId',
+          'type' => TType::STRING,
+          ),
+        18 => array(
+          'var' => 'initiatorVersion',
+          'type' => TType::STRING,
+          ),
         );
     }
     if (is_array($vals)) {
@@ -23953,6 +24023,15 @@ class ShowCompactResponseElement {
       }
       if (isset($vals['enqueueTime'])) {
         $this->enqueueTime = $vals['enqueueTime'];
+      }
+      if (isset($vals['workerVersion'])) {
+        $this->workerVersion = $vals['workerVersion'];
+      }
+      if (isset($vals['initiatorId'])) {
+        $this->initiatorId = $vals['initiatorId'];
+      }
+      if (isset($vals['initiatorVersion'])) {
+        $this->initiatorVersion = $vals['initiatorVersion'];
       }
     }
   }
@@ -24081,6 +24160,27 @@ class ShowCompactResponseElement {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 16:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->workerVersion);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 17:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->initiatorId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 18:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->initiatorVersion);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -24167,6 +24267,21 @@ class ShowCompactResponseElement {
     if ($this->enqueueTime !== null) {
       $xfer += $output->writeFieldBegin('enqueueTime', TType::I64, 15);
       $xfer += $output->writeI64($this->enqueueTime);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->workerVersion !== null) {
+      $xfer += $output->writeFieldBegin('workerVersion', TType::STRING, 16);
+      $xfer += $output->writeString($this->workerVersion);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->initiatorId !== null) {
+      $xfer += $output->writeFieldBegin('initiatorId', TType::STRING, 17);
+      $xfer += $output->writeString($this->initiatorId);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->initiatorVersion !== null) {
+      $xfer += $output->writeFieldBegin('initiatorVersion', TType::STRING, 18);
+      $xfer += $output->writeString($this->initiatorVersion);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -43479,7 +43594,7 @@ final class Constant extends \Thrift\Type\TConstant {
   }
 
   static protected function init_HMS_API() {
-    return "1.2.11";
+    return "1.2.13";
   }
 
   static protected function init_ACCESSTYPE_NONE() {

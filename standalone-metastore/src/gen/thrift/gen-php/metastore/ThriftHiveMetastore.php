@@ -1401,10 +1401,11 @@ interface ThriftHiveMetastoreIf extends \FacebookServiceIf {
   public function add_dynamic_partitions(\metastore\AddDynamicPartitions $rqst);
   /**
    * @param string $workerId
+   * @param string $workerVersion
    * @return \metastore\OptionalCompactionInfoStruct
    * @throws \metastore\MetaException
    */
-  public function find_next_compact($workerId);
+  public function find_next_compact($workerId, $workerVersion);
   /**
    * @param \metastore\CompactionInfoStruct $cr
    * @param int $txn_id
@@ -12227,16 +12228,17 @@ class ThriftHiveMetastoreClient extends \FacebookServiceClient implements \metas
     return;
   }
 
-  public function find_next_compact($workerId)
+  public function find_next_compact($workerId, $workerVersion)
   {
-    $this->send_find_next_compact($workerId);
+    $this->send_find_next_compact($workerId, $workerVersion);
     return $this->recv_find_next_compact();
   }
 
-  public function send_find_next_compact($workerId)
+  public function send_find_next_compact($workerId, $workerVersion)
   {
     $args = new \metastore\ThriftHiveMetastore_find_next_compact_args();
     $args->workerId = $workerId;
+    $args->workerVersion = $workerVersion;
     $bin_accel = ($this->output_ instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_write_binary');
     if ($bin_accel)
     {
@@ -57794,6 +57796,10 @@ class ThriftHiveMetastore_find_next_compact_args {
    * @var string
    */
   public $workerId = null;
+  /**
+   * @var string
+   */
+  public $workerVersion = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -57802,11 +57808,18 @@ class ThriftHiveMetastore_find_next_compact_args {
           'var' => 'workerId',
           'type' => TType::STRING,
           ),
+        2 => array(
+          'var' => 'workerVersion',
+          'type' => TType::STRING,
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['workerId'])) {
         $this->workerId = $vals['workerId'];
+      }
+      if (isset($vals['workerVersion'])) {
+        $this->workerVersion = $vals['workerVersion'];
       }
     }
   }
@@ -57837,6 +57850,13 @@ class ThriftHiveMetastore_find_next_compact_args {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 2:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->workerVersion);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -57853,6 +57873,11 @@ class ThriftHiveMetastore_find_next_compact_args {
     if ($this->workerId !== null) {
       $xfer += $output->writeFieldBegin('workerId', TType::STRING, 1);
       $xfer += $output->writeString($this->workerId);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->workerVersion !== null) {
+      $xfer += $output->writeFieldBegin('workerVersion', TType::STRING, 2);
+      $xfer += $output->writeString($this->workerVersion);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();

@@ -161,7 +161,10 @@ public final class TestTxnDbUtil {
           " CQ_ERROR_MESSAGE clob," +
           " CQ_NEXT_TXN_ID bigint," +
           " CQ_TXN_ID bigint," +
-          " CQ_COMMIT_TIME bigint)");
+          " CQ_COMMIT_TIME bigint," +
+          " CQ_INITIATOR_ID varchar(128)," +
+          " CQ_INITIATOR_VERSION varchar(128)," +
+          " CQ_WORKER_VERSION varchar(128))");
 
       stmt.execute("CREATE TABLE NEXT_COMPACTION_QUEUE_ID (NCQ_NEXT bigint NOT NULL)");
       stmt.execute("INSERT INTO NEXT_COMPACTION_QUEUE_ID VALUES(1)");
@@ -182,7 +185,10 @@ public final class TestTxnDbUtil {
           " CC_HIGHEST_WRITE_ID bigint," +
           " CC_META_INFO varchar(2048) for bit data," +
           " CC_HADOOP_JOB_ID varchar(32)," +
-          " CC_ERROR_MESSAGE clob)");
+          " CC_ERROR_MESSAGE clob," +
+          " CC_INITIATOR_ID varchar(128)," +
+          " CC_INITIATOR_VERSION varchar(128)," +
+          " CC_WORKER_VERSION varchar(128))");
 
       stmt.execute("CREATE INDEX COMPLETED_COMPACTIONS_RES ON COMPLETED_COMPACTIONS ("
           + "CC_DATABASE,CC_TABLE,CC_PARTITION)");

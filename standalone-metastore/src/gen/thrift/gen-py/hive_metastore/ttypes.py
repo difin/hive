@@ -15935,6 +15935,8 @@ class CompactionRequest:
    - type
    - runas
    - properties
+   - initiatorId
+   - initiatorVersion
   """
 
   thrift_spec = (
@@ -15945,15 +15947,19 @@ class CompactionRequest:
     (4, TType.I32, 'type', None, None, ), # 4
     (5, TType.STRING, 'runas', None, None, ), # 5
     (6, TType.MAP, 'properties', (TType.STRING,None,TType.STRING,None), None, ), # 6
+    (7, TType.STRING, 'initiatorId', None, None, ), # 7
+    (8, TType.STRING, 'initiatorVersion', None, None, ), # 8
   )
 
-  def __init__(self, dbname=None, tablename=None, partitionname=None, type=None, runas=None, properties=None,):
+  def __init__(self, dbname=None, tablename=None, partitionname=None, type=None, runas=None, properties=None, initiatorId=None, initiatorVersion=None,):
     self.dbname = dbname
     self.tablename = tablename
     self.partitionname = partitionname
     self.type = type
     self.runas = runas
     self.properties = properties
+    self.initiatorId = initiatorId
+    self.initiatorVersion = initiatorVersion
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -16000,6 +16006,16 @@ class CompactionRequest:
           iprot.readMapEnd()
         else:
           iprot.skip(ftype)
+      elif fid == 7:
+        if ftype == TType.STRING:
+          self.initiatorId = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 8:
+        if ftype == TType.STRING:
+          self.initiatorVersion = iprot.readString()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -16038,6 +16054,14 @@ class CompactionRequest:
         oprot.writeString(viter694)
       oprot.writeMapEnd()
       oprot.writeFieldEnd()
+    if self.initiatorId is not None:
+      oprot.writeFieldBegin('initiatorId', TType.STRING, 7)
+      oprot.writeString(self.initiatorId)
+      oprot.writeFieldEnd()
+    if self.initiatorVersion is not None:
+      oprot.writeFieldBegin('initiatorVersion', TType.STRING, 8)
+      oprot.writeString(self.initiatorVersion)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -16059,6 +16083,8 @@ class CompactionRequest:
     value = (value * 31) ^ hash(self.type)
     value = (value * 31) ^ hash(self.runas)
     value = (value * 31) ^ hash(self.properties)
+    value = (value * 31) ^ hash(self.initiatorId)
+    value = (value * 31) ^ hash(self.initiatorVersion)
     return value
 
   def __repr__(self):
@@ -16554,6 +16580,9 @@ class ShowCompactResponseElement:
    - id
    - errorMessage
    - enqueueTime
+   - workerVersion
+   - initiatorId
+   - initiatorVersion
   """
 
   thrift_spec = (
@@ -16573,9 +16602,12 @@ class ShowCompactResponseElement:
     (13, TType.I64, 'id', None, None, ), # 13
     (14, TType.STRING, 'errorMessage', None, None, ), # 14
     (15, TType.I64, 'enqueueTime', None, None, ), # 15
+    (16, TType.STRING, 'workerVersion', None, None, ), # 16
+    (17, TType.STRING, 'initiatorId', None, None, ), # 17
+    (18, TType.STRING, 'initiatorVersion', None, None, ), # 18
   )
 
-  def __init__(self, dbname=None, tablename=None, partitionname=None, type=None, state=None, workerid=None, start=None, runAs=None, hightestTxnId=None, metaInfo=None, endTime=None, hadoopJobId=thrift_spec[12][4], id=None, errorMessage=None, enqueueTime=None,):
+  def __init__(self, dbname=None, tablename=None, partitionname=None, type=None, state=None, workerid=None, start=None, runAs=None, hightestTxnId=None, metaInfo=None, endTime=None, hadoopJobId=thrift_spec[12][4], id=None, errorMessage=None, enqueueTime=None, workerVersion=None, initiatorId=None, initiatorVersion=None,):
     self.dbname = dbname
     self.tablename = tablename
     self.partitionname = partitionname
@@ -16591,6 +16623,9 @@ class ShowCompactResponseElement:
     self.id = id
     self.errorMessage = errorMessage
     self.enqueueTime = enqueueTime
+    self.workerVersion = workerVersion
+    self.initiatorId = initiatorId
+    self.initiatorVersion = initiatorVersion
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -16676,6 +16711,21 @@ class ShowCompactResponseElement:
           self.enqueueTime = iprot.readI64()
         else:
           iprot.skip(ftype)
+      elif fid == 16:
+        if ftype == TType.STRING:
+          self.workerVersion = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 17:
+        if ftype == TType.STRING:
+          self.initiatorId = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 18:
+        if ftype == TType.STRING:
+          self.initiatorVersion = iprot.readString()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -16746,6 +16796,18 @@ class ShowCompactResponseElement:
       oprot.writeFieldBegin('enqueueTime', TType.I64, 15)
       oprot.writeI64(self.enqueueTime)
       oprot.writeFieldEnd()
+    if self.workerVersion is not None:
+      oprot.writeFieldBegin('workerVersion', TType.STRING, 16)
+      oprot.writeString(self.workerVersion)
+      oprot.writeFieldEnd()
+    if self.initiatorId is not None:
+      oprot.writeFieldBegin('initiatorId', TType.STRING, 17)
+      oprot.writeString(self.initiatorId)
+      oprot.writeFieldEnd()
+    if self.initiatorVersion is not None:
+      oprot.writeFieldBegin('initiatorVersion', TType.STRING, 18)
+      oprot.writeString(self.initiatorVersion)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -16778,6 +16840,9 @@ class ShowCompactResponseElement:
     value = (value * 31) ^ hash(self.id)
     value = (value * 31) ^ hash(self.errorMessage)
     value = (value * 31) ^ hash(self.enqueueTime)
+    value = (value * 31) ^ hash(self.workerVersion)
+    value = (value * 31) ^ hash(self.initiatorId)
+    value = (value * 31) ^ hash(self.initiatorVersion)
     return value
 
   def __repr__(self):

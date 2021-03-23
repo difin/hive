@@ -73,6 +73,8 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
     os.write(Utilities.tabCode);
     os.writeBytes("State");
     os.write(Utilities.tabCode);
+    os.writeBytes("Worker host");
+    os.write(Utilities.tabCode);
     os.writeBytes("Worker");
     os.write(Utilities.tabCode);
     os.writeBytes("Enqueue Time");
@@ -84,6 +86,10 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
     os.writeBytes("HadoopJobId");
     os.write(Utilities.tabCode);
     os.writeBytes("Error message");
+    os.write(Utilities.tabCode);
+    os.writeBytes("Initiator host");
+    os.write(Utilities.tabCode);
+    os.writeBytes("Initiator");
     os.write(Utilities.newLineCode);
   }
 
@@ -103,8 +109,9 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
     os.write(Utilities.tabCode);
     os.writeBytes(e.getState());
     os.write(Utilities.tabCode);
-    String wid = e.getWorkerid();
-    os.writeBytes(wid == null ? NO_VAL : wid);
+    os.writeBytes(getHostFromId(e.getWorkerid()));
+    os.write(Utilities.tabCode);
+    os.writeBytes(getThreadIdFromId(e.getWorkerid()));
     os.write(Utilities.tabCode);
     os.writeBytes(e.isSetEnqueueTime() ? Long.toString(e.getEnqueueTime()) : NO_VAL);
     os.write(Utilities.tabCode);
@@ -116,6 +123,25 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
     os.write(Utilities.tabCode);
     String error = e.getErrorMessage();
     os.writeBytes(error == null ? NO_VAL : error);
+    os.write(Utilities.tabCode);
+    os.writeBytes(getHostFromId(e.getInitiatorId()));
+    os.write(Utilities.tabCode);
+    os.writeBytes(getThreadIdFromId(e.getInitiatorId()));
     os.write(Utilities.newLineCode);
+  }
+
+  private String getHostFromId(String id) {
+    if (id == null) {
+      return NO_VAL;
+    }
+    int lastDash = id.lastIndexOf('-');
+    return id.substring(0, lastDash > -1 ? lastDash : id.length());
+  }
+
+  private String getThreadIdFromId(String id) {
+    if (id == null) {
+      return NO_VAL;
+    }
+    return id.substring(id.lastIndexOf('-') + 1);
   }
 }

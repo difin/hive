@@ -1,7 +1,9 @@
 --! qt:dataset:alltypesorc,alltypesparquet,part,src,src1,srcbucket,srcbucket2,src_cbo,src_json,src_sequencefile,src_thrift,srcpart,cbo_t1,cbo_t2,cbo_t3,lineitem
 --! qt:sysdb
 -- Mask the enqueue time which is based on current time
---! qt:replace:/(initiated\s+NULL\s+NULL\s+)[0-9]*(\s+NULL)/$1#Masked#$2/
+--! qt:replace:/(initiated\s+NULL\s+NULL\s+NULL\s+)[0-9]*(\s+NULL)/$1#Masked#$2/
+-- Mask the hostname and version in compaction view
+--! qt:replace:/(NULL\s+)[\S]*(\s+manual\s+)[\S]*($)/$1#Masked#$2#Masked#$3/
 
 set hive.strict.checks.cartesian.product=false;
 

@@ -8657,9 +8657,9 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     }
 
     @Override
-    public OptionalCompactionInfoStruct find_next_compact(String workerId) throws MetaException{
+    public OptionalCompactionInfoStruct find_next_compact(String workerId, String workerVersion) throws MetaException{
       return CompactionInfo.compactionInfoToOptionalStruct(
-          getTxnHandler().findNextToCompact(workerId));
+          getTxnHandler().findNextToCompact(workerId, workerVersion));
     }
 
     @Override

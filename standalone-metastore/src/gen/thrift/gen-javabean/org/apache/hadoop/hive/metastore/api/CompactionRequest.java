@@ -44,6 +44,8 @@ import org.slf4j.LoggerFactory;
   private static final org.apache.thrift.protocol.TField TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("type", org.apache.thrift.protocol.TType.I32, (short)4);
   private static final org.apache.thrift.protocol.TField RUNAS_FIELD_DESC = new org.apache.thrift.protocol.TField("runas", org.apache.thrift.protocol.TType.STRING, (short)5);
   private static final org.apache.thrift.protocol.TField PROPERTIES_FIELD_DESC = new org.apache.thrift.protocol.TField("properties", org.apache.thrift.protocol.TType.MAP, (short)6);
+  private static final org.apache.thrift.protocol.TField INITIATOR_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("initiatorId", org.apache.thrift.protocol.TType.STRING, (short)7);
+  private static final org.apache.thrift.protocol.TField INITIATOR_VERSION_FIELD_DESC = new org.apache.thrift.protocol.TField("initiatorVersion", org.apache.thrift.protocol.TType.STRING, (short)8);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -57,6 +59,8 @@ import org.slf4j.LoggerFactory;
   private CompactionType type; // required
   private String runas; // optional
   private Map<String,String> properties; // optional
+  private String initiatorId; // optional
+  private String initiatorVersion; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -69,7 +73,9 @@ import org.slf4j.LoggerFactory;
      */
     TYPE((short)4, "type"),
     RUNAS((short)5, "runas"),
-    PROPERTIES((short)6, "properties");
+    PROPERTIES((short)6, "properties"),
+    INITIATOR_ID((short)7, "initiatorId"),
+    INITIATOR_VERSION((short)8, "initiatorVersion");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -96,6 +102,10 @@ import org.slf4j.LoggerFactory;
           return RUNAS;
         case 6: // PROPERTIES
           return PROPERTIES;
+        case 7: // INITIATOR_ID
+          return INITIATOR_ID;
+        case 8: // INITIATOR_VERSION
+          return INITIATOR_VERSION;
         default:
           return null;
       }
@@ -136,7 +146,7 @@ import org.slf4j.LoggerFactory;
   }
 
   // isset id assignments
-  private static final _Fields optionals[] = {_Fields.PARTITIONNAME,_Fields.RUNAS,_Fields.PROPERTIES};
+  private static final _Fields optionals[] = {_Fields.PARTITIONNAME,_Fields.RUNAS,_Fields.PROPERTIES,_Fields.INITIATOR_ID,_Fields.INITIATOR_VERSION};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -154,6 +164,10 @@ import org.slf4j.LoggerFactory;
         new org.apache.thrift.meta_data.MapMetaData(org.apache.thrift.protocol.TType.MAP, 
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING), 
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
+    tmpMap.put(_Fields.INITIATOR_ID, new org.apache.thrift.meta_data.FieldMetaData("initiatorId", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.INITIATOR_VERSION, new org.apache.thrift.meta_data.FieldMetaData("initiatorVersion", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(CompactionRequest.class, metaDataMap);
   }
@@ -195,6 +209,12 @@ import org.slf4j.LoggerFactory;
       Map<String,String> __this__properties = new HashMap<String,String>(other.properties);
       this.properties = __this__properties;
     }
+    if (other.isSetInitiatorId()) {
+      this.initiatorId = other.initiatorId;
+    }
+    if (other.isSetInitiatorVersion()) {
+      this.initiatorVersion = other.initiatorVersion;
+    }
   }
 
   public CompactionRequest deepCopy() {
@@ -209,6 +229,8 @@ import org.slf4j.LoggerFactory;
     this.type = null;
     this.runas = null;
     this.properties = null;
+    this.initiatorId = null;
+    this.initiatorVersion = null;
   }
 
   public String getDbname() {
@@ -368,6 +390,52 @@ import org.slf4j.LoggerFactory;
     }
   }
 
+  public String getInitiatorId() {
+    return this.initiatorId;
+  }
+
+  public void setInitiatorId(String initiatorId) {
+    this.initiatorId = initiatorId;
+  }
+
+  public void unsetInitiatorId() {
+    this.initiatorId = null;
+  }
+
+  /** Returns true if field initiatorId is set (has been assigned a value) and false otherwise */
+  public boolean isSetInitiatorId() {
+    return this.initiatorId != null;
+  }
+
+  public void setInitiatorIdIsSet(boolean value) {
+    if (!value) {
+      this.initiatorId = null;
+    }
+  }
+
+  public String getInitiatorVersion() {
+    return this.initiatorVersion;
+  }
+
+  public void setInitiatorVersion(String initiatorVersion) {
+    this.initiatorVersion = initiatorVersion;
+  }
+
+  public void unsetInitiatorVersion() {
+    this.initiatorVersion = null;
+  }
+
+  /** Returns true if field initiatorVersion is set (has been assigned a value) and false otherwise */
+  public boolean isSetInitiatorVersion() {
+    return this.initiatorVersion != null;
+  }
+
+  public void setInitiatorVersionIsSet(boolean value) {
+    if (!value) {
+      this.initiatorVersion = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case DBNAME:
@@ -418,6 +486,22 @@ import org.slf4j.LoggerFactory;
       }
       break;
 
+    case INITIATOR_ID:
+      if (value == null) {
+        unsetInitiatorId();
+      } else {
+        setInitiatorId((String)value);
+      }
+      break;
+
+    case INITIATOR_VERSION:
+      if (value == null) {
+        unsetInitiatorVersion();
+      } else {
+        setInitiatorVersion((String)value);
+      }
+      break;
+
     }
   }
 
@@ -440,6 +524,12 @@ import org.slf4j.LoggerFactory;
 
     case PROPERTIES:
       return getProperties();
+
+    case INITIATOR_ID:
+      return getInitiatorId();
+
+    case INITIATOR_VERSION:
+      return getInitiatorVersion();
 
     }
     throw new IllegalStateException();
@@ -464,6 +554,10 @@ import org.slf4j.LoggerFactory;
       return isSetRunas();
     case PROPERTIES:
       return isSetProperties();
+    case INITIATOR_ID:
+      return isSetInitiatorId();
+    case INITIATOR_VERSION:
+      return isSetInitiatorVersion();
     }
     throw new IllegalStateException();
   }
@@ -535,6 +629,24 @@ import org.slf4j.LoggerFactory;
         return false;
     }
 
+    boolean this_present_initiatorId = true && this.isSetInitiatorId();
+    boolean that_present_initiatorId = true && that.isSetInitiatorId();
+    if (this_present_initiatorId || that_present_initiatorId) {
+      if (!(this_present_initiatorId && that_present_initiatorId))
+        return false;
+      if (!this.initiatorId.equals(that.initiatorId))
+        return false;
+    }
+
+    boolean this_present_initiatorVersion = true && this.isSetInitiatorVersion();
+    boolean that_present_initiatorVersion = true && that.isSetInitiatorVersion();
+    if (this_present_initiatorVersion || that_present_initiatorVersion) {
+      if (!(this_present_initiatorVersion && that_present_initiatorVersion))
+        return false;
+      if (!this.initiatorVersion.equals(that.initiatorVersion))
+        return false;
+    }
+
     return true;
   }
 
@@ -571,6 +683,16 @@ import org.slf4j.LoggerFactory;
     list.add(present_properties);
     if (present_properties)
       list.add(properties);
+
+    boolean present_initiatorId = true && (isSetInitiatorId());
+    list.add(present_initiatorId);
+    if (present_initiatorId)
+      list.add(initiatorId);
+
+    boolean present_initiatorVersion = true && (isSetInitiatorVersion());
+    list.add(present_initiatorVersion);
+    if (present_initiatorVersion)
+      list.add(initiatorVersion);
 
     return list.hashCode();
   }
@@ -639,6 +761,26 @@ import org.slf4j.LoggerFactory;
     }
     if (isSetProperties()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.properties, other.properties);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetInitiatorId()).compareTo(other.isSetInitiatorId());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetInitiatorId()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.initiatorId, other.initiatorId);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetInitiatorVersion()).compareTo(other.isSetInitiatorVersion());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetInitiatorVersion()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.initiatorVersion, other.initiatorVersion);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -713,6 +855,26 @@ import org.slf4j.LoggerFactory;
         sb.append("null");
       } else {
         sb.append(this.properties);
+      }
+      first = false;
+    }
+    if (isSetInitiatorId()) {
+      if (!first) sb.append(", ");
+      sb.append("initiatorId:");
+      if (this.initiatorId == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.initiatorId);
+      }
+      first = false;
+    }
+    if (isSetInitiatorVersion()) {
+      if (!first) sb.append(", ");
+      sb.append("initiatorVersion:");
+      if (this.initiatorVersion == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.initiatorVersion);
       }
       first = false;
     }
@@ -831,6 +993,22 @@ import org.slf4j.LoggerFactory;
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 7: // INITIATOR_ID
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.initiatorId = iprot.readString();
+              struct.setInitiatorIdIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 8: // INITIATOR_VERSION
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.initiatorVersion = iprot.readString();
+              struct.setInitiatorVersionIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -888,6 +1066,20 @@ import org.slf4j.LoggerFactory;
           oprot.writeFieldEnd();
         }
       }
+      if (struct.initiatorId != null) {
+        if (struct.isSetInitiatorId()) {
+          oprot.writeFieldBegin(INITIATOR_ID_FIELD_DESC);
+          oprot.writeString(struct.initiatorId);
+          oprot.writeFieldEnd();
+        }
+      }
+      if (struct.initiatorVersion != null) {
+        if (struct.isSetInitiatorVersion()) {
+          oprot.writeFieldBegin(INITIATOR_VERSION_FIELD_DESC);
+          oprot.writeString(struct.initiatorVersion);
+          oprot.writeFieldEnd();
+        }
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -918,7 +1110,13 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetProperties()) {
         optionals.set(2);
       }
-      oprot.writeBitSet(optionals, 3);
+      if (struct.isSetInitiatorId()) {
+        optionals.set(3);
+      }
+      if (struct.isSetInitiatorVersion()) {
+        optionals.set(4);
+      }
+      oprot.writeBitSet(optionals, 5);
       if (struct.isSetPartitionname()) {
         oprot.writeString(struct.partitionname);
       }
@@ -935,6 +1133,12 @@ import org.slf4j.LoggerFactory;
           }
         }
       }
+      if (struct.isSetInitiatorId()) {
+        oprot.writeString(struct.initiatorId);
+      }
+      if (struct.isSetInitiatorVersion()) {
+        oprot.writeString(struct.initiatorVersion);
+      }
     }
 
     @Override
@@ -946,7 +1150,7 @@ import org.slf4j.LoggerFactory;
       struct.setTablenameIsSet(true);
       struct.type = org.apache.hadoop.hive.metastore.api.CompactionType.findByValue(iprot.readI32());
       struct.setTypeIsSet(true);
-      BitSet incoming = iprot.readBitSet(3);
+      BitSet incoming = iprot.readBitSet(5);
       if (incoming.get(0)) {
         struct.partitionname = iprot.readString();
         struct.setPartitionnameIsSet(true);
@@ -969,6 +1173,14 @@ import org.slf4j.LoggerFactory;
           }
         }
         struct.setPropertiesIsSet(true);
+      }
+      if (incoming.get(3)) {
+        struct.initiatorId = iprot.readString();
+        struct.setInitiatorIdIsSet(true);
+      }
+      if (incoming.get(4)) {
+        struct.initiatorVersion = iprot.readString();
+        struct.setInitiatorVersionIsSet(true);
       }
     }
   }

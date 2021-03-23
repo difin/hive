@@ -17,6 +17,7 @@
  */
 package org.apache.hadoop.hive.ql.txn.compactor;
 
+import org.apache.hadoop.hive.common.ServerUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.TransactionalValidationListener;
 import org.apache.hadoop.hive.metastore.api.AbortTxnRequest;
@@ -37,20 +38,21 @@ import org.apache.hadoop.hive.metastore.api.ShowCompactResponseElement;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.metastore.metrics.Metrics;
-import org.apache.hadoop.hive.metastore.metrics.MetricsConstants;
-import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.mockito.Mockito.doReturn;
+import org.mockito.Mockito;
 
 /**
  * Tests for the compactor Initiator thread.
@@ -74,8 +76,8 @@ public class TestInitiator extends CompactorTest {
     rqst = new CompactionRequest("default", "rflw2", CompactionType.MINOR);
     txnHandler.compact(rqst);
 
-    txnHandler.findNextToCompact(Worker.hostname() + "-193892");
-    txnHandler.findNextToCompact("nosuchhost-193892");
+    txnHandler.findNextToCompact(ServerUtils.hostname() + "-193892", "4.0.0");
+    txnHandler.findNextToCompact("nosuchhost-193892", "4.0.0");
 
     startInitiator();
 
@@ -101,7 +103,7 @@ public class TestInitiator extends CompactorTest {
     CompactionRequest rqst = new CompactionRequest("default", "rfrw1", CompactionType.MINOR);
     txnHandler.compact(rqst);
 
-    txnHandler.findNextToCompact("nosuchhost-193892");
+    txnHandler.findNextToCompact("nosuchhost-193892", "4.0.0");
 
     conf.setTimeVar(HiveConf.ConfVars.HIVE_COMPACTOR_WORKER_TIMEOUT, 1L, TimeUnit.MILLISECONDS);
 
@@ -979,6 +981,49 @@ public class TestInitiator extends CompactorTest {
 
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
     Assert.assertEquals(0, rsp.getCompactsSize());
+  }
+
+  @Test
+  public void testInitiatorHostAndVersion() throws Exception {
+    String tableName = "my_table";
+    Table t = newTable("default", tableName, false);
+
+    HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_COMPACTOR_ABORTEDTXN_THRESHOLD, 1);
+
+    // 2 aborts
+    for (int i = 0; i < 2; i++) {
+      long txnid = openTxn();
+      LockComponent comp = new LockComponent(LockType.SHARED_WRITE, LockLevel.TABLE, "default");
+      comp.setTablename(tableName);
+      comp.setOperationType(DataOperationType.UPDATE);
+      List<LockComponent> components = new ArrayList<>(1);
+      components.add(comp);
+      LockRequest req = new LockRequest(components, "me", "localhost");
+      req.setTxnid(txnid);
+      txnHandler.lock(req);
+      txnHandler.abortTxn(new AbortTxnRequest(txnid));
+    }
+
+    // need to mock the runtime version, because the manifest file won't be there in the mvn test setup
+    Initiator initiator = Mockito.spy(new Initiator());
+    initiator.setThreadId((int) t.getId());
+    initiator.setConf(conf);
+    String runtimeVersion = "4.0.0-SNAPSHOT";
+    doReturn(runtimeVersion).when(initiator).getRuntimeVersion();
+    initiator.init(new AtomicBoolean(true));
+    initiator.run();
+
+    // verify status of table compaction
+    ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
+    List<ShowCompactResponseElement> compacts = rsp.getCompacts();
+    Assert.assertEquals(1, compacts.size());
+    Assert.assertEquals("initiated", compacts.get(0).getState());
+    Assert.assertEquals(tableName, compacts.get(0).getTablename());
+    Assert.assertEquals(runtimeVersion, compacts.get(0).getInitiatorVersion());
+    // split the threadid
+    String[] parts = compacts.get(0).getInitiatorId().split("-");
+    Assert.assertTrue(parts.length > 1);
+    Assert.assertEquals(ServerUtils.hostname(), String.join("-", Arrays.copyOfRange(parts, 0, parts.length - 1)));
   }
 
   @Override

@@ -1096,7 +1096,7 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
-    public OptionalCompactionInfoStruct find_next_compact(String workerId) throws MetaException, TException {
+    public OptionalCompactionInfoStruct find_next_compact(String workerId, String workerVersion) throws MetaException, TException {
         return null;
     }
 
