@@ -508,12 +508,12 @@ public class CalcitePlanner extends SemanticAnalyzer {
   }
 
   public static RelOptPlanner createPlanner(HiveConf conf, FunctionHelper functionHelper) {
-    return createPlanner(conf, null, functionHelper, new HashSet<>());
+    return createPlanner(conf, null, functionHelper, new HashSet<>(), false);
   }
 
   private static RelOptPlanner createPlanner(
       HiveConf conf, EngineEventSequence timeline, FunctionHelper functionHelper,
-      Set<RelNode> corrScalarRexSQWithAgg) {
+      Set<RelNode> corrScalarRexSQWithAgg, boolean isExplainPlan) {
     final Double maxSplitSize = (double) HiveConf.getLongVar(
             conf, HiveConf.ConfVars.MAPREDMAXSPLITSIZE);
     final Double maxMemory = (double) HiveConf.getLongVar(
@@ -533,7 +533,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
         HiveConf.ConfVars.HIVE_MATERIALIZED_VIEW_REWRITING_SELECTION_STRATEGY).equals("heuristic");
     boolean legacyBetweenSelectivity = HiveConf.getBoolVar(conf, ConfVars.HIVE_BETWEEN_SELECTIVITY_LEGACY);
     HiveConfPlannerContext hiveConfPlannerContext =
-        new HiveConfPlannerContext(isCorrelatedColumns, heuristicMaterializationStrategy, legacyBetweenSelectivity);
+        new HiveConfPlannerContext(isCorrelatedColumns, heuristicMaterializationStrategy, isExplainPlan, legacyBetweenSelectivity);
     HivePlannerContext confContext = new HivePlannerContext(algorithmsConf, registry, calciteConfig,
         corrScalarRexSQWithAgg, hiveConfPlannerContext, functionHelper, timeline);
     return HiveVolcanoPlanner.createPlanner(confContext);
@@ -1774,7 +1774,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       final RexBuilder rexBuilder = cluster.getRexBuilder();
       this.functionHelper = createFunctionHelper(rexBuilder);
       RelOptPlanner planner = createPlanner(conf, ctx.getTimeline(),
-          functionHelper, corrScalarRexSQWithAgg);
+          functionHelper, corrScalarRexSQWithAgg, ctx.isExplainPlan());
       final RelOptCluster optCluster = RelOptCluster.create(planner, rexBuilder);
       this.cluster = optCluster;
       this.relOptSchema = relOptSchema;
