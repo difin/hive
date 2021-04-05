@@ -185,17 +185,14 @@ public class HiveSubQueryRemoveRule extends RelOptRule {
       builder.aggregate(builder.groupKey(), builder.count(false, "cnt"));
 
       SqlFunction countCheck =
-          new SqlFunction("sq_count_check", SqlKind.OTHER_FUNCTION, ReturnTypes.BIGINT,
+          new SqlFunction("sq_count_check", SqlKind.OTHER_FUNCTION, ReturnTypes.BOOLEAN,
               InferTypes.RETURN_TYPE, OperandTypes.NUMERIC,
               SqlFunctionCategory.USER_DEFINED_FUNCTION);
 
-      //we create FILTER (sq_count_check(count()) <= 1) instead of PROJECT because RelFieldTrimmer
+      //we create FILTER (sq_count_check(count())) instead of PROJECT because RelFieldTrimmer
       // ends up getting rid of Project since it is not used further up the tree
-      RexNode field = builder.field("cnt");
-      RexBuilder rexBuilder = e.rel.getCluster().getRexBuilder();
-      RexNode literalOne = rexBuilder.makeExactLiteral(BigDecimal.valueOf(1), field.getType());
-      builder.filter(builder.call(SqlStdOperatorTable.LESS_THAN_OR_EQUAL,
-          builder.call(countCheck, field), literalOne));
+      //sq_count_check returns true when subquery returns single row, else it fails
+      builder.filter(builder.call(countCheck, builder.field("cnt")));
       if (!variablesSet.isEmpty()) {
         builder.join(JoinRelType.LEFT, builder.literal(true), variablesSet);
       } else {
@@ -410,17 +407,18 @@ public class HiveSubQueryRemoveRule extends RelOptRule {
         }
 
         SqlFunction inCountCheck =
-            new SqlFunction("sq_count_check", SqlKind.OTHER_FUNCTION, ReturnTypes.BIGINT,
+            new SqlFunction("sq_count_check", SqlKind.OTHER_FUNCTION, ReturnTypes.BOOLEAN,
                 InferTypes.RETURN_TYPE, OperandTypes.NUMERIC,
                 SqlFunctionCategory.USER_DEFINED_FUNCTION);
 
-        // we create FILTER (sq_count_check(count()) > 0) instead of PROJECT
+        // we create FILTER (sq_count_check(count())) instead of PROJECT
         // because RelFieldTrimmer ends up getting rid of Project
-        // since it is not used further up the tree
-        builder.filter(builder.call(SqlStdOperatorTable.GREATER_THAN,
+        // since it is not used further up the tree.
+        // sq_count_check returns true when subquery returns single row, else it fails
+        builder.filter(
             //true here indicates that sq_count_check is for IN/NOT IN subqueries
-            builder.call(inCountCheck, builder.field("cnt_in"), builder.literal(true)),
-            builder.literal(0)));
+            builder.call(inCountCheck, builder.field("cnt_in"), builder.literal(true))
+            );
         offset = offset + 1;
         builder.push(e.rel);
       }
