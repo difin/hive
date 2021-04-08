@@ -27,6 +27,7 @@ import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.hive.cli.CliSessionState;
 import org.apache.hadoop.hive.common.repl.ReplScope;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.ql.metadata.StringAppender;
 import org.apache.hive.hcatalog.listener.DbNotificationListener;
 import org.apache.hadoop.hive.metastore.*;
 import org.apache.hadoop.hive.metastore.InjectableBehaviourObjectStore.BehaviourInjection;
@@ -79,6 +80,12 @@ import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.stats.StatsUtils;
 import org.apache.hadoop.hive.shims.Utils;
 import org.apache.hadoop.security.authorize.ProxyUsers;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.thrift.TException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -88,7 +95,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
@@ -140,7 +146,7 @@ public class TestReplicationScenarios {
 
   // Make sure we skip backward-compat checking for those tests that don't generate events
 
-  protected static final Logger LOG = LoggerFactory.getLogger(TestReplicationScenarios.class);
+  protected static final org.slf4j.Logger LOG = LoggerFactory.getLogger(TestReplicationScenarios.class);
   private ArrayList<String> lastResults;
 
   private boolean verifySetupSteps = false;
@@ -4291,6 +4297,37 @@ public class TestReplicationScenarios {
     verifyRun("SELECT a from " + replDbName + ".unptned", data_after_ovwrite, driverMirror);
     verifyRun("SELECT count(*) from " + replDbName + ".unptned", "1", driverMirror);
     verifyRun("SELECT count(*) from " + replDbName + ".unptned_late ", "3", driverMirror);
+  }
+
+  @Test
+  public void testDatabaseInJobName() throws Throwable {
+    // Get the logger at the root level.
+    Logger logger = LogManager.getLogger("hive.ql.metadata.Hive");
+    Level oldLevel = logger.getLevel();
+    LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+    Configuration config = ctx.getConfiguration();
+    LoggerConfig loggerConfig = config.getLoggerConfig(logger.getName());
+    loggerConfig.setLevel(Level.DEBUG);
+    ctx.updateLoggers();
+    // Create a String Appender to capture log output
+
+    StringAppender appender = StringAppender.createStringAppender("%m");
+    appender.addToLogger(logger.getName(), Level.DEBUG);
+    appender.start();
+    String testName = "testDatabaseInJobName";
+    String dbName = createDB(testName, driver);
+    String replDbName = dbName + "_dupe";
+
+    run("CREATE TABLE " + dbName + ".emp (id int)", driver);
+    run("insert into table " + dbName + ".emp values ('1')", driver);
+
+    Tuple bootstrapDump = bootstrapLoadAndVerify(dbName, replDbName);
+
+    assertTrue(appender.getOutput().contains("Using Repl#testDatabaseInJobName as job name for map-reduce jobs."));
+    assertTrue(appender.getOutput().contains("Using Repl#testDatabaseInJobName_dupe as job name for map-reduce jobs."));
+    loggerConfig.setLevel(oldLevel);
+    ctx.updateLoggers();
+    appender.removeFromLogger(logger.getName());
   }
 
   @Test
