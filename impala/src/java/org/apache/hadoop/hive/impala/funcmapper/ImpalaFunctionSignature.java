@@ -216,9 +216,18 @@ public class ImpalaFunctionSignature {
     // equality.
     if (this.argTypes.size() != other.argTypes.size()) {
       if (other.hasVarArgs()) {
+        // Only the hasVarArgs side can have more arguments than the non hasVarArgs side.
+        if (this.argTypes.size() < other.argTypes.size()) {
+          return false;
+        }
         argsToCheck = other.argTypes.size();
       } else if (!this.hasVarArgs()) {
         return false;
+      } else {
+        // Only the hasVarArgs side can have more arguments than the non hasVarArgs side.
+        if (other.argTypes.size() < this.argTypes.size()) {
+          return false;
+        }
       }
     }
 

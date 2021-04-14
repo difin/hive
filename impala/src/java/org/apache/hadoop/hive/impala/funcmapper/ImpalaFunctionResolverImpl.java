@@ -208,7 +208,7 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
       }
     }
     if (matchingCandidates.isEmpty()) {
-      throw new SemanticException("Could not cast for function name " + func);
+      throw new SemanticException("No matching function with signature: " + toString());
     }
     return pickPreferredCastCandidate(matchingCandidates);
   }
@@ -230,6 +230,13 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
    * signature.
    **/
   protected boolean canCast(ImpalaFunctionSignature candidate) {
+
+    // Return false immediately if the candidate function has more arguments than
+    // the function we are checking.
+    if (argTypes.size() < candidate.getArgTypes().size()) {
+      return false;
+    }
+
     // If the number of arguments is different and the signature doesn't
     // allow a variable number of arguments, we cannot cast to this
     // signature.
@@ -521,6 +528,9 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     }
     if (func.equals("inline")) {
       return new InlineFunctionResolver(helper, inputs);
+    }
+    if (func.startsWith("ds_hll_sketch")) {
+      return new HllSketchFunctionResolver(helper, func, inputs);
     }
 
     return new ImpalaFunctionResolverImpl(helper, func, inputs);
