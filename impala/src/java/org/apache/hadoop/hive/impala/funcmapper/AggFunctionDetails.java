@@ -127,7 +127,12 @@ public class AggFunctionDetails implements FunctionDetails {
         if (func instanceof AggregateFunction) {
           AggFunctionDetails afd =
               new AggFunctionDetails(func.functionName(), (AggregateFunction) func);
-          result.add(afd);
+          // Some of the sketch functions (e.g. data_kll_sketch) have a function defined in
+          // the builtins, but there is no "init" function (or others) rendering it
+          // unusable, so we do not add these to our list of functions.
+          if (!(afd.initFnSymbol == null && func.functionName().contains("sketch"))) {
+            result.add(afd);
+          }
         }
       }
     }

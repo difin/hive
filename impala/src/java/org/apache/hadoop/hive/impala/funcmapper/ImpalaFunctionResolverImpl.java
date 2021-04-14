@@ -183,8 +183,7 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     List<ImpalaFunctionSignature> castCandidates = getCastCandidates(func);
         ImpalaFunctionSignature.CAST_CHECK_FUNCS_INSTANCE.get(func);
     if (castCandidates == null) {
-      throw new SemanticException("Could not find function name " + func +
-          " in resource file");
+      throw new SemanticException("No matching function with signature: " + toString());
     }
 
     // Check if we should favor a precise numeric function (e.g. decimal) over a
@@ -208,7 +207,7 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
       }
     }
     if (matchingCandidates.isEmpty()) {
-      throw new SemanticException("Could not cast for function name " + func);
+      throw new SemanticException("No matching function with signature: " + toString());
     }
     return pickPreferredCastCandidate(matchingCandidates);
   }
@@ -521,6 +520,12 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     }
     if (func.equals("inline")) {
       return new InlineFunctionResolver(helper, inputs);
+    }
+    // All of the "data*sketch" functions except ds_kll_sketch do
+    // not allow casting for its parameter, so we need a special
+    // resolver for them.
+    if (SketchFunctionResolver.needsResolver(func)) {
+      return new SketchFunctionResolver(helper, func, inputs);
     }
 
     return new ImpalaFunctionResolverImpl(helper, func, inputs);
