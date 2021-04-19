@@ -401,9 +401,6 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
         }
       }
       ci = CompactionInfo.optionalCompactionInfoStructToInfo(msc.findNextCompact(workerName, runtimeVersion));
-      if ((runtimeVersion != null || ci.initiatorVersion != null) && !runtimeVersion.equals(ci.initiatorVersion)) {
-        LOG.warn("Worker and Initiator versions do not match. Worker: v{}, Initiator: v{}", runtimeVersion, ci.initiatorVersion);
-      }
       LOG.debug("Processing compaction request " + ci);
 
       if (ci == null && !stop.get()) {
@@ -414,6 +411,9 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
           LOG.warn("Worker thread sleep interrupted " + e.getMessage());
           return false;
         }
+      }
+      if ((runtimeVersion != null || ci.initiatorVersion != null) && !runtimeVersion.equals(ci.initiatorVersion)) {
+        LOG.warn("Worker and Initiator versions do not match. Worker: v{}, Initiator: v{}", runtimeVersion, ci.initiatorVersion);
       }
       checkInterrupt();
 
