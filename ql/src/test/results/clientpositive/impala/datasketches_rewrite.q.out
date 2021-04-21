@@ -1,8 +1,8 @@
-PREHOOK: query: create table sketch_input (id int, category char(1))
+PREHOOK: query: create table sketch_input (id int, category char(1)) TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@sketch_input
-POSTHOOK: query: create table sketch_input (id int, category char(1))
+POSTHOOK: query: create table sketch_input (id int, category char(1)) TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@sketch_input
@@ -23,7 +23,6 @@ ImpalaProjectPassthroughRel($f0=[$0], $f1=[ds_hll_estimate($1)])
     ImpalaHdfsScanRel(table=[[default, sketch_input]])
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain cbo physical
 select id, rank() over (order by id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) from sketch_input order by id
 PREHOOK: type: QUERY
@@ -45,7 +44,6 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
             ImpalaHdfsScanRel(table=[[default, sketch_input]])
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain cbo physical
 select id, count(id) over ()*rank() over (order by id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) from sketch_input order by id
 PREHOOK: type: QUERY
@@ -67,7 +65,6 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
             ImpalaHdfsScanRel(table=[[default, sketch_input]])
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain cbo physical
 select id, rank() over (partition by category order by id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) from sketch_input order by category,id
 PREHOOK: type: QUERY
@@ -90,7 +87,6 @@ ImpalaProjectPassthroughRel(id=[$0], _o__c1=[$1])
               ImpalaHdfsScanRel(table=[[default, sketch_input]])
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain cbo physical
 select id, ntile(4) over (order by id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) from sketch_input order by id
 PREHOOK: type: QUERY
@@ -111,7 +107,6 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
           ImpalaHdfsScanRel(table=[[default, sketch_input]])
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain cbo physical
 select id, ntile(4) over (partition by category order by id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) from sketch_input order by category,id
 PREHOOK: type: QUERY
@@ -133,7 +128,6 @@ ImpalaProjectPassthroughRel(id=[$0], _o__c1=[$1])
             ImpalaHdfsScanRel(table=[[default, sketch_input]])
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain cbo physical
 select id, cume_dist() over (order by id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) from sketch_input order by id
 PREHOOK: type: QUERY
@@ -154,7 +148,6 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
           ImpalaHdfsScanRel(table=[[default, sketch_input]])
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain cbo physical
 select id, count(id) over ()*cume_dist() over (order by id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) from sketch_input order by id
 PREHOOK: type: QUERY
@@ -175,7 +168,6 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
           ImpalaHdfsScanRel(table=[[default, sketch_input]])
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain cbo physical
 select id, cume_dist() over (partition by category order by id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) from sketch_input order by category,id
 PREHOOK: type: QUERY

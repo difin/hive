@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 
 explain cbo physical select  channel, col_name, d_year, d_qoy, i_category, COUNT(*) sales_cnt, SUM(ext_sales_price) sales_amt FROM (

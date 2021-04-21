@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 
 explain cbo physical select  ca_zip
@@ -35,4 +37,3 @@ explain select  ca_zip
  group by ca_zip
  order by ca_zip
  limit 100;
-

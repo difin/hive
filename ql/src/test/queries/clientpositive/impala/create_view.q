@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 drop view impala_complex_view;
 create view impala_complex_view AS

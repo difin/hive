@@ -120,11 +120,11 @@ PREHOOK: type: DROPTABLE
 HMS CALL get_table_req FOR cdpd_18053
 POSTHOOK: query: drop table if exists cdpd_18053
 POSTHOOK: type: DROPTABLE
-PREHOOK: query: create table cdpd_18053 (i1 int, i2 int)
+PREHOOK: query: create table cdpd_18053 (i1 int, i2 int) TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@cdpd_18053
-POSTHOOK: query: create table cdpd_18053 (i1 int, i2 int)
+POSTHOOK: query: create table cdpd_18053 (i1 int, i2 int) TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@cdpd_18053

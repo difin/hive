@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 
 explain cbo physical select
@@ -89,4 +91,3 @@ order by
   s_name,
   p_partkey
 limit 100;
-

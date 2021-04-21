@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 
 explain cbo physical with ssales as
@@ -104,4 +106,3 @@ order by c_last_name
         ,c_first_name
         ,s_store_name
 ;
-

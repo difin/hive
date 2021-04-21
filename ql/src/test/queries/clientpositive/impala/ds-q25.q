@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 
 explain cbo physical select  
@@ -91,4 +93,3 @@ explain select
  ,s_store_id
  ,s_store_name
  limit 100;
-

@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 
 explain cbo physical with ss as (
@@ -145,4 +147,3 @@ where i_category in ('Home'))
  group by i_manufact_id
  order by total_sales
 limit 100;
-

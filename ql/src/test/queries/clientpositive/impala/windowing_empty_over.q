@@ -1,3 +1,9 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+set hive.metastore.client.capabilities=HIVEFULLACIDREAD,HIVEFULLACIDWRITE,HIVECACHEINVALIDATE,HIVEMANAGESTATS,HIVEMANAGEDINSERTWRITE,HIVEMANAGEDINSERTREAD;
+set hive.support.concurrency=true;
+set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
+set hive.stats.fetch.column.stats=true;
+
 --! qt:dataset:impala_dataset
 drop table if exists tab_sales_n1;
 create table tab_sales_n1
@@ -26,7 +32,7 @@ create table tab_sales_n1
     ss_net_paid_inc_tax       decimal(7,2),
     ss_net_profit             decimal(7,2)
 )
-STORED AS PARQUET;
+STORED AS PARQUET TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only');
 
 
 explain cbo physical

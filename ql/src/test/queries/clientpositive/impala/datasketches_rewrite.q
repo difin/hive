@@ -1,7 +1,12 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+set hive.metastore.client.capabilities=HIVEFULLACIDREAD,HIVEFULLACIDWRITE,HIVECACHEINVALIDATE,HIVEMANAGESTATS,HIVEMANAGEDINSERTWRITE,HIVEMANAGEDINSERTREAD;
+set hive.support.concurrency=true;
+set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
+set hive.stats.fetch.column.stats=true;
 set hive.query.results.cache.enabled=false;
 set hive.optimize.bi.enabled=true;
 
-create table sketch_input (id int, category char(1));
+create table sketch_input (id int, category char(1)) TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only');
 
 -- count distinct -> hll
 explain cbo physical

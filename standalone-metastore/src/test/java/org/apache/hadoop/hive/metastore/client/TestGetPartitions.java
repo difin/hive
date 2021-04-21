@@ -39,6 +39,7 @@ import org.apache.hadoop.hive.metastore.client.builder.CatalogBuilder;
 import org.apache.hadoop.hive.metastore.client.builder.DatabaseBuilder;
 import org.apache.hadoop.hive.metastore.client.builder.PartitionBuilder;
 import org.apache.hadoop.hive.metastore.client.builder.TableBuilder;
+import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.minihms.AbstractMetaStoreService;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.thrift.TException;
@@ -76,6 +77,7 @@ public class TestGetPartitions extends MetaStoreClientTest {
 
   public TestGetPartitions(String name, AbstractMetaStoreService metaStore) {
     this.metaStore = metaStore;
+    MetastoreConf.setVar(metaStore.getConf(), MetastoreConf.ConfVars.METASTORE_METADATA_TRANSFORMER_CLASS, " ");
   }
 
   @Before

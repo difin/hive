@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 
 explain cbo physical select
@@ -71,4 +73,3 @@ where
       and l_shipinstruct = 'DELIVER IN PERSON'
     )
   );
-

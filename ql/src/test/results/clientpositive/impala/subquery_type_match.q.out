@@ -6,7 +6,7 @@ PREHOOK: query: create table my_test_table (
   bigint_col bigint,
   year int,
   month int,
-  day int)
+  day int) TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@my_test_table
@@ -18,7 +18,7 @@ POSTHOOK: query: create table my_test_table (
   bigint_col bigint,
   year int,
   month int,
-  day int)
+  day int) TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@my_test_table
@@ -60,7 +60,6 @@ ImpalaAggregateRel(group=[{}], agg#0=[count($0)])
           ImpalaHdfsScanRel(table=[[default, my_test_table]], condition=[IS NOT NULL($7)])
 
 HMS CALL get_table_req FOR my_test_table
-HMS CALL get_foreign_keys FOR my_test_table
 PREHOOK: query: explain cbo physical
 select count(t1.c) over () from
   (select max(int_col) c from my_test_table) t1
@@ -105,7 +104,6 @@ HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_foreign_keys FOR my_test_table
 PREHOOK: query: explain cbo physical
 WITH foo AS (SELECT 1 FROM my_test_table WHERE int_col IN (SELECT 1))
 SELECT * FROM foo
@@ -152,7 +150,6 @@ HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_foreign_keys FOR my_test_table
 PREHOOK: query: explain cbo physical
 WITH foo AS (SELECT 1 FROM my_test_table WHERE int_col IN (SELECT 1))
 SELECT * FROM (SELECT * FROM foo UNION SELECT * FROM foo) bar
@@ -185,7 +182,6 @@ ImpalaProjectPassthroughRel(_o__c0=[1:TINYINT])
                 ImpalaUnionRel
 
 HMS CALL get_table_req FOR my_test_table
-HMS CALL get_foreign_keys FOR my_test_table
 PREHOOK: query: explain cbo physical
 select t1.int_col
 from my_test_table t1 left join
@@ -222,7 +218,6 @@ ImpalaProjectPassthroughRel(int_col=[$0])
           ImpalaHdfsScanRel(table=[[default, my_test_table]], condition=[AND(IS NOT NULL($7), IS NOT NULL(CAST($7):BIGINT))])
 
 HMS CALL get_table_req FOR my_test_table
-HMS CALL get_foreign_keys FOR my_test_table
 PREHOOK: query: explain cbo physical
 select id,
   exists (select id from my_test_table)

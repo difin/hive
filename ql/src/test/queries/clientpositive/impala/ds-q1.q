@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 
 explain cbo physical with customer_total_return as
@@ -45,4 +47,3 @@ and s_state = 'NM'
 and ctr1.ctr_customer_sk = c_customer_sk
 order by c_customer_id
 limit 100;
-

@@ -22,7 +22,7 @@ PREHOOK: query: create table type_test(
   tt_char char(13),
   tt_boolean boolean
   -- BINARY NOT SUPPORTED tt_binary binary
-) partitioned by (tt_date date) stored as parquet
+) partitioned by (tt_date date) stored as parquet TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@type_test
@@ -44,7 +44,7 @@ POSTHOOK: query: create table type_test(
   tt_char char(13),
   tt_boolean boolean
   -- BINARY NOT SUPPORTED tt_binary binary
-) partitioned by (tt_date date) stored as parquet
+) partitioned by (tt_date date) stored as parquet TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@type_test
@@ -100,7 +100,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR type_test
-HMS CALL get_foreign_keys FOR type_test
 PREHOOK: query: explain select 1 < tt_int from type_test
 PREHOOK: type: QUERY
 PREHOOK: Input: default@type_test
@@ -151,7 +150,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR type_test
-HMS CALL get_foreign_keys FOR type_test
 PREHOOK: query: explain select cast(tt_int as bigint) from type_test
 PREHOOK: type: QUERY
 PREHOOK: Input: default@type_test
@@ -202,7 +200,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR type_test
-HMS CALL get_foreign_keys FOR type_test
 PREHOOK: query: explain select tt_decimal, 'literal' from type_test
 PREHOOK: type: QUERY
 PREHOOK: Input: default@type_test
@@ -253,7 +250,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR type_test
-HMS CALL get_foreign_keys FOR type_test
 PREHOOK: query: explain select case when tt_int > 34 then 34 else tt_int end  from type_test
 PREHOOK: type: QUERY
 PREHOOK: Input: default@type_test
@@ -304,7 +300,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR type_test
-HMS CALL get_foreign_keys FOR type_test
 PREHOOK: query: explain select tt_int in (1,2,3,4) from type_test
 PREHOOK: type: QUERY
 PREHOOK: Input: default@type_test
@@ -392,7 +387,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR type_test
-HMS CALL get_foreign_keys FOR type_test
 PREHOOK: query: explain select max(tt_int) over(partition by tt_date) as yest from type_test
 PREHOOK: type: QUERY
 PREHOOK: Input: default@type_test
@@ -503,7 +497,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR type_test
-HMS CALL get_foreign_keys FOR type_test
 PREHOOK: query: explain select tt_int is null from type_test
 PREHOOK: type: QUERY
 PREHOOK: Input: default@type_test
@@ -554,7 +547,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR type_test
-HMS CALL get_foreign_keys FOR type_test
 PREHOOK: query: explain select tt_int > 4 and tt_int < 10 or tt_int = 33 from type_test
 PREHOOK: type: QUERY
 PREHOOK: Input: default@type_test

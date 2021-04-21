@@ -4,11 +4,11 @@ PREHOOK: type: DROPTABLE
 HMS CALL get_table_req FOR t_one_col
 POSTHOOK: query: drop table t_one_col
 POSTHOOK: type: DROPTABLE
-PREHOOK: query: create table t_one_col (c1 int)
+PREHOOK: query: create table t_one_col (c1 int) TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@t_one_col
-POSTHOOK: query: create table t_one_col (c1 int)
+POSTHOOK: query: create table t_one_col (c1 int) TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@t_one_col
@@ -60,4 +60,6 @@ Per-Host Resources: mem-estimate=4B mem-reservation=0B thread-reservation=1
               output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
               serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
               name: default.t_one_col
+          Write Type: INSERT
+          micromanaged table: true
 

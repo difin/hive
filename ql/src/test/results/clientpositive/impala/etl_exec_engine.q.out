@@ -289,6 +289,7 @@ STAGE PLANS:
       columns: empid int, deptno int
       name: default.tab1_hive
       input format: org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
+      location: hdfs://### HDFS PATH ###
       output format: org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
       serde name: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
       table properties:

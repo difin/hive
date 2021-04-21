@@ -1,3 +1,8 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+set hive.metastore.client.capabilities=HIVEFULLACIDREAD,HIVEFULLACIDWRITE,HIVECACHEINVALIDATE,HIVEMANAGESTATS,HIVEMANAGEDINSERTWRITE,HIVEMANAGEDINSERTREAD;
+set hive.support.concurrency=true;
+set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
+set hive.stats.fetch.column.stats=true;
 --! qt:dataset:impala_dataset
 drop table if exists type_test;
 create table type_test(
@@ -18,7 +23,7 @@ create table type_test(
   tt_char char(13),
   tt_boolean boolean
   -- BINARY NOT SUPPORTED tt_binary binary
-) partitioned by (tt_date date) stored as parquet;
+) partitioned by (tt_date date) stored as parquet TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only');
 
 -- tests basic types
 explain select * from type_test;

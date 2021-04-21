@@ -30,7 +30,7 @@ PREHOOK: query: create table tab_sales_n1
     ss_net_paid_inc_tax       decimal(7,2),
     ss_net_profit             decimal(7,2)
 )
-STORED AS PARQUET
+STORED AS PARQUET TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@tab_sales_n1
@@ -60,7 +60,7 @@ POSTHOOK: query: create table tab_sales_n1
     ss_net_paid_inc_tax       decimal(7,2),
     ss_net_profit             decimal(7,2)
 )
-STORED AS PARQUET
+STORED AS PARQUET TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab_sales_n1
@@ -81,7 +81,6 @@ ImpalaProjectPassthroughRel(sum_window_0=[sum($1) OVER (ORDER BY $0 NULLS LAST R
     ImpalaHdfsScanRel(table=[[default, tab_sales_n1]])
 
 HMS CALL get_table_req FOR tab_sales_n1
-HMS CALL get_foreign_keys FOR tab_sales_n1
 PREHOOK: query: explain cbo physical
 select sum(ss_net_profit) over(order by ss_net_profit) from tab_sales_n1
 PREHOOK: type: QUERY
@@ -96,7 +95,6 @@ ImpalaProjectPassthroughRel(sum_window_0=[sum($22) OVER (ORDER BY $22 NULLS LAST
   ImpalaHdfsScanRel(table=[[default, tab_sales_n1]])
 
 HMS CALL get_table_req FOR tab_sales_n1
-HMS CALL get_foreign_keys FOR tab_sales_n1
 PREHOOK: query: explain
 select row_number() over(partition by ss_sold_date_sk order by ss_quantity) from tab_sales_n1
 PREHOOK: type: QUERY
@@ -172,7 +170,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR tab_sales_n1
-HMS CALL get_foreign_keys FOR tab_sales_n1
 PREHOOK: query: explain
 select row_number() over(order by ss_quantity) from tab_sales_n1
 PREHOOK: type: QUERY

@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 
 explain cbo physical select  *
@@ -101,4 +103,3 @@ from (select avg(ss_list_price) B1_LP
           or ss_coupon_amt between 12592 and 12592+1000
           or ss_wholesale_cost between 22 and 22+20)) B6
 limit 100;
-

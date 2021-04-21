@@ -1,3 +1,5 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+
 --! qt:dataset:impala_dataset
 explain cbo physical select  i_item_id,
         s_state, grouping(s_state) g_state,
@@ -40,4 +42,3 @@ explain select  i_item_id,
  order by i_item_id
          ,s_state
  limit 100;
-

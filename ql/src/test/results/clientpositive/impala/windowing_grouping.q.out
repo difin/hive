@@ -30,7 +30,7 @@ PREHOOK: query: create table tab_sales_n0
     ss_net_paid_inc_tax       decimal(7,2),
     ss_net_profit             decimal(7,2)
 )
-STORED AS PARQUET
+STORED AS PARQUET TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@tab_sales_n0
@@ -60,7 +60,7 @@ POSTHOOK: query: create table tab_sales_n0
     ss_net_paid_inc_tax       decimal(7,2),
     ss_net_profit             decimal(7,2)
 )
-STORED AS PARQUET
+STORED AS PARQUET TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab_sales_n0
@@ -95,7 +95,7 @@ PREHOOK: query: create table tab_item_n0
     i_manager_id              int,
     i_product_name            string
 )
-STORED AS PARQUET
+STORED AS PARQUET TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@tab_item_n0
@@ -124,7 +124,7 @@ POSTHOOK: query: create table tab_item_n0
     i_manager_id              int,
     i_product_name            string
 )
-STORED AS PARQUET
+STORED AS PARQUET TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab_item_n0
@@ -182,8 +182,6 @@ ImpalaProjectPassthroughRel(gross_margin=[$7], i_category=[$2], i_class=[$3], lo
 
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain cbo physical
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
@@ -233,8 +231,6 @@ ImpalaProjectPassthroughRel(gross_margin=[$6], i_category=[$2], i_class=[$3], lo
 
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain cbo physical
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
@@ -285,8 +281,6 @@ ImpalaProjectPassthroughRel(gross_margin=[$7], i_category=[$2], i_class=[$3], lo
 
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
@@ -469,8 +463,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
 
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
@@ -653,8 +645,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
 
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin

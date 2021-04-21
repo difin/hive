@@ -1,8 +1,14 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+set hive.metastore.client.capabilities=HIVEFULLACIDREAD,HIVEFULLACIDWRITE,HIVECACHEINVALIDATE,HIVEMANAGESTATS,HIVEMANAGEDINSERTWRITE,HIVEMANAGEDINSERTREAD;
+set hive.support.concurrency=true;
+set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
+set hive.stats.fetch.column.stats=true;
+
 --! qt:dataset:impala_dataset
 drop table if exists table_single_ts_n0;
 create table table_single_ts_n0(
   tt_timestamp timestamp
-) stored as parquet;
+) stored as parquet TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only');
 
 set explain_level=MINIMAL;
 

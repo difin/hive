@@ -1,3 +1,9 @@
+set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+set hive.metastore.client.capabilities=HIVEFULLACIDREAD,HIVEFULLACIDWRITE,HIVECACHEINVALIDATE,HIVEMANAGESTATS,HIVEMANAGEDINSERTWRITE,HIVEMANAGEDINSERTREAD;
+set hive.support.concurrency=true;
+set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
+set hive.stats.fetch.column.stats=true;
+
 create table my_test_table (
   id integer,
   tinyint_col tinyint,
@@ -6,7 +12,7 @@ create table my_test_table (
   bigint_col bigint,
   year int,
   month int,
-  day int);
+  day int) TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only');
 
 -- CDPD-20749
 explain cbo physical
