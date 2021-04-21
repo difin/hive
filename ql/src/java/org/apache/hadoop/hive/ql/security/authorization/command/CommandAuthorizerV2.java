@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.ql.exec.FunctionInfo;
@@ -190,32 +191,35 @@ final class CommandAuthorizerV2 {
           tableName2Cols.get(Table.getCompleteName(table.getDbName(), table.getTableName()));
       hivePrivObject = new HivePrivilegeObject(privObjType, table.getDbName(), table.getTableName(),
           null, columns, actionType, null, null, table.getOwner(), table.getOwnerType());
-      if (table.getStorageHandler() != null) {
-        //TODO: add hive privilege object for storage based handlers for create and alter table commands.
-        if (hiveOpType == HiveOperationType.CREATETABLE ||
-                hiveOpType == HiveOperationType.ALTERTABLE_PROPERTIES ||
-                hiveOpType == HiveOperationType.CREATETABLE_AS_SELECT) {
-          String storageuri = null;
-          Map<String, String> tableProperties = new HashMap<>();
-          Configuration conf = new Configuration();
-          tableProperties.putAll(table.getSd().getSerdeInfo().getParameters());
-          tableProperties.putAll(table.getParameters());
-          try {
-            if (table.getStorageHandler() instanceof HiveStorageAuthorizationHandler) {
-              HiveStorageAuthorizationHandler authorizationHandler = (HiveStorageAuthorizationHandler) ReflectionUtils.newInstance(
-                      conf.getClassByName(table.getStorageHandler().getClass().getName()), SessionState.get().getConf());
-              storageuri = authorizationHandler.getURIForAuth(tableProperties).toString();
-            } else {
-              //Custom storage handler that has not implemented the HiveStorageAuthorizationHandler
-              storageuri = table.getStorageHandler().getClass().getSimpleName().toLowerCase() + "://" +
-                      HiveCustomStorageHandlerUtils.getTablePropsForCustomStorageHandler(tableProperties);
+      if (HiveConf.getBoolVar(SessionState.getSessionConf(), HiveConf.ConfVars.HIVE_AUTHORIZATION_TABLES_ON_STORAGEHANDLERS, false)) {
+        if (table.getStorageHandler() != null) {
+          //TODO: add hive privilege object for storage based handlers for create and alter table commands.
+          if (hiveOpType == HiveOperationType.CREATETABLE ||
+                  hiveOpType == HiveOperationType.ALTERTABLE_PROPERTIES ||
+                  hiveOpType == HiveOperationType.CREATETABLE_AS_SELECT ||
+                  hiveOpType == HiveOperationType.DROPTABLE) {
+            String storageuri = null;
+            Map<String, String> tableProperties = new HashMap<>();
+            Configuration conf = new Configuration();
+            tableProperties.putAll(table.getSd().getSerdeInfo().getParameters());
+            tableProperties.putAll(table.getParameters());
+            try {
+              if (table.getStorageHandler() instanceof HiveStorageAuthorizationHandler) {
+                HiveStorageAuthorizationHandler authorizationHandler = (HiveStorageAuthorizationHandler) ReflectionUtils.newInstance(
+                        conf.getClassByName(table.getStorageHandler().getClass().getName()), SessionState.get().getConf());
+                storageuri = authorizationHandler.getURIForAuth(tableProperties).toString();
+              } else {
+                //Custom storage handler that has not implemented the HiveStorageAuthorizationHandler
+                storageuri = table.getStorageHandler().getClass().getName() + "://" +
+                        HiveCustomStorageHandlerUtils.getTablePropsForCustomStorageHandler(tableProperties);
+              }
+            } catch (Exception ex) {
+              LOG.error("Exception occured while getting the URI from storage handler: " + ex.getMessage(), ex);
+              throw new HiveException("Exception occured while getting the URI from storage handler: "+ex.getMessage());
             }
-          } catch(Exception ex) {
-            LOG.error("Exception occured while getting the URI from storage handler: "+ex.getMessage(), ex);
-            throw new HiveException("Exception occured while getting the URI from storage handler: "+ex.getMessage());
+            hivePrivObjs.add(new HivePrivilegeObject(HivePrivilegeObjectType.STORAGEHANDLER_URI, null, storageuri, null, null,
+                    actionType, null, table.getStorageHandler().getClass().getName(), table.getOwner(), table.getOwnerType()));
           }
-          hivePrivObjs.add(new HivePrivilegeObject(HivePrivilegeObjectType.STORAGEHANDLER_URI, null, storageuri, null, null,
-                  actionType, null, table.getStorageHandler().getClass().getName(), table.getOwner(), table.getOwnerType()));
         }
       }
       break;
