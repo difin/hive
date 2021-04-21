@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.ql.parse.repl.metric;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils;
+import org.apache.hadoop.hive.ql.exec.repl.util.SnapshotUtils;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.parse.repl.dump.metric.BootstrapDumpMetricCollector;
 import org.apache.hadoop.hive.ql.parse.repl.dump.metric.IncrementalDumpMetricCollector;
@@ -131,7 +132,7 @@ public class TestReplicationMetricCollector {
     actualMetrics = MetricCollector.getInstance().getMetrics();
     Assert.assertEquals(1, actualMetrics.size());
 
-    bootstrapDumpMetricCollector.reportStageEnd("dump", Status.SUCCESS, 10);
+    bootstrapDumpMetricCollector.reportStageEnd("dump", Status.SUCCESS, 10, new SnapshotUtils.ReplSnapshotCount());
     bootstrapDumpMetricCollector.reportEnd(Status.SUCCESS);
     actualMetrics = MetricCollector.getInstance().getMetrics();
     Assert.assertEquals(1, actualMetrics.size());
@@ -172,7 +173,7 @@ public class TestReplicationMetricCollector {
     actualMetrics = MetricCollector.getInstance().getMetrics();
     Assert.assertEquals(1, actualMetrics.size());
 
-    incrDumpMetricCollector.reportStageEnd("dump", Status.SUCCESS, 10);
+    incrDumpMetricCollector.reportStageEnd("dump", Status.SUCCESS, 10, new SnapshotUtils.ReplSnapshotCount());
     incrDumpMetricCollector.reportEnd(Status.SUCCESS);
     actualMetrics = MetricCollector.getInstance().getMetrics();
     Assert.assertEquals(1, actualMetrics.size());
@@ -214,7 +215,8 @@ public class TestReplicationMetricCollector {
     actualMetrics = MetricCollector.getInstance().getMetrics();
     Assert.assertEquals(1, actualMetrics.size());
 
-    bootstrapLoadMetricCollector.reportStageEnd("dump", Status.SUCCESS, 10);
+    bootstrapLoadMetricCollector
+        .reportStageEnd("dump", Status.SUCCESS, 10, new SnapshotUtils.ReplSnapshotCount());
     bootstrapLoadMetricCollector.reportEnd(Status.SUCCESS);
     actualMetrics = MetricCollector.getInstance().getMetrics();
     Assert.assertEquals(1, actualMetrics.size());
@@ -256,7 +258,7 @@ public class TestReplicationMetricCollector {
     actualMetrics = MetricCollector.getInstance().getMetrics();
     Assert.assertEquals(1, actualMetrics.size());
 
-    incrLoadMetricCollector.reportStageEnd("dump", Status.SUCCESS, 10);
+    incrLoadMetricCollector.reportStageEnd("dump", Status.SUCCESS, 10, new SnapshotUtils.ReplSnapshotCount());
     incrLoadMetricCollector.reportEnd(Status.SUCCESS);
     actualMetrics = MetricCollector.getInstance().getMetrics();
     Assert.assertEquals(1, actualMetrics.size());
