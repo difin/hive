@@ -1,0 +1,29 @@
+PREHOOK: query: create table emp(name string, age int)
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@emp
+POSTHOOK: query: create table emp(name string, age int)
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@emp
+PREHOOK: query: insert into emp(name, age) values ('a', 5), ('b', 15), ('c', 12)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@emp
+POSTHOOK: query: insert into emp(name, age) values ('a', 5), ('b', 15), ('c', 12)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@emp
+POSTHOOK: Lineage: emp.age SCRIPT []
+POSTHOOK: Lineage: emp.name SCRIPT []
+PREHOOK: query: select emp.age > 10 is true, (emp.age > 10) is true, not emp.age > 10 is true, not emp.age > 10 is not true from emp
+PREHOOK: type: QUERY
+PREHOOK: Input: default@emp
+#### A masked pattern was here ####
+POSTHOOK: query: select emp.age > 10 is true, (emp.age > 10) is true, not emp.age > 10 is true, not emp.age > 10 is not true from emp
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@emp
+#### A masked pattern was here ####
+false	false	true	false
+true	true	false	true
+true	true	false	true

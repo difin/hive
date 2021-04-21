@@ -535,24 +535,9 @@ precedenceUnaryOperator
     PLUS | MINUS | TILDE
     ;
 
-isCondition
-    : KW_NULL -> Identifier["isnull"]
-    | KW_TRUE -> Identifier["istrue"]
-    | KW_FALSE -> Identifier["isfalse"]
-    | KW_NOT KW_NULL -> Identifier["isnotnull"]
-    | KW_NOT KW_TRUE -> Identifier["isnottrue"]
-    | KW_NOT KW_FALSE -> Identifier["isnotfalse"]
-    ;
-
 precedenceUnaryPrefixExpression
     :
     (precedenceUnaryOperator^)* precedenceFieldExpression
-    ;
-
-precedenceUnarySuffixExpression
-    : precedenceUnaryPrefixExpression (a=KW_IS isCondition)?
-    -> {$a != null}? ^(TOK_FUNCTION isCondition precedenceUnaryPrefixExpression)
-    -> precedenceUnaryPrefixExpression
     ;
 
 
@@ -563,7 +548,7 @@ precedenceBitwiseXorOperator
 
 precedenceBitwiseXorExpression
     :
-    precedenceUnarySuffixExpression (precedenceBitwiseXorOperator^ precedenceUnarySuffixExpression)*
+    precedenceUnaryPrefixExpression (precedenceBitwiseXorOperator^ precedenceUnaryPrefixExpression)*
     ;
 
 
@@ -733,6 +718,21 @@ precedenceEqualExpression
     )*
     -> {$precedenceEqualExpression.tree}
     ;
+
+isCondition
+    : KW_NULL -> Identifier["isnull"]
+    | KW_TRUE -> Identifier["istrue"]
+    | KW_FALSE -> Identifier["isfalse"]
+    | KW_NOT KW_NULL -> Identifier["isnotnull"]
+    | KW_NOT KW_TRUE -> Identifier["isnottrue"]
+    | KW_NOT KW_FALSE -> Identifier["isnotfalse"]
+    ;
+
+precedenceUnarySuffixExpression
+    : precedenceEqualExpression (a=KW_IS isCondition)?
+    -> {$a != null}? ^(TOK_FUNCTION isCondition precedenceEqualExpression)
+    -> precedenceEqualExpression
+    ;
     
 precedenceNotOperator
     :
@@ -741,7 +741,7 @@ precedenceNotOperator
 
 precedenceNotExpression
     :
-    (precedenceNotOperator^)* precedenceEqualExpression
+    (precedenceNotOperator^)* precedenceUnarySuffixExpression
     ;
 
 
