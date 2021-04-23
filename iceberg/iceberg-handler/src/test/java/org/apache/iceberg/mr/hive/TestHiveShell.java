@@ -22,6 +22,7 @@ package org.apache.iceberg.mr.hive;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
@@ -154,6 +155,18 @@ public class TestHiveShell {
     }
   }
 
+  /**
+   * Used for debugging. Please do not remove even if unused in the codebase.
+   * @param statement EXPLAIN statement
+   * @return EXPLAIN statement output in a single String which is IDE friendly for viewing
+   */
+  public String executeExplain(String statement) {
+    List<Object[]> objects = executeStatement(statement);
+    return objects.stream()
+        .map(o -> (String) o[0])
+        .collect(Collectors.joining("\n"));
+  }
+
   public Configuration getHiveConf() {
     if (session != null) {
       return session.getHiveConf();
@@ -202,6 +215,9 @@ public class TestHiveShell {
 
     // CDPD only change since mr is deprecated and throws an exception
     hiveConf.set(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "spark");
+
+    // enables vectorization on Tez
+    hiveConf.set("tez.mrreader.config.update.properties", "hive.io.file.readcolumn.names,hive.io.file.readcolumn.ids");
 
     return hiveConf;
   }
