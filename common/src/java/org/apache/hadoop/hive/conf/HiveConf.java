@@ -5459,6 +5459,8 @@ public class HiveConf extends Configuration {
         "Comma-separated list of class names extending EventConsumer," +
          "to handle the NotificationEvents retreived by the notification event poll."),
 
+    HIVE_SERVER2_ICEBERG_METADATA_GENERATOR_THREADS("hive.server2.iceberg.metadata.generator.threads", 10,
+        "Number of threads used to scan partition directories for data files and update/generate iceberg metadata"),
     /* BLOBSTORE section */
 
     HIVE_BLOBSTORE_SUPPORTED_SCHEMES("hive.blobstore.supported.schemes", "s3,s3a,s3n",
