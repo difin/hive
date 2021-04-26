@@ -526,7 +526,12 @@
         <artifactId>stax-api</artifactId>
         <version>${stax.version}</version>
       </dependency>
-       <dependency>
+      <dependency>
+        <groupId>org.apache.calcite</groupId>
+        <artifactId>calcite-core</artifactId>
+        <version>${calcite.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.orc</groupId>
         <artifactId>orc-core</artifactId>
         <version>${orc.version}</version>
@@ -1173,6 +1178,16 @@
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
         <version>${snakeyaml.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tez</groupId>
+        <artifactId>tez-dag</artifactId>
+        <version>${tez.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.tez</groupId>
+        <artifactId>tez-mapreduce</artifactId>
+        <version>${tez.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

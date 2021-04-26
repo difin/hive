@@ -16,13 +16,13 @@
     <parent>
         <groupId>org.apache.hive</groupId>
         <artifactId>hive</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>3.1.3000.2021.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hive-iceberg</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>3.1.3000.2021.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Hive Iceberg Modules</name>
 
@@ -33,11 +33,13 @@
         <kryo-shaded.version>4.0.2</kryo-shaded.version>
         <iceberg.mockito-core.version>1.10.19</iceberg.mockito-core.version>
         <iceberg.avro.version>1.9.2</iceberg.avro.version>
+        <iceberg.junit.version>4.13</iceberg.junit.version>
         <iceberg.kryo.version>4.0.2</iceberg.kryo.version>
         <iceberg.checkstyle.plugin.version>3.1.2</iceberg.checkstyle.plugin.version>
         <spotless.maven.plugin.version>2.5.0</spotless.maven.plugin.version>
         <google.errorprone.javac.version>9+181-r4173-1</google.errorprone.javac.version>
         <google.errorprone.version>2.5.1</google.errorprone.version>
+        <caffeine.version>2.8.4</caffeine.version>
     </properties>
 
     <modules>
@@ -108,10 +110,6 @@
                         <artifactId>avro</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.apache.calcite.avatica</groupId>
-                        <artifactId>*</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.apache.hive</groupId>
                         <artifactId>hive-llap-tez</artifactId>
                     </exclusion>
@@ -136,7 +134,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.hive</groupId>
-                <artifactId>hive-standalone-metastore-common</artifactId>
+                <artifactId>hive-standalone-metastore</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -156,6 +154,11 @@
                 <artifactId>avro</artifactId>
                 <version>${iceberg.avro.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
 
             <!-- test dependencies -->
             <dependency>
@@ -171,17 +174,16 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.hive</groupId>
-                <artifactId>hive-standalone-metastore-server</artifactId>
-                <classifier>tests</classifier>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.hive</groupId>
                 <artifactId>hive-iceberg-catalog</artifactId>
                 <classifier>tests</classifier>
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${iceberg.junit.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.esotericsoftware</groupId>
                 <artifactId>kryo-shaded</artifactId>

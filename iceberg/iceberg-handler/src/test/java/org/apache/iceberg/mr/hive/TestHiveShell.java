@@ -200,6 +200,9 @@ public class TestHiveShell {
     // set to true so that the Tez session will create an empty jar for localization
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_IN_TEST_IDE, true);
 
+    // CDPD only change since mr is deprecated and throws an exception
+    hiveConf.set(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "spark");
+
     return hiveConf;
   }
 }

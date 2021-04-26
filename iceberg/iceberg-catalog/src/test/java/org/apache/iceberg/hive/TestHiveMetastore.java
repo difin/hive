@@ -27,16 +27,15 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.HMSHandler;
+import org.apache.hadoop.hive.metastore.HiveMetaStore;
 import org.apache.hadoop.hive.metastore.IHMSHandler;
 import org.apache.hadoop.hive.metastore.RetryingHMSHandler;
 import org.apache.hadoop.hive.metastore.TSetIpAddressProcessor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
+import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
 import org.apache.iceberg.common.DynConstructors;
 import org.apache.iceberg.common.DynMethods;
-import org.apache.iceberg.hadoop.Util;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
@@ -55,9 +54,9 @@ public class TestHiveMetastore {
 
   // create the metastore handlers based on whether we're working with Hive2 or Hive3 dependencies
   // we need to do this because there is a breaking API change between Hive2 and Hive3
-  private static final DynConstructors.Ctor<HMSHandler> HMS_HANDLER_CTOR = DynConstructors.builder()
-          .impl(HMSHandler.class, String.class, Configuration.class)
-          .impl(HMSHandler.class, String.class, HiveConf.class)
+  private static final DynConstructors.Ctor<HiveMetaStore.HMSHandler> HMS_HANDLER_CTOR = DynConstructors.builder()
+          .impl(HiveMetaStore.HMSHandler.class, String.class, Configuration.class)
+          .impl(HiveMetaStore.HMSHandler.class, String.class, HiveConf.class)
           .build();
 
   private static final DynMethods.StaticMethod GET_BASE_HMS_HANDLER = DynMethods.builder("getProxy")
@@ -82,14 +81,17 @@ public class TestHiveMetastore {
   private HiveConf hiveConf;
   private ExecutorService executorService;
   private TServer server;
-  private HMSHandler baseHandler;
+  private HiveMetaStore.HMSHandler baseHandler;
   private HiveClientPool clientPool;
 
   /**
    * Starts a TestHiveMetastore with the default connection pool size (5) and the default HiveConf.
    */
   public void start() {
-    start(new HiveConf(new Configuration(), TestHiveMetastore.class), DEFAULT_POOL_SIZE);
+    // CDPD only change since mr is deprecated and throws an exception
+    HiveConf conf = new HiveConf(new Configuration(), TestHiveMetastore.class);
+    conf.set(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "spark");
+    start(conf, DEFAULT_POOL_SIZE);
   }
 
   /**
@@ -116,7 +118,7 @@ public class TestHiveMetastore {
       // create and initialize HMS backend DB for ACID and non-ACID tables as well
       MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CONNECT_URL_KEY,
           "jdbc:derby:" + getDerbyPath() + ";create=true");
-      TestTxnDbUtil.prepDb(conf);
+      TxnDbUtil.prepDb(conf);
 
       TServerSocket socket = new TServerSocket(0);
       int port = socket.getServerSocket().getLocalPort();
@@ -183,7 +185,7 @@ public class TestHiveMetastore {
     }
 
     Path warehouseRoot = new Path(hiveLocalDir.getAbsolutePath());
-    FileSystem fs = Util.getFs(warehouseRoot, hiveConf);
+    FileSystem fs = warehouseRoot.getFileSystem(hiveConf);
     for (FileStatus fileStatus : fs.listStatus(warehouseRoot)) {
       if (!fileStatus.getPath().getName().equals("derby.log") &&
           !fileStatus.getPath().getName().equals("metastore_db")) {
