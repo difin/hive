@@ -107,29 +107,9 @@ import com.google.common.collect.Sets;
 
 public class HiveCalciteUtil {
 
-  /**
-   * Get list of virtual columns from the given list of projections.
-   * <p>
-   *
-   * @param exps
-   *          list of rex nodes representing projections
-   * @return List of Virtual Columns, will not be null.
-   */
-  public static List<Integer> getVirtualCols(List<? extends RexNode> exps) {
-    List<Integer> vCols = new ArrayList<Integer>();
-
-    for (int i = 0; i < exps.size(); i++) {
-      if (!(exps.get(i) instanceof RexInputRef)) {
-        vCols.add(i);
-      }
-    }
-
-    return vCols;
-  }
-
   public static Pair<Boolean, String> unsupportedFeaturesPresentInASTorQB(ASTNode ast, QB qb) {
-    Pair<Boolean, String> containsToken = 
-        ParseUtils.containsTokenOfType(ast, HiveParser.TOK_CHARSETLITERAL, HiveParser.TOK_TABLESPLITSAMPLE, 
+    Pair<Boolean, String> containsToken =
+        ParseUtils.containsTokenOfType(ast, HiveParser.TOK_CHARSETLITERAL, HiveParser.TOK_TABLESPLITSAMPLE,
             HiveParser.TOK_UNIQUEJOIN, HiveParser.TOK_TABLEBUCKETSAMPLE);
 
     if (Boolean.TRUE.equals(containsToken.getKey())) {
