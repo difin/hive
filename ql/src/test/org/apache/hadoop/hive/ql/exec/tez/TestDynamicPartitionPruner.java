@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -456,6 +457,7 @@ public class TestDynamicPartitionPruner {
     Map<String, List<String>> columnMap = new HashMap<>();
     Map<String, List<String>> typeMap = new HashMap<>();
     Map<String, List<ExprNodeDesc>> exprMap = new HashMap<>();
+    Map<String, List<ExprNodeDesc>> predMap = new HashMap<>();
 
     int count = 0;
     for (TestSource testSource : testSources) {
@@ -488,6 +490,13 @@ public class TestDynamicPartitionPruner {
           exprMap.put(testSource.vertexName, exprNodeDescList);
         }
         exprNodeDescList.add(mock(ExprNodeDesc.class));
+
+        List<ExprNodeDesc> predNodeDescList = predMap.get(testSource.vertexName);
+        if (predNodeDescList == null) {
+          predNodeDescList = new LinkedList<>();
+          predMap.put(testSource.vertexName, predNodeDescList);
+        }
+        predNodeDescList.add(mock(ExprNodeDesc.class));
       }
 
       count++;
@@ -497,6 +506,7 @@ public class TestDynamicPartitionPruner {
     doReturn(columnMap).when(mapWork).getEventSourceColumnNameMap();
     doReturn(exprMap).when(mapWork).getEventSourcePartKeyExprMap();
     doReturn(typeMap).when(mapWork).getEventSourceColumnTypeMap();
+    doReturn(predMap).when(mapWork).getEventSourcePredicateExprMap();
     return mapWork;
   }
 
@@ -512,6 +522,7 @@ public class TestDynamicPartitionPruner {
 
   private static class DynamicPartitionPrunerForEventTesting extends DynamicPartitionPruner {
 
+    LongAdder filteredSources = new LongAdder();
 
     public DynamicPartitionPrunerForEventTesting(
         InputInitializerContext context, MapWork work) throws SerDeException {
@@ -519,10 +530,10 @@ public class TestDynamicPartitionPruner {
     }
 
     @Override
-    protected SourceInfo createSourceInfo(TableDesc t, ExprNodeDesc partKeyExpr, String columnName, String columnType,
+    protected SourceInfo createSourceInfo(TableDesc t, ExprNodeDesc partKeyExpr, ExprNodeDesc predicate, String columnName, String columnType,
                                           JobConf jobConf) throws
         SerDeException {
-      return new SourceInfo(t, partKeyExpr, columnName, columnType, jobConf, null);
+      return new SourceInfo(t, partKeyExpr, predicate, columnName, columnType, jobConf, null);
     }
 
     @Override
@@ -533,9 +544,11 @@ public class TestDynamicPartitionPruner {
     }
 
     @Override
-    protected void prunePartitionSingleSource(String source, SourceInfo si)
+    protected ExprNodeDesc prunePartitionSingleSource(JobConf conf, String source, SourceInfo si)
         throws HiveException {
       // No-op: testing events only
+      filteredSources.increment();
+      return null;
     }
   }
 }

@@ -187,12 +187,17 @@ public class DynamicPartitionPruningOptimization implements SemanticNodeProcesso
           // have been already filtered
           if (plist == null || plist.getPartitions().size() != 0) {
             LOG.info("Dynamic partitioning: " + table.getCompleteName() + "." + column);
-            generateEventOperatorPlan(ctx, parseContext, ts, column, columnType);
+            generateEventOperatorPlan(ctx, parseContext, ts, column, columnType, null);
           } else {
             // all partitions have been statically removed
             LOG.debug("No partition pruning necessary.");
           }
-        } else {
+        } else if (table.isNonNative() &&
+          table.getStorageHandler().addDynamicSplitPruningEdge(table, ctx.parent)) {
+          generateEventOperatorPlan(ctx, parseContext, ts, column,
+            table.getCols().stream().filter(e -> e.getName().equals(column)).
+          map(e -> e.getType()).findFirst().get(), ctx.parent);
+        } else { // semijoin
           LOG.debug("Column " + column + " is not a partition column");
           if (semiJoin && !disableSemiJoinOptDueToExternalTable(parseContext.getConf(), ts, ctx)
                   && ts.getConf().getFilterExpr() != null) {
@@ -440,7 +445,7 @@ public class DynamicPartitionPruningOptimization implements SemanticNodeProcesso
   }
 
   private void generateEventOperatorPlan(DynamicListContext ctx, ParseContext parseContext,
-      TableScanOperator ts, String column, String columnType) {
+      TableScanOperator ts, String column, String columnType, ExprNodeDesc predicate) {
 
     // we will put a fork in the plan at the source of the reduce sink
     Operator<? extends OperatorDesc> parentOfRS = ctx.generator.getParentOperators().get(0);
@@ -515,6 +520,9 @@ public class DynamicPartitionPruningOptimization implements SemanticNodeProcesso
       eventDesc.setTargetColumnName(column);
       eventDesc.setTargetColumnType(columnType);
       eventDesc.setPartKey(partKey);
+      if (predicate != null) {
+        eventDesc.setPredicate(predicate.clone());
+      }
       OperatorFactory.getAndMakeChild(eventDesc, groupByOp);
     } else {
       // Must be spark branch

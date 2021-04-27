@@ -26,6 +26,7 @@ import org.apache.hadoop.hive.metastore.api.LockType;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
+import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 import org.apache.hadoop.hive.ql.plan.OperatorDesc;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.security.authorization.HiveAuthorizationProvider;
@@ -176,7 +177,20 @@ public interface HiveStorageHandler extends Configurable {
   }
 
   /**
-   * Used to add additional operator specific information from storage handler during DESCRIBE EXTENDED statement
+   * Test if the storage handler allows the push-down of join filter predicate to prune further the splits.
+   *
+   * @param table The table to filter.
+   * @param syntheticFilterPredicate Join filter predicate.
+   * @return true if supports dynamic split pruning for the given predicate.
+   */
+
+  default boolean addDynamicSplitPruningEdge(org.apache.hadoop.hive.ql.metadata.Table table,
+      ExprNodeDesc syntheticFilterPredicate) {
+    return false;
+  }
+
+  /**
+   * Used to add additional operator specific information from storage handler during DESCRIBE EXTENDED statement.
    *
    * @param operatorDesc operatorDesc
    * @param initialProps Map containing initial operator properties
