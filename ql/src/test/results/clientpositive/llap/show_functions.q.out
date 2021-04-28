@@ -208,6 +208,7 @@ initcap
 inline
 instr
 internal_interval
+is_not_distinct_from
 isfalse
 isnotfalse
 isnotnull
@@ -710,6 +711,7 @@ initcap
 inline
 instr
 internal_interval
+is_not_distinct_from
 isfalse
 isnotfalse
 isnotnull
