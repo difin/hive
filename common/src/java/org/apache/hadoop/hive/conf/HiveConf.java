@@ -4427,27 +4427,12 @@ public class HiveConf extends Configuration {
     HIVE_IMPALA_FETCH_SIZE("hive.impala.fetch.size", 1024L,
         new RangeValidator(1L, (long)Long.MAX_VALUE),
         "Determines the number of rows per fetch when streaming results from an Impala coordinator"),
-    HIVE_IMPALA_MAX_TIMER_ERROR("hive.impala.max.timer.error", 8000000L, "Maximum timer " +
-        "error on the Impala server in nanoseconds"),
-    HIVE_IMPALA_ROW_FETCH_RETRY_SLEEP("hive.impala.fetch.sleep", 500,
-        "Sleep in milliseconds between attempts to fetch rows when streaming results from Impala"),
-    HIVE_IMPALA_ROW_FETCH_MAX_RETRY("hive.impala.fetch.retry.limit", -1,
-        "Maximum number of retry attempts to fetch rows when streaming results from Impala. -1 " +
-        "means retry forever"),
     HIVE_IMPALA_ROW_FETCH_EARLY_CLOSE("hive.impala.fetch.early.close", false,
         "Controls whether the Impala backend operation handle is closed at " +
         "the end of fetch. Leaving the operation handle open allows the Impala " +
         "profile to capture statement timing after row fetch has completed."),
-    HIVE_IMPALA_RPC_TIMEOUT("hive.impala.rpc.timeout", 300000,
+    HIVE_IMPALA_CONNECT_TIMEOUT("hive.impala.connect.timeout", 300000,
         "Timeout for Impala RPCs in milliseconds"),
-    HIVE_IMPALA_RPC_RETRY_LIMIT("hive.impala.rpc.retry.limit", 200,
-        "Number of retry attempts for Impala RPCs that fail due to transport errors. -1 means " +
-        "retry forever"),
-    HIVE_IMPALA_RPC_MAX_RETRY_SLEEP("hive.impala.rpc.max.sleep", 10000,
-        "Maximum sleep time between retries of Impala RPCs in milliseconds"),
-    HIVE_IMPALA_RPC_START_RETRY_SLEEP("hive.impala.rpc.start.sleep", 500,
-        "Starting sleep time between retries of Impala RPCs in milliseconds"),
-
     HIVE_JAR_DIRECTORY("hive.jar.directory", null,
         "This is the location hive in tez mode will look for to find a site wide \n" +
         "installed hive instance."),

@@ -44,6 +44,7 @@ import org.apache.hive.service.rpc.thrift.TProtocolVersion;
 import org.apache.hive.service.rpc.thrift.TRowSet;
 import org.apache.hive.service.rpc.thrift.TSessionHandle;
 import org.apache.hive.service.rpc.thrift.TStatus;
+import org.apache.hive.service.rpc.thrift.TStatusCode;
 import org.apache.impala.thrift.TBackendGflags;
 import org.apache.impala.thrift.TGetBackendConfigReq;
 import org.apache.impala.thrift.TGetBackendConfigResp;
@@ -84,16 +85,6 @@ public class ImpalaSessionImpl implements EngineSession {
     private String address;
     /* Generates random numbers for RPC retry sleeps */
     private final Random randGen = new Random();
-    /* Initial starting point for sleeps (in milliseconds) */
-    private int startSleep;
-    /* Maximum sleep time (in milliseconds) */
-    private int maxSleep;
-    /* Max retries */
-    private int maxRetries;
-    /* Sleep between row fetch status checks */
-    private int rowFetchSleep;
-    /* Max retries for row fetching */
-    private int rowFetchMaxRetries;
     /* Underlying configured TSocket timeout */
     private int connectionTimeout;
     /* Maximum timer error on the Impala server */
@@ -110,46 +101,8 @@ public class ImpalaSessionImpl implements EngineSession {
     @Override
     public void init(HiveConf conf) {
       this.address = conf.getVar(HiveConf.ConfVars.HIVE_IMPALA_ADDRESS);
-      this.startSleep = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_RPC_START_RETRY_SLEEP);
-      this.maxSleep = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_RPC_MAX_RETRY_SLEEP);
-      this.maxRetries = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_RPC_RETRY_LIMIT);
-      this.rowFetchSleep = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_ROW_FETCH_RETRY_SLEEP);
-      this.rowFetchMaxRetries = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_ROW_FETCH_MAX_RETRY);
-      this.connectionTimeout = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_RPC_TIMEOUT);
-      this.impalaMaxTimerError = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_MAX_TIMER_ERROR);
+      this.connectionTimeout = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_CONNECT_TIMEOUT);
       this.socketBufferSize = conf.getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_SOCKET_BUFFER_SIZE);
-    }
-
-    /* Calculates the next sleep time for retryRPC. Uses an exponential backoff with jitter approach. */
-    private int calculateRPCSleepMilliseconds(int startSleep, int maxSleep, int attempt) {
-        LOG.debug("calculateRPCSleepMilliseconds: start: {} max: {} attempt: {}", startSleep, maxSleep, attempt);
-        // limit exponent to be 30 (2^30)
-        int exponent = Math.min(30, attempt);
-        int expPower = (int) Math.pow(2, exponent);
-        int calculatedMax = 0;
-        try {
-            calculatedMax = Math.multiplyExact(startSleep, expPower);
-            calculatedMax = Math.min(maxSleep, calculatedMax);
-        } catch (ArithmeticException e) {
-            // we've overflowed the multiply, so lets use the max sleep
-            calculatedMax = maxSleep;
-        }
-        LOG.debug("calculatedMax: {}", calculatedMax);
-        // return between 0 and calculatedMax for jitter
-        return randGen.nextInt(calculatedMax);
-    }
-
-    /* Sleeps for the specified sleepTimeMs (milliseconds) returns true if interrupted. */
-    private static boolean RPCSleep(int sleepTimeMs) {
-        Preconditions.checkState(sleepTimeMs >= 0);
-        LOG.debug("RPCSleep: Sleeping for {}ms", sleepTimeMs);
-        try {
-            Thread.sleep(sleepTimeMs);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return true;
-        }
-        return false;
     }
 
     /* Used to provide an interface for RPC calls consumed by retryRPC. */
@@ -159,64 +112,31 @@ public class ImpalaSessionImpl implements EngineSession {
 
     /* Used to provide an interface for RPC calls consumed by retryRPC with number of
      * times the call has been retried provided to callback */
-    private interface RPCCallWithRetryCount<T> {
-        T execute(ImpalaHiveServer2Service.Client c, int retryCount) throws TException, HiveException;
+    private interface RPCCallWithRetry<T> {
+        T execute(ImpalaHiveServer2Service.Client c) throws TException, HiveException;
     }
 
-    private <T> T retryRPC(String rpcCallName, boolean canReOpenSession, RPCCall<T> call) throws HiveException {
-      return retryRPC(rpcCallName, canReOpenSession, (c, count) -> call.execute(c));
-    }
-
-    /* Retries RPC calls that fail due to TException. */
-    private <T> T retryRPC(String rpcCallName, boolean canReOpenSession, RPCCallWithRetryCount<T> call) throws HiveException {
-        int retryCount = 0;
+    /* Retries RPC calls that are still executing or fail due to TException. */
+    private <T> T retryRPC(String rpcCallName, boolean canReOpenSession, RPCCallWithRetry<T> call) throws HiveException {
         T resp = null;
-        Exception lastException = null;
-        do {
-            boolean retryTransportError = lastException != null && lastException instanceof TTransportException;
-            lastException = null;
-            // retryCount > 0 on 2nd+ iteration of loop
-            if (retryCount > 0) {
-                int sleepTime = calculateRPCSleepMilliseconds(startSleep, maxSleep, retryCount);
-                LOG.info("retryRPC({}): retry attempt: {} (max {}) sleep time: {} ms", rpcCallName, retryCount,
-                        maxRetries, sleepTime);
-                // Close prior session if error is not transport related
-                if (!retryTransportError) {
-                  if (canReOpenSession) {
-                    if (connection == null) { // Reconnect if checkThriftStatus closed the connection
-                      connectClient();
-                    }
-                    close(); // Close session, client, and connection
-                  } else {
-                    // Don't retry RPC that depends on session state
-                    throw new HiveException(lastException);
-                  }
-                }
-                if (RPCSleep(sleepTime)) {
-                    // Sleep was interrupted, lets give up
-                    throw new HiveException(String.format("Impala RPC(%s) was interrupted while sleeping",
-                            rpcCallName));
-                }
-                if(retryTransportError) {
-                  connectClient(); // Reopen connection and client
-                } else if (canReOpenSession) {
-                  open();     // Reopen connection, client, and session
-                }
-            }
-            try {
-                resp = call.execute(client, retryCount);
-            } catch (Exception e) {
-                LOG.info("retryRPC({}): retry attempt: {} (max {})", rpcCallName, retryCount, maxRetries, e);
-                lastException = e;
-            }
-            // Loop while we've seen an TException and we haven't exceeded the requested maximum retry count
-        } while (lastException != null && (maxRetries == -1 || retryCount++ < maxRetries));
 
-        // We've exhausted our retry limit, give up and throw
-        if (lastException != null) {
-            throw new HiveException(String.format("Impala RPC(%s) failed after %d retries: %s", rpcCallName, maxRetries,
-                    lastException.getMessage()),
-                    lastException);
+        try {
+            resp = call.execute(client);
+            return resp;
+        } catch (Exception e) {
+            if (canReOpenSession) {
+                close(); // Close session, client, and connection
+                openImpl(false);     // Reopen connection, client, and session
+            } else if (e instanceof TTransportException) {
+                disconnectClient();
+                connectClient(); // Reopen connection and client
+            }
+        }
+
+        try {
+            resp = call.execute(client);
+        } catch (Exception e) {
+            throw new HiveException(e);
         }
         return resp;
     }
@@ -224,26 +144,16 @@ public class ImpalaSessionImpl implements EngineSession {
     /* Checks TStatus status code, returns false if status is success, true if status suggests retrying, or throws
      * an HiveException if an error is encountered.
      */
-    private boolean checkThriftStatus(TStatus status) throws HiveException {
+    private void checkThriftStatus(TStatus status) throws HiveException {
         String errmsg;
         switch (status.getStatusCode()) {
-            case SUCCESS_STATUS:
-            case SUCCESS_WITH_INFO_STATUS:
-                return false;
             case ERROR_STATUS:
-                errmsg = String.format(
-                    "Thrift call failed for server %s error: %s",
-                    connection, status.getErrorMessage());
-                disconnectClient();
-                throw new HiveException(errmsg);
+                throw new HiveException(status.getErrorMessage());
             case INVALID_HANDLE_STATUS:
                 errmsg = "Invalid handle for server " + connection;
-                disconnectClient();
                 throw new HiveException(errmsg);
-            case STILL_EXECUTING_STATUS:
-                return true;
         }
-        return false;
+
     }
 
     /* Given a valid TOperationHandle attempts to retrieve rows from Impala. */
@@ -263,21 +173,16 @@ public class ImpalaSessionImpl implements EngineSession {
         req.setMaxRows(fetchSize);
 
         TFetchResultsResp resp = null;
-        int retryCount = 0;
+
         do {
-            // only log every 30 retries, it is expected for long running queries for this to be retried many times
-            if ((retryCount%30) == 0) {
-                LOG.info("FetchResults: attempt: {} (max {}) retrySleep: {}ms", retryCount, rowFetchMaxRetries,
-                        rowFetchSleep);
-            }
-            // After 1 loop resp is always non-null
-            if (resp != null && RPCSleep(rowFetchSleep)) {
-                throw new HiveException("FetchResults: Retry sleep was interrupted");
-            }
             resp = retryRPC("FetchResults", false, (c) -> c.FetchResults(req));
-            // Loop while checkThriftStatus says we should retry and retryCount doesnt exceed requested maxRetry
-        } while (checkThriftStatus(resp.getStatus()) &&
-                (rowFetchMaxRetries == -1 || retryCount++ < rowFetchMaxRetries));
+            checkThriftStatus(resp.getStatus());
+            // A query can return STILL_EXECUTING_STATUS when the fetch time
+            // exceeds FETCH_ROWS_TIMEOUT_MS. This could be propagated to the
+            // user in the future but for now just retry the operation with
+            // the same timeout.
+        } while (resp.getStatus().getStatusCode() == TStatusCode.STILL_EXECUTING_STATUS ||
+            (resp.isHasMoreRows() && resp.getResults().getRowsSize() == 0));
 
         if(!resp.isHasMoreRows()) {
               fetchEOF = true;
@@ -309,22 +214,19 @@ public class ImpalaSessionImpl implements EngineSession {
                 });
     }
 
-    private long PrepareForExecution() throws HiveException {
+    private TPingImpalaHS2ServiceResp PrepareForExecution() throws HiveException {
           TPingImpalaHS2ServiceReq req = new TPingImpalaHS2ServiceReq(sessionHandle);
-          long ping_send_ts = System.nanoTime();
-          TPingImpalaHS2ServiceResp resp = retryRPC("PingImpalaHS2Service", true,
-                (c, retryCount) -> {
+          return retryRPC("PingImpalaHS2Service", true,
+                (c) -> {
                   req.setSessionHandle(sessionHandle); // Set latest session handle since Ping retry may reopen session
-                  TPingImpalaHS2ServiceResp resp2 = client.PingImpalaHS2Service(req);
-                  checkThriftStatus(resp2.getStatus()); // Check errors on every iteration
-                  return resp2;
+                  long ping_send_ts = System.nanoTime();
+                  TPingImpalaHS2ServiceResp resp = client.PingImpalaHS2Service(req);
+                  checkThriftStatus(resp.getStatus()); // Check errors on every iteration
+                  // Move the coordinator timestamp forward by half of the RPC latency
+                  // to compensate for overlap between the frontend and backend timelines.
+                  resp.timestamp += ((System.nanoTime() - ping_send_ts) / 2);
+                  return resp; 
                 });
-          // Move the coordinator timestamp forward by half of the RPC latency
-          // to compensate for overlap between the frontend and backend timelines
-          // if the roundtrip time is not too short compared to HIVE_IMPALA_MAX_TIMER_ERROR.
-          long roundtripTime = System.nanoTime() - ping_send_ts;
-          long estimatedOneWayTime = roundtripTime >= impalaMaxTimerError ? roundtripTime / 2 : 0;
-          return resp.timestamp + estimatedOneWayTime;
     }
 
     /* Executes an Impala plan */
@@ -336,11 +238,22 @@ public class ImpalaSessionImpl implements EngineSession {
         statementRequest.setRunAsync(true);
         statementRequest.setStatement(sql);
 
+// TODO: Parameters could be passed here instead of during session open to
+// avoid the need to reconnect when parameters change. However, parameters
+// would then not be set in the Impala session. Need further investigation to
+// determine if session parameters are accessed elsewhere in the backend.
+/*
+        statementRequest.setConfOverlay(
+             SessionState.get().getConf().subtree("impala").entrySet().stream()
+             .filter(e -> !e.getKey().equals("core-site.overridden"))
+             .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue)));
+*/
+
         TExecutePlannedStatementReq req = new TExecutePlannedStatementReq();
         req.setStatementReq(statementRequest);
         req.setPlan(plan.getExecRequest());
 
-        req.plan.setRemote_submit_time(PrepareForExecution());
+        req.plan.setRemote_submit_time(PrepareForExecution().timestamp);
         // Don't retry the Execute itself in case the statment was DML or modified state
         TExecuteStatementResp resp;
         statementRequest.setSessionHandle(sessionHandle);
@@ -448,7 +361,7 @@ public class ImpalaSessionImpl implements EngineSession {
 
         TGetExecutorMembershipReq req = new TGetExecutorMembershipReq();
         TGetExecutorMembershipResp resp = retryRPC("GetExecutorMembership", true,
-            (c, retryCount) -> {
+            (c) -> {
                 req.setSessionHandle(sessionHandle); // Set the latest handle, since retry may reopen
                 TGetExecutorMembershipResp respInternal = client.GetExecutorMembership(req);
                 checkThriftStatus(respInternal.getStatus());
@@ -466,7 +379,7 @@ public class ImpalaSessionImpl implements EngineSession {
         Preconditions.checkNotNull(sessionHandle);
 
         TInitQueryContextResp resp = retryRPC("InitQueryContext", true,
-            (c, retryCount) -> {
+            (c) -> {
                 TInitQueryContextResp respInternal = client.InitQueryContext();
                 checkThriftStatus(respInternal.getStatus());
                 return respInternal;
@@ -483,6 +396,10 @@ public class ImpalaSessionImpl implements EngineSession {
     /* Opens an Impala session */
     @Override
     public void open() throws HiveException {
+      openImpl(true);
+    }
+
+    private void openImpl(boolean retryOpen) throws HiveException {
         // we've already called open
         if (client != null) {
             return;
@@ -503,12 +420,22 @@ public class ImpalaSessionImpl implements EngineSession {
         // This is to force Impala to send back row oriented data (V6 and above returns columnar
         req.setClient_protocol(TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V5);
 
-        TOpenSessionResp resp = retryRPC("OpenSession", true,
-                (c) -> {
-                  TOpenSessionResp resp2 = c.OpenSession(req);
-                  checkThriftStatus(resp2.getStatus()); // Check errors on every iteration
-                  return resp2;
-                });
+        TOpenSessionResp resp;
+        if (retryOpen) {
+          resp = retryRPC("OpenSession", true,
+              (c) -> {
+              TOpenSessionResp resp2 = c.OpenSession(req);
+              checkThriftStatus(resp2.getStatus()); // Check errors on every iteration
+              return resp2;
+              });
+        } else {
+          try {
+            resp = client.OpenSession(req);
+            checkThriftStatus(resp.getStatus());
+          } catch (TException e) {
+            throw new HiveException(e);
+          }
+        }
         sessionHandle = resp.getSessionHandle();
         sessionConfig = resp.getConfiguration();
     }
@@ -535,22 +462,23 @@ public class ImpalaSessionImpl implements EngineSession {
     @Override
     public void close() {
         Preconditions.checkNotNull(client);
-        Preconditions.checkNotNull(sessionHandle);
+        if (sessionHandle != null) {
 
-        TCloseSessionReq req = new TCloseSessionReq();
-        req.setSessionHandle(sessionHandle);
-        try {
-            // we retry CloseSession to cleanup resources on the Impala side
-            TCloseSessionResp resp = retryRPC("CloseSession", false,
-                (c, retryCount) -> {
-                  TCloseSessionResp resp2 = client.CloseSession(req);
-                  checkThriftStatus(resp2.getStatus());
-                  return resp2;
-                });
-        } catch (Exception e) {
-            // ignore TStatus error on close because there is nothing user actionable, but report it in log
-            LOG.warn("Failed to close session ({}) to Impala coordinator ({})", getSessionId(), address,
-                    e);
+          TCloseSessionReq req = new TCloseSessionReq();
+          req.setSessionHandle(sessionHandle);
+          try {
+              // we retry CloseSession to cleanup resources on the Impala side
+              TCloseSessionResp resp = retryRPC("CloseSession", false,
+                  (c) -> {
+                    TCloseSessionResp resp2 = client.CloseSession(req);
+                    checkThriftStatus(resp2.getStatus());
+                    return resp2;
+                  });
+          } catch (Exception e) {
+              // ignore TStatus error on close because there is nothing user actionable, but report it in log
+              LOG.warn("Failed to close session ({}) to Impala coordinator ({})", getSessionId(), address,
+                      e);
+          }
         }
         if (connection != null) {
             disconnectClient();

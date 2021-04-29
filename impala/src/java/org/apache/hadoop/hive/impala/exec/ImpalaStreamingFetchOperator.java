@@ -134,7 +134,9 @@ public class ImpalaStreamingFetchOperator extends FetchOperator {
     public void clearFetchContext() throws HiveException {
         if (!HiveConf.getBoolVar(SessionState.get().getConf(), HiveConf.ConfVars.HIVE_IMPALA_ROW_FETCH_EARLY_CLOSE)) {
 
-          context.close();
+            if (context != null) {
+                context.close();
+            }
         }
     }
 

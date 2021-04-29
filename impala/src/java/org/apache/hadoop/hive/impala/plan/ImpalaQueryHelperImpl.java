@@ -279,11 +279,21 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
         .map(e -> e.getKey() + "=" + e.getValue())
         .collect(Collectors.joining(","));
 
+    Map<String, String> sessionOptions = 
+      SessionState.get().getConf().subtree("impala").entrySet().stream()
+          .filter(e -> !e.getKey().equals("core-site.overridden"))
+          .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
+
+    String csvSessionOptions = sessionOptions.entrySet().stream()
+          .map(e -> e.getKey() + "=" + e.getValue())
+          .collect(Collectors.joining(","));
+
     // Overlay defaults from Impala backend option settings
     TQueryOptions options;
     try {
       options = FeSupport.ParseQueryOptions(csvQueryOptions,
           new TQueryOptions());
+      options = FeSupport.ParseQueryOptions(csvSessionOptions, options);
     } catch (InternalException e) {
       throw new HiveException(e);
     }
@@ -335,10 +345,13 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     // option is updated, the change will not be reflected in the TOpenSessionReq we send
     // to the Impala backend in the next query. Refer to
     // ImpalaSessionManager#getSession() for further details.
-    if (!origImpalaProps.isEmpty()) conf.setImpalaConfigUpdated(true);
 
     for (Map.Entry<Object, Object> e : impalaProps.entrySet()) {
-      conf.set((String) e.getKey(), (String) e.getValue());
+      String oldVal = conf.get((String) e.getKey());
+      if (oldVal == null || oldVal != (String) e.getValue()) {
+        conf.set((String) e.getKey(), (String) e.getValue());
+        conf.setImpalaConfigUpdated(true);
+      }
     }
 
     // We do not call unset() for each query option 'name' in 'origImpalaProps' so that a
