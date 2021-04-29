@@ -468,7 +468,7 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
       client.alter_table_req(req);
       if (hook != null) {
         PartitionSpecProxy partitionSpecProxy = listPartitionSpecs(dbname, tbl_name, Integer.MAX_VALUE);
-        hook.commitAlterTable(new_tbl, partitionSpecProxy);
+        hook.commitAlterTable(new_tbl, envContext, partitionSpecProxy);
       }
       success = true;
     } finally {
@@ -513,7 +513,7 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
       client.alter_table_req(req);
       if (hook != null) {
         PartitionSpecProxy partitionSpecProxy = listPartitionSpecs(catName, dbName, tbl_name, Integer.MAX_VALUE);
-        hook.commitAlterTable(new_tbl, partitionSpecProxy);
+        hook.commitAlterTable(new_tbl, envContext, partitionSpecProxy);
       }
       success = true;
     } finally {
