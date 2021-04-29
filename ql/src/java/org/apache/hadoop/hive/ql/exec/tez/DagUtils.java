@@ -1605,8 +1605,7 @@ public class DagUtils {
     if (endVertex) {
       OutputCommitterDescriptor ocd = null;
       String committerClass = HiveConf.getVar(conf, ConfVars.TEZ_MAPREDUCE_OUTPUT_COMMITTER);
-      if (!HiveConf.getBoolVar(conf, ConfVars.TEZ_MAPREDUCE_OUTPUT_COMMITTER_ON_HS2) &&
-          committerClass != null && !committerClass.isEmpty()) {
+      if (committerClass != null && !committerClass.isEmpty()) {
         ocd = OutputCommitterDescriptor.create(committerClass);
       }
       vertex.addDataSink("out_"+workUnit.getName(), new DataSinkDescriptor(

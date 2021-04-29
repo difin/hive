@@ -4549,8 +4549,6 @@ public class HiveConf extends Configuration {
     TEZ_LLAP_MIN_REDUCER_PER_EXECUTOR("hive.tez.llap.min.reducer.per.executor", 0.33f,
         "If above 0, the min number of reducers for auto-parallelism for LLAP scheduling will\n" +
         "be set to this fraction of the number of executors."),
-    TEZ_MAPREDUCE_OUTPUT_COMMITTER_ON_HS2("hive.tez.mapreduce.output.committer.on.hs2", false,
-        "Whether the job commit should be invoked on HS2 side (true) or on the Tez AM side (false)."),
     TEZ_MAPREDUCE_OUTPUT_COMMITTER("hive.tez.mapreduce.output.committer.class",
         "org.apache.tez.mapreduce.committer.MROutputCommitter",
         "Output committer class which should commit the job on the Tez AM side after each vertex execution."),
