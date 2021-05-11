@@ -143,6 +143,7 @@ import org.apache.hadoop.hive.metastore.datasource.DataSourceProvider;
 import org.apache.hadoop.hive.metastore.datasource.DataSourceProviderFactory;
 import org.apache.hadoop.hive.metastore.events.AbortTxnEvent;
 import org.apache.hadoop.hive.metastore.events.AllocWriteIdEvent;
+import org.apache.hadoop.hive.metastore.events.CommitCompactionEvent;
 import org.apache.hadoop.hive.metastore.events.CommitTxnEvent;
 import org.apache.hadoop.hive.metastore.events.OpenTxnEvent;
 import org.apache.hadoop.hive.metastore.events.AcidWriteEvent;
@@ -279,7 +280,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       "SELECT COUNT(*) FROM \"TXN_TO_WRITE_ID\" UNION ALL SELECT COUNT(*) FROM \"COMPLETED_TXN_COMPONENTS\"";
 
 
-  private List<TransactionalMetaStoreEventListener> transactionalListeners;
+  protected List<TransactionalMetaStoreEventListener> transactionalListeners;
 
   // Maximum number of open transactions that's allowed
   private static volatile int maxOpenTxns = 0;
@@ -293,7 +294,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   private long deadlockRetryInterval;
   protected Configuration conf;
   protected static DatabaseProduct dbProduct;
-  private static SQLGenerator sqlGenerator;
+  protected static SQLGenerator sqlGenerator;
 
   // (End user) Transaction timeout, in milliseconds.
   private long timeout;
@@ -1225,10 +1226,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           updateKeyValueAssociatedWithTxn(rqst, stmt);
         }
 
-        if (transactionalListeners != null) {
-          MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners,
-                  EventMessage.EventType.COMMIT_TXN, new CommitTxnEvent(txnid, txnType.get()), dbConn, sqlGenerator);
-        }
+        createCommitNotificationEvent(dbConn, txnid , txnType);
 
         LOG.debug("Going to commit");
         dbConn.commit();
@@ -1245,6 +1243,21 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       }
     } catch (RetryException e) {
       commitTxn(rqst);
+    }
+  }
+
+  /**
+   * Create Notifiaction Events on txn commit
+   * @param dbConn DatabaseConnection
+   * @param txnid committed txn
+   * @param txnType transaction type
+   * @throws MetaException ex
+   */
+  protected void createCommitNotificationEvent(Connection dbConn, long txnid, Optional<TxnType> txnType)
+      throws MetaException, SQLException {
+    if (transactionalListeners != null) {
+      MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners,
+              EventMessage.EventType.COMMIT_TXN, new CommitTxnEvent(txnid, txnType.get()), dbConn, sqlGenerator);
     }
   }
 

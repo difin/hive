@@ -36,6 +36,7 @@ import org.apache.hadoop.hive.metastore.events.AlterISchemaEvent;
 import org.apache.hadoop.hive.metastore.events.AlterPartitionEvent;
 import org.apache.hadoop.hive.metastore.events.AlterSchemaVersionEvent;
 import org.apache.hadoop.hive.metastore.events.AlterTableEvent;
+import org.apache.hadoop.hive.metastore.events.CommitCompactionEvent;
 import org.apache.hadoop.hive.metastore.events.CreateCatalogEvent;
 import org.apache.hadoop.hive.metastore.events.CreateDatabaseEvent;
 import org.apache.hadoop.hive.metastore.events.CreateFunctionEvent;
@@ -237,6 +238,8 @@ public class MetaStoreListenerNotifier {
               (listener, event) -> listener.onUpdatePartitionColumnStat((UpdatePartitionColumnStatEvent) event))
           .put(EventType.DELETE_PARTITION_COLUMN_STAT,
               (listener, event) -> listener.onDeletePartitionColumnStat((DeletePartitionColumnStatEvent) event))
+          .put(EventType.COMMIT_COMPACTION,
+              ((listener, event) -> listener.onCommitCompaction((CommitCompactionEvent) event, null, null)))
           .build()
   );
 
@@ -260,6 +263,9 @@ public class MetaStoreListenerNotifier {
       .put(EventType.ACID_WRITE,
         (listener, event, dbConn, sqlGenerator) ->
                 listener.onAcidWrite((AcidWriteEvent) event, dbConn, sqlGenerator))
+      .put(EventType.COMMIT_COMPACTION,
+        (listener, event, dbConn, sqlGenerator) -> listener
+            .onCommitCompaction((CommitCompactionEvent) event, dbConn, sqlGenerator))
       .put(EventType.UPDATE_PARTITION_COLUMN_STAT_BATCH,
               (listener, event, dbConn, sqlGenerator) ->
                       listener.onUpdatePartitionColumnStatInBatch((UpdatePartitionColumnStatEventBatch) event,
