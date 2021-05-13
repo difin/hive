@@ -127,6 +127,10 @@ public class ExplainSemanticAnalyzer extends BaseSemanticAnalyzer {
         config.setLocks(true);
       } else if (explainOptions == HiveParser.KW_DEBUG) {
         config.setDebug(true);
+      } else if (explainOptions == HiveParser.KW_DDL) {
+        config.setDDL(true);
+        config.setCbo(true);
+        config.setVectorization(true);
       } else {
         // UNDONE: UNKNOWN OPTION?
       }

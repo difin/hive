@@ -53,6 +53,8 @@ public class ExplainConfiguration {
   private VectorizationDetailLevel vectorizationDetailLevel = VectorizationDetailLevel.SUMMARY;
   private boolean locks = false;
   private boolean debug = false;
+  private boolean ddl = false;
+  private boolean ast = false;
 
   private Path explainRootPath;
   private Map<String, Long> opIdToRuntimeNumRows;
@@ -206,5 +208,21 @@ public class ExplainConfiguration {
 
   public void setLocks(boolean locks) {
     this.locks = locks;
+  }
+
+  public boolean isAst() {
+    return ast;
+  }
+
+  public void setAst(boolean ast) {
+    this.ast = ast;
+  }
+
+  public void setDDL(boolean ddl) {
+    this.ddl = ddl;
+  }
+
+  public boolean isDDL() {
+    return this.ddl;
   }
 }

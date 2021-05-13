@@ -226,4 +226,11 @@ public class ExplainWork implements Serializable {
     return config.isLocks();
   }
 
+  public boolean isAst() {
+    return config.isAst();
+  }
+
+  public boolean isDDL() {
+    return config.isDDL();
+  }
 }
