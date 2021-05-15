@@ -182,6 +182,7 @@
         <include>hplsql.cmd</include>
         <include>beeline.cmd</include>
         <include>ext/**/*</include>
+        <include>replstats.sh</include>
       </includes>
       <outputDirectory>bin</outputDirectory>
     </fileSet>
