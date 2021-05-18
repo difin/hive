@@ -36,6 +36,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.exec.Operator;
 import org.apache.hadoop.hive.ql.io.HiveInputFormat;
 import org.apache.hadoop.hive.ql.plan.PartitionDesc;
+import org.apache.hadoop.hive.ql.txn.compactor.metrics.DeltaFilesMetricReporter;
 import org.apache.tez.common.counters.TezCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -284,6 +285,7 @@ public class HiveSplitGenerator extends InputInitializer {
           }
           counterName = Utilities.getVertexCounterName(HiveInputCounters.INPUT_FILES.name(), vertexName);
           tezCounters.findCounter(groupName, counterName).increment(files.size());
+          DeltaFilesMetricReporter.createCountersForAcidMetrics(tezCounters, jobConf);
         }
 
         if (work.getIncludedBuckets() != null) {

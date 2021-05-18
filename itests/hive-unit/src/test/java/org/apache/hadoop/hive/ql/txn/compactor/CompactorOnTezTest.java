@@ -52,7 +52,7 @@ import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeS
 /**
  * Superclass for Test[Crud|Mm]CompactorOnTez, for setup and helper classes.
  */
-public class CompactorOnTezTest {
+public abstract class CompactorOnTezTest {
   private static final AtomicInteger RANDOM_INT = new AtomicInteger(new Random().nextInt());
   private static final String TEST_DATA_DIR = new File(
       System.getProperty("java.io.tmpdir") + File.separator + TestCrudCompactorOnTez.class
