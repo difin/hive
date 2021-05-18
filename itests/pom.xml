@@ -61,6 +61,7 @@
         <module>hive-minikdc</module>
         <module>qtest-druid</module>
         <module>qtest-kudu</module>
+        <module>qtest-iceberg</module>
       </modules>
     </profile>
     <profile>
