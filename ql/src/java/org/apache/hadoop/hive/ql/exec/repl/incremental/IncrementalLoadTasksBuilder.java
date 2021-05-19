@@ -51,6 +51,7 @@ import org.apache.hadoop.hive.ql.parse.repl.load.message.MessageHandler;
 import org.apache.hadoop.hive.ql.parse.repl.metric.ReplicationMetricCollector;
 import org.apache.hadoop.hive.ql.plan.DependencyCollectionWork;
 import org.slf4j.Logger;
+import org.stringtemplate.v4.ST;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -233,30 +234,7 @@ public class IncrementalLoadTasksBuilder {
     return addUpdateReplStateTasks(messageHandler.getUpdatedMetadata(), tasks);
   }
 
-  private Task<? extends Serializable> tableUpdateReplStateTask(String dbName, String tableName,
-                                                    Map<String, String> partSpec, String replState,
-                                                    Task<? extends Serializable> preCursor) throws SemanticException {
-    HashMap<String, String> mapProp = new HashMap<>();
-    mapProp.put(ReplicationSpec.KEY.CURR_STATE_ID.toString(), replState);
-
-    TableName tName = TableName.fromString(tableName, null, dbName);
-    AlterTableSetPropertiesDesc alterTblDesc = new AlterTableSetPropertiesDesc(tName, partSpec,
-        new ReplicationSpec(replState, replState), false, mapProp, false, false, null);
-
-    Task<? extends Serializable> updateReplIdTask = TaskFactory.get(new DDLWork(inputs, outputs, alterTblDesc,
-                                                                    true, dumpDirectory, metricCollector), conf);
-
-    // Link the update repl state task with dependency collection task
-    if (preCursor != null) {
-      preCursor.addDependentTask(updateReplIdTask);
-      log.debug("Added {}:{} as a precursor of {}:{}", preCursor.getClass(), preCursor.getId(),
-              updateReplIdTask.getClass(), updateReplIdTask.getId());
-    }
-    return updateReplIdTask;
-  }
-
-  private Task<? extends Serializable> dbUpdateReplStateTask(String dbName, String replState,
-                                                             Task<? extends Serializable> preCursor) {
+  private Task<?> dbUpdateReplStateTask(String dbName, String replState, Task<?> preCursor) {
     HashMap<String, String> mapProp = new HashMap<>();
     mapProp.put(ReplicationSpec.KEY.CURR_STATE_ID.toString(), replState);
 
@@ -290,32 +268,24 @@ public class IncrementalLoadTasksBuilder {
     List<Task<? extends Serializable>> tasks = new ArrayList<>();
     Task<? extends Serializable> updateReplIdTask;
 
+    HashMap<String, Integer> dbS = new HashMap<>();
     for (UpdatedMetaDataTracker.UpdateMetaData updateMetaData : updatedMetaDataTracker.getUpdateMetaDataList()) {
       String replState = updateMetaData.getReplState();
       String dbName = updateMetaData.getDbName();
-      String tableName = updateMetaData.getTableName();
-
-      // If any partition is updated, then update repl state in partition object
-
-      for (final Map<String, String> partSpec : updateMetaData.getPartitionsList()) {
-        updateReplIdTask = tableUpdateReplStateTask(dbName, tableName, partSpec, replState, barrierTask);
-        tasks.add(updateReplIdTask);
+      if (dbS.get(dbName) != null) {
+        if (Integer.parseInt(replState) > dbS.get(dbName)) {
+          dbS.put(dbName, Integer.parseInt(replState));
+        }
+      } else {
+        dbS.put(dbName, Integer.parseInt(replState));
       }
-
-
-      // If any table/partition is updated, then update repl state in table object
-      if (tableName != null) {
-        updateReplIdTask = tableUpdateReplStateTask(dbName, tableName, null, replState, barrierTask);
-        tasks.add(updateReplIdTask);
-      }
-
-
-      // For table level load, need not update replication state for the database
-      updateReplIdTask = dbUpdateReplStateTask(dbName, replState, barrierTask);
-      tasks.add(updateReplIdTask);
-
     }
 
+    for (Map.Entry<String, Integer> entry : dbS.entrySet()) {
+      updateReplIdTask = dbUpdateReplStateTask(dbName, String.valueOf(entry.getValue()), barrierTask);
+      // For table level load, need not update replication state for the database
+      tasks.add(updateReplIdTask);
+    }
     if (tasks.isEmpty()) {
       log.debug("No objects need update of repl state: 0 update tracker tasks");
       return importTasks;

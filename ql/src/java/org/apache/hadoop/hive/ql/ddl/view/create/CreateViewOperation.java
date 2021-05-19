@@ -33,6 +33,8 @@ import org.apache.hadoop.hive.ql.metadata.Table;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.util.Map;
+
 /**
  * Operation process of creating a view.
  */
@@ -47,8 +49,9 @@ public class CreateViewOperation extends DDLOperation<CreateViewDesc> {
     if (oldview != null) {
       // Check whether we are replicating
       if (desc.getReplicationSpec().isInReplicationScope()) {
+        Map<String, String> dbParams = context.getDb().getDatabase(oldview.getDbName()).getParameters();
         // if this is a replication spec, then replace-mode semantics might apply.
-        if (desc.getReplicationSpec().allowEventReplacementInto(oldview.getParameters())) {
+        if (desc.getReplicationSpec().allowEventReplacementInto(dbParams)) {
           desc.setReplace(true); // we replace existing view.
         } else {
           LOG.debug("DDLTask: Create View is skipped as view {} is newer than update",
