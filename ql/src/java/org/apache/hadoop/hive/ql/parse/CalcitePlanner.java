@@ -1744,9 +1744,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
     @Override
     public CalcitePlan apply(RelOptCluster cluster, RelOptSchema relOptSchema, SchemaPlus rootSchema) {
-      RelNode calciteGenPlan = null;
-      RelNode calcitePreCboPlan = null;
-      RelNode calciteOptimizedPlan = null;
+      RelNode calcitePlan;
       RelNode calciteEnginePlan = null;
       PerfLogger perfLogger = SessionState.getPerfLogger();
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.PLAN_GENERATION);
@@ -1766,9 +1764,9 @@ public class CalcitePlanner extends SemanticAnalyzer {
       // 1. Gen Calcite Plan
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.OPTIMIZER);
       try {
-        calciteGenPlan = genLogicalPlan(getQB(), true, null, null);
+        calcitePlan = genLogicalPlan(getQB(), true, null, null);
         tabNameToTabObject.markParsingCompleted();
-        sinkRowResolver = relToHiveRR.get(calciteGenPlan);
+        sinkRowResolver = relToHiveRR.get(calcitePlan);
         // if it is to create view, we do not use table alias
         resultSchema = SemanticAnalyzer.convertRowSchemaToResultSetSchema(
             sinkRowResolver,
@@ -1781,10 +1779,14 @@ public class CalcitePlanner extends SemanticAnalyzer {
       perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.PLAN_GENERATION);
       markEvent("Calcite - Plan created");
 
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Initial CBO Plan:\n" + RelOptUtil.toString(calcitePlan));
+      }
+
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.MV_REWRITE_FIELD_TRIMMER);
       // Create executor
       RexExecutor executorProvider = functionHelper.getRexExecutor();
-      calciteGenPlan.getCluster().getPlanner().setExecutor(executorProvider);
+      calcitePlan.getCluster().getPlanner().setExecutor(executorProvider);
 
       // Create and set MD provider
       HiveDefaultRelMetadataProvider mdProvider = new HiveDefaultRelMetadataProvider(conf, HIVE_REL_NODE_CLASSES);
@@ -1792,29 +1794,29 @@ public class CalcitePlanner extends SemanticAnalyzer {
       optCluster.setMetadataQuerySupplier(HiveRelMetadataQuery::new);
       optCluster.invalidateMetadataQuery();
 
-      calciteGenPlan = applyMaterializedViewRewritingByText(
-          ast, calciteGenPlan, optCluster, mdProvider.getMetadataProvider());
+      calcitePlan = applyMaterializedViewRewritingByText(
+          ast, calcitePlan, optCluster, mdProvider.getMetadataProvider());
 
       // We need to get the ColumnAccessInfo and viewToTableSchema for views.
       HiveRelFieldTrimmer.get()
           .trim(HiveRelFactories.HIVE_BUILDER.create(optCluster, null),
-              calciteGenPlan, this.columnAccessInfo, this.viewProjectToTableSchema);
+              calcitePlan, this.columnAccessInfo, this.viewProjectToTableSchema);
       perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.MV_REWRITE_FIELD_TRIMMER);
 
       //Remove subquery
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.REMOVING_SUBQUERY);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Plan before removing subquery:\n" + RelOptUtil.toString(calciteGenPlan));
+        LOG.debug("Plan before removing subquery:\n" + RelOptUtil.toString(calcitePlan));
       }
-      calciteGenPlan = removeSubqueries(calciteGenPlan, mdProvider.getMetadataProvider());
+      calcitePlan = removeSubqueries(calcitePlan, mdProvider.getMetadataProvider());
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Plan just after removing subquery:\n" + RelOptUtil.toString(calciteGenPlan));
+        LOG.debug("Plan after removing subquery:\n" + RelOptUtil.toString(calcitePlan));
       }
       perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.REMOVING_SUBQUERY);
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.DECORRELATION);
-      calciteGenPlan = HiveRelDecorrelator.decorrelateQuery(calciteGenPlan);
+      calcitePlan = HiveRelDecorrelator.decorrelateQuery(calcitePlan);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Plan after decorrelation:\n" + RelOptUtil.toString(calciteGenPlan));
+        LOG.debug("Plan after decorrelation:\n" + RelOptUtil.toString(calcitePlan));
       }
       perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.DECORRELATION);
 
@@ -1827,7 +1829,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       // are supported by the rewriting algorithm.
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.VALIDATE_QUERY_MATERIALIZATION);
       HiveRelOptMaterializationValidator materializationValidator = new HiveRelOptMaterializationValidator();
-      materializationValidator.validate(calciteGenPlan);
+      materializationValidator.validate(calcitePlan);
       setInvalidResultCacheReason(materializationValidator.getResultCacheInvalidReason());
       setMaterializationValidationResult(
           materializationValidator.getAutomaticRewritingValidationResult());
@@ -1835,9 +1837,13 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
       // 2. Apply pre-join order optimizations
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.PREJOIN_ORDERING);
-      calcitePreCboPlan = applyPreJoinOrderingTransforms(calciteGenPlan,
+      calcitePlan = applyPreJoinOrderingTransforms(calcitePlan,
           mdProvider.getMetadataProvider(), executorProvider);
       perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.PREJOIN_ORDERING);
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Plan after pre-join transformations:\n" + RelOptUtil.toString(calcitePlan));
+      }
 
       // 3. Materialized view based rewriting
       // We disable it for CTAS and MV creation queries (trying to avoid any problem
@@ -1849,8 +1855,11 @@ public class CalcitePlanner extends SemanticAnalyzer {
               !getQB().isMaterializedView() && !ctx.isLoadingMaterializedView() && !getQB().isCTAS() &&
               !viewOperations.contains(queryState.getHiveOperation()) &&
               !forViewCreation) {
-        calcitePreCboPlan = applyMaterializedViewRewriting(planner,
-            calcitePreCboPlan, mdProvider.getMetadataProvider(), executorProvider);
+        calcitePlan =
+            applyMaterializedViewRewriting(planner, calcitePlan, mdProvider.getMetadataProvider(), executorProvider);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Plan after view-based rewriting:\n" + RelOptUtil.toString(calcitePlan));
+        }
       }
       perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.MV_REWRITING);
 
@@ -1859,10 +1868,11 @@ public class CalcitePlanner extends SemanticAnalyzer {
       //    the rest of optimizations
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.JOIN_REORDERING);
       if (profilesCBO.contains(ExtendedCBOProfile.JOIN_REORDERING)) {
-        calciteOptimizedPlan = applyJoinOrderingTransform(calcitePreCboPlan,
-            mdProvider.getMetadataProvider(), executorProvider);
+        calcitePlan = applyJoinOrderingTransform(calcitePlan, mdProvider.getMetadataProvider(), executorProvider);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Plan after join transformations:\n" + RelOptUtil.toString(calcitePlan));
+        }
       } else {
-        calciteOptimizedPlan = calcitePreCboPlan;
         disableSemJoinReordering = false;
       }
       markEvent("Calcite - Join order selection");
@@ -1870,39 +1880,44 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
       // 5. Apply post-join order optimizations
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.POSTJOIN_ORDERING);
-      calciteOptimizedPlan = applyPostJoinOrderingTransform(calciteOptimizedPlan,
+      calcitePlan = applyPostJoinOrderingTransform(calcitePlan,
           mdProvider.getMetadataProvider(), executorProvider);
       perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.POSTJOIN_ORDERING);
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Plan after post-join transformations:\n" + RelOptUtil.toString(calcitePlan));
+      }
+      
       // Perform the CTE rewriting near the end of CBO transformations to avoid interference of the new HiveTableSpool 
       // operator with other rules (especially those related to constant folding and branch pruning).
       if (!forViewCreation) {
-        calciteOptimizedPlan = applyCteRewriting(planner, calciteOptimizedPlan, mdProvider.getMetadataProvider(), executorProvider);
+        calcitePlan = applyCteRewriting(planner, calcitePlan, mdProvider.getMetadataProvider(), executorProvider);
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Plan after CTE rewriting:\n{}", RelOptUtil.toString(calciteOptimizedPlan));
+          LOG.debug("Plan after CTE rewriting:\n{}", RelOptUtil.toString(calcitePlan));
         }
       }
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.HIVE_SORT_PREDICATES);
       if (conf.getBoolVar(HiveConf.ConfVars.HIVE_OPTIMIZE_SORT_PREDS_WITH_STATS)) {
-        calciteOptimizedPlan = calciteOptimizedPlan.accept(new HiveFilterSortPredicates(noColsMissingStats));
+        calcitePlan = calcitePlan.accept(new HiveFilterSortPredicates(noColsMissingStats));
       }
       perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.HIVE_SORT_PREDICATES);
       markEvent("Calcite - Post-join order optimization");
 
       if (LOG.isDebugEnabled() && !conf.getBoolVar(ConfVars.HIVE_IN_TEST)) {
         LOG.debug("CBO Planning details:\n");
-        LOG.debug("Original Plan:\n" + RelOptUtil.toString(calciteGenPlan));
+        LOG.debug("Original Plan:\n" + RelOptUtil.toString(calcitePlan));
         LOG.debug("Plan After PPD, PartPruning, ColumnPruning:\n"
-            + RelOptUtil.toString(calcitePreCboPlan));
+            + RelOptUtil.toString(calcitePlan));
         LOG.debug("Plan After Join Reordering:\n"
-            + RelOptUtil.toString(calciteOptimizedPlan, SqlExplainLevel.ALL_ATTRIBUTES));
+            + RelOptUtil.toString(calcitePlan, SqlExplainLevel.ALL_ATTRIBUTES));
       }
 
       if (generateEnginePlan) {
-        calciteEnginePlan = generateEnginePlan(calciteOptimizedPlan,
+        calciteEnginePlan = generateEnginePlan(calcitePlan,
             mdProvider.getMetadataProvider(), executorProvider);
       }
 
-      return CalcitePlan.of(calciteOptimizedPlan, calciteEnginePlan);
+      return CalcitePlan.of(calcitePlan, calciteEnginePlan);
     }
 
     /**
