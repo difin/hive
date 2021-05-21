@@ -56,6 +56,7 @@ import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.io.orc.OrcInputFormat;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.metadata.HiveUtils;
 import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.optimizer.GenMapRedUtils;
@@ -130,6 +131,16 @@ public abstract class TaskCompiler {
 
     boolean isCStats = pCtx.getQueryProperties().isAnalyzeRewrite();
     int outerQueryLimit = pCtx.getQueryProperties().getOuterQueryLimit();
+
+    boolean directInsertCtas = false;
+    if (pCtx.getCreateTable() != null && pCtx.getCreateTable().getStorageHandler() != null) {
+      try {
+        directInsertCtas =
+            HiveUtils.getStorageHandler(conf, pCtx.getCreateTable().getStorageHandler()).directInsertCTAS();
+      } catch (HiveException e) {
+        throw new SemanticException("Failed to load storage handler:  " + e.getMessage());
+      }
+    }
 
     if (pCtx.getFetchTask() != null) {
       if (pCtx.getFetchTask().getTblDesc() == null) {
@@ -270,8 +281,11 @@ public abstract class TaskCompiler {
           setLoadFileLocation(pCtx, lfd);
           oneLoadFileForCtas = false;
         }
-        mvTask.add(TaskFactory
-            .get(new MoveWork(null, null, null, lfd, false)));
+        // for direct insert CTAS, we don't need this MoveTask since the data will be inserted into its final location
+        if (!directInsertCtas) {
+          mvTask.add(TaskFactory
+              .get(new MoveWork(null, null, null, lfd, false)));
+        }
       }
     }
 
@@ -298,7 +312,9 @@ public abstract class TaskCompiler {
 
     decideExecMode(rootTasks, ctx, globalLimitCtx);
 
-    if (pCtx.getQueryProperties().isCTAS() && !pCtx.getCreateTable().isMaterialization()) {
+    // for direct insert CTAS, we don't need this table creation DDL task, since the table will be created
+    // ahead of time by the non-native table
+    if (pCtx.getQueryProperties().isCTAS() && !pCtx.getCreateTable().isMaterialization() && !directInsertCtas) {
       // generate a DDL task and make it a dependent task of the leaf
       CreateTableDesc crtTblDesc = pCtx.getCreateTable();
       crtTblDesc.validate(conf);

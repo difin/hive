@@ -172,6 +172,11 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   }
 
   @Override
+  public boolean directInsertCTAS() {
+    return true;
+  }
+
+  @Override
   public Configuration getConf() {
     return conf;
   }
