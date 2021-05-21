@@ -2124,6 +2124,20 @@ public class MetaStoreUtils {
     return catName;
   }
 
+  /**
+   * Because TABLE_NO_AUTO_COMPACT was originally assumed to be NO_AUTO_COMPACT and then was moved
+   * to no_auto_compact, we need to check it in both cases.
+   */
+  public static boolean isNoAutoCompactSet(Map<String, String> parameters) {
+    String noAutoCompact =
+        parameters.get(hive_metastoreConstants.TABLE_NO_AUTO_COMPACT);
+    if (noAutoCompact == null) {
+      noAutoCompact =
+          parameters.get(hive_metastoreConstants.TABLE_NO_AUTO_COMPACT.toUpperCase());
+    }
+    return noAutoCompact != null && noAutoCompact.equalsIgnoreCase("true");
+  }
+
   // Some util methods from Hive.java, this is copied so as to avoid circular dependency with hive ql
   public static Path getPath(Table table) {
     String location = table.getSd().getLocation();
