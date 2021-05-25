@@ -4258,6 +4258,10 @@ public class HiveConf extends Configuration {
         "remains the default engine for historical reasons, it is itself a historical engine\n" +
         "and is deprecated in Hive 2 line. It may be removed without further warning.", "execution.engine"),
 
+    HIVE_ETL_EXECUTION_ENGINE("hive.etl.execution.engine", "", new StringSet("", Runtime.TEZ.toString()),
+        "Modify this parameter to set a different execution engine for only etl queries. The same engine " +
+            "is used for all the queries if empty."),
+
     HIVE_EXECUTION_MODE("hive.execution.mode", "container", new StringSet("container", "llap"),
         "Chooses whether query fragments will run in container or in llap"),
 
@@ -6399,16 +6403,16 @@ public class HiveConf extends Configuration {
     Runtime runtime = getRuntime();
     Engine engine = Engine.INVALID_ENGINE;
     switch (runtime) {
-    case MR:
-    case TEZ:
-    case SPARK:
-      engine = Engine.HIVE;
-      break;
-    case IMPALA:
-      engine = Engine.IMPALA;
-      break;
-    case INVALID_RUNTIME:
-      throw new RuntimeException(Runtime.INVALID_RUNTIME.toString());
+      case MR:
+      case TEZ:
+      case SPARK:
+        engine = Engine.HIVE;
+        break;
+      case IMPALA:
+        engine = Engine.IMPALA;
+        break;
+      case INVALID_RUNTIME:
+        throw new RuntimeException(Runtime.INVALID_RUNTIME.toString());
     }
     return engine;
   }
@@ -6418,7 +6422,7 @@ public class HiveConf extends Configuration {
    */
   public Runtime getRuntime() {
     try {
-      return Runtime.valueOf(this.getVar(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE).toUpperCase());
+      return Runtime.valueOf(this.getVar(ConfVars.HIVE_EXECUTION_ENGINE).toUpperCase());
     } catch (Exception e) {
       return Runtime.INVALID_RUNTIME;
     }
