@@ -34,8 +34,6 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public class StringSubstrColStart extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
-  private final int colNum;
-
   private int startIdx;
 
   private transient static byte[] EMPTY_STRING;
@@ -51,8 +49,7 @@ public class StringSubstrColStart extends VectorExpression {
   }
 
   public StringSubstrColStart(int colNum, int startIdx, int outputColumnNum) {
-    super(outputColumnNum);
-    this.colNum = colNum;
+    super(colNum, outputColumnNum);
 
     /* Switch from a 1-based start offset (the Hive end user convention) to a 0-based start offset
      * (the internal convention).
@@ -75,7 +72,6 @@ public class StringSubstrColStart extends VectorExpression {
     super();
 
     // Dummy final assignments.
-    colNum = -1;
     startIdx = -1;
   }
 
@@ -126,7 +122,7 @@ public class StringSubstrColStart extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    BytesColumnVector inV = (BytesColumnVector) batch.cols[colNum];
+    BytesColumnVector inV = (BytesColumnVector) batch.cols[inputColumnNum[0]];
     BytesColumnVector outputColVector = (BytesColumnVector) batch.cols[outputColumnNum];
 
     int n = batch.size;
@@ -241,7 +237,7 @@ public class StringSubstrColStart extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, colNum) + ", start " + startIdx;
+    return getColumnParamString(0, inputColumnNum[0]) + ", start " + startIdx;
   }
 
   @Override
