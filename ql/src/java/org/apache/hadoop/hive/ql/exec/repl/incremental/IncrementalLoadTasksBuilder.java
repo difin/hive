@@ -105,6 +105,7 @@ public class IncrementalLoadTasksBuilder {
                                             TaskTracker tracker) throws Exception {
     Task<? extends Serializable> evTaskRoot = TaskFactory.get(new DependencyCollectionWork());
     Task<? extends Serializable> taskChainTail = evTaskRoot;
+    long builderStartTime = System.currentTimeMillis();
     Long lastReplayedEvent = null;
     this.log = log;
     numIteration++;
@@ -178,6 +179,8 @@ public class IncrementalLoadTasksBuilder {
               taskChainTail.getClass(), taskChainTail.getId(),
               barrierTask.getClass(), barrierTask.getId());
     }
+    this.log.info("REPL_INCREMENTAL_LOAD task-builder iteration #{}, duration : {} ms",
+            numIteration, System.currentTimeMillis() - builderStartTime);
     return evTaskRoot;
   }
 
