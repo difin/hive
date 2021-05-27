@@ -91,6 +91,11 @@ public class TestHiveMetastore {
     // CDPD only change since mr is deprecated and throws an exception
     HiveConf conf = new HiveConf(new Configuration(), TestHiveMetastore.class);
     conf.set(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "spark");
+
+    // CDPD only change until HIVE-23207 is backported, and then we will find a way to expose the
+    // init scripts for Iceberg
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.SCHEMA_VERIFICATION, false);
+    conf.set("datanucleus.schema.autoCreateAll", "true");
     start(conf, DEFAULT_POOL_SIZE);
   }
 
