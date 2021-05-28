@@ -74,6 +74,7 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.cache.CachedStore;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
+import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.cleanup.CleanupService;
 import org.apache.hadoop.hive.ql.MapRedStats;
 import org.apache.hadoop.hive.ql.cleanup.SyncCleanupService;
@@ -356,6 +357,20 @@ public class SessionState {
 
   private volatile long waitingTezSession;
 
+  private final Map<String, QueryState> queryStateMap = new HashMap<>();
+
+  public QueryState getQueryState(String queryId) {
+    return queryStateMap.get(queryId);
+  }
+
+  public void addQueryState(String queryId, QueryState queryState) {
+    queryStateMap.put(queryId, queryState);
+  }
+
+  public void removeQueryState(String queryId) {
+    queryStateMap.remove(queryId);
+  }
+  
   public HiveConf getConf() {
     return sessionConf;
   }

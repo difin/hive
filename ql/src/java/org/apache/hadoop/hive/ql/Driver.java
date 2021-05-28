@@ -167,6 +167,10 @@ public class Driver implements IDriver {
     driverContext = new DriverContext(queryState, queryInfo, userName, new HookRunner(queryState.getConf(), CONSOLE),
         txnManager);
     validTxnManager = new ValidTxnManager(this, driverContext);
+
+    if (SessionState.get() != null) {
+      SessionState.get().addQueryState(getConf().get(HiveConf.ConfVars.HIVEQUERYID.varname), queryState);
+    }
   }
 
   /**
@@ -800,6 +804,11 @@ public class Driver implements IDriver {
       } else {
         // only release the related resources ctx, taskQueue as normal
         releaseResources();
+      }
+
+      if (SessionState.get() != null) {
+        // Remove any query state reference from the session state
+        SessionState.get().removeQueryState(getConf().get(HiveConf.ConfVars.HIVEQUERYID.varname));
       }
 
       driverState.lock();
