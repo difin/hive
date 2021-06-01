@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.StatsSetupConst;
+import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.metastore.ColumnType;
 import org.apache.hadoop.hive.metastore.HiveMetaStore;
 import org.apache.hadoop.hive.metastore.TableType;
@@ -2506,6 +2507,10 @@ public class MetaStoreUtils {
    */
   public static List<Predicate<String>> compilePatternsToPredicates(List<String> patterns) {
     return patterns.stream().map(pattern -> compile(pattern).asPredicate()).collect(Collectors.toList());
+  }
+    
+  public static TableName getTableNameFor(Table table) {
+    return TableName.fromString(table.getTableName(), table.getCatName(), table.getDbName());
   }
 
   public enum FailoverEndpoint {

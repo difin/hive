@@ -93,12 +93,11 @@ public class TestGetPartitions extends MetaStoreClientTest {
   @After
   public void tearDown() throws Exception {
     try {
-      if (client != null) {
-        try {
-          client.close();
-        } catch (Exception e) {
-          // HIVE-19729: Shallow the exceptions based on the discussion in the Jira
-        }
+      try {
+        client.dropDatabase(DB_NAME, true, true, true);
+        client.close();
+      } catch (Exception e) {
+        // HIVE-19729: Shallow the exceptions based on the discussion in the Jira
       }
     } finally {
       client = null;
@@ -604,7 +603,9 @@ public class TestGetPartitions extends MetaStoreClientTest {
         Arrays.asList("partcol=a0", "partcol=a1"));
     Assert.assertEquals(2, fetchedParts.size());
     Set<String> vals = new HashSet<>(fetchedParts.size());
-    for (Partition part : fetchedParts) vals.add(part.getValues().get(0));
+    for (Partition part : fetchedParts) {
+      vals.add(part.getValues().get(0));
+    }
     Assert.assertTrue(vals.contains("a0"));
     Assert.assertTrue(vals.contains("a1"));
 
