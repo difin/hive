@@ -5941,7 +5941,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       try {
         Table oldt = get_table_core(catName, dbname, name, null);
         if (transformer != null && !isInTest) {
-          newTable = transformer.transformAlterTable(newTable, processorCapabilities, processorId);
+          newTable = transformer.transformAlterTable(oldt, newTable, processorCapabilities, processorId);
         }
         firePreEvent(new PreAlterTableEvent(oldt, newTable, this));
         alterHandler.alterTable(getMS(), wh, catName, dbname, name, newTable,
