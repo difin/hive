@@ -221,7 +221,7 @@ public final class PlanUtils {
   public static TableDesc getTableDesc(
       Class<? extends Deserializer> serdeClass, String separatorCode,
       String columns, boolean lastColumnTakesRestOfTheLine) {
-    return getTableDesc(serdeClass, separatorCode, columns, null,
+    return getTableDesc(serdeClass, separatorCode, columns, null, null,
         lastColumnTakesRestOfTheLine);
   }
 
@@ -233,20 +233,20 @@ public final class PlanUtils {
   public static TableDesc getDefaultTableDesc(String separatorCode,
       String columns, String columnTypes, boolean lastColumnTakesRestOfTheLine) {
     return getTableDesc(getDefaultSerDe(), separatorCode, columns,
-        columnTypes, lastColumnTakesRestOfTheLine);
+        columnTypes, null, lastColumnTakesRestOfTheLine);
   }
 
   public static TableDesc getTableDesc(Class<? extends Deserializer> serdeClass,
-      String separatorCode, String columns, String columnTypes,
+      String separatorCode, String columns, String columnTypes, List<FieldSchema> partCols,
       boolean lastColumnTakesRestOfTheLine) {
 
-    return getTableDesc(serdeClass, separatorCode, columns, columnTypes,
+    return getTableDesc(serdeClass, separatorCode, columns, columnTypes, partCols,
         lastColumnTakesRestOfTheLine, "TextFile");
   }
 
   public static TableDesc getTableDesc(
       Class<? extends Deserializer> serdeClass, String separatorCode,
-      String columns, String columnTypes, boolean lastColumnTakesRestOfTheLine,
+      String columns, String columnTypes, List<FieldSchema> partCols, boolean lastColumnTakesRestOfTheLine,
       String fileFormat) {
 
     Properties properties = Utilities.makeProperties(
@@ -259,6 +259,13 @@ public final class PlanUtils {
 
     if (columnTypes != null) {
       properties.setProperty(serdeConstants.LIST_COLUMN_TYPES, columnTypes);
+    }
+
+    if (partCols != null && !partCols.isEmpty()) {
+      properties.setProperty(serdeConstants.LIST_PARTITION_COLUMNS,
+          MetaStoreUtils.getColumnNamesFromFieldSchema(partCols));
+      properties.setProperty(serdeConstants.LIST_PARTITION_COLUMN_TYPES,
+          MetaStoreUtils.getColumnTypesFromFieldSchema(partCols, ":"));
     }
 
     if (lastColumnTakesRestOfTheLine) {
@@ -294,7 +301,7 @@ public final class PlanUtils {
   public static TableDesc getDefaultQueryOutputTableDesc(String cols, String colTypes,
       String fileFormat, Class<? extends Deserializer> serdeClass) {
     TableDesc tblDesc =
-        getTableDesc(serdeClass, "" + Utilities.ctrlaCode, cols, colTypes, false, fileFormat);
+        getTableDesc(serdeClass, "" + Utilities.ctrlaCode, cols, colTypes, null, false, fileFormat);
     // enable escaping
     tblDesc.getProperties().setProperty(serdeConstants.ESCAPE_CHAR, "\\");
     tblDesc.getProperties().setProperty(serdeConstants.SERIALIZATION_ESCAPE_CRLF, "true");
@@ -336,7 +343,7 @@ public final class PlanUtils {
         separatorCode = crtTblDesc.getFieldDelim();
       }
 
-      ret = getTableDesc(serdeClass, separatorCode, columns, columnTypes,
+      ret = getTableDesc(serdeClass, separatorCode, columns, columnTypes, crtTblDesc.getPartCols(),
           lastColumnTakesRestOfTheLine);
 
       // set other table properties
@@ -433,7 +440,7 @@ public final class PlanUtils {
         serdeClass = JavaUtils.loadClass(crtViewDesc.getSerde());
       }
 
-      ret = getTableDesc(serdeClass, separatorCode, columns, columnTypes,
+      ret = getTableDesc(serdeClass, separatorCode, columns, columnTypes, crtViewDesc.getPartCols(),
           lastColumnTakesRestOfTheLine);
 
       // set other table properties
