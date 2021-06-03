@@ -8116,11 +8116,24 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       return false;
     }
     boolean directInsertEnabled = conf.getBoolVar(HiveConf.ConfVars.HIVE_ACID_DIRECT_INSERT_ENABLED);
-    boolean directInsert = directInsertEnabled && destTableIsFullAcid && acidOp != AcidUtils.Operation.NOT_ACID;
-    if (LOG.isDebugEnabled() && directInsert) {
-      LOG.debug("Direct insert for ACID tables is enabled.");
+    boolean directUpdateAndDeleteEnabled = conf.getBoolVar(HiveConf.ConfVars.HIVE_ACID_DIRECT_UPDATE_AND_DELETE_ENABLED);
+
+    if (!destTableIsFullAcid || !directInsertEnabled) {
+      return false;
     }
-    return directInsert;
+
+    if (directInsertEnabled && acidOp == AcidUtils.Operation.INSERT) {
+      LOG.info("Direct insert for ACID tables is enabled.");
+      return true;
+    }
+
+    if (directUpdateAndDeleteEnabled
+        && (acidOp == AcidUtils.Operation.UPDATE || acidOp == AcidUtils.Operation.DELETE)) {
+      LOG.info("Direct update and delete for ACID tables are enabled.");
+      return true;
+    }
+
+    return false;
   }
 
   private Path getTmpDir(boolean isNonNativeTable, boolean isMmTable, boolean isDirectInsert,

@@ -90,6 +90,7 @@ public class BaseReplicationScenariosAcidTables {
       put("fs.defaultFS", miniDFSCluster.getFileSystem().getUri().toString());
       put("hive.support.concurrency", "true");
       put("hive.txn.manager", "org.apache.hadoop.hive.ql.lockmgr.DbTxnManager");
+      put("hive.acid.direct.update.and.delete.enabled", "true");
       put("hive.metastore.client.capability.check", "false");
       put("hive.repl.bootstrap.dump.open.txn.timeout", "1s");
       put("hive.exec.dynamic.partition.mode", "nonstrict");

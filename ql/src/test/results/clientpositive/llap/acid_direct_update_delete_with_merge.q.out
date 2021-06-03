@@ -49,7 +49,6 @@ POSTHOOK: query: INSERT INTO transactions PARTITION (tran_date) VALUES
 (10, 'value_10','creation', '20170413')
 POSTHOOK: type: QUERY
 POSTHOOK: Input: _dummy_database@_dummy_table
-POSTHOOK: Output: default@transactions
 POSTHOOK: Output: default@transactions@tran_date=20170410
 POSTHOOK: Output: default@transactions@tran_date=20170413
 POSTHOOK: Lineage: transactions PARTITION(tran_date=20170410).id SCRIPT []
@@ -110,7 +109,6 @@ POSTHOOK: Input: default@transactions
 POSTHOOK: Input: default@transactions@tran_date=20170410
 POSTHOOK: Input: default@transactions@tran_date=20170413
 POSTHOOK: Output: default@merge_tmp_table
-POSTHOOK: Output: default@transactions
 POSTHOOK: Output: default@transactions@tran_date=20170410
 POSTHOOK: Output: default@transactions@tran_date=20170410
 POSTHOOK: Output: default@transactions@tran_date=20170413

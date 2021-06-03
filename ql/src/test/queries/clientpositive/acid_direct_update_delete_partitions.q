@@ -1,6 +1,7 @@
 SET hive.support.concurrency=true;
 SET hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 SET hive.acid.direct.insert.enabled=true;
+set hive.acid.direct.update.and.delete.enabled=true;
 
 DROP TABLE IF EXISTS test_update_part_text;
 DROP TABLE IF EXISTS test_update_part;

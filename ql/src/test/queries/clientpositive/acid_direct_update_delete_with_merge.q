@@ -3,6 +3,8 @@
 set hive.support.concurrency=true;
 set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 set hive.acid.direct.insert.enabled=true;
+set hive.acid.direct.update.and.delete.enabled=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
 
 DROP TABLE IF EXISTS transactions;
 DROP TABLE IF EXISTS merge_source;

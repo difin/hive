@@ -30,9 +30,9 @@ insert into target partition(p,q) values (1,2,1,2), (3,4,1,2), (5,6,1,3), (7,8,2
 insert into source values (1,2,1,2), (3,4,1,2), (5,6,1,3), (7,8,2,2), (111,111,111,111);
 
 -- the extra predicates in when matched clause match 1 partition
-merge into target t using source s on t.a = s.a1 
-when matched and p = 1 and q = 2 then update set b = 1 
-when matched and p = 2 and q = 2 then delete 
+merge into target t using source s on t.a = s.a1
+when matched and p = 1 and q = 2 then update set b = 1
+when matched and p = 2 and q = 2 then delete
 when not matched and a1 > 100 then insert values(s.a1,s.b1,s.p1, s.q1);
 
 drop table if exists target;

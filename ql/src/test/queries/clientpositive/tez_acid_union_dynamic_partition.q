@@ -21,8 +21,8 @@ create table partunion2(id1 int) partitioned by (part1 string) stored as orc tbl
 
 insert into table partunion1 partition(part1)
 select temps.* from (
-select 1 as id1, '2014' as part1 from dummy_n2 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n2
+union all
 select 2 as id1, '2014' as part1 from dummy_n2 ) temps;
 
 select * from partunion1;
@@ -30,8 +30,8 @@ show partitions partunion1;
 
 insert into table partunion2 partition(part1)
 select temps.* from (
-select 1 as id1, '2014' as part1 from dummy_n2 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n2
+union all
 select 2 as id1, '2015' as part1 from dummy_n2 ) temps;
 
 select * from partunion2;

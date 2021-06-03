@@ -38,11 +38,11 @@ POSTHOOK: Lineage: dummy_n7.i SCRIPT []
 PREHOOK: query: select * from dummy_n7
 PREHOOK: type: QUERY
 PREHOOK: Input: default@dummy_n7
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 POSTHOOK: query: select * from dummy_n7
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@dummy_n7
-POSTHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 1
 PREHOOK: query: create table partunion1_n0(id1 int) partitioned by (part1 string) stored as orc tblproperties('transactional'='true', 'transactional_properties'='insert_only')
 PREHOOK: type: CREATETABLE
@@ -77,31 +77,30 @@ POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@partunion1_n3
 PREHOOK: query: insert overwrite table partunion1_n0 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2014' as part1 from dummy_n7
 PREHOOK: type: QUERY
 PREHOOK: Input: default@dummy_n7
 PREHOOK: Output: default@partunion1_n0
 POSTHOOK: query: insert overwrite table partunion1_n0 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2014' as part1 from dummy_n7
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@dummy_n7
-POSTHOOK: Output: default@partunion1_n0
 POSTHOOK: Output: default@partunion1_n0@part1=2014
 POSTHOOK: Lineage: partunion1_n0 PARTITION(part1=2014).id1 EXPRESSION []
 PREHOOK: query: select * from partunion1_n0
 PREHOOK: type: QUERY
 PREHOOK: Input: default@partunion1_n0
 PREHOOK: Input: default@partunion1_n0@part1=2014
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 POSTHOOK: query: select * from partunion1_n0
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@partunion1_n0
 POSTHOOK: Input: default@partunion1_n0@part1=2014
-POSTHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 1	2014
 2	2014
 PREHOOK: query: show partitions partunion1_n0
@@ -112,19 +111,18 @@ POSTHOOK: type: SHOWPARTITIONS
 POSTHOOK: Input: default@partunion1_n0
 part1=2014
 PREHOOK: query: insert overwrite table partunion1_n1 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2015' as part1 from dummy_n7
 PREHOOK: type: QUERY
 PREHOOK: Input: default@dummy_n7
 PREHOOK: Output: default@partunion1_n1
 POSTHOOK: query: insert overwrite table partunion1_n1 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2015' as part1 from dummy_n7
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@dummy_n7
-POSTHOOK: Output: default@partunion1_n1
 POSTHOOK: Output: default@partunion1_n1@part1=2014
 POSTHOOK: Output: default@partunion1_n1@part1=2015
 POSTHOOK: Lineage: partunion1_n1 PARTITION(part1=2014).id1 EXPRESSION []
@@ -134,13 +132,13 @@ PREHOOK: type: QUERY
 PREHOOK: Input: default@partunion1_n1
 PREHOOK: Input: default@partunion1_n1@part1=2014
 PREHOOK: Input: default@partunion1_n1@part1=2015
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 POSTHOOK: query: select * from partunion1_n1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@partunion1_n1
 POSTHOOK: Input: default@partunion1_n1@part1=2014
 POSTHOOK: Input: default@partunion1_n1@part1=2015
-POSTHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 1	2014
 2	2015
 PREHOOK: query: show partitions partunion1_n1
@@ -152,31 +150,30 @@ POSTHOOK: Input: default@partunion1_n1
 part1=2014
 part1=2015
 PREHOOK: query: insert into table partunion1_n2 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2014' as part1 from dummy_n7
 PREHOOK: type: QUERY
 PREHOOK: Input: default@dummy_n7
 PREHOOK: Output: default@partunion1_n2
 POSTHOOK: query: insert into table partunion1_n2 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2014' as part1 from dummy_n7
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@dummy_n7
-POSTHOOK: Output: default@partunion1_n2
 POSTHOOK: Output: default@partunion1_n2@part1=2014
 POSTHOOK: Lineage: partunion1_n2 PARTITION(part1=2014).id1 EXPRESSION []
 PREHOOK: query: select * from partunion1_n2
 PREHOOK: type: QUERY
 PREHOOK: Input: default@partunion1_n2
 PREHOOK: Input: default@partunion1_n2@part1=2014
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 POSTHOOK: query: select * from partunion1_n2
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@partunion1_n2
 POSTHOOK: Input: default@partunion1_n2@part1=2014
-POSTHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 1	2014
 2	2014
 PREHOOK: query: show partitions partunion1_n2
@@ -187,19 +184,18 @@ POSTHOOK: type: SHOWPARTITIONS
 POSTHOOK: Input: default@partunion1_n2
 part1=2014
 PREHOOK: query: insert overwrite table partunion1_n3 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2015' as part1 from dummy_n7
 PREHOOK: type: QUERY
 PREHOOK: Input: default@dummy_n7
 PREHOOK: Output: default@partunion1_n3
 POSTHOOK: query: insert overwrite table partunion1_n3 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2015' as part1 from dummy_n7
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@dummy_n7
-POSTHOOK: Output: default@partunion1_n3
 POSTHOOK: Output: default@partunion1_n3@part1=2014
 POSTHOOK: Output: default@partunion1_n3@part1=2015
 POSTHOOK: Lineage: partunion1_n3 PARTITION(part1=2014).id1 EXPRESSION []
@@ -209,13 +205,13 @@ PREHOOK: type: QUERY
 PREHOOK: Input: default@partunion1_n3
 PREHOOK: Input: default@partunion1_n3@part1=2014
 PREHOOK: Input: default@partunion1_n3@part1=2015
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 POSTHOOK: query: select * from partunion1_n3
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@partunion1_n3
 POSTHOOK: Input: default@partunion1_n3@part1=2014
 POSTHOOK: Input: default@partunion1_n3@part1=2015
-POSTHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 1	2014
 2	2015
 PREHOOK: query: show partitions partunion1_n3

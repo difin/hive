@@ -103,9 +103,9 @@ public class TestAcidOnTez {
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED, false);
     hiveConf.setVar(HiveConf.ConfVars.HIVEMAPREDMODE, "nonstrict");
     hiveConf.setVar(HiveConf.ConfVars.HIVEINPUTFORMAT, HiveInputFormat.class.getName());
-    hiveConf
-        .setVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
-            "org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory");
+    hiveConf.setVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
+        "org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory");
+    hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_ACID_DIRECT_UPDATE_AND_DELETE_ENABLED, true);
     TestTxnDbUtil.setConfValues(hiveConf);
     hiveConf.setInt(MRJobConfig.MAP_MEMORY_MB, 1024);
     hiveConf.setInt(MRJobConfig.REDUCE_MEMORY_MB, 1024);
@@ -838,7 +838,7 @@ ekoifman:apache-hive-3.0.0-SNAPSHOT-bin ekoifman$ tree  ~/dev/hiverwgit/itests/h
     // No transactions - just the header row
     assertEquals(1, rows.size());
   }
- 
+
   /**
    * HIVE-20699
    *
@@ -961,7 +961,7 @@ ekoifman:apache-hive-3.0.0-SNAPSHOT-bin ekoifman$ tree  ~/dev/hiverwgit/itests/h
     conf.set("tez.staging-dir", TEST_DATA_DIR);
     conf.setBoolean("tez.ignore.lib.uris", true);
     conf.set("hive.tez.container.size", "128");
-    conf.setBoolean("hive.merge.tezfiles", false); 
+    conf.setBoolean("hive.merge.tezfiles", false);
     conf.setBoolean("hive.in.tez.test", true);
   }
 

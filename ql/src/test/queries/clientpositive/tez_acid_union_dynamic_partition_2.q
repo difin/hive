@@ -20,8 +20,8 @@ create table partunion1_n1(id1 int) partitioned by (part1 string) stored as orc 
 set hive.merge.tezfiles=true;
 
 insert into table partunion1_n0 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2014' as part1 from dummy_n7;
 
 select * from partunion1_n0;
@@ -29,8 +29,8 @@ select * from partunion1_n0;
 show partitions partunion1_n0;
 
 insert into table partunion1_n1 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2015' as part1 from dummy_n7;
 
 select * from partunion1_n1;

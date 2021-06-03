@@ -4,6 +4,7 @@ SET hive.vectorized.execution.enabled=false;
 set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 set hive.support.concurrency=true;
 set hive.acid.direct.insert.enabled=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
 
 drop table if exists dummy_n7;
 drop table if exists partunion1_n0;
@@ -23,16 +24,16 @@ create table partunion1_n3(id1 int) partitioned by (part1 string) stored as orc 
 set hive.merge.tezfiles=true;
 
 insert overwrite table partunion1_n0 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2014' as part1 from dummy_n7;
 
 select * from partunion1_n0;
 show partitions partunion1_n0;
 
 insert overwrite table partunion1_n1 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2015' as part1 from dummy_n7;
 
 select * from partunion1_n1;
@@ -40,16 +41,16 @@ show partitions partunion1_n1;
 
 
 insert into table partunion1_n2 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2014' as part1 from dummy_n7;
 
 select * from partunion1_n2;
 show partitions partunion1_n2;
 
 insert overwrite table partunion1_n3 partition(part1)
-select 1 as id1, '2014' as part1 from dummy_n7 
-union all 
+select 1 as id1, '2014' as part1 from dummy_n7
+union all
 select 2 as id1, '2015' as part1 from dummy_n7;
 
 select * from partunion1_n3;

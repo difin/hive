@@ -165,6 +165,7 @@ public class TestTxnCommands2 {
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED, false);
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVEOPTIMIZEMETADATAQUERIES, false);
     hiveConf.setVar(HiveConf.ConfVars.DYNAMICPARTITIONINGMODE, "nonstrict");
+    hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_ACID_DIRECT_UPDATE_AND_DELETE_ENABLED, true);
 
     TestTxnDbUtil.setConfValues(hiveConf);
     TestTxnDbUtil.prepDb(hiveConf);
