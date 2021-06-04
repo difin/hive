@@ -78,9 +78,15 @@ public class HiveFilter extends Filter implements HiveRelNode {
       // Loop until we find the first filter that contains a correlated variable.
       // CDPD-24188: Is it possible to have both a having and where clause with
       // a correlated variable?
-      while (input != null && input.getInputs().size() == 1 &&
-          correlatedVars == allVars.size()) {
-        if (input instanceof HiveFilter) {
+      while (input != null && input.getInputs().size() >= 1) {
+        if(input.getInputs().size() > 1) {
+          if (input instanceof HiveJoin) {
+            findCorrelatedVar(((HiveJoin) input).getJoinFilter(), allVars);
+          }
+          return;
+        }
+        if (input instanceof HiveFilter && input.getInputs().size() == 1
+            && correlatedVars == allVars.size()) {
           findCorrelatedVar(((HiveFilter)input).getCondition(), allVars);
         }
         input = input.getInput(0);

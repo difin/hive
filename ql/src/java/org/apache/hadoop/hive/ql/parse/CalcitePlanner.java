@@ -2914,7 +2914,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
     }
 
     private RelNode genJoinRelNode(RelNode leftRel, String leftTableAlias, RelNode rightRel, String rightTableAlias, JoinType hiveJoinType,
-        ASTNode joinCond) throws SemanticException {
+        ASTNode joinCond, ImmutableMap<String, Integer> outerNameToPosMap, RowResolver outerRR) throws SemanticException {
 
       RowResolver leftRR = this.relToHiveRR.get(leftRel);
       RowResolver rightRR = this.relToHiveRR.get(rightRel);
@@ -2924,7 +2924,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
       List<String> namedColumns = null;
       if (joinCond != null) {
         JoinTypeCheckCtx jCtx = new JoinTypeCheckCtx(leftRR, rightRR, cluster.getRexBuilder(), hiveJoinType);
-        RowResolver input = RowResolver.getCombinedRR(leftRR, rightRR);
+        jCtx.setOuterRR(outerRR);
+        RowResolver input = jCtx.getInputRR();
         // named columns join
         // TODO: we can also do the same for semi join but it seems that other
         // DBMS does not support it yet.
@@ -3115,12 +3116,18 @@ public class CalcitePlanner extends SemanticAnalyzer {
         final RelDataType combinedRowType = SqlValidatorUtil.createJoinType(
             cluster.getTypeFactory(), leftRel.getRowType(), rightRel.getRowType(),
             null, ImmutableList.of());
+        topRR = RowResolver.getCombinedRR(leftRR, rightRR);
+        final ImmutableMap<String, Integer> hiveColNameCalcitePosMap =
+          buildHiveToCalciteColumnMap(topRR);
+        calciteJoinCond = new CorrelationConverter(
+          new InputContext(combinedRowType, hiveColNameCalcitePosMap, topRR),
+          outerNameToPosMap, outerRR, subqueryId).apply(calciteJoinCond);
         topRel = HiveJoin.getJoin(
             cluster, leftRel, rightRel,
             HiveCalciteUtil.fixNullability(cluster.getRexBuilder(),
                 calciteJoinCond, RelOptUtil.getFieldTypeList(combinedRowType)),
             calciteJoinType);
-        topRR = RowResolver.getCombinedRR(leftRR, rightRR);
+
         if (namedColumns != null) {
           List<String> tableAliases = new ArrayList<>();
           tableAliases.add(leftTableAlias);
@@ -3144,7 +3151,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
      * @return
      * @throws SemanticException
      */
-    private RelNode genJoinLogicalPlan(QB qb, ASTNode joinParseTree, Map<String, RelNode> aliasToRel)
+    private RelNode genJoinLogicalPlan(QB qb, ASTNode joinParseTree, Map<String, RelNode> aliasToRel,
+                                       ImmutableMap<String, Integer> outerNameToPosMap, RowResolver outerRR)
         throws SemanticException {
       RelNode leftRel = null;
       RelNode rightRel = null;
@@ -3189,7 +3197,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
         leftTableAlias = getTableAlias(left);
         leftRel = aliasToRel.get(leftTableAlias);
       } else if (SemanticAnalyzer.isJoinToken(left)) {
-        leftRel = genJoinLogicalPlan(qb, left, aliasToRel);
+        leftRel = genJoinLogicalPlan(qb, left, aliasToRel, outerNameToPosMap, outerRR);
       } else if (left.getToken().getType() == HiveParser.TOK_LATERAL_VIEW) {
         leftRel = genLateralViewPlans(qb, left, aliasToRel);
       } else {
@@ -3214,7 +3222,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
       ASTNode joinCond = (ASTNode) joinParseTree.getChild(2);
 
       // 5. Create Join rel
-      return genJoinRelNode(leftRel, leftTableAlias, rightRel, rightTableAlias, hiveJoinType, joinCond);
+      return genJoinRelNode(leftRel, leftTableAlias, rightRel, rightTableAlias, hiveJoinType, joinCond,
+        outerNameToPosMap, outerRR);
     }
 
     private RelNode genTableLogicalPlan(String tableAlias, QB qb) throws SemanticException {
@@ -3519,7 +3528,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
               factoredFilterExpression, RelOptUtil.getFieldTypeList(srcRel.getRowType())));
       this.relToHiveColNameCalcitePosMap.put(filterRel, hiveColNameCalcitePosMap);
       relToHiveRR.put(filterRel, relToHiveRR.get(srcRel));
-      relToHiveColNameCalcitePosMap.put(filterRel, hiveColNameCalcitePosMap);
 
       return filterRel;
     }
@@ -5369,7 +5377,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
       // 1.3.2 process the actual join
       if (qb.getParseInfo().getJoinExpr() != null) {
-        srcRel = genJoinLogicalPlan(qb, qb.getParseInfo().getJoinExpr(), aliasToRel);
+        srcRel = genJoinLogicalPlan(qb, qb.getParseInfo().getJoinExpr(), aliasToRel, outerNameToPosMap, outerRR);
       } else {
         // If no join then there should only be either 1 TS or 1 SubQuery
         Map.Entry<String, RelNode> uniqueAliasToRel = aliasToRel.entrySet().iterator().next();
