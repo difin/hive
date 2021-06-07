@@ -373,6 +373,7 @@ KW_INCREMENTAL: 'INCREMENTAL';
 KW_REFRESH: 'REFRESH';
 KW_IGNORE: 'IGNORE';
 KW_RESPECT: 'RESPECT';
+KW_SPEC: 'SPEC';
 
 // Operators
 // NOTE: if you add a new function/operator, add it to sysFuncNames so that describe function _FUNC_ will work.

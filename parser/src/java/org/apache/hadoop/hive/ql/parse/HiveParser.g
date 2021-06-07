@@ -222,6 +222,7 @@ TOK_TABCOLLIST;
 TOK_TABCOL;
 TOK_TABLECOMMENT;
 TOK_TABLEPARTCOLS;
+TOK_TABLEPARTCOLSBYSPEC;
 TOK_TABLEPARTCOLNAMES;
 TOK_TABLEROWFORMAT;
 TOK_TABLEROWFORMATFIELD;
@@ -463,6 +464,13 @@ TOK_WITHIN_GROUP;
 TOK_REFRESH_TABLE;
 TOK_RESPECT_NULLS;
 TOK_IGNORE_NULLS;
+TOK_IDENTITY;
+TOK_YEAR;
+TOK_MONTH;
+TOK_DAY;
+TOK_HOUR;
+TOK_TRUNCATE;
+TOK_BUCKET;
 }
 
 
@@ -659,6 +667,13 @@ import org.apache.hadoop.hive.conf.HiveConf;
     xlateMap.put("KW_AST", "AST");
     xlateMap.put("KW_TRANSACTIONAL", "TRANSACTIONAL");
     xlateMap.put("KW_MANAGED", "MANAGED");
+    xlateMap.put("KW_SPEC", "SPEC");
+    xlateMap.put("KW_YEAR", "YEAR");
+    xlateMap.put("KW_MONTH", "MONTH");
+    xlateMap.put("KW_DAY", "DAY");
+    xlateMap.put("KW_HOUR", "HOUR");
+    xlateMap.put("KW_BUCKET", "BUCKET");
+    xlateMap.put("KW_TRUNCATE", "TRUNCATE");
 
     // Operators
     xlateMap.put("DOT", ".");
@@ -2173,6 +2188,8 @@ createTablePartitionSpec
     : KW_PARTITIONED KW_BY LPAREN (opt1 = createTablePartitionColumnTypeSpec | opt2 = createTablePartitionColumnSpec) RPAREN
     -> {$opt1.tree != null}? $opt1
     -> $opt2
+    | KW_PARTITIONED KW_BY KW_SPEC LPAREN (spec = createTablePartitionTransformSpec) RPAREN
+    -> $spec
     ;
 
 createTablePartitionColumnTypeSpec
@@ -2187,6 +2204,46 @@ createTablePartitionColumnSpec
 @after { popMsg(state); }
     : columnName (COMMA columnName)*
     -> ^(TOK_TABLEPARTCOLNAMES columnName+)
+    ;
+
+createTablePartitionTransformSpec
+@init { pushMsg("create table partition by specification", state); }
+@after { popMsg(state); }
+    : columnNameTransformConstraint (COMMA columnNameTransformConstraint)*
+    -> ^(TOK_TABLEPARTCOLSBYSPEC columnNameTransformConstraint+)
+    ;
+
+columnNameTransformConstraint
+@init { pushMsg("column transform specification", state); }
+@after { popMsg(state); }
+    : partitionTransformType
+    -> ^(TOK_TABCOL partitionTransformType)
+    ;
+
+partitionTransformType
+@init {pushMsg("partitition transform type specification", state); }
+@after { popMsg(state); }
+    : columnName
+    -> {containExcludedCharForCreateTableColumnName($columnName.text)}? {throwColumnNameException()}
+    ->  ^(TOK_IDENTITY columnName)
+    | KW_YEAR LPAREN columnName RPAREN
+    -> {containExcludedCharForCreateTableColumnName($columnName.text)}? {throwColumnNameException()}
+    ->  ^(TOK_YEAR columnName)
+    | KW_MONTH LPAREN columnName RPAREN
+    -> {containExcludedCharForCreateTableColumnName($columnName.text)}? {throwColumnNameException()}
+    ->  ^(TOK_MONTH columnName)
+    | KW_DAY LPAREN columnName RPAREN
+    -> {containExcludedCharForCreateTableColumnName($columnName.text)}? {throwColumnNameException()}
+    ->  ^(TOK_DAY columnName)
+    | KW_HOUR LPAREN columnName RPAREN
+    -> {containExcludedCharForCreateTableColumnName($columnName.text)}? {throwColumnNameException()}
+    ->  ^(TOK_HOUR columnName)
+    | KW_TRUNCATE LPAREN value = Number COMMA columnName RPAREN
+    -> {containExcludedCharForCreateTableColumnName($columnName.text)}? {throwColumnNameException()}
+    ->  ^(TOK_TRUNCATE $value columnName)
+    | KW_BUCKET LPAREN value = Number COMMA columnName RPAREN
+    -> {containExcludedCharForCreateTableColumnName($columnName.text)}? {throwColumnNameException()}
+    ->  ^(TOK_BUCKET $value columnName)
     ;
 
 tableBuckets

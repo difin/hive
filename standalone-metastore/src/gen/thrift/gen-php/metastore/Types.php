@@ -43444,6 +43444,7 @@ final class Constant extends \Thrift\Type\TConstant {
   static protected $DRUID_CONFIG_PREFIX;
   static protected $JDBC_CONFIG_PREFIX;
   static protected $TABLE_IS_CTAS;
+  static protected $PARTITION_TRANSFORM_SPEC;
 
   static protected function init_DDL_TIME() {
     return "transient_lastDdlTime";
@@ -43575,6 +43576,10 @@ final class Constant extends \Thrift\Type\TConstant {
 
   static protected function init_TABLE_IS_CTAS() {
     return "created_with_ctas";
+  }
+
+  static protected function init_PARTITION_TRANSFORM_SPEC() {
+    return "partition_transform_spec";
   }
 }
 

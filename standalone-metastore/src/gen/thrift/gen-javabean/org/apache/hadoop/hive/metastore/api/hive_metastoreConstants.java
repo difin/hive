@@ -102,4 +102,6 @@ import org.slf4j.LoggerFactory;
 
   public static final String TABLE_IS_CTAS = "created_with_ctas";
 
+  public static final String PARTITION_TRANSFORM_SPEC = "partition_transform_spec";
+
 }

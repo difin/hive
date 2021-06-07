@@ -31,6 +31,7 @@ public class SessionStateUtil {
   private static final Logger LOG = LoggerFactory.getLogger(SessionStateUtil.class);
   private static final String COMMIT_INFO_PREFIX = "COMMIT_INFO.";
 
+
   private SessionStateUtil() {
 
   }
