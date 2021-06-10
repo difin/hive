@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql.exec.tez;
 
 import org.apache.hadoop.hive.shims.ShimLoader;
 import org.apache.hadoop.hive.ql.exec.tez.UserPoolMapping.MappingInput;
+import org.apache.hadoop.hive.ql.session.SessionStateUtil;
 import org.apache.hive.common.util.Ref;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -99,9 +100,6 @@ import com.google.common.annotations.VisibleForTesting;
  */
 @SuppressWarnings({"serial"})
 public class TezTask extends Task<TezWork> {
-
-  public static final String HIVE_TEZ_COMMIT_JOB_ID_PREFIX = "hive.tez.commit.job.id.";
-  public static final String HIVE_TEZ_COMMIT_TASK_COUNT_PREFIX = "hive.tez.commit.task.count.";
 
   private static final String CLASS_NAME = TezTask.class.getName();
   private static final String JOB_ID_TEMPLATE = "job_%s%d_%s";
@@ -361,7 +359,6 @@ public class TezTask extends Task<TezWork> {
   }
 
   private void collectCommitInformation(TezWork work) throws IOException, TezException {
-    HiveConf sessionConf = SessionState.get().getConf();
     for (BaseWork w : work.getAllWork()) {
       JobConf jobConf = workToConf.get(w);
       Vertex vertex = workToVertex.get(w);
@@ -377,25 +374,21 @@ public class TezTask extends Task<TezWork> {
         int vertexId = Integer.parseInt(jobIdParts[jobIdParts.length - 1]);
         String jobId = String.format(JOB_ID_TEMPLATE, jobIdParts[1], vertexId, jobIdParts[2]);
 
-        // get all target tables this vertex wrote to
         List<String> tables = new ArrayList<>();
+        Map<String, String> icebergProperties = new HashMap<>();
         for (Map.Entry<String, String> entry : jobConf) {
           if (entry.getKey().startsWith(ICEBERG_SERIALIZED_TABLE_PREFIX)) {
+            // get all target tables this vertex wrote to
             tables.add(entry.getKey().substring(ICEBERG_SERIALIZED_TABLE_PREFIX.length()));
+          } else if (entry.getKey().startsWith(ICEBERG_PROPERTY_PREFIX)) {
+            // find iceberg props in jobConf as they can be needed, but not available, during job commit
+            icebergProperties.put(entry.getKey(), entry.getValue());
           }
         }
-        // save information for each target table (jobID, task num)
-        for (String table : tables) {
-          sessionConf.set(HIVE_TEZ_COMMIT_JOB_ID_PREFIX + table, jobId);
-          sessionConf.setInt(HIVE_TEZ_COMMIT_TASK_COUNT_PREFIX + table,
-              status.getProgress().getSucceededTaskCount());
-        }
-        // save iceberg mr props as they can be needed during job commit (e.g. serialized table)
-        jobConf.forEach(e -> {
-          if (e.getKey().startsWith(ICEBERG_PROPERTY_PREFIX)) {
-            sessionConf.set(e.getKey(), e.getValue());
-          }
-        });
+
+        // save information for each target table
+        tables.forEach(table -> SessionStateUtil.addCommitInfo(jobConf, table, jobId,
+            status.getProgress().getSucceededTaskCount(), icebergProperties));
       }
     }
   }
