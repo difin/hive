@@ -92,12 +92,17 @@ public class GlobalLimitOptimizer extends Transform {
       //    SELECT * FROM (SELECT col1 as col2 (SELECT * FROM ...) t1 LIMIT ...) t2);
       //
       TableScanOperator ts = topOps.values().iterator().next();
-      LimitOperator tempGlobalLimit = checkQbpForGlobalLimit(ts);
 
+      Table tab = ts.getConf().getTableMetadata();
+      if (tab.isNonNative()) {
+        LOG.info("Not enabling limit optimization on non native table: " + tab.getTableName());
+        return pctx;
+      }
+
+      LimitOperator tempGlobalLimit = checkQbpForGlobalLimit(ts);
       // query qualify for the optimization
       if (tempGlobalLimit != null) {
         LimitDesc tempGlobalLimitDesc = tempGlobalLimit.getConf();
-        Table tab = ts.getConf().getTableMetadata();
         Set<FilterOperator> filterOps = OperatorUtils.findOperators(ts, FilterOperator.class);
 
         if (!tab.isPartitioned()) {
