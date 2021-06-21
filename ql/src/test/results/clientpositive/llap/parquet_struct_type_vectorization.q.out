@@ -234,7 +234,7 @@ STAGE PLANS:
                     Filter Vectorization:
                         className: VectorFilterOperator
                         native: true
-                        predicateExpression: FilterLongColGreaterLongScalar(col 4:int, val 500)(children: VectorUDFStructField(col 1:struct<f1:int,f2:string>, col 0:int) -> 4:int)
+                        predicateExpression: FilterLongColGreaterLongScalar(col 5:int, val 500)(children: VectorUDFStructField(col 1:struct<f1:int,f2:string>, col 0:int) -> 5:int)
                     predicate: (st1.f1 > 500) (type: boolean)
                     Statistics: Num rows: 341 Data size: 76542 Basic stats: COMPLETE Column stats: NONE
                     Top N Key Operator
@@ -245,7 +245,7 @@ STAGE PLANS:
                       top n: 10
                       Top N Key Vectorization:
                           className: VectorTopNKeyOperator
-                          keyExpressions: VectorUDFStructField(col 1:struct<f1:int,f2:string>, col 0:int) -> 5:int
+                          keyExpressions: VectorUDFStructField(col 1:struct<f1:int,f2:string>, col 0:int) -> 6:int
                           native: true
                       Select Operator
                         expressions: st1.f1 (type: int)
@@ -253,16 +253,16 @@ STAGE PLANS:
                         Select Vectorization:
                             className: VectorSelectOperator
                             native: true
-                            projectedOutputColumnNums: [4]
-                            selectExpressions: VectorUDFStructField(col 1:struct<f1:int,f2:string>, col 0:int) -> 4:int
+                            projectedOutputColumnNums: [5]
+                            selectExpressions: VectorUDFStructField(col 1:struct<f1:int,f2:string>, col 0:int) -> 5:int
                         Statistics: Num rows: 341 Data size: 76542 Basic stats: COMPLETE Column stats: NONE
                         Group By Operator
                           aggregations: sum(_col0)
                           Group By Vectorization:
-                              aggregators: VectorUDAFSumLong(col 4:int) -> bigint
+                              aggregators: VectorUDAFSumLong(col 5:int) -> bigint
                               className: VectorGroupByOperator
                               groupByMode: HASH
-                              keyExpressions: col 4:int
+                              keyExpressions: col 5:int
                               native: false
                               vectorProcessingMode: HASH
                               projectedOutputColumnNums: [0]

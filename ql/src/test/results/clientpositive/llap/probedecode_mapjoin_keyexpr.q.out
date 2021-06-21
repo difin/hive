@@ -252,12 +252,12 @@ STAGE PLANS:
                   Statistics: Num rows: 1 Data size: 184 Basic stats: COMPLETE Column stats: NONE
                   TableScan Vectorization:
                       native: true
-                      vectorizationSchemaColumns: [0:l_orderkey:string, 1:l_partkey:bigint, 2:l_suppkey:bigint, 3:l_linenumber:int, 4:l_quantity:decimal(12,2)/DECIMAL_64, 5:l_extendedprice:decimal(12,2)/DECIMAL_64, 6:l_discount:decimal(12,2)/DECIMAL_64, 7:l_tax:decimal(12,2)/DECIMAL_64, 8:l_returnflag:string, 9:l_linestatus:string, 10:l_shipdate:string, 11:l_commitdate:string, 12:l_receiptdate:string, 13:l_shipinstruct:string, 14:l_shipmode:string, 15:l_comment:string, 16:ROW__ID:struct<writeid:bigint,bucketid:int,rowid:bigint>]
+                      vectorizationSchemaColumns: [0:l_orderkey:string, 1:l_partkey:bigint, 2:l_suppkey:bigint, 3:l_linenumber:int, 4:l_quantity:decimal(12,2)/DECIMAL_64, 5:l_extendedprice:decimal(12,2)/DECIMAL_64, 6:l_discount:decimal(12,2)/DECIMAL_64, 7:l_tax:decimal(12,2)/DECIMAL_64, 8:l_returnflag:string, 9:l_linestatus:string, 10:l_shipdate:string, 11:l_commitdate:string, 12:l_receiptdate:string, 13:l_shipinstruct:string, 14:l_shipmode:string, 15:l_comment:string, 16:ROW__ID:struct<writeid:bigint,bucketid:int,rowid:bigint>, 17:ROW__IS__DELETED:boolean]
                   Filter Operator
                     Filter Vectorization:
                         className: VectorFilterOperator
                         native: true
-                        predicateExpression: SelectColumnIsNotNull(col 17:double)(children: CastStringToDouble(col 0:string) -> 17:double)
+                        predicateExpression: SelectColumnIsNotNull(col 18:double)(children: CastStringToDouble(col 0:string) -> 18:double)
                     predicate: UDFToDouble(l_orderkey) is not null (type: boolean)
                     Statistics: Num rows: 1 Data size: 184 Basic stats: COMPLETE Column stats: NONE
                     Select Operator
@@ -318,12 +318,12 @@ STAGE PLANS:
                   Statistics: Num rows: 1 Data size: 1944 Basic stats: COMPLETE Column stats: NONE
                   TableScan Vectorization:
                       native: true
-                      vectorizationSchemaColumns: [0:l_orderkey:bigint, 1:l_partkey:bigint, 2:l_suppkey:bigint, 3:l_linenumber:int, 4:l_quantity:decimal(12,2)/DECIMAL_64, 5:l_extendedprice:decimal(12,2)/DECIMAL_64, 6:l_discount:decimal(12,2)/DECIMAL_64, 7:l_tax:decimal(12,2)/DECIMAL_64, 8:l_returnflag:string, 9:l_linestatus:string, 10:l_shipdate:string, 11:l_commitdate:string, 12:l_receiptdate:string, 13:l_shipinstruct:string, 14:l_shipmode:string, 15:l_comment:string, 16:ROW__ID:struct<writeid:bigint,bucketid:int,rowid:bigint>]
+                      vectorizationSchemaColumns: [0:l_orderkey:bigint, 1:l_partkey:bigint, 2:l_suppkey:bigint, 3:l_linenumber:int, 4:l_quantity:decimal(12,2)/DECIMAL_64, 5:l_extendedprice:decimal(12,2)/DECIMAL_64, 6:l_discount:decimal(12,2)/DECIMAL_64, 7:l_tax:decimal(12,2)/DECIMAL_64, 8:l_returnflag:string, 9:l_linestatus:string, 10:l_shipdate:string, 11:l_commitdate:string, 12:l_receiptdate:string, 13:l_shipinstruct:string, 14:l_shipmode:string, 15:l_comment:string, 16:ROW__ID:struct<writeid:bigint,bucketid:int,rowid:bigint>, 17:ROW__IS__DELETED:boolean]
                   Filter Operator
                     Filter Vectorization:
                         className: VectorFilterOperator
                         native: true
-                        predicateExpression: FilterExprAndExpr(children: SelectColumnIsNotNull(col 0:bigint), SelectColumnIsNotNull(col 17:double)(children: CastLongToDouble(col 0:bigint) -> 17:double))
+                        predicateExpression: FilterExprAndExpr(children: SelectColumnIsNotNull(col 0:bigint), SelectColumnIsNotNull(col 18:double)(children: CastLongToDouble(col 0:bigint) -> 18:double))
                     predicate: (l_orderkey is not null and UDFToDouble(l_orderkey) is not null) (type: boolean)
                     Statistics: Num rows: 1 Data size: 1944 Basic stats: COMPLETE Column stats: NONE
                     Select Operator

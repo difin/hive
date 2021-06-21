@@ -247,7 +247,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColGreaterEqualLongScalar(col 0:int, val 100) -> 4:boolean, LongColLessEqualLongScalar(col 0:int, val 102) -> 5:boolean
+                        selectExpressions: LongColGreaterEqualLongScalar(col 0:int, val 100) -> 5:boolean, LongColLessEqualLongScalar(col 0:int, val 102) -> 6:boolean
                     Statistics: Num rows: 6 Data size: 620 Basic stats: COMPLETE Column stats: COMPLETE
                     Map Join Operator
                       condition map:
@@ -418,7 +418,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColGreaterEqualLongScalar(col 0:int, val 100) -> 4:boolean, LongColLessEqualLongScalar(col 0:int, val 102) -> 5:boolean
+                        selectExpressions: LongColGreaterEqualLongScalar(col 0:int, val 100) -> 5:boolean, LongColLessEqualLongScalar(col 0:int, val 102) -> 6:boolean
                     Statistics: Num rows: 6 Data size: 620 Basic stats: COMPLETE Column stats: COMPLETE
                     Map Join Operator
                       condition map:
@@ -738,7 +738,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
                     Map Join Operator
                       condition map:
@@ -945,7 +945,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       null sort order: 
@@ -1242,7 +1242,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       null sort order: 
@@ -1393,7 +1393,7 @@ STAGE PLANS:
                       Select Vectorization:
                           className: VectorSelectOperator
                           native: true
-                          selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                          selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                       Statistics: Num rows: 3 Data size: 297 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col1 (type: int)
@@ -1501,7 +1501,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       null sort order: 
@@ -1651,7 +1651,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       null sort order: 
@@ -1948,7 +1948,7 @@ STAGE PLANS:
                       Select Vectorization:
                           className: VectorSelectOperator
                           native: true
-                          selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                          selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                       Statistics: Num rows: 4 Data size: 400 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col1 (type: int)
@@ -2093,7 +2093,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       null sort order: 
@@ -2128,7 +2128,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       null sort order: 
@@ -2265,7 +2265,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       null sort order: 
@@ -2468,7 +2468,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       null sort order: 
@@ -2601,7 +2601,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 6 Data size: 596 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
@@ -2638,7 +2638,7 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 4:boolean
+                        selectExpressions: LongColumnBetween(col 0:int, left 100, right 102) -> 5:boolean
                     Statistics: Num rows: 4 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
