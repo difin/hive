@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.impala.plan;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.impala.catalog.ImpalaKuduTable;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -28,6 +29,7 @@ import org.apache.hadoop.hive.impala.prune.ImpalaBasicHdfsTable;
 import org.apache.hadoop.hive.impala.prune.ImpalaBasicHdfsTable.TableWithPartitionNames;
 import org.apache.impala.catalog.Db;
 import org.apache.impala.catalog.HdfsTable;
+import org.apache.impala.catalog.Table;
 import org.apache.impala.common.ImpalaException;
 import org.apache.impala.util.EventSequence;
 import org.slf4j.Logger;
@@ -37,6 +39,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.apache.impala.catalog.KuduTable.isKuduTable;
 
 /**
  * This class manages the loading of table and partitions metadata (which includes file
@@ -50,8 +54,8 @@ import java.util.Set;
 public class ImpalaTableLoader {
   private static final Logger LOG = LoggerFactory.getLogger(ImpalaTableLoader.class);
 
-  private final Map<HdfsTable, Set<String>> tablePartitionMap;
-  private final Map<String, ImpalaHdfsTable> tableMap;
+  private final Map<org.apache.impala.catalog.Table, Set<String>> tablePartitionMap;
+  private final Map<String, org.apache.impala.catalog.Table> tableMap;
   private final Map<String, org.apache.hadoop.hive.metastore.api.Database> dbMap;
   private final EventSequence timeline;
   private final ImpalaQueryContext queryContext;
@@ -64,8 +68,17 @@ public class ImpalaTableLoader {
     this.queryContext = queryContext;
   }
 
-  public HdfsTable loadHdfsTable(Hive db, HiveConf conf,
-      org.apache.hadoop.hive.metastore.api.Table msTbl) throws HiveException {
+  /**
+   * creates and returns new impala table
+   * @param db Database
+   * @param conf Hive configuration
+   * @param msTbl Metastore table
+   * @return table object from tableMap (of type ImpalaHdfsTable or ImpalaKuduTable)
+   * @throws HiveException
+   * @throws MetaException
+   */
+  public Table loadImpalaTable(Hive db, HiveConf conf, org.apache.hadoop.hive.metastore.api.Table msTbl)
+          throws HiveException, MetaException {
     org.apache.hadoop.hive.metastore.api.Database msDb = dbMap.get(msTbl.getDbName());
     if (msDb == null) {
       // cache the Database object to avoid rpc to the metastore for future requests
@@ -73,17 +86,26 @@ public class ImpalaTableLoader {
       dbMap.put(msTbl.getDbName(), msDb);
     }
     String fqn = getFullyQualifiedName(msTbl);
-    ImpalaHdfsTable hdfsTable = tableMap.get(fqn);
-    if (hdfsTable == null) {
-      org.apache.impala.catalog.Db impalaDb = new Db(msTbl.getDbName(), msDb);
-      hdfsTable = new ImpalaHdfsTable(conf, msTbl, impalaDb, msTbl.getTableName(), msTbl.getOwner());
-      tableMap.put(fqn, hdfsTable);
-      tablePartitionMap.put(hdfsTable, new HashSet<>());
+    Table impalaTable = tableMap.get(fqn);
+    if (impalaTable != null) {
+      return impalaTable;
     }
-    return hdfsTable;
+
+    org.apache.impala.catalog.Db impalaDb = new Db(msTbl.getDbName(), msDb);
+    impalaTable = isKuduTable(msTbl)
+        ? new ImpalaKuduTable(msTbl, impalaDb, msTbl.getTableName(), msTbl.getOwner())
+        : new ImpalaHdfsTable(conf, msTbl, impalaDb, msTbl.getTableName(), msTbl.getOwner());
+    tableMap.put(fqn, impalaTable);
+    tablePartitionMap.put(impalaTable, new HashSet<>());
+    return impalaTable;
   }
 
-  public ImpalaHdfsTable getHdfsTable(org.apache.hadoop.hive.metastore.api.Table table) {
+  /**
+   * Fetches impala table from tableMap
+   * @param table Metastore table
+   * @return table object from tableMap (of type ImpalaHdfsTable or ImpalaKuduTable)
+   */
+  public Table getImpalaTable(org.apache.hadoop.hive.metastore.api.Table table) {
     return tableMap.get(getFullyQualifiedName(table));
   }
 
@@ -91,9 +113,10 @@ public class ImpalaTableLoader {
     return msTbl.getDbName() + "." + msTbl.getTableName();
   }
 
-  public void loadTablesAndPartitions(Hive db, ValidTxnWriteIdList txnWriteIdList) throws HiveException {
-    timeline.markEvent("Metadata load started, loading " + queryContext.getBasicTables().size() +
-        " tables.");
+  public void loadTablesAndPartitions(Hive db, ValidTxnWriteIdList txnWriteIdList)
+          throws HiveException {
+    timeline.markEvent("Metadata load started, loading " + queryContext.getBasicTables().size()
+            + " tables.");
     for (TableWithPartitionNames tableWithNames : queryContext.getBasicTables()) {
       ImpalaBasicHdfsTable basicTable = tableWithNames.getTable();
       LOG.info("Loading metadata for table " + basicTable.getName());
@@ -103,12 +126,18 @@ public class ImpalaTableLoader {
           // Lets get this specific table's write id list
           validWriteIdList = txnWriteIdList.getTableValidWriteIdList(basicTable.getFullName());
         }
-        tableMap.put(getFullyQualifiedName(basicTable.getMetaStoreTable()),
-            ImpalaHdfsTable.create(queryContext.getConf(), basicTable,
-                tableWithNames.getPartitionNames(), validWriteIdList));
+
+        // load only one type of table (ImpalaHdfsTable or ImpalaKuduTable) in tableMap,
+        // depending on the type of query
+        Table impalaTable = isKuduTable(basicTable.getMetaStoreTable())
+            ? new ImpalaKuduTable(basicTable.getMetaStoreTable(), basicTable.getDb(), basicTable.getName(),
+            basicTable.getOwnerUser())
+            : ImpalaHdfsTable.create(queryContext.getConf(), basicTable, tableWithNames.getPartitionNames(),
+            validWriteIdList);
+        tableMap.put(getFullyQualifiedName(basicTable.getMetaStoreTable()), impalaTable);
       } catch (ImpalaException|MetaException e) {
-        timeline.markEvent("Metadata load failed for table " + basicTable.getName() + ". Completed" +
-            " for " + tableMap.entrySet().size() + " tables.");
+        timeline.markEvent("Metadata load failed for table " + basicTable.getName() +
+                ". Completed" + " for " + tableMap.entrySet().size() + " tables.");
         throw new HiveException(e);
       }
     }

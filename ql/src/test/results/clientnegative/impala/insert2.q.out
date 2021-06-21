@@ -54,4 +54,4 @@ HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
-FAILED: RuntimeException org.apache.hadoop.hive.ql.parse.SemanticException: Insert operation against org.apache.hadoop.hive.ql.io.orc.OrcInputFormat is not supported by Impala. Only the text or Parquet tables are supported.
+FAILED: RuntimeException org.apache.hadoop.hive.ql.parse.SemanticException: Insert operation against org.apache.hadoop.hive.ql.io.orc.OrcInputFormat is not supported by Impala. Only the text, Parquet, and Kudu tables are supported.

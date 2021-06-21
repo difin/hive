@@ -8752,9 +8752,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
     if (!(
         inputFormat.equalsIgnoreCase("org.apache.hadoop.mapred.TextInputFormat") ||
-        inputFormat.equalsIgnoreCase("org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"))) {
+        inputFormat.equalsIgnoreCase("org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat") ||
+        inputFormat.equalsIgnoreCase("org.apache.hadoop.hive.kudu.KuduInputFormat"))) {
       throw new SemanticException("Insert operation against " + inputFormat +
-          " is not supported by Impala. Only the text or Parquet tables are supported.");
+          " is not supported by Impala. Only the text, Parquet, and Kudu tables are supported.");
     }
   }
 

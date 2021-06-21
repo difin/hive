@@ -63,15 +63,18 @@ import org.apache.impala.analysis.JoinOperator;
 import org.apache.impala.planner.HashJoinNode;
 import org.apache.impala.planner.JoinNode;
 import org.apache.impala.planner.JoinNode.DistributionMode;
+import org.apache.impala.planner.ScanNode;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.impala.catalog.KuduTable.isKuduTable;
+
 public class ImpalaHdfsScanRel extends ImpalaPlanRel {
 
-  private PlanNode hdfsScanNode = null;
+  private PlanNode impalaScanNode = null;
   private final HiveTableScan scan;
   private final HiveFilter filter;
   private final Hive db;
@@ -99,8 +102,8 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
   @Override
   public PlanNode getPlanNode(ImpalaPlannerContext ctx) throws ImpalaException, HiveException,
       MetaException {
-    if (hdfsScanNode != null) {
-      return hdfsScanNode;
+    if (impalaScanNode != null) {
+      return impalaScanNode;
     }
 
     String tableName = scan.getTable().getQualifiedName().get(1);
@@ -114,8 +117,6 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
           "Table %s is an Iceberg table format which is not currently supported.",
           tableName));
     }
-
-    List<FeFsPartition> feFsPartitions = Lists.newArrayList();
 
     ImpalaPrunedPartitionList prunedPartList =
         (ImpalaPrunedPartitionList) ((RelOptHiveTable) scan.getTable()).getPrunedPartitionList();
@@ -142,18 +143,12 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
     TableRef tblRef = new TableRef(impalaTblName.toPath(), alias);
     ImpalaBasicAnalyzer basicAnalyzer = (ImpalaBasicAnalyzer) ctx.getRootAnalyzer();
     // save the mapping from table name to impala Table
-    ImpalaHdfsTable impalaHdfsTable =
-        ctx.getTableLoader().getHdfsTable(prunedPartList.getMetaStoreTable());
-    basicAnalyzer.setTable(impalaTblName, impalaHdfsTable);
+    org.apache.impala.catalog.Table impalaTable =
+        ctx.getTableLoader().getImpalaTable(prunedPartList.getMetaStoreTable());
+    basicAnalyzer.setTable(impalaTblName, impalaTable);
     Path resolvedPath = ctx.getRootAnalyzer().resolvePath(tblRef.getPath(), Path.PathType.TABLE_REF);
 
     ImpalaBaseTableRef baseTblRef = new ImpalaBaseTableRef(tblRef, resolvedPath, basicAnalyzer);
-
-    // Fetch a sorted list of basic partitions such that when the scan ranges are computed
-    // by the HdfsScanNode, they are in some deterministic order. This allows the backend
-    // to schedule the scan ranges to different nodes in a more predictable manner.
-    List<FeFsPartition> impalaPartitions =
-        impalaHdfsTable.getPartitions(prunedPartList.getSortedBasicPartitions());
 
     TupleDescriptor tupleDesc =
         createTupleAndSlotDesc(baseTblRef, scan.getPrunedRowType(), basicAnalyzer);
@@ -166,28 +161,43 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
     // after partition pruning.  We pass in partition conjuncts because we don't want
     // the partition conjuncts to be used in the filter condition. This will also validate
     // that the existing partition conjuncts found at pruning time are still present in the
-    // filter as a check to make sure that the partiton conjunct wasn't stripped out of
+    // filter as a check to make sure that the partition conjunct wasn't stripped out of
     // the filter. Since partition pruning has already been done, we do not add any new
     // partition conjuncts, even if it is on a partitioned column.  It will be added to
-    // the nonpartitioned conjuncts.
+    // the non partitioned conjuncts.
     ImpalaConjuncts assignedConjuncts = ImpalaConjuncts.create(filter,
         partitionConjuncts, basicAnalyzer, this, getCluster().getRexBuilder());
     List<Expr> impalaAssignedConjuncts = assignedConjuncts.getImpalaNonPartitionConjuncts();
     List<Expr> impalaPartitionConjuncts = assignedConjuncts.getImpalaPartitionConjuncts();
 
-    this.nodeInfo = new ImpalaNodeInfo(impalaAssignedConjuncts, tupleDesc);
     PlanNodeId nodeId = ctx.getNextNodeId();
 
-    if (SingleNodePlanner.addAcidSlotsIfNeeded(basicAnalyzer, baseTblRef, impalaPartitions)) {
-      hdfsScanNode = createAcidJoinNode(ctx, ctx.getRootAnalyzer(), baseTblRef,
-          impalaAssignedConjuncts, impalaPartitions, impalaPartitionConjuncts);
+    if (isKuduTable(prunedPartList.getMetaStoreTable())) {
+      // KuduScanNode extracts predicates from conjuncts that can be pushed down to Kudu,
+      // hence impalaAssignedConjuncts is made mutable
+      List<Expr> mutableAssignedConjuncts = new ArrayList<>(impalaAssignedConjuncts);
+      ImpalaNodeInfo scanNodeInfo = new ImpalaNodeInfo(mutableAssignedConjuncts, tupleDesc);
+      impalaScanNode = new ImpalaKuduScanNode(nodeId, aggInfo, scanNodeInfo, tblRef);
+      impalaScanNode.init(ctx.getRootAnalyzer());
     } else {
-      hdfsScanNode = new ImpalaHdfsScanNode(nodeId, impalaPartitions, baseTblRef, aggInfo,
-          impalaPartitionConjuncts, nodeInfo);
-      hdfsScanNode.init(ctx.getRootAnalyzer());
-    }
+      ImpalaHdfsTable impalaHdfsTable = (ImpalaHdfsTable) impalaTable;
+      // Fetch a sorted list of basic partitions such that when the scan ranges are computed
+      // by the HdfsScanNode, they are in some deterministic order. This allows the backend
+      // to schedule the scan ranges to different nodes in a more predictable manner.
+      List<FeFsPartition> impalaPartitions =
+          impalaHdfsTable.getPartitions(prunedPartList.getSortedBasicPartitions());
 
-    return hdfsScanNode;
+      if (SingleNodePlanner.addAcidSlotsIfNeeded(basicAnalyzer, baseTblRef, impalaPartitions)) {
+        impalaScanNode = createAcidJoinNode(ctx, ctx.getRootAnalyzer(), baseTblRef,
+            impalaAssignedConjuncts, impalaPartitions, impalaPartitionConjuncts);
+      } else {
+        ImpalaNodeInfo scanNodeInfo = new ImpalaNodeInfo(impalaAssignedConjuncts, tupleDesc);
+        impalaScanNode = new ImpalaHdfsScanNode(nodeId, impalaPartitions, baseTblRef, aggInfo,
+            impalaPartitionConjuncts, scanNodeInfo);
+        impalaScanNode.init(ctx.getRootAnalyzer());
+      }
+    }
+    return impalaScanNode;
   }
 
   // Create tuple and slot descriptors for this base table

@@ -141,6 +141,8 @@ public final class KuduHiveUtils {
       return TypeInfoFactory.stringTypeInfo;
     case BINARY:
       return TypeInfoFactory.binaryTypeInfo;
+    case DATE:
+      return TypeInfoFactory.dateTypeInfo;
     default:
       throw new SerDeException("Unsupported column type: " + kuduType);
     }

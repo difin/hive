@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import org.apache.hadoop.hive.impala.catalog.ImpalaKuduTable;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.ql.metadata.Partition;
@@ -219,7 +220,8 @@ public class TargetHelper {
     if (targetedColNames == null) {
       // The case where no list is provided. Find the last location of the nonpartitioned
       // column, and all other result expressions are for partitioned columns
-      Preconditions.checkState(impalaTable instanceof HdfsTable);
+      Preconditions.checkState(impalaTable instanceof HdfsTable ||
+          impalaTable instanceof ImpalaKuduTable);
       IntStream.range(impalaTable.getNonClusteringColumns().size(),
           selectResultExprs.size()).forEach(dynPartitionColPositions::add);
     } else {

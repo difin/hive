@@ -30,6 +30,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ResultMethod;
 import org.apache.hadoop.hive.impala.ImpalaEventSequence;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.ql.engine.EngineEventSequence;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -43,13 +44,17 @@ import org.apache.impala.analysis.JoinOperator;
 import org.apache.impala.analysis.SortInfo;
 import org.apache.impala.catalog.FeTable;
 import org.apache.impala.catalog.HdfsTable;
+import org.apache.impala.catalog.Table;
+import org.apache.impala.common.AnalysisException;
 import org.apache.impala.common.ImpalaException;
+import org.apache.impala.common.ImpalaRuntimeException;
 import org.apache.impala.common.Pair;
 import org.apache.impala.compat.MetastoreShim;
 import org.apache.impala.planner.DataPartition;
 import org.apache.impala.planner.DistributedPlanner;
 import org.apache.impala.planner.HdfsTableSink;
 import org.apache.impala.planner.JoinNode;
+import org.apache.impala.planner.KuduTableSink;
 import org.apache.impala.planner.NestedLoopJoinNode;
 import org.apache.impala.planner.ParallelPlanner;
 import org.apache.impala.planner.PlanFragment;
@@ -303,7 +308,7 @@ public class ImpalaPlanner {
     return sb.toString();
   }
 
-  void initTargetTable() throws HiveException {
+  void initTargetTable() throws HiveException, MetaException {
     if (stmtType_ == TStmtType.DML) {
       ctx_.initTxnId();
       // Use FileSinkDesc to determine expected location of query results
@@ -314,7 +319,7 @@ public class ImpalaPlanner {
         tab = part.getTable();
       }
 
-      HdfsTable hdfsTable = null;
+      Table impalaTable = null;
 
       if (tab != null ) {
         org.apache.hadoop.hive.metastore.api.Table msTbl = tab.getTTable();
@@ -325,21 +330,21 @@ public class ImpalaPlanner {
             if (msTbl.getSd().getLocation() == null || msTbl.getSd().getLocation().isEmpty()) {
               msTbl.getSd().setLocation(MetastoreShim.getPathForNewTable(msDb, msTbl));
             }
-            hdfsTable = HdfsTable.createCtasTarget(new org.apache.impala.catalog.Db(msTbl.getDbName(), msDb),  msTbl);
+            impalaTable = HdfsTable.createCtasTarget(new org.apache.impala.catalog.Db(msTbl.getDbName(), msDb),  msTbl);
           } catch (Exception e) {
             throw new HiveException(e);
           }
         } else {
           // Load the target table
-          hdfsTable = ctx_.getTableLoader().loadHdfsTable(db_, ctx_.getQueryContext().getConf(), msTbl);
+          impalaTable = ctx_.getTableLoader().loadImpalaTable(db_, ctx_.getQueryContext().getConf(), msTbl);
         }
       }
 
-      if (hdfsTable != null) {
-        ctx_.setTargetTable(hdfsTable);
-      }
       if (part != null) {
         ctx_.setTargetPartition(part);
+      }
+      if (impalaTable != null) {
+        ctx_.setTargetTable(impalaTable);
       }
     }
   }
@@ -356,8 +361,12 @@ public class ImpalaPlanner {
    * This function calls Impala's DistributedPlanner to create the plan fragments and does
    * some post-processing.  It is loosely based on Impala's Planner.createPlan() function.
    * @param planNodeRoot root node of the Impala physical plan
+   * @param destination path to the target table if the table is not null
+   * @param isOverwrite true if it is an INSERT OVERWRITE statement
+   * @param writeId write ID of the target table if the table is not null
    * @return list of plan fragments in the order [root fragment, child of root ... leaf fragment]
    * @throws ImpalaException
+   * @throws HiveException
    */
   private List<PlanFragment> createPlanFragments(PlanNode planNodeRoot, Path destination,
       boolean isOverwrite, long writeId)
@@ -461,23 +470,9 @@ public class ImpalaPlanner {
       }
       List<Integer> referencedColumns = new ArrayList<>(); // Kudu only position mapping
       boolean isUpsert = false; // Kudu only upsert
-      TableSink sink = TableSink.create(ctx_.getTargetTable(),
-            isUpsert ? TableSink.Op.UPSERT : TableSink.Op.INSERT,
-            partitionKeyExprs, resultExprs, referencedColumns,
-            isOverwrite, inputIsClustered, new Pair<>(sortColumns, TSortingOrder.LEXICAL),
-            writeId, null, 0);
-      Preconditions.checkState(sink instanceof HdfsTableSink, "Currently only HDFS table sinks are supported");
-      Preconditions.checkNotNull(destination, "Invalid destination for Impala sink");
-      HdfsTableSink s = (HdfsTableSink) sink;
-      s.setExternalOutputDir(destination.toString());
-      // This is how deep into a partition that FENG has precreated in destination.
-      // Table Partitioning - (year, month, day)
-      // I.E. hdfs://localhost/warehouse/test.db/test_table/year=2020/month=2
-      // The destinationPartitionDepth is 2 due to the fact the year and month partitions are precreated.
-      // (This ends up acting as a hint for Impala TableSink not to create the same partition directories in
-      // the staging directory we setup). HS2 seems to always create the static portion of partition specs for
-      // DML.
-      s.setExternalOutputPartitionDepth(targetHelper.getNumStaticPartitionColumns());
+      TableSink sink = createTableSink(isUpsert, partitionKeyExprs, resultExprs,
+          referencedColumns, isOverwrite, inputIsClustered, sortColumns, writeId,
+          destination, targetHelper);
       rootFragment.setSink(sink);
     } else {
       List<Expr> resultExprs = ctx_.getResultExprs();
@@ -515,6 +510,33 @@ public class ImpalaPlanner {
     Collections.reverse(fragments);
     markEvent("Distributed plan created");
     return fragments;
+  }
+
+  private TableSink createTableSink(boolean isUpsert, List<Expr> partitionKeyExprs,
+      List<Expr> resultExprs, List<Integer> referencedColumns, boolean isOverwrite,
+      boolean inputIsClustered, List<Integer> sortColumns, long writeId,
+      Path destination, TargetHelper targetHelper) {
+    TableSink sink = TableSink.create(ctx_.getTargetTable(),
+        isUpsert ? TableSink.Op.UPSERT : TableSink.Op.INSERT,
+        partitionKeyExprs, resultExprs, referencedColumns,
+        isOverwrite, inputIsClustered, new Pair<>(sortColumns, TSortingOrder.LEXICAL),
+        writeId, null, 0);
+    Preconditions.checkState(sink instanceof HdfsTableSink  || sink instanceof KuduTableSink, "Currently only HDFS " +
+        "and KUDU table sinks are supported");
+    if (sink instanceof HdfsTableSink) {
+      Preconditions.checkNotNull(destination, "Invalid destination for Impala sink");
+      HdfsTableSink s = (HdfsTableSink) sink;
+      s.setExternalOutputDir(destination.toString());
+      // This is how deep into a partition that FENG has precreated in destination.
+      // Table Partitioning - (year, month, day)
+      // I.E. hdfs://localhost/warehouse/test.db/test_table/year=2020/month=2
+      // The destinationPartitionDepth is 2 due to the fact the year and month partitions are precreated.
+      // (This ends up acting as a hint for Impala TableSink not to create the same partition directories in
+      // the staging directory we setup). HS2 seems to always create the static portion of partition specs for
+      // DML.
+      s.setExternalOutputPartitionDepth(targetHelper.getNumStaticPartitionColumns());
+    }
+    return sink;
   }
 
   /**
