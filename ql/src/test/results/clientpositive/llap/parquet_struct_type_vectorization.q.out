@@ -106,8 +106,8 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        projectedOutputColumnNums: [1, 4, 5, 2, 6, 7]
-                        selectExpressions: VectorUDFStructField(col 1:struct<f1:int,f2:string>, col 0:int) -> 4:int, VectorUDFStructField(col 1:struct<f1:int,f2:string>, col 1:int) -> 5:string, VectorUDFStructField(col 2:struct<f1:int,f3:string>, col 0:int) -> 6:int, VectorUDFStructField(col 2:struct<f1:int,f3:string>, col 1:int) -> 7:string
+                        projectedOutputColumnNums: [1, 5, 6, 2, 7, 8]
+                        selectExpressions: VectorUDFStructField(col 1:struct<f1:int,f2:string>, col 0:int) -> 5:int, VectorUDFStructField(col 1:struct<f1:int,f2:string>, col 1:int) -> 6:string, VectorUDFStructField(col 2:struct<f1:int,f3:string>, col 0:int) -> 7:int, VectorUDFStructField(col 2:struct<f1:int,f3:string>, col 1:int) -> 8:string
                     Statistics: Num rows: 1023 Data size: 459256 Basic stats: COMPLETE Column stats: NONE
                     Limit
                       Number of rows: 10

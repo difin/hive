@@ -118,8 +118,8 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        projectedOutputColumnNums: [2, 6, 7, 8, 4]
-                        selectExpressions: ListIndexColScalar(col 2:array<int>, col 0:int) -> 6:int, ListIndexColScalar(col 2:array<int>, col 1:int) -> 7:int, ListIndexColColumn(col 2:array<int>, col 4:int) -> 8:int
+                        projectedOutputColumnNums: [2, 7, 8, 9, 4]
+                        selectExpressions: ListIndexColScalar(col 2:array<int>, col 0:int) -> 7:int, ListIndexColScalar(col 2:array<int>, col 1:int) -> 8:int, ListIndexColColumn(col 2:array<int>, col 4:int) -> 9:int
                     Statistics: Num rows: 1023 Data size: 120652 Basic stats: COMPLETE Column stats: NONE
                     Limit
                       Number of rows: 10
@@ -428,8 +428,8 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        projectedOutputColumnNums: [2, 6, 7, 8, 4]
-                        selectExpressions: ListIndexColScalar(col 2:array<int>, col 0:int) -> 6:int, ListIndexColScalar(col 2:array<int>, col 1:int) -> 7:int, ListIndexColColumn(col 2:array<int>, col 4:int) -> 8:int
+                        projectedOutputColumnNums: [2, 7, 8, 9, 4]
+                        selectExpressions: ListIndexColScalar(col 2:array<int>, col 0:int) -> 7:int, ListIndexColScalar(col 2:array<int>, col 1:int) -> 8:int, ListIndexColColumn(col 2:array<int>, col 4:int) -> 9:int
                     Statistics: Num rows: 1024 Data size: 120776 Basic stats: COMPLETE Column stats: NONE
                     Limit
                       Number of rows: 10
@@ -738,8 +738,8 @@ STAGE PLANS:
                     Select Vectorization:
                         className: VectorSelectOperator
                         native: true
-                        projectedOutputColumnNums: [2, 6, 7, 8, 4]
-                        selectExpressions: ListIndexColScalar(col 2:array<int>, col 0:int) -> 6:int, ListIndexColScalar(col 2:array<int>, col 1:int) -> 7:int, ListIndexColColumn(col 2:array<int>, col 4:int) -> 8:int
+                        projectedOutputColumnNums: [2, 7, 8, 9, 4]
+                        selectExpressions: ListIndexColScalar(col 2:array<int>, col 0:int) -> 7:int, ListIndexColScalar(col 2:array<int>, col 1:int) -> 8:int, ListIndexColColumn(col 2:array<int>, col 4:int) -> 9:int
                     Statistics: Num rows: 1025 Data size: 120900 Basic stats: COMPLETE Column stats: NONE
                     Limit
                       Number of rows: 10
