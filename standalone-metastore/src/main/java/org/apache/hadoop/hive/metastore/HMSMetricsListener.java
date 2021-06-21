@@ -22,6 +22,7 @@ import com.codahale.metrics.MetricRegistry;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.events.AddPartitionEvent;
 import org.apache.hadoop.hive.metastore.events.AllocWriteIdEvent;
 import org.apache.hadoop.hive.metastore.events.CreateDatabaseEvent;
@@ -97,10 +98,12 @@ public class HMSMetricsListener extends MetaStoreEventListener {
 
   @Override
   public void onAllocWriteId(AllocWriteIdEvent allocWriteIdEvent, Connection dbConn, SQLGenerator sqlGenerator) throws MetaException {
-    Table table = getTable(allocWriteIdEvent);
+    if (MetastoreConf.getBoolVar(getConf(), MetastoreConf.ConfVars.METASTORE_ACIDMETRICS_EXT_ON)) {
+      Table table = getTable(allocWriteIdEvent);
 
-    if (MetaStoreUtils.isNoAutoCompactSet(table.getParameters())) {
-      Metrics.getOrCreateGauge(MetricsConstants.WRITES_TO_DISABLED_COMPACTION_TABLE).incrementAndGet();
+      if (MetaStoreUtils.isNoAutoCompactSet(table.getParameters())) {
+        Metrics.getOrCreateGauge(MetricsConstants.WRITES_TO_DISABLED_COMPACTION_TABLE).incrementAndGet();
+      }
     }
   }
 
