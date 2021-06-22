@@ -167,13 +167,7 @@ public class ImpalaResultLocation implements FeFsTable {
 
     // Create the required thrift structures
     THdfsPartition thriftHdfsPart = new THdfsPartition(new ArrayList<>());
-    thriftHdfsPart.setLineDelim(hdfsSd.getLineDelim());
-    thriftHdfsPart.setFieldDelim(hdfsSd.getFieldDelim());
-    thriftHdfsPart.setCollectionDelim(hdfsSd.getCollectionDelim());
-    thriftHdfsPart.setMapKeyDelim(hdfsSd.getMapKeyDelim());
-    thriftHdfsPart.setEscapeChar(hdfsSd.getEscapeChar());
-    thriftHdfsPart.setFileFormat(hdfsSd.getFileFormat().toThrift());
-    thriftHdfsPart.setBlockSize(hdfsSd.getBlockSize());
+    thriftHdfsPart.setHdfs_storage_descriptor(hdfsSd.toThrift());
     Map<Long, THdfsPartition> idToPartition = new HashMap<>();
     THdfsTable hdfsTable = new THdfsTable(baseDir_, columnNames,
         MetaStoreUtil.DEFAULT_NULL_PARTITION_KEY_VALUE,
