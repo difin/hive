@@ -287,4 +287,9 @@ public class HiveIcebergSerDe extends AbstractSerDe {
   public Collection<String> partitionColumns() {
     return partitionColumns;
   }
+
+  @Override
+  public boolean shouldStoreFieldsInMetastore(Map<String, String> tableParams) {
+    return true;
+  }
 }
