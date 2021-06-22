@@ -115,18 +115,18 @@ public class Initiator extends MetaStoreCompactorThread {
           long compactionInterval = (prevStart < 0) ? prevStart : (startedAt - prevStart)/1000;
           prevStart = startedAt;
 
-          ShowCompactResponse currentCompactions = txnHandler.showCompact(new ShowCompactRequest());
+          final ShowCompactResponse currentCompactions = txnHandler.showCompact(new ShowCompactRequest());
 
           if (metricsEnabled) {
             // Update compaction metrics based on showCompactions result
             updateCompactionMetrics(currentCompactions);
           }
 
-          Set<CompactionInfo> potentials = txnHandler.findPotentialCompactions(abortedThreshold,
-              abortedTimeThreshold, compactionInterval)
-              .stream()
+          Set<CompactionInfo> potentials = compactionExecutor.submit(() ->
+            txnHandler.findPotentialCompactions(abortedThreshold, abortedTimeThreshold, compactionInterval)
+              .parallelStream()
               .filter(ci -> isEligibleForCompaction(ci, currentCompactions))
-              .collect(Collectors.toSet());
+              .collect(Collectors.toSet())).get();
           LOG.debug("Found " + potentials.size() + " potential compactions, " +
               "checking to see if we should compact any of them");
 

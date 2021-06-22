@@ -1043,11 +1043,7 @@ public class TestTxnCommands2 {
       runWorker(hiveConf);
     }
     //this should not schedule a new compaction due to prior failures, but will create Attempted entry
-    Initiator init = new Initiator();
-    init.setThreadId((int)init.getId());
-    init.setConf(hiveConf);
-    init.init(stop);
-    init.run();
+    runInitiator(hiveConf);
     int numAttemptedCompactions = 1;
     checkCompactionState(new CompactionsByState(numAttemptedCompactions,numFailedCompactions,0,0,0,0,numFailedCompactions + numAttemptedCompactions), countCompacts(txnHandler));
 
@@ -1061,9 +1057,9 @@ public class TestTxnCommands2 {
     runWorker(hiveConf);//will fail
     txnHandler.compact(new CompactionRequest("default", tblName, CompactionType.MINOR));
     runWorker(hiveConf);//will fail
-    init.run();
+    runInitiator(hiveConf);
     numAttemptedCompactions++;
-    init.run();
+    runInitiator(hiveConf);
     numAttemptedCompactions++;
     checkCompactionState(new CompactionsByState(numAttemptedCompactions,numFailedCompactions + 2,0,0,0,0,numFailedCompactions + 2 + numAttemptedCompactions), countCompacts(txnHandler));
 
