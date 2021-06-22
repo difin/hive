@@ -21,6 +21,7 @@ import com.codahale.metrics.Counter;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Sets;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -137,8 +138,8 @@ public class Initiator extends MetaStoreCompactorThread {
           // Currently we invalidate all entries after each cycle, because the bootstrap replication is marked via
           // table property hive.repl.first.inc.pending which would be cached.
           tableCache.ifPresent(c -> c.invalidateAll());
-          Set<String> skipDBs = new HashSet<>();
-          Set<String> skipTables = new HashSet<>();
+          Set<String> skipDBs = Sets.newConcurrentHashSet();
+          Set<String> skipTables = Sets.newConcurrentHashSet();
 
           Set<CompactionInfo> potentials = compactionExecutor.submit(() ->
             txnHandler.findPotentialCompactions(abortedThreshold, abortedTimeThreshold, compactionInterval)
