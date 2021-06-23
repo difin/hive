@@ -1,0 +1,684 @@
+[
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "BOOLEAN",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "BOOLEAN",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "BOOLEAN",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "BOOLEAN",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "TINYINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "TINYINT",
+        "argTypes": [
+            "TINYINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "TINYINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "TINYINT",
+        "argTypes": [
+            "TINYINT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "TINYINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "TINYINT",
+        "argTypes": [
+            "TINYINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "TINYINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "TINYINT",
+        "argTypes": [
+            "TINYINT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "SMALLINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "SMALLINT",
+        "argTypes": [
+            "SMALLINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "SMALLINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "SMALLINT",
+        "argTypes": [
+            "SMALLINT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "SMALLINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "SMALLINT",
+        "argTypes": [
+            "SMALLINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "SMALLINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "SMALLINT",
+        "argTypes": [
+            "SMALLINT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "INT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "INT",
+        "argTypes": [
+            "INT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "INT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "INT",
+        "argTypes": [
+            "INT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "INT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "INT",
+        "argTypes": [
+            "INT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "INT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "INT",
+        "argTypes": [
+            "INT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "BIGINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "BIGINT",
+        "argTypes": [
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "BIGINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "BIGINT",
+        "argTypes": [
+            "BIGINT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "BIGINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "BIGINT",
+        "argTypes": [
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "BIGINT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "BIGINT",
+        "argTypes": [
+            "BIGINT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "FLOAT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "FLOAT",
+        "argTypes": [
+            "FLOAT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "FLOAT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "FLOAT",
+        "argTypes": [
+            "FLOAT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "FLOAT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "FLOAT",
+        "argTypes": [
+            "FLOAT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "FLOAT",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "FLOAT",
+        "argTypes": [
+            "FLOAT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DOUBLE",
+        "intermediateType": "DOUBLE",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "argTypes": [
+            "DOUBLE"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DOUBLE",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DOUBLE",
+        "argTypes": [
+            "DOUBLE",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DOUBLE",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DOUBLE",
+        "argTypes": [
+            "DOUBLE"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DOUBLE",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DOUBLE",
+        "argTypes": [
+            "DOUBLE",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "STRING",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "STRING",
+        "argTypes": [
+            "STRING"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "STRING",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "STRING",
+        "argTypes": [
+            "STRING",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "STRING",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "STRING",
+        "argTypes": [
+            "STRING"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "STRING",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "STRING",
+        "argTypes": [
+            "STRING",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "TIMESTAMP",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "TIMESTAMP",
+        "argTypes": [
+            "TIMESTAMP"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "TIMESTAMP",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "TIMESTAMP",
+        "argTypes": [
+            "TIMESTAMP",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "TIMESTAMP",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "TIMESTAMP",
+        "argTypes": [
+            "TIMESTAMP"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "TIMESTAMP",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "TIMESTAMP",
+        "argTypes": [
+            "TIMESTAMP",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DECIMAL",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DECIMAL",
+        "argTypes": [
+            "DECIMAL"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DECIMAL",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DECIMAL",
+        "argTypes": [
+            "DECIMAL",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DECIMAL",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DECIMAL",
+        "argTypes": [
+            "DECIMAL"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DECIMAL",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DECIMAL",
+        "argTypes": [
+            "DECIMAL",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DATE",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DATE",
+        "argTypes": [
+            "DATE"
+        ]
+    },
+    {
+        "fnName": "lag",
+        "impalaFnName": "lag",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DATE",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DATE",
+        "argTypes": [
+            "DATE",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DATE",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DATE",
+        "argTypes": [
+            "DATE"
+        ]
+    },
+    {
+        "fnName": "lead",
+        "impalaFnName": "lead",
+        "dbName": "_impala_builtins",
+        "binaryType": "BUILTIN",
+        "isAgg": "false",
+        "retType": "DATE",
+        "isAnalyticFn": "true",
+        "ignoresDistinct": "false",
+        "returnsNonNullOnEmpty": "false",
+        "intermediateType": "DATE",
+        "argTypes": [
+            "DATE",
+            "BIGINT"
+        ]
+    }
+]

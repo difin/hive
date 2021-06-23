@@ -78,6 +78,10 @@ public class ImpalaRexCall {
       return processGroupingFunction(rexCall, params, calciteReturnType, analyzer);
     }
 
+    if (rexCall.getOperator().getKind() == SqlKind.BETWEEN) {
+      return createBetweenExpr(analyzer, rexCall, params);
+    }
+
     String funcName = rexCall.getOperator().getName().toLowerCase();
     List<RexNode> operands = rexCall.getOperands();
 
@@ -134,9 +138,6 @@ public class ImpalaRexCall {
         } else {
           retExpr = new ImpalaFunctionCallExpr(analyzer, fn, params, rexCall, impalaRetType);
         }
-        break;
-      case BETWEEN:
-        retExpr = createBetweenExpr(analyzer, rexCall, params);
         break;
       default:
         retExpr = new ImpalaFunctionCallExpr(analyzer, fn, params, rexCall, impalaRetType);

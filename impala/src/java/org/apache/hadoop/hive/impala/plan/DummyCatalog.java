@@ -17,7 +17,6 @@
 
 package org.apache.hadoop.hive.impala.plan;
 
-import org.apache.hadoop.hive.impala.funcmapper.ImpalaBuiltinsDb;
 import org.apache.impala.analysis.TableName;
 import org.apache.impala.authorization.AuthorizationPolicy;
 import org.apache.impala.catalog.BuiltinsDb;
@@ -104,7 +103,7 @@ public class DummyCatalog implements FeCatalog {
 
   @Override
   public Function getFunction(Function desc, Function.CompareMode mode) {
-    return ImpalaBuiltinsDb.getInstance().getFunction(desc, mode);
+    return BuiltinsDb.getInstance().getFunction(desc, mode);
   }
 
   @Override

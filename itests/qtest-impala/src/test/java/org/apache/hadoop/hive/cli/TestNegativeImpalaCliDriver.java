@@ -20,8 +20,14 @@ package org.apache.hadoop.hive.cli;
 import java.io.File;
 import java.util.List;
 
+
+import org.apache.hadoop.hive.cli.TestImpalaCliDriver.TestScalarFunctionWrapper;
+import org.apache.hadoop.hive.cli.TestImpalaCliDriver.TestAggNonImpalaFunction;
 import org.apache.hadoop.hive.cli.control.CliAdapter;
 import org.apache.hadoop.hive.cli.control.CliConfigs;
+import org.apache.hadoop.hive.impala.funcmapper.AggFunctionDetails;
+import org.apache.hadoop.hive.impala.funcmapper.ScalarFunctionDetails;
+import org.apache.impala.catalog.BuiltinsDb;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,6 +40,14 @@ import org.junit.runners.Parameterized.Parameters;
 public class TestNegativeImpalaCliDriver {
 
   static CliAdapter adapter = new CliConfigs.ImpalaNegativeCliConfig().getCliAdapter();
+
+  static {
+    ScalarFunctionDetails.addFunctionsFromImpala(
+        TestScalarFunctionWrapper.createScalarFunctionDetailsFromTestFile());
+    AggFunctionDetails.addFunctionsFromImpala(
+        TestAggNonImpalaFunction.createAggFunctionDetailsFromTestFile());
+    BuiltinsDb.getInstance(ImpalaBuiltinsDb.LOADER);
+  }
 
   @Parameters(name = "{0}")
   public static List<Object[]> getParameters() throws Exception {

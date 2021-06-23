@@ -1,0 +1,163 @@
+[
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "TINYINT",
+            "TINYINT",
+            "TINYINT"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "SMALLINT",
+            "SMALLINT",
+            "SMALLINT"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "INT",
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "BIGINT",
+            "BIGINT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "DECIMAL",
+            "DECIMAL",
+            "DECIMAL"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "FLOAT",
+            "FLOAT",
+            "FLOAT"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "DOUBLE",
+            "DOUBLE",
+            "DOUBLE"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "DATE",
+            "DATE",
+            "DATE"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "TIMESTAMP",
+            "TIMESTAMP",
+            "TIMESTAMP"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "CHAR",
+            "CHAR",
+            "CHAR"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "VARCHAR",
+            "VARCHAR",
+            "VARCHAR"
+        ]
+    },
+    {
+        "fnName": "between",
+        "retType": "BOOLEAN",
+        "argTypes": [
+            "BOOLEAN",
+            "STRING",
+            "STRING",
+            "STRING"
+        ]
+    },
+    {
+        "fnName": "inline",
+        "retType": "NULL_TYPE"
+    },
+    {
+        "fnName": "struct",
+        "retType": "NULL_TYPE"
+    },
+    {
+        "fnName": "array",
+        "retType": "NULL_TYPE"
+    },
+    {
+        "fnName": "grouping",
+        "retType": "NULL_TYPE"
+    },
+    {
+        "fnName": "internal_interval",
+        "retType": "NULL_TYPE"
+    },
+    {
+        "fnName": "ndv_compute_bit_vector",
+        "retType": "NULL_TYPE"
+    },
+    {
+        "impalaFnName": "sq_count_check",
+        "fnName": "sq_count_check",
+        "retType": "BIGINT",
+        "argTypes": [
+            "BIGINT"
+        ]
+    },
+    {
+        "impalaFnName": "sq_count_check",
+        "fnName": "sq_count_check",
+        "retType": "BIGINT",
+        "argTypes": [
+            "BIGINT",
+            "BOOLEAN"
+        ]
+    }
+]
