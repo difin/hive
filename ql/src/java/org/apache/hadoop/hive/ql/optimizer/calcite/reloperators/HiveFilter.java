@@ -71,7 +71,11 @@ public class HiveFilter extends Filter implements HiveRelNode {
   private static void traverseFilter(RexNode node, Set<CorrelationId> allVars) {
     Preconditions.checkNotNull(allVars);
     if (node instanceof RexSubQuery) {
-      RelNode input = ((RexSubQuery)node).rel.getInput(0);
+      RexSubQuery rexSubQuery = (RexSubQuery) node;
+      if (rexSubQuery.rel.getInputs().isEmpty()) {
+        return;
+      }
+      RelNode input = rexSubQuery.rel.getInput(0);
       Preconditions.checkNotNull(input);
       // initialize number of correlated variables input here to check if it changes.
       int correlatedVars = allVars.size();

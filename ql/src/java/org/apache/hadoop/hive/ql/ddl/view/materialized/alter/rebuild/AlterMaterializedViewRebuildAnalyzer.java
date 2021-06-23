@@ -168,7 +168,7 @@ public class AlterMaterializedViewRebuildAnalyzer extends CalcitePlanner {
                                          Map<String, PrunedPartitionList> partitionCache,
                                          Map<String, ColumnStatsList> colStatsCache,
                                          ColumnAccessInfo columnAccessInfo) {
-      super(generateEnginePlan, partitionCache, colStatsCache, columnAccessInfo);
+      super(generateEnginePlan, partitionCache, colStatsCache, columnAccessInfo, getQB());
     }
 
     @Override
