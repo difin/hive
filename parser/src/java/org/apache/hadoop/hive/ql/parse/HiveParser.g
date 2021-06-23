@@ -198,6 +198,7 @@ TOK_ALTERTABLE_DROPCONSTRAINT;
 TOK_ALTERTABLE_ADDCONSTRAINT;
 TOK_ALTERTABLE_UPDATECOLUMNS;
 TOK_ALTERTABLE_OWNER;
+TOK_ALTERTABLE_SETPARTSPEC;
 TOK_MSCK;
 TOK_SHOWDATABASES;
 TOK_SHOWTABLES;
@@ -1209,6 +1210,7 @@ alterTableStatementSuffix
     | alterTblPartitionStatementSuffix[false]
     | partitionSpec alterTblPartitionStatementSuffix[true] -> alterTblPartitionStatementSuffix partitionSpec
     | alterStatementSuffixSetOwner
+    | alterStatementSuffixSetPartSpec
     ;
 
 alterTblPartitionStatementSuffix[boolean partition]
@@ -1576,6 +1578,13 @@ alterStatementSuffixSetOwner
 @after { popMsg(state); }
     : KW_SET KW_OWNER principalName
     -> ^(TOK_ALTERTABLE_OWNER principalName)
+    ;
+
+alterStatementSuffixSetPartSpec
+@init { pushMsg("alter table set partition spec", state); }
+@after { popMsg(state); }
+    : KW_SET KW_PARTITION KW_SPEC LPAREN (spec = partitionTransformSpec) RPAREN
+    -> ^(TOK_ALTERTABLE_SETPARTSPEC $spec)
     ;
 
 fileFormat
@@ -2188,8 +2197,8 @@ createTablePartitionSpec
     : KW_PARTITIONED KW_BY LPAREN (opt1 = createTablePartitionColumnTypeSpec | opt2 = createTablePartitionColumnSpec) RPAREN
     -> {$opt1.tree != null}? $opt1
     -> $opt2
-    | KW_PARTITIONED KW_BY KW_SPEC LPAREN (spec = createTablePartitionTransformSpec) RPAREN
-    -> $spec
+    | KW_PARTITIONED KW_BY KW_SPEC LPAREN (spec = partitionTransformSpec) RPAREN
+    -> ^(TOK_TABLEPARTCOLSBYSPEC $spec)
     ;
 
 createTablePartitionColumnTypeSpec
@@ -2206,11 +2215,11 @@ createTablePartitionColumnSpec
     -> ^(TOK_TABLEPARTCOLNAMES columnName+)
     ;
 
-createTablePartitionTransformSpec
+partitionTransformSpec
 @init { pushMsg("create table partition by specification", state); }
 @after { popMsg(state); }
     : columnNameTransformConstraint (COMMA columnNameTransformConstraint)*
-    -> ^(TOK_TABLEPARTCOLSBYSPEC columnNameTransformConstraint+)
+    -> columnNameTransformConstraint+
     ;
 
 columnNameTransformConstraint
