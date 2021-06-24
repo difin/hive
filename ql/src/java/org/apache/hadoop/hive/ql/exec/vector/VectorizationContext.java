@@ -1354,7 +1354,8 @@ public class VectorizationContext {
                    || arg0Type(expr).equals("float"))) {
       return true;
     } else if (gudf instanceof GenericUDFBetween && (mode == VectorExpressionDescriptor.Mode.PROJECTION)) {
-      // between has 4 args here, but can be vectorized like this
+      return true;
+    } else if (gudf instanceof GenericUDFConcat && (mode == VectorExpressionDescriptor.Mode.PROJECTION)) {
       return true;
     }
     return false;
