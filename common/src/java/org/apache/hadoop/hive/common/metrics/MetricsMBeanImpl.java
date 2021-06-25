@@ -146,6 +146,13 @@ public class MetricsMBeanImpl implements  MetricsMBean {
       }
     }
 
+  public void updateAll(Map<String, ?> snapshot) {
+    synchronized (metricsMap) {
+      clear();
+      snapshot.forEach(this::put);
+    }
+  }
+
     @Override
     public Object get(String name) throws JMException {
       return getAttribute(name);
@@ -158,7 +165,7 @@ public class MetricsMBeanImpl implements  MetricsMBean {
         }
       }
     }
-    
+
     @Override
     public void clear() {
       synchronized(metricsMap) {
