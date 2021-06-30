@@ -522,7 +522,7 @@ public class ImportSemanticAnalyzer extends BaseSemanticAnalyzer {
   private static Task<?> createTableTask(ImportTableDesc tableDesc, EximUtil.SemanticAnalyzerWrapperContext x,
                                          String dumpRoot, ReplicationMetricCollector metricCollector) {
     return tableDesc.getCreateTableTask(x.getInputs(), x.getOutputs(), x.getConf(), true,
-                                        dumpRoot, metricCollector);
+                                        dumpRoot, metricCollector, false);
   }
 
   private static Task<?> dropTableTask(Table table, EximUtil.SemanticAnalyzerWrapperContext x,
@@ -558,7 +558,7 @@ public class ImportSemanticAnalyzer extends BaseSemanticAnalyzer {
       tableDesc.setReplicationSpec(replicationSpec);
     }
     return tableDesc.getCreateTableTask(x.getInputs(), x.getOutputs(), x.getConf(), isReplication,
-                                        dumpRoot, metricCollector);
+                                        dumpRoot, metricCollector, false);
   }
 
   private static Task<?> alterSinglePartition(
