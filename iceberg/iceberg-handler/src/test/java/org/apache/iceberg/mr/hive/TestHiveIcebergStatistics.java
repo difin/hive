@@ -136,7 +136,7 @@ public class TestHiveIcebergStatistics extends HiveIcebergStorageHandlerWithEngi
 
     shell.setHiveSessionValue(HiveConf.ConfVars.HIVESTATSAUTOGATHER.varname, true);
     shell.executeStatement(String.format(
-        "CREATE TABLE target STORED BY ICEBERG %s TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source",
+        "CREATE EXTERNAL TABLE target STORED BY ICEBERG %s TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source",
         testTables.locationForCreateTableSQL(TableIdentifier.of("default", "target")),
         TableProperties.DEFAULT_FILE_FORMAT, fileFormat));
 
@@ -153,7 +153,7 @@ public class TestHiveIcebergStatistics extends HiveIcebergStorageHandlerWithEngi
 
     shell.setHiveSessionValue(HiveConf.ConfVars.HIVESTATSAUTOGATHER.varname, true);
     shell.executeStatement(String.format(
-        "CREATE TABLE target PARTITIONED BY (dept, name) " +
+        "CREATE EXTERNAL TABLE target PARTITIONED BY (dept, name) " +
             "STORED BY ICEBERG TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source s",
         TableProperties.DEFAULT_FILE_FORMAT, fileFormat));
 

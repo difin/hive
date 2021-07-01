@@ -176,6 +176,20 @@ public class AbstractThriftHiveMetastore implements Iface {
         throw new UnsupportedOperationException("this method is not supported");
     }
 
+
+    /**
+     * Dry run that translates table
+     *    *
+     *    * @param tbl
+     *    *          a table object
+     *    * @throws HiveException
+     */
+    @Override
+    public Table translate_table_dryrun(final CreateTableRequest req) throws AlreadyExistsException,
+            InvalidObjectException, MetaException, NoSuchObjectException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
     @Override
     public void create_table(Table tbl)
             throws AlreadyExistsException, InvalidObjectException, MetaException, NoSuchObjectException, TException {

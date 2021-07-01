@@ -45,12 +45,10 @@ __isset.flag = true;
 
 void PropValueUnion::__set_lString(const std::vector<std::string> & val) {
   this->lString = val;
-__isset.lString = true;
 }
 
 void PropValueUnion::__set_unionMStringString(const std::map<std::string, std::string> & val) {
   this->unionMStringString = val;
-__isset.unionMStringString = true;
 }
 
 uint32_t PropValueUnion::read(::apache::thrift::protocol::TProtocol* iprot) {
@@ -199,33 +197,31 @@ uint32_t PropValueUnion::write(::apache::thrift::protocol::TProtocol* oprot) con
     xfer += oprot->writeBool(this->flag);
     xfer += oprot->writeFieldEnd();
   }
-  if (this->__isset.lString) {
-    xfer += oprot->writeFieldBegin("lString", ::apache::thrift::protocol::T_LIST, 6);
+  xfer += oprot->writeFieldBegin("lString", ::apache::thrift::protocol::T_LIST, 6);
+  {
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->lString.size()));
+    std::vector<std::string> ::const_iterator _iter12;
+    for (_iter12 = this->lString.begin(); _iter12 != this->lString.end(); ++_iter12)
     {
-      xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->lString.size()));
-      std::vector<std::string> ::const_iterator _iter12;
-      for (_iter12 = this->lString.begin(); _iter12 != this->lString.end(); ++_iter12)
-      {
-        xfer += oprot->writeString((*_iter12));
-      }
-      xfer += oprot->writeListEnd();
+      xfer += oprot->writeString((*_iter12));
     }
-    xfer += oprot->writeFieldEnd();
+    xfer += oprot->writeListEnd();
   }
-  if (this->__isset.unionMStringString) {
-    xfer += oprot->writeFieldBegin("unionMStringString", ::apache::thrift::protocol::T_MAP, 7);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("unionMStringString", ::apache::thrift::protocol::T_MAP, 7);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->unionMStringString.size()));
+    std::map<std::string, std::string> ::const_iterator _iter13;
+    for (_iter13 = this->unionMStringString.begin(); _iter13 != this->unionMStringString.end(); ++_iter13)
     {
-      xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->unionMStringString.size()));
-      std::map<std::string, std::string> ::const_iterator _iter13;
-      for (_iter13 = this->unionMStringString.begin(); _iter13 != this->unionMStringString.end(); ++_iter13)
-      {
-        xfer += oprot->writeString(_iter13->first);
-        xfer += oprot->writeString(_iter13->second);
-      }
-      xfer += oprot->writeMapEnd();
+      xfer += oprot->writeString(_iter13->first);
+      xfer += oprot->writeString(_iter13->second);
     }
-    xfer += oprot->writeFieldEnd();
+    xfer += oprot->writeMapEnd();
   }
+  xfer += oprot->writeFieldEnd();
+
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -272,8 +268,8 @@ void PropValueUnion::printTo(std::ostream& out) const {
   out << ", " << "stringValue="; (__isset.stringValue ? (out << to_string(stringValue)) : (out << "<null>"));
   out << ", " << "doubleValue="; (__isset.doubleValue ? (out << to_string(doubleValue)) : (out << "<null>"));
   out << ", " << "flag="; (__isset.flag ? (out << to_string(flag)) : (out << "<null>"));
-  out << ", " << "lString="; (__isset.lString ? (out << to_string(lString)) : (out << "<null>"));
-  out << ", " << "unionMStringString="; (__isset.unionMStringString ? (out << to_string(unionMStringString)) : (out << "<null>"));
+  out << ", " << "lString=" << to_string(lString);
+  out << ", " << "unionMStringString=" << to_string(unionMStringString);
   out << ")";
 }
 

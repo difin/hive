@@ -19,6 +19,7 @@ package org.apache.hadoop.hive.metastore;
 
 import static org.apache.commons.lang.StringUtils.join;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.TABLE_IS_CTAS;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_COMMENT;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_NAME;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_CATALOG_NAME;
@@ -2161,6 +2162,22 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       throw new MetaException("Not yet implemented");
     }
 
+    @Override
+    public Table translate_table_dryrun(final CreateTableRequest req) throws AlreadyExistsException,
+            MetaException, InvalidObjectException, InvalidInputException {
+      Table transformedTbl = null;
+      Table tbl = req.getTable();
+      List<String> processorCapabilities = req.getProcessorCapabilities();
+      String processorId = req.getProcessorIdentifier();
+      if (!tbl.isSetCatName()) {
+        tbl.setCatName(getDefaultCatalog(conf));
+      }
+      if (transformer != null && !isInTest) {
+        transformedTbl = transformer.transformCreateTable(tbl, processorCapabilities, processorId);
+      }
+      return transformedTbl != null ? transformedTbl : tbl;
+    }
+
     private void create_table_core(final RawStore ms, final Table tbl,
         final EnvironmentContext envContext)
             throws AlreadyExistsException, MetaException,
@@ -2218,6 +2235,10 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       if (transformer != null && !isInTest) {
         tbl = transformer.transformCreateTable(tbl, processorCapabilities, processorId);
       }
+      if (tbl.getParameters() != null) {
+        tbl.getParameters().remove(TABLE_IS_CTAS);
+      }
+
       if (tbl.getParameters() != null) {
         tbl.getParameters().remove(TABLE_IS_CTAS);
       }

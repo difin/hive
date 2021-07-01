@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.14"
+const string HMS_API = "1.2.15"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -2339,7 +2339,8 @@ service ThriftHiveMetastore extends fb303.FacebookService
       throws(1:NoSuchObjectException o1, 2:MetaException o2)
   void add_check_constraint(1:AddCheckConstraintRequest req)
       throws(1:NoSuchObjectException o1, 2:MetaException o2)
-
+  Table translate_table_dryrun(1:CreateTableRequest request)
+      throws(1:AlreadyExistsException o1, 2:InvalidObjectException o2, 3:MetaException o3, 4:NoSuchObjectException o4)
   // drops the table and all the partitions associated with it if the table has partitions
   // delete data (including partitions) if deleteData is set to true
   void drop_table(1:string dbname, 2:string name, 3:bool deleteData)
@@ -2983,3 +2984,4 @@ const string DRUID_CONFIG_PREFIX = "druid.",
 const string JDBC_CONFIG_PREFIX = "hive.sql.",
 const string TABLE_IS_CTAS = "created_with_ctas",
 const string PARTITION_TRANSFORM_SPEC = "partition_transform_spec",
+const string CTAS_LEGACY_CONFIG = "create_table_as_external",

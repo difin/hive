@@ -1469,13 +1469,13 @@ class ColumnStatisticsData < ::Thrift::Union
   DATESTATS = 7
 
   FIELDS = {
-    BOOLEANSTATS => {:type => ::Thrift::Types::STRUCT, :name => 'booleanStats', :class => ::BooleanColumnStatsData, :optional => true},
-    LONGSTATS => {:type => ::Thrift::Types::STRUCT, :name => 'longStats', :class => ::LongColumnStatsData, :optional => true},
-    DOUBLESTATS => {:type => ::Thrift::Types::STRUCT, :name => 'doubleStats', :class => ::DoubleColumnStatsData, :optional => true},
-    STRINGSTATS => {:type => ::Thrift::Types::STRUCT, :name => 'stringStats', :class => ::StringColumnStatsData, :optional => true},
-    BINARYSTATS => {:type => ::Thrift::Types::STRUCT, :name => 'binaryStats', :class => ::BinaryColumnStatsData, :optional => true},
-    DECIMALSTATS => {:type => ::Thrift::Types::STRUCT, :name => 'decimalStats', :class => ::DecimalColumnStatsData, :optional => true},
-    DATESTATS => {:type => ::Thrift::Types::STRUCT, :name => 'dateStats', :class => ::DateColumnStatsData, :optional => true}
+    BOOLEANSTATS => {:type => ::Thrift::Types::STRUCT, :name => 'booleanStats', :class => ::BooleanColumnStatsData},
+    LONGSTATS => {:type => ::Thrift::Types::STRUCT, :name => 'longStats', :class => ::LongColumnStatsData},
+    DOUBLESTATS => {:type => ::Thrift::Types::STRUCT, :name => 'doubleStats', :class => ::DoubleColumnStatsData},
+    STRINGSTATS => {:type => ::Thrift::Types::STRUCT, :name => 'stringStats', :class => ::StringColumnStatsData},
+    BINARYSTATS => {:type => ::Thrift::Types::STRUCT, :name => 'binaryStats', :class => ::BinaryColumnStatsData},
+    DECIMALSTATS => {:type => ::Thrift::Types::STRUCT, :name => 'decimalStats', :class => ::DecimalColumnStatsData},
+    DATESTATS => {:type => ::Thrift::Types::STRUCT, :name => 'dateStats', :class => ::DateColumnStatsData}
   }
 
   def struct_fields; FIELDS; end
@@ -2575,8 +2575,8 @@ class RequestPartsSpec < ::Thrift::Union
   EXPRS = 2
 
   FIELDS = {
-    NAMES => {:type => ::Thrift::Types::LIST, :name => 'names', :element => {:type => ::Thrift::Types::STRING}, :optional => true},
-    EXPRS => {:type => ::Thrift::Types::LIST, :name => 'exprs', :element => {:type => ::Thrift::Types::STRUCT, :class => ::DropPartitionsExpr}, :optional => true}
+    NAMES => {:type => ::Thrift::Types::LIST, :name => 'names', :element => {:type => ::Thrift::Types::STRING}},
+    EXPRS => {:type => ::Thrift::Types::LIST, :name => 'exprs', :element => {:type => ::Thrift::Types::STRUCT, :class => ::DropPartitionsExpr}}
   }
 
   def struct_fields; FIELDS; end
@@ -4133,8 +4133,8 @@ class FireEventRequestData < ::Thrift::Union
   INSERTDATAS = 2
 
   FIELDS = {
-    INSERTDATA => {:type => ::Thrift::Types::STRUCT, :name => 'insertData', :class => ::InsertEventRequestData, :optional => true},
-    INSERTDATAS => {:type => ::Thrift::Types::LIST, :name => 'insertDatas', :element => {:type => ::Thrift::Types::STRUCT, :class => ::InsertEventRequestData}, :optional => true}
+    INSERTDATA => {:type => ::Thrift::Types::STRUCT, :name => 'insertData', :class => ::InsertEventRequestData},
+    INSERTDATAS => {:type => ::Thrift::Types::LIST, :name => 'insertDatas', :element => {:type => ::Thrift::Types::STRUCT, :class => ::InsertEventRequestData}}
   }
 
   def struct_fields; FIELDS; end

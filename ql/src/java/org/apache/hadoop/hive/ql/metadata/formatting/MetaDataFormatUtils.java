@@ -18,6 +18,8 @@
 
 package org.apache.hadoop.hive.ql.metadata.formatting;
 
+import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.TABLE_IS_CTAS;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.hadoop.hive.common.StatsSetupConst;
