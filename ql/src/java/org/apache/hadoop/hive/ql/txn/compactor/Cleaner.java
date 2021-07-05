@@ -167,7 +167,8 @@ public class Cleaner extends MetaStoreCompactorThread {
   private void clean(CompactionInfo ci, long minOpenTxnGLB, boolean metricsEnabled) throws MetaException {
     LOG.info("Starting cleaning for " + ci);
     PerfLogger perfLogger = PerfLogger.getPerfLogger(false);
-    String cleanerMetric = MetricsConstants.COMPACTION_CLEANER_CYCLE + "_" + ci.type;
+    String cleanerMetric = MetricsConstants.COMPACTION_CLEANER_CYCLE + "_" +
+        (ci.type != null ? ci.type.toString().toLowerCase() : null);
     try {
       if (metricsEnabled) {
         perfLogger.PerfLogBegin(CLASS_NAME, cleanerMetric);
