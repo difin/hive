@@ -145,8 +145,8 @@ def hdbPodTemplate(closure) {
         alwaysPullImage: true,
         resourceRequestCpu: '2800m',
         resourceLimitCpu: '8000m',
-        resourceRequestMemory: '6400Mi',
-        resourceLimitMemory: '12000Mi',
+        resourceRequestMemory: '12000Mi',
+        resourceLimitMemory: '25000Mi',
         envVars: [
             envVar(key: 'DOCKER_HOST', value: 'tcp://localhost:2375')
         ]
