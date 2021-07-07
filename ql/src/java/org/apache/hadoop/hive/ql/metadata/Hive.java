@@ -3368,30 +3368,36 @@ private void constructOneLBLocationMap(FileStatus fSta,
             partsToAdd.add(p);
           }
         }
-        for (org.apache.hadoop.hive.metastore.api.Partition outPart
-            : getMSC().add_partitions(partsToAdd, addPartitionDesc.isIfNotExists(), true)) {
-          out.add(new Partition(tbl, outPart));
-        }
-        EnvironmentContext ec = new EnvironmentContext();
-        // In case of replication statistics is obtained from the source, so do not update those
-        // on replica. Since we are not replicating statistics for transactional tables, do not do
-        // so for a partition of a transactional table right now.
-        if (!AcidUtils.isTransactionalTable(tbl)) {
-          ec.putToProperties(StatsSetupConst.DO_NOT_UPDATE_STATS, StatsSetupConst.TRUE);
-        }
-        getMSC().alter_partitions(addPartitionDesc.getDbName(), addPartitionDesc.getTableName(),
-            partsToAlter, ec, validWriteIdList, writeId);
 
-        GetPartitionsByNamesRequest partsRequest = new GetPartitionsByNamesRequest();
-        partsRequest
-            .setDb_name(prependCatalogToDbName(addPartitionDesc.getDbName(), conf));
-        partsRequest.setTbl_name(addPartitionDesc.getTableName());
-        partsRequest.setNames(part_names);
-        partsRequest.setValidWriteIdList(validWriteIdList);
-        List<org.apache.hadoop.hive.metastore.api.Partition> partitions = getMSC()
-            .getPartitionsByNames(partsRequest).getPartitions();
-        for ( org.apache.hadoop.hive.metastore.api.Partition outPart : partitions){
-          out.add(new Partition(tbl,outPart));
+        if (!partsToAdd.isEmpty()) {
+          LOG.debug("Calling AddPartition for {}", partsToAdd);
+          for (org.apache.hadoop.hive.metastore.api.Partition outPart : getMSC()
+              .add_partitions(partsToAdd, addPartitionDesc.isIfNotExists(), true)) {
+            out.add(new Partition(tbl, outPart));
+          }
+        }
+        if (!partsToAlter.isEmpty()) {
+          LOG.debug("Calling AlterPartition for {}", partsToAlter);
+          EnvironmentContext ec = new EnvironmentContext();
+          // In case of replication statistics is obtained from the source, so do not update those
+          // on replica. Since we are not replicating statistics for transactional tables, do not do
+          // so for a partition of a transactional table right now.
+          if (!AcidUtils.isTransactionalTable(tbl)) {
+            ec.putToProperties(StatsSetupConst.DO_NOT_UPDATE_STATS, StatsSetupConst.TRUE);
+          }
+          getMSC().alter_partitions(addPartitionDesc.getDbName(), addPartitionDesc.getTableName(), partsToAlter, ec,
+              validWriteIdList, writeId);
+
+          GetPartitionsByNamesRequest partsRequest = new GetPartitionsByNamesRequest();
+          partsRequest.setDb_name(prependCatalogToDbName(addPartitionDesc.getDbName(), conf));
+          partsRequest.setTbl_name(addPartitionDesc.getTableName());
+          partsRequest.setNames(part_names);
+          partsRequest.setValidWriteIdList(validWriteIdList);
+          List<org.apache.hadoop.hive.metastore.api.Partition> partitions =
+              getMSC().getPartitionsByNames(partsRequest).getPartitions();
+          for (org.apache.hadoop.hive.metastore.api.Partition outPart : partitions) {
+            out.add(new Partition(tbl, outPart));
+          }
         }
       }
     } catch (Exception e) {
