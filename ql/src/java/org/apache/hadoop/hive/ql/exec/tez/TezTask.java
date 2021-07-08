@@ -278,7 +278,7 @@ public class TezTask extends Task<TezWork> {
           counters = null;
         }
 
-        // save useful commit information into session conf, e.g. for custom commit hooks, like Iceberg
+        // save useful commit information into query state, e.g. for custom commit hooks, like Iceberg
         if (rc == 0) {
           collectCommitInformation(work);
         }
