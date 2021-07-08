@@ -1,4 +1,3 @@
---! qt:disabled:test unstable
 --! qt:authorizer
 --! qt:scheduledqueryservice
 --! qt:sysdb
@@ -38,4 +37,6 @@ alter scheduled query repl2 execute;
 
 show databases;
 
-select policy_name from sys.replication_metrics;
+select policy_name, dump_execution_id from sys.replication_metrics;
+
+select count(*) from sys.replication_metrics where scheduled_execution_id > 0;
