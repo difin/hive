@@ -289,7 +289,7 @@ public class HiveIcebergMetaHook extends DefaultHiveMetaHook {
       }
       HiveTableUtil.importFiles(preAlterTableProperties.tableLocation, preAlterTableProperties.format,
           partitionSpecProxy, preAlterTableProperties.partitionKeys, catalogProperties, conf);
-    } else {
+    } else if (currentAlterTableOp != null) {
       Map<String, String> contextProperties = context.getProperties();
       switch (currentAlterTableOp) {
         case ADDCOLS:
@@ -299,7 +299,7 @@ public class HiveIcebergMetaHook extends DefaultHiveMetaHook {
           break;
         case ADDPROPS:
         case DROPPROPS:
-          alterTableProperties(hmsTable, context.getProperties());
+          alterTableProperties(hmsTable, contextProperties);
           break;
         case SETPARTITIONSPEC:
           IcebergTableUtil.updateSpec(conf, icebergTable);
