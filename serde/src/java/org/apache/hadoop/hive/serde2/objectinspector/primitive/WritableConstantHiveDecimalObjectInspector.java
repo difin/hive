@@ -56,14 +56,6 @@ implements ConstantObjectInspector {
   }
 
   @Override
-  public int precision() {
-    if (value == null) {
-      return super.precision();
-    }
-    return value.precision();
-  }
-
-  @Override
   public int scale() {
     if (value == null) {
       return super.scale();
