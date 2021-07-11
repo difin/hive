@@ -30,6 +30,10 @@ import org.apache.hadoop.hive.ql.ddl.DDLUtils;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 
+import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.NO_VAL;
+import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getHostFromId;
+import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getThreadIdFromId;
+
 /**
  * Operation process of showing compactions.
  */
@@ -93,8 +97,6 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
     os.write(Utilities.newLineCode);
   }
 
-  private static final String NO_VAL = " --- ";
-
   private void writeRow(DataOutputStream os, ShowCompactResponseElement e) throws IOException {
     os.writeBytes(Long.toString(e.getId()));
     os.write(Utilities.tabCode);
@@ -128,20 +130,5 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
     os.write(Utilities.tabCode);
     os.writeBytes(getThreadIdFromId(e.getInitiatorId()));
     os.write(Utilities.newLineCode);
-  }
-
-  private String getHostFromId(String id) {
-    if (id == null) {
-      return NO_VAL;
-    }
-    int lastDash = id.lastIndexOf('-');
-    return id.substring(0, lastDash > -1 ? lastDash : id.length());
-  }
-
-  private String getThreadIdFromId(String id) {
-    if (id == null) {
-      return NO_VAL;
-    }
-    return id.substring(id.lastIndexOf('-') + 1);
   }
 }
