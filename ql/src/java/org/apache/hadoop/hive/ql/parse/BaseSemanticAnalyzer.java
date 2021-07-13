@@ -140,6 +140,7 @@ public abstract class BaseSemanticAnalyzer {
   protected Map<String, String> idToTableNameMap;
   protected QueryProperties queryProperties;
   protected EngineQueryHelper impalaHelper;
+  ParseContext pCtx = null;
 
   /**
    * A set of FileSinkOperators being written to in an ACID compliant way.  We need to remember
@@ -1922,4 +1923,9 @@ public abstract class BaseSemanticAnalyzer {
   public static boolean isImpalaPlan(HiveConf conf) {
     return conf.getEngine() == Engine.IMPALA;
   }
+
+  public ParseContext getParseContext() {
+    return pCtx;
+  }
+
 }
