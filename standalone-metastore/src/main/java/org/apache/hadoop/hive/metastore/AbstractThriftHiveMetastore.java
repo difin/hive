@@ -719,6 +719,12 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
+    public AllTableConstraintsResponse get_all_table_constraints(AllTableConstraintsRequest request)
+            throws MetaException, NoSuchObjectException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public boolean update_table_column_statistics(ColumnStatistics stats_obj)
             throws NoSuchObjectException, InvalidObjectException, MetaException, InvalidInputException, TException {
         throw new UnsupportedOperationException("this method is not supported");

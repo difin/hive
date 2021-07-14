@@ -8,13 +8,13 @@ HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_store_returns
 HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_table_req FOR impala_tpcds_web_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_item
-HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
+HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_web_returns
 PREHOOK: query: explain cbo physical WITH all_sales AS (
  SELECT d_year
@@ -269,13 +269,13 @@ HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_store_returns
 HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_table_req FOR impala_tpcds_web_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_item
-HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
+HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_web_returns
 PREHOOK: query: explain WITH all_sales AS (
  SELECT d_year

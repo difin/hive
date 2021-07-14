@@ -2,10 +2,10 @@ HMS CALL get_table_req FOR impala_tpch_customer
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_lineitem
 HMS CALL get_table_req FOR impala_tpch_nation
-HMS CALL get_foreign_keys FOR impala_tpch_customer
-HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_nation
+HMS CALL get_foreign_keys FOR impala_tpch_customer
 PREHOOK: query: explain cbo physical select
   c_custkey,
   c_name,
@@ -103,10 +103,10 @@ HMS CALL get_table_req FOR impala_tpch_customer
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_lineitem
 HMS CALL get_table_req FOR impala_tpch_nation
-HMS CALL get_foreign_keys FOR impala_tpch_customer
-HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_nation
+HMS CALL get_foreign_keys FOR impala_tpch_customer
 PREHOOK: query: explain select
   c_custkey,
   c_name,

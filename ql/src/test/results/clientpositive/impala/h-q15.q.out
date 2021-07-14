@@ -1,9 +1,9 @@
 HMS CALL get_table_req FOR impala_tpch_supplier
 HMS CALL get_table_req FOR revenue_view
 HMS CALL get_table_req FOR impala_tpch_lineitem
+HMS CALL get_table_req FOR revenue_view
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 HMS CALL get_foreign_keys FOR impala_tpch_supplier
-HMS CALL get_table_req FOR revenue_view
 PREHOOK: query: explain cbo physical with revenue_view as (
   select 
     l_suppkey as supplier_no,
@@ -89,9 +89,9 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
 HMS CALL get_table_req FOR impala_tpch_supplier
 HMS CALL get_table_req FOR revenue_view
 HMS CALL get_table_req FOR impala_tpch_lineitem
+HMS CALL get_table_req FOR revenue_view
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 HMS CALL get_foreign_keys FOR impala_tpch_supplier
-HMS CALL get_table_req FOR revenue_view
 PREHOOK: query: explain with revenue_view as (
   select 
     l_suppkey as supplier_no,

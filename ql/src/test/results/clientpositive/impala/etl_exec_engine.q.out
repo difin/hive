@@ -959,8 +959,6 @@ POSTHOOK: Output: default@test_updates
 HMS CALL get_table_req FOR test_dest
 HMS CALL get_table_req FOR merge_tmp_table
 HMS CALL get_table_req FOR test_updates
-HMS CALL get_foreign_keys FOR test_dest
-HMS CALL get_foreign_keys FOR test_updates
 PREHOOK: query: EXPLAIN MERGE INTO test_dest USING test_updates ON test_dest.i = test_updates.i
 WHEN MATCHED THEN UPDATE
 SET s = test_updates.s

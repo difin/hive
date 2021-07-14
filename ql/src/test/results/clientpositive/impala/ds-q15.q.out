@@ -2,10 +2,10 @@ HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR impala_tpcds_customer
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_customer
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain cbo physical select  ca_zip
        ,sum(cs_sales_price)
  from impala_tpcds_catalog_sales
@@ -70,10 +70,10 @@ HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR impala_tpcds_customer
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_customer
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain select  ca_zip
        ,sum(cs_sales_price)
  from impala_tpcds_catalog_sales

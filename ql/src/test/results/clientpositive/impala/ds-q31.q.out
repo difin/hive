@@ -9,9 +9,9 @@ HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
-HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
 PREHOOK: query: explain cbo physical with ss as
  (select ca_county,d_qoy, d_year,sum(ss_ext_sales_price) as store_sales
  from impala_tpcds_store_sales,impala_tpcds_date_dim,impala_tpcds_customer_address
@@ -194,9 +194,9 @@ HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
-HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
 PREHOOK: query: explain with ss as
  (select ca_county,d_qoy, d_year,sum(ss_ext_sales_price) as store_sales
  from impala_tpcds_store_sales,impala_tpcds_date_dim,impala_tpcds_customer_address

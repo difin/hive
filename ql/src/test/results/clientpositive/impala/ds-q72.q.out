@@ -7,14 +7,14 @@ HMS CALL get_table_req FOR impala_tpcds_household_demographics
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_promotion
 HMS CALL get_table_req FOR impala_tpcds_catalog_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_inventory
-HMS CALL get_foreign_keys FOR impala_tpcds_warehouse
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_customer_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_inventory
+HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
+HMS CALL get_foreign_keys FOR impala_tpcds_warehouse
 HMS CALL get_foreign_keys FOR impala_tpcds_promotion
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
 PREHOOK: query: explain cbo physical select  i_item_desc
       ,w_warehouse_name
@@ -135,14 +135,14 @@ HMS CALL get_table_req FOR impala_tpcds_household_demographics
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_promotion
 HMS CALL get_table_req FOR impala_tpcds_catalog_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_inventory
-HMS CALL get_foreign_keys FOR impala_tpcds_warehouse
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_customer_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_inventory
+HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
+HMS CALL get_foreign_keys FOR impala_tpcds_warehouse
 HMS CALL get_foreign_keys FOR impala_tpcds_promotion
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
 PREHOOK: query: explain select  i_item_desc
       ,w_warehouse_name

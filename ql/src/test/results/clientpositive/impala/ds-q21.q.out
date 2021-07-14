@@ -2,10 +2,10 @@ HMS CALL get_table_req FOR impala_tpcds_inventory
 HMS CALL get_table_req FOR impala_tpcds_warehouse
 HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_inventory
-HMS CALL get_foreign_keys FOR impala_tpcds_warehouse
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_inventory
+HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_warehouse
 PREHOOK: query: explain cbo physical select  *
  from(select w_warehouse_name
             ,i_item_id
@@ -90,10 +90,10 @@ HMS CALL get_table_req FOR impala_tpcds_inventory
 HMS CALL get_table_req FOR impala_tpcds_warehouse
 HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_inventory
-HMS CALL get_foreign_keys FOR impala_tpcds_warehouse
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_inventory
+HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_warehouse
 PREHOOK: query: explain select  *
  from(select w_warehouse_name
             ,i_item_id

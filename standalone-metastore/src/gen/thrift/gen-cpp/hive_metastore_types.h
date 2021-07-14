@@ -313,6 +313,8 @@ class SQLDefaultConstraint;
 
 class SQLCheckConstraint;
 
+class SQLAllTableConstraints;
+
 class Type;
 
 class HiveObjectRef;
@@ -448,6 +450,10 @@ class DefaultConstraintsResponse;
 class CheckConstraintsRequest;
 
 class CheckConstraintsResponse;
+
+class AllTableConstraintsRequest;
+
+class AllTableConstraintsResponse;
 
 class DropConstraintRequest;
 
@@ -1634,6 +1640,94 @@ class SQLCheckConstraint {
 void swap(SQLCheckConstraint &a, SQLCheckConstraint &b);
 
 inline std::ostream& operator<<(std::ostream& out, const SQLCheckConstraint& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+typedef struct _SQLAllTableConstraints__isset {
+  _SQLAllTableConstraints__isset() : primaryKeys(false), foreignKeys(false), uniqueConstraints(false), notNullConstraints(false), defaultConstraints(false), checkConstraints(false) {}
+  bool primaryKeys :1;
+  bool foreignKeys :1;
+  bool uniqueConstraints :1;
+  bool notNullConstraints :1;
+  bool defaultConstraints :1;
+  bool checkConstraints :1;
+} _SQLAllTableConstraints__isset;
+
+class SQLAllTableConstraints {
+ public:
+
+  SQLAllTableConstraints(const SQLAllTableConstraints&);
+  SQLAllTableConstraints& operator=(const SQLAllTableConstraints&);
+  SQLAllTableConstraints() {
+  }
+
+  virtual ~SQLAllTableConstraints() throw();
+  std::vector<SQLPrimaryKey>  primaryKeys;
+  std::vector<SQLForeignKey>  foreignKeys;
+  std::vector<SQLUniqueConstraint>  uniqueConstraints;
+  std::vector<SQLNotNullConstraint>  notNullConstraints;
+  std::vector<SQLDefaultConstraint>  defaultConstraints;
+  std::vector<SQLCheckConstraint>  checkConstraints;
+
+  _SQLAllTableConstraints__isset __isset;
+
+  void __set_primaryKeys(const std::vector<SQLPrimaryKey> & val);
+
+  void __set_foreignKeys(const std::vector<SQLForeignKey> & val);
+
+  void __set_uniqueConstraints(const std::vector<SQLUniqueConstraint> & val);
+
+  void __set_notNullConstraints(const std::vector<SQLNotNullConstraint> & val);
+
+  void __set_defaultConstraints(const std::vector<SQLDefaultConstraint> & val);
+
+  void __set_checkConstraints(const std::vector<SQLCheckConstraint> & val);
+
+  bool operator == (const SQLAllTableConstraints & rhs) const
+  {
+    if (__isset.primaryKeys != rhs.__isset.primaryKeys)
+      return false;
+    else if (__isset.primaryKeys && !(primaryKeys == rhs.primaryKeys))
+      return false;
+    if (__isset.foreignKeys != rhs.__isset.foreignKeys)
+      return false;
+    else if (__isset.foreignKeys && !(foreignKeys == rhs.foreignKeys))
+      return false;
+    if (__isset.uniqueConstraints != rhs.__isset.uniqueConstraints)
+      return false;
+    else if (__isset.uniqueConstraints && !(uniqueConstraints == rhs.uniqueConstraints))
+      return false;
+    if (__isset.notNullConstraints != rhs.__isset.notNullConstraints)
+      return false;
+    else if (__isset.notNullConstraints && !(notNullConstraints == rhs.notNullConstraints))
+      return false;
+    if (__isset.defaultConstraints != rhs.__isset.defaultConstraints)
+      return false;
+    else if (__isset.defaultConstraints && !(defaultConstraints == rhs.defaultConstraints))
+      return false;
+    if (__isset.checkConstraints != rhs.__isset.checkConstraints)
+      return false;
+    else if (__isset.checkConstraints && !(checkConstraints == rhs.checkConstraints))
+      return false;
+    return true;
+  }
+  bool operator != (const SQLAllTableConstraints &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const SQLAllTableConstraints & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(SQLAllTableConstraints &a, SQLAllTableConstraints &b);
+
+inline std::ostream& operator<<(std::ostream& out, const SQLAllTableConstraints& obj)
 {
   obj.printTo(out);
   return out;
@@ -4172,19 +4266,33 @@ class ColumnStatisticsData {
 
   bool operator == (const ColumnStatisticsData & rhs) const
   {
-    if (!(booleanStats == rhs.booleanStats))
+    if (__isset.booleanStats != rhs.__isset.booleanStats)
       return false;
-    if (!(longStats == rhs.longStats))
+    else if (__isset.booleanStats && !(booleanStats == rhs.booleanStats))
       return false;
-    if (!(doubleStats == rhs.doubleStats))
+    if (__isset.longStats != rhs.__isset.longStats)
       return false;
-    if (!(stringStats == rhs.stringStats))
+    else if (__isset.longStats && !(longStats == rhs.longStats))
       return false;
-    if (!(binaryStats == rhs.binaryStats))
+    if (__isset.doubleStats != rhs.__isset.doubleStats)
       return false;
-    if (!(decimalStats == rhs.decimalStats))
+    else if (__isset.doubleStats && !(doubleStats == rhs.doubleStats))
       return false;
-    if (!(dateStats == rhs.dateStats))
+    if (__isset.stringStats != rhs.__isset.stringStats)
+      return false;
+    else if (__isset.stringStats && !(stringStats == rhs.stringStats))
+      return false;
+    if (__isset.binaryStats != rhs.__isset.binaryStats)
+      return false;
+    else if (__isset.binaryStats && !(binaryStats == rhs.binaryStats))
+      return false;
+    if (__isset.decimalStats != rhs.__isset.decimalStats)
+      return false;
+    else if (__isset.decimalStats && !(decimalStats == rhs.decimalStats))
+      return false;
+    if (__isset.dateStats != rhs.__isset.dateStats)
+      return false;
+    else if (__isset.dateStats && !(dateStats == rhs.dateStats))
       return false;
     return true;
   }
@@ -5936,6 +6044,96 @@ inline std::ostream& operator<<(std::ostream& out, const CheckConstraintsRespons
   return out;
 }
 
+
+class AllTableConstraintsRequest {
+ public:
+
+  AllTableConstraintsRequest(const AllTableConstraintsRequest&);
+  AllTableConstraintsRequest& operator=(const AllTableConstraintsRequest&);
+  AllTableConstraintsRequest() : dbName(), tblName(), catName() {
+  }
+
+  virtual ~AllTableConstraintsRequest() throw();
+  std::string dbName;
+  std::string tblName;
+  std::string catName;
+
+  void __set_dbName(const std::string& val);
+
+  void __set_tblName(const std::string& val);
+
+  void __set_catName(const std::string& val);
+
+  bool operator == (const AllTableConstraintsRequest & rhs) const
+  {
+    if (!(dbName == rhs.dbName))
+      return false;
+    if (!(tblName == rhs.tblName))
+      return false;
+    if (!(catName == rhs.catName))
+      return false;
+    return true;
+  }
+  bool operator != (const AllTableConstraintsRequest &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const AllTableConstraintsRequest & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(AllTableConstraintsRequest &a, AllTableConstraintsRequest &b);
+
+inline std::ostream& operator<<(std::ostream& out, const AllTableConstraintsRequest& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+class AllTableConstraintsResponse {
+ public:
+
+  AllTableConstraintsResponse(const AllTableConstraintsResponse&);
+  AllTableConstraintsResponse& operator=(const AllTableConstraintsResponse&);
+  AllTableConstraintsResponse() {
+  }
+
+  virtual ~AllTableConstraintsResponse() throw();
+  SQLAllTableConstraints allTableConstraints;
+
+  void __set_allTableConstraints(const SQLAllTableConstraints& val);
+
+  bool operator == (const AllTableConstraintsResponse & rhs) const
+  {
+    if (!(allTableConstraints == rhs.allTableConstraints))
+      return false;
+    return true;
+  }
+  bool operator != (const AllTableConstraintsResponse &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const AllTableConstraintsResponse & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(AllTableConstraintsResponse &a, AllTableConstraintsResponse &b);
+
+inline std::ostream& operator<<(std::ostream& out, const AllTableConstraintsResponse& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
 typedef struct _DropConstraintRequest__isset {
   _DropConstraintRequest__isset() : catName(false) {}
   bool catName :1;
@@ -6931,9 +7129,13 @@ class RequestPartsSpec {
 
   bool operator == (const RequestPartsSpec & rhs) const
   {
-    if (!(names == rhs.names))
+    if (__isset.names != rhs.__isset.names)
       return false;
-    if (!(exprs == rhs.exprs))
+    else if (__isset.names && !(names == rhs.names))
+      return false;
+    if (__isset.exprs != rhs.__isset.exprs)
+      return false;
+    else if (__isset.exprs && !(exprs == rhs.exprs))
       return false;
     return true;
   }
@@ -10976,9 +11178,13 @@ class FireEventRequestData {
 
   bool operator == (const FireEventRequestData & rhs) const
   {
-    if (!(insertData == rhs.insertData))
+    if (__isset.insertData != rhs.__isset.insertData)
       return false;
-    if (!(insertDatas == rhs.insertDatas))
+    else if (__isset.insertData && !(insertData == rhs.insertData))
+      return false;
+    if (__isset.insertDatas != rhs.__isset.insertDatas)
+      return false;
+    else if (__isset.insertDatas && !(insertDatas == rhs.insertDatas))
       return false;
     return true;
   }

@@ -130,8 +130,8 @@ POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab_item_n0
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 HMS CALL get_foreign_keys FOR tab_item_n0
+HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain cbo physical
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
@@ -182,8 +182,8 @@ ImpalaProjectPassthroughRel(gross_margin=[$7], i_category=[$2], i_class=[$3], lo
 
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 HMS CALL get_foreign_keys FOR tab_item_n0
+HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain cbo physical
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
@@ -233,8 +233,8 @@ ImpalaProjectPassthroughRel(gross_margin=[$6], i_category=[$2], i_class=[$3], lo
 
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 HMS CALL get_foreign_keys FOR tab_item_n0
+HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain cbo physical
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
@@ -285,8 +285,8 @@ ImpalaProjectPassthroughRel(gross_margin=[$7], i_category=[$2], i_class=[$3], lo
 
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 HMS CALL get_foreign_keys FOR tab_item_n0
+HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
@@ -469,8 +469,8 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
 
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 HMS CALL get_foreign_keys FOR tab_item_n0
+HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
@@ -653,8 +653,8 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
 
 HMS CALL get_table_req FOR tab_sales_n0
 HMS CALL get_table_req FOR tab_item_n0
-HMS CALL get_foreign_keys FOR tab_sales_n0
 HMS CALL get_foreign_keys FOR tab_item_n0
+HMS CALL get_foreign_keys FOR tab_sales_n0
 PREHOOK: query: explain
 select
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin

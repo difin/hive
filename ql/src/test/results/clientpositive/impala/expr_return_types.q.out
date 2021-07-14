@@ -354,11 +354,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
       Processor Tree:
         ListSink
 
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain select cast('01/01/1984' as date) + interval 1 days
 PREHOOK: type: QUERY
 PREHOOK: Output: streaming
@@ -465,11 +460,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
       Processor Tree:
         ListSink
 
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain select 1 is null
 PREHOOK: type: QUERY
 PREHOOK: Output: streaming
@@ -604,11 +594,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
       Processor Tree:
         ListSink
 
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain select date '1984-01-01'
 PREHOOK: type: QUERY
 PREHOOK: Output: streaming

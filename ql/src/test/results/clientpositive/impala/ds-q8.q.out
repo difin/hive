@@ -3,11 +3,11 @@ HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_store
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_customer
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 HMS CALL get_foreign_keys FOR impala_tpcds_customer
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_store
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain cbo physical select  s_store_name
       ,sum(ss_net_profit)
  from impala_tpcds_store_sales
@@ -263,11 +263,11 @@ HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_store
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_customer
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 HMS CALL get_foreign_keys FOR impala_tpcds_customer
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_store
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain select  s_store_name
       ,sum(ss_net_profit)
  from impala_tpcds_store_sales

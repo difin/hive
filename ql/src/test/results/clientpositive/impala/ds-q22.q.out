@@ -1,8 +1,8 @@
 HMS CALL get_table_req FOR impala_tpcds_inventory
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_item
-HMS CALL get_foreign_keys FOR impala_tpcds_inventory
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_inventory
 HMS CALL get_foreign_keys FOR impala_tpcds_item
 PREHOOK: query: explain cbo physical select  i_product_name
              ,i_brand
@@ -63,8 +63,8 @@ ImpalaSortRel(sort0=[$4], sort1=[$0], sort2=[$1], sort3=[$2], sort4=[$3], dir0=[
 HMS CALL get_table_req FOR impala_tpcds_inventory
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_item
-HMS CALL get_foreign_keys FOR impala_tpcds_inventory
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_inventory
 HMS CALL get_foreign_keys FOR impala_tpcds_item
 PREHOOK: query: explain select  i_product_name
              ,i_brand

@@ -8,11 +8,11 @@ HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR ws
 HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain cbo physical with ss as (
  select
           i_manufact_id,sum(ss_ext_sales_price) total_sales
@@ -235,11 +235,11 @@ HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR ws
 HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain with ss as (
  select
           i_manufact_id,sum(ss_ext_sales_price) total_sales

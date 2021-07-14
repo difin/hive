@@ -96,16 +96,6 @@ HMS CALL get_table_req FOR foo
 HMS CALL get_table_req FOR my_test_table
 HMS CALL get_table_req FOR foo
 HMS CALL get_foreign_keys FOR my_test_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain cbo physical
 WITH foo AS (SELECT 1 FROM my_test_table WHERE int_col IN (SELECT 1))
 SELECT * FROM foo
@@ -143,16 +133,6 @@ HMS CALL get_table_req FOR foo
 HMS CALL get_table_req FOR my_test_table
 HMS CALL get_table_req FOR foo
 HMS CALL get_foreign_keys FOR my_test_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain cbo physical
 WITH foo AS (SELECT 1 FROM my_test_table WHERE int_col IN (SELECT 1))
 SELECT * FROM (SELECT * FROM foo UNION SELECT * FROM foo) bar

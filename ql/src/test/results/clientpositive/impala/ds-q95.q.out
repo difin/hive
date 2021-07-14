@@ -2,13 +2,13 @@ HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_web_site
-HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
-HMS CALL get_foreign_keys FOR impala_tpcds_web_site
 HMS CALL get_table_req FOR ws_wh
 HMS CALL get_table_req FOR impala_tpcds_web_returns
 HMS CALL get_table_req FOR ws_wh
+HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_web_site
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 HMS CALL get_foreign_keys FOR impala_tpcds_web_returns
 PREHOOK: query: explain cbo physical with ws_wh as
 (select ws1.ws_order_number,ws1.ws_warehouse_sk wh1,ws2.ws_warehouse_sk wh2
@@ -119,13 +119,13 @@ HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_web_site
-HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
-HMS CALL get_foreign_keys FOR impala_tpcds_web_site
 HMS CALL get_table_req FOR ws_wh
 HMS CALL get_table_req FOR impala_tpcds_web_returns
 HMS CALL get_table_req FOR ws_wh
+HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_web_site
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 HMS CALL get_foreign_keys FOR impala_tpcds_web_returns
 PREHOOK: query: explain with ws_wh as
 (select ws1.ws_order_number,ws1.ws_warehouse_sk wh1,ws2.ws_warehouse_sk wh2

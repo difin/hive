@@ -2,8 +2,8 @@ HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_store_returns
 HMS CALL get_table_req FOR impala_tpcds_reason
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_reason
+HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 PREHOOK: query: explain cbo physical select  ss_customer_sk
             ,sum(act_sales) sumsales
       from (select ss_item_sk
@@ -60,8 +60,8 @@ HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_store_returns
 HMS CALL get_table_req FOR impala_tpcds_reason
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_reason
+HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 PREHOOK: query: explain select  ss_customer_sk
             ,sum(act_sales) sumsales
       from (select ss_item_sk

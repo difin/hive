@@ -18,6 +18,7 @@
 package org.apache.hadoop.hive.ql.exec.repl;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -36,10 +37,7 @@ import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.NotificationEvent;
-import org.apache.hadoop.hive.metastore.api.SQLForeignKey;
-import org.apache.hadoop.hive.metastore.api.SQLNotNullConstraint;
-import org.apache.hadoop.hive.metastore.api.SQLPrimaryKey;
-import org.apache.hadoop.hive.metastore.api.SQLUniqueConstraint;
+import org.apache.hadoop.hive.metastore.api.SQLAllTableConstraints;
 import org.apache.hadoop.hive.metastore.api.ShowLocksResponse;
 import org.apache.hadoop.hive.metastore.api.ShowLocksRequest;
 import org.apache.hadoop.hive.metastore.api.ShowLocksResponseElement;
@@ -1537,22 +1535,20 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
       Path constraintsRoot = new Path(dbRoot, ReplUtils.CONSTRAINTS_ROOT_DIR_NAME);
       Path commonConstraintsFile = new Path(constraintsRoot, ConstraintFileType.COMMON.getPrefix() + tblName);
       Path fkConstraintsFile = new Path(constraintsRoot, ConstraintFileType.FOREIGNKEY.getPrefix() + tblName);
-      List<SQLPrimaryKey> pks = hiveDb.getPrimaryKeyList(dbName, tblName);
-      List<SQLForeignKey> fks = hiveDb.getForeignKeyList(dbName, tblName);
-      List<SQLUniqueConstraint> uks = hiveDb.getUniqueConstraintList(dbName, tblName);
-      List<SQLNotNullConstraint> nns = hiveDb.getNotNullConstraintList(dbName, tblName);
-      if ((pks != null && !pks.isEmpty()) || (uks != null && !uks.isEmpty())
-          || (nns != null && !nns.isEmpty())) {
-        try (JsonWriter jsonWriter =
-            new JsonWriter(commonConstraintsFile.getFileSystem(conf), commonConstraintsFile)) {
-          ConstraintsSerializer serializer = new ConstraintsSerializer(pks, null, uks, nns, conf);
+      SQLAllTableConstraints tableConstraints = hiveDb.getTableConstraints(dbName, tblName);
+      if (CollectionUtils.isNotEmpty(tableConstraints.getPrimaryKeys()) || CollectionUtils
+          .isNotEmpty(tableConstraints.getUniqueConstraints()) || CollectionUtils
+          .isNotEmpty(tableConstraints.getNotNullConstraints())) {
+        try (JsonWriter jsonWriter = new JsonWriter(commonConstraintsFile.getFileSystem(conf), commonConstraintsFile)) {
+          ConstraintsSerializer serializer = new ConstraintsSerializer(tableConstraints.getPrimaryKeys(), null,
+              tableConstraints.getUniqueConstraints(), tableConstraints.getNotNullConstraints(), conf);
           serializer.writeTo(jsonWriter, null);
         }
       }
-      if (fks != null && !fks.isEmpty()) {
-        try (JsonWriter jsonWriter =
-            new JsonWriter(fkConstraintsFile.getFileSystem(conf), fkConstraintsFile)) {
-          ConstraintsSerializer serializer = new ConstraintsSerializer(null, fks, null, null, conf);
+      if (CollectionUtils.isNotEmpty(tableConstraints.getForeignKeys())) {
+        try (JsonWriter jsonWriter = new JsonWriter(fkConstraintsFile.getFileSystem(conf), fkConstraintsFile)) {
+          ConstraintsSerializer serializer =
+              new ConstraintsSerializer(null, tableConstraints.getForeignKeys(), null, null, conf);
           serializer.writeTo(jsonWriter, null);
         }
       }

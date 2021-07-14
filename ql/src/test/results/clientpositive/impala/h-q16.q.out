@@ -1,9 +1,9 @@
 HMS CALL get_table_req FOR impala_tpch_partsupp
 HMS CALL get_table_req FOR impala_tpch_part
-HMS CALL get_foreign_keys FOR impala_tpch_partsupp
-HMS CALL get_foreign_keys FOR impala_tpch_part
 HMS CALL get_table_req FOR impala_tpch_supplier
+HMS CALL get_foreign_keys FOR impala_tpch_partsupp
 HMS CALL get_foreign_keys FOR impala_tpch_supplier
+HMS CALL get_foreign_keys FOR impala_tpch_part
 PREHOOK: query: explain cbo physical select
   p_brand,
   p_type,
@@ -93,10 +93,10 @@ ImpalaSortRel(sort0=[$3], sort1=[$0], sort2=[$1], sort3=[$2], dir0=[DESC], dir1=
 
 HMS CALL get_table_req FOR impala_tpch_partsupp
 HMS CALL get_table_req FOR impala_tpch_part
-HMS CALL get_foreign_keys FOR impala_tpch_partsupp
-HMS CALL get_foreign_keys FOR impala_tpch_part
 HMS CALL get_table_req FOR impala_tpch_supplier
+HMS CALL get_foreign_keys FOR impala_tpch_partsupp
 HMS CALL get_foreign_keys FOR impala_tpch_supplier
+HMS CALL get_foreign_keys FOR impala_tpch_part
 PREHOOK: query: explain select
   p_brand,
   p_type,

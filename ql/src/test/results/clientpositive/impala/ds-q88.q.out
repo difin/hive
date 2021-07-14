@@ -3,9 +3,9 @@ HMS CALL get_table_req FOR impala_tpcds_household_demographics
 HMS CALL get_table_req FOR impala_tpcds_time_dim
 HMS CALL get_table_req FOR impala_tpcds_store
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
 HMS CALL get_foreign_keys FOR impala_tpcds_time_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_store
+HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
 PREHOOK: query: explain cbo physical select  *
 from
  (select count(*) h8_30_to_9
@@ -308,9 +308,9 @@ HMS CALL get_table_req FOR impala_tpcds_household_demographics
 HMS CALL get_table_req FOR impala_tpcds_time_dim
 HMS CALL get_table_req FOR impala_tpcds_store
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
 HMS CALL get_foreign_keys FOR impala_tpcds_time_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_store
+HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
 PREHOOK: query: explain select  *
 from
  (select count(*) h8_30_to_9

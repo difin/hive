@@ -15,19 +15,19 @@ HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR impala_tpcds_catalog_returns
 HMS CALL get_table_req FOR cs_ui
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_store
-HMS CALL get_foreign_keys FOR impala_tpcds_customer
 HMS CALL get_foreign_keys FOR impala_tpcds_customer_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_promotion
-HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
-HMS CALL get_foreign_keys FOR impala_tpcds_income_band
 HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_store
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer
+HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_income_band
+HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
+HMS CALL get_foreign_keys FOR impala_tpcds_promotion
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
+HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain cbo physical with cs_ui as
  (select cs_item_sk
         ,sum(cs_ext_list_price) as sale,sum(cr_refunded_cash+cr_reversed_charge+cr_store_credit) as refund
@@ -436,19 +436,19 @@ HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR impala_tpcds_catalog_returns
 HMS CALL get_table_req FOR cs_ui
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_store
-HMS CALL get_foreign_keys FOR impala_tpcds_customer
 HMS CALL get_foreign_keys FOR impala_tpcds_customer_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_promotion
-HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
-HMS CALL get_foreign_keys FOR impala_tpcds_income_band
 HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_store
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer
+HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_income_band
+HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
+HMS CALL get_foreign_keys FOR impala_tpcds_promotion
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
+HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain with cs_ui as
  (select cs_item_sk
         ,sum(cs_ext_list_price) as sale,sum(cr_refunded_cash+cr_reversed_charge+cr_store_credit) as refund

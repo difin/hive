@@ -1,9 +1,9 @@
 HMS CALL get_table_req FOR impala_tpch_customer
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_customer
-HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_orders
+HMS CALL get_foreign_keys FOR impala_tpch_customer
 PREHOOK: query: explain cbo physical select
   c_name,
   c_custkey,
@@ -104,9 +104,9 @@ ImpalaSortRel(sort0=[$4], sort1=[$3], sort2=[$2], dir0=[DESC], dir1=[ASC], dir2=
 HMS CALL get_table_req FOR impala_tpch_customer
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_customer
-HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_orders
+HMS CALL get_foreign_keys FOR impala_tpch_customer
 PREHOOK: query: explain select
   c_name,
   c_custkey,

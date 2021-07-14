@@ -7,5 +7,4 @@ POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@my_table_n1
 HMS CALL get_table_req FOR my_table_n1
-HMS CALL get_foreign_keys FOR my_table_n1
 FAILED: SemanticException TOK_ALLCOLREF is not supported in current context

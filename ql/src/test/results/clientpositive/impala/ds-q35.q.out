@@ -1,17 +1,17 @@
 HMS CALL get_table_req FOR impala_tpcds_customer
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_customer_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_customer
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_demographics
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_web_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer
+HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_demographics
+HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain cbo physical select   
   ca_state,
   cd_gender,
@@ -179,17 +179,17 @@ ImpalaSortRel(sort0=[$0], sort1=[$1], sort2=[$2], sort3=[$3], sort4=[$8], sort5=
 HMS CALL get_table_req FOR impala_tpcds_customer
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_customer_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_customer
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_demographics
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_web_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer
+HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_demographics
+HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain select   
   ca_state,
   cd_gender,

@@ -1,9 +1,9 @@
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
 PREHOOK: query: explain cbo physical select  sum(cs_ext_discount_amt)  as `excess discount amount` 
 from 
    impala_tpcds_catalog_sales 
@@ -86,9 +86,9 @@ ImpalaSortRel(fetch=[100])
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
 PREHOOK: query: explain select  sum(cs_ext_discount_amt)  as `excess discount amount` 
 from 
    impala_tpcds_catalog_sales 

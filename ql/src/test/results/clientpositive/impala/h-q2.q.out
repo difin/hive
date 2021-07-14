@@ -3,10 +3,10 @@ HMS CALL get_table_req FOR impala_tpch_supplier
 HMS CALL get_table_req FOR impala_tpch_partsupp
 HMS CALL get_table_req FOR impala_tpch_nation
 HMS CALL get_table_req FOR impala_tpch_region
-HMS CALL get_foreign_keys FOR impala_tpch_part
-HMS CALL get_foreign_keys FOR impala_tpch_supplier
 HMS CALL get_foreign_keys FOR impala_tpch_partsupp
 HMS CALL get_foreign_keys FOR impala_tpch_nation
+HMS CALL get_foreign_keys FOR impala_tpch_supplier
+HMS CALL get_foreign_keys FOR impala_tpch_part
 HMS CALL get_foreign_keys FOR impala_tpch_region
 PREHOOK: query: explain cbo physical select
   s_acctbal,
@@ -144,10 +144,10 @@ HMS CALL get_table_req FOR impala_tpch_supplier
 HMS CALL get_table_req FOR impala_tpch_partsupp
 HMS CALL get_table_req FOR impala_tpch_nation
 HMS CALL get_table_req FOR impala_tpch_region
-HMS CALL get_foreign_keys FOR impala_tpch_part
-HMS CALL get_foreign_keys FOR impala_tpch_supplier
 HMS CALL get_foreign_keys FOR impala_tpch_partsupp
 HMS CALL get_foreign_keys FOR impala_tpch_nation
+HMS CALL get_foreign_keys FOR impala_tpch_supplier
+HMS CALL get_foreign_keys FOR impala_tpch_part
 HMS CALL get_foreign_keys FOR impala_tpch_region
 PREHOOK: query: explain select
   s_acctbal,

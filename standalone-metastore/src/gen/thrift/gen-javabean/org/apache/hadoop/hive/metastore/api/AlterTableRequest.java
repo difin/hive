@@ -1073,13 +1073,13 @@ import org.slf4j.LoggerFactory;
           case 8: // PROCESSOR_CAPABILITIES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list1202 = iprot.readListBegin();
-                struct.processorCapabilities = new ArrayList<String>(_list1202.size);
-                String _elem1203;
-                for (int _i1204 = 0; _i1204 < _list1202.size; ++_i1204)
+                org.apache.thrift.protocol.TList _list1250 = iprot.readListBegin();
+                struct.processorCapabilities = new ArrayList<String>(_list1250.size);
+                String _elem1251;
+                for (int _i1252 = 0; _i1252 < _list1250.size; ++_i1252)
                 {
-                  _elem1203 = iprot.readString();
-                  struct.processorCapabilities.add(_elem1203);
+                  _elem1251 = iprot.readString();
+                  struct.processorCapabilities.add(_elem1251);
                 }
                 iprot.readListEnd();
               }
@@ -1155,9 +1155,9 @@ import org.slf4j.LoggerFactory;
           oprot.writeFieldBegin(PROCESSOR_CAPABILITIES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.processorCapabilities.size()));
-            for (String _iter1205 : struct.processorCapabilities)
+            for (String _iter1253 : struct.processorCapabilities)
             {
-              oprot.writeString(_iter1205);
+              oprot.writeString(_iter1253);
             }
             oprot.writeListEnd();
           }
@@ -1226,9 +1226,9 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetProcessorCapabilities()) {
         {
           oprot.writeI32(struct.processorCapabilities.size());
-          for (String _iter1206 : struct.processorCapabilities)
+          for (String _iter1254 : struct.processorCapabilities)
           {
-            oprot.writeString(_iter1206);
+            oprot.writeString(_iter1254);
           }
         }
       }
@@ -1267,13 +1267,13 @@ import org.slf4j.LoggerFactory;
       }
       if (incoming.get(4)) {
         {
-          org.apache.thrift.protocol.TList _list1207 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.processorCapabilities = new ArrayList<String>(_list1207.size);
-          String _elem1208;
-          for (int _i1209 = 0; _i1209 < _list1207.size; ++_i1209)
+          org.apache.thrift.protocol.TList _list1255 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.processorCapabilities = new ArrayList<String>(_list1255.size);
+          String _elem1256;
+          for (int _i1257 = 0; _i1257 < _list1255.size; ++_i1257)
           {
-            _elem1208 = iprot.readString();
-            struct.processorCapabilities.add(_elem1208);
+            _elem1256 = iprot.readString();
+            struct.processorCapabilities.add(_elem1256);
           }
         }
         struct.setProcessorCapabilitiesIsSet(true);

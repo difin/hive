@@ -1,9 +1,9 @@
 HMS CALL get_table_req FOR impala_tpch_customer
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_customer
-HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_orders
+HMS CALL get_foreign_keys FOR impala_tpch_customer
 PREHOOK: query: explain cbo physical select
   l_orderkey,
   sum(l_extendedprice * (1 - l_discount)) as revenue,
@@ -77,9 +77,9 @@ ImpalaSortRel(sort0=[$1], sort1=[$2], sort2=[$0], dir0=[DESC], dir1=[ASC], dir2=
 HMS CALL get_table_req FOR impala_tpch_customer
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_customer
-HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_orders
+HMS CALL get_foreign_keys FOR impala_tpch_customer
 PREHOOK: query: explain select
   l_orderkey,
   sum(l_extendedprice * (1 - l_discount)) as revenue,

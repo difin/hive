@@ -3,11 +3,11 @@ HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_store
 HMS CALL get_table_req FOR impala_tpcds_household_demographics
+HMS CALL get_foreign_keys FOR impala_tpcds_customer
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_store
 HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_customer
 PREHOOK: query: explain cbo physical select c_last_name
        ,c_first_name
        ,c_salutation
@@ -96,11 +96,11 @@ HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_store
 HMS CALL get_table_req FOR impala_tpcds_household_demographics
+HMS CALL get_foreign_keys FOR impala_tpcds_customer
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_store
 HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_customer
 PREHOOK: query: explain select c_last_name
        ,c_first_name
        ,c_salutation

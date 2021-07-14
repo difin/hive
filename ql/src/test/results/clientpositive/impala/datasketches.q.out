@@ -214,8 +214,8 @@ Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reserva
         ListSink
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 WARNING: Comparing a bigint and a double may result in a loss of precision.
+HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain cbo physical
 select id,
 		rank() over (order by id),
@@ -246,8 +246,8 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
           ImpalaHdfsScanRel(table=[[default, sketch_input]])
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 WARNING: Comparing a bigint and a double may result in a loss of precision.
+HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain
 select id,
 		rank() over (order by id),
@@ -371,8 +371,8 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 WARNING: Comparing a bigint and a double may result in a loss of precision.
+HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain cbo physical
 select id,category,
 		rank() over (partition by category order by id),
@@ -402,8 +402,8 @@ ImpalaSortRel(sort0=[$1], sort1=[$0], dir0=[ASC], dir1=[ASC])
           ImpalaHdfsScanRel(table=[[default, sketch_input]], condition=[IS NOT NULL($1)])
 
 HMS CALL get_table_req FOR sketch_input
-HMS CALL get_foreign_keys FOR sketch_input
 WARNING: Comparing a bigint and a double may result in a loss of precision.
+HMS CALL get_foreign_keys FOR sketch_input
 PREHOOK: query: explain
 select id,category,
 		rank() over (partition by category order by id),

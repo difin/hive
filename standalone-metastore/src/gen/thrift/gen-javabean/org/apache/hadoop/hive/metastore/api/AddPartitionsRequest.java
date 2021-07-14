@@ -866,14 +866,14 @@ import org.slf4j.LoggerFactory;
           case 3: // PARTS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list540 = iprot.readListBegin();
-                struct.parts = new ArrayList<Partition>(_list540.size);
-                Partition _elem541;
-                for (int _i542 = 0; _i542 < _list540.size; ++_i542)
+                org.apache.thrift.protocol.TList _list588 = iprot.readListBegin();
+                struct.parts = new ArrayList<Partition>(_list588.size);
+                Partition _elem589;
+                for (int _i590 = 0; _i590 < _list588.size; ++_i590)
                 {
-                  _elem541 = new Partition();
-                  _elem541.read(iprot);
-                  struct.parts.add(_elem541);
+                  _elem589 = new Partition();
+                  _elem589.read(iprot);
+                  struct.parts.add(_elem589);
                 }
                 iprot.readListEnd();
               }
@@ -941,9 +941,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(PARTS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.parts.size()));
-          for (Partition _iter543 : struct.parts)
+          for (Partition _iter591 : struct.parts)
           {
-            _iter543.write(oprot);
+            _iter591.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -992,9 +992,9 @@ import org.slf4j.LoggerFactory;
       oprot.writeString(struct.tblName);
       {
         oprot.writeI32(struct.parts.size());
-        for (Partition _iter544 : struct.parts)
+        for (Partition _iter592 : struct.parts)
         {
-          _iter544.write(oprot);
+          _iter592.write(oprot);
         }
       }
       oprot.writeBool(struct.ifNotExists);
@@ -1028,14 +1028,14 @@ import org.slf4j.LoggerFactory;
       struct.tblName = iprot.readString();
       struct.setTblNameIsSet(true);
       {
-        org.apache.thrift.protocol.TList _list545 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.parts = new ArrayList<Partition>(_list545.size);
-        Partition _elem546;
-        for (int _i547 = 0; _i547 < _list545.size; ++_i547)
+        org.apache.thrift.protocol.TList _list593 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.parts = new ArrayList<Partition>(_list593.size);
+        Partition _elem594;
+        for (int _i595 = 0; _i595 < _list593.size; ++_i595)
         {
-          _elem546 = new Partition();
-          _elem546.read(iprot);
-          struct.parts.add(_elem546);
+          _elem594 = new Partition();
+          _elem594.read(iprot);
+          struct.parts.add(_elem594);
         }
       }
       struct.setPartsIsSet(true);

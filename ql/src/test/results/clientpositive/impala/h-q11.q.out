@@ -2,8 +2,8 @@ HMS CALL get_table_req FOR impala_tpch_partsupp
 HMS CALL get_table_req FOR impala_tpch_supplier
 HMS CALL get_table_req FOR impala_tpch_nation
 HMS CALL get_foreign_keys FOR impala_tpch_partsupp
-HMS CALL get_foreign_keys FOR impala_tpch_supplier
 HMS CALL get_foreign_keys FOR impala_tpch_nation
+HMS CALL get_foreign_keys FOR impala_tpch_supplier
 PREHOOK: query: explain cbo physical select
   *
 from (
@@ -105,8 +105,8 @@ HMS CALL get_table_req FOR impala_tpch_partsupp
 HMS CALL get_table_req FOR impala_tpch_supplier
 HMS CALL get_table_req FOR impala_tpch_nation
 HMS CALL get_foreign_keys FOR impala_tpch_partsupp
-HMS CALL get_foreign_keys FOR impala_tpch_supplier
 HMS CALL get_foreign_keys FOR impala_tpch_nation
+HMS CALL get_foreign_keys FOR impala_tpch_supplier
 PREHOOK: query: explain select
   *
 from (

@@ -4,8 +4,8 @@ HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_store
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_store
+HMS CALL get_foreign_keys FOR impala_tpcds_item
 PREHOOK: query: explain cbo physical select  
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
    ,i_category
@@ -96,8 +96,8 @@ HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_store
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_store
+HMS CALL get_foreign_keys FOR impala_tpcds_item
 PREHOOK: query: explain select  
     sum(ss_net_profit)/sum(ss_ext_sales_price) as gross_margin
    ,i_category

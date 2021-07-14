@@ -3,11 +3,11 @@ HMS CALL get_table_req FOR impala_tpcds_customer
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_item
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 HMS CALL get_foreign_keys FOR impala_tpcds_customer
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain cbo physical select  a.ca_state state, count(*) cnt
  from impala_tpcds_customer_address a
      ,impala_tpcds_customer c
@@ -103,11 +103,11 @@ HMS CALL get_table_req FOR impala_tpcds_customer
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_item
-HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 HMS CALL get_foreign_keys FOR impala_tpcds_customer
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_customer_address
 PREHOOK: query: explain select  a.ca_state state, count(*) cnt
  from impala_tpcds_customer_address a
      ,impala_tpcds_customer c

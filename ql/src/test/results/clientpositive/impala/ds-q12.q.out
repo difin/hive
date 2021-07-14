@@ -2,8 +2,8 @@ HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_item
 PREHOOK: query: explain cbo physical select  i_item_id
       ,i_item_desc 
       ,i_category 
@@ -92,8 +92,8 @@ HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_item
 PREHOOK: query: explain select  i_item_id
       ,i_item_desc 
       ,i_category 

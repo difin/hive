@@ -354,14 +354,14 @@ import org.slf4j.LoggerFactory;
           case 1: // COMPACTIONS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list806 = iprot.readListBegin();
-                struct.compactions = new ArrayList<CompactionInfoStruct>(_list806.size);
-                CompactionInfoStruct _elem807;
-                for (int _i808 = 0; _i808 < _list806.size; ++_i808)
+                org.apache.thrift.protocol.TList _list854 = iprot.readListBegin();
+                struct.compactions = new ArrayList<CompactionInfoStruct>(_list854.size);
+                CompactionInfoStruct _elem855;
+                for (int _i856 = 0; _i856 < _list854.size; ++_i856)
                 {
-                  _elem807 = new CompactionInfoStruct();
-                  _elem807.read(iprot);
-                  struct.compactions.add(_elem807);
+                  _elem855 = new CompactionInfoStruct();
+                  _elem855.read(iprot);
+                  struct.compactions.add(_elem855);
                 }
                 iprot.readListEnd();
               }
@@ -387,9 +387,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(COMPACTIONS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.compactions.size()));
-          for (CompactionInfoStruct _iter809 : struct.compactions)
+          for (CompactionInfoStruct _iter857 : struct.compactions)
           {
-            _iter809.write(oprot);
+            _iter857.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -414,9 +414,9 @@ import org.slf4j.LoggerFactory;
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
         oprot.writeI32(struct.compactions.size());
-        for (CompactionInfoStruct _iter810 : struct.compactions)
+        for (CompactionInfoStruct _iter858 : struct.compactions)
         {
-          _iter810.write(oprot);
+          _iter858.write(oprot);
         }
       }
     }
@@ -425,14 +425,14 @@ import org.slf4j.LoggerFactory;
     public void read(org.apache.thrift.protocol.TProtocol prot, GetLatestCommittedCompactionInfoResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list811 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.compactions = new ArrayList<CompactionInfoStruct>(_list811.size);
-        CompactionInfoStruct _elem812;
-        for (int _i813 = 0; _i813 < _list811.size; ++_i813)
+        org.apache.thrift.protocol.TList _list859 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.compactions = new ArrayList<CompactionInfoStruct>(_list859.size);
+        CompactionInfoStruct _elem860;
+        for (int _i861 = 0; _i861 < _list859.size; ++_i861)
         {
-          _elem812 = new CompactionInfoStruct();
-          _elem812.read(iprot);
-          struct.compactions.add(_elem812);
+          _elem860 = new CompactionInfoStruct();
+          _elem860.read(iprot);
+          struct.compactions.add(_elem860);
         }
       }
       struct.setCompactionsIsSet(true);

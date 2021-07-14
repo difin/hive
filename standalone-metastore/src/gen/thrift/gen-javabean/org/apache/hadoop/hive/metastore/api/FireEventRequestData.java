@@ -103,9 +103,9 @@ import org.slf4j.LoggerFactory;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.INSERT_DATA, new org.apache.thrift.meta_data.FieldMetaData("insertData", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.INSERT_DATA, new org.apache.thrift.meta_data.FieldMetaData("insertData", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, InsertEventRequestData.class)));
-    tmpMap.put(_Fields.INSERT_DATAS, new org.apache.thrift.meta_data.FieldMetaData("insertDatas", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+    tmpMap.put(_Fields.INSERT_DATAS, new org.apache.thrift.meta_data.FieldMetaData("insertDatas", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, InsertEventRequestData.class))));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -177,14 +177,14 @@ import org.slf4j.LoggerFactory;
           if (field.type == INSERT_DATAS_FIELD_DESC.type) {
             List<InsertEventRequestData> insertDatas;
             {
-              org.apache.thrift.protocol.TList _list870 = iprot.readListBegin();
-              insertDatas = new ArrayList<InsertEventRequestData>(_list870.size);
-              InsertEventRequestData _elem871;
-              for (int _i872 = 0; _i872 < _list870.size; ++_i872)
+              org.apache.thrift.protocol.TList _list918 = iprot.readListBegin();
+              insertDatas = new ArrayList<InsertEventRequestData>(_list918.size);
+              InsertEventRequestData _elem919;
+              for (int _i920 = 0; _i920 < _list918.size; ++_i920)
               {
-                _elem871 = new InsertEventRequestData();
-                _elem871.read(iprot);
-                insertDatas.add(_elem871);
+                _elem919 = new InsertEventRequestData();
+                _elem919.read(iprot);
+                insertDatas.add(_elem919);
               }
               iprot.readListEnd();
             }
@@ -213,9 +213,9 @@ import org.slf4j.LoggerFactory;
         List<InsertEventRequestData> insertDatas = (List<InsertEventRequestData>)value_;
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, insertDatas.size()));
-          for (InsertEventRequestData _iter873 : insertDatas)
+          for (InsertEventRequestData _iter921 : insertDatas)
           {
-            _iter873.write(oprot);
+            _iter921.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -238,14 +238,14 @@ import org.slf4j.LoggerFactory;
         case INSERT_DATAS:
           List<InsertEventRequestData> insertDatas;
           {
-            org.apache.thrift.protocol.TList _list874 = iprot.readListBegin();
-            insertDatas = new ArrayList<InsertEventRequestData>(_list874.size);
-            InsertEventRequestData _elem875;
-            for (int _i876 = 0; _i876 < _list874.size; ++_i876)
+            org.apache.thrift.protocol.TList _list922 = iprot.readListBegin();
+            insertDatas = new ArrayList<InsertEventRequestData>(_list922.size);
+            InsertEventRequestData _elem923;
+            for (int _i924 = 0; _i924 < _list922.size; ++_i924)
             {
-              _elem875 = new InsertEventRequestData();
-              _elem875.read(iprot);
-              insertDatas.add(_elem875);
+              _elem923 = new InsertEventRequestData();
+              _elem923.read(iprot);
+              insertDatas.add(_elem923);
             }
             iprot.readListEnd();
           }
@@ -269,9 +269,9 @@ import org.slf4j.LoggerFactory;
         List<InsertEventRequestData> insertDatas = (List<InsertEventRequestData>)value_;
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, insertDatas.size()));
-          for (InsertEventRequestData _iter877 : insertDatas)
+          for (InsertEventRequestData _iter925 : insertDatas)
           {
-            _iter877.write(oprot);
+            _iter925.write(oprot);
           }
           oprot.writeListEnd();
         }

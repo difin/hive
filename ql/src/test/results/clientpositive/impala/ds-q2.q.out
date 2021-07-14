@@ -6,8 +6,8 @@ HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR wswscs
 HMS CALL get_table_req FOR wscs
 HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
 PREHOOK: query: explain cbo physical with wscs as
  (select sold_date_sk
         ,sales_price
@@ -170,8 +170,8 @@ HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR wswscs
 HMS CALL get_table_req FOR wscs
 HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_catalog_sales
 PREHOOK: query: explain with wscs as
  (select sold_date_sk
         ,sales_price

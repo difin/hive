@@ -354,14 +354,14 @@ import org.slf4j.LoggerFactory;
           case 1: // UNIQUE_CONSTRAINT_COLS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list442 = iprot.readListBegin();
-                struct.uniqueConstraintCols = new ArrayList<SQLUniqueConstraint>(_list442.size);
-                SQLUniqueConstraint _elem443;
-                for (int _i444 = 0; _i444 < _list442.size; ++_i444)
+                org.apache.thrift.protocol.TList _list490 = iprot.readListBegin();
+                struct.uniqueConstraintCols = new ArrayList<SQLUniqueConstraint>(_list490.size);
+                SQLUniqueConstraint _elem491;
+                for (int _i492 = 0; _i492 < _list490.size; ++_i492)
                 {
-                  _elem443 = new SQLUniqueConstraint();
-                  _elem443.read(iprot);
-                  struct.uniqueConstraintCols.add(_elem443);
+                  _elem491 = new SQLUniqueConstraint();
+                  _elem491.read(iprot);
+                  struct.uniqueConstraintCols.add(_elem491);
                 }
                 iprot.readListEnd();
               }
@@ -387,9 +387,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(UNIQUE_CONSTRAINT_COLS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.uniqueConstraintCols.size()));
-          for (SQLUniqueConstraint _iter445 : struct.uniqueConstraintCols)
+          for (SQLUniqueConstraint _iter493 : struct.uniqueConstraintCols)
           {
-            _iter445.write(oprot);
+            _iter493.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -414,9 +414,9 @@ import org.slf4j.LoggerFactory;
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
         oprot.writeI32(struct.uniqueConstraintCols.size());
-        for (SQLUniqueConstraint _iter446 : struct.uniqueConstraintCols)
+        for (SQLUniqueConstraint _iter494 : struct.uniqueConstraintCols)
         {
-          _iter446.write(oprot);
+          _iter494.write(oprot);
         }
       }
     }
@@ -425,14 +425,14 @@ import org.slf4j.LoggerFactory;
     public void read(org.apache.thrift.protocol.TProtocol prot, AddUniqueConstraintRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list447 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.uniqueConstraintCols = new ArrayList<SQLUniqueConstraint>(_list447.size);
-        SQLUniqueConstraint _elem448;
-        for (int _i449 = 0; _i449 < _list447.size; ++_i449)
+        org.apache.thrift.protocol.TList _list495 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.uniqueConstraintCols = new ArrayList<SQLUniqueConstraint>(_list495.size);
+        SQLUniqueConstraint _elem496;
+        for (int _i497 = 0; _i497 < _list495.size; ++_i497)
         {
-          _elem448 = new SQLUniqueConstraint();
-          _elem448.read(iprot);
-          struct.uniqueConstraintCols.add(_elem448);
+          _elem496 = new SQLUniqueConstraint();
+          _elem496.read(iprot);
+          struct.uniqueConstraintCols.add(_elem496);
         }
       }
       struct.setUniqueConstraintColsIsSet(true);

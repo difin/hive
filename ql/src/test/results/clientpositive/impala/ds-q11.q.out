@@ -8,8 +8,8 @@ HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_customer
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 PREHOOK: query: explain cbo physical with year_total as (
  select c_customer_id customer_id
        ,c_first_name customer_first_name
@@ -235,8 +235,8 @@ HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_customer
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
 PREHOOK: query: explain with year_total as (
  select c_customer_id customer_id
        ,c_first_name customer_first_name

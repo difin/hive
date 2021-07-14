@@ -2,10 +2,10 @@ HMS CALL get_table_req FOR impala_tpch_supplier
 HMS CALL get_table_req FOR impala_tpch_lineitem
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_nation
-HMS CALL get_foreign_keys FOR impala_tpch_supplier
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_nation
+HMS CALL get_foreign_keys FOR impala_tpch_supplier
 PREHOOK: query: explain cbo physical select
   s_name,
   count(*) as numwait
@@ -124,10 +124,10 @@ HMS CALL get_table_req FOR impala_tpch_supplier
 HMS CALL get_table_req FOR impala_tpch_lineitem
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_nation
-HMS CALL get_foreign_keys FOR impala_tpch_supplier
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_nation
+HMS CALL get_foreign_keys FOR impala_tpch_supplier
 PREHOOK: query: explain select
   s_name,
   count(*) as numwait

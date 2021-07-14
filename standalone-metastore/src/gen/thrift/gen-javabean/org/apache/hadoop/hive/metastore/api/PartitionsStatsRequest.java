@@ -883,13 +883,13 @@ import org.slf4j.LoggerFactory;
           case 3: // COL_NAMES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list516 = iprot.readListBegin();
-                struct.colNames = new ArrayList<String>(_list516.size);
-                String _elem517;
-                for (int _i518 = 0; _i518 < _list516.size; ++_i518)
+                org.apache.thrift.protocol.TList _list564 = iprot.readListBegin();
+                struct.colNames = new ArrayList<String>(_list564.size);
+                String _elem565;
+                for (int _i566 = 0; _i566 < _list564.size; ++_i566)
                 {
-                  _elem517 = iprot.readString();
-                  struct.colNames.add(_elem517);
+                  _elem565 = iprot.readString();
+                  struct.colNames.add(_elem565);
                 }
                 iprot.readListEnd();
               }
@@ -901,13 +901,13 @@ import org.slf4j.LoggerFactory;
           case 4: // PART_NAMES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list519 = iprot.readListBegin();
-                struct.partNames = new ArrayList<String>(_list519.size);
-                String _elem520;
-                for (int _i521 = 0; _i521 < _list519.size; ++_i521)
+                org.apache.thrift.protocol.TList _list567 = iprot.readListBegin();
+                struct.partNames = new ArrayList<String>(_list567.size);
+                String _elem568;
+                for (int _i569 = 0; _i569 < _list567.size; ++_i569)
                 {
-                  _elem520 = iprot.readString();
-                  struct.partNames.add(_elem520);
+                  _elem568 = iprot.readString();
+                  struct.partNames.add(_elem568);
                 }
                 iprot.readListEnd();
               }
@@ -967,9 +967,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(COL_NAMES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.colNames.size()));
-          for (String _iter522 : struct.colNames)
+          for (String _iter570 : struct.colNames)
           {
-            oprot.writeString(_iter522);
+            oprot.writeString(_iter570);
           }
           oprot.writeListEnd();
         }
@@ -979,9 +979,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(PART_NAMES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.partNames.size()));
-          for (String _iter523 : struct.partNames)
+          for (String _iter571 : struct.partNames)
           {
-            oprot.writeString(_iter523);
+            oprot.writeString(_iter571);
           }
           oprot.writeListEnd();
         }
@@ -1029,16 +1029,16 @@ import org.slf4j.LoggerFactory;
       oprot.writeString(struct.tblName);
       {
         oprot.writeI32(struct.colNames.size());
-        for (String _iter524 : struct.colNames)
+        for (String _iter572 : struct.colNames)
         {
-          oprot.writeString(_iter524);
+          oprot.writeString(_iter572);
         }
       }
       {
         oprot.writeI32(struct.partNames.size());
-        for (String _iter525 : struct.partNames)
+        for (String _iter573 : struct.partNames)
         {
-          oprot.writeString(_iter525);
+          oprot.writeString(_iter573);
         }
       }
       BitSet optionals = new BitSet();
@@ -1071,24 +1071,24 @@ import org.slf4j.LoggerFactory;
       struct.tblName = iprot.readString();
       struct.setTblNameIsSet(true);
       {
-        org.apache.thrift.protocol.TList _list526 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-        struct.colNames = new ArrayList<String>(_list526.size);
-        String _elem527;
-        for (int _i528 = 0; _i528 < _list526.size; ++_i528)
+        org.apache.thrift.protocol.TList _list574 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+        struct.colNames = new ArrayList<String>(_list574.size);
+        String _elem575;
+        for (int _i576 = 0; _i576 < _list574.size; ++_i576)
         {
-          _elem527 = iprot.readString();
-          struct.colNames.add(_elem527);
+          _elem575 = iprot.readString();
+          struct.colNames.add(_elem575);
         }
       }
       struct.setColNamesIsSet(true);
       {
-        org.apache.thrift.protocol.TList _list529 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-        struct.partNames = new ArrayList<String>(_list529.size);
-        String _elem530;
-        for (int _i531 = 0; _i531 < _list529.size; ++_i531)
+        org.apache.thrift.protocol.TList _list577 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+        struct.partNames = new ArrayList<String>(_list577.size);
+        String _elem578;
+        for (int _i579 = 0; _i579 < _list577.size; ++_i579)
         {
-          _elem530 = iprot.readString();
-          struct.partNames.add(_elem530);
+          _elem578 = iprot.readString();
+          struct.partNames.add(_elem578);
         }
       }
       struct.setPartNamesIsSet(true);

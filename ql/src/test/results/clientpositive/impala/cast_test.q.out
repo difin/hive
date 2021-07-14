@@ -1,8 +1,3 @@
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain select cast (3 as string)
 PREHOOK: type: QUERY
 PREHOOK: Output: streaming
@@ -35,11 +30,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
       Processor Tree:
         ListSink
 
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain select cast ('3' as double)
 PREHOOK: type: QUERY
 PREHOOK: Output: streaming

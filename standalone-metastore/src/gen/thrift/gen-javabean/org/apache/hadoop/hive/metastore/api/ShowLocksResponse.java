@@ -350,14 +350,14 @@ import org.slf4j.LoggerFactory;
           case 1: // LOCKS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list756 = iprot.readListBegin();
-                struct.locks = new ArrayList<ShowLocksResponseElement>(_list756.size);
-                ShowLocksResponseElement _elem757;
-                for (int _i758 = 0; _i758 < _list756.size; ++_i758)
+                org.apache.thrift.protocol.TList _list804 = iprot.readListBegin();
+                struct.locks = new ArrayList<ShowLocksResponseElement>(_list804.size);
+                ShowLocksResponseElement _elem805;
+                for (int _i806 = 0; _i806 < _list804.size; ++_i806)
                 {
-                  _elem757 = new ShowLocksResponseElement();
-                  _elem757.read(iprot);
-                  struct.locks.add(_elem757);
+                  _elem805 = new ShowLocksResponseElement();
+                  _elem805.read(iprot);
+                  struct.locks.add(_elem805);
                 }
                 iprot.readListEnd();
               }
@@ -383,9 +383,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(LOCKS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.locks.size()));
-          for (ShowLocksResponseElement _iter759 : struct.locks)
+          for (ShowLocksResponseElement _iter807 : struct.locks)
           {
-            _iter759.write(oprot);
+            _iter807.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -416,9 +416,9 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetLocks()) {
         {
           oprot.writeI32(struct.locks.size());
-          for (ShowLocksResponseElement _iter760 : struct.locks)
+          for (ShowLocksResponseElement _iter808 : struct.locks)
           {
-            _iter760.write(oprot);
+            _iter808.write(oprot);
           }
         }
       }
@@ -430,14 +430,14 @@ import org.slf4j.LoggerFactory;
       BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list761 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.locks = new ArrayList<ShowLocksResponseElement>(_list761.size);
-          ShowLocksResponseElement _elem762;
-          for (int _i763 = 0; _i763 < _list761.size; ++_i763)
+          org.apache.thrift.protocol.TList _list809 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.locks = new ArrayList<ShowLocksResponseElement>(_list809.size);
+          ShowLocksResponseElement _elem810;
+          for (int _i811 = 0; _i811 < _list809.size; ++_i811)
           {
-            _elem762 = new ShowLocksResponseElement();
-            _elem762.read(iprot);
-            struct.locks.add(_elem762);
+            _elem810 = new ShowLocksResponseElement();
+            _elem810.read(iprot);
+            struct.locks.add(_elem810);
           }
         }
         struct.setLocksIsSet(true);

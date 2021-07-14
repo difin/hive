@@ -350,14 +350,14 @@ import org.slf4j.LoggerFactory;
           case 1: // PRIVILEGES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list26 = iprot.readListBegin();
-                struct.privileges = new ArrayList<HiveObjectPrivilege>(_list26.size);
-                HiveObjectPrivilege _elem27;
-                for (int _i28 = 0; _i28 < _list26.size; ++_i28)
+                org.apache.thrift.protocol.TList _list74 = iprot.readListBegin();
+                struct.privileges = new ArrayList<HiveObjectPrivilege>(_list74.size);
+                HiveObjectPrivilege _elem75;
+                for (int _i76 = 0; _i76 < _list74.size; ++_i76)
                 {
-                  _elem27 = new HiveObjectPrivilege();
-                  _elem27.read(iprot);
-                  struct.privileges.add(_elem27);
+                  _elem75 = new HiveObjectPrivilege();
+                  _elem75.read(iprot);
+                  struct.privileges.add(_elem75);
                 }
                 iprot.readListEnd();
               }
@@ -383,9 +383,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(PRIVILEGES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.privileges.size()));
-          for (HiveObjectPrivilege _iter29 : struct.privileges)
+          for (HiveObjectPrivilege _iter77 : struct.privileges)
           {
-            _iter29.write(oprot);
+            _iter77.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -416,9 +416,9 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetPrivileges()) {
         {
           oprot.writeI32(struct.privileges.size());
-          for (HiveObjectPrivilege _iter30 : struct.privileges)
+          for (HiveObjectPrivilege _iter78 : struct.privileges)
           {
-            _iter30.write(oprot);
+            _iter78.write(oprot);
           }
         }
       }
@@ -430,14 +430,14 @@ import org.slf4j.LoggerFactory;
       BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list31 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.privileges = new ArrayList<HiveObjectPrivilege>(_list31.size);
-          HiveObjectPrivilege _elem32;
-          for (int _i33 = 0; _i33 < _list31.size; ++_i33)
+          org.apache.thrift.protocol.TList _list79 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.privileges = new ArrayList<HiveObjectPrivilege>(_list79.size);
+          HiveObjectPrivilege _elem80;
+          for (int _i81 = 0; _i81 < _list79.size; ++_i81)
           {
-            _elem32 = new HiveObjectPrivilege();
-            _elem32.read(iprot);
-            struct.privileges.add(_elem32);
+            _elem80 = new HiveObjectPrivilege();
+            _elem80.read(iprot);
+            struct.privileges.add(_elem80);
           }
         }
         struct.setPrivilegesIsSet(true);

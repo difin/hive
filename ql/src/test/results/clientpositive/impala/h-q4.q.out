@@ -1,7 +1,7 @@
 HMS CALL get_table_req FOR impala_tpch_orders
-HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_lineitem
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_orders
 PREHOOK: query: explain cbo physical select
   o_orderpriority,
   count(*) as order_count
@@ -61,9 +61,9 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
         ImpalaHdfsScanRel(table=[[default, impala_tpch_lineitem]], condition=[AND(<($11, $12), IS NOT NULL($0))])
 
 HMS CALL get_table_req FOR impala_tpch_orders
-HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_lineitem
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_orders
 PREHOOK: query: explain select
   o_orderpriority,
   count(*) as order_count

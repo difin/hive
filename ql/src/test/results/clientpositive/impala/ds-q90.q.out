@@ -2,10 +2,10 @@ HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_table_req FOR impala_tpcds_household_demographics
 HMS CALL get_table_req FOR impala_tpcds_time_dim
 HMS CALL get_table_req FOR impala_tpcds_web_page
-HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_time_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_web_page
+HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_time_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
 PREHOOK: query: explain cbo physical select  cast(amc as decimal(15,4))/cast(pmc as decimal(15,4)) am_pm_ratio
  from ( select count(*) amc
        from impala_tpcds_web_sales, impala_tpcds_household_demographics , impala_tpcds_time_dim, impala_tpcds_web_page
@@ -88,10 +88,10 @@ HMS CALL get_table_req FOR impala_tpcds_web_sales
 HMS CALL get_table_req FOR impala_tpcds_household_demographics
 HMS CALL get_table_req FOR impala_tpcds_time_dim
 HMS CALL get_table_req FOR impala_tpcds_web_page
-HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
-HMS CALL get_foreign_keys FOR impala_tpcds_time_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_web_page
+HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
+HMS CALL get_foreign_keys FOR impala_tpcds_time_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_household_demographics
 PREHOOK: query: explain select  cast(amc as decimal(15,4))/cast(pmc as decimal(15,4)) am_pm_ratio
  from ( select count(*) amc
        from impala_tpcds_web_sales, impala_tpcds_household_demographics , impala_tpcds_time_dim, impala_tpcds_web_page

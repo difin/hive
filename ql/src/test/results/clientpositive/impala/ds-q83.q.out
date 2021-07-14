@@ -6,9 +6,9 @@ HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_catalog_returns
 HMS CALL get_table_req FOR impala_tpcds_web_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_web_returns
 PREHOOK: query: explain cbo physical with sr_items as
@@ -220,9 +220,9 @@ HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_catalog_returns
 HMS CALL get_table_req FOR impala_tpcds_web_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_item
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_item
+HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_catalog_returns
 HMS CALL get_foreign_keys FOR impala_tpcds_web_returns
 PREHOOK: query: explain with sr_items as

@@ -1,7 +1,7 @@
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_orders
 PREHOOK: query: explain cbo physical select
   l_shipmode,
   sum(case
@@ -76,8 +76,8 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
 
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_orders
 PREHOOK: query: explain select
   l_shipmode,
   sum(case

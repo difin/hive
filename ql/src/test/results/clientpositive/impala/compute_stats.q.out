@@ -1,5 +1,4 @@
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 PREHOOK: query: explain
 analyze table `impala_tpch_lineitem`
 compute statistics
@@ -29,7 +28,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 PREHOOK: query: explain
 analyze table `impala_tpch_lineitem`
 compute statistics for columns
@@ -60,7 +58,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 PREHOOK: query: explain
 analyze table `impala_tpch_lineitem`
 compute statistics for columns l_returnflag
@@ -91,7 +88,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 PREHOOK: query: explain
 analyze table `impala_tpch_lineitem`
 compute statistics for columns
@@ -134,7 +130,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 PREHOOK: query: explain
 analyze table `impala_tpcds_store_sales`
 compute statistics
@@ -164,7 +159,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 PREHOOK: query: explain
 analyze table `impala_tpcds_store_sales`
 compute statistics for columns
@@ -195,7 +189,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 PREHOOK: query: explain
 analyze table `impala_tpcds_store_sales`
 compute statistics for columns ss_addr_sk
@@ -226,7 +219,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 PREHOOK: query: explain
 drop statistics `impala_tpch_lineitem`
 PREHOOK: type: DROP_STATS
@@ -252,7 +244,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 PREHOOK: query: explain
 drop statistics `impala_tpcds_store_sales`
 PREHOOK: type: DROP_STATS
@@ -278,7 +269,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 PREHOOK: query: explain
 analyze table `impala_tpch_lineitem`
 compute incremental statistics
@@ -308,7 +298,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 PREHOOK: query: explain
 analyze table `impala_tpcds_store_sales`
 compute incremental statistics
@@ -338,7 +327,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 PREHOOK: query: explain
 analyze table `impala_tpcds_store_sales` partition(`ss_sold_date_sk`='1')
 compute incremental statistics
@@ -368,7 +356,6 @@ STAGE PLANS:
         ListSink
 
 HMS CALL get_table_req FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 PREHOOK: query: explain
 drop incremental statistics `impala_tpcds_store_sales` partition(`ss_sold_date_sk`='1')
 PREHOOK: type: DROP_STATS

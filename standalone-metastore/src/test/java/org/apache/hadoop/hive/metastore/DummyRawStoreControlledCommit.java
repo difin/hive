@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.metastore;
 import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.metastore.api.CreationMetadata;
 import org.apache.hadoop.hive.metastore.api.ISchemaName;
+import org.apache.hadoop.hive.metastore.api.SQLAllTableConstraints;
 import org.apache.hadoop.hive.metastore.api.ListStoredProcedureRequest;
 import org.apache.hadoop.hive.metastore.api.SchemaVersionDescriptor;
 import org.apache.hadoop.hive.metastore.api.Catalog;
@@ -398,18 +399,17 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
         catName, dbName, tblName, partValsList, newParts, writeId, queryValidWriteIds);
   }
 
+  @Override
+  public List<Partition> getPartitionsByFilter(String catName, String dbName, String tblName,
+      String filter, short maxParts) throws MetaException, NoSuchObjectException {
+    return objectStore.getPartitionsByFilter(catName, dbName, tblName, filter, maxParts);
+  }
 
   @Override
   public List<Partition> getPartitionSpecsByFilterAndProjection(Table table,
       GetProjectionsSpec projectionSpec, GetPartitionsFilterSpec filterSpec)
       throws MetaException, NoSuchObjectException {
     return objectStore.getPartitionSpecsByFilterAndProjection(table, projectionSpec, filterSpec);
-  }
-
-  @Override
-  public List<Partition> getPartitionsByFilter(String catName, String dbName, String tblName,
-      String filter, short maxParts) throws MetaException, NoSuchObjectException {
-    return objectStore.getPartitionsByFilter(catName, dbName, tblName, filter, maxParts);
   }
 
   @Override
@@ -1013,6 +1013,11 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
   public List<SQLCheckConstraint> getCheckConstraints(String catName, String db_name, String tbl_name)
       throws MetaException {
     // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override public SQLAllTableConstraints getAllTableConstraints(String catName, String dbName, String tblName)
+      throws MetaException, NoSuchObjectException {
     return null;
   }
 

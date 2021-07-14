@@ -3,9 +3,9 @@ HMS CALL get_table_req FOR impala_tpcds_store_returns
 HMS CALL get_table_req FOR impala_tpcds_store
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_store
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_store
+HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 PREHOOK: query: explain cbo physical select  
    s_store_name
   ,s_company_id
@@ -153,9 +153,9 @@ HMS CALL get_table_req FOR impala_tpcds_store_returns
 HMS CALL get_table_req FOR impala_tpcds_store
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
-HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
-HMS CALL get_foreign_keys FOR impala_tpcds_store
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
+HMS CALL get_foreign_keys FOR impala_tpcds_store
+HMS CALL get_foreign_keys FOR impala_tpcds_store_returns
 PREHOOK: query: explain select  
    s_store_name
   ,s_company_id

@@ -17,7 +17,6 @@
  */
 package org.apache.hadoop.hive.metastore.cache;
 
-
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,6 +89,7 @@ import org.apache.hadoop.hive.metastore.api.PartitionValuesResponse;
 import org.apache.hadoop.hive.metastore.api.PrincipalPrivilegeSet;
 import org.apache.hadoop.hive.metastore.api.PrincipalType;
 import org.apache.hadoop.hive.metastore.api.PrivilegeBag;
+import org.apache.hadoop.hive.metastore.api.SQLAllTableConstraints;
 import org.apache.hadoop.hive.metastore.api.StoredProcedure;
 import org.apache.hadoop.hive.metastore.api.WMNullablePool;
 import org.apache.hadoop.hive.metastore.api.WMNullableResourcePlan;
@@ -801,7 +801,7 @@ public class CachedStore implements RawStore, Configurable {
           // TODO: prewarm and update can probably be merged.
           try {
             update();
-            
+
           } catch (Exception e) {
             LOG.error("periodical refresh fail ", e);
           }
@@ -2085,7 +2085,7 @@ public class CachedStore implements RawStore, Configurable {
     }
     return partitions;
   }
-  
+
   private String getPartNameMatcher(Table table, List<String> partSpecs) throws MetaException {
     List<FieldSchema> partCols = table.getPartitionKeys();
     int numPartKeys = partCols.size();
@@ -2790,6 +2790,27 @@ public class CachedStore implements RawStore, Configurable {
       throws MetaException {
     // TODO constraintCache
     return rawStore.getCheckConstraints(catName, db_name, tbl_name);
+  }
+
+  /**
+   * Method to fetch all table constraints at once
+   * @param catName catalog name
+   * @param dbName database name
+   * @param tblName table name
+   * @return list of all table constraints
+   * @throws MetaException
+   */
+  @Override
+  public SQLAllTableConstraints getAllTableConstraints(String catName, String dbName, String tblName)
+      throws MetaException, NoSuchObjectException {
+    SQLAllTableConstraints sqlAllTableConstraints = new SQLAllTableConstraints();
+    sqlAllTableConstraints.setPrimaryKeys(getPrimaryKeys(catName, dbName, tblName));
+    sqlAllTableConstraints.setForeignKeys(getForeignKeys(catName, null, null, dbName, tblName));
+    sqlAllTableConstraints.setUniqueConstraints(getUniqueConstraints(catName, dbName, tblName));
+    sqlAllTableConstraints.setDefaultConstraints(getDefaultConstraints(catName, dbName, tblName));
+    sqlAllTableConstraints.setCheckConstraints(getCheckConstraints(catName, dbName, tblName));
+    sqlAllTableConstraints.setNotNullConstraints(getNotNullConstraints(catName, dbName, tblName));
+    return sqlAllTableConstraints;
   }
 
   @Override

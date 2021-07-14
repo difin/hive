@@ -1,7 +1,7 @@
 HMS CALL get_table_req FOR impala_tpch_customer
-HMS CALL get_foreign_keys FOR impala_tpch_customer
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_orders
+HMS CALL get_foreign_keys FOR impala_tpch_customer
 PREHOOK: query: explain cbo physical select
   cntrycode,
   count(*) as numcust,
@@ -93,9 +93,9 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
             ImpalaHdfsScanRel(table=[[default, impala_tpch_orders]], condition=[IS NOT NULL($1)])
 
 HMS CALL get_table_req FOR impala_tpch_customer
-HMS CALL get_foreign_keys FOR impala_tpch_customer
 HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_foreign_keys FOR impala_tpch_orders
+HMS CALL get_foreign_keys FOR impala_tpch_customer
 PREHOOK: query: explain select
   cntrycode,
   count(*) as numcust,

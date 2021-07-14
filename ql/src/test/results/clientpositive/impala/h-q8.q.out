@@ -5,13 +5,13 @@ HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_customer
 HMS CALL get_table_req FOR impala_tpch_nation
 HMS CALL get_table_req FOR impala_tpch_region
-HMS CALL get_foreign_keys FOR impala_tpch_part
-HMS CALL get_foreign_keys FOR impala_tpch_supplier
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 HMS CALL get_foreign_keys FOR impala_tpch_orders
-HMS CALL get_foreign_keys FOR impala_tpch_customer
 HMS CALL get_foreign_keys FOR impala_tpch_nation
+HMS CALL get_foreign_keys FOR impala_tpch_supplier
+HMS CALL get_foreign_keys FOR impala_tpch_part
 HMS CALL get_foreign_keys FOR impala_tpch_region
+HMS CALL get_foreign_keys FOR impala_tpch_customer
 PREHOOK: query: explain cbo physical select
   o_year,
   sum(case
@@ -139,13 +139,13 @@ HMS CALL get_table_req FOR impala_tpch_orders
 HMS CALL get_table_req FOR impala_tpch_customer
 HMS CALL get_table_req FOR impala_tpch_nation
 HMS CALL get_table_req FOR impala_tpch_region
-HMS CALL get_foreign_keys FOR impala_tpch_part
-HMS CALL get_foreign_keys FOR impala_tpch_supplier
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 HMS CALL get_foreign_keys FOR impala_tpch_orders
-HMS CALL get_foreign_keys FOR impala_tpch_customer
 HMS CALL get_foreign_keys FOR impala_tpch_nation
+HMS CALL get_foreign_keys FOR impala_tpch_supplier
+HMS CALL get_foreign_keys FOR impala_tpch_part
 HMS CALL get_foreign_keys FOR impala_tpch_region
+HMS CALL get_foreign_keys FOR impala_tpch_customer
 PREHOOK: query: explain select
   o_year,
   sum(case
