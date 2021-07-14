@@ -52,16 +52,20 @@ import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.HiveAlterHandler;
 import org.apache.hadoop.hive.metastore.api.AddPackageRequest;
 import org.apache.hadoop.hive.metastore.api.AggrStats;
+import org.apache.hadoop.hive.metastore.api.AllTableConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.Catalog;
+import org.apache.hadoop.hive.metastore.api.CheckConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.CreationMetadata;
 import org.apache.hadoop.hive.metastore.api.CurrentNotificationEventId;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.DefaultConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.DropPackageRequest;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.FileMetadataExprType;
+import org.apache.hadoop.hive.metastore.api.ForeignKeysRequest;
 import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.metastore.api.GetPackageRequest;
 import org.apache.hadoop.hive.metastore.api.GetProjectionsSpec;
@@ -78,6 +82,7 @@ import org.apache.hadoop.hive.metastore.api.ListPackageRequest;
 import org.apache.hadoop.hive.metastore.api.ListStoredProcedureRequest;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
+import org.apache.hadoop.hive.metastore.api.NotNullConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.NotificationEvent;
 import org.apache.hadoop.hive.metastore.api.NotificationEventRequest;
 import org.apache.hadoop.hive.metastore.api.NotificationEventResponse;
@@ -86,11 +91,13 @@ import org.apache.hadoop.hive.metastore.api.NotificationEventsCountResponse;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.PartitionEventType;
 import org.apache.hadoop.hive.metastore.api.PartitionValuesResponse;
+import org.apache.hadoop.hive.metastore.api.PrimaryKeysRequest;
 import org.apache.hadoop.hive.metastore.api.PrincipalPrivilegeSet;
 import org.apache.hadoop.hive.metastore.api.PrincipalType;
 import org.apache.hadoop.hive.metastore.api.PrivilegeBag;
 import org.apache.hadoop.hive.metastore.api.SQLAllTableConstraints;
 import org.apache.hadoop.hive.metastore.api.StoredProcedure;
+import org.apache.hadoop.hive.metastore.api.UniqueConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.WMNullablePool;
 import org.apache.hadoop.hive.metastore.api.WMNullableResourcePlan;
 import org.apache.hadoop.hive.metastore.api.WMResourcePlan;
@@ -2750,46 +2757,90 @@ public class CachedStore implements RawStore, Configurable {
   }
 
   @Override
-  public List<SQLPrimaryKey> getPrimaryKeys(String catName, String db_name, String tbl_name)
+  @Deprecated
+  public List<SQLPrimaryKey> getPrimaryKeys(String catName, String dbName, String tblName)
       throws MetaException {
     // TODO constraintCache
-    return rawStore.getPrimaryKeys(catName, db_name, tbl_name);
+    PrimaryKeysRequest request = new PrimaryKeysRequest(dbName, tblName);
+    request.setCatName(catName);
+    return getPrimaryKeys(request);
   }
 
   @Override
-  public List<SQLForeignKey> getForeignKeys(String catName, String parent_db_name,
-      String parent_tbl_name, String foreign_db_name, String foreign_tbl_name)
-      throws MetaException {
-    // TODO constraintCache
-    return rawStore.getForeignKeys(catName, parent_db_name, parent_tbl_name, foreign_db_name, foreign_tbl_name);
+  public List<SQLPrimaryKey> getPrimaryKeys(PrimaryKeysRequest request) throws MetaException {
+    return rawStore.getPrimaryKeys(request);
   }
 
   @Override
-  public List<SQLUniqueConstraint> getUniqueConstraints(String catName, String db_name, String tbl_name)
-      throws MetaException {
+  @Deprecated
+  public List<SQLForeignKey> getForeignKeys(String catName, String parentDbName, String parentTblName,
+      String foreignDbName, String foreignTblName) throws MetaException {
     // TODO constraintCache
-    return rawStore.getUniqueConstraints(catName, db_name, tbl_name);
+    ForeignKeysRequest request = new ForeignKeysRequest(parentDbName, parentTblName, foreignDbName, foreignTblName);
+    request.setCatName(catName);
+    return getForeignKeys(request);
   }
 
   @Override
-  public List<SQLNotNullConstraint> getNotNullConstraints(String catName, String db_name, String tbl_name)
-      throws MetaException {
-    // TODO constraintCache
-    return rawStore.getNotNullConstraints(catName, db_name, tbl_name);
+  public List<SQLForeignKey> getForeignKeys(ForeignKeysRequest request) throws MetaException {
+    return rawStore.getForeignKeys(request);
   }
 
   @Override
-  public List<SQLDefaultConstraint> getDefaultConstraints(String catName, String db_name, String tbl_name)
+  @Deprecated
+  public List<SQLUniqueConstraint> getUniqueConstraints(String catName, String dbName, String tblName)
       throws MetaException {
     // TODO constraintCache
-    return rawStore.getDefaultConstraints(catName, db_name, tbl_name);
+    UniqueConstraintsRequest request = new UniqueConstraintsRequest(catName, dbName, tblName);
+    return getUniqueConstraints(request);
   }
 
   @Override
-  public List<SQLCheckConstraint> getCheckConstraints(String catName, String db_name, String tbl_name)
+  public List<SQLUniqueConstraint> getUniqueConstraints(UniqueConstraintsRequest request) throws MetaException {
+    return rawStore.getUniqueConstraints(request);
+  }
+
+  @Override
+  @Deprecated
+  public List<SQLNotNullConstraint> getNotNullConstraints(String catName, String dbName, String tblName)
       throws MetaException {
     // TODO constraintCache
-    return rawStore.getCheckConstraints(catName, db_name, tbl_name);
+    NotNullConstraintsRequest request = new NotNullConstraintsRequest(catName, dbName, tblName);
+    return getNotNullConstraints(request);
+  }
+
+  @Override
+  public List<SQLNotNullConstraint> getNotNullConstraints(NotNullConstraintsRequest request) throws MetaException {
+    return rawStore.getNotNullConstraints(request);
+  }
+
+  @Override
+  @Deprecated
+  public List<SQLDefaultConstraint> getDefaultConstraints(String catName, String dbName, String tblName)
+      throws MetaException {
+    // TODO constraintCache
+    DefaultConstraintsRequest request = new DefaultConstraintsRequest(catName, dbName, tblName);
+    return getDefaultConstraints(request);
+  }
+
+  @Override
+  public List<SQLDefaultConstraint> getDefaultConstraints(DefaultConstraintsRequest request) throws MetaException {
+    return rawStore.getDefaultConstraints(request);
+  }
+
+
+  @Override
+  @Deprecated
+  public List<SQLCheckConstraint> getCheckConstraints(String catName, String dbName, String tblName)
+      throws MetaException {
+    // TODO constraintCache
+    CheckConstraintsRequest request = new CheckConstraintsRequest(catName, dbName, tblName);
+    return getCheckConstraints(request);
+  }
+
+  @Override
+  public List<SQLCheckConstraint> getCheckConstraints(CheckConstraintsRequest request) throws MetaException {
+    return rawStore.getCheckConstraints(request);
   }
 
   /**
@@ -2801,16 +2852,17 @@ public class CachedStore implements RawStore, Configurable {
    * @throws MetaException
    */
   @Override
+  @Deprecated
   public SQLAllTableConstraints getAllTableConstraints(String catName, String dbName, String tblName)
       throws MetaException, NoSuchObjectException {
-    SQLAllTableConstraints sqlAllTableConstraints = new SQLAllTableConstraints();
-    sqlAllTableConstraints.setPrimaryKeys(getPrimaryKeys(catName, dbName, tblName));
-    sqlAllTableConstraints.setForeignKeys(getForeignKeys(catName, null, null, dbName, tblName));
-    sqlAllTableConstraints.setUniqueConstraints(getUniqueConstraints(catName, dbName, tblName));
-    sqlAllTableConstraints.setDefaultConstraints(getDefaultConstraints(catName, dbName, tblName));
-    sqlAllTableConstraints.setCheckConstraints(getCheckConstraints(catName, dbName, tblName));
-    sqlAllTableConstraints.setNotNullConstraints(getNotNullConstraints(catName, dbName, tblName));
-    return sqlAllTableConstraints;
+    AllTableConstraintsRequest request = new AllTableConstraintsRequest(dbName, tblName, catName);
+    return getAllTableConstraints(request);
+  }
+
+  @Override
+  public SQLAllTableConstraints getAllTableConstraints(AllTableConstraintsRequest request)
+    throws MetaException, NoSuchObjectException {
+    return rawStore.getAllTableConstraints(request);
   }
 
   @Override

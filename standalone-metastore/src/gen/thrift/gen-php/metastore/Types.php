@@ -12453,6 +12453,14 @@ class PrimaryKeysRequest {
    * @var string
    */
   public $catName = null;
+  /**
+   * @var string
+   */
+  public $validWriteIdList = null;
+  /**
+   * @var int
+   */
+  public $tableId = -1;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -12469,6 +12477,14 @@ class PrimaryKeysRequest {
           'var' => 'catName',
           'type' => TType::STRING,
           ),
+        4 => array(
+          'var' => 'validWriteIdList',
+          'type' => TType::STRING,
+          ),
+        5 => array(
+          'var' => 'tableId',
+          'type' => TType::I64,
+          ),
         );
     }
     if (is_array($vals)) {
@@ -12480,6 +12496,12 @@ class PrimaryKeysRequest {
       }
       if (isset($vals['catName'])) {
         $this->catName = $vals['catName'];
+      }
+      if (isset($vals['validWriteIdList'])) {
+        $this->validWriteIdList = $vals['validWriteIdList'];
+      }
+      if (isset($vals['tableId'])) {
+        $this->tableId = $vals['tableId'];
       }
     }
   }
@@ -12524,6 +12546,20 @@ class PrimaryKeysRequest {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 4:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->validWriteIdList);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 5:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->tableId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -12550,6 +12586,16 @@ class PrimaryKeysRequest {
     if ($this->catName !== null) {
       $xfer += $output->writeFieldBegin('catName', TType::STRING, 3);
       $xfer += $output->writeString($this->catName);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->validWriteIdList !== null) {
+      $xfer += $output->writeFieldBegin('validWriteIdList', TType::STRING, 4);
+      $xfer += $output->writeString($this->validWriteIdList);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->tableId !== null) {
+      $xfer += $output->writeFieldBegin('tableId', TType::I64, 5);
+      $xfer += $output->writeI64($this->tableId);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -12685,6 +12731,14 @@ class ForeignKeysRequest {
    * @var string
    */
   public $catName = null;
+  /**
+   * @var string
+   */
+  public $validWriteIdList = null;
+  /**
+   * @var int
+   */
+  public $tableId = -1;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -12709,6 +12763,14 @@ class ForeignKeysRequest {
           'var' => 'catName',
           'type' => TType::STRING,
           ),
+        6 => array(
+          'var' => 'validWriteIdList',
+          'type' => TType::STRING,
+          ),
+        7 => array(
+          'var' => 'tableId',
+          'type' => TType::I64,
+          ),
         );
     }
     if (is_array($vals)) {
@@ -12726,6 +12788,12 @@ class ForeignKeysRequest {
       }
       if (isset($vals['catName'])) {
         $this->catName = $vals['catName'];
+      }
+      if (isset($vals['validWriteIdList'])) {
+        $this->validWriteIdList = $vals['validWriteIdList'];
+      }
+      if (isset($vals['tableId'])) {
+        $this->tableId = $vals['tableId'];
       }
     }
   }
@@ -12784,6 +12852,20 @@ class ForeignKeysRequest {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 6:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->validWriteIdList);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 7:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->tableId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -12820,6 +12902,16 @@ class ForeignKeysRequest {
     if ($this->catName !== null) {
       $xfer += $output->writeFieldBegin('catName', TType::STRING, 5);
       $xfer += $output->writeString($this->catName);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->validWriteIdList !== null) {
+      $xfer += $output->writeFieldBegin('validWriteIdList', TType::STRING, 6);
+      $xfer += $output->writeString($this->validWriteIdList);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->tableId !== null) {
+      $xfer += $output->writeFieldBegin('tableId', TType::I64, 7);
+      $xfer += $output->writeI64($this->tableId);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -12947,6 +13039,14 @@ class UniqueConstraintsRequest {
    * @var string
    */
   public $tbl_name = null;
+  /**
+   * @var string
+   */
+  public $validWriteIdList = null;
+  /**
+   * @var int
+   */
+  public $tableId = -1;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -12963,6 +13063,14 @@ class UniqueConstraintsRequest {
           'var' => 'tbl_name',
           'type' => TType::STRING,
           ),
+        4 => array(
+          'var' => 'validWriteIdList',
+          'type' => TType::STRING,
+          ),
+        5 => array(
+          'var' => 'tableId',
+          'type' => TType::I64,
+          ),
         );
     }
     if (is_array($vals)) {
@@ -12974,6 +13082,12 @@ class UniqueConstraintsRequest {
       }
       if (isset($vals['tbl_name'])) {
         $this->tbl_name = $vals['tbl_name'];
+      }
+      if (isset($vals['validWriteIdList'])) {
+        $this->validWriteIdList = $vals['validWriteIdList'];
+      }
+      if (isset($vals['tableId'])) {
+        $this->tableId = $vals['tableId'];
       }
     }
   }
@@ -13018,6 +13132,20 @@ class UniqueConstraintsRequest {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 4:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->validWriteIdList);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 5:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->tableId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -13044,6 +13172,16 @@ class UniqueConstraintsRequest {
     if ($this->tbl_name !== null) {
       $xfer += $output->writeFieldBegin('tbl_name', TType::STRING, 3);
       $xfer += $output->writeString($this->tbl_name);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->validWriteIdList !== null) {
+      $xfer += $output->writeFieldBegin('validWriteIdList', TType::STRING, 4);
+      $xfer += $output->writeString($this->validWriteIdList);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->tableId !== null) {
+      $xfer += $output->writeFieldBegin('tableId', TType::I64, 5);
+      $xfer += $output->writeI64($this->tableId);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -13171,6 +13309,14 @@ class NotNullConstraintsRequest {
    * @var string
    */
   public $tbl_name = null;
+  /**
+   * @var string
+   */
+  public $validWriteIdList = null;
+  /**
+   * @var int
+   */
+  public $tableId = -1;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -13187,6 +13333,14 @@ class NotNullConstraintsRequest {
           'var' => 'tbl_name',
           'type' => TType::STRING,
           ),
+        4 => array(
+          'var' => 'validWriteIdList',
+          'type' => TType::STRING,
+          ),
+        5 => array(
+          'var' => 'tableId',
+          'type' => TType::I64,
+          ),
         );
     }
     if (is_array($vals)) {
@@ -13198,6 +13352,12 @@ class NotNullConstraintsRequest {
       }
       if (isset($vals['tbl_name'])) {
         $this->tbl_name = $vals['tbl_name'];
+      }
+      if (isset($vals['validWriteIdList'])) {
+        $this->validWriteIdList = $vals['validWriteIdList'];
+      }
+      if (isset($vals['tableId'])) {
+        $this->tableId = $vals['tableId'];
       }
     }
   }
@@ -13242,6 +13402,20 @@ class NotNullConstraintsRequest {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 4:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->validWriteIdList);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 5:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->tableId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -13268,6 +13442,16 @@ class NotNullConstraintsRequest {
     if ($this->tbl_name !== null) {
       $xfer += $output->writeFieldBegin('tbl_name', TType::STRING, 3);
       $xfer += $output->writeString($this->tbl_name);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->validWriteIdList !== null) {
+      $xfer += $output->writeFieldBegin('validWriteIdList', TType::STRING, 4);
+      $xfer += $output->writeString($this->validWriteIdList);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->tableId !== null) {
+      $xfer += $output->writeFieldBegin('tableId', TType::I64, 5);
+      $xfer += $output->writeI64($this->tableId);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -13395,6 +13579,14 @@ class DefaultConstraintsRequest {
    * @var string
    */
   public $tbl_name = null;
+  /**
+   * @var string
+   */
+  public $validWriteIdList = null;
+  /**
+   * @var int
+   */
+  public $tableId = -1;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -13411,6 +13603,14 @@ class DefaultConstraintsRequest {
           'var' => 'tbl_name',
           'type' => TType::STRING,
           ),
+        4 => array(
+          'var' => 'validWriteIdList',
+          'type' => TType::STRING,
+          ),
+        5 => array(
+          'var' => 'tableId',
+          'type' => TType::I64,
+          ),
         );
     }
     if (is_array($vals)) {
@@ -13422,6 +13622,12 @@ class DefaultConstraintsRequest {
       }
       if (isset($vals['tbl_name'])) {
         $this->tbl_name = $vals['tbl_name'];
+      }
+      if (isset($vals['validWriteIdList'])) {
+        $this->validWriteIdList = $vals['validWriteIdList'];
+      }
+      if (isset($vals['tableId'])) {
+        $this->tableId = $vals['tableId'];
       }
     }
   }
@@ -13466,6 +13672,20 @@ class DefaultConstraintsRequest {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 4:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->validWriteIdList);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 5:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->tableId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -13492,6 +13712,16 @@ class DefaultConstraintsRequest {
     if ($this->tbl_name !== null) {
       $xfer += $output->writeFieldBegin('tbl_name', TType::STRING, 3);
       $xfer += $output->writeString($this->tbl_name);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->validWriteIdList !== null) {
+      $xfer += $output->writeFieldBegin('validWriteIdList', TType::STRING, 4);
+      $xfer += $output->writeString($this->validWriteIdList);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->tableId !== null) {
+      $xfer += $output->writeFieldBegin('tableId', TType::I64, 5);
+      $xfer += $output->writeI64($this->tableId);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -13619,6 +13849,14 @@ class CheckConstraintsRequest {
    * @var string
    */
   public $tbl_name = null;
+  /**
+   * @var string
+   */
+  public $validWriteIdList = null;
+  /**
+   * @var int
+   */
+  public $tableId = -1;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -13635,6 +13873,14 @@ class CheckConstraintsRequest {
           'var' => 'tbl_name',
           'type' => TType::STRING,
           ),
+        4 => array(
+          'var' => 'validWriteIdList',
+          'type' => TType::STRING,
+          ),
+        5 => array(
+          'var' => 'tableId',
+          'type' => TType::I64,
+          ),
         );
     }
     if (is_array($vals)) {
@@ -13646,6 +13892,12 @@ class CheckConstraintsRequest {
       }
       if (isset($vals['tbl_name'])) {
         $this->tbl_name = $vals['tbl_name'];
+      }
+      if (isset($vals['validWriteIdList'])) {
+        $this->validWriteIdList = $vals['validWriteIdList'];
+      }
+      if (isset($vals['tableId'])) {
+        $this->tableId = $vals['tableId'];
       }
     }
   }
@@ -13690,6 +13942,20 @@ class CheckConstraintsRequest {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 4:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->validWriteIdList);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 5:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->tableId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -13716,6 +13982,16 @@ class CheckConstraintsRequest {
     if ($this->tbl_name !== null) {
       $xfer += $output->writeFieldBegin('tbl_name', TType::STRING, 3);
       $xfer += $output->writeString($this->tbl_name);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->validWriteIdList !== null) {
+      $xfer += $output->writeFieldBegin('validWriteIdList', TType::STRING, 4);
+      $xfer += $output->writeString($this->validWriteIdList);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->tableId !== null) {
+      $xfer += $output->writeFieldBegin('tableId', TType::I64, 5);
+      $xfer += $output->writeI64($this->tableId);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -13843,6 +14119,14 @@ class AllTableConstraintsRequest {
    * @var string
    */
   public $catName = null;
+  /**
+   * @var string
+   */
+  public $validWriteIdList = null;
+  /**
+   * @var int
+   */
+  public $tableId = -1;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -13859,6 +14143,14 @@ class AllTableConstraintsRequest {
           'var' => 'catName',
           'type' => TType::STRING,
           ),
+        4 => array(
+          'var' => 'validWriteIdList',
+          'type' => TType::STRING,
+          ),
+        5 => array(
+          'var' => 'tableId',
+          'type' => TType::I64,
+          ),
         );
     }
     if (is_array($vals)) {
@@ -13870,6 +14162,12 @@ class AllTableConstraintsRequest {
       }
       if (isset($vals['catName'])) {
         $this->catName = $vals['catName'];
+      }
+      if (isset($vals['validWriteIdList'])) {
+        $this->validWriteIdList = $vals['validWriteIdList'];
+      }
+      if (isset($vals['tableId'])) {
+        $this->tableId = $vals['tableId'];
       }
     }
   }
@@ -13914,6 +14212,20 @@ class AllTableConstraintsRequest {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 4:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->validWriteIdList);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 5:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->tableId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -13940,6 +14252,16 @@ class AllTableConstraintsRequest {
     if ($this->catName !== null) {
       $xfer += $output->writeFieldBegin('catName', TType::STRING, 3);
       $xfer += $output->writeString($this->catName);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->validWriteIdList !== null) {
+      $xfer += $output->writeFieldBegin('validWriteIdList', TType::STRING, 4);
+      $xfer += $output->writeString($this->validWriteIdList);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->tableId !== null) {
+      $xfer += $output->writeFieldBegin('tableId', TType::I64, 5);
+      $xfer += $output->writeI64($this->tableId);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();

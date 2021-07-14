@@ -1888,11 +1888,15 @@ class PrimaryKeysRequest
   DB_NAME = 1
   TBL_NAME = 2
   CATNAME = 3
+  VALIDWRITEIDLIST = 4
+  TABLEID = 5
 
   FIELDS = {
     DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
     TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
-    CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName', :optional => true}
+    CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName', :optional => true},
+    VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
+    TABLEID => {:type => ::Thrift::Types::I64, :name => 'tableId', :default => -1, :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -1929,13 +1933,17 @@ class ForeignKeysRequest
   FOREIGN_DB_NAME = 3
   FOREIGN_TBL_NAME = 4
   CATNAME = 5
+  VALIDWRITEIDLIST = 6
+  TABLEID = 7
 
   FIELDS = {
     PARENT_DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'parent_db_name'},
     PARENT_TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'parent_tbl_name'},
     FOREIGN_DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'foreign_db_name'},
     FOREIGN_TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'foreign_tbl_name'},
-    CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName', :optional => true}
+    CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName', :optional => true},
+    VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
+    TABLEID => {:type => ::Thrift::Types::I64, :name => 'tableId', :default => -1, :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -1968,11 +1976,15 @@ class UniqueConstraintsRequest
   CATNAME = 1
   DB_NAME = 2
   TBL_NAME = 3
+  VALIDWRITEIDLIST = 4
+  TABLEID = 5
 
   FIELDS = {
     CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName'},
     DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
-    TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'}
+    TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+    VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
+    TABLEID => {:type => ::Thrift::Types::I64, :name => 'tableId', :default => -1, :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -2008,11 +2020,15 @@ class NotNullConstraintsRequest
   CATNAME = 1
   DB_NAME = 2
   TBL_NAME = 3
+  VALIDWRITEIDLIST = 4
+  TABLEID = 5
 
   FIELDS = {
     CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName'},
     DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
-    TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'}
+    TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+    VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
+    TABLEID => {:type => ::Thrift::Types::I64, :name => 'tableId', :default => -1, :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -2048,11 +2064,15 @@ class DefaultConstraintsRequest
   CATNAME = 1
   DB_NAME = 2
   TBL_NAME = 3
+  VALIDWRITEIDLIST = 4
+  TABLEID = 5
 
   FIELDS = {
     CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName'},
     DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
-    TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'}
+    TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+    VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
+    TABLEID => {:type => ::Thrift::Types::I64, :name => 'tableId', :default => -1, :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -2088,11 +2108,15 @@ class CheckConstraintsRequest
   CATNAME = 1
   DB_NAME = 2
   TBL_NAME = 3
+  VALIDWRITEIDLIST = 4
+  TABLEID = 5
 
   FIELDS = {
     CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName'},
     DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
-    TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'}
+    TBL_NAME => {:type => ::Thrift::Types::STRING, :name => 'tbl_name'},
+    VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
+    TABLEID => {:type => ::Thrift::Types::I64, :name => 'tableId', :default => -1, :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -2128,11 +2152,15 @@ class AllTableConstraintsRequest
   DBNAME = 1
   TBLNAME = 2
   CATNAME = 3
+  VALIDWRITEIDLIST = 4
+  TABLEID = 5
 
   FIELDS = {
     DBNAME => {:type => ::Thrift::Types::STRING, :name => 'dbName'},
     TBLNAME => {:type => ::Thrift::Types::STRING, :name => 'tblName'},
-    CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName'}
+    CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName'},
+    VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
+    TABLEID => {:type => ::Thrift::Types::I64, :name => 'tableId', :default => -1, :optional => true}
   }
 
   def struct_fields; FIELDS; end

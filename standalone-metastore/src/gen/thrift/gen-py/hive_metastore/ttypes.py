@@ -8493,6 +8493,8 @@ class PrimaryKeysRequest:
    - db_name
    - tbl_name
    - catName
+   - validWriteIdList
+   - tableId
   """
 
   thrift_spec = (
@@ -8500,12 +8502,16 @@ class PrimaryKeysRequest:
     (1, TType.STRING, 'db_name', None, None, ), # 1
     (2, TType.STRING, 'tbl_name', None, None, ), # 2
     (3, TType.STRING, 'catName', None, None, ), # 3
+    (4, TType.STRING, 'validWriteIdList', None, None, ), # 4
+    (5, TType.I64, 'tableId', None, -1, ), # 5
   )
 
-  def __init__(self, db_name=None, tbl_name=None, catName=None,):
+  def __init__(self, db_name=None, tbl_name=None, catName=None, validWriteIdList=None, tableId=thrift_spec[5][4],):
     self.db_name = db_name
     self.tbl_name = tbl_name
     self.catName = catName
+    self.validWriteIdList = validWriteIdList
+    self.tableId = tableId
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -8531,6 +8537,16 @@ class PrimaryKeysRequest:
           self.catName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.validWriteIdList = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.I64:
+          self.tableId = iprot.readI64()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -8553,6 +8569,14 @@ class PrimaryKeysRequest:
       oprot.writeFieldBegin('catName', TType.STRING, 3)
       oprot.writeString(self.catName)
       oprot.writeFieldEnd()
+    if self.validWriteIdList is not None:
+      oprot.writeFieldBegin('validWriteIdList', TType.STRING, 4)
+      oprot.writeString(self.validWriteIdList)
+      oprot.writeFieldEnd()
+    if self.tableId is not None:
+      oprot.writeFieldBegin('tableId', TType.I64, 5)
+      oprot.writeI64(self.tableId)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -8569,6 +8593,8 @@ class PrimaryKeysRequest:
     value = (value * 31) ^ hash(self.db_name)
     value = (value * 31) ^ hash(self.tbl_name)
     value = (value * 31) ^ hash(self.catName)
+    value = (value * 31) ^ hash(self.validWriteIdList)
+    value = (value * 31) ^ hash(self.tableId)
     return value
 
   def __repr__(self):
@@ -8666,6 +8692,8 @@ class ForeignKeysRequest:
    - foreign_db_name
    - foreign_tbl_name
    - catName
+   - validWriteIdList
+   - tableId
   """
 
   thrift_spec = (
@@ -8675,14 +8703,18 @@ class ForeignKeysRequest:
     (3, TType.STRING, 'foreign_db_name', None, None, ), # 3
     (4, TType.STRING, 'foreign_tbl_name', None, None, ), # 4
     (5, TType.STRING, 'catName', None, None, ), # 5
+    (6, TType.STRING, 'validWriteIdList', None, None, ), # 6
+    (7, TType.I64, 'tableId', None, -1, ), # 7
   )
 
-  def __init__(self, parent_db_name=None, parent_tbl_name=None, foreign_db_name=None, foreign_tbl_name=None, catName=None,):
+  def __init__(self, parent_db_name=None, parent_tbl_name=None, foreign_db_name=None, foreign_tbl_name=None, catName=None, validWriteIdList=None, tableId=thrift_spec[7][4],):
     self.parent_db_name = parent_db_name
     self.parent_tbl_name = parent_tbl_name
     self.foreign_db_name = foreign_db_name
     self.foreign_tbl_name = foreign_tbl_name
     self.catName = catName
+    self.validWriteIdList = validWriteIdList
+    self.tableId = tableId
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -8718,6 +8750,16 @@ class ForeignKeysRequest:
           self.catName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 6:
+        if ftype == TType.STRING:
+          self.validWriteIdList = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 7:
+        if ftype == TType.I64:
+          self.tableId = iprot.readI64()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -8748,6 +8790,14 @@ class ForeignKeysRequest:
       oprot.writeFieldBegin('catName', TType.STRING, 5)
       oprot.writeString(self.catName)
       oprot.writeFieldEnd()
+    if self.validWriteIdList is not None:
+      oprot.writeFieldBegin('validWriteIdList', TType.STRING, 6)
+      oprot.writeString(self.validWriteIdList)
+      oprot.writeFieldEnd()
+    if self.tableId is not None:
+      oprot.writeFieldBegin('tableId', TType.I64, 7)
+      oprot.writeI64(self.tableId)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -8762,6 +8812,8 @@ class ForeignKeysRequest:
     value = (value * 31) ^ hash(self.foreign_db_name)
     value = (value * 31) ^ hash(self.foreign_tbl_name)
     value = (value * 31) ^ hash(self.catName)
+    value = (value * 31) ^ hash(self.validWriteIdList)
+    value = (value * 31) ^ hash(self.tableId)
     return value
 
   def __repr__(self):
@@ -8857,6 +8909,8 @@ class UniqueConstraintsRequest:
    - catName
    - db_name
    - tbl_name
+   - validWriteIdList
+   - tableId
   """
 
   thrift_spec = (
@@ -8864,12 +8918,16 @@ class UniqueConstraintsRequest:
     (1, TType.STRING, 'catName', None, None, ), # 1
     (2, TType.STRING, 'db_name', None, None, ), # 2
     (3, TType.STRING, 'tbl_name', None, None, ), # 3
+    (4, TType.STRING, 'validWriteIdList', None, None, ), # 4
+    (5, TType.I64, 'tableId', None, -1, ), # 5
   )
 
-  def __init__(self, catName=None, db_name=None, tbl_name=None,):
+  def __init__(self, catName=None, db_name=None, tbl_name=None, validWriteIdList=None, tableId=thrift_spec[5][4],):
     self.catName = catName
     self.db_name = db_name
     self.tbl_name = tbl_name
+    self.validWriteIdList = validWriteIdList
+    self.tableId = tableId
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -8895,6 +8953,16 @@ class UniqueConstraintsRequest:
           self.tbl_name = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.validWriteIdList = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.I64:
+          self.tableId = iprot.readI64()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -8917,6 +8985,14 @@ class UniqueConstraintsRequest:
       oprot.writeFieldBegin('tbl_name', TType.STRING, 3)
       oprot.writeString(self.tbl_name)
       oprot.writeFieldEnd()
+    if self.validWriteIdList is not None:
+      oprot.writeFieldBegin('validWriteIdList', TType.STRING, 4)
+      oprot.writeString(self.validWriteIdList)
+      oprot.writeFieldEnd()
+    if self.tableId is not None:
+      oprot.writeFieldBegin('tableId', TType.I64, 5)
+      oprot.writeI64(self.tableId)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -8935,6 +9011,8 @@ class UniqueConstraintsRequest:
     value = (value * 31) ^ hash(self.catName)
     value = (value * 31) ^ hash(self.db_name)
     value = (value * 31) ^ hash(self.tbl_name)
+    value = (value * 31) ^ hash(self.validWriteIdList)
+    value = (value * 31) ^ hash(self.tableId)
     return value
 
   def __repr__(self):
@@ -9030,6 +9108,8 @@ class NotNullConstraintsRequest:
    - catName
    - db_name
    - tbl_name
+   - validWriteIdList
+   - tableId
   """
 
   thrift_spec = (
@@ -9037,12 +9117,16 @@ class NotNullConstraintsRequest:
     (1, TType.STRING, 'catName', None, None, ), # 1
     (2, TType.STRING, 'db_name', None, None, ), # 2
     (3, TType.STRING, 'tbl_name', None, None, ), # 3
+    (4, TType.STRING, 'validWriteIdList', None, None, ), # 4
+    (5, TType.I64, 'tableId', None, -1, ), # 5
   )
 
-  def __init__(self, catName=None, db_name=None, tbl_name=None,):
+  def __init__(self, catName=None, db_name=None, tbl_name=None, validWriteIdList=None, tableId=thrift_spec[5][4],):
     self.catName = catName
     self.db_name = db_name
     self.tbl_name = tbl_name
+    self.validWriteIdList = validWriteIdList
+    self.tableId = tableId
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -9068,6 +9152,16 @@ class NotNullConstraintsRequest:
           self.tbl_name = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.validWriteIdList = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.I64:
+          self.tableId = iprot.readI64()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -9090,6 +9184,14 @@ class NotNullConstraintsRequest:
       oprot.writeFieldBegin('tbl_name', TType.STRING, 3)
       oprot.writeString(self.tbl_name)
       oprot.writeFieldEnd()
+    if self.validWriteIdList is not None:
+      oprot.writeFieldBegin('validWriteIdList', TType.STRING, 4)
+      oprot.writeString(self.validWriteIdList)
+      oprot.writeFieldEnd()
+    if self.tableId is not None:
+      oprot.writeFieldBegin('tableId', TType.I64, 5)
+      oprot.writeI64(self.tableId)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -9108,6 +9210,8 @@ class NotNullConstraintsRequest:
     value = (value * 31) ^ hash(self.catName)
     value = (value * 31) ^ hash(self.db_name)
     value = (value * 31) ^ hash(self.tbl_name)
+    value = (value * 31) ^ hash(self.validWriteIdList)
+    value = (value * 31) ^ hash(self.tableId)
     return value
 
   def __repr__(self):
@@ -9203,6 +9307,8 @@ class DefaultConstraintsRequest:
    - catName
    - db_name
    - tbl_name
+   - validWriteIdList
+   - tableId
   """
 
   thrift_spec = (
@@ -9210,12 +9316,16 @@ class DefaultConstraintsRequest:
     (1, TType.STRING, 'catName', None, None, ), # 1
     (2, TType.STRING, 'db_name', None, None, ), # 2
     (3, TType.STRING, 'tbl_name', None, None, ), # 3
+    (4, TType.STRING, 'validWriteIdList', None, None, ), # 4
+    (5, TType.I64, 'tableId', None, -1, ), # 5
   )
 
-  def __init__(self, catName=None, db_name=None, tbl_name=None,):
+  def __init__(self, catName=None, db_name=None, tbl_name=None, validWriteIdList=None, tableId=thrift_spec[5][4],):
     self.catName = catName
     self.db_name = db_name
     self.tbl_name = tbl_name
+    self.validWriteIdList = validWriteIdList
+    self.tableId = tableId
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -9241,6 +9351,16 @@ class DefaultConstraintsRequest:
           self.tbl_name = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.validWriteIdList = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.I64:
+          self.tableId = iprot.readI64()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -9263,6 +9383,14 @@ class DefaultConstraintsRequest:
       oprot.writeFieldBegin('tbl_name', TType.STRING, 3)
       oprot.writeString(self.tbl_name)
       oprot.writeFieldEnd()
+    if self.validWriteIdList is not None:
+      oprot.writeFieldBegin('validWriteIdList', TType.STRING, 4)
+      oprot.writeString(self.validWriteIdList)
+      oprot.writeFieldEnd()
+    if self.tableId is not None:
+      oprot.writeFieldBegin('tableId', TType.I64, 5)
+      oprot.writeI64(self.tableId)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -9281,6 +9409,8 @@ class DefaultConstraintsRequest:
     value = (value * 31) ^ hash(self.catName)
     value = (value * 31) ^ hash(self.db_name)
     value = (value * 31) ^ hash(self.tbl_name)
+    value = (value * 31) ^ hash(self.validWriteIdList)
+    value = (value * 31) ^ hash(self.tableId)
     return value
 
   def __repr__(self):
@@ -9376,6 +9506,8 @@ class CheckConstraintsRequest:
    - catName
    - db_name
    - tbl_name
+   - validWriteIdList
+   - tableId
   """
 
   thrift_spec = (
@@ -9383,12 +9515,16 @@ class CheckConstraintsRequest:
     (1, TType.STRING, 'catName', None, None, ), # 1
     (2, TType.STRING, 'db_name', None, None, ), # 2
     (3, TType.STRING, 'tbl_name', None, None, ), # 3
+    (4, TType.STRING, 'validWriteIdList', None, None, ), # 4
+    (5, TType.I64, 'tableId', None, -1, ), # 5
   )
 
-  def __init__(self, catName=None, db_name=None, tbl_name=None,):
+  def __init__(self, catName=None, db_name=None, tbl_name=None, validWriteIdList=None, tableId=thrift_spec[5][4],):
     self.catName = catName
     self.db_name = db_name
     self.tbl_name = tbl_name
+    self.validWriteIdList = validWriteIdList
+    self.tableId = tableId
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -9414,6 +9550,16 @@ class CheckConstraintsRequest:
           self.tbl_name = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.validWriteIdList = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.I64:
+          self.tableId = iprot.readI64()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -9436,6 +9582,14 @@ class CheckConstraintsRequest:
       oprot.writeFieldBegin('tbl_name', TType.STRING, 3)
       oprot.writeString(self.tbl_name)
       oprot.writeFieldEnd()
+    if self.validWriteIdList is not None:
+      oprot.writeFieldBegin('validWriteIdList', TType.STRING, 4)
+      oprot.writeString(self.validWriteIdList)
+      oprot.writeFieldEnd()
+    if self.tableId is not None:
+      oprot.writeFieldBegin('tableId', TType.I64, 5)
+      oprot.writeI64(self.tableId)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -9454,6 +9608,8 @@ class CheckConstraintsRequest:
     value = (value * 31) ^ hash(self.catName)
     value = (value * 31) ^ hash(self.db_name)
     value = (value * 31) ^ hash(self.tbl_name)
+    value = (value * 31) ^ hash(self.validWriteIdList)
+    value = (value * 31) ^ hash(self.tableId)
     return value
 
   def __repr__(self):
@@ -9549,6 +9705,8 @@ class AllTableConstraintsRequest:
    - dbName
    - tblName
    - catName
+   - validWriteIdList
+   - tableId
   """
 
   thrift_spec = (
@@ -9556,12 +9714,16 @@ class AllTableConstraintsRequest:
     (1, TType.STRING, 'dbName', None, None, ), # 1
     (2, TType.STRING, 'tblName', None, None, ), # 2
     (3, TType.STRING, 'catName', None, None, ), # 3
+    (4, TType.STRING, 'validWriteIdList', None, None, ), # 4
+    (5, TType.I64, 'tableId', None, -1, ), # 5
   )
 
-  def __init__(self, dbName=None, tblName=None, catName=None,):
+  def __init__(self, dbName=None, tblName=None, catName=None, validWriteIdList=None, tableId=thrift_spec[5][4],):
     self.dbName = dbName
     self.tblName = tblName
     self.catName = catName
+    self.validWriteIdList = validWriteIdList
+    self.tableId = tableId
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -9587,6 +9749,16 @@ class AllTableConstraintsRequest:
           self.catName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.validWriteIdList = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.I64:
+          self.tableId = iprot.readI64()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -9609,6 +9781,14 @@ class AllTableConstraintsRequest:
       oprot.writeFieldBegin('catName', TType.STRING, 3)
       oprot.writeString(self.catName)
       oprot.writeFieldEnd()
+    if self.validWriteIdList is not None:
+      oprot.writeFieldBegin('validWriteIdList', TType.STRING, 4)
+      oprot.writeString(self.validWriteIdList)
+      oprot.writeFieldEnd()
+    if self.tableId is not None:
+      oprot.writeFieldBegin('tableId', TType.I64, 5)
+      oprot.writeI64(self.tableId)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -9627,6 +9807,8 @@ class AllTableConstraintsRequest:
     value = (value * 31) ^ hash(self.dbName)
     value = (value * 31) ^ hash(self.tblName)
     value = (value * 31) ^ hash(self.catName)
+    value = (value * 31) ^ hash(self.validWriteIdList)
+    value = (value * 31) ^ hash(self.tableId)
     return value
 
   def __repr__(self):
