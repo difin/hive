@@ -22,6 +22,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
+import org.apache.hadoop.hive.ql.parse.PartitionTransformSpec;
 import org.apache.hive.common.util.HiveStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -253,6 +255,8 @@ class TextMetaDataFormatter implements MetaDataFormatter {
       }
       outStream.write(output.getBytes("UTF-8"));
 
+      addPartitionTransformData(outStream, tbl, isOutputPadded);
+
       if (colPath == null) {
         if (isFormatted) {
           if (part != null) {
@@ -339,6 +343,32 @@ class TextMetaDataFormatter implements MetaDataFormatter {
     } catch (IOException e) {
       throw new HiveException(e);
     }
+  }
+
+  private void addPartitionTransformData(DataOutputStream out, Table table, boolean isOutputPadded) throws IOException {
+    String partitionTransformOutput = "";
+    if (table.isNonNative() && table.getStorageHandler() != null &&
+            table.getStorageHandler().supportsPartitionTransform()) {
+
+      List<PartitionTransformSpec> partSpecs = table.getStorageHandler().getPartitionTransformSpec(table);
+      if (partSpecs != null && !partSpecs.isEmpty()) {
+        TextMetaDataTable metaDataTable = new TextMetaDataTable();
+        partitionTransformOutput += MetaDataFormatUtils.LINE_DELIM + "# Partition Transform Information" + MetaDataFormatUtils.LINE_DELIM + "# ";
+        metaDataTable.addRow(DescTableDesc.PARTITION_TRANSFORM_SPEC_SCHEMA.split("#")[0].split(","));
+        for (PartitionTransformSpec spec : partSpecs) {
+          String[] row = new String[2];
+          row[0] = spec.getColumnName();
+          if (spec.getTransformType() != null) {
+            row[1] = spec.getTransformParam().isPresent() ?
+                         spec.getTransformType().name() + "[" + spec.getTransformParam().get() + "]" :
+                         spec.getTransformType().name();
+          }
+          metaDataTable.addRow(row);
+        }
+        partitionTransformOutput += metaDataTable.renderTable(isOutputPadded);
+      }
+    }
+    out.write(partitionTransformOutput.getBytes(StandardCharsets.UTF_8));
   }
 
   @Override

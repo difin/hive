@@ -25,14 +25,17 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.metadata.*;
+import org.apache.hadoop.hive.ql.parse.PartitionTransformSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,6 +220,21 @@ public class JsonMetaDataFormatter implements MetaDataFormatter {
       }
       else {
         builder.put("tableInfo", tbl.getTTable());
+      }
+      if (tbl.isNonNative() && tbl.getStorageHandler() != null &&
+              tbl.getStorageHandler().supportsPartitionTransform()) {
+        List<PartitionTransformSpec> specs = tbl.getStorageHandler().getPartitionTransformSpec(tbl);
+        if (!specs.isEmpty()) {
+          builder.put("partitionSpecInfo", specs.stream().map(s -> {
+            Map<String, String> result = new LinkedHashMap<>();
+            result.put("column_name", s.getColumnName());
+            result.put("transform_type", s.getTransformType().name());
+            if (s.getTransformParam().isPresent()) {
+              result.put("transform_param", String.valueOf(s.getTransformParam().get()));
+            }
+            return result;
+          }).collect(Collectors.toList()));
+        }
       }
       if (PrimaryKeyInfo.isPrimaryKeyInfoNotEmpty(tbl.getPrimaryKeyInfo())) {
         builder.put("primaryKeyInfo", tbl.getPrimaryKeyInfo());
