@@ -749,7 +749,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
    */
   protected boolean isInsertInto(QBParseInfo qbp, String dest) {
     // get the destination and check if it is TABLE
-    if(qbp == null || dest == null ) return false;
+    if(qbp == null || dest == null ) {
+      return false;
+    }
     ASTNode destNode = qbp.getDestForClause(dest);
     if(destNode != null && destNode.getType() == HiveParser.TOK_TAB) {
       return true;
@@ -762,7 +764,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
    * e.g. VALUES(1,3..)
    */
   private boolean isValueClause(ASTNode select) {
-    if(select == null) return false;
+    if(select == null) {
+      return false;
+    }
     if(select.getChildCount() == 1) {
       ASTNode selectExpr = (ASTNode)select.getChild(0);
       if(selectExpr.getChildCount() == 1 ) {
@@ -13051,11 +13055,11 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     if (!ctx.getExplainLogical()) {
       TaskCompiler compiler = EngineCompileHelper.getInstance(conf).getCompiler(conf);
       compiler.init(queryState, console, db);
-      compiler.compile(pCtx, (List<Task<?>>)rootTasks, inputs, outputs);
+      compiler.compile(pCtx, rootTasks, inputs, outputs);
       fetchTask = pCtx.getFetchTask();
     }
     //find all Acid FileSinkOperatorS
-    QueryPlanPostProcessor qp = new QueryPlanPostProcessor((List<Task<?>>)rootTasks, acidFileSinks, ctx.getExecutionId());
+    QueryPlanPostProcessor qp = new QueryPlanPostProcessor(rootTasks, acidFileSinks, ctx.getExecutionId());
 
     // 10. Attach CTAS/Insert-Commit-hooks for Storage Handlers
     final Optional<TezTask> optionalTezTask =
@@ -16010,10 +16014,11 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       rewrittenQueryStr.append(" partition (");
       boolean first = true;
       for (FieldSchema fschema : partCols) {
-        if (first)
+        if (first) {
           first = false;
-        else
+        } else {
           rewrittenQueryStr.append(", ");
+        }
         // Would be nice if there was a way to determine if quotes are needed
         rewrittenQueryStr.append(HiveUtils.unparseIdentifier(fschema.getName(), this.conf));
         String partVal = (partSpec != null) ? partSpec.get(fschema.getName()) : null;
