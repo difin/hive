@@ -1588,11 +1588,12 @@ public class CalcitePlanner extends SemanticAnalyzer {
   @Override
   protected boolean validateFunction(ASTNode expressionTree, String functionName, boolean windowSpec)
       throws SemanticException {
+    String db = SessionState.get().getCurrentDatabase();
     if (isImpalaPlan(conf)) {
-      impalaHelper.createFunctionHelper(null).validateFunction(functionName, windowSpec);
+      impalaHelper.createFunctionHelper(null).validateFunction(functionName, db, windowSpec);
     }
     return isImpalaPlan(conf)
-        ? impalaHelper.createFunctionHelper(null).isAggregateFunction(functionName)
+        ? impalaHelper.createFunctionHelper(null).isAggregateFunction(functionName, db)
         : super.validateFunction(expressionTree, functionName, windowSpec);
   }
 

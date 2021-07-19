@@ -20,11 +20,13 @@ package org.apache.hadoop.hive.ql.ddl.function.desc;
 
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.ddl.DDLUtils;
+import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.FunctionInfo;
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.exec.FunctionInfo.FunctionResource;
+import org.apache.hadoop.hive.ql.session.SessionState;
 
 import static org.apache.commons.lang.StringUtils.join;
 
@@ -48,25 +50,31 @@ public class DescFunctionOperation extends DDLOperation<DescFunctionDesc> {
   @Override
   public int execute() throws HiveException {
     try (DataOutputStream outStream = DDLUtils.getOutputStream(desc.getResFile(), context)) {
-      String funcName = desc.getName();
-      FunctionInfo functionInfo = FunctionRegistry.getFunctionInfo(funcName);
-      Class<?> funcClass = functionInfo == null ? null : functionInfo.getFunctionClass();
-      Description description = funcClass == null ? null : AnnotationUtils.getAnnotation(funcClass, Description.class);
-
-      printBaseInfo(outStream, funcName, funcClass, description);
-      outStream.write(Utilities.newLineCode);
-      printExtendedInfoIfRequested(outStream, functionInfo, funcClass);
+      EngineCompileHelper helper = EngineCompileHelper.getInstance(SessionState.get().getConf());
+      return helper.fetchFunctionInfo(outStream, desc.getName(), desc.isExtended());
     } catch (IOException e) {
       LOG.warn("describe function: ", e);
       return 1;
     } catch (Exception e) {
       throw new HiveException(e);
     }
+  }
+
+  public static int execute(DataOutputStream outStream, String funcName, boolean isExtended)
+      throws IOException, SemanticException {
+    FunctionInfo functionInfo = FunctionRegistry.getFunctionInfo(funcName);
+    Class<?> funcClass = functionInfo == null ? null : functionInfo.getFunctionClass();
+    Description description = funcClass == null ? null : AnnotationUtils.getAnnotation(funcClass, Description.class);
+
+    printBaseInfo(outStream, funcName, funcClass, description, isExtended);
+    outStream.write(Utilities.newLineCode);
+    printExtendedInfoIfRequested(outStream, functionInfo, funcClass, isExtended);
 
     return 0;
   }
 
-  private void printBaseInfo(DataOutputStream outStream, String funcName, Class<?> funcClass, Description description)
+  private static void printBaseInfo(DataOutputStream outStream, String funcName, Class<?> funcClass,
+      Description description, boolean isExtended)
       throws IOException, SemanticException {
     if (funcClass == null) {
       outStream.writeBytes("Function '" + funcName + "' does not exist.");
@@ -74,7 +82,7 @@ public class DescFunctionOperation extends DDLOperation<DescFunctionDesc> {
       outStream.writeBytes("There is no documentation for function '" + funcName + "'");
     } else {
       outStream.writeBytes(description.value().replace("_FUNC_", funcName));
-      if (desc.isExtended()) {
+      if (isExtended) {
         Set<String> synonyms = FunctionRegistry.getFunctionSynonyms(funcName);
         if (synonyms.size() > 0) {
           outStream.writeBytes("\nSynonyms: " + join(synonyms, ", "));
@@ -86,10 +94,10 @@ public class DescFunctionOperation extends DDLOperation<DescFunctionDesc> {
     }
   }
 
-
-  private void printExtendedInfoIfRequested(DataOutputStream outStream, FunctionInfo functionInfo, Class<?> funcClass)
+  private static void printExtendedInfoIfRequested(DataOutputStream outStream,
+      FunctionInfo functionInfo, Class<?> funcClass, boolean isExtended)
       throws IOException {
-    if (!desc.isExtended()) {
+    if (!isExtended) {
       return;
     }
 

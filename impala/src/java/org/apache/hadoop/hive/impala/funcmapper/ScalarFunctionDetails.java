@@ -19,6 +19,7 @@
 package org.apache.hadoop.hive.impala.funcmapper;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -30,25 +31,37 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.impala.exec.ImpalaSessionImpl;
+import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.ResourceUri;
+import org.apache.hadoop.hive.metastore.api.ResourceType;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.impala.analysis.HdfsUri;
 import org.apache.impala.catalog.BuiltinsDb;
 import org.apache.impala.catalog.Function;
 import org.apache.impala.catalog.ScalarFunction;
 import org.apache.impala.catalog.ScalarType;
 import org.apache.impala.catalog.Type;
+import org.apache.impala.thrift.TBackendGflags;
 import org.apache.impala.thrift.TFunctionBinaryType;
 import org.apache.impala.thrift.TPrimitiveType;
+import org.apache.impala.util.FunctionUtils;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Contains details for Scalar functions.  These functions are retrieved from the Impala
  * frontend and shared library and are stored in the SCALAR_FUNCTIONS_MAP.
@@ -60,6 +73,8 @@ import java.util.Map;
  * file. This can be found in the qtest-impala/src/test/resources directory.
  */
 public class ScalarFunctionDetails implements FunctionDetails {
+
+  protected static final Logger LOG = LoggerFactory.getLogger(ScalarFunctionDetails.class);
 
   public final String dbName;
 
@@ -94,13 +109,24 @@ public class ScalarFunctionDetails implements FunctionDetails {
   public final ImpalaFunctionSignature ifs;
 
   // Set of all scalar functions available in Impala
-  static final Set<String> SCALAR_BUILTINS = new HashSet<>();
+  // This contains just the builtins.
+  private static final Set<String> SCALAR_BUILTINS = new HashSet<>();
 
   // Map containing a scalar  Impala signature to the details associated with the signature.
   // A signature consists of the function name, the operand types and the return type.
-  static final Map<ImpalaFunctionSignature, ScalarFunctionDetails>
+  // This contains just the builtins.
+  private static final Map<ImpalaFunctionSignature, ScalarFunctionDetails>
       SCALAR_BUILTINS_MAP = Maps.newHashMap();
 
+  // Set of all scalar functions available in Impala
+  // This contains both the builtins and the UDFs
+  private static volatile Set<String> ALL_SCALARS_FUNCS = new HashSet<>();
+
+  // Map containing a scalar Impala signature to the details associated with the signature.
+  // A signature consists of the function name, the operand types and the return type.
+  // This contains both the builtins and the UDFs
+  private static volatile Map<ImpalaFunctionSignature, ScalarFunctionDetails>
+      ALL_SCALARS_MAP = ImmutableMap.of();
   /**
    * Fetch the functions from the Impala frontend and return them as a ScalarFunctionDetails list.
    */
@@ -137,20 +163,50 @@ public class ScalarFunctionDetails implements FunctionDetails {
     List<ImpalaFunctionSignature> ifsList = new ArrayList<>();
     for (ScalarFunctionDetails sfd : sfdList) {
       SCALAR_BUILTINS_MAP.put(sfd.ifs, sfd);
-      SCALAR_BUILTINS.add(sfd.fnName.toUpperCase());
+      SCALAR_BUILTINS.add(sfd.fnName.toLowerCase());
       ifsList.add(sfd.ifs);
     }
 
     // Also add functions that don't map directly into Impala (which are stored in a "json"
     // resources file.
     for (NonImpalaFunction nif : NonImpalaFunction.getNonImpalaFunctionsFromFile("/impala_scalars.json")) {
-      ImpalaFunctionSignature ifs = ImpalaFunctionSignature.create(nif.fnName, nif.getArgTypes(),
-          nif.getRetType(), nif.hasVarArgs, nif.retTypeAlwaysNullable);
-      SCALAR_BUILTINS.add(nif.fnName.toUpperCase());
+      ImpalaFunctionSignature ifs = ImpalaFunctionSignature.create(nif.fnName.toLowerCase(),
+          nif.getArgTypes(), nif.getRetType(), nif.hasVarArgs, nif.retTypeAlwaysNullable);
+      SCALAR_BUILTINS.add(nif.fnName.toLowerCase());
       ifsList.add(ifs);
     }
 
-    ImpalaFunctionSignature.populateCastCheckBuiltins(ifsList);
+    ImpalaFunctionSignature.populateCastCheckFunctions(ifsList);
+    // make a copy.  SCALAR_BUILTINS will only contain builtins whereas ALL_SCALAR will
+    // contain builtins and UDFs.
+    ALL_SCALARS_FUNCS = ImmutableSet.copyOf(SCALAR_BUILTINS);
+    ALL_SCALARS_MAP = ImmutableMap.copyOf(SCALAR_BUILTINS_MAP);
+  }
+
+  public static void addUDFs(List<Function> functions) {
+    List<ImpalaFunctionSignature> ifsList = new ArrayList<>();
+    Set<String> allFuncs = new HashSet<>(SCALAR_BUILTINS);
+    Map<ImpalaFunctionSignature, ScalarFunctionDetails> allFuncsMap =
+      new HashMap<>(SCALAR_BUILTINS_MAP);
+
+    for (Function func : functions) {
+      if (!(func instanceof ScalarFunction)) {
+        continue;
+      }
+      // udf function name is saved with the database
+      String fullFunctionName = func.getFunctionName().toString();
+      LOG.info("Registering function " + fullFunctionName);
+      fullFunctionName = fullFunctionName.toLowerCase();
+      ScalarFunctionWrapper funcWrapper = new ScalarFunctionWrapperImpl(func);
+      ScalarFunctionDetails sfd = new ScalarFunctionDetails(fullFunctionName, funcWrapper);
+      allFuncsMap.put(sfd.ifs, sfd);
+      allFuncs.add(fullFunctionName);
+      ifsList.add(sfd.ifs);
+    }
+    ImpalaFunctionSignature.populateCastCheckFunctions(ifsList);
+    ALL_SCALARS_FUNCS = ImmutableSet.copyOf(allFuncs);
+    ALL_SCALARS_MAP = ImmutableMap.copyOf(allFuncsMap);
+    LOG.info("Done Registering functions ");
   }
 
   public static Set<String> getFunctionNames(String impalaFnName) {
@@ -160,7 +216,7 @@ public class ScalarFunctionDetails implements FunctionDetails {
   }
 
   public static Collection<ScalarFunctionDetails> getAllFuncDetails() {
-    return SCALAR_BUILTINS_MAP.values();
+    return ALL_SCALARS_MAP.values();
   }
 
   public ScalarFunctionDetails(String fnName, ScalarFunctionWrapper func) {
@@ -197,8 +253,8 @@ public class ScalarFunctionDetails implements FunctionDetails {
     this.retTypeAlwaysNullable =
         FunctionDetailStatics.RET_TYPE_ALWAYS_NULLABLE_FUNCS.contains(fnName);
 
-    this.ifs = ImpalaFunctionSignature.create(fnName, getArgTypes(), getRetType(),
-          hasVarArgs, retTypeAlwaysNullable);
+    this.ifs = ImpalaFunctionSignature.create(fnName.toLowerCase(), getArgTypes(),
+        getRetType(), hasVarArgs, retTypeAlwaysNullable);
   }
 
   public List<Type> getArgTypes() {
@@ -227,19 +283,35 @@ public class ScalarFunctionDetails implements FunctionDetails {
   public static ScalarFunctionDetails get(String name, List<Type> operandTypes,
        Type retType) {
 
-    ImpalaFunctionSignature sig = ImpalaFunctionSignature.create(name,
+    ImpalaFunctionSignature sig = ImpalaFunctionSignature.create(name.toLowerCase(),
         operandTypes, retType, false, null);
 
-    return SCALAR_BUILTINS_MAP.get(sig);
+    return ALL_SCALARS_MAP.get(sig);
   }
 
   public static ScalarFunctionDetails get(String name, List<RelDataType> operandTypes,
        RelDataType retType) {
 
     ImpalaFunctionSignature sig = ImpalaFunctionSignature.fetch(
-        SCALAR_BUILTINS_MAP, name, operandTypes, retType);
+        ALL_SCALARS_MAP, name, operandTypes, retType);
 
-    return SCALAR_BUILTINS_MAP.get(sig);
+    return get(sig);
+  }
+
+  public static ScalarFunctionDetails get(ImpalaFunctionSignature ifs) {
+    return ALL_SCALARS_MAP.get(ifs);
+  }
+
+  public static Set<String> getAllScalars() {
+    return ALL_SCALARS_FUNCS;
+  }
+
+  public static Map<ImpalaFunctionSignature, ScalarFunctionDetails> getScalarsMap() {
+    return ALL_SCALARS_MAP;
+  }
+
+  public static boolean isScalarFunction(String name) {
+    return ALL_SCALARS_FUNCS.contains(name.toLowerCase());
   }
 
   public static class ScalarFunctionWrapperImpl implements ScalarFunctionWrapper {

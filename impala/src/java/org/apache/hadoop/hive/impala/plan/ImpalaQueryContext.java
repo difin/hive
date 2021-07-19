@@ -71,6 +71,7 @@ public class ImpalaQueryContext {
   private final AuthorizationFactory authFactory;
   private final HiveTxnManager txnMgr;
   private final Context calcitePlannerCtx;
+  private final String dbname;
 
   public ImpalaQueryContext(HiveConf conf, String dbname, String username,
       TQueryOptions options, HiveTxnManager txnMgr, Context ctx) throws HiveException {
@@ -95,6 +96,7 @@ public class ImpalaQueryContext {
         new ImpalaBasicAnalyzer(pruneStmtTableCache, queryCtx, authFactory, hostLocations);
     this.txnMgr = txnMgr;
     this.calcitePlannerCtx = ctx;
+    this.dbname = dbname;
   }
 
   public Analyzer getAnalyzer() {
@@ -242,5 +244,9 @@ public class ImpalaQueryContext {
     queryCtx.setCoord_ip_address(krpcCordAddr);
 
     return queryCtx;
+  }
+
+  public String getDbName() {
+    return dbname;
   }
 }

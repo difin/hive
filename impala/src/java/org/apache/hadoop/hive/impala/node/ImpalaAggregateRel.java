@@ -281,7 +281,7 @@ public class ImpalaAggregateRel extends ImpalaPlanRel {
           .stream()
           .map(input::getExpr)
           .collect(Collectors.toList());
-      Function fn = getFunction(aggCall);
+      Function fn = getFunction(ctx, aggCall);
 
       Type impalaRetType = ImpalaTypeConverter.createImpalaType(aggCall.getType());
       FunctionParams params;
@@ -303,7 +303,7 @@ public class ImpalaAggregateRel extends ImpalaPlanRel {
     return exprs;
   }
 
-  private Function getFunction(AggregateCall aggCall)
+  private Function getFunction(ImpalaPlannerContext ctx, AggregateCall aggCall)
       throws HiveException {
     RelDataType retType = aggCall.getType();
     SqlAggFunction aggFunction = aggCall.getAggregation();
@@ -313,7 +313,8 @@ public class ImpalaAggregateRel extends ImpalaPlanRel {
       RelDataType relDataType = input.getRowType().getFieldList().get(i).getType();
       operandTypes.add(relDataType);
     }
-    return ImpalaRelUtil.getAggregateFunction(aggFunction, retType, operandTypes);
+    String db = ctx.getQueryContext().getDbName();
+    return ImpalaRelUtil.getAggregateFunction(db, aggFunction, retType, operandTypes);
   }
 
   @Override

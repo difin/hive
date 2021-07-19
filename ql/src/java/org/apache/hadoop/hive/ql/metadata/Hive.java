@@ -167,6 +167,7 @@ import org.apache.hadoop.hive.metastore.api.PrimaryKeysRequest;
 import org.apache.hadoop.hive.metastore.api.PrincipalPrivilegeSet;
 import org.apache.hadoop.hive.metastore.api.PrincipalType;
 import org.apache.hadoop.hive.metastore.api.PrivilegeBag;
+import org.apache.hadoop.hive.metastore.api.ResourceUri;
 import org.apache.hadoop.hive.metastore.api.Role;
 import org.apache.hadoop.hive.metastore.api.RolePrincipalGrant;
 import org.apache.hadoop.hive.metastore.api.SQLAllTableConstraints;
@@ -195,6 +196,7 @@ import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.table.partition.add.AlterTableAddPartitionDesc;
+import org.apache.hadoop.hive.ql.engine.EngineLoader;
 import org.apache.hadoop.hive.ql.exec.AbstractFileMergeOperator;
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.exec.FunctionUtils;
@@ -287,8 +289,17 @@ public class Hive {
   private final static AtomicInteger didRegisterAllFuncs = new AtomicInteger(0);
   private final static int REG_FUNCS_NO = 0, REG_FUNCS_DONE = 2, REG_FUNCS_PENDING = 1;
 
+  // variable to hold the current thread registering the functions.
+  private static Thread registerFunctionsThread;
+
   // register all permanent functions. need improvement
+  // XXX: CDPD-30168: make this thread-safe.
   private void registerAllFunctionsOnce() throws HiveException {
+    // There are potential metastore calls within this function, so
+    // this check makes sure we don't call this recursively.
+    if (registerFunctionsThread == Thread.currentThread()) {
+      return;
+    }
     boolean breakLoop = false;
     while (!breakLoop) {
       int val = didRegisterAllFuncs.get();
@@ -316,7 +327,9 @@ public class Hive {
       }
     }
     try {
+      registerFunctionsThread = Thread.currentThread();
       reloadFunctions();
+      registerFunctionsThread = null;
       didRegisterAllFuncs.compareAndSet(REG_FUNCS_PENDING, REG_FUNCS_DONE);
     } catch (Exception | Error e) {
       LOG.warn("Failed to register all functions.", e);
@@ -337,7 +350,8 @@ public class Hive {
   public void reloadFunctions() throws HiveException {
     HashSet<String> registryFunctions = new HashSet<String>(
         FunctionRegistry.getFunctionNames(".+\\..+"));
-    for (Function function : getAllFunctions()) {
+    List<Function> allFunctions = getAllFunctions();
+    for (Function function : allFunctions) {
       String functionName = function.getFunctionName();
       try {
         LOG.info("Registering function " + functionName + " " + function.getClassName());
@@ -358,6 +372,14 @@ public class Hive {
         LOG.warn("Failed to unregister persistent function " +
             functionName + "on reload. Ignore and continue.");
       }
+    }
+
+    // Allow third party engines to reload their functions.
+    try {
+      EngineLoader.getExternalInstance().getCompileHelper().reloadFunctions(allFunctions, conf,
+          getMSC());
+    } catch (Exception e) {
+      LOG.warn("Failed to register udf functions in external driver.");
     }
   }
 

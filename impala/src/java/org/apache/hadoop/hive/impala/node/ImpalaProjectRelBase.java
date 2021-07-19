@@ -212,7 +212,7 @@ abstract public class ImpalaProjectRelBase extends ImpalaPlanRel {
       throws HiveException {
     final RexWindow rexWindow = rexOver.getWindow();
     // First parameter is the function call
-    Function fn = getFunction(rexOver);
+    Function fn = getFunction(ctx, rexOver);
     Type impalaRetType = ImpalaTypeConverter.createImpalaType(rexOver.getType());
     List<Expr> operands = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(rexOver.operands)) {
@@ -300,7 +300,7 @@ abstract public class ImpalaProjectRelBase extends ImpalaPlanRel {
     return result;
   }
 
-  private Function getFunction(RexOver exp)
+  private Function getFunction(ImpalaPlannerContext ctx, RexOver exp)
       throws HiveException {
     RelDataType retType = exp.getType();
     SqlAggFunction aggFunction = exp.getAggOperator();
@@ -308,6 +308,7 @@ abstract public class ImpalaProjectRelBase extends ImpalaPlanRel {
     for (RexNode operand : exp.operands) {
       operandTypes.add(operand.getType());
     }
-    return ImpalaRelUtil.getAggregateFunction(aggFunction, retType, operandTypes);
+    String db = ctx.getQueryContext().getDbName();
+    return ImpalaRelUtil.getAggregateFunction(db, aggFunction, retType, operandTypes);
   }
 }

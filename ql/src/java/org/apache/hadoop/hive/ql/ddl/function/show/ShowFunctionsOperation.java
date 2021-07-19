@@ -20,8 +20,10 @@ package org.apache.hadoop.hive.ql.ddl.function.show;
 
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.ddl.DDLUtils;
+import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.exec.Utilities;
+import org.apache.hadoop.hive.ql.session.SessionState;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -44,16 +46,28 @@ public class ShowFunctionsOperation extends DDLOperation<ShowFunctionsDesc> {
 
   @Override
   public int execute() throws HiveException {
-    Set<String> funcs = fetchFunctions();
-    return printFunctions(funcs);
+    try (DataOutputStream outStream = DDLUtils.getOutputStream(new Path(desc.getResFile()), context)) {
+      EngineCompileHelper helper = EngineCompileHelper.getInstance(SessionState.get().getConf());
+      return helper.fetchFunctions(outStream, desc.getPattern());
+    } catch (IOException e) {
+      LOG.warn("show function: ", e);
+      return 1;
+    } catch (Exception e) {
+      throw new HiveException(e);
+    }
   }
 
-  private Set<String> fetchFunctions() {
+  public static int execute(DataOutputStream outStream, String pattern) throws IOException {
+    Set<String> funcs = fetchFunctions(pattern);
+    return printFunctions(outStream, funcs);
+  }
+
+  private static Set<String> fetchFunctions(String pattern) {
     Set<String> funcs = null;
-    if (desc.getPattern() != null) {
-      funcs = FunctionRegistry.getFunctionNamesByLikePattern(desc.getPattern());
+    if (pattern != null) {
+      funcs = FunctionRegistry.getFunctionNamesByLikePattern(pattern);
       LOG.info("Found {} function(s) using pattern {} matching the SHOW FUNCTIONS statement.", funcs.size(),
-          desc.getPattern());
+          pattern);
     } else {
       funcs = FunctionRegistry.getFunctionNames();
     }
@@ -61,22 +75,16 @@ public class ShowFunctionsOperation extends DDLOperation<ShowFunctionsDesc> {
     return funcs;
   }
 
-  private int printFunctions(Set<String> funcs) throws HiveException {
-    try (DataOutputStream outStream = DDLUtils.getOutputStream(new Path(desc.getResFile()), context)) {
-      SortedSet<String> sortedFuncs = new TreeSet<String>(funcs);
-      sortedFuncs.removeAll(serdeConstants.PrimitiveTypes);
+  public static int printFunctions(DataOutputStream outStream, Set<String> funcs)
+      throws IOException {
+    SortedSet<String> sortedFuncs = new TreeSet<String>(funcs);
+    sortedFuncs.removeAll(serdeConstants.PrimitiveTypes);
 
-      for (String func : sortedFuncs) {
-        outStream.writeBytes(func);
-        outStream.write(Utilities.newLineCode);
-      }
-
-      return 0;
-    } catch (IOException e) {
-      LOG.warn("show function: ", e);
-      return 1;
-    } catch (Exception e) {
-      throw new HiveException(e);
+    for (String func : sortedFuncs) {
+      outStream.writeBytes(func);
+      outStream.write(Utilities.newLineCode);
     }
+
+    return 0;
   }
 }

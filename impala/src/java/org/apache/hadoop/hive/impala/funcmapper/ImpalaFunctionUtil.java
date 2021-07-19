@@ -74,6 +74,7 @@ public class ImpalaFunctionUtil {
             afd.mergeFnSymbol, afd.getValueFnSymbol, afd.removeFnSymbol,
             afd.finalizeFnSymbol);
     retVal.setBinaryType(afd.binaryType);
+    retVal.setLocation(afd.hdfsUri);
     return retVal;
   }
 

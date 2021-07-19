@@ -27,6 +27,7 @@ import org.apache.hadoop.hive.impala.funcmapper.ImpalaFunctionSignature;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.impala.funcmapper.AggFunctionDetails;
+import org.apache.hadoop.hive.impala.funcmapper.ImpalaFunctionHelper;
 import org.apache.hadoop.hive.impala.funcmapper.ImpalaTypeConverter;
 import org.apache.hadoop.hive.impala.rex.ImpalaRexVisitor.ImpalaInferMappingRexVisitor;
 import org.apache.impala.analysis.Analyzer;
@@ -49,10 +50,13 @@ public class ImpalaRelUtil {
    * Returns the aggregation function for the provided parameters. In Impala,
    * this could be either an aggregation or analytic function.
    */
-  public static AggregateFunction getAggregateFunction(SqlAggFunction aggFunction, RelDataType retType,
+  public static AggregateFunction getAggregateFunction(String currentDatabase,
+      SqlAggFunction aggFunction, RelDataType retType,
       List<RelDataType> operandTypes) throws HiveException {
 
-    AggFunctionDetails funcDetails = AggFunctionDetails.get(aggFunction.getName(), operandTypes,
+    String funcName = ImpalaFunctionHelper.getFuncName(AggFunctionDetails.getAllAggs(),
+        aggFunction.getName(), currentDatabase);
+    AggFunctionDetails funcDetails = AggFunctionDetails.get(funcName, operandTypes,
         retType);
 
     if (funcDetails == null) {
@@ -61,13 +65,14 @@ public class ImpalaRelUtil {
 
     List<Type> argTypes = ImpalaTypeConverter.createImpalaTypes(operandTypes);
     Type impalaRetType = ImpalaTypeConverter.createImpalaType(retType);
-    int intermediateTypePrecision = funcDetails.intermediateTypeLength != 0 
+    int intermediateTypePrecision = funcDetails.intermediateTypeLength != 0
         ? funcDetails.intermediateTypeLength
         : retType.getPrecision();
     Type intermediateType = ImpalaTypeConverter.createImpalaType(funcDetails.getIntermediateType(),
         intermediateTypePrecision, retType.getScale());
 
-    return createAggFunction(funcDetails,aggFunction.getName(), argTypes, impalaRetType, intermediateType);
+    return createAggFunction(funcDetails, funcDetails.getName(), argTypes, impalaRetType,
+        intermediateType);
   }
 
   public static AggregateFunction getAggregateFunction(String aggFuncName, Type retType,
@@ -91,7 +96,8 @@ public class ImpalaRelUtil {
         .createImpalaType(funcDetails.getIntermediateType(), intermediateTypePrecision,
             intermediateTypeScale);
 
-    return createAggFunction(funcDetails, aggFuncName, operandTypes, retType, intermediateType);
+    return createAggFunction(funcDetails, funcDetails.getName(), operandTypes,
+        retType, intermediateType);
   }
 
   private static AggregateFunction createAggFunction(AggFunctionDetails funcDetails, String aggFuncName,
@@ -112,10 +118,12 @@ public class ImpalaRelUtil {
     }
     // Some agg functions are used both in analytic functions and regular aggregations (e.g. count)
     // We can treat them both as a regular builtin.
-    return AggregateFunction
-        .createBuiltin(BuiltinsDb.getInstance(), aggFuncName, operandTypes, retType, intermediateType, funcDetails.initFnSymbol,
-            funcDetails.updateFnSymbol, funcDetails.mergeFnSymbol, funcDetails.serializeFnSymbol, funcDetails.getValueFnSymbol, funcDetails.removeFnSymbol,
-            funcDetails.finalizeFnSymbol, funcDetails.ignoresDistinct, funcDetails.isAnalyticFn, funcDetails.returnsNonNullOnEmpty);
+    AggregateFunction agg = new AggregateFunction(funcDetails.getFunctionName(), operandTypes,
+        retType, intermediateType, funcDetails.hdfsUri, funcDetails.updateFnSymbol,
+        funcDetails.initFnSymbol, funcDetails.serializeFnSymbol, funcDetails.mergeFnSymbol,
+        funcDetails.getValueFnSymbol, funcDetails.removeFnSymbol, funcDetails.finalizeFnSymbol);
+    agg.setBinaryType(funcDetails.binaryType);
+    return agg;
   }
 
   /**

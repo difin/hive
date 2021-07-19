@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.impala.funcmapper;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import java.nio.charset.Charset;
 import org.apache.calcite.rel.type.RelDataType;
@@ -68,7 +69,6 @@ import java.util.Set;
  */
 @Evolving
 public class ImpalaFunctionHelper implements FunctionHelper {
-
   private static final BigDecimal TINYINT_MIN_VALUE = BigDecimal.valueOf(Byte.MIN_VALUE);
   private static final BigDecimal TINYINT_MAX_VALUE = BigDecimal.valueOf(Byte.MAX_VALUE);
   private static final BigDecimal SMALLINT_MIN_VALUE = BigDecimal.valueOf(Short.MIN_VALUE);
@@ -141,13 +141,15 @@ public class ImpalaFunctionHelper implements FunctionHelper {
       ) throws SemanticException {
     try {
       ImpalaFunctionResolver funcResolver = ImpalaFunctionResolverImpl.create(this,
-          functionInfo.getDisplayName(), inputs, null);
+          getFuncName(ScalarFunctionDetails.getAllScalars(), functionInfo.getDisplayName(),
+              queryContext.getDbName()),
+          inputs, null);
 
       ImpalaFunctionInfo impalaFunctionInfo = (ImpalaFunctionInfo) functionInfo;
       impalaFunctionInfo.setFunctionResolver(funcResolver);
 
       ImpalaFunctionSignature ifs =
-          funcResolver.getFunction(ScalarFunctionDetails.SCALAR_BUILTINS_MAP);
+          funcResolver.getFunction(ScalarFunctionDetails.getScalarsMap());
       impalaFunctionInfo.setImpalaFunctionSignature(ifs);
       return funcResolver.getRetType(ifs, inputs);
     } catch (HiveException e) {
@@ -171,8 +173,10 @@ public class ImpalaFunctionHelper implements FunctionHelper {
       ImpalaFunctionInfo impalaFunctionInfo = (ImpalaFunctionInfo) functionInfo;
       ImpalaFunctionResolver funcResolver = impalaFunctionInfo.getFunctionResolver();
       if (funcResolver == null) {
-        funcResolver =
-            ImpalaFunctionResolverImpl.create(this,functionInfo.getDisplayName(), inputs, returnType);
+        funcResolver = ImpalaFunctionResolverImpl.create(this,
+          getFuncName(ScalarFunctionDetails.getAllScalars(), functionInfo.getDisplayName(),
+              queryContext.getDbName()),
+          inputs, returnType);
         impalaFunctionInfo.setFunctionResolver(funcResolver);
       }
       return funcResolver.getConvertedInputs(impalaFunctionInfo.getImpalaFunctionSignature());
@@ -197,8 +201,10 @@ public class ImpalaFunctionHelper implements FunctionHelper {
       ImpalaFunctionInfo impalaFunctionInfo = (ImpalaFunctionInfo) functionInfo;
       ImpalaFunctionResolver funcResolver = impalaFunctionInfo.getFunctionResolver();
       if (funcResolver == null) {
-        funcResolver =
-            ImpalaFunctionResolverImpl.create(this,functionInfo.getDisplayName(), inputs, returnType);
+        funcResolver = ImpalaFunctionResolverImpl.create(this,
+          getFuncName(ScalarFunctionDetails.getAllScalars(), functionInfo.getDisplayName(),
+              queryContext.getDbName()),
+          inputs, returnType);
         impalaFunctionInfo.setFunctionResolver(funcResolver);
       }
       return funcResolver.createRexNode(impalaFunctionInfo.getImpalaFunctionSignature(),
@@ -455,10 +461,11 @@ public class ImpalaFunctionHelper implements FunctionHelper {
   private AggregateInfo getAggregateCommon(boolean isDistinct, boolean isAllColumns, String aggregateName,
       List<RexNode> aggregateParameters) throws SemanticException {
     try {
-      ImpalaFunctionResolver funcResolver =
-          ImpalaFunctionResolverImpl.create(this, aggregateName, aggregateParameters, null);
+      ImpalaFunctionResolver funcResolver = ImpalaFunctionResolverImpl.create(this,
+          getFuncName(AggFunctionDetails.getAllAggs(), aggregateName, queryContext.getDbName()),
+          aggregateParameters, null);
       ImpalaFunctionSignature function =
-          funcResolver.getFunction(AggFunctionDetails.AGG_BUILTINS_MAP);
+          funcResolver.getFunction(AggFunctionDetails.getAggsMap());
 
       List<RexNode> convertedInputs = funcResolver.getConvertedInputs(function);
 
@@ -491,28 +498,9 @@ public class ImpalaFunctionHelper implements FunctionHelper {
     return SqlKind.VAR_SAMP;
   }
 
-  /**
-   * Returns true if the name corresponds to a scalar function
-   * in Impala.
-   */
-  public boolean isScalarFunction(String name) {
-    return ScalarFunctionDetails.SCALAR_BUILTINS.contains(name.toUpperCase());
-  }
-
-  /**
-   * Returns true if the name corresponds to an aggregate function
-   * in Impala.
-   */
-  public boolean isAggregateFunction(String name) {
-    return AggFunctionDetails.AGG_BUILTINS.contains(name.toUpperCase());
-  }
-
-  /**
-   * Returns true if the name corresponds to an analytic function
-   * in Impala.
-   */
-  public boolean isAnalyticFunction(String name) {
-    return AggFunctionDetails.ANALYTIC_BUILTINS.contains(name.toUpperCase());
+  @Override
+  public boolean isAggregateFunction(String name, String db) {
+    return AggFunctionDetails.isAggFunction(name, db);
   }
 
   /**
@@ -595,20 +583,66 @@ public class ImpalaFunctionHelper implements FunctionHelper {
    */
   @Override
   public boolean isStateful(FunctionInfo fi) {
-    //TODO: CDPD-15770: need to implement for validation checks.
     return false;
   }
 
   @Override
-  public void validateFunction(String functionName, boolean windowSpec) throws SemanticException {
-    boolean scalarFunction = isScalarFunction(functionName);
-    boolean aggFunction = !scalarFunction && isAggregateFunction(functionName);
-    boolean analyticFunction = !scalarFunction && isAnalyticFunction(functionName);
+  public void validateFunction(String functionName, String dbName, boolean windowSpec)
+      throws SemanticException {
+    validateFunction(functionName, dbName, windowSpec, true);
+  }
+
+  /**
+   * Validate that the function exists in Impala. We go through 2 passes. The first checks
+   * the function name as/is. This will check if it matches a builtin function. Udf functions
+   * are saved as "dbname.func_name. So if it is a udf, it will match on the first pass if the
+   * dbname is explicitly used with the function name (e.g. mydb.my_func() ). If a match is not
+   * found, we tack on the dbname passed in, which should be the current database.
+   */
+  private void validateFunction(String functionName, String dbName, boolean windowSpec,
+      boolean firstPass) throws SemanticException {
+    String fullName = firstPass ? functionName : dbName + "." + functionName;
+    boolean scalarFunction = ScalarFunctionDetails.isScalarFunction(fullName);
+    boolean aggFunction = !scalarFunction && AggFunctionDetails.isAggFunction(functionName, dbName);
+    boolean analyticFunction = !scalarFunction && AggFunctionDetails.isAnalyticFunction(fullName);
     if (!scalarFunction && !aggFunction && !analyticFunction) {
-      throw new SemanticException(ErrorMsg.INVALID_FUNCTION.getMsg(functionName));
+      if (!firstPass) {
+        throw new SemanticException(ErrorMsg.INVALID_FUNCTION.getMsg(functionName));
+      } else {
+        // Function was not found.  Let's try one more time but with the dbName explicitly
+        // passed in.
+        Preconditions.checkNotNull(dbName);
+        validateFunction(functionName, dbName, windowSpec, false);
+      }
     }
     if (!aggFunction && analyticFunction && !windowSpec) {
       throw new SemanticException(ErrorMsg.MISSING_OVER_CLAUSE.getMsg(functionName));
     }
   }
+
+  /**
+   * get the funciton name from the given set. The function name in the set has the form of
+   * either <function_name> (for the builtins) or <db>.<function_name> for UDFs. We have to
+   * check both forms for the "name" value passed in (along with the current database for the
+   * session which is also passed in.
+   */
+  public static String getFuncName(Set<String> allFuncNames, String name, String db)
+      throws SemanticException {
+    // If the name is not of the form db.func, then it will match a builtin over the UDF.
+    if (allFuncNames.contains(name.toLowerCase())) {
+      return name;
+    }
+    // udfs are stored with the database name, so also check with the current database.
+    String fullName = db + "." + name;
+    if (allFuncNames.contains(fullName.toLowerCase())) {
+      return fullName;
+    }
+
+    // If neither is found, it could still be a special builtin function so just pass back
+    // the name. One example where this happens is for casts, where the Hive engine passes
+    // the type (e.g. "timestamp") for the function rather than "cast", and this is not
+    // in the function list.
+    return name;
+  }
+
 }

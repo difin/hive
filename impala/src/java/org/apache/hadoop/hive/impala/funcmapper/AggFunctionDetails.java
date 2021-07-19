@@ -19,6 +19,8 @@
 package org.apache.hadoop.hive.impala.funcmapper;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -26,6 +28,9 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.reflect.TypeToken;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.impala.analysis.FunctionName;
+import org.apache.impala.analysis.HdfsUri;
 import org.apache.impala.catalog.AggregateFunction;
 import org.apache.impala.catalog.BuiltinsDb;
 import org.apache.impala.catalog.Function;
@@ -34,15 +39,21 @@ import org.apache.impala.catalog.Type;
 import org.apache.impala.thrift.TFunctionBinaryType;
 import org.apache.impala.thrift.TPrimitiveType;
 
+import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains details for Aggregation functions.  These functions are retrieved from the Impala
@@ -51,6 +62,7 @@ import java.util.Set;
  * as a key for both AggFunctionDetails and ScalarFunctionDetails.
  */
 public class AggFunctionDetails implements FunctionDetails {
+  protected static final Logger LOG = LoggerFactory.getLogger(AggFunctionDetails.class);
 
   public final String dbName;
   public final String fnName;
@@ -75,16 +87,26 @@ public class AggFunctionDetails implements FunctionDetails {
   public final boolean returnsNonNullOnEmpty;
   public final boolean isAgg;
   public final TFunctionBinaryType binaryType;
+  public final HdfsUri hdfsUri;
   private final ImpalaFunctionSignature ifs;
 
   // Set of all aggregate functions available in Impala
-  static final Set<String> AGG_BUILTINS = new HashSet<>();
+  private static final Set<String> AGG_BUILTINS = new HashSet<>();
   // Set of all analytic functions available in Impala
-  static final Set<String> ANALYTIC_BUILTINS = new HashSet<>();
+  private static final Set<String> ANALYTIC_BUILTINS = new HashSet<>();
   // Map containing an aggregate Impala signature to the details associated with the signature.
   // A signature consists of the function name, the operand types and the return type.
-  static final Map<ImpalaFunctionSignature, AggFunctionDetails> AGG_BUILTINS_MAP = Maps.newHashMap();
+  private static final Map<ImpalaFunctionSignature, AggFunctionDetails> AGG_BUILTINS_MAP = Maps.newHashMap();
 
+  // Set of all agg functions available in Impala
+  // This contains both the builtins and the UDFs
+  private static volatile Set<String> ALL_AGG_FUNCS = new HashSet<>();
+
+  // Map containing an agg Impala signature to the details associated with the signature.
+  // A signature consists of the function name, the operand types and the return type.
+  // This contains both the builtins and the UDFs
+  private static volatile Map<ImpalaFunctionSignature, AggFunctionDetails>
+      ALL_AGG_MAP = Maps.newHashMap();
   /**
    * Fetch the functions from the Impala frontend and return them as a AggFunctionDetails list.
    */
@@ -103,7 +125,8 @@ public class AggFunctionDetails implements FunctionDetails {
           continue;
         }
         if (func instanceof AggregateFunction) {
-          AggFunctionDetails afd = new AggFunctionDetails((AggregateFunction) func);
+          AggFunctionDetails afd =
+              new AggFunctionDetails(func.functionName(), (AggregateFunction) func);
           result.add(afd);
         }
       }
@@ -122,10 +145,10 @@ public class AggFunctionDetails implements FunctionDetails {
     for (AggFunctionDetails afd : afdList) {
       AGG_BUILTINS_MAP.put(afd.ifs, afd);
       if (afd.isAgg) {
-        AGG_BUILTINS.add(afd.fnName.toUpperCase());
+        AGG_BUILTINS.add(afd.fnName.toLowerCase());
       }
       if (afd.isAnalyticFn) {
-        ANALYTIC_BUILTINS.add(afd.fnName.toUpperCase());
+        ANALYTIC_BUILTINS.add(afd.fnName.toLowerCase());
       }
       ifsList.add(afd.ifs);
     }
@@ -138,25 +161,57 @@ public class AggFunctionDetails implements FunctionDetails {
       AggFunctionDetails afd = new AggFunctionDetails(nif);
       AGG_BUILTINS_MAP.put(afd.ifs, afd);
       if (nif.isAnalyticFn) {
-        ANALYTIC_BUILTINS.add(nif.fnName.toUpperCase());
+        ANALYTIC_BUILTINS.add(nif.fnName.toLowerCase());
       }
       if (nif.isAgg) {
-        AGG_BUILTINS.add(nif.fnName.toUpperCase());
+        AGG_BUILTINS.add(nif.fnName.toLowerCase());
       }
       ifsList.add(ifs);
     }
 
-    ImpalaFunctionSignature.populateCastCheckBuiltins(ifsList);
+    ImpalaFunctionSignature.populateCastCheckFunctions(ifsList);
+    //XXX: CDPD-30169: support for analytic UDFs (we probably need
+    // to copy over ANALYTIC_BUILTINS to support this.)
+    ALL_AGG_FUNCS = ImmutableSet.copyOf(AGG_BUILTINS);
+    ALL_AGG_MAP = ImmutableMap.copyOf(AGG_BUILTINS_MAP);
+
   }
 
-  public AggFunctionDetails(AggregateFunction func) {
+  public static void addUDFs(List<Function> functions) {
+    List<ImpalaFunctionSignature> ifsList = new ArrayList<>();
+    Set<String> allFuncs = new HashSet<>(AGG_BUILTINS);
+    Map<ImpalaFunctionSignature, AggFunctionDetails> allFuncsMap =
+        new HashMap<>(AGG_BUILTINS_MAP);
+
+    for (Function func : functions) {
+      if (!(func instanceof AggregateFunction)) {
+        continue;
+      }
+      // udf function name is saved with the database
+      String fullFunctionName = func.getFunctionName().toString();
+      LOG.info("Registering function " + fullFunctionName);
+      fullFunctionName = fullFunctionName.toLowerCase();
+      AggFunctionDetails afd =
+          new AggFunctionDetails(fullFunctionName, (AggregateFunction) func);
+      allFuncsMap.put(afd.ifs, afd);
+      allFuncs.add(fullFunctionName);
+      ifsList.add(afd.ifs);
+    }
+    ImpalaFunctionSignature.populateCastCheckFunctions(ifsList);
+    ALL_AGG_FUNCS = ImmutableSet.copyOf(allFuncs);
+    ALL_AGG_MAP = ImmutableMap.copyOf(allFuncsMap);
+    LOG.info("Done Registering functions ");
+  }
+
+  public AggFunctionDetails(String funcName, AggregateFunction func) {
     dbName = func.dbName();
-    fnName = func.functionName();
+    fnName = funcName;
     impalaFnName = func.functionName();
     impalaRetType = func.getReturnType();
     impalaArgTypes = new ArrayList<Type>(Arrays.asList(func.getArgs()));
     isPersistent = func.isPersistent();
     binaryType = func.getBinaryType();
+    hdfsUri = func.getLocation();
     impalaIntermediateType = (func.getIntermediateType() == null)
         ? impalaRetType : func.getIntermediateType();
     intermediateTypeLength = (func.getIntermediateType() == null)
@@ -172,7 +227,8 @@ public class AggFunctionDetails implements FunctionDetails {
     ignoresDistinct = func.ignoresDistinct();
     returnsNonNullOnEmpty = func.returnsNonNullOnEmpty();
     isAgg = func.isAggregateFn();
-    ifs = ImpalaFunctionSignature.create(fnName, getArgTypes(), getRetType(), false, false);
+    ifs = ImpalaFunctionSignature.create(fnName.toLowerCase(), getArgTypes(), getRetType(),
+        false, false);
   }
 
   public AggFunctionDetails(AggFunctionWrapper func) {
@@ -183,6 +239,7 @@ public class AggFunctionDetails implements FunctionDetails {
     impalaArgTypes = func.getArgTypes();
     isPersistent = func.isPersistent();
     binaryType = func.getBinaryType();
+    hdfsUri = null;
     impalaIntermediateType = (func.getIntermediateType() == null)
         ? impalaRetType : func.getIntermediateType();
 
@@ -199,7 +256,8 @@ public class AggFunctionDetails implements FunctionDetails {
     ignoresDistinct = func.ignoresDistinct();
     returnsNonNullOnEmpty = func.returnsNonNullOnEmpty();
     isAgg = func.isAggregateFn();
-    ifs = ImpalaFunctionSignature.create(fnName, getArgTypes(), getRetType(), false, false);
+    ifs = ImpalaFunctionSignature.create(fnName.toLowerCase(), getArgTypes(), getRetType(),
+        false, false);
   }
 
   public AggFunctionDetails(NonImpalaFunction func) {
@@ -210,6 +268,7 @@ public class AggFunctionDetails implements FunctionDetails {
     impalaArgTypes = func.getArgTypes();
     isPersistent = false;
     binaryType = null;
+    hdfsUri = null;
     impalaIntermediateType = impalaRetType;
 
     intermediateTypeLength = 0;
@@ -229,11 +288,15 @@ public class AggFunctionDetails implements FunctionDetails {
   }
 
   public static Collection<AggFunctionDetails> getAllFuncDetails() {
-    return AGG_BUILTINS_MAP.values();
+    return ALL_AGG_MAP.values();
   }
 
   public List<Type> getArgTypes() {
     return impalaArgTypes;
+  }
+
+  public String getName() {
+    return impalaFnName;
   }
 
   public Type getRetType() {
@@ -249,6 +312,15 @@ public class AggFunctionDetails implements FunctionDetails {
     return ifs;
   }
 
+  public FunctionName getFunctionName() {
+    return new FunctionName(dbName, impalaFnName);
+  }
+
+  public static int fetchFunctionInfo(DataOutputStream outStream, String func)
+      throws IOException, SemanticException {
+    return 0;
+  }
+
   /**
    * Retrieve function details about an agg function given a signature
    * containing the function name, return type, and operand types.
@@ -256,17 +328,25 @@ public class AggFunctionDetails implements FunctionDetails {
   public static AggFunctionDetails get(String name, List<RelDataType> operandTypes,
        RelDataType retType) {
 
-    ImpalaFunctionSignature sig = ImpalaFunctionSignature.fetch(AGG_BUILTINS_MAP,
+    ImpalaFunctionSignature sig = ImpalaFunctionSignature.fetch(ALL_AGG_MAP,
         name, operandTypes, retType);
 
     if (sig != null) {
-      return AGG_BUILTINS_MAP.get(sig);
+      return ALL_AGG_MAP.get(sig);
     }
     return null;
   }
 
-  public static boolean isAggFunction(String fnName) {
-    return AGG_BUILTINS.contains(fnName.toUpperCase());
+  public static boolean isAggFunction(String name) {
+    return ALL_AGG_FUNCS.contains(name.toLowerCase());
+  }
+
+  public static boolean isAggFunction(String name, String db) {
+    return ALL_AGG_FUNCS.contains(name.toLowerCase()) || ALL_AGG_FUNCS.contains(db + "." + name);
+  }
+
+  public static boolean isAnalyticFunction(String name) {
+    return ANALYTIC_BUILTINS.contains(name.toLowerCase());
   }
 
   public static AggFunctionDetails get(String name, List<Type> operandTypes,
@@ -276,8 +356,20 @@ public class AggFunctionDetails implements FunctionDetails {
         hasVarArgs, null);
 
     if (sig != null) {
-      return AGG_BUILTINS_MAP.get(sig);
+      return ALL_AGG_MAP.get(sig);
     }
     return null;
+  }
+
+  public static AggFunctionDetails get(ImpalaFunctionSignature ifs) {
+    return ALL_AGG_MAP.get(ifs);
+  }
+
+  public static Set<String> getAllAggs() {
+    return ALL_AGG_FUNCS;
+  }
+
+  public static Map<ImpalaFunctionSignature, AggFunctionDetails>  getAggsMap() {
+    return ALL_AGG_MAP;
   }
 }

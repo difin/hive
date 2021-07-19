@@ -21,11 +21,16 @@ package org.apache.hadoop.hive.ql.engine.internal;
 import org.apache.calcite.rel.type.RelDataTypeSystem;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HMSConverter;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryState;
+import org.apache.hadoop.hive.ql.ddl.function.desc.DescFunctionOperation;
+import org.apache.hadoop.hive.ql.ddl.function.show.ShowFunctionsOperation;
 import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
 import org.apache.hadoop.hive.ql.engine.EngineEventSequence;
 import org.apache.hadoop.hive.ql.engine.EngineQueryHelper;
+import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveTypeSystemImpl;
@@ -35,10 +40,32 @@ import org.apache.hadoop.hive.ql.parse.TaskCompiler;
 import org.apache.hadoop.hive.ql.parse.TezCompiler;
 import org.apache.hadoop.hive.ql.parse.spark.SparkCompiler;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class NativeEngineCompileHelper implements EngineCompileHelper {
+  protected static final Logger LOG = LoggerFactory.getLogger(NativeEngineCompileHelper.class);
 
   public HMSConverter getHMSConverter() {
     return null;
+  }
+
+  public void reloadFunctions(List<Function> functions, HiveConf conf, IMetaStoreClient msc) {
+  }
+
+  public int fetchFunctions(DataOutputStream outStream, String pattern)
+      throws IOException {
+    return ShowFunctionsOperation.execute(outStream, pattern);
+  }
+
+  public int fetchFunctionInfo(DataOutputStream outStream, String func, boolean isExtended) 
+      throws IOException, SemanticException {
+    return DescFunctionOperation.execute(outStream, func, isExtended);
   }
 
   public EngineEventSequence getEventSequence(String event) {

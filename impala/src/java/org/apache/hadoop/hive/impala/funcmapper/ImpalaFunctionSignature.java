@@ -43,12 +43,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 public class ImpalaFunctionSignature {
-
+  protected static final Logger LOG = LoggerFactory.getLogger(ImpalaFunctionSignature.class);
   private enum SqlTypeOrdering {
     BOOLEAN,
     TINYINT,
@@ -68,28 +71,37 @@ public class ImpalaFunctionSignature {
   // A map of the function name to a list of possible signatures.
   // For instance, the "sum" function has an instance where BIGINT is an operand and has an instance
   // where DOUBLE is an operand.
-  static Map<String, List<ImpalaFunctionSignature>> CAST_CHECK_BUILTINS_INSTANCE = Maps.newHashMap();
+  public static volatile Map<String, List<ImpalaFunctionSignature>> CAST_CHECK_FUNCS_INSTANCE
+      = Maps.newHashMap();
 
   // List of functions where Impala does not handle CHAR or VARCHAR types but handles a STRING type.
   public static List<String> STRING_ONLY_FUNCTIONS =
       ImmutableList.of("coalesce", "in", "substr", "substring", "upper", "lower", "like");
 
   /**
-   * Populate the CAST_CHECK_BUILTINS_INSTANCE map by placing in all the signatures passed
+   * Populate the CAST_CHECK_FUNCS_INSTANCE map by placing in all the signatures passed
    * in and sorting them in the correct cast order.
    */
-  public static void populateCastCheckBuiltins(List<ImpalaFunctionSignature> ifsList) {
+  public static void populateCastCheckFunctions(List<ImpalaFunctionSignature> ifsList) {
+    Map<String, List<ImpalaFunctionSignature>> tmpMap = new HashMap<>(CAST_CHECK_FUNCS_INSTANCE);
+
+    // all the signatures for a given function should be passed in, so it is ok to delete
+    // the key value.
+    for (ImpalaFunctionSignature ifs : ifsList) {
+      tmpMap.remove(ifs.func);
+    }
+
     for (ImpalaFunctionSignature ifs : ifsList) {
       List<ImpalaFunctionSignature> castIfsList =
-          CAST_CHECK_BUILTINS_INSTANCE.computeIfAbsent(ifs.func, k -> Lists.newArrayList());
+          tmpMap.computeIfAbsent(ifs.func, k -> Lists.newArrayList());
       castIfsList.add(ifs);
     }
 
-    for (String fnName : CAST_CHECK_BUILTINS_INSTANCE.keySet()) {
-      List<ImpalaFunctionSignature> list = CAST_CHECK_BUILTINS_INSTANCE.get(fnName);
+    for (String fnName : tmpMap.keySet()) {
+      List<ImpalaFunctionSignature> list = tmpMap.get(fnName);
       Collections.sort(list, new SignatureComparator());
     }
-
+    CAST_CHECK_FUNCS_INSTANCE = new HashMap<>(tmpMap);
   }
 
   private final String func;
@@ -225,12 +237,12 @@ public class ImpalaFunctionSignature {
     return retVal;
   }
 
+  // For the hash code, we need to ensure that all potential matching signatures go
+  // to the same bucket. It is possible for signatures to be equal when they have
+  // a different number of arguments. For this reason, we will return the same
+  // hashcode based only on the first argument, if it exists.
   @Override
   public int hashCode() {
-    // For the hash code, we need to ensure that all potential matching signatures go
-    // to the same bucket. It is possible for signatures to be equal when they have
-    // a different number of arguments. For this reason, we will return the same
-    // hashcode based only on the first argument, if it exists.
     if (argTypes.size() == 0) {
       return Objects.hash(func);
     }
@@ -503,7 +515,7 @@ public class ImpalaFunctionSignature {
 
     ImpalaFunctionSignature castSig =
         new ImpalaFunctionSignature("cast", Lists.newArrayList(castFrom), castTo);
-    ScalarFunctionDetails details = ScalarFunctionDetails.SCALAR_BUILTINS_MAP.get(castSig);
+    ScalarFunctionDetails details = ScalarFunctionDetails.get(castSig);
     return details != null && details.castUp;
   }
 
