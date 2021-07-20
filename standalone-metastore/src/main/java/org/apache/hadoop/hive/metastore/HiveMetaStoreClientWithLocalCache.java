@@ -499,13 +499,15 @@ public class HiveMetaStoreClientWithLocalCache extends HiveMetaStoreClient imple
   @Override
   protected ForeignKeysResponse getForeignKeysInternal(ForeignKeysRequest req) throws TException {
     if (isCacheEnabledAndInitialized()) {
-      // TODO: There is no consistency guarantees around constraints right now since
-      // changing constraints does not change the snapshot nor the table id (CDPD-17940).
+      // The FK table name might be null if we are retrieving the constraint from the PK side
+      String foreign_db_name = (req.getForeign_db_name() != null) ? req.getForeign_db_name() : req.getParent_db_name();
+      String foreign_tbl_name = (req.getForeign_tbl_name() != null)? req.getForeign_tbl_name() : req.getParent_tbl_name();
+
       TableWatermark watermark = new TableWatermark(
-          getValidWriteIdList(req.getForeign_db_name(), req.getForeign_tbl_name()),
-          getTable(req.getForeign_db_name(), req.getForeign_tbl_name()).getId());
+          getValidWriteIdList(foreign_db_name, foreign_tbl_name),
+          getTable(foreign_db_name, foreign_tbl_name).getId());
       if (watermark.isValid()) {
-        Long txnId = getTxnId(req.getForeign_db_name(), req.getForeign_tbl_name());
+        Long txnId = getTxnId(foreign_db_name, foreign_tbl_name);
         CacheKey cacheKey = CacheKey.create(txnId, KeyType.FOREIGN_KEYS, watermark, req);
         ForeignKeysResponse r = (ForeignKeysResponse) mscLocalCache.getIfPresent(cacheKey);
         if (r == null) {
