@@ -28,6 +28,7 @@ import static org.apache.hadoop.hive.ql.parse.CalcitePlanner.ASTSearcher;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -124,10 +125,10 @@ import org.apache.hadoop.hive.shims.ShimLoader;
 import org.apache.hive.common.util.Ref;
 import org.apache.orc.FileFormatException;
 import org.apache.orc.impl.OrcAcidUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.concurrent.Immutable;
 import java.nio.charset.Charset;
@@ -2469,7 +2470,7 @@ public class AcidUtils {
       }
       Path formatFile = new Path(baseOrDeltaDir, METADATA_FILE);
       try (FSDataInputStream strm = fs.open(formatFile)) {
-        Map<String, String> metaData = new ObjectMapper().readValue(strm, Map.class);
+        Map<String, String> metaData = new ObjectMapper().readValue((InputStream)strm, Map.class);
         if (!CURRENT_VERSION.equalsIgnoreCase(metaData.get(Field.VERSION.toString()))) {
           throw new IllegalStateException("Unexpected Meta Data version: " + metaData.get(Field.VERSION));
         }

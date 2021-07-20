@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.ql.ddl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.datasketches.kll.KllFloatsSketch;
@@ -46,7 +47,6 @@ import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.serde2.io.DateWritableV2;
 import org.apache.hadoop.hive.serde2.io.TimestampWritableV2;
 import org.apache.hive.common.util.HiveStringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -86,9 +86,9 @@ public final class ShowUtils {
    *    'property_name1'='property_value1',
    *    'property_name2'='property_value2',
    *    ...
-   * 
+   *
    * Properties are listed in alphabetical order.
-   * 
+   *
    * @param properties The properties to list.
    * @param exclude Property names to exclude.
    */
@@ -111,7 +111,7 @@ public final class ShowUtils {
     if (StringUtils.isEmpty(data)) {
       return;
     }
-  
+
     Path resFile = new Path(file);
     FileSystem fs = resFile.getFileSystem(context.getConf());
     try (FSDataOutputStream out = fs.create(resFile);
@@ -299,7 +299,7 @@ public final class ShowUtils {
   /**
    * Prints a row with the given fields into the builder.
    * The last field could be a multiline field, and the extra lines should be padded.
-   * 
+   *
    * @param fields The fields to print
    * @param tableInfo The target builder
    * @param isLastLinePadded Is the last field could be printed in multiple lines, if contains newlines?
@@ -339,7 +339,7 @@ public final class ShowUtils {
 
   /**
    * Prints a row the given fields to a formatted line.
-   * 
+   *
    * @param fields The fields to print
    * @param tableInfo The target builder
    */
@@ -350,7 +350,7 @@ public final class ShowUtils {
   /**
    * Prints the name value pair, and if the value contains newlines, it adds one more empty field
    * before the two values (Assumes, the name value pair is already indented with it).
-   * 
+   *
    * @param name The field name to print
    * @param value The value to print - might contain newlines
    * @param tableInfo The target builder
@@ -365,7 +365,7 @@ public final class ShowUtils {
    * Prints the name value pair
    * If the output is padded then unescape the value, so it could be printed in multiple lines.
    * In this case it assumes the pair is already indented with a field delimiter
-   * 
+   *
    * @param name The field name to print
    * @param value The value t print
    * @param tableInfo The target builder
@@ -381,7 +381,7 @@ public final class ShowUtils {
    * Indent processing for multi-line values.
    * Values should be indented the same amount on each line.
    * If the first line comment starts indented by k, the following line comments should also be indented by k.
-   * 
+   *
    * @param value the value to write
    * @param tableInfo the buffer to write to
    * @param columnWidths the widths of the previous columns
@@ -406,7 +406,7 @@ public final class ShowUtils {
 
   /**
    * Print the right padding, with the given column widths.
-   * 
+   *
    * @param tableInfo The buffer to write to
    * @param columnWidths The column widths
    */

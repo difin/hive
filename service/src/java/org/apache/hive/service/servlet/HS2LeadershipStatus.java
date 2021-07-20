@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.apache.hive.http.HttpConstants;
 import org.apache.hive.http.HttpServer;
+import org.apache.hive.service.server.HiveServer2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

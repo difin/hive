@@ -29,7 +29,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,17 +42,13 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.registry.impl.ZkRegistryBase;
 import org.apache.hive.http.security.PamAuthenticator;
-import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
 import org.apache.hive.jdbc.miniHS2.MiniHS2;
-import org.apache.hive.service.cli.HiveSQLException;
 import org.apache.hive.service.server.HS2ActivePassiveHARegistry;
 import org.apache.hive.service.server.HS2ActivePassiveHARegistryClient;
 import org.apache.hive.service.server.HiveServer2Instance;
 import org.apache.hive.service.server.TestHS2HttpServerPam;
 import org.apache.hive.service.servlet.HS2Peers;
 import org.apache.http.Header;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -72,6 +67,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.junit.Ignore;
 
 public class TestActivePassiveHA {
   private MiniHS2 miniHS2_1 = null;
@@ -155,7 +154,7 @@ public class TestActivePassiveHA {
         hiveConf1.get(ConfVars.HIVE_SERVER2_ACTIVE_PASSIVE_HA_HEALTHCHECK_PORT.varname) + "/leader";
     String healthCheckURLWebUIPort = "http://localhost:" +
         hiveConf1.get(ConfVars.HIVE_SERVER2_WEBUI_PORT.varname) + "/ha-healthcheck/health-ha";
-    
+
     assertEquals(true, miniHS2_1.getIsLeaderTestFuture().get());
     assertEquals(true, miniHS2_1.isLeader());
 
@@ -649,7 +648,7 @@ public class TestActivePassiveHA {
 
       resp = sendDelete(healthCheckUrl1, true);
       assertTrue(resp.contains("Method Not Allowed"));
-      
+
       // make sure miniHS2_1 is not leader
       assertEquals(true, miniHS2_1.getNotLeaderTestFuture().get());
       assertEquals(false, miniHS2_1.isLeader());

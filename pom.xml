@@ -1627,6 +1627,7 @@
                   <bannedImports>
                     <bannedImport>**.shaded.**</bannedImport>
                     <bannedImport>jersey.repackaged.com.google.**</bannedImport>
+                    <bannedImport>org.codehaus.jackson.**</bannedImport>
                   </bannedImports>
                   <allowedImports>
                     <allowedImport>org.apache.atlas.shaded.**</allowedImport>

@@ -78,9 +78,6 @@ import org.apache.hive.service.cli.RowSetFactory;
 import org.apache.hive.service.cli.TableSchema;
 import org.apache.hive.service.cli.session.HiveSession;
 import org.apache.hive.service.server.ThreadWithGarbageCleanup;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import static org.apache.hadoop.hive.shims.HadoopShims.USER_ID;
 
@@ -510,26 +507,11 @@ public class SQLOperation extends ExecuteStatementOperation {
     if (driver != null) {
       List<QueryDisplay.TaskDisplay> statuses = driver.getQueryDisplay().getTaskDisplays();
       if (statuses != null) {
-        ByteArrayOutputStream out = null;
-        try {
-          ObjectMapper mapper = new ObjectMapper();
-          out = new ByteArrayOutputStream();
-          mapper.writeValue(out, statuses);
+        try (final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+          QueryDisplay.OBJECT_MAPPER.writeValue(out, statuses);
           return out.toString("UTF-8");
-        } catch (JsonGenerationException e) {
-          throw new HiveSQLException(e, queryState.getQueryId());
-        } catch (JsonMappingException e) {
-          throw new HiveSQLException(e, queryState.getQueryId());
-        } catch (IOException e) {
-          throw new HiveSQLException(e, queryState.getQueryId());
-        } finally {
-          if (out != null) {
-            try {
-              out.close();
-            } catch (IOException e) {
-              throw new HiveSQLException(e, queryState.getQueryId());
-            }
-          }
+        } catch (Exception e) {
+          throw new HiveSQLException(e);
         }
       }
     }
