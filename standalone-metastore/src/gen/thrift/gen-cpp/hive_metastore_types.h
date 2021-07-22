@@ -2092,10 +2092,11 @@ inline std::ostream& operator<<(std::ostream& out, const GrantRevokePrivilegeRes
 }
 
 typedef struct _TruncateTableRequest__isset {
-  _TruncateTableRequest__isset() : partNames(false), writeId(true), validWriteIdList(false) {}
+  _TruncateTableRequest__isset() : partNames(false), writeId(true), validWriteIdList(false), environmentContext(false) {}
   bool partNames :1;
   bool writeId :1;
   bool validWriteIdList :1;
+  bool environmentContext :1;
 } _TruncateTableRequest__isset;
 
 class TruncateTableRequest {
@@ -2112,6 +2113,7 @@ class TruncateTableRequest {
   std::vector<std::string>  partNames;
   int64_t writeId;
   std::string validWriteIdList;
+  EnvironmentContext environmentContext;
 
   _TruncateTableRequest__isset __isset;
 
@@ -2124,6 +2126,8 @@ class TruncateTableRequest {
   void __set_writeId(const int64_t val);
 
   void __set_validWriteIdList(const std::string& val);
+
+  void __set_environmentContext(const EnvironmentContext& val);
 
   bool operator == (const TruncateTableRequest & rhs) const
   {
@@ -2142,6 +2146,10 @@ class TruncateTableRequest {
     if (__isset.validWriteIdList != rhs.__isset.validWriteIdList)
       return false;
     else if (__isset.validWriteIdList && !(validWriteIdList == rhs.validWriteIdList))
+      return false;
+    if (__isset.environmentContext != rhs.__isset.environmentContext)
+      return false;
+    else if (__isset.environmentContext && !(environmentContext == rhs.environmentContext))
       return false;
     return true;
   }

@@ -2615,6 +2615,7 @@ class TruncateTableRequest:
    - partNames
    - writeId
    - validWriteIdList
+   - environmentContext
   """
 
   thrift_spec = (
@@ -2624,14 +2625,16 @@ class TruncateTableRequest:
     (3, TType.LIST, 'partNames', (TType.STRING,None), None, ), # 3
     (4, TType.I64, 'writeId', None, -1, ), # 4
     (5, TType.STRING, 'validWriteIdList', None, None, ), # 5
+    (6, TType.STRUCT, 'environmentContext', (EnvironmentContext, EnvironmentContext.thrift_spec), None, ), # 6
   )
 
-  def __init__(self, dbName=None, tableName=None, partNames=None, writeId=thrift_spec[4][4], validWriteIdList=None,):
+  def __init__(self, dbName=None, tableName=None, partNames=None, writeId=thrift_spec[4][4], validWriteIdList=None, environmentContext=None,):
     self.dbName = dbName
     self.tableName = tableName
     self.partNames = partNames
     self.writeId = writeId
     self.validWriteIdList = validWriteIdList
+    self.environmentContext = environmentContext
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -2672,6 +2675,12 @@ class TruncateTableRequest:
           self.validWriteIdList = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 6:
+        if ftype == TType.STRUCT:
+          self.environmentContext = EnvironmentContext()
+          self.environmentContext.read(iprot)
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -2705,6 +2714,10 @@ class TruncateTableRequest:
       oprot.writeFieldBegin('validWriteIdList', TType.STRING, 5)
       oprot.writeString(self.validWriteIdList)
       oprot.writeFieldEnd()
+    if self.environmentContext is not None:
+      oprot.writeFieldBegin('environmentContext', TType.STRUCT, 6)
+      self.environmentContext.write(oprot)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -2723,6 +2736,7 @@ class TruncateTableRequest:
     value = (value * 31) ^ hash(self.partNames)
     value = (value * 31) ^ hash(self.writeId)
     value = (value * 31) ^ hash(self.validWriteIdList)
+    value = (value * 31) ^ hash(self.environmentContext)
     return value
 
   def __repr__(self):

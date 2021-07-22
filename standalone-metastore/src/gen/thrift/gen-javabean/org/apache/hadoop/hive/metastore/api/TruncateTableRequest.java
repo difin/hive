@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
   private static final org.apache.thrift.protocol.TField PART_NAMES_FIELD_DESC = new org.apache.thrift.protocol.TField("partNames", org.apache.thrift.protocol.TType.LIST, (short)3);
   private static final org.apache.thrift.protocol.TField WRITE_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("writeId", org.apache.thrift.protocol.TType.I64, (short)4);
   private static final org.apache.thrift.protocol.TField VALID_WRITE_ID_LIST_FIELD_DESC = new org.apache.thrift.protocol.TField("validWriteIdList", org.apache.thrift.protocol.TType.STRING, (short)5);
+  private static final org.apache.thrift.protocol.TField ENVIRONMENT_CONTEXT_FIELD_DESC = new org.apache.thrift.protocol.TField("environmentContext", org.apache.thrift.protocol.TType.STRUCT, (short)6);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -55,6 +56,7 @@ import org.slf4j.LoggerFactory;
   private List<String> partNames; // optional
   private long writeId; // optional
   private String validWriteIdList; // optional
+  private EnvironmentContext environmentContext; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -62,7 +64,8 @@ import org.slf4j.LoggerFactory;
     TABLE_NAME((short)2, "tableName"),
     PART_NAMES((short)3, "partNames"),
     WRITE_ID((short)4, "writeId"),
-    VALID_WRITE_ID_LIST((short)5, "validWriteIdList");
+    VALID_WRITE_ID_LIST((short)5, "validWriteIdList"),
+    ENVIRONMENT_CONTEXT((short)6, "environmentContext");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -87,6 +90,8 @@ import org.slf4j.LoggerFactory;
           return WRITE_ID;
         case 5: // VALID_WRITE_ID_LIST
           return VALID_WRITE_ID_LIST;
+        case 6: // ENVIRONMENT_CONTEXT
+          return ENVIRONMENT_CONTEXT;
         default:
           return null;
       }
@@ -129,7 +134,7 @@ import org.slf4j.LoggerFactory;
   // isset id assignments
   private static final int __WRITEID_ISSET_ID = 0;
   private byte __isset_bitfield = 0;
-  private static final _Fields optionals[] = {_Fields.PART_NAMES,_Fields.WRITE_ID,_Fields.VALID_WRITE_ID_LIST};
+  private static final _Fields optionals[] = {_Fields.PART_NAMES,_Fields.WRITE_ID,_Fields.VALID_WRITE_ID_LIST,_Fields.ENVIRONMENT_CONTEXT};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -144,6 +149,8 @@ import org.slf4j.LoggerFactory;
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     tmpMap.put(_Fields.VALID_WRITE_ID_LIST, new org.apache.thrift.meta_data.FieldMetaData("validWriteIdList", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.ENVIRONMENT_CONTEXT, new org.apache.thrift.meta_data.FieldMetaData("environmentContext", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "EnvironmentContext")));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TruncateTableRequest.class, metaDataMap);
   }
@@ -181,6 +188,9 @@ import org.slf4j.LoggerFactory;
     if (other.isSetValidWriteIdList()) {
       this.validWriteIdList = other.validWriteIdList;
     }
+    if (other.isSetEnvironmentContext()) {
+      this.environmentContext = other.environmentContext;
+    }
   }
 
   public TruncateTableRequest deepCopy() {
@@ -195,6 +205,7 @@ import org.slf4j.LoggerFactory;
     this.writeId = -1L;
 
     this.validWriteIdList = null;
+    this.environmentContext = null;
   }
 
   public String getDbName() {
@@ -326,6 +337,29 @@ import org.slf4j.LoggerFactory;
     }
   }
 
+  public EnvironmentContext getEnvironmentContext() {
+    return this.environmentContext;
+  }
+
+  public void setEnvironmentContext(EnvironmentContext environmentContext) {
+    this.environmentContext = environmentContext;
+  }
+
+  public void unsetEnvironmentContext() {
+    this.environmentContext = null;
+  }
+
+  /** Returns true if field environmentContext is set (has been assigned a value) and false otherwise */
+  public boolean isSetEnvironmentContext() {
+    return this.environmentContext != null;
+  }
+
+  public void setEnvironmentContextIsSet(boolean value) {
+    if (!value) {
+      this.environmentContext = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case DB_NAME:
@@ -368,6 +402,14 @@ import org.slf4j.LoggerFactory;
       }
       break;
 
+    case ENVIRONMENT_CONTEXT:
+      if (value == null) {
+        unsetEnvironmentContext();
+      } else {
+        setEnvironmentContext((EnvironmentContext)value);
+      }
+      break;
+
     }
   }
 
@@ -387,6 +429,9 @@ import org.slf4j.LoggerFactory;
 
     case VALID_WRITE_ID_LIST:
       return getValidWriteIdList();
+
+    case ENVIRONMENT_CONTEXT:
+      return getEnvironmentContext();
 
     }
     throw new IllegalStateException();
@@ -409,6 +454,8 @@ import org.slf4j.LoggerFactory;
       return isSetWriteId();
     case VALID_WRITE_ID_LIST:
       return isSetValidWriteIdList();
+    case ENVIRONMENT_CONTEXT:
+      return isSetEnvironmentContext();
     }
     throw new IllegalStateException();
   }
@@ -471,6 +518,15 @@ import org.slf4j.LoggerFactory;
         return false;
     }
 
+    boolean this_present_environmentContext = true && this.isSetEnvironmentContext();
+    boolean that_present_environmentContext = true && that.isSetEnvironmentContext();
+    if (this_present_environmentContext || that_present_environmentContext) {
+      if (!(this_present_environmentContext && that_present_environmentContext))
+        return false;
+      if (!this.environmentContext.equals(that.environmentContext))
+        return false;
+    }
+
     return true;
   }
 
@@ -502,6 +558,11 @@ import org.slf4j.LoggerFactory;
     list.add(present_validWriteIdList);
     if (present_validWriteIdList)
       list.add(validWriteIdList);
+
+    boolean present_environmentContext = true && (isSetEnvironmentContext());
+    list.add(present_environmentContext);
+    if (present_environmentContext)
+      list.add(environmentContext);
 
     return list.hashCode();
   }
@@ -564,6 +625,16 @@ import org.slf4j.LoggerFactory;
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetEnvironmentContext()).compareTo(other.isSetEnvironmentContext());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetEnvironmentContext()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.environmentContext, other.environmentContext);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -622,6 +693,16 @@ import org.slf4j.LoggerFactory;
         sb.append("null");
       } else {
         sb.append(this.validWriteIdList);
+      }
+      first = false;
+    }
+    if (isSetEnvironmentContext()) {
+      if (!first) sb.append(", ");
+      sb.append("environmentContext:");
+      if (this.environmentContext == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.environmentContext);
       }
       first = false;
     }
@@ -728,6 +809,15 @@ import org.slf4j.LoggerFactory;
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 6: // ENVIRONMENT_CONTEXT
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+              struct.environmentContext = new EnvironmentContext();
+              struct.environmentContext.read(iprot);
+              struct.setEnvironmentContextIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -777,6 +867,13 @@ import org.slf4j.LoggerFactory;
           oprot.writeFieldEnd();
         }
       }
+      if (struct.environmentContext != null) {
+        if (struct.isSetEnvironmentContext()) {
+          oprot.writeFieldBegin(ENVIRONMENT_CONTEXT_FIELD_DESC);
+          struct.environmentContext.write(oprot);
+          oprot.writeFieldEnd();
+        }
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -806,7 +903,10 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetValidWriteIdList()) {
         optionals.set(2);
       }
-      oprot.writeBitSet(optionals, 3);
+      if (struct.isSetEnvironmentContext()) {
+        optionals.set(3);
+      }
+      oprot.writeBitSet(optionals, 4);
       if (struct.isSetPartNames()) {
         {
           oprot.writeI32(struct.partNames.size());
@@ -822,6 +922,9 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetValidWriteIdList()) {
         oprot.writeString(struct.validWriteIdList);
       }
+      if (struct.isSetEnvironmentContext()) {
+        struct.environmentContext.write(oprot);
+      }
     }
 
     @Override
@@ -831,7 +934,7 @@ import org.slf4j.LoggerFactory;
       struct.setDbNameIsSet(true);
       struct.tableName = iprot.readString();
       struct.setTableNameIsSet(true);
-      BitSet incoming = iprot.readBitSet(3);
+      BitSet incoming = iprot.readBitSet(4);
       if (incoming.get(0)) {
         {
           org.apache.thrift.protocol.TList _list83 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
@@ -852,6 +955,11 @@ import org.slf4j.LoggerFactory;
       if (incoming.get(2)) {
         struct.validWriteIdList = iprot.readString();
         struct.setValidWriteIdListIsSet(true);
+      }
+      if (incoming.get(3)) {
+        struct.environmentContext = new EnvironmentContext();
+        struct.environmentContext.read(iprot);
+        struct.setEnvironmentContextIsSet(true);
       }
     }
   }

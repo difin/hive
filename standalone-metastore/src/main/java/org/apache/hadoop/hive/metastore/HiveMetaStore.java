@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -237,6 +238,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
   private static ShutdownHookManager shutdownHookMgr;
 
+  public static final String TRUNCATE_SKIP_DATA_DELETION = "truncateSkipDataDeletion";
   public static final String ADMIN = "admin";
   public static final String PUBLIC = "public";
   /** MM write states. */
@@ -3420,36 +3422,44 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public void truncate_table(final String dbName, final String tableName, List<String> partNames)
       throws NoSuchObjectException, MetaException {
       // Deprecated path, won't work for txn tables.
-      truncateTableInternal(dbName, tableName, partNames, null, -1);
+      truncateTableInternal(dbName, tableName, partNames, null, -1, null);
     }
 
     @Override
     public TruncateTableResponse truncate_table_req(TruncateTableRequest req)
         throws MetaException, TException {
       truncateTableInternal(req.getDbName(), req.getTableName(), req.getPartNames(),
-          req.getValidWriteIdList(), req.getWriteId());
+          req.getValidWriteIdList(), req.getWriteId(), req.getEnvironmentContext());
       return new TruncateTableResponse();
     }
 
     private void truncateTableInternal(String dbName, String tableName, List<String> partNames,
-        String validWriteIds, long writeId) throws MetaException, NoSuchObjectException {
+        String validWriteIds, long writeId, EnvironmentContext context) throws MetaException, NoSuchObjectException {
       try {
         String[] parsedDbName = parseDbName(dbName, conf);
         Table tbl = get_table_core(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tableName);
 
-        boolean truncateFiles = !TxnUtils.isTransactionalTable(tbl) ||
-            !MetastoreConf.getBoolVar(getConf(), MetastoreConf.ConfVars.TRUNCATE_ACID_USE_BASE);
+        boolean skipDataDeletion = Optional.ofNullable(context)
+            .map(EnvironmentContext::getProperties)
+            .map(prop -> prop.get(TRUNCATE_SKIP_DATA_DELETION))
+            .map(Boolean::parseBoolean)
+            .orElse(false);
 
-        // This is not transactional
-        for (Path location : getLocationsForTruncate(getMS(), parsedDbName[CAT_NAME],
-            parsedDbName[DB_NAME], tableName, tbl, partNames)) {
-          FileSystem fs = location.getFileSystem(getConf());
-          if (truncateFiles) {
-            truncateDataFiles(tbl, parsedDbName, location, fs);
-          } else {
-            // For Acid tables we don't need to delete the old files, only write an empty baseDir.
-            // Compaction and cleaner will take care of the rest
-            addTruncateBaseFile(location, writeId, fs);
+        if (!skipDataDeletion) {
+          boolean truncateFiles = !TxnUtils.isTransactionalTable(tbl) ||
+              !MetastoreConf.getBoolVar(getConf(), MetastoreConf.ConfVars.TRUNCATE_ACID_USE_BASE);
+          
+          // This is not transactional
+          for (Path location : getLocationsForTruncate(getMS(), parsedDbName[CAT_NAME],
+              parsedDbName[DB_NAME], tableName, tbl, partNames)) {
+            FileSystem fs = location.getFileSystem(getConf());
+            if (truncateFiles) {
+              truncateDataFiles(tbl, parsedDbName, location, fs);
+            } else {
+              // For Acid tables we don't need to delete the old files, only write an empty baseDir.
+              // Compaction and cleaner will take care of the rest
+              addTruncateBaseFile(location, writeId, fs);
+            }
           }
         }
 
