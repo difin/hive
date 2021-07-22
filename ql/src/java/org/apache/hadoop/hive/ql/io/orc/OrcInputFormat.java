@@ -103,6 +103,7 @@ import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.ColumnProjectionUtils;
 import org.apache.hadoop.hive.serde2.SerDeStats;
+import org.apache.hadoop.hive.serde2.SerDeUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.BaseCharTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
@@ -587,7 +588,14 @@ public class OrcInputFormat implements InputFormat<NullWritable, OrcStruct>,
   }
 
   static String getNeededColumnNamesString(Configuration conf) {
-    return conf.get(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR);
+    String icebergOrcSchema = conf.get(ColumnProjectionUtils.ICEBERG_ORC_SCHEMA_STRING);
+
+    if (icebergOrcSchema != null) {
+      final String columnNameDelimiter = conf.get(serdeConstants.COLUMN_NAME_DELIMITER, String.valueOf(SerDeUtils.COMMA));
+      return String.join(columnNameDelimiter, TypeDescription.fromString(icebergOrcSchema).getFieldNames());
+    } else {
+      return conf.get(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR);
+    }
   }
 
   static String getSargColumnIDsString(Configuration conf) {
