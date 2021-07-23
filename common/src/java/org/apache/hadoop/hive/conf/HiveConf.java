@@ -4188,6 +4188,17 @@ public class HiveConf extends Configuration {
         "Number of seconds the appender, which has been dynamically created by Log4J framework for the " +
         "operation log, should survive without having any events sent to it. For more details, check " +
         "Log4J's IdlePurgePolicy."),
+    HIVE_SERVER2_HISTORIC_OPERATION_LOG_ENABLED("hive.server2.historic.operation.log.enabled", false,
+        "Keep the operation log for some time until the operation's query info is evicted from QueryInfoCache."),
+    HIVE_SERVER2_HISTORIC_OPERATION_LOG_CHECK_INTERVAL("hive.server2.historic.operation.log.check.interval", "15m",
+        new TimeValidator(TimeUnit.MILLISECONDS, 3000l, true, null, false),
+        "The check interval for cleaning up the historic operation log and session dirs, " +
+          "which should be used only if hive.server2.historic.operation.log.enabled is enabled."),
+    HIVE_SERVER2_HISTORIC_OPERATION_LOG_FETCH_MAXBYTES("hive.server2.operation.log.fetch.maxBytes", "4Mb",
+        new SizeValidator(1L, true, (long)Integer.MAX_VALUE, false),
+        "The buffer size for fetching the operation log, " +
+          "which should be used only if hive.server2.historic.operation.log.enabled is enabled."),
+
     // HS2 connections guard rails
     HIVE_SERVER2_LIMIT_CONNECTIONS_PER_USER("hive.server2.limit.connections.per.user", 0,
       "Maximum hive server2 connections per user. Any user exceeding this limit will not be allowed to connect. " +

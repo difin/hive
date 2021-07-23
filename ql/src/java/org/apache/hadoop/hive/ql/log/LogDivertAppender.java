@@ -182,7 +182,6 @@ public class LogDivertAppender {
     String loggingLevel = HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_SERVER2_LOGGING_OPERATION_LEVEL);
     OperationLog.LoggingLevel loggingMode = OperationLog.getLoggingLevel(loggingLevel);
     String layout = loggingMode == OperationLog.LoggingLevel.VERBOSE ? verboseLayout : nonVerboseLayout;
-    String logLocation = HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_SERVER2_LOGGING_OPERATION_LOG_LOCATION);
 
     // Create NullAppender
     PluginEntry nullEntry = new PluginEntry();
@@ -217,7 +216,7 @@ public class LogDivertAppender {
     PluginType<HushableRandomAccessFileAppender> childType = new PluginType<>(childEntry, HushableRandomAccessFileAppender.class, "appender");
     Node childNode = new Node(node, "HushableMutableRandomAccess", childType);
     childNode.getAttributes().put("name", "query-file-appender");
-    childNode.getAttributes().put("fileName", logLocation + "/${ctx:sessionId}/${ctx:queryId}");
+    childNode.getAttributes().put("fileName", "${ctx:operationLogLocation}/${ctx:sessionId}/${ctx:queryId}");
     node.getChildren().add(childNode);
 
     PluginEntry filterEntry = new PluginEntry();
