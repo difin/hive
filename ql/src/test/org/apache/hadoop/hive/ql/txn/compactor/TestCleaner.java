@@ -24,6 +24,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.CommitTxnRequest;
 import org.apache.hadoop.hive.metastore.api.CompactionRequest;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
+import org.apache.hadoop.hive.metastore.api.FindNextCompactRequest;
 import org.apache.hadoop.hive.metastore.api.GetValidWriteIdsRequest;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.ShowCompactRequest;
@@ -99,7 +100,7 @@ public class TestCleaner extends CompactorTest {
 
     CompactionRequest rqst = new CompactionRequest("default", "camtc", CompactionType.MAJOR);
     txnHandler.compact(rqst);
-    CompactionInfo ci = txnHandler.findNextToCompact("fred", "4.0.0");
+    CompactionInfo ci = txnHandler.findNextToCompact(new FindNextCompactRequest("fred", "4.0.0"));
     ci.runAs = System.getProperty("user.name");
     long compactTxn = openTxn(TxnType.COMPACTION);
 

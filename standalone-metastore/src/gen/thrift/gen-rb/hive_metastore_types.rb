@@ -3775,6 +3775,26 @@ class GetLatestCommittedCompactionInfoResponse
   ::Thrift::Struct.generate_accessors self
 end
 
+class FindNextCompactRequest
+  include ::Thrift::Struct, ::Thrift::Struct_Union
+  WORKERID = 1
+  WORKERVERSION = 2
+
+  FIELDS = {
+    WORKERID => {:type => ::Thrift::Types::STRING, :name => 'workerId'},
+    WORKERVERSION => {:type => ::Thrift::Types::STRING, :name => 'workerVersion'}
+  }
+
+  def struct_fields; FIELDS; end
+
+  def validate
+    raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field workerId is unset!') unless @workerId
+    raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Required field workerVersion is unset!') unless @workerVersion
+  end
+
+  ::Thrift::Struct.generate_accessors self
+end
+
 class AddDynamicPartitions
   include ::Thrift::Struct, ::Thrift::Struct_Union
   TXNID = 1

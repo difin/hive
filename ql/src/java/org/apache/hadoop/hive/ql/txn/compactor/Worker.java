@@ -33,6 +33,7 @@ import org.apache.hadoop.hive.metastore.api.DataOperationType;
 import org.apache.hadoop.hive.metastore.api.LockRequest;
 import org.apache.hadoop.hive.metastore.api.LockResponse;
 import org.apache.hadoop.hive.metastore.api.LockState;
+import org.apache.hadoop.hive.metastore.api.FindNextCompactRequest;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
@@ -400,7 +401,8 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
           return false;
         }
       }
-      ci = CompactionInfo.optionalCompactionInfoStructToInfo(msc.findNextCompact(workerName, runtimeVersion));
+      ci = CompactionInfo.optionalCompactionInfoStructToInfo(
+              msc.findNextCompact(new FindNextCompactRequest(workerName, runtimeVersion)));
       LOG.debug("Processing compaction request " + ci);
 
       if (ci == null && !stop.get()) {

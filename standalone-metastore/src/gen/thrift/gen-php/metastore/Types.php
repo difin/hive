@@ -24644,6 +24644,104 @@ class GetLatestCommittedCompactionInfoResponse {
 
 }
 
+class FindNextCompactRequest {
+  static $_TSPEC;
+
+  /**
+   * @var string
+   */
+  public $workerId = null;
+  /**
+   * @var string
+   */
+  public $workerVersion = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'workerId',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'workerVersion',
+          'type' => TType::STRING,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['workerId'])) {
+        $this->workerId = $vals['workerId'];
+      }
+      if (isset($vals['workerVersion'])) {
+        $this->workerVersion = $vals['workerVersion'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'FindNextCompactRequest';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->workerId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->workerVersion);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('FindNextCompactRequest');
+    if ($this->workerId !== null) {
+      $xfer += $output->writeFieldBegin('workerId', TType::STRING, 1);
+      $xfer += $output->writeString($this->workerId);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->workerVersion !== null) {
+      $xfer += $output->writeFieldBegin('workerVersion', TType::STRING, 2);
+      $xfer += $output->writeString($this->workerVersion);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
 class AddDynamicPartitions {
   static $_TSPEC;
 
@@ -43594,7 +43692,7 @@ final class Constant extends \Thrift\Type\TConstant {
   }
 
   static protected function init_HMS_API() {
-    return "1.2.13";
+    return "1.2.14";
   }
 
   static protected function init_ACCESSTYPE_NONE() {

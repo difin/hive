@@ -1430,11 +1430,17 @@ class Iface(fb303.FacebookService.Iface):
     """
     pass
 
-  def find_next_compact(self, workerId, workerVersion):
+  def find_next_compact(self, workerId):
     """
     Parameters:
      - workerId
-     - workerVersion
+    """
+    pass
+
+  def find_next_compact2(self, rqst):
+    """
+    Parameters:
+     - rqst
     """
     pass
 
@@ -8494,20 +8500,18 @@ class Client(fb303.FacebookService.Client, Iface):
       raise result.o2
     return
 
-  def find_next_compact(self, workerId, workerVersion):
+  def find_next_compact(self, workerId):
     """
     Parameters:
      - workerId
-     - workerVersion
     """
-    self.send_find_next_compact(workerId, workerVersion)
+    self.send_find_next_compact(workerId)
     return self.recv_find_next_compact()
 
-  def send_find_next_compact(self, workerId, workerVersion):
+  def send_find_next_compact(self, workerId):
     self._oprot.writeMessageBegin('find_next_compact', TMessageType.CALL, self._seqid)
     args = find_next_compact_args()
     args.workerId = workerId
-    args.workerVersion = workerVersion
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
@@ -8528,6 +8532,39 @@ class Client(fb303.FacebookService.Client, Iface):
     if result.o1 is not None:
       raise result.o1
     raise TApplicationException(TApplicationException.MISSING_RESULT, "find_next_compact failed: unknown result")
+
+  def find_next_compact2(self, rqst):
+    """
+    Parameters:
+     - rqst
+    """
+    self.send_find_next_compact2(rqst)
+    return self.recv_find_next_compact2()
+
+  def send_find_next_compact2(self, rqst):
+    self._oprot.writeMessageBegin('find_next_compact2', TMessageType.CALL, self._seqid)
+    args = find_next_compact2_args()
+    args.rqst = rqst
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_find_next_compact2(self):
+    iprot = self._iprot
+    (fname, mtype, rseqid) = iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(iprot)
+      iprot.readMessageEnd()
+      raise x
+    result = find_next_compact2_result()
+    result.read(iprot)
+    iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    if result.o1 is not None:
+      raise result.o1
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "find_next_compact2 failed: unknown result")
 
   def update_compactor_state(self, cr, txn_id):
     """
@@ -11123,6 +11160,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     self._processMap["show_compact"] = Processor.process_show_compact
     self._processMap["add_dynamic_partitions"] = Processor.process_add_dynamic_partitions
     self._processMap["find_next_compact"] = Processor.process_find_next_compact
+    self._processMap["find_next_compact2"] = Processor.process_find_next_compact2
     self._processMap["update_compactor_state"] = Processor.process_update_compactor_state
     self._processMap["find_columns_with_stats"] = Processor.process_find_columns_with_stats
     self._processMap["mark_cleaned"] = Processor.process_mark_cleaned
@@ -15731,7 +15769,7 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
     iprot.readMessageEnd()
     result = find_next_compact_result()
     try:
-      result.success = self._handler.find_next_compact(args.workerId, args.workerVersion)
+      result.success = self._handler.find_next_compact(args.workerId)
       msg_type = TMessageType.REPLY
     except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
       raise
@@ -15743,6 +15781,28 @@ class Processor(fb303.FacebookService.Processor, Iface, TProcessor):
       logging.exception(ex)
       result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
     oprot.writeMessageBegin("find_next_compact", msg_type, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_find_next_compact2(self, seqid, iprot, oprot):
+    args = find_next_compact2_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = find_next_compact2_result()
+    try:
+      result.success = self._handler.find_next_compact2(args.rqst)
+      msg_type = TMessageType.REPLY
+    except (TTransport.TTransportException, KeyboardInterrupt, SystemExit):
+      raise
+    except MetaException as o1:
+      msg_type = TMessageType.REPLY
+      result.o1 = o1
+    except Exception as ex:
+      msg_type = TMessageType.EXCEPTION
+      logging.exception(ex)
+      result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
+    oprot.writeMessageBegin("find_next_compact2", msg_type, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -48131,18 +48191,15 @@ class find_next_compact_args:
   """
   Attributes:
    - workerId
-   - workerVersion
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'workerId', None, None, ), # 1
-    (2, TType.STRING, 'workerVersion', None, None, ), # 2
   )
 
-  def __init__(self, workerId=None, workerVersion=None,):
+  def __init__(self, workerId=None,):
     self.workerId = workerId
-    self.workerVersion = workerVersion
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -48156,11 +48213,6 @@ class find_next_compact_args:
       if fid == 1:
         if ftype == TType.STRING:
           self.workerId = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRING:
-          self.workerVersion = iprot.readString()
         else:
           iprot.skip(ftype)
       else:
@@ -48177,10 +48229,6 @@ class find_next_compact_args:
       oprot.writeFieldBegin('workerId', TType.STRING, 1)
       oprot.writeString(self.workerId)
       oprot.writeFieldEnd()
-    if self.workerVersion is not None:
-      oprot.writeFieldBegin('workerVersion', TType.STRING, 2)
-      oprot.writeString(self.workerVersion)
-      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -48191,7 +48239,6 @@ class find_next_compact_args:
   def __hash__(self):
     value = 17
     value = (value * 31) ^ hash(self.workerId)
-    value = (value * 31) ^ hash(self.workerVersion)
     return value
 
   def __repr__(self):
@@ -48252,6 +48299,151 @@ class find_next_compact_result:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('find_next_compact_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.STRUCT, 0)
+      self.success.write(oprot)
+      oprot.writeFieldEnd()
+    if self.o1 is not None:
+      oprot.writeFieldBegin('o1', TType.STRUCT, 1)
+      self.o1.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __hash__(self):
+    value = 17
+    value = (value * 31) ^ hash(self.success)
+    value = (value * 31) ^ hash(self.o1)
+    return value
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class find_next_compact2_args:
+  """
+  Attributes:
+   - rqst
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRUCT, 'rqst', (FindNextCompactRequest, FindNextCompactRequest.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, rqst=None,):
+    self.rqst = rqst
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRUCT:
+          self.rqst = FindNextCompactRequest()
+          self.rqst.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('find_next_compact2_args')
+    if self.rqst is not None:
+      oprot.writeFieldBegin('rqst', TType.STRUCT, 1)
+      self.rqst.write(oprot)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __hash__(self):
+    value = 17
+    value = (value * 31) ^ hash(self.rqst)
+    return value
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class find_next_compact2_result:
+  """
+  Attributes:
+   - success
+   - o1
+  """
+
+  thrift_spec = (
+    (0, TType.STRUCT, 'success', (OptionalCompactionInfoStruct, OptionalCompactionInfoStruct.thrift_spec), None, ), # 0
+    (1, TType.STRUCT, 'o1', (MetaException, MetaException.thrift_spec), None, ), # 1
+  )
+
+  def __init__(self, success=None, o1=None,):
+    self.success = success
+    self.o1 = o1
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRUCT:
+          self.success = OptionalCompactionInfoStruct()
+          self.success.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 1:
+        if ftype == TType.STRUCT:
+          self.o1 = MetaException()
+          self.o1.read(iprot)
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('find_next_compact2_result')
     if self.success is not None:
       oprot.writeFieldBegin('success', TType.STRUCT, 0)
       self.success.write(oprot)

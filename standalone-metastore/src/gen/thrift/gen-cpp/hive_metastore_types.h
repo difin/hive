@@ -585,6 +585,8 @@ class GetLatestCommittedCompactionInfoRequest;
 
 class GetLatestCommittedCompactionInfoResponse;
 
+class FindNextCompactRequest;
+
 class AddDynamicPartitions;
 
 class BasicTxnInfo;
@@ -10298,6 +10300,51 @@ class GetLatestCommittedCompactionInfoResponse {
 void swap(GetLatestCommittedCompactionInfoResponse &a, GetLatestCommittedCompactionInfoResponse &b);
 
 inline std::ostream& operator<<(std::ostream& out, const GetLatestCommittedCompactionInfoResponse& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+class FindNextCompactRequest {
+ public:
+
+  FindNextCompactRequest(const FindNextCompactRequest&);
+  FindNextCompactRequest& operator=(const FindNextCompactRequest&);
+  FindNextCompactRequest() : workerId(), workerVersion() {
+  }
+
+  virtual ~FindNextCompactRequest() throw();
+  std::string workerId;
+  std::string workerVersion;
+
+  void __set_workerId(const std::string& val);
+
+  void __set_workerVersion(const std::string& val);
+
+  bool operator == (const FindNextCompactRequest & rhs) const
+  {
+    if (!(workerId == rhs.workerId))
+      return false;
+    if (!(workerVersion == rhs.workerVersion))
+      return false;
+    return true;
+  }
+  bool operator != (const FindNextCompactRequest &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const FindNextCompactRequest & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(FindNextCompactRequest &a, FindNextCompactRequest &b);
+
+inline std::ostream& operator<<(std::ostream& out, const FindNextCompactRequest& obj)
 {
   obj.printTo(out);
   return out;
