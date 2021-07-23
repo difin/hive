@@ -90,7 +90,7 @@ public class ImpalaHdfsPartition extends HdfsPartition {
         null /*encodedInsertFileDescriptors*/, null /*encodedDeleteFileDescriptors*/,
         location, false, accessLevel, Maps.newHashMap() /*hmsParameters*/,
         null /*cachedMsPartitionDescriptor*/, null /*partitionStats*/, false, numRows, -1L,
-        null /*inFlightEvents*/);
+        null /*inFlightEvents*/, -1L /*createEventId=*/);
     try {
       this.hostIndex = hostIndex;
       Preconditions.checkNotNull(getLocationPath().toUri().getScheme(),
