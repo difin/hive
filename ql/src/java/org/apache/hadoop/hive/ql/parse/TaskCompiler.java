@@ -504,14 +504,6 @@ public abstract class TaskCompiler {
       if (pCtx.getQueryProperties().isCTAS()) {
         protoName = pCtx.getCreateTable().getDbTableName();
         isExternal = pCtx.getCreateTable().isExternal();
-        // Temporary until HIVE-23968 or HIVE-24086 are resolved (CTAS with external table
-        // translation ends up writing to the untranslated path).
-        if (conf.getEngine() == Engine.IMPALA) {
-          Map<String, String> tableProps = pCtx.getCreateTable().getTblProps();
-          boolean isTransactional = "true".equalsIgnoreCase(tableProps.get("transactional"));
-          boolean isInsertOnly = "insert_only".equalsIgnoreCase(tableProps.get("transactional_properties"));
-          isExternal = isExternal | (!isTransactional && !isInsertOnly);
-        }
       } else if (pCtx.getQueryProperties().isMaterializedView()) {
         protoName = pCtx.getCreateViewDesc().getViewName();
       }
