@@ -1600,9 +1600,12 @@ public class DagUtils {
     } else {
       outputKlass = MROutput.class;
     }
+
+    // If there is a fileSink add a DataSink to the vertex
+    boolean hasFileSink = workUnit.getAllOperators().stream().anyMatch(o -> o instanceof FileSinkOperator);
     // final vertices need to have at least one output
     boolean endVertex = tezWork.getLeaves().contains(workUnit);
-    if (endVertex) {
+    if (endVertex || hasFileSink) {
       OutputCommitterDescriptor ocd = null;
       String committerClass = HiveConf.getVar(conf, ConfVars.TEZ_MAPREDUCE_OUTPUT_COMMITTER);
       if (committerClass != null && !committerClass.isEmpty()) {

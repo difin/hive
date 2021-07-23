@@ -255,9 +255,8 @@ class TextMetaDataFormatter implements MetaDataFormatter {
       }
       outStream.write(output.getBytes("UTF-8"));
 
-      addPartitionTransformData(outStream, tbl, isOutputPadded);
-
       if (colPath == null) {
+        addPartitionTransformData(outStream, tbl, isOutputPadded);
         if (isFormatted) {
           if (part != null) {
             output = MetaDataFormatUtils.getPartitionInformation(part);
