@@ -186,11 +186,14 @@ public class ImpalaResultLocation implements FeFsTable {
   }
 
   /**
-   * @return the metastore.api.Table object this Table was created from. Returns null
-   * if the derived Table object was not created from a metastore Table (ex. InlineViews).
+   * @return the metastore.api.Table object this Table was created from. Returns a
+   * dummy table since this Table was not created from a Metastore Table (but must
+   * be non-null due to a caller outside this library).
    */
   public Table getMetaStoreTable() {
-    throw new IllegalStateException("Not implemented");
+    Table table = new Table();
+    table.setParameters(new HashMap<>());
+    return table;
   }
 
   /**
