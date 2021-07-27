@@ -58,8 +58,7 @@ public class ReadTableEvent extends HiveMetaStoreAuthorizableEvent {
         String                      dbName             = preReadTableEvent.getTable().getDbName();
         Table                       table              = preReadTableEvent.getTable();
 
-        ret.add(new HivePrivilegeObject(HivePrivilegeObjectType.DATABASE, dbName, null, null, null,
-                HivePrivilegeObject.HivePrivObjectActionType.OTHER, null, null, table.getOwner(), table.getOwnerType()));
+
         ret.add(getHivePrivilegeObject(table));
 
         if (LOG.isDebugEnabled()) {
