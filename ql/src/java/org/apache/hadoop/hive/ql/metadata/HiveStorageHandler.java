@@ -313,4 +313,12 @@ public interface HiveStorageHandler extends Configurable {
   default boolean isAllowedAlterOperation(AlterTableType opType) {
     return DEFAULT_ALLOWED_ALTER_OPS.contains(opType);
   }
+
+  /**
+   * Should return true if the StorageHandler is able to handle time travel.
+   * @return True if time travel is allowed
+   */
+  default boolean isTimeTravelAllowed() {
+    return false;
+  }
 }

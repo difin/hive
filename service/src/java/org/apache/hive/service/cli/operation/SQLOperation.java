@@ -486,7 +486,7 @@ public class SQLOperation extends ExecuteStatementOperation {
     } catch (IOException e) {
       throw new HiveSQLException(e);
     } catch (Exception e) {
-      throw new HiveSQLException(e);
+      throw new HiveSQLException("Unable to get the next row set with exception: " + e.getMessage(), e);
     } finally {
       convey.clear();
     }

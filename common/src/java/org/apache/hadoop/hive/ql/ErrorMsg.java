@@ -474,6 +474,7 @@ public enum ErrorMsg {
   OFFSET_NOT_SUPPORTED_IN_SUBQUERY(10424, "OFFSET is not supported in subquery of exists", true),
   WITH_COL_LIST_NUM_OVERFLOW(10425, "WITH-clause query {0} returns {1} columns, but {2} labels were specified. The number of column labels must be smaller or equal to the number of expressions returned by the query.", true),
   NULL_TREATMENT_NOT_SUPPORTED(10426, "Function {0} does not support null treatment.", true),
+  TIME_TRAVEL_NOT_ALLOWED(10429, "Time travel is not allowed for {0}. Please choose a storage format which supports the feature.", true),
   REBUILD_MATERIALIZED_VIEW_DIFFERENT_ENGINE(10500, "Cannot rebuild materialized view in strict mode with different engine. " +
       "Materialized view engine: {0}", true),
   REFRESH_VIEW(10501, "REFRESH is not supported for views"),

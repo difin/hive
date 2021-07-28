@@ -921,6 +921,7 @@ nonReserved
     | KW_POOL | KW_ALLOC_FRACTION | KW_SCHEDULING_POLICY | KW_PATH | KW_MAPPING | KW_WORKLOAD | KW_MANAGEMENT | KW_ACTIVE | KW_UNMANAGED
     | KW_WITHIN | KW_REFRESH
     | KW_SPEC
+    | KW_SYSTEM_TIME | KW_SYSTEM_VERSION
 ;
 
 //The following SQL2011 reserved keywords are used as function name only, but not as identifiers.
