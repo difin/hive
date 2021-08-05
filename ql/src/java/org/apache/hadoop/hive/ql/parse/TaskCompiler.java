@@ -95,6 +95,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.apache.hadoop.hive.ql.io.KuduStorageFormatDescriptor.KUDU_SERDE;
+
 /**
  * TaskCompiler is a the base class for classes that compile
  * operator pipelines into tasks.
@@ -350,8 +352,11 @@ public abstract class TaskCompiler {
       CreateTableDesc crtTblDesc = pCtx.getCreateTable();
       crtTblDesc.validate(conf);
       Task<?> crtTblTask = TaskFactory.get(new DDLWork(inputs, outputs, crtTblDesc));
+      // kudu requires createTask to be before moveTask
+      boolean createTaskAfterMoveTask = !crtTblDesc.getSerName().equals(KUDU_SERDE) &&
+              CollectionUtils.isEmpty(crtTblDesc.getPartColNames());
       patchUpAfterCTASorMaterializedView(rootTasks, inputs, outputs, crtTblTask,
-          CollectionUtils.isEmpty(crtTblDesc.getPartColNames()));
+          createTaskAfterMoveTask);
     } else if (pCtx.getQueryProperties().isMaterializedView() && !directInsert) {
       // generate a DDL task and make it a dependent task of the leaf
       CreateMaterializedViewDesc viewDesc = pCtx.getCreateViewDesc();
@@ -619,10 +624,17 @@ public abstract class TaskCompiler {
         createTask.addDependentTask(task);
         targetTask = task;
       } else if (task instanceof MoveTask && !createTaskAfterMoveTask) {
-        // For partitioned CTAS, we need to create the table before the move task
-        // as we need to create the partitions in metastore and for that we should
-        // have already registered the table
-        interleaveTask(task, createTask);
+        LoadFileDesc work = ((MoveWork)task.getWork()).getLoadFileWork();
+        if (work != null && work.getCtasCreateTableDesc().getSerName().equals(KUDU_SERDE)) {
+          createTask.addDependentTask(rootTasks.get(0));
+          rootTasks.remove(0);
+          rootTasks.add(createTask);
+        } else {
+          // For partitioned CTAS, we need to create the table before the move task
+          // as we need to create the partitions in metastore and for that we should
+          // have already registered the table
+          interleaveTask(task, createTask);
+        }
         targetTask = task;
       } else {
         task.addDependentTask(createTask);

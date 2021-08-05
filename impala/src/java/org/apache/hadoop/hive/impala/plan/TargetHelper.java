@@ -43,6 +43,7 @@ import org.apache.impala.analysis.NullLiteral;
 import org.apache.impala.analysis.StatementBase;
 import org.apache.impala.catalog.FeTable;
 import org.apache.impala.catalog.HdfsTable;
+import org.apache.impala.catalog.KuduTable;
 import org.apache.impala.common.AnalysisException;
 import org.apache.impala.common.Pair;
 
@@ -219,9 +220,13 @@ public class TargetHelper {
     List<Integer> dynPartitionColPositions = new ArrayList<>();
     if (targetedColNames == null) {
       // The case where no list is provided. Find the last location of the nonpartitioned
-      // column, and all other result expressions are for partitioned columns
+      // column, and all other result expressions are for partitioned columns.
+      // For a CTAS statement, 'impalaTable' has to be an instance of HdfsTable or
+      // KuduTable because in ImpalaPlanner#initTargetTable(), we use either
+      // HdfsTable#createCtasTarget() or KuduTable#createCtasTarget() to create the table
+      // object.
       Preconditions.checkState(impalaTable instanceof HdfsTable ||
-          impalaTable instanceof ImpalaKuduTable);
+          impalaTable instanceof KuduTable);
       IntStream.range(impalaTable.getNonClusteringColumns().size(),
           selectResultExprs.size()).forEach(dynPartitionColPositions::add);
     } else {

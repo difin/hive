@@ -45,6 +45,7 @@ import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.ql.io.StorageFormats;
 import org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe;
+import org.apache.hadoop.hive.kudu.KuduSerDe;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.avro.AvroSerDe;
 import org.apache.hadoop.io.BytesWritable;
@@ -106,6 +107,7 @@ public abstract class HCatMapReduceTest extends HCatBaseTest {
    */
   public static final Set<String> DISABLED_SERDES = ImmutableSet.of(
       AvroSerDe.class.getName(),
+      KuduSerDe.class.getName(),
       ParquetHiveSerDe.class.getName());
 
   @Parameterized.Parameters

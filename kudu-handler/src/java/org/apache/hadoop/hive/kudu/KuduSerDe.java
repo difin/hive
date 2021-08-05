@@ -27,6 +27,7 @@ import com.google.common.base.Preconditions;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.common.type.Timestamp;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.utils.StringUtils;
 import org.apache.hadoop.hive.serde2.AbstractSerDe;
 import org.apache.hadoop.hive.serde2.SerDeException;
@@ -37,6 +38,7 @@ import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.hive.serde2.io.TimestampWritableV2;
+import org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
@@ -91,6 +93,21 @@ public class KuduSerDe extends AbstractSerDe {
     String tableName = conf.get(KuduStorageHandler.KUDU_TABLE_NAME_KEY);
     if (StringUtils.isEmpty(tableName)) {
       throw new SerDeException(KUDU_TABLE_NAME_KEY + " is not set.");
+    }
+
+    // When hive is using Impala as the execution engine, KuduClient creation and Object Inspector
+    // creation is handled differently due to:
+    // 1. Impala will handle Kudu communication during execution time of queries.
+    // 2. During CREATE DDL for a Kudu table this initialize method gets invoked -
+    // this is problematic due to the fact that we are in the process of creating the table, so
+    // the Kudu side does not know the existence of the table nor the schema. As a result, we
+    // trust the hive schema and create the object inspector based upon that.
+    if (sysConf.get(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "")
+            .toUpperCase().equals(HiveConf.Engine.IMPALA.name())) {
+      LazySimpleSerDe lazySimpleSerDe = new LazySimpleSerDe();
+      lazySimpleSerDe.initialize(sysConf, tblProps);
+      this.objectInspector = lazySimpleSerDe.getObjectInspector();
+      return;
     }
     try (KuduClient client = KuduHiveUtils.getKuduClient(conf)) {
       if (!client.tableExists(tableName)) {

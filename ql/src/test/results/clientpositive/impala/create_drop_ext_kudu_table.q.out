@@ -1,0 +1,23 @@
+PREHOOK: query: CREATE EXTERNAL TABLE fe_kudu_ext_table (
+id BIGINT, name STRING, PRIMARY KEY(id) DISABLE NOVALIDATE)
+STORED AS KUDU TBLPROPERTIES ('kudu.table_name'='default.fe_kudu_table')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@fe_kudu_ext_table
+POSTHOOK: query: CREATE EXTERNAL TABLE fe_kudu_ext_table (
+id BIGINT, name STRING, PRIMARY KEY(id) DISABLE NOVALIDATE)
+STORED AS KUDU TBLPROPERTIES ('kudu.table_name'='default.fe_kudu_table')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@fe_kudu_ext_table
+HMS CALL get_table_req FOR fe_kudu_ext_table
+PREHOOK: query: DROP TABLE fe_kudu_ext_table
+PREHOOK: type: DROPTABLE
+PREHOOK: Input: default@fe_kudu_ext_table
+PREHOOK: Output: default@fe_kudu_ext_table
+HMS CALL get_table_req FOR fe_kudu_ext_table
+HMS CALL get_table_req FOR fe_kudu_ext_table
+POSTHOOK: query: DROP TABLE fe_kudu_ext_table
+POSTHOOK: type: DROPTABLE
+POSTHOOK: Input: default@fe_kudu_ext_table
+POSTHOOK: Output: default@fe_kudu_ext_table

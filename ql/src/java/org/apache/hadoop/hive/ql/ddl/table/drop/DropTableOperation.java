@@ -19,6 +19,7 @@
 package org.apache.hadoop.hive.ql.ddl.table.drop;
 
 import org.apache.hadoop.hive.common.TableName;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.llap.LlapHiveUtils;
 import org.apache.hadoop.hive.llap.ProactiveEviction;
 import org.apache.hadoop.hive.metastore.api.Database;
@@ -26,6 +27,7 @@ import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.ddl.DDLUtils;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
+import org.apache.hadoop.hive.ql.engine.EngineLoader;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.InvalidTableException;
@@ -106,6 +108,10 @@ public class DropTableOperation extends DDLOperation<DropTableDesc> {
         LOG.debug("DDLTask: Drop Table is skipped as table {} is newer than update", desc.getTableName());
         return 0; // table is newer, leave it be.
       }
+    }
+
+    if (context.getConf().getEngine() == HiveConf.Engine.IMPALA) {
+      EngineLoader.getExternalInstance().getRuntimeHelper().dropTable(table, context);
     }
 
     // TODO: API w/catalog name

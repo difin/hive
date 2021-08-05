@@ -22,8 +22,11 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.metastore.api.Schema;
+import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.ddl.function.desc.DescFunctionOperation;
 import org.apache.hadoop.hive.ql.ddl.function.show.ShowFunctionsOperation;
+import org.apache.hadoop.hive.ql.ddl.table.create.CreateTableDesc;
 import org.apache.hadoop.hive.ql.engine.EngineRuntimeHelper;
 import org.apache.hadoop.hive.ql.exec.FetchOperator;
 import org.apache.hadoop.hive.ql.exec.Operator;
@@ -87,5 +90,20 @@ public class NativeEngineRuntimeHelper implements EngineRuntimeHelper {
   public int fetchFunctionInfo(DataOutputStream outStream, String func, boolean isExtended) 
       throws IOException, SemanticException {
     return DescFunctionOperation.execute(outStream, func, isExtended);
+  }
+
+  @Override
+  public void dropDatabase(List<String> tableNameList, List<Table> tables)
+      throws HiveException {
+  }
+
+  @Override
+  public void createTable(org.apache.hadoop.hive.ql.metadata.Table tbl, DDLOperationContext context,
+      CreateTableDesc desc) throws HiveException {
+  }
+
+  @Override
+  public void dropTable(org.apache.hadoop.hive.ql.metadata.Table table, DDLOperationContext context)
+      throws HiveException {
   }
 }

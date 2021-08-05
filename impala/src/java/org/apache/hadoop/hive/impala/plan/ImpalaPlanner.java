@@ -31,7 +31,9 @@ import org.apache.hadoop.hive.conf.HiveConf.ResultMethod;
 import org.apache.hadoop.hive.impala.ImpalaEventSequence;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.SQLPrimaryKey;
 import org.apache.hadoop.hive.ql.engine.EngineEventSequence;
+import org.apache.hadoop.hive.ql.io.KuduStorageFormatDescriptor;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.QB;
@@ -39,13 +41,15 @@ import org.apache.hadoop.hive.ql.parse.QBMetaData;
 import org.apache.hadoop.hive.ql.plan.FileSinkDesc;
 import org.apache.impala.analysis.Analyzer;
 import org.apache.impala.analysis.CastExpr;
+import org.apache.impala.analysis.ColumnDef;
 import org.apache.impala.analysis.Expr;
 import org.apache.impala.analysis.JoinOperator;
+import org.apache.impala.analysis.KuduPartitionParam;
 import org.apache.impala.analysis.SortInfo;
 import org.apache.impala.catalog.FeTable;
 import org.apache.impala.catalog.HdfsTable;
+import org.apache.impala.catalog.KuduTable;
 import org.apache.impala.catalog.Table;
-import org.apache.impala.common.AnalysisException;
 import org.apache.impala.common.ImpalaException;
 import org.apache.impala.common.ImpalaRuntimeException;
 import org.apache.impala.common.Pair;
@@ -82,6 +86,8 @@ import org.apache.impala.thrift.TStmtType;
 import org.apache.impala.util.EventSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.impala.analysis.ColumnDef.createFromFieldSchemas;
 
 /**
  * The ImpalaPlanner encapsulates selected functionality from Impala's Frontend and
@@ -330,7 +336,23 @@ public class ImpalaPlanner {
             if (msTbl.getSd().getLocation() == null || msTbl.getSd().getLocation().isEmpty()) {
               msTbl.getSd().setLocation(MetastoreShim.getPathForNewTable(msDb, msTbl));
             }
-            impalaTable = HdfsTable.createCtasTarget(new org.apache.impala.catalog.Db(msTbl.getDbName(), msDb),  msTbl);
+            if (msTbl.getSd().getSerdeInfo().getSerializationLib().contains(KuduStorageFormatDescriptor.KUDU_SERDE)) {
+              List<ColumnDef> columnDefs = createFromFieldSchemas(msTbl.getSd().getCols());
+              List<ColumnDef> primaryKeyColumnDefs = new ArrayList<>();
+              List<KuduPartitionParam> partitionParams = new ArrayList<>();
+              for (SQLPrimaryKey pk: qb_.getTableDesc().getPrimaryKeys()) {
+                for (ColumnDef col: columnDefs) {
+                  if (col.getColName().equals(pk.getColumn_name())) {
+                    primaryKeyColumnDefs.add(col);
+                  }
+                }
+              }
+              impalaTable = KuduTable.createCtasTarget(new org.apache.impala.catalog.Db(msTbl.getDbName(), msDb),
+                      msTbl, columnDefs, primaryKeyColumnDefs, partitionParams);
+            } else {
+              impalaTable = HdfsTable.createCtasTarget(new org.apache.impala.catalog.Db(msTbl.getDbName(), msDb),
+                      msTbl);
+            }
           } catch (Exception e) {
             throw new HiveException(e);
           }

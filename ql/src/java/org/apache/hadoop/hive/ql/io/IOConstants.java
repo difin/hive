@@ -36,6 +36,7 @@ public final class IOConstants {
   public static final String AVRO = "AVRO";
   public static final String AVROFILE = "AVROFILE";
   public static final String JSONFILE = "JSONFILE";
+  public static final String KUDU = "KUDU";
 
   /**
    * The desired TABLE column names and types for input format schema evolution.

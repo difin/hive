@@ -175,6 +175,7 @@ import org.apache.hadoop.hive.ql.io.AcidInputFormat;
 import org.apache.hadoop.hive.ql.io.AcidOutputFormat;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.io.AcidUtils.Operation;
+import org.apache.hadoop.hive.ql.io.KuduStorageFormatDescriptor;
 import org.apache.hadoop.hive.ql.io.arrow.ArrowColumnarBatchSerDe;
 import org.apache.hadoop.hive.ql.io.CombineHiveInputFormat;
 import org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat;
@@ -13914,6 +13915,28 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     } else {
       addDbAndTabToOutputs(qualifiedTabName,
               TableType.EXTERNAL_TABLE, isTemporaryTable, retValue, storageFormat);
+    }
+
+    // set default table properties for kudu tables if they aren't supplied using TBLPROPERTIES()
+    if (conf.getEngine() == HiveConf.Engine.IMPALA
+        && storageFormat != null && storageFormat.getSerde() != null
+        && storageFormat.getSerde().contains(KuduStorageFormatDescriptor.KUDU_SERDE)) {
+      if (!retValue.containsKey("kudu.table_name")) {
+        if (isExt) {
+          throw new SemanticException("Table property kudu.table_name must be specified when creating an external " +
+              "Kudu table.");
+        } else {
+          retValue.put("kudu.table_name", qualifiedTableName);
+        }
+      }
+      if (!retValue.containsKey("kudu.master_addresses")) {
+        String masterAddresses = HiveConf.getVar(conf,
+            HiveConf.ConfVars.HIVE_KUDU_MASTER_ADDRESSES_DEFAULT);
+        retValue.put("kudu.master_addresses", masterAddresses);
+      }
+      if (!retValue.containsKey("storage_handler")) {
+        retValue.put("storage_handler", KuduStorageFormatDescriptor.KUDU_STORAGE_HANDLER);
+      }
     }
     return retValue;
   }

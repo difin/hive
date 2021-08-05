@@ -1,0 +1,1 @@
+FAILED: SemanticException Table property kudu.table_name must be specified when creating an external Kudu table.

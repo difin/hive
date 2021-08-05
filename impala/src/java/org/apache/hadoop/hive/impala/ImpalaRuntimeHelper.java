@@ -24,10 +24,16 @@ import org.apache.hadoop.hive.conf.HiveConf.ResultMethod;
 import org.apache.hadoop.hive.impala.exec.ImpalaQueryOperator;
 import org.apache.hadoop.hive.impala.exec.ImpalaStreamingFetchOperator;
 import org.apache.hadoop.hive.impala.exec.ImpalaTask;
+import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
+import org.apache.hadoop.hive.ql.ddl.table.create.CreateTableDesc;
+import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
+import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.metastore.api.Schema;
+import org.apache.hadoop.hive.metastore.api.SQLPrimaryKey;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.ddl.function.show.ShowFunctionsOperation;
 import org.apache.hadoop.hive.ql.engine.EngineRuntimeHelper;
@@ -36,6 +42,8 @@ import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.exec.Operator;
 import org.apache.hadoop.hive.ql.exec.TaskFactory.TaskTuple;
 import org.apache.hadoop.hive.ql.exec.Utilities;
+import org.apache.hadoop.hive.ql.io.KuduStorageFormatDescriptor;
+import org.apache.hadoop.hive.kudu.KuduStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -53,10 +61,16 @@ import org.apache.hadoop.hive.impala.parse.ImpalaFetchWork;
 import org.apache.hadoop.hive.impala.plan.ImpalaQueryDesc;
 import org.apache.hadoop.hive.impala.work.ImpalaWork;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.impala.catalog.KuduTable;
+import org.apache.impala.catalog.Type;
 import org.apache.impala.hive.executor.HiveJavaFunction;
 import org.apache.impala.hive.executor.HiveJavaFunctionFactory;
 import org.apache.impala.hive.executor.HiveJavaFunctionFactoryImpl;
+import org.apache.impala.service.KuduCatalogOpExecutor;
 import org.apache.impala.thrift.TBackendGflags;
+import org.apache.impala.thrift.TColumn;
+import org.apache.impala.thrift.TCreateTableParams;
+import org.apache.impala.thrift.TTableName;
 import org.apache.impala.util.FunctionUtils;
 
 import java.io.DataOutputStream;
@@ -72,6 +86,8 @@ import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.EXTERNAL_TABLE_PURGE;
 
 public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
   protected static final Logger LOG = LoggerFactory.getLogger(ImpalaRuntimeHelper.class);
@@ -141,6 +157,94 @@ public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
       outStream.write(Utilities.newLineCode);
     }
     return 0;
+  }
+
+  @Override
+  public void dropDatabase(List<String> tableNameList, List<org.apache.hadoop.hive.metastore.api.Table> tables)
+      throws HiveException {
+    for (org.apache.hadoop.hive.metastore.api.Table msTbl : tables) {
+      boolean isSynchronizedKuduTable = msTbl != null && KuduTable.isKuduTable(msTbl) &&
+          KuduTable.isSynchronizedTable(msTbl);
+      if (isSynchronizedKuduTable) {
+        // drop table only if it is managed table or purge property set to true
+        // drop external table shouldn't drop base kudu table
+        if (msTbl.getTableType().equalsIgnoreCase(TableType.MANAGED_TABLE.toString()) ||
+            Boolean.parseBoolean(msTbl.getParameters().get(EXTERNAL_TABLE_PURGE))) {
+          try {
+            LOG.info("Table {} is being dropped from kudu", msTbl.getTableName());
+            KuduCatalogOpExecutor.dropTable(msTbl, /* if exists */ true);
+          } catch (Exception e) {
+            throw new HiveException(e);
+          }
+        }
+      }
+    }
+  }
+
+  @Override
+  public void createTable(Table tbl, DDLOperationContext context, CreateTableDesc desc)
+      throws HiveException {
+    org.apache.hadoop.hive.metastore.api.Table msTbl = tbl.getTTable();
+    // set default table properties if they aren't supplied using TBLPROPERTIES()
+    if (!tbl.getParameters().containsKey(KuduStorageHandler.KUDU_TABLE_NAME_KEY)) {
+      tbl.getParameters().put(KuduStorageHandler.KUDU_TABLE_NAME_KEY, msTbl.getDbName() + "." + msTbl.getTableName());
+    }
+    if (!tbl.getParameters().containsKey(KuduStorageHandler.KUDU_MASTER_ADDRS_KEY)) {
+      String masterAddresses = HiveConf.getVar(context.getConf(),
+          HiveConf.ConfVars.HIVE_KUDU_MASTER_ADDRESSES_DEFAULT);
+      tbl.getParameters().put(KuduStorageHandler.KUDU_MASTER_ADDRS_KEY, masterAddresses);
+    }
+    if (!tbl.getParameters().containsKey(KuduTable.KEY_STORAGE_HANDLER)) {
+      tbl.getParameters().put(KuduTable.KEY_STORAGE_HANDLER, KuduStorageFormatDescriptor.KUDU_STORAGE_HANDLER);
+    }
+    msTbl.setParameters(tbl.getParameters());
+
+    TCreateTableParams createTableParams = new TCreateTableParams();
+    createTableParams.setTable_name(new TTableName(msTbl.getDbName(), msTbl.getTableName()));
+    createTableParams.setIs_external(org.apache.impala.catalog.Table.isExternalTable(msTbl));
+    List<String> primary_key_column_names = new ArrayList<>();
+    for (SQLPrimaryKey pk: desc.getPrimaryKeys()) {
+      primary_key_column_names.add(pk.getColumn_name());
+    }
+    createTableParams.setPrimary_key_column_names(primary_key_column_names);
+
+    List<TColumn> columns = new ArrayList<>(msTbl.getSd().getColsSize());
+    for (FieldSchema column: msTbl.getSd().getCols()) {
+      columns.add(new TColumn(column.getName(), Type.parseColumnType(column.getType()).toThrift()));
+    }
+    createTableParams.setColumns(columns);
+
+    try {
+      // Return if we are in Hive's q test. This allows us to exercise the corresponding
+      // code path up to this point in the q test.
+      if (context.getConf().getBoolVar(HiveConf.ConfVars.HIVE_IN_TEST)) return;
+      KuduCatalogOpExecutor.createSynchronizedTable(msTbl, createTableParams);
+    } catch (Exception e) {
+      throw new HiveException(e);
+    }
+  }
+
+  public void dropTable(Table table, DDLOperationContext context) throws HiveException {
+    org.apache.hadoop.hive.metastore.api.Table msTbl = table.getTTable();
+    boolean isSynchronizedKuduTable = msTbl != null && KuduTable.isKuduTable(msTbl) &&
+        KuduTable.isSynchronizedTable(msTbl);
+    // if kudu table, drop it from kudu too
+    if (isSynchronizedKuduTable) {
+      // drop table only if it is managed table or purge property set to true
+      // drop external table shouldn't drop base kudu table
+      if (msTbl.getTableType().equalsIgnoreCase(TableType.MANAGED_TABLE.toString()) ||
+          Boolean.parseBoolean(msTbl.getParameters().get(EXTERNAL_TABLE_PURGE))) {
+        try {
+          LOG.info("Table {} is being dropped from kudu", msTbl.getTableName());
+          // Return if we are in Hive's q test. This allows us to exercise the
+          // corresponding code path up to this point in the q test.
+          if (context.getConf().getBoolVar(HiveConf.ConfVars.HIVE_IN_TEST)) return;
+          KuduCatalogOpExecutor.dropTable(msTbl, /* if exists */ true);
+        } catch (Exception e) {
+          throw new HiveException(e);
+        }
+      }
+    }
   }
 
   public TaskCompiler getCompiler(HiveConf conf) {

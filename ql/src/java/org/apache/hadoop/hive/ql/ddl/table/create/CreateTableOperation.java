@@ -32,6 +32,7 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.ddl.DDLUtils;
+import org.apache.hadoop.hive.ql.engine.EngineLoader;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
@@ -39,6 +40,7 @@ import org.apache.hadoop.hive.ql.hooks.LineageInfo.DataContainer;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.io.HdfsUtils;
 import org.apache.hadoop.hive.ql.io.SchemaInferenceUtils;
+import org.apache.hadoop.hive.ql.io.KuduStorageFormatDescriptor;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.parse.ReplicationSpec;
@@ -113,11 +115,32 @@ public class CreateTableOperation extends DDLOperation<CreateTableDesc> {
               !tbl.getParameters().containsKey(ReplConst.REPL_TARGET_TABLE_PROPERTY)) {
         tbl.getParameters().put(ReplConst.REPL_TARGET_TABLE_PROPERTY, "0");
       }
+
+      // create kudu table only when:
+      // 1. hive.execution.engine is Impala 2. its already not present in kudu
+      // if its external table, that means it is already present in kudu and only mapping needs to be done
+      if (context.getConf().getEngine() == HiveConf.Engine.IMPALA
+              && tbl.getSd().getSerdeInfo().getSerializationLib().equals(KuduStorageFormatDescriptor.KUDU_SERDE)
+              && isManagedOrTranslatedToExternal(tbl, desc)) {
+        EngineLoader.getExternalInstance().getRuntimeHelper().createTable(tbl, context, desc);
+      }
       createTableNonReplaceMode(tbl);
     }
 
     DDLUtils.addIfAbsentByName(new WriteEntity(tbl, WriteEntity.WriteType.DDL_NO_LOCK), context);
     return 0;
+  }
+
+  private boolean isManagedOrTranslatedToExternal(Table tbl, CreateTableDesc desc) {
+    if (tbl.getTableType() == TableType.MANAGED_TABLE) return true;
+
+    String translatedToExternal = desc.getTblProps().get("TRANSLATED_TO_EXTERNAL");
+    if (desc.isExternal() && translatedToExternal != null &&
+        translatedToExternal.equalsIgnoreCase("TRUE")) {
+      return true;
+    }
+
+    return false;
   }
 
   private void createTableReplaceMode(Table tbl, boolean replDataLocationChanged) throws HiveException {

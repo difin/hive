@@ -23,6 +23,9 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.metastore.api.Schema;
+import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
+import org.apache.hadoop.hive.ql.ddl.table.create.CreateTableDesc;
+import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.ddl.function.desc.DescFunctionOperation;
 import org.apache.hadoop.hive.ql.exec.FetchOperator;
 import org.apache.hadoop.hive.ql.exec.Operator;
@@ -75,4 +78,12 @@ public interface EngineRuntimeHelper {
 
   public int fetchFunctionInfo(DataOutputStream outStream, String func, boolean isExtended)
       throws IOException, SemanticException;
+
+  public void dropDatabase(List<String> tableNameList, List<org.apache.hadoop.hive.metastore.api.Table> tables)
+      throws HiveException;
+
+  public void createTable(Table tbl, DDLOperationContext context, CreateTableDesc desc)
+      throws HiveException;
+
+  public void dropTable(Table table, DDLOperationContext context) throws HiveException;
 }

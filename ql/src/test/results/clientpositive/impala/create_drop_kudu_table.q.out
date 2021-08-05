@@ -1,0 +1,21 @@
+PREHOOK: query: CREATE TABLE fe_kudu_table (id BIGINT, name STRING, PRIMARY KEY(id) DISABLE NOVALIDATE)
+STORED AS KUDU
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@fe_kudu_table
+POSTHOOK: query: CREATE TABLE fe_kudu_table (id BIGINT, name STRING, PRIMARY KEY(id) DISABLE NOVALIDATE)
+STORED AS KUDU
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@fe_kudu_table
+HMS CALL get_table_req FOR fe_kudu_table
+PREHOOK: query: DROP TABLE fe_kudu_table
+PREHOOK: type: DROPTABLE
+PREHOOK: Input: default@fe_kudu_table
+PREHOOK: Output: default@fe_kudu_table
+HMS CALL get_table_req FOR fe_kudu_table
+HMS CALL get_table_req FOR fe_kudu_table
+POSTHOOK: query: DROP TABLE fe_kudu_table
+POSTHOOK: type: DROPTABLE
+POSTHOOK: Input: default@fe_kudu_table
+POSTHOOK: Output: default@fe_kudu_table

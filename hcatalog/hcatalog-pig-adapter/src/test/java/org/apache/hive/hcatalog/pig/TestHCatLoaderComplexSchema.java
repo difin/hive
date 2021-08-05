@@ -67,6 +67,15 @@ public class TestHCatLoaderComplexSchema {
   //private static Properties props;
   private static final Logger LOG = LoggerFactory.getLogger(TestHCatLoaderComplexSchema.class);
 
+  private static final Set<String> allTests = new HashSet<String>() {
+    {
+      add("testSyntheticComplexSchema");
+      add("testTupleInBagInTupleInBag");
+      add("testMapWithComplexData");
+      add("testMapNullKey");
+    }
+  };
+
   private static final Map<String, Set<String>> DISABLED_STORAGE_FORMATS =
       new HashMap<String, Set<String>>() {{
         put(IOConstants.AVRO, new HashSet<String>() {{
@@ -78,6 +87,7 @@ public class TestHCatLoaderComplexSchema {
         put(IOConstants.JSONFILE, new HashSet<String>() {{
           add("testMapNullKey");
         }});
+        put(IOConstants.KUDU, allTests);
       }};
 
   private String storageFormat;
