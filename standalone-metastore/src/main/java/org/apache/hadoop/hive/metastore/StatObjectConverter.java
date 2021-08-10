@@ -592,6 +592,16 @@ public class StatObjectConverter {
     return statsDesc;
   }
 
+  public static byte[] getBitVector(byte[] bytes) {
+    // workaround for DN bug in persisting nulls in pg bytea column
+    // instead set empty bit vector with header.
+    // https://issues.apache.org/jira/browse/HIVE-17836
+    if (bytes != null && bytes.length == 2 && bytes[0] == 'H' && bytes[1] == 'L') {
+      return null;
+    }
+    return bytes;
+  }
+
   // JAVA
   public static void fillColumnStatisticsData(String colType, ColumnStatisticsData data,
       Object llow, Object lhigh, Object dlow, Object dhigh, Object declow, Object dechigh,
@@ -610,7 +620,7 @@ public class StatObjectConverter {
       stringStats.setAvgColLen(MetastoreDirectSqlUtils.extractSqlDouble(avglen));
       stringStats.setMaxColLen(MetastoreDirectSqlUtils.extractSqlLong(maxlen));
       stringStats.setNumDVs(MetastoreDirectSqlUtils.extractSqlLong(dist));
-      stringStats.setBitVectors(MetastoreDirectSqlUtils.extractSqlBlob(bitVector));
+      stringStats.setBitVectors(getBitVector(MetastoreDirectSqlUtils.extractSqlBlob(bitVector)));
       data.setStringStats(stringStats);
     } else if (colType.equals("binary")) {
       BinaryColumnStatsData binaryStats = new BinaryColumnStatsData();
@@ -630,7 +640,7 @@ public class StatObjectConverter {
         longStats.setLowValue(MetastoreDirectSqlUtils.extractSqlLong(llow));
       }
       longStats.setNumDVs(MetastoreDirectSqlUtils.extractSqlLong(dist));
-      longStats.setBitVectors(MetastoreDirectSqlUtils.extractSqlBlob(bitVector));
+      longStats.setBitVectors(getBitVector(MetastoreDirectSqlUtils.extractSqlBlob(bitVector)));
       data.setLongStats(longStats);
     } else if (colType.equals("double") || colType.equals("float")) {
       DoubleColumnStatsDataInspector doubleStats = new DoubleColumnStatsDataInspector();
@@ -642,7 +652,7 @@ public class StatObjectConverter {
         doubleStats.setLowValue(MetastoreDirectSqlUtils.extractSqlDouble(dlow));
       }
       doubleStats.setNumDVs(MetastoreDirectSqlUtils.extractSqlLong(dist));
-      doubleStats.setBitVectors(MetastoreDirectSqlUtils.extractSqlBlob(bitVector));
+      doubleStats.setBitVectors(getBitVector(MetastoreDirectSqlUtils.extractSqlBlob(bitVector)));
       data.setDoubleStats(doubleStats);
     } else if (colType.startsWith("decimal")) {
       DecimalColumnStatsDataInspector decimalStats = new DecimalColumnStatsDataInspector();
@@ -654,7 +664,7 @@ public class StatObjectConverter {
         decimalStats.setLowValue(DecimalUtils.createThriftDecimal((String)declow));
       }
       decimalStats.setNumDVs(MetastoreDirectSqlUtils.extractSqlLong(dist));
-      decimalStats.setBitVectors(MetastoreDirectSqlUtils.extractSqlBlob(bitVector));
+      decimalStats.setBitVectors(getBitVector(MetastoreDirectSqlUtils.extractSqlBlob(bitVector)));
       data.setDecimalStats(decimalStats);
     } else if (colType.equals("date")) {
       DateColumnStatsDataInspector dateStats = new DateColumnStatsDataInspector();
@@ -666,7 +676,7 @@ public class StatObjectConverter {
         dateStats.setLowValue(new Date(MetastoreDirectSqlUtils.extractSqlLong(llow)));
       }
       dateStats.setNumDVs(MetastoreDirectSqlUtils.extractSqlLong(dist));
-      dateStats.setBitVectors(MetastoreDirectSqlUtils.extractSqlBlob(bitVector));
+      dateStats.setBitVectors(getBitVector(MetastoreDirectSqlUtils.extractSqlBlob(bitVector)));
       data.setDateStats(dateStats);
     }
   }
