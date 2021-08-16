@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.hadoop.classification.InterfaceStability;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -749,7 +750,7 @@ public class HiveStreamingConnection implements StreamingConnection {
 
         // List the new files added inside the write path (delta directory).
         FileSystem fs = tableObject.getDataLocation().getFileSystem(conf);
-        List<Path> newFiles = new ArrayList<>();
+        List<FileStatus> newFiles = new ArrayList<>();
         Hive.listFilesInsideAcidDirectory(writeInfo.getWriteDir(), fs, newFiles);
 
         // If no files are added by this streaming writes, then no need to log write notification event.
