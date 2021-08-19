@@ -154,11 +154,13 @@ import org.apache.hadoop.hive.metastore.events.PreAuthorizationCallEvent;
 import org.apache.hadoop.hive.metastore.events.PreCreateCatalogEvent;
 import org.apache.hadoop.hive.metastore.events.PreCreateDatabaseEvent;
 import org.apache.hadoop.hive.metastore.events.PreCreateISchemaEvent;
+import org.apache.hadoop.hive.metastore.events.PreCreateFunctionEvent;
 import org.apache.hadoop.hive.metastore.events.PreAddSchemaVersionEvent;
 import org.apache.hadoop.hive.metastore.events.PreCreateTableEvent;
 import org.apache.hadoop.hive.metastore.events.PreDropCatalogEvent;
 import org.apache.hadoop.hive.metastore.events.PreDropDatabaseEvent;
 import org.apache.hadoop.hive.metastore.events.PreDropISchemaEvent;
+import org.apache.hadoop.hive.metastore.events.PreDropFunctionEvent;
 import org.apache.hadoop.hive.metastore.events.PreDropPartitionEvent;
 import org.apache.hadoop.hive.metastore.events.PreDropSchemaVersionEvent;
 import org.apache.hadoop.hive.metastore.events.PreDropTableEvent;
@@ -8390,6 +8392,14 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       Map<String, String> transactionalListenerResponses = Collections.emptyMap();
       try {
         String catName = func.isSetCatName() ? func.getCatName() : getDefaultCatalog(conf);
+        if (!func.isSetOwnerName()) {
+          try {
+            func.setOwnerName(SecurityUtils.getUGI().getShortUserName());
+          } catch (Exception ex) {
+            LOG.error("Cannot obtain username from the session to create a function", ex);
+            throw new TException(ex);
+          }
+        }
         ms.openTransaction();
         Database db = ms.getDatabase(catName, func.getDbName());
         if (db == null) {
@@ -8401,7 +8411,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           throw new AlreadyExistsException(
               "Function " + func.getFunctionName() + " already exists");
         }
-
+        firePreEvent(new PreCreateFunctionEvent(func, this));
         long time = System.currentTimeMillis() / 1000;
         func.setCreateTime((int) time);
         ms.createFunction(func);
@@ -8462,6 +8472,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             }
           }
         }
+        firePreEvent(new PreDropFunctionEvent(func, this));
 
         // if the operation on metastore fails, we don't do anything in change management, but fail
         // the metastore transaction, as having a copy of the jar in change management is not going
@@ -8496,6 +8507,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       boolean success = false;
       RawStore ms = getMS();
       try {
+        firePreEvent(new PreCreateFunctionEvent(newFunc, this));
         ms.openTransaction();
         ms.alterFunction(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], funcName, newFunc);
         success = ms.commitTransaction();
