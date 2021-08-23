@@ -478,6 +478,8 @@ public enum ErrorMsg {
   REBUILD_MATERIALIZED_VIEW_DIFFERENT_ENGINE(10500, "Cannot rebuild materialized view in strict mode with different engine. " +
       "Materialized view engine: {0}", true),
   REFRESH_VIEW(10501, "REFRESH is not supported for views"),
+  INVALID_METADATA_TABLE_NAME(10502, "Invalid metadata table name {0}.", true),
+  METADATA_TABLE_NOT_SUPPORTED(10503, "Metadata tables are not supported for table {0}.", true),
 
   //========================== 20000 range starts here ========================//
 

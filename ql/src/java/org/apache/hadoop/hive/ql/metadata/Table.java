@@ -131,6 +131,8 @@ public class Table implements Serializable {
   private transient boolean isDefaultFetched=false;
   private transient boolean isCheckFetched=false;
 
+  private String metaTable;
+
   /**
    * The version of the table. For Iceberg tables this is the snapshotId.
    */
@@ -181,6 +183,7 @@ public class Table implements Serializable {
     newTab.setAsOfTimestamp(this.asOfTimestamp);
     newTab.setAsOfVersion(this.asOfVersion);
 
+    newTab.setMetaTable(this.getMetaTable());
     return newTab;
   }
 
@@ -342,7 +345,7 @@ public class Table implements Serializable {
 
   final public Deserializer getDeserializerFromMetaStore(boolean skipConfError) {
     try {
-      return HiveMetaStoreUtils.getDeserializer(SessionState.getSessionConf(), tTable, skipConfError);
+      return HiveMetaStoreUtils.getDeserializer(SessionState.getSessionConf(), tTable, metaTable, skipConfError);
     } catch (MetaException e) {
       throw new RuntimeException(e);
     }
@@ -1373,5 +1376,13 @@ public class Table implements Serializable {
 
   public void setAsOfTimestamp(long asOfTimestamp) {
     this.asOfTimestamp = asOfTimestamp;
+  }
+
+  public String getMetaTable() {
+    return metaTable;
+  }
+
+  public void setMetaTable(String metaTable) {
+    this.metaTable = metaTable;
   }
 };

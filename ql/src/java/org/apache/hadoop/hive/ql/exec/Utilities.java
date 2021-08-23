@@ -773,6 +773,9 @@ public final class Utilities {
   public static TableDesc getTableDesc(Table tbl) {
     Properties props = tbl.getMetadata();
     props.put(serdeConstants.SERIALIZATION_LIB, tbl.getDeserializer().getClass().getName());
+    if (tbl.getMetaTable() != null) {
+      props.put("metaTable", tbl.getMetaTable());
+    }
     return (new TableDesc(tbl.getInputFormatClass(), tbl
         .getOutputFormatClass(), props));
   }
@@ -2418,6 +2421,7 @@ public final class Utilities {
     }
     String[] names =  dbtable.split("\\.");
     switch (names.length) {
+      case 3:
       case 2:
         return names;
       case 1:

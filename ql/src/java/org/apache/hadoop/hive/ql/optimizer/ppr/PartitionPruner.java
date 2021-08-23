@@ -178,6 +178,9 @@ public class PartitionPruner extends Transform {
     }
 
     String key = PrunerUtils.getTableKey(tab);
+    if (tab.getMetaTable() != null) {
+      key = tab.getFullyQualifiedName() + "." + tab.getMetaTable() + ";";
+    }
 
     if (!tab.isPartitioned()) {
       // If the table is not partitioned, return empty list.

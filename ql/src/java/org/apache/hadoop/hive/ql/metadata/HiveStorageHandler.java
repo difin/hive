@@ -331,4 +331,13 @@ public interface HiveStorageHandler extends Configurable {
   default boolean supportsTruncateOnNonNativeTables() {
     return false;
   }
+
+  default boolean isMetadataTableSupported() {
+    return false;
+  }
+
+  default boolean isValidMetadataTable(String metaTableName) {
+    return false;
+  }
+
 }

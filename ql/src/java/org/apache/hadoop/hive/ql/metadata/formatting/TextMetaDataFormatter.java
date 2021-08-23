@@ -255,7 +255,9 @@ class TextMetaDataFormatter implements MetaDataFormatter {
       }
       outStream.write(output.getBytes("UTF-8"));
 
-      if (colPath == null) {
+      boolean isIcebergMetaTable = tbl.getMetaTable() != null;
+
+      if (colPath == null && !isIcebergMetaTable) {
         addPartitionTransformData(outStream, tbl, isOutputPadded);
         if (isFormatted) {
           if (part != null) {
@@ -277,7 +279,7 @@ class TextMetaDataFormatter implements MetaDataFormatter {
         }
 
         // if extended desc table then show the complete details of the table
-        if (isExt) {
+        if (isExt && !isIcebergMetaTable) {
           // add empty line
           outStream.write(terminator);
           if (part != null) {
