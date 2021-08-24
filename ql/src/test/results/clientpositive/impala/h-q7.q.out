@@ -99,16 +99,16 @@ POSTHOOK: Input: default@impala_tpch_orders
 POSTHOOK: Input: default@impala_tpch_supplier
 CBO PLAN:
 ImpalaSortRel(sort0=[$0], sort1=[$1], sort2=[$2], dir0=[ASC], dir1=[ASC], dir2=[ASC])
-  ImpalaProjectRel(n_name=[$1], n_name0=[$2], YEAR=[$0], $f3=[$3])
+  ImpalaProjectRel(n_name=[$1], n_name0=[$2], EXPR$0=[$0], $f3=[$3])
     ImpalaAggregateRel(group=[{2, 7, 15}], agg#0=[sum($3)])
       ImpalaJoinRel(condition=[AND(=($12, $0), OR(AND($8, $16), AND($9, $17)))], joinType=[inner])
         ImpalaJoinRel(condition=[=($5, $6)], joinType=[inner])
           ImpalaJoinRel(condition=[=($4, $1)], joinType=[inner])
-            ImpalaProjectPassthroughRel(l_orderkey=[$0], l_suppkey=[$2], YEAR=[YEAR(FLAG(YEAR), CAST($10):DATE)], *=[*($5, -(1:DECIMAL(3, 0), $6))])
+            ImpalaProjectPassthroughRel(l_orderkey=[$0], l_suppkey=[$2], EXPR$0=[YEAR(FLAG(YEAR), CAST($10):DATE)], EXPR$1=[*($5, -(1:DECIMAL(3, 0), $6))])
               ImpalaHdfsScanRel(table=[[default, impala_tpch_lineitem]], condition=[AND(BETWEEN(false, $10, _UTF-16LE'1995-01-01':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'1996-12-31':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"), IS NOT NULL($0), IS NOT NULL($2))])
             ImpalaProjectPassthroughRel(s_suppkey=[$0], s_nationkey=[$3])
               ImpalaHdfsScanRel(table=[[default, impala_tpch_supplier]], condition=[AND(IS NOT NULL($3), IS NOT NULL($0))])
-          ImpalaProjectPassthroughRel(n_nationkey=[$0], n_name=[$1], ==[=($1, _UTF-16LE'FRANCE')], =3=[=($1, _UTF-16LE'GERMANY')])
+          ImpalaProjectPassthroughRel(n_nationkey=[$0], n_name=[$1], EXPR$0=[=($1, _UTF-16LE'FRANCE')], EXPR$1=[=($1, _UTF-16LE'GERMANY')])
             ImpalaHdfsScanRel(table=[[default, impala_tpch_nation]], condition=[AND(IN($1, _UTF-16LE'FRANCE':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'GERMANY':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"), IS NOT NULL($0))])
         ImpalaJoinRel(condition=[=($1, $4)], joinType=[inner])
           ImpalaJoinRel(condition=[=($0, $3)], joinType=[inner])
@@ -116,7 +116,7 @@ ImpalaSortRel(sort0=[$0], sort1=[$1], sort2=[$2], dir0=[ASC], dir1=[ASC], dir2=[
               ImpalaHdfsScanRel(table=[[default, impala_tpch_customer]], condition=[AND(IS NOT NULL($3), IS NOT NULL($0))])
             ImpalaProjectPassthroughRel(o_orderkey=[$0], o_custkey=[$1])
               ImpalaHdfsScanRel(table=[[default, impala_tpch_orders]], condition=[AND(IS NOT NULL($1), IS NOT NULL($0))])
-          ImpalaProjectPassthroughRel(n_nationkey=[$0], n_name=[$1], ==[=($1, _UTF-16LE'GERMANY')], =3=[=($1, _UTF-16LE'FRANCE')])
+          ImpalaProjectPassthroughRel(n_nationkey=[$0], n_name=[$1], EXPR$0=[=($1, _UTF-16LE'GERMANY')], EXPR$1=[=($1, _UTF-16LE'FRANCE')])
             ImpalaHdfsScanRel(table=[[default, impala_tpch_nation]], condition=[AND(IN($1, _UTF-16LE'GERMANY':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'FRANCE':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"), IS NOT NULL($0))])
 
 HMS CALL get_table_req FOR impala_tpch_supplier

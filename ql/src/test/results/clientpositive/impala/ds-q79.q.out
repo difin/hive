@@ -66,7 +66,7 @@ ImpalaProjectPassthroughRel(c_last_name=[$0], c_first_name=[$1], _o__c2=[$2], ss
   ImpalaSortRel(sort0=[$0], sort1=[$1], sort2=[$6], sort3=[$5], dir0=[ASC], dir1=[ASC], dir2=[ASC], dir3=[ASC], fetch=[100])
     ImpalaProjectRel(c_last_name=[$8], c_first_name=[$7], _o__c2=[$5], ss_ticket_number=[$0], amt=[$3], profit=[$4], (tok_function substr (tok_table_or_col s_city) 1 30)=[SUBSTRING($2, 1:BIGINT, 30:BIGINT)])
       ImpalaJoinRel(condition=[=($1, $6)], joinType=[inner])
-        ImpalaProjectPassthroughRel(ss_ticket_number=[$2], ss_customer_sk=[$0], s_city=[$3], amt=[$4], profit=[$5], SUBSTRING=[SUBSTRING($3, 1:BIGINT, 30:BIGINT)])
+        ImpalaProjectPassthroughRel(ss_ticket_number=[$2], ss_customer_sk=[$0], s_city=[$3], amt=[$4], profit=[$5], EXPR$0=[SUBSTRING($3, 1:BIGINT, 30:BIGINT)])
           ImpalaAggregateRel(group=[{0, 2, 4, 11}], agg#0=[sum($5)], agg#1=[sum($6)])
             ImpalaJoinRel(condition=[=($3, $10)], joinType=[inner])
               ImpalaJoinRel(condition=[=($1, $9)], joinType=[inner])

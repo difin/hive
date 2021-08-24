@@ -87,7 +87,7 @@ ImpalaSortRel(sort0=[$0], sort1=[$1], dir0=[ASC], dir1=[ASC], fetch=[100])
               ImpalaHdfsScanRel(table=[[default, impala_tpcds_warehouse]], condition=[IS NOT NULL($0)])
           ImpalaProjectPassthroughRel(i_item_sk=[$0], i_item_id=[$1])
             ImpalaHdfsScanRel(table=[[default, impala_tpcds_item]], condition=[AND(BETWEEN(false, $5, 0.99:DECIMAL(2, 2), 1.49:DECIMAL(3, 2)), IS NOT NULL($0))])
-        ImpalaProjectPassthroughRel(d_date_sk=[$0], <=[<(CAST($2):DATE, CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE)], >==[>=(CAST($2):DATE, CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE)])
+        ImpalaProjectPassthroughRel(d_date_sk=[$0], EXPR$0=[<(CAST($2):DATE, CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE)], EXPR$1=[>=(CAST($2):DATE, CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE)])
           ImpalaHdfsScanRel(table=[[default, impala_tpcds_date_dim]], condition=[AND(BETWEEN(false, CAST($2):TIMESTAMP(9), -(CAST(CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE):TIMESTAMP(9), 2592000000.000000:INTERVAL MILLISECOND), +(CAST(CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE):TIMESTAMP(9), 2592000000.000000:INTERVAL MILLISECOND)), IS NOT NULL($0))])
 
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales
@@ -437,6 +437,6 @@ ImpalaSortRel(sort0=[$0], sort1=[$1], dir0=[ASC], dir1=[ASC], fetch=[100])
               ImpalaHdfsScanRel(table=[[default, impala_tpcds_warehouse]])
           ImpalaProjectPassthroughRel(i_item_sk=[$0], i_item_id=[$1])
             ImpalaHdfsScanRel(table=[[default, impala_tpcds_item]], condition=[BETWEEN(false, $5, 0.99:DECIMAL(2, 2), 1.49:DECIMAL(3, 2))])
-        ImpalaProjectPassthroughRel(d_date_sk=[$0], <=[<(CAST($2):DATE, CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE)], >==[>=(CAST($2):DATE, CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE)])
+        ImpalaProjectPassthroughRel(d_date_sk=[$0], EXPR$0=[<(CAST($2):DATE, CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE)], EXPR$1=[>=(CAST($2):DATE, CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE)])
           ImpalaHdfsScanRel(table=[[default, impala_tpcds_date_dim]], condition=[BETWEEN(false, CAST($2):TIMESTAMP(9), -(CAST(CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE):TIMESTAMP(9), 2592000000.000000:INTERVAL MILLISECOND), +(CAST(CAST(_UTF-16LE'2000-03-18':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):DATE):TIMESTAMP(9), 2592000000.000000:INTERVAL MILLISECOND))])
 

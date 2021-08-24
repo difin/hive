@@ -252,10 +252,10 @@ HiveProject(a0=[$4], $f1=[CASE(IS NULL($1), $5, IS NULL($5), $1, +($5, $1))], $f
         HiveAggregate(group=[{0}], agg#0=[SUM($1)], agg#1=[SUM($2)])
           HiveProject(a=[$0], $f3=[CASE(OR($2, $5), *(-1, $1), $1)], $f4=[CASE(OR($2, $5), -1, 1)])
             HiveJoin(condition=[AND(=($0, $4), OR($3, $6))], joinType=[inner])
-              HiveProject(a=[$0], b=[$1], ROW__IS__DELETED=[$6], <=[<(3, $5.writeid)])
+              HiveProject(a=[$0], b=[$1], ROW__IS__DELETED=[$6], EXPR$0=[<(3, $5.writeid)])
                 HiveFilter(condition=[IS NOT NULL($0)])
                   HiveTableScan(table=[[default, t1]], table:alias=[t1])
-              HiveProject(a=[$0], ROW__IS__DELETED=[$5], <=[<(3, $4.writeid)])
+              HiveProject(a=[$0], ROW__IS__DELETED=[$5], EXPR$0=[<(3, $4.writeid)])
                 HiveFilter(condition=[IS NOT NULL($0)])
                   HiveTableScan(table=[[default, t2]], table:alias=[t2])
 

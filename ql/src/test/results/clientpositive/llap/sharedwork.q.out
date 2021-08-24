@@ -100,8 +100,8 @@ POSTHOOK: Input: default@my_table_0001_00
 POSTHOOK: Input: default@my_table_0001_01
 POSTHOOK: Input: default@my_table_0003
 #### A masked pattern was here ####
-OPTIMIZED SQL: SELECT `t0`.`col_7`, `t0`.`CAST` AS `col_3`, `t0`.`col_20`, `t2`.`col_21` AS `col_21_1232`, `t0`.`col_1`, `t4`.`col_22`, `t6`.`col_21` AS `col_21_879`, `t4`.`col_23`
-FROM (SELECT `col_1`, `col_7`, `col_20`, CAST(`col_3` AS DATE) AS `CAST`
+OPTIMIZED SQL: SELECT `t0`.`col_7`, `t0`.`EXPR$0` AS `col_3`, `t0`.`col_20`, `t2`.`col_21` AS `col_21_1232`, `t0`.`col_1`, `t4`.`col_22`, `t6`.`col_21` AS `col_21_879`, `t4`.`col_23`
+FROM (SELECT `col_1`, `col_7`, `col_20`, CAST(`col_3` AS DATE) AS `EXPR$0`
 FROM `default`.`my_table_0001`
 WHERE CAST(`col_3` AS DATE) BETWEEN DATE '2018-07-01' AND DATE '2019-01-23' AND (CAST(`col_7` AS DOUBLE) IS NOT NULL OR `col_7` IS NULL) AND `col_20` IN ('part1', 'part2', 'part3')) AS `t0`
 LEFT JOIN (SELECT `col_24`, `col_21`

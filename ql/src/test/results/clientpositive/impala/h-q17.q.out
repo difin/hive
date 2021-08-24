@@ -52,7 +52,7 @@ ImpalaProjectPassthroughRel(avg_yearly=[/($0, 7.0:DECIMAL(2, 1))])
           ImpalaHdfsScanRel(table=[[default, impala_tpch_lineitem]], condition=[AND(IS NOT NULL($4), IS NOT NULL($1))])
         ImpalaProjectPassthroughRel(p_partkey=[$0])
           ImpalaHdfsScanRel(table=[[default, impala_tpch_part]], condition=[AND(=($3, _UTF-16LE'Brand#23'), =($6, _UTF-16LE'MED BOX'), IS NOT NULL($0))])
-      ImpalaProjectPassthroughRel(l_partkey=[$0], *=[*(0.2:DECIMAL(1, 1), CAST(/($1, CAST($2):DECIMAL(19, 0))):DECIMAL(16, 6))])
+      ImpalaProjectPassthroughRel(l_partkey=[$0], EXPR$0=[*(0.2:DECIMAL(1, 1), CAST(/($1, CAST($2):DECIMAL(19, 0))):DECIMAL(16, 6))])
         ImpalaAggregateRel(group=[{1}], agg#0=[sum($4)], agg#1=[count($4)], condition=[IS NOT NULL(CAST(/($1, CAST($2):DECIMAL(19, 0))):DECIMAL(16, 6))])
           ImpalaHdfsScanRel(table=[[default, impala_tpch_lineitem]], condition=[IS NOT NULL($1)])
 
