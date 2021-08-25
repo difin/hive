@@ -78,7 +78,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@org.junit.Ignore("hive-test-kube migration - flaky")
 public class TestReplicationScenariosAcrossInstances extends BaseReplicationAcrossInstances {
   private static final String NS_REMOTE = "nsRemote";
   @BeforeClass

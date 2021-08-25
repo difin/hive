@@ -75,7 +75,6 @@ import static org.junit.Assert.fail;
 /**
  * TestReplicationScenariosAcidTables - test replication for ACID tables.
  */
-@org.junit.Ignore("flaky")
 public class TestReplicationScenariosAcidTables extends BaseReplicationScenariosAcidTables {
 
   @BeforeClass
@@ -95,7 +94,7 @@ public class TestReplicationScenariosAcidTables extends BaseReplicationScenarios
     conf.set("metastore.warehouse.tenant.colocation", "true");
     conf.set("hadoop.proxyuser." + Utils.getUGI().getShortUserName() + ".hosts", "*");
     MiniDFSCluster miniDFSCluster =
-        new MiniDFSCluster.Builder(conf).numDataNodes(1).format(true).build();
+        new MiniDFSCluster.Builder(conf).numDataNodes(2).format(true).build();
     Map<String, String> acidEnableConf = new HashMap<String, String>() {{
         put("fs.defaultFS", miniDFSCluster.getFileSystem().getUri().toString());
         put("hive.support.concurrency", "true");
@@ -212,7 +211,8 @@ public class TestReplicationScenariosAcidTables extends BaseReplicationScenarios
       primary.run("EXPLAIN SELECT * from " + dbName + ".t1");
       primary.run("SHOW LOCKS");
       primary.run("EXPLAIN SHOW LOCKS");
-      primary.run("EXPLAIN LOCKS UPDATE target SET b = 1 WHERE p IN (SELECT t.q1 FROM source t WHERE t.a1=5)");
+      // TODO: Dependent on HIVE-25011
+      //primary.run("EXPLAIN LOCKS UPDATE target SET b = 1 WHERE p IN (SELECT t.q1 FROM source t WHERE t.a1=5)");
       long currentEventId = primary.getCurrentNotificationEventId().getEventId();
       Assert.assertEquals(lastEventId, currentEventId);
     } finally {

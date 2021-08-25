@@ -57,7 +57,6 @@ import static org.junit.Assert.assertFalse;
 /**
  * Tests Table level replication scenarios.
  */
-@org.junit.Ignore("hive-test-kube migration")
 public class TestTableLevelReplicationScenarios extends BaseReplicationScenariosAcidTables {
 
   @BeforeClass
