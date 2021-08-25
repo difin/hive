@@ -142,8 +142,6 @@ public class ReplUtils {
   // Reserved number of items to accommodate operational files in the dump root dir.
   public static final int RESERVED_DIR_ITEMS_COUNT = 10;
 
-  public static final String TARGET_OF_REPLICATION = "repl.target.for";
-
   // Service name for hive.
   public static final String REPL_HIVE_SERVICE = "hive";
 
@@ -266,8 +264,8 @@ public class ReplUtils {
   public static boolean isTargetOfReplication(Database db) {
     assert (db != null);
     Map<String, String> m = db.getParameters();
-    if ((m != null) && (m.containsKey(TARGET_OF_REPLICATION))) {
-      return !StringUtils.isEmpty(m.get(TARGET_OF_REPLICATION));
+    if ((m != null) && (m.containsKey(ReplConst.TARGET_OF_REPLICATION))) {
+      return !StringUtils.isEmpty(m.get(ReplConst.TARGET_OF_REPLICATION));
     }
     return false;
   }

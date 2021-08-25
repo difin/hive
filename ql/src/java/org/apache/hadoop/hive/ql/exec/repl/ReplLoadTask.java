@@ -646,7 +646,7 @@ public class ReplLoadTask extends Task<ReplLoadWork> implements Serializable {
     }
     if (!ReplUtils.isTargetOfReplication(getHive().getDatabase(work.dbNameToLoadIn))) {
       Map<String, String> props = new HashMap<>();
-      props.put(ReplUtils.TARGET_OF_REPLICATION, "true");
+      props.put(ReplConst.TARGET_OF_REPLICATION, "true");
       AlterDatabaseSetPropertiesDesc setTargetDesc = new AlterDatabaseSetPropertiesDesc(work.dbNameToLoadIn, props, null);
       Task<?> addReplTargetPropTask =
               TaskFactory.get(new DDLWork(new HashSet<>(), new HashSet<>(), setTargetDesc, true,
