@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
@@ -166,8 +167,7 @@ import org.apache.hadoop.hive.ql.plan.PartitionDesc;
 import org.apache.hadoop.hive.ql.plan.PlanUtils;
 import org.apache.hadoop.hive.ql.plan.ReduceWork;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
-import org.apache.hadoop.hive.ql.plan.api.Adjacency;
-import org.apache.hadoop.hive.ql.plan.api.Graph;
+import org.apache.hadoop.hive.ql.secrets.URISecretSource;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.stats.StatsFactory;
 import org.apache.hadoop.hive.ql.stats.StatsPublisher;
@@ -4966,6 +4966,21 @@ public final class Utilities {
     } catch (IOException e) {
       throw new SemanticException(e);
     }
+  }
+
+  /**
+   * Load password from the given uri.
+   * @param uriString The URI which is used to load the password.
+   * @return null if the uri is empty or null, else the password represented by the URI.
+   * @throws IOException
+   * @throws URISyntaxException
+   * @throws HiveException
+   */
+  public static String getPasswdFromUri(String uriString) throws IOException, URISyntaxException, HiveException {
+    if (uriString == null || uriString.isEmpty()) {
+      return null;
+    }
+    return URISecretSource.getInstance().getPasswordFromUri(new URI(uriString));
   }
 
   /**
