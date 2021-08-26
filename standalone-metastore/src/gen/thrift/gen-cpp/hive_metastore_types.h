@@ -278,7 +278,8 @@ struct QueryState {
     EXECUTING = 1,
     FAILED = 2,
     FINISHED = 3,
-    TIMED_OUT = 4
+    TIMED_OUT = 4,
+    AUTO_DISABLED = 5
   };
 };
 
@@ -4115,33 +4116,19 @@ class ColumnStatisticsData {
 
   bool operator == (const ColumnStatisticsData & rhs) const
   {
-    if (__isset.booleanStats != rhs.__isset.booleanStats)
+    if (!(booleanStats == rhs.booleanStats))
       return false;
-    else if (__isset.booleanStats && !(booleanStats == rhs.booleanStats))
+    if (!(longStats == rhs.longStats))
       return false;
-    if (__isset.longStats != rhs.__isset.longStats)
+    if (!(doubleStats == rhs.doubleStats))
       return false;
-    else if (__isset.longStats && !(longStats == rhs.longStats))
+    if (!(stringStats == rhs.stringStats))
       return false;
-    if (__isset.doubleStats != rhs.__isset.doubleStats)
+    if (!(binaryStats == rhs.binaryStats))
       return false;
-    else if (__isset.doubleStats && !(doubleStats == rhs.doubleStats))
+    if (!(decimalStats == rhs.decimalStats))
       return false;
-    if (__isset.stringStats != rhs.__isset.stringStats)
-      return false;
-    else if (__isset.stringStats && !(stringStats == rhs.stringStats))
-      return false;
-    if (__isset.binaryStats != rhs.__isset.binaryStats)
-      return false;
-    else if (__isset.binaryStats && !(binaryStats == rhs.binaryStats))
-      return false;
-    if (__isset.decimalStats != rhs.__isset.decimalStats)
-      return false;
-    else if (__isset.decimalStats && !(decimalStats == rhs.decimalStats))
-      return false;
-    if (__isset.dateStats != rhs.__isset.dateStats)
-      return false;
-    else if (__isset.dateStats && !(dateStats == rhs.dateStats))
+    if (!(dateStats == rhs.dateStats))
       return false;
     return true;
   }
@@ -6934,13 +6921,9 @@ class RequestPartsSpec {
 
   bool operator == (const RequestPartsSpec & rhs) const
   {
-    if (__isset.names != rhs.__isset.names)
+    if (!(names == rhs.names))
       return false;
-    else if (__isset.names && !(names == rhs.names))
-      return false;
-    if (__isset.exprs != rhs.__isset.exprs)
-      return false;
-    else if (__isset.exprs && !(exprs == rhs.exprs))
+    if (!(exprs == rhs.exprs))
       return false;
     return true;
   }
@@ -10882,13 +10865,9 @@ class FireEventRequestData {
 
   bool operator == (const FireEventRequestData & rhs) const
   {
-    if (__isset.insertData != rhs.__isset.insertData)
+    if (!(insertData == rhs.insertData))
       return false;
-    else if (__isset.insertData && !(insertData == rhs.insertData))
-      return false;
-    if (__isset.insertDatas != rhs.__isset.insertDatas)
-      return false;
-    else if (__isset.insertDatas && !(insertDatas == rhs.insertDatas))
+    if (!(insertDatas == rhs.insertDatas))
       return false;
     return true;
   }

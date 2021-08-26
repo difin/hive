@@ -760,29 +760,17 @@ class TTypeEntry {
 
   bool operator == (const TTypeEntry & rhs) const
   {
-    if (__isset.primitiveEntry != rhs.__isset.primitiveEntry)
+    if (!(primitiveEntry == rhs.primitiveEntry))
       return false;
-    else if (__isset.primitiveEntry && !(primitiveEntry == rhs.primitiveEntry))
+    if (!(arrayEntry == rhs.arrayEntry))
       return false;
-    if (__isset.arrayEntry != rhs.__isset.arrayEntry)
+    if (!(mapEntry == rhs.mapEntry))
       return false;
-    else if (__isset.arrayEntry && !(arrayEntry == rhs.arrayEntry))
+    if (!(structEntry == rhs.structEntry))
       return false;
-    if (__isset.mapEntry != rhs.__isset.mapEntry)
+    if (!(unionEntry == rhs.unionEntry))
       return false;
-    else if (__isset.mapEntry && !(mapEntry == rhs.mapEntry))
-      return false;
-    if (__isset.structEntry != rhs.__isset.structEntry)
-      return false;
-    else if (__isset.structEntry && !(structEntry == rhs.structEntry))
-      return false;
-    if (__isset.unionEntry != rhs.__isset.unionEntry)
-      return false;
-    else if (__isset.unionEntry && !(unionEntry == rhs.unionEntry))
-      return false;
-    if (__isset.userDefinedTypeEntry != rhs.__isset.userDefinedTypeEntry)
-      return false;
-    else if (__isset.userDefinedTypeEntry && !(userDefinedTypeEntry == rhs.userDefinedTypeEntry))
+    if (!(userDefinedTypeEntry == rhs.userDefinedTypeEntry))
       return false;
     return true;
   }
@@ -1331,33 +1319,19 @@ class TColumnValue {
 
   bool operator == (const TColumnValue & rhs) const
   {
-    if (__isset.boolVal != rhs.__isset.boolVal)
+    if (!(boolVal == rhs.boolVal))
       return false;
-    else if (__isset.boolVal && !(boolVal == rhs.boolVal))
+    if (!(byteVal == rhs.byteVal))
       return false;
-    if (__isset.byteVal != rhs.__isset.byteVal)
+    if (!(i16Val == rhs.i16Val))
       return false;
-    else if (__isset.byteVal && !(byteVal == rhs.byteVal))
+    if (!(i32Val == rhs.i32Val))
       return false;
-    if (__isset.i16Val != rhs.__isset.i16Val)
+    if (!(i64Val == rhs.i64Val))
       return false;
-    else if (__isset.i16Val && !(i16Val == rhs.i16Val))
+    if (!(doubleVal == rhs.doubleVal))
       return false;
-    if (__isset.i32Val != rhs.__isset.i32Val)
-      return false;
-    else if (__isset.i32Val && !(i32Val == rhs.i32Val))
-      return false;
-    if (__isset.i64Val != rhs.__isset.i64Val)
-      return false;
-    else if (__isset.i64Val && !(i64Val == rhs.i64Val))
-      return false;
-    if (__isset.doubleVal != rhs.__isset.doubleVal)
-      return false;
-    else if (__isset.doubleVal && !(doubleVal == rhs.doubleVal))
-      return false;
-    if (__isset.stringVal != rhs.__isset.stringVal)
-      return false;
-    else if (__isset.stringVal && !(stringVal == rhs.stringVal))
+    if (!(stringVal == rhs.stringVal))
       return false;
     return true;
   }
@@ -1831,37 +1805,21 @@ class TColumn {
 
   bool operator == (const TColumn & rhs) const
   {
-    if (__isset.boolVal != rhs.__isset.boolVal)
+    if (!(boolVal == rhs.boolVal))
       return false;
-    else if (__isset.boolVal && !(boolVal == rhs.boolVal))
+    if (!(byteVal == rhs.byteVal))
       return false;
-    if (__isset.byteVal != rhs.__isset.byteVal)
+    if (!(i16Val == rhs.i16Val))
       return false;
-    else if (__isset.byteVal && !(byteVal == rhs.byteVal))
+    if (!(i32Val == rhs.i32Val))
       return false;
-    if (__isset.i16Val != rhs.__isset.i16Val)
+    if (!(i64Val == rhs.i64Val))
       return false;
-    else if (__isset.i16Val && !(i16Val == rhs.i16Val))
+    if (!(doubleVal == rhs.doubleVal))
       return false;
-    if (__isset.i32Val != rhs.__isset.i32Val)
+    if (!(stringVal == rhs.stringVal))
       return false;
-    else if (__isset.i32Val && !(i32Val == rhs.i32Val))
-      return false;
-    if (__isset.i64Val != rhs.__isset.i64Val)
-      return false;
-    else if (__isset.i64Val && !(i64Val == rhs.i64Val))
-      return false;
-    if (__isset.doubleVal != rhs.__isset.doubleVal)
-      return false;
-    else if (__isset.doubleVal && !(doubleVal == rhs.doubleVal))
-      return false;
-    if (__isset.stringVal != rhs.__isset.stringVal)
-      return false;
-    else if (__isset.stringVal && !(stringVal == rhs.stringVal))
-      return false;
-    if (__isset.binaryVal != rhs.__isset.binaryVal)
-      return false;
-    else if (__isset.binaryVal && !(binaryVal == rhs.binaryVal))
+    if (!(binaryVal == rhs.binaryVal))
       return false;
     return true;
   }
@@ -2538,29 +2496,17 @@ class TGetInfoValue {
 
   bool operator == (const TGetInfoValue & rhs) const
   {
-    if (__isset.stringValue != rhs.__isset.stringValue)
+    if (!(stringValue == rhs.stringValue))
       return false;
-    else if (__isset.stringValue && !(stringValue == rhs.stringValue))
+    if (!(smallIntValue == rhs.smallIntValue))
       return false;
-    if (__isset.smallIntValue != rhs.__isset.smallIntValue)
+    if (!(integerBitmask == rhs.integerBitmask))
       return false;
-    else if (__isset.smallIntValue && !(smallIntValue == rhs.smallIntValue))
+    if (!(integerFlag == rhs.integerFlag))
       return false;
-    if (__isset.integerBitmask != rhs.__isset.integerBitmask)
+    if (!(binaryValue == rhs.binaryValue))
       return false;
-    else if (__isset.integerBitmask && !(integerBitmask == rhs.integerBitmask))
-      return false;
-    if (__isset.integerFlag != rhs.__isset.integerFlag)
-      return false;
-    else if (__isset.integerFlag && !(integerFlag == rhs.integerFlag))
-      return false;
-    if (__isset.binaryValue != rhs.__isset.binaryValue)
-      return false;
-    else if (__isset.binaryValue && !(binaryValue == rhs.binaryValue))
-      return false;
-    if (__isset.lenValue != rhs.__isset.lenValue)
-      return false;
-    else if (__isset.lenValue && !(lenValue == rhs.lenValue))
+    if (!(lenValue == rhs.lenValue))
       return false;
     return true;
   }

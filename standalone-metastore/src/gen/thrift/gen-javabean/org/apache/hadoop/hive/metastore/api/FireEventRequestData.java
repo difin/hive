@@ -103,9 +103,9 @@ import org.slf4j.LoggerFactory;
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.INSERT_DATA, new org.apache.thrift.meta_data.FieldMetaData("insertData", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+    tmpMap.put(_Fields.INSERT_DATA, new org.apache.thrift.meta_data.FieldMetaData("insertData", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, InsertEventRequestData.class)));
-    tmpMap.put(_Fields.INSERT_DATAS, new org.apache.thrift.meta_data.FieldMetaData("insertDatas", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+    tmpMap.put(_Fields.INSERT_DATAS, new org.apache.thrift.meta_data.FieldMetaData("insertDatas", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, InsertEventRequestData.class))));
     metaDataMap = Collections.unmodifiableMap(tmpMap);

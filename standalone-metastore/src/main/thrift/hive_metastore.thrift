@@ -1904,6 +1904,7 @@ enum QueryState {
    FAILED,
    FINISHED,
    TIMED_OUT,
+   AUTO_DISABLED,
 }
 
 struct ScheduledQueryProgressInfo{

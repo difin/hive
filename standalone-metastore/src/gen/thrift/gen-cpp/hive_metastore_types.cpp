@@ -322,16 +322,18 @@ int _kQueryStateValues[] = {
   QueryState::EXECUTING,
   QueryState::FAILED,
   QueryState::FINISHED,
-  QueryState::TIMED_OUT
+  QueryState::TIMED_OUT,
+  QueryState::AUTO_DISABLED
 };
 const char* _kQueryStateNames[] = {
   "INITED",
   "EXECUTING",
   "FAILED",
   "FINISHED",
-  "TIMED_OUT"
+  "TIMED_OUT",
+  "AUTO_DISABLED"
 };
-const std::map<int, const char*> _QueryState_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(5, _kQueryStateValues, _kQueryStateNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
+const std::map<int, const char*> _QueryState_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(6, _kQueryStateValues, _kQueryStateNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
 
 int _kPartitionFilterModeValues[] = {
   PartitionFilterMode::BY_NAMES,
@@ -8379,37 +8381,30 @@ ColumnStatisticsData::~ColumnStatisticsData() throw() {
 
 void ColumnStatisticsData::__set_booleanStats(const BooleanColumnStatsData& val) {
   this->booleanStats = val;
-__isset.booleanStats = true;
 }
 
 void ColumnStatisticsData::__set_longStats(const LongColumnStatsData& val) {
   this->longStats = val;
-__isset.longStats = true;
 }
 
 void ColumnStatisticsData::__set_doubleStats(const DoubleColumnStatsData& val) {
   this->doubleStats = val;
-__isset.doubleStats = true;
 }
 
 void ColumnStatisticsData::__set_stringStats(const StringColumnStatsData& val) {
   this->stringStats = val;
-__isset.stringStats = true;
 }
 
 void ColumnStatisticsData::__set_binaryStats(const BinaryColumnStatsData& val) {
   this->binaryStats = val;
-__isset.binaryStats = true;
 }
 
 void ColumnStatisticsData::__set_decimalStats(const DecimalColumnStatsData& val) {
   this->decimalStats = val;
-__isset.decimalStats = true;
 }
 
 void ColumnStatisticsData::__set_dateStats(const DateColumnStatsData& val) {
   this->dateStats = val;
-__isset.dateStats = true;
 }
 
 uint32_t ColumnStatisticsData::read(::apache::thrift::protocol::TProtocol* iprot) {
@@ -8506,41 +8501,34 @@ uint32_t ColumnStatisticsData::write(::apache::thrift::protocol::TProtocol* opro
   apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("ColumnStatisticsData");
 
-  if (this->__isset.booleanStats) {
-    xfer += oprot->writeFieldBegin("booleanStats", ::apache::thrift::protocol::T_STRUCT, 1);
-    xfer += this->booleanStats.write(oprot);
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.longStats) {
-    xfer += oprot->writeFieldBegin("longStats", ::apache::thrift::protocol::T_STRUCT, 2);
-    xfer += this->longStats.write(oprot);
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.doubleStats) {
-    xfer += oprot->writeFieldBegin("doubleStats", ::apache::thrift::protocol::T_STRUCT, 3);
-    xfer += this->doubleStats.write(oprot);
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.stringStats) {
-    xfer += oprot->writeFieldBegin("stringStats", ::apache::thrift::protocol::T_STRUCT, 4);
-    xfer += this->stringStats.write(oprot);
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.binaryStats) {
-    xfer += oprot->writeFieldBegin("binaryStats", ::apache::thrift::protocol::T_STRUCT, 5);
-    xfer += this->binaryStats.write(oprot);
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.decimalStats) {
-    xfer += oprot->writeFieldBegin("decimalStats", ::apache::thrift::protocol::T_STRUCT, 6);
-    xfer += this->decimalStats.write(oprot);
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.dateStats) {
-    xfer += oprot->writeFieldBegin("dateStats", ::apache::thrift::protocol::T_STRUCT, 7);
-    xfer += this->dateStats.write(oprot);
-    xfer += oprot->writeFieldEnd();
-  }
+  xfer += oprot->writeFieldBegin("booleanStats", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->booleanStats.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("longStats", ::apache::thrift::protocol::T_STRUCT, 2);
+  xfer += this->longStats.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("doubleStats", ::apache::thrift::protocol::T_STRUCT, 3);
+  xfer += this->doubleStats.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("stringStats", ::apache::thrift::protocol::T_STRUCT, 4);
+  xfer += this->stringStats.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("binaryStats", ::apache::thrift::protocol::T_STRUCT, 5);
+  xfer += this->binaryStats.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("decimalStats", ::apache::thrift::protocol::T_STRUCT, 6);
+  xfer += this->decimalStats.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("dateStats", ::apache::thrift::protocol::T_STRUCT, 7);
+  xfer += this->dateStats.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -8582,13 +8570,13 @@ ColumnStatisticsData& ColumnStatisticsData::operator=(const ColumnStatisticsData
 void ColumnStatisticsData::printTo(std::ostream& out) const {
   using ::apache::thrift::to_string;
   out << "ColumnStatisticsData(";
-  out << "booleanStats="; (__isset.booleanStats ? (out << to_string(booleanStats)) : (out << "<null>"));
-  out << ", " << "longStats="; (__isset.longStats ? (out << to_string(longStats)) : (out << "<null>"));
-  out << ", " << "doubleStats="; (__isset.doubleStats ? (out << to_string(doubleStats)) : (out << "<null>"));
-  out << ", " << "stringStats="; (__isset.stringStats ? (out << to_string(stringStats)) : (out << "<null>"));
-  out << ", " << "binaryStats="; (__isset.binaryStats ? (out << to_string(binaryStats)) : (out << "<null>"));
-  out << ", " << "decimalStats="; (__isset.decimalStats ? (out << to_string(decimalStats)) : (out << "<null>"));
-  out << ", " << "dateStats="; (__isset.dateStats ? (out << to_string(dateStats)) : (out << "<null>"));
+  out << "booleanStats=" << to_string(booleanStats);
+  out << ", " << "longStats=" << to_string(longStats);
+  out << ", " << "doubleStats=" << to_string(doubleStats);
+  out << ", " << "stringStats=" << to_string(stringStats);
+  out << ", " << "binaryStats=" << to_string(binaryStats);
+  out << ", " << "decimalStats=" << to_string(decimalStats);
+  out << ", " << "dateStats=" << to_string(dateStats);
   out << ")";
 }
 
@@ -15926,12 +15914,10 @@ RequestPartsSpec::~RequestPartsSpec() throw() {
 
 void RequestPartsSpec::__set_names(const std::vector<std::string> & val) {
   this->names = val;
-__isset.names = true;
 }
 
 void RequestPartsSpec::__set_exprs(const std::vector<DropPartitionsExpr> & val) {
   this->exprs = val;
-__isset.exprs = true;
 }
 
 uint32_t RequestPartsSpec::read(::apache::thrift::protocol::TProtocol* iprot) {
@@ -16012,32 +15998,30 @@ uint32_t RequestPartsSpec::write(::apache::thrift::protocol::TProtocol* oprot) c
   apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("RequestPartsSpec");
 
-  if (this->__isset.names) {
-    xfer += oprot->writeFieldBegin("names", ::apache::thrift::protocol::T_LIST, 1);
+  xfer += oprot->writeFieldBegin("names", ::apache::thrift::protocol::T_LIST, 1);
+  {
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->names.size()));
+    std::vector<std::string> ::const_iterator _iter636;
+    for (_iter636 = this->names.begin(); _iter636 != this->names.end(); ++_iter636)
     {
-      xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->names.size()));
-      std::vector<std::string> ::const_iterator _iter636;
-      for (_iter636 = this->names.begin(); _iter636 != this->names.end(); ++_iter636)
-      {
-        xfer += oprot->writeString((*_iter636));
-      }
-      xfer += oprot->writeListEnd();
+      xfer += oprot->writeString((*_iter636));
     }
-    xfer += oprot->writeFieldEnd();
+    xfer += oprot->writeListEnd();
   }
-  if (this->__isset.exprs) {
-    xfer += oprot->writeFieldBegin("exprs", ::apache::thrift::protocol::T_LIST, 2);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("exprs", ::apache::thrift::protocol::T_LIST, 2);
+  {
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->exprs.size()));
+    std::vector<DropPartitionsExpr> ::const_iterator _iter637;
+    for (_iter637 = this->exprs.begin(); _iter637 != this->exprs.end(); ++_iter637)
     {
-      xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->exprs.size()));
-      std::vector<DropPartitionsExpr> ::const_iterator _iter637;
-      for (_iter637 = this->exprs.begin(); _iter637 != this->exprs.end(); ++_iter637)
-      {
-        xfer += (*_iter637).write(oprot);
-      }
-      xfer += oprot->writeListEnd();
+      xfer += (*_iter637).write(oprot);
     }
-    xfer += oprot->writeFieldEnd();
+    xfer += oprot->writeListEnd();
   }
+  xfer += oprot->writeFieldEnd();
+
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -16064,8 +16048,8 @@ RequestPartsSpec& RequestPartsSpec::operator=(const RequestPartsSpec& other639) 
 void RequestPartsSpec::printTo(std::ostream& out) const {
   using ::apache::thrift::to_string;
   out << "RequestPartsSpec(";
-  out << "names="; (__isset.names ? (out << to_string(names)) : (out << "<null>"));
-  out << ", " << "exprs="; (__isset.exprs ? (out << to_string(exprs)) : (out << "<null>"));
+  out << "names=" << to_string(names);
+  out << ", " << "exprs=" << to_string(exprs);
   out << ")";
 }
 
@@ -26291,12 +26275,10 @@ FireEventRequestData::~FireEventRequestData() throw() {
 
 void FireEventRequestData::__set_insertData(const InsertEventRequestData& val) {
   this->insertData = val;
-__isset.insertData = true;
 }
 
 void FireEventRequestData::__set_insertDatas(const std::vector<InsertEventRequestData> & val) {
   this->insertDatas = val;
-__isset.insertDatas = true;
 }
 
 uint32_t FireEventRequestData::read(::apache::thrift::protocol::TProtocol* iprot) {
@@ -26365,24 +26347,22 @@ uint32_t FireEventRequestData::write(::apache::thrift::protocol::TProtocol* opro
   apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("FireEventRequestData");
 
-  if (this->__isset.insertData) {
-    xfer += oprot->writeFieldBegin("insertData", ::apache::thrift::protocol::T_STRUCT, 1);
-    xfer += this->insertData.write(oprot);
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.insertDatas) {
-    xfer += oprot->writeFieldBegin("insertDatas", ::apache::thrift::protocol::T_LIST, 2);
+  xfer += oprot->writeFieldBegin("insertData", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->insertData.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("insertDatas", ::apache::thrift::protocol::T_LIST, 2);
+  {
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->insertDatas.size()));
+    std::vector<InsertEventRequestData> ::const_iterator _iter1004;
+    for (_iter1004 = this->insertDatas.begin(); _iter1004 != this->insertDatas.end(); ++_iter1004)
     {
-      xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->insertDatas.size()));
-      std::vector<InsertEventRequestData> ::const_iterator _iter1004;
-      for (_iter1004 = this->insertDatas.begin(); _iter1004 != this->insertDatas.end(); ++_iter1004)
-      {
-        xfer += (*_iter1004).write(oprot);
-      }
-      xfer += oprot->writeListEnd();
+      xfer += (*_iter1004).write(oprot);
     }
-    xfer += oprot->writeFieldEnd();
+    xfer += oprot->writeListEnd();
   }
+  xfer += oprot->writeFieldEnd();
+
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -26409,8 +26389,8 @@ FireEventRequestData& FireEventRequestData::operator=(const FireEventRequestData
 void FireEventRequestData::printTo(std::ostream& out) const {
   using ::apache::thrift::to_string;
   out << "FireEventRequestData(";
-  out << "insertData="; (__isset.insertData ? (out << to_string(insertData)) : (out << "<null>"));
-  out << ", " << "insertDatas="; (__isset.insertDatas ? (out << to_string(insertDatas)) : (out << "<null>"));
+  out << "insertData=" << to_string(insertData);
+  out << ", " << "insertDatas=" << to_string(insertDatas);
   out << ")";
 }
 
