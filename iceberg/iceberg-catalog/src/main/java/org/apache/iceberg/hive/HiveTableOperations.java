@@ -206,6 +206,7 @@ public class HiveTableOperations extends BaseMetastoreTableOperations {
     String newMetadataLocation = base == null && metadata.metadataFileLocation() != null ?
         metadata.metadataFileLocation() : writeNewMetadata(metadata, currentVersion() + 1);
     boolean hiveEngineEnabled = hiveEngineEnabled(metadata, conf);
+    boolean keepHiveStats = conf.getBoolean(ConfigProperties.KEEP_HIVE_STATS, false);
 
     CommitStatus commitStatus = CommitStatus.FAILURE;
     boolean updateHiveTable = false;
@@ -255,6 +256,11 @@ public class HiveTableOperations extends BaseMetastoreTableOperations {
           .map(Snapshot::summary)
           .orElseGet(ImmutableMap::of);
       setHmsTableParameters(newMetadataLocation, tbl, metadata, removedProps, hiveEngineEnabled, summary);
+
+      if (!keepHiveStats) {
+        StatsSetupConst.setBasicStatsState(tbl.getParameters(), StatsSetupConst.FALSE);
+        StatsSetupConst.clearColumnStatsState(tbl.getParameters());
+      }
 
       try {
         persistTable(tbl, updateHiveTable);
