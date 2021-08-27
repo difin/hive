@@ -91,9 +91,7 @@ ImpalaProjectPassthroughRel(_o__col2=[count($0) OVER (ROWS BETWEEN UNBOUNDED PRE
           ImpalaProjectPassthroughRel($f0=[CAST($2):BIGINT])
             ImpalaHdfsScanRel(table=[[default, my_test_table]])
 
-HMS CALL get_table_req FOR foo
 HMS CALL get_table_req FOR my_test_table
-HMS CALL get_table_req FOR foo
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
@@ -137,9 +135,7 @@ ImpalaProjectPassthroughRel(_o__c0=[1:TINYINT])
               ImpalaProjectPassthroughRel($f0=[true])
                 ImpalaUnionRel
 
-HMS CALL get_table_req FOR foo
 HMS CALL get_table_req FOR my_test_table
-HMS CALL get_table_req FOR foo
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table

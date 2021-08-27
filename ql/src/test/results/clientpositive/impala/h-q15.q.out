@@ -1,7 +1,5 @@
 HMS CALL get_table_req FOR impala_tpch_supplier
-HMS CALL get_table_req FOR revenue_view
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_table_req FOR revenue_view
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 HMS CALL get_foreign_keys FOR impala_tpch_supplier
 PREHOOK: query: explain cbo physical with revenue_view as (
@@ -87,9 +85,7 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
         ImpalaHdfsScanRel(table=[[default, impala_tpch_supplier]], condition=[IS NOT NULL($0)])
 
 HMS CALL get_table_req FOR impala_tpch_supplier
-HMS CALL get_table_req FOR revenue_view
 HMS CALL get_table_req FOR impala_tpch_lineitem
-HMS CALL get_table_req FOR revenue_view
 HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 HMS CALL get_foreign_keys FOR impala_tpch_supplier
 PREHOOK: query: explain with revenue_view as (

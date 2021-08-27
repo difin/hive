@@ -3,12 +3,6 @@ HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR impala_tpcds_web_sales
-HMS CALL get_table_req FOR cross_items
-HMS CALL get_table_req FOR avg_sales
-HMS CALL get_table_req FOR cross_items
-HMS CALL get_table_req FOR avg_sales
-HMS CALL get_table_req FOR cross_items
-HMS CALL get_table_req FOR avg_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim
@@ -449,12 +443,6 @@ HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales
 HMS CALL get_table_req FOR impala_tpcds_web_sales
-HMS CALL get_table_req FOR cross_items
-HMS CALL get_table_req FOR avg_sales
-HMS CALL get_table_req FOR cross_items
-HMS CALL get_table_req FOR avg_sales
-HMS CALL get_table_req FOR cross_items
-HMS CALL get_table_req FOR avg_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_store_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_web_sales
 HMS CALL get_foreign_keys FOR impala_tpcds_date_dim

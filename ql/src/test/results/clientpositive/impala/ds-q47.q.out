@@ -1,7 +1,3 @@
-HMS CALL get_table_req FOR v2
-HMS CALL get_table_req FOR v1
-HMS CALL get_table_req FOR v1
-HMS CALL get_table_req FOR v1
 HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
@@ -166,10 +162,6 @@ ImpalaProjectPassthroughRel(s_store_name=[$0], d_year=[CAST(1999):INTEGER], d_mo
                 ImpalaProjectPassthroughRel(s_store_sk=[$0], s_store_name=[$5], s_company_name=[$17])
                   ImpalaHdfsScanRel(table=[[default, impala_tpcds_store]], condition=[AND(IS NOT NULL($0), IS NOT NULL($5), IS NOT NULL($17))])
 
-HMS CALL get_table_req FOR v2
-HMS CALL get_table_req FOR v1
-HMS CALL get_table_req FOR v1
-HMS CALL get_table_req FOR v1
 HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim

@@ -1,5 +1,3 @@
-HMS CALL get_table_req FOR ssci
-HMS CALL get_table_req FOR csci
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales
@@ -78,8 +76,6 @@ ImpalaSortRel(fetch=[100])
             ImpalaProjectPassthroughRel(d_date_sk=[$0])
               ImpalaHdfsScanRel(table=[[default, impala_tpcds_date_dim]], condition=[AND(BETWEEN(false, $3, 1190, +(1190, 11)), IS NOT NULL($0))])
 
-HMS CALL get_table_req FOR ssci
-HMS CALL get_table_req FOR csci
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_date_dim
 HMS CALL get_table_req FOR impala_tpcds_catalog_sales

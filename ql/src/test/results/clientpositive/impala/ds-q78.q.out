@@ -1,6 +1,3 @@
-HMS CALL get_table_req FOR ss
-HMS CALL get_table_req FOR ws
-HMS CALL get_table_req FOR cs
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_store_returns
 HMS CALL get_table_req FOR impala_tpcds_date_dim
@@ -180,9 +177,6 @@ ImpalaProjectPassthroughRel(ss_customer_sk=[$0], ratio=[$1], store_qty=[$2], sto
               ImpalaProjectPassthroughRel(d_date_sk=[$0])
                 ImpalaHdfsScanRel(table=[[default, impala_tpcds_date_dim]], condition=[AND(=($6, 2001), IS NOT NULL($0))])
 
-HMS CALL get_table_req FOR ss
-HMS CALL get_table_req FOR ws
-HMS CALL get_table_req FOR cs
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_store_returns
 HMS CALL get_table_req FOR impala_tpcds_date_dim

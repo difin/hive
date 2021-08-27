@@ -1,5 +1,3 @@
-HMS CALL get_table_req FOR inv
-HMS CALL get_table_req FOR inv
 HMS CALL get_table_req FOR impala_tpcds_inventory
 HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_warehouse
@@ -100,8 +98,6 @@ ImpalaProjectPassthroughRel(w_warehouse_sk=[$0], i_item_sk=[$1], d_moy=[CAST(2):
               ImpalaProjectPassthroughRel(w_warehouse_sk=[$0], w_warehouse_name=[$2])
                 ImpalaHdfsScanRel(table=[[default, impala_tpcds_warehouse]], condition=[IS NOT NULL($0)])
 
-HMS CALL get_table_req FOR inv
-HMS CALL get_table_req FOR inv
 HMS CALL get_table_req FOR impala_tpcds_inventory
 HMS CALL get_table_req FOR impala_tpcds_item
 HMS CALL get_table_req FOR impala_tpcds_warehouse

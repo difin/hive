@@ -1,6 +1,3 @@
-HMS CALL get_table_req FOR segments
-HMS CALL get_table_req FOR my_revenue
-HMS CALL get_table_req FOR my_customers
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_store
@@ -195,9 +192,6 @@ ImpalaSortRel(sort0=[$0], sort1=[$1], dir0=[ASC], dir1=[ASC], fetch=[100])
                 ImpalaProjectPassthroughRel($f0=[+(CAST($3):BIGINT, 3)])
                   ImpalaHdfsScanRel(table=[[default, impala_tpcds_date_dim]], condition=[AND(=($6, 2000), =($8, 2))])
 
-HMS CALL get_table_req FOR segments
-HMS CALL get_table_req FOR my_revenue
-HMS CALL get_table_req FOR my_customers
 HMS CALL get_table_req FOR impala_tpcds_store_sales
 HMS CALL get_table_req FOR impala_tpcds_customer_address
 HMS CALL get_table_req FOR impala_tpcds_store
