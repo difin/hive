@@ -33,6 +33,7 @@ import org.apache.hive.service.rpc.thrift.TSetClientInfoResp;
 import org.apache.hive.service.rpc.thrift.TSetClientInfoReq;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.common.auth.HiveAuthUtils;
+import org.apache.hive.jdbc.jwt.HttpJwtAuthRequestInterceptor;
 import org.apache.hive.jdbc.saml.HiveJdbcBrowserClientFactory;
 import org.apache.hive.jdbc.saml.HiveJdbcSamlRedirectStrategy;
 import org.apache.hive.jdbc.saml.HttpSamlAuthRequestInterceptor;
@@ -586,6 +587,12 @@ public class HiveConnection implements java.sql.Connection {
           host, getServerHttpUrl(useSsl), loggedInSubject, cookieStore, cookieName,
           useSsl, additionalHttpHeaders,
           customCookies);
+    } else if (isJwtAuthMode()) {
+      final String signedJwt = getJWT();
+      Preconditions.checkArgument(signedJwt != null && !signedJwt.isEmpty(), "For jwt auth mode," +
+          " a signed jwt must be provided");
+      requestInterceptor = new HttpJwtAuthRequestInterceptor(signedJwt, cookieStore,
+          cookieName, useSsl, additionalHttpHeaders, customCookies);
     } else if (isBrowserAuthMode()) {
       requestInterceptor = new HttpSamlAuthRequestInterceptor(browserClient, cookieStore,
           cookieName, useSsl, additionalHttpHeaders, customCookies);
@@ -792,6 +799,38 @@ public class HiveConnection implements java.sql.Connection {
       }
     }
     return httpClientBuilder.build();
+  }
+
+  private String getJWT() {
+    String jwtCredential = getJWTStringFromSession();
+    if (jwtCredential == null || jwtCredential.isEmpty()) {
+      jwtCredential = getJWTStringFromEnv();
+    }
+    return jwtCredential;
+  }
+
+  private String getJWTStringFromEnv() {
+    String jwtCredential = System.getenv(JdbcConnectionParams.AUTH_JWT_ENV);
+    if (jwtCredential == null || jwtCredential.isEmpty()) {
+      LOG.debug("No JWT is specified in env variable {}", JdbcConnectionParams.AUTH_JWT_ENV);
+    } else {
+      int startIndex = Math.max(0, jwtCredential.length() - 7);
+      String lastSevenChars = jwtCredential.substring(startIndex);
+      LOG.debug("Fetched JWT (ends with {}) from the env.", lastSevenChars);
+    }
+    return jwtCredential;
+  }
+
+  private String getJWTStringFromSession() {
+    String jwtCredential = sessConfMap.get(JdbcConnectionParams.AUTH_TYPE_JWT_KEY);
+    if (jwtCredential == null || jwtCredential.isEmpty()) {
+      LOG.debug("No JWT is specified in connection string.");
+    } else {
+      int startIndex = Math.max(0, jwtCredential.length() - 7);
+      String lastSevenChars = jwtCredential.substring(startIndex);
+      LOG.debug("Fetched JWT (ends with {}) from the session.", lastSevenChars);
+    }
+    return jwtCredential;
   }
 
   /**
@@ -1198,6 +1237,11 @@ public class HiveConnection implements java.sql.Connection {
   private boolean isBrowserAuthMode() {
     return JdbcConnectionParams.AUTH_SSO_BROWSER_MODE
         .equals(sessConfMap.get(JdbcConnectionParams.AUTH_TYPE));
+  }
+
+  private boolean isJwtAuthMode() {
+    return JdbcConnectionParams.AUTH_TYPE_JWT.equalsIgnoreCase(sessConfMap.get(JdbcConnectionParams.AUTH_TYPE))
+        || sessConfMap.containsKey(JdbcConnectionParams.AUTH_TYPE_JWT_KEY);
   }
 
   /**
