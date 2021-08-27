@@ -508,6 +508,7 @@ public class HiveTableOperations extends BaseMetastoreTableOperations {
       return metadata.propertyAsBoolean(TableProperties.ENGINE_HIVE_ENABLED, false);
     }
 
-    return conf.getBoolean(ConfigProperties.ENGINE_HIVE_ENABLED, TableProperties.ENGINE_HIVE_ENABLED_DEFAULT);
+    // As per CDPD-34093, our new default should be true in TableProperties.ENGINE_HIVE_ENABLED_DEFAULT
+    return conf.getBoolean(ConfigProperties.ENGINE_HIVE_ENABLED, true);
   }
 }
