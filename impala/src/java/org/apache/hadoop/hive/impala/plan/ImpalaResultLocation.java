@@ -91,7 +91,7 @@ public class ImpalaResultLocation implements FeFsTable {
   }
 
   public ImpalaResultLocation(List<Expr> outputExprs, String baseDir, String outputFormatClassName) {
-    this(outputExprs, baseDir, HdfsFileFormat.fromJavaClassName(outputFormatClassName));
+    this(outputExprs, baseDir, HdfsFileFormat.fromJavaClassName(outputFormatClassName, /*serDe*/ null));
   }
 
   public ImpalaResultLocation(List<Expr> outputExprs, String baseDir,
