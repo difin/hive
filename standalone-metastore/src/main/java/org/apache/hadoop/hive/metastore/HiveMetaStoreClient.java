@@ -3549,10 +3549,11 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   }
 
   @Override
-  public List<Long> replOpenTxn(String replPolicy, List<Long> srcTxnIds, String user) throws TException {
+  public List<Long> replOpenTxn(String replPolicy, List<Long> srcTxnIds, String user, TxnType txnType) throws TException {
     // As this is called from replication task, the user is the user who has fired the repl command.
     // This is required for standalone metastore authentication.
-    OpenTxnsResponse txns = openTxnsIntr(user, srcTxnIds != null ? srcTxnIds.size() : 1, replPolicy, srcTxnIds, null);
+    OpenTxnsResponse txns = openTxnsIntr(user, srcTxnIds != null ? srcTxnIds.size() : 1,
+                                        replPolicy, srcTxnIds, txnType);
     return txns.getTxn_ids();
   }
 
@@ -3572,11 +3573,12 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
     }
     OpenTxnRequest rqst = new OpenTxnRequest(numTxns, user, hostname);
     if (replPolicy != null) {
-      assert srcTxnIds != null;
-      assert numTxns == srcTxnIds.size();
-      // need to set this only for replication tasks
       rqst.setReplPolicy(replPolicy);
-      rqst.setReplSrcTxnIds(srcTxnIds);
+      if (txnType == TxnType.REPL_CREATED) {
+        assert srcTxnIds != null;
+        assert numTxns == srcTxnIds.size();
+        rqst.setReplSrcTxnIds(srcTxnIds);
+      }
     } else {
       assert srcTxnIds == null;
     }
@@ -3592,9 +3594,10 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   }
 
   @Override
-  public void replRollbackTxn(long srcTxnId, String replPolicy) throws NoSuchTxnException, TException {
+  public void replRollbackTxn(long srcTxnId, String replPolicy, TxnType txnType) throws NoSuchTxnException, TException {
     AbortTxnRequest rqst = new AbortTxnRequest(srcTxnId);
     rqst.setReplPolicy(replPolicy);
+    rqst.setTxn_type(txnType);
     client.abort_txn(rqst);
   }
 

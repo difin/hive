@@ -61,7 +61,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Collections;
 import java.util.Map;
 
 
@@ -258,7 +257,7 @@ public class TestReplicationScenariosAcidTables extends BaseReplicationScenarios
     long currentLoadNotificationID = fetchNotificationIDFromDump(new Path(bootstrapDump.dumpLocation));
     long currentNotificationID = replica.getCurrentNotificationEventId().getEventId();
     assertTrue(currentLoadNotificationID > previousLoadNotificationID);
-    assertTrue(currentNotificationID > currentLoadNotificationID);
+    assertTrue(currentNotificationID == currentLoadNotificationID);
     previousLoadNotificationID = currentLoadNotificationID;
     WarehouseInstance.Tuple incrementalDump1 = primary.run("insert into t1 values (1)")
             .dump(primaryDbName);
@@ -267,7 +266,7 @@ public class TestReplicationScenariosAcidTables extends BaseReplicationScenarios
     currentLoadNotificationID = fetchNotificationIDFromDump(new Path(incrementalDump1.dumpLocation));
     currentNotificationID = replica.getCurrentNotificationEventId().getEventId();
     assertTrue(currentLoadNotificationID > previousLoadNotificationID);
-    assertTrue(currentNotificationID > currentLoadNotificationID);
+    assertTrue(currentNotificationID == currentLoadNotificationID);
   }
 
   private long fetchNotificationIDFromDump(Path dumpLocation) throws Exception {
@@ -885,7 +884,6 @@ public class TestReplicationScenariosAcidTables extends BaseReplicationScenarios
             primary.dump(primaryDbName);
 
     long lastReplId = Long.parseLong(bootStrapDump.lastReplicationId);
-    primary.testEventCounts(primaryDbName, lastReplId, null, null, 22);
     primary.testEventCounts(primaryDbName, lastReplId, null, null, 12);
 
     // Test load
@@ -1702,8 +1700,7 @@ public class TestReplicationScenariosAcidTables extends BaseReplicationScenarios
             .run("insert into t1 values (10)")
             .dump(primaryDbName, dumpClause);
 
-    int eventCount = Integer.parseInt(incrementalDump1.lastReplicationId)
-            - Integer.parseInt(bootstrapDump.lastReplicationId);
+    int eventCount = primary.getNoOfEventsDumped(incrementalDump1.dumpLocation, conf);
     assertEquals(eventCount, 5);
 
     replica.load(replicatedDbName, primaryDbName)
@@ -1715,9 +1712,8 @@ public class TestReplicationScenariosAcidTables extends BaseReplicationScenarios
     WarehouseInstance.Tuple incrementalDump2 = primary.run("use " + primaryDbName)
             .dump(primaryDbName, dumpClause);
 
-    eventCount = Integer.parseInt(incrementalDump2.lastReplicationId)
-            - Integer.parseInt(incrementalDump1.lastReplicationId);
-    assertTrue(eventCount > 5);
+    eventCount = primary.getNoOfEventsDumped(incrementalDump2.dumpLocation, conf);
+    assertTrue(eventCount > 5 && eventCount < 1000);
 
     replica.load(replicatedDbName, primaryDbName)
             .run("select * from " + replicatedDbName + ".t1")

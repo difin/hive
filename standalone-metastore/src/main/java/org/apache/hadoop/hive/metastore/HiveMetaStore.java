@@ -8534,7 +8534,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public OpenTxnsResponse open_txns(OpenTxnRequest rqst) throws TException {
       OpenTxnsResponse response = getTxnHandler().openTxns(rqst);
       List<Long> txnIds = response.getTxn_ids();
-      if (txnIds != null && listeners != null && !listeners.isEmpty()) {
+      boolean isHiveReplTxn = rqst.isSetReplPolicy() && TxnType.DEFAULT.equals(rqst.getTxn_type());
+      if (txnIds != null && listeners != null && !listeners.isEmpty() && !isHiveReplTxn) {
         MetaStoreListenerNotifier.notifyEvent(listeners, EventType.OPEN_TXN,
             new OpenTxnEvent(txnIds, this));
       }
@@ -8544,7 +8545,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     @Override
     public void abort_txn(AbortTxnRequest rqst) throws TException {
       getTxnHandler().abortTxn(rqst);
-      if (listeners != null && !listeners.isEmpty()) {
+      boolean isHiveReplTxn = rqst.isSetReplPolicy() && TxnType.DEFAULT.equals(rqst.getTxn_type());
+      if (listeners != null && !listeners.isEmpty() && !isHiveReplTxn) {
         MetaStoreListenerNotifier.notifyEvent(listeners, EventType.ABORT_TXN,
                 new AbortTxnEvent(rqst.getTxnid(), this));
       }
@@ -8568,8 +8570,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
     @Override
     public void commit_txn(CommitTxnRequest rqst) throws TException {
+      boolean isReplayedReplTxn = TxnType.REPL_CREATED.equals(rqst.getTxn_type());
+      boolean isHiveReplTxn = rqst.isSetReplPolicy() && TxnType.DEFAULT.equals(rqst.getTxn_type());
       // in replication flow, the write notification log table will be updated here.
-      if (rqst.isSetWriteEventInfos()) {
+      if (rqst.isSetWriteEventInfos() && isReplayedReplTxn) {
+        assert (rqst.isSetReplPolicy());
         long targetTxnId = getTxnHandler().getTargetTxnId(rqst.getReplPolicy(), rqst.getTxnid());
         if (targetTxnId < 0) {
           //looks like a retry
@@ -8618,7 +8623,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
       }
       getTxnHandler().commitTxn(rqst);
-      if (listeners != null && !listeners.isEmpty()) {
+      if (listeners != null && !listeners.isEmpty() && !isHiveReplTxn) {
         MetaStoreListenerNotifier.notifyEvent(listeners, EventType.COMMIT_TXN,
                 new CommitTxnEvent(rqst.getTxnid(), this));
         Optional<CompactionInfo> compactionInfo = getTxnHandler().getCompactionByTxnId(rqst.getTxnid());

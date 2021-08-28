@@ -12904,17 +12904,20 @@ class AbortTxnRequest:
   Attributes:
    - txnid
    - replPolicy
+   - txn_type
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.I64, 'txnid', None, None, ), # 1
     (2, TType.STRING, 'replPolicy', None, None, ), # 2
+    (3, TType.I32, 'txn_type', None, None, ), # 3
   )
 
-  def __init__(self, txnid=None, replPolicy=None,):
+  def __init__(self, txnid=None, replPolicy=None, txn_type=None,):
     self.txnid = txnid
     self.replPolicy = replPolicy
+    self.txn_type = txn_type
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -12935,6 +12938,11 @@ class AbortTxnRequest:
           self.replPolicy = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.I32:
+          self.txn_type = iprot.readI32()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -12953,6 +12961,10 @@ class AbortTxnRequest:
       oprot.writeFieldBegin('replPolicy', TType.STRING, 2)
       oprot.writeString(self.replPolicy)
       oprot.writeFieldEnd()
+    if self.txn_type is not None:
+      oprot.writeFieldBegin('txn_type', TType.I32, 3)
+      oprot.writeI32(self.txn_type)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -12966,6 +12978,7 @@ class AbortTxnRequest:
     value = 17
     value = (value * 31) ^ hash(self.txnid)
     value = (value * 31) ^ hash(self.replPolicy)
+    value = (value * 31) ^ hash(self.txn_type)
     return value
 
   def __repr__(self):
@@ -13440,6 +13453,7 @@ class CommitTxnRequest:
    - replLastIdInfo
    - keyValue
    - exclWriteEnabled
+   - txn_type
   """
 
   thrift_spec = (
@@ -13450,15 +13464,17 @@ class CommitTxnRequest:
     (4, TType.STRUCT, 'replLastIdInfo', (ReplLastIdInfo, ReplLastIdInfo.thrift_spec), None, ), # 4
     (5, TType.STRUCT, 'keyValue', (CommitTxnKeyValue, CommitTxnKeyValue.thrift_spec), None, ), # 5
     (6, TType.BOOL, 'exclWriteEnabled', None, True, ), # 6
+    (7, TType.I32, 'txn_type', None, None, ), # 7
   )
 
-  def __init__(self, txnid=None, replPolicy=None, writeEventInfos=None, replLastIdInfo=None, keyValue=None, exclWriteEnabled=thrift_spec[6][4],):
+  def __init__(self, txnid=None, replPolicy=None, writeEventInfos=None, replLastIdInfo=None, keyValue=None, exclWriteEnabled=thrift_spec[6][4], txn_type=None,):
     self.txnid = txnid
     self.replPolicy = replPolicy
     self.writeEventInfos = writeEventInfos
     self.replLastIdInfo = replLastIdInfo
     self.keyValue = keyValue
     self.exclWriteEnabled = exclWriteEnabled
+    self.txn_type = txn_type
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -13507,6 +13523,11 @@ class CommitTxnRequest:
           self.exclWriteEnabled = iprot.readBool()
         else:
           iprot.skip(ftype)
+      elif fid == 7:
+        if ftype == TType.I32:
+          self.txn_type = iprot.readI32()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -13544,6 +13565,10 @@ class CommitTxnRequest:
       oprot.writeFieldBegin('exclWriteEnabled', TType.BOOL, 6)
       oprot.writeBool(self.exclWriteEnabled)
       oprot.writeFieldEnd()
+    if self.txn_type is not None:
+      oprot.writeFieldBegin('txn_type', TType.I32, 7)
+      oprot.writeI32(self.txn_type)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -13561,6 +13586,7 @@ class CommitTxnRequest:
     value = (value * 31) ^ hash(self.replLastIdInfo)
     value = (value * 31) ^ hash(self.keyValue)
     value = (value * 31) ^ hash(self.exclWriteEnabled)
+    value = (value * 31) ^ hash(self.txn_type)
     return value
 
   def __repr__(self):

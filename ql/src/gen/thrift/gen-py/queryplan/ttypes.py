@@ -172,8 +172,9 @@ class StageType:
   ACK = 18
   RANGER_DUMP = 19
   RANGER_LOAD = 20
-  ATLAS_DUMP = 21
-  ATLAS_LOAD = 22
+  RANGER_DENY = 21
+  ATLAS_DUMP = 22
+  ATLAS_LOAD = 23
 
   _VALUES_TO_NAMES = {
     0: "CONDITIONAL",
@@ -197,8 +198,9 @@ class StageType:
     18: "ACK",
     19: "RANGER_DUMP",
     20: "RANGER_LOAD",
-    21: "ATLAS_DUMP",
-    22: "ATLAS_LOAD",
+    21: "RANGER_DENY",
+    22: "ATLAS_DUMP",
+    23: "ATLAS_LOAD",
   }
 
   _NAMES_TO_VALUES = {
@@ -223,8 +225,9 @@ class StageType:
     "ACK": 18,
     "RANGER_DUMP": 19,
     "RANGER_LOAD": 20,
-    "ATLAS_DUMP": 21,
-    "ATLAS_LOAD": 22,
+    "RANGER_DENY": 21,
+    "ATLAS_DUMP": 22,
+    "ATLAS_LOAD": 23,
   }
 
 

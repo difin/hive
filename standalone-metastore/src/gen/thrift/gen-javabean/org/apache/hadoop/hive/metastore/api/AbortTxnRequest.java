@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
   private static final org.apache.thrift.protocol.TField TXNID_FIELD_DESC = new org.apache.thrift.protocol.TField("txnid", org.apache.thrift.protocol.TType.I64, (short)1);
   private static final org.apache.thrift.protocol.TField REPL_POLICY_FIELD_DESC = new org.apache.thrift.protocol.TField("replPolicy", org.apache.thrift.protocol.TType.STRING, (short)2);
+  private static final org.apache.thrift.protocol.TField TXN_TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("txn_type", org.apache.thrift.protocol.TType.I32, (short)3);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -49,11 +50,17 @@ import org.slf4j.LoggerFactory;
 
   private long txnid; // required
   private String replPolicy; // optional
+  private TxnType txn_type; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     TXNID((short)1, "txnid"),
-    REPL_POLICY((short)2, "replPolicy");
+    REPL_POLICY((short)2, "replPolicy"),
+    /**
+     * 
+     * @see TxnType
+     */
+    TXN_TYPE((short)3, "txn_type");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -72,6 +79,8 @@ import org.slf4j.LoggerFactory;
           return TXNID;
         case 2: // REPL_POLICY
           return REPL_POLICY;
+        case 3: // TXN_TYPE
+          return TXN_TYPE;
         default:
           return null;
       }
@@ -114,7 +123,7 @@ import org.slf4j.LoggerFactory;
   // isset id assignments
   private static final int __TXNID_ISSET_ID = 0;
   private byte __isset_bitfield = 0;
-  private static final _Fields optionals[] = {_Fields.REPL_POLICY};
+  private static final _Fields optionals[] = {_Fields.REPL_POLICY,_Fields.TXN_TYPE};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -122,6 +131,8 @@ import org.slf4j.LoggerFactory;
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     tmpMap.put(_Fields.REPL_POLICY, new org.apache.thrift.meta_data.FieldMetaData("replPolicy", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.TXN_TYPE, new org.apache.thrift.meta_data.FieldMetaData("txn_type", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, TxnType.class)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(AbortTxnRequest.class, metaDataMap);
   }
@@ -146,6 +157,9 @@ import org.slf4j.LoggerFactory;
     if (other.isSetReplPolicy()) {
       this.replPolicy = other.replPolicy;
     }
+    if (other.isSetTxn_type()) {
+      this.txn_type = other.txn_type;
+    }
   }
 
   public AbortTxnRequest deepCopy() {
@@ -157,6 +171,7 @@ import org.slf4j.LoggerFactory;
     setTxnidIsSet(false);
     this.txnid = 0;
     this.replPolicy = null;
+    this.txn_type = null;
   }
 
   public long getTxnid() {
@@ -204,6 +219,37 @@ import org.slf4j.LoggerFactory;
     }
   }
 
+  /**
+   * 
+   * @see TxnType
+   */
+  public TxnType getTxn_type() {
+    return this.txn_type;
+  }
+
+  /**
+   * 
+   * @see TxnType
+   */
+  public void setTxn_type(TxnType txn_type) {
+    this.txn_type = txn_type;
+  }
+
+  public void unsetTxn_type() {
+    this.txn_type = null;
+  }
+
+  /** Returns true if field txn_type is set (has been assigned a value) and false otherwise */
+  public boolean isSetTxn_type() {
+    return this.txn_type != null;
+  }
+
+  public void setTxn_typeIsSet(boolean value) {
+    if (!value) {
+      this.txn_type = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case TXNID:
@@ -222,6 +268,14 @@ import org.slf4j.LoggerFactory;
       }
       break;
 
+    case TXN_TYPE:
+      if (value == null) {
+        unsetTxn_type();
+      } else {
+        setTxn_type((TxnType)value);
+      }
+      break;
+
     }
   }
 
@@ -232,6 +286,9 @@ import org.slf4j.LoggerFactory;
 
     case REPL_POLICY:
       return getReplPolicy();
+
+    case TXN_TYPE:
+      return getTxn_type();
 
     }
     throw new IllegalStateException();
@@ -248,6 +305,8 @@ import org.slf4j.LoggerFactory;
       return isSetTxnid();
     case REPL_POLICY:
       return isSetReplPolicy();
+    case TXN_TYPE:
+      return isSetTxn_type();
     }
     throw new IllegalStateException();
   }
@@ -283,6 +342,15 @@ import org.slf4j.LoggerFactory;
         return false;
     }
 
+    boolean this_present_txn_type = true && this.isSetTxn_type();
+    boolean that_present_txn_type = true && that.isSetTxn_type();
+    if (this_present_txn_type || that_present_txn_type) {
+      if (!(this_present_txn_type && that_present_txn_type))
+        return false;
+      if (!this.txn_type.equals(that.txn_type))
+        return false;
+    }
+
     return true;
   }
 
@@ -299,6 +367,11 @@ import org.slf4j.LoggerFactory;
     list.add(present_replPolicy);
     if (present_replPolicy)
       list.add(replPolicy);
+
+    boolean present_txn_type = true && (isSetTxn_type());
+    list.add(present_txn_type);
+    if (present_txn_type)
+      list.add(txn_type.getValue());
 
     return list.hashCode();
   }
@@ -327,6 +400,16 @@ import org.slf4j.LoggerFactory;
     }
     if (isSetReplPolicy()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.replPolicy, other.replPolicy);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetTxn_type()).compareTo(other.isSetTxn_type());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetTxn_type()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.txn_type, other.txn_type);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -361,6 +444,16 @@ import org.slf4j.LoggerFactory;
         sb.append("null");
       } else {
         sb.append(this.replPolicy);
+      }
+      first = false;
+    }
+    if (isSetTxn_type()) {
+      if (!first) sb.append(", ");
+      sb.append("txn_type:");
+      if (this.txn_type == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.txn_type);
       }
       first = false;
     }
@@ -429,6 +522,14 @@ import org.slf4j.LoggerFactory;
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 3: // TXN_TYPE
+            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+              struct.txn_type = org.apache.hadoop.hive.metastore.api.TxnType.findByValue(iprot.readI32());
+              struct.setTxn_typeIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -449,6 +550,13 @@ import org.slf4j.LoggerFactory;
         if (struct.isSetReplPolicy()) {
           oprot.writeFieldBegin(REPL_POLICY_FIELD_DESC);
           oprot.writeString(struct.replPolicy);
+          oprot.writeFieldEnd();
+        }
+      }
+      if (struct.txn_type != null) {
+        if (struct.isSetTxn_type()) {
+          oprot.writeFieldBegin(TXN_TYPE_FIELD_DESC);
+          oprot.writeI32(struct.txn_type.getValue());
           oprot.writeFieldEnd();
         }
       }
@@ -474,9 +582,15 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetReplPolicy()) {
         optionals.set(0);
       }
-      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetTxn_type()) {
+        optionals.set(1);
+      }
+      oprot.writeBitSet(optionals, 2);
       if (struct.isSetReplPolicy()) {
         oprot.writeString(struct.replPolicy);
+      }
+      if (struct.isSetTxn_type()) {
+        oprot.writeI32(struct.txn_type.getValue());
       }
     }
 
@@ -485,10 +599,14 @@ import org.slf4j.LoggerFactory;
       TTupleProtocol iprot = (TTupleProtocol) prot;
       struct.txnid = iprot.readI64();
       struct.setTxnidIsSet(true);
-      BitSet incoming = iprot.readBitSet(1);
+      BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
         struct.replPolicy = iprot.readString();
         struct.setReplPolicyIsSet(true);
+      }
+      if (incoming.get(1)) {
+        struct.txn_type = org.apache.hadoop.hive.metastore.api.TxnType.findByValue(iprot.readI32());
+        struct.setTxn_typeIsSet(true);
       }
     }
   }

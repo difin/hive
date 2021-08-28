@@ -124,11 +124,11 @@ public class serdeConstants {
 
   public static final String LIST_COLUMN_TYPES = "columns.types";
 
-  public static final java.lang.String LIST_PARTITION_COLUMNS = "partition.columns";
+  public static final String LIST_PARTITION_COLUMNS = "partition.columns";
 
-  public static final java.lang.String LIST_PARTITION_COLUMN_TYPES = "partition.columns.types";
+  public static final String LIST_PARTITION_COLUMN_TYPES = "partition.columns.types";
 
-  public static final java.lang.String TIMESTAMP_FORMATS = "timestamp.formats";
+  public static final String TIMESTAMP_FORMATS = "timestamp.formats";
 
   public static final String COLUMN_NAME_DELIMITER = "column.name.delimiter";
 

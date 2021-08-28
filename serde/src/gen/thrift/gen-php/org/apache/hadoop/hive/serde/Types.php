@@ -62,6 +62,8 @@ final class Constant extends \Thrift\Type\TConstant {
   static protected $UNION_TYPE_NAME;
   static protected $LIST_COLUMNS;
   static protected $LIST_COLUMN_TYPES;
+  static protected $LIST_PARTITION_COLUMNS;
+  static protected $LIST_PARTITION_COLUMN_TYPES;
   static protected $TIMESTAMP_FORMATS;
   static protected $COLUMN_NAME_DELIMITER;
   static protected $PrimitiveTypes;
@@ -242,6 +244,14 @@ final class Constant extends \Thrift\Type\TConstant {
 
   static protected function init_LIST_COLUMN_TYPES() {
     return "columns.types";
+  }
+
+  static protected function init_LIST_PARTITION_COLUMNS() {
+    return "partition.columns";
+  }
+
+  static protected function init_LIST_PARTITION_COLUMN_TYPES() {
+    return "partition.columns.types";
   }
 
   static protected function init_TIMESTAMP_FORMATS() {

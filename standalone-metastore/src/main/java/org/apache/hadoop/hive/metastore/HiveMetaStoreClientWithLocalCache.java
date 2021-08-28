@@ -30,43 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
-import org.apache.hadoop.hive.metastore.api.AllocateTableWriteIdsRequest;
-import org.apache.hadoop.hive.metastore.api.AggrStats;
-import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
-import org.apache.hadoop.hive.metastore.api.CommitTxnRequest;
-import org.apache.hadoop.hive.metastore.api.Database;
-import org.apache.hadoop.hive.metastore.api.ForeignKeysRequest;
-import org.apache.hadoop.hive.metastore.api.ForeignKeysResponse;
-import org.apache.hadoop.hive.metastore.api.GetDatabaseRequest;
-import org.apache.hadoop.hive.metastore.api.GetPartitionNamesPsRequest;
-import org.apache.hadoop.hive.metastore.api.GetPartitionNamesPsResponse;
-import org.apache.hadoop.hive.metastore.api.GetPartitionsByNamesRequest;
-import org.apache.hadoop.hive.metastore.api.GetPartitionsByNamesResult;
-import org.apache.hadoop.hive.metastore.api.GetPartitionsPsWithAuthRequest;
-import org.apache.hadoop.hive.metastore.api.GetPartitionsPsWithAuthResponse;
-import org.apache.hadoop.hive.metastore.api.GetTableRequest;
-import org.apache.hadoop.hive.metastore.api.GetTableResult;
-import org.apache.hadoop.hive.metastore.api.GetValidWriteIdsRequest;
-import org.apache.hadoop.hive.metastore.api.GetValidWriteIdsResponse;
-import org.apache.hadoop.hive.metastore.api.MetaException;
-import org.apache.hadoop.hive.metastore.api.NoSuchTxnException;
-import org.apache.hadoop.hive.metastore.api.NotNullConstraintsRequest;
-import org.apache.hadoop.hive.metastore.api.NotNullConstraintsResponse;
-import org.apache.hadoop.hive.metastore.api.ObjectDictionary;
-import org.apache.hadoop.hive.metastore.api.Partition;
-import org.apache.hadoop.hive.metastore.api.PartitionsByExprRequest;
-import org.apache.hadoop.hive.metastore.api.PartitionsByExprResult;
-import org.apache.hadoop.hive.metastore.api.PartitionsStatsRequest;
-import org.apache.hadoop.hive.metastore.api.PrimaryKeysRequest;
-import org.apache.hadoop.hive.metastore.api.PrimaryKeysResponse;
-import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.hadoop.hive.metastore.api.TableStatsRequest;
-import org.apache.hadoop.hive.metastore.api.TableStatsResult;
-import org.apache.hadoop.hive.metastore.api.TableValidWriteIds;
-import org.apache.hadoop.hive.metastore.api.TxnAbortedException;
-import org.apache.hadoop.hive.metastore.api.TxnToWriteId;
-import org.apache.hadoop.hive.metastore.api.UniqueConstraintsRequest;
-import org.apache.hadoop.hive.metastore.api.UniqueConstraintsResponse;
+import org.apache.hadoop.hive.metastore.api.*;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.localcache.HMSPartitionNamesConverter;
 import org.apache.hadoop.hive.metastore.localcache.PartitionCacheHelper;
@@ -911,9 +875,9 @@ public class HiveMetaStoreClientWithLocalCache extends HiveMetaStoreClient imple
   }
 
   @Override
-  public void replRollbackTxn(long srcTxnId, String replPolicy) throws NoSuchTxnException, TException {
+  public void replRollbackTxn(long srcTxnId, String replPolicy,  TxnType txnType) throws NoSuchTxnException, TException {
     try {
-      super.replRollbackTxn(srcTxnId, replPolicy);
+      super.replRollbackTxn(srcTxnId, replPolicy, txnType);
     } finally {
       CacheKey.clearTransactionInfo(srcTxnId, OPEN_WRITE_TXNS.containsKey(srcTxnId));
       OPEN_WRITE_TXNS.remove(srcTxnId);
