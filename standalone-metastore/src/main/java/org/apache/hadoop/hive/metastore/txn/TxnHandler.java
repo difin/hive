@@ -73,6 +73,7 @@ import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.common.classification.RetrySemantics;
+import org.apache.hadoop.hive.common.repl.ReplConst;
 import org.apache.hadoop.hive.metastore.DatabaseProduct;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.MetaStoreListenerNotifier;
@@ -789,6 +790,37 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     }
   }
 
+  private Set<String> getDbNamesForReplayedTxns(Connection dbConn, List<Long> targetTxnIds) throws SQLException {
+    Set<String> dbNames = new HashSet<>();
+    if (targetTxnIds.isEmpty()) {
+      return dbNames;
+    }
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+    try {
+      List<String> inQueries = new ArrayList<>();
+      StringBuilder prefix = new StringBuilder();
+      prefix.append("SELECT \"RTM_REPL_POLICY\" FROM \"REPL_TXN_MAP\" WHERE ");
+      TxnUtils.buildQueryWithINClause(conf, inQueries, prefix, new StringBuilder(), targetTxnIds,
+              "\"RTM_TARGET_TXN_ID\"", false, false);
+      for (String query : inQueries) {
+        LOG.debug("Going to execute select <" + query + ">");
+        pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, null);
+        rs = pst.executeQuery();
+        while (rs.next()) {
+          dbNames.add(MetaStoreUtils.getDbNameFromReplPolicy(rs.getString(1)));
+        }
+      }
+      return dbNames;
+    } catch (SQLException e) {
+      LOG.warn("Failed to get ReplPolicies for replayed txns: " + e.getMessage());
+      throw e;
+    } finally {
+      closeStmt(pst);
+      close(rs);
+    }
+  }
+
   private void deleteReplTxnMapEntry(Connection dbConn, long sourceTxnId, String replPolicy) throws SQLException {
     String s = "DELETE FROM \"REPL_TXN_MAP\" WHERE \"RTM_SRC_TXN_ID\" = " + sourceTxnId + " AND \"RTM_REPL_POLICY\" = ?";
     try (PreparedStatement pst = sqlGenerator.prepareStmtWithParameters(dbConn, s, Arrays.asList(replPolicy))) {
@@ -843,7 +875,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           }
           raiseTxnUnexpectedState(status, txnid);
         }
-        abortTxns(dbConn, Collections.singletonList(txnid), true);
+        abortTxns(dbConn, Collections.singletonList(txnid), true, isReplayedReplTxn);
 
         if (isReplayedReplTxn) {
           deleteReplTxnMapEntry(dbConn, sourceTxnId, rqst.getReplPolicy());
@@ -900,7 +932,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             }
           }
         }
-        int numAborted = abortTxns(dbConn, txnIds, false);
+        int numAborted = abortTxns(dbConn, txnIds, false, false);
         if (numAborted != txnIds.size()) {
           LOG.warn("Abort Transactions command only aborted " + numAborted + " out of " +
               txnIds.size() + " transactions. It's possible that the other " +
@@ -932,10 +964,79 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     }
   }
 
+  private long getDatabaseId(Connection dbConn, String database, String catalog) throws SQLException, MetaException {
+    ResultSet rs = null;
+    PreparedStatement pst = null;
+    try {
+      String query = "select \"DB_ID\" from \"DBS\" where \"NAME\" = ?  and \"CTLG_NAME\" = ?";
+      pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, Arrays.asList(database, catalog));
+      LOG.debug("Going to execute query <" + query.replaceAll("\\?", "{}") + ">",
+              quoteString(database), quoteString(catalog));
+      rs = pst.executeQuery();
+      if (!rs.next()) {
+        throw new MetaException("DB with name " + database + " does not exist in catalog " + catalog);
+      }
+      return rs.getLong(1);
+    } finally {
+      close(rs);
+      closeStmt(pst);
+    }
+  }
+
+  private void updateDatabaseProp(Connection dbConn, String database,
+                                  long dbId, String prop, String propValue) throws SQLException {
+    ResultSet rs = null;
+    PreparedStatement pst = null;
+    try {
+      String query = "SELECT \"PARAM_VALUE\" FROM \"DATABASE_PARAMS\" WHERE \"PARAM_KEY\" = " +
+              "'" + prop + "' AND \"DB_ID\" = " + dbId;
+      pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, null);
+      rs = pst.executeQuery();
+      query = null;
+      if (!rs.next()) {
+        query = "INSERT INTO \"DATABASE_PARAMS\" VALUES ( " + dbId + " , '" + prop + "' , ? )";
+      } else if (!rs.getString(1).equals(propValue)) {
+        query = "UPDATE \"DATABASE_PARAMS\" SET \"PARAM_VALUE\" = ? WHERE \"DB_ID\" = " + dbId +
+                " AND \"PARAM_KEY\" = '" + prop + "'";
+      }
+      closeStmt(pst);
+      if (query == null) {
+        LOG.info("Database property: " + prop + " with value: " + propValue + " already updated for db: " + database);
+        return;
+      }
+      pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, Arrays.asList(propValue));
+      LOG.debug("Updating " + prop + " for db: " + database + " <" + query.replaceAll("\\?", "{}") + ">", propValue);
+      if (pst.executeUpdate() != 1) {
+        //only one row insert or update should happen
+        throw new RuntimeException("DATABASE_PARAMS is corrupted for database: " + database);
+      }
+    } finally {
+      close(rs);
+      closeStmt(pst);
+    }
+  }
+
+  private void markDbAsReplIncompatible(Connection dbConn, String database) throws SQLException, MetaException {
+    Statement stmt = null;
+    try {
+      stmt = dbConn.createStatement();
+      String catalog = MetaStoreUtils.getDefaultCatalog(conf);
+      if (sqlGenerator.getDbProduct() == MYSQL) {
+        stmt.execute("SET @@session.sql_mode=ANSI_QUOTES");
+      }
+      long dbId = getDatabaseId(dbConn, database, catalog);
+      updateDatabaseProp(dbConn, database, dbId, ReplConst.REPL_INCOMPATIBLE, ReplConst.TRUE);
+    } finally {
+      closeStmt(stmt);
+    }
+  }
+
   private void updateReplId(Connection dbConn, ReplLastIdInfo replLastIdInfo) throws SQLException, MetaException {
     PreparedStatement pst = null;
     ResultSet rs = null;
     Statement stmt = null;
+    String query;
+    List<String> params;
     String lastReplId = quoteString(Long.toString(replLastIdInfo.getLastReplId()));
     String catalog = replLastIdInfo.isSetCatalog() ? normalizeIdentifier(replLastIdInfo.getCatalog()) :
                                                         getDefaultCatalog(conf);
@@ -950,26 +1051,9 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         stmt.execute("SET @@session.sql_mode=ANSI_QUOTES");
       }
 
-      String query = "select \"DB_ID\" from \"DBS\" where \"NAME\" = ?  and \"CTLG_NAME\" = ?";
-      List<String> params = Arrays.asList(db, catalog);
-      pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, params);
-      LOG.debug("Going to execute query <" + query.replaceAll("\\?", "{}") + ">",
-              quoteString(db), quoteString(catalog));
-      rs = pst.executeQuery();
-      if (rs == null || !rs.next()) {
-        throw new MetaException(" db with name " + db + " does not exist in catalog " + catalog);
-      }
-      long dbId = rs.getLong(1);
+      long dbId = getDatabaseId(dbConn, db, catalog);
 
-      rs = stmt.executeQuery("SELECT \"PARAM_VALUE\" FROM \"DATABASE_PARAMS\" WHERE \"PARAM_KEY\" = " +
-              "'repl.last.id' AND \"DB_ID\" = " + dbId);
-      if (rs == null || !rs.next()) {
-        stmt.executeUpdate("INSERT INTO \"DATABASE_PARAMS\" VALUES ( " + dbId +
-                " , 'repl.last.id' , " + lastReplId + ")");
-      } else {
-        query = "UPDATE \"DATABASE_PARAMS\" SET \"PARAM_VALUE\" = ? WHERE \"DB_ID\" = " + dbId +
-                " AND \"PARAM_KEY\" = 'repl.last.id'";
-      }
+      updateDatabaseProp(dbConn, db, dbId, ReplConst.REPL_TARGET_TABLE_PROPERTY, lastReplId);
 
       if (table == null) {
         // if only database last repl id to be updated.
@@ -1186,7 +1270,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
                 dbConn.rollback(undoWriteSetForCurrentTxn);
                 LOG.info(msg);
                 //todo: should make abortTxns() write something into TXNS.TXN_META_INFO about this
-                if (abortTxns(dbConn, Collections.singletonList(txnid), false) != 1) {
+                if (abortTxns(dbConn, Collections.singletonList(txnid), false, isReplayedReplTxn) != 1) {
                   throw new IllegalStateException(msg + " FAILED!");
                 }
                 dbConn.commit();
@@ -1510,7 +1594,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           }
 
           // Abort all the allocated txns so that the mapped write ids are referred as aborted ones.
-          int numAborts = abortTxns(dbConn, txnIds, false);
+          int numAborts = abortTxns(dbConn, txnIds, false, false);
           assert(numAborts == numAbortedWrites);
         }
 
@@ -4495,8 +4579,9 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   // we are checking to the desired action.
   private static Map<LockType, Map<LockType, Map<LockState, LockAction>>> jumpTable;
 
-  private int abortTxns(Connection dbConn, List<Long> txnids, boolean skipCount) throws SQLException, MetaException {
-    return abortTxns(dbConn, txnids, false, skipCount);
+  private int abortTxns(Connection dbConn, List<Long> txnids,
+                        boolean skipCount, boolean isReplReplayed) throws SQLException, MetaException {
+    return abortTxns(dbConn, txnids, false, skipCount, isReplReplayed);
   }
   /**
    * TODO: expose this as an operation to client.  Useful for streaming API to abort all remaining
@@ -4512,7 +4597,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
    * @return 0 if skipCount is true, the number of aborted transactions otherwise
    * @throws SQLException
    */
-  private int abortTxns(Connection dbConn, List<Long> txnids, boolean checkHeartbeat, boolean skipCount)
+  private int abortTxns(Connection dbConn, List<Long> txnids, boolean checkHeartbeat,
+                        boolean skipCount, boolean isReplReplayed)
       throws SQLException, MetaException {
     Statement stmt = null;
     if (txnids.isEmpty()) {
@@ -4543,6 +4629,18 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       prefix.append("DELETE FROM \"HIVE_LOCKS\" WHERE ");
       TxnUtils.buildQueryWithINClause(conf, queries, prefix, suffix, txnids, "\"HL_TXNID\"", false, false);
 
+      //If this abort is for REPL_CREATED TXN initiated outside the replication flow, then clean the corresponding entry
+      //from REPL_TXN_MAP and mark that database as replication incompatible.
+      if (!isReplReplayed) {
+        for (String database : getDbNamesForReplayedTxns(dbConn, txnids)) {
+          markDbAsReplIncompatible(dbConn, database);
+        }
+        // Delete mapping from REPL_TXN_MAP if it exists.
+        prefix.setLength(0);
+        suffix.setLength(0);
+        prefix.append("DELETE FROM \"REPL_TXN_MAP\" WHERE ");
+        TxnUtils.buildQueryWithINClause(conf, queries, prefix, suffix, txnids, "\"RTM_TARGET_TXN_ID\"", false, false);
+      }
       // execute all queries in the list in one batch
       int numAborted = 0;
       if (skipCount) {
@@ -4657,7 +4755,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             " since a concurrent committed transaction [" + JavaUtils.txnIdToString(rs.getLong(4)) + "," + rs.getLong(5) +
             "] has already updated resource '" + resourceName + "'";
           LOG.info(msg);
-          if (abortTxns(dbConn, Collections.singletonList(writeSet.get(0).txnId), false) != 1) {
+          if (abortTxns(dbConn, Collections.singletonList(writeSet.get(0).txnId), false, false) != 1) {
             throw new IllegalStateException(msg + " FAILED!");
           }
           dbConn.commit();
@@ -5178,7 +5276,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         close(rs, stmt, null);
         int numTxnsAborted = 0;
         for(List<Long> batchToAbort : timedOutTxns) {
-          if (abortTxns(dbConn, batchToAbort, true, false) == batchToAbort.size()) {
+          if (abortTxns(dbConn, batchToAbort, true, false, false) == batchToAbort.size()) {
             dbConn.commit();
             numTxnsAborted += batchToAbort.size();
             //todo: add TXNS.COMMENT filed and set it to 'aborted by system due to timeout'

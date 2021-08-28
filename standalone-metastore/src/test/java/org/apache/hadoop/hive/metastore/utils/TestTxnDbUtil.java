@@ -285,6 +285,17 @@ public final class TestTxnDbUtil {
       }
 
       try {
+        stmt.execute("CREATE TABLE \"APP\".\"DATABASE_PARAMS\" (\"DB_ID\" BIGINT NOT NULL," +
+                "\"PARAM_KEY\" VARCHAR(180) NOT NULL, \"PARAM_VALUE\" VARCHAR(4000), PRIMARY KEY (DB_ID,PARAM_KEY))");
+      } catch (SQLException e) {
+        if (e.getMessage() != null && e.getMessage().contains("already exists")) {
+          LOG.info("DATABASE_PARAMS table already exist, ignoring");
+        } else {
+          throw e;
+        }
+      }
+
+      try {
         stmt.execute("CREATE TABLE \"APP\".\"PARTITION_PARAMS\" (" +
             " \"PART_ID\" BIGINT NOT NULL, \"PARAM_KEY\" VARCHAR(256) NOT NULL, " +
             " \"PARAM_VALUE\" VARCHAR(4000), " +

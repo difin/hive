@@ -172,6 +172,7 @@ public class TestReplicationMetricUpdateOnFailure {
     IncrementalLoadMetricCollector metricCollector =
             new IncrementalLoadMetricCollector(null, TEST_PATH, 0, conf);
     ReplLoadWork replLoadWork = Mockito.mock(ReplLoadWork.class);
+    Mockito.when(replLoadWork.getTargetDatabase()).thenReturn("dummy");
     Mockito.when(replLoadWork.getDumpDirectory()).thenReturn(
             new Path(dumpDir + Path.SEPARATOR + "test").toString());
     Mockito.when(replLoadWork.getMetricCollector()).thenReturn(metricCollector);
@@ -205,6 +206,7 @@ public class TestReplicationMetricUpdateOnFailure {
     BootstrapLoadMetricCollector metricCollector = 
             new BootstrapLoadMetricCollector(null, TEST_PATH, 0, conf);
     ReplLoadWork replLoadWork = Mockito.mock(ReplLoadWork.class);
+    Mockito.when(replLoadWork.getTargetDatabase()).thenReturn("dummy");
     Mockito.when(replLoadWork.getDumpDirectory()).thenReturn(
             new Path(dumpDir + Path.SEPARATOR + "test").toString());
     Mockito.when(replLoadWork.getMetricCollector()).thenReturn(metricCollector);
@@ -230,6 +232,7 @@ public class TestReplicationMetricUpdateOnFailure {
     IncrementalLoadMetricCollector metricCollector = 
             new IncrementalLoadMetricCollector(null, TEST_PATH, 0, conf);
     ReplLoadWork replLoadWork = Mockito.mock(ReplLoadWork.class);
+    Mockito.when(replLoadWork.getTargetDatabase()).thenReturn("dummy");
     Mockito.when(replLoadWork.getDumpDirectory()).thenReturn(
             new Path(dumpDir + Path.SEPARATOR + "test").toString());
     Mockito.when(replLoadWork.getMetricCollector()).thenReturn(metricCollector);

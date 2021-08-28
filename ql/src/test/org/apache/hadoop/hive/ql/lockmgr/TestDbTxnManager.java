@@ -516,9 +516,14 @@ public class TestDbTxnManager {
     } catch (LockException e) {
       exception = e;
     }
-    Assert.assertNotNull("Txn should have been aborted", exception);
-    Assert.assertEquals(ErrorMsg.TXN_ABORTED, exception.getCanonicalErrorMsg());
-  };
+    Assert.assertNull("This CommitTxnRequest is no op since transaction is already aborted by reaper.", exception);
+    try {
+      txnMgr.replRollbackTxn(replPolicy, 1L);
+    } catch (LockException e) {
+      exception = e;
+    }
+    Assert.assertNull("This AbortTxnRequest is no op since transaction is already aborted by reaper.", exception);
+  }
 
   @Before
   public void setUp() throws Exception {
