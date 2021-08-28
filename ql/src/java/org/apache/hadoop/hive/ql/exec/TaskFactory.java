@@ -37,6 +37,8 @@ import org.apache.hadoop.hive.ql.exec.repl.ReplDumpTask;
 import org.apache.hadoop.hive.ql.exec.repl.ReplDumpWork;
 import org.apache.hadoop.hive.ql.exec.repl.ReplLoadTask;
 import org.apache.hadoop.hive.ql.exec.repl.ReplLoadWork;
+import org.apache.hadoop.hive.ql.exec.repl.RangerDenyTask;
+import org.apache.hadoop.hive.ql.exec.repl.RangerDenyWork;
 import org.apache.hadoop.hive.ql.exec.repl.AckTask;
 import org.apache.hadoop.hive.ql.exec.repl.AckWork;
 import org.apache.hadoop.hive.ql.exec.repl.ReplStateLogTask;
@@ -130,6 +132,7 @@ public final class TaskFactory {
     taskvec.add(new TaskTuple<AckWork>(AckWork.class, AckTask.class));
     taskvec.add(new TaskTuple<RangerDumpWork>(RangerDumpWork.class, RangerDumpTask.class));
     taskvec.add(new TaskTuple<RangerLoadWork>(RangerLoadWork.class, RangerLoadTask.class));
+    taskvec.add(new TaskTuple<RangerDenyWork>(RangerDenyWork.class, RangerDenyTask.class));
     taskvec.add(new TaskTuple<AtlasDumpWork>(AtlasDumpWork.class, AtlasDumpTask.class));
     taskvec.add(new TaskTuple<AtlasLoadWork>(AtlasLoadWork.class, AtlasLoadTask.class));
     taskvec.add(new TaskTuple<ExportWork>(ExportWork.class, ExportTask.class));

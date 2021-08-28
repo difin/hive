@@ -127,6 +127,7 @@ int _kStageTypeValues[] = {
   StageType::ACK,
   StageType::RANGER_DUMP,
   StageType::RANGER_LOAD,
+  StageType::RANGER_DENY,
   StageType::ATLAS_DUMP,
   StageType::ATLAS_LOAD
 };
@@ -152,6 +153,7 @@ const char* _kStageTypeNames[] = {
   "ACK",
   "RANGER_DUMP",
   "RANGER_LOAD",
+  "RANGER_DENY",
   "ATLAS_DUMP",
   "ATLAS_LOAD"
 };
