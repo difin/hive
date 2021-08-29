@@ -85,7 +85,7 @@ public class ImpalaTableConverter implements HMSTableConverter {
       String name = ImpalaHdfsPartition.DUMMY_PARTITION;
       // Put in the dummy partition.
       response.partitionInfo.hdfsPartitions.put(name,
-          new ImpalaHdfsPartition(partition, keyValues,
+          new ImpalaHdfsPartition(hmsTable, keyValues,
               fileFormatDescriptor, fds, 1,
               partitionLocationCompressor.new Location(hmsTable.getSd().getLocation()),
               TAccessLevel.READ_ONLY, name, hostIndex, -1L /*numRows*/));

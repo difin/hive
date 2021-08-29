@@ -142,7 +142,7 @@ public class ImpalaHdfsPartitionLoader {
       List<FileDescriptor> fds = new ArrayList<>();
       ListMap<TNetworkAddress> hostIndex = new ListMap<>();
       r.partitionInfo.hdfsPartitions.put(name,
-            new ImpalaHdfsPartition(null, keyValues,
+            new ImpalaHdfsPartition(table.getMetaStoreTable(), keyValues,
                 fileFormatDescriptor, fds, 1,
                 partitionLocationCompressor.new Location(
                 table.getMetaStoreTable().getSd().getLocation()),

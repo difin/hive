@@ -20,9 +20,11 @@ package org.apache.hadoop.hive.impala.catalog;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.impala.analysis.LiteralExpr;
 import org.apache.impala.catalog.HdfsPartition;
@@ -32,12 +34,15 @@ import org.apache.impala.catalog.HdfsTable;
 import org.apache.impala.common.FileSystemUtil;
 import org.apache.impala.thrift.TAccessLevel;
 import org.apache.impala.thrift.TNetworkAddress;
+import org.apache.impala.util.AcidUtils;
 import org.apache.impala.util.ListMap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Extension of Impala's HdfsPartition.  In this extension, the partition name and hostIndex
  * get overridden.  The parent class has dependencies on the Table object in these methods.
@@ -49,6 +54,7 @@ import com.google.common.collect.Maps;
  */
 public class ImpalaHdfsPartition extends HdfsPartition {
 
+  protected static final Logger LOG = LoggerFactory.getLogger(ImpalaHdfsPartition.class);
   public static final String DUMMY_PARTITION = "DUMMY";
 
   // Static Configuration object. On first iteration, getting a FileSystem object with a new
@@ -65,14 +71,19 @@ public class ImpalaHdfsPartition extends HdfsPartition {
 
   private final List<HdfsPartition.FileDescriptor> fileDescriptors;
 
+  private final List<HdfsPartition.FileDescriptor> insertFileDescriptors;
+
+  private final List<HdfsPartition.FileDescriptor> deleteFileDescriptors;
+
+  private final boolean isFullAcidTable;
+
   public ImpalaHdfsPartition(
-        org.apache.hadoop.hive.metastore.api.Partition msPartition,
         List<LiteralExpr> partitionKeyValues,
         HdfsStorageDescriptor fileFormatDescriptor,
         List<HdfsPartition.FileDescriptor> fileDescriptors, long id,
         HdfsPartitionLocationCompressor.Location location, TAccessLevel accessLevel,
-        String partitionName, ListMap<TNetworkAddress> hostIndex, long numRows
-        ) throws HiveException {
+        String partitionName, ListMap<TNetworkAddress> hostIndex, long numRows,
+        boolean isFullAcidTable) throws HiveException {
     super(null /*table*/, id, -1, partitionName, partitionKeyValues,
         fileFormatDescriptor,
         null /*encodedFileDescriptors*/,
@@ -89,6 +100,103 @@ public class ImpalaHdfsPartition extends HdfsPartition {
       this.fileDescriptors = fileDescriptors;
     } catch (Exception e) {
       throw new HiveException("Could not create ImpalaHdfsPartition.", e);
+    }
+    this.isFullAcidTable = isFullAcidTable;
+    this.insertFileDescriptors = getInsertFileDescriptors(isFullAcidTable, fileDescriptors);
+    this.deleteFileDescriptors = getDeleteFileDescriptors(isFullAcidTable, fileDescriptors);
+  }
+
+  public ImpalaHdfsPartition(
+        Table msTbl,
+        List<LiteralExpr> partitionKeyValues,
+        HdfsStorageDescriptor fileFormatDescriptor,
+        List<HdfsPartition.FileDescriptor> fileDescriptors, long id,
+        HdfsPartitionLocationCompressor.Location location, TAccessLevel accessLevel,
+        String partitionName, ListMap<TNetworkAddress> hostIndex, long numRows
+        ) throws HiveException {
+    this(partitionKeyValues, fileFormatDescriptor, fileDescriptors, id, location, accessLevel,
+        partitionName, hostIndex, numRows, isFullAcidTable(msTbl));
+  }
+
+  public ImpalaHdfsPartition(ImpalaHdfsPartition partition, List<HdfsPartition.FileDescriptor> fds)
+        throws HiveException {
+    this(partition.getPartitionValues(),
+        partition.getInputFormatDescriptor(), fds, partition.getId(),
+        partition.getLocationStruct(), partition.getAccessLevel(),
+        partition.getPartitionName(), partition.getHostIndex(), partition.getNumRows(),
+        partition.isFullAcidTable);
+  }
+
+  /**
+   * Method called by constructor which separates out the delete file descriptors from
+   * the list of all file descriptors.
+   */
+  private List<HdfsPartition.FileDescriptor> getDeleteFileDescriptors(boolean isFullAcidTable,
+      List<HdfsPartition.FileDescriptor> fds) {
+    ImmutableList.Builder<HdfsPartition.FileDescriptor> result = ImmutableList.builder();
+    if (!isFullAcidTable) {
+      return result.build();
+    }
+    for (HdfsPartition.FileDescriptor fd : fds) {
+      if (AcidUtils.isDeleteDeltaFd(fd)) {
+        result.add(fd);
+      }
+    }
+    return result.build();
+  }
+
+  /**
+   * Method called by constructor which separates out the insert file descriptors from
+   * the list of all file descriptors.
+   */
+  private List<HdfsPartition.FileDescriptor> getInsertFileDescriptors(boolean isFullAcidTable,
+      List<HdfsPartition.FileDescriptor> fds) {
+    ImmutableList.Builder<HdfsPartition.FileDescriptor> result = ImmutableList.builder();
+    if (!isFullAcidTable) {
+      return result.build();
+    }
+    for (HdfsPartition.FileDescriptor fd : fds) {
+      if (!AcidUtils.isDeleteDeltaFd(fd)) {
+        result.add(fd);
+      }
+    }
+    return result.build();
+  }
+
+  /**
+   * Generate a similar partition to "this" but one that just contains
+   * the insert file descriptors.
+   */
+  @Override
+  public HdfsPartition genInsertDeltaPartition() {
+    try {
+      List<HdfsPartition.FileDescriptor> fds =
+          insertFileDescriptors.isEmpty() ?
+              fileDescriptors : insertFileDescriptors;
+      return new ImpalaHdfsPartition(this, fds);
+    } catch (HiveException e) {
+      // parent method returns null when partition could not be generated.
+      LOG.warn("Exception generating insert partition: " + e);
+      return null;
+    }
+  }
+
+  /**
+   * Generate a similar partition to "this" but one that just contains
+   * the delete file descriptors.
+   */
+  @Override
+  public HdfsPartition genDeleteDeltaPartition() {
+    try {
+      if (deleteFileDescriptors.isEmpty()) {
+        // parent method returns null when there are no delete fds.
+        return null;
+      }
+      return new ImpalaHdfsPartition(this, deleteFileDescriptors);
+    } catch (HiveException e) {
+      LOG.warn("Exception generating delete partition: " + e);
+      // parent method returns null when partition could not be generated.
+      return null;
     }
   }
 
@@ -120,5 +228,9 @@ public class ImpalaHdfsPartition extends HdfsPartition {
   @Override
   public boolean hasFileDescriptors() {
     return !fileDescriptors.isEmpty();
+  }
+
+  private static boolean isFullAcidTable(Table table) {
+    return AcidUtils.isFullAcidTable(table.getParameters());
   }
 }
