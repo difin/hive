@@ -668,7 +668,21 @@ public class MetaStoreUtils {
   public static boolean isDbBeingFailedOver(Database db) {
     assert (db != null);
     Map<String, String> dbParameters = db.getParameters();
-    return dbParameters != null && ReplConst.TRUE.equalsIgnoreCase(dbParameters.get(ReplConst.REPL_FAILOVER_ENABLED));
+    if (dbParameters == null) {
+      return false;
+    }
+    String dbFailoverEndPoint = dbParameters.get(ReplConst.REPL_FAILOVER_ENDPOINT);
+    return FailoverEndpoint.SOURCE.toString().equalsIgnoreCase(dbFailoverEndPoint)
+            || FailoverEndpoint.TARGET.toString().equalsIgnoreCase(dbFailoverEndPoint);
+  }
+
+  public static boolean isDbBeingFailedOverAtEndpoint(Database db, FailoverEndpoint endPoint) {
+    if (db == null) {
+      return false;
+    }
+    Map<String, String> dbParameters = db.getParameters();
+    return dbParameters != null
+            && endPoint.toString().equalsIgnoreCase(dbParameters.get(ReplConst.REPL_FAILOVER_ENDPOINT));
   }
 
   public static boolean isTargetOfReplication(Database db) {
@@ -2482,6 +2496,13 @@ public class MetaStoreUtils {
    */
   public static List<Predicate<String>> compilePatternsToPredicates(List<String> patterns) {
     return patterns.stream().map(pattern -> compile(pattern).asPredicate()).collect(Collectors.toList());
+  }
+
+  public enum FailoverEndpoint {
+    /**
+     * EndPoint to specify nature of database for which failover is initiated.
+     */
+    SOURCE, TARGET;
   }
 
   public static String getHostFromId(String id) {

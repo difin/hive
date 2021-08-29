@@ -40,6 +40,8 @@ import org.apache.hadoop.hive.common.repl.ReplConst;
 import org.apache.hadoop.hive.metastore.annotation.MetastoreUnitTest;
 import org.apache.hadoop.hive.metastore.api.Catalog;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
@@ -384,7 +386,7 @@ public class TestPartitionManagement {
     assertEquals(6, fs.listStatus(tablePath).length);
     Database db = client.getDatabase(table.getDbName());
     //PartitionManagementTask would not run for the database which is being failed over.
-    db.putToParameters(ReplConst.REPL_FAILOVER_ENABLED, ReplConst.TRUE);
+    db.putToParameters(ReplConst.REPL_FAILOVER_ENDPOINT, MetaStoreUtils.FailoverEndpoint.SOURCE.toString());
     client.alterDatabase(dbName, db);
     runPartitionManagementTask(conf);
     partitions = client.listPartitions(dbName, tableName, (short) -1);
@@ -535,7 +537,7 @@ public class TestPartitionManagement {
     assertEquals(5, partitions.size());
 
     Database db = client.getDatabase(table.getDbName());
-    db.putToParameters(ReplConst.REPL_FAILOVER_ENABLED, ReplConst.TRUE);
+    db.putToParameters(ReplConst.REPL_FAILOVER_ENDPOINT, MetaStoreUtils.FailoverEndpoint.SOURCE.toString());
     client.alterDatabase(table.getDbName(), db);
     // PartitionManagementTask would not do anything because the db is being failed over.
     Thread.sleep(30 * 1000);
@@ -543,7 +545,7 @@ public class TestPartitionManagement {
     partitions = client.listPartitions(dbName, tableName, (short) -1);
     assertEquals(5, partitions.size());
 
-    db.putToParameters(ReplConst.REPL_FAILOVER_ENABLED, "");
+    db.putToParameters(ReplConst.REPL_FAILOVER_ENDPOINT, "");
     client.alterDatabase(table.getDbName(), db);
 
     // after 30s all partitions should have been gone
