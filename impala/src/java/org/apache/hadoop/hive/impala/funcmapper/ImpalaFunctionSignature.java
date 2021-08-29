@@ -46,8 +46,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ImpalaFunctionSignature {
+  protected static final Logger LOG = LoggerFactory.getLogger(ImpalaFunctionSignature.class);
 
   private enum SqlTypeOrdering {
     BOOLEAN,
@@ -74,22 +77,39 @@ public class ImpalaFunctionSignature {
   public static List<String> STRING_ONLY_FUNCTIONS =
       ImmutableList.of("coalesce", "in", "substr", "substring", "upper", "lower", "like");
 
-  /**
-   * Populate the CAST_CHECK_BUILTINS_INSTANCE map by placing in all the signatures passed
-   * in and sorting them in the correct cast order.
-   */
-  public static void populateCastCheckBuiltins(List<ImpalaFunctionSignature> ifsList) {
-    for (ImpalaFunctionSignature ifs : ifsList) {
+  // populate the static structures
+  static {
+    Reader reader =
+        new InputStreamReader(ImpalaFunctionSignature.class.getResourceAsStream("/impala_scalars.json"));
+    Gson gson = new Gson();
+    java.lang.reflect.Type scalarFuncDetailsType = new TypeToken<ArrayList<ScalarFunctionDetails>>(){}.getType();
+    List<ScalarFunctionDetails> scalarDetails = gson.fromJson(reader, scalarFuncDetailsType);
+
+    reader =
+        new InputStreamReader(ImpalaFunctionSignature.class.getResourceAsStream("/impala_aggs.json"));
+    java.lang.reflect.Type aggFuncDetailsType = new TypeToken<ArrayList<AggFunctionDetails>>(){}.getType();
+    List<AggFunctionDetails> aggDetails = gson.fromJson(reader, aggFuncDetailsType);
+
+    for (ScalarFunctionDetails sfd : scalarDetails) {
+      ImpalaFunctionSignature ifs = new ImpalaFunctionSignature(sfd.fnName, sfd.getArgTypes(),
+          sfd.getRetType(), sfd.hasVarArgs, sfd.retTypeAlwaysNullable);
       List<ImpalaFunctionSignature> castIfsList =
-          CAST_CHECK_BUILTINS_INSTANCE.computeIfAbsent(ifs.func, k -> Lists.newArrayList());
+          CAST_CHECK_BUILTINS_INSTANCE.computeIfAbsent(sfd.fnName, k -> Lists.newArrayList());
+      castIfsList.add(ifs);
+    }
+
+    for (AggFunctionDetails afd : aggDetails) {
+      ImpalaFunctionSignature ifs = new ImpalaFunctionSignature(afd.fnName, afd.getArgTypes(),
+          afd.getRetType(), false, false);
+      List<ImpalaFunctionSignature> castIfsList =
+          CAST_CHECK_BUILTINS_INSTANCE.computeIfAbsent(afd.fnName, k -> Lists.newArrayList());
       castIfsList.add(ifs);
     }
 
     for (String fnName : CAST_CHECK_BUILTINS_INSTANCE.keySet()) {
-      List<ImpalaFunctionSignature> list = CAST_CHECK_BUILTINS_INSTANCE.get(fnName);
-      Collections.sort(list, new SignatureComparator());
+      List<ImpalaFunctionSignature> ifsList = CAST_CHECK_BUILTINS_INSTANCE.get(fnName);
+      Collections.sort(ifsList, new SignatureComparator());
     }
-
   }
 
   private final String func;
@@ -528,21 +548,15 @@ public class ImpalaFunctionSignature {
         return 0;
       }
 
-      for (int i = 0; i < o1.argTypes.size(); ++i) {
-        // Check that the types match.
-        // The pattern of the ordinal string for the type needs to be normalized.
-        // It is possible the type can show up like "DECIMAL(32,8)", and we only
-        // want the DECIMAL part.
-        String thisOrdinalString = o1.argTypes.get(i).toString().split("\\(")[0];
-        String otherOrdinalString = o2.argTypes.get(i).toString().split("\\(")[0];
-        int thisOrdinal = SqlTypeOrdering.valueOf(thisOrdinalString).ordinal();
-        int otherOrdinal = SqlTypeOrdering.valueOf(otherOrdinalString).ordinal();
-        int compareVal = Integer.compare(thisOrdinal, otherOrdinal);
-        if (compareVal != 0) {
-          return compareVal;
-        }
-      }
-      return 0;
+      // Check that the types match.
+      // The pattern of the ordinal string for the type needs to be normalized.
+      // It is possible the type can show up like "DECIMAL(32,8)", and we only
+      // want the DECIMAL part.
+      String thisOrdinalString = o1.argTypes.get(0).toString().split("\\(")[0];
+      String otherOrdinalString = o2.argTypes.get(0).toString().split("\\(")[0];
+      int thisOrdinal = SqlTypeOrdering.valueOf(thisOrdinalString).ordinal();
+      int otherOrdinal = SqlTypeOrdering.valueOf(otherOrdinalString).ordinal();
+      return Integer.compare(thisOrdinal, otherOrdinal);
     }
   }
 }

@@ -30,7 +30,6 @@ import org.apache.calcite.sql.SqlCollation;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.ConversionUtil;
 import org.apache.hadoop.hive.impala.calcite.ImpalaTypeSystemImpl;
-import org.apache.impala.catalog.PrimitiveType;
 import org.apache.impala.catalog.ScalarType;
 import org.apache.impala.catalog.Type;
 import org.apache.impala.thrift.TPrimitiveType;
@@ -170,24 +169,6 @@ public class ImpalaTypeConverter {
     }
   }
 
-  public static List<Type> getNormalizedTypeList(List<Type> types) {
-    return Lists.transform(types, ImpalaTypeConverter::getNormalizedType);
-  }
-
-  public static Type getNormalizedType(Type impalaType) {
-    if (impalaType.getPrimitiveType() == PrimitiveType.CHAR) {
-      return Type.CHAR;
-    }
-    if (impalaType.getPrimitiveType() == PrimitiveType.VARCHAR) {
-      return Type.VARCHAR;
-    }
-    if (impalaType.getPrimitiveType() == PrimitiveType.DECIMAL) {
-      return Type.DECIMAL;
-    }
-    return impalaType;
-  }
-
-
   // helper function to handle translation of lists.
   public static List<RelDataType> getRelDataTypesForArgs(List<Type> impalaTypes) {
     List<RelDataType> result = Lists.newArrayList();
@@ -262,7 +243,7 @@ public class ImpalaTypeConverter {
    * Create list of types given primitive types.
    * Primitive types should not be exposed outside of this class.
    */
-  public static List<Type> getImpalaTypesList(TPrimitiveType[] argTypes) {
+  static List<Type> getImpalaTypesList(TPrimitiveType[] argTypes) {
     List<Type> types = Lists.newArrayList();
     if (argTypes == null) {
       return types;
@@ -277,7 +258,7 @@ public class ImpalaTypeConverter {
    * Create Impala types given primitive types.
    * Primitive types should not be exposed outside of this class.
    */
-  public static Type getImpalaType(TPrimitiveType argType) {
+  static Type getImpalaType(TPrimitiveType argType) {
     // Char and decimal contain precisions and need to be treated separately from
     // the rest. The precisions for this case are unknown though, as we are only given
     // a "primitivetype'.

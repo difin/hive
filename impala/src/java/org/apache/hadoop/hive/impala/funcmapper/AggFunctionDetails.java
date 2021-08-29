@@ -24,12 +24,11 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.reflect.TypeToken;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-import org.apache.impala.catalog.AggregateFunction;
 import org.apache.impala.catalog.BuiltinsDb;
-import org.apache.impala.catalog.Function;
-import org.apache.impala.catalog.ScalarType;
 import org.apache.impala.catalog.Type;
 import org.apache.impala.thrift.TFunctionBinaryType;
 import org.apache.impala.thrift.TPrimitiveType;
@@ -37,45 +36,43 @@ import org.apache.impala.thrift.TPrimitiveType;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * Contains details for Aggregation functions.  These functions are retrieved from the Impala
- * frontend and shared library and are stored in the SCALAR_FUNCTIONS_MAP.
+ * Contains details for Aggregation functions.  These functions are currently
+ * stored in a resource file.
  * Implements FunctionDetails because ImpalaFunctionSignature can be used
  * as a key for both AggFunctionDetails and ScalarFunctionDetails.
  */
 public class AggFunctionDetails implements FunctionDetails {
 
-  public final String dbName;
-  public final String fnName;
-  public final String impalaFnName;
+  public String fnName;
+  public String impalaFnName;
+  private TPrimitiveType retType;
+  private TPrimitiveType[] argTypes;
+  private TPrimitiveType intermediateType;
   @Expose(serialize=false,deserialize=false)
-  private final Type impalaRetType;
+  private Type impalaRetType;
   @Expose(serialize=false,deserialize=false)
-  private final List<Type> impalaArgTypes;
+  private List<Type> impalaArgTypes;
   @Expose(serialize=false,deserialize=false)
-  private final Type impalaIntermediateType;
-  public final int intermediateTypeLength;
-  public final boolean isAnalyticFn;
-  public final boolean isPersistent;
-  public final String updateFnSymbol;
-  public final String initFnSymbol;
-  public final String mergeFnSymbol;
-  public final String finalizeFnSymbol;
-  public final String getValueFnSymbol;
-  public final String removeFnSymbol;
-  public final String serializeFnSymbol;
-  public final boolean ignoresDistinct;
-  public final boolean returnsNonNullOnEmpty;
-  public final boolean isAgg;
-  public final TFunctionBinaryType binaryType;
-  private final ImpalaFunctionSignature ifs;
+  private Type impalaIntermediateType;
+  public int intermediateTypeLength;
+  public boolean isAnalyticFn;
+  public String updateFnSymbol;
+  public String initFnSymbol;
+  public String mergeFnSymbol;
+  public String finalizeFnSymbol;
+  public String getValueFnSymbol;
+  public String removeFnSymbol;
+  public String serializeFnSymbol;
+  public boolean ignoresDistinct;
+  public boolean returnsNonNullOnEmpty;
+  public boolean isAgg;
+  public TFunctionBinaryType binaryType;
+  private ImpalaFunctionSignature ifs;
 
   // Set of all aggregate functions available in Impala
   static final Set<String> AGG_BUILTINS = new HashSet<>();
@@ -85,121 +82,131 @@ public class AggFunctionDetails implements FunctionDetails {
   // A signature consists of the function name, the operand types and the return type.
   static final Map<ImpalaFunctionSignature, AggFunctionDetails> AGG_BUILTINS_MAP = Maps.newHashMap();
 
-  /**
-   * Fetch the functions from the Impala frontend and return them as a AggFunctionDetails list.
-   */
-  public static List<AggFunctionDetails> createAggFunctionDetailsFromImpala() {
-    List<AggFunctionDetails> result = new ArrayList<>();
-    // Retrieve all functions from the Impala front-end
-    Map<String, List<Function>> functions = BuiltinsDb.getInstance().getAllFunctions();
-    Set<String> allFnNames = new HashSet<>();
-    for (String impalaFnName : functions.keySet()) {
-      for (Function func : functions.get(impalaFnName)) {
-        // The 'grouping' function is found in the 'agg' functions within Impala, but
-        // within Hive, we treat it as if it's scalar. So we ignore the function here.
-        // CDPD-28066:  Aggregate grouping function not supported. It's an overloaded
-        // function that is used both in analytical functions and in aggregate functions..
-        if (func.functionName().equals("grouping")) {
-          continue;
-        }
-        if (func instanceof AggregateFunction) {
-          AggFunctionDetails afd = new AggFunctionDetails((AggregateFunction) func);
-          result.add(afd);
-        }
-      }
-    }
-    return result;
-  }
+  // populate all agg functions from the resource file.
+  static {
+    Reader reader =
+        new InputStreamReader(ImpalaFunctionSignature.class.getResourceAsStream("/impala_aggs.json"));
+    Gson gson = new Gson();
+    java.lang.reflect.Type aggFuncDetailsType = new TypeToken<ArrayList<AggFunctionDetails>>(){}.getType();
+    List<AggFunctionDetails> aggDetails = gson.fromJson(reader, aggFuncDetailsType);
 
-  /**
-   * Add all functions from the Impala shared library into static structures to be used
-   * at compilation time.
-   */
-  public static void addFunctionsFromImpala(List<AggFunctionDetails> afdList) {
-    // This method should only be called once at initialization.
-    Preconditions.checkState(AGG_BUILTINS_MAP.isEmpty());
-    List<ImpalaFunctionSignature> ifsList = new ArrayList<>();
-    for (AggFunctionDetails afd : afdList) {
-      AGG_BUILTINS_MAP.put(afd.ifs, afd);
+    for (AggFunctionDetails afd : aggDetails) {
+      Preconditions.checkState(afd.isAgg || afd.isAnalyticFn);
       if (afd.isAgg) {
         AGG_BUILTINS.add(afd.fnName.toUpperCase());
       }
       if (afd.isAnalyticFn) {
         ANALYTIC_BUILTINS.add(afd.fnName.toUpperCase());
       }
-      ifsList.add(afd.ifs);
+      ImpalaFunctionSignature ifs = ImpalaFunctionSignature.create(afd.fnName, afd.getArgTypes(),
+          afd.getRetType(), false, false);
+      afd.ifs = ifs;
+      AGG_BUILTINS_MAP.put(ifs, afd);
     }
-
-    ImpalaFunctionSignature.populateCastCheckBuiltins(ifsList);
-  }
-
-  public AggFunctionDetails(AggregateFunction func) {
-    dbName = func.dbName();
-    fnName = func.functionName();
-    impalaFnName = func.functionName();
-    impalaRetType = func.getReturnType();
-    impalaArgTypes = new ArrayList<Type>(Arrays.asList(func.getArgs()));
-    isPersistent = func.isPersistent();
-    binaryType = func.getBinaryType();
-    impalaIntermediateType = (func.getIntermediateType() == null)
-        ? impalaRetType : func.getIntermediateType();
-    intermediateTypeLength = (func.getIntermediateType() == null)
-        ? 0 : ((ScalarType)func.getIntermediateType()).getSlotSize();
-    isAnalyticFn = func.isAnalyticFn();
-    updateFnSymbol = func.getUpdateFnSymbol();
-    initFnSymbol = func.getInitFnSymbol();
-    mergeFnSymbol = func.getMergeFnSymbol();
-    getValueFnSymbol = func.getValueFnSymbol();
-    finalizeFnSymbol = func.getFinalizeFnSymbol();
-    removeFnSymbol = func.getRemoveFnSymbol();
-    serializeFnSymbol = func.getSerializeFnSymbol();
-    ignoresDistinct = func.ignoresDistinct();
-    returnsNonNullOnEmpty = func.returnsNonNullOnEmpty();
-    isAgg = func.isAggregateFn();
-    ifs = ImpalaFunctionSignature.create(fnName, getArgTypes(), getRetType(), false, false);
-  }
-
-  public AggFunctionDetails(AggFunctionWrapper func) {
-    dbName = func.dbName();
-    fnName = func.functionName();
-    impalaFnName = func.functionName();
-    impalaRetType = func.getReturnType();
-    impalaArgTypes = func.getArgTypes();
-    isPersistent = func.isPersistent();
-    binaryType = func.getBinaryType();
-    impalaIntermediateType = (func.getIntermediateType() == null)
-        ? impalaRetType : func.getIntermediateType();
-
-    intermediateTypeLength = func.getIntermediateTypeLength();
-
-    isAnalyticFn = func.isAnalyticFn();
-    updateFnSymbol = func.getUpdateFnSymbol();
-    initFnSymbol = func.getInitFnSymbol();
-    mergeFnSymbol = func.getMergeFnSymbol();
-    getValueFnSymbol = func.getValueFnSymbol();
-    finalizeFnSymbol = func.getFinalizeFnSymbol();
-    removeFnSymbol = func.getRemoveFnSymbol();
-    serializeFnSymbol = func.getSerializeFnSymbol();
-    ignoresDistinct = func.ignoresDistinct();
-    returnsNonNullOnEmpty = func.returnsNonNullOnEmpty();
-    isAgg = func.isAggregateFn();
-    ifs = ImpalaFunctionSignature.create(fnName, getArgTypes(), getRetType(), false, false);
   }
 
   public static Collection<AggFunctionDetails> getAllFuncDetails() {
     return AGG_BUILTINS_MAP.values();
   }
 
+  public void setFnName(String fnName) {
+    this.fnName = fnName;
+  }
+
+  public void setImpalaFnName(String impalaFnName) {
+    this.impalaFnName = impalaFnName;
+  }
+
+  public void setRetType(TPrimitiveType retType) {
+    this.retType = retType;
+  }
+
+  public void setArgTypes(TPrimitiveType[] argTypes) {
+    this.argTypes = argTypes;
+  }
+
+  public void setIntermediateType(TPrimitiveType intermediateType) {
+    this.intermediateType = intermediateType;
+  }
+
+  public void setIntermediateTypeLength(int intermediateTypeLength) {
+    this.intermediateTypeLength = intermediateTypeLength;
+  }
+
   public List<Type> getArgTypes() {
+    if (impalaArgTypes == null) {
+      impalaArgTypes = (argTypes != null)
+          ? ImpalaTypeConverter.getImpalaTypesList(argTypes)
+          : Lists.newArrayList();
+    }
     return impalaArgTypes;
   }
 
   public Type getRetType() {
+    if (impalaRetType == null) {
+      impalaRetType = ImpalaTypeConverter.getImpalaType(retType);
+    }
     return impalaRetType;
   }
 
   public Type getIntermediateType() {
+    if (intermediateType == null) {
+      return getRetType();
+    }
+    if (impalaIntermediateType == null) {
+      impalaIntermediateType = ImpalaTypeConverter.getImpalaType(intermediateType);
+      // The only case where intermediateTypeLength is set is for FIXED_UDA_INTERMEDIATE.
+      if (intermediateTypeLength > 0) {
+        Preconditions.checkState(intermediateType == TPrimitiveType.FIXED_UDA_INTERMEDIATE);
+        impalaIntermediateType =
+            ImpalaTypeConverter.createImpalaType(impalaIntermediateType, intermediateTypeLength, 0);
+      }
+    }
     return impalaIntermediateType;
+  }
+
+  public void setIsAnalyticFn(boolean isAnalyticFn) {
+    this.isAnalyticFn = isAnalyticFn;
+  }
+
+  public void setUpdateFnSymbol(String updateFnSymbol) {
+    this.updateFnSymbol = updateFnSymbol;
+  }
+
+  public void setInitFnSymbol(String initFnSymbol) {
+    this.initFnSymbol = initFnSymbol;
+  }
+
+  public void setMergeFnSymbol(String mergeFnSymbol) {
+    this.mergeFnSymbol = mergeFnSymbol;
+  }
+
+  public void setFinalizeFnSymbol(String finalizeFnSymbol) {
+    this.finalizeFnSymbol = finalizeFnSymbol;
+  }
+
+  public void setGetValueFnSymbol(String getValueFnSymbol) {
+    this.getValueFnSymbol = getValueFnSymbol;
+  }
+
+  public void setRemoveFnSymbol(String removeFnSymbol) {
+    this.removeFnSymbol = removeFnSymbol;
+  }
+
+  public void setIgnoresDistinct(boolean ignoresDistinct) {
+    this.ignoresDistinct = ignoresDistinct;
+  }
+
+  public void setReturnsNonNullOnEmpty(boolean returnsNonNullOnEmpty) {
+    this.returnsNonNullOnEmpty = returnsNonNullOnEmpty;
+  }
+
+  public void setIsAgg(boolean isAgg) {
+    this.isAgg = isAgg;
+  }
+
+  public void setBinaryType(TFunctionBinaryType binaryType) {
+    this.binaryType = binaryType;
   }
 
   @Override

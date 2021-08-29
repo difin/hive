@@ -16,16 +16,31 @@
  * limitations under the License.
  */
 
-package org.apache.hadoop.hive.cli;
+package org.apache.hadoop.hive.impala.funcmapper;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.annotations.Expose;
+import com.google.gson.reflect.TypeToken;
+import java.util.HashSet;
+import java.util.Set;
+import org.apache.calcite.rel.type.RelDataType;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-import org.apache.hadoop.hive.impala.funcmapper.AggFunctionDetails;
-import org.apache.hadoop.hive.impala.funcmapper.ImpalaFunctionUtil;
-import org.apache.hadoop.hive.impala.funcmapper.ScalarFunctionDetails;
+import org.apache.impala.analysis.HdfsUri;
 import org.apache.impala.catalog.BuiltinsDb;
 import org.apache.impala.catalog.Db;
+import org.apache.impala.catalog.Type;
+import org.apache.impala.thrift.TFunctionBinaryType;
+import org.apache.impala.thrift.TPrimitiveType;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ImpalaBuiltinsDb class.  This class will serve as the replacement INSTANCE on the Hive
@@ -55,7 +70,7 @@ public class ImpalaBuiltinsDb extends Db {
   }
 
   public static Db getInstance() {
-    return BuiltinsDb.getInstance();
+    return BuiltinsDb.getInstance(LOADER);
   }
 
   private static class ImpalaBuiltinsDbLoader implements BuiltinsDb.BuiltinsDbLoader {
