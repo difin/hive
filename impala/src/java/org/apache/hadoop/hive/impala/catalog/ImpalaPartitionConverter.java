@@ -37,7 +37,6 @@ import org.apache.impala.catalog.HdfsPartitionLocationCompressor;
 import org.apache.impala.catalog.HdfsPartition.FileDescriptor;
 import org.apache.impala.catalog.HdfsStorageDescriptor;
 import org.apache.impala.catalog.metastore.CatalogHmsClientUtils;
-import org.apache.impala.util.AcidUtils;
 import org.apache.impala.util.ListMap;
 import org.apache.impala.thrift.TAccessLevel;
 import org.apache.impala.thrift.TNetworkAddress;
@@ -184,13 +183,13 @@ public class ImpalaPartitionConverter implements HMSPartitionConverter {
     Preconditions.checkNotNull(id);
 
     long numRows = FeCatalogUtils.getRowCount(partition.getParameters());
-    HdfsPartition newPartition =  new ImpalaHdfsPartition(
-        basicHdfsTable.getMetaStoreTable(), keyValues,
+    HdfsPartition newPartition =  new ImpalaHdfsPartition(partition, keyValues,
         fileFormatDescriptor, fds, id,
         cachedLocationCompressor.new Location(partition.getSd().getLocation()),
         TAccessLevel.READ_ONLY, partitionName, cachedHostIndex, numRows);
     return newPartition;
   }
+
 
   /**
    * PartitionInfo contains all the converted partition information needed to create

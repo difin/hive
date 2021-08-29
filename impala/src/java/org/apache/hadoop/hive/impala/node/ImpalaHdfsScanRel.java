@@ -37,7 +37,6 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveFilter;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTableScan;
 import org.apache.hadoop.hive.impala.plan.ImpalaBasicAnalyzer;
 import org.apache.hadoop.hive.impala.plan.ImpalaPlannerContext;
-import org.apache.hadoop.hive.impala.catalog.ImpalaHdfsPartition;
 import org.apache.hadoop.hive.impala.catalog.ImpalaHdfsTable;
 import org.apache.hadoop.hive.impala.funcmapper.ImpalaConjuncts;
 import org.apache.hadoop.hive.impala.prune.ImpalaPrunedPartitionList;
@@ -55,23 +54,15 @@ import org.apache.impala.catalog.FeFsPartition;
 import org.apache.impala.common.ImpalaException;
 import org.apache.impala.planner.PlanNode;
 import org.apache.impala.planner.PlanNodeId;
-import org.apache.impala.planner.SingleNodePlanner;
 import org.apache.impala.util.AcidUtils;
 
-import org.apache.impala.analysis.BinaryPredicate;
-import org.apache.impala.analysis.JoinOperator;
-import org.apache.impala.planner.HashJoinNode;
-import org.apache.impala.planner.JoinNode;
-import org.apache.impala.planner.JoinNode.DistributionMode;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class ImpalaHdfsScanRel extends ImpalaPlanRel {
 
-  private PlanNode hdfsScanNode = null;
+
+  private ImpalaHdfsScanNode hdfsScanNode = null;
   private final HiveTableScan scan;
   private final HiveFilter filter;
   private final Hive db;
@@ -167,14 +158,9 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
     this.nodeInfo = new ImpalaNodeInfo(impalaAssignedConjuncts, tupleDesc);
     PlanNodeId nodeId = ctx.getNextNodeId();
 
-    if (SingleNodePlanner.addAcidSlotsIfNeeded(basicAnalyzer, baseTblRef, impalaPartitions)) {
-      hdfsScanNode = createAcidJoinNode(ctx, ctx.getRootAnalyzer(), baseTblRef,
-          impalaAssignedConjuncts, impalaPartitions, impalaPartitionConjuncts);
-    } else {
-      hdfsScanNode = new ImpalaHdfsScanNode(nodeId, impalaPartitions, baseTblRef, aggInfo,
-          impalaPartitionConjuncts, nodeInfo);
-      hdfsScanNode.init(ctx.getRootAnalyzer());
-    }
+    hdfsScanNode = new ImpalaHdfsScanNode(nodeId, impalaPartitions, baseTblRef, aggInfo,
+        impalaPartitionConjuncts, nodeInfo);
+    hdfsScanNode.init(ctx.getRootAnalyzer());
 
     return hdfsScanNode;
   }
@@ -245,53 +231,5 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
   public double estimateRowCount(RelMetadataQuery mq) {
     return filter != null ?
         mq.getRowCount(filter) : mq.getRowCount(scan);
-  }
-
-  /**
-   * Identical to SingleNodePlanner.createAcidJoinNode except that this version
-   * creats two ImpalaHfdsScanNodes instead of HdfsScanNodes
-   */
-  private PlanNode createAcidJoinNode(ImpalaPlannerContext ctx, Analyzer analyzer, TableRef hdfsTblRef,
-      List<Expr> conjuncts, List<? extends FeFsPartition> partitions,
-      List<Expr> partConjuncts)
-      throws ImpalaException {
-
-    // Let's create separate partitions for inserts and deletes.
-    List<FeFsPartition> insertDeltaPartitions = new ArrayList<>();
-    List<FeFsPartition> deleteDeltaPartitions = new ArrayList<>();
-    for (FeFsPartition part : partitions) {
-      insertDeltaPartitions.add(part.genInsertDeltaPartition());
-      FeFsPartition deleteDeltaPartition = part.genDeleteDeltaPartition();
-      if (deleteDeltaPartition != null) deleteDeltaPartitions.add(deleteDeltaPartition);
-    }
-    // The followings just create separate scan nodes for insert deltas and delete deltas,
-    // plus adds a LEFT ANTI HASH JOIN above them.
-    TableRef deleteDeltaRef = TableRef.newTableRef(analyzer, hdfsTblRef.getPath(),
-        hdfsTblRef.getUniqueAlias() + "-delete-delta");
-    SingleNodePlanner.addAcidSlots(analyzer, deleteDeltaRef);
-
-    ImpalaNodeInfo insertNodeInfo = new ImpalaNodeInfo(conjuncts, hdfsTblRef.getDesc());
-    ImpalaHdfsScanNode deltaScanNode = new ImpalaHdfsScanNode(ctx.getNextNodeId(),
-        insertDeltaPartitions, hdfsTblRef, null, partConjuncts, insertNodeInfo);
-    deltaScanNode.init(analyzer);
-
-    ImpalaNodeInfo deleteNodeInfo = new ImpalaNodeInfo(Collections.emptyList(), deleteDeltaRef.getDesc());
-    ImpalaHdfsScanNode deleteDeltaScanNode = new ImpalaHdfsScanNode(ctx.getNextNodeId(),
-        deleteDeltaPartitions, deleteDeltaRef, null, partConjuncts, deleteNodeInfo);
-    deleteDeltaScanNode.init(analyzer);
-    //TODO: ACID join conjuncts currently contain predicates for all partitioning columns
-    // and the ACID fields. So all of those columns will be the inputs of the hash
-    // function in the HASH JOIN. Probably we could only include 'originalTransaction' and
-    // 'rowid' in the hash predicates, while passing the other conjuncts in
-    // 'otherJoinConjuncts'.
-    List<BinaryPredicate> acidJoinConjuncts = SingleNodePlanner.createAcidJoinConjuncts(analyzer,
-        hdfsTblRef.getDesc(), deleteDeltaRef.getDesc());
-    JoinNode acidJoin = new HashJoinNode(deltaScanNode, deleteDeltaScanNode,
-        /*straight_join=*/true, DistributionMode.BROADCAST, JoinOperator.LEFT_ANTI_JOIN,
-        acidJoinConjuncts, /*otherJoinConjuncts=*/Collections.emptyList());
-    acidJoin.setId(ctx.getNextNodeId());
-    acidJoin.init(analyzer);
-    acidJoin.setIsAcidJoin();
-    return acidJoin;
   }
 }
