@@ -4812,7 +4812,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
 
     List<Path> newFiles = null;
     if (newFilesStatus != null) {
-      newFiles = Collections.synchronizedList(new ArrayList<Path>());
+      newFiles = new ArrayList<>();
     }
 
     // If we're moving files around for an ACID write then the rules and paths are all different.
