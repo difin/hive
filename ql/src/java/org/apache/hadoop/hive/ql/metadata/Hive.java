@@ -2229,7 +2229,7 @@ public class Hive {
     // If config is set, table is not temporary and partition being inserted exists, capture
     // the list of files added. For not yet existing partitions (insert overwrite to new partition
     // or dynamic partition inserts), the add partition event will capture the list of files added.
-    List<FileStatus> newFiles = Collections.synchronizedList(new ArrayList<>());
+    List<Path> newFiles = Collections.synchronizedList(new ArrayList<>());
 
     Partition newTPart = loadPartitionInternal(loadPath, tbl, partSpec, oldPart,
             loadFileType, inheritTableSpecs,
@@ -2305,7 +2305,7 @@ public class Hive {
                         boolean inheritLocation, boolean isSkewedStoreAsSubdir,
                         boolean isSrcLocal, boolean isAcidIUDoperation, boolean resetStatistics,
                         Long writeId, int stmtId, boolean isInsertOverwrite,
-                        boolean isTxnTable, List<FileStatus> newFiles, boolean isDirectInsert) throws HiveException {
+                        boolean isTxnTable, List<Path> newFiles, boolean isDirectInsert) throws HiveException {
     Path tblDataLocationPath =  tbl.getDataLocation();
     boolean isMmTableWrite = AcidUtils.isInsertOnlyTable(tbl.getParameters());
     assert tbl.getPath() != null : "null==getPath() for " + tbl.getTableName();
@@ -2598,7 +2598,7 @@ public class Hive {
     return destPath;
   }
 
-  public static void listFilesInsideAcidDirectory(Path acidDir, FileSystem srcFs, List<FileStatus> newFiles)
+  public static void listFilesInsideAcidDirectory(Path acidDir, FileSystem srcFs, List<Path> newFiles)
           throws IOException {
     // list out all the files/directory in the path
     FileStatus[] acidFiles;
@@ -2611,7 +2611,7 @@ public class Hive {
     for (FileStatus acidFile : acidFiles) {
       // need to list out only files, ignore folders.
       if (!acidFile.isDirectory()) {
-        newFiles.add(acidFile);
+        newFiles.add(acidFile.getPath());
       } else {
         listFilesInsideAcidDirectory(acidFile.getPath(), srcFs, newFiles);
       }
@@ -2619,7 +2619,7 @@ public class Hive {
   }
 
   private void listFilesCreatedByQuery(Path loadPath, long writeId, int stmtId,
-                                           boolean isInsertOverwrite, List<FileStatus> newFiles) throws HiveException {
+                                             boolean isInsertOverwrite, List<Path> newFiles) throws HiveException {
     Path acidDir = new Path(loadPath, AcidUtils.baseOrDeltaSubdir(isInsertOverwrite, writeId, writeId, stmtId));
     try {
       FileSystem srcFs = loadPath.getFileSystem(conf);
@@ -2883,7 +2883,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
     final class PartitionDetails {
       Map<String, String> fullSpec;
       Partition partition;
-      List<FileStatus> newFiles;
+      List<Path> newFiles;
       boolean hasOldPartition = false;
       AcidUtils.TableSnapshot tableSnapshot;
     }
@@ -2937,7 +2937,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
           SessionState.setCurrentSessionState(parentSession);
           LOG.info("New loading path = " + entry.getKey() + " withPartSpec " + fullPartSpec);
 
-          List<FileStatus> newFiles = Lists.newArrayList();
+          List<Path> newFiles = Lists.newArrayList();
           Partition oldPartition = partitionDetails.partition;
           // load the partition
           Partition partition = loadPartitionInternal(entry.getKey(), tbl,
@@ -3104,7 +3104,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
     PerfLogger perfLogger = SessionState.getPerfLogger();
     perfLogger.PerfLogBegin("MoveTask", PerfLogger.LOAD_TABLE);
 
-    List<FileStatus> newFiles = null;
+    List<Path> newFiles = null;
     Table tbl = getTable(tableName);
     assert tbl.getPath() != null : "null==getPath() for " + tbl.getTableName();
     boolean isTxnTable = AcidUtils.isTransactionalTable(tbl);
@@ -3113,7 +3113,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
     boolean isCompactionTable = AcidUtils.isCompactionTable(tbl.getParameters());
 
     if (conf.getBoolVar(ConfVars.FIRE_EVENTS_FOR_DML) && !tbl.isTemporary()) {
-      newFiles = Collections.synchronizedList(new ArrayList<FileStatus>());
+      newFiles = Collections.synchronizedList(new ArrayList<Path>());
     }
 
     // Note: this assumes both paths are qualified; which they are, currently.
@@ -3520,7 +3520,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
   }
 
   public void addWriteNotificationLog(Table tbl, Map<String, String> partitionSpec,
-                                       List<FileStatus> newFiles, Long writeId) throws HiveException {
+                                       List<Path> newFiles, Long writeId) throws HiveException {
     if (!conf.getBoolVar(ConfVars.FIRE_EVENTS_FOR_DML)) {
       LOG.debug("write notification log is ignored as dml event logging is disabled");
       return;
@@ -3556,7 +3556,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
   }
 
   public static void addWriteNotificationLog(HiveConf conf, Table tbl, List<String> partitionVals,
-                                             Long txnId, Long writeId, List<FileStatus> newFiles)
+                                             Long txnId, Long writeId, List<Path> newFiles)
           throws IOException, HiveException, TException {
     FileSystem fileSystem = tbl.getDataLocation().getFileSystem(conf);
     InsertEventRequestData insertData = new InsertEventRequestData();
@@ -3570,7 +3570,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
     get(conf).getSynchronizedMSC().addWriteNotificationLog(rqst);
   }
 
-  private void fireInsertEvent(Table tbl, Map<String, String> partitionSpec, boolean replace, List<FileStatus> newFiles)
+  private void fireInsertEvent(Table tbl, Map<String, String> partitionSpec, boolean replace, List<Path> newFiles)
       throws HiveException {
     if (conf.getBoolVar(ConfVars.FIRE_EVENTS_FOR_DML)) {
       LOG.debug("Firing dml insert event");
@@ -3607,18 +3607,18 @@ private void constructOneLBLocationMap(FileStatus fSta,
   }
 
 
-  private static void addInsertFileInformation(List<FileStatus> newFiles, FileSystem fileSystem,
+  private static void addInsertFileInformation(List<Path> newFiles, FileSystem fileSystem,
       InsertEventRequestData insertData) throws IOException {
     LinkedList<Path> directories = null;
-    for (FileStatus status : newFiles) {
-      if (status.isDirectory()) {
+    for (Path p : newFiles) {
+      if (fileSystem.isDirectory(p)) {
         if (directories == null) {
           directories = new LinkedList<>();
         }
-        directories.add(status.getPath());
+        directories.add(p);
         continue;
       }
-      addInsertNonDirectoryInformation(status.getPath(), fileSystem, insertData);
+      addInsertNonDirectoryInformation(p, fileSystem, insertData);
     }
     if (directories == null) {
       return;
@@ -4483,14 +4483,14 @@ private void constructOneLBLocationMap(FileStatus fSta,
 
   // List the new files in destination path which gets copied from source.
   public static void listNewFilesRecursively(final FileSystem destFs, Path dest,
-                                             List<FileStatus> newFiles) throws HiveException {
+                                             List<Path> newFiles) throws HiveException {
     try {
       for (FileStatus fileStatus : destFs.listStatus(dest, FileUtils.HIDDEN_FILES_PATH_FILTER)) {
         if (fileStatus.isDirectory()) {
           // If it is a sub-directory, then recursively list the files.
           listNewFilesRecursively(destFs, fileStatus.getPath(), newFiles);
         } else {
-          newFiles.add(fileStatus);
+          newFiles.add(fileStatus.getPath());
         }
       }
     } catch (IOException e) {
@@ -4782,7 +4782,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
    * @throws HiveException
    */
   static protected void copyFiles(HiveConf conf, Path srcf, Path destf, FileSystem fs,
-      boolean isSrcLocal, boolean isAcidIUD, boolean isOverwrite, List<FileStatus> newFilesStatus, boolean isBucketed,
+      boolean isSrcLocal, boolean isAcidIUD, boolean isOverwrite, List<Path> newFiles, boolean isBucketed,
       boolean isFullAcidTable, boolean isManaged, boolean isCompactionTable) throws HiveException {
     try {
       // create the destination if it does not exist
@@ -4810,11 +4810,6 @@ private void constructOneLBLocationMap(FileStatus fSta,
       // srcs = new FileStatus[0]; Why is this needed?
     }
 
-    List<Path> newFiles = null;
-    if (newFilesStatus != null) {
-      newFiles = new ArrayList<>();
-    }
-
     // If we're moving files around for an ACID write then the rules and paths are all different.
     // You can blame this on Owen.
     if (isAcidIUD) {
@@ -4825,17 +4820,6 @@ private void constructOneLBLocationMap(FileStatus fSta,
       // The extension is only maintained for files which are compressed.
       copyFiles(conf, fs, srcs, srcFs, destf, isSrcLocal, isOverwrite,
               newFiles, isFullAcidTable && !isBucketed, isManaged, isCompactionTable);
-    }
-
-    if (newFilesStatus != null) {
-      for (Path filePath : newFiles) {
-        try {
-          newFilesStatus.add(fs.getFileStatus(filePath));
-        } catch (Exception e) {
-          LOG.error("Failed to get getFileStatus", e);
-          throw new HiveException(e.getMessage());
-        }
-      }
     }
   }
 
@@ -4999,7 +4983,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
    *          If the table is managed.
    */
   private void replaceFiles(Path tablePath, Path srcf, Path destf, Path oldPath, HiveConf conf,
-          boolean isSrcLocal, boolean purge, List<FileStatus> newFiles, PathFilter deletePathFilter,
+          boolean isSrcLocal, boolean purge, List<Path> newFiles, PathFilter deletePathFilter,
       boolean isNeedRecycle, boolean isManaged, boolean isInsertOverwrite) throws HiveException {
     try {
 
@@ -5057,7 +5041,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
 
           // Add file paths of the files that will be moved to the destination if the caller needs it
           if (null != newFiles) {
-            newFiles.add(destFs.getFileStatus(destFile));
+            newFiles.add(destFile);
           }
         }
       }
