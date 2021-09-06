@@ -46,6 +46,14 @@ struct FieldSchema {
   3: string comment
 }
 
+// Key-value store to be used with selected
+// Metastore APIs (create, alter methods).
+// The client can pass environment properties / configs that can be
+// accessed in hooks.
+struct EnvironmentContext {
+  1: map<string, string> properties
+}
+
 struct SQLPrimaryKey {
   1: string table_db,    // table schema
   2: string table_name,  // table name
@@ -665,14 +673,6 @@ struct Schema {
  // column names, types, comments
  1: list<FieldSchema> fieldSchemas,  // delimiters etc
  2: map<string, string> properties
-}
-
-// Key-value store to be used with selected
-// Metastore APIs (create, alter methods).
-// The client can pass environment properties / configs that can be
-// accessed in hooks.
-struct EnvironmentContext {
-  1: map<string, string> properties
 }
 
 struct PrimaryKeysRequest {

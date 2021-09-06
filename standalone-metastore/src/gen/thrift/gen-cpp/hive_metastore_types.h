@@ -299,6 +299,8 @@ class Version;
 
 class FieldSchema;
 
+class EnvironmentContext;
+
 class SQLPrimaryKey;
 
 class SQLForeignKey;
@@ -422,8 +424,6 @@ class SetPartitionsStatsRequest;
 class SetPartitionsStatsResponse;
 
 class Schema;
-
-class EnvironmentContext;
 
 class PrimaryKeysRequest;
 
@@ -988,6 +988,52 @@ class FieldSchema {
 void swap(FieldSchema &a, FieldSchema &b);
 
 inline std::ostream& operator<<(std::ostream& out, const FieldSchema& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+typedef struct _EnvironmentContext__isset {
+  _EnvironmentContext__isset() : properties(false) {}
+  bool properties :1;
+} _EnvironmentContext__isset;
+
+class EnvironmentContext {
+ public:
+
+  EnvironmentContext(const EnvironmentContext&);
+  EnvironmentContext& operator=(const EnvironmentContext&);
+  EnvironmentContext() {
+  }
+
+  virtual ~EnvironmentContext() throw();
+  std::map<std::string, std::string>  properties;
+
+  _EnvironmentContext__isset __isset;
+
+  void __set_properties(const std::map<std::string, std::string> & val);
+
+  bool operator == (const EnvironmentContext & rhs) const
+  {
+    if (!(properties == rhs.properties))
+      return false;
+    return true;
+  }
+  bool operator != (const EnvironmentContext &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const EnvironmentContext & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(EnvironmentContext &a, EnvironmentContext &b);
+
+inline std::ostream& operator<<(std::ostream& out, const EnvironmentContext& obj)
 {
   obj.printTo(out);
   return out;
@@ -5313,52 +5359,6 @@ class Schema {
 void swap(Schema &a, Schema &b);
 
 inline std::ostream& operator<<(std::ostream& out, const Schema& obj)
-{
-  obj.printTo(out);
-  return out;
-}
-
-typedef struct _EnvironmentContext__isset {
-  _EnvironmentContext__isset() : properties(false) {}
-  bool properties :1;
-} _EnvironmentContext__isset;
-
-class EnvironmentContext {
- public:
-
-  EnvironmentContext(const EnvironmentContext&);
-  EnvironmentContext& operator=(const EnvironmentContext&);
-  EnvironmentContext() {
-  }
-
-  virtual ~EnvironmentContext() throw();
-  std::map<std::string, std::string>  properties;
-
-  _EnvironmentContext__isset __isset;
-
-  void __set_properties(const std::map<std::string, std::string> & val);
-
-  bool operator == (const EnvironmentContext & rhs) const
-  {
-    if (!(properties == rhs.properties))
-      return false;
-    return true;
-  }
-  bool operator != (const EnvironmentContext &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const EnvironmentContext & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(EnvironmentContext &a, EnvironmentContext &b);
-
-inline std::ostream& operator<<(std::ostream& out, const EnvironmentContext& obj)
 {
   obj.printTo(out);
   return out;

@@ -579,26 +579,26 @@ import org.slf4j.LoggerFactory;
           case 1: // USER_PRIVILEGES
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
-                org.apache.thrift.protocol.TMap _map24 = iprot.readMapBegin();
-                struct.userPrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map24.size);
-                String _key25;
-                List<PrivilegeGrantInfo> _val26;
-                for (int _i27 = 0; _i27 < _map24.size; ++_i27)
+                org.apache.thrift.protocol.TMap _map34 = iprot.readMapBegin();
+                struct.userPrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map34.size);
+                String _key35;
+                List<PrivilegeGrantInfo> _val36;
+                for (int _i37 = 0; _i37 < _map34.size; ++_i37)
                 {
-                  _key25 = iprot.readString();
+                  _key35 = iprot.readString();
                   {
-                    org.apache.thrift.protocol.TList _list28 = iprot.readListBegin();
-                    _val26 = new ArrayList<PrivilegeGrantInfo>(_list28.size);
-                    PrivilegeGrantInfo _elem29;
-                    for (int _i30 = 0; _i30 < _list28.size; ++_i30)
+                    org.apache.thrift.protocol.TList _list38 = iprot.readListBegin();
+                    _val36 = new ArrayList<PrivilegeGrantInfo>(_list38.size);
+                    PrivilegeGrantInfo _elem39;
+                    for (int _i40 = 0; _i40 < _list38.size; ++_i40)
                     {
-                      _elem29 = new PrivilegeGrantInfo();
-                      _elem29.read(iprot);
-                      _val26.add(_elem29);
+                      _elem39 = new PrivilegeGrantInfo();
+                      _elem39.read(iprot);
+                      _val36.add(_elem39);
                     }
                     iprot.readListEnd();
                   }
-                  struct.userPrivileges.put(_key25, _val26);
+                  struct.userPrivileges.put(_key35, _val36);
                 }
                 iprot.readMapEnd();
               }
@@ -610,26 +610,26 @@ import org.slf4j.LoggerFactory;
           case 2: // GROUP_PRIVILEGES
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
-                org.apache.thrift.protocol.TMap _map31 = iprot.readMapBegin();
-                struct.groupPrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map31.size);
-                String _key32;
-                List<PrivilegeGrantInfo> _val33;
-                for (int _i34 = 0; _i34 < _map31.size; ++_i34)
+                org.apache.thrift.protocol.TMap _map41 = iprot.readMapBegin();
+                struct.groupPrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map41.size);
+                String _key42;
+                List<PrivilegeGrantInfo> _val43;
+                for (int _i44 = 0; _i44 < _map41.size; ++_i44)
                 {
-                  _key32 = iprot.readString();
+                  _key42 = iprot.readString();
                   {
-                    org.apache.thrift.protocol.TList _list35 = iprot.readListBegin();
-                    _val33 = new ArrayList<PrivilegeGrantInfo>(_list35.size);
-                    PrivilegeGrantInfo _elem36;
-                    for (int _i37 = 0; _i37 < _list35.size; ++_i37)
+                    org.apache.thrift.protocol.TList _list45 = iprot.readListBegin();
+                    _val43 = new ArrayList<PrivilegeGrantInfo>(_list45.size);
+                    PrivilegeGrantInfo _elem46;
+                    for (int _i47 = 0; _i47 < _list45.size; ++_i47)
                     {
-                      _elem36 = new PrivilegeGrantInfo();
-                      _elem36.read(iprot);
-                      _val33.add(_elem36);
+                      _elem46 = new PrivilegeGrantInfo();
+                      _elem46.read(iprot);
+                      _val43.add(_elem46);
                     }
                     iprot.readListEnd();
                   }
-                  struct.groupPrivileges.put(_key32, _val33);
+                  struct.groupPrivileges.put(_key42, _val43);
                 }
                 iprot.readMapEnd();
               }
@@ -641,26 +641,26 @@ import org.slf4j.LoggerFactory;
           case 3: // ROLE_PRIVILEGES
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
-                org.apache.thrift.protocol.TMap _map38 = iprot.readMapBegin();
-                struct.rolePrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map38.size);
-                String _key39;
-                List<PrivilegeGrantInfo> _val40;
-                for (int _i41 = 0; _i41 < _map38.size; ++_i41)
+                org.apache.thrift.protocol.TMap _map48 = iprot.readMapBegin();
+                struct.rolePrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map48.size);
+                String _key49;
+                List<PrivilegeGrantInfo> _val50;
+                for (int _i51 = 0; _i51 < _map48.size; ++_i51)
                 {
-                  _key39 = iprot.readString();
+                  _key49 = iprot.readString();
                   {
-                    org.apache.thrift.protocol.TList _list42 = iprot.readListBegin();
-                    _val40 = new ArrayList<PrivilegeGrantInfo>(_list42.size);
-                    PrivilegeGrantInfo _elem43;
-                    for (int _i44 = 0; _i44 < _list42.size; ++_i44)
+                    org.apache.thrift.protocol.TList _list52 = iprot.readListBegin();
+                    _val50 = new ArrayList<PrivilegeGrantInfo>(_list52.size);
+                    PrivilegeGrantInfo _elem53;
+                    for (int _i54 = 0; _i54 < _list52.size; ++_i54)
                     {
-                      _elem43 = new PrivilegeGrantInfo();
-                      _elem43.read(iprot);
-                      _val40.add(_elem43);
+                      _elem53 = new PrivilegeGrantInfo();
+                      _elem53.read(iprot);
+                      _val50.add(_elem53);
                     }
                     iprot.readListEnd();
                   }
-                  struct.rolePrivileges.put(_key39, _val40);
+                  struct.rolePrivileges.put(_key49, _val50);
                 }
                 iprot.readMapEnd();
               }
@@ -686,14 +686,14 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(USER_PRIVILEGES_FIELD_DESC);
         {
           oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, struct.userPrivileges.size()));
-          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter45 : struct.userPrivileges.entrySet())
+          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter55 : struct.userPrivileges.entrySet())
           {
-            oprot.writeString(_iter45.getKey());
+            oprot.writeString(_iter55.getKey());
             {
-              oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, _iter45.getValue().size()));
-              for (PrivilegeGrantInfo _iter46 : _iter45.getValue())
+              oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, _iter55.getValue().size()));
+              for (PrivilegeGrantInfo _iter56 : _iter55.getValue())
               {
-                _iter46.write(oprot);
+                _iter56.write(oprot);
               }
               oprot.writeListEnd();
             }
@@ -706,14 +706,14 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(GROUP_PRIVILEGES_FIELD_DESC);
         {
           oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, struct.groupPrivileges.size()));
-          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter47 : struct.groupPrivileges.entrySet())
+          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter57 : struct.groupPrivileges.entrySet())
           {
-            oprot.writeString(_iter47.getKey());
+            oprot.writeString(_iter57.getKey());
             {
-              oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, _iter47.getValue().size()));
-              for (PrivilegeGrantInfo _iter48 : _iter47.getValue())
+              oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, _iter57.getValue().size()));
+              for (PrivilegeGrantInfo _iter58 : _iter57.getValue())
               {
-                _iter48.write(oprot);
+                _iter58.write(oprot);
               }
               oprot.writeListEnd();
             }
@@ -726,14 +726,14 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(ROLE_PRIVILEGES_FIELD_DESC);
         {
           oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, struct.rolePrivileges.size()));
-          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter49 : struct.rolePrivileges.entrySet())
+          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter59 : struct.rolePrivileges.entrySet())
           {
-            oprot.writeString(_iter49.getKey());
+            oprot.writeString(_iter59.getKey());
             {
-              oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, _iter49.getValue().size()));
-              for (PrivilegeGrantInfo _iter50 : _iter49.getValue())
+              oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, _iter59.getValue().size()));
+              for (PrivilegeGrantInfo _iter60 : _iter59.getValue())
               {
-                _iter50.write(oprot);
+                _iter60.write(oprot);
               }
               oprot.writeListEnd();
             }
@@ -773,14 +773,14 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetUserPrivileges()) {
         {
           oprot.writeI32(struct.userPrivileges.size());
-          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter51 : struct.userPrivileges.entrySet())
+          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter61 : struct.userPrivileges.entrySet())
           {
-            oprot.writeString(_iter51.getKey());
+            oprot.writeString(_iter61.getKey());
             {
-              oprot.writeI32(_iter51.getValue().size());
-              for (PrivilegeGrantInfo _iter52 : _iter51.getValue())
+              oprot.writeI32(_iter61.getValue().size());
+              for (PrivilegeGrantInfo _iter62 : _iter61.getValue())
               {
-                _iter52.write(oprot);
+                _iter62.write(oprot);
               }
             }
           }
@@ -789,14 +789,14 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetGroupPrivileges()) {
         {
           oprot.writeI32(struct.groupPrivileges.size());
-          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter53 : struct.groupPrivileges.entrySet())
+          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter63 : struct.groupPrivileges.entrySet())
           {
-            oprot.writeString(_iter53.getKey());
+            oprot.writeString(_iter63.getKey());
             {
-              oprot.writeI32(_iter53.getValue().size());
-              for (PrivilegeGrantInfo _iter54 : _iter53.getValue())
+              oprot.writeI32(_iter63.getValue().size());
+              for (PrivilegeGrantInfo _iter64 : _iter63.getValue())
               {
-                _iter54.write(oprot);
+                _iter64.write(oprot);
               }
             }
           }
@@ -805,14 +805,14 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetRolePrivileges()) {
         {
           oprot.writeI32(struct.rolePrivileges.size());
-          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter55 : struct.rolePrivileges.entrySet())
+          for (Map.Entry<String, List<PrivilegeGrantInfo>> _iter65 : struct.rolePrivileges.entrySet())
           {
-            oprot.writeString(_iter55.getKey());
+            oprot.writeString(_iter65.getKey());
             {
-              oprot.writeI32(_iter55.getValue().size());
-              for (PrivilegeGrantInfo _iter56 : _iter55.getValue())
+              oprot.writeI32(_iter65.getValue().size());
+              for (PrivilegeGrantInfo _iter66 : _iter65.getValue())
               {
-                _iter56.write(oprot);
+                _iter66.write(oprot);
               }
             }
           }
@@ -826,75 +826,75 @@ import org.slf4j.LoggerFactory;
       BitSet incoming = iprot.readBitSet(3);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TMap _map57 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, iprot.readI32());
-          struct.userPrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map57.size);
-          String _key58;
-          List<PrivilegeGrantInfo> _val59;
-          for (int _i60 = 0; _i60 < _map57.size; ++_i60)
+          org.apache.thrift.protocol.TMap _map67 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, iprot.readI32());
+          struct.userPrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map67.size);
+          String _key68;
+          List<PrivilegeGrantInfo> _val69;
+          for (int _i70 = 0; _i70 < _map67.size; ++_i70)
           {
-            _key58 = iprot.readString();
+            _key68 = iprot.readString();
             {
-              org.apache.thrift.protocol.TList _list61 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-              _val59 = new ArrayList<PrivilegeGrantInfo>(_list61.size);
-              PrivilegeGrantInfo _elem62;
-              for (int _i63 = 0; _i63 < _list61.size; ++_i63)
+              org.apache.thrift.protocol.TList _list71 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+              _val69 = new ArrayList<PrivilegeGrantInfo>(_list71.size);
+              PrivilegeGrantInfo _elem72;
+              for (int _i73 = 0; _i73 < _list71.size; ++_i73)
               {
-                _elem62 = new PrivilegeGrantInfo();
-                _elem62.read(iprot);
-                _val59.add(_elem62);
+                _elem72 = new PrivilegeGrantInfo();
+                _elem72.read(iprot);
+                _val69.add(_elem72);
               }
             }
-            struct.userPrivileges.put(_key58, _val59);
+            struct.userPrivileges.put(_key68, _val69);
           }
         }
         struct.setUserPrivilegesIsSet(true);
       }
       if (incoming.get(1)) {
         {
-          org.apache.thrift.protocol.TMap _map64 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, iprot.readI32());
-          struct.groupPrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map64.size);
-          String _key65;
-          List<PrivilegeGrantInfo> _val66;
-          for (int _i67 = 0; _i67 < _map64.size; ++_i67)
+          org.apache.thrift.protocol.TMap _map74 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, iprot.readI32());
+          struct.groupPrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map74.size);
+          String _key75;
+          List<PrivilegeGrantInfo> _val76;
+          for (int _i77 = 0; _i77 < _map74.size; ++_i77)
           {
-            _key65 = iprot.readString();
+            _key75 = iprot.readString();
             {
-              org.apache.thrift.protocol.TList _list68 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-              _val66 = new ArrayList<PrivilegeGrantInfo>(_list68.size);
-              PrivilegeGrantInfo _elem69;
-              for (int _i70 = 0; _i70 < _list68.size; ++_i70)
+              org.apache.thrift.protocol.TList _list78 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+              _val76 = new ArrayList<PrivilegeGrantInfo>(_list78.size);
+              PrivilegeGrantInfo _elem79;
+              for (int _i80 = 0; _i80 < _list78.size; ++_i80)
               {
-                _elem69 = new PrivilegeGrantInfo();
-                _elem69.read(iprot);
-                _val66.add(_elem69);
+                _elem79 = new PrivilegeGrantInfo();
+                _elem79.read(iprot);
+                _val76.add(_elem79);
               }
             }
-            struct.groupPrivileges.put(_key65, _val66);
+            struct.groupPrivileges.put(_key75, _val76);
           }
         }
         struct.setGroupPrivilegesIsSet(true);
       }
       if (incoming.get(2)) {
         {
-          org.apache.thrift.protocol.TMap _map71 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, iprot.readI32());
-          struct.rolePrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map71.size);
-          String _key72;
-          List<PrivilegeGrantInfo> _val73;
-          for (int _i74 = 0; _i74 < _map71.size; ++_i74)
+          org.apache.thrift.protocol.TMap _map81 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.LIST, iprot.readI32());
+          struct.rolePrivileges = new HashMap<String,List<PrivilegeGrantInfo>>(2*_map81.size);
+          String _key82;
+          List<PrivilegeGrantInfo> _val83;
+          for (int _i84 = 0; _i84 < _map81.size; ++_i84)
           {
-            _key72 = iprot.readString();
+            _key82 = iprot.readString();
             {
-              org.apache.thrift.protocol.TList _list75 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-              _val73 = new ArrayList<PrivilegeGrantInfo>(_list75.size);
-              PrivilegeGrantInfo _elem76;
-              for (int _i77 = 0; _i77 < _list75.size; ++_i77)
+              org.apache.thrift.protocol.TList _list85 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+              _val83 = new ArrayList<PrivilegeGrantInfo>(_list85.size);
+              PrivilegeGrantInfo _elem86;
+              for (int _i87 = 0; _i87 < _list85.size; ++_i87)
               {
-                _elem76 = new PrivilegeGrantInfo();
-                _elem76.read(iprot);
-                _val73.add(_elem76);
+                _elem86 = new PrivilegeGrantInfo();
+                _elem86.read(iprot);
+                _val83.add(_elem86);
               }
             }
-            struct.rolePrivileges.put(_key72, _val73);
+            struct.rolePrivileges.put(_key82, _val83);
           }
         }
         struct.setRolePrivilegesIsSet(true);

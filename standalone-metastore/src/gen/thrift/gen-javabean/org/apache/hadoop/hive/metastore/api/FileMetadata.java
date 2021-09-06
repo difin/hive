@@ -525,13 +525,13 @@ import org.slf4j.LoggerFactory;
           case 3: // DATA
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list222 = iprot.readListBegin();
-                struct.data = new ArrayList<ByteBuffer>(_list222.size);
-                ByteBuffer _elem223;
-                for (int _i224 = 0; _i224 < _list222.size; ++_i224)
+                org.apache.thrift.protocol.TList _list232 = iprot.readListBegin();
+                struct.data = new ArrayList<ByteBuffer>(_list232.size);
+                ByteBuffer _elem233;
+                for (int _i234 = 0; _i234 < _list232.size; ++_i234)
                 {
-                  _elem223 = iprot.readBinary();
-                  struct.data.add(_elem223);
+                  _elem233 = iprot.readBinary();
+                  struct.data.add(_elem233);
                 }
                 iprot.readListEnd();
               }
@@ -563,9 +563,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(DATA_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.data.size()));
-          for (ByteBuffer _iter225 : struct.data)
+          for (ByteBuffer _iter235 : struct.data)
           {
-            oprot.writeBinary(_iter225);
+            oprot.writeBinary(_iter235);
           }
           oprot.writeListEnd();
         }
@@ -608,9 +608,9 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetData()) {
         {
           oprot.writeI32(struct.data.size());
-          for (ByteBuffer _iter226 : struct.data)
+          for (ByteBuffer _iter236 : struct.data)
           {
-            oprot.writeBinary(_iter226);
+            oprot.writeBinary(_iter236);
           }
         }
       }
@@ -630,13 +630,13 @@ import org.slf4j.LoggerFactory;
       }
       if (incoming.get(2)) {
         {
-          org.apache.thrift.protocol.TList _list227 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.data = new ArrayList<ByteBuffer>(_list227.size);
-          ByteBuffer _elem228;
-          for (int _i229 = 0; _i229 < _list227.size; ++_i229)
+          org.apache.thrift.protocol.TList _list237 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.data = new ArrayList<ByteBuffer>(_list237.size);
+          ByteBuffer _elem238;
+          for (int _i239 = 0; _i239 < _list237.size; ++_i239)
           {
-            _elem228 = iprot.readBinary();
-            struct.data.add(_elem228);
+            _elem238 = iprot.readBinary();
+            struct.data.add(_elem238);
           }
         }
         struct.setDataIsSet(true);

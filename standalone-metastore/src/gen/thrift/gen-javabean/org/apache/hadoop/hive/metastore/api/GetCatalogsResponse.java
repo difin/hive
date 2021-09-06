@@ -347,13 +347,13 @@ import org.slf4j.LoggerFactory;
           case 1: // NAMES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list102 = iprot.readListBegin();
-                struct.names = new ArrayList<String>(_list102.size);
-                String _elem103;
-                for (int _i104 = 0; _i104 < _list102.size; ++_i104)
+                org.apache.thrift.protocol.TList _list112 = iprot.readListBegin();
+                struct.names = new ArrayList<String>(_list112.size);
+                String _elem113;
+                for (int _i114 = 0; _i114 < _list112.size; ++_i114)
                 {
-                  _elem103 = iprot.readString();
-                  struct.names.add(_elem103);
+                  _elem113 = iprot.readString();
+                  struct.names.add(_elem113);
                 }
                 iprot.readListEnd();
               }
@@ -379,9 +379,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(NAMES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.names.size()));
-          for (String _iter105 : struct.names)
+          for (String _iter115 : struct.names)
           {
-            oprot.writeString(_iter105);
+            oprot.writeString(_iter115);
           }
           oprot.writeListEnd();
         }
@@ -412,9 +412,9 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetNames()) {
         {
           oprot.writeI32(struct.names.size());
-          for (String _iter106 : struct.names)
+          for (String _iter116 : struct.names)
           {
-            oprot.writeString(_iter106);
+            oprot.writeString(_iter116);
           }
         }
       }
@@ -426,13 +426,13 @@ import org.slf4j.LoggerFactory;
       BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list107 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.names = new ArrayList<String>(_list107.size);
-          String _elem108;
-          for (int _i109 = 0; _i109 < _list107.size; ++_i109)
+          org.apache.thrift.protocol.TList _list117 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.names = new ArrayList<String>(_list117.size);
+          String _elem118;
+          for (int _i119 = 0; _i119 < _list117.size; ++_i119)
           {
-            _elem108 = iprot.readString();
-            struct.names.add(_elem108);
+            _elem118 = iprot.readString();
+            struct.names.add(_elem118);
           }
         }
         struct.setNamesIsSet(true);

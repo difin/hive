@@ -267,6 +267,22 @@ class FieldSchema
   ::Thrift::Struct.generate_accessors self
 end
 
+class EnvironmentContext
+  include ::Thrift::Struct, ::Thrift::Struct_Union
+  PROPERTIES = 1
+
+  FIELDS = {
+    PROPERTIES => {:type => ::Thrift::Types::MAP, :name => 'properties', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}}
+  }
+
+  def struct_fields; FIELDS; end
+
+  def validate
+  end
+
+  ::Thrift::Struct.generate_accessors self
+end
+
 class SQLPrimaryKey
   include ::Thrift::Struct, ::Thrift::Struct_Union
   TABLE_DB = 1
@@ -1830,22 +1846,6 @@ class Schema
 
   FIELDS = {
     FIELDSCHEMAS => {:type => ::Thrift::Types::LIST, :name => 'fieldSchemas', :element => {:type => ::Thrift::Types::STRUCT, :class => ::FieldSchema}},
-    PROPERTIES => {:type => ::Thrift::Types::MAP, :name => 'properties', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}}
-  }
-
-  def struct_fields; FIELDS; end
-
-  def validate
-  end
-
-  ::Thrift::Struct.generate_accessors self
-end
-
-class EnvironmentContext
-  include ::Thrift::Struct, ::Thrift::Struct_Union
-  PROPERTIES = 1
-
-  FIELDS = {
     PROPERTIES => {:type => ::Thrift::Types::MAP, :name => 'properties', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}}
   }
 

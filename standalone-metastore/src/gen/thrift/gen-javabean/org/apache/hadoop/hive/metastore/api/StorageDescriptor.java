@@ -1290,14 +1290,14 @@ import org.slf4j.LoggerFactory;
           case 1: // COLS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list172 = iprot.readListBegin();
-                struct.cols = new ArrayList<FieldSchema>(_list172.size);
-                FieldSchema _elem173;
-                for (int _i174 = 0; _i174 < _list172.size; ++_i174)
+                org.apache.thrift.protocol.TList _list182 = iprot.readListBegin();
+                struct.cols = new ArrayList<FieldSchema>(_list182.size);
+                FieldSchema _elem183;
+                for (int _i184 = 0; _i184 < _list182.size; ++_i184)
                 {
-                  _elem173 = new FieldSchema();
-                  _elem173.read(iprot);
-                  struct.cols.add(_elem173);
+                  _elem183 = new FieldSchema();
+                  _elem183.read(iprot);
+                  struct.cols.add(_elem183);
                 }
                 iprot.readListEnd();
               }
@@ -1358,13 +1358,13 @@ import org.slf4j.LoggerFactory;
           case 8: // BUCKET_COLS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list175 = iprot.readListBegin();
-                struct.bucketCols = new ArrayList<String>(_list175.size);
-                String _elem176;
-                for (int _i177 = 0; _i177 < _list175.size; ++_i177)
+                org.apache.thrift.protocol.TList _list185 = iprot.readListBegin();
+                struct.bucketCols = new ArrayList<String>(_list185.size);
+                String _elem186;
+                for (int _i187 = 0; _i187 < _list185.size; ++_i187)
                 {
-                  _elem176 = iprot.readString();
-                  struct.bucketCols.add(_elem176);
+                  _elem186 = iprot.readString();
+                  struct.bucketCols.add(_elem186);
                 }
                 iprot.readListEnd();
               }
@@ -1376,14 +1376,14 @@ import org.slf4j.LoggerFactory;
           case 9: // SORT_COLS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list178 = iprot.readListBegin();
-                struct.sortCols = new ArrayList<Order>(_list178.size);
-                Order _elem179;
-                for (int _i180 = 0; _i180 < _list178.size; ++_i180)
+                org.apache.thrift.protocol.TList _list188 = iprot.readListBegin();
+                struct.sortCols = new ArrayList<Order>(_list188.size);
+                Order _elem189;
+                for (int _i190 = 0; _i190 < _list188.size; ++_i190)
                 {
-                  _elem179 = new Order();
-                  _elem179.read(iprot);
-                  struct.sortCols.add(_elem179);
+                  _elem189 = new Order();
+                  _elem189.read(iprot);
+                  struct.sortCols.add(_elem189);
                 }
                 iprot.readListEnd();
               }
@@ -1395,15 +1395,15 @@ import org.slf4j.LoggerFactory;
           case 10: // PARAMETERS
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
-                org.apache.thrift.protocol.TMap _map181 = iprot.readMapBegin();
-                struct.parameters = new HashMap<String,String>(2*_map181.size);
-                String _key182;
-                String _val183;
-                for (int _i184 = 0; _i184 < _map181.size; ++_i184)
+                org.apache.thrift.protocol.TMap _map191 = iprot.readMapBegin();
+                struct.parameters = new HashMap<String,String>(2*_map191.size);
+                String _key192;
+                String _val193;
+                for (int _i194 = 0; _i194 < _map191.size; ++_i194)
                 {
-                  _key182 = iprot.readString();
-                  _val183 = iprot.readString();
-                  struct.parameters.put(_key182, _val183);
+                  _key192 = iprot.readString();
+                  _val193 = iprot.readString();
+                  struct.parameters.put(_key192, _val193);
                 }
                 iprot.readMapEnd();
               }
@@ -1446,9 +1446,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(COLS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.cols.size()));
-          for (FieldSchema _iter185 : struct.cols)
+          for (FieldSchema _iter195 : struct.cols)
           {
-            _iter185.write(oprot);
+            _iter195.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -1484,9 +1484,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(BUCKET_COLS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.bucketCols.size()));
-          for (String _iter186 : struct.bucketCols)
+          for (String _iter196 : struct.bucketCols)
           {
-            oprot.writeString(_iter186);
+            oprot.writeString(_iter196);
           }
           oprot.writeListEnd();
         }
@@ -1496,9 +1496,9 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(SORT_COLS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.sortCols.size()));
-          for (Order _iter187 : struct.sortCols)
+          for (Order _iter197 : struct.sortCols)
           {
-            _iter187.write(oprot);
+            _iter197.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -1508,10 +1508,10 @@ import org.slf4j.LoggerFactory;
         oprot.writeFieldBegin(PARAMETERS_FIELD_DESC);
         {
           oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, struct.parameters.size()));
-          for (Map.Entry<String, String> _iter188 : struct.parameters.entrySet())
+          for (Map.Entry<String, String> _iter198 : struct.parameters.entrySet())
           {
-            oprot.writeString(_iter188.getKey());
-            oprot.writeString(_iter188.getValue());
+            oprot.writeString(_iter198.getKey());
+            oprot.writeString(_iter198.getValue());
           }
           oprot.writeMapEnd();
         }
@@ -1587,9 +1587,9 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetCols()) {
         {
           oprot.writeI32(struct.cols.size());
-          for (FieldSchema _iter189 : struct.cols)
+          for (FieldSchema _iter199 : struct.cols)
           {
-            _iter189.write(oprot);
+            _iter199.write(oprot);
           }
         }
       }
@@ -1614,28 +1614,28 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetBucketCols()) {
         {
           oprot.writeI32(struct.bucketCols.size());
-          for (String _iter190 : struct.bucketCols)
+          for (String _iter200 : struct.bucketCols)
           {
-            oprot.writeString(_iter190);
+            oprot.writeString(_iter200);
           }
         }
       }
       if (struct.isSetSortCols()) {
         {
           oprot.writeI32(struct.sortCols.size());
-          for (Order _iter191 : struct.sortCols)
+          for (Order _iter201 : struct.sortCols)
           {
-            _iter191.write(oprot);
+            _iter201.write(oprot);
           }
         }
       }
       if (struct.isSetParameters()) {
         {
           oprot.writeI32(struct.parameters.size());
-          for (Map.Entry<String, String> _iter192 : struct.parameters.entrySet())
+          for (Map.Entry<String, String> _iter202 : struct.parameters.entrySet())
           {
-            oprot.writeString(_iter192.getKey());
-            oprot.writeString(_iter192.getValue());
+            oprot.writeString(_iter202.getKey());
+            oprot.writeString(_iter202.getValue());
           }
         }
       }
@@ -1653,14 +1653,14 @@ import org.slf4j.LoggerFactory;
       BitSet incoming = iprot.readBitSet(12);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list193 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.cols = new ArrayList<FieldSchema>(_list193.size);
-          FieldSchema _elem194;
-          for (int _i195 = 0; _i195 < _list193.size; ++_i195)
+          org.apache.thrift.protocol.TList _list203 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.cols = new ArrayList<FieldSchema>(_list203.size);
+          FieldSchema _elem204;
+          for (int _i205 = 0; _i205 < _list203.size; ++_i205)
           {
-            _elem194 = new FieldSchema();
-            _elem194.read(iprot);
-            struct.cols.add(_elem194);
+            _elem204 = new FieldSchema();
+            _elem204.read(iprot);
+            struct.cols.add(_elem204);
           }
         }
         struct.setColsIsSet(true);
@@ -1692,42 +1692,42 @@ import org.slf4j.LoggerFactory;
       }
       if (incoming.get(7)) {
         {
-          org.apache.thrift.protocol.TList _list196 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.bucketCols = new ArrayList<String>(_list196.size);
-          String _elem197;
-          for (int _i198 = 0; _i198 < _list196.size; ++_i198)
+          org.apache.thrift.protocol.TList _list206 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.bucketCols = new ArrayList<String>(_list206.size);
+          String _elem207;
+          for (int _i208 = 0; _i208 < _list206.size; ++_i208)
           {
-            _elem197 = iprot.readString();
-            struct.bucketCols.add(_elem197);
+            _elem207 = iprot.readString();
+            struct.bucketCols.add(_elem207);
           }
         }
         struct.bucketCols = org.apache.hadoop.hive.metastore.utils.StringUtils.intern(struct.bucketCols); struct.setBucketColsIsSet(true);
       }
       if (incoming.get(8)) {
         {
-          org.apache.thrift.protocol.TList _list199 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.sortCols = new ArrayList<Order>(_list199.size);
-          Order _elem200;
-          for (int _i201 = 0; _i201 < _list199.size; ++_i201)
+          org.apache.thrift.protocol.TList _list209 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.sortCols = new ArrayList<Order>(_list209.size);
+          Order _elem210;
+          for (int _i211 = 0; _i211 < _list209.size; ++_i211)
           {
-            _elem200 = new Order();
-            _elem200.read(iprot);
-            struct.sortCols.add(_elem200);
+            _elem210 = new Order();
+            _elem210.read(iprot);
+            struct.sortCols.add(_elem210);
           }
         }
         struct.setSortColsIsSet(true);
       }
       if (incoming.get(9)) {
         {
-          org.apache.thrift.protocol.TMap _map202 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.parameters = new HashMap<String,String>(2*_map202.size);
-          String _key203;
-          String _val204;
-          for (int _i205 = 0; _i205 < _map202.size; ++_i205)
+          org.apache.thrift.protocol.TMap _map212 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.parameters = new HashMap<String,String>(2*_map212.size);
+          String _key213;
+          String _val214;
+          for (int _i215 = 0; _i215 < _map212.size; ++_i215)
           {
-            _key203 = iprot.readString();
-            _val204 = iprot.readString();
-            struct.parameters.put(_key203, _val204);
+            _key213 = iprot.readString();
+            _val214 = iprot.readString();
+            struct.parameters.put(_key213, _val214);
           }
         }
         struct.parameters = org.apache.hadoop.hive.metastore.utils.StringUtils.intern(struct.parameters); struct.setParametersIsSet(true);

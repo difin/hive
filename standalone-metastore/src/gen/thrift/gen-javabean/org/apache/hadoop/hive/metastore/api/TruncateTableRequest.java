@@ -150,7 +150,7 @@ import org.slf4j.LoggerFactory;
     tmpMap.put(_Fields.VALID_WRITE_ID_LIST, new org.apache.thrift.meta_data.FieldMetaData("validWriteIdList", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.ENVIRONMENT_CONTEXT, new org.apache.thrift.meta_data.FieldMetaData("environmentContext", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "EnvironmentContext")));
+        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, EnvironmentContext.class)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TruncateTableRequest.class, metaDataMap);
   }
@@ -189,7 +189,7 @@ import org.slf4j.LoggerFactory;
       this.validWriteIdList = other.validWriteIdList;
     }
     if (other.isSetEnvironmentContext()) {
-      this.environmentContext = other.environmentContext;
+      this.environmentContext = new EnvironmentContext(other.environmentContext);
     }
   }
 
@@ -721,6 +721,9 @@ import org.slf4j.LoggerFactory;
     }
 
     // check for sub-struct validity
+    if (environmentContext != null) {
+      environmentContext.validate();
+    }
   }
 
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -778,13 +781,13 @@ import org.slf4j.LoggerFactory;
           case 3: // PART_NAMES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list78 = iprot.readListBegin();
-                struct.partNames = new ArrayList<String>(_list78.size);
-                String _elem79;
-                for (int _i80 = 0; _i80 < _list78.size; ++_i80)
+                org.apache.thrift.protocol.TList _list88 = iprot.readListBegin();
+                struct.partNames = new ArrayList<String>(_list88.size);
+                String _elem89;
+                for (int _i90 = 0; _i90 < _list88.size; ++_i90)
                 {
-                  _elem79 = iprot.readString();
-                  struct.partNames.add(_elem79);
+                  _elem89 = iprot.readString();
+                  struct.partNames.add(_elem89);
                 }
                 iprot.readListEnd();
               }
@@ -846,9 +849,9 @@ import org.slf4j.LoggerFactory;
           oprot.writeFieldBegin(PART_NAMES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.partNames.size()));
-            for (String _iter81 : struct.partNames)
+            for (String _iter91 : struct.partNames)
             {
-              oprot.writeString(_iter81);
+              oprot.writeString(_iter91);
             }
             oprot.writeListEnd();
           }
@@ -910,9 +913,9 @@ import org.slf4j.LoggerFactory;
       if (struct.isSetPartNames()) {
         {
           oprot.writeI32(struct.partNames.size());
-          for (String _iter82 : struct.partNames)
+          for (String _iter92 : struct.partNames)
           {
-            oprot.writeString(_iter82);
+            oprot.writeString(_iter92);
           }
         }
       }
@@ -937,13 +940,13 @@ import org.slf4j.LoggerFactory;
       BitSet incoming = iprot.readBitSet(4);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list83 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.partNames = new ArrayList<String>(_list83.size);
-          String _elem84;
-          for (int _i85 = 0; _i85 < _list83.size; ++_i85)
+          org.apache.thrift.protocol.TList _list93 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.partNames = new ArrayList<String>(_list93.size);
+          String _elem94;
+          for (int _i95 = 0; _i95 < _list93.size; ++_i95)
           {
-            _elem84 = iprot.readString();
-            struct.partNames.add(_elem84);
+            _elem94 = iprot.readString();
+            struct.partNames.add(_elem94);
           }
         }
         struct.setPartNamesIsSet(true);
