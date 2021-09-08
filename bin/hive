@@ -136,8 +136,12 @@ if [ "$SERVICE" != "beeline" ]; then
   fi
 fi
 
-for f in ${HIVE_LIB}/*.jar; do
-  CLASSPATH=${CLASSPATH}:$f;
+# Multiple jars in HIVE_CP_EXCLUDE_LIST can be added using "\|" separator
+# Ex: HIVE_CP_EXCLUDE_LIST="javax.ws.rs-api\|jersey-multipart"
+HIVE_CP_EXCLUDE_LIST="javax.ws.rs-api"
+
+for f in $(find "${HIVE_LIB}" -name  "*.jar" | grep -v "$HIVE_CP_EXCLUDE_LIST"); do
+    CLASSPATH="${CLASSPATH}:$f"
 done
 
 # add the auxillary jars such as serdes
