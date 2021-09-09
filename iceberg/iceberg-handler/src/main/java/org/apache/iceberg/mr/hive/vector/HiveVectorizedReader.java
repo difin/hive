@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.llap.io.api.LlapProxy;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.ql.io.orc.OrcSplit;
 import org.apache.hadoop.hive.ql.io.orc.VectorizedOrcInputFormat;
@@ -75,9 +77,9 @@ public class HiveVectorizedReader {
     int[] partitionColIndices = null;
     Object[] partitionValues = null;
     PartitionSpec partitionSpec = task.spec();
+    List<Integer> readColumnIds = ColumnProjectionUtils.getReadColumnIDs(job);
 
     if (!partitionSpec.isUnpartitioned()) {
-      List<Integer> readColumnIds = ColumnProjectionUtils.getReadColumnIDs(job);
 
       List<PartitionField> fields = partitionSpec.fields();
       List<Integer> partitionColIndicesList = Lists.newLinkedList();
@@ -128,9 +130,18 @@ public class HiveVectorizedReader {
           long start = task.start();
           long length = task.length();
 
-          InputSplit split = new OrcSplit(path, null, start, length, (String[]) null, orcTail,
-              false, false, com.google.common.collect.Lists.newArrayList(), 0, length, path.getParent(), null);
-          recordReader = new VectorizedOrcInputFormat().getRecordReader(split, job, reporter);
+          // If LLAP enabled, try to retrieve an LLAP record reader - this might yield to null in some special cases
+          if (HiveConf.getBoolVar(job, HiveConf.ConfVars.LLAP_IO_ENABLED, LlapProxy.isDaemon()) &&
+              LlapProxy.getIo() != null) {
+            recordReader = LlapProxy.getIo().llapVectorizedOrcReaderForPath(null, path, null, readColumnIds,
+                job, start, length, reporter);
+          }
+
+          if (recordReader == null) {
+            InputSplit split = new OrcSplit(path, null, start, length, (String[]) null, orcTail,
+                false, false, com.google.common.collect.Lists.newArrayList(), 0, length, path.getParent(), null);
+            recordReader = new VectorizedOrcInputFormat().getRecordReader(split, job, reporter);
+          }
           return createVectorizedRowBatchIterable(recordReader, job, partitionColIndices, partitionValues);
 
         default:

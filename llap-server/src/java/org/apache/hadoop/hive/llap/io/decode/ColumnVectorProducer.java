@@ -56,6 +56,7 @@ public interface ColumnVectorProducer {
     String getProbeCacheKey();
     String getProbeColName();
     JobConf getJobConf();
+    List<Integer> getLogicalOrderedColumnIds();
   }
 
   ReadPipeline createReadPipeline(Consumer<ColumnVectorBatch> consumer, FileSplit split,
