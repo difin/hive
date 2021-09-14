@@ -828,13 +828,7 @@ public class MetastoreDefaultTransformer implements IMetaStoreMetadataTransforme
           return table;
         }
       } else {
-        dbLocation = Path.getPathWithoutSchemeAndAuthority(new Path(db.getLocationUri()));
-        Path tablePath = null;
-        if (!FileUtils.isSubdirectory(whRootPath.toString(), dbLocation.toString()) && !dbLocation.equals(whRootPath)) {
-          tablePath = new Path(db.getLocationUri(), table.getTableName());
-        } else {
-          tablePath = hmsHandler.getWh().getDefaultTablePath(db, table.getTableName(), true);
-        }
+        Path tablePath = hmsHandler.getWh().getDefaultTablePath(db, table.getTableName(), true);
         table.getSd().setLocation(tablePath.toString());
       }
     }
