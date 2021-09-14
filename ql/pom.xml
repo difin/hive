@@ -28,7 +28,7 @@
     <hive.path.to.root>..</hive.path.to.root>
     <powermock.version>1.6.6</powermock.version>
     <reflections.version>0.9.10</reflections.version>
-    <atlas.version>2.1.0.7.2.10.0-148</atlas.version>
+    <atlas.version>2.1.0.7.2.11.0-233</atlas.version>
     <commons-configuration.version>1.10</commons-configuration.version>
   </properties>
 
