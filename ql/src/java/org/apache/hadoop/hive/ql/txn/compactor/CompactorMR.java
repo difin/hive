@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileStatus;
@@ -113,12 +114,11 @@ public class CompactorMR {
   static final private String TBLPROPS_PREFIX = "tblprops.";
   static final private String COMPACTOR_PREFIX = "compactor.";
 
-  private JobConf mrJob;  // the MR job for compaction
-
   public CompactorMR() {
   }
 
-  private JobConf createBaseJobConf(HiveConf conf, String jobName, Table t, StorageDescriptor sd,
+  @VisibleForTesting
+  public JobConf createBaseJobConf(HiveConf conf, String jobName, Table t, StorageDescriptor sd,
                                     ValidWriteIdList writeIds, CompactionInfo ci) {
     JobConf job = new JobConf(conf);
     job.setJobName(jobName);
@@ -213,7 +213,7 @@ public class CompactorMR {
    * @param su StatsUpdater which is null if no stats gathering is needed
    * @throws java.io.IOException if the job fails
    */
-  void run(HiveConf conf, String jobName, Table t, Partition p, StorageDescriptor sd, ValidWriteIdList writeIds,
+  public void run(HiveConf conf, String jobName, Table t, Partition p, StorageDescriptor sd, ValidWriteIdList writeIds,
            CompactionInfo ci, Worker.StatsUpdater su, IMetaStoreClient msc, AcidDirectory dir) throws IOException {
 
     JobConf job = createBaseJobConf(conf, jobName, t, sd, writeIds, ci);
@@ -358,10 +358,6 @@ public class CompactorMR {
     dirs.addAll(deltaDirs);
     dirs.addAll(dirsToSearch);
     TokenCache.obtainTokensForNamenodes(job.getCredentials(), dirs.toArray(new Path[]{}), job);
-
-    if (hiveConf.getBoolVar(HiveConf.ConfVars.HIVE_IN_TEST)) {
-      mrJob = job;
-    }
 
     LOG.info("Submitting " + compactionType + " compaction job '" +
       job.getJobName() + "' to " + job.getQueueName() + " queue.  " +
@@ -778,7 +774,8 @@ public class CompactorMR {
     }
   }
 
-  static class CompactorMap<V extends Writable>
+  @VisibleForTesting
+  public static class CompactorMap<V extends Writable>
       implements Mapper<WritableComparable, CompactorInputSplit,  NullWritable,  NullWritable> {
 
     JobConf jobConf;
@@ -877,9 +874,10 @@ public class CompactorMR {
         cleanupTmpLocationOnTaskRetry(options, rootDir);
         writer = aof.getRawRecordWriter(rootDir, options);
       }
-   }
+    }
 
-    private void cleanupTmpLocationOnTaskRetry(AcidOutputFormat.Options options, Path rootDir) throws IOException {
+    @VisibleForTesting
+    public void cleanupTmpLocationOnTaskRetry(AcidOutputFormat.Options options, Path rootDir) throws IOException {
       Path tmpLocation = AcidUtils.createFilename(rootDir, options);
       FileSystem fs = tmpLocation.getFileSystem(jobConf);
 
