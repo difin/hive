@@ -3260,11 +3260,9 @@ public class TestInputOutputFormat {
         readOpsDelta = statistics.getReadOps() - readOpsBefore;
       }
     }
-    // call-1: open to read footer - split 1 => mock:/mocktable1/0_0
-    // call-2: open to read data - split 1 => mock:/mocktable1/0_0
-    // call-3: open to read footer - split 2 => mock:/mocktable1/0_1
-    // call-4: open to read data - split 2 => mock:/mocktable1/0_1
-    assertEquals(4, readOpsDelta);
+    // call-1: open to read - split 1 => mock:/mocktable1/0_0
+    // call-2: open to read - split 2 => mock:/mocktable1/0_1
+    assertEquals(2, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
@@ -3405,11 +3403,9 @@ public class TestInputOutputFormat {
         readOpsDelta = statistics.getReadOps() - readOpsBefore;
       }
     }
-    // call-1: open to read footer - split 1 => mock:/mocktable3/0_0
-    // call-2: open to read data - split 1 => mock:/mocktable3/0_0
-    // call-3: open to read footer - split 2 => mock:/mocktable3/0_1
-    // call-4: open to read data - split 2 => mock:/mocktable3/0_1
-    assertEquals(4, readOpsDelta);
+    // call-1: open to read - split 1 => mock:/mocktable3/0_0
+    // call-2: open to read - split 2 => mock:/mocktable3/0_1
+    assertEquals(2, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
@@ -3552,9 +3548,7 @@ public class TestInputOutputFormat {
         readOpsDelta = statistics.getReadOps() - readOpsBefore;
       }
     }
-    // for each split, 2 by getAcidState (1 list directory + 1 file status) + 1 footer read + 1 data read
-    // ORC-416 delays opening data reader until data is read but it is not backported to cdpd-master
-    assertEquals(8, readOpsDelta);
+    assertEquals(6, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
@@ -3699,7 +3693,7 @@ public class TestInputOutputFormat {
         readOpsDelta = statistics.getReadOps() - readOpsBefore;
       }
     }
-    assertEquals(6, readOpsDelta);
+    assertEquals(4, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
