@@ -80,6 +80,7 @@ POSTHOOK: Output: default@t1_ctas_part@key=3
 POSTHOOK: Output: default@t1_ctas_part@key=4
 POSTHOOK: Output: default@t1_ctas_part@key=5
 POSTHOOK: Output: default@t1_ctas_part@key=6
+POSTHOOK: Lineage: t1_ctas_part.value SIMPLE [(t1)t1.FieldSchema(name:value, type:string, comment:null), ]
 POSTHOOK: Lineage: t1_ctas_part PARTITION(key=1).value SIMPLE [(t1)t1.FieldSchema(name:value, type:string, comment:null), ]
 POSTHOOK: Lineage: t1_ctas_part PARTITION(key=2).value SIMPLE [(t1)t1.FieldSchema(name:value, type:string, comment:null), ]
 POSTHOOK: Lineage: t1_ctas_part PARTITION(key=3).value SIMPLE [(t1)t1.FieldSchema(name:value, type:string, comment:null), ]
