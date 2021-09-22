@@ -264,6 +264,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSortPullUpConstants
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSortRemoveRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSortUnionReduceRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSubQueryRemoveRule;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveUnionSimpleSelectsToInlineTableRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveUnionMergeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveUnionPullUpConstantsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveWindowingFixRule;
@@ -1769,6 +1770,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
     LinkedHashMap<RelNode, ImmutableMap<String, Integer>> relToHiveColNameCalcitePosMap = new LinkedHashMap<RelNode, ImmutableMap<String, Integer>>();
 
     Map<RelNode, ASTNode> subQueryMap = new HashMap<>();
+    private RelNode dummyTableScan;
 
     protected CalcitePlannerAction(
         boolean generateEnginePlan,
@@ -2433,6 +2435,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
           ProjectRemoveRule.INSTANCE,
           HiveUnionMergeRule.INSTANCE,
+          new HiveUnionSimpleSelectsToInlineTableRule(dummyTableScan),
           HiveAggregateProjectMergeRule.INSTANCE,
           HiveProjectMergeRule.INSTANCE_NO_FORCE,
           HiveJoinCommuteRule.INSTANCE);
@@ -5292,6 +5295,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
         qb.addAlias(DUMMY_TABLE);
         qb.setTabAlias(DUMMY_TABLE, DUMMY_TABLE);
         RelNode op = genTableLogicalPlan(DUMMY_TABLE, qb);
+        dummyTableScan = op;
         aliasToRel.put(DUMMY_TABLE, op);
 
       }
