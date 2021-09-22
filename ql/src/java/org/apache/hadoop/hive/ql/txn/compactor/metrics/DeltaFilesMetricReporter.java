@@ -225,7 +225,11 @@ public class DeltaFilesMetricReporter {
 
     try {
       long baseSize = getBaseSize(dir);
-      int numObsoleteDeltas = getNumObsoleteDeltas(dir, checkThresholdInSec);
+
+      // Removed because org.apache.hadoop.fs.FileSystem.getFileStatus calls will cause performance issues.
+      // Obsolete delta metrics will always be 0.
+//      int numObsoleteDeltas = getNumObsoleteDeltas(dir, checkThresholdInSec);
+      int numObsoleteDeltas = 0;
 
       int numDeltas = 0;
       int numSmallDeltas = 0;
@@ -337,16 +341,17 @@ public class DeltaFilesMetricReporter {
     }
   }
 
-  private static int getNumObsoleteDeltas(AcidDirectory dir, long checkThresholdInSec) throws IOException {
-    int numObsoleteDeltas = 0;
-    for (Path obsolete : dir.getObsolete()) {
-      FileStatus stat = dir.getFs().getFileStatus(obsolete);
-      if (System.currentTimeMillis() - stat.getModificationTime() >= checkThresholdInSec * 1000) {
-        numObsoleteDeltas++;
-      }
-    }
-    return numObsoleteDeltas;
-  }
+//  Removed because org.apache.hadoop.fs.FileSystem.getFileStatus calls will cause performance issues.
+//  private static int getNumObsoleteDeltas(AcidDirectory dir, long checkThresholdInSec) throws IOException {
+//    int numObsoleteDeltas = 0;
+//    for (Path obsolete : dir.getObsolete()) {
+//      FileStatus stat = dir.getFs().getFileStatus(obsolete);
+//      if (System.currentTimeMillis() - stat.getModificationTime() >= checkThresholdInSec * 1000) {
+//        numObsoleteDeltas++;
+//      }
+//    }
+//    return numObsoleteDeltas;
+//  }
 
   public static void createCountersForAcidMetrics(TezCounters tezCounters, JobConf jobConf) {
     if (HiveConf.getBoolVar(jobConf, HiveConf.ConfVars.HIVE_SERVER2_METRICS_ENABLED) &&
