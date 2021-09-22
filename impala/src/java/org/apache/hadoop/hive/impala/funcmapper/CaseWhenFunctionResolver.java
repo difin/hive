@@ -78,15 +78,18 @@ public class CaseWhenFunctionResolver extends ImpalaFunctionResolverImpl {
   /**
    * Get return type for case function.  Use the default getRetType except for decimals.
    * In the case of decimals, return the datatype compatible across all the inputs.
+   * TODO: CDPD-29728: There really is no need to pass in "operands" at all since it is passed
+   * into the constructor. The parameter is marked as 'unused'. A little refactoring will
+   * need to be done across all classes to get this right.
    */
   @Override
-  public RelDataType getRetType(ImpalaFunctionSignature funcSig, List<RexNode> operands) {
+  public RelDataType getRetType(ImpalaFunctionSignature funcSig, List<RexNode> unused) {
     RelDataType relDataType = funcSig.getRetType();
     if (funcSig.getRetType().getSqlTypeName() != SqlTypeName.DECIMAL) {
-      return super.getRetType(funcSig, operands);
+      return super.getRetType(funcSig, inputNodes);
     }
     RelDataTypeFactory typeFactory = rexBuilder.getTypeFactory();
-    return getCommonDecimalType(typeFactory, operands);
+    return getCommonDecimalType(typeFactory, inputNodes);
   }
 
   @Override

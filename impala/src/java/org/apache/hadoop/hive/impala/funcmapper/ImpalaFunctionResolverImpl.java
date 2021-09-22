@@ -531,6 +531,22 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     return new ImpalaFunctionResolverImpl(helper, func, inputs);
   }
 
+  private static ImpalaFunctionResolver createCaseResolver(FunctionHelper helper, String func,
+      SqlOperator op, List<RexNode> inputs) throws HiveException {
+    // 'nullif'  is a special case for the 'case' statement
+    if (func.toLowerCase().equals("nullif")) {
+      List<RexNode> caseInputs = CaseFunctionResolver.convertNullIfToCaseParams(helper, inputs);
+      return new CaseFunctionResolver(helper, op, caseInputs);
+    }
+
+    // case statements can come in as "when" or "case", see the Case*Resolver comment
+    // for more information.
+    if (func.toLowerCase().equals("when")) {
+      return new CaseWhenFunctionResolver(helper, op, inputs);
+    }
+    return new CaseFunctionResolver(helper, op, inputs);
+  }
+
   public static ImpalaFunctionResolver create(FunctionHelper helper, String func,
       List<RexNode> inputs, RelDataType retType) throws HiveException {
 
@@ -560,12 +576,7 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
         }
         return new CastFunctionResolver(helper, op, inputs, retType);
       case CASE:
-        // case statements can come in as "when" or "case", see cthe Case*Resolver comment
-        // for more information.
-        if (func.toLowerCase().equals("when")) {
-          return new CaseWhenFunctionResolver(helper, op, inputs);
-        }
-        return new CaseFunctionResolver(helper, op, inputs);
+        return createCaseResolver(helper, func, op, inputs);
       case IN:
         return new InFunctionResolver(helper, op, inputs);
       case EXTRACT:

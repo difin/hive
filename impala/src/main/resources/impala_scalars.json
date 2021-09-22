@@ -120,6 +120,102 @@
         ]
     },
     {
+        "fnName": "nullif",
+        "retType": "TINYINT",
+        "argTypes": [
+            "TINYINT",
+            "TINYINT"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "SMALLINT",
+        "argTypes": [
+            "SMALLINT",
+            "SMALLINT"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "INT",
+        "argTypes": [
+            "INT",
+            "INT"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "BIGINT",
+        "argTypes": [
+            "BIGINT",
+            "BIGINT"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "DECIMAL",
+        "argTypes": [
+            "DECIMAL",
+            "DECIMAL"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "FLOAT",
+        "argTypes": [
+            "FLOAT",
+            "FLOAT"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "DOUBLE",
+        "argTypes": [
+            "DOUBLE",
+            "DOUBLE"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "DATE",
+        "argTypes": [
+            "DATE",
+            "DATE"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "TIMESTAMP",
+        "argTypes": [
+            "TIMESTAMP",
+            "TIMESTAMP"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "CHAR",
+        "argTypes": [
+            "CHAR",
+            "CHAR"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "VARCHAR",
+        "argTypes": [
+            "VARCHAR",
+            "VARCHAR"
+        ]
+    },
+    {
+        "fnName": "nullif",
+        "retType": "STRING",
+        "argTypes": [
+            "STRING",
+            "STRING"
+        ]
+    },
+    {
         "fnName": "inline",
         "retType": "NULL_TYPE"
     },

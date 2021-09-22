@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
+import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.type.SqlTypeName;
@@ -73,15 +74,21 @@ public class CaseFunctionResolver extends ImpalaFunctionResolverImpl {
   /**
    * Get return type for case function.  Use the default getRetType except for decimals.
    * In the case of decimals, return the datatype compatible across all the inputs.
+   * TODO: CDPD-29728: There really is no need to pass in "operands" at all since it is passed
+   * into the constructor. The parameter is marked as 'unused'. A little refactoring will
+   * need to be done across all classes to get this right.
    */
   @Override
-  public RelDataType getRetType(ImpalaFunctionSignature funcSig, List<RexNode> operands) {
+  public RelDataType getRetType(ImpalaFunctionSignature funcSig, List<RexNode> unused) {
     RelDataType relDataType = funcSig.getRetType();
+    // Use "inputNodes" rather than passed in "operands".  Usually they are exactly the
+    // same value. However, for the "nullif" function, the values are adjusted before calling
+    // the constructor (see code in convertNullIfToCaseParams()).
     if (funcSig.getRetType().getSqlTypeName() != SqlTypeName.DECIMAL) {
-      return super.getRetType(funcSig, operands);
+      return super.getRetType(funcSig, inputNodes);
     }
     RelDataTypeFactory typeFactory = rexBuilder.getTypeFactory();
-    return getCommonDecimalType(typeFactory, operands);
+    return getCommonDecimalType(typeFactory, inputNodes);
   }
 
   @Override
@@ -187,13 +194,42 @@ public class CaseFunctionResolver extends ImpalaFunctionResolverImpl {
   @Override
   protected List<RexNode> getCommonDecimalInputs(List<RexNode> inputs) {
     List<RexNode> decimalInputs = new ArrayList<>();
-    for (int i = 1; i < inputs.size(); i += 2) {
+    // Start at input 2, since that is where the first THEN clause is (see comment
+    // at the top of the file).
+    for (int i = 2; i < inputs.size(); i += 2) {
       decimalInputs.add(inputs.get(i));
     }
 
-    if ((inputs.size() % 2) == 1) {
+    // Get return value of "else" clause if it exists. It will only exist if
+    // there are an even number of params (see comment at the top of the file).
+    if ((inputs.size() % 2) == 0) {
       decimalInputs.add(inputs.get(inputs.size() - 1));
     }
     return decimalInputs;
+  }
+
+  /**
+   * Convert NullIf params into the "case" format.  The NullIf function is a special
+   * case version of the "case" function. "NullIf" returns NULL if the 2 params are
+   * equal.  So when the 2 params are equals, the first "THEN" clause becomes "NULL"
+   * The "ELSE" clause becomes the first parameter.
+   */
+  public static List<RexNode> convertNullIfToCaseParams(FunctionHelper helper,
+      List<RexNode> inputs) throws HiveException {
+    List<RexNode> finalParams = new ArrayList<>();
+    RexBuilder rexBuilder = helper.getRexNodeExprFactory().getRexBuilder();
+    if (inputs.size() != 2) {
+      throw new HiveException("NULLIF must take two parameters");
+    }
+    RelDataTypeFactory factory = rexBuilder.getTypeFactory();
+    // case part
+    finalParams.add(inputs.get(0));
+    // first when expr
+    finalParams.add(inputs.get(1));
+    // first then expr
+    finalParams.add(rexBuilder.makeNullLiteral(inputs.get(0).getType()));
+    // else expr
+    finalParams.add(inputs.get(0));
+    return finalParams;
   }
 }
