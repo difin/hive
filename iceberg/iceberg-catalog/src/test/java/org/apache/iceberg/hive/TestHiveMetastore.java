@@ -33,7 +33,7 @@ import org.apache.hadoop.hive.metastore.RetryingHMSHandler;
 import org.apache.hadoop.hive.metastore.TSetIpAddressProcessor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.metastore.txn.TxnDbUtil;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.iceberg.common.DynConstructors;
 import org.apache.iceberg.common.DynMethods;
 import org.apache.thrift.TException;
@@ -123,7 +123,7 @@ public class TestHiveMetastore {
       // create and initialize HMS backend DB for ACID and non-ACID tables as well
       MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CONNECT_URL_KEY,
           "jdbc:derby:" + getDerbyPath() + ";create=true");
-      TxnDbUtil.prepDb(conf);
+      TestTxnDbUtil.prepDb(conf);
 
       TServerSocket socket = new TServerSocket(0);
       int port = socket.getServerSocket().getLocalPort();

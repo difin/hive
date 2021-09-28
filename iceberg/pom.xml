@@ -195,7 +195,12 @@
                 <classifier>tests</classifier>
                 <version>${project.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.hive</groupId>
+                <artifactId>hive-standalone-metastore</artifactId>
+                <classifier>tests</classifier>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
