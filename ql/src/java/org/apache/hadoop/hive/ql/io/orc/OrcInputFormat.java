@@ -2138,7 +2138,7 @@ public class OrcInputFormat implements InputFormat<NullWritable, OrcStruct>,
               + " isTransactionalTable: " + HiveConf.getBoolVar(conf, ConfVars.HIVE_TRANSACTIONAL_TABLE_SCAN));
       LOG.debug("Creating merger for {} and {}", split.getPath(), Arrays.toString(deltas));
     }
-    boolean fetchDeletedRows = conf.getBoolean(Constants.ACID_FETCH_DELETED_ROWS, false);
+    boolean fetchDeletedRows = acidOperationalProperties.isFetchDeletedRows();
 
     final OrcRawRecordMerger records;
     if (!fetchDeletedRows) {

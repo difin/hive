@@ -3232,8 +3232,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
         // 4. Build operator
         Map<String, String> tabPropsFromQuery = qb.getTabPropsForAlias(tableAlias);
-        boolean fetchDeletedRows = tabPropsFromQuery != null &&
-            Boolean.parseBoolean(tabPropsFromQuery.get(Constants.ACID_FETCH_DELETED_ROWS));
+        HiveTableScan.HiveTableScanTrait tableScanTrait = HiveTableScan.HiveTableScanTrait.from(tabPropsFromQuery);
         RelOptHiveTable optTable;
         if (tableType == TableType.DRUID ||
                 (tableType == TableType.JDBC && tabMetaData.getProperty(Constants.JDBC_TABLE) != null)) {
@@ -3298,7 +3297,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
                 optTable, null == tableAlias ? tabMetaData.getTableName() : tableAlias,
                 getAliasId(tableAlias, qb), HiveConf.getBoolVar(conf,
                     HiveConf.ConfVars.HIVE_CBO_RETPATH_HIVEOP), qb.isInsideView()
-                    || qb.getAliasInsideView().contains(tableAlias.toLowerCase()), fetchDeletedRows);
+                    || qb.getAliasInsideView().contains(tableAlias.toLowerCase()), tableScanTrait);
             tableRel = DruidQuery.create(cluster, cluster.traitSetOf(BindableConvention.INSTANCE),
                 optTable, druidTable, ImmutableList.of(scan), DruidSqlOperatorConverter.getDefaultMap());
           } else {
@@ -3311,7 +3310,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
                   null == tableAlias ? tabMetaData.getTableName() : tableAlias,
                   getAliasId(tableAlias, qb),
                   HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_CBO_RETPATH_HIVEOP),
-                  qb.isInsideView() || qb.getAliasInsideView().contains(tableAlias.toLowerCase()), fetchDeletedRows);
+                  qb.isInsideView() || qb.getAliasInsideView().contains(tableAlias.toLowerCase()), tableScanTrait);
 
             final String dataBaseType = tabMetaData.getProperty(Constants.JDBC_DATABASE_TYPE);
             final String url = tabMetaData.getProperty(Constants.JDBC_URL);
@@ -3358,7 +3357,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
               null == tableAlias ? tabMetaData.getTableName() : tableAlias,
               getAliasId(tableAlias, qb), HiveConf.getBoolVar(conf,
                   HiveConf.ConfVars.HIVE_CBO_RETPATH_HIVEOP), qb.isInsideView()
-                  || qb.getAliasInsideView().contains(tableAlias.toLowerCase()), fetchDeletedRows);
+                  || qb.getAliasInsideView().contains(tableAlias.toLowerCase()), tableScanTrait);
         }
 
         if (!optTable.getReferentialConstraints().isEmpty()) {
