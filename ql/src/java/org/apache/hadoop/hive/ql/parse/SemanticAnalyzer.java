@@ -8041,15 +8041,21 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         loadFileDesc.setMoveTaskId(moveTaskId);
         loadFileWork.add(loadFileDesc);
         WriteEntity we;
-        if (isStreaming) {
-          we = new WriteEntity("streaming", Entity.Type.STREAMING);
-        } else {
-          we = new WriteEntity(destinationPath, !isDfsDir, isDestTempFile);
-        }
-        if (!outputs.add(we)) {
-          throw new SemanticException(ErrorMsg.OUTPUT_SPECIFIED_MULTIPLE_TIMES
-              .getMsg(destinationPath.toUri().toString()));
-        }
+
+          if (isStreaming) {
+            we = new WriteEntity("streaming", Entity.Type.STREAMING);
+          } else {
+            try {
+              Path qualifiedPath = destinationPath.getFileSystem(conf).makeQualified(destinationPath);
+              we = new WriteEntity(qualifiedPath, !isDfsDir, isDestTempFile);
+            } catch (IOException ex) {
+              throw new SemanticException("Error while getting the full qualified path for the given directory: " + ex.getMessage());
+            }
+          }
+          if (!outputs.add(we)) {
+            throw new SemanticException(ErrorMsg.OUTPUT_SPECIFIED_MULTIPLE_TIMES
+                    .getMsg(destinationPath.toUri().toString()));
+          }
       }
       break;
     }
