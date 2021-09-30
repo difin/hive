@@ -87,7 +87,7 @@ public class AlterTableAddConstraintAnalyzer extends AbstractAlterTableAnalyzer 
     if(AcidUtils.isTransactionalTable(tbl)) {
       setAcidDdlDesc(desc);
     }
-
+    addInputsOutputsAlterTable(tableName, partitionSpec, desc, desc.getType(), false);
     rootTasks.add(TaskFactory.get(new DDLWork(getInputs(), getOutputs(), desc)));
   }
 }

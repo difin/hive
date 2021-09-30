@@ -35,20 +35,35 @@ POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@depts_hive
 HMS CALL get_table_req FOR emps_hive
+HMS CALL get_table_req FOR emps_hive
 PREHOOK: query: alter table emps_hive add constraint pk1 primary key (empid) disable novalidate rely
 PREHOOK: type: ALTERTABLE_ADDCONSTRAINT
+PREHOOK: Input: default@emps_hive
+PREHOOK: Output: default@emps_hive
 POSTHOOK: query: alter table emps_hive add constraint pk1 primary key (empid) disable novalidate rely
 POSTHOOK: type: ALTERTABLE_ADDCONSTRAINT
+POSTHOOK: Input: default@emps_hive
+POSTHOOK: Output: default@emps_hive
+HMS CALL get_table_req FOR depts_hive
 HMS CALL get_table_req FOR depts_hive
 PREHOOK: query: alter table depts_hive add constraint pk2 primary key (deptno) disable novalidate rely
 PREHOOK: type: ALTERTABLE_ADDCONSTRAINT
+PREHOOK: Input: default@depts_hive
+PREHOOK: Output: default@depts_hive
 POSTHOOK: query: alter table depts_hive add constraint pk2 primary key (deptno) disable novalidate rely
 POSTHOOK: type: ALTERTABLE_ADDCONSTRAINT
+POSTHOOK: Input: default@depts_hive
+POSTHOOK: Output: default@depts_hive
+HMS CALL get_table_req FOR emps_hive
 HMS CALL get_table_req FOR emps_hive
 PREHOOK: query: alter table emps_hive add constraint fk1 foreign key (deptno) references depts_hive(deptno) disable novalidate rely
 PREHOOK: type: ALTERTABLE_ADDCONSTRAINT
+PREHOOK: Input: default@emps_hive
+PREHOOK: Output: default@emps_hive
 POSTHOOK: query: alter table emps_hive add constraint fk1 foreign key (deptno) references depts_hive(deptno) disable novalidate rely
 POSTHOOK: type: ALTERTABLE_ADDCONSTRAINT
+POSTHOOK: Input: default@emps_hive
+POSTHOOK: Output: default@emps_hive
 HMS CALL get_table_req FOR emps_hive
 HMS CALL get_table_req FOR depts_hive
 HMS CALL get_foreign_keys FOR emps_hive
