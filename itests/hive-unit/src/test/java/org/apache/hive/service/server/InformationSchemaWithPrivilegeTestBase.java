@@ -58,6 +58,7 @@ import org.apache.hive.service.cli.SessionHandle;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.Ignore;
 
 /**
  * Test restricted information schema with privilege synchronization
@@ -239,6 +240,7 @@ public abstract class InformationSchemaWithPrivilegeTestBase {
     }
   }
 
+  @Ignore
   @Test
   public void test() throws Exception {
 
