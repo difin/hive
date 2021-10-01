@@ -211,6 +211,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateProjectMer
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregatePullUpConstantsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateReduceFunctionsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateReduceRule;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateSortLimitRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateSplitRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveCardinalityPreservingJoinRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveDruidRules;
@@ -2428,6 +2429,10 @@ public class CalcitePlanner extends SemanticAnalyzer {
           ProjectRemoveRule.INSTANCE, HiveUnionMergeRule.INSTANCE,
           HiveAggregateProjectMergeRule.INSTANCE, HiveProjectMergeRule.INSTANCE_NO_FORCE,
           HiveJoinCommuteRule.INSTANCE);
+
+      if (conf.getEngine() == HiveConf.Engine.HIVE) {
+        generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST, HiveAggregateSortLimitRule.getInstance(conf));
+      }
 
       // 2. Run aggregate-join transpose (cost based)
       //    If it failed because of missing stats, we continue with
