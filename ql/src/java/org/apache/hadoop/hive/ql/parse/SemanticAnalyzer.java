@@ -1987,6 +1987,13 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       }
     }
 
+    // Identify ETL queries as early as possible so various engine specific code paths
+    // are respected. (Such as function resolution, which is different between impala
+    // and hive)
+    if (qb.isCTAS() || qb.getParseInfo().hasInsertTables() || qb.isMaterializedView()) {
+      setETLEngine();
+    }
+
     if (!skipRecursion) {
       // Iterate over the rest of the children
       int child_count = ast.getChildCount();
@@ -12759,7 +12766,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
   void setETLEngine() {
     String etlEngine = conf.getVar(ConfVars.HIVE_ETL_EXECUTION_ENGINE);
-    if (!etlEngine.isEmpty()) {
+    if (!etlEngine.isEmpty() && !etlEngine.equals(conf.getVar(ConfVars.HIVE_EXECUTION_ENGINE))) {
        LOG.info("Switching execution engine to {} from {} for ETL execution",
            etlEngine, conf.getVar(ConfVars.HIVE_EXECUTION_ENGINE));
        conf.setVar(ConfVars.HIVE_EXECUTION_ENGINE, etlEngine);
@@ -12818,10 +12825,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       astForMasking = (ASTNode) ParseDriver.adaptor.dupTree(ast);
     } else {
       astForMasking = ast;
-    }
-
-    if (qb.isCTAS() || qb.getParseInfo().hasInsertTables() || qb.isMaterializedView()) {
-      setETLEngine();
     }
 
     // 2. Gen OP Tree from resolved Parse Tree
