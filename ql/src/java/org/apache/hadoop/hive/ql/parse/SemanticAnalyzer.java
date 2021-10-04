@@ -7951,6 +7951,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           AcidUtils.Operation acidOp = AcidUtils.Operation.NOT_ACID;
           if (destTableIsTransactional) {
             acidOp = getAcidType(tableDescriptor.getOutputFileFormatClass(), dest, isMmTable);
+            acidOperation = acidOp;
             checkAcidConstraints(qb, tableDescriptor, null);
           }
           // isReplace = false in case concurrent operation is executed
