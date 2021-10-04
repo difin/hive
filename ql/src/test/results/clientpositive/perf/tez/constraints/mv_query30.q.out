@@ -14,6 +14,37 @@ POSTHOOK: Input: default@customer
 POSTHOOK: Input: default@customer_address
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@mv_customer_customer_address_n100
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_birth_country SIMPLE [(customer)c.FieldSchema(name:c_birth_country, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_birth_day SIMPLE [(customer)c.FieldSchema(name:c_birth_day, type:int, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_birth_month SIMPLE [(customer)c.FieldSchema(name:c_birth_month, type:int, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_birth_year SIMPLE [(customer)c.FieldSchema(name:c_birth_year, type:int, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_current_addr_sk SIMPLE [(customer)c.FieldSchema(name:c_current_addr_sk, type:int, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_current_cdemo_sk SIMPLE [(customer)c.FieldSchema(name:c_current_cdemo_sk, type:int, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_current_hdemo_sk SIMPLE [(customer)c.FieldSchema(name:c_current_hdemo_sk, type:int, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_customer_id SIMPLE [(customer)c.FieldSchema(name:c_customer_id, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_customer_sk SIMPLE [(customer)c.FieldSchema(name:c_customer_sk, type:int, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_email_address SIMPLE [(customer)c.FieldSchema(name:c_email_address, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_first_name SIMPLE [(customer)c.FieldSchema(name:c_first_name, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_first_sales_date_sk SIMPLE [(customer)c.FieldSchema(name:c_first_sales_date_sk, type:int, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_first_shipto_date_sk SIMPLE [(customer)c.FieldSchema(name:c_first_shipto_date_sk, type:int, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_last_name SIMPLE [(customer)c.FieldSchema(name:c_last_name, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_last_review_date SIMPLE [(customer)c.FieldSchema(name:c_last_review_date, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_login SIMPLE [(customer)c.FieldSchema(name:c_login, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_preferred_cust_flag SIMPLE [(customer)c.FieldSchema(name:c_preferred_cust_flag, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.c_salutation SIMPLE [(customer)c.FieldSchema(name:c_salutation, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_address_id SIMPLE [(customer_address)ca.FieldSchema(name:ca_address_id, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_address_sk SIMPLE [(customer_address)ca.FieldSchema(name:ca_address_sk, type:int, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_city SIMPLE [(customer_address)ca.FieldSchema(name:ca_city, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_country SIMPLE [(customer_address)ca.FieldSchema(name:ca_country, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_county SIMPLE [(customer_address)ca.FieldSchema(name:ca_county, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_gmt_offset SIMPLE [(customer_address)ca.FieldSchema(name:ca_gmt_offset, type:decimal(5,2), comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_location_type SIMPLE [(customer_address)ca.FieldSchema(name:ca_location_type, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_state SIMPLE [(customer_address)ca.FieldSchema(name:ca_state, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_street_name SIMPLE [(customer_address)ca.FieldSchema(name:ca_street_name, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_street_number SIMPLE [(customer_address)ca.FieldSchema(name:ca_street_number, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_street_type SIMPLE [(customer_address)ca.FieldSchema(name:ca_street_type, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_suite_number SIMPLE [(customer_address)ca.FieldSchema(name:ca_suite_number, type:string, comment:null), ]
+POSTHOOK: Lineage: mv_customer_customer_address_n100.ca_zip SIMPLE [(customer_address)ca.FieldSchema(name:ca_zip, type:string, comment:null), ]
 PREHOOK: query: explain cbo
 with customer_total_return as
  (select wr_returning_customer_sk as ctr_customer_sk

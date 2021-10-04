@@ -20,7 +20,9 @@ package org.apache.hadoop.hive.ql.ddl.view.create;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
+import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.CreationMetadata;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
@@ -28,6 +30,7 @@ import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.ddl.DDLUtils;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
 import org.apache.hadoop.hive.ql.hooks.LineageInfo.DataContainer;
+import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Table;
 
@@ -114,7 +117,21 @@ public class CreateViewOperation extends DDLOperation<CreateViewDesc> {
 
       //set lineage info
       DataContainer dc = new DataContainer(tbl.getTTable());
-      context.getQueryState().getLineageState().setLineage(new Path(desc.getViewName()), dc, tbl.getCols());
+      if (desc.isMaterialized()) {
+        Map<String, String> tblProps = tbl.getTTable().getParameters();
+        Path tlocation;
+        try {
+          Warehouse wh = new Warehouse(context.getConf());
+          tlocation = wh.getDefaultTablePath(context.getDb().getDatabase(tbl.getDbName()), tbl.getTableName(),
+              tblProps == null || !AcidUtils.isTablePropertyTransactional(tblProps));
+        } catch (MetaException e) {
+          throw new HiveException(e);
+        }
+
+        context.getQueryState().getLineageState().setLineage(tlocation, dc, tbl.getCols());
+      } else {
+        context.getQueryState().getLineageState().setLineage(new Path(desc.getViewName()), dc, tbl.getCols());
+      }
     }
     return 0;
   }

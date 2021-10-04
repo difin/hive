@@ -1476,7 +1476,7 @@ STAGE PLANS:
                   Top N Key Operator
                     sort order: +
                     keys: key (type: string)
-                    null sort order: z
+                    null sort order: a
                     Statistics: Num rows: 500 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
                     top n: 40
                     Select Operator
@@ -1485,7 +1485,7 @@ STAGE PLANS:
                       Statistics: Num rows: 500 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: key (type: string)
-                        null sort order: z
+                        null sort order: a
                         sort order: +
                         Map-reduce partition columns: key (type: string)
                         Statistics: Num rows: 500 Data size: 43500 Basic stats: COMPLETE Column stats: COMPLETE

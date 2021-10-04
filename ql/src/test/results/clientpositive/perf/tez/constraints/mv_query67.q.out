@@ -28,6 +28,15 @@ POSTHOOK: Input: default@store
 POSTHOOK: Input: default@store_sales
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@my_materialized_view_n100
+POSTHOOK: Lineage: my_materialized_view_n100.d_moy SIMPLE [(date_dim)date_dim.FieldSchema(name:d_moy, type:int, comment:null), ]
+POSTHOOK: Lineage: my_materialized_view_n100.d_qoy SIMPLE [(date_dim)date_dim.FieldSchema(name:d_qoy, type:int, comment:null), ]
+POSTHOOK: Lineage: my_materialized_view_n100.d_year SIMPLE [(date_dim)date_dim.FieldSchema(name:d_year, type:int, comment:null), ]
+POSTHOOK: Lineage: my_materialized_view_n100.i_brand SIMPLE [(item)item.FieldSchema(name:i_brand, type:string, comment:null), ]
+POSTHOOK: Lineage: my_materialized_view_n100.i_category SIMPLE [(item)item.FieldSchema(name:i_category, type:string, comment:null), ]
+POSTHOOK: Lineage: my_materialized_view_n100.i_class SIMPLE [(item)item.FieldSchema(name:i_class, type:string, comment:null), ]
+POSTHOOK: Lineage: my_materialized_view_n100.i_product_name SIMPLE [(item)item.FieldSchema(name:i_product_name, type:string, comment:null), ]
+POSTHOOK: Lineage: my_materialized_view_n100.s_store_id SIMPLE [(store)store.FieldSchema(name:s_store_id, type:string, comment:null), ]
+POSTHOOK: Lineage: my_materialized_view_n100.sumsales EXPRESSION [(store_sales)store_sales.FieldSchema(name:ss_sales_price, type:decimal(7,2), comment:null), (store_sales)store_sales.FieldSchema(name:ss_quantity, type:int, comment:null), ]
 PREHOOK: query: explain cbo
 select  *
 from (select i_category
