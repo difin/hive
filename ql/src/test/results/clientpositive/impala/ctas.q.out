@@ -333,6 +333,7 @@ select empid, deptno, name
 from emps_imp0
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@emps_imp0
+POSTHOOK: Output: default@tab1_imp0_part
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
   Stage-0 depends on stages: Stage-1
@@ -398,6 +399,7 @@ from emps_imp0
 limit 10
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@emps_imp0
+POSTHOOK: Output: default@tab1_imp0_part
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
   Stage-0 depends on stages: Stage-1

@@ -37,6 +37,7 @@ PREHOOK: Output: default@destintable
 POSTHOOK: query: EXPLAIN INSERT OVERWRITE TABLE destinTable partition (one) SELECT one,two FROM sourceTable
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sourcetable
+POSTHOOK: Output: default@destintable
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
   Stage-2 depends on stages: Stage-1

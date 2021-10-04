@@ -44,6 +44,7 @@ PREHOOK: Output: default@test_update_part
 POSTHOOK: query: INSERT OVERWRITE TABLE test_update_part SELECT a, b, c FROM test_update_part_text
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@test_update_part_text
+POSTHOOK: Output: default@test_update_part
 POSTHOOK: Output: default@test_update_part@c=11
 POSTHOOK: Output: default@test_update_part@c=22
 POSTHOOK: Output: default@test_update_part@c=33
@@ -239,6 +240,7 @@ PREHOOK: Output: default@test_delete_part
 POSTHOOK: query: INSERT OVERWRITE TABLE test_delete_part SELECT a, b, c FROM test_update_part_text
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@test_update_part_text
+POSTHOOK: Output: default@test_delete_part
 POSTHOOK: Output: default@test_delete_part@c=11
 POSTHOOK: Output: default@test_delete_part@c=22
 POSTHOOK: Output: default@test_delete_part@c=33

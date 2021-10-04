@@ -8,6 +8,9 @@ input="target/generated-sources/antlr3/org/apache/hadoop/hive/ql/parse/HiveParse
 output="target/generated-sources/antlr3/org/apache/hadoop/hive/ql/parse/HiveParser.java-fixed"
 tokenFile="target/generated-sources/antlr3/org/apache/hadoop/hive/ql/parse/HiveParserTokens.java"
 
+# bail out if already patched
+grep 'tokenNames = HiveParserTokens.tokenNames' $input && exit 0
+
 # create HiveParserTokens containing the tokenNames 
 
 rm $tokenFile > /dev/null 2>&1

@@ -645,6 +645,7 @@ POSTHOOK: Input: default@ssb_part_n3
 POSTHOOK: Input: default@supplier_n3
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@ssb_mv_n3
+POSTHOOK: Output: default@ssb_mv_n3
 PREHOOK: query: explain cbo
 select 
     sum(lo_extendedprice*lo_discount) as revenue

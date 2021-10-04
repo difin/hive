@@ -68,6 +68,7 @@ PREHOOK: Output: default@part_table
 POSTHOOK: query: INSERT INTO TABLE part_table PARTITION (year, month, day) SELECT id, value, year, month, day FROM txt_table
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@txt_table
+POSTHOOK: Output: default@part_table
 POSTHOOK: Output: default@part_table@year=2019/month=03/day=12
 POSTHOOK: Output: default@part_table@year=2020/month=02/day=11
 POSTHOOK: Output: default@part_table@year=2020/month=03/day=13

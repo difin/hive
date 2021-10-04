@@ -708,6 +708,7 @@ select empid, deptno, name
 from emps_hive
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@emps_hive
+POSTHOOK: Output: default@tab1_hive_part
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
   Stage-2 depends on stages: Stage-1
@@ -823,6 +824,7 @@ from emps_hive
 limit 10
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@emps_hive
+POSTHOOK: Output: default@tab1_hive_part
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
   Stage-2 depends on stages: Stage-1

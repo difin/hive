@@ -8486,7 +8486,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     if ((dpCtx != null) && (dpCtx.getNumDPCols() >= 0)) {
       // No static partition specified
       if (dpCtx.getNumSPCols() == 0) {
-        output = new WriteEntity(dest_tab, determineWriteType(ltd, isNonNativeTable, dest), false);
+        output = new WriteEntity(dest_tab, determineWriteType(ltd, isNonNativeTable, dest), true);
         outputs.add(output);
         output.setDynamicPartitionWrite(true);
       }

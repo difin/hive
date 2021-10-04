@@ -297,6 +297,7 @@ POSTHOOK: query: INSERT INTO FinancialPart partition (country) values
 )
 POSTHOOK: type: QUERY
 POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@financialpart
 POSTHOOK: Output: default@financialpart@country=country3
 POSTHOOK: Lineage: financialpart PARTITION(country=country3).cbigint SCRIPT []
 POSTHOOK: Lineage: financialpart PARTITION(country=country3).cboolean SCRIPT []

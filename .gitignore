@@ -34,3 +34,4 @@ patchprocess
 standalone-metastore/src/gen/version
 launch.json
 settings.json
+dag_*.dot

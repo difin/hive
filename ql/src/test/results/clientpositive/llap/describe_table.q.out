@@ -497,6 +497,7 @@ PREHOOK: Output: default@desc_parttable_stats
 POSTHOOK: query: INSERT INTO desc_parttable_stats values(0,1),(0,2),(0,3)
 POSTHOOK: type: QUERY
 POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@desc_parttable_stats
 POSTHOOK: Output: default@desc_parttable_stats@yr=1
 POSTHOOK: Output: default@desc_parttable_stats@yr=2
 POSTHOOK: Output: default@desc_parttable_stats@yr=3
