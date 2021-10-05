@@ -200,7 +200,7 @@ Stage-0
                                                 Filter Operator [FIL_203] (rows=182855757 width=110)
                                                   predicate:ss_quantity BETWEEN 41 AND 60
                                                   TableScan [TS_66] (rows=575995635 width=3)
-                                                    default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_quantity","ss_ext_list_price","ss_net_paid_inc_tax"]
+                                                    default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_quantity","ss_ext_list_price","ss_net_paid_inc_tax"]
                                   <-Reducer 9 [CUSTOM_SIMPLE_EDGE]
                                     PARTITION_ONLY_SHUFFLE [RS_132]
                                       Merge Join Operator [MERGEJOIN_178] (rows=2 width=572)
@@ -312,7 +312,7 @@ Stage-0
                                                                         Filter Operator [FIL_186] (rows=2 width=4)
                                                                           predicate:(r_reason_sk = 1)
                                                                           TableScan [TS_0] (rows=72 width=4)
-                                                                            default@reason,reason,Tbl:COMPLETE,Col:COMPLETE,Output:["r_reason_sk"]
+                                                                            default@reason,reason, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["r_reason_sk"]
                                                                   <-Reducer 20 [CUSTOM_SIMPLE_EDGE] vectorized
                                                                     PARTITION_ONLY_SHUFFLE [RS_251]
                                                                       Select Operator [SEL_250] (rows=1 width=4)

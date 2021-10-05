@@ -110,7 +110,7 @@ Stage-0
                                 Filter Operator [FIL_88] (rows=27 width=104)
                                   predicate:w_warehouse_sk is not null
                                   TableScan [TS_9] (rows=27 width=104)
-                                    default@warehouse,warehouse,Tbl:COMPLETE,Col:COMPLETE,Output:["w_warehouse_sk","w_warehouse_name"]
+                                    default@warehouse,warehouse, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["w_warehouse_sk","w_warehouse_name"]
                           <-Reducer 3 [SIMPLE_EDGE]
                             SHUFFLE [RS_18]
                               PartitionCols:_col2
@@ -124,7 +124,7 @@ Stage-0
                                     Filter Operator [FIL_85] (rows=8116 width=98)
                                       predicate:(CAST( d_date AS TIMESTAMP) BETWEEN TIMESTAMP'1998-03-09 00:00:00' AND TIMESTAMP'1998-05-08 00:00:00' and d_date_sk is not null)
                                       TableScan [TS_6] (rows=73049 width=98)
-                                        default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
+                                        default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
                               <-Reducer 2 [SIMPLE_EDGE]
                                 SHUFFLE [RS_15]
                                   PartitionCols:_col0
@@ -138,7 +138,7 @@ Stage-0
                                         Filter Operator [FIL_79] (rows=37584000 width=15)
                                           predicate:(inv_date_sk is not null and inv_item_sk is not null and inv_warehouse_sk is not null)
                                           TableScan [TS_0] (rows=37584000 width=15)
-                                            default@inventory,inventory,Tbl:COMPLETE,Col:COMPLETE,Output:["inv_date_sk","inv_item_sk","inv_warehouse_sk","inv_quantity_on_hand"]
+                                            default@inventory,inventory, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["inv_date_sk","inv_item_sk","inv_warehouse_sk","inv_quantity_on_hand"]
                                   <-Map 7 [SIMPLE_EDGE] vectorized
                                     SHUFFLE [RS_84]
                                       PartitionCols:_col0
@@ -147,5 +147,5 @@ Stage-0
                                         Filter Operator [FIL_82] (rows=51333 width=215)
                                           predicate:(i_current_price BETWEEN 0.99 AND 1.49 and i_item_sk is not null)
                                           TableScan [TS_3] (rows=462000 width=215)
-                                            default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id","i_current_price"]
+                                            default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id","i_current_price"]
 

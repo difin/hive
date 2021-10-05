@@ -93,7 +93,7 @@ Stage-0
                             Filter Operator [FIL_132] (rows=7200 width=8)
                               predicate:hd_income_band_sk is not null
                               TableScan [TS_15] (rows=7200 width=8)
-                                default@household_demographics,household_demographics,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_income_band_sk"]
+                                default@household_demographics,household_demographics, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_income_band_sk"]
                       <-Map 12 [SIMPLE_EDGE] vectorized
                         SHUFFLE [RS_137]
                           PartitionCols:_col0
@@ -102,7 +102,7 @@ Stage-0
                             Filter Operator [FIL_135] (rows=2 width=12)
                               predicate:((ib_lower_bound >= 32287) and (ib_upper_bound <= 82287))
                               TableScan [TS_18] (rows=20 width=12)
-                                default@income_band,income_band,Tbl:COMPLETE,Col:COMPLETE,Output:["ib_income_band_sk","ib_lower_bound","ib_upper_bound"]
+                                default@income_band,income_band, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ib_income_band_sk","ib_lower_bound","ib_upper_bound"]
                   <-Reducer 3 [SIMPLE_EDGE]
                     SHUFFLE [RS_31]
                       PartitionCols:_col4
@@ -121,14 +121,14 @@ Stage-0
                                 Filter Operator [FIL_121] (rows=55577698 width=3)
                                   predicate:sr_cdemo_sk is not null
                                   TableScan [TS_0] (rows=57591150 width=3)
-                                    default@store_returns,store_returns,Tbl:COMPLETE,Col:COMPLETE,Output:["sr_cdemo_sk"]
+                                    default@store_returns,store_returns, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["sr_cdemo_sk"]
                           <-Map 6 [SIMPLE_EDGE] vectorized
                             SHUFFLE [RS_125]
                               PartitionCols:_col0
                               Select Operator [SEL_124] (rows=1861800 width=4)
                                 Output:["_col0"]
                                 TableScan [TS_3] (rows=1861800 width=4)
-                                  default@customer_demographics,customer_demographics,Tbl:COMPLETE,Col:COMPLETE,Output:["cd_demo_sk"]
+                                  default@customer_demographics,customer_demographics, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cd_demo_sk"]
                       <-Reducer 8 [SIMPLE_EDGE]
                         SHUFFLE [RS_29]
                           PartitionCols:_col1
@@ -142,7 +142,7 @@ Stage-0
                                 Filter Operator [FIL_126] (rows=74500295 width=291)
                                   predicate:(c_current_hdemo_sk is not null and c_current_cdemo_sk is not null and c_current_addr_sk is not null)
                                   TableScan [TS_5] (rows=80000000 width=291)
-                                    default@customer,customer,Tbl:COMPLETE,Col:COMPLETE,Output:["c_customer_id","c_current_cdemo_sk","c_current_hdemo_sk","c_current_addr_sk","c_first_name","c_last_name"]
+                                    default@customer,customer, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["c_customer_id","c_current_cdemo_sk","c_current_hdemo_sk","c_current_addr_sk","c_first_name","c_last_name"]
                           <-Map 9 [SIMPLE_EDGE] vectorized
                             SHUFFLE [RS_131]
                               PartitionCols:_col0
@@ -151,5 +151,5 @@ Stage-0
                                 Filter Operator [FIL_129] (rows=44643 width=97)
                                   predicate:(ca_city = 'Hopewell')
                                   TableScan [TS_8] (rows=40000000 width=97)
-                                    default@customer_address,customer_address,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_city"]
+                                    default@customer_address,customer_address, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_city"]
 

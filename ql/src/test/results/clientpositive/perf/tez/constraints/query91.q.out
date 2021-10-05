@@ -113,7 +113,7 @@ Stage-0
                         Select Operator [SEL_164] (rows=60 width=298)
                           Output:["_col0","_col1","_col2","_col3"]
                           TableScan [TS_22] (rows=60 width=298)
-                            default@call_center,call_center,Tbl:COMPLETE,Col:COMPLETE,Output:["cc_call_center_sk","cc_call_center_id","cc_name","cc_manager"]
+                            default@call_center,call_center, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cc_call_center_sk","cc_call_center_id","cc_name","cc_manager"]
                     <-Reducer 5 [SIMPLE_EDGE]
                       SHUFFLE [RS_36]
                         PartitionCols:_col10
@@ -127,7 +127,7 @@ Stage-0
                               Filter Operator [FIL_161] (rows=3600 width=96)
                                 predicate:(hd_buy_potential like '0-500%')
                                 TableScan [TS_19] (rows=7200 width=96)
-                                  default@household_demographics,household_demographics,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_buy_potential"]
+                                  default@household_demographics,household_demographics, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_buy_potential"]
                         <-Reducer 4 [SIMPLE_EDGE]
                           SHUFFLE [RS_33]
                             PartitionCols:_col2
@@ -146,7 +146,7 @@ Stage-0
                                       Filter Operator [FIL_155] (rows=27658583 width=121)
                                         predicate:(cr_call_center_sk is not null and cr_returning_customer_sk is not null and cr_returned_date_sk is not null)
                                         TableScan [TS_9] (rows=28798881 width=121)
-                                          default@catalog_returns,catalog_returns,Tbl:COMPLETE,Col:COMPLETE,Output:["cr_returned_date_sk","cr_returning_customer_sk","cr_call_center_sk","cr_net_loss"]
+                                          default@catalog_returns,catalog_returns, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cr_returned_date_sk","cr_returning_customer_sk","cr_call_center_sk","cr_net_loss"]
                                 <-Map 13 [SIMPLE_EDGE] vectorized
                                   SHUFFLE [RS_160]
                                     PartitionCols:_col0
@@ -155,7 +155,7 @@ Stage-0
                                       Filter Operator [FIL_158] (rows=50 width=12)
                                         predicate:((d_year = 1999) and (d_moy = 11))
                                         TableScan [TS_12] (rows=73049 width=12)
-                                          default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year","d_moy"]
+                                          default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year","d_moy"]
                             <-Reducer 3 [SIMPLE_EDGE]
                               SHUFFLE [RS_30]
                                 PartitionCols:_col0
@@ -169,7 +169,7 @@ Stage-0
                                       Filter Operator [FIL_152] (rows=8000000 width=112)
                                         predicate:(ca_gmt_offset = -7)
                                         TableScan [TS_6] (rows=40000000 width=112)
-                                          default@customer_address,customer_address,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_gmt_offset"]
+                                          default@customer_address,customer_address, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_gmt_offset"]
                                 <-Reducer 2 [SIMPLE_EDGE]
                                   SHUFFLE [RS_27]
                                     PartitionCols:_col3
@@ -183,7 +183,7 @@ Stage-0
                                           Filter Operator [FIL_146] (rows=74500295 width=15)
                                             predicate:(c_current_hdemo_sk is not null and c_current_cdemo_sk is not null and c_current_addr_sk is not null)
                                             TableScan [TS_0] (rows=80000000 width=15)
-                                              default@customer,customer,Tbl:COMPLETE,Col:COMPLETE,Output:["c_customer_sk","c_current_cdemo_sk","c_current_hdemo_sk","c_current_addr_sk"]
+                                              default@customer,customer, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["c_customer_sk","c_current_cdemo_sk","c_current_hdemo_sk","c_current_addr_sk"]
                                     <-Map 9 [SIMPLE_EDGE] vectorized
                                       SHUFFLE [RS_151]
                                         PartitionCols:_col0
@@ -192,5 +192,5 @@ Stage-0
                                           Filter Operator [FIL_149] (rows=26269 width=183)
                                             predicate:((cd_marital_status) IN ('M', 'W') and (cd_education_status) IN ('Unknown', 'Advanced Degree') and (struct(cd_marital_status,cd_education_status)) IN (const struct('M','Unknown'), const struct('W','Advanced Degree')))
                                             TableScan [TS_3] (rows=1861800 width=183)
-                                              default@customer_demographics,customer_demographics,Tbl:COMPLETE,Col:COMPLETE,Output:["cd_demo_sk","cd_marital_status","cd_education_status"]
+                                              default@customer_demographics,customer_demographics, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cd_demo_sk","cd_marital_status","cd_education_status"]
 

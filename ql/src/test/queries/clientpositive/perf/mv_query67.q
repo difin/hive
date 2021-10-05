@@ -196,3 +196,5 @@ order by i_category
         ,sumsales
         ,rk
 limit 100;
+
+DROP MATERIALIZED VIEW `my_materialized_view_n100`;

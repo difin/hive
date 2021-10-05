@@ -137,7 +137,7 @@ Stage-0
                                               Filter Operator [FIL_155] (rows=28798881 width=4)
                                                 predicate:cr_order_number is not null
                                                 TableScan [TS_25] (rows=28798881 width=4)
-                                                  default@catalog_returns,cr1,Tbl:COMPLETE,Col:COMPLETE,Output:["cr_order_number"]
+                                                  default@catalog_returns,cr1, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cr_order_number"]
                                   <-Reducer 5 [SIMPLE_EDGE]
                                     SHUFFLE [RS_38]
                                       PartitionCols:_col4
@@ -158,7 +158,7 @@ Stage-0
                                                   Filter Operator [FIL_146] (rows=10 width=102)
                                                     predicate:((cc_county) IN ('Ziebach County', 'Levy County', 'Huron County', 'Franklin Parish', 'Daviess County') and cc_call_center_sk is not null)
                                                     TableScan [TS_9] (rows=60 width=102)
-                                                      default@call_center,call_center,Tbl:COMPLETE,Col:COMPLETE,Output:["cc_call_center_sk","cc_county"]
+                                                      default@call_center,call_center, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cc_call_center_sk","cc_county"]
                                             <-Reducer 3 [SIMPLE_EDGE]
                                               SHUFFLE [RS_18]
                                                 PartitionCols:_col2
@@ -172,7 +172,7 @@ Stage-0
                                                       Filter Operator [FIL_143] (rows=8116 width=98)
                                                         predicate:(CAST( d_date AS TIMESTAMP) BETWEEN TIMESTAMP'2001-04-01 00:00:00' AND TIMESTAMP'2001-05-31 00:00:00' and d_date_sk is not null)
                                                         TableScan [TS_6] (rows=73049 width=98)
-                                                          default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
+                                                          default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
                                                 <-Reducer 2 [SIMPLE_EDGE]
                                                   SHUFFLE [RS_15]
                                                     PartitionCols:_col0
@@ -186,7 +186,7 @@ Stage-0
                                                           Filter Operator [FIL_132] (rows=784314 width=90)
                                                             predicate:((ca_state = 'NY') and ca_address_sk is not null)
                                                             TableScan [TS_3] (rows=40000000 width=90)
-                                                              default@customer_address,customer_address,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_state"]
+                                                              default@customer_address,customer_address, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_state"]
                                                     <-Map 1 [SIMPLE_EDGE] vectorized
                                                       SHUFFLE [RS_142]
                                                         PartitionCols:_col1
@@ -195,7 +195,7 @@ Stage-0
                                                           Filter Operator [FIL_140] (rows=283695062 width=243)
                                                             predicate:(cs_ship_date_sk is not null and cs_call_center_sk is not null and cs_ship_addr_sk is not null and cs_order_number is not null and cs_ship_addr_sk BETWEEN DynamicValue(RS_13_customer_address_ca_address_sk_min) AND DynamicValue(RS_13_customer_address_ca_address_sk_max) and in_bloom_filter(cs_ship_addr_sk, DynamicValue(RS_13_customer_address_ca_address_sk_bloom_filter)))
                                                             TableScan [TS_0] (rows=287989836 width=243)
-                                                              default@catalog_sales,cs1,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_ship_date_sk","cs_ship_addr_sk","cs_call_center_sk","cs_warehouse_sk","cs_order_number","cs_ext_ship_cost","cs_net_profit"]
+                                                              default@catalog_sales,cs1, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_ship_date_sk","cs_ship_addr_sk","cs_call_center_sk","cs_warehouse_sk","cs_order_number","cs_ext_ship_cost","cs_net_profit"]
                                                             <-Reducer 12 [BROADCAST_EDGE] vectorized
                                                               BROADCAST [RS_139]
                                                                 Group By Operator [GBY_138] (rows=1 width=12)
@@ -217,7 +217,7 @@ Stage-0
                                                 Filter Operator [FIL_151] (rows=286548719 width=7)
                                                   predicate:(cs_warehouse_sk is not null and cs_order_number is not null and cs_order_number BETWEEN DynamicValue(RS_34_cs1_cs_order_number_min) AND DynamicValue(RS_34_cs1_cs_order_number_max) and in_bloom_filter(cs_order_number, DynamicValue(RS_34_cs1_cs_order_number_bloom_filter)))
                                                   TableScan [TS_22] (rows=287989836 width=7)
-                                                    default@catalog_sales,cs2,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_warehouse_sk","cs_order_number"]
+                                                    default@catalog_sales,cs2, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_warehouse_sk","cs_order_number"]
                                                   <-Reducer 10 [BROADCAST_EDGE] vectorized
                                                     BROADCAST [RS_150]
                                                       Group By Operator [GBY_149] (rows=1 width=12)

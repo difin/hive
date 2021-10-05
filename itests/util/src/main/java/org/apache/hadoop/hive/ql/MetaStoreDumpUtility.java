@@ -80,6 +80,22 @@ public class MetaStoreDumpUtility {
               new File(HiveTestEnvSetup.HIVE_ROOT + "/metastore/scripts/upgrade/derby/022-HIVE-11107.derby.sql")));
       String command;
 
+      // Load existing table parameters before we drop the TABLE_PARAMS table
+      Map<String, Map<String, String>> tableParamsData = new ConcurrentHashMap<>();
+      rs = s.executeQuery("SELECT T.TBL_NAME, TP.PARAM_KEY, TP.PARAM_VALUE FROM APP.TABLE_PARAMS TP \n" +
+          "JOIN APP.TBLS T ON T.TBL_ID = TP.TBL_ID");
+      while (rs.next()) {
+        String tblName = rs.getString(1);
+        String paramKey = rs.getString(2);
+        String paramValue = rs.getString(3);
+        Map<String, String> params = tableParamsData.get(tblName);
+        if (null == params) {
+          params = new HashMap<>();
+        }
+        params.put(paramKey, paramValue);
+        tableParamsData.put(tblName, params);
+      }
+
       s.execute("DROP TABLE APP.TABLE_PARAMS");
       s.execute("DROP TABLE APP.TAB_COL_STATS");
       // Create the column stats table
@@ -167,28 +183,52 @@ public class MetaStoreDumpUtility {
 
       BufferedReader reader2 = new BufferedReader(new InputStreamReader(
           new BZip2CompressorInputStream(Files.newInputStream(tabParamsCsv, StandardOpenOption.READ))));
-      final Map<String,String> colStats = new ConcurrentHashMap<>();
-      Stream<String> replacedStream = reader2.lines().parallel().map(str-> {
+
+      // Update table parameters
+      reader2.lines().parallel().forEach(str -> {
         String[] splits = str.split("_@");
         String tblName = splits[0];
+        splits = splits[1].split("@");
+        String paramKey = splits[0];
+        String paramValue = splits[1];
+        tableParamsData.get(tblName).put(paramKey, paramValue);
+      });
+
+      // Save table parameters to file and regenerate COLUMN_STATS_ACCURATE property value
+      tmpFileLoc2.toFile().createNewFile();
+      final Map<String,String> colStats = new ConcurrentHashMap<>();
+      for (Map.Entry<String, Map<String, String>> entry : tableParamsData.entrySet()) {
+        String tblName = entry.getKey();
         Integer tblId = tableNameToID.get(tblName);
-        Map<String,String> cols = data.get(tblName);
         StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> param : entry.getValue().entrySet()) {
+          if ("COLUMN_STATS_ACCURATE".equals(param.getKey())) {
+            continue;
+          }
+          sb.append(tblId);
+          sb.append("@");
+          sb.append(param.getKey());
+          sb.append("@");
+          sb.append(param.getValue());
+          sb.append("\n");
+        }
+
+        Files.write(tmpFileLoc2, sb.toString().getBytes(), StandardOpenOption.APPEND);
+
+        Map<String,String> cols = data.get(tblName);
+        sb = new StringBuilder();
         sb.append("{\"COLUMN_STATS\":{");
         for (String colName : cols.keySet()) {
           sb.append("\""+colName+"\":\"true\",");
         }
         sb.append("},\"BASIC_STATS\":\"true\"}");
         colStats.put(tblId.toString(), sb.toString());
+      }
 
-        return  tblId.toString() + "@" + splits[1];
-      });
-
-      Files.write(tmpFileLoc2, (Iterable<String>)replacedStream::iterator);
+      // Save COLUMN_STATS_ACCURATE to file
       Files.write(tmpFileLoc2, (Iterable<String>)colStats.entrySet().stream()
         .map(map->map.getKey()+"@COLUMN_STATS_ACCURATE@"+map.getValue())::iterator, StandardOpenOption.APPEND);
 
-      replacedStream.close();
       reader2.close();
       // Load the column stats and table params with 30 TB scale
       String importStatement1 =  "CALL SYSCS_UTIL.SYSCS_IMPORT_TABLE(null, '" + "TAB_COL_STATS" +

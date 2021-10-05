@@ -111,7 +111,7 @@ Stage-0
                                         Filter Operator [FIL_73] (rows=462000 width=186)
                                           predicate:i_item_sk is not null
                                           TableScan [TS_6] (rows=462000 width=186)
-                                            default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_class","i_category"]
+                                            default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_class","i_category"]
                                   <-Reducer 2 [SIMPLE_EDGE]
                                     SHUFFLE [RS_12]
                                       PartitionCols:_col1
@@ -125,7 +125,7 @@ Stage-0
                                             Filter Operator [FIL_62] (rows=317 width=8)
                                               predicate:(d_month_seq BETWEEN 1212 AND 1223 and d_date_sk is not null)
                                               TableScan [TS_3] (rows=73049 width=8)
-                                                default@date_dim,d1,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_month_seq"]
+                                                default@date_dim,d1, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_month_seq"]
                                       <-Map 1 [SIMPLE_EDGE] vectorized
                                         SHUFFLE [RS_72]
                                           PartitionCols:_col0
@@ -134,7 +134,7 @@ Stage-0
                                             Filter Operator [FIL_70] (rows=143966864 width=119)
                                               predicate:(ws_sold_date_sk is not null and ws_item_sk is not null and ws_sold_date_sk BETWEEN DynamicValue(RS_10_d1_d_date_sk_min) AND DynamicValue(RS_10_d1_d_date_sk_max) and in_bloom_filter(ws_sold_date_sk, DynamicValue(RS_10_d1_d_date_sk_bloom_filter)))
                                               TableScan [TS_0] (rows=144002668 width=119)
-                                                default@web_sales,web_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_sold_date_sk","ws_item_sk","ws_net_paid"]
+                                                default@web_sales,web_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_sold_date_sk","ws_item_sk","ws_net_paid"]
                                               <-Reducer 8 [BROADCAST_EDGE] vectorized
                                                 BROADCAST [RS_69]
                                                   Group By Operator [GBY_68] (rows=1 width=12)

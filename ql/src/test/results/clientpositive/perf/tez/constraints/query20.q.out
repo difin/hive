@@ -113,7 +113,7 @@ Stage-0
                                     Filter Operator [FIL_71] (rows=138600 width=581)
                                       predicate:(i_category) IN ('Jewelry', 'Sports', 'Books')
                                       TableScan [TS_6] (rows=462000 width=581)
-                                        default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id","i_item_desc","i_current_price","i_class","i_category"]
+                                        default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id","i_item_desc","i_current_price","i_class","i_category"]
                               <-Reducer 2 [SIMPLE_EDGE]
                                 SHUFFLE [RS_12]
                                   PartitionCols:_col1
@@ -127,7 +127,7 @@ Stage-0
                                         Filter Operator [FIL_60] (rows=8116 width=98)
                                           predicate:CAST( d_date AS TIMESTAMP) BETWEEN TIMESTAMP'2001-01-12 00:00:00' AND TIMESTAMP'2001-02-11 00:00:00'
                                           TableScan [TS_3] (rows=73049 width=98)
-                                            default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
+                                            default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
                                   <-Map 1 [SIMPLE_EDGE] vectorized
                                     SHUFFLE [RS_70]
                                       PartitionCols:_col0
@@ -136,7 +136,7 @@ Stage-0
                                         Filter Operator [FIL_68] (rows=286549727 width=119)
                                           predicate:(cs_sold_date_sk is not null and cs_sold_date_sk BETWEEN DynamicValue(RS_10_date_dim_d_date_sk_min) AND DynamicValue(RS_10_date_dim_d_date_sk_max) and in_bloom_filter(cs_sold_date_sk, DynamicValue(RS_10_date_dim_d_date_sk_bloom_filter)))
                                           TableScan [TS_0] (rows=287989836 width=119)
-                                            default@catalog_sales,catalog_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_item_sk","cs_ext_sales_price"]
+                                            default@catalog_sales,catalog_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_item_sk","cs_ext_sales_price"]
                                           <-Reducer 8 [BROADCAST_EDGE] vectorized
                                             BROADCAST [RS_67]
                                               Group By Operator [GBY_66] (rows=1 width=12)

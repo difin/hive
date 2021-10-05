@@ -95,7 +95,7 @@ Stage-0
                               Filter Operator [FIL_122] (rows=462000 width=104)
                                 predicate:i_item_sk is not null
                                 TableScan [TS_12] (rows=462000 width=104)
-                                  default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id"]
+                                  default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id"]
                         <-Reducer 4 [SIMPLE_EDGE]
                           SHUFFLE [RS_24]
                             PartitionCols:_col2
@@ -109,7 +109,7 @@ Stage-0
                                   Filter Operator [FIL_119] (rows=2300 width=174)
                                     predicate:(((p_channel_email = 'N') or (p_channel_event = 'N')) and p_promo_sk is not null)
                                     TableScan [TS_9] (rows=2300 width=174)
-                                      default@promotion,promotion,Tbl:COMPLETE,Col:COMPLETE,Output:["p_promo_sk","p_channel_email","p_channel_event"]
+                                      default@promotion,promotion, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["p_promo_sk","p_channel_email","p_channel_event"]
                             <-Reducer 3 [SIMPLE_EDGE]
                               SHUFFLE [RS_21]
                                 PartitionCols:_col3
@@ -123,7 +123,7 @@ Stage-0
                                       Filter Operator [FIL_116] (rows=652 width=8)
                                         predicate:((d_year = 1998) and d_date_sk is not null)
                                         TableScan [TS_6] (rows=73049 width=8)
-                                          default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year"]
+                                          default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year"]
                                 <-Reducer 2 [SIMPLE_EDGE]
                                   SHUFFLE [RS_18]
                                     PartitionCols:_col0
@@ -137,7 +137,7 @@ Stage-0
                                           Filter Operator [FIL_105] (rows=14776 width=268)
                                             predicate:((cd_marital_status = 'W') and (cd_education_status = 'Primary') and (cd_gender = 'F') and cd_demo_sk is not null)
                                             TableScan [TS_3] (rows=1861800 width=268)
-                                              default@customer_demographics,customer_demographics,Tbl:COMPLETE,Col:COMPLETE,Output:["cd_demo_sk","cd_gender","cd_marital_status","cd_education_status"]
+                                              default@customer_demographics,customer_demographics, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cd_demo_sk","cd_gender","cd_marital_status","cd_education_status"]
                                     <-Map 1 [SIMPLE_EDGE] vectorized
                                       SHUFFLE [RS_115]
                                         PartitionCols:_col1
@@ -146,7 +146,7 @@ Stage-0
                                           Filter Operator [FIL_113] (rows=283691050 width=354)
                                             predicate:(cs_promo_sk is not null and cs_sold_date_sk is not null and cs_bill_cdemo_sk is not null and cs_item_sk is not null and cs_bill_cdemo_sk BETWEEN DynamicValue(RS_16_customer_demographics_cd_demo_sk_min) AND DynamicValue(RS_16_customer_demographics_cd_demo_sk_max) and in_bloom_filter(cs_bill_cdemo_sk, DynamicValue(RS_16_customer_demographics_cd_demo_sk_bloom_filter)))
                                             TableScan [TS_0] (rows=287989836 width=354)
-                                              default@catalog_sales,catalog_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_bill_cdemo_sk","cs_item_sk","cs_promo_sk","cs_quantity","cs_list_price","cs_sales_price","cs_coupon_amt"]
+                                              default@catalog_sales,catalog_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_bill_cdemo_sk","cs_item_sk","cs_promo_sk","cs_quantity","cs_list_price","cs_sales_price","cs_coupon_amt"]
                                             <-Reducer 9 [BROADCAST_EDGE] vectorized
                                               BROADCAST [RS_112]
                                                 Group By Operator [GBY_111] (rows=1 width=12)

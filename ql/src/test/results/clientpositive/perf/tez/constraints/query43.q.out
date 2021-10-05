@@ -87,7 +87,7 @@ Stage-0
                                 Filter Operator [FIL_72] (rows=341 width=303)
                                   predicate:(s_gmt_offset = -6)
                                   TableScan [TS_6] (rows=1704 width=303)
-                                    default@store,store,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_store_id","s_store_name","s_gmt_offset"]
+                                    default@store,store, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_store_id","s_store_name","s_gmt_offset"]
                           <-Reducer 2 [SIMPLE_EDGE]
                             SHUFFLE [RS_12]
                               PartitionCols:_col1
@@ -101,7 +101,7 @@ Stage-0
                                     Filter Operator [FIL_61] (rows=652 width=99)
                                       predicate:(d_year = 1998)
                                       TableScan [TS_3] (rows=73049 width=99)
-                                        default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year","d_day_name"]
+                                        default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year","d_day_name"]
                               <-Map 1 [SIMPLE_EDGE] vectorized
                                 SHUFFLE [RS_71]
                                   PartitionCols:_col0
@@ -110,7 +110,7 @@ Stage-0
                                     Filter Operator [FIL_69] (rows=525329897 width=114)
                                       predicate:(ss_sold_date_sk is not null and ss_store_sk is not null and ss_sold_date_sk BETWEEN DynamicValue(RS_10_date_dim_d_date_sk_min) AND DynamicValue(RS_10_date_dim_d_date_sk_max) and in_bloom_filter(ss_sold_date_sk, DynamicValue(RS_10_date_dim_d_date_sk_bloom_filter)))
                                       TableScan [TS_0] (rows=575995635 width=114)
-                                        default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_date_sk","ss_store_sk","ss_sales_price"]
+                                        default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_date_sk","ss_store_sk","ss_sales_price"]
                                       <-Reducer 7 [BROADCAST_EDGE] vectorized
                                         BROADCAST [RS_68]
                                           Group By Operator [GBY_67] (rows=1 width=12)

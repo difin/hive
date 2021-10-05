@@ -118,7 +118,7 @@ Stage-0
                                       Filter Operator [FIL_123] (rows=8116 width=98)
                                         predicate:(CAST( d_date AS TIMESTAMP) BETWEEN TIMESTAMP'1998-03-18 00:00:00' AND TIMESTAMP'1998-06-16 00:00:00' and d_date_sk is not null)
                                         TableScan [TS_6] (rows=73049 width=98)
-                                          default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
+                                          default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
                                 <-Reducer 2 [SIMPLE_EDGE]
                                   SHUFFLE [RS_27]
                                     PartitionCols:_col0
@@ -132,7 +132,7 @@ Stage-0
                                           Filter Operator [FIL_117] (rows=143930905 width=119)
                                             predicate:(ws_ext_discount_amt is not null and ws_sold_date_sk is not null and ws_item_sk is not null and ws_item_sk BETWEEN DynamicValue(RS_25_item_i_item_sk_min) AND DynamicValue(RS_25_item_i_item_sk_max) and in_bloom_filter(ws_item_sk, DynamicValue(RS_25_item_i_item_sk_bloom_filter)))
                                             TableScan [TS_0] (rows=144002668 width=119)
-                                              default@web_sales,web_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_sold_date_sk","ws_item_sk","ws_ext_discount_amt"]
+                                              default@web_sales,web_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_sold_date_sk","ws_item_sk","ws_ext_discount_amt"]
                                             <-Reducer 10 [BROADCAST_EDGE] vectorized
                                               BROADCAST [RS_116]
                                                 Group By Operator [GBY_115] (rows=1 width=12)
@@ -148,7 +148,7 @@ Stage-0
                                                           Filter Operator [FIL_109] (rows=669 width=7)
                                                             predicate:((i_manufact_id = 269) and i_item_sk is not null)
                                                             TableScan [TS_3] (rows=462000 width=7)
-                                                              default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_manufact_id"]
+                                                              default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_manufact_id"]
                                     <-Map 9 [SIMPLE_EDGE] vectorized
                                       SHUFFLE [RS_111]
                                         PartitionCols:_col0

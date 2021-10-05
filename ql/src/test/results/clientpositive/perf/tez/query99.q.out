@@ -123,7 +123,7 @@ Stage-0
                               Filter Operator [FIL_106] (rows=1 width=88)
                                 predicate:sm_ship_mode_sk is not null
                                 TableScan [TS_12] (rows=1 width=88)
-                                  default@ship_mode,ship_mode,Tbl:COMPLETE,Col:COMPLETE,Output:["sm_ship_mode_sk","sm_type"]
+                                  default@ship_mode,ship_mode, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["sm_ship_mode_sk","sm_type"]
                         <-Reducer 4 [SIMPLE_EDGE]
                           SHUFFLE [RS_24]
                             PartitionCols:_col2
@@ -137,7 +137,7 @@ Stage-0
                                   Filter Operator [FIL_123] (rows=27 width=104)
                                     predicate:w_warehouse_sk is not null
                                     TableScan [TS_9] (rows=27 width=104)
-                                      default@warehouse,warehouse,Tbl:COMPLETE,Col:COMPLETE,Output:["w_warehouse_sk","w_warehouse_name"]
+                                      default@warehouse,warehouse, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["w_warehouse_sk","w_warehouse_name"]
                             <-Reducer 3 [SIMPLE_EDGE]
                               SHUFFLE [RS_21]
                                 PartitionCols:_col3
@@ -151,7 +151,7 @@ Stage-0
                                       Filter Operator [FIL_120] (rows=60 width=102)
                                         predicate:cc_call_center_sk is not null
                                         TableScan [TS_6] (rows=60 width=102)
-                                          default@call_center,call_center,Tbl:COMPLETE,Col:COMPLETE,Output:["cc_call_center_sk","cc_name"]
+                                          default@call_center,call_center, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cc_call_center_sk","cc_name"]
                                 <-Reducer 2 [SIMPLE_EDGE]
                                   SHUFFLE [RS_18]
                                     PartitionCols:_col1
@@ -165,7 +165,7 @@ Stage-0
                                           Filter Operator [FIL_114] (rows=282273729 width=19)
                                             predicate:(cs_warehouse_sk is not null and cs_ship_date_sk is not null and cs_ship_mode_sk is not null and cs_call_center_sk is not null and cs_ship_mode_sk BETWEEN DynamicValue(RS_25_ship_mode_sm_ship_mode_sk_min) AND DynamicValue(RS_25_ship_mode_sm_ship_mode_sk_max) and in_bloom_filter(cs_ship_mode_sk, DynamicValue(RS_25_ship_mode_sm_ship_mode_sk_bloom_filter)))
                                             TableScan [TS_0] (rows=287989836 width=19)
-                                              default@catalog_sales,catalog_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_ship_date_sk","cs_call_center_sk","cs_ship_mode_sk","cs_warehouse_sk"]
+                                              default@catalog_sales,catalog_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_ship_date_sk","cs_call_center_sk","cs_ship_mode_sk","cs_warehouse_sk"]
                                             <-Reducer 12 [BROADCAST_EDGE] vectorized
                                               BROADCAST [RS_113]
                                                 Group By Operator [GBY_112] (rows=1 width=12)
@@ -185,5 +185,5 @@ Stage-0
                                           Filter Operator [FIL_117] (rows=317 width=8)
                                             predicate:(d_month_seq BETWEEN 1212 AND 1223 and d_date_sk is not null)
                                             TableScan [TS_3] (rows=73049 width=8)
-                                              default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_month_seq"]
+                                              default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_month_seq"]
 

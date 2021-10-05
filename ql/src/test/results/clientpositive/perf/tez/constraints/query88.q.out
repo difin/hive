@@ -294,7 +294,7 @@ Stage-0
                                   Filter Operator [FIL_669] (rows=155 width=92)
                                     predicate:(s_store_name = 'ese')
                                     TableScan [TS_9] (rows=1704 width=92)
-                                      default@store,store,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_store_name"]
+                                      default@store,store, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_store_name"]
                             <-Reducer 31 [SIMPLE_EDGE]
                               SHUFFLE [RS_148]
                                 PartitionCols:_col2
@@ -308,7 +308,7 @@ Stage-0
                                       Filter Operator [FIL_611] (rows=1515 width=12)
                                         predicate:((t_hour = 10) and (t_minute < 30))
                                         TableScan [TS_6] (rows=86400 width=12)
-                                          default@time_dim,time_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["t_time_sk","t_hour","t_minute"]
+                                          default@time_dim,time_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["t_time_sk","t_hour","t_minute"]
                                 <-Reducer 30 [SIMPLE_EDGE]
                                   SHUFFLE [RS_145]
                                     PartitionCols:_col0
@@ -322,7 +322,7 @@ Stage-0
                                           Filter Operator [FIL_659] (rows=817 width=12)
                                             predicate:((hd_dep_count) IN (3, 0, 1) and (((hd_dep_count = 3) and (hd_vehicle_count <= 5)) or ((hd_dep_count = 0) and (hd_vehicle_count <= 2)) or ((hd_dep_count = 1) and (hd_vehicle_count <= 3))) and ((hd_vehicle_count <= 5) or (hd_vehicle_count <= 2) or (hd_vehicle_count <= 3)))
                                             TableScan [TS_3] (rows=7200 width=12)
-                                              default@household_demographics,household_demographics,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_dep_count","hd_vehicle_count"]
+                                              default@household_demographics,household_demographics, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_dep_count","hd_vehicle_count"]
                                     <-Map 56 [SIMPLE_EDGE] vectorized
                                       SHUFFLE [RS_713]
                                         PartitionCols:_col1
@@ -331,7 +331,7 @@ Stage-0
                                           Filter Operator [FIL_711] (rows=501695814 width=11)
                                             predicate:(ss_sold_time_sk is not null and ss_hdemo_sk is not null and ss_store_sk is not null and ss_sold_time_sk BETWEEN DynamicValue(RS_146_time_dim_t_time_sk_min) AND DynamicValue(RS_146_time_dim_t_time_sk_max) and in_bloom_filter(ss_sold_time_sk, DynamicValue(RS_146_time_dim_t_time_sk_bloom_filter)))
                                             TableScan [TS_130] (rows=575995635 width=11)
-                                              default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
+                                              default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
                                             <-Reducer 48 [BROADCAST_EDGE] vectorized
                                               BROADCAST [RS_710]
                                                 Group By Operator [GBY_709] (rows=1 width=12)
@@ -391,7 +391,7 @@ Stage-0
                                               Filter Operator [FIL_704] (rows=501695814 width=11)
                                                 predicate:(ss_sold_time_sk is not null and ss_hdemo_sk is not null and ss_store_sk is not null and ss_sold_time_sk BETWEEN DynamicValue(RS_120_time_dim_t_time_sk_min) AND DynamicValue(RS_120_time_dim_t_time_sk_max) and in_bloom_filter(ss_sold_time_sk, DynamicValue(RS_120_time_dim_t_time_sk_bloom_filter)))
                                                 TableScan [TS_104] (rows=575995635 width=11)
-                                                  default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
+                                                  default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
                                                 <-Reducer 47 [BROADCAST_EDGE] vectorized
                                                   BROADCAST [RS_703]
                                                     Group By Operator [GBY_702] (rows=1 width=12)
@@ -451,7 +451,7 @@ Stage-0
                                                   Filter Operator [FIL_697] (rows=501695814 width=11)
                                                     predicate:(ss_sold_time_sk is not null and ss_hdemo_sk is not null and ss_store_sk is not null and ss_sold_time_sk BETWEEN DynamicValue(RS_94_time_dim_t_time_sk_min) AND DynamicValue(RS_94_time_dim_t_time_sk_max) and in_bloom_filter(ss_sold_time_sk, DynamicValue(RS_94_time_dim_t_time_sk_bloom_filter)))
                                                     TableScan [TS_78] (rows=575995635 width=11)
-                                                      default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
+                                                      default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
                                                     <-Reducer 46 [BROADCAST_EDGE] vectorized
                                                       BROADCAST [RS_696]
                                                         Group By Operator [GBY_695] (rows=1 width=12)
@@ -511,7 +511,7 @@ Stage-0
                                                       Filter Operator [FIL_690] (rows=501695814 width=11)
                                                         predicate:(ss_sold_time_sk is not null and ss_hdemo_sk is not null and ss_store_sk is not null and ss_sold_time_sk BETWEEN DynamicValue(RS_68_time_dim_t_time_sk_min) AND DynamicValue(RS_68_time_dim_t_time_sk_max) and in_bloom_filter(ss_sold_time_sk, DynamicValue(RS_68_time_dim_t_time_sk_bloom_filter)))
                                                         TableScan [TS_52] (rows=575995635 width=11)
-                                                          default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
+                                                          default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
                                                         <-Reducer 45 [BROADCAST_EDGE] vectorized
                                                           BROADCAST [RS_689]
                                                             Group By Operator [GBY_688] (rows=1 width=12)
@@ -571,7 +571,7 @@ Stage-0
                                                           Filter Operator [FIL_683] (rows=501695814 width=11)
                                                             predicate:(ss_sold_time_sk is not null and ss_hdemo_sk is not null and ss_store_sk is not null and ss_sold_time_sk BETWEEN DynamicValue(RS_42_time_dim_t_time_sk_min) AND DynamicValue(RS_42_time_dim_t_time_sk_max) and in_bloom_filter(ss_sold_time_sk, DynamicValue(RS_42_time_dim_t_time_sk_bloom_filter)))
                                                             TableScan [TS_26] (rows=575995635 width=11)
-                                                              default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
+                                                              default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
                                                             <-Reducer 44 [BROADCAST_EDGE] vectorized
                                                               BROADCAST [RS_682]
                                                                 Group By Operator [GBY_681] (rows=1 width=12)
@@ -627,7 +627,7 @@ Stage-0
                                                           Filter Operator [FIL_656] (rows=501695814 width=11)
                                                             predicate:(ss_sold_time_sk is not null and ss_hdemo_sk is not null and ss_store_sk is not null and ss_sold_time_sk BETWEEN DynamicValue(RS_16_time_dim_t_time_sk_min) AND DynamicValue(RS_16_time_dim_t_time_sk_max) and in_bloom_filter(ss_sold_time_sk, DynamicValue(RS_16_time_dim_t_time_sk_bloom_filter)))
                                                             TableScan [TS_0] (rows=575995635 width=11)
-                                                              default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
+                                                              default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
                                                             <-Reducer 43 [BROADCAST_EDGE] vectorized
                                                               BROADCAST [RS_655]
                                                                 Group By Operator [GBY_654] (rows=1 width=12)
@@ -683,7 +683,7 @@ Stage-0
                                       Filter Operator [FIL_718] (rows=501695814 width=11)
                                         predicate:(ss_sold_time_sk is not null and ss_hdemo_sk is not null and ss_store_sk is not null and ss_sold_time_sk BETWEEN DynamicValue(RS_172_time_dim_t_time_sk_min) AND DynamicValue(RS_172_time_dim_t_time_sk_max) and in_bloom_filter(ss_sold_time_sk, DynamicValue(RS_172_time_dim_t_time_sk_bloom_filter)))
                                         TableScan [TS_156] (rows=575995635 width=11)
-                                          default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
+                                          default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
                                         <-Reducer 49 [BROADCAST_EDGE] vectorized
                                           BROADCAST [RS_717]
                                             Group By Operator [GBY_716] (rows=1 width=12)
@@ -739,7 +739,7 @@ Stage-0
                                   Filter Operator [FIL_725] (rows=501695814 width=11)
                                     predicate:(ss_sold_time_sk is not null and ss_hdemo_sk is not null and ss_store_sk is not null and ss_sold_time_sk BETWEEN DynamicValue(RS_198_time_dim_t_time_sk_min) AND DynamicValue(RS_198_time_dim_t_time_sk_max) and in_bloom_filter(ss_sold_time_sk, DynamicValue(RS_198_time_dim_t_time_sk_bloom_filter)))
                                     TableScan [TS_182] (rows=575995635 width=11)
-                                      default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
+                                      default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
                                     <-Reducer 50 [BROADCAST_EDGE] vectorized
                                       BROADCAST [RS_724]
                                         Group By Operator [GBY_723] (rows=1 width=12)

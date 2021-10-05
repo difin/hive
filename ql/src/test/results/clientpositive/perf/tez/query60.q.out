@@ -236,7 +236,7 @@ Stage-0
                                         Filter Operator [FIL_351] (rows=46200 width=190)
                                           predicate:((i_category = 'Children') and i_item_id is not null)
                                           TableScan [TS_9] (rows=462000 width=104)
-                                            default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id","i_category"]
+                                            default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id","i_category"]
                                 <-Reducer 14 [SIMPLE_EDGE]
                                   SHUFFLE [RS_62]
                                     PartitionCols:_col10
@@ -263,7 +263,7 @@ Stage-0
                                               Filter Operator [FIL_345] (rows=8000000 width=112)
                                                 predicate:((ca_gmt_offset = -6) and ca_address_sk is not null)
                                                 TableScan [TS_6] (rows=40000000 width=112)
-                                                  default@customer_address,customer_address,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_gmt_offset"]
+                                                  default@customer_address,customer_address, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_gmt_offset"]
                                         <-Reducer 12 [SIMPLE_EDGE]
                                           SHUFFLE [RS_50]
                                             PartitionCols:_col1
@@ -277,7 +277,7 @@ Stage-0
                                                   Filter Operator [FIL_326] (rows=50 width=12)
                                                     predicate:((d_year = 1999) and (d_moy = 9) and d_date_sk is not null)
                                                     TableScan [TS_3] (rows=73049 width=12)
-                                                      default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year","d_moy"]
+                                                      default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year","d_moy"]
                                             <-Map 26 [SIMPLE_EDGE] vectorized
                                               SHUFFLE [RS_375]
                                                 PartitionCols:_col0
@@ -286,7 +286,7 @@ Stage-0
                                                   Filter Operator [FIL_373] (rows=285117733 width=123)
                                                     predicate:(cs_sold_date_sk is not null and cs_bill_addr_sk is not null and cs_item_sk is not null and cs_sold_date_sk BETWEEN DynamicValue(RS_48_date_dim_d_date_sk_min) AND DynamicValue(RS_48_date_dim_d_date_sk_max) and in_bloom_filter(cs_sold_date_sk, DynamicValue(RS_48_date_dim_d_date_sk_bloom_filter)))
                                                     TableScan [TS_35] (rows=287989836 width=123)
-                                                      default@catalog_sales,catalog_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_bill_addr_sk","cs_item_sk","cs_ext_sales_price"]
+                                                      default@catalog_sales,catalog_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_bill_addr_sk","cs_item_sk","cs_ext_sales_price"]
                                                     <-Reducer 17 [BROADCAST_EDGE] vectorized
                                                       BROADCAST [RS_372]
                                                         Group By Operator [GBY_371] (rows=1 width=12)
@@ -353,7 +353,7 @@ Stage-0
                                                   Filter Operator [FIL_382] (rows=143931246 width=123)
                                                     predicate:(ws_sold_date_sk is not null and ws_bill_addr_sk is not null and ws_item_sk is not null and ws_sold_date_sk BETWEEN DynamicValue(RS_84_date_dim_d_date_sk_min) AND DynamicValue(RS_84_date_dim_d_date_sk_max) and in_bloom_filter(ws_sold_date_sk, DynamicValue(RS_84_date_dim_d_date_sk_bloom_filter)))
                                                     TableScan [TS_71] (rows=144002668 width=123)
-                                                      default@web_sales,web_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_sold_date_sk","ws_item_sk","ws_bill_addr_sk","ws_ext_sales_price"]
+                                                      default@web_sales,web_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_sold_date_sk","ws_item_sk","ws_bill_addr_sk","ws_ext_sales_price"]
                                                     <-Reducer 23 [BROADCAST_EDGE] vectorized
                                                       BROADCAST [RS_381]
                                                         Group By Operator [GBY_380] (rows=1 width=12)
@@ -420,7 +420,7 @@ Stage-0
                                                   Filter Operator [FIL_342] (rows=525327191 width=118)
                                                     predicate:(ss_sold_date_sk is not null and ss_addr_sk is not null and ss_item_sk is not null and ss_sold_date_sk BETWEEN DynamicValue(RS_13_date_dim_d_date_sk_min) AND DynamicValue(RS_13_date_dim_d_date_sk_max) and in_bloom_filter(ss_sold_date_sk, DynamicValue(RS_13_date_dim_d_date_sk_bloom_filter)))
                                                     TableScan [TS_0] (rows=575995635 width=118)
-                                                      default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_date_sk","ss_item_sk","ss_addr_sk","ss_ext_sales_price"]
+                                                      default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_date_sk","ss_item_sk","ss_addr_sk","ss_ext_sales_price"]
                                                     <-Reducer 11 [BROADCAST_EDGE] vectorized
                                                       BROADCAST [RS_341]
                                                         Group By Operator [GBY_340] (rows=1 width=12)

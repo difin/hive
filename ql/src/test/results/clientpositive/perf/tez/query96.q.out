@@ -81,7 +81,7 @@ Stage-0
                               Filter Operator [FIL_92] (rows=155 width=92)
                                 predicate:((s_store_name = 'ese') and s_store_sk is not null)
                                 TableScan [TS_9] (rows=1704 width=92)
-                                  default@store,store,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_store_name"]
+                                  default@store,store, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_store_name"]
                         <-Reducer 3 [SIMPLE_EDGE]
                           SHUFFLE [RS_18]
                             PartitionCols:_col2
@@ -95,7 +95,7 @@ Stage-0
                                   Filter Operator [FIL_89] (rows=655 width=8)
                                     predicate:((hd_dep_count = 5) and hd_demo_sk is not null)
                                     TableScan [TS_6] (rows=7200 width=8)
-                                      default@household_demographics,household_demographics,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_dep_count"]
+                                      default@household_demographics,household_demographics, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_dep_count"]
                             <-Reducer 2 [SIMPLE_EDGE]
                               SHUFFLE [RS_15]
                                 PartitionCols:_col1
@@ -109,7 +109,7 @@ Stage-0
                                       Filter Operator [FIL_78] (rows=1515 width=12)
                                         predicate:((t_hour = 8) and (t_minute >= 30) and t_time_sk is not null)
                                         TableScan [TS_3] (rows=86400 width=12)
-                                          default@time_dim,time_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["t_time_sk","t_hour","t_minute"]
+                                          default@time_dim,time_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["t_time_sk","t_hour","t_minute"]
                                 <-Map 1 [SIMPLE_EDGE] vectorized
                                   SHUFFLE [RS_88]
                                     PartitionCols:_col0
@@ -118,7 +118,7 @@ Stage-0
                                       Filter Operator [FIL_86] (rows=501695814 width=11)
                                         predicate:(ss_sold_time_sk is not null and ss_hdemo_sk is not null and ss_store_sk is not null and ss_sold_time_sk BETWEEN DynamicValue(RS_13_time_dim_t_time_sk_min) AND DynamicValue(RS_13_time_dim_t_time_sk_max) and in_bloom_filter(ss_sold_time_sk, DynamicValue(RS_13_time_dim_t_time_sk_bloom_filter)))
                                         TableScan [TS_0] (rows=575995635 width=11)
-                                          default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
+                                          default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_time_sk","ss_hdemo_sk","ss_store_sk"]
                                         <-Reducer 8 [BROADCAST_EDGE] vectorized
                                           BROADCAST [RS_85]
                                             Group By Operator [GBY_84] (rows=1 width=12)

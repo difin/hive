@@ -87,7 +87,7 @@ Stage-0
                                 Filter Operator [FIL_91] (rows=8116 width=98)
                                   predicate:(CAST( d_date AS TIMESTAMP) BETWEEN TIMESTAMP'2002-05-30 00:00:00' AND TIMESTAMP'2002-07-29 00:00:00' and d_date_sk is not null)
                                   TableScan [TS_6] (rows=73049 width=98)
-                                    default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
+                                    default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
                           <-Reducer 2 [SIMPLE_EDGE]
                             SHUFFLE [RS_15]
                               PartitionCols:_col0
@@ -101,7 +101,7 @@ Stage-0
                                     Filter Operator [FIL_85] (rows=4176000 width=11)
                                       predicate:(inv_quantity_on_hand BETWEEN 100 AND 500 and inv_date_sk is not null and inv_item_sk is not null)
                                       TableScan [TS_0] (rows=37584000 width=11)
-                                        default@inventory,inventory,Tbl:COMPLETE,Col:COMPLETE,Output:["inv_date_sk","inv_item_sk","inv_quantity_on_hand"]
+                                        default@inventory,inventory, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["inv_date_sk","inv_item_sk","inv_quantity_on_hand"]
                               <-Map 8 [SIMPLE_EDGE] vectorized
                                 SHUFFLE [RS_90]
                                   PartitionCols:_col0
@@ -110,7 +110,7 @@ Stage-0
                                     Filter Operator [FIL_88] (rows=297 width=404)
                                       predicate:((i_manufact_id) IN (437, 129, 727, 663) and i_current_price BETWEEN 30 AND 60 and i_item_sk is not null)
                                       TableScan [TS_3] (rows=462000 width=403)
-                                        default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id","i_item_desc","i_current_price","i_manufact_id"]
+                                        default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id","i_item_desc","i_current_price","i_manufact_id"]
                       <-Map 10 [SIMPLE_EDGE] vectorized
                         SHUFFLE [RS_98]
                           PartitionCols:_col0
@@ -119,7 +119,7 @@ Stage-0
                             Filter Operator [FIL_96] (rows=575995635 width=4)
                               predicate:(ss_item_sk is not null and ss_item_sk BETWEEN DynamicValue(RS_18_item_i_item_sk_min) AND DynamicValue(RS_18_item_i_item_sk_max) and in_bloom_filter(ss_item_sk, DynamicValue(RS_18_item_i_item_sk_bloom_filter)))
                               TableScan [TS_9] (rows=575995635 width=4)
-                                default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_item_sk"]
+                                default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_item_sk"]
                               <-Reducer 7 [BROADCAST_EDGE] vectorized
                                 BROADCAST [RS_95]
                                   Group By Operator [GBY_94] (rows=1 width=12)

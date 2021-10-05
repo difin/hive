@@ -228,7 +228,7 @@ Stage-0
                               Filter Operator [FIL_230] (rows=4602 width=4)
                                 predicate:wp_web_page_sk is not null
                                 TableScan [TS_34] (rows=4602 width=4)
-                                  default@web_page,web_page,Tbl:COMPLETE,Col:COMPLETE,Output:["wp_web_page_sk"]
+                                  default@web_page,web_page, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["wp_web_page_sk"]
                         <-Reducer 3 [SIMPLE_EDGE]
                           SHUFFLE [RS_45]
                             PartitionCols:_col2
@@ -251,7 +251,7 @@ Stage-0
                                           Filter Operator [FIL_227] (rows=72 width=101)
                                             predicate:r_reason_sk is not null
                                             TableScan [TS_18] (rows=72 width=101)
-                                              default@reason,reason,Tbl:COMPLETE,Col:COMPLETE,Output:["r_reason_sk","r_reason_desc"]
+                                              default@reason,reason, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["r_reason_sk","r_reason_desc"]
                                     <-Reducer 12 [SIMPLE_EDGE]
                                       SHUFFLE [RS_30]
                                         PartitionCols:_col4
@@ -265,7 +265,7 @@ Stage-0
                                               Filter Operator [FIL_222] (rows=265971 width=183)
                                                 predicate:((cd_marital_status) IN ('M', 'D', 'U') and (cd_education_status) IN ('4 yr Degree', 'Primary', 'Advanced Degree') and cd_demo_sk is not null)
                                                 TableScan [TS_15] (rows=1861800 width=183)
-                                                  default@customer_demographics,cd1,Tbl:COMPLETE,Col:COMPLETE,Output:["cd_demo_sk","cd_marital_status","cd_education_status"]
+                                                  default@customer_demographics,cd1, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cd_demo_sk","cd_marital_status","cd_education_status"]
                                         <-Reducer 11 [SIMPLE_EDGE]
                                           SHUFFLE [RS_27]
                                             PartitionCols:_col1, _col13, _col14
@@ -290,7 +290,7 @@ Stage-0
                                                       Filter Operator [FIL_219] (rows=3529412 width=187)
                                                         predicate:((ca_state) IN ('KY', 'GA', 'NM', 'MT', 'OR', 'IN', 'WI', 'MO', 'WV') and (ca_country = 'United States') and ca_address_sk is not null)
                                                         TableScan [TS_9] (rows=40000000 width=187)
-                                                          default@customer_address,customer_address,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_state","ca_country"]
+                                                          default@customer_address,customer_address, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_state","ca_country"]
                                                 <-Map 9 [SIMPLE_EDGE] vectorized
                                                   SHUFFLE [RS_218]
                                                     PartitionCols:_col2
@@ -299,7 +299,7 @@ Stage-0
                                                       Filter Operator [FIL_216] (rows=11975292 width=237)
                                                         predicate:(wr_refunded_addr_sk is not null and wr_returning_cdemo_sk is not null and wr_refunded_cdemo_sk is not null and wr_reason_sk is not null and wr_item_sk is not null and wr_order_number is not null)
                                                         TableScan [TS_6] (rows=14398467 width=237)
-                                                          default@web_returns,web_returns,Tbl:COMPLETE,Col:COMPLETE,Output:["wr_item_sk","wr_refunded_cdemo_sk","wr_refunded_addr_sk","wr_returning_cdemo_sk","wr_reason_sk","wr_order_number","wr_fee","wr_refunded_cash"]
+                                                          default@web_returns,web_returns, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["wr_item_sk","wr_refunded_cdemo_sk","wr_refunded_addr_sk","wr_returning_cdemo_sk","wr_reason_sk","wr_order_number","wr_fee","wr_refunded_cash"]
                               <-Reducer 2 [SIMPLE_EDGE]
                                 SHUFFLE [RS_40]
                                   PartitionCols:_col1, _col3
@@ -313,7 +313,7 @@ Stage-0
                                         Filter Operator [FIL_205] (rows=652 width=8)
                                           predicate:((d_year = 1998) and d_date_sk is not null)
                                           TableScan [TS_3] (rows=73049 width=8)
-                                            default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year"]
+                                            default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year"]
                                   <-Map 1 [SIMPLE_EDGE] vectorized
                                     SHUFFLE [RS_215]
                                       PartitionCols:_col0
@@ -322,7 +322,7 @@ Stage-0
                                         Filter Operator [FIL_213] (rows=143931136 width=243)
                                           predicate:(((ws_sales_price >= 100) or (ws_sales_price <= 150) or (ws_sales_price >= 50) or (ws_sales_price <= 100) or (ws_sales_price >= 150) or (ws_sales_price <= 200)) and ((ws_net_profit >= 100) or (ws_net_profit <= 200) or (ws_net_profit >= 150) or (ws_net_profit <= 300) or (ws_net_profit >= 50) or (ws_net_profit <= 250)) and ws_sold_date_sk is not null and ws_web_page_sk is not null and ws_item_sk is not null and ws_order_number is not null and ws_sold_date_sk BETWEEN DynamicValue(RS_38_date_dim_d_date_sk_min) AND DynamicValue(RS_38_date_dim_d_date_sk_max) and in_bloom_filter(ws_sold_date_sk, DynamicValue(RS_38_date_dim_d_date_sk_bloom_filter)))
                                           TableScan [TS_0] (rows=144002668 width=243)
-                                            default@web_sales,web_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_sold_date_sk","ws_item_sk","ws_web_page_sk","ws_order_number","ws_quantity","ws_sales_price","ws_net_profit"]
+                                            default@web_sales,web_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_sold_date_sk","ws_item_sk","ws_web_page_sk","ws_order_number","ws_quantity","ws_sales_price","ws_net_profit"]
                                           <-Reducer 8 [BROADCAST_EDGE] vectorized
                                             BROADCAST [RS_212]
                                               Group By Operator [GBY_211] (rows=1 width=12)

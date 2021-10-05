@@ -209,7 +209,7 @@ Stage-0
                                           Filter Operator [FIL_365] (rows=73049 width=98)
                                             predicate:(d_week_seq is not null and d_date is not null)
                                             TableScan [TS_6] (rows=73049 width=98)
-                                              default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date","d_week_seq"]
+                                              default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date","d_week_seq"]
                                     <-Map 20 [SIMPLE_EDGE] vectorized
                                       SHUFFLE [RS_375]
                                         PartitionCols:_col0
@@ -220,7 +220,7 @@ Stage-0
                                             Filter Operator [FIL_372] (rows=2 width=98)
                                               predicate:((d_date) IN ('1998-01-02', '1998-10-15', '1998-11-10') and d_week_seq is not null)
                                               TableScan [TS_12] (rows=73049 width=98)
-                                                default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date","d_week_seq"]
+                                                default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date","d_week_seq"]
                               <-Reducer 15 [SIMPLE_EDGE]
                                 SHUFFLE [RS_103]
                                   PartitionCols:_col6
@@ -247,7 +247,7 @@ Stage-0
                                             Filter Operator [FIL_359] (rows=462000 width=104)
                                               predicate:(i_item_id is not null and i_item_sk is not null)
                                               TableScan [TS_3] (rows=462000 width=104)
-                                                default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id"]
+                                                default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id"]
                                       <-Map 22 [SIMPLE_EDGE] vectorized
                                         SHUFFLE [RS_387]
                                           PartitionCols:_col1
@@ -256,7 +256,7 @@ Stage-0
                                             Filter Operator [FIL_385] (rows=13749816 width=11)
                                               predicate:(wr_returned_date_sk is not null and wr_item_sk is not null)
                                               TableScan [TS_74] (rows=14398467 width=11)
-                                                default@web_returns,web_returns,Tbl:COMPLETE,Col:COMPLETE,Output:["wr_returned_date_sk","wr_item_sk","wr_return_quantity"]
+                                                default@web_returns,web_returns, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["wr_returned_date_sk","wr_item_sk","wr_return_quantity"]
                   <-Reducer 6 [SIMPLE_EDGE]
                     SHUFFLE [RS_114]
                       PartitionCols:_col0
@@ -306,7 +306,7 @@ Stage-0
                                                 Filter Operator [FIL_379] (rows=55578005 width=11)
                                                   predicate:(sr_returned_date_sk is not null and sr_item_sk is not null)
                                                   TableScan [TS_37] (rows=57591150 width=11)
-                                                    default@store_returns,store_returns,Tbl:COMPLETE,Col:COMPLETE,Output:["sr_returned_date_sk","sr_item_sk","sr_return_quantity"]
+                                                    default@store_returns,store_returns, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["sr_returned_date_sk","sr_item_sk","sr_return_quantity"]
                       <-Reducer 5 [SIMPLE_EDGE] vectorized
                         SHUFFLE [RS_378]
                           PartitionCols:_col0
@@ -351,5 +351,5 @@ Stage-0
                                                 Filter Operator [FIL_356] (rows=28798881 width=11)
                                                   predicate:(cr_returned_date_sk is not null and cr_item_sk is not null)
                                                   TableScan [TS_0] (rows=28798881 width=11)
-                                                    default@catalog_returns,catalog_returns,Tbl:COMPLETE,Col:COMPLETE,Output:["cr_returned_date_sk","cr_item_sk","cr_return_quantity"]
+                                                    default@catalog_returns,catalog_returns, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cr_returned_date_sk","cr_item_sk","cr_return_quantity"]
 

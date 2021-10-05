@@ -45,3 +45,5 @@ order by asceding.rnk
 limit 100;
 
 -- end query 1 in stream 0 using template query44.tpl
+
+DROP MATERIALIZED VIEW mv_store_sales_item_customer;

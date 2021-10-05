@@ -131,7 +131,7 @@ Stage-0
                                             Group By Operator [GBY_154] (rows=14398467 width=4)
                                               Output:["_col0"],keys:wr_order_number
                                               TableScan [TS_25] (rows=14398467 width=4)
-                                                default@web_returns,wr1,Tbl:COMPLETE,Col:COMPLETE,Output:["wr_order_number"]
+                                                default@web_returns,wr1, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["wr_order_number"]
                                   <-Reducer 5 [SIMPLE_EDGE]
                                     SHUFFLE [RS_37]
                                       PartitionCols:_col4
@@ -152,7 +152,7 @@ Stage-0
                                                   Filter Operator [FIL_145] (rows=12 width=92)
                                                     predicate:(web_company_name = 'pri')
                                                     TableScan [TS_9] (rows=84 width=92)
-                                                      default@web_site,web_site,Tbl:COMPLETE,Col:COMPLETE,Output:["web_site_sk","web_company_name"]
+                                                      default@web_site,web_site, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["web_site_sk","web_company_name"]
                                             <-Reducer 3 [SIMPLE_EDGE]
                                               SHUFFLE [RS_18]
                                                 PartitionCols:_col2
@@ -166,7 +166,7 @@ Stage-0
                                                       Filter Operator [FIL_142] (rows=8116 width=98)
                                                         predicate:CAST( d_date AS TIMESTAMP) BETWEEN TIMESTAMP'1999-05-01 00:00:00' AND TIMESTAMP'1999-06-30 00:00:00'
                                                         TableScan [TS_6] (rows=73049 width=98)
-                                                          default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
+                                                          default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
                                                 <-Reducer 2 [SIMPLE_EDGE]
                                                   SHUFFLE [RS_15]
                                                     PartitionCols:_col0
@@ -180,7 +180,7 @@ Stage-0
                                                           Filter Operator [FIL_131] (rows=784314 width=90)
                                                             predicate:(ca_state = 'TX')
                                                             TableScan [TS_3] (rows=40000000 width=90)
-                                                              default@customer_address,customer_address,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_state"]
+                                                              default@customer_address,customer_address, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_state"]
                                                     <-Map 1 [SIMPLE_EDGE] vectorized
                                                       SHUFFLE [RS_141]
                                                         PartitionCols:_col1
@@ -189,7 +189,7 @@ Stage-0
                                                           Filter Operator [FIL_139] (rows=143895019 width=243)
                                                             predicate:(ws_web_site_sk is not null and ws_ship_addr_sk is not null and ws_ship_date_sk is not null and ws_ship_addr_sk BETWEEN DynamicValue(RS_13_customer_address_ca_address_sk_min) AND DynamicValue(RS_13_customer_address_ca_address_sk_max) and in_bloom_filter(ws_ship_addr_sk, DynamicValue(RS_13_customer_address_ca_address_sk_bloom_filter)))
                                                             TableScan [TS_0] (rows=144002668 width=243)
-                                                              default@web_sales,ws1,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_ship_date_sk","ws_ship_addr_sk","ws_web_site_sk","ws_warehouse_sk","ws_order_number","ws_ext_ship_cost","ws_net_profit"]
+                                                              default@web_sales,ws1, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_ship_date_sk","ws_ship_addr_sk","ws_web_site_sk","ws_warehouse_sk","ws_order_number","ws_ext_ship_cost","ws_net_profit"]
                                                             <-Reducer 12 [BROADCAST_EDGE] vectorized
                                                               BROADCAST [RS_138]
                                                                 Group By Operator [GBY_137] (rows=1 width=12)
@@ -211,7 +211,7 @@ Stage-0
                                                 Filter Operator [FIL_150] (rows=143966743 width=7)
                                                   predicate:(ws_warehouse_sk is not null and ws_order_number BETWEEN DynamicValue(RS_33_ws1_ws_order_number_min) AND DynamicValue(RS_33_ws1_ws_order_number_max) and in_bloom_filter(ws_order_number, DynamicValue(RS_33_ws1_ws_order_number_bloom_filter)))
                                                   TableScan [TS_22] (rows=144002668 width=7)
-                                                    default@web_sales,ws2,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_warehouse_sk","ws_order_number"]
+                                                    default@web_sales,ws2, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_warehouse_sk","ws_order_number"]
                                                   <-Reducer 10 [BROADCAST_EDGE] vectorized
                                                     BROADCAST [RS_149]
                                                       Group By Operator [GBY_148] (rows=1 width=12)

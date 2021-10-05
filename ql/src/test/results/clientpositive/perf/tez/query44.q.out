@@ -121,7 +121,7 @@ Stage-0
                             Filter Operator [FIL_161] (rows=462000 width=111)
                               predicate:i_item_sk is not null
                               TableScan [TS_0] (rows=462000 width=111)
-                                default@item,i1,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_product_name"]
+                                default@item,i1, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_product_name"]
                       <-Reducer 9 [SIMPLE_EDGE] vectorized
                         SHUFFLE [RS_198]
                           PartitionCols:_col0
@@ -169,7 +169,7 @@ Stage-0
                                                                     Filter Operator [FIL_166] (rows=287946 width=7)
                                                                       predicate:(ss_hdemo_sk is null and (ss_store_sk = 410))
                                                                       TableScan [TS_27] (rows=575995635 width=114)
-                                                                        default@store_sales,ss1,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_item_sk","ss_store_sk","ss_net_profit","ss_hdemo_sk"]
+                                                                        default@store_sales,ss1, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_item_sk","ss_store_sk","ss_net_profit","ss_hdemo_sk"]
                                             <-Reducer 14 [CUSTOM_SIMPLE_EDGE] vectorized
                                               PARTITION_ONLY_SHUFFLE [RS_193]
                                                 Select Operator [SEL_192] (rows=1 width=112)

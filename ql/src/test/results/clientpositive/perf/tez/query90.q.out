@@ -101,7 +101,7 @@ Stage-0
                                   Filter Operator [FIL_168] (rows=9095 width=8)
                                     predicate:(t_hour BETWEEN 6 AND 7 and t_time_sk is not null)
                                     TableScan [TS_9] (rows=86400 width=8)
-                                      default@time_dim,time_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["t_time_sk","t_hour"]
+                                      default@time_dim,time_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["t_time_sk","t_hour"]
                             <-Reducer 3 [SIMPLE_EDGE]
                               SHUFFLE [RS_18]
                                 PartitionCols:_col0
@@ -115,7 +115,7 @@ Stage-0
                                       Filter Operator [FIL_165] (rows=511 width=7)
                                         predicate:(wp_char_count BETWEEN 5000 AND 5200 and wp_web_page_sk is not null)
                                         TableScan [TS_6] (rows=4602 width=7)
-                                          default@web_page,web_page,Tbl:COMPLETE,Col:COMPLETE,Output:["wp_web_page_sk","wp_char_count"]
+                                          default@web_page,web_page, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["wp_web_page_sk","wp_char_count"]
                                 <-Reducer 2 [SIMPLE_EDGE]
                                   SHUFFLE [RS_15]
                                     PartitionCols:_col2
@@ -129,7 +129,7 @@ Stage-0
                                           Filter Operator [FIL_154] (rows=655 width=8)
                                             predicate:((hd_dep_count = 8) and hd_demo_sk is not null)
                                             TableScan [TS_3] (rows=7200 width=8)
-                                              default@household_demographics,household_demographics,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_dep_count"]
+                                              default@household_demographics,household_demographics, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_dep_count"]
                                     <-Map 1 [SIMPLE_EDGE] vectorized
                                       SHUFFLE [RS_164]
                                         PartitionCols:_col1
@@ -138,7 +138,7 @@ Stage-0
                                           Filter Operator [FIL_162] (rows=143895111 width=11)
                                             predicate:(ws_sold_time_sk is not null and ws_ship_hdemo_sk is not null and ws_web_page_sk is not null and ws_ship_hdemo_sk BETWEEN DynamicValue(RS_13_household_demographics_hd_demo_sk_min) AND DynamicValue(RS_13_household_demographics_hd_demo_sk_max) and in_bloom_filter(ws_ship_hdemo_sk, DynamicValue(RS_13_household_demographics_hd_demo_sk_bloom_filter)))
                                             TableScan [TS_0] (rows=144002668 width=11)
-                                              default@web_sales,web_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_sold_time_sk","ws_ship_hdemo_sk","ws_web_page_sk"]
+                                              default@web_sales,web_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ws_sold_time_sk","ws_ship_hdemo_sk","ws_web_page_sk"]
                                             <-Reducer 11 [BROADCAST_EDGE] vectorized
                                               BROADCAST [RS_161]
                                                 Group By Operator [GBY_160] (rows=1 width=12)

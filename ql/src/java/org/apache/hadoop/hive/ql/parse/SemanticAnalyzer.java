@@ -14422,26 +14422,24 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       Table oldView = getTable(createVwDesc.getViewName(), false);
 
       // Do not allow view to be defined on temp table or other materialized view
-      Set<String> tableAliases = qb.getTabAliases();
-      for (String alias : tableAliases) {
-        try {
-          if (DUMMY_TABLE.equals(alias)) {
-            continue;
-          }
-          Table table = getTableObjectByName(qb.getTabNameForAlias(alias));
-          if (table.isTemporary()) {
-            throw new SemanticException("View definition references temporary table " + alias);
-          }
-          if (table.isMaterializedView()) {
-            throw new SemanticException("View definition references materialized view " + alias);
-          }
-          if (createVwDesc.isMaterialized() && createVwDesc.isRewriteEnabled() &&
-              !AcidUtils.isTransactionalTable(table)) {
-            throw new SemanticException("Automatic rewriting for materialized view cannot "
-                + "be enabled if the materialized view uses non-transactional tables");
-          }
-        } catch (HiveException ex) {
-          throw new SemanticException(ex);
+      for (TableScanOperator ts : topOps.values()) {
+        if (ts.getConf() == null || ts.getConf().getTableMetadata() == null) {
+          continue;
+        }
+        Table table = ts.getConf().getTableMetadata();
+        if (SemanticAnalyzer.DUMMY_TABLE.equals(table.getTableName())) {
+          continue;
+        }
+        if (table.isTemporary()) {
+          throw new SemanticException("View definition references temporary table " + table.getCompleteName());
+        }
+        if (table.isMaterializedView()) {
+          throw new SemanticException("View definition references materialized view " + table.getCompleteName());
+        }
+        if (createVwDesc.isMaterialized() && createVwDesc.isRewriteEnabled() &&
+            !AcidUtils.isTransactionalTable(table)) {
+          throw new SemanticException("Automatic rewriting for materialized view cannot "
+              + "be enabled if the materialized view uses non-transactional tables");
         }
       }
 

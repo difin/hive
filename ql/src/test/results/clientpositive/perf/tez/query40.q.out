@@ -109,7 +109,7 @@ Stage-0
                               Filter Operator [FIL_124] (rows=27 width=90)
                                 predicate:w_warehouse_sk is not null
                                 TableScan [TS_12] (rows=27 width=90)
-                                  default@warehouse,warehouse,Tbl:COMPLETE,Col:COMPLETE,Output:["w_warehouse_sk","w_state"]
+                                  default@warehouse,warehouse, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["w_warehouse_sk","w_state"]
                         <-Reducer 4 [SIMPLE_EDGE]
                           SHUFFLE [RS_24]
                             PartitionCols:_col1
@@ -123,7 +123,7 @@ Stage-0
                                   Filter Operator [FIL_121] (rows=8116 width=98)
                                     predicate:(CAST( d_date AS TIMESTAMP) BETWEEN TIMESTAMP'1998-03-09 00:00:00' AND TIMESTAMP'1998-05-08 00:00:00' and d_date_sk is not null)
                                     TableScan [TS_9] (rows=73049 width=98)
-                                      default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
+                                      default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date"]
                             <-Reducer 3 [SIMPLE_EDGE]
                               SHUFFLE [RS_21]
                                 PartitionCols:_col0
@@ -137,7 +137,7 @@ Stage-0
                                       Filter Operator [FIL_107] (rows=51333 width=215)
                                         predicate:(i_current_price BETWEEN 0.99 AND 1.49 and i_item_sk is not null)
                                         TableScan [TS_6] (rows=462000 width=215)
-                                          default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id","i_current_price"]
+                                          default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_id","i_current_price"]
                                 <-Reducer 2 [SIMPLE_EDGE]
                                   SHUFFLE [RS_18]
                                     PartitionCols:_col2
@@ -151,7 +151,7 @@ Stage-0
                                           Filter Operator [FIL_115] (rows=285115816 width=127)
                                             predicate:(cs_warehouse_sk is not null and cs_sold_date_sk is not null and cs_item_sk is not null and cs_item_sk BETWEEN DynamicValue(RS_19_item_i_item_sk_min) AND DynamicValue(RS_19_item_i_item_sk_max) and in_bloom_filter(cs_item_sk, DynamicValue(RS_19_item_i_item_sk_bloom_filter)))
                                             TableScan [TS_0] (rows=287989836 width=127)
-                                              default@catalog_sales,catalog_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_warehouse_sk","cs_item_sk","cs_order_number","cs_sales_price"]
+                                              default@catalog_sales,catalog_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_warehouse_sk","cs_item_sk","cs_order_number","cs_sales_price"]
                                             <-Reducer 10 [BROADCAST_EDGE] vectorized
                                               BROADCAST [RS_114]
                                                 Group By Operator [GBY_113] (rows=1 width=12)
@@ -171,5 +171,5 @@ Stage-0
                                           Filter Operator [FIL_118] (rows=28798881 width=117)
                                             predicate:(cr_order_number is not null and cr_item_sk is not null)
                                             TableScan [TS_3] (rows=28798881 width=117)
-                                              default@catalog_returns,catalog_returns,Tbl:COMPLETE,Col:COMPLETE,Output:["cr_item_sk","cr_order_number","cr_refunded_cash"]
+                                              default@catalog_returns,catalog_returns, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cr_item_sk","cr_order_number","cr_refunded_cash"]
 

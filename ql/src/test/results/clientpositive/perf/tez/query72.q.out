@@ -129,7 +129,7 @@ Stage-0
                               Filter Operator [FIL_289] (rows=28798881 width=8)
                                 predicate:(cr_item_sk is not null and cr_order_number is not null)
                                 TableScan [TS_61] (rows=28798881 width=8)
-                                  default@catalog_returns,catalog_returns,Tbl:COMPLETE,Col:COMPLETE,Output:["cr_item_sk","cr_order_number"]
+                                  default@catalog_returns,catalog_returns, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cr_item_sk","cr_order_number"]
                         <-Reducer 4 [SIMPLE_EDGE]
                           SHUFFLE [RS_64]
                             PartitionCols:_col4, _col6
@@ -145,7 +145,7 @@ Stage-0
                                     Filter Operator [FIL_262] (rows=73049 width=8)
                                       predicate:(d_date_sk is not null and d_week_seq is not null)
                                       TableScan [TS_24] (rows=73049 width=98)
-                                        default@date_dim,d3,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date","d_week_seq","d_year"]
+                                        default@date_dim,d3, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_date","d_week_seq","d_year"]
                               <-Reducer 3 [SIMPLE_EDGE]
                                 SHUFFLE [RS_57]
                                   PartitionCols:_col0, _col19
@@ -183,7 +183,7 @@ Stage-0
                                                       Filter Operator [FIL_286] (rows=462000 width=188)
                                                         predicate:i_item_sk is not null
                                                         TableScan [TS_21] (rows=462000 width=188)
-                                                          default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_desc"]
+                                                          default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_item_desc"]
                                                 <-Reducer 13 [SIMPLE_EDGE]
                                                   SHUFFLE [RS_39]
                                                     PartitionCols:_col4
@@ -197,7 +197,7 @@ Stage-0
                                                           Filter Operator [FIL_283] (rows=2300 width=4)
                                                             predicate:p_promo_sk is not null
                                                             TableScan [TS_18] (rows=2300 width=4)
-                                                              default@promotion,promotion,Tbl:COMPLETE,Col:COMPLETE,Output:["p_promo_sk"]
+                                                              default@promotion,promotion, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["p_promo_sk"]
                                                     <-Reducer 12 [SIMPLE_EDGE]
                                                       SHUFFLE [RS_36]
                                                         PartitionCols:_col5
@@ -211,7 +211,7 @@ Stage-0
                                                               Filter Operator [FIL_280] (rows=1440 width=96)
                                                                 predicate:((hd_buy_potential = '1001-5000') and hd_demo_sk is not null)
                                                                 TableScan [TS_15] (rows=7200 width=96)
-                                                                  default@household_demographics,household_demographics,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_buy_potential"]
+                                                                  default@household_demographics,household_demographics, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["hd_demo_sk","hd_buy_potential"]
                                                         <-Reducer 11 [SIMPLE_EDGE]
                                                           SHUFFLE [RS_33]
                                                             PartitionCols:_col3
@@ -225,7 +225,7 @@ Stage-0
                                                                   Filter Operator [FIL_277] (rows=265971 width=89)
                                                                     predicate:((cd_marital_status = 'M') and cd_demo_sk is not null)
                                                                     TableScan [TS_12] (rows=1861800 width=89)
-                                                                      default@customer_demographics,customer_demographics,Tbl:COMPLETE,Col:COMPLETE,Output:["cd_demo_sk","cd_marital_status"]
+                                                                      default@customer_demographics,customer_demographics, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cd_demo_sk","cd_marital_status"]
                                                             <-Reducer 10 [SIMPLE_EDGE]
                                                               SHUFFLE [RS_30]
                                                                 PartitionCols:_col2
@@ -247,7 +247,7 @@ Stage-0
                                                                       Filter Operator [FIL_274] (rows=280863798 width=31)
                                                                         predicate:(cs_sold_date_sk is not null and cs_bill_cdemo_sk is not null and cs_ship_date_sk is not null and cs_quantity is not null and cs_bill_hdemo_sk is not null and cs_item_sk is not null and cs_sold_date_sk BETWEEN DynamicValue(RS_28_d1_d_date_sk_min) AND DynamicValue(RS_28_d1_d_date_sk_max) and in_bloom_filter(cs_sold_date_sk, DynamicValue(RS_28_d1_d_date_sk_bloom_filter)))
                                                                         TableScan [TS_6] (rows=287989836 width=31)
-                                                                          default@catalog_sales,catalog_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_ship_date_sk","cs_bill_cdemo_sk","cs_bill_hdemo_sk","cs_item_sk","cs_promo_sk","cs_order_number","cs_quantity"]
+                                                                          default@catalog_sales,catalog_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["cs_sold_date_sk","cs_ship_date_sk","cs_bill_cdemo_sk","cs_bill_hdemo_sk","cs_item_sk","cs_promo_sk","cs_order_number","cs_quantity"]
                                                                         <-Reducer 21 [BROADCAST_EDGE] vectorized
                                                                           BROADCAST [RS_273]
                                                                             Group By Operator [GBY_272] (rows=1 width=12)
@@ -272,7 +272,7 @@ Stage-0
                                               Filter Operator [FIL_254] (rows=35703276 width=15)
                                                 predicate:(inv_quantity_on_hand is not null and inv_date_sk is not null and inv_warehouse_sk is not null and inv_item_sk is not null)
                                                 TableScan [TS_0] (rows=37584000 width=15)
-                                                  default@inventory,inventory,Tbl:COMPLETE,Col:COMPLETE,Output:["inv_date_sk","inv_item_sk","inv_warehouse_sk","inv_quantity_on_hand"]
+                                                  default@inventory,inventory, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["inv_date_sk","inv_item_sk","inv_warehouse_sk","inv_quantity_on_hand"]
                                         <-Map 8 [SIMPLE_EDGE] vectorized
                                           SHUFFLE [RS_259]
                                             PartitionCols:_col0
@@ -281,5 +281,5 @@ Stage-0
                                               Filter Operator [FIL_257] (rows=27 width=104)
                                                 predicate:w_warehouse_sk is not null
                                                 TableScan [TS_3] (rows=27 width=104)
-                                                  default@warehouse,warehouse,Tbl:COMPLETE,Col:COMPLETE,Output:["w_warehouse_sk","w_warehouse_name"]
+                                                  default@warehouse,warehouse, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["w_warehouse_sk","w_warehouse_name"]
 

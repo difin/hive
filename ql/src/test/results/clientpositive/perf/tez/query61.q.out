@@ -160,7 +160,7 @@ Stage-0
                                       Filter Operator [FIL_268] (rows=80000000 width=8)
                                         predicate:(c_current_addr_sk is not null and c_customer_sk is not null)
                                         TableScan [TS_0] (rows=80000000 width=8)
-                                          default@customer,customer,Tbl:COMPLETE,Col:COMPLETE,Output:["c_customer_sk","c_current_addr_sk"]
+                                          default@customer,customer, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["c_customer_sk","c_current_addr_sk"]
                                 <-Map 9 [SIMPLE_EDGE] vectorized
                                   SHUFFLE [RS_273]
                                     PartitionCols:_col0
@@ -169,7 +169,7 @@ Stage-0
                                       Filter Operator [FIL_271] (rows=8000000 width=112)
                                         predicate:((ca_gmt_offset = -7) and ca_address_sk is not null)
                                         TableScan [TS_3] (rows=40000000 width=112)
-                                          default@customer_address,customer_address,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_gmt_offset"]
+                                          default@customer_address,customer_address, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_address_sk","ca_gmt_offset"]
                             <-Reducer 14 [SIMPLE_EDGE]
                               SHUFFLE [RS_38]
                                 PartitionCols:_col2
@@ -183,7 +183,7 @@ Stage-0
                                       Filter Operator [FIL_292] (rows=2300 width=259)
                                         predicate:(((p_channel_dmail = 'Y') or (p_channel_email = 'Y') or (p_channel_tv = 'Y')) and p_promo_sk is not null)
                                         TableScan [TS_18] (rows=2300 width=259)
-                                          default@promotion,promotion,Tbl:COMPLETE,Col:COMPLETE,Output:["p_promo_sk","p_channel_dmail","p_channel_email","p_channel_tv"]
+                                          default@promotion,promotion, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["p_promo_sk","p_channel_dmail","p_channel_email","p_channel_tv"]
                                 <-Reducer 13 [SIMPLE_EDGE]
                                   SHUFFLE [RS_30]
                                     PartitionCols:_col4
@@ -197,7 +197,7 @@ Stage-0
                                           Filter Operator [FIL_288] (rows=341 width=115)
                                             predicate:((s_gmt_offset = -7) and s_store_sk is not null)
                                             TableScan [TS_15] (rows=1704 width=115)
-                                              default@store,store,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_gmt_offset"]
+                                              default@store,store, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_gmt_offset"]
                                     <-Reducer 12 [SIMPLE_EDGE]
                                       SHUFFLE [RS_27]
                                         PartitionCols:_col3
@@ -211,7 +211,7 @@ Stage-0
                                               Filter Operator [FIL_284] (rows=46200 width=94)
                                                 predicate:((i_category = 'Electronics') and i_item_sk is not null)
                                                 TableScan [TS_12] (rows=462000 width=94)
-                                                  default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_category"]
+                                                  default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_category"]
                                         <-Reducer 11 [SIMPLE_EDGE]
                                           SHUFFLE [RS_24]
                                             PartitionCols:_col1
@@ -225,7 +225,7 @@ Stage-0
                                                   Filter Operator [FIL_274] (rows=479120969 width=126)
                                                     predicate:(ss_sold_date_sk is not null and ss_promo_sk is not null and ss_customer_sk is not null and ss_store_sk is not null and ss_item_sk is not null)
                                                     TableScan [TS_6] (rows=575995635 width=126)
-                                                      default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_date_sk","ss_item_sk","ss_customer_sk","ss_store_sk","ss_promo_sk","ss_ext_sales_price"]
+                                                      default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_date_sk","ss_item_sk","ss_customer_sk","ss_store_sk","ss_promo_sk","ss_ext_sales_price"]
                                             <-Map 18 [SIMPLE_EDGE] vectorized
                                               SHUFFLE [RS_282]
                                                 PartitionCols:_col0
@@ -234,7 +234,7 @@ Stage-0
                                                   Filter Operator [FIL_280] (rows=50 width=12)
                                                     predicate:((d_year = 1999) and (d_moy = 11) and d_date_sk is not null)
                                                     TableScan [TS_9] (rows=73049 width=12)
-                                                      default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year","d_moy"]
+                                                      default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year","d_moy"]
                   <-Reducer 8 [CUSTOM_SIMPLE_EDGE] vectorized
                     PARTITION_ONLY_SHUFFLE [RS_298]
                       Group By Operator [GBY_297] (rows=1 width=112)

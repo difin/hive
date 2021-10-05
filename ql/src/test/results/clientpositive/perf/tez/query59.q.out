@@ -132,7 +132,7 @@ Stage-0
                         Filter Operator [FIL_205] (rows=1704 width=192)
                           predicate:(s_store_id is not null and s_store_sk is not null)
                           TableScan [TS_18] (rows=1704 width=192)
-                            default@store,store,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_store_id","s_store_name"]
+                            default@store,store, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_store_id","s_store_name"]
                   <-Reducer 6 [SIMPLE_EDGE]
                     SHUFFLE [RS_55]
                       PartitionCols:_col11, _col14
@@ -151,7 +151,7 @@ Stage-0
                                 Filter Operator [FIL_194] (rows=317 width=8)
                                   predicate:(d_month_seq BETWEEN 1197 AND 1208 and d_week_seq is not null)
                                   TableScan [TS_3] (rows=73049 width=99)
-                                    default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_week_seq","d_day_name","d_month_seq"]
+                                    default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_week_seq","d_day_name","d_month_seq"]
                           <-Reducer 10 [SIMPLE_EDGE] vectorized
                             SHUFFLE [RS_211]
                               PartitionCols:_col0
@@ -182,7 +182,7 @@ Stage-0
                                             Filter Operator [FIL_188] (rows=525329897 width=114)
                                               predicate:(ss_sold_date_sk is not null and ss_store_sk is not null)
                                               TableScan [TS_0] (rows=575995635 width=114)
-                                                default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_date_sk","ss_store_sk","ss_sales_price"]
+                                                default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_date_sk","ss_store_sk","ss_sales_price"]
                       <-Reducer 5 [SIMPLE_EDGE]
                         SHUFFLE [RS_52]
                           PartitionCols:_col0

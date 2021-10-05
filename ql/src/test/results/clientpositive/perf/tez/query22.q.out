@@ -92,7 +92,7 @@ Stage-0
                               Filter Operator [FIL_86] (rows=462000 width=393)
                                 predicate:i_item_sk is not null
                                 TableScan [TS_9] (rows=462000 width=393)
-                                  default@item,item,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_brand","i_class","i_category","i_product_name"]
+                                  default@item,item, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["i_item_sk","i_brand","i_class","i_category","i_product_name"]
                         <-Reducer 3 [SIMPLE_EDGE]
                           SHUFFLE [RS_18]
                             PartitionCols:_col1
@@ -106,7 +106,7 @@ Stage-0
                                   Filter Operator [FIL_83] (rows=27 width=4)
                                     predicate:w_warehouse_sk is not null
                                     TableScan [TS_6] (rows=27 width=4)
-                                      default@warehouse,warehouse,Tbl:COMPLETE,Col:COMPLETE,Output:["w_warehouse_sk"]
+                                      default@warehouse,warehouse, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["w_warehouse_sk"]
                             <-Reducer 2 [SIMPLE_EDGE]
                               SHUFFLE [RS_15]
                                 PartitionCols:_col2
@@ -120,7 +120,7 @@ Stage-0
                                       Filter Operator [FIL_77] (rows=37584000 width=15)
                                         predicate:(inv_warehouse_sk is not null and inv_item_sk is not null and inv_date_sk is not null)
                                         TableScan [TS_0] (rows=37584000 width=15)
-                                          default@inventory,inventory,Tbl:COMPLETE,Col:COMPLETE,Output:["inv_date_sk","inv_item_sk","inv_warehouse_sk","inv_quantity_on_hand"]
+                                          default@inventory,inventory, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["inv_date_sk","inv_item_sk","inv_warehouse_sk","inv_quantity_on_hand"]
                                 <-Map 7 [SIMPLE_EDGE] vectorized
                                   SHUFFLE [RS_82]
                                     PartitionCols:_col0
@@ -129,5 +129,5 @@ Stage-0
                                       Filter Operator [FIL_80] (rows=317 width=8)
                                         predicate:(d_month_seq BETWEEN 1212 AND 1223 and d_date_sk is not null)
                                         TableScan [TS_3] (rows=73049 width=8)
-                                          default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_month_seq"]
+                                          default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_month_seq"]
 

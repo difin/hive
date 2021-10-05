@@ -497,3 +497,11 @@ HiveSortLimit(sort0=[$0], sort1=[$1], sort2=[$2], sort3=[$3], sort4=[$4], sort5=
               HiveProject(i_item_sk=[$0], i_brand=[$8], i_class=[$10], i_category=[$12], i_product_name=[$21])
                 HiveTableScan(table=[[default, item]], table:alias=[item])
 
+PREHOOK: query: DROP MATERIALIZED VIEW `my_materialized_view_n100`
+PREHOOK: type: DROP_MATERIALIZED_VIEW
+PREHOOK: Input: default@my_materialized_view_n100
+PREHOOK: Output: default@my_materialized_view_n100
+POSTHOOK: query: DROP MATERIALIZED VIEW `my_materialized_view_n100`
+POSTHOOK: type: DROP_MATERIALIZED_VIEW
+POSTHOOK: Input: default@my_materialized_view_n100
+POSTHOOK: Output: default@my_materialized_view_n100

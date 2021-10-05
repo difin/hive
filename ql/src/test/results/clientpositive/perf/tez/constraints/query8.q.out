@@ -276,7 +276,7 @@ Stage-0
                                 Filter Operator [FIL_149] (rows=1704 width=181)
                                   predicate:substr(s_zip, 1, 2) is not null
                                   TableScan [TS_42] (rows=1704 width=181)
-                                    default@store,store,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_store_name","s_zip"]
+                                    default@store,store, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["s_store_sk","s_store_name","s_zip"]
                           <-Reducer 11 [SIMPLE_EDGE] vectorized
                             SHUFFLE [RS_148]
                               PartitionCols:_col0
@@ -320,7 +320,7 @@ Stage-0
                                                                 Filter Operator [FIL_158] (rows=40000000 width=93)
                                                                   predicate:substr(substr(ca_zip, 1, 5), 1, 2) is not null
                                                                   TableScan [TS_6] (rows=40000000 width=89)
-                                                                    default@customer_address,customer_address,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_zip","ca_address_sk"]
+                                                                    default@customer_address,customer_address, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ca_zip","ca_address_sk"]
                                                           <-Map 16 [SIMPLE_EDGE] vectorized
                                                             SHUFFLE [RS_169]
                                                               PartitionCols:_col0
@@ -329,7 +329,7 @@ Stage-0
                                                                 Filter Operator [FIL_167] (rows=26666667 width=89)
                                                                   predicate:((c_preferred_cust_flag = 'Y') and c_current_addr_sk is not null)
                                                                   TableScan [TS_17] (rows=80000000 width=89)
-                                                                    default@customer,customer,Tbl:COMPLETE,Col:COMPLETE,Output:["c_current_addr_sk","c_preferred_cust_flag"]
+                                                                    default@customer,customer, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["c_current_addr_sk","c_preferred_cust_flag"]
                                     <-Reducer 9 [CONTAINS] vectorized
                                       Reduce Output Operator [RS_166]
                                         PartitionCols:_col0
@@ -360,7 +360,7 @@ Stage-0
                                 Filter Operator [FIL_134] (rows=130 width=12)
                                   predicate:((d_year = 2002) and (d_qoy = 1))
                                   TableScan [TS_3] (rows=73049 width=12)
-                                    default@date_dim,date_dim,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year","d_qoy"]
+                                    default@date_dim,date_dim, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["d_date_sk","d_year","d_qoy"]
                           <-Map 1 [SIMPLE_EDGE] vectorized
                             SHUFFLE [RS_144]
                               PartitionCols:_col0
@@ -369,7 +369,7 @@ Stage-0
                                 Filter Operator [FIL_142] (rows=525329897 width=114)
                                   predicate:(ss_sold_date_sk is not null and ss_store_sk is not null and ss_sold_date_sk BETWEEN DynamicValue(RS_50_date_dim_d_date_sk_min) AND DynamicValue(RS_50_date_dim_d_date_sk_max) and in_bloom_filter(ss_sold_date_sk, DynamicValue(RS_50_date_dim_d_date_sk_bloom_filter)))
                                   TableScan [TS_0] (rows=575995635 width=114)
-                                    default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_date_sk","ss_store_sk","ss_net_profit"]
+                                    default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_sold_date_sk","ss_store_sk","ss_net_profit"]
                                   <-Reducer 7 [BROADCAST_EDGE] vectorized
                                     BROADCAST [RS_141]
                                       Group By Operator [GBY_140] (rows=1 width=12)

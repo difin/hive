@@ -166,7 +166,7 @@ Stage-0
                                 Filter Operator [FIL_112] (rows=15237978 width=324)
                                   predicate:(ss_quantity BETWEEN 6 AND 10 and (ss_list_price BETWEEN 91 AND 101 or ss_coupon_amt BETWEEN 1430 AND 2430 or ss_wholesale_cost BETWEEN 32 AND 52))
                                   TableScan [TS_0] (rows=575995635 width=324)
-                                    default@store_sales,store_sales,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_quantity","ss_wholesale_cost","ss_list_price","ss_coupon_amt"]
+                                    default@store_sales,store_sales, ACID table,Tbl:COMPLETE,Col:COMPLETE,Output:["ss_quantity","ss_wholesale_cost","ss_list_price","ss_coupon_amt"]
             <-Reducer 7 [CUSTOM_SIMPLE_EDGE]
               PARTITION_ONLY_SHUFFLE [RS_54]
                 Merge Join Operator [MERGEJOIN_105] (rows=1 width=640)
