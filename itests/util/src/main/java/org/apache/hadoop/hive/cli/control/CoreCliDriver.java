@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.hadoop.hive.ql.QTestExternalDB;
 import org.apache.hadoop.hive.ql.QTestArguments;
 import org.apache.hadoop.hive.ql.QTestProcessExecResult;
 import org.apache.hadoop.hive.ql.QTestUtil;
@@ -63,7 +62,6 @@ public class CoreCliDriver extends CliAdapter {
     String hiveConfDir = cliConfig.getHiveConfDir();
     String initScript = cliConfig.getInitScript();
     String cleanupScript = cliConfig.getCleanupScript();
-    Set<QTestExternalDB> externalDBs = cliConfig.getExternalDBs();
 
     try {
       qt = new ElapsedTimeLoggingWrapper<QTestUtil>() {
@@ -77,7 +75,6 @@ public class CoreCliDriver extends CliAdapter {
                 .withConfDir(hiveConfDir)
                 .withInitScript(initScript)
                 .withCleanupScript(cleanupScript)
-                .withExternalDBs(externalDBs)
                 .withLlapIo(true)
                 .withFsType(cliConfig.getFsType())
                 .build());

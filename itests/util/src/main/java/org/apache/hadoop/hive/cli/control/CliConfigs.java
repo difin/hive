@@ -24,7 +24,6 @@ import java.net.URL;
 import org.apache.hadoop.hive.ql.QTestMiniClusters;
 import org.apache.hadoop.hive.ql.QTestMiniClusters.MiniClusterType;
 import org.apache.hadoop.hive.ql.parse.CoreParseNegative;
-import org.apache.hadoop.hive.ql.QTestExternalDB;
 
 public class CliConfigs {
 
@@ -235,7 +234,6 @@ public class CliConfigs {
         excludesFrom(testConfigProps, "spark.only.query.files");
         excludesFrom(testConfigProps, "localSpark.only.query.files");
         excludesFrom(testConfigProps, "miniSparkOnYarn.only.query.files");
-        excludesFrom(testConfigProps, "externalDB.llap.query.files");
 
         setResultsDir("ql/src/test/results/clientpositive/llap");
         setLogDir("itests/qtest/target/qfile-results/clientpositive");
@@ -247,28 +245,6 @@ public class CliConfigs {
         setClusterType(MiniClusterType.LLAP_LOCAL);
         setMetastoreType(MetastoreType.sql);
         setFsType(QTestMiniClusters.FsType.LOCAL);
-      } catch (Exception e) {
-        throw new RuntimeException("can't construct cliconfig", e);
-      }
-    }
-  }
-
-  public static class MiniLlapExtDBCliConfig extends AbstractCliConfig {
-
-    public MiniLlapExtDBCliConfig() {
-      super(CoreCliDriver.class);
-      try {
-        setQueryDir("ql/src/test/queries/clientpositive");
-
-        includesFrom(testConfigProps, "externalDB.llap.query.files");
-
-        setResultsDir("ql/src/test/results/clientpositive/llap");
-        setLogDir("itests/qtest/target/qfile-results/clientpositive");
-
-        addExternalDB(QTestExternalDB.createDefaultExtDB("mysql"));
-
-        setHiveConfDir("data/conf/llap");
-        setClusterType(MiniClusterType.LLAP_LOCAL);
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
       }
