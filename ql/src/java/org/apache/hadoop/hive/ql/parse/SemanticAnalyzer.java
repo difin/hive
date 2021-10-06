@@ -7665,7 +7665,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       }
       try {
         if (ctx.getExplainConfig() != null) {
-          writeId = 0L; // For explain plan, txn won't be opened and doesn't make sense to allocate write id
+          writeId = null; // For explain plan, txn won't be opened and doesn't make sense to allocate write id
         } else {
           if (isMmTable) {
             writeId = txnMgr.getTableWriteId(destinationTable.getDbName(), destinationTable.getTableName());
@@ -15778,11 +15778,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     if (queryState.getHiveOperation() != HiveOperation.QUERY) {
       return false;
     }
-
     if (qb.getParseInfo().isAnalyzeCommand()) {
       return false;
     }
-
     if (qb.getParseInfo().hasInsertTables()) {
       return false;
     }

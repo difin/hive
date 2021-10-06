@@ -332,7 +332,7 @@ public class Driver implements IDriver {
       //sorting makes tests easier to write since file names and ROW__IDs depend on statementId
       //so this makes (file name -> data) mapping stable
       acidSinks.sort(Comparator.comparing(FileSinkDesc::getDirName));
-      
+
       // If the direct insert is on, sort the FSOs by moveTaskId as well because the dir is the same for all except the union use cases.
       boolean isDirectInsertOn = false;
       for (FileSinkDesc acidSink : acidSinks) {
@@ -344,7 +344,7 @@ public class Driver implements IDriver {
       if (isDirectInsertOn) {
         acidSinks.sort((FileSinkDesc fsd1, FileSinkDesc fsd2) -> fsd1.getMoveTaskId().compareTo(fsd2.getMoveTaskId()));
       }
-      
+
       for (FileSinkDesc desc : acidSinks) {
         TableDesc tableInfo = desc.getTableInfo();
         final TableName tn = HiveTableName.ofNullable(tableInfo.getTableName());
@@ -779,7 +779,7 @@ public class Driver implements IDriver {
       //if needRequireLock is false, the release here will do nothing because there is no lock
       try {
         //since set autocommit starts an implicit txn, close it
-        if (driverContext.getTxnManager().isImplicitTransactionOpen() ||
+        if (driverContext.getTxnManager().isImplicitTransactionOpen(context) ||
             driverContext.getPlan().getOperation() == HiveOperation.COMMIT) {
           releaseLocksAndCommitOrRollback(true);
         }
@@ -869,6 +869,10 @@ public class Driver implements IDriver {
     }
     // Lock operations themselves don't require the lock.
     if (isExplicitLockOperation()) {
+      return false;
+    }
+    // no execution is going to be attempted, skip acquiring locks
+    if (context.isExplainSkipExecution()) {
       return false;
     }
     if (!HiveConf.getBoolVar(driverContext.getConf(), ConfVars.HIVE_LOCK_MAPRED_ONLY)) {
