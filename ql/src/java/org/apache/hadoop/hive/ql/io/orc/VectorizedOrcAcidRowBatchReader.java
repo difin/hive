@@ -28,7 +28,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.ValidReaderWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.common.io.CacheTag;
-import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.llap.IllegalCacheConfigurationException;
@@ -88,7 +87,6 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.hadoop.hive.ql.io.sarg.ConvertAstToSearchArg.sargToKryo;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A fast vectorized batch reader class for ACID. Insert events are read directly
@@ -853,8 +851,13 @@ public class VectorizedOrcAcidRowBatchReader
     return false;
   }
 
+  @Deprecated
+  static Path[] getDeleteDeltaDirsFromSplit(OrcSplit orcSplit) {
+    return getDeleteDeltaDirsFromSplit(orcSplit, null);
+  }
+
   static Path[] getDeleteDeltaDirsFromSplit(OrcSplit orcSplit,
-      Map<String, AcidInputFormat.DeltaMetaData> pathToDeltaMetaData) throws IOException {
+      Map<String, AcidInputFormat.DeltaMetaData> pathToDeltaMetaData) {
     Path path = orcSplit.getPath();
     Path root;
     if (orcSplit.hasBase()) {
