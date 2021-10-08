@@ -1533,7 +1533,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       // rely on that behavior)
       FileSinkDesc impalaQueryDesc = this.impalaHelper.compilePlan(
           getDb(), impalaRel, fso.getConf(), ctx.isExplainPlan(), getQB(), cboCtx.type,
-          getQueryValidTxnWriteIdList());
+          getQueryValidTxnWriteIdList(), resultSchema);
       markEvent("Impala plan generated");
       return OperatorFactory.getAndMakeChild(impalaQueryDesc, fso);
     } catch (HiveException e) {

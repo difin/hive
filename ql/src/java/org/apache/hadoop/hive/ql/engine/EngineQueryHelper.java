@@ -25,6 +25,7 @@ import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rex.RexBuilder;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
+import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.type.FunctionHelper;
@@ -32,6 +33,7 @@ import org.apache.hadoop.hive.ql.plan.FileSinkDesc;
 import org.apache.hadoop.hive.ql.parse.CalcitePlanner;
 import org.apache.hadoop.hive.ql.parse.QB;
 
+import java.util.List;
 /**
  * EngineQueryHelper.  This interface defines objects created and used while compiling
  * query database engine specific code.
@@ -43,7 +45,7 @@ public interface EngineQueryHelper {
 
   public FileSinkDesc compilePlan(Hive db, RelNode rootRelNode,
       FileSinkDesc fileSinkDesc, boolean isExplain, QB qb, CalcitePlanner.PreCboCtx.Type stmtType,
-      ValidTxnWriteIdList txnWriteIdList) throws HiveException;
+      ValidTxnWriteIdList txnWriteIdList, List<FieldSchema> resultSchema) throws HiveException;
 
   public FunctionHelper createFunctionHelper(RexBuilder rexBuilder);
 

@@ -13116,6 +13116,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     return resultSchema;
   }
 
+  // See {@link ReorderMVPartitionSelect} for additional information on
+  // why we may place a RelNode that reorders the columns on materialized views with partitions.
   protected void saveViewDefinition() throws SemanticException {
     if (createVwDesc.isMaterialized() && createVwDesc.isReplace()) {
       // This is a rebuild, there's nothing to do here

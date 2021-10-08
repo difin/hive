@@ -24,7 +24,14 @@ alter table depts_imp0 add constraint pk2 primary key (deptno) disable novalidat
 alter table emps_imp0 add constraint fk1 foreign key (deptno) references depts_imp0(deptno) disable novalidate rely;
 
 explain
-create table tab1_imp0
+create table tab1_imp0_out_of_order_partitions partitioned by (empid)
+stored as parquet TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only') as
+select empid, depts_imp0.deptno from emps_imp0
+join depts_imp0 using (deptno) where depts_imp0.deptno > cast(ltrim('10', 'a') as integer)
+group by empid, depts_imp0.deptno;
+
+explain
+create table tab1_imp0_reorder_partitions
 stored as parquet TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only') as
 select empid, depts_imp0.deptno from emps_imp0
 join depts_imp0 using (deptno) where depts_imp0.deptno > cast(ltrim('10', 'a') as integer)

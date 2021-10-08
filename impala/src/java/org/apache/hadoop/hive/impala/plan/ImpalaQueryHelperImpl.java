@@ -33,6 +33,7 @@ import org.apache.hadoop.hive.impala.calcite.rules.HiveImpalaWindowingFixRule;
 import org.apache.hadoop.hive.impala.exec.ImpalaSessionManager;
 import org.apache.hadoop.hive.impala.funcmapper.ImpalaFunctionHelper;
 import org.apache.hadoop.hive.impala.node.ImpalaPlanRel;
+import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryState;
@@ -41,6 +42,7 @@ import org.apache.hadoop.hive.ql.engine.EngineQueryHelper;
 import org.apache.hadoop.hive.ql.engine.EngineSession;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.metadata.Hive;
+import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
 import org.apache.hadoop.hive.ql.parse.CalcitePlanner;
@@ -150,7 +152,7 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
 
   public FileSinkDesc compilePlan(Hive db, RelNode rootRelNode,
       FileSinkDesc fileSinkDesc, boolean isExplain, QB qb, CalcitePlanner.PreCboCtx.Type stmtType,
-      ValidTxnWriteIdList txnWriteIdList) throws HiveException {
+      ValidTxnWriteIdList txnWriteIdList, List<FieldSchema> resultSchema) throws HiveException {
     try {
       Preconditions.checkState(rootRelNode instanceof ImpalaPlanRel, "Plan contains operators not supported by Impala");
       ImpalaPlanRel impalaRelNode = (ImpalaPlanRel) rootRelNode;
@@ -159,6 +161,13 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
       ImpalaPlannerContext planCtx = impalaPlanner.getPlannerContext();
       planCtx.getTableLoader().loadTablesAndPartitions(db, txnWriteIdList);
       impalaPlanner.initTargetTable();
+
+      // See {@link ReorderMVPartitionSelect} for additional information on
+      // why we may place a RelNode that reorders the columns on CTAS with partitions.
+      if (qb.isMaterializedView() || (stmtType == CalcitePlanner.PreCboCtx.Type.CTAS)) {
+        impalaRelNode = ReorderMVPartitionSelect.getImpalaRelNodeForMV(impalaRelNode, qb,
+            fileSinkDesc.getTable(), resultSchema);
+      }
 
       PlanNode rootImpalaNode = impalaRelNode.getRootPlanNode(planCtx);
       timeline.markEvent("Single node plan created");

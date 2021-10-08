@@ -31,5 +31,20 @@ join depts_imp0 using (deptno) where depts_imp0.deptno > cast(ltrim('10', 'a') a
 group by empid, depts_imp0.deptno;
 
 drop materialized view mv1_imp0;
+
+explain
+create materialized view mv1_imp0_with_partitions_in_order partitioned on (salary_alias, commission) 
+stored as parquet as
+select empid, deptno deptno_alias, name, salary salary_alias, commission from emps_imp0
+where salary > 0.0;
+
+drop materialized view mv1_imp0_with_partitions_in_order;
+explain
+create materialized view mv1_imp0_with_partitions_out_of_order partitioned on (salary_alias, deptno_alias) 
+stored as parquet as
+select empid, deptno deptno_alias, name, salary salary_alias, commission from emps_imp0
+where salary > 0.0;
+
+drop materialized view mv1_imp0_with_partitions_out_of_order;
 drop table emps_imp0;
 drop table depts_imp0;
