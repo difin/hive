@@ -333,6 +333,7 @@ Per-Host Resources: mem-estimate=10.00MB mem-reservation=2.00MB thread-reservati
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   09:AGGREGATE [STREAMING]
   |  group by: TRUE
+  |  limit: 2
   |  mem-estimate=10.00MB mem-reservation=2.00MB spill-buffer=64.00KB thread-reservation=0
   |  tuple-ids=7 row-size=1B cardinality=0
   |  in pipelines: 08(GETNEXT)
@@ -529,6 +530,7 @@ Per-Host Resources: mem-estimate=10.00MB mem-reservation=2.00MB thread-reservati
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   23:AGGREGATE [STREAMING]
   |  group by: TRUE
+  |  limit: 2
   |  mem-estimate=10.00MB mem-reservation=2.00MB spill-buffer=64.00KB thread-reservation=0
   |  tuple-ids=21 row-size=1B cardinality=0
   |  in pipelines: 22(GETNEXT)
