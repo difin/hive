@@ -243,7 +243,7 @@ public class CoreBeeLineDriver extends CliAdapter {
 
       if (!overwrite) {
 
-        qOutProcessor.maskPatterns(qFile.getOutputFile().getAbsolutePath(), qFile.getName());
+        qOutProcessor.maskPatterns(qFile.getOutputFile().getAbsolutePath());
         QTestProcessExecResult result = qFile.compareResults();
 
         long compareEndTime = System.currentTimeMillis();

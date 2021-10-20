@@ -21,8 +21,6 @@ package org.apache.hadoop.hive.cli.control;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
-
 import org.apache.hadoop.hive.hbase.HBaseQTestUtil;
 import org.apache.hadoop.hive.hbase.HBaseTestSetup;
 import org.apache.hadoop.hive.ql.QTestProcessExecResult;
@@ -109,21 +107,21 @@ public class CoreHBaseNegativeCliDriver extends CliAdapter {
     long startTime = System.currentTimeMillis();
     try {
       System.err.println("Begin query: " + fname);
-      qt.addFile(fpath);
+      qt.setInputFile(fpath);
 
       if (qt.shouldBeSkipped(fname)) {
         System.err.println("Test " + fname + " skipped");
         return;
       }
 
-      qt.cliInit(new File(fpath));
+      qt.cliInit();
       try {
-        qt.executeClient(fname);
+        qt.executeClient();
         qt.failed(fname, null);
       } catch (CommandProcessorException e) {
         // this is the expected result
       }
-      QTestProcessExecResult result = qt.checkCliDriverResults(fname);
+      QTestProcessExecResult result = qt.checkCliDriverResults();
       if (result.getReturnCode() != 0) {
         qt.failedDiff(result.getReturnCode(), fname, result.getCapturedOutput());
       }

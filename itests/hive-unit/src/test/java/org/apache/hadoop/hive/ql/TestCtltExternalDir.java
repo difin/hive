@@ -59,7 +59,7 @@ public class TestCtltExternalDir extends BaseTestQueries {
     TestTxnDbUtil.prepDb(hiveConf);
     qt.postInit();
     qt.newSession();
-    qt.addFile(qfiles[0], false);
+    qt.setInputFile(qfiles[0]);
     qt.clearTestSideEffects();
 
     boolean success = QTestRunnerUtils.queryListRunnerSingleThreaded(qfiles, new QTestUtil[] { qt });

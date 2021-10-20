@@ -130,9 +130,9 @@ public class CoreCompareCliDriver extends CliAdapter{
         fail("Cannot run " + tname + " with only " + versionFiles.size() + " versions");
       }
 
-      qt.addFile(fpath);
+      qt.setInputFile(fpath);
       for (String versionFile : versionFiles) {
-        qt.addFile(new File(queryDirectory, versionFile), true);
+        qt.setInputFile(new File(queryDirectory, versionFile));
       }
 
       if (qt.shouldBeSkipped(fname)) {
@@ -141,16 +141,16 @@ public class CoreCompareCliDriver extends CliAdapter{
 
       int ecode = 0;
       
-      qt.cliInit(new File(fpath));
+      qt.cliInit();
 
       List<String> outputs = new ArrayList<>(versionFiles.size());
       for (String versionFile : versionFiles) {
         // 1 for "_" after tname; 3 for ".qv" at the end. Version is in between.
         String versionStr = versionFile.substring(tname.length() + 1, versionFile.length() - 3);
-        outputs.add(qt.cliInit(new File(queryDirectory, versionFile)));
+        outputs.add(qt.cliInit());
         // TODO: will this work?
         try {
-          qt.executeClient(versionFile, fname);
+          qt.executeClient();
         } catch (CommandProcessorException e) {
           qt.failedQuery(e.getException(), e.getResponseCode(), fname, QTestUtil.DEBUG_HINT);
         }

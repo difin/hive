@@ -20,8 +20,6 @@ package org.apache.hadoop.hive.cli.control;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
-
 import com.google.common.base.Strings;
 import org.apache.hadoop.hive.ql.QTestArguments;
 import org.apache.hadoop.hive.ql.QTestProcessExecResult;
@@ -120,23 +118,23 @@ public class CoreNegativeCliDriver extends CliAdapter{
     try {
       System.err.println("Begin query: " + fname);
 
-      qt.addFile(fpath);
+      qt.setInputFile(fpath);
 
       if (qt.shouldBeSkipped(fname)) {
         System.err.println("Test " + fname + " skipped");
         return;
       }
 
-      qt.cliInit(new File(fpath));
+      qt.cliInit();
 
       try {
-        qt.executeClient(fname);
+        qt.executeClient();
         qt.failed(fname, QTestUtil.DEBUG_HINT);
       } catch (CommandProcessorException e) {
         // this is the expected outcome
       }
 
-      QTestProcessExecResult result = qt.checkCliDriverResults(fname);
+      QTestProcessExecResult result = qt.checkCliDriverResults();
       if (result.getReturnCode() != 0) {
         String message = Strings.isNullOrEmpty(result.getCapturedOutput()) ? QTestUtil.DEBUG_HINT
           : "\r\n" + result.getCapturedOutput();

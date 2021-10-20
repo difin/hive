@@ -64,7 +64,8 @@ public class TestLocationQueries extends BaseTestQueries {
      * @return non-zero if it failed
      */
     @Override
-    public QTestProcessExecResult checkCliDriverResults(String tname) throws Exception {
+    public QTestProcessExecResult checkCliDriverResults() throws Exception {
+      String tname = getInputFile().getName();
       File logFile = new File(logDir, tname + ".out");
 
       int failedCount = 0;
@@ -131,7 +132,7 @@ public class TestLocationQueries extends BaseTestQueries {
       qt[i] = new CheckResults(resDir, logDir, MiniClusterType.TEZ_LOCAL, "parta");
       qt[i].postInit();
       qt[i].newSession();
-      qt[i].addFile(qfiles[i], false);
+      qt[i].setInputFile(qfiles[i]);
       qt[i].clearTestSideEffects();
     }
 
@@ -166,7 +167,7 @@ public class TestLocationQueries extends BaseTestQueries {
     TestTxnDbUtil.prepDb(hiveConf);
     qt.postInit();
     qt.newSession();
-    qt.addFile(qfiles[0].getPath());
+    qt.setInputFile(qfiles[0].getPath());
     qt.clearTestSideEffects();
 
     boolean success = QTestRunnerUtils.queryListRunnerSingleThreaded(qfiles, new QTestUtil[]{qt});
