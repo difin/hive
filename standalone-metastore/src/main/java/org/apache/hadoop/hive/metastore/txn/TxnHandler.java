@@ -542,7 +542,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         LOG.debug("Got OpenTxnList with hwm: {} and openTxnList size {}.", hwm, txnInfos.size());
         return new OpenTxnList(hwm, txnInfos);
       } catch (SQLException e) {
-        checkRetryable(dbConn, e, "getOpenTxnsList");
+        checkRetryable(e, "getOpenTxnsList");
         throw new MetaException("Unable to select from transaction database, "
           + StringUtils.stringifyException(e));
       } finally {
@@ -615,7 +615,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "openTxns(" + rqst + ")");
+        checkRetryable(e, "openTxns(" + rqst + ")");
         throw new MetaException("Unable to select from transaction database "
           + StringUtils.stringifyException(e));
       } finally {
@@ -778,7 +778,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         assert (targetTxnIds.size() == 1);
         return targetTxnIds.get(0);
       } catch (SQLException e) {
-        checkRetryable(dbConn, e, "getTargetTxnId(" + replPolicy + sourceTxnId + ")");
+        checkRetryable(e, "getTargetTxnId(" + replPolicy + sourceTxnId + ")");
         throw new MetaException("Unable to get target transaction id "
                 + StringUtils.stringifyException(e));
       } finally {
@@ -891,7 +891,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "abortTxn(" + rqst + ")");
+        checkRetryable(e, "abortTxn(" + rqst + ")");
         throw new MetaException("Unable to update transaction database "
           + StringUtils.stringifyException(e));
       } finally {
@@ -952,7 +952,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "abortTxns(" + rqst + ")");
+        checkRetryable(e, "abortTxns(" + rqst + ")");
         throw new MetaException("Unable to update transaction database "
             + StringUtils.stringifyException(e));
       } finally {
@@ -1143,11 +1143,11 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
    */
   @Override
   @RetrySemantics.Idempotent("No-op if already committed")
-  public void commitTxn(CommitTxnRequest rqst)
-    throws NoSuchTxnException, TxnAbortedException, MetaException {
+  public void commitTxn(CommitTxnRequest rqst) throws NoSuchTxnException, TxnAbortedException, MetaException {
     char isUpdateDelete = 'N';
     long txnid = rqst.getTxnid();
     long sourceTxnId = -1;
+
     boolean isReplayedReplTxn = TxnType.REPL_CREATED.equals(rqst.getTxn_type());
     boolean isHiveReplTxn = rqst.isSetReplPolicy() && TxnType.DEFAULT.equals(rqst.getTxn_type());
     try {
@@ -1207,37 +1207,9 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
         String conflictSQLSuffix = "FROM \"TXN_COMPONENTS\" WHERE \"TC_TXNID\"=" + txnid + " AND \"TC_OPERATION_TYPE\" IN (" +
                 OperationType.UPDATE + "," + OperationType.DELETE + ")";
-
         long tempCommitId = generateTemporaryId();
-        if (txnType.get() != TxnType.READ_ONLY
-                && !isReplayedReplTxn
-                && isUpdateOrDelete(stmt, conflictSQLSuffix)) {
 
-          isUpdateDelete = 'Y';
-          //if here it means currently committing txn performed update/delete and we should check WW conflict
-          /**
-           * "select distinct" is used below because
-           * 1. once we get to multi-statement txns, we only care to record that something was updated once
-           * 2. if {@link #addDynamicPartitions(AddDynamicPartitions)} is retried by caller it may create
-           *  duplicate entries in TXN_COMPONENTS
-           * but we want to add a PK on WRITE_SET which won't have unique rows w/o this distinct
-           * even if it includes all of its columns
-           *
-           * First insert into write_set using a temporary commitID, which will be updated in a separate call,
-           * see: {@link #updateCommitIdAndCleanUpMetadata(Statement, long, TxnType, Long, long)}}.
-           * This should decrease the scope of the S4U lock on the next_txn_id table.
-           */
-          Savepoint undoWriteSetForCurrentTxn = dbConn.setSavepoint();
-          stmt.executeUpdate("INSERT INTO \"WRITE_SET\" (\"WS_DATABASE\", \"WS_TABLE\", \"WS_PARTITION\", \"WS_TXNID\", \"WS_COMMIT_ID\", \"WS_OPERATION_TYPE\")" +
-                          " SELECT DISTINCT \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\", \"TC_TXNID\", " + tempCommitId + ", \"TC_OPERATION_TYPE\" " + conflictSQLSuffix);
-
-          /**
-           * This S4U will mutex with other commitTxn() and openTxns().
-           * -1 below makes txn intervals look like [3,3] [4,4] if all txns are serial
-           * Note: it's possible to have several txns have the same commit id.  Suppose 3 txns start
-           * at the same time and no new txns start until all 3 commit.
-           * We could've incremented the sequence for commitId as well but it doesn't add anything functionally.
-           */
+        if (txnType.get() == TxnType.COMPACTION) {
           try (ResultSet commitIdRs = stmt.executeQuery(sqlGenerator.addForUpdateClause("SELECT \"NTXN_NEXT\" - 1 FROM \"NEXT_TXN_ID\""))) {
             if (!commitIdRs.next()) {
               throw new IllegalStateException("No rows found in NEXT_TXN_ID");
@@ -1245,48 +1217,90 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             commitId = commitIdRs.getLong(1);
           }
 
-          if (!rqst.isExclWriteEnabled()) {
+        } else if (txnType.get() != TxnType.READ_ONLY && !isReplayedReplTxn) {
+          String writeSetInsertSql = "INSERT INTO \"WRITE_SET\" (\"WS_DATABASE\", \"WS_TABLE\", \"WS_PARTITION\"," +
+            "   \"WS_TXNID\", \"WS_COMMIT_ID\", \"WS_OPERATION_TYPE\")" +
+            " SELECT DISTINCT \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\", \"TC_TXNID\", " + tempCommitId + ", \"TC_OPERATION_TYPE\" ";
+
+          if (isUpdateOrDelete(stmt, conflictSQLSuffix)) {
+            isUpdateDelete = 'Y';
+            //if here it means currently committing txn performed update/delete and we should check WW conflict
             /**
-             * see if there are any overlapping txns that wrote the same element, i.e. have a conflict
-             * Since entire commit operation is mutexed wrt other start/commit ops,
-             * committed.ws_commit_id <= current.ws_commit_id for all txns
-             * thus if committed.ws_commit_id < current.ws_txnid, transactions do NOT overlap
-             * For example, [17,20] is committed, [6,80] is being committed right now - these overlap
-             * [17,20] committed and [21,21] committing now - these do not overlap.
-             * [17,18] committed and [18,19] committing now - these overlap  (here 18 started while 17 was still running)
+             * "select distinct" is used below because
+             * 1. once we get to multi-statement txns, we only care to record that something was updated once
+             * 2. if {@link #addDynamicPartitions(AddDynamicPartitions)} is retried by caller it may create
+             *  duplicate entries in TXN_COMPONENTS
+             * but we want to add a PK on WRITE_SET which won't have unique rows w/o this distinct
+             * even if it includes all of its columns
+             *
+             * First insert into write_set using a temporary commitID, which will be updated in a separate call,
+             * see: {@link #updateCommitIdAndCleanUpMetadata(Statement, long, TxnType, Long, long)}}.
+             * This should decrease the scope of the S4U lock on the next_txn_id table.
              */
-            try (ResultSet rs = checkForWriteConflict(stmt, txnid)) {
-              if (rs.next()) {
-                //found a conflict, so let's abort the txn
-                String committedTxn = "[" + JavaUtils.txnIdToString(rs.getLong(1)) + "," + rs.getLong(2) + "]";
-                StringBuilder resource = new StringBuilder(rs.getString(3)).append("/").append(rs.getString(4));
-                String partitionName = rs.getString(5);
-                if (partitionName != null) {
-                  resource.append('/').append(partitionName);
+            Savepoint undoWriteSetForCurrentTxn = dbConn.setSavepoint();
+            stmt.executeUpdate(writeSetInsertSql + (useMinHistoryLevel ? conflictSQLSuffix :
+              "FROM \"TXN_COMPONENTS\" WHERE \"TC_TXNID\"=" + txnid + " AND \"TC_OPERATION_TYPE\" <> " + OperationType.COMPACT));
+
+            /**
+             * This S4U will mutex with other commitTxn() and openTxns().
+             * -1 below makes txn intervals look like [3,3] [4,4] if all txns are serial
+             * Note: it's possible to have several txns have the same commit id.  Suppose 3 txns start
+             * at the same time and no new txns start until all 3 commit.
+             * We could've incremented the sequence for commitId as well but it doesn't add anything functionally.
+             */
+            try (ResultSet commitIdRs = stmt.executeQuery(sqlGenerator.addForUpdateClause("SELECT \"NTXN_NEXT\" - 1 FROM \"NEXT_TXN_ID\""))) {
+              if (!commitIdRs.next()) {
+                throw new IllegalStateException("No rows found in NEXT_TXN_ID");
+              }
+              commitId = commitIdRs.getLong(1);
+            }
+
+            if (!rqst.isExclWriteEnabled()) {
+              /**
+               * see if there are any overlapping txns that wrote the same element, i.e. have a conflict
+               * Since entire commit operation is mutexed wrt other start/commit ops,
+               * committed.ws_commit_id <= current.ws_commit_id for all txns
+               * thus if committed.ws_commit_id < current.ws_txnid, transactions do NOT overlap
+               * For example, [17,20] is committed, [6,80] is being committed right now - these overlap
+               * [17,20] committed and [21,21] committing now - these do not overlap.
+               * [17,18] committed and [18,19] committing now - these overlap  (here 18 started while 17 was still running)
+               */
+              try (ResultSet rs = checkForWriteConflict(stmt, txnid)) {
+                if (rs.next()) {
+                  //found a conflict, so let's abort the txn
+                  String committedTxn = "[" + JavaUtils.txnIdToString(rs.getLong(1)) + "," + rs.getLong(2) + "]";
+                  StringBuilder resource = new StringBuilder(rs.getString(3)).append("/").append(rs.getString(4));
+                  String partitionName = rs.getString(5);
+                  if (partitionName != null) {
+                    resource.append('/').append(partitionName);
+                  }
+                  String msg = "Aborting [" + JavaUtils.txnIdToString(txnid) + "," + commitId + "]" + " due to a write conflict on " + resource +
+                          " committed by " + committedTxn + " " + rs.getString(7) + "/" + rs.getString(8);
+                  //remove WRITE_SET info for current txn since it's about to abort
+                  dbConn.rollback(undoWriteSetForCurrentTxn);
+                  LOG.info(msg);
+                  //todo: should make abortTxns() write something into TXNS.TXN_META_INFO about this
+                  if (abortTxns(dbConn, Collections.singletonList(txnid), false, isReplayedReplTxn) != 1) {
+                    throw new IllegalStateException(msg + " FAILED!");
+                  }
+                  dbConn.commit();
+                  throw new TxnAbortedException(msg);
                 }
-                String msg = "Aborting [" + JavaUtils.txnIdToString(txnid) + "," + commitId + "]" + " due to a write conflict on " + resource +
-                        " committed by " + committedTxn + " " + rs.getString(7) + "/" + rs.getString(8);
-                //remove WRITE_SET info for current txn since it's about to abort
-                dbConn.rollback(undoWriteSetForCurrentTxn);
-                LOG.info(msg);
-                //todo: should make abortTxns() write something into TXNS.TXN_META_INFO about this
-                if (abortTxns(dbConn, Collections.singletonList(txnid), false, isReplayedReplTxn) != 1) {
-                  throw new IllegalStateException(msg + " FAILED!");
+              }
+            }
+          } else if (!useMinHistoryLevel) {
+            if (stmt.executeUpdate(writeSetInsertSql + "FROM \"TXN_COMPONENTS\" WHERE \"TC_TXNID\"=" + txnid +
+              " AND \"TC_OPERATION_TYPE\" <> " + OperationType.COMPACT) > 0) {
+              try (ResultSet commitIdRs = stmt.executeQuery("SELECT \"NTXN_NEXT\" - 1 FROM \"NEXT_TXN_ID\"")) {
+                if (!commitIdRs.next()) {
+                  throw new IllegalStateException("No rows found in NEXT_TXN_ID");
                 }
-                dbConn.commit();
-                throw new TxnAbortedException(msg);
+                commitId = commitIdRs.getLong(1);
               }
             }
           }
-        } else if (txnType.get() == TxnType.COMPACTION) {
-          try (ResultSet commitIdRs = stmt.executeQuery(sqlGenerator.addForUpdateClause("SELECT \"NTXN_NEXT\" - 1 FROM \"NEXT_TXN_ID\""))) {
-            if (!commitIdRs.next()) {
-              throw new IllegalStateException("No rows found in NEXT_TXN_ID");
-            }
-            commitId = commitIdRs.getLong(1);
-          }
-        }  else {
-          /**
+        } else {
+          /*
            * current txn didn't update/delete anything (may have inserted), so just proceed with commit
            *
            * We only care about commit id for write txns, so for RO (when supported) txns we don't
@@ -1345,7 +1359,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "commitTxn(" + rqst + ")");
+        checkRetryable(e, "commitTxn(" + rqst + ")");
         throw new MetaException("Unable to update transaction database "
           + StringUtils.stringifyException(e));
       } finally {
@@ -1388,40 +1402,42 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
    * @return max Id for the conflicting transaction, if any, otherwise -1
    * @throws MetaException
    */
+  @RetrySemantics.ReadOnly
   public long getLatestTxnIdInConflict(long txnid) throws MetaException {
-    Connection dbConn = null;
-    Statement stmt = null;
-
     try {
-      dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
-      stmt = dbConn.createStatement();
+      try (Connection dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
+           Statement stmt = dbConn.createStatement()) {
 
-      String writeConflictQuery = "SELECT MAX(\"COMMITTED\".\"WS_TXNID\")" +
-        " FROM \"WRITE_SET\" \"COMMITTED\" " +
-        "   INNER JOIN (" +
-        "SELECT DISTINCT \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\", \"TC_TXNID\" " +
-        " FROM \"TXN_COMPONENTS\"  " +
-        "   WHERE \"TC_TXNID\" = " + txnid +
-        "     AND \"TC_OPERATION_TYPE\" IN (" + OperationType.UPDATE + "," + OperationType.DELETE + ")) \"CUR\" " +
-        "   ON \"COMMITTED\".\"WS_DATABASE\" = \"CUR\".\"TC_DATABASE\" " +
-        "     AND \"COMMITTED\".\"WS_TABLE\" = \"CUR\".\"TC_TABLE\" " +
-        //For partitioned table we always track writes at partition level (never at table)
-        //and for non partitioned - always at table level, thus the same table should never
-        //have entries with partition key and w/o
-        "     AND (\"COMMITTED\".\"WS_PARTITION\" = \"CUR\".\"TC_PARTITION\" OR " +
-        "       \"CUR\".\"TC_PARTITION\" IS NULL) " +
-        " WHERE \"CUR\".\"TC_TXNID\" <= \"COMMITTED\".\"WS_COMMIT_ID\""; //txns overlap
+        String writeConflictQuery = "SELECT MAX(\"COMMITTED\".\"WS_TXNID\")" +
+          " FROM \"WRITE_SET\" \"COMMITTED\"" +
+          " INNER JOIN (" +
+          "   SELECT DISTINCT \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\", \"TC_TXNID\"" +
+          "   FROM \"TXN_COMPONENTS\"" +
+          "   WHERE \"TC_TXNID\" = " + txnid +
+          "     AND \"TC_OPERATION_TYPE\" IN (" + OperationType.UPDATE + "," + OperationType.DELETE + ")" +
+          " ) \"CUR\"" +
+          " ON \"COMMITTED\".\"WS_DATABASE\" = \"CUR\".\"TC_DATABASE\"" +
+          "   AND \"COMMITTED\".\"WS_TABLE\" = \"CUR\".\"TC_TABLE\"" +
+          (useMinHistoryLevel ? "" :
+          "   AND \"COMMITTED\".\"WS_OPERATION_TYPE\" != " + OperationType.INSERT) +
+          // For partitioned table we always track writes at partition level (never at table)
+          // and for non partitioned - always at table level, thus the same table should never
+          // have entries with partition key and w/o
+          "   AND (\"COMMITTED\".\"WS_PARTITION\" = \"CUR\".\"TC_PARTITION\" OR" +
+          "     \"CUR\".\"TC_PARTITION\" IS NULL) " +
+          // txns overlap
+          " WHERE \"CUR\".\"TC_TXNID\" <= \"COMMITTED\".\"WS_COMMIT_ID\"";
 
-      LOG.debug("Going to execute query: <" + writeConflictQuery + ">");
-      ResultSet rs = stmt.executeQuery(writeConflictQuery);
-      return rs.next() ? rs.getLong(1) : -1;
-
-    } catch (Exception e) {
-      throw new MetaException(StringUtils.stringifyException(e));
-
-    } finally {
-      closeStmt(stmt);
-      closeDbConn(dbConn);
+        LOG.debug("Going to execute query: <" + writeConflictQuery + ">");
+        try (ResultSet rs = stmt.executeQuery(writeConflictQuery)) {
+          return rs.next() ? rs.getLong(1) : -1;
+        }
+      } catch (SQLException e) {
+        checkRetryable(e, "getLatestTxnIdInConflict");
+        throw new MetaException(StringUtils.stringifyException(e));
+      }
+    } catch (RetryException e) {
+      return getLatestTxnIdInConflict(txnid);
     }
   }
 
@@ -1618,7 +1634,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "replTableWriteIdState(" + rqst + ")", true);
+        checkRetryable(e, "replTableWriteIdState(" + rqst + ")", true);
         throw new MetaException("Unable to update transaction database "
                 + StringUtils.stringifyException(e));
       } finally {
@@ -1726,7 +1742,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         GetValidWriteIdsResponse owr = new GetValidWriteIdsResponse(tblValidWriteIdsList);
         return owr;
       } catch (SQLException e) {
-        checkRetryable(dbConn, e, "getValidWriteIds");
+        checkRetryable(e, "getValidWriteIds");
         throw new MetaException("Unable to select from transaction database, "
                 + StringUtils.stringifyException(e));
       } finally {
@@ -2038,7 +2054,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.error("Exception during write ids allocation for request={}. Will retry if possible.", rqst, e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "allocateTableWriteIds(" + rqst + ")", true);
+        checkRetryable(e, "allocateTableWriteIds(" + rqst + ")", true);
         throw new MetaException("Unable to update transaction database "
                 + StringUtils.stringifyException(e));
       } finally {
@@ -2076,7 +2092,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         LOG.error(
             "Exception during reading the max allocated writeId for dbName={}, tableName={}. Will retry if possible.",
             dbName, tableName, e);
-        checkRetryable(dbConn, e, "getMaxAllocatedTableWrited(" + rqst + ")");
+        checkRetryable(e, "getMaxAllocatedTableWrited(" + rqst + ")");
         throw new MetaException("Unable to update transaction database " + StringUtils.stringifyException(e));
       } finally {
         close(rs, pStmt, dbConn);
@@ -2111,7 +2127,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         dbConn.commit();
       } catch (SQLException e) {
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "seedWriteId(" + rqst + ")");
+        checkRetryable(e, "seedWriteId(" + rqst + ")");
         throw new MetaException("Unable to update transaction database " + StringUtils.stringifyException(e));
       } finally {
         close(null, pst, dbConn);
@@ -2152,7 +2168,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
       } catch (SQLException e) {
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "seedTxnId(" + rqst + ")");
+        checkRetryable(e, "seedTxnId(" + rqst + ")");
         throw new MetaException("Unable to update transaction database " + StringUtils.stringifyException(e));
       } finally {
         close(rs, stmt, dbConn);
@@ -2188,7 +2204,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           retryNum = 0;
           throw new MetaException(e.getMessage());
         }
-        checkRetryable(dbConn, e, "addWriteNotificationLog(" + acidWriteEvent + ")");
+        checkRetryable(e, "addWriteNotificationLog(" + acidWriteEvent + ")");
         throw new MetaException("Unable to add write notification event " + StringUtils.stringifyException(e));
       } finally{
         closeDbConn(dbConn);
@@ -2495,7 +2511,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e,
+        checkRetryable(e,
             "heartbeatLockMaterializationRebuild(" + TableName.getDbTable(dbName, tableName) + ", " + txnId + ")");
         throw new MetaException("Unable to heartbeat rebuild lock due to " +
             StringUtils.stringifyException(e));
@@ -2551,7 +2567,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "cleanupMaterializationRebuildLocks");
+        checkRetryable(e, "cleanupMaterializationRebuildLocks");
         throw new MetaException("Unable to clean rebuild locks due to " +
             StringUtils.stringifyException(e));
       } finally {
@@ -2667,7 +2683,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.error("enqueueLock failed for request: {}. Exception msg: {}", rqst, getMessage(e));
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "enqueueLockWithRetry(" + rqst + ")");
+        checkRetryable(e, "enqueueLockWithRetry(" + rqst + ")");
         throw new MetaException("Unable to update transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -2913,7 +2929,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.error("checkLock failed for extLockId={}/txnId={}. Exception msg: {}", extLockId, txnId, getMessage(e));
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "checkLockWithRetry(" + extLockId + "," + txnId + ")");
+        checkRetryable(e, "checkLockWithRetry(" + extLockId + "," + txnId + ")");
         throw new MetaException("Unable to update transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -2973,7 +2989,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.error("checkLock failed for request={}. Exception msg: {}", rqst, getMessage(e));
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "checkLock(" + rqst + " )");
+        checkRetryable(e, "checkLock(" + rqst + " )");
         throw new MetaException("Unable to update transaction database " +
           JavaUtils.lockIdToString(extLockId) + " " + StringUtils.stringifyException(e));
       } finally {
@@ -3054,7 +3070,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.error("Unlock failed for request={}. Exception msg: {}", rqst, getMessage(e));
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "unlock(" + rqst + ")");
+        checkRetryable(e, "unlock(" + rqst + ")");
         throw new MetaException("Unable to update transaction database " +
           JavaUtils.lockIdToString(extLockId) + " " + StringUtils.stringifyException(e));
       } finally {
@@ -3169,7 +3185,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           sortedList.add(new LockInfoExt(e));
         }
       } catch (SQLException e) {
-        checkRetryable(dbConn, e, "showLocks(" + rqst + ")");
+        checkRetryable(e, "showLocks(" + rqst + ")");
         throw new MetaException("Unable to select from transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -3206,7 +3222,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "heartbeat(" + ids + ")");
+        checkRetryable(e, "heartbeat(" + ids + ")");
         throw new MetaException("Unable to select from transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -3273,7 +3289,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "heartbeatTxnRange(" + rqst + ")");
+        checkRetryable(e, "heartbeatTxnRange(" + rqst + ")");
         throw new MetaException("Unable to select from transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -3326,7 +3342,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         }
         return txnId;
       } catch (SQLException e) {
-        checkRetryable(dbConn, e, "getTxnIdForWriteId");
+        checkRetryable(e, "getTxnIdForWriteId");
         throw new MetaException("Unable to select from transaction database, "
                 + StringUtils.stringifyException(e));
       } finally {
@@ -3450,7 +3466,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "COMPACT(" + rqst + ")");
+        checkRetryable(e, "COMPACT(" + rqst + ")");
         throw new MetaException("Unable to select from transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -3538,7 +3554,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           response.addToCompacts(e);
         }
       } catch (SQLException e) {
-        checkRetryable(dbConn, e, "showCompact(" + rqst + ")");
+        checkRetryable(e, "showCompact(" + rqst + ")");
         throw new MetaException("Unable to select from transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -3621,7 +3637,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         }
       } catch (SQLException e) {
         LOG.error("Unable to execute query " + e.getMessage());
-        checkRetryable(dbConn, e, "getLatestCommittedCompactionInfo");
+        checkRetryable(e, "getLatestCommittedCompactionInfo");
       } finally {
         close(rs, pst, dbConn);
       }
@@ -3673,7 +3689,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         return metrics;
       } catch (SQLException e) {
         LOG.error("Unable to getMetricsInfo", e);
-        checkRetryable(dbConn, e, "getMetricsInfo");
+        checkRetryable(e, "getMetricsInfo");
         throw new MetaException("Unable to execute getMetricsInfo() " + StringUtils.stringifyException(e));
       } finally {
         closeDbConn(dbConn);
@@ -3753,7 +3769,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "addDynamicPartitions(" + rqst + ")");
+        checkRetryable(e, "addDynamicPartitions(" + rqst + ")");
         throw new MetaException("Unable to insert into from transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -3972,7 +3988,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: ", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "cleanupRecords");
+        checkRetryable(e, "cleanupRecords");
         if (e.getMessage().contains("does not exist")) {
           LOG.warn("Cannot perform cleanup since metastore table does not exist");
         } else {
@@ -4146,7 +4162,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       } catch (SQLException e) {
         LOG.debug("Going to rollback: " + callSig);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, callSig);
+        checkRetryable(e, callSig);
         if (e.getMessage().contains("does not exist")) {
           LOG.warn("Cannot perform " + callSig + " since metastore table does not exist");
         } else {
@@ -4290,10 +4306,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   }
 
   /**
-   * See {@link #checkRetryable(Connection, SQLException, String, boolean)}.
+   * See {@link #checkRetryable(SQLException, String, boolean)}.
    */
-  protected void checkRetryable(Connection conn, SQLException e, String caller) throws RetryException {
-    checkRetryable(conn, e, caller, false);
+  void checkRetryable(SQLException e, String caller) throws RetryException {
+    checkRetryable(e, caller, false);
   }
 
   /**
@@ -4301,13 +4317,12 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
    * this, so we have to inspect the error messages and catch the telltale signs for each
    * different database.  This method will throw {@code RetryException}
    * if the error is retry-able.
-   * @param conn database connection
    * @param e exception that was thrown.
    * @param caller name of the method calling this (and other info useful to log)
    * @param retryOnDuplicateKey whether to retry on unique key constraint violation
    * @throws org.apache.hadoop.hive.metastore.txn.TxnHandler.RetryException when the operation should be retried
    */
-  protected void checkRetryable(Connection conn, SQLException e, String caller, boolean retryOnDuplicateKey)
+  void checkRetryable(SQLException e, String caller, boolean retryOnDuplicateKey)
       throws RetryException {
 
     // If you change this function, remove the @Ignore from TestTxnHandler.deadlockIsDetected()
@@ -5334,7 +5349,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         }
       } catch (SQLException e) {
         LOG.info("Failed to update number of open transactions");
-        checkRetryable(dbConn, e, "countOpenTxns()");
+        checkRetryable(e, "countOpenTxns()");
       } finally {
         close(rs, stmt, dbConn);
       }
@@ -5356,7 +5371,6 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     }
     // Need to register minimum open txnid for current transactions into MIN_HISTORY table.
     try (Statement stmt = dbConn.createStatement()) {
-
       List<String> rows = txnIds.stream().map(txnId -> txnId + ", " + minOpenTxnId).collect(Collectors.toList());
 
       // Insert transaction entries into MIN_HISTORY_LEVEL.
@@ -5566,7 +5580,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         //OK, so now we have a lock
         return new LockHandleImpl(dbConn, stmt, rs, key, derbySemaphore);
       } catch (SQLException ex) {
-        checkRetryable(dbConn, ex, "acquireLock(" + key + ")");
+        checkRetryable(ex, "acquireLock(" + key + ")");
         throw new MetaException("Unable to lock " + quoteString(key) + " due to: " + getMessage(ex) + "; " + StringUtils.stringifyException(ex));
       }
       catch(InterruptedException ex) {

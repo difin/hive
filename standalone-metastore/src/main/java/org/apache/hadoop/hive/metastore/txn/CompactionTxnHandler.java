@@ -151,7 +151,7 @@ class CompactionTxnHandler extends TxnHandler {
         }
       } catch (SQLException e) {
         LOG.error("Unable to connect to transaction database " + e.getMessage());
-        checkRetryable(dbConn, e,
+        checkRetryable(e,
             "findPotentialCompactions(maxAborted:" + abortedThreshold
                 + ", abortedTimeThreshold:" + abortedTimeThreshold + ")");
       } finally {
@@ -245,7 +245,7 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.error("Unable to select next element for compaction, " + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "findNextToCompact(rqst:" + rqst + ")");
+        checkRetryable(e, "findNextToCompact(rqst:" + rqst + ")");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -287,7 +287,7 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.error("Unable to update compaction queue " + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "markCompacted(" + info + ")");
+        checkRetryable(e, "markCompacted(" + info + ")");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -354,7 +354,7 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.error("Unable to select next element for cleaning, " + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "findReadyToClean");
+        checkRetryable(e, "findReadyToClean");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -497,7 +497,7 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.error("Unable to delete from compaction queue " + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "markCleaned(" + info + ")");
+        checkRetryable(e, "markCleaned(" + info + ")");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -520,6 +520,8 @@ class CompactionTxnHandler extends TxnHandler {
       ResultSet rs = null;
 
       try {
+        long minTxnIdSeenOpen = findMinTxnIdSeenOpen();
+
         // We query for minimum values in all the queries and they can only increase by any concurrent
         // operations. So, READ COMMITTED is sufficient.
         dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
@@ -529,19 +531,22 @@ class CompactionTxnHandler extends TxnHandler {
         // If there are no txns which are currently open or aborted in the system, then current value of
         // NEXT_TXN_ID.ntxn_next could be min_uncommitted_txnid.
         String s = "SELECT MIN(\"RES\".\"ID\") AS \"ID\" FROM (" +
-            "SELECT MIN(\"NTXN_NEXT\") AS \"ID\" FROM \"NEXT_TXN_ID\" " +
-            "UNION " +
-            "SELECT MIN(\"WS_COMMIT_ID\") AS \"ID\" FROM \"WRITE_SET\" " +
-            "UNION " +
-            "SELECT MIN(\"TXN_ID\") AS \"ID\" FROM \"TXNS\" WHERE \"TXN_STATE\" = " + TxnStatus.ABORTED +
-            " OR \"TXN_STATE\" = " + TxnStatus.OPEN +
-            ") \"RES\"";
+          " SELECT MIN(\"NTXN_NEXT\") AS \"ID\" FROM \"NEXT_TXN_ID\"" +
+          (useMinHistoryLevel ? "" :
+          "   UNION" +
+          " SELECT MIN(\"WS_TXNID\") AS \"ID\" FROM \"WRITE_SET\"") +
+          "   UNION" +
+          " SELECT MIN(\"TXN_ID\") AS \"ID\" FROM \"TXNS\" WHERE \"TXN_STATE\" = " + TxnStatus.ABORTED +
+          (useMinHistoryLevel ? "" :
+          "   OR \"TXN_STATE\" = " + TxnStatus.OPEN) +
+          " ) \"RES\"";
+
         LOG.debug("Going to execute query <" + s + ">");
         rs = stmt.executeQuery(s);
         if (!rs.next()) {
           throw new MetaException("Transaction tables not properly initialized, no record found in NEXT_TXN_ID");
         }
-        long minUncommitedTxnid = rs.getLong(1);
+        long minUncommitedTxnid = minTxnIdSeenOpen < 0 ? rs.getLong(1) : Math.min(rs.getLong(1), minTxnIdSeenOpen);
 
         // As all txns below min_uncommitted_txnid are either committed or empty_aborted, we are allowed
         // to cleanup the entries less than min_uncommitted_txnid from the TXN_TO_WRITE_ID table.
@@ -556,7 +561,7 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.error("Unable to delete from TXN_TO_WRITE_ID table " + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "cleanTxnToWriteIdTable");
+        checkRetryable(e, "cleanTxnToWriteIdTable");
         throw new MetaException("Unable to connect to transaction database " +
                 StringUtils.stringifyException(e));
       } finally {
@@ -645,7 +650,7 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.error("Unable to delete from COMPLETED_TXN_COMPONENTS table " + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "removeDuplicateCompletedTxnComponents");
+        checkRetryable(e, "removeDuplicateCompletedTxnComponents");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -708,7 +713,7 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.error("Unable to delete from txns table " + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "cleanEmptyAbortedTxns");
+        checkRetryable(e, "cleanEmptyAbortedTxns");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -753,7 +758,7 @@ class CompactionTxnHandler extends TxnHandler {
           e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "revokeFromLocalWorkers(hostname:" + hostname +")");
+        checkRetryable(e, "revokeFromLocalWorkers(hostname:" + hostname +")");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -800,7 +805,7 @@ class CompactionTxnHandler extends TxnHandler {
           e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "revokeTimedoutWorkers(timeout:" + timeout + ")");
+        checkRetryable(e, "revokeTimedoutWorkers(timeout:" + timeout + ")");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -867,7 +872,7 @@ class CompactionTxnHandler extends TxnHandler {
         return columns;
       } catch (SQLException e) {
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "findColumnsWithStats(" + ci.tableName +
+        checkRetryable(e, "findColumnsWithStats(" + ci.tableName +
           (ci.partName == null ? "" : "/" + ci.partName) + ")");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
@@ -928,7 +933,7 @@ class CompactionTxnHandler extends TxnHandler {
         dbConn.commit();
       } catch (SQLException e) {
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "updateCompactorState(" + ci + "," + compactionTxnId +")");
+        checkRetryable(e, "updateCompactorState(" + ci + "," + compactionTxnId +")");
         throw new MetaException("Unable to connect to transaction database " +
             StringUtils.stringifyException(e));
       } finally {
@@ -1074,7 +1079,7 @@ class CompactionTxnHandler extends TxnHandler {
         dbConn.commit();
       } catch (SQLException e) {
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "purgeCompactionHistory()");
+        checkRetryable(e, "purgeCompactionHistory()");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
       } finally {
@@ -1156,7 +1161,7 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.error("Unable to check for failed compactions " + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "checkFailedCompactions(" + ci + ")");
+        checkRetryable(e, "checkFailedCompactions(" + ci + ")");
         LOG.error("Unable to connect to transaction database " + StringUtils.stringifyException(e));
         return false;//weren't able to check
       } finally {
@@ -1249,7 +1254,7 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.warn("markFailed(" + ci.id + "):" + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "markFailed(" + ci + ")");
+        checkRetryable(e, "markFailed(" + ci + ")");
         LOG.error("markFailed(" + ci + ") failed: " + e.getMessage(), e);
       } finally {
         close(rs, stmt, null);
@@ -1279,7 +1284,7 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.warn("setHadoopJobId(" + hadoopJobId + "," + id + "):" + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "setHadoopJobId(" + hadoopJobId + "," + id + ")");
+        checkRetryable(e, "setHadoopJobId(" + hadoopJobId + "," + id + ")");
         LOG.error("setHadoopJobId(" + hadoopJobId + "," + id + ") failed: " + e.getMessage(), e);
       } finally {
         close(null, stmt, dbConn);
@@ -1300,7 +1305,7 @@ class CompactionTxnHandler extends TxnHandler {
       } catch (SQLException e) {
         LOG.error("Unable to getMinOpenTxnIdForCleaner", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "getMinOpenTxnForCleaner");
+        checkRetryable(e, "getMinOpenTxnForCleaner");
         throw new MetaException("Unable to execute getMinOpenTxnIfForCleaner() " +
             StringUtils.stringifyException(e));
       } finally {
@@ -1349,7 +1354,7 @@ class CompactionTxnHandler extends TxnHandler {
         } else {
           LOG.error("Unable to execute findMinTxnIdSeenOpen", e);
           rollbackDBConn(dbConn);
-          checkRetryable(dbConn, e, "findMinTxnIdSeenOpen");
+          checkRetryable(e, "findMinTxnIdSeenOpen");
           throw new MetaException("Unable to execute findMinTxnIdSeenOpen() " + StringUtils.stringifyException(e));
         }
       } finally {
@@ -1394,7 +1399,7 @@ class CompactionTxnHandler extends TxnHandler {
       } catch (SQLException e) {
         LOG.error("Unable to getCompactionByTxnId", e);
         rollbackDBConn(dbConn);
-        checkRetryable(dbConn, e, "getCompactionByTxnId");
+        checkRetryable(e, "getCompactionByTxnId");
         throw new MetaException("Unable to execute getCompactionByTxnId() " + StringUtils.stringifyException(e));
       } finally {
         closeDbConn(dbConn);

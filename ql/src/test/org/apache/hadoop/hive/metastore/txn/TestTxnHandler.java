@@ -1485,7 +1485,7 @@ public class TestTxnHandler {
                   LOG.debug("no exception, no deadlock");
                 } catch (SQLException e) {
                   try {
-                    tHndlr.checkRetryable(conn1, e, "thread t1");
+                    tHndlr.checkRetryable(e, "thread t1");
                     LOG.debug("Got an exception, but not a deadlock, SQLState is " +
                         e.getSQLState() + " class of exception is " + e.getClass().getName() +
                         " msg is <" + e.getMessage() + ">");
@@ -1515,7 +1515,7 @@ public class TestTxnHandler {
                   LOG.debug("no exception, no deadlock");
                 } catch (SQLException e) {
                   try {
-                    tHndlr.checkRetryable(conn2, e, "thread t2");
+                    tHndlr.checkRetryable(e, "thread t2");
                     LOG.debug("Got an exception, but not a deadlock, SQLState is " +
                         e.getSQLState() + " class of exception is " + e.getClass().getName() +
                         " msg is <" + e.getMessage() + ">");

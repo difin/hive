@@ -102,7 +102,8 @@ public class TestDbTxnManager2 {
 
   @Before
   public void setUp() throws Exception {
-    conf.setBoolVar(HiveConf.ConfVars.TXN_WRITE_X_LOCK, false);
+    HiveConf.setBoolVar(conf, HiveConf.ConfVars.TXN_WRITE_X_LOCK, false);
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.TXN_USE_MIN_HISTORY_LEVEL, true);
     SessionState.start(conf);
     ctx = new Context(conf);
     driver = new Driver(new QueryState.Builder().withHiveConf(conf).nonIsolated().build(), null);
@@ -2312,7 +2313,7 @@ public class TestDbTxnManager2 {
 
     swapTxnManager(txnMgr);
     driver.run("select * from target");
-    List res = new ArrayList();
+    List<String> res = new ArrayList<>();
     driver.getFetchTask().fetch(res);
     Assert.assertEquals("Duplicate records " + (extectedDuplicates ? "" : "not") + "found",
       extectedDuplicates ? 5 : 4, res.size());
@@ -2358,7 +2359,7 @@ public class TestDbTxnManager2 {
 
     swapTxnManager(txnMgr);
     driver.run("select * from target");
-    List res = new ArrayList();
+    List<String> res = new ArrayList<>();
     driver.getFetchTask().fetch(res);
     Assert.assertEquals(2, res.size());
     Assert.assertEquals("Lost Update", "5\t8", res.get(1));
@@ -2405,7 +2406,7 @@ public class TestDbTxnManager2 {
 
     swapTxnManager(txnMgr);
     driver.run("select * from target where age=10");
-    List res = new ArrayList();
+    List<String> res = new ArrayList<>();
     driver.getFetchTask().fetch(res);
     Assert.assertEquals(2, res.size());
     Assert.assertEquals("Lost Update", "[earl\t10, amy\t10]", res.toString());
@@ -2443,7 +2444,7 @@ public class TestDbTxnManager2 {
 
     swapTxnManager(txnMgr);
     driver.run("select * from target");
-    List res = new ArrayList();
+    List<String> res = new ArrayList<>();
     driver.getFetchTask().fetch(res);
     Assert.assertEquals(conflict ? 3 : 4, res.size());
   }
@@ -2476,7 +2477,7 @@ public class TestDbTxnManager2 {
     driver.run("merge into target t using source s on t.a = s.a " +
       "when not matched then insert values (s.a, s.b, s.c)");
     driver.run("select * from target");
-    List res = new ArrayList();
+    List<String> res = new ArrayList<>();
     driver.getFetchTask().fetch(res);
     // The merge should see all three partition and not create duplicates
     Assert.assertEquals("Duplicate records found", 6, res.size());
@@ -2547,7 +2548,7 @@ public class TestDbTxnManager2 {
 
     swapTxnManager(txnMgr);
     driver.run("select * from target");
-    List res = new ArrayList();
+    List<String> res = new ArrayList<>();
     driver.getFetchTask().fetch(res);
     // The merge should see all three partition and not create duplicates
     Assert.assertEquals("Duplicate records found", 6, res.size());
@@ -3317,6 +3318,66 @@ public class TestDbTxnManager2 {
 
     List<ShowLocksResponseElement> locks = getLocks();
     Assert.assertEquals("Unexpected lock count", 0, locks.size());
+  }
+
+  @Test
+  public void testInsertSnapshotIsolationMinHistoryDisabled() throws Exception {
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.TXN_USE_MIN_HISTORY_LEVEL, false);
+    testInsertSnapshotIsolation();
+  }
+
+  @Test
+  public void testInsertSnapshotIsolation() throws Exception {
+    dropTable(new String[] {"tab_acid"});
+
+    driver.run("create table if not exists tab_acid (a int, b int) " +
+        "stored as orc TBLPROPERTIES ('transactional'='true')");
+    driver.compileAndRespond("insert into tab_acid values(1,2)");
+
+    DbTxnManager txnMgr2 = (DbTxnManager) TxnManagerFactory.getTxnManagerFactory().getTxnManager(conf);
+    swapTxnManager(txnMgr2);
+    driver2.compileAndRespond("select * from tab_acid");
+    swapTxnManager(txnMgr);
+
+    driver.run();
+    txnHandler.cleanTxnToWriteIdTable();
+    swapTxnManager(txnMgr2);
+
+    driver2.run();
+    List<String> res = new ArrayList<>();
+    driver2.getFetchTask().fetch(res);
+    Assert.assertEquals(0, res.size());
+  }
+
+  @Test
+  public void testUpdateSnapshotIsolationMinHistoryDisabled() throws Exception {
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.TXN_USE_MIN_HISTORY_LEVEL, false);
+    testUpdateSnapshotIsolation();
+  }
+
+  @Test
+  public void testUpdateSnapshotIsolation() throws Exception {
+    dropTable(new String[] {"tab_acid"});
+
+    driver.run("create table if not exists tab_acid (a int, b int) " +
+        "stored as orc TBLPROPERTIES ('transactional'='true')");
+    driver.run("insert into tab_acid values(1,2)");
+    driver.compileAndRespond("update tab_acid set a=2");
+
+    DbTxnManager txnMgr2 = (DbTxnManager) TxnManagerFactory.getTxnManagerFactory().getTxnManager(conf);
+    swapTxnManager(txnMgr2);
+    driver2.compileAndRespond("select * from tab_acid");
+    swapTxnManager(txnMgr);
+
+    driver.run();
+    txnHandler.cleanTxnToWriteIdTable();
+    swapTxnManager(txnMgr2);
+
+    driver2.run();
+    List<String> res = new ArrayList<>();
+    driver2.getFetchTask().fetch(res);
+    Assert.assertEquals(1, res.size());
+    Assert.assertEquals("1\t2", res.get(0));
   }
 
 }

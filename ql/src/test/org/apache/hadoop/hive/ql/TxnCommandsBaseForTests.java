@@ -122,8 +122,8 @@ public abstract class TxnCommandsBaseForTests {
     hiveConf.setBoolean("hive.txn.write.acid.version.file", true);
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_ACID_DIRECT_UPDATE_AND_DELETE_ENABLED, true);
     TestTxnDbUtil.setConfValues(hiveConf);
-    txnHandler = TxnUtils.getTxnStore(hiveConf);
     TestTxnDbUtil.prepDb(hiveConf);
+    txnHandler = TxnUtils.getTxnStore(hiveConf);
     File f = new File(getWarehouseDir());
     if (f.exists()) {
       FileUtil.fullyDelete(f);
