@@ -119,7 +119,12 @@ public class StatsTask extends Task<StatsWork> implements Serializable {
 
 
   private Table getTable(Hive db) throws SemanticException, HiveException {
-    return db.getTable(work.getFullTableName());
+    Table tbl = work.getTable();
+    // FIXME for ctas this is still needed because location is not set sometimes
+    if (tbl.getSd().getLocation() == null) {
+      tbl = db.getTable(work.getFullTableName());
+    }
+    return tbl;
   }
 
   @Override

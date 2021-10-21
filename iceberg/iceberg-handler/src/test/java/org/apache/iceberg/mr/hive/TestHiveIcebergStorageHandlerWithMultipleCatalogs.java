@@ -137,7 +137,7 @@ public class TestHiveIcebergStorageHandlerWithMultipleCatalogs {
         fileFormat2, HiveIcebergStorageHandlerTestUtils.CUSTOMER_RECORDS);
 
     shell.executeStatement(String.format(
-        "CREATE EXTERNAL TABLE target STORED BY ICEBERG TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source",
+        "CREATE TABLE target STORED BY ICEBERG TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source",
         InputFormatConfig.CATALOG_NAME, HIVECATALOGNAME));
 
     List<Object[]> objects = shell.executeStatement("SELECT * FROM target");
@@ -157,7 +157,7 @@ public class TestHiveIcebergStorageHandlerWithMultipleCatalogs {
     AssertHelpers.assertThrows("Should fail while loading non-existent output committer class.",
         IllegalArgumentException.class, "org.apache.NotExistingClass",
         () -> shell.executeStatement(String.format(
-            "CREATE EXTERNAL TABLE target STORED BY ICEBERG TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source",
+            "CREATE TABLE target STORED BY ICEBERG TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source",
             InputFormatConfig.CATALOG_NAME, HIVECATALOGNAME)));
     // CTAS table should have been dropped by the lifecycle hook
     Assert.assertThrows(NoSuchTableException.class, () -> testTables1.loadTable(target));

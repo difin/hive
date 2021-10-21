@@ -39,7 +39,6 @@ import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsDesc;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Order;
-import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.metastore.api.SQLCheckConstraint;
 import org.apache.hadoop.hive.metastore.api.SQLDefaultConstraint;
 import org.apache.hadoop.hive.metastore.api.SQLForeignKey;
@@ -504,8 +503,7 @@ public class CreateTableDesc implements DDLDesc, Serializable {
   @Explain(displayName = "table properties")
   public Map<String, String> getTblPropsExplain() { // only for displaying plan
     HashMap<String, String> copy = new HashMap<>(tblProps);
-    copy.remove(hive_metastoreConstants.TABLE_IS_CTAS);
-    copy.remove(hive_metastoreConstants.TABLE_BUCKETING_VERSION);
+    copy.remove(TABLE_IS_CTAS);
     return copy;
   }
 
@@ -976,16 +974,5 @@ public class CreateTableDesc implements DDLDesc, Serializable {
 
   public void setOwnerName(String ownerName) {
     this.ownerName = ownerName;
-  }
-
-  public void fromTable(org.apache.hadoop.hive.metastore.api.Table tTable) {
-    if (tTable.getSd() != null  && tTable.getSd().getLocation() != null) {
-      setLocation(tTable.getSd().getLocation());
-    }
-    setExternal(TableType.EXTERNAL_TABLE.toString().equals(tTable.getTableType()));
-    HashMap<String, String> copy = new HashMap<>(tTable.getParameters());
-    copy.remove(hive_metastoreConstants.CTAS_LEGACY_CONFIG);
-    setTblProps(copy);
-    tblProps.remove(hive_metastoreConstants.CTAS_LEGACY_CONFIG);
   }
 }

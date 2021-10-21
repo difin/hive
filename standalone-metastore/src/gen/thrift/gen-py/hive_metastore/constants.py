@@ -13,7 +13,7 @@ from thrift.TRecursive import fix_spec
 import sys
 from .ttypes import *
 DDL_TIME = "transient_lastDdlTime"
-HMS_API = "1.2.15"
+HMS_API = "1.2.14"
 ACCESSTYPE_NONE = 1
 ACCESSTYPE_READONLY = 2
 ACCESSTYPE_WRITEONLY = 4
@@ -46,4 +46,3 @@ DRUID_CONFIG_PREFIX = "druid."
 JDBC_CONFIG_PREFIX = "hive.sql."
 TABLE_IS_CTAS = "created_with_ctas"
 PARTITION_TRANSFORM_SPEC = "partition_transform_spec"
-CTAS_LEGACY_CONFIG = "create_table_as_external"

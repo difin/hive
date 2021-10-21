@@ -576,7 +576,7 @@ public class TestHiveMetastoreTransformer {
       tProps.put("PROPERTIES", TABLE_IS_CTAS + "=true;transactional=false");
       createTableWithCapabilities(tProps);
       Table tbl2 = client.getTable(dbName, tblName);
-      assertEquals(TableType.EXTERNAL_TABLE.name(), tbl2.getTableType());
+      assertEquals(TableType.MANAGED_TABLE.name(), tbl2.getTableType());
     } catch (Exception e) {
       e.printStackTrace();
       fail("testTransformerManagedTable failed with " + e.getMessage());

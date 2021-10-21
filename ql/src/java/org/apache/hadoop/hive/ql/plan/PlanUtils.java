@@ -20,7 +20,6 @@ package org.apache.hadoop.hive.ql.plan;
 
 import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.TABLE_IS_CTAS;
 import static org.apache.hive.common.util.HiveStringUtils.quoteComments;
-import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.TABLE_IS_CTAS;
 
 import java.io.IOException;
 import java.util.ArrayList;

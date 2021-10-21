@@ -45,7 +45,7 @@ public class TestHiveIcebergCTAS extends HiveIcebergStorageHandlerWithEngineBase
         HiveIcebergStorageHandlerTestUtils.CUSTOMER_RECORDS, TableIdentifier.of("default", "source"), false));
 
     shell.executeStatement(String.format(
-        "CREATE EXTERNAL TABLE target STORED BY ICEBERG %s TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source",
+        "CREATE TABLE target STORED BY ICEBERG %s TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source",
         testTables.locationForCreateTableSQL(TableIdentifier.of("default", "target")),
         TableProperties.DEFAULT_FILE_FORMAT, fileFormat));
 
@@ -63,7 +63,7 @@ public class TestHiveIcebergCTAS extends HiveIcebergStorageHandlerWithEngineBase
         HiveIcebergStorageHandlerTestUtils.CUSTOMER_RECORDS, TableIdentifier.of("default", "source"), false));
 
     shell.executeStatement(String.format(
-        "CREATE EXTERNAL TABLE target PARTITIONED BY (dept, name) " +
+        "CREATE TABLE target PARTITIONED BY (dept, name) " +
             "STORED BY ICEBERG TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source",
         TableProperties.DEFAULT_FILE_FORMAT, fileFormat));
 
@@ -101,7 +101,7 @@ public class TestHiveIcebergCTAS extends HiveIcebergStorageHandlerWithEngineBase
       AssertHelpers.assertThrows("Should fail while loading non-existent output committer class.",
           IllegalArgumentException.class, "org.apache.NotExistingClass",
           () -> shell.executeStatement(String.format(
-              "CREATE EXTERNAL TABLE target %s STORED BY ICEBERG AS SELECT * FROM source", partitioning)));
+              "CREATE TABLE target %s STORED BY ICEBERG AS SELECT * FROM source", partitioning)));
       // CTAS table should have been dropped by the lifecycle hook
       Assert.assertThrows(NoSuchTableException.class, () -> testTables.loadTable(target));
     }
