@@ -33,6 +33,7 @@ import org.apache.iceberg.BaseMetastoreTableOperations;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
+import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.thrift.TException;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -52,7 +53,8 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
   public void testMigrateHiveTableToIceberg() throws TException, InterruptedException {
     String tableName = "tbl";
     String createQuery = "CREATE EXTERNAL TABLE " +  tableName + " (a int) STORED AS " + fileFormat.name() + " " +
-        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName));
+        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)) +
+        testTables.propertiesForCreateTableSQL(ImmutableMap.of());
     shell.executeStatement(createQuery);
     shell.executeStatement("INSERT INTO " + tableName + " VALUES (1), (2), (3)");
     validateMigration(tableName);
@@ -62,7 +64,8 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
   public void testMigratePartitionedHiveTableToIceberg() throws TException, InterruptedException {
     String tableName = "tbl_part";
     shell.executeStatement("CREATE EXTERNAL TABLE " + tableName + " (a int) PARTITIONED BY (b string) STORED AS " +
-        fileFormat.name() + " " + testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
+        fileFormat.name() + " " + testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)) +
+        testTables.propertiesForCreateTableSQL(ImmutableMap.of()));
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='aaa') VALUES (1), (2), (3)");
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='bbb') VALUES (4), (5)");
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='ccc') VALUES (6)");
@@ -75,7 +78,8 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
     String tableName = "tbl_part_bucketed";
     shell.executeStatement("CREATE EXTERNAL TABLE " + tableName + " (a int) PARTITIONED BY (b string) clustered by " +
         "(a) INTO 2 BUCKETS STORED AS " + fileFormat.name() + " " +
-        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
+        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)) +
+        testTables.propertiesForCreateTableSQL(ImmutableMap.of()));
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='aaa') VALUES (1), (2), (3)");
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='bbb') VALUES (4), (5)");
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='ccc') VALUES (6)");
@@ -87,7 +91,8 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
   public void testRollbackMigrateHiveTableToIceberg() throws TException, InterruptedException {
     String tableName = "tbl_rollback";
     shell.executeStatement("CREATE EXTERNAL TABLE " +  tableName + " (a int) STORED AS " + fileFormat.name() + " " +
-        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
+        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)) +
+        testTables.propertiesForCreateTableSQL(ImmutableMap.of()));
     shell.executeStatement("INSERT INTO " + tableName + " VALUES (1), (2), (3)");
     validateMigrationRollback(tableName);
   }
@@ -96,7 +101,8 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
   public void testRollbackMigratePartitionedHiveTableToIceberg() throws TException, InterruptedException {
     String tableName = "tbl_rollback";
     shell.executeStatement("CREATE EXTERNAL TABLE " + tableName + " (a int) PARTITIONED BY (b string) STORED AS " +
-        fileFormat.name() + " " + testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
+        fileFormat.name() + " " + testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)) +
+        testTables.propertiesForCreateTableSQL(ImmutableMap.of()));
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='aaa') VALUES (1), (2), (3)");
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='bbb') VALUES (4), (5)");
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='ccc') VALUES (6)");
@@ -109,7 +115,8 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
     String tableName = "tbl_rollback";
     shell.executeStatement("CREATE EXTERNAL TABLE " + tableName + " (a int) PARTITIONED BY (b string, c int) " +
         "STORED AS " + fileFormat.name() + " " +
-        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
+        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)) +
+        testTables.propertiesForCreateTableSQL(ImmutableMap.of()));
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='aaa', c='111') VALUES (1), (2), (3)");
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='bbb', c='111') VALUES (4), (5)");
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='aaa', c='222') VALUES (6)");
@@ -122,7 +129,8 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
     String tableName = "tbl_part_bucketed";
     shell.executeStatement("CREATE EXTERNAL TABLE " + tableName + " (a int) PARTITIONED BY (b string) clustered by " +
         "(a) INTO 2 BUCKETS STORED AS " + fileFormat.name() + " " +
-        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
+        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)) +
+        testTables.propertiesForCreateTableSQL(ImmutableMap.of()));
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='aaa') VALUES (1), (2), (3)");
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='bbb') VALUES (4), (5)");
     shell.executeStatement("INSERT INTO " + tableName + " PARTITION (b='ccc') VALUES (6)");
@@ -139,7 +147,8 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
     List<String> formats = ImmutableList.of("TEXTFILE", "JSONFILE", "RCFILE", "SEQUENCEFILE");
     formats.forEach(format -> {
       shell.executeStatement("CREATE EXTERNAL TABLE " +  tableName + " (a int) STORED AS " + format + " " +
-          testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
+          testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)) +
+          testTables.propertiesForCreateTableSQL(ImmutableMap.of()));
       shell.executeStatement("INSERT INTO " + tableName + " VALUES (1), (2), (3)");
       AssertHelpers.assertThrows("Migrating a " + format + " table to Iceberg should have thrown an exception.",
           IllegalArgumentException.class, "Cannot convert hive table to iceberg with input format: ",
@@ -156,7 +165,8 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
         testTableType == TestTables.TestTableType.HIVE_CATALOG);
     String tableName = "tbl_unsupported";
     shell.executeStatement("CREATE MANAGED TABLE " +  tableName + " (a int) STORED AS " + fileFormat + " " +
-        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
+        testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)) +
+        testTables.propertiesForCreateTableSQL(ImmutableMap.of()));
     shell.executeStatement("INSERT INTO " + tableName + " VALUES (1), (2), (3)");
     AssertHelpers.assertThrows("Migrating a managed table to Iceberg should have thrown an exception.",
         IllegalArgumentException.class, "Converting non-external, temporary or transactional hive table to iceberg",

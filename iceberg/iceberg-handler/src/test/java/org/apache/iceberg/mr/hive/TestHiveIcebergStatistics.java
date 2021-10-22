@@ -29,6 +29,7 @@ import org.apache.iceberg.Table;
 import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
+import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.thrift.TException;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -136,9 +137,10 @@ public class TestHiveIcebergStatistics extends HiveIcebergStorageHandlerWithEngi
 
     shell.setHiveSessionValue(HiveConf.ConfVars.HIVESTATSAUTOGATHER.varname, true);
     shell.executeStatement(String.format(
-        "CREATE TABLE target STORED BY ICEBERG %s TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source",
+        "CREATE TABLE target STORED BY ICEBERG %s %s AS SELECT * FROM source",
         testTables.locationForCreateTableSQL(TableIdentifier.of("default", "target")),
-        TableProperties.DEFAULT_FILE_FORMAT, fileFormat));
+        testTables.propertiesForCreateTableSQL(
+            ImmutableMap.of(TableProperties.DEFAULT_FILE_FORMAT, fileFormat.toString()))));
 
     checkColStat("target", "id");
   }
@@ -153,9 +155,9 @@ public class TestHiveIcebergStatistics extends HiveIcebergStorageHandlerWithEngi
 
     shell.setHiveSessionValue(HiveConf.ConfVars.HIVESTATSAUTOGATHER.varname, true);
     shell.executeStatement(String.format(
-        "CREATE TABLE target PARTITIONED BY (dept, name) " +
-            "STORED BY ICEBERG TBLPROPERTIES ('%s'='%s') AS SELECT * FROM source s",
-        TableProperties.DEFAULT_FILE_FORMAT, fileFormat));
+        "CREATE TABLE target PARTITIONED BY (dept, name) STORED BY ICEBERG %s AS SELECT * FROM source s",
+        testTables.propertiesForCreateTableSQL(
+            ImmutableMap.of(TableProperties.DEFAULT_FILE_FORMAT, fileFormat.toString()))));
 
     checkColStat("target", "id");
     checkColStat("target", "dept");
