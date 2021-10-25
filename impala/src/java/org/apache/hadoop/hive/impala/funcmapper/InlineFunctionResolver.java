@@ -43,9 +43,11 @@ public class InlineFunctionResolver extends ImpalaFunctionResolverImpl {
   public ImpalaFunctionSignature getFunction(
       Map<ImpalaFunctionSignature, ? extends FunctionDetails> functionDetailsMap)
       throws SemanticException {
-    // there is no function signature associated with the struct function so just return null
-    return null;
+    // There is no matching Impala function for "array", so we create a dummy
+    // ImpalaFunctionSignature
+    return ImpalaFunctionSignature.createDummyFuncSignature(this.func);
   }
+
 
   public List<RexNode> getConvertedInputs(ImpalaFunctionSignature function) throws HiveException {
     return inputNodes;

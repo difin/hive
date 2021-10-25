@@ -27,6 +27,7 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.parse.type.FunctionHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,8 +45,9 @@ public class ArrayFunctionResolver extends ImpalaFunctionResolverImpl {
   public ImpalaFunctionSignature getFunction(
       Map<ImpalaFunctionSignature, ? extends FunctionDetails> functionDetailsMap)
       throws SemanticException {
-    // there is no function signature associated with the struct function so just return null
-    return null;
+    // There is no matching Impala function for "array", so we create a dummy
+    // ImpalaFunctionSignature
+    return ImpalaFunctionSignature.createDummyFuncSignature(this.func);
   }
 
   public List<RexNode> getConvertedInputs(ImpalaFunctionSignature function) throws HiveException {

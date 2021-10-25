@@ -79,6 +79,11 @@ public class ArithmeticFunctionResolver extends ImpalaFunctionResolverImpl {
   @Override
   protected List<ImpalaFunctionSignature> getCastCandidates(String func) throws SemanticException {
     List<ImpalaFunctionSignature> castCandidates = super.getCastCandidates(func);
+    if (castCandidates == null) {
+      // If we cannot resolve the function for the ArithmeticFunctionResolver, it is not necessary
+      // to fallback to the HiveFunctionResolver so we throw an exception here.
+      throw new SemanticException("Could not find function " + func);
+    }
 
     // Since the return type for this resolver has been resolved, only one candidate should match.
     for (ImpalaFunctionSignature ifs : castCandidates) {

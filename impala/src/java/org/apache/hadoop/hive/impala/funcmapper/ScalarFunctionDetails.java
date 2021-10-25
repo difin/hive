@@ -23,9 +23,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.reflect.ClassPath;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.reflect.TypeToken;
+import java.lang.annotation.Annotation;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,6 +40,8 @@ import org.apache.hadoop.hive.impala.exec.ImpalaSessionImpl;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.ResourceUri;
 import org.apache.hadoop.hive.metastore.api.ResourceType;
+import org.apache.hadoop.hive.ql.exec.Description;
+import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.impala.analysis.HdfsUri;
@@ -134,6 +139,9 @@ public class ScalarFunctionDetails implements FunctionDetails {
   // This contains both the builtins and the UDFs
   private static volatile Map<ImpalaFunctionSignature, ScalarFunctionDetails>
       ALL_SCALARS_MAP = ImmutableMap.of();
+
+  private static volatile Map<String, Class<?>> HIVE_UDF_MAP = new HashMap<>();
+
   /**
    * Fetch the functions from the Impala frontend and return them as a ScalarFunctionDetails list.
    */
@@ -270,6 +278,40 @@ public class ScalarFunctionDetails implements FunctionDetails {
         FunctionDetailStatics.STATEFUL_FUNCS.contains(fnName.toLowerCase());
   }
 
+  public ScalarFunctionDetails(String fnName, List<Type> argTypes, Type retType, String hdfsUri, String className) {
+    this.fnName = fnName;
+
+    this.dbName = "";
+
+    this.impalaFnName = fnName;
+
+    this.impalaRetType = retType;
+
+    this.impalaArgTypes = argTypes;
+
+    this.symbolName = className;
+
+    this.prepareFnSymbol = null;
+
+    this.closeFnSymbol = null;
+
+    this.hasVarArgs = false;
+
+    this.isPersistent = false;
+
+    this.binaryType = TFunctionBinaryType.JAVA;
+
+    this.hdfsUri = new HdfsUri(hdfsUri);
+
+    this.castUp = false;
+
+    this.retTypeAlwaysNullable = false;
+
+    this.ifs = null;
+
+    this.isStateful = true;
+  }
+
   public List<Type> getArgTypes() {
      return impalaArgTypes;
   }
@@ -299,11 +341,40 @@ public class ScalarFunctionDetails implements FunctionDetails {
     ImpalaFunctionSignature sig = ImpalaFunctionSignature.fetch(
         ALL_SCALARS_MAP, name, operandTypes, retType);
 
-    return get(sig);
+    ScalarFunctionDetails sfd = get(sig);
+    if (sfd != null) {
+      return sfd;
+    }
+
+    // Look to see if this is a Hive Generic function. Hive Generic functions do not
+    // have stored signatures since Hive signatures are more lenient with types allowed.
+    // For instance, the "+" operator in Impala forces both parameters to be of the same
+    // type whereas Hive allows a mix and match approach, like adding a TINYINT to an INT.
+    // Because of this, the ScalarFunctionDetail structure is created on the fly and resolved
+    // by the HiveFunctionResolver.
+    if (HIVE_UDF_MAP.containsKey(name)) {
+      try {
+        sfd = new ScalarFunctionDetails(name,
+            ImpalaTypeConverter.getNormalizedImpalaTypes(operandTypes),
+            ImpalaTypeConverter.getNormalizedImpalaType(retType),
+            Hive.get().getConf().getVar(HiveConf.ConfVars.IMPALA_RUNTIME_HIVE_EXEC_JAR_LOCATION),
+            HIVE_UDF_MAP.get(name).getName());
+      } catch (HiveException e) {
+        // This catch is needed because retrieving the conf variable may fail. If this fails, we may as
+        // well throw a RuntimeException here, since something basic is wrong.
+        throw new RuntimeException("Exception trying to create ScalarFunctionDetails", e);
+      }
+    }
+    return sfd;
   }
 
   public static ScalarFunctionDetails get(ImpalaFunctionSignature ifs) {
-    return ALL_SCALARS_MAP.get(ifs);
+    ScalarFunctionDetails sfd = ALL_SCALARS_MAP.get(ifs);
+    if (sfd != null) {
+      return sfd;
+    }
+
+    return null;
   }
 
   public static Set<String> getAllScalars() {
@@ -315,7 +386,8 @@ public class ScalarFunctionDetails implements FunctionDetails {
   }
 
   public static boolean isScalarFunction(String name) {
-    return ALL_SCALARS_FUNCS.contains(name.toLowerCase());
+    return ALL_SCALARS_FUNCS.contains(name.toLowerCase()) ||
+        HIVE_UDF_MAP.containsKey(name.toLowerCase());
   }
 
   private static class ScalarFunctionWrapperImpl implements ScalarFunctionWrapper {
@@ -374,5 +446,40 @@ public class ScalarFunctionDetails implements FunctionDetails {
     public boolean isUDF() {
       return isUDF;
     }
+  }
+
+  /**
+   * Add the builtin in hive UDFs to the map. The Hive UDFs should all be in the
+   * ql.udf.generic package and must have an annotation defined.
+   */
+  public static void addHiveUDFs() throws IOException, ClassNotFoundException {
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    ClassPath cp = ClassPath.from(loader);
+    Set<ClassPath.ClassInfo> udfClasses =
+        cp.getTopLevelClasses("org.apache.hadoop.hive.ql.udf.generic");
+    for (ClassPath.ClassInfo udfClass : udfClasses) {
+      Class<?> c = Class.forName(udfClass.getName());
+      for (Annotation a : c.getAnnotations()) {
+        if (a instanceof Description) {
+          Description d = (Description) a;
+          HIVE_UDF_MAP.put(d.name(), c);
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns true if it is a hive function and similar function isn't present in
+   * Impala.
+   *
+   * For example, it returns false for + as it is a builtin Impala function, although
+   * we have a Hive UDF for it - org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPPlus
+   * @param function name
+   * @return boolean
+   */
+  public static boolean isHiveFunction(String name) {
+    String funcName = name.toLowerCase();
+    return HIVE_UDF_MAP.containsKey(funcName) &&
+        !SCALAR_BUILTINS.contains(funcName);
   }
 }

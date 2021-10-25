@@ -38,14 +38,6 @@ public class GroupingFunctionResolver extends ImpalaFunctionResolverImpl {
     super(helper, op, inputNodes);
   }
 
-  @Override
-  public ImpalaFunctionSignature getFunction(
-      Map<ImpalaFunctionSignature, ? extends FunctionDetails> functionDetailsMap)
-      throws SemanticException {
-    // there is no function signature associated with the grouping function so just return null
-    return null;
-  }
-
   public List<RexNode> getConvertedInputs(ImpalaFunctionSignature function) throws HiveException {
     return inputNodes;
   }

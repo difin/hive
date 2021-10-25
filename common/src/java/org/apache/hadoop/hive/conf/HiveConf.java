@@ -4617,6 +4617,9 @@ public class HiveConf extends Configuration {
         "profile to capture statement timing after row fetch has completed."),
     HIVE_IMPALA_CONNECT_TIMEOUT("hive.impala.connect.timeout", 300000,
         "Timeout for Impala RPCs in milliseconds"),
+    IMPALA_RUNTIME_HIVE_EXEC_JAR_LOCATION("hive.impala.hive.exec.jar.location",
+        "hdfs:///test-warehouse/hive-exec.jar", "Location of the hive-exec jar. Used in order " +
+        "to run Hive Generic UDFs in the Impala runtime environment"),
     HIVE_IMPALA_SHOW_IMPALA_PARSING_ERROR("hive.impala.show.impala.parsing.error", true,
         "If the execution engine is Impala, when there is a parsing error and the type of command " +
         "exists in both Hive and Impala, a 'true' setting will display the parsing error returned " +

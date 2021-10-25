@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexBuilder;
+import org.apache.calcite.rex.RexCall;
 import org.apache.calcite.rex.RexExecutorImpl;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.rex.RexUtil;
@@ -66,6 +67,13 @@ public class ImpalaRexExecutorImpl extends RexExecutorImpl {
       if (RexUtil.isLiteral(constExp, true)) {
         reducedValues.add(constExp);
         continue;
+      }
+      if (constExp instanceof RexCall) {
+        String funcName = ((RexCall) constExp).getOperator().getName();
+        if (ScalarFunctionDetails.isHiveFunction(funcName)) {
+          reducedValues.add(constExp);
+          continue;
+        }
       }
       try {
         ImpalaInferMappingRexVisitor visitor = new ImpalaInferMappingRexVisitor(

@@ -532,6 +532,10 @@ public class ImpalaFunctionSignature {
     return new ImpalaFunctionSignature(func, argTypes, retType);
   }
 
+  public static ImpalaFunctionSignature createDummyFuncSignature(String func) {
+    return new ImpalaFunctionSignature(func, new ArrayList<>(), null);
+  }
+
   public static RelDataType getCastType(RelDataType dt1, RelDataType dt2, RelDataTypeFactory typeFactory) {
     if (dt1.getSqlTypeName() == SqlTypeName.NULL) {
       return dt2;

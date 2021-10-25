@@ -232,6 +232,14 @@
         "retType": "NULL_TYPE"
     },
     {
+        "fnName": "grouping",
+        "argTypes": [
+            "BIGINT",
+            "BIGINT"
+        ],
+        "retType": "BIGINT"
+    },
+    {
         "fnName": "internal_interval",
         "retType": "NULL_TYPE"
     },

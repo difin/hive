@@ -181,7 +181,9 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     List<ImpalaFunctionSignature> castCandidates = getCastCandidates(func);
         ImpalaFunctionSignature.CAST_CHECK_FUNCS_INSTANCE.get(func);
     if (castCandidates == null) {
-      throw new SemanticException("No matching function with signature: " + toString());
+      // return null here. If a function is not found, it's still possible that it can be resolved
+      // through the HiveFunctionResolver.
+      return null;
     }
 
     // Check if we should favor a precise numeric function (e.g. decimal) over a
@@ -213,13 +215,7 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
   protected List<ImpalaFunctionSignature> getCastCandidates(String func) throws SemanticException {
     // castCandidates contains a list of potential functions that matches the name.
     // These candidates will have the same function name, but different operand/return types.
-    List<ImpalaFunctionSignature> castCandidates =
-        ImpalaFunctionSignature.CAST_CHECK_FUNCS_INSTANCE.get(func);
-    if (castCandidates == null) {
-      throw new SemanticException("Could not find function name " + func +
-          " in resource file");
-    }
-    return castCandidates;
+    return ImpalaFunctionSignature.CAST_CHECK_FUNCS_INSTANCE.get(func);
   }
 
   /**

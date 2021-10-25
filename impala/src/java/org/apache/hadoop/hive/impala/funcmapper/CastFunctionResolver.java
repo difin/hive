@@ -50,7 +50,9 @@ public class CastFunctionResolver extends ImpalaFunctionResolverImpl {
   @Override
   public ImpalaFunctionSignature getFunction(Map<ImpalaFunctionSignature,
       ? extends FunctionDetails> functionDetailsMap) {
-    return ImpalaFunctionSignature.fetch(functionDetailsMap, func, argTypes, returnType);
+    ImpalaFunctionSignature ifs =
+        ImpalaFunctionSignature.fetch(functionDetailsMap, func, argTypes, returnType);
+    return ifs != null ? ifs : ImpalaFunctionSignature.createDummyFuncSignature(this.func);
   }
 
   @Override

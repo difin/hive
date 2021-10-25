@@ -27,6 +27,7 @@ import org.apache.calcite.sql.SqlIntervalQualifier;
 import org.apache.calcite.sql.parser.SqlParserPos;;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.HiveParser;
+import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.parse.type.FunctionHelper;
 import org.apache.hadoop.hive.ql.parse.type.RexNodeExprFactory;
 
@@ -49,9 +50,11 @@ public class InternalIntervalFunctionResolver extends ImpalaFunctionResolverImpl
 
   @Override
   public ImpalaFunctionSignature getFunction(
-      Map<ImpalaFunctionSignature, ? extends FunctionDetails> functionDetailsMap) {
-    // there is no impala function for this.
-    return null;
+      Map<ImpalaFunctionSignature, ? extends FunctionDetails> functionDetailsMap)
+      throws SemanticException {
+    // There is no matching Impala function for "array", so we create a dummy
+    // ImpalaFunctionSignature
+    return ImpalaFunctionSignature.createDummyFuncSignature(this.func);
   }
 
   @Override

@@ -67,8 +67,10 @@ public class ImpalaHelper extends EngineHelper {
             AggFunctionDetails.createAggFunctionDetailsFromImpala();
         AggFunctionDetails.addFunctionsFromImpala(afdList);
       }
+
+      ScalarFunctionDetails.addHiveUDFs();
     } catch (Exception e) {
-      LOG.warn("Unable to load Impala functions: ", e);
+      LOG.warn("Unable to load all Impala functions: ", e);
       initializationError = e;
     }
     // CDPD-49726: Hack for IMPALA-11745: Resetting BackendConfig to null so it can be instantiated

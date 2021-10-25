@@ -65,11 +65,15 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Function helper for Impala.
  */
 @Evolving
 public class ImpalaFunctionHelper implements FunctionHelper {
+  protected static final Logger LOG = LoggerFactory.getLogger(ImpalaFunctionHelper.class);
   private static final BigDecimal TINYINT_MIN_VALUE = BigDecimal.valueOf(Byte.MIN_VALUE);
   private static final BigDecimal TINYINT_MAX_VALUE = BigDecimal.valueOf(Byte.MAX_VALUE);
   private static final BigDecimal SMALLINT_MIN_VALUE = BigDecimal.valueOf(Short.MIN_VALUE);
@@ -141,17 +145,26 @@ public class ImpalaFunctionHelper implements FunctionHelper {
   public RelDataType getReturnType(FunctionInfo functionInfo, List<RexNode> inputs
       ) throws SemanticException {
     try {
-      ImpalaFunctionResolver funcResolver = ImpalaFunctionResolverImpl.create(this,
-          getFuncName(ScalarFunctionDetails.getAllScalars(), functionInfo.getDisplayName(),
-              queryContext.getDbName()),
-          inputs, null);
+      String funcName = getFuncName(ScalarFunctionDetails.getAllScalars(),
+          functionInfo.getDisplayName(), queryContext.getDbName());
+      ImpalaFunctionResolver funcResolver =
+          ImpalaFunctionResolverImpl.create(this, funcName, inputs, null);
 
       ImpalaFunctionInfo impalaFunctionInfo = (ImpalaFunctionInfo) functionInfo;
-      impalaFunctionInfo.setFunctionResolver(funcResolver);
-
       ImpalaFunctionSignature ifs =
           funcResolver.getFunction(ScalarFunctionDetails.getScalarsMap());
-      impalaFunctionInfo.setImpalaFunctionSignature(ifs);
+
+      // If there is no function signature found, fallback to the Hive function resolver.
+      if (ifs == null) {
+        funcResolver = HiveGenericUDFFunctionResolver.create(this, funcName, inputs);
+      } else {
+        // CDPD-44564 This needs a little cleanup. The ImpalaFunctionSignature is only used
+        // when resolving functions that exist in Impala.  So ownership of this object should
+        // be within the ImpalaFunctionResolver, not the FunctionInfo class.
+        impalaFunctionInfo.setImpalaFunctionSignature(ifs);
+      }
+
+      impalaFunctionInfo.setFunctionResolver(funcResolver);
       return funcResolver.getRetType(ifs, inputs);
     } catch (HiveException e) {
       throw new SemanticException(e);
