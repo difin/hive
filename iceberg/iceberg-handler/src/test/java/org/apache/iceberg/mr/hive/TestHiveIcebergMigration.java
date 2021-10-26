@@ -26,8 +26,10 @@ import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
+import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.partition.spec.PartitionSpecProxy;
 import org.apache.iceberg.AssertHelpers;
+import org.apache.iceberg.BaseMetastoreTableOperations;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
@@ -48,7 +50,6 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
 
   @Test
   public void testMigrateHiveTableToIceberg() throws TException, InterruptedException {
-    Assume.assumeTrue(fileFormat == FileFormat.AVRO || fileFormat == FileFormat.PARQUET);
     String tableName = "tbl";
     String createQuery = "CREATE EXTERNAL TABLE " +  tableName + " (a int) STORED AS " + fileFormat.name() + " " +
         testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName));
@@ -59,7 +60,6 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
 
   @Test
   public void testMigratePartitionedHiveTableToIceberg() throws TException, InterruptedException {
-    Assume.assumeTrue(fileFormat == FileFormat.AVRO || fileFormat == FileFormat.PARQUET);
     String tableName = "tbl_part";
     shell.executeStatement("CREATE EXTERNAL TABLE " + tableName + " (a int) PARTITIONED BY (b string) STORED AS " +
         fileFormat.name() + " " + testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
@@ -72,7 +72,6 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
 
   @Test
   public void testMigratePartitionedBucketedHiveTableToIceberg() throws TException, InterruptedException {
-    Assume.assumeTrue(fileFormat == FileFormat.AVRO || fileFormat == FileFormat.PARQUET);
     String tableName = "tbl_part_bucketed";
     shell.executeStatement("CREATE EXTERNAL TABLE " + tableName + " (a int) PARTITIONED BY (b string) clustered by " +
         "(a) INTO 2 BUCKETS STORED AS " + fileFormat.name() + " " +
@@ -86,7 +85,6 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
 
   @Test
   public void testRollbackMigrateHiveTableToIceberg() throws TException, InterruptedException {
-    Assume.assumeTrue(fileFormat == FileFormat.AVRO || fileFormat == FileFormat.PARQUET);
     String tableName = "tbl_rollback";
     shell.executeStatement("CREATE EXTERNAL TABLE " +  tableName + " (a int) STORED AS " + fileFormat.name() + " " +
         testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
@@ -96,7 +94,6 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
 
   @Test
   public void testRollbackMigratePartitionedHiveTableToIceberg() throws TException, InterruptedException {
-    Assume.assumeTrue(fileFormat == FileFormat.AVRO || fileFormat == FileFormat.PARQUET);
     String tableName = "tbl_rollback";
     shell.executeStatement("CREATE EXTERNAL TABLE " + tableName + " (a int) PARTITIONED BY (b string) STORED AS " +
         fileFormat.name() + " " + testTables.locationForCreateTableSQL(TableIdentifier.of("default", tableName)));
@@ -109,7 +106,6 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
 
   @Test
   public void testRollbackMultiPartitionedHiveTableToIceberg() throws TException, InterruptedException {
-    Assume.assumeTrue(fileFormat == FileFormat.AVRO || fileFormat == FileFormat.PARQUET);
     String tableName = "tbl_rollback";
     shell.executeStatement("CREATE EXTERNAL TABLE " + tableName + " (a int) PARTITIONED BY (b string, c int) " +
         "STORED AS " + fileFormat.name() + " " +
@@ -123,7 +119,6 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
 
   @Test
   public void testRollbackMigratePartitionedBucketedHiveTableToIceberg() throws TException, InterruptedException {
-    Assume.assumeTrue(fileFormat == FileFormat.AVRO || fileFormat == FileFormat.PARQUET);
     String tableName = "tbl_part_bucketed";
     shell.executeStatement("CREATE EXTERNAL TABLE " + tableName + " (a int) PARTITIONED BY (b string) clustered by " +
         "(a) INTO 2 BUCKETS STORED AS " + fileFormat.name() + " " +
@@ -178,7 +173,9 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
     for (int i = 0; i < originalResult.size(); i++) {
       Assert.assertTrue(Arrays.equals(originalResult.get(i), alterResult.get(i)));
     }
-    validateSd(tableName, "iceberg");
+    Table hmsTable = shell.metastore().getTable("default", tableName);
+    validateSd(hmsTable, "iceberg");
+    validateTblProps(hmsTable, true);
   }
 
   private void validateMigrationRollback(String tableName) throws TException, InterruptedException {
@@ -193,7 +190,9 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
             "('storage_handler'='org.apache.iceberg.mr.hive.HiveIcebergStorageHandler')");
       } catch (IllegalArgumentException e) {
         Assert.assertTrue(e.getMessage().contains("Error occurred during hive table migration to iceberg."));
-        validateSd(tableName, fileFormat.name());
+        Table hmsTable = shell.metastore().getTable("default", tableName);
+        validateSd(hmsTable, fileFormat.name());
+        validateTblProps(hmsTable, false);
         shell.executeStatement("MSCK REPAIR TABLE " + tableName);
         List<Object[]> alterResult = shell.executeStatement("SELECT * FROM " + tableName + " ORDER BY a");
         Assert.assertEquals(originalResult.size(), alterResult.size());
@@ -206,12 +205,22 @@ public class TestHiveIcebergMigration extends HiveIcebergStorageHandlerWithEngin
     }
   }
 
-  private void validateSd(String tableName, String format) throws TException, InterruptedException {
-    org.apache.hadoop.hive.metastore.api.Table hmsTable = shell.metastore().getTable("default", tableName);
+  private void validateSd(Table hmsTable, String format) {
     StorageDescriptor sd = hmsTable.getSd();
     Assert.assertTrue(sd.getSerdeInfo().getSerializationLib().toLowerCase().contains(format.toLowerCase()));
     Assert.assertTrue(sd.getInputFormat().toLowerCase().contains(format.toLowerCase()));
     Assert.assertTrue(sd.getOutputFormat().toLowerCase(Locale.ROOT).contains(format.toLowerCase()));
   }
 
+  private void validateTblProps(Table hmsTable, boolean migrationSucceeded) {
+    String migratedProp = hmsTable.getParameters().get(HiveIcebergMetaHook.MIGRATED_TO_ICEBERG);
+    String tableTypeProp = hmsTable.getParameters().get(BaseMetastoreTableOperations.TABLE_TYPE_PROP);
+    if (migrationSucceeded) {
+      Assert.assertTrue(Boolean.parseBoolean(migratedProp));
+      Assert.assertEquals(BaseMetastoreTableOperations.ICEBERG_TABLE_TYPE_VALUE.toUpperCase(), tableTypeProp);
+    } else {
+      Assert.assertNull(migratedProp);
+      Assert.assertNotEquals(BaseMetastoreTableOperations.ICEBERG_TABLE_TYPE_VALUE.toUpperCase(), tableTypeProp);
+    }
+  }
 }
