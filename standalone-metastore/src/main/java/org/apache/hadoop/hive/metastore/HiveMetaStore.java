@@ -2231,6 +2231,16 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       List<String> processorCapabilities = req.getProcessorCapabilities();
       String processorId = req.getProcessorIdentifier();
 
+      // To preserve backward compatibility throw MetaException in case of null database
+      if (tbl.getDbName() == null) {
+        throw new InvalidObjectException("Null database name is not allowed");
+      }
+
+      if (is_table_exists(ms, tbl.getCatName(), tbl.getDbName(), tbl.getTableName())) {
+        throw new AlreadyExistsException("Table " + getCatalogQualifiedTableName(tbl)
+            + " already exists");
+      }
+
       if (transformer != null) {
         tbl = transformer.transformCreateTable(tbl, processorCapabilities, processorId);
       }
