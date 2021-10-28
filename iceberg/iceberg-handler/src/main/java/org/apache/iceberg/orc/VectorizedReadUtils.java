@@ -22,8 +22,15 @@ package org.apache.iceberg.orc;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.common.io.CacheTag;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.llap.LlapHiveUtils;
+import org.apache.hadoop.hive.llap.io.api.LlapProxy;
+import org.apache.hadoop.hive.ql.io.SyntheticFileId;
 import org.apache.hadoop.hive.ql.io.orc.OrcFile;
 import org.apache.hadoop.hive.ql.io.sarg.ConvertAstToSearchArg;
+import org.apache.hadoop.hive.ql.plan.MapWork;
+import org.apache.hadoop.hive.ql.plan.PartitionDesc;
 import org.apache.hadoop.hive.ql.plan.TableScanDesc;
 import org.apache.hadoop.hive.serde2.ColumnProjectionUtils;
 import org.apache.hadoop.mapred.JobConf;
@@ -37,11 +44,15 @@ import org.apache.iceberg.expressions.Expression;
 import org.apache.iceberg.hadoop.HadoopInputFile;
 import org.apache.iceberg.io.InputFile;
 import org.apache.iceberg.mapping.MappingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities that rely on Iceberg code from org.apache.iceberg.orc package and are required for ORC vectorization.
  */
 public class VectorizedReadUtils {
+
+  private static final Logger LOG = LoggerFactory.getLogger(VectorizedReadUtils.class);
 
   private VectorizedReadUtils() {
 
@@ -52,22 +63,52 @@ public class VectorizedReadUtils {
    * Note that org.apache.orc (aka Hive bundled) ORC is used, as it is the older version compared to Iceberg's ORC.
    * @param inputFile - the original ORC file - this needs to be accessed to retrieve the original schema for mapping
    * @param job - JobConf instance to adjust
+   * @param fileId - FileID for the input file, serves as cache key in an LLAP setup
    * @throws IOException - errors relating to accessing the ORC file
    */
-  public static ByteBuffer getSerializedOrcTail(InputFile inputFile, JobConf job)
+  public static ByteBuffer getSerializedOrcTail(InputFile inputFile, SyntheticFileId fileId, JobConf job)
       throws IOException {
 
-    org.apache.orc.OrcFile.ReaderOptions readerOptions =
-        org.apache.orc.OrcFile.readerOptions(job).useUTCTimestamp(true);
-    if (inputFile instanceof HadoopInputFile) {
-      readerOptions.filesystem(((HadoopInputFile) inputFile).getFileSystem());
+    ByteBuffer result = null;
+
+    if (HiveConf.getBoolVar(job, HiveConf.ConfVars.LLAP_IO_ENABLED, LlapProxy.isDaemon()) &&
+        LlapProxy.getIo() != null) {
+      MapWork mapWork = LlapHiveUtils.findMapWork(job);
+      Path path = new Path(inputFile.location());
+      PartitionDesc partitionDesc = LlapHiveUtils.partitionDescForPath(path, mapWork.getPathToPartitionInfo());
+
+      // Note: Since Hive doesn't know about partition information of Iceberg tables, partitionDesc is only used to
+      // deduct the table (and DB) name here.
+      CacheTag cacheTag = HiveConf.getBoolVar(job, HiveConf.ConfVars.LLAP_TRACK_CACHE_USAGE) ?
+          LlapHiveUtils.getDbAndTableNameForMetrics(path, true, partitionDesc) : null;
+
+      try {
+        // Schema has to be serialized and deserialized as it is passed between different packages of TypeDescription:
+        // Iceberg expects org.apache.hive.iceberg.org.apache.orc.TypeDescription as it shades ORC, while LLAP provides
+        // the unshaded org.apache.orc.TypeDescription type.
+        return LlapProxy.getIo().getOrcTailFromCache(path, job, cacheTag, fileId).getSerializedTail();
+      } catch (IOException ioe) {
+        LOG.warn("LLAP is turned on but was unable to get file metadata information through its cache for {}",
+            path, ioe);
+      }
+
     }
 
-    try (org.apache.orc.impl.ReaderImpl orcFileReader =
-             (org.apache.orc.impl.ReaderImpl) OrcFile.createReader(new Path(inputFile.location()), readerOptions)) {
-      return orcFileReader.getSerializedFileFooter();
+    // Fallback to simple ORC reader file opening method in lack of or failure of LLAP.
+    if (result == null) {
+      org.apache.orc.OrcFile.ReaderOptions readerOptions =
+          org.apache.orc.OrcFile.readerOptions(job).useUTCTimestamp(true);
+      if (inputFile instanceof HadoopInputFile) {
+        readerOptions.filesystem(((HadoopInputFile) inputFile).getFileSystem());
+      }
+
+      try (org.apache.orc.impl.ReaderImpl orcFileReader =
+               (org.apache.orc.impl.ReaderImpl) OrcFile.createReader(new Path(inputFile.location()), readerOptions)) {
+        return orcFileReader.getSerializedFileFooter();
+      }
     }
 
+    return result;
   }
 
   /**
@@ -112,7 +153,7 @@ public class VectorizedReadUtils {
       readOrcSchema = ORCSchemaUtil.buildOrcProjection(currentSchema, typeWithIds);
     }
 
-      job.set(ColumnProjectionUtils.ORC_SCHEMA_STRING, readOrcSchema.toString());
+    job.set(ColumnProjectionUtils.ORC_SCHEMA_STRING, readOrcSchema.toString());
 
     // Predicate pushdowns needs to be adjusted too in case of column renames, we let Iceberg generate this into job
     if (task.residual() != null) {
