@@ -120,7 +120,6 @@ public abstract class TxnCommandsBaseForTests {
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVESTATSCOLAUTOGATHER, false);
     hiveConf.setBoolean("mapred.input.dir.recursive", true);
     hiveConf.setBoolean("hive.txn.write.acid.version.file", true);
-    hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_ACID_DIRECT_INSERT_ENABLED, true);
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_ACID_DIRECT_UPDATE_AND_DELETE_ENABLED, true);
     TestTxnDbUtil.setConfValues(hiveConf);
     txnHandler = TxnUtils.getTxnStore(hiveConf);
