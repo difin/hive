@@ -103,7 +103,7 @@ Table Parameters:
 	previous_metadata_location	hdfs://### HDFS PATH ###
 	storage_handler     	org.apache.iceberg.mr.hive.HiveIcebergStorageHandler
 	table_type          	ICEBERG             
-	totalSize           	930                 
+	totalSize           	#Masked#                 
 #### A masked pattern was here ####
 	write.format.default	avro                
 	 	 
