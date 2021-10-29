@@ -585,7 +585,7 @@ public class VectorizedOrcAcidRowBatchReader
       maxKey = keyIndex[lastStripeIndex];
     } else {
       if(columnStatsPresent) {
-        maxKey = getKeyInterval(stats.get(firstStripeIndex).getColStatsList()).getMaxKey();
+        maxKey = getKeyInterval(stats.get(lastStripeIndex).getColStatsList()).getMaxKey();
       }
     }
     OrcRawRecordMerger.KeyInterval keyInterval =
