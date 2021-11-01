@@ -99,6 +99,9 @@ public class QueryInfo {
     this.ugiPool = ugiPool;
     final InetSocketAddress address =
         NetUtils.createSocketAddrForHost(amNodeId.getHostname(), amNodeId.getPort());
+    if (!address.isUnresolved()) {
+      SecurityUtil.setTokenService(appToken, address);
+    }
     // TODO Caching this and re-using across submissions breaks AM recovery, since the
     // new AM may run on a different host/port.
   }
