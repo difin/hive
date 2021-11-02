@@ -159,7 +159,8 @@ public class DescTableOperation extends DDLOperation<DescTableDesc> {
 
     // Fetch partition statistics only for describe extended or formatted.
     if (desc.isExtended() || desc.isFormatted()) {
-      if (table.isPartitioned() && partition == null) {
+      boolean disablePartitionStats = HiveConf.getBoolVar(context.getConf(), HiveConf.ConfVars.HIVE_DESCRIBE_PARTITIONED_TABLE_IGNORE_STATS);
+      if (table.isPartitioned() && partition == null && !disablePartitionStats) {
         // No partition specified for partitioned table, lets fetch all.
         Map<String, String> tblProps = table.getParameters() == null ?
                 new HashMap<String, String>() : table.getParameters();
