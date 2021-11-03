@@ -57,6 +57,8 @@ import org.apache.hadoop.hive.metastore.PartitionDropOptions;
 import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.AggrStats;
+import org.apache.hadoop.hive.metastore.api.AllTableConstraintsRequest;
+import org.apache.hadoop.hive.metastore.api.AllTableConstraintsResponse;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsDesc;
@@ -2119,6 +2121,29 @@ public class SessionHiveMetaStoreClient extends HiveMetaStoreClientWithLocalCach
       return v;
     }
     return super.getNotNullConstraintsInternal(req);
+  }
+
+  @Override
+  protected AllTableConstraintsResponse getAllTableConstraintsInternal(AllTableConstraintsRequest req)
+    throws MetaException, TException {
+    Map<Object, Object> queryCache = getQueryCache();
+    if (queryCache != null) {
+      // Retrieve or populate cache
+      CacheKey cacheKey = CacheKey.create(KeyType.ALL_TABLE_CONSTRAINTS, req);
+      AllTableConstraintsResponse v = (AllTableConstraintsResponse) queryCache.get(cacheKey);
+      if (v == null) {
+        v = super.getAllTableConstraintsInternal(req);
+        queryCache.put(cacheKey, v);
+      } else {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(
+              "Query level HMS cache: method=getAllTableConstraintsInternal, dbName={}, tblName={}",
+              req.getDbName(), req.getTblName());
+        }
+      }
+      return v;
+    }
+    return super.getAllTableConstraintsInternal(req);
   }
 
   @Override

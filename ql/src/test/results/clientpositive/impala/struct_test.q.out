@@ -1,3 +1,8 @@
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain
 select inline(array(struct('abc')))
 PREHOOK: type: QUERY
@@ -33,6 +38,11 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
         ListSink
 
 HMS CALL get_table_req FOR simple_char_tbl
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_foreign_keys FOR simple_char_tbl
 PREHOOK: query: explain
 select 'abc' from simple_char_tbl union all select 'def'
@@ -119,6 +129,11 @@ POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@cdpd_18053
 HMS CALL get_table_req FOR cdpd_18053
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_foreign_keys FOR cdpd_18053
 PREHOOK: query: explain
 select * from (select * from cdpd_18053 t

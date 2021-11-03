@@ -2881,13 +2881,18 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
     }
 
     try {
-      return client.get_all_table_constraints(req).getAllTableConstraints();
+      return getAllTableConstraintsInternal(req).getAllTableConstraints();
     } finally {
       if (LOG.isDebugEnabled()) {
         LOG.debug("class={}, method={}, duration={}, comments={}", CLASS_NAME, "getAllTableConstraints",
             System.currentTimeMillis() - t1, "HMS client");
       }
     }
+  }
+
+  protected AllTableConstraintsResponse getAllTableConstraintsInternal(AllTableConstraintsRequest req)
+      throws MetaException, TException {
+    return client.get_all_table_constraints(req);
   }
 
   /**

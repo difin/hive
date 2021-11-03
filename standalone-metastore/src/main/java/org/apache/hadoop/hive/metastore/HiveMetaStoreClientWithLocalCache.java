@@ -128,6 +128,8 @@ public class HiveMetaStoreClientWithLocalCache extends HiveMetaStoreClient imple
     UNIQUE_CONSTRAINTS(UniqueConstraintsResponse.class, UniqueConstraintsRequest.class),
     // NotNullConstraintsResponse <-- getNotNullConstraintsInternal(NotNullConstraintsRequest req)
     NOT_NULL_CONSTRAINTS(NotNullConstraintsResponse.class, NotNullConstraintsRequest.class),
+    // AllTableConstraintsResponse <-- getAllTableConstraintsInternal(AllTableConstraintsRequest req)
+    ALL_TABLE_CONSTRAINTS(AllTableConstraintsResponse.class, AllTableConstraintsRequest.class),
     // TableStatsResult <-- getTableColumnStatisticsInternal(TableStatsRequest rqst)
     // Stored individually as:
     // ConcurrentHashMap <-- String dbName, String tblName,
@@ -498,8 +500,6 @@ public class HiveMetaStoreClientWithLocalCache extends HiveMetaStoreClient imple
   @Override
   protected UniqueConstraintsResponse getUniqueConstraintsInternal(UniqueConstraintsRequest req) throws TException {
     if (isCacheEnabledAndInitialized()) {
-      // TODO: There is no consistency guarantees around constraints right now since
-      // changing constraints does not change the snapshot nor the table id (CDPD-17940).
       TableWatermark watermark = new TableWatermark(
           getValidWriteIdList(req.getDb_name(), req.getTbl_name()),
           getTable(req.getDb_name(), req.getTbl_name()).getId());
@@ -531,8 +531,6 @@ public class HiveMetaStoreClientWithLocalCache extends HiveMetaStoreClient imple
   @Override
   protected NotNullConstraintsResponse getNotNullConstraintsInternal(NotNullConstraintsRequest req) throws TException {
     if (isCacheEnabledAndInitialized()) {
-      // TODO: There is no consistency guarantees around constraints right now since
-      // changing constraints does not change the snapshot nor the table id (CDPD-17940).
       TableWatermark watermark = new TableWatermark(
           getValidWriteIdList(req.getDb_name(), req.getTbl_name()),
           getTable(req.getDb_name(), req.getTbl_name()).getId());
@@ -559,6 +557,38 @@ public class HiveMetaStoreClientWithLocalCache extends HiveMetaStoreClient imple
       }
     }
     return super.getNotNullConstraintsInternal(req);
+  }
+
+  @Override
+  protected AllTableConstraintsResponse getAllTableConstraintsInternal(AllTableConstraintsRequest req)
+    throws MetaException, TException {
+    if (isCacheEnabledAndInitialized()) {
+      TableWatermark watermark = new TableWatermark(
+          getValidWriteIdList(req.getDbName(), req.getTblName()),
+          getTable(req.getDbName(), req.getTblName()).getId());
+      if (watermark.isValid()) {
+        Long txnId = getTxnId(req.getDbName(), req.getTblName());
+        CacheKey cacheKey = CacheKey.create(txnId, KeyType.ALL_TABLE_CONSTRAINTS, watermark, req);
+        AllTableConstraintsResponse r = (AllTableConstraintsResponse) mscLocalCache.getIfPresent(cacheKey);
+        if (r == null) {
+          r = super.getAllTableConstraintsInternal(req);
+          mscLocalCache.put(cacheKey, r);
+        } else {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(
+                "HS2 level HMS cache: method=getAllTableConstraintsInternal, dbName={}, tblName={}",
+                req.getDbName(), req.getTblName());
+          }
+        }
+
+        if (LOG.isDebugEnabled() && recordStats) {
+          LOG.debug(cacheObjName + ": " + mscLocalCache.stats().toString());
+        }
+        // deep copy here to avoid the cached instance be modified
+        return r.deepCopy();
+      }
+    }
+    return super.getAllTableConstraintsInternal(req);
   }
 
   @Override

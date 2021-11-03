@@ -325,6 +325,11 @@ Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reserva
       Processor Tree:
         ListSink
 
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain
 select "What\'s happening?" as single_within_double,
        'I\'m not sure.' as single_within_single,
@@ -756,6 +761,11 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
       Processor Tree:
         ListSink
 
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain
 select 'value''alias'
 PREHOOK: type: QUERY
@@ -790,6 +800,11 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
       Processor Tree:
         ListSink
 
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain
 select "value"'alias'
 PREHOOK: type: QUERY
@@ -824,6 +839,11 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
       Processor Tree:
         ListSink
 
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain
 select 'value'"alias"
 PREHOOK: type: QUERY
@@ -858,6 +878,11 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
       Processor Tree:
         ListSink
 
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain
 select 'value'alias
 PREHOOK: type: QUERY
@@ -892,6 +917,11 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
       Processor Tree:
         ListSink
 
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 PREHOOK: query: explain
 select "value"alias
 PREHOOK: type: QUERY

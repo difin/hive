@@ -95,6 +95,16 @@ ImpalaProjectPassthroughRel(_o__col2=[count($0) OVER (ROWS BETWEEN UNBOUNDED PRE
 HMS CALL get_table_req FOR foo
 HMS CALL get_table_req FOR my_test_table
 HMS CALL get_table_req FOR foo
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_foreign_keys FOR my_test_table
 PREHOOK: query: explain cbo physical
 WITH foo AS (SELECT 1 FROM my_test_table WHERE int_col IN (SELECT 1))
@@ -132,6 +142,16 @@ ImpalaProjectPassthroughRel(_o__c0=[1:TINYINT])
 HMS CALL get_table_req FOR foo
 HMS CALL get_table_req FOR my_test_table
 HMS CALL get_table_req FOR foo
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_foreign_keys FOR my_test_table
 PREHOOK: query: explain cbo physical
 WITH foo AS (SELECT 1 FROM my_test_table WHERE int_col IN (SELECT 1))
