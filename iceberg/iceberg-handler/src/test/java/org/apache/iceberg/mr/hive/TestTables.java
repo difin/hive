@@ -495,7 +495,7 @@ abstract class TestTables {
       }
 
       Assert.assertTrue(location.delete());
-      return location.toString();
+      return "file://" + location;
     }
 
     @Override
