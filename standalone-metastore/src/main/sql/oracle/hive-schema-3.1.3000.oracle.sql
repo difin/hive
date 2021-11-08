@@ -1247,7 +1247,8 @@ CREATE TABLE "REPLICATION_METRICS" (
   "RM_DUMP_EXECUTION_ID" number NOT NULL,
   "RM_METADATA" varchar2(4000),
   "RM_PROGRESS" varchar2(4000),
-  "RM_START_TIME" integer NOT NULL
+  "RM_START_TIME" integer NOT NULL,
+  "MESSAGE_FORMAT" VARCHAR(16) DEFAULT 'json-0.2'
 );
 
 --Create indexes for the replication metrics table
@@ -1284,6 +1285,6 @@ CREATE UNIQUE INDEX UNIQUEPKG ON PACKAGES ("NAME", "DB_ID");
 ALTER TABLE "PACKAGES" ADD CONSTRAINT "PACKAGES_FK1" FOREIGN KEY ("DB_ID") REFERENCES "DBS" ("DB_ID");
 
 
-INSERT INTO CDH_VERSION (VER_ID, SCHEMA_VERSION, VERSION_COMMENT) VALUES (1, '3.1.3000.7.2.15.0-Update1', 'Hive release version 3.1.3000 for 7.2.15.0');
+INSERT INTO CDH_VERSION (VER_ID, SCHEMA_VERSION, VERSION_COMMENT) VALUES (1, '3.1.3000.7.2.15.0-Update2', 'Hive release version 3.1.3000 for 7.2.15.0');
 
-SELECT 'Initialized metastore to 3.1.3000.7.2.15.0-Update1' AS Status from dual;
+SELECT 'Initialized metastore to 3.1.3000.7.2.15.0-Update2' AS Status from dual;
