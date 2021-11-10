@@ -79,6 +79,8 @@ hive_metastoreConstants::hive_metastoreConstants() {
 
   PARTITION_TRANSFORM_SPEC = "partition_transform_spec";
 
+  CTAS_LEGACY_CONFIG = "create_table_as_external";
+
 }
 
 }}} // namespace

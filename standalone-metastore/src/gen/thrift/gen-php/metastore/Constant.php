@@ -52,6 +52,7 @@ final class Constant extends \Thrift\Type\TConstant
     static protected $JDBC_CONFIG_PREFIX;
     static protected $TABLE_IS_CTAS;
     static protected $PARTITION_TRANSFORM_SPEC;
+    static protected $CTAS_LEGACY_CONFIG;
 
     protected static function init_DDL_TIME()
     {
@@ -221,5 +222,10 @@ final class Constant extends \Thrift\Type\TConstant
     protected static function init_PARTITION_TRANSFORM_SPEC()
     {
         return "partition_transform_spec";
+    }
+
+    protected static function init_CTAS_LEGACY_CONFIG()
+    {
+        return "create_table_as_external";
     }
 }

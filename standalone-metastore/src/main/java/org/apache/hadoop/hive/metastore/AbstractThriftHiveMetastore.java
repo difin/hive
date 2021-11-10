@@ -139,6 +139,12 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
+    public Table translate_table_dryrun(final Table tbl) throws AlreadyExistsException,
+            MetaException, InvalidObjectException, InvalidInputException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public List<FieldSchema> get_fields(String db_name, String table_name)
             throws MetaException, UnknownTableException, UnknownDBException, TException {
         throw new UnsupportedOperationException("this method is not supported");

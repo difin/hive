@@ -2164,6 +2164,19 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       throw new MetaException("Not yet implemented");
     }
 
+    @Override
+    public Table translate_table_dryrun(final Table tbl) throws AlreadyExistsException,
+            MetaException, InvalidObjectException, InvalidInputException {
+      Table transformedTbl = null;
+      if (!tbl.isSetCatName()) {
+        tbl.setCatName(getDefaultCatalog(conf));
+      }
+      if (transformer != null) {
+        transformedTbl = transformer.transformCreateTable(tbl, null, null);
+      }
+      return transformedTbl != null ? transformedTbl : tbl;
+    }
+
     private void create_table_core(final RawStore ms, final Table tbl,
         final EnvironmentContext envContext)
             throws AlreadyExistsException, MetaException,
