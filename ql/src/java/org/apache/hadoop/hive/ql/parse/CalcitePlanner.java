@@ -1787,6 +1787,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.OPTIMIZER);
       try {
         calciteGenPlan = genLogicalPlan(getQB(), true, null, null);
+        tabNameToTabObject.markParsingCompleted();
         sinkRowResolver = relToHiveRR.get(calciteGenPlan);
         // if it is to create view, we do not use table alias
         resultSchema = SemanticAnalyzer.convertRowSchemaToResultSetSchema(
@@ -3373,7 +3374,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
                   || qb.getAliasInsideView().contains(tableAlias.toLowerCase()), tableScanTrait);
         }
 
-        if (!optTable.getReferentialConstraints().isEmpty()) {
+        if (optTable.hasReferentialConstraints()) {
           profilesCBO.add(ExtendedCBOProfile.REFERENTIAL_CONSTRAINTS);
         }
 

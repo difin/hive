@@ -428,7 +428,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
   private WriteEntity acidAnalyzeTable;
 
   // A mapping from a tableName to a table object in metastore.
-  Map<String, Table> tabNameToTabObject;
+  QueryTables tabNameToTabObject;
 
   // The tokens we should ignore when we are trying to do table masking.
   private final Set<Integer> ignoredTokens = Sets.newHashSet(HiveParser.TOK_GROUPBY,
@@ -495,7 +495,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     viewAliasToInput = new HashMap<String, ReadEntity>();
     mergeIsDirect = true;
     noscan = false;
-    tabNameToTabObject = new HashMap<>();
+    tabNameToTabObject = new QueryTables();
     defaultJoinMerge = false == HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_MERGE_NWAY_JOINS);
     disableJoinMerge = defaultJoinMerge;
   }
@@ -2767,7 +2767,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       if (viewMask.isEnabled() && analyzeRewrite == null) {
         ParseResult parseResult = rewriteASTWithMaskAndFilter(viewMask, viewTree,
             ctx.getViewTokenRewriteStream(viewFullyQualifiedName),
-            ctx, db, tabNameToTabObject, ignoredTokens);
+            ctx, db, ignoredTokens);
         viewTree = parseResult.getTree();
       }
       SemanticDispatcher nodeOriginDispatcher = new SemanticDispatcher() {
@@ -12454,7 +12454,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
   }
 
   private void walkASTMarkTABREF(TableMask tableMask, ASTNode ast, Set<String> cteAlias,
-      Context ctx, Hive db, Map<String, Table> tabNameToTabObject, Set<Integer> ignoredTokens)
+      Context ctx, Hive db, Set<Integer> ignoredTokens)
       throws SemanticException {
     Queue<Node> queue = new LinkedList<>();
     queue.add(ast);
@@ -12593,7 +12593,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
   // For the replacement, we leverage the methods that are used for
   // unparseTranslator.
   private ParseResult rewriteASTWithMaskAndFilter(TableMask tableMask, ASTNode ast, TokenRewriteStream tokenRewriteStream,
-      Context ctx, Hive db, Map<String, Table> tabNameToTabObject, Set<Integer> ignoredTokens)
+      Context ctx, Hive db, Set<Integer> ignoredTokens)
       throws SemanticException {
     // 1. collect information about CTE if there is any.
     // The base table of CTE should be masked.
@@ -12618,19 +12618,19 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         } else {
           cteAlias.add(alias);
           walkASTMarkTABREF(tableMask, subq, cteAlias,
-              ctx, db, tabNameToTabObject, ignoredTokens);
+              ctx, db, ignoredTokens);
         }
       }
       // walk the other part of ast
       for (int index = 1; index < ast.getChildCount(); index++) {
         walkASTMarkTABREF(tableMask, (ASTNode) ast.getChild(index), cteAlias,
-            ctx, db, tabNameToTabObject, ignoredTokens);
+            ctx, db, ignoredTokens);
       }
     }
     // there is no CTE, walk the whole AST
     else {
       walkASTMarkTABREF(tableMask, ast, cteAlias,
-          ctx, db, tabNameToTabObject, ignoredTokens);
+          ctx, db, ignoredTokens);
     }
     // 2. rewrite the AST, replace TABREF with masking/filtering
     if (tableMask.needsRewrite()) {
@@ -12887,7 +12887,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
             !viewOperations.contains(queryState.getHiveOperation())) {
       // Here we rewrite the * and also the masking table
       ParseResult rewrittenResult = rewriteASTWithMaskAndFilter(tableMask, astForMasking, ctx.getTokenRewriteStream(),
-          ctx, db, tabNameToTabObject, ignoredTokens);
+          ctx, db, ignoredTokens);
       ASTNode rewrittenAST = rewrittenResult.getTree();
       if (astForMasking != rewrittenAST) {
         usesMasking = true;
