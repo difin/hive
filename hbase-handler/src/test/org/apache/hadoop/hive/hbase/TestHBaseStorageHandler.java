@@ -37,6 +37,24 @@ import org.mockito.Mockito;
 public class TestHBaseStorageHandler {
 
   @Test
+  public void testHbaseConfigIsAddedToJobConf() {
+    HBaseStorageHandler hbaseStorageHandler = new HBaseStorageHandler();
+    hbaseStorageHandler.setConf(new JobConf(new HiveConf()));
+
+    TableDesc tableDesc = getHBaseTableDesc();
+
+    JobConf jobConfToConfigure = new JobConf(new HiveConf());
+
+    Assert.assertTrue("hbase-site.xml is supposed to be present",
+        jobConfToConfigure.get("hbase.some.fake.option.from.xml.file") == null);
+
+    hbaseStorageHandler.configureJobConf(tableDesc, jobConfToConfigure);
+
+    Assert.assertTrue("hbase-site.xml is supposed to be added as a resource by HBaseStorageHandler",
+        jobConfToConfigure.get("hbase.some.fake.option.from.xml.file") != null);
+  }
+
+  @Test
   public void testGetUriForAuthEmptyTableDefaultHostPort() throws URISyntaxException {
     Table table = createMockTable(new HashMap<>());
     URI uri = checkURIForAuth(table);
@@ -95,6 +113,17 @@ public class TestHBaseStorageHandler {
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_SECURITY_HBASE_URLENCODE_AUTHORIZATION_URI, true);
     uri = checkURIForAuth(createMockTable(serdeParams), new JobConf(hiveConf));
     Assert.assertEquals("hbase://testhost:8765/my%23tbl/myco%23lumn%0As", uri.toString());
+  }
+
+  private TableDesc getHBaseTableDesc() {
+    TableDesc tableDesc = Mockito.mock(TableDesc.class);
+    Properties properties = new Properties();
+    properties.put(HBaseSerDe.HBASE_COLUMNS_MAPPING, "cf:string");
+    properties.put(HBaseSerDe.HBASE_AUTOGENERATE_STRUCT, "true");
+    properties.put("cf.string.serialization.type", "avro");
+    properties.put("cf.string.serialization.class", "org.apache.hadoop.io.serializer.avro.AvroSpecificSerialization");
+    Mockito.when(tableDesc.getProperties()).thenReturn(properties);
+    return tableDesc;
   }
 
   private static URI checkURIForAuth(Table table) throws URISyntaxException {
