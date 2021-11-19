@@ -32,7 +32,7 @@ Table Parameters:
 	bucketing_version   	2                   
 	numFiles            	0                   
 	numRows             	0                   
-	rawDataSize         	0                   
+	rawDataSize         	#Masked#                   
 	totalSize           	#Masked#                   
 #### A masked pattern was here ####
 	 	 
@@ -105,7 +105,7 @@ Table Parameters:
 	numFiles            	1                   
 	numRows             	5                   
 	previous_metadata_location	hdfs://### HDFS PATH ###
-	rawDataSize         	455                 
+	rawDataSize         	#Masked#                 
 	schema.name-mapping.default	[ {                 
 	                           	  \"field-id\" : 1, 
 	                           	  \"names\" : [ \"a\" ]
@@ -182,7 +182,7 @@ Table Parameters:
 	bucketing_version   	2                   
 	numFiles            	0                   
 	numRows             	0                   
-	rawDataSize         	0                   
+	rawDataSize         	#Masked#                   
 	totalSize           	#Masked#                   
 #### A masked pattern was here ####
 	 	 
@@ -255,7 +255,7 @@ Table Parameters:
 	numFiles            	1                   
 	numRows             	5                   
 	previous_metadata_location	hdfs://### HDFS PATH ###
-	rawDataSize         	116                 
+	rawDataSize         	#Masked#                  
 	schema.name-mapping.default	[ {                 
 	                           	  \"field-id\" : 1, 
 	                           	  \"names\" : [ \"a\" ]
@@ -332,7 +332,7 @@ Table Parameters:
 	bucketing_version   	2                   
 	numFiles            	0                   
 	numRows             	0                   
-	rawDataSize         	0                   
+	rawDataSize         	#Masked#                   
 	totalSize           	#Masked#                   
 #### A masked pattern was here ####
 	 	 
@@ -405,7 +405,7 @@ Table Parameters:
 	numFiles            	1                   
 	numRows             	5                   
 	previous_metadata_location	hdfs://### HDFS PATH ###
-	rawDataSize         	0                   
+	rawDataSize         	#Masked#                   
 	schema.name-mapping.default	[ {                 
 	                           	  \"field-id\" : 1, 
 	                           	  \"names\" : [ \"a\" ]
