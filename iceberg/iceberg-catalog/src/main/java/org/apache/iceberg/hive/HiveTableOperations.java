@@ -65,6 +65,7 @@ import org.apache.iceberg.relocated.com.google.common.collect.BiMap;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableBiMap;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
+import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 import org.apache.iceberg.util.Tasks;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -369,7 +370,7 @@ public class HiveTableOperations extends BaseMetastoreTableOperations {
     storageDescriptor.setCols(HiveSchemaUtil.convert(metadata.schema()));
     storageDescriptor.setLocation(metadata.location());
     SerDeInfo serDeInfo = new SerDeInfo();
-    serDeInfo.setParameters(new HashMap<>());
+    serDeInfo.setParameters(Maps.newHashMap());
     if (hiveEngineEnabled) {
       storageDescriptor.setInputFormat("org.apache.iceberg.mr.hive.HiveIcebergInputFormat");
       storageDescriptor.setOutputFormat("org.apache.iceberg.mr.hive.HiveIcebergOutputFormat");
