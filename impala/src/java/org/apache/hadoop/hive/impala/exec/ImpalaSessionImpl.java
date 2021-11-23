@@ -96,6 +96,8 @@ public class ImpalaSessionImpl implements EngineSession {
     private int rowFetchMaxRetries;
     /* Underlying configured TSocket timeout */
     private int connectionTimeout;
+    /* Maximum timer error on the Impala server */
+    private long impalaMaxTimerError;
     /* Fetch EOF status */
     private boolean fetchEOF = false;
     /* Shutdown request */
@@ -114,6 +116,7 @@ public class ImpalaSessionImpl implements EngineSession {
       this.rowFetchSleep = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_ROW_FETCH_RETRY_SLEEP);
       this.rowFetchMaxRetries = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_ROW_FETCH_MAX_RETRY);
       this.connectionTimeout = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_RPC_TIMEOUT);
+      this.impalaMaxTimerError = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_MAX_TIMER_ERROR);
       this.socketBufferSize = conf.getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_SOCKET_BUFFER_SIZE);
     }
 
@@ -317,8 +320,11 @@ public class ImpalaSessionImpl implements EngineSession {
                   return resp2;
                 });
           // Move the coordinator timestamp forward by half of the RPC latency
-          // to compensate for overlap between the frontend and backend timelines.
-          return resp.timestamp + (System.nanoTime() - ping_send_ts) / 2;
+          // to compensate for overlap between the frontend and backend timelines
+          // if the roundtrip time is not too short compared to HIVE_IMPALA_MAX_TIMER_ERROR.
+          long roundtripTime = System.nanoTime() - ping_send_ts;
+          long estimatedOneWayTime = roundtripTime >= impalaMaxTimerError ? roundtripTime / 2 : 0;
+          return resp.timestamp + estimatedOneWayTime;
     }
 
     /* Executes an Impala plan */
