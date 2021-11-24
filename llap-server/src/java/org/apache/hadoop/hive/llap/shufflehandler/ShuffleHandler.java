@@ -266,7 +266,8 @@ public class ShuffleHandler implements AttemptRegistrationListener {
     }
   }
 
-  private ShuffleHandler(Configuration conf) {
+  @VisibleForTesting
+  ShuffleHandler(Configuration conf) {
     this.conf = conf;
     manageOsCache = conf.getBoolean(SHUFFLE_MANAGE_OS_CACHE,
         DEFAULT_SHUFFLE_MANAGE_OS_CACHE);
@@ -284,6 +285,7 @@ public class ShuffleHandler implements AttemptRegistrationListener {
       maxShuffleThreads = 2 * Runtime.getRuntime().availableProcessors();
     }
 
+    port = conf.getInt(SHUFFLE_PORT_CONFIG_KEY, DEFAULT_SHUFFLE_PORT);
     // TODO: this is never used
     localDirs = conf.getTrimmedStrings(SHUFFLE_HANDLER_LOCAL_DIRS);
 
@@ -359,7 +361,6 @@ public class ShuffleHandler implements AttemptRegistrationListener {
         .childOption(ChannelOption.SO_KEEPALIVE, true);
     initPipeline(bootstrap, conf);
 
-    port = conf.getInt(SHUFFLE_PORT_CONFIG_KEY, DEFAULT_SHUFFLE_PORT);
     Channel ch = bootstrap.bind().sync().channel();
     accepted.add(ch);
     port = ((InetSocketAddress)ch.localAddress()).getPort();
