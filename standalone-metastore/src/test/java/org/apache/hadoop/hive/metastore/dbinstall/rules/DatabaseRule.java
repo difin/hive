@@ -288,7 +288,7 @@ public abstract class DatabaseRule extends ExternalResource {
         "-dbType",
         getDbType(),
         "-userName",
-        HIVE_USER,
+        getHiveUser(),
         "-passWord",
         getHivePassword(),
         "-url",

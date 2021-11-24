@@ -82,6 +82,7 @@ public abstract class CliAdapter {
             LOG.debug("will initialize metastore database in class rule");
             metaStoreHandler.getRule().before();
             metaStoreHandler.getRule().install();
+            metaStoreHandler.getRule().upgradeToLatest();
 
             if (getQt() != null) {
               metaStoreHandler.setMetaStoreConfiguration(getQt().getConf());
