@@ -19,6 +19,7 @@
 package org.apache.hadoop.hive.impala.node;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import org.apache.calcite.plan.RelOptCost;
 import org.apache.calcite.plan.RelOptPlanner;
 import org.apache.calcite.rel.RelNode;
@@ -30,7 +31,9 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveFilter;
 import org.apache.hadoop.hive.impala.plan.ImpalaPlannerContext;
 
 import org.apache.impala.analysis.Analyzer;
+import org.apache.impala.analysis.LiteralExpr;
 import org.apache.impala.analysis.TupleDescriptor;
+import org.apache.impala.catalog.Type;
 import org.apache.impala.common.ImpalaException;
 import org.apache.impala.planner.CardinalityCheckNode;
 import org.apache.impala.planner.PlanNode;
@@ -68,10 +71,10 @@ public class ImpalaCardinalityCheckRel extends ImpalaPlanRel {
     // abort of the query.
     input.setLimit(2);
 
-    TupleDescriptorCreator tupleDescCreator =
-        new TupleDescriptorCreator("CARDINALITY CHECK", filter.getRowType());
-    TupleDescriptor tupleDesc = tupleDescCreator.create(ctx.getRootAnalyzer());
-    this.outputExprs = createOutputExprs(tupleDesc.getSlots());
+    // The original Hive CBO plan that created this node uses a filter with a "sq_count_check"
+    // function. This function outputs a BIGINT of 1 if it passes the check so we output that
+    // here as well.
+    this.outputExprs = ImmutableMap.of(0, LiteralExpr.createFromUnescapedStr("1", Type.BIGINT));
 
     CardinalityCheckNode cardinalityCheckNode =
           new CardinalityCheckNode(nodeId, input, "CARDINALITY CHECK");

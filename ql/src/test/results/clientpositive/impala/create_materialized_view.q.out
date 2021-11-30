@@ -191,6 +191,7 @@ POSTHOOK: type: CREATE_MATERIALIZED_VIEW
 POSTHOOK: Input: default@emps_imp0
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@mv1_imp0_with_partitions_in_order
+POSTHOOK: Output: default@mv1_imp0_with_partitions_in_order
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
   Stage-2 depends on stages: Stage-1
@@ -287,6 +288,7 @@ where salary > 0.0
 POSTHOOK: type: CREATE_MATERIALIZED_VIEW
 POSTHOOK: Input: default@emps_imp0
 POSTHOOK: Output: database:default
+POSTHOOK: Output: default@mv1_imp0_with_partitions_out_of_order
 POSTHOOK: Output: default@mv1_imp0_with_partitions_out_of_order
 STAGE DEPENDENCIES:
   Stage-1 is a root stage

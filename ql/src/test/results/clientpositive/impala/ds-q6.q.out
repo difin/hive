@@ -184,12 +184,12 @@ Per-Host Resources: mem-estimate=133.83MB mem-reservation=39.81MB thread-reserva
   21:TOP-N [LIMIT=100]
   |  order by: count(*) ASC NULLS LAST, a.ca_state ASC NULLS LAST
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
-  |  tuple-ids=21 row-size=32B cardinality=0
+  |  tuple-ids=20 row-size=32B cardinality=0
   |  in pipelines: 21(GETNEXT), 20(OPEN)
   |
   00:UNION
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
-  |  tuple-ids=20 row-size=32B cardinality=0
+  |  tuple-ids=19 row-size=32B cardinality=0
   |  in pipelines: 20(GETNEXT)
   |
   20:AGGREGATE [FINALIZE]
@@ -197,43 +197,43 @@ Per-Host Resources: mem-estimate=133.83MB mem-reservation=39.81MB thread-reserva
   |  group by: a.ca_state
   |  having: count(*) >= CAST(10 AS BIGINT)
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=19 row-size=20B cardinality=0
+  |  tuple-ids=18 row-size=20B cardinality=0
   |  in pipelines: 20(GETNEXT), 07(OPEN)
   |
   19:HASH JOIN [INNER JOIN, BROADCAST]
   |  hash predicates: s.ss_customer_sk = c.c_customer_sk
   |  fk/pk conjuncts: assumed fk/pk
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=7,0,4,9,10,14,15,17 row-size=116B cardinality=0
+  |  tuple-ids=7,0,4,8,9,13,14,16 row-size=116B cardinality=0
   |  in pipelines: 07(GETNEXT), 16(OPEN)
   |
   |--35:EXCHANGE [UNPARTITIONED]
   |     mem-estimate=32.00KB mem-reservation=0B thread-reservation=0
-  |     tuple-ids=15,17 row-size=24B cardinality=0
+  |     tuple-ids=14,16 row-size=24B cardinality=0
   |     in pipelines: 16(GETNEXT)
   |
   15:HASH JOIN [INNER JOIN, BROADCAST]
   |  hash predicates: s.ss_item_sk = i.i_item_sk
   |  fk/pk conjuncts: assumed fk/pk
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=7,0,4,9,10,14 row-size=92B cardinality=0
+  |  tuple-ids=7,0,4,8,9,13 row-size=92B cardinality=0
   |  in pipelines: 07(GETNEXT), 11(OPEN)
   |
   |--33:EXCHANGE [UNPARTITIONED]
   |     mem-estimate=68.00KB mem-reservation=0B thread-reservation=0
-  |     tuple-ids=10,14 row-size=60B cardinality=0
+  |     tuple-ids=9,13 row-size=60B cardinality=0
   |     in pipelines: 11(GETNEXT)
   |
   10:HASH JOIN [INNER JOIN, BROADCAST]
   |  hash predicates: d.d_date_sk = s.ss_sold_date_sk
   |  fk/pk conjuncts: assumed fk/pk
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=7,0,4,9 row-size=32B cardinality=0
+  |  tuple-ids=7,0,4,8 row-size=32B cardinality=0
   |  in pipelines: 07(GETNEXT), 09(OPEN)
   |
   |--29:EXCHANGE [UNPARTITIONED]
   |     mem-estimate=20.00KB mem-reservation=0B thread-reservation=0
-  |     tuple-ids=9 row-size=16B cardinality=0
+  |     tuple-ids=8 row-size=16B cardinality=0
   |     in pipelines: 09(GETNEXT)
   |
   08:NESTED LOOP JOIN [CROSS JOIN, BROADCAST]
@@ -379,7 +379,7 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      extrapolated-rows=disabled max-scan-range-rows=0
      file formats: []
      mem-estimate=0B mem-reservation=0B thread-reservation=0
-     tuple-ids=9 row-size=16B cardinality=0
+     tuple-ids=8 row-size=16B cardinality=0
      in pipelines: 09(GETNEXT)
 
 F07:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -391,12 +391,12 @@ Per-Host Resources: mem-estimate=1.98MB mem-reservation=1.94MB thread-reservatio
   |  fk/pk conjuncts: assumed fk/pk
   |  other join predicates: i.i_current_price > multiply(CAST(1.2 AS DECIMAL(2,1)), casttodecimal(casttodecimal(divide(sum(j.i_current_price), casttodecimal(count(j.i_current_price))))))
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=10,14 row-size=60B cardinality=0
+  |  tuple-ids=9,13 row-size=60B cardinality=0
   |  in pipelines: 11(GETNEXT), 31(OPEN)
   |
   |--32:EXCHANGE [BROADCAST]
   |     mem-estimate=40.00KB mem-reservation=0B thread-reservation=0
-  |     tuple-ids=14 row-size=36B cardinality=0
+  |     tuple-ids=13 row-size=36B cardinality=0
   |     in pipelines: 31(GETNEXT)
   |
   11:SCAN HDFS [default.impala_tpcds_item i, RANDOM]
@@ -408,7 +408,7 @@ Per-Host Resources: mem-estimate=1.98MB mem-reservation=1.94MB thread-reservatio
      extrapolated-rows=disabled max-scan-range-rows=0
      file formats: [PARQUET]
      mem-estimate=0B mem-reservation=0B thread-reservation=0
-     tuple-ids=10 row-size=24B cardinality=0
+     tuple-ids=9 row-size=24B cardinality=0
      in pipelines: 11(GETNEXT)
 
 F09:PLAN FRAGMENT [HASH(j.i_category)] hosts=1 instances=1
@@ -420,12 +420,12 @@ Per-Host Resources: mem-estimate=128.04MB mem-reservation=34.00MB thread-reserva
   |  group by: j.i_category
   |  having: casttodecimal(casttodecimal(divide(sum(j.i_current_price), casttodecimal(count(j.i_current_price))))) IS NOT NULL
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=14 row-size=36B cardinality=0
+  |  tuple-ids=13 row-size=36B cardinality=0
   |  in pipelines: 31(GETNEXT), 12(OPEN)
   |
   30:EXCHANGE [HASH(j.i_category)]
      mem-estimate=40.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=14 row-size=36B cardinality=0
+     tuple-ids=13 row-size=36B cardinality=0
      in pipelines: 12(GETNEXT)
 
 F08:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -436,7 +436,7 @@ Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reserva
   |  output: sum(j.i_current_price), count(j.i_current_price)
   |  group by: j.i_category
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=14 row-size=36B cardinality=0
+  |  tuple-ids=13 row-size=36B cardinality=0
   |  in pipelines: 12(GETNEXT)
   |
   12:SCAN HDFS [default.impala_tpcds_item j, RANDOM]
@@ -448,7 +448,7 @@ Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reserva
      extrapolated-rows=disabled max-scan-range-rows=0
      file formats: [PARQUET]
      mem-estimate=0B mem-reservation=0B thread-reservation=0
-     tuple-ids=12 row-size=16B cardinality=0
+     tuple-ids=11 row-size=16B cardinality=0
      in pipelines: 12(GETNEXT)
 
 F10:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -459,12 +459,12 @@ Per-Host Resources: mem-estimate=1.95MB mem-reservation=1.94MB thread-reservatio
   |  hash predicates: a.ca_address_sk = c.c_current_addr_sk
   |  fk/pk conjuncts: assumed fk/pk
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
-  |  tuple-ids=15,17 row-size=24B cardinality=0
+  |  tuple-ids=14,16 row-size=24B cardinality=0
   |  in pipelines: 16(GETNEXT), 17(OPEN)
   |
   |--34:EXCHANGE [BROADCAST]
   |     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-  |     tuple-ids=17 row-size=8B cardinality=0
+  |     tuple-ids=16 row-size=8B cardinality=0
   |     in pipelines: 17(GETNEXT)
   |
   16:SCAN HDFS [default.impala_tpcds_customer_address a, RANDOM]
@@ -476,7 +476,7 @@ Per-Host Resources: mem-estimate=1.95MB mem-reservation=1.94MB thread-reservatio
      extrapolated-rows=disabled max-scan-range-rows=0
      file formats: [PARQUET]
      mem-estimate=0B mem-reservation=0B thread-reservation=0
-     tuple-ids=15 row-size=16B cardinality=0
+     tuple-ids=14 row-size=16B cardinality=0
      in pipelines: 16(GETNEXT)
 
 F11:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -492,7 +492,7 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      extrapolated-rows=disabled max-scan-range-rows=0
      file formats: [PARQUET]
      mem-estimate=0B mem-reservation=0B thread-reservation=0
-     tuple-ids=17 row-size=8B cardinality=0
+     tuple-ids=16 row-size=8B cardinality=0
      in pipelines: 17(GETNEXT)
 
 

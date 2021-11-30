@@ -77,6 +77,7 @@ POSTHOOK: Input: default@depts_imp0
 POSTHOOK: Input: default@emps_imp0
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab1_imp0_out_of_order_partitions
+POSTHOOK: Output: default@tab1_imp0_out_of_order_partitions
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
   Stage-2 depends on stages: Stage-1
