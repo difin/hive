@@ -80,7 +80,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
   @Override
   protected void initHiveConf() {
     super.initHiveConf();
-    MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.TRUNCATE_ACID_USE_BASE, true);
+    HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_ACID_TRUNCATE_USE_BASE, false);
   }
 
   @Override
@@ -601,7 +601,9 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
   }
 
   @Test
-  public void testTruncateWithBase() throws Exception{
+  public void testTruncateWithBase() throws Exception {
+    HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_ACID_TRUNCATE_USE_BASE, true);
+
     runStatementOnDriver("insert into " + TableExtended.MMTBL + " values(1,2),(3,4)");
     runStatementOnDriver("truncate table " + TableExtended.MMTBL);
 
@@ -619,7 +621,9 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
   }
 
   @Test
-  public void testTruncateWithBaseAllPartition() throws Exception{
+  public void testTruncateWithBaseAllPartition() throws Exception {
+    HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_ACID_TRUNCATE_USE_BASE, true);
+
     runStatementOnDriver("insert into " + TableExtended.MMTBLPART + " partition(p='a') values(1,2),(3,4)");
     runStatementOnDriver("insert into " + TableExtended.MMTBLPART + " partition(p='b') values(1,2),(3,4)");
     runStatementOnDriver("truncate table " + TableExtended.MMTBLPART);
@@ -638,7 +642,9 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
   }
 
   @Test
-  public void testTruncateWithBaseOnePartition() throws Exception{
+  public void testTruncateWithBaseOnePartition() throws Exception {
+    HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_ACID_TRUNCATE_USE_BASE, true);
+
     runStatementOnDriver("insert into " + TableExtended.MMTBLPART + " partition(p='a') values(1,2),(3,4)");
     runStatementOnDriver("insert into " + TableExtended.MMTBLPART+ " partition(p='b') values(5,5),(4,4)");
     runStatementOnDriver("truncate table " + TableExtended.MMTBLPART + " partition(p='b')");

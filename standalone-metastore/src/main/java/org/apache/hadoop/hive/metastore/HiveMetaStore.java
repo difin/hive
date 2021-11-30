@@ -24,6 +24,7 @@ import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_NAME;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_CATALOG_NAME;
 import static org.apache.hadoop.hive.metastore.Warehouse.getCatalogQualifiedTableName;
 import static org.apache.hadoop.hive.metastore.api.FireEventRequestData._Fields.INSERT_DATA;
+import static org.apache.hadoop.hive.metastore.HiveMetaStoreClient.TRUNCATE_SKIP_DATA_DELETION;
 import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.TABLE_IS_CTAS;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCatalog;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.parseDbName;
@@ -238,8 +239,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
   static long TEST_TIMEOUT_VALUE = -1;
 
   private static ShutdownHookManager shutdownHookMgr;
-
-  public static final String TRUNCATE_SKIP_DATA_DELETION = "truncateSkipDataDeletion";
+  
   public static final String ADMIN = "admin";
   public static final String PUBLIC = "public";
   /** MM write states. */
@@ -3445,15 +3445,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             .map(Boolean::parseBoolean)
             .orElse(false);
 
-        if (!skipDataDeletion) {
-          boolean truncateFiles = !TxnUtils.isTransactionalTable(tbl) ||
-              !MetastoreConf.getBoolVar(getConf(), MetastoreConf.ConfVars.TRUNCATE_ACID_USE_BASE);
-          
+        if (TxnUtils.isTransactionalTable(tbl) || !skipDataDeletion) {
           // This is not transactional
           for (Path location : getLocationsForTruncate(getMS(), parsedDbName[CAT_NAME],
               parsedDbName[DB_NAME], tableName, tbl, partNames)) {
             FileSystem fs = location.getFileSystem(getConf());
-            if (truncateFiles) {
+            if (!skipDataDeletion) {
               truncateDataFiles(tbl, parsedDbName, location, fs);
             } else {
               // For Acid tables we don't need to delete the old files, only write an empty baseDir.

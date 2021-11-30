@@ -3742,6 +3742,13 @@ public class HiveMetaStoreClientPreCatalog implements IMetaStoreClient, AutoClos
   }
 
   @Override
+  public void truncateTable(String dbName, String tableName,
+                            List<String> partNames, String validWriteIds, long writeId, boolean deleteData)
+    throws TException {
+    throw new UnsupportedOperationException();
+  }
+  
+  @Override
   @Deprecated
   public OptionalCompactionInfoStruct findNextCompact(String workerId) throws MetaException, TException {
     return client.find_next_compact(workerId);

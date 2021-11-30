@@ -107,8 +107,8 @@ public class TestTxnCommands extends TxnCommandsBaseForTests {
     super.initHiveConf();
     //TestTxnCommandsWithSplitUpdateAndVectorization has the vectorized version
     //of these tests.
-    hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED, false);
-    MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.TRUNCATE_ACID_USE_BASE, true);
+    HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED, false);
+    HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_ACID_TRUNCATE_USE_BASE, false);
   }
 
 
@@ -1520,6 +1520,8 @@ public class TestTxnCommands extends TxnCommandsBaseForTests {
 
   @Test
   public void testTruncateWithBase() throws Exception{
+    HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_ACID_TRUNCATE_USE_BASE, true);
+    
     runStatementOnDriver("insert into " + Table.ACIDTBL + " values(1,2),(3,4)");
     runStatementOnDriver("truncate table " + Table.ACIDTBL);
 
@@ -1538,6 +1540,8 @@ public class TestTxnCommands extends TxnCommandsBaseForTests {
 
   @Test
   public void testTruncateWithBaseAllPartition() throws Exception{
+    HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_ACID_TRUNCATE_USE_BASE, true);
+    
     runStatementOnDriver("insert into " + Table.ACIDTBLPART + " partition(p='a') values(1,2),(3,4)");
     runStatementOnDriver("insert into " + Table.ACIDTBLPART + " partition(p='b') values(1,2),(3,4)");
     runStatementOnDriver("truncate table " + Table.ACIDTBLPART);
@@ -1557,6 +1561,8 @@ public class TestTxnCommands extends TxnCommandsBaseForTests {
 
   @Test
   public void testTruncateWithBaseOnePartition() throws Exception{
+    HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_ACID_TRUNCATE_USE_BASE, true);
+    
     runStatementOnDriver("insert into " + Table.ACIDTBLPART + " partition(p='a') values(1,2),(3,4)");
     runStatementOnDriver("insert into " + Table.ACIDTBLPART + " partition(p='b') values(5,5),(4,4)");
     runStatementOnDriver("truncate table " + Table.ACIDTBLPART + " partition(p='b')");
