@@ -2,6 +2,6 @@
 docker_images:
   hive: hive
 
-registry: docker-private.infra.cloudera.com/cloudera/
+registry: docker-private.infra.cloudera.com/cloudera
 docker_image_tag:
   build_tag: latest
