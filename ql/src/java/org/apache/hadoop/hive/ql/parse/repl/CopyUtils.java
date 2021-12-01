@@ -114,15 +114,12 @@ public class CopyUtils {
   }
 
   @VisibleForTesting
-  void copyFilesBetweenFS(FileSystem sourceFs, Path[] paths, FileSystem destinationFs,
-                                  Path finalDestination, boolean deleteSource, boolean overwrite) throws IOException {
-    retryableFxn(new Callable<Void>() {
-      @Override
-      public Void call() throws Exception {
-        FileUtil
-                .copy(sourceFs, paths, destinationFs, finalDestination, deleteSource, overwrite, hiveConf);
-        return null;
-      }
+  void copyFilesBetweenFS(FileSystem srcFS, Path[] paths, FileSystem dstFS,
+                                  Path dst, boolean deleteSource, boolean overwrite) throws IOException {
+    retryableFxn(() -> {
+      boolean preserveXAttrs = FileUtils.shouldPreserveXAttrs(hiveConf, srcFS, dstFS);
+      FileUtils.copy(srcFS, paths, dstFS, dst, deleteSource, overwrite, preserveXAttrs, hiveConf);
+      return null;
     });
   }
 
