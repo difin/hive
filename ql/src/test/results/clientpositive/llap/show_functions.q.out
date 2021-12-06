@@ -103,6 +103,7 @@ decode
 default.qtest_get_java_boolean
 degrees
 dense_rank
+deserialize
 div
 ds_cpc_estimate
 ds_cpc_estimate_bounds
@@ -451,6 +452,7 @@ coalesce
 current_database
 current_date
 decode
+deserialize
 ds_cpc_estimate
 ds_hll_estimate
 ds_kll_quantile
@@ -606,6 +608,7 @@ decode
 default.qtest_get_java_boolean
 degrees
 dense_rank
+deserialize
 div
 ds_cpc_estimate
 ds_cpc_estimate_bounds
