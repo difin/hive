@@ -1,5 +1,6 @@
 set hive.cbo.enable = True;
 set hive.vectorized.execution.enabled = True;
+set hive.exec.dynamic.partition.mode=nonstrict;
 
 CREATE TABLE add_part_test (key STRING, value STRING) PARTITIONED BY (ds STRING);
 explain ddl select * from add_part_test;

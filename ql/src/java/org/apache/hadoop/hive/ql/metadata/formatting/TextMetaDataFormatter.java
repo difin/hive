@@ -297,27 +297,27 @@ class TextMetaDataFormatter implements MetaDataFormatter {
           if (tbl.getTableConstraintsInfo().isTableConstraintsInfoNotEmpty()) {
             outStream.write(("Constraints").getBytes("UTF-8"));
             outStream.write(separator);
-            if (PrimaryKeyInfo.isPrimaryKeyInfoNotEmpty(tbl.getPrimaryKeyInfo())) {
+            if (PrimaryKeyInfo.isNotEmpty(tbl.getPrimaryKeyInfo())) {
               outStream.write(tbl.getPrimaryKeyInfo().toString().getBytes("UTF-8"));
               outStream.write(terminator);
             }
-            if (ForeignKeyInfo.isForeignKeyInfoNotEmpty(tbl.getForeignKeyInfo())) {
+            if (ForeignKeyInfo.isNotEmpty(tbl.getForeignKeyInfo())) {
               outStream.write(tbl.getForeignKeyInfo().toString().getBytes("UTF-8"));
               outStream.write(terminator);
             }
-            if (UniqueConstraint.isUniqueConstraintNotEmpty(tbl.getUniqueKeyInfo())) {
+            if (UniqueConstraint.isNotEmpty(tbl.getUniqueKeyInfo())) {
               outStream.write(tbl.getUniqueKeyInfo().toString().getBytes("UTF-8"));
               outStream.write(terminator);
             }
-            if (NotNullConstraint.isNotNullConstraintNotEmpty(tbl.getNotNullConstraint())) {
+            if (NotNullConstraint.isNotEmpty(tbl.getNotNullConstraint())) {
               outStream.write(tbl.getNotNullConstraint().toString().getBytes("UTF-8"));
               outStream.write(terminator);
             }
-            if (DefaultConstraint.isCheckConstraintNotEmpty(tbl.getDefaultConstraint())) {
+            if (DefaultConstraint.isNotEmpty(tbl.getDefaultConstraint())) {
               outStream.write(tbl.getDefaultConstraint().toString().getBytes("UTF-8"));
               outStream.write(terminator);
             }
-            if (CheckConstraint.isCheckConstraintNotEmpty(tbl.getCheckConstraint())) {
+            if (CheckConstraint.isNotEmpty(tbl.getCheckConstraint())) {
               outStream.write(tbl.getCheckConstraint().toString().getBytes("UTF-8"));
               outStream.write(terminator);
             }
