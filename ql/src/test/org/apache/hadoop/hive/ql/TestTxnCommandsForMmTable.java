@@ -47,7 +47,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     File.separator + TestTxnCommands.class.getCanonicalName()
     + "-" + System.currentTimeMillis()
   ).getPath().replaceAll("\\\\", "/");
-  protected static final String TEST_WAREHOUSE_DIR = TEST_DATA_DIR + "/warehouse";
+
   @Override
   protected String getTestDataDir() {
     return TEST_DATA_DIR;
@@ -64,9 +64,6 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     @Override
     public String toString() {
       return name;
-    }
-    String getPartitionColumns() {
-      return partitionColumns;
     }
     TableExtended(String name) {
       this(name, null);
@@ -109,9 +106,11 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
       runStatementOnDriver("create table " + TableExtended.MMTBLPART + "(a int, b int) partitioned by (p string) stored as orc TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')");
     }
   }
+
+  @Override
   protected void dropTables() throws Exception {
     super.dropTables();
-    for(TestTxnCommandsForMmTable.TableExtended t : TestTxnCommandsForMmTable.TableExtended.values()) {
+    for (TestTxnCommandsForMmTable.TableExtended t : TestTxnCommandsForMmTable.TableExtended.values()) {
       runStatementOnDriver("drop table if exists " + t);
     }
   }
@@ -130,7 +129,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     // 1. Insert two rows to an MM table
     runStatementOnDriver("insert into " + TableExtended.MMTBL + "(a,b) values(1,2)");
     runStatementOnDriver("insert into " + TableExtended.MMTBL + "(a,b) values(3,4)");
-    status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+    status = fs.listStatus(new Path(getWarehouseDir() + "/" +
         (TableExtended.MMTBL).toString().toLowerCase()), FileUtils.STAGING_DIR_PATH_FILTER);
     // There should be 2 delta dirs in the location
     Assert.assertEquals(2, status.length);
@@ -143,7 +142,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     runStatementOnDriver("insert into " + Table.NONACIDORCTBL + "(a,b) values(5,6),(7,8)");
     // Insert overwrite MM table from source table
     runStatementOnDriver("insert overwrite table " + TableExtended.MMTBL + " select a,b from " + Table.NONACIDORCTBL);
-    status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+    status = fs.listStatus(new Path(getWarehouseDir() + "/" +
         (TableExtended.MMTBL).toString().toLowerCase()), FileUtils.STAGING_DIR_PATH_FILTER);
     // There should be 2 delta dirs, plus 1 base dir in the location
     Assert.assertEquals(3, status.length);
@@ -187,7 +186,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     String[] pStrings = {"/p=odd", "/p=even"};
 
     for(int i=0; i < pStrings.length; i++) {
-      status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+      status = fs.listStatus(new Path(getWarehouseDir() + "/" +
           (TableExtended.MMTBLPART).toString().toLowerCase() + pStrings[i]), FileUtils.STAGING_DIR_PATH_FILTER);
       // There should be 1 delta dir per partition location
       Assert.assertEquals(1, status.length);
@@ -219,7 +218,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     String[] baseDirs = {"", ""};
     int deltaCount = 0;
     for(int h=0; h < pStrings.length; h++) {
-      status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+      status = fs.listStatus(new Path(getWarehouseDir() + "/" +
           (TableExtended.MMTBLPART).toString().toLowerCase() + pStrings[h]), FileUtils.STAGING_DIR_PATH_FILTER);
       // There should be 1 delta dir, plus a base dir in the location
       Assert.assertEquals(2, status.length);
@@ -257,7 +256,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     runWorker(hiveConf);
 
     for(int h=0; h < pStrings.length; h++) {
-      status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+      status = fs.listStatus(new Path(getWarehouseDir() + "/" +
           (TableExtended.MMTBLPART).toString().toLowerCase() + pStrings[h]), FileUtils.STAGING_DIR_PATH_FILTER);
       // There should be 2 delta dirs, plus a base dir in the location
       Assert.assertEquals(2, status.length);
@@ -290,7 +289,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     // There should be only 1 directory left: base_xxxxxxx.
     // The delta dirs should have been cleaned up.
     for(int h=0; h < pStrings.length; h++) {
-      status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+      status = fs.listStatus(new Path(getWarehouseDir() + "/" +
           (TableExtended.MMTBLPART).toString().toLowerCase() + pStrings[h]), FileUtils.STAGING_DIR_PATH_FILTER);
       Assert.assertEquals(1, status.length);
       Assert.assertTrue(status[0].getPath().getName().matches("base_.*"));
@@ -322,7 +321,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     String[] pStrings = {"/p=odd", "/p=even"};
 
     for(int i=0; i < pStrings.length; i++) {
-      status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+      status = fs.listStatus(new Path(getWarehouseDir() + "/" +
           (TableExtended.MMTBLPART).toString().toLowerCase() + pStrings[i]), FileUtils.STAGING_DIR_PATH_FILTER);
       // There should be 1 delta dir per partition location
       Assert.assertEquals(1, status.length);
@@ -344,7 +343,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     String[] baseDirs = {"", ""};
     int deltaCount = 0;
     for(int h=0; h < pStrings.length; h++) {
-      status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+      status = fs.listStatus(new Path(getWarehouseDir() + "/" +
           (TableExtended.MMTBLPART).toString().toLowerCase() + pStrings[h]), FileUtils.STAGING_DIR_PATH_FILTER);
       // There should be 1 delta dir, plus a base dir in the location
       Assert.assertEquals(2, status.length);   // steve
@@ -389,7 +388,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     // 1. Insert two rows to an MM table
     runStatementOnDriver("insert into " + TableExtended.MMTBL + "(a,b) values(1,2)");
     runStatementOnDriver("insert into " + TableExtended.MMTBL + "(a,b) values(3,4)");
-    status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+    status = fs.listStatus(new Path(getWarehouseDir() + "/" +
         (TableExtended.MMTBL).toString().toLowerCase()), FileUtils.STAGING_DIR_PATH_FILTER);
     // There should be 2 delta dirs in the location
     Assert.assertEquals(2, status.length);
@@ -399,7 +398,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
 
     // 2. Insert Overwrite.
     int[][] values = {{1,2},{2,4},{5,6},{6,8},{9,10}};
-    runStatementOnDriver("insert into " + Table.NONACIDORCTBL + TestTxnCommands2.makeValuesClause(values));
+    runStatementOnDriver("insert into " + Table.NONACIDORCTBL + makeValuesClause(values));
 
     runStatementOnDriver("insert overwrite table " + TableExtended.MMTBL + " select a,b from " + Table.NONACIDORCTBL + " where a between 1 and 3 union all select a,b from " + Table.NONACIDORCTBL + " where a between 5 and 7");
 
@@ -408,7 +407,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     String baseDir = "";
     int deltaCount = 0;
 
-    status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+    status = fs.listStatus(new Path(getWarehouseDir() + "/" +
       (TableExtended.MMTBL).toString().toLowerCase()), FileUtils.STAGING_DIR_PATH_FILTER);
     // There should be 2 delta dirs, plus a base dir in the location
     Assert.assertEquals(3, status.length);
@@ -441,7 +440,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     Assert.assertEquals(stringifyValues(rExpected), rs);
 
     // Verify resulting dirs.
-    status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+    status = fs.listStatus(new Path(getWarehouseDir() + "/" +
       (TableExtended.MMTBL).toString().toLowerCase()), FileUtils.STAGING_DIR_PATH_FILTER);
     // There should be one base dir in the location
     Assert.assertEquals(1, status.length);
@@ -518,7 +517,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
     }
     FileSystem fs = FileSystem.get(hiveConf);
     FileStatus[] status;
-    Path tblLocation = new Path(TEST_WAREHOUSE_DIR + "/" +
+    Path tblLocation = new Path(getWarehouseDir() + "/" +
         (TableExtended.MMTBL).toString().toLowerCase());
 
     // 1. Insert two rows to an MM table
@@ -577,7 +576,7 @@ public class TestTxnCommandsForMmTable extends TxnCommandsBaseForTests {
   private void verifyDir(int expectedDeltas, boolean expectBaseDir) throws Exception {
     FileSystem fs = FileSystem.get(hiveConf);
     // Verify the content of subdirs
-    FileStatus[] status = fs.listStatus(new Path(TEST_WAREHOUSE_DIR + "/" +
+    FileStatus[] status = fs.listStatus(new Path(getWarehouseDir() + "/" +
         (TableExtended.MMTBL).toString().toLowerCase()), FileUtils.HIDDEN_FILES_PATH_FILTER);
     int sawDeltaTimes = 0;
     int sawBaseTimes = 0;

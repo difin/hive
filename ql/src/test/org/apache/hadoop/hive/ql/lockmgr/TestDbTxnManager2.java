@@ -64,6 +64,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.hadoop.hive.ql.TxnCommandsBaseForTests.runWorker;
+import static org.apache.hadoop.hive.ql.TxnCommandsBaseForTests.runCleaner;
+
 /**
  * See additional tests in {@link org.apache.hadoop.hive.ql.lockmgr.TestDbTxnManager}
  * Tests here are "end-to-end"ish and simulate concurrent queries.
@@ -539,11 +542,11 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     count = TestTxnDbUtil.countQueryAgent(conf, "select count(*) from \"COMPACTION_QUEUE\" " +
         "where \"CQ_DATABASE\"='temp' and \"CQ_TABLE\"='t11' and \"CQ_STATE\"='i' and \"CQ_TYPE\"='i'");
     Assert.assertEquals(1, count);
-    TestTxnCommands2.runWorker(conf);
+    runWorker(conf);
     count = TestTxnDbUtil.countQueryAgent(conf, "select count(*) from \"COMPACTION_QUEUE\" " +
         "where \"CQ_DATABASE\"='temp' and \"CQ_TABLE\"='t11' and \"CQ_STATE\"='r' and \"CQ_TYPE\"='i'");
     Assert.assertEquals(1, count);
-    TestTxnCommands2.runCleaner(conf);
+    runCleaner(conf);
     count = TestTxnDbUtil.countQueryAgent(conf, "select count(*) from \"COMPACTION_QUEUE\" " +
         "where \"CQ_DATABASE\"='temp' and \"CQ_TABLE\"='t11'");
     Assert.assertEquals(0, count);
@@ -556,12 +559,12 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
         "where \"CQ_DATABASE\"='temp' and \"CQ_TABLE\"='t12p' and \"CQ_PARTITION\"='ds=tomorrow/hour=2' " +
         "and \"CQ_STATE\"='i' and \"CQ_TYPE\"='i'");
     Assert.assertEquals(1, count);
-    TestTxnCommands2.runWorker(conf);
+    runWorker(conf);
     count = TestTxnDbUtil.countQueryAgent(conf, "select count(*) from \"COMPACTION_QUEUE\" " +
         "where \"CQ_DATABASE\"='temp' and \"CQ_TABLE\"='t12p' and \"CQ_PARTITION\"='ds=tomorrow/hour=2' " +
         "and \"CQ_STATE\"='r' and \"CQ_TYPE\"='i'");
     Assert.assertEquals(1, count);
-    TestTxnCommands2.runCleaner(conf);
+    runCleaner(conf);
     count = TestTxnDbUtil.countQueryAgent(conf, "select count(*) from \"COMPACTION_QUEUE\" " +
         "where \"CQ_DATABASE\"='temp' and \"CQ_TABLE\"='t12p'");
     Assert.assertEquals(0, count);
@@ -578,7 +581,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     count = TestTxnDbUtil.countQueryAgent(conf, "select count(*) from \"COMPACTION_QUEUE\" " +
         "where \"CQ_DATABASE\"='temp' and \"CQ_TABLE\"='t11' and \"CQ_STATE\"='i' and \"CQ_TYPE\"='a'");
     Assert.assertEquals(1, count);
-    TestTxnCommands2.runWorker(conf); // will fail
+    runWorker(conf); // will fail
     count = TestTxnDbUtil.countQueryAgent(conf, "select count(*) from \"COMPACTION_QUEUE\" " +
         "where \"CQ_DATABASE\"='temp' and \"CQ_TABLE\"='t11' and \"CQ_STATE\"='i' and \"CQ_TYPE\"='a'");
     Assert.assertEquals(0, count);
@@ -591,7 +594,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
         "where \"CQ_DATABASE\"='temp' and \"CQ_TABLE\"='t12p' and \"CQ_PARTITION\"='ds=tomorrow/hour=2' " +
         "and \"CQ_STATE\"='i' and \"CQ_TYPE\"='a'");
     Assert.assertEquals(1, count);
-    TestTxnCommands2.runWorker(conf); // will fail
+    runWorker(conf); // will fail
     count = TestTxnDbUtil.countQueryAgent(conf, "select count(*) from \"COMPACTION_QUEUE\" " +
         "where \"CQ_DATABASE\"='temp' and \"CQ_TABLE\"='t12p' and \"CQ_PARTITION\"='ds=tomorrow/hour=2' " +
         "and \"CQ_STATE\"='i' and \"CQ_TYPE\"='a'");
@@ -3210,7 +3213,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   @Test
   public void testFullTableReadLock() throws Exception {
     dropTable(new String[] {"tab_acid", "tab_not_acid"});
-    conf.setIntVar(HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 2);
+    HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 2);
 
     driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");

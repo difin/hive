@@ -58,10 +58,12 @@ import org.slf4j.LoggerFactory;
 
 public abstract class TxnCommandsBaseForTests {
   private static final Logger LOG = LoggerFactory.getLogger(TxnCommandsBaseForTests.class);
+  
   //bucket count for test tables; set it to 1 for easier debugging
   final static int BUCKET_COUNT = 2;
   @Rule
   public TestName testName = new TestName();
+  
   protected HiveConf hiveConf;
   protected Driver d;
   protected TxnStore txnHandler;
@@ -137,6 +139,10 @@ public abstract class TxnCommandsBaseForTests {
     d = new Driver(new QueryState.Builder().withHiveConf(hiveConf).nonIsolated().build(), null);
     d.setMaxRows(10000);
     dropTables();
+    setUpSchema();
+  }
+
+  protected void setUpSchema() throws Exception {
     runStatementOnDriver("create table " + Table.ACIDTBL + "(a int, b int) clustered by (a) into " + BUCKET_COUNT + " buckets stored as orc TBLPROPERTIES ('transactional'='true')");
     runStatementOnDriver("create table " + Table.ACIDTBLPART + "(a int, b int) partitioned by (p string) clustered by (a) into " + BUCKET_COUNT + " buckets stored as orc TBLPROPERTIES ('transactional'='true')");
     runStatementOnDriver("create table " + Table.ACIDTBLNESTEDPART + "(a int, b int) partitioned by (p1 string, p2 string, p3 string) clustered by (a) into " + BUCKET_COUNT + " buckets stored as orc TBLPROPERTIES ('transactional'='true')");
@@ -146,7 +152,7 @@ public abstract class TxnCommandsBaseForTests {
     runStatementOnDriver("create table " + Table.NONACIDNONBUCKET + "(a int, b int) stored as orc TBLPROPERTIES ('transactional'='false')");
   }
   protected void dropTables() throws Exception {
-    for(TxnCommandsBaseForTests.Table t : TxnCommandsBaseForTests.Table.values()) {
+    for (TxnCommandsBaseForTests.Table t : TxnCommandsBaseForTests.Table.values()) {
       runStatementOnDriver("drop table if exists " + t);
     }
   }
@@ -201,17 +207,35 @@ public abstract class TxnCommandsBaseForTests {
       return 0;
     }
   }
-  protected String makeValuesClause(int[][] rows) {
-    return TestTxnCommands2.makeValuesClause(rows);
+  public static String makeValuesClause(int[][] rows) {
+    assert rows.length > 0;
+    StringBuilder sb = new StringBuilder(" values");
+    for (int[] row : rows) {
+      assert row.length > 0;
+      if (row.length > 1) {
+        sb.append("(");
+      }
+      for (int value : row) {
+        sb.append(value).append(",");
+      }
+      sb.setLength(sb.length() - 1);//remove trailing comma
+      if (row.length > 1) {
+        sb.append(")");
+      }
+      sb.append(",");
+    }
+    sb.setLength(sb.length() - 1);//remove trailing comma
+    return sb.toString();
+  }
+
+  public static void runInitiator(HiveConf hiveConf) throws Exception {
+    runCompactorThread(hiveConf, CompactorThreadType.INITIATOR);
   }
   public static void runWorker(HiveConf hiveConf) throws Exception {
     runCompactorThread(hiveConf, CompactorThreadType.WORKER);
   }
   public static void runCleaner(HiveConf hiveConf) throws Exception {
     runCompactorThread(hiveConf, CompactorThreadType.CLEANER);
-  }
-  public static void runInitiator(HiveConf hiveConf) throws Exception {
-    runCompactorThread(hiveConf, CompactorThreadType.INITIATOR);
   }
   private static void runCompactorThread(HiveConf hiveConf, CompactorThreadType type)
       throws Exception {
