@@ -7903,6 +7903,12 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         tableDescriptor = PlanUtils.getTableDesc(tblDesc, cols, colTypes);
       }
 
+      // if available, set location in table desc properties
+      if (tblDesc != null && tblDesc.getLocation() != null && tableDescriptor != null &&
+          !tableDescriptor.getProperties().containsKey(hive_metastoreConstants.META_TABLE_LOCATION)) {
+        tableDescriptor.getProperties().setProperty(hive_metastoreConstants.META_TABLE_LOCATION, tblDesc.getLocation());
+      }
+
       boolean isDfsDir = (destType == QBMetaData.DEST_DFS_FILE);
 
       try {
