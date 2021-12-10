@@ -29,12 +29,15 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -42,8 +45,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
 import javax.jdo.datastore.JDOConnection;
-
-import com.google.common.collect.ImmutableMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -56,6 +57,7 @@ import org.apache.hadoop.hive.metastore.api.ColumnStatisticsDesc;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.GetPartitionsFilterSpec;
 import org.apache.hadoop.hive.metastore.api.HiveObjectPrivilege;
 import org.apache.hadoop.hive.metastore.api.HiveObjectRef;
 import org.apache.hadoop.hive.metastore.api.HiveObjectType;
@@ -71,7 +73,6 @@ import org.apache.hadoop.hive.metastore.api.SQLNotNullConstraint;
 import org.apache.hadoop.hive.metastore.api.SQLPrimaryKey;
 import org.apache.hadoop.hive.metastore.api.SQLUniqueConstraint;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;
-import org.apache.hadoop.hive.metastore.api.GetPartitionsFilterSpec;
 import org.apache.hadoop.hive.metastore.api.SkewedInfo;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
@@ -101,6 +102,7 @@ import org.datanucleus.store.rdbms.query.ForwardQueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 /**
@@ -139,10 +141,9 @@ class MetaStoreDirectSql {
    */
   private final boolean isCompatibleDatastore;
   private final boolean isAggregateStatsCacheEnabled;
+  private final ImmutableMap<String, String> fieldnameToTableName;
   private AggregateStatsCache aggrStatsCache;
   private DirectSqlUpdateStat updateStat;
-
-  private final ImmutableMap<String, String> fieldnameToTableName;
 
   /**
    * This method returns a comma separated string consisting of String values of a given list.
@@ -151,12 +152,11 @@ class MetaStoreDirectSql {
    * @return The concatenated list
    * @throws MetaException If the list contains wrong data
    */
-  public static <T> String getIdListForIn(List<T> objectIds) throws MetaException {
+  public static <T> String getIdListForIn(Collection<T> objectIds) throws MetaException {
     return objectIds.stream()
         .map(i -> i.toString())
         .collect(Collectors.joining(","));
   }
-
 
   @java.lang.annotation.Target(java.lang.annotation.ElementType.FIELD)
   @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
@@ -188,7 +188,6 @@ class MetaStoreDirectSql {
     }
     this.batchSize = batchSize;
     this.updateStat = new DirectSqlUpdateStat(pm, conf, dbType, batchSize);
-
     ImmutableMap.Builder<String, String> fieldNameToTableNameBuilder =
         new ImmutableMap.Builder<>();
 
@@ -227,6 +226,7 @@ class MetaStoreDirectSql {
     if (isAggregateStatsCacheEnabled) {
       aggrStatsCache = AggregateStatsCache.getInstance(conf);
     }
+
     // now use the tableanames to create the mapping
     // note that some of the optional single-valued fields are not present
     fieldnameToTableName =
@@ -292,10 +292,9 @@ class MetaStoreDirectSql {
       initQueries.add(pm.newQuery(MCreationMetadata.class, "dbName == ''"));
       initQueries.add(pm.newQuery(MPartitionPrivilege.class, "principalName == ''"));
       initQueries.add(pm.newQuery(MPartitionColumnPrivilege.class, "principalName == ''"));
-      Query q;
-      while ((q = initQueries.peekFirst()) != null) {
+
+      for (Query q : initQueries) {
         q.execute();
-        initQueries.pollFirst();
       }
 
       return true;
@@ -792,12 +791,11 @@ class MetaStoreDirectSql {
   private List<Partition> getPartitionsFromPartitionIds(String catName, String dbName, String tblName,
       Boolean isView, List<Long> partIdList, List<String> projectionFields,
       boolean isAcidTable) throws MetaException {
+
     boolean doTrace = LOG.isDebugEnabled();
 
     int idStringWidth = (int)Math.ceil(Math.log10(partIdList.size())) + 1; // 1 for comma
     int sbCapacity = partIdList.size() * idStringWidth;
-
-
     // Get most of the fields for the IDs provided.
     // Assume db and table names are the same for all partition, as provided in arguments.
     String partIds = getIdListForIn(partIdList);
@@ -968,6 +966,7 @@ class MetaStoreDirectSql {
 
     // Get FieldSchema stuff if any.
     if (!colss.isEmpty()) {
+      // We are skipping the CDS table here, as it seems to be totally useless.
       MetastoreDirectSqlUtils.setSDCols(COLUMNS_V2, pm, colss, colIds);
     }
 
@@ -975,7 +974,6 @@ class MetaStoreDirectSql {
     if (!isAcidTable) {
       MetastoreDirectSqlUtils.setSerdeParams(SERDE_PARAMS, convertMapNullsToEmptyStrings, pm, serdes, serdeIds);
     }
-
 
     return orderedResult;
   }
@@ -1012,7 +1010,6 @@ class MetaStoreDirectSql {
     MetastoreDirectSqlUtils.timingTrace(doTrace, queryText, start, queryTime);
     return sqlResult;
   }
-
 
   private static String trimCommaList(StringBuilder sb) {
     if (sb.length() > 0) {
@@ -2480,7 +2477,7 @@ class MetaStoreDirectSql {
     List<Object[]> sqlResult = MetastoreDirectSqlUtils.ensureList(MetastoreDirectSqlUtils.executeWithArray(query, null, queryText));
 
     List<Object> sdIdList = new ArrayList<>(partitionIdList.size());
-    List<Object> columnDescriptorIdList = new ArrayList<>(1);
+    List<Long> columnDescriptorIdList = new ArrayList<>(1);
     List<Object> serdeIdList = new ArrayList<>(partitionIdList.size());
 
     if (!sqlResult.isEmpty()) {
@@ -2658,33 +2655,32 @@ class MetaStoreDirectSql {
    * @throws MetaException If there is an SQL exception during the execution it converted to
    * MetaException
    */
-  private void dropDanglingColumnDescriptors(List<Object> columnDescriptorIdList)
+  private void dropDanglingColumnDescriptors(List<Long> columnDescriptorIdList)
       throws MetaException {
     String queryText;
     String colIds = getIdListForIn(columnDescriptorIdList);
 
     // Drop column descriptor, if no relation left
     queryText =
-        "SELECT " + SDS + ".\"CD_ID\", count(1) "
+        "SELECT " + SDS + ".\"CD_ID\" "
             + "from " + SDS + " "
             + "WHERE " + SDS + ".\"CD_ID\" in (" + colIds + ") "
             + "GROUP BY " + SDS + ".\"CD_ID\"";
     Query query = pm.newQuery("javax.jdo.query.SQL", queryText);
-    List<Object[]> sqlResult = MetastoreDirectSqlUtils.ensureList(MetastoreDirectSqlUtils.executeWithArray(query, null, queryText));
+    List<Long> sqlResult = MetastoreDirectSqlUtils.executeWithArray(query, null, queryText);
 
-    List<Object> danglingColumnDescriptorIdList = new ArrayList<>(columnDescriptorIdList.size());
+    Set<Long> danglingColumnDescriptorIdSet = new HashSet<>(columnDescriptorIdList);
     if (!sqlResult.isEmpty()) {
-      for (Object[] fields : sqlResult) {
-        if (extractSqlInt(fields[1]) == 0) {
-          danglingColumnDescriptorIdList.add(MetastoreDirectSqlUtils.extractSqlLong(fields[0]));
-        }
+      for (Long cdId : sqlResult) {
+        // the returned CD is not dangling, so remove it from the list
+        danglingColumnDescriptorIdSet.remove(cdId);
       }
     }
     query.closeAll();
 
-    if (!danglingColumnDescriptorIdList.isEmpty()) {
+    if (!danglingColumnDescriptorIdSet.isEmpty()) {
       try {
-        String danglingCDIds = getIdListForIn(danglingColumnDescriptorIdList);
+        String danglingCDIds = getIdListForIn(danglingColumnDescriptorIdSet);
 
         // Drop the columns_v2
         queryText = "delete from " + COLUMNS_V2 + " where \"CD_ID\" in (" + danglingCDIds + ")";
