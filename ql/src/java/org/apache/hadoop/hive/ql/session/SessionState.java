@@ -279,11 +279,6 @@ public class SessionState {
    */
   private Map<URI, HadoopShims.HdfsEncryptionShim> hdfsEncryptionShims = Maps.newHashMap();
 
-  /**
-   * Cache for Erasure Coding shims.
-   */
-  private Map<URI, HadoopShims.HdfsErasureCodingShim> erasureCodingShims;
-
   private final String userName;
 
   private final Map<Class, Object> dynamicVars = new HashMap<>();
@@ -2253,30 +2248,16 @@ public class SessionState {
   }
 
   /**
-   * Can be called when we start compilation of a query.
-   * @param queryId the unique identifier of the query
-   */
-  public void startScope(String queryId) {
-    Map<Object, Object> existingVal = cache.put(queryId, new HashMap<>());
-    Preconditions.checkState(existingVal == null);
-  }
-
-  /**
-   * Can be called when we end compilation of a query.
-   * @param queryId the unique identifier of the query
-   */
-  public void endScope(String queryId) {
-    Map<Object, Object> existingVal = cache.remove(queryId);
-    Preconditions.checkState(existingVal != null);
-  }
-
-  /**
    * Retrieves the query cache for the given query.
    * @param queryId the unique identifier of the query
    * @return the cache for the query
    */
   public Map<Object, Object> getQueryCache(String queryId) {
-    return cache.get(queryId);
+    QueryState qs = getQueryState(queryId);
+    if (qs == null) {
+      return null;
+    }
+    return qs.getHMSCache();
   }
 }
 

@@ -390,6 +390,7 @@ public class Driver implements IDriver {
     }
     try {
       String userFromUGI = DriverUtils.getUserFromUGI(driverContext);
+      driverContext.getQueryState().disableHMSCache();
       setWriteIdForAcidFileSinks();
 
       if (driverContext.getPlan().getAcidAnalyzeTable() != null) {
@@ -436,6 +437,7 @@ public class Driver implements IDriver {
       throw DriverUtils.createProcessorException(driverContext, 10, errorMessage, ErrorMsg.findSQLState(e.getMessage()),
           e);
     } finally {
+      driverContext.getQueryState().enableHMSCache();
       perfLogger.PerfLogEnd(CLASS_NAME, PerfLogger.ACQUIRE_READ_WRITE_LOCKS);
     }
   }
