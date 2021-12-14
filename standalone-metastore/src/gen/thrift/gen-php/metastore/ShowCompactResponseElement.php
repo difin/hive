@@ -111,6 +111,11 @@ class ShowCompactResponseElement
             'isRequired' => false,
             'type' => TType::STRING,
         ),
+        19 => array(
+            'var' => 'cleanerStart',
+            'isRequired' => false,
+            'type' => TType::I64,
+        ),
     );
 
     /**
@@ -185,6 +190,10 @@ class ShowCompactResponseElement
      * @var string
      */
     public $initiatorVersion = null;
+    /**
+     * @var int
+     */
+    public $cleanerStart = null;
 
     public function __construct($vals = null)
     {
@@ -242,6 +251,9 @@ class ShowCompactResponseElement
             }
             if (isset($vals['initiatorVersion'])) {
                 $this->initiatorVersion = $vals['initiatorVersion'];
+            }
+            if (isset($vals['cleanerStart'])) {
+                $this->cleanerStart = $vals['cleanerStart'];
             }
         }
     }
@@ -391,6 +403,13 @@ class ShowCompactResponseElement
                         $xfer += $input->skip($ftype);
                     }
                     break;
+                case 19:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->cleanerStart);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
                 default:
                     $xfer += $input->skip($ftype);
                     break;
@@ -493,6 +512,11 @@ class ShowCompactResponseElement
         if ($this->initiatorVersion !== null) {
             $xfer += $output->writeFieldBegin('initiatorVersion', TType::STRING, 18);
             $xfer += $output->writeString($this->initiatorVersion);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->cleanerStart !== null) {
+            $xfer += $output->writeFieldBegin('cleanerStart', TType::I64, 19);
+            $xfer += $output->writeI64($this->cleanerStart);
             $xfer += $output->writeFieldEnd();
         }
         $xfer += $output->writeFieldStop();

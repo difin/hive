@@ -130,6 +130,14 @@ public class Cleaner extends MetaStoreCompactorThread {
         try {
           handle = txnHandler.getMutexAPI().acquireLock(TxnStore.MUTEX_KEY.Cleaner.name());
           startedAt = System.currentTimeMillis();
+
+          if (metricsEnabled) {
+            stopCycleUpdater();
+            startCycleUpdater(HiveConf.getTimeVar(conf,
+                    HiveConf.ConfVars.HIVE_COMPACTOR_CLEANER_DURATION_UPDATE_INTERVAL, TimeUnit.MILLISECONDS),
+                    new CleanerCycleUpdater(MetricsConstants.COMPACTION_CLEANER_CYCLE_DURATION, startedAt));
+          }
+
           long minOpenTxnId = txnHandler.findMinOpenTxnIdForCleaner();
 
           List<CompactionInfo> readyToClean = txnHandler.findReadyToClean(minOpenTxnId, retentionTime);
@@ -164,6 +172,10 @@ public class Cleaner extends MetaStoreCompactorThread {
           if (handle != null) {
             handle.releaseLocks();
           }
+          if (metricsEnabled) {
+            updateCycleDurationMetric(MetricsConstants.COMPACTION_INITIATOR_CYCLE_DURATION, startedAt);
+          }
+          stopCycleUpdater();
         }
         // Now, go back to bed until it's time to do this again
         long elapsedTime = System.currentTimeMillis() - startedAt;
@@ -215,6 +227,7 @@ public class Cleaner extends MetaStoreCompactorThread {
           }
         }
       }
+      txnHandler.markCleanerStart(ci);
 
       if (t != null || ci.partName != null) {
         String path = location == null
@@ -247,6 +260,7 @@ public class Cleaner extends MetaStoreCompactorThread {
       if (removedFiles.value || isDynPartAbort(t, ci)) {
         txnHandler.markCleaned(ci);
       } else {
+        txnHandler.clearCleanerStart(ci);
         LOG.warn("No files were removed. Leaving queue entry " + ci + " in ready for cleaning state.");
       }
     } catch (Exception e) {
@@ -477,5 +491,20 @@ public class Cleaner extends MetaStoreCompactorThread {
   
   private String getDebugInfo(List<Path> paths) {
     return "[" + paths.stream().map(Path::getName).collect(Collectors.joining(",")) + ']';
+  }
+
+  private static class CleanerCycleUpdater implements Runnable {
+    private final String metric;
+    private final long startedAt;
+
+    CleanerCycleUpdater(String metric, long startedAt) {
+      this.metric = metric;
+      this.startedAt = startedAt;
+    }
+
+    @Override
+    public void run() {
+      updateCycleDurationMetric(metric, startedAt);
+    }
   }
 }
