@@ -105,7 +105,7 @@
     <commons-lang3.version>3.9</commons-lang3.version>
     <commons-math3.version>3.6.1</commons-math3.version>
     <commons-pool.version>1.5.4</commons-pool.version>
-    <cdh.logredactor.version>2.0.8</cdh.logredactor.version>
+    <cdh.logredactor.version>2.0.11</cdh.logredactor.version>
     <commons-dbcp.version>1.4</commons-dbcp.version>
     <derby.version>10.14.2.0</derby.version>
     <dropwizard.version>3.1.0</dropwizard.version>
