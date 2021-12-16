@@ -278,6 +278,18 @@ interface ThriftHiveMetastoreIf extends \FacebookServiceIf
      */
     public function add_check_constraint(\metastore\AddCheckConstraintRequest $req);
     /**
+<<<<<<< HEAD
+=======
+     * @param \metastore\CreateTableRequest $request
+     * @return \metastore\Table
+     * @throws \metastore\AlreadyExistsException
+     * @throws \metastore\InvalidObjectException
+     * @throws \metastore\MetaException
+     * @throws \metastore\NoSuchObjectException
+     */
+    public function translate_table_dryrun(\metastore\CreateTableRequest $request);
+    /**
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
      * @param string $dbname
      * @param string $name
      * @param bool $deleteData

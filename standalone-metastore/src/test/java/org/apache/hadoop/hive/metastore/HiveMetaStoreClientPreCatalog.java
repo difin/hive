@@ -782,7 +782,8 @@ public class HiveMetaStoreClientPreCatalog implements IMetaStoreClient, AutoClos
   @Override
   public Table getTranslateTableDryrun(Table tbl) throws AlreadyExistsException,
           InvalidObjectException, MetaException, NoSuchObjectException, TException {
-    return client.translate_table_dryrun(tbl);
+    CreateTableRequest request = new CreateTableRequest(tbl);
+    return client.translate_table_dryrun(request);
   }
 
   /**

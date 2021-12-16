@@ -2617,6 +2617,7 @@ class ThriftHiveMetastoreClient extends \FacebookServiceClient implements \metas
         throw new \Exception("get_tables failed: unknown result");
     }
 
+<<<<<<< HEAD
     public function get_tables_by_type($db_name, $pattern, $tableType)
     {
         $this->send_get_tables_by_type($db_name, $pattern, $tableType);
@@ -2629,6 +2630,18 @@ class ThriftHiveMetastoreClient extends \FacebookServiceClient implements \metas
         $args->db_name = $db_name;
         $args->pattern = $pattern;
         $args->tableType = $tableType;
+=======
+    public function translate_table_dryrun(\metastore\CreateTableRequest $request)
+    {
+        $this->send_translate_table_dryrun($request);
+        return $this->recv_translate_table_dryrun();
+    }
+
+    public function send_translate_table_dryrun(\metastore\CreateTableRequest $request)
+    {
+        $args = new \metastore\ThriftHiveMetastore_translate_table_dryrun_args();
+        $args->request = $request;
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
         $bin_accel = ($this->output_ instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_write_binary');
         if ($bin_accel) {
             thrift_protocol_write_binary(

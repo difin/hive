@@ -9477,6 +9477,7 @@ uint32_t ThriftHiveMetastore_get_tables_args::read(::apache::thrift::protocol::T
     switch (fid)
     {
       case 1:
+<<<<<<< HEAD
         if (ftype == ::apache::thrift::protocol::T_STRING) {
           xfer += iprot->readString(this->db_name);
           this->__isset.db_name = true;
@@ -9488,6 +9489,11 @@ uint32_t ThriftHiveMetastore_get_tables_args::read(::apache::thrift::protocol::T
         if (ftype == ::apache::thrift::protocol::T_STRING) {
           xfer += iprot->readString(this->pattern);
           this->__isset.pattern = true;
+=======
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->request.read(iprot);
+          this->__isset.request = true;
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -9509,12 +9515,17 @@ uint32_t ThriftHiveMetastore_get_tables_args::write(::apache::thrift::protocol::
   ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("ThriftHiveMetastore_get_tables_args");
 
+<<<<<<< HEAD
   xfer += oprot->writeFieldBegin("db_name", ::apache::thrift::protocol::T_STRING, 1);
   xfer += oprot->writeString(this->db_name);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldBegin("pattern", ::apache::thrift::protocol::T_STRING, 2);
   xfer += oprot->writeString(this->pattern);
+=======
+  xfer += oprot->writeFieldBegin("request", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->request.write(oprot);
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -9532,12 +9543,17 @@ uint32_t ThriftHiveMetastore_get_tables_pargs::write(::apache::thrift::protocol:
   ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("ThriftHiveMetastore_get_tables_pargs");
 
+<<<<<<< HEAD
   xfer += oprot->writeFieldBegin("db_name", ::apache::thrift::protocol::T_STRING, 1);
   xfer += oprot->writeString((*(this->db_name)));
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldBegin("pattern", ::apache::thrift::protocol::T_STRING, 2);
   xfer += oprot->writeString((*(this->pattern)));
+=======
+  xfer += oprot->writeFieldBegin("request", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += (*(this->request)).write(oprot);
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -66892,6 +66908,7 @@ void ThriftHiveMetastoreClient::recv_alter_function()
   return;
 }
 
+<<<<<<< HEAD
 void ThriftHiveMetastoreClient::get_functions(std::vector<std::string> & _return, const std::string& dbName, const std::string& pattern)
 {
   send_get_functions(dbName, pattern);
@@ -66899,13 +66916,27 @@ void ThriftHiveMetastoreClient::get_functions(std::vector<std::string> & _return
 }
 
 void ThriftHiveMetastoreClient::send_get_functions(const std::string& dbName, const std::string& pattern)
+=======
+void ThriftHiveMetastoreClient::translate_table_dryrun(Table& _return, const CreateTableRequest& request)
+{
+  send_translate_table_dryrun(request);
+  recv_translate_table_dryrun(_return);
+}
+
+void ThriftHiveMetastoreClient::send_translate_table_dryrun(const CreateTableRequest& request)
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("get_functions", ::apache::thrift::protocol::T_CALL, cseqid);
 
+<<<<<<< HEAD
   ThriftHiveMetastore_get_functions_pargs args;
   args.dbName = &dbName;
   args.pattern = &pattern;
+=======
+  ThriftHiveMetastore_translate_table_dryrun_pargs args;
+  args.request = &request;
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -83398,7 +83429,11 @@ void ThriftHiveMetastoreProcessor::process_remove_master_key(int32_t seqid, ::ap
 
   ThriftHiveMetastore_remove_master_key_result result;
   try {
+<<<<<<< HEAD
     result.success = iface_->remove_master_key(args.key_seq);
+=======
+    iface_->translate_table_dryrun(result.success, args.request);
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {
@@ -89952,6 +89987,7 @@ bool ThriftHiveMetastoreConcurrentClient::recv_drop_type(const int32_t seqid)
   } // end while(true)
 }
 
+<<<<<<< HEAD
 void ThriftHiveMetastoreConcurrentClient::get_type_all(std::map<std::string, Type> & _return, const std::string& name)
 {
   int32_t seqid = send_get_type_all(name);
@@ -89959,13 +89995,27 @@ void ThriftHiveMetastoreConcurrentClient::get_type_all(std::map<std::string, Typ
 }
 
 int32_t ThriftHiveMetastoreConcurrentClient::send_get_type_all(const std::string& name)
+=======
+void ThriftHiveMetastoreConcurrentClient::translate_table_dryrun(Table& _return, const CreateTableRequest& request)
+{
+  int32_t seqid = send_translate_table_dryrun(request);
+  recv_translate_table_dryrun(_return, seqid);
+}
+
+int32_t ThriftHiveMetastoreConcurrentClient::send_translate_table_dryrun(const CreateTableRequest& request)
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
 {
   int32_t cseqid = this->sync_->generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(this->sync_.get());
   oprot_->writeMessageBegin("get_type_all", ::apache::thrift::protocol::T_CALL, cseqid);
 
+<<<<<<< HEAD
   ThriftHiveMetastore_get_type_all_pargs args;
   args.name = &name;
+=======
+  ThriftHiveMetastore_translate_table_dryrun_pargs args;
+  args.request = &request;
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
   args.write(oprot_);
 
   oprot_->writeMessageEnd();

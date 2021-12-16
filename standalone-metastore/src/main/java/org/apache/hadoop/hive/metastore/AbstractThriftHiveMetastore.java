@@ -139,8 +139,8 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
-    public Table translate_table_dryrun(final Table tbl) throws AlreadyExistsException,
-            MetaException, InvalidObjectException, InvalidInputException {
+    public Table translate_table_dryrun(final CreateTableRequest req) throws AlreadyExistsException,
+            InvalidObjectException, MetaException, NoSuchObjectException, org.apache.thrift.TException {
         throw new UnsupportedOperationException("this method is not supported");
     }
 

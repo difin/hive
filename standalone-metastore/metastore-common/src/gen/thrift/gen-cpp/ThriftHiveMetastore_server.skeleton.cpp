@@ -195,6 +195,14 @@ class ThriftHiveMetastoreHandler : virtual public ThriftHiveMetastoreIf {
     printf("add_check_constraint\n");
   }
 
+<<<<<<< HEAD
+=======
+  void translate_table_dryrun(Table& _return, const CreateTableRequest& request) {
+    // Your implementation goes here
+    printf("translate_table_dryrun\n");
+  }
+
+>>>>>>> decd725f2b2... HIVE-25782: Added client capabilites in the dry run call for the CTAS… (#2858) (Sai Hemanth Gantasala reviewed by Zoltan Haindrich)
   void drop_table(const std::string& dbname, const std::string& name, const bool deleteData) {
     // Your implementation goes here
     printf("drop_table\n");
