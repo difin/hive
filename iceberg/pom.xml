@@ -40,6 +40,7 @@
         <google.errorprone.javac.version>9+181-r4173-1</google.errorprone.javac.version>
         <google.errorprone.version>2.5.1</google.errorprone.version>
         <caffeine.version>2.8.4</caffeine.version>
+        <validate.skip>false</validate.skip>
     </properties>
 
     <modules>
@@ -243,6 +244,7 @@
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>${spotless.maven.plugin.version}</version>
                 <configuration>
+                    <skip>${validate.skip}</skip>
                     <java>
                         <removeUnusedImports />
                         <importOrder>
@@ -273,6 +275,7 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>${iceberg.checkstyle.plugin.version}</version>
                 <configuration>
+                    <skip>${validate.skip}</skip>
                     <propertyExpansion>config_loc=${basedir}/${path.to.iceberg.root}/checkstyle/</propertyExpansion>
                     <configLocation>${basedir}/${path.to.iceberg.root}/checkstyle/checkstyle.xml</configLocation>
                     <suppressionsLocation>${basedir}/${path.to.iceberg.root}/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
