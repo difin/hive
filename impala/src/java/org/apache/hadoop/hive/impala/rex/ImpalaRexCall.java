@@ -64,8 +64,6 @@ import java.util.List;
  * Static Helper class that returns Exprs for RexCall nodes.
  */
 public class ImpalaRexCall {
-  private static final Logger LOG = LoggerFactory.getLogger(ImpalaRexCall.class);
-
   /*
    * Returns the Impala Expr object for ImpalaRexCall.
    */
@@ -83,6 +81,13 @@ public class ImpalaRexCall {
     }
 
     String funcName = rexCall.getOperator().getName().toLowerCase();
+    // Check for the function name to be "cast" rather than the "getKind()" to be
+    // CAST. There are some cases where the "getKind()" is OTHEr when the function
+    // name is "cast".
+    if (funcName.equals("cast") && params.size() == 2) {
+      return createCastFormatExpr(analyzer, rexCall, params);
+    }
+
     List<RexNode> operands = rexCall.getOperands();
 
     Function fn = getFunction(funcName, operands, rexCall.getType(), analyzer);
@@ -365,6 +370,19 @@ public class ImpalaRexCall {
     return createCompoundExpr(analyzer, op, fnCompound, impalaExprList, retType);
   }
 
+  private static Expr createCastFormatExpr(Analyzer analyzer, RexCall rexCall, List<Expr> params
+       ) throws HiveException {
+    List<RexNode> operands = rexCall.getOperands();
+
+    Type impalaRetType = ImpalaTypeConverter.getNormalizedImpalaType(rexCall.getType());
+    Type impalaParamType = params.get(0).getType();
+    ScalarFunctionDetails sfd =
+        ScalarFunctionDetails.get("cast", Lists.newArrayList(impalaParamType), impalaRetType);
+    Function fn = ImpalaFunctionUtil.create(sfd, analyzer);
+    return new ImpalaCastExpr(analyzer, fn, impalaRetType, params.get(0),
+        RexLiteral.stringValue(operands.get(1)));
+  }
+
   public static boolean isBinaryComparison(SqlKind sqlKind) {
     switch (sqlKind) {
       case EQUALS:
@@ -399,27 +417,6 @@ public class ImpalaRexCall {
       }
     }
     return false;
-  }
-
-  private static List<Expr> castParamsToString(List<Expr> params, List<RexNode> operands, Analyzer analyzer) {
-    List<Expr> castParams = Lists.newArrayList();
-    Preconditions.checkState(params.size() == operands.size());
-    for (int i = 0; i < params.size(); ++i) {
-      Expr param = params.get(i);
-      if (param.getType().matchesType(Type.VARCHAR) || param.getType().matchesType(Type.CHAR)) {
-        try {
-          Function castFn = getFunction("cast", operands.subList(i, i+1),
-	      ImpalaTypeConverter.getRelDataType(Type.STRING, true), analyzer);
-          ImpalaCastExpr castExpr = new ImpalaCastExpr(analyzer, castFn, Type.STRING, param);
-          castParams.add(castExpr);
-        } catch (Exception e) {
-          throw new RuntimeException("Casting exception: " + e);
-        }
-      } else { 
-        castParams.add(param);
-      }
-    }
-    return castParams;
   }
 
   private static List<RexNode> castRexNodesToString(List<RexNode> operands, RexBuilder rexBuilder) {

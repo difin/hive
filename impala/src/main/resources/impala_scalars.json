@@ -159,5 +159,41 @@
             "BIGINT",
             "BOOLEAN"
         ]
+    },
+    {
+        "impalaFnName": "casttodate",
+        "fnName": "cast",
+        "retType": "DATE",
+        "argTypes": [
+            "STRING",
+            "STRING"
+        ]
+    },
+    {
+        "impalaFnName": "casttotimestamp",
+        "fnName": "cast",
+        "retType": "TIMESTAMP",
+        "argTypes": [
+            "STRING",
+            "STRING"
+        ]
+    },
+    {
+        "impalaFnName": "casttostring",
+        "fnName": "cast",
+        "retType": "STRING",
+        "argTypes": [
+            "DATE",
+            "STRING"
+        ]
+    },
+    {
+        "impalaFnName": "casttostring",
+        "fnName": "cast",
+        "retType": "STRING",
+        "argTypes": [
+            "TIMESTAMP",
+            "STRING"
+        ]
     }
 ]

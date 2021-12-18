@@ -81,10 +81,8 @@ public class ImpalaTypeConverter {
     map.put(Type.TIMESTAMP, factory.createSqlType(SqlTypeName.TIMESTAMP));
     map.put(Type.DATE, factory.createSqlType(SqlTypeName.DATE));
     map.put(Type.DECIMAL, factory.createSqlType(SqlTypeName.DECIMAL));
+    map.put(Type.CHAR, createCharType(factory, 1));
     Charset charSetName = Charset.forName(ConversionUtil.NATIVE_UTF16_CHARSET_NAME);
-    RelDataType charType = factory.createTypeWithCharsetAndCollation(
-        factory.createSqlType(SqlTypeName.CHAR, 1), charSetName, SqlCollation.IMPLICIT);
-    map.put(Type.CHAR, charType);
     RelDataType varcharType = factory.createTypeWithCharsetAndCollation(
         factory.createSqlType(SqlTypeName.VARCHAR, 1), charSetName, SqlCollation.IMPLICIT);
     map.put(Type.VARCHAR, varcharType);
@@ -315,6 +313,12 @@ public class ImpalaTypeConverter {
       default:
         throw new RuntimeException("Unknown type " + argType);
     }
+  }
+
+  public static RelDataType createCharType(RelDataTypeFactory factory, int charLength) {
+    Charset charSetName = Charset.forName(ConversionUtil.NATIVE_UTF16_CHARSET_NAME);
+    return factory.createTypeWithCharsetAndCollation(
+        factory.createSqlType(SqlTypeName.CHAR, charLength), charSetName, SqlCollation.IMPLICIT);
   }
 
   /**

@@ -543,6 +543,9 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
 
     switch(op.getKind()) {
       case CAST:
+        if (func.toLowerCase().equals("cast_format")) {
+          return new CastFormatFunctionResolver(helper, inputs);
+        }
         // if the return type is not passed in, it is derived from the function name.
         if (retType == null) {
           String adjustedFunc = func.toLowerCase().equals("int") ? "integer" : func.toLowerCase();

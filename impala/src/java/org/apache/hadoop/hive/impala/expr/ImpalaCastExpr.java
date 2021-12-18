@@ -34,6 +34,19 @@ import org.apache.impala.common.AnalysisException;
 public class ImpalaCastExpr extends CastExpr {
   private final Analyzer analyzer;
 
+  public ImpalaCastExpr(Analyzer analyzer, Function fn, Type type, Expr param,
+      String format) throws HiveException {
+    super(new TypeDef(type), param, format);
+    this.fn_ = fn;
+    this.type_ = type;
+    this.analyzer = analyzer;
+    try {
+      this.analyze(analyzer);
+    } catch (AnalysisException e) {
+      throw new HiveException("Exception in ImpalaCastExpr instantiation", e);
+    }
+  }
+
   public ImpalaCastExpr(Analyzer analyzer, Function fn, Type type, Expr param) throws HiveException {
     super(new TypeDef(type), param);
     this.fn_ = fn;
@@ -42,7 +55,7 @@ public class ImpalaCastExpr extends CastExpr {
     try {
       this.analyze(analyzer);
     } catch (AnalysisException e) {
-      throw new HiveException("Exception in ImpalaNullExpr instantiation", e);
+      throw new HiveException("Exception in ImpalaCastExpr instantiation", e);
     }
   }
 
