@@ -123,6 +123,14 @@ public class FunctionDetailStatics {
   public static Set<String> RET_TYPE_ALWAYS_NULLABLE_FUNCS =
       ImmutableSet.<String> builder()
       .add("cast")
+      .add("extract")
+      .add("year")
+      .add("month")
+      .add("day")
+      .add("hour")
+      .add("minute")
+      .add("second")
+      .add("millisecond")
       .build();
 
   // Set containing functions where the hasVarArgs parameter in the

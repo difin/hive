@@ -104,7 +104,7 @@ ImpalaSortRel(sort0=[$0], sort1=[$1], dir0=[ASC], dir1=[DESC])
                 ImpalaHdfsScanRel(table=[[default, impala_tpch_supplier]], condition=[AND(IS NOT NULL($3), IS NOT NULL($0))])
               ImpalaProjectPassthroughRel(n_nationkey=[$0], n_name=[$1])
                 ImpalaHdfsScanRel(table=[[default, impala_tpch_nation]], condition=[IS NOT NULL($0)])
-          ImpalaProjectPassthroughRel(o_orderkey=[$0], EXPR$0=[YEAR(FLAG(YEAR), CAST($4):DATE)])
+          ImpalaProjectPassthroughRel(o_orderkey=[$0], EXPR$0=[YEAR(FLAG(YEAR), CAST($4):TIMESTAMP(9))])
             ImpalaHdfsScanRel(table=[[default, impala_tpch_orders]], condition=[IS NOT NULL($0)])
         ImpalaProjectPassthroughRel(ps_partkey=[$0], ps_suppkey=[$1], ps_supplycost=[$3])
           ImpalaHdfsScanRel(table=[[default, impala_tpch_partsupp]], condition=[AND(IS NOT NULL($1), IS NOT NULL($0))])
@@ -209,44 +209,44 @@ STAGE PLANS:
 F07:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=36.00KB mem-reservation=0B thread-reservation=1
   PLAN-ROOT SINK
-  |  output exprs: default.impala_tpch_nation.n_name, year(casttodate(default.impala_tpch_orders.o_orderdate)), sum(subtract(multiply(default.impala_tpch_lineitem.l_extendedprice, subtract(1, default.impala_tpch_lineitem.l_discount)), multiply(default.impala_tpch_partsupp.ps_supplycost, default.impala_tpch_lineitem.l_quantity)))
+  |  output exprs: default.impala_tpch_nation.n_name, year(casttotimestamp(default.impala_tpch_orders.o_orderdate)), sum(subtract(multiply(default.impala_tpch_lineitem.l_extendedprice, subtract(1, default.impala_tpch_lineitem.l_discount)), multiply(default.impala_tpch_partsupp.ps_supplycost, default.impala_tpch_lineitem.l_quantity)))
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |
   20:MERGING-EXCHANGE [UNPARTITIONED]
-     order by: default.impala_tpch_nation.n_name ASC NULLS LAST, year(casttodate(default.impala_tpch_orders.o_orderdate)) DESC NULLS FIRST
+     order by: default.impala_tpch_nation.n_name ASC NULLS LAST, year(casttotimestamp(default.impala_tpch_orders.o_orderdate)) DESC NULLS FIRST
      mem-estimate=36.00KB mem-reservation=0B thread-reservation=0
      tuple-ids=13 row-size=32B cardinality=0
      in pipelines: 12(GETNEXT)
 
-F06:PLAN FRAGMENT [HASH(default.impala_tpch_nation.n_name,year(casttodate(default.impala_tpch_orders.o_orderdate)))] hosts=1 instances=1
+F06:PLAN FRAGMENT [HASH(default.impala_tpch_nation.n_name,year(casttotimestamp(default.impala_tpch_orders.o_orderdate)))] hosts=1 instances=1
 Per-Host Resources: mem-estimate=140.00MB mem-reservation=46.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F07, EXCHANGE=20, UNPARTITIONED]
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   12:SORT
-  |  order by: default.impala_tpch_nation.n_name ASC NULLS LAST, year(casttodate(default.impala_tpch_orders.o_orderdate)) DESC NULLS FIRST
+  |  order by: default.impala_tpch_nation.n_name ASC NULLS LAST, year(casttotimestamp(default.impala_tpch_orders.o_orderdate)) DESC NULLS FIRST
   |  mem-estimate=12.00MB mem-reservation=12.00MB spill-buffer=2.00MB thread-reservation=0
   |  tuple-ids=13 row-size=32B cardinality=0
   |  in pipelines: 12(GETNEXT), 19(OPEN)
   |
   19:AGGREGATE [FINALIZE]
   |  output: sum:merge(subtract(multiply(default.impala_tpch_lineitem.l_extendedprice, subtract(1, default.impala_tpch_lineitem.l_discount)), multiply(default.impala_tpch_partsupp.ps_supplycost, default.impala_tpch_lineitem.l_quantity)))
-  |  group by: default.impala_tpch_nation.n_name, year(casttodate(default.impala_tpch_orders.o_orderdate))
+  |  group by: default.impala_tpch_nation.n_name, year(casttotimestamp(default.impala_tpch_orders.o_orderdate))
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
   |  tuple-ids=12 row-size=32B cardinality=0
   |  in pipelines: 19(GETNEXT), 00(OPEN)
   |
-  18:EXCHANGE [HASH(default.impala_tpch_nation.n_name,year(casttodate(default.impala_tpch_orders.o_orderdate)))]
+  18:EXCHANGE [HASH(default.impala_tpch_nation.n_name,year(casttotimestamp(default.impala_tpch_orders.o_orderdate)))]
      mem-estimate=36.00KB mem-reservation=0B thread-reservation=0
      tuple-ids=12 row-size=32B cardinality=0
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=135.86MB mem-reservation=41.75MB thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F06, EXCHANGE=18, HASH(default.impala_tpch_nation.n_name,year(casttodate(default.impala_tpch_orders.o_orderdate)))]
+  DATASTREAM SINK [FRAGMENT=F06, EXCHANGE=18, HASH(default.impala_tpch_nation.n_name,year(casttotimestamp(default.impala_tpch_orders.o_orderdate)))]
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   11:AGGREGATE [STREAMING]
   |  output: sum(subtract(multiply(default.impala_tpch_lineitem.l_extendedprice, subtract(CAST(1 AS DECIMAL(3,0)), default.impala_tpch_lineitem.l_discount)), multiply(default.impala_tpch_partsupp.ps_supplycost, default.impala_tpch_lineitem.l_quantity)))
-  |  group by: default.impala_tpch_nation.n_name, year(casttodate(default.impala_tpch_orders.o_orderdate))
+  |  group by: default.impala_tpch_nation.n_name, year(casttotimestamp(default.impala_tpch_orders.o_orderdate))
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
   |  tuple-ids=12 row-size=32B cardinality=0
   |  in pipelines: 00(GETNEXT)
