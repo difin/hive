@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.StatsSetupConst;
+import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.TableType;
@@ -73,7 +74,7 @@ public class CreateViewDesc implements DDLDesc, Serializable {
   private String serde; // only used for materialized views
   private String storageHandler; // only used for materialized views
   private Map<String, String> serdeProps; // only used for materialized views
-  private Set<String> tablesUsed;  // only used for materialized views
+  private Set<TableName> tablesUsed;  // only used for materialized views
   private List<String> sortColNames;  // only used for materialized views
   private List<FieldSchema> sortCols;  // only used for materialized views
   private List<String> distributeColNames;  // only used for materialized views
@@ -279,11 +280,11 @@ public class CreateViewDesc implements DDLDesc, Serializable {
     this.ifNotExists = ifNotExists;
   }
 
-  public Set<String> getTablesUsed() {
+  public Set<TableName> getTablesUsed() {
     return tablesUsed;
   }
 
-  public void setTablesUsed(Set<String> tablesUsed) {
+  public void setTablesUsed(Set<TableName> tablesUsed) {
     this.tablesUsed = tablesUsed;
   }
 

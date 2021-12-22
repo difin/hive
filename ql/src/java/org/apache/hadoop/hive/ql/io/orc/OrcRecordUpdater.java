@@ -116,6 +116,9 @@ public class OrcRecordUpdater implements RecordUpdater {
   // This records how many rows have been inserted or deleted.  It is separate from insertedRows
   // because that is monotonically increasing to give new unique row ids.
   private long rowCountDelta = 0;
+  private long insertCount = 0;
+  private long updateCount = 0;
+  private long deleteCount = 0;
   // used only for insert events, this is the number of rows held in memory before flush() is invoked
   private long bufferedRows = 0;
   private final KeyIndexBuilder indexBuilder = new KeyIndexBuilder("insert");
@@ -490,6 +493,7 @@ public class OrcRecordUpdater implements RecordUpdater {
       addSimpleEvent(INSERT_OPERATION, currentWriteId, insertedRows++, row);
     }
     rowCountDelta++;
+    insertCount++;
     bufferedRows++;
   }
 
@@ -503,6 +507,7 @@ public class OrcRecordUpdater implements RecordUpdater {
     } else {
       addSimpleEvent(UPDATE_OPERATION, currentWriteId, -1L, row);
     }
+    updateCount++;
   }
 
   @Override
@@ -515,6 +520,7 @@ public class OrcRecordUpdater implements RecordUpdater {
     } else {
       addSimpleEvent(DELETE_OPERATION, currentWriteId, -1L, row);
     }
+    deleteCount++;
     rowCountDelta--;
   }
 
@@ -624,6 +630,9 @@ public class OrcRecordUpdater implements RecordUpdater {
   public SerDeStats getStats() {
     SerDeStats stats = new SerDeStats();
     stats.setRowCount(rowCountDelta);
+    stats.setInsertCount(insertCount);
+    stats.setUpdateCount(updateCount);
+    stats.setDeleteCount(deleteCount);
     // Don't worry about setting raw data size diff.  I have no idea how to calculate that
     // without finding the row we are updating or deleting, which would be a mess.
     return stats;

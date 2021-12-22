@@ -2161,7 +2161,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       final boolean useMaterializedViewsRegistry = !conf.get(HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname)
           .equals("DUMMY");
       final RelNode calcitePreMVRewritingPlan = basePlan;
-      final List<String> tablesUsedQuery = getTablesUsed(basePlan);
+      final Set<TableName> tablesUsedQuery = getTablesUsed(basePlan);
 
       if (tablesUsedQuery.isEmpty()) {
         // There are no tables used in the plan (DUMMY_TABLEs such as INSERT INTO VALUES())
@@ -2325,10 +2325,10 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
           try {
             Table hiveTableMD = extractTable(relOptMaterialization);
+            Set<TableName> sourceTables = new HashSet<>(1);
+            sourceTables.add(hiveTableMD.getFullTableName());
             if (db.validateMaterializedViewsFromRegistry(
-                    singletonList(hiveTableMD),
-                    singletonList(hiveTableMD.getFullyQualifiedName()),
-                    getTxnMgr())) {
+                singletonList(hiveTableMD), sourceTables, getTxnMgr())) {
               return relOptMaterialization.copyToNewCluster(
                       optCluster, functionHelper.getPartitionPruneRuleHelper()).tableRel;
             }
@@ -2619,8 +2619,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
     }
 
     // Get all non-dummy tables used in plan
-    protected List<String> getTablesUsed(RelNode plan) {
-      List<String> tablesUsed = new ArrayList<>();
+    protected Set<TableName> getTablesUsed(RelNode plan) {
+      Set<TableName> tablesUsed = new HashSet<>();
       new RelVisitor() {
         @Override
         public void visit(RelNode node, int ordinal, RelNode parent) {
@@ -2628,7 +2628,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
             TableScan ts = (TableScan) node;
             RelOptHiveTable table = (RelOptHiveTable) ts.getTable();
             if (!table.isDummyTable()) {
-              tablesUsed.add(table.getHiveTableMD().getFullyQualifiedName());
+            Table hiveTableMD = ((RelOptHiveTable) ts.getTable()).getHiveTableMD();
+            tablesUsed.add(hiveTableMD.getFullTableName());
             }
           }
           super.visit(node, ordinal, parent);
@@ -5601,8 +5602,11 @@ public class CalcitePlanner extends SemanticAnalyzer {
         return;
       }
       try {
-        List<String> tablesUsed = getTablesUsed(relNode);
-        getQueryValidTxnWriteIdList(tablesUsed);
+        Set<TableName> tablesUsed = getTablesUsed(relNode);
+        getQueryValidTxnWriteIdList(tablesUsed.stream()
+            .map(sourceTable -> TableName.getDbTable(
+                sourceTable.getDb(), sourceTable.getTable()))
+            .collect(Collectors.toList()));
       } catch (SemanticException e) {
         LOG.info("Call to cache validTxnWriteIdList failed.");
       }

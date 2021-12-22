@@ -38,6 +38,7 @@ import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;
 import org.apache.hadoop.hive.metastore.api.SkewedInfo;
+import org.apache.hadoop.hive.metastore.api.SourceTable;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.UnknownDBException;
@@ -72,6 +73,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.apache.hadoop.hive.metastore.TestHiveMetaStore.createSourceTable;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_CATALOG_NAME;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_NAME;
 
@@ -1133,6 +1135,14 @@ public class TestTablesCreateDropAlterTruncate extends MetaStoreClientTest {
         .setCatalogName(catName)
         .create(client, metaStore.getConf());
 
+    Table table = new TableBuilder()
+        .inDb(db)
+        .setTableName("mvSource")
+        .addCol("col1_1", ColumnType.STRING_TYPE_NAME)
+        .addCol("col2_2", ColumnType.INT_TYPE_NAME).build(metaStore.getConf());
+    client.createTable(table);
+    SourceTable sourceTable = createSourceTable(table);
+
     String[] tableNames = new String[4];
     for (int i = 0; i < tableNames.length; i++) {
       tableNames[i] = "table_in_other_catalog_" + i;
@@ -1153,7 +1163,7 @@ public class TestTablesCreateDropAlterTruncate extends MetaStoreClientTest {
       if (i == 3) {
         builder.setType(TableType.MATERIALIZED_VIEW.name())
             .setRewriteEnabled(true)
-            .addMaterializedViewReferencedTable(dbName + "." + tableNames[0]);
+            .addMaterializedViewReferencedTable(sourceTable);
       }
       client.createTable(builder.build(metaStore.getConf()));
     }
@@ -1195,10 +1205,15 @@ public class TestTablesCreateDropAlterTruncate extends MetaStoreClientTest {
 
     // test getAllTables
     Set<String> fetchedNames = new HashSet<>(client.getAllTables(catName, dbName));
+<<<<<<< HEAD
     Assert.assertEquals(tableNames.length, fetchedNames.size());
     for (String tableName : tableNames) {
       Assert.assertTrue(fetchedNames.contains(tableName));
     }
+=======
+    Assert.assertEquals(tableNames.length + 1, fetchedNames.size());
+    for (String tableName : tableNames) Assert.assertTrue(fetchedNames.contains(tableName));
+>>>>>>> 24a6777e38 (CDPD-19702: HIVE-25656: Get materialized view state based on number of affected rows of transactions (Krisztian Kasa, reviewed by Zoltan Haindrich, Stephen Carlin))
 
     fetchedNames = new HashSet<>(client.getAllTables(DEFAULT_DATABASE_NAME));
     for (String tableName : tableNames) {
@@ -1242,7 +1257,14 @@ public class TestTablesCreateDropAlterTruncate extends MetaStoreClientTest {
 
     // Update the metadata for the materialized view
     CreationMetadata cm = client.getTable(catName, dbName, tableNames[3]).getCreationMetadata();
-    cm.addToTablesUsed(dbName + "." + tableNames[1]);
+    Table table1 = new TableBuilder()
+        .inDb(db)
+        .setTableName("mvSource2")
+        .addCol("col1_1", ColumnType.STRING_TYPE_NAME)
+        .addCol("col2_2", ColumnType.INT_TYPE_NAME).build(metaStore.getConf());
+    client.createTable(table1);
+    sourceTable = createSourceTable(table1);
+    cm.addToTablesUsed(sourceTable);
     cm.unsetMaterializationTime();
     client.updateCreationMetadata(catName, dbName, tableNames[3], cm);
 
@@ -1286,6 +1308,10 @@ public class TestTablesCreateDropAlterTruncate extends MetaStoreClientTest {
         Assert.assertFalse(tableDir.exists());
       }
     }
+
+    client.dropTable(table.getCatName(), table.getDbName(), table.getTableName());
+    client.dropTable(table1.getCatName(), table1.getDbName(), table1.getTableName());
+
     Assert.assertEquals(0, client.getAllTables(catName, dbName).size());
   }
 
