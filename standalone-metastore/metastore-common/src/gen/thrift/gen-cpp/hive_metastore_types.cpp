@@ -7519,6 +7519,11 @@ void CreationMetadata::__set_materializationTime(const int64_t val) {
   this->materializationTime = val;
 __isset.materializationTime = true;
 }
+
+void CreationMetadata::__set_sourceTables(const std::set<SourceTable> & val) {
+  this->sourceTables = val;
+__isset.sourceTables = true;
+}
 std::ostream& operator<<(std::ostream& out, const CreationMetadata& obj)
 {
   obj.printTo(out);
@@ -7671,6 +7676,19 @@ uint32_t CreationMetadata::write(::apache::thrift::protocol::TProtocol* oprot) c
     xfer += oprot->writeI64(this->materializationTime);
     xfer += oprot->writeFieldEnd();
   }
+  if (this->__isset.sourceTables) {
+    xfer += oprot->writeFieldBegin("sourceTables", ::apache::thrift::protocol::T_SET, 7);
+    {
+      xfer += oprot->writeSetBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->sourceTables.size()));
+      std::set<SourceTable> ::const_iterator _iter310;
+      for (_iter310 = this->sourceTables.begin(); _iter310 != this->sourceTables.end(); ++_iter310)
+      {
+        xfer += (*_iter310).write(oprot);
+      }
+      xfer += oprot->writeSetEnd();
+    }
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -7715,6 +7733,7 @@ void CreationMetadata::printTo(std::ostream& out) const {
   out << ", " << "tablesUsed=" << to_string(tablesUsed);
   out << ", " << "validTxnList="; (__isset.validTxnList ? (out << to_string(validTxnList)) : (out << "<null>"));
   out << ", " << "materializationTime="; (__isset.materializationTime ? (out << to_string(materializationTime)) : (out << "<null>"));
+  out << ", " << "sourceTables="; (__isset.sourceTables ? (out << to_string(sourceTables)) : (out << "<null>"));
   out << ")";
 }
 
@@ -8342,6 +8361,27 @@ uint32_t StringColumnStatsData::read(::apache::thrift::protocol::TProtocol* ipro
         if (ftype == ::apache::thrift::protocol::T_STRING) {
           xfer += iprot->readBinary(this->bitVectors);
           this->__isset.bitVectors = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 7:
+        if (ftype == ::apache::thrift::protocol::T_SET) {
+          {
+            this->sourceTables.clear();
+            uint32_t _size303;
+            ::apache::thrift::protocol::TType _etype306;
+            xfer += iprot->readSetBegin(_etype306, _size303);
+            uint32_t _i307;
+            for (_i307 = 0; _i307 < _size303; ++_i307)
+            {
+              SourceTable _elem308;
+              xfer += _elem308.read(iprot);
+              this->sourceTables.insert(_elem308);
+            }
+            xfer += iprot->readSetEnd();
+          }
+          this->__isset.sourceTables = true;
         } else {
           xfer += iprot->skip(ftype);
         }

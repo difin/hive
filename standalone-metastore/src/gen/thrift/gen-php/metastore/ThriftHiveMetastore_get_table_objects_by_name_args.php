@@ -87,13 +87,13 @@ class ThriftHiveMetastore_get_table_objects_by_name_args
                 case 2:
                     if ($ftype == TType::LST) {
                         $this->tbl_names = array();
-                        $_size1362 = 0;
-                        $_etype1365 = 0;
-                        $xfer += $input->readListBegin($_etype1365, $_size1362);
-                        for ($_i1366 = 0; $_i1366 < $_size1362; ++$_i1366) {
-                            $elem1367 = null;
-                            $xfer += $input->readString($elem1367);
-                            $this->tbl_names []= $elem1367;
+                        $_size1370 = 0;
+                        $_etype1373 = 0;
+                        $xfer += $input->readListBegin($_etype1373, $_size1370);
+                        for ($_i1374 = 0; $_i1374 < $_size1370; ++$_i1374) {
+                            $elem1375 = null;
+                            $xfer += $input->readString($elem1375);
+                            $this->tbl_names []= $elem1375;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -125,8 +125,8 @@ class ThriftHiveMetastore_get_table_objects_by_name_args
             }
             $xfer += $output->writeFieldBegin('tbl_names', TType::LST, 2);
             $output->writeListBegin(TType::STRING, count($this->tbl_names));
-            foreach ($this->tbl_names as $iter1368) {
-                $xfer += $output->writeString($iter1368);
+            foreach ($this->tbl_names as $iter1376) {
+                $xfer += $output->writeString($iter1376);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

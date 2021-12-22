@@ -3410,6 +3410,10 @@ class CreationMetadata : public virtual ::apache::thrift::TBase {
       return false;
     else if (__isset.materializationTime && !(materializationTime == rhs.materializationTime))
       return false;
+    if (__isset.sourceTables != rhs.__isset.sourceTables)
+      return false;
+    else if (__isset.sourceTables && !(sourceTables == rhs.sourceTables))
+      return false;
     return true;
   }
   bool operator != (const CreationMetadata &rhs) const {

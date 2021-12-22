@@ -34,7 +34,6 @@ import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.prependCatal
 import static org.apache.hadoop.hive.ql.io.AcidUtils.getFullTableName;
 import static org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization.RewriteAlgorithm.CALCITE;
 import static org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization.RewriteAlgorithm.ALL;
-import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializedViewUtils.asTableNames;
 import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializedViewUtils.extractTable;
 import static org.apache.hadoop.hive.serde.serdeConstants.SERIALIZATION_FORMAT;
 import static org.apache.hadoop.hive.serde.serdeConstants.STRING_TYPE_NAME;
@@ -878,10 +877,10 @@ public class Hive {
     }
   }
 
-  public void updateCreationMetadata(String dbName, String tableName, CreationMetadata cm)
+  public void updateCreationMetadata(String dbName, String tableName, MaterializedViewMetadata metadata)
       throws HiveException {
     try {
-      getMSC().updateCreationMetadata(dbName, tableName, cm);
+      getMSC().updateCreationMetadata(dbName, tableName, metadata.creationMetadata);
     } catch (TException e) {
       throw new HiveException("Unable to update creation metadata " + e.getMessage(), e);
     }
@@ -1800,7 +1799,6 @@ public class Hive {
           continue;
         }
 
-        final CreationMetadata creationMetadata = materializedViewTable.getCreationMetadata();
         if (outdated) {
           // The MV is outdated, see whether we should consider it for rewriting or not
           if (!tryIncrementalRewriting) {
@@ -1816,7 +1814,7 @@ public class Hive {
           // disabled by default).
           materialization = HiveMaterializedViewUtils.augmentMaterializationWithTimeInformation(
               materialization, validTxnsList, new ValidTxnWriteIdList(
-                  creationMetadata.getValidTxnList()));
+                          materializedViewTable.getMVMetadata().getValidTxnList()));
         }
         result.addAll(HiveMaterializedViewUtils.deriveGroupingSetsMaterializedViews(materialization));
       }
@@ -1849,7 +1847,7 @@ public class Hive {
             HiveConf.toTime(timeWindowString,
                     HiveConf.getDefaultTimeUnit(HiveConf.ConfVars.HIVE_MATERIALIZED_VIEW_REWRITING_TIME_WINDOW),
                     TimeUnit.MILLISECONDS);
-    CreationMetadata creationMetadata = materializedViewTable.getCreationMetadata();
+    MaterializedViewMetadata mvMetadata = materializedViewTable.getMVMetadata();
     boolean outdated = false;
     if (timeWindow < 0L) {
       // We only consider the materialized view to be outdated if forceOutdated = true, i.e.,
@@ -1858,7 +1856,7 @@ public class Hive {
     } else {
       // Check whether the materialized view is invalidated
       if (forceMVContentsUpToDate || timeWindow == 0L ||
-              creationMetadata.getMaterializationTime() < System.currentTimeMillis() - timeWindow) {
+              mvMetadata.getMaterializationTime() < System.currentTimeMillis() - timeWindow) {
         return HiveMaterializedViewUtils.isOutdatedMaterializedView(
                 validTxnsList, txnMgr, tablesUsed, materializedViewTable);
       }
@@ -1881,7 +1879,7 @@ public class Hive {
     }
 
     return HiveMaterializedViewUtils.isOutdatedMaterializedView(
-        validTxnsList, txnManager, asTableNames(table.getCreationMetadata().getTablesUsed()), table);
+        validTxnsList, txnManager, table.getMVMetadata().getSourceTableNames(), table);
   }
 
   /**
@@ -1928,7 +1926,7 @@ public class Hive {
               // Obtain additional information if we should try incremental rewriting / rebuild
               // We will not try partial rewriting if there were update/delete/compaction operations on source tables
               Materialization invalidationInfo = getMSC().getMaterializationInvalidationInfo(
-                  materializedViewTable.getCreationMetadata());
+                  materializedViewTable.getMVMetadata().creationMetadata);
               if (invalidationInfo == null || invalidationInfo.isSourceTablesUpdateDeleteModified() ||
                   invalidationInfo.isSourceTablesCompacted()) {
                 // We ignore (as it did not meet the requirements), but we do not need to update it in the
@@ -2012,7 +2010,7 @@ public class Hive {
           continue;
         }
 
-        final CreationMetadata creationMetadata = materializedViewTable.getCreationMetadata();
+        final MaterializedViewMetadata metadata = materializedViewTable.getMVMetadata();
         Materialization invalidationInfo = null;
         if (outdated) {
           // The MV is outdated, see whether we should consider it for rewriting or not
@@ -2030,7 +2028,7 @@ public class Hive {
           } else {
             // Obtain additional information if we should try incremental rewriting / rebuild
             // We will not try partial rewriting if there were update/delete/compaction operations on source tables
-            invalidationInfo = getMSC().getMaterializationInvalidationInfo(creationMetadata);
+            invalidationInfo = getMSC().getMaterializationInvalidationInfo(metadata.creationMetadata);
             ignore = invalidationInfo == null || invalidationInfo.isSourceTablesCompacted();
           }
           if (ignore) {
@@ -2053,7 +2051,7 @@ public class Hive {
               // so we can produce partial rewritings
               relOptMaterialization = HiveMaterializedViewUtils.augmentMaterializationWithTimeInformation(
                   relOptMaterialization, validTxnsList, new ValidTxnWriteIdList(
-                      creationMetadata.getValidTxnList()));
+                      metadata.getValidTxnList()));
             }
             addToMaterializationList(expandGroupingSets, invalidationInfo, relOptMaterialization, result);
             continue;
@@ -2076,7 +2074,7 @@ public class Hive {
             // so we can produce partial rewritings
             relOptMaterialization = HiveMaterializedViewUtils.augmentMaterializationWithTimeInformation(
                     hiveRelOptMaterialization, validTxnsList, new ValidTxnWriteIdList(
-                    creationMetadata.getValidTxnList()));
+                    metadata.getValidTxnList()));
           }
           addToMaterializationList(expandGroupingSets, invalidationInfo, relOptMaterialization, result);
         }

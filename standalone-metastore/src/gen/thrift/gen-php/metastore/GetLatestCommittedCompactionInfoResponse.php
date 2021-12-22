@@ -69,14 +69,14 @@ class GetLatestCommittedCompactionInfoResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->compactions = array();
-                        $_size754 = 0;
-                        $_etype757 = 0;
-                        $xfer += $input->readListBegin($_etype757, $_size754);
-                        for ($_i758 = 0; $_i758 < $_size754; ++$_i758) {
-                            $elem759 = null;
-                            $elem759 = new \metastore\CompactionInfoStruct();
-                            $xfer += $elem759->read($input);
-                            $this->compactions []= $elem759;
+                        $_size762 = 0;
+                        $_etype765 = 0;
+                        $xfer += $input->readListBegin($_etype765, $_size762);
+                        for ($_i766 = 0; $_i766 < $_size762; ++$_i766) {
+                            $elem767 = null;
+                            $elem767 = new \metastore\CompactionInfoStruct();
+                            $xfer += $elem767->read($input);
+                            $this->compactions []= $elem767;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +103,8 @@ class GetLatestCommittedCompactionInfoResponse
             }
             $xfer += $output->writeFieldBegin('compactions', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->compactions));
-            foreach ($this->compactions as $iter760) {
-                $xfer += $iter760->write($output);
+            foreach ($this->compactions as $iter768) {
+                $xfer += $iter768->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

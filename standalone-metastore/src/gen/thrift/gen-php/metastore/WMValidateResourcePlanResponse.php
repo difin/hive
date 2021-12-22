@@ -84,13 +84,13 @@ class WMValidateResourcePlanResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->errors = array();
-                        $_size1003 = 0;
-                        $_etype1006 = 0;
-                        $xfer += $input->readListBegin($_etype1006, $_size1003);
-                        for ($_i1007 = 0; $_i1007 < $_size1003; ++$_i1007) {
-                            $elem1008 = null;
-                            $xfer += $input->readString($elem1008);
-                            $this->errors []= $elem1008;
+                        $_size1011 = 0;
+                        $_etype1014 = 0;
+                        $xfer += $input->readListBegin($_etype1014, $_size1011);
+                        for ($_i1015 = 0; $_i1015 < $_size1011; ++$_i1015) {
+                            $elem1016 = null;
+                            $xfer += $input->readString($elem1016);
+                            $this->errors []= $elem1016;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -100,13 +100,13 @@ class WMValidateResourcePlanResponse
                 case 2:
                     if ($ftype == TType::LST) {
                         $this->warnings = array();
-                        $_size1009 = 0;
-                        $_etype1012 = 0;
-                        $xfer += $input->readListBegin($_etype1012, $_size1009);
-                        for ($_i1013 = 0; $_i1013 < $_size1009; ++$_i1013) {
-                            $elem1014 = null;
-                            $xfer += $input->readString($elem1014);
-                            $this->warnings []= $elem1014;
+                        $_size1017 = 0;
+                        $_etype1020 = 0;
+                        $xfer += $input->readListBegin($_etype1020, $_size1017);
+                        for ($_i1021 = 0; $_i1021 < $_size1017; ++$_i1021) {
+                            $elem1022 = null;
+                            $xfer += $input->readString($elem1022);
+                            $this->warnings []= $elem1022;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -133,8 +133,8 @@ class WMValidateResourcePlanResponse
             }
             $xfer += $output->writeFieldBegin('errors', TType::LST, 1);
             $output->writeListBegin(TType::STRING, count($this->errors));
-            foreach ($this->errors as $iter1015) {
-                $xfer += $output->writeString($iter1015);
+            foreach ($this->errors as $iter1023) {
+                $xfer += $output->writeString($iter1023);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -145,8 +145,8 @@ class WMValidateResourcePlanResponse
             }
             $xfer += $output->writeFieldBegin('warnings', TType::LST, 2);
             $output->writeListBegin(TType::STRING, count($this->warnings));
-            foreach ($this->warnings as $iter1016) {
-                $xfer += $output->writeString($iter1016);
+            foreach ($this->warnings as $iter1024) {
+                $xfer += $output->writeString($iter1024);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

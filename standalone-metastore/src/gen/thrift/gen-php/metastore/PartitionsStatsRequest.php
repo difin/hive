@@ -158,13 +158,13 @@ class PartitionsStatsRequest
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->colNames = array();
-                        $_size498 = 0;
-                        $_etype501 = 0;
-                        $xfer += $input->readListBegin($_etype501, $_size498);
-                        for ($_i502 = 0; $_i502 < $_size498; ++$_i502) {
-                            $elem503 = null;
-                            $xfer += $input->readString($elem503);
-                            $this->colNames []= $elem503;
+                        $_size506 = 0;
+                        $_etype509 = 0;
+                        $xfer += $input->readListBegin($_etype509, $_size506);
+                        for ($_i510 = 0; $_i510 < $_size506; ++$_i510) {
+                            $elem511 = null;
+                            $xfer += $input->readString($elem511);
+                            $this->colNames []= $elem511;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -174,13 +174,13 @@ class PartitionsStatsRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->partNames = array();
-                        $_size504 = 0;
-                        $_etype507 = 0;
-                        $xfer += $input->readListBegin($_etype507, $_size504);
-                        for ($_i508 = 0; $_i508 < $_size504; ++$_i508) {
-                            $elem509 = null;
-                            $xfer += $input->readString($elem509);
-                            $this->partNames []= $elem509;
+                        $_size512 = 0;
+                        $_etype515 = 0;
+                        $xfer += $input->readListBegin($_etype515, $_size512);
+                        for ($_i516 = 0; $_i516 < $_size512; ++$_i516) {
+                            $elem517 = null;
+                            $xfer += $input->readString($elem517);
+                            $this->partNames []= $elem517;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -238,8 +238,8 @@ class PartitionsStatsRequest
             }
             $xfer += $output->writeFieldBegin('colNames', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->colNames));
-            foreach ($this->colNames as $iter510) {
-                $xfer += $output->writeString($iter510);
+            foreach ($this->colNames as $iter518) {
+                $xfer += $output->writeString($iter518);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -250,8 +250,8 @@ class PartitionsStatsRequest
             }
             $xfer += $output->writeFieldBegin('partNames', TType::LST, 4);
             $output->writeListBegin(TType::STRING, count($this->partNames));
-            foreach ($this->partNames as $iter511) {
-                $xfer += $output->writeString($iter511);
+            foreach ($this->partNames as $iter519) {
+                $xfer += $output->writeString($iter519);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
