@@ -19,10 +19,12 @@
 package org.apache.hadoop.hive.ql.ddl.view.create;
 
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.CreationMetadata;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.SourceTable;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
@@ -36,7 +38,9 @@ import org.apache.hadoop.hive.ql.metadata.Table;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Operation process of creating a view.
@@ -105,9 +109,13 @@ public class CreateViewOperation extends DDLOperation<CreateViewDesc> {
       Table tbl = desc.toTable(context.getConf());
       // We set the signature for the view if it is a materialized view
       if (tbl.isMaterializedView()) {
+        Set<SourceTable> sourceTables = new HashSet<>(desc.getTablesUsed().size());
+        for (TableName tableName : desc.getTablesUsed()) {
+          sourceTables.add(context.getDb().getTable(tableName).createSourceTable());
+        }
         CreationMetadata cm =
             new CreationMetadata(MetaStoreUtils.getDefaultCatalog(context.getConf()), tbl.getDbName(),
-                tbl.getTableName(), ImmutableSet.copyOf(desc.getTablesUsed()));
+                tbl.getTableName(), sourceTables);
         cm.setValidTxnList(context.getConf().get(ValidTxnWriteIdList.VALID_TABLES_WRITEIDS_KEY));
         tbl.getTTable().setCreationMetadata(cm);
       }
