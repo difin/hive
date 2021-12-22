@@ -710,7 +710,7 @@ POSTHOOK: Input: default@cmv_basetable_n5
 3	6
 PREHOOK: query: EXPLAIN
 ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@cmv_basetable_2_n2
 PREHOOK: Input: default@cmv_basetable_n5
 PREHOOK: Input: default@cmv_mat_view_n5
@@ -718,7 +718,7 @@ PREHOOK: Output: default@cmv_mat_view_n5
 PREHOOK: Output: default@cmv_mat_view_n5
 POSTHOOK: query: EXPLAIN
 ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@cmv_basetable_2_n2
 POSTHOOK: Input: default@cmv_basetable_n5
 POSTHOOK: Input: default@cmv_mat_view_n5
@@ -983,14 +983,14 @@ STAGE PLANS:
           Table: default.cmv_mat_view_n5
 
 PREHOOK: query: ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@cmv_basetable_2_n2
 PREHOOK: Input: default@cmv_basetable_n5
 PREHOOK: Input: default@cmv_mat_view_n5
 PREHOOK: Output: default@cmv_mat_view_n5
 PREHOOK: Output: default@cmv_mat_view_n5
 POSTHOOK: query: ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@cmv_basetable_2_n2
 POSTHOOK: Input: default@cmv_basetable_n5
 POSTHOOK: Input: default@cmv_mat_view_n5
@@ -1117,13 +1117,13 @@ POSTHOOK: Input: default@cmv_basetable_2_n2
 POSTHOOK: Output: default@cmv_basetable_2_n2
 PREHOOK: query: EXPLAIN
 ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@cmv_basetable_2_n2
 PREHOOK: Input: default@cmv_basetable_n5
 PREHOOK: Output: default@cmv_mat_view_n5
 POSTHOOK: query: EXPLAIN
 ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@cmv_basetable_2_n2
 POSTHOOK: Input: default@cmv_basetable_n5
 POSTHOOK: Output: default@cmv_mat_view_n5
@@ -1293,12 +1293,12 @@ STAGE PLANS:
       update creation metadata: true
 
 PREHOOK: query: ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@cmv_basetable_2_n2
 PREHOOK: Input: default@cmv_basetable_n5
 PREHOOK: Output: default@cmv_mat_view_n5
 POSTHOOK: query: ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@cmv_basetable_2_n2
 POSTHOOK: Input: default@cmv_basetable_n5
 POSTHOOK: Output: default@cmv_mat_view_n5
@@ -1423,13 +1423,13 @@ POSTHOOK: Input: default@cmv_basetable_2_n2
 POSTHOOK: Output: default@cmv_basetable_2_n2
 PREHOOK: query: EXPLAIN
 ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@cmv_basetable_2_n2
 PREHOOK: Input: default@cmv_basetable_n5
 PREHOOK: Output: default@cmv_mat_view_n5
 POSTHOOK: query: EXPLAIN
 ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@cmv_basetable_2_n2
 POSTHOOK: Input: default@cmv_basetable_n5
 POSTHOOK: Output: default@cmv_mat_view_n5
@@ -1599,12 +1599,12 @@ STAGE PLANS:
       update creation metadata: true
 
 PREHOOK: query: ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@cmv_basetable_2_n2
 PREHOOK: Input: default@cmv_basetable_n5
 PREHOOK: Output: default@cmv_mat_view_n5
 POSTHOOK: query: ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@cmv_basetable_2_n2
 POSTHOOK: Input: default@cmv_basetable_n5
 POSTHOOK: Output: default@cmv_mat_view_n5
@@ -1734,7 +1734,7 @@ POSTHOOK: Lineage: cmv_basetable_2_n2.c SCRIPT []
 POSTHOOK: Lineage: cmv_basetable_2_n2.d SCRIPT []
 PREHOOK: query: EXPLAIN
 ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@cmv_basetable_2_n2
 PREHOOK: Input: default@cmv_basetable_n5
 PREHOOK: Input: default@cmv_mat_view_n5
@@ -1742,7 +1742,7 @@ PREHOOK: Output: default@cmv_mat_view_n5
 PREHOOK: Output: default@cmv_mat_view_n5
 POSTHOOK: query: EXPLAIN
 ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@cmv_basetable_2_n2
 POSTHOOK: Input: default@cmv_basetable_n5
 POSTHOOK: Input: default@cmv_mat_view_n5
@@ -2007,14 +2007,14 @@ STAGE PLANS:
           Table: default.cmv_mat_view_n5
 
 PREHOOK: query: ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@cmv_basetable_2_n2
 PREHOOK: Input: default@cmv_basetable_n5
 PREHOOK: Input: default@cmv_mat_view_n5
 PREHOOK: Output: default@cmv_mat_view_n5
 PREHOOK: Output: default@cmv_mat_view_n5
 POSTHOOK: query: ALTER MATERIALIZED VIEW cmv_mat_view_n5 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@cmv_basetable_2_n2
 POSTHOOK: Input: default@cmv_basetable_n5
 POSTHOOK: Input: default@cmv_mat_view_n5

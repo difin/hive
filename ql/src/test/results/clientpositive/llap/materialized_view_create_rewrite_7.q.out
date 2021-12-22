@@ -87,14 +87,14 @@ HiveAggregate(group=[{0}], agg#0=[count()])
 
 PREHOOK: query: explain cbo
 alter materialized view mat1 rebuild
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@mat1
 PREHOOK: Input: default@t1
 PREHOOK: Output: default@mat1
 PREHOOK: Output: default@mat1
 POSTHOOK: query: explain cbo
 alter materialized view mat1 rebuild
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@mat1
 POSTHOOK: Input: default@t1
 POSTHOOK: Output: default@mat1
@@ -112,14 +112,14 @@ HiveProject(a0=[$3], $f1=[CASE(IS NULL($1), $4, IS NULL($4), $1, +($4, $1))])
 
 PREHOOK: query: explain
 alter materialized view mat1 rebuild
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@mat1
 PREHOOK: Input: default@t1
 PREHOOK: Output: default@mat1
 PREHOOK: Output: default@mat1
 POSTHOOK: query: explain
 alter materialized view mat1 rebuild
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@mat1
 POSTHOOK: Input: default@t1
 POSTHOOK: Output: default@mat1
@@ -343,13 +343,13 @@ STAGE PLANS:
           Table: default.mat1
 
 PREHOOK: query: alter materialized view mat1 rebuild
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@mat1
 PREHOOK: Input: default@t1
 PREHOOK: Output: default@mat1
 PREHOOK: Output: default@mat1
 POSTHOOK: query: alter materialized view mat1 rebuild
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@mat1
 POSTHOOK: Input: default@t1
 POSTHOOK: Output: default@mat1

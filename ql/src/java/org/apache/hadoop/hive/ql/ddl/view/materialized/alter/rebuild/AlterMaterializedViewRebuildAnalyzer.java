@@ -52,6 +52,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.RelOptHiveTable;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveInBetweenExpandRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.*;
 import org.apache.hadoop.hive.ql.parse.*;
+import org.apache.hadoop.hive.ql.plan.HiveOperation;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +90,19 @@ public class AlterMaterializedViewRebuildAnalyzer extends CalcitePlanner {
       return;
     }
 
+    try {
+      Boolean outdated = db.isOutdatedMaterializedView(getTxnMgr(), tableName);
+      if (outdated != null && !outdated) {
+        String msg = String.format("Materialized view %s.%s is up to date. Skipping rebuild.",
+                tableName.getDb(), tableName.getTable());
+        LOG.info(msg);
+        console.printInfo(msg, false);
+        return;
+      }
+    } catch (HiveException e) {
+      LOG.warn("Error while checking materialized view " + tableName.getDb() + "." + tableName.getTable(), e);
+    }
+
     ASTNode rewrittenAST = getRewrittenAST(tableName);
 
     mvRebuildMode = MaterializationRebuildMode.INSERT_OVERWRITE_REBUILD;
@@ -97,6 +111,7 @@ public class AlterMaterializedViewRebuildAnalyzer extends CalcitePlanner {
 
     LOG.debug("Rebuilding materialized view " + tableName.getNotEmptyDbTable());
     super.analyzeInternal(rewrittenAST);
+    queryState.setCommandType(HiveOperation.ALTER_MATERIALIZED_VIEW_REBUILD);
   }
 
   private static final String REWRITTEN_INSERT_STATEMENT = "INSERT OVERWRITE TABLE %s %s";

@@ -107,7 +107,7 @@ POSTHOOK: Input: default@t1
 4	220	NULL
 PREHOOK: query: EXPLAIN CBO
 ALTER MATERIALIZED VIEW mat1 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@mat1
 PREHOOK: Input: default@mat1@a=1
 PREHOOK: Input: default@mat1@a=2
@@ -116,7 +116,7 @@ PREHOOK: Input: default@t1
 PREHOOK: Output: default@mat1
 POSTHOOK: query: EXPLAIN CBO
 ALTER MATERIALIZED VIEW mat1 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@mat1
 POSTHOOK: Input: default@mat1@a=1
 POSTHOOK: Input: default@mat1@a=2
@@ -143,7 +143,7 @@ HiveProject(b=[$0], sumc=[$2], a=[$1])
 
 PREHOOK: query: EXPLAIN
 ALTER MATERIALIZED VIEW mat1 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@mat1
 PREHOOK: Input: default@mat1@a=1
 PREHOOK: Input: default@mat1@a=2
@@ -152,7 +152,7 @@ PREHOOK: Input: default@t1
 PREHOOK: Output: default@mat1
 POSTHOOK: query: EXPLAIN
 ALTER MATERIALIZED VIEW mat1 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@mat1
 POSTHOOK: Input: default@mat1@a=1
 POSTHOOK: Input: default@mat1@a=2
@@ -408,7 +408,7 @@ STAGE PLANS:
       update creation metadata: true
 
 PREHOOK: query: ALTER MATERIALIZED VIEW mat1 REBUILD
-PREHOOK: type: QUERY
+PREHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 PREHOOK: Input: default@mat1
 PREHOOK: Input: default@mat1@a=1
 PREHOOK: Input: default@mat1@a=2
@@ -416,7 +416,7 @@ PREHOOK: Input: default@mat1@a=__HIVE_DEFAULT_PARTITION__
 PREHOOK: Input: default@t1
 PREHOOK: Output: default@mat1
 POSTHOOK: query: ALTER MATERIALIZED VIEW mat1 REBUILD
-POSTHOOK: type: QUERY
+POSTHOOK: type: ALTER_MATERIALIZED_VIEW_REBUILD
 POSTHOOK: Input: default@mat1
 POSTHOOK: Input: default@mat1@a=1
 POSTHOOK: Input: default@mat1@a=2
