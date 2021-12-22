@@ -1262,15 +1262,6 @@ public class Table implements Serializable {
     return tableConstraintsInfo.getCheckConstraint();
   }
 
-  public void fetchConstraints() {
-    getPrimaryKeyInfo();
-    getForeignKeyInfo();
-    getUniqueKeyInfo();
-    getNotNullConstraint();
-    getDefaultConstraint();
-    getCheckConstraint();
-  }
-
   /** This shouldn't use get apis because those api call metastore
    * to fetch constraints.
    * getMetaData only need to make a reference copy of existing constraints, even if those are not fetched
