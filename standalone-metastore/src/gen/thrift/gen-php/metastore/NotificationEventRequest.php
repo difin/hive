@@ -106,13 +106,13 @@ class NotificationEventRequest
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->eventTypeSkipList = array();
-                        $_size768 = 0;
-                        $_etype771 = 0;
-                        $xfer += $input->readListBegin($_etype771, $_size768);
-                        for ($_i772 = 0; $_i772 < $_size768; ++$_i772) {
-                            $elem773 = null;
-                            $xfer += $input->readString($elem773);
-                            $this->eventTypeSkipList []= $elem773;
+                        $_size776 = 0;
+                        $_etype779 = 0;
+                        $xfer += $input->readListBegin($_etype779, $_size776);
+                        for ($_i780 = 0; $_i780 < $_size776; ++$_i780) {
+                            $elem781 = null;
+                            $xfer += $input->readString($elem781);
+                            $this->eventTypeSkipList []= $elem781;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -149,8 +149,8 @@ class NotificationEventRequest
             }
             $xfer += $output->writeFieldBegin('eventTypeSkipList', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->eventTypeSkipList));
-            foreach ($this->eventTypeSkipList as $iter774) {
-                $xfer += $output->writeString($iter774);
+            foreach ($this->eventTypeSkipList as $iter782) {
+                $xfer += $output->writeString($iter782);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

@@ -20,4 +20,8 @@ ee9ff6cb0a4a2b0c3923427fbf2dfda4, 1.2.13
 ff626408496160848d02a5150e8be4c2, 1.2.16
 =======
 0a164c3cf5b7dab5265e3247e859c6cd, 1.2.15
+<<<<<<< HEAD
 >>>>>>> 24a6777e38 (CDPD-19702: HIVE-25656: Get materialized view state based on number of affected rows of transactions (Krisztian Kasa, reviewed by Zoltan Haindrich, Stephen Carlin))
+=======
+916aecc6172cb41207b3580aa4ac6b63, 1.2.16
+>>>>>>> 7344c2b77d (CDPD-19702: HIVE-25744: Support backward compatibility of thrift struct CreationMetadata (Krisztian Kasa, reviewed by Zoltan Haindrich))

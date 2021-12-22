@@ -194,7 +194,7 @@ public final class HiveMaterializedViewsRegistry {
               Table existingMVTable = HiveMaterializedViewUtils.extractTable(existingMV);
               if (existingMVTable.getCreateTime() < mvTable.getCreateTime() ||
                   (existingMVTable.getCreateTime() == mvTable.getCreateTime() &&
-                      existingMVTable.getCreationMetadata().getMaterializationTime() <= mvTable.getCreationMetadata().getMaterializationTime())) {
+                      existingMVTable.getMVMetadata().getMaterializationTime() <= mvTable.getMVMetadata().getMaterializationTime())) {
                 refreshMaterializedView(db.getConf(), db, existingMVTable, mvTable);
               }
             } else {

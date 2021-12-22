@@ -34,6 +34,7 @@ import org.apache.hadoop.hive.ql.hooks.WriteEntity;
 import org.apache.hadoop.hive.ql.hooks.LineageInfo.DataContainer;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.metadata.MaterializedViewMetadata;
 import org.apache.hadoop.hive.ql.metadata.Table;
 
 import com.google.common.collect.ImmutableSet;
@@ -113,11 +114,13 @@ public class CreateViewOperation extends DDLOperation<CreateViewDesc> {
         for (TableName tableName : desc.getTablesUsed()) {
           sourceTables.add(context.getDb().getTable(tableName).createSourceTable());
         }
-        CreationMetadata cm =
-            new CreationMetadata(MetaStoreUtils.getDefaultCatalog(context.getConf()), tbl.getDbName(),
-                tbl.getTableName(), sourceTables);
-        cm.setValidTxnList(context.getConf().get(ValidTxnWriteIdList.VALID_TABLES_WRITEIDS_KEY));
-        tbl.getTTable().setCreationMetadata(cm);
+        MaterializedViewMetadata metadata = new MaterializedViewMetadata(
+            MetaStoreUtils.getDefaultCatalog(context.getConf()),
+            tbl.getDbName(),
+            tbl.getTableName(),
+            sourceTables,
+            context.getConf().get(ValidTxnWriteIdList.VALID_TABLES_WRITEIDS_KEY));
+        tbl.setMaterializedViewMetadata(metadata);
       }
       context.getDb().createTable(tbl, desc.getIfNotExists());
       DDLUtils.addIfAbsentByName(new WriteEntity(tbl, WriteEntity.WriteType.DDL_NO_LOCK),
