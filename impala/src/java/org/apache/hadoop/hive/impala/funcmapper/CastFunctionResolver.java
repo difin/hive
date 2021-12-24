@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.sql.SqlOperator;
+import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.hadoop.hive.ql.parse.type.FunctionHelper;
 
 import java.util.List;
@@ -66,6 +67,14 @@ public class CastFunctionResolver extends ImpalaFunctionResolverImpl {
   @Override
   public RexNode createRexNode(ImpalaFunctionSignature candidate, List<RexNode> inputs,
       RelDataType retType) {
+
+    // Calcite treats their floats as doubles, so we do not want to use their
+    // makeCast method. Instead, this will keep the expression as a "cast as float"
+    // expression which will eventually be reduced by the Impala engine to a float
+    // value.
+    if (retType.getSqlTypeName() == SqlTypeName.FLOAT) {
+      return super.createRexNode(candidate, inputs, retType);
+    }
     return rexBuilder.makeCast(retType, inputs.get(0));
   }
 }
