@@ -46,7 +46,7 @@ import java.util.Map;
  *
  * In this "case", the first expression (i.e. CASE [expr]) is given. This will get rewritten
  * into Calcite so that all WHEN expressions are of type <boolean>
- * (e.g.WHEN expr == whenexpr)
+ * (e.g. "WHEN expr == whenexpr" or "WHEN expr IS NOT DISTINCT FROM whenexpr")
  *
  * The ELSE condition in Calcite will also always be the same type as the return type.
  *
@@ -56,9 +56,17 @@ import java.util.Map;
  */
 public class CaseFunctionResolver extends ImpalaFunctionResolverImpl {
 
+  private final String caseComparisonFunc;
+
+  public CaseFunctionResolver(FunctionHelper helper, SqlOperator op,
+      List<RexNode> inputNodes, boolean isDecode) {
+    super(helper, op, inputNodes);
+    caseComparisonFunc = isDecode ? "is not distinct from" : "=";
+  }
+
   public CaseFunctionResolver(FunctionHelper helper, SqlOperator op,
       List<RexNode> inputNodes) {
-    super(helper, op, inputNodes);
+    this(helper, op, inputNodes, false);
   }
 
   @Override
@@ -174,10 +182,10 @@ public class CaseFunctionResolver extends ImpalaFunctionResolverImpl {
   }
 
   private RexNode createWhenExpression(List<RexNode> equalsInputs) throws SemanticException {
-    FunctionInfo functionInfo = helper.getFunctionInfo("=");
+    FunctionInfo functionInfo = helper.getFunctionInfo(caseComparisonFunc);
     RelDataType retType = helper.getReturnType(functionInfo, equalsInputs);
     List<RexNode> convertedInputs = helper.convertInputs(functionInfo, equalsInputs, retType);
-    return helper.getExpression("=", functionInfo, convertedInputs, retType);
+    return helper.getExpression(caseComparisonFunc, functionInfo, convertedInputs, retType);
   }
 
   @Override

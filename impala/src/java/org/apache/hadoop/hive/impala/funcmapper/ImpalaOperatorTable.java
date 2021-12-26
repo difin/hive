@@ -72,6 +72,7 @@ public class ImpalaOperatorTable {
     map.put("UNIX_TIMESTAMP", HiveUnixTimestampSqlOperator.INSTANCE);
     // there is a "when" version of case we need to handle.
     map.put("WHEN", SqlStdOperatorTable.CASE);
+    map.put("DECODE", SqlStdOperatorTable.CASE);
 
     // special extract operators
     map.put("YEAR", HiveExtractDate.YEAR);

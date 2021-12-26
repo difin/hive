@@ -580,12 +580,12 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     if (func.toLowerCase().equals("nullif")) {
       List<RexNode> caseInputs = CaseFunctionResolver.convertNullIfToCaseParams(helper, inputs);
       return new CaseFunctionResolver(helper, op, caseInputs);
-    }
-
-    // case statements can come in as "when" or "case", see the Case*Resolver comment
-    // for more information.
-    if (func.toLowerCase().equals("when")) {
+    } else if (func.toLowerCase().equals("when")) {
+      // case statements can come in as "when" or "case", see the Case*Resolver comment
+      // for more information.
       return new CaseWhenFunctionResolver(helper, op, inputs);
+    } else if (func.toLowerCase().equals("decode")) {
+      return new CaseFunctionResolver(helper, op, inputs, true);
     }
     return new CaseFunctionResolver(helper, op, inputs);
   }
