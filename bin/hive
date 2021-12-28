@@ -321,6 +321,7 @@ if [ "$EXECUTE_WITH_JAVA" == "false" ]; then
       hadoop_patch_ver=${BASH_REMATCH[4]}
     else
       echo "Unable to determine Hadoop version information."
+      echo "\$HADOOP_VERSION is: $HADOOP_VERSION"
       echo "'hadoop version' returned:"
       # Have to explicitly export HADOOP_SHELL_SCRIPT_DEBUG so that the related
       # environment variables could be output, e.g., HADOOP_OPTS.
