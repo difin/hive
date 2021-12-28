@@ -80,8 +80,8 @@ public class TestInitiator extends CompactorTest {
     rqst = new CompactionRequest("default", "rflw2", CompactionType.MINOR);
     txnHandler.compact(rqst);
 
-    txnHandler.findNextToCompact(new FindNextCompactRequest(ServerUtils.hostname() + "-193892", "4.0.0"));
-    txnHandler.findNextToCompact(new FindNextCompactRequest("nosuchhost-193892", "4.0.0"));
+    txnHandler.findNextToCompact(aFindNextCompactRequest(ServerUtils.hostname() + "-193892", "4.0.0"));
+    txnHandler.findNextToCompact(aFindNextCompactRequest("nosuchhost-193892", "4.0.0"));
 
     startInitiator();
 
@@ -107,7 +107,7 @@ public class TestInitiator extends CompactorTest {
     CompactionRequest rqst = new CompactionRequest("default", "rfrw1", CompactionType.MINOR);
     txnHandler.compact(rqst);
 
-    txnHandler.findNextToCompact(new FindNextCompactRequest("nosuchhost-193892", "4.0.0"));
+    txnHandler.findNextToCompact(aFindNextCompactRequest("nosuchhost-193892", "4.0.0"));
 
     conf.setTimeVar(HiveConf.ConfVars.HIVE_COMPACTOR_WORKER_TIMEOUT, 1L, TimeUnit.MILLISECONDS);
 
@@ -1072,6 +1072,13 @@ public class TestInitiator extends CompactorTest {
     List<ShowCompactResponseElement> compacts = rsp.getCompacts();
     Assert.assertEquals(2, compacts.size());
     Mockito.verify(initiator, times(1)).resolveTable(Mockito.any());
+  }
+
+  private static FindNextCompactRequest aFindNextCompactRequest(String workerId, String workerVersion) {
+    FindNextCompactRequest request = new FindNextCompactRequest();
+    request.setWorkerId(workerId);
+    request.setWorkerVersion(workerVersion);
+    return request;
   }
 
   @Override
