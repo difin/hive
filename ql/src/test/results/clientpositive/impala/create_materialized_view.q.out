@@ -170,7 +170,6 @@ POSTHOOK: query: drop materialized view mv1_imp0
 POSTHOOK: type: DROP_MATERIALIZED_VIEW
 HMS CALL get_table_req FOR mv1_imp0_with_partitions_in_order
 HMS CALL get_table_req FOR emps_imp0
-HMS CALL get_table_req FOR depts_imp0
 HMS CALL get_table_req FOR mv1_imp0_with_partitions_in_order
 PREHOOK: query: explain
 create materialized view mv1_imp0_with_partitions_in_order partitioned on (salary_alias, commission) 
@@ -268,7 +267,6 @@ POSTHOOK: query: drop materialized view mv1_imp0_with_partitions_in_order
 POSTHOOK: type: DROP_MATERIALIZED_VIEW
 HMS CALL get_table_req FOR mv1_imp0_with_partitions_out_of_order
 HMS CALL get_table_req FOR emps_imp0
-HMS CALL get_table_req FOR depts_imp0
 HMS CALL get_table_req FOR mv1_imp0_with_partitions_out_of_order
 PREHOOK: query: explain
 create materialized view mv1_imp0_with_partitions_out_of_order partitioned on (salary_alias, deptno_alias) 

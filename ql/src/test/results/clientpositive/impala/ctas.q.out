@@ -293,7 +293,6 @@ POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab1_imp0
 HMS CALL get_table_req FOR emps_imp0
 HMS CALL get_table_req FOR tab1_imp0
-HMS CALL get_table_req FOR depts_imp0
 PREHOOK: query: explain
 insert into tab1_imp0
 select empid, deptno
@@ -349,7 +348,6 @@ Per-Host Resources: mem-estimate=8B mem-reservation=0B thread-reservation=1
 
 HMS CALL get_table_req FOR emps_imp0
 HMS CALL get_table_req FOR tab1_imp0
-HMS CALL get_table_req FOR depts_imp0
 PREHOOK: query: explain
 insert into tab1_imp0
 select empid, deptno
@@ -442,7 +440,6 @@ POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab1_imp0_part
 HMS CALL get_table_req FOR emps_imp0
 HMS CALL get_table_req FOR tab1_imp0_part
-HMS CALL get_table_req FOR depts_imp0
 PREHOOK: query: explain
 insert into tab1_imp0_part
 select empid, deptno, name
@@ -506,7 +503,6 @@ Per-Host Resources: mem-estimate=12.00MB mem-reservation=12.00MB thread-reservat
 
 HMS CALL get_table_req FOR emps_imp0
 HMS CALL get_table_req FOR tab1_imp0_part
-HMS CALL get_table_req FOR depts_imp0
 PREHOOK: query: explain
 insert into tab1_imp0_part
 select empid, deptno, name

@@ -327,7 +327,6 @@ POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab1_hive
 HMS CALL get_table_req FOR emps_hive
 HMS CALL get_table_req FOR tab1_hive
-HMS CALL get_table_req FOR depts_hive
 PREHOOK: query: explain
 insert into tab1_hive
 select empid, deptno
@@ -546,7 +545,6 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
 
 HMS CALL get_table_req FOR emps_hive
 HMS CALL get_table_req FOR tab1_hive
-HMS CALL get_table_req FOR depts_hive
 PREHOOK: query: explain
 insert into tab1_hive
 select empid, deptno
@@ -694,7 +692,6 @@ POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab1_hive_part
 HMS CALL get_table_req FOR emps_hive
 HMS CALL get_table_req FOR tab1_hive_part
-HMS CALL get_table_req FOR depts_hive
 PREHOOK: query: explain
 insert into tab1_hive_part
 select empid, deptno, name
@@ -808,7 +805,6 @@ STAGE PLANS:
 
 HMS CALL get_table_req FOR emps_hive
 HMS CALL get_table_req FOR tab1_hive_part
-HMS CALL get_table_req FOR depts_hive
 PREHOOK: query: explain
 insert into tab1_hive_part
 select empid, deptno, name
