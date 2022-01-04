@@ -45,7 +45,7 @@ public class EngineLoader {
       EngineHelper impalaHelper = (EngineHelper)
           Class.forName("org.apache.hadoop.hive.impala.ImpalaHelper").newInstance();
       engineHelpers.put(Engine.IMPALA, impalaHelper);
-    } catch (Exception e) {
+    } catch (Throwable e) {
       LOG.info("Could not load Impala Helper class.", e);
     }
     EngineHelper defaultHelper = new NativeEngineHelper();
