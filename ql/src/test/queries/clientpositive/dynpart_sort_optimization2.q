@@ -1,3 +1,4 @@
+--! qt:disabled:CDPD-33219
 --! qt:dataset:src
 set hive.mapred.mode=nonstrict;
 set hive.explain.user=false;
