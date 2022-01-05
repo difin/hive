@@ -3262,7 +3262,7 @@ public class TestInputOutputFormat {
     }
     // call-1: open to read - split 1 => mock:/mocktable1/0_0
     // call-2: open to read - split 2 => mock:/mocktable1/0_1
-    assertEquals(2, readOpsDelta);
+    assertEquals(4, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
@@ -3405,7 +3405,7 @@ public class TestInputOutputFormat {
     }
     // call-1: open to read - split 1 => mock:/mocktable3/0_0
     // call-2: open to read - split 2 => mock:/mocktable3/0_1
-    assertEquals(2, readOpsDelta);
+    assertEquals(4, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
@@ -3548,7 +3548,7 @@ public class TestInputOutputFormat {
         readOpsDelta = statistics.getReadOps() - readOpsBefore;
       }
     }
-    assertEquals(6, readOpsDelta);
+    assertEquals(8, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
@@ -3693,7 +3693,7 @@ public class TestInputOutputFormat {
         readOpsDelta = statistics.getReadOps() - readOpsBefore;
       }
     }
-    assertEquals(4, readOpsDelta);
+    assertEquals(6, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
