@@ -91,6 +91,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.AcidConstants;
 import org.apache.hadoop.hive.common.AcidMetaDataFile;
+import org.apache.hadoop.hive.common.AcidMetaDataFile.DataFormat;
 import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.common.StatsSetupConst;
 import org.apache.hadoop.hive.common.ValidReaderWriteIdList;
@@ -3449,13 +3450,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           // This is not transactional
           for (Path location : getLocationsForTruncate(getMS(), parsedDbName[CAT_NAME],
               parsedDbName[DB_NAME], tableName, tbl, partNames)) {
-            FileSystem fs = location.getFileSystem(getConf());
             if (!skipDataDeletion) {
-              truncateDataFiles(tbl, parsedDbName, location, fs);
+              truncateDataFiles(tbl, parsedDbName, location);
             } else {
               // For Acid tables we don't need to delete the old files, only write an empty baseDir.
               // Compaction and cleaner will take care of the rest
-              addTruncateBaseFile(location, writeId, fs);
+              addTruncateBaseFile(location, writeId, DataFormat.TRUNCATED);
             }
           }
         }
@@ -3476,26 +3476,37 @@ public class HiveMetaStore extends ThriftHiveMetastore {
      * Add an empty baseDir with a truncate metadatafile
      * @param location partition or table directory
      * @param writeId allocated writeId
-     * @param fs FileSystem
-     * @throws Exception
+     * @throws MetaException
      */
-    private void addTruncateBaseFile(Path location, long writeId, FileSystem fs) throws Exception {
+    private void addTruncateBaseFile(Path location, long writeId, DataFormat dataFormat)
+        throws MetaException {
+      if (location == null)
+        return;
+      
       Path basePath = new Path(location, AcidConstants.baseDir(writeId));
-      fs.mkdirs(basePath);
-      // We can not leave the folder empty, otherwise it will be skipped at some file listing in AcidUtils
-      // No need for a data file, a simple metadata is enough
-      AcidMetaDataFile.writeToFile(fs, basePath, AcidMetaDataFile.DataFormat.TRUNCATED);
+      try {
+        FileSystem fs = location.getFileSystem(getConf());
+        fs.mkdirs(basePath);
+        // We can not leave the folder empty, otherwise it will be skipped at some file listing in AcidUtils
+        // No need for a data file, a simple metadata is enough
+        AcidMetaDataFile.writeToFile(fs, basePath, dataFormat);
+      } catch (Exception e) {
+        throw newMetaException(e);
+      }
     }
 
-    private void truncateDataFiles(Table tbl, String[] parsedDbName, Path location, FileSystem fs)
+    private void truncateDataFiles(Table tbl, String[] parsedDbName, Path location)
         throws IOException, MetaException, NoSuchObjectException {
       boolean isAutopurge = (tbl.isSetParameters() && "true".equalsIgnoreCase(tbl.getParameters().get("auto.purge")));
       Database db = get_database_core(parsedDbName[CAT_NAME], parsedDbName[DB_NAME]);
+      FileSystem fs = location.getFileSystem(getConf());
+      
       if (!HdfsUtils.isPathEncrypted(getConf(), fs.getUri(), location) &&
           !FileUtils.pathHasSnapshotSubDir(location, fs)) {
         HdfsUtils.HadoopFileStatus status = new HdfsUtils.HadoopFileStatus(getConf(), fs, location);
         FileStatus targetStatus = fs.getFileStatus(location);
         String targetGroup = targetStatus == null ? null : targetStatus.getGroup();
+        
         wh.deleteDir(location, true, isAutopurge, ReplChangeManager.shouldEnableCm(db, tbl));
         fs.mkdirs(location);
         HdfsUtils.setFullFileStatus(getConf(), status, targetGroup, fs, location, false);
@@ -4973,22 +4984,22 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
     }
 
-    private boolean drop_partition_common(RawStore ms, String catName, String db_name,
-                                          String tbl_name, List<String> part_vals,
-                                          final boolean deleteData, final EnvironmentContext envContext)
-        throws MetaException, NoSuchObjectException, IOException, InvalidObjectException,
-      InvalidInputException {
-      boolean success = false;
+    private boolean drop_partition_common(RawStore ms, String catName, String db_name, String tbl_name, 
+        List<String> part_vals, boolean deleteData, final EnvironmentContext envContext)
+        throws MetaException, NoSuchObjectException, IOException, InvalidObjectException, InvalidInputException {
       Path partPath = null;
-      Table tbl = null;
-      Partition part = null;
       boolean isArchived = false;
       Path archiveParentDir = null;
-      boolean mustPurge = false;
-      boolean tableDataShouldBeDeleted = false;
-      boolean needsCm = false;
-      Map<String, String> transactionalListenerResponses = Collections.emptyMap();
+      boolean success = false;
 
+      Table tbl = null;
+      Partition part = null;
+      boolean mustPurge = false;
+      long writeId = 0;
+    
+      Map<String, String> transactionalListenerResponses = Collections.emptyMap();
+      boolean needsCm = false;
+      
       if (db_name == null) {
         throw new MetaException("The DB name cannot be null.");
       }
@@ -5001,17 +5012,17 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
       try {
         ms.openTransaction();
+      
         part = ms.getPartition(catName, db_name, tbl_name, part_vals);
         tbl = get_table_core(catName, db_name, tbl_name, null);
-        tableDataShouldBeDeleted = checkTableDataShouldBeDeleted(tbl, deleteData);
         firePreEvent(new PreDropPartitionEvent(tbl, part, deleteData, this));
+      
         mustPurge = isMustPurge(envContext, tbl);
+        writeId = getWriteId(envContext);
 
         if (part == null) {
-          throw new NoSuchObjectException("Partition doesn't exist. "
-              + part_vals);
+          throw new NoSuchObjectException("Partition doesn't exist. " + part_vals);
         }
-
         isArchived = MetaStoreUtils.isArchived(part);
         if (isArchived) {
           archiveParentDir = MetaStoreUtils.getOriginalLocation(part);
@@ -5040,29 +5051,26 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       } finally {
         if (!success) {
           ms.rollbackTransaction();
-        } else if (deleteData && ((partPath != null) || (archiveParentDir != null))) {
-          if (tableDataShouldBeDeleted) {
-            if (mustPurge) {
-              LOG.info("dropPartition() will purge " + partPath + " directly, skipping trash.");
-            }
-            else {
-              LOG.info("dropPartition() will move " + partPath + " to trash-directory.");
-            }
-            // Archived partitions have har:/to_har_file as their location.
-            // The original directory was saved in params
+        } else if (checkTableDataShouldBeDeleted(tbl, deleteData) && 
+            (partPath != null || archiveParentDir != null)) {
 
-            if (isArchived) {
-              assert (archiveParentDir != null);
-              wh.deleteDir(archiveParentDir, true, mustPurge, needsCm);
-            } else {
-              assert (partPath != null);
-              wh.deleteDir(partPath, true, mustPurge, needsCm);
-              deleteParentRecursive(partPath.getParent(), part_vals.size() - 1,
-                      mustPurge, needsCm);
-            }
-            // ok even if the data is not deleted
+          LOG.info(mustPurge ?
+            "dropPartition() will purge " + partPath + " directly, skipping trash." :
+            "dropPartition() will move " + partPath + " to trash-directory.");
+          
+          // Archived partitions have har:/to_har_file as their location.
+          // The original directory was saved in params
+          if (isArchived) {
+            wh.deleteDir(archiveParentDir, true, mustPurge, needsCm);
+          } else {
+            wh.deleteDir(partPath, true, mustPurge, needsCm);
+            deleteParentRecursive(partPath.getParent(), part_vals.size() - 1, mustPurge, needsCm);
           }
+          // ok even if the data is not deleted
+        } else if (TxnUtils.isTransactionalTable(tbl) && writeId > 0) {
+          addTruncateBaseFile(partPath, writeId, DataFormat.DROPPED);
         }
+    
         if (!listeners.isEmpty()) {
           MetaStoreListenerNotifier.notifyEvent(listeners,
                                                 EventType.DROP_PARTITION,
@@ -5074,7 +5082,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       return true;
     }
 
-    private static boolean isMustPurge(EnvironmentContext envContext, Table tbl) {
+    static boolean isMustPurge(EnvironmentContext envContext, Table tbl) {
       // Data needs deletion. Check if trash may be skipped.
       // Trash may be skipped iff:
       //  1. deleteData == true, obviously.
@@ -5086,6 +5094,15 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         || (tbl.isSetParameters() && "true".equalsIgnoreCase(tbl.getParameters().get("auto.purge")));
 
     }
+    
+    private long getWriteId(EnvironmentContext context){
+      return Optional.ofNullable(context)
+        .map(EnvironmentContext::getProperties)
+        .map(prop -> prop.get("writeId"))
+        .map(Long::parseLong)
+        .orElse(0L);
+    }
+    
     private void deleteParentRecursive(Path parent, int depth, boolean mustPurge, boolean needRecycle)
             throws IOException, MetaException {
       if (depth > 0 && parent != null && wh.isWritable(parent)) {
@@ -5119,32 +5136,38 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       RawStore ms = getMS();
       String dbName = request.getDbName(), tblName = request.getTblName();
       String catName = request.isSetCatName() ? request.getCatName() : getDefaultCatalog(conf);
+    
       boolean ifExists = request.isSetIfExists() && request.isIfExists();
       boolean deleteData = request.isSetDeleteData() && request.isDeleteData();
       boolean ignoreProtection = request.isSetIgnoreProtection() && request.isIgnoreProtection();
       boolean needResult = !request.isSetNeedResult() || request.isNeedResult();
+      
       List<PathAndPartValSize> dirsToDelete = new ArrayList<>();
       List<Path> archToDelete = new ArrayList<>();
-      EnvironmentContext envContext = request.isSetEnvironmentContext()
-          ? request.getEnvironmentContext() : null;
-
+      EnvironmentContext envContext = 
+          request.isSetEnvironmentContext() ? request.getEnvironmentContext() : null;
       boolean success = false;
-      ms.openTransaction();
+    
       Table tbl = null;
       List<Partition> parts = null;
       boolean mustPurge = false;
+      long writeId = 0;
+    
       Map<String, String> transactionalListenerResponses = null;
-      boolean needsCm = ReplChangeManager.shouldEnableCm(ms.getDatabase(catName, dbName),
-              ms.getTable(catName, dbName, tblName));
+      boolean needsCm = false;
 
       try {
+        ms.openTransaction();
         // We need Partition-s for firing events and for result; DN needs MPartition-s to drop.
         // Great... Maybe we could bypass fetching MPartitions by issuing direct SQL deletes.
         tbl = get_table_core(catName, dbName, tblName);
         mustPurge = isMustPurge(envContext, tbl);
+        writeId = getWriteId(envContext);
+      
         int minCount = 0;
         RequestPartsSpec spec = request.getParts();
         List<String> partNames = null;
+      
         if (spec.isSetExprs()) {
           // Dropping by expressions.
           parts = new ArrayList<>(spec.getExprs().size());
@@ -5192,7 +5215,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
 
         for (Partition part : parts) {
-
           // TODO - we need to speed this up for the normal path where all partitions are under
           // the table and we don't have to stat every partition
 
@@ -5215,26 +5237,24 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
 
         ms.dropPartitions(catName, dbName, tblName, partNames);
-        if (parts != null && !transactionalListeners.isEmpty()) {
-          if (parts != null && !parts.isEmpty() && !transactionalListeners.isEmpty()) {
-            transactionalListenerResponses = MetaStoreListenerNotifier
-                .notifyEvent(transactionalListeners, EventType.DROP_PARTITION,
-                    new DropPartitionEvent(tbl, parts, true, deleteData, this), envContext);
-          }
+        if (!parts.isEmpty() && !transactionalListeners.isEmpty()) {
+          transactionalListenerResponses = MetaStoreListenerNotifier
+              .notifyEvent(transactionalListeners, EventType.DROP_PARTITION,
+                  new DropPartitionEvent(tbl, parts, true, deleteData, this), envContext);
         }
-
         success = ms.commitTransaction();
+        needsCm = ReplChangeManager.shouldEnableCm(ms.getDatabase(catName, dbName), tbl);
+      
         DropPartitionsResult result = new DropPartitionsResult();
         if (needResult) {
           result.setPartitions(parts);
         }
-
         return result;
       } finally {
         if (!success) {
           ms.rollbackTransaction();
         } else if (checkTableDataShouldBeDeleted(tbl, deleteData)) {
-          LOG.info( mustPurge?
+          LOG.info(mustPurge ?
                       "dropPartition() will purge partition-directories directly, skipping trash."
                     :  "dropPartition() will move partition-directories to trash-directory.");
           // Archived partitions have har:/to_har_file as their location.
@@ -5251,9 +5271,18 @@ public class HiveMetaStore extends ThriftHiveMetastore {
               throw new MetaException("Failed to delete parent: " + ex.getMessage());
             }
           }
+        } else if (TxnUtils.isTransactionalTable(tbl) && writeId > 0) {
+          for (Partition part : parts) {
+            if ((part.getSd() != null) && (part.getSd().getLocation() != null)) {
+              Path partPath = new Path(part.getSd().getLocation());
+              verifyIsWritablePath(partPath);
+              
+              addTruncateBaseFile(partPath, writeId, DataFormat.DROPPED);
+            }
+          }
         }
         if (parts != null) {
-          if (parts != null && !parts.isEmpty() && !listeners.isEmpty()) {
+          if (!parts.isEmpty() && !listeners.isEmpty()) {
             MetaStoreListenerNotifier.notifyEvent(listeners, EventType.DROP_PARTITION,
                 new DropPartitionEvent(tbl, parts, success, deleteData, this), envContext,
                 transactionalListenerResponses, ms);

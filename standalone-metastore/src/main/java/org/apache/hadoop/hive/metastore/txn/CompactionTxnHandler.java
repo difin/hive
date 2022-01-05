@@ -326,7 +326,7 @@ class CompactionTxnHandler extends TxnHandler {
           whereClause += " AND \"CQ_COMMIT_TIME\" < (" + getEpochFn(dbProduct) + " - " + retentionTime + ")";
         }
         String s = "SELECT \"CQ_ID\", \"cq1\".\"CQ_DATABASE\", \"cq1\".\"CQ_TABLE\", \"cq1\".\"CQ_PARTITION\"," +
-          "   \"CQ_TYPE\", \"CQ_RUN_AS\", \"CQ_HIGHEST_WRITE_ID\"" +
+          "   \"CQ_TYPE\", \"CQ_RUN_AS\", \"CQ_HIGHEST_WRITE_ID\", \"CQ_TBLPROPERTIES\"" +
           "  FROM \"COMPACTION_QUEUE\" \"cq1\" " +
           "INNER JOIN (" +
           "  SELECT MIN(\"CQ_HIGHEST_WRITE_ID\") \"WRITE_ID\", \"CQ_DATABASE\", \"CQ_TABLE\", \"CQ_PARTITION\"" +
@@ -352,6 +352,7 @@ class CompactionTxnHandler extends TxnHandler {
             info.type = dbCompactionType2ThriftType(rs.getString(5).charAt(0));
             info.runAs = rs.getString(6);
             info.highestWriteId = rs.getLong(7);
+            info.properties = rs.getString(8);
             if (LOG.isDebugEnabled()) {
               LOG.debug("Found ready to clean: " + info.toString());
             }
@@ -1374,7 +1375,7 @@ class CompactionTxnHandler extends TxnHandler {
   protected void updateCommitIdAndCleanUpMetadata(Statement stmt, long txnid, TxnType txnType, Long commitId,
       long tempId) throws SQLException, MetaException {
     super.updateCommitIdAndCleanUpMetadata(stmt, txnid, txnType, commitId, tempId);
-    if (txnType == TxnType.COMPACTION) {
+    if (txnType == TxnType.SOFT_DELETE || txnType == TxnType.COMPACTION) {
       stmt.executeUpdate(
           "UPDATE \"COMPACTION_QUEUE\" SET \"CQ_NEXT_TXN_ID\" = " + commitId + ", \"CQ_COMMIT_TIME\" = " +
               getEpochFn(dbProduct) + " WHERE \"CQ_TXN_ID\" = " + txnid);

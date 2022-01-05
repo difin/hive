@@ -255,6 +255,16 @@ public class MetaStoreUtils {
     throw new MetaException(exInfo);
   }
 
+  /**
+   * Catches exceptions that cannot be handled and wraps them in MetaException.
+   *
+   * @param e exception to wrap.
+   * @throws MetaException wrapper for the exception
+   */
+  public static void throwMetaException(Exception e) throws MetaException {
+    throw new MetaException("Got exception: " + e.getClass().getName() + " " + e.getMessage());
+  }
+  
   public static String encodeTableName(String name) {
     // The encoding method is simple, e.g., replace
     // all the special characters with the corresponding number in ASCII.

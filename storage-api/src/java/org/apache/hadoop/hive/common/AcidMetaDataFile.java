@@ -54,7 +54,9 @@ public class AcidMetaDataFile {
     // written by Major compaction
     COMPACTED,
     // written by truncate
-    TRUNCATED;
+    TRUNCATED,
+    // written by drop partition
+    DROPPED;
 
     @Override
     public String toString() {
