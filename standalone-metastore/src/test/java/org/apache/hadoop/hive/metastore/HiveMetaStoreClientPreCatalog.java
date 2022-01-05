@@ -1510,9 +1510,9 @@ public class HiveMetaStoreClientPreCatalog implements IMetaStoreClient, AutoClos
 
   /** {@inheritDoc} */
   @Override
-  public Materialization getMaterializationInvalidationInfo(CreationMetadata cm)
+  public Materialization getMaterializationInvalidationInfo(CreationMetadata cm, String validTxnList)
       throws MetaException, InvalidOperationException, UnknownDBException, TException {
-    return client.get_materialization_invalidation_info(cm);
+    return client.get_materialization_invalidation_info(cm, validTxnList);
   }
 
   /** {@inheritDoc} */
@@ -1883,11 +1883,6 @@ public class HiveMetaStoreClientPreCatalog implements IMetaStoreClient, AutoClos
     InvalidInputException
   {
     return client.delete_table_column_statistics(dbName, tableName, colName, engine);
-  }
-
-  @Override
-  public void updateTransactionalStatistics(UpdateTransactionalStatsRequest req)  throws TException {
-    client.update_transaction_statistics(req);
   }
 
   /**

@@ -176,7 +176,6 @@ import org.apache.hadoop.hive.metastore.api.SchemaVersionState;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;
 import org.apache.hadoop.hive.metastore.api.SerdeType;
 import org.apache.hadoop.hive.metastore.api.SkewedInfo;
-import org.apache.hadoop.hive.metastore.api.SourceTable;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.StoredProcedure;
 import org.apache.hadoop.hive.metastore.api.Table;
@@ -285,7 +284,6 @@ import org.apache.hadoop.hive.metastore.api.WMResourcePlanStatus;
 import org.apache.hadoop.hive.metastore.api.WMTrigger;
 import org.apache.hadoop.hive.metastore.api.WMValidateResourcePlanResponse;
 import org.apache.hadoop.hive.metastore.api.WriteEventInfo;
-import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.apache.hadoop.hive.metastore.metrics.Metrics;
@@ -302,7 +300,6 @@ import org.apache.hadoop.hive.metastore.model.MFieldSchema;
 import org.apache.hadoop.hive.metastore.model.MFunction;
 import org.apache.hadoop.hive.metastore.model.MGlobalPrivilege;
 import org.apache.hadoop.hive.metastore.model.MISchema;
-import org.apache.hadoop.hive.metastore.model.MMVSource;
 import org.apache.hadoop.hive.metastore.model.MMasterKey;
 import org.apache.hadoop.hive.metastore.model.MMetastoreDBProperties;
 import org.apache.hadoop.hive.metastore.model.MNotificationLog;
@@ -1423,9 +1420,8 @@ public class ObjectStore implements RawStore, Configurable {
       while (iter.hasNext())
       {
         MCreationMetadata p = iter.next();
-        Set<MMVSource> tables = p.getTables();
-        for (MMVSource sourceTable : tables) {
-          MTable table = sourceTable.getTable();
+        Set<MTable> tables = p.getTables();
+        for (MTable table : tables) {
           if (dbName.equals(table.getDatabase().getName())  && tblName.equals(table.getTableName())) {
             LOG.info("Cannot drop table " + table.getTableName() +
                     " as it is being used by MView " + p.getTblName());
@@ -2401,29 +2397,25 @@ public class ObjectStore implements RawStore, Configurable {
       return null;
     }
     assert !m.isSetMaterializationTime();
-    Set<MMVSource> tablesUsed = new HashSet<>();
-    for (SourceTable sourceTable : m.getTablesUsed()) {
-      Table table = sourceTable.getTable();
-      MTable mtbl = getMTable(m.getCatName(), table.getDbName(), table.getTableName(), false).mtbl;
-      MMVSource source = new MMVSource();
-      source.setTable(mtbl);
-      source.setInsertedCount(sourceTable.getInsertedCount());
-      source.setUpdatedCount(sourceTable.getUpdatedCount());
-      source.setDeletedCount(sourceTable.getDeletedCount());
-      tablesUsed.add(source);
+    Set<MTable> tablesUsed = new HashSet<>();
+    for (String fullyQualifiedName : m.getTablesUsed()) {
+      String[] names =  fullyQualifiedName.split("\\.");
+      tablesUsed.add(getMTable(m.getCatName(), names[0], names[1], false).mtbl);
     }
     return new MCreationMetadata(normalizeIdentifier(m.getCatName()),
             normalizeIdentifier(m.getDbName()), normalizeIdentifier(m.getTblName()),
         tablesUsed, m.getValidTxnList(), System.currentTimeMillis());
   }
 
-  private CreationMetadata convertToCreationMetadata(MCreationMetadata s) throws MetaException {
+  private CreationMetadata convertToCreationMetadata(MCreationMetadata s) {
     if (s == null) {
       return null;
     }
-    Set<SourceTable> tablesUsed = new HashSet<>();
-    for (MMVSource mtbl : s.getTables()) {
-      tablesUsed.add(convertToSourceTable(mtbl, s.getCatalogName()));
+    Set<String> tablesUsed = new HashSet<>();
+    for (MTable mtbl : s.getTables()) {
+      tablesUsed.add(
+          Warehouse.getQualifiedName(
+              mtbl.getDatabase().getName(), mtbl.getTableName()));
     }
     CreationMetadata r = new CreationMetadata(s.getCatalogName(),
         s.getDbName(), s.getTblName(), tablesUsed);
@@ -2432,17 +2424,6 @@ public class ObjectStore implements RawStore, Configurable {
       r.setValidTxnList(s.getTxnList());
     }
     return r;
-  }
-
-  private SourceTable convertToSourceTable(MMVSource mmvSource, String catalogName) throws MetaException {
-    SourceTable sourceTable = new SourceTable();
-    MTable mTable = mmvSource.getTable();
-    Table table = getTable(catalogName, mTable.getDatabase().getName(), mTable.getTableName());
-    sourceTable.setTable(table);
-    sourceTable.setInsertedCount(mmvSource.getInsertedCount());
-    sourceTable.setUpdatedCount(mmvSource.getUpdatedCount());
-    sourceTable.setDeletedCount(mmvSource.getDeletedCount());
-    return sourceTable;
   }
 
   @Override

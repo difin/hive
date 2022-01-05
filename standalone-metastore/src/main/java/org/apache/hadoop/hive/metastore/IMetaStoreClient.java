@@ -794,7 +794,7 @@ public interface IMetaStoreClient {
   /**
    * Returns the invalidation information for the materialized views given as input.
    */
-  Materialization getMaterializationInvalidationInfo(CreationMetadata cm)
+  Materialization getMaterializationInvalidationInfo(CreationMetadata cm, String validTxnList)
       throws MetaException, InvalidOperationException, UnknownDBException, TException;
 
   /**
@@ -2656,8 +2656,6 @@ public interface IMetaStoreClient {
    */
   boolean deleteTableColumnStatistics(String catName, String dbName, String tableName, String colName, String engine)
       throws NoSuchObjectException, MetaException, InvalidObjectException, TException, InvalidInputException;
-
-  void updateTransactionalStatistics(UpdateTransactionalStatsRequest req) throws TException;
 
   /**
    * @param role

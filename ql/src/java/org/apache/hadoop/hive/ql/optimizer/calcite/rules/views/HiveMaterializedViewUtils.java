@@ -22,9 +22,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.calcite.adapter.druid.DruidQuery;
 import org.apache.calcite.interpreter.BindableConvention;
 import org.apache.calcite.plan.RelOptCluster;
@@ -47,11 +44,9 @@ import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.tools.RelBuilder;
 import org.apache.calcite.util.ImmutableBitSet;
-import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.metastore.api.CreationMetadata;
-import org.apache.hadoop.hive.metastore.api.SourceTable;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.lockmgr.LockException;
 import org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization;
@@ -100,12 +95,9 @@ public class HiveMaterializedViewUtils {
    * materialized view definition uses external tables.
    */
   public static Boolean isOutdatedMaterializedView(
-      String validTxnsList, HiveTxnManager txnMgr,
-      Set<TableName> tablesUsed, Table materializedViewTable) throws LockException {
-    List<String> tablesUsedNames = tablesUsed.stream()
-        .map(tableName -> TableName.getDbTable(tableName.getDb(), tableName.getTable()))
-        .collect(Collectors.toList());
-    ValidTxnWriteIdList currentTxnWriteIds = txnMgr.getValidWriteIds(tablesUsedNames, validTxnsList);
+          String validTxnsList, HiveTxnManager txnMgr,
+          List<String> tablesUsed, Table materializedViewTable) throws LockException {
+    ValidTxnWriteIdList currentTxnWriteIds = txnMgr.getValidWriteIds(tablesUsed, validTxnsList);
     if (currentTxnWriteIds == null) {
       LOG.debug("Materialized view " + materializedViewTable.getFullyQualifiedName() +
               " ignored for rewriting as we could not obtain current txn ids");
@@ -113,11 +105,6 @@ public class HiveMaterializedViewUtils {
     }
 
     CreationMetadata creationMetadata = materializedViewTable.getCreationMetadata();
-    Set<String> storedTablesUsed =
-        creationMetadata.getTablesUsed().stream()
-            .map(sourceTable -> TableName.getDbTable(
-                    sourceTable.getTable().getDbName(), sourceTable.getTable().getTableName()))
-            .collect(Collectors.toSet());
     if (creationMetadata.getValidTxnList() == null ||
             creationMetadata.getValidTxnList().isEmpty()) {
       LOG.debug("Materialized view " + materializedViewTable.getFullyQualifiedName() +
@@ -127,28 +114,28 @@ public class HiveMaterializedViewUtils {
     boolean ignore = false;
     ValidTxnWriteIdList mvTxnWriteIds = new ValidTxnWriteIdList(
             creationMetadata.getValidTxnList());
-    for (String fullyQualifiedTableName : tablesUsedNames) {
+    for (String qName : tablesUsed) {
       // Note. If the materialized view does not contain a table that is contained in the query,
       // we do not need to check whether that specific table is outdated or not. If a rewriting
       // is produced in those cases, it is because that additional table is joined with the
       // existing tables with an append-columns only join, i.e., PK-FK + not null.
-      if (!storedTablesUsed.contains(fullyQualifiedTableName)) {
+      if (!creationMetadata.getTablesUsed().contains(qName)) {
         continue;
       }
-      ValidWriteIdList tableCurrentWriteIds = currentTxnWriteIds.getTableValidWriteIdList(fullyQualifiedTableName);
+      ValidWriteIdList tableCurrentWriteIds = currentTxnWriteIds.getTableValidWriteIdList(qName);
       if (tableCurrentWriteIds == null) {
         // Uses non-transactional table, cannot be considered
         LOG.debug("Materialized view " + materializedViewTable.getFullyQualifiedName() +
                 " ignored for rewriting as it is outdated and cannot be considered for " +
-                " rewriting because it uses non-transactional table " + fullyQualifiedTableName);
+                " rewriting because it uses non-transactional table " + qName);
         ignore = true;
         break;
       }
-      ValidWriteIdList tableWriteIds = mvTxnWriteIds.getTableValidWriteIdList(fullyQualifiedTableName);
+      ValidWriteIdList tableWriteIds = mvTxnWriteIds.getTableValidWriteIdList(qName);
       if (tableWriteIds == null) {
         // This should not happen, but we ignore for safety
         LOG.warn("Materialized view " + materializedViewTable.getFullyQualifiedName() +
-                " ignored for rewriting as details about txn ids for table " + fullyQualifiedTableName +
+                " ignored for rewriting as details about txn ids for table " + qName +
                 " could not be found in " + mvTxnWriteIds);
         ignore = true;
         break;
@@ -378,14 +365,5 @@ public class HiveMaterializedViewUtils {
         newTable, ((RelOptHiveTable) scan.getTable()).getName(), null, false, false);
     }
     return newScan;
-  }
-
-  public static Set<TableName> asTableNames(Set<SourceTable> sourceTables) {
-    return sourceTables.stream()
-            .map(sourceTable -> new TableName(
-                    sourceTable.getTable().getCatName(),
-                    sourceTable.getTable().getDbName(),
-                    sourceTable.getTable().getTableName()))
-            .collect(Collectors.toSet());
   }
 }

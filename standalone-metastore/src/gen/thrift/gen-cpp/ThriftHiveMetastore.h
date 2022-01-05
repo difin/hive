@@ -74,7 +74,7 @@ class ThriftHiveMetastoreIf : virtual public  ::facebook::fb303::FacebookService
   virtual void get_tables_ext(std::vector<ExtendedTableInfo> & _return, const GetTablesExtRequest& req) = 0;
   virtual void get_table_req(GetTableResult& _return, const GetTableRequest& req) = 0;
   virtual void get_table_objects_by_name_req(GetTablesResult& _return, const GetTablesRequest& req) = 0;
-  virtual void get_materialization_invalidation_info(Materialization& _return, const CreationMetadata& creation_metadata) = 0;
+  virtual void get_materialization_invalidation_info(Materialization& _return, const CreationMetadata& creation_metadata, const std::string& validTxnList) = 0;
   virtual void update_creation_metadata(const std::string& catName, const std::string& dbname, const std::string& tbl_name, const CreationMetadata& creation_metadata) = 0;
   virtual void get_table_names_by_filter(std::vector<std::string> & _return, const std::string& dbname, const std::string& filter, const int16_t max_tables) = 0;
   virtual void alter_table(const std::string& dbname, const std::string& tbl_name, const Table& new_tbl) = 0;
@@ -142,7 +142,6 @@ class ThriftHiveMetastoreIf : virtual public  ::facebook::fb303::FacebookService
   virtual bool update_partition_column_statistics(const ColumnStatistics& stats_obj) = 0;
   virtual void update_table_column_statistics_req(SetPartitionsStatsResponse& _return, const SetPartitionsStatsRequest& req) = 0;
   virtual void update_partition_column_statistics_req(SetPartitionsStatsResponse& _return, const SetPartitionsStatsRequest& req) = 0;
-  virtual void update_transaction_statistics(const UpdateTransactionalStatsRequest& req) = 0;
   virtual void get_table_column_statistics(ColumnStatistics& _return, const std::string& db_name, const std::string& tbl_name, const std::string& col_name) = 0;
   virtual void get_partition_column_statistics(ColumnStatistics& _return, const std::string& db_name, const std::string& tbl_name, const std::string& part_name, const std::string& col_name) = 0;
   virtual void get_table_statistics_req(TableStatsResult& _return, const TableStatsRequest& request) = 0;
@@ -465,7 +464,7 @@ class ThriftHiveMetastoreNull : virtual public ThriftHiveMetastoreIf , virtual p
   void get_table_objects_by_name_req(GetTablesResult& /* _return */, const GetTablesRequest& /* req */) {
     return;
   }
-  void get_materialization_invalidation_info(Materialization& /* _return */, const CreationMetadata& /* creation_metadata */) {
+  void get_materialization_invalidation_info(Materialization& /* _return */, const CreationMetadata& /* creation_metadata */, const std::string& /* validTxnList */) {
     return;
   }
   void update_creation_metadata(const std::string& /* catName */, const std::string& /* dbname */, const std::string& /* tbl_name */, const CreationMetadata& /* creation_metadata */) {
@@ -678,9 +677,6 @@ class ThriftHiveMetastoreNull : virtual public ThriftHiveMetastoreIf , virtual p
     return;
   }
   void update_partition_column_statistics_req(SetPartitionsStatsResponse& /* _return */, const SetPartitionsStatsRequest& /* req */) {
-    return;
-  }
-  void update_transaction_statistics(const UpdateTransactionalStatsRequest& /* req */) {
     return;
   }
   void get_table_column_statistics(ColumnStatistics& /* _return */, const std::string& /* db_name */, const std::string& /* tbl_name */, const std::string& /* col_name */) {
@@ -7261,8 +7257,9 @@ class ThriftHiveMetastore_get_table_objects_by_name_req_presult {
 };
 
 typedef struct _ThriftHiveMetastore_get_materialization_invalidation_info_args__isset {
-  _ThriftHiveMetastore_get_materialization_invalidation_info_args__isset() : creation_metadata(false) {}
+  _ThriftHiveMetastore_get_materialization_invalidation_info_args__isset() : creation_metadata(false), validTxnList(false) {}
   bool creation_metadata :1;
+  bool validTxnList :1;
 } _ThriftHiveMetastore_get_materialization_invalidation_info_args__isset;
 
 class ThriftHiveMetastore_get_materialization_invalidation_info_args {
@@ -7270,19 +7267,24 @@ class ThriftHiveMetastore_get_materialization_invalidation_info_args {
 
   ThriftHiveMetastore_get_materialization_invalidation_info_args(const ThriftHiveMetastore_get_materialization_invalidation_info_args&);
   ThriftHiveMetastore_get_materialization_invalidation_info_args& operator=(const ThriftHiveMetastore_get_materialization_invalidation_info_args&);
-  ThriftHiveMetastore_get_materialization_invalidation_info_args() {
+  ThriftHiveMetastore_get_materialization_invalidation_info_args() : validTxnList() {
   }
 
   virtual ~ThriftHiveMetastore_get_materialization_invalidation_info_args() noexcept;
   CreationMetadata creation_metadata;
+  std::string validTxnList;
 
   _ThriftHiveMetastore_get_materialization_invalidation_info_args__isset __isset;
 
   void __set_creation_metadata(const CreationMetadata& val);
 
+  void __set_validTxnList(const std::string& val);
+
   bool operator == (const ThriftHiveMetastore_get_materialization_invalidation_info_args & rhs) const
   {
     if (!(creation_metadata == rhs.creation_metadata))
+      return false;
+    if (!(validTxnList == rhs.validTxnList))
       return false;
     return true;
   }
@@ -7304,6 +7306,7 @@ class ThriftHiveMetastore_get_materialization_invalidation_info_pargs {
 
   virtual ~ThriftHiveMetastore_get_materialization_invalidation_info_pargs() noexcept;
   const CreationMetadata* creation_metadata;
+  const std::string* validTxnList;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -16301,110 +16304,6 @@ class ThriftHiveMetastore_update_partition_column_statistics_req_presult {
   InvalidInputException o4;
 
   _ThriftHiveMetastore_update_partition_column_statistics_req_presult__isset __isset;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-
-};
-
-typedef struct _ThriftHiveMetastore_update_transaction_statistics_args__isset {
-  _ThriftHiveMetastore_update_transaction_statistics_args__isset() : req(false) {}
-  bool req :1;
-} _ThriftHiveMetastore_update_transaction_statistics_args__isset;
-
-class ThriftHiveMetastore_update_transaction_statistics_args {
- public:
-
-  ThriftHiveMetastore_update_transaction_statistics_args(const ThriftHiveMetastore_update_transaction_statistics_args&);
-  ThriftHiveMetastore_update_transaction_statistics_args& operator=(const ThriftHiveMetastore_update_transaction_statistics_args&);
-  ThriftHiveMetastore_update_transaction_statistics_args() {
-  }
-
-  virtual ~ThriftHiveMetastore_update_transaction_statistics_args() noexcept;
-  UpdateTransactionalStatsRequest req;
-
-  _ThriftHiveMetastore_update_transaction_statistics_args__isset __isset;
-
-  void __set_req(const UpdateTransactionalStatsRequest& val);
-
-  bool operator == (const ThriftHiveMetastore_update_transaction_statistics_args & rhs) const
-  {
-    if (!(req == rhs.req))
-      return false;
-    return true;
-  }
-  bool operator != (const ThriftHiveMetastore_update_transaction_statistics_args &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const ThriftHiveMetastore_update_transaction_statistics_args & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-
-class ThriftHiveMetastore_update_transaction_statistics_pargs {
- public:
-
-
-  virtual ~ThriftHiveMetastore_update_transaction_statistics_pargs() noexcept;
-  const UpdateTransactionalStatsRequest* req;
-
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _ThriftHiveMetastore_update_transaction_statistics_result__isset {
-  _ThriftHiveMetastore_update_transaction_statistics_result__isset() : o1(false) {}
-  bool o1 :1;
-} _ThriftHiveMetastore_update_transaction_statistics_result__isset;
-
-class ThriftHiveMetastore_update_transaction_statistics_result {
- public:
-
-  ThriftHiveMetastore_update_transaction_statistics_result(const ThriftHiveMetastore_update_transaction_statistics_result&);
-  ThriftHiveMetastore_update_transaction_statistics_result& operator=(const ThriftHiveMetastore_update_transaction_statistics_result&);
-  ThriftHiveMetastore_update_transaction_statistics_result() {
-  }
-
-  virtual ~ThriftHiveMetastore_update_transaction_statistics_result() noexcept;
-  MetaException o1;
-
-  _ThriftHiveMetastore_update_transaction_statistics_result__isset __isset;
-
-  void __set_o1(const MetaException& val);
-
-  bool operator == (const ThriftHiveMetastore_update_transaction_statistics_result & rhs) const
-  {
-    if (!(o1 == rhs.o1))
-      return false;
-    return true;
-  }
-  bool operator != (const ThriftHiveMetastore_update_transaction_statistics_result &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const ThriftHiveMetastore_update_transaction_statistics_result & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _ThriftHiveMetastore_update_transaction_statistics_presult__isset {
-  _ThriftHiveMetastore_update_transaction_statistics_presult__isset() : o1(false) {}
-  bool o1 :1;
-} _ThriftHiveMetastore_update_transaction_statistics_presult__isset;
-
-class ThriftHiveMetastore_update_transaction_statistics_presult {
- public:
-
-
-  virtual ~ThriftHiveMetastore_update_transaction_statistics_presult() noexcept;
-  MetaException o1;
-
-  _ThriftHiveMetastore_update_transaction_statistics_presult__isset __isset;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
 
@@ -32343,8 +32242,8 @@ class ThriftHiveMetastoreClient : virtual public ThriftHiveMetastoreIf, public  
   void get_table_objects_by_name_req(GetTablesResult& _return, const GetTablesRequest& req);
   void send_get_table_objects_by_name_req(const GetTablesRequest& req);
   void recv_get_table_objects_by_name_req(GetTablesResult& _return);
-  void get_materialization_invalidation_info(Materialization& _return, const CreationMetadata& creation_metadata);
-  void send_get_materialization_invalidation_info(const CreationMetadata& creation_metadata);
+  void get_materialization_invalidation_info(Materialization& _return, const CreationMetadata& creation_metadata, const std::string& validTxnList);
+  void send_get_materialization_invalidation_info(const CreationMetadata& creation_metadata, const std::string& validTxnList);
   void recv_get_materialization_invalidation_info(Materialization& _return);
   void update_creation_metadata(const std::string& catName, const std::string& dbname, const std::string& tbl_name, const CreationMetadata& creation_metadata);
   void send_update_creation_metadata(const std::string& catName, const std::string& dbname, const std::string& tbl_name, const CreationMetadata& creation_metadata);
@@ -32547,9 +32446,6 @@ class ThriftHiveMetastoreClient : virtual public ThriftHiveMetastoreIf, public  
   void update_partition_column_statistics_req(SetPartitionsStatsResponse& _return, const SetPartitionsStatsRequest& req);
   void send_update_partition_column_statistics_req(const SetPartitionsStatsRequest& req);
   void recv_update_partition_column_statistics_req(SetPartitionsStatsResponse& _return);
-  void update_transaction_statistics(const UpdateTransactionalStatsRequest& req);
-  void send_update_transaction_statistics(const UpdateTransactionalStatsRequest& req);
-  void recv_update_transaction_statistics();
   void get_table_column_statistics(ColumnStatistics& _return, const std::string& db_name, const std::string& tbl_name, const std::string& col_name);
   void send_get_table_column_statistics(const std::string& db_name, const std::string& tbl_name, const std::string& col_name);
   void recv_get_table_column_statistics(ColumnStatistics& _return);
@@ -33093,7 +32989,6 @@ class ThriftHiveMetastoreProcessor : public  ::facebook::fb303::FacebookServiceP
   void process_update_partition_column_statistics(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_update_table_column_statistics_req(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_update_partition_column_statistics_req(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
-  void process_update_transaction_statistics(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_get_table_column_statistics(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_get_partition_column_statistics(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_get_table_statistics_req(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
@@ -33355,7 +33250,6 @@ class ThriftHiveMetastoreProcessor : public  ::facebook::fb303::FacebookServiceP
     processMap_["update_partition_column_statistics"] = &ThriftHiveMetastoreProcessor::process_update_partition_column_statistics;
     processMap_["update_table_column_statistics_req"] = &ThriftHiveMetastoreProcessor::process_update_table_column_statistics_req;
     processMap_["update_partition_column_statistics_req"] = &ThriftHiveMetastoreProcessor::process_update_partition_column_statistics_req;
-    processMap_["update_transaction_statistics"] = &ThriftHiveMetastoreProcessor::process_update_transaction_statistics;
     processMap_["get_table_column_statistics"] = &ThriftHiveMetastoreProcessor::process_get_table_column_statistics;
     processMap_["get_partition_column_statistics"] = &ThriftHiveMetastoreProcessor::process_get_partition_column_statistics;
     processMap_["get_table_statistics_req"] = &ThriftHiveMetastoreProcessor::process_get_table_statistics_req;
@@ -34014,13 +33908,13 @@ class ThriftHiveMetastoreMultiface : virtual public ThriftHiveMetastoreIf, publi
     return;
   }
 
-  void get_materialization_invalidation_info(Materialization& _return, const CreationMetadata& creation_metadata) {
+  void get_materialization_invalidation_info(Materialization& _return, const CreationMetadata& creation_metadata, const std::string& validTxnList) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->get_materialization_invalidation_info(_return, creation_metadata);
+      ifaces_[i]->get_materialization_invalidation_info(_return, creation_metadata, validTxnList);
     }
-    ifaces_[i]->get_materialization_invalidation_info(_return, creation_metadata);
+    ifaces_[i]->get_materialization_invalidation_info(_return, creation_metadata, validTxnList);
     return;
   }
 
@@ -34671,15 +34565,6 @@ class ThriftHiveMetastoreMultiface : virtual public ThriftHiveMetastoreIf, publi
     }
     ifaces_[i]->update_partition_column_statistics_req(_return, req);
     return;
-  }
-
-  void update_transaction_statistics(const UpdateTransactionalStatsRequest& req) {
-    size_t sz = ifaces_.size();
-    size_t i = 0;
-    for (; i < (sz - 1); ++i) {
-      ifaces_[i]->update_transaction_statistics(req);
-    }
-    ifaces_[i]->update_transaction_statistics(req);
   }
 
   void get_table_column_statistics(ColumnStatistics& _return, const std::string& db_name, const std::string& tbl_name, const std::string& col_name) {
@@ -36178,8 +36063,8 @@ class ThriftHiveMetastoreConcurrentClient : virtual public ThriftHiveMetastoreIf
   void get_table_objects_by_name_req(GetTablesResult& _return, const GetTablesRequest& req);
   int32_t send_get_table_objects_by_name_req(const GetTablesRequest& req);
   void recv_get_table_objects_by_name_req(GetTablesResult& _return, const int32_t seqid);
-  void get_materialization_invalidation_info(Materialization& _return, const CreationMetadata& creation_metadata);
-  int32_t send_get_materialization_invalidation_info(const CreationMetadata& creation_metadata);
+  void get_materialization_invalidation_info(Materialization& _return, const CreationMetadata& creation_metadata, const std::string& validTxnList);
+  int32_t send_get_materialization_invalidation_info(const CreationMetadata& creation_metadata, const std::string& validTxnList);
   void recv_get_materialization_invalidation_info(Materialization& _return, const int32_t seqid);
   void update_creation_metadata(const std::string& catName, const std::string& dbname, const std::string& tbl_name, const CreationMetadata& creation_metadata);
   int32_t send_update_creation_metadata(const std::string& catName, const std::string& dbname, const std::string& tbl_name, const CreationMetadata& creation_metadata);
@@ -36382,9 +36267,6 @@ class ThriftHiveMetastoreConcurrentClient : virtual public ThriftHiveMetastoreIf
   void update_partition_column_statistics_req(SetPartitionsStatsResponse& _return, const SetPartitionsStatsRequest& req);
   int32_t send_update_partition_column_statistics_req(const SetPartitionsStatsRequest& req);
   void recv_update_partition_column_statistics_req(SetPartitionsStatsResponse& _return, const int32_t seqid);
-  void update_transaction_statistics(const UpdateTransactionalStatsRequest& req);
-  int32_t send_update_transaction_statistics(const UpdateTransactionalStatsRequest& req);
-  void recv_update_transaction_statistics(const int32_t seqid);
   void get_table_column_statistics(ColumnStatistics& _return, const std::string& db_name, const std::string& tbl_name, const std::string& col_name);
   int32_t send_get_table_column_statistics(const std::string& db_name, const std::string& tbl_name, const std::string& col_name);
   void recv_get_table_column_statistics(ColumnStatistics& _return, const int32_t seqid);

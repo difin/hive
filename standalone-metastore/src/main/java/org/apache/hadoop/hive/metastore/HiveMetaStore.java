@@ -3851,8 +3851,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     }
 
     @Override
-    public Materialization get_materialization_invalidation_info(final CreationMetadata cm) throws MetaException {
-      return getTxnHandler().getMaterializationInvalidationInfo(cm);
+    public Materialization get_materialization_invalidation_info(final CreationMetadata cm, final String validTxnList) throws MetaException {
+      return getTxnHandler().getMaterializationInvalidationInfo(cm, validTxnList);
     }
 
     @Override
@@ -7146,11 +7146,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         endFunction("delete_column_statistics_by_table", ret != false, null, tableName);
       }
       return ret;
-    }
-
-    @Override
-    public void update_transaction_statistics(UpdateTransactionalStatsRequest req) throws TException {
-      getTxnHandler().updateTransactionStatistics(req);
     }
 
     @Override

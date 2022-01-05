@@ -389,12 +389,13 @@ interface ThriftHiveMetastoreIf extends \FacebookServiceIf
     public function get_table_objects_by_name_req(\metastore\GetTablesRequest $req);
     /**
      * @param \metastore\CreationMetadata $creation_metadata
+     * @param string $validTxnList
      * @return \metastore\Materialization
      * @throws \metastore\MetaException
      * @throws \metastore\InvalidOperationException
      * @throws \metastore\UnknownDBException
      */
-    public function get_materialization_invalidation_info(\metastore\CreationMetadata $creation_metadata);
+    public function get_materialization_invalidation_info(\metastore\CreationMetadata $creation_metadata, $validTxnList);
     /**
      * @param string $catName
      * @param string $dbname
@@ -987,11 +988,6 @@ interface ThriftHiveMetastoreIf extends \FacebookServiceIf
      * @throws \metastore\InvalidInputException
      */
     public function update_partition_column_statistics_req(\metastore\SetPartitionsStatsRequest $req);
-    /**
-     * @param \metastore\UpdateTransactionalStatsRequest $req
-     * @throws \metastore\MetaException
-     */
-    public function update_transaction_statistics(\metastore\UpdateTransactionalStatsRequest $req);
     /**
      * @param string $db_name
      * @param string $tbl_name

@@ -2370,9 +2370,9 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   }
 
   @Override
-  public Materialization getMaterializationInvalidationInfo(CreationMetadata cm)
+  public Materialization getMaterializationInvalidationInfo(CreationMetadata cm, String validTxnList)
       throws MetaException, InvalidOperationException, UnknownDBException, TException {
-    return client.get_materialization_invalidation_info(cm);
+    return client.get_materialization_invalidation_info(cm, validTxnList);
   }
 
   @Override
@@ -3047,11 +3047,6 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
       String colName, String engine) throws TException {
     return client.delete_table_column_statistics(prependCatalogToDbName(catName, dbName, conf),
         tableName, colName, engine);
-  }
-
-  @Override
-  public void updateTransactionalStatistics(UpdateTransactionalStatsRequest req)  throws TException {
-    client.update_transaction_statistics(req);
   }
 
   @Override

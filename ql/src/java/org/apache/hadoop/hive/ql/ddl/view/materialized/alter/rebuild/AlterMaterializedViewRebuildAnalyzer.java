@@ -60,7 +60,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static java.util.Collections.singletonList;
 
@@ -193,7 +192,7 @@ public class AlterMaterializedViewRebuildAnalyzer extends CalcitePlanner {
       final RelOptCluster optCluster = basePlan.getCluster();
       final PerfLogger perfLogger = SessionState.getPerfLogger();
       final RelNode calcitePreMVRewritingPlan = basePlan;
-      final Set<TableName> tablesUsedQuery = getTablesUsed(basePlan);
+      final List<String> tablesUsedQuery = getTablesUsed(basePlan);
 
       // Add views to planner
       HiveRelOptMaterialization materialization;

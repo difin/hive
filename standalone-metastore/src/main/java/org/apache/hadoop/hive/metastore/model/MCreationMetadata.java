@@ -17,7 +17,6 @@
  */
 package org.apache.hadoop.hive.metastore.model;
 
-import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -28,45 +27,18 @@ import java.util.Set;
  */
 public class MCreationMetadata {
 
-  private long id;
   private String catalogName;
   private String dbName;
   private String tblName;
-  private Set<MMVSource> tables;
+  private Set<MTable> tables;
   private String txnList;
   private long materializationTime;
-
-  public static class PK implements Serializable {
-    public long id;
-
-    public PK() {}
-
-    public PK(long id) {
-      this.id = id;
-    }
-
-    public String toString() {
-      return String.format("%d", id);
-    }
-
-    public int hashCode() {
-      return toString().hashCode();
-    }
-
-    public boolean equals(Object other) {
-      if (other != null && (other instanceof MCreationMetadata.PK)) {
-        MCreationMetadata.PK otherPK = (MCreationMetadata.PK) other;
-        return otherPK.id == id;
-      }
-      return false;
-    }
-  }
 
   public MCreationMetadata() {
   }
 
   public MCreationMetadata(String catName, String dbName, String tblName,
-      Set<MMVSource> tables, String txnList, long materializationTime) {
+      Set<MTable> tables, String txnList, long materializationTime) {
     this.catalogName = catName;
     this.dbName = dbName;
     this.tblName = tblName;
@@ -75,13 +47,12 @@ public class MCreationMetadata {
     this.materializationTime = materializationTime;
   }
 
-  public Set<MMVSource> getTables() {
+  public Set<MTable> getTables() {
     return tables;
   }
 
-  public void setTables(Set<MMVSource> tables) {
-    this.tables.clear();
-    this.tables.addAll(tables);
+  public void setTables(Set<MTable> tables) {
+    this.tables = tables;
   }
 
   public String getTxnList() {

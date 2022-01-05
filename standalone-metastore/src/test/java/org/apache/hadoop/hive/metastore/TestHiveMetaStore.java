@@ -43,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.collect.Sets;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.hive.metastore.api.CreationMetadata;
-import org.apache.hadoop.hive.metastore.api.SourceTable;
 import org.apache.hadoop.hive.metastore.client.builder.DatabaseBuilder;
 import org.apache.hadoop.hive.metastore.client.builder.TableBuilder;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
@@ -2865,8 +2864,8 @@ public abstract class TestHiveMetaStore {
    * @param tableName the table name to be created
    */
 
-  private Table createTable(String dbName, String tableName) throws TException {
-    return new TableBuilder()
+  private void createTable(String dbName, String tableName) throws TException {
+    new TableBuilder()
         .setDbName(dbName)
         .setTableName(tableName)
         .addCol("foo", "string")
@@ -2874,27 +2873,13 @@ public abstract class TestHiveMetaStore {
         .create(client, conf);
   }
 
-  public static SourceTable createSourceTable(Table table) {
-    SourceTable sourceTable = new SourceTable();
-    sourceTable.setTable(table);
-    sourceTable.setInsertedCount(0L);
-    sourceTable.setUpdatedCount(0L);
-    sourceTable.setDeletedCount(0L);
-    return sourceTable;
-  }
-
-  private void createMaterializedView(String dbName, String tableName, Set<Table> tablesUsed)
+  private void createMaterializedView(String dbName, String tableName, Set<String> tablesUsed)
       throws TException {
-    Set<SourceTable> sourceTables = new HashSet<>(tablesUsed.size());
-    for (Table table : tablesUsed) {
-      sourceTables.add(createSourceTable(table));
-    }
-
     Table t = new TableBuilder()
         .setDbName(dbName)
         .setTableName(tableName)
         .setType(TableType.MATERIALIZED_VIEW.name())
-        .addMaterializedViewReferencedTables(sourceTables)
+        .addMaterializedViewReferencedTables(tablesUsed)
         .addCol("foo", "string")
         .addCol("bar", "string")
         .create(client, conf);
@@ -3000,14 +2985,13 @@ public abstract class TestHiveMetaStore {
     // Setup
     silentDropDatabase(dbName);
 
-    Set<Table> tablesUsed = new HashSet<>();
     new DatabaseBuilder()
         .setName(dbName)
         .create(client, conf);
     for (String tableName : tableNames) {
-      tablesUsed.add(createTable(dbName, tableName));
+      createTable(dbName, tableName);
     }
-    createMaterializedView(dbName, "mv1", tablesUsed);
+    createMaterializedView(dbName, "mv1", Sets.newHashSet("db.table1", "db.table2"));
 
     // Test
     List<Table> tableObjs = client.getTableObjectsByName(dbName, tableNames);
@@ -3037,13 +3021,13 @@ public abstract class TestHiveMetaStore {
     Database db1 = new Database();
     db1.setName(dbName1);
     client.createDatabase(db1);
-    Table table1 = createTable(dbName1, tableName1);
+    createTable(dbName1, tableName1);
     Database db2 = new Database();
     db2.setName(dbName2);
     client.createDatabase(db2);
-    Table table2 = createTable(dbName2, tableName2);
+    createTable(dbName2, tableName2);
 
-    createMaterializedView(dbName2, mvName, Sets.newHashSet(table1, table2));
+    createMaterializedView(dbName2, mvName, Sets.newHashSet("db1.table1", "db2.table2"));
 
     boolean exceptionFound = false;
     try {

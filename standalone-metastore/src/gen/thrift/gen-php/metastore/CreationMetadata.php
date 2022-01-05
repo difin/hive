@@ -40,10 +40,9 @@ class CreationMetadata
             'var' => 'tablesUsed',
             'isRequired' => true,
             'type' => TType::SET,
-            'etype' => TType::STRUCT,
+            'etype' => TType::STRING,
             'elem' => array(
-                'type' => TType::STRUCT,
-                'class' => '\metastore\SourceTable',
+                'type' => TType::STRING,
                 ),
         ),
         5 => array(
@@ -71,7 +70,7 @@ class CreationMetadata
      */
     public $tblName = null;
     /**
-     * @var \metastore\SourceTable[]
+     * @var string[]
      */
     public $tablesUsed = null;
     /**
@@ -155,9 +154,8 @@ class CreationMetadata
                         $xfer += $input->readSetBegin($_etype236, $_size233);
                         for ($_i237 = 0; $_i237 < $_size233; ++$_i237) {
                             $elem238 = null;
-                            $elem238 = new \metastore\SourceTable();
-                            $xfer += $elem238->read($input);
-                            $this->tablesUsed[] = $elem238;
+                            $xfer += $input->readString($elem238);
+                            $this->tablesUsed[$elem238] = true;
                         }
                         $xfer += $input->readSetEnd();
                     } else {
@@ -212,9 +210,9 @@ class CreationMetadata
                 throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
             }
             $xfer += $output->writeFieldBegin('tablesUsed', TType::SET, 4);
-            $output->writeSetBegin(TType::STRUCT, count($this->tablesUsed));
+            $output->writeSetBegin(TType::STRING, count($this->tablesUsed));
             foreach ($this->tablesUsed as $iter239 => $iter240) {
-                $xfer += $iter240->write($output);
+                $xfer += $output->writeString($iter239);
             }
             $output->writeSetEnd();
             $xfer += $output->writeFieldEnd();
