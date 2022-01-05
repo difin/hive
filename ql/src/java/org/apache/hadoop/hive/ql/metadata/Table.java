@@ -107,7 +107,6 @@ public class Table implements Serializable {
 
   private transient HiveStorageHandler storageHandler;
   private transient StorageHandlerInfo storageHandlerInfo;
-  private transient MaterializedViewMetadata materializedViewMetadata;
 
   private transient TableSpec tableSpec;
 
@@ -958,24 +957,16 @@ public class Table implements Serializable {
   /**
    * @return the creation metadata (only for materialized views)
    */
-  public MaterializedViewMetadata getMVMetadata() {
-    if (tTable.getCreationMetadata() == null) {
-      return null;
-    }
-    if (materializedViewMetadata == null) {
-      materializedViewMetadata = new MaterializedViewMetadata(tTable.getCreationMetadata());
-    }
-
-    return materializedViewMetadata;
+  public CreationMetadata getCreationMetadata() {
+    return tTable.getCreationMetadata();
   }
 
   /**
-   * @param materializedViewMetadata
+   * @param creationMetadata
    *          the creation metadata (only for materialized views)
    */
-  public void setMaterializedViewMetadata(MaterializedViewMetadata materializedViewMetadata) {
-    this.materializedViewMetadata = materializedViewMetadata;
-    tTable.setCreationMetadata(materializedViewMetadata.creationMetadata);
+  public void setCreationMetadata(CreationMetadata creationMetadata) {
+    tTable.setCreationMetadata(creationMetadata);
   }
 
   public void clearSerDeInfo() {

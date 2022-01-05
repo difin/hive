@@ -217,13 +217,13 @@ class AlterTableRequest
                 case 8:
                     if ($ftype == TType::LST) {
                         $this->processorCapabilities = array();
-                        $_size1109 = 0;
-                        $_etype1112 = 0;
-                        $xfer += $input->readListBegin($_etype1112, $_size1109);
-                        for ($_i1113 = 0; $_i1113 < $_size1109; ++$_i1113) {
-                            $elem1114 = null;
-                            $xfer += $input->readString($elem1114);
-                            $this->processorCapabilities []= $elem1114;
+                        $_size1101 = 0;
+                        $_etype1104 = 0;
+                        $xfer += $input->readListBegin($_etype1104, $_size1101);
+                        for ($_i1105 = 0; $_i1105 < $_size1101; ++$_i1105) {
+                            $elem1106 = null;
+                            $xfer += $input->readString($elem1106);
+                            $this->processorCapabilities []= $elem1106;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -298,8 +298,8 @@ class AlterTableRequest
             }
             $xfer += $output->writeFieldBegin('processorCapabilities', TType::LST, 8);
             $output->writeListBegin(TType::STRING, count($this->processorCapabilities));
-            foreach ($this->processorCapabilities as $iter1115) {
-                $xfer += $output->writeString($iter1115);
+            foreach ($this->processorCapabilities as $iter1107) {
+                $xfer += $output->writeString($iter1107);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

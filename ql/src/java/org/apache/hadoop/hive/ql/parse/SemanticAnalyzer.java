@@ -12513,7 +12513,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         if (table.isMaterializedView()) {
           // When we are querying a materialized view directly, we check whether the source tables
           // do not apply any policies.
-          for (SourceTable sourceTable : table.getMVMetadata().getSourceTables()) {
+          for (SourceTable sourceTable : table.getCreationMetadata().getTablesUsed()) {
             String qualifiedTableName = TableName.getDbTable(
                     sourceTable.getTable().getDbName(), sourceTable.getTable().getTableName());
             try {

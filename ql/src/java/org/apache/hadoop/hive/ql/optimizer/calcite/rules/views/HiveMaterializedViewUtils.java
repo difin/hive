@@ -55,7 +55,6 @@ import org.apache.hadoop.hive.metastore.api.SourceTable;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.lockmgr.LockException;
 import org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization;
-import org.apache.hadoop.hive.ql.metadata.MaterializedViewMetadata;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
 import org.apache.hadoop.hive.ql.optimizer.calcite.RelOptHiveTable;
@@ -113,17 +112,21 @@ public class HiveMaterializedViewUtils {
       return null;
     }
 
-    MaterializedViewMetadata mvMetadata = materializedViewTable.getMVMetadata();
-    Set<String> storedTablesUsed = materializedViewTable.getMVMetadata().getSourceTableFullNames();
-    if (mvMetadata.getValidTxnList() == null ||
-            mvMetadata.getValidTxnList().isEmpty()) {
+    CreationMetadata creationMetadata = materializedViewTable.getCreationMetadata();
+    Set<String> storedTablesUsed =
+        creationMetadata.getTablesUsed().stream()
+            .map(sourceTable -> TableName.getDbTable(
+                    sourceTable.getTable().getDbName(), sourceTable.getTable().getTableName()))
+            .collect(Collectors.toSet());
+    if (creationMetadata.getValidTxnList() == null ||
+            creationMetadata.getValidTxnList().isEmpty()) {
       LOG.debug("Materialized view " + materializedViewTable.getFullyQualifiedName() +
               " ignored for rewriting as we could not obtain materialization txn ids");
       return null;
     }
     boolean ignore = false;
     ValidTxnWriteIdList mvTxnWriteIds = new ValidTxnWriteIdList(
-            mvMetadata.getValidTxnList());
+            creationMetadata.getValidTxnList());
     for (String fullyQualifiedTableName : tablesUsedNames) {
       // Note. If the materialized view does not contain a table that is contained in the query,
       // we do not need to check whether that specific table is outdated or not. If a rewriting
@@ -375,5 +378,14 @@ public class HiveMaterializedViewUtils {
         newTable, ((RelOptHiveTable) scan.getTable()).getName(), null, false, false);
     }
     return newScan;
+  }
+
+  public static Set<TableName> asTableNames(Set<SourceTable> sourceTables) {
+    return sourceTables.stream()
+            .map(sourceTable -> new TableName(
+                    sourceTable.getTable().getCatName(),
+                    sourceTable.getTable().getDbName(),
+                    sourceTable.getTable().getTableName()))
+            .collect(Collectors.toSet());
   }
 }

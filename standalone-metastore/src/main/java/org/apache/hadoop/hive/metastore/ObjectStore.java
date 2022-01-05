@@ -2402,7 +2402,7 @@ public class ObjectStore implements RawStore, Configurable {
     }
     assert !m.isSetMaterializationTime();
     Set<MMVSource> tablesUsed = new HashSet<>();
-    for (SourceTable sourceTable : m.getSourceTables()) {
+    for (SourceTable sourceTable : m.getTablesUsed()) {
       Table table = sourceTable.getTable();
       MTable mtbl = getMTable(m.getCatName(), table.getDbName(), table.getTableName(), false).mtbl;
       MMVSource source = new MMVSource();
@@ -2421,11 +2421,9 @@ public class ObjectStore implements RawStore, Configurable {
     if (s == null) {
       return null;
     }
-    Set<String> tablesUsed = new HashSet<>();
-    Set<SourceTable> sourceTables = new HashSet<>();
+    Set<SourceTable> tablesUsed = new HashSet<>();
     for (MMVSource mtbl : s.getTables()) {
-      tablesUsed.add(Warehouse.getQualifiedName(mtbl.getTable().getDatabase().getName(), mtbl.getTable().getTableName()));
-      sourceTables.add(convertToSourceTable(mtbl, s.getCatalogName()));
+      tablesUsed.add(convertToSourceTable(mtbl, s.getCatalogName()));
     }
     CreationMetadata r = new CreationMetadata(s.getCatalogName(),
         s.getDbName(), s.getTblName(), tablesUsed);
@@ -2433,7 +2431,6 @@ public class ObjectStore implements RawStore, Configurable {
     if (s.getTxnList() != null) {
       r.setValidTxnList(s.getTxnList());
     }
-    r.setSourceTables(sourceTables);
     return r;
   }
 

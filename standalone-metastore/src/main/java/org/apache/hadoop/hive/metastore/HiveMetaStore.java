@@ -3851,11 +3851,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     }
 
     @Override
-    public Materialization get_materialization_invalidation_info(final CreationMetadata cm, String validTxnList) throws MetaException {
-      if (validTxnList == null) {
-        return getTxnHandler().getMaterializationInvalidationInfo(cm);
-      }
-      return getTxnHandler().getMaterializationInvalidationInfo(cm, validTxnList);
+    public Materialization get_materialization_invalidation_info(final CreationMetadata cm) throws MetaException {
+      return getTxnHandler().getMaterializationInvalidationInfo(cm);
     }
 
     @Override

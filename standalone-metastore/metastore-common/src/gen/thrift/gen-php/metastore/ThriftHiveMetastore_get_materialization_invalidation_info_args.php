@@ -89,13 +89,6 @@ class ThriftHiveMetastore_get_materialization_invalidation_info_args
                         $xfer += $input->skip($ftype);
                     }
                     break;
-                case 2:
-                    if ($ftype == TType::STRING) {
-                        $xfer += $input->readString($this->validTxnList);
-                    } else {
-                        $xfer += $input->skip($ftype);
-                    }
-                    break;
                 default:
                     $xfer += $input->skip($ftype);
                     break;
