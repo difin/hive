@@ -92,7 +92,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-core</artifactId>
+      <artifactId>activemq-all</artifactId>
       <version>${activemq.version}</version>
       <scope>test</scope>
       <exclusions>
@@ -101,12 +101,6 @@
           <artifactId>spring-context</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>kahadb</artifactId>
-      <version>${activemq.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.pig</groupId>
