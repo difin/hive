@@ -777,7 +777,7 @@ public class SerializationUtilities {
     return deserializeObjectFromKryo(bytes, ExprNodeGenericFuncDesc.class);
   }
 
-  private static byte[] serializeObjectToKryo(Serializable object) {
+  public static byte[] serializeObjectToKryo(Serializable object) {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Output output = new Output(baos);
     Kryo kryo = borrowKryo();

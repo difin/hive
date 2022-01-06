@@ -111,7 +111,8 @@ public class Msck {
     // the only reason we are using new conf here is to override EXPRESSION_PROXY_CLASS
     Configuration metastoreConf = MetastoreConf.newMetastoreConf(new Configuration(conf));
     metastoreConf.set(MetastoreConf.ConfVars.EXPRESSION_PROXY_CLASS.getVarname(),
-            MsckPartitionExpressionProxy.class.getCanonicalName());
+            metastoreConf.get(MetastoreConf.ConfVars.EXPRESSION_PROXY_CLASS.getVarname(),
+                    MsckPartitionExpressionProxy.class.getCanonicalName()));
     return metastoreConf;
   }
 
@@ -140,7 +141,7 @@ public class Msck {
       // And partitions that are not present in filesystem and metadata exists in metastore -
       // accessed through getPartitionNotOnFS
       result = checker.checkMetastore(msckInfo.getCatalogName(), msckInfo.getDbName(), msckInfo.getTableName(),
-        msckInfo.getPartSpecs());
+        msckInfo.getFilterExp());
       Set<CheckResult.PartitionResult> partsNotInMs = result.getPartitionsNotInMs();
       Set<CheckResult.PartitionResult> partsNotInFs = result.getPartitionsNotOnFs();
       Set<CheckResult.PartitionResult> expiredPartitions = result.getExpiredPartitions();
