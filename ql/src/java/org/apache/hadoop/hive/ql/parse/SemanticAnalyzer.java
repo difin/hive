@@ -29,6 +29,7 @@ import com.google.common.math.IntMath;
 import com.google.common.math.LongMath;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_DEFAULT_STORAGE_HANDLER;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVESTATSDBCLASS;
+import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.DEFAULT_TABLE_TYPE;
 import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.TABLE_IS_CTAS;
 import static org.apache.hadoop.hive.ql.plan.HiveOperation.*;
 import static org.apache.hadoop.hive.ql.plan.HiveOperation.ALTERVIEW_PROPERTIES;
@@ -13679,21 +13680,11 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
    * @return Modified table property map
    */
   private Map<String, String> validateAndAddDefaultProperties(
-          Map<String, String> tblProp, boolean isExt, StorageFormat storageFormat,
-          String qualifiedTableName, List<Order> sortCols, boolean isMaterialization,
-          boolean isTemporaryTable, boolean isTransactional, boolean isManaged) throws SemanticException {
-    Map<String, String> retValue;
-    if (tblProp == null) {
-      retValue = new HashMap<String, String>();
-    } else {
-      retValue = tblProp;
-    }
-    if (!retValue.containsKey(hive_metastoreConstants.TABLE_IS_TRANSACTIONAL)
-      && retValue.containsKey(hive_metastoreConstants.TABLE_TRANSACTIONAL_PROPERTIES)) {
-      throw new SemanticException("Cannot specify "
-        + hive_metastoreConstants.TABLE_TRANSACTIONAL_PROPERTIES
-        + " without " + hive_metastoreConstants.TABLE_IS_TRANSACTIONAL);
-    }
+      Map<String, String> tblProp, boolean isExt, StorageFormat storageFormat,
+      String qualifiedTableName, List<Order> sortCols, boolean isMaterialization,
+      boolean isTemporaryTable, boolean isTransactional, boolean isManaged, String[] qualifiedTabName, boolean isTableTypeChanged) throws SemanticException {
+    Map<String, String> retValue = Optional.ofNullable(tblProp).orElseGet(HashMap::new);
+
     String paraString = HiveConf.getVar(conf, ConfVars.NEWTABLEDEFAULTPARA);
     if (paraString != null && !paraString.isEmpty()) {
       for (String keyValuePair : paraString.split(",")) {
@@ -13706,6 +13697,14 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         }
       }
     }
+
+    if (!retValue.containsKey(hive_metastoreConstants.TABLE_IS_TRANSACTIONAL)
+        && retValue.containsKey(hive_metastoreConstants.TABLE_TRANSACTIONAL_PROPERTIES)) {
+      throw new SemanticException("Cannot specify "
+        + hive_metastoreConstants.TABLE_TRANSACTIONAL_PROPERTIES
+        + " without " + hive_metastoreConstants.TABLE_IS_TRANSACTIONAL);
+    }
+    isExt = isExternalTableChanged(retValue, isTransactional, isExt, isTableTypeChanged);
 
     if (isExt && HiveConf.getBoolVar(conf, ConfVars.HIVE_EXTERNALTABLE_PURGE_DEFAULT)) {
       if (retValue.get(MetaStoreUtils.EXTERNAL_TABLE_PURGE) == null) {
@@ -13735,7 +13734,26 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         retValue = convertToAcidByDefault(storageFormat, qualifiedTableName, sortCols, retValue);
       }
     }
+    if (!isExt) {
+      addDbAndTabToOutputs(qualifiedTabName,
+              TableType.MANAGED_TABLE, isTemporaryTable, retValue, storageFormat);
+    } else {
+      addDbAndTabToOutputs(qualifiedTabName,
+              TableType.EXTERNAL_TABLE, isTemporaryTable, retValue, storageFormat);
+    }
     return retValue;
+  }
+
+  /**
+   * This api is used to determine where to create acid tables are not.
+   * if the default table type is set to external, then create transcational table should result in acid tables,
+   * else create table should result in external table.
+   * */
+  private boolean isExternalTableChanged (Map<String, String> tblProp, boolean isTransactional, boolean isExt, boolean isTableTypeChanged) {
+    if (isTableTypeChanged && tblProp != null && tblProp.getOrDefault(hive_metastoreConstants.TABLE_IS_TRANSACTIONAL, "false").equalsIgnoreCase("true") || isTransactional) {
+      isExt = false;
+    }
+    return isExt;
   }
 
   private Map<String, String> convertToAcidByDefault(
@@ -14089,7 +14107,22 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
     // Handle different types of CREATE TABLE command
     // Note: each branch must call addDbAndTabToOutputs after finalizing table properties.
-
+    Database database  = getDatabase(qualifiedTabName.getDb());
+    boolean isDefaultTableTypeChanged = false;
+    if(database.getParameters() != null) {
+      String defaultTableType = database.getParameters().getOrDefault(DEFAULT_TABLE_TYPE, null);
+      if (defaultTableType != null && defaultTableType.equalsIgnoreCase("external")) {
+        isExt = true;
+        isDefaultTableTypeChanged = true;
+      } else if (defaultTableType != null && defaultTableType.equalsIgnoreCase("acid")) {
+        isDefaultTableTypeChanged = true;
+        if (isExt) { // create external table on db with default type as acid
+          isTransactional = false;
+        } else {
+          isTransactional = true;
+        }
+      }
+    }
     switch (command_type) {
 
     case CREATE_TABLE: // REGULAR CREATE TABLE DDL
@@ -14099,7 +14132,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       }
       tblProps = validateAndAddDefaultProperties(
           tblProps, isExt, storageFormat, dbDotTab, sortCols, isMaterialization, isTemporary,
-          isTransactional, isManaged);
+          isTransactional, isManaged, new String[] {qualifiedTabName.getDb(), qualifiedTabName.getTable()}, isDefaultTableTypeChanged);
+      isExt = isExternalTableChanged(tblProps, isTransactional, isExt, isDefaultTableTypeChanged);
       addDbAndTabToOutputs(new String[] {qualifiedTabName.getDb(), qualifiedTabName.getTable()},
           TableType.MANAGED_TABLE, isTemporary, tblProps, storageFormat);
 
@@ -14122,12 +14156,13 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       rootTasks.add(TaskFactory.get(new DDLWork(getInputs(), getOutputs(), crtTblDesc)));
       break;
     case ctt: // CREATE TRANSACTIONAL TABLE
-      if (isExt) {
+      if (isExt && !isDefaultTableTypeChanged) {
         throw new SemanticException(
             qualifiedTabName.getTable() + " cannot be declared transactional because it's an external table");
       }
       tblProps = validateAndAddDefaultProperties(tblProps, isExt, storageFormat, dbDotTab, sortCols, isMaterialization,
-          isTemporary, isTransactional, isManaged);
+          isTemporary, isTransactional, isManaged, new String[] {qualifiedTabName.getDb(), qualifiedTabName.getTable()}, isDefaultTableTypeChanged);
+      isExt = isExternalTableChanged(tblProps, isTransactional, isExt, isDefaultTableTypeChanged);
       addDbAndTabToOutputs(new String[] {qualifiedTabName.getDb(), qualifiedTabName.getTable()},
           TableType.MANAGED_TABLE, false, tblProps, storageFormat);
 
@@ -14151,7 +14186,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
       tblProps = validateAndAddDefaultProperties(
           tblProps, isExt, storageFormat, dbDotTab, sortCols, isMaterialization, isTemporary,
-          isTransactional, isManaged);
+          isTransactional, isManaged, new String[]{qualifiedTabName.getDb(), qualifiedTabName.getTable()}, isDefaultTableTypeChanged);
+
+      isExt = isExternalTableChanged(tblProps, isTransactional, isExt, isDefaultTableTypeChanged);
       addDbAndTabToOutputs(new String[] {qualifiedTabName.getDb(), qualifiedTabName.getTable()},
           TableType.MANAGED_TABLE, isTemporary, tblProps, storageFormat);
 
@@ -14237,7 +14274,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
       tblProps = validateAndAddDefaultProperties(
           tblProps, isExt, storageFormat, dbDotTab, sortCols, isMaterialization, isTemporary,
-          isTransactional, isManaged);
+          isTransactional, isManaged, new String[]{qualifiedTabName.getDb(), qualifiedTabName.getTable()}, isDefaultTableTypeChanged);
+      isExt = isExternalTableChanged(tblProps, isTransactional, isExt, isDefaultTableTypeChanged);
       tblProps.put(TABLE_IS_CTAS, "true");
       addDbAndTabToOutputs(new String[] {qualifiedTabName.getDb(), qualifiedTabName.getTable()},
           TableType.MANAGED_TABLE, isTemporary, tblProps, storageFormat);

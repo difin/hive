@@ -46,6 +46,15 @@ class hive_metastoreConstants {
   std::string TABLE_BUCKETING_VERSION;
   std::string DRUID_CONFIG_PREFIX;
   std::string JDBC_CONFIG_PREFIX;
+<<<<<<< HEAD
+=======
+  std::string TABLE_IS_CTAS;
+  std::string TABLE_IS_CTLT;
+  std::string PARTITION_TRANSFORM_SPEC;
+  std::string NO_CLEANUP;
+  std::string CTAS_LEGACY_CONFIG;
+  std::string DEFAULT_TABLE_TYPE;
+>>>>>>> 9c0c8a7ec9... HIVE-25826: Support default table types at each database level (Saihemanth Gantasala via Naveen Gangam)
 };
 
 extern const hive_metastoreConstants g_hive_metastore_constants;

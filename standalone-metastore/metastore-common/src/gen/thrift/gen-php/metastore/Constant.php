@@ -49,6 +49,15 @@ final class Constant extends \Thrift\Type\TConstant
     static protected $TABLE_BUCKETING_VERSION;
     static protected $DRUID_CONFIG_PREFIX;
     static protected $JDBC_CONFIG_PREFIX;
+<<<<<<< HEAD
+=======
+    static protected $TABLE_IS_CTAS;
+    static protected $TABLE_IS_CTLT;
+    static protected $PARTITION_TRANSFORM_SPEC;
+    static protected $NO_CLEANUP;
+    static protected $CTAS_LEGACY_CONFIG;
+    static protected $DEFAULT_TABLE_TYPE;
+>>>>>>> 9c0c8a7ec9... HIVE-25826: Support default table types at each database level (Saihemanth Gantasala via Naveen Gangam)
 
     protected static function init_DDL_TIME()
     {
@@ -204,4 +213,37 @@ final class Constant extends \Thrift\Type\TConstant
     {
         return "hive.sql.";
     }
+<<<<<<< HEAD
+=======
+
+    protected static function init_TABLE_IS_CTAS()
+    {
+        return "created_with_ctas";
+    }
+
+    protected static function init_TABLE_IS_CTLT()
+    {
+        return "created_with_ctlt";
+    }
+
+    protected static function init_PARTITION_TRANSFORM_SPEC()
+    {
+        return "partition_transform_spec";
+    }
+
+    protected static function init_NO_CLEANUP()
+    {
+        return "no_cleanup";
+    }
+
+    protected static function init_CTAS_LEGACY_CONFIG()
+    {
+        return "create_table_as_external";
+    }
+
+    protected static function init_DEFAULT_TABLE_TYPE()
+    {
+        return "defaultTableType";
+    }
+>>>>>>> 9c0c8a7ec9... HIVE-25826: Support default table types at each database level (Saihemanth Gantasala via Naveen Gangam)
 }

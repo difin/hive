@@ -81,6 +81,8 @@ hive_metastoreConstants::hive_metastoreConstants() {
 
   CTAS_LEGACY_CONFIG = "create_table_as_external";
 
+  DEFAULT_TABLE_TYPE = "defaultTableType";
+
 }
 
 }}} // namespace

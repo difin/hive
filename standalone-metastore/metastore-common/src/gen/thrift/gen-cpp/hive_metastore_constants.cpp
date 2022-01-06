@@ -73,6 +73,21 @@ hive_metastoreConstants::hive_metastoreConstants() {
 
   JDBC_CONFIG_PREFIX = "hive.sql.";
 
+<<<<<<< HEAD
+=======
+  TABLE_IS_CTAS = "created_with_ctas";
+
+  TABLE_IS_CTLT = "created_with_ctlt";
+
+  PARTITION_TRANSFORM_SPEC = "partition_transform_spec";
+
+  NO_CLEANUP = "no_cleanup";
+
+  CTAS_LEGACY_CONFIG = "create_table_as_external";
+
+  DEFAULT_TABLE_TYPE = "defaultTableType";
+
+>>>>>>> 9c0c8a7ec9... HIVE-25826: Support default table types at each database level (Saihemanth Gantasala via Naveen Gangam)
 }
 
 }}} // namespace
