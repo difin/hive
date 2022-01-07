@@ -2428,12 +2428,15 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
       // 1. Run other optimizations that do not need stats
       generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
-          ProjectRemoveRule.INSTANCE, HiveUnionMergeRule.INSTANCE,
-          HiveAggregateProjectMergeRule.INSTANCE, HiveProjectMergeRule.INSTANCE_NO_FORCE,
+          ProjectRemoveRule.INSTANCE,
+          HiveUnionMergeRule.INSTANCE,
+          HiveAggregateProjectMergeRule.INSTANCE,
+          HiveProjectMergeRule.INSTANCE_NO_FORCE,
           HiveJoinCommuteRule.INSTANCE);
 
       if (conf.getEngine() == HiveConf.Engine.HIVE) {
-        generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST, HiveAggregateSortLimitRule.getInstance(conf));
+        generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
+          new HiveAggregateSortLimitRule(conf.getBoolVar(ConfVars.HIVE_DEFAULT_NULLS_LAST)));
       }
 
       // 2. Run aggregate-join transpose (cost based)
