@@ -1,0 +1,47 @@
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+PREHOOK: query: explain cbo select tmp.str from (values
+('testfield' as str),
+('hello'),
+('world')) as tmp
+where tmp.str = 'hello'
+PREHOOK: type: QUERY
+PREHOOK: Output: streaming
+POSTHOOK: query: explain cbo select tmp.str from (values
+('testfield' as str),
+('hello'),
+('world')) as tmp
+where tmp.str = 'hello'
+POSTHOOK: type: QUERY
+CBO PLAN:
+HiveProject(str=[CAST(_UTF-16LE'hello':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):VARCHAR(2147483647) CHARACTER SET "UTF-16LE"])
+  HiveFilter(condition=[=($0, _UTF-16LE'hello')])
+    HiveTableFunctionScan(invocation=[inline(ARRAY(ROW(_UTF-16LE'testfield':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"), ROW(_UTF-16LE'hello':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"), ROW(_UTF-16LE'world':VARCHAR(2147483647) CHARACTER SET "UTF-16LE")))], rowType=[RecordType(VARCHAR(2147483647) str)])
+      HiveTableScan(table=[[_dummy_database, _dummy_table]], table:alias=[_dummy_table])
+
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+PREHOOK: query: explain cbo physical select tmp.str from (values
+('testfield' as str),
+('hello'),
+('world')) as tmp
+where tmp.str = 'hello'
+PREHOOK: type: QUERY
+PREHOOK: Output: streaming
+POSTHOOK: query: explain cbo physical select tmp.str from (values
+('testfield' as str),
+('hello'),
+('world')) as tmp
+where tmp.str = 'hello'
+POSTHOOK: type: QUERY
+CBO PLAN:
+ImpalaProjectPassthroughRel(str=[CAST(_UTF-16LE'hello':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):VARCHAR(2147483647) CHARACTER SET "UTF-16LE"])
+  ImpalaTableFunctionScanRel
+    ImpalaUnionRel(condition=[=($0, _UTF-16LE'hello')])
+

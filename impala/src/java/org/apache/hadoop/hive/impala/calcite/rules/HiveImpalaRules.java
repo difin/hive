@@ -134,6 +134,26 @@ public class HiveImpalaRules {
     }
   }
 
+  public static class ImpalaFilterTableFunctionRule extends RelOptRule {
+
+    private final Hive db;
+
+    public ImpalaFilterTableFunctionRule(RelBuilderFactory relBuilderFactory, Hive db) {
+      super(operand(HiveFilter.class, operand(ImpalaTableFunctionScanRel.class, none())),
+              relBuilderFactory, null);
+      this.db = db;
+    }
+
+    @Override
+    public void onMatch(RelOptRuleCall call) {
+      final HiveFilter filter = call.rel(0);
+      final ImpalaTableFunctionScanRel scan = call.rel(1);
+      scan.setFilter(filter);
+
+      call.transformTo(scan);
+    }
+  }
+
   public static class ImpalaFilterAggRule extends RelOptRule {
 
     public ImpalaFilterAggRule(RelBuilderFactory relBuilderFactory) {

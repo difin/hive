@@ -141,6 +141,8 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     programBuilder.addRuleInstance(
         new HiveImpalaRules.ImpalaTableFunctionRule(HiveRelFactories.HIVE_BUILDER, db));
     programBuilder.addRuleInstance(
+        new HiveImpalaRules.ImpalaFilterTableFunctionRule(HiveRelFactories.HIVE_BUILDER, db));
+    programBuilder.addRuleInstance(
         new HiveImpalaRules.ImpalaProjectRule(HiveRelFactories.HIVE_BUILDER));
     programBuilder.addRuleInstance(
         new HiveImpalaRules.ImpalaAggRule(HiveRelFactories.HIVE_BUILDER));

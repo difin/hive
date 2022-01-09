@@ -22,12 +22,14 @@ import com.google.common.base.Preconditions;
 
 import org.apache.calcite.plan.RelOptCost;
 import org.apache.calcite.plan.RelOptPlanner;
+import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.metadata.RelMetadataQuery;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexCall;
 import org.apache.calcite.rex.RexNode;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveFilter;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTableFunctionScan;
 import org.apache.hadoop.hive.impala.plan.ImpalaPlannerContext;
 import org.apache.impala.common.ImpalaException;
@@ -44,6 +46,8 @@ public class ImpalaTableFunctionScanRel extends ImpalaPlanRel {
 
   PlanNode planNode;
   HiveTableFunctionScan hiveUDTFS;
+  HiveFilter hiveFilter;
+
   public ImpalaTableFunctionScanRel(HiveTableFunctionScan udtfs) {
     super(udtfs.getCluster(), udtfs.getTraitSet(), udtfs.getInputs(), udtfs.getRowType());
     hiveUDTFS = udtfs;
@@ -97,6 +101,8 @@ public class ImpalaTableFunctionScanRel extends ImpalaPlanRel {
         inputRel.setConstRowType(dataRow.getType());
       }
     }
+    inputRel.setFilter(hiveFilter);
+
     // bypass this node, just get from the input.
     planNode = inputRel.getPlanNode(ctx);
 
@@ -114,6 +120,10 @@ public class ImpalaTableFunctionScanRel extends ImpalaPlanRel {
   @Override
   public double estimateRowCount(RelMetadataQuery mq) {
     return mq.getRowCount(hiveUDTFS);
+  }
+
+  public void setFilter(HiveFilter filter) {
+    this.hiveFilter = filter;
   }
 
 }

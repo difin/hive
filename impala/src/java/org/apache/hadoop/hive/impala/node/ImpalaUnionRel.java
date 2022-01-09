@@ -84,7 +84,7 @@ public class ImpalaUnionRel extends ImpalaPlanRel {
 
   private final RelNode relNode;
   private final NodeType nodeType;
-  private final HiveFilter filter;
+  private HiveFilter filter;
 
   protected List<List<RexNode>> constExprLists_ = new ArrayList<>();
 
@@ -253,5 +253,13 @@ public class ImpalaUnionRel extends ImpalaPlanRel {
   public double estimateRowCount(RelMetadataQuery mq) {
     return filter != null ?
         mq.getRowCount(filter) : mq.getRowCount(relNode);
+  }
+
+  public HiveTableScan getInputScanNode() {
+    return (HiveTableScan) relNode;
+  }
+
+  public void setFilter(HiveFilter filter) {
+    this.filter = filter;
   }
 }
