@@ -33,13 +33,16 @@ import org.apache.hadoop.hive.impala.calcite.rules.HiveImpalaWindowingFixRule;
 import org.apache.hadoop.hive.impala.exec.ImpalaSessionManager;
 import org.apache.hadoop.hive.impala.funcmapper.ImpalaFunctionHelper;
 import org.apache.hadoop.hive.impala.node.ImpalaPlanRel;
+import org.apache.hadoop.hive.impala.prune.ImpalaBasicHdfsTable;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.engine.EngineEventSequence;
 import org.apache.hadoop.hive.ql.engine.EngineQueryHelper;
 import org.apache.hadoop.hive.ql.engine.EngineSession;
+import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.Table;
@@ -152,13 +155,36 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
 
   public FileSinkDesc compilePlan(Hive db, RelNode rootRelNode,
       FileSinkDesc fileSinkDesc, boolean isExplain, QB qb, CalcitePlanner.PreCboCtx.Type stmtType,
-      ValidTxnWriteIdList txnWriteIdList, List<FieldSchema> resultSchema) throws HiveException {
+      String txnString, HiveTxnManager txnMgr, List<FieldSchema> resultSchema) throws HiveException {
     try {
       Preconditions.checkState(rootRelNode instanceof ImpalaPlanRel, "Plan contains operators not supported by Impala");
       ImpalaPlanRel impalaRelNode = (ImpalaPlanRel) rootRelNode;
       ImpalaPlanner impalaPlanner = new ImpalaPlanner(queryContext, fileSinkDesc, db, qb,
           getImpalaStmtType(stmtType, qb), timeline);
       ImpalaPlannerContext planCtx = impalaPlanner.getPlannerContext();
+      // We plumb through getQueryValidTxnWriteIdList() due to the fact that when we load
+      // ImpalaHdfsTable we make HMS calls that require a ValidWriteIdList (for transactional
+      // tables). This is typically done for most HMS calls automatically once compilation and
+      // lock acquistion is done, but since we are in the middle of compilation we can not
+      // rely on that behavior).
+      // Moreover, we do not use SemanticAnalyzer#getQueryValidTxnWriteIdList() to
+      // retrieve the transaction ID's associated with the query, i.e., 'txnWriteIdList',
+      // because SemanticAnalyzer#getQueryValidTxnWriteIdList() computes the transaction
+      // ID's based on a list of tables extracted from the SemanticAnalyzer's 'inputs',
+      // which is not updated accordingly when a table not explicitly involved in the
+      // query is added to queryContext's 'cachedTables'. For instance, a materialized
+      // view would be added to 'cachedTables' if the materialized view is created based
+      // on the current query.
+      // Recall that in ImpalaTableLoader#loadTablesAndPartitions(), for each table in
+      // 'cachedTables' we call ImpalaHdfsTable#create(), which results in
+      // getPartitionsByNamesRequest() or getTableRequest() of ImpalaHdfsPartitionLoader
+      // being invoked. Both methods require each transactional table in 'cachedTables'
+      // to have a transaction ID that could be found in 'txnWriteIdList'.
+      // Thus, we compute the transaction ID's based on the tables in 'cachedTables' to
+      // make sure the transaction ID for each transactional table in 'cachedTables'
+      // could be found in 'txnWriteIdList'.
+      ValidTxnWriteIdList txnWriteIdList =
+          getQueryValidTxnWriteIdList(txnMgr, txnString);
       planCtx.getTableLoader().loadTablesAndPartitions(db, txnWriteIdList);
       impalaPlanner.initTargetTable();
 
@@ -176,6 +202,29 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
       return new ImpalaQueryDesc(compiledPlan);
     } catch (ImpalaException | MetaException e) {
       throw new HiveException(e);
+    }
+  }
+
+  private ValidTxnWriteIdList getQueryValidTxnWriteIdList(HiveTxnManager txnMgr,
+      String txnString) throws SemanticException {
+    List<String> transactionalTables = queryContext.getBasicTables()
+        .stream().map(entity -> entity.getTable())
+        .map(t -> t.getMetaStoreTable())
+        .filter(table -> AcidUtils.isTransactionalTable(table))
+        .map(a -> Warehouse.getQualifiedName(a))
+        .collect(Collectors.toList());
+    return (transactionalTables.size() > 0 ?
+        getQueryValidTxnWriteIdList(txnMgr, transactionalTables, txnString) : null);
+  }
+
+  private ValidTxnWriteIdList getQueryValidTxnWriteIdList(HiveTxnManager txnMgr,
+      List<String> transactionalTables, String txnString) throws SemanticException {
+    try {
+      return txnMgr.getValidWriteIds(transactionalTables, txnString);
+    } catch (Exception err) {
+      String msg = "Error while getting the txnWriteIdList for tables "
+          + transactionalTables + " and validTxnList " + txnString;
+      throw new SemanticException(msg, err);
     }
   }
 

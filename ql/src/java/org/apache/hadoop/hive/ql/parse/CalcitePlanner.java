@@ -137,6 +137,7 @@ import org.apache.calcite.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.TableName;
+import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
@@ -1527,14 +1528,9 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
       String dest = getQB().getParseInfo().getClauseNames().iterator().next();
       FileSinkOperator fso = (FileSinkOperator) genFileSinkPlan(dest, getQB(), tableScanOp);
-      // We plumb through the QueryValidTxnWriteIdList() due to the fact that when we load
-      // ImpalaHdfsTable we make HMS calls that require a ValidWriteIdList (for transactional
-      // tables). This is typically done for most HMS calls automatically once compilation and
-      // lock acquistion is done, but since we are in the middle of compilation we can not
-      // rely on that behavior)
       FileSinkDesc impalaQueryDesc = this.impalaHelper.compilePlan(
           getDb(), impalaRel, fso.getConf(), ctx.isExplainPlan(), getQB(), cboCtx.type,
-          getQueryValidTxnWriteIdList(), resultSchema);
+          conf.get(ValidTxnList.VALID_TXNS_KEY), getTxnMgr(), resultSchema);
       markEvent("Impala plan generated");
       return OperatorFactory.getAndMakeChild(impalaQueryDesc, fso);
     } catch (HiveException e) {
