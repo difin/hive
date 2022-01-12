@@ -38,7 +38,6 @@ import org.apache.hadoop.hive.metastore.api.TxnType;
 import org.apache.hadoop.hive.metastore.api.CommitTxnRequest;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.txn.AcidHouseKeeperService;
-import org.apache.hadoop.hive.ql.TestTxnCommands2;
 import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
@@ -63,6 +62,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.hadoop.hive.common.AcidConstants.SOFT_DELETE_TABLE_PATTERN;
 
 import static org.apache.hadoop.hive.ql.TxnCommandsBaseForTests.runWorker;
 import static org.apache.hadoop.hive.ql.TxnCommandsBaseForTests.runCleaner;
@@ -3364,9 +3365,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     changer.enableAccess(validTxnManager);
     Object obj = validTxnManager.get(driver);
 
-    HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
     HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
-    
     driver = Mockito.spy(driver);
     new FieldSetter(obj, obj.getClass().getDeclaredField("driver")).set(driver);
     changer.safelyDisableAccess(validTxnManager);
@@ -3454,4 +3453,148 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     Assert.assertEquals("Expecting 1 rows and found " + res.size(), 1, res.size());
   }
   
+  @Test
+  public void testDropTableNonBlocking() throws Exception {
+    testDropTable(false);
+  }
+  @Test
+  public void testDropTableBlocking() throws Exception {
+    testDropTable(true);
+  }
+
+  private void testDropTable(boolean blocking) throws Exception {
+    dropTable(new String[] {"tab_acid"});
+    FileSystem fs = FileSystem.get(conf);
+    AccessibilityChanger changer = new AccessibilityChanger();
+    
+    Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
+    changer.enableAccess(validTxnManager);
+    Object obj = validTxnManager.get(driver);
+
+    HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
+    HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
+    
+    driver = Mockito.spy(driver);
+    new FieldSetter(obj, obj.getClass().getDeclaredField("driver")).set(driver);
+    changer.safelyDisableAccess(validTxnManager);
+    
+    validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
+    changer.enableAccess(validTxnManager);
+    obj = validTxnManager.get(driver2);
+
+    HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_CREATE_TABLE_USE_SUFFIX, !blocking);
+    driver2 = Mockito.spy(driver2);
+    new FieldSetter(obj, obj.getClass().getDeclaredField("driver")).set(driver2);
+    changer.safelyDisableAccess(validTxnManager);
+
+    driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
+      "stored as orc TBLPROPERTIES ('transactional'='true')");
+    driver.run("insert into tab_acid partition(p) (a,b,p) values(1,2,'foo'),(3,4,'bar')");
+
+    driver.compileAndRespond("select * from tab_acid");
+    List<String> res = new ArrayList<>();
+    
+    driver.lockAndRespond();
+    List<ShowLocksResponseElement> locks = getLocks();
+    Assert.assertEquals("Unexpected lock count", 1, locks.size());
+
+    checkLock(LockType.SHARED_READ,
+      LockState.ACQUIRED, "default", "tab_acid", null, locks);
+
+    DbTxnManager txnMgr2 = (DbTxnManager) TxnManagerFactory.getTxnManagerFactory().getTxnManager(conf);
+    swapTxnManager(txnMgr2);
+    driver2.compileAndRespond("drop table if exists tab_acid");
+
+    if (blocking) {
+      txnMgr2.acquireLocks(driver2.getPlan(), ctx, null, false);
+      locks = getLocks();
+
+      ShowLocksResponseElement checkLock = checkLock(LockType.EXCLUSIVE,
+        LockState.WAITING, "default", "tab_acid", null, locks);
+
+      swapTxnManager(txnMgr);
+      Mockito.doNothing().when(driver).lockAndRespond();
+      driver.run();
+      
+      driver.getFetchTask().fetch(res);
+      swapTxnManager(txnMgr2);
+      
+      new FieldSetter(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements")).set(0);
+      txnMgr2.getMS().unlock(checkLock.getLockid());
+    }
+    driver2.lockAndRespond();
+    locks = getLocks();
+    Assert.assertEquals("Unexpected lock count", blocking ? 1 : 2, locks.size());
+    
+    checkLock(blocking ? LockType.EXCLUSIVE : LockType.EXCL_WRITE, 
+      LockState.ACQUIRED, "default", "tab_acid", null, locks);
+    
+    Mockito.doNothing().when(driver2).lockAndRespond();
+    driver2.run();
+
+    if (!blocking) {
+      swapTxnManager(txnMgr);
+      Mockito.doNothing().when(driver).lockAndRespond();
+      driver.run();
+    }
+    Mockito.reset(driver, driver2);
+    
+    FileStatus[] stat = fs.listStatus(new Path(getWarehouseDir()),
+      t -> t.getName().matches("tab_acid" + (blocking ? "" : SOFT_DELETE_TABLE_PATTERN)));
+    if ((blocking ? 0 : 1) != stat.length) {
+      Assert.fail("Table data was " + (blocking ? "not" : "") + "removed from FS");
+    }
+    driver.getFetchTask().fetch(res);
+    Assert.assertEquals("Expecting 2 rows and found " + res.size(), 2, res.size());
+
+    try {
+      driver.run("select * from tab_acid");
+    } catch (CommandProcessorException ex) {
+      Assert.assertEquals(ErrorMsg.INVALID_TABLE.getErrorCode(), ex.getResponseCode());
+    }
+    
+    //re-create table with the same name
+    driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
+      "stored as orc TBLPROPERTIES ('transactional'='true')");
+    driver.run("insert into tab_acid partition(p) (a,b,p) values(1,2,'foo'),(3,4,'bar')");
+    
+    driver.run("select * from tab_acid ");
+    res = new ArrayList<>();
+    driver.getFetchTask().fetch(res);
+    Assert.assertEquals("Expecting 2 rows and found " + res.size(), 2, res.size());
+  }
+  
+  @Test
+  public void testDropTableNonBlocking2() throws Exception {
+    dropTable(new String[] {"tab_acid"});
+
+    HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, true);
+    HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_CREATE_TABLE_USE_SUFFIX, true);
+
+    driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
+      "stored as orc TBLPROPERTIES ('transactional'='true')");
+    driver.run("insert into tab_acid partition(p) (a,b,p) values(1,2,'foo'),(3,4,'bar')");
+
+    driver.compileAndRespond("select * from tab_acid");
+
+    DbTxnManager txnMgr2 = (DbTxnManager) TxnManagerFactory.getTxnManagerFactory().getTxnManager(conf);
+    swapTxnManager(txnMgr2);
+    // when running this, valid writeid list is not yet fetched by the `select` operation, 
+    // so we should keep TXN_TO_WRITE_ID entries until the Cleaner runs. 
+    driver2.run("drop table if exists tab_acid");
+
+    swapTxnManager(txnMgr);
+    driver.run();
+
+    FileSystem fs = FileSystem.get(conf);
+    FileStatus[] stat = fs.listStatus(new Path(getWarehouseDir()),
+      t -> t.getName().matches("tab_acid" + SOFT_DELETE_TABLE_PATTERN));
+    if (1 != stat.length) {
+      Assert.fail("Table data was removed from FS");
+    }
+
+    List<String> res = new ArrayList<>();
+    driver.getFetchTask().fetch(res);
+    Assert.assertEquals("No records found", 2, res.size());
+  }
 }

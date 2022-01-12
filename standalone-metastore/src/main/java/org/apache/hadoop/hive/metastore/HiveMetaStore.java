@@ -23,7 +23,10 @@ import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_COMMEN
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_NAME;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_CATALOG_NAME;
 import static org.apache.hadoop.hive.metastore.Warehouse.getCatalogQualifiedTableName;
-import static org.apache.hadoop.hive.metastore.api.FireEventRequestData._Fields.INSERT_DATA;
+import static org.apache.hadoop.hive.common.AcidConstants.SOFT_DELETE_PATH_SUFFIX;
+import static org.apache.hadoop.hive.common.AcidConstants.SOFT_DELETE_TABLE;
+import static org.apache.hadoop.hive.common.AcidConstants.DELTA_DIGITS;
+
 import static org.apache.hadoop.hive.metastore.HiveMetaStoreClient.TRUNCATE_SKIP_DATA_DELETION;
 import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.TABLE_IS_CTAS;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCatalog;
@@ -2287,7 +2290,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         if (!TableType.VIRTUAL_VIEW.toString().equals(tbl.getTableType())) {
           if (tbl.getSd().getLocation() == null
               || tbl.getSd().getLocation().isEmpty()) {
-            tblPath = wh.getDefaultTablePath(db, tbl);
+            tblPath = wh.getDefaultTablePath(db, getTableName(tbl), isExternal(tbl));
           } else {
             if (!isExternal(tbl) && !MetaStoreUtils.isNonNativeTable(tbl)) {
               LOG.warn("Location: " + tbl.getSd().getLocation()
@@ -2481,6 +2484,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
     }
 
+    private String getTableName(Table tbl) {
+      return tbl.getTableName() + (tbl.isSetTxnId() &&
+        tbl.getParameters() != null && Boolean.parseBoolean(tbl.getParameters().get(SOFT_DELETE_TABLE)) ?
+            SOFT_DELETE_PATH_SUFFIX + String.format(DELTA_DIGITS, tbl.getTxnId()) : "");
+    }
+    
     @Override
     public void create_table(final Table tbl) throws AlreadyExistsException,
         MetaException, InvalidObjectException, InvalidInputException {

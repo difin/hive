@@ -62,7 +62,7 @@ public abstract class DbTxnManagerEndToEndTestBase {
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.WAREHOUSE, getWarehouseDir());
     TestTxnDbUtil.setConfValues(conf);
   }
-
+  
   @Before
   public void setUp() throws Exception {
     // set up metastore client cache

@@ -10807,6 +10807,11 @@ void Table::__set_dictionary(const ObjectDictionary& val) {
   this->dictionary = val;
 __isset.dictionary = true;
 }
+
+void Table::__set_txnId(const int64_t val) {
+  this->txnId = val;
+__isset.txnId = true;
+}
 std::ostream& operator<<(std::ostream& out, const Table& obj)
 {
   obj.printTo(out);
@@ -11104,6 +11109,14 @@ uint32_t Table::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
+      case 29:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->txnId);
+          this->__isset.txnId = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -11277,6 +11290,11 @@ uint32_t Table::write(::apache::thrift::protocol::TProtocol* oprot) const {
     xfer += this->dictionary.write(oprot);
     xfer += oprot->writeFieldEnd();
   }
+  if (this->__isset.txnId) {
+    xfer += oprot->writeFieldBegin("txnId", ::apache::thrift::protocol::T_I64, 29);
+    xfer += oprot->writeI64(this->txnId);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -11311,6 +11329,7 @@ void swap(Table &a, Table &b) {
   swap(a.id, b.id);
   swap(a.fileMetadata, b.fileMetadata);
   swap(a.dictionary, b.dictionary);
+  swap(a.txnId, b.txnId);
   swap(a.__isset, b.__isset);
 }
 
@@ -11342,6 +11361,7 @@ Table::Table(const Table& other386) {
   id = other386.id;
   fileMetadata = other386.fileMetadata;
   dictionary = other386.dictionary;
+  txnId = other386.txnId;
   __isset = other386.__isset;
 }
 Table& Table::operator=(const Table& other387) {
@@ -11372,6 +11392,7 @@ Table& Table::operator=(const Table& other387) {
   id = other387.id;
   fileMetadata = other387.fileMetadata;
   dictionary = other387.dictionary;
+  txnId = other387.txnId;
   __isset = other387.__isset;
   return *this;
 }
@@ -11405,6 +11426,7 @@ void Table::printTo(std::ostream& out) const {
   out << ", " << "id="; (__isset.id ? (out << to_string(id)) : (out << "<null>"));
   out << ", " << "fileMetadata="; (__isset.fileMetadata ? (out << to_string(fileMetadata)) : (out << "<null>"));
   out << ", " << "dictionary="; (__isset.dictionary ? (out << to_string(dictionary)) : (out << "<null>"));
+  out << ", " << "txnId="; (__isset.txnId ? (out << to_string(txnId)) : (out << "<null>"));
   out << ")";
 }
 

@@ -183,6 +183,11 @@ class Table
             'type' => TType::STRUCT,
             'class' => '\metastore\ObjectDictionary',
         ),
+        29 => array(
+            'var' => 'txnId',
+            'isRequired' => false,
+            'type' => TType::I64,
+        ),
     );
 
     /**
@@ -293,6 +298,10 @@ class Table
      * @var \metastore\ObjectDictionary
      */
     public $dictionary = null;
+    /**
+     * @var int
+     */
+    public $txnId = null;
 
     public function __construct($vals = null)
     {
@@ -377,6 +386,9 @@ class Table
             }
             if (isset($vals['dictionary'])) {
                 $this->dictionary = $vals['dictionary'];
+            }
+            if (isset($vals['txnId'])) {
+                $this->txnId = $vals['txnId'];
             }
         }
     }
@@ -635,6 +647,13 @@ class Table
                         $xfer += $input->skip($ftype);
                     }
                     break;
+                case 29:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->txnId);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
                 default:
                     $xfer += $input->skip($ftype);
                     break;
@@ -829,6 +848,11 @@ class Table
             }
             $xfer += $output->writeFieldBegin('dictionary', TType::STRUCT, 28);
             $xfer += $this->dictionary->write($output);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->txnId !== null) {
+            $xfer += $output->writeFieldBegin('txnId', TType::I64, 29);
+            $xfer += $output->writeI64($this->txnId);
             $xfer += $output->writeFieldEnd();
         }
         $xfer += $output->writeFieldStop();

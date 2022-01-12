@@ -182,14 +182,15 @@ public class Cleaner extends MetaStoreCompactorThread {
       if (metricsEnabled) {
         perfLogger.PerfLogBegin(CLASS_NAME, cleanerMetric);
       }
-      String location = Optional.ofNullable(ci.properties).map(StringableMap::new)
-          .map(config -> config.get("location")).orElse(null);
+      Optional<String> location = Optional.ofNullable(ci.properties).map(StringableMap::new)
+          .map(config -> config.get("location"));
       
       Callable<Boolean> cleanUpTask;
-      Table t = resolveTable(ci);
+      Table t = null;
       Partition p = resolvePartition(ci);
 
-      if (location == null) {
+      if (!location.isPresent()) {
+        t = resolveTable(ci);
         if (t == null) {
           // The table was dropped before we got around to cleaning it.
           LOG.info("Unable to find table " + ci.getFullTableName() + ", assuming it was dropped." +
@@ -207,10 +208,15 @@ public class Cleaner extends MetaStoreCompactorThread {
           }
         }
       }
-      StorageDescriptor sd = resolveStorageDescriptor(t, p);
-      cleanUpTask = () -> removeFiles(Optional.ofNullable(location).orElse(sd.getLocation()), 
-          minOpenTxnGLB, ci, ci.partName != null && p == null);
-
+      
+      if (t != null) {
+        StorageDescriptor sd = resolveStorageDescriptor(t, p);
+        cleanUpTask = () -> removeFiles(location.orElse(sd.getLocation()), minOpenTxnGLB, ci, 
+            ci.partName != null && p == null);
+      } else {
+        cleanUpTask = () -> removeFiles(location.get(), ci);
+      }
+      
       Ref<Boolean> removedFiles = Ref.from(false);
       if (runJobAsSelf(ci.runAs)) {
         removedFiles.value = cleanUpTask.call();
@@ -289,15 +295,9 @@ public class Cleaner extends MetaStoreCompactorThread {
       try {
         res = txnHandler.lock(lockRequest);
         if (res.getState() == LockState.ACQUIRED) {
+          //check if partition wasn't recreated
           if (resolvePartition(ci) == null) {
-            Path path = new Path(location);
-            StringBuilder extraDebugInfo = new StringBuilder("[").append(path.getName()).append(",");
-
-            boolean ifPurge = Optional.ofNullable(ci.properties).map(StringableMap::new)
-              .map(config -> config.get("ifPurge")).map(Boolean::valueOf).orElse(true);
-
-            return remove(location, ci, Collections.singletonList(path), ifPurge,
-              path.getFileSystem(conf), extraDebugInfo);
+            return removeFiles(location, ci);
           }
         }
       } catch (NoSuchTxnException | TxnAbortedException e) {
@@ -388,6 +388,18 @@ public class Cleaner extends MetaStoreCompactorThread {
     return remove(location, ci, obsoleteDirs, true, fs, extraDebugInfo);
   }
 
+  private boolean removeFiles(String location, CompactionInfo ci)
+    throws NoSuchObjectException, IOException, MetaException {
+    Path path = new Path(location);
+    StringBuilder extraDebugInfo = new StringBuilder("[").append(path.getName()).append(",");
+
+    boolean ifPurge = Optional.ofNullable(ci.properties).map(StringableMap::new)
+      .map(config -> config.get("ifPurge")).map(Boolean::valueOf).orElse(true);
+
+    return remove(location, ci, Collections.singletonList(path), ifPurge,
+      path.getFileSystem(conf), extraDebugInfo);
+  }
+  
   private boolean remove(String location, CompactionInfo ci, List<Path> filesToDelete, boolean ifPurge, 
       FileSystem fs, StringBuilder extraDebugInfo) 
       throws NoSuchObjectException, MetaException, IOException {

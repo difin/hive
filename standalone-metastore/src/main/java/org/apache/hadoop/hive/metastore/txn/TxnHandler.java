@@ -862,8 +862,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           txnid = targetTxnIds.get(0);
         }
 
-        Optional<TxnType> txnType = getOpenTxnTypeAndLock(stmt, txnid);
-        if (!txnType.isPresent()) {
+        TxnType txnType = getOpenTxnTypeAndLock(stmt, txnid);
+        if (txnType == null) {
           TxnStatus status = findTxnState(txnid, stmt);
           if (status == TxnStatus.ABORTED) {
             if (isReplayedReplTxn) {
@@ -885,7 +885,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
         if (transactionalListeners != null && !isHiveReplTxn) {
           MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners,
-                  EventMessage.EventType.ABORT_TXN, new AbortTxnEvent(txnid, txnType.get()), dbConn, sqlGenerator);
+                  EventMessage.EventType.ABORT_TXN, new AbortTxnEvent(txnid, txnType), dbConn, sqlGenerator);
         }
 
         LOG.debug("Going to commit");
@@ -1188,8 +1188,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
          * should not normally run concurrently (for same txn) but could due to bugs in the client
          * which could then corrupt internal transaction manager state.  Also competes with abortTxn().
          */
-        Optional<TxnType> txnType = getOpenTxnTypeAndLock(stmt, txnid);
-        if (!txnType.isPresent()) {
+        TxnType txnType = getOpenTxnTypeAndLock(stmt, txnid);
+        if (txnType == null) {
           //if here, txn was not found (in expected state)
           TxnStatus actualTxnStatus = findTxnState(txnid, stmt);
           if (actualTxnStatus == TxnStatus.COMMITTED) {
@@ -1211,7 +1211,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
                 OperationType.UPDATE + "," + OperationType.DELETE + ")";
         long tempCommitId = generateTemporaryId();
 
-        if (txnType.get() == TxnType.COMPACTION) {
+        if (txnType == TxnType.SOFT_DELETE || txnType == TxnType.COMPACTION) {
           try (ResultSet commitIdRs = stmt.executeQuery(sqlGenerator.addForUpdateClause("SELECT \"NTXN_NEXT\" - 1 FROM \"NEXT_TXN_ID\""))) {
             if (!commitIdRs.next()) {
               throw new IllegalStateException("No rows found in NEXT_TXN_ID");
@@ -1219,7 +1219,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             commitId = commitIdRs.getLong(1);
           }
 
-        } else if (txnType.get() != TxnType.READ_ONLY && !isReplayedReplTxn) {
+        } else if (txnType != TxnType.READ_ONLY && !isReplayedReplTxn) {
           String writeSetInsertSql = "INSERT INTO \"WRITE_SET\" (\"WS_DATABASE\", \"WS_TABLE\", \"WS_PARTITION\"," +
             "   \"WS_TXNID\", \"WS_COMMIT_ID\", \"WS_OPERATION_TYPE\")" +
             " SELECT DISTINCT \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\", \"TC_TXNID\", " + tempCommitId + ", \"TC_OPERATION_TYPE\" ";
@@ -1314,7 +1314,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
            */
         }
 
-        if (txnType.get() != TxnType.READ_ONLY && !isReplayedReplTxn) {
+        if (txnType != TxnType.READ_ONLY && !isReplayedReplTxn) {
           moveTxnComponentsToCompleted(stmt, txnid, isUpdateDelete);
         } else if (isReplayedReplTxn) {
           if (rqst.isSetWriteEventInfos()) {
@@ -1342,7 +1342,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           }
           deleteReplTxnMapEntry(dbConn, sourceTxnId, rqst.getReplPolicy());
         }
-        updateCommitIdAndCleanUpMetadata(stmt, txnid, txnType.get(), commitId, tempCommitId);
+        updateCommitIdAndCleanUpMetadata(stmt, txnid, txnType, commitId, tempCommitId);
         removeTxnsFromMinHistoryLevel(dbConn, ImmutableList.of(txnid));
         if (rqst.isSetKeyValue()) {
           updateKeyValueAssociatedWithTxn(rqst, stmt);
@@ -1381,11 +1381,11 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
    * @param txnType transaction type
    * @throws MetaException ex
    */
-  protected void createCommitNotificationEvent(Connection dbConn, long txnid, Optional<TxnType> txnType)
+  protected void createCommitNotificationEvent(Connection dbConn, long txnid, TxnType txnType)
       throws MetaException, SQLException {
     if (transactionalListeners != null) {
       MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners,
-              EventMessage.EventType.COMMIT_TXN, new CommitTxnEvent(txnid, txnType.get()), dbConn, sqlGenerator);
+              EventMessage.EventType.COMMIT_TXN, new CommitTxnEvent(txnid, txnType), dbConn, sqlGenerator);
     }
   }
 
@@ -2628,12 +2628,11 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
    * @throws SQLException
    * @throws MetaException
    */
-  private Optional<TxnType> getOpenTxnTypeAndLock(Statement stmt, long txnId) throws SQLException, MetaException {
+  private TxnType getOpenTxnTypeAndLock(Statement stmt, long txnId) throws SQLException, MetaException {
     String query = "SELECT \"TXN_TYPE\" FROM \"TXNS\" WHERE \"TXN_ID\" = " + txnId
         + " AND \"TXN_STATE\" = " + TxnStatus.OPEN;
     try (ResultSet rs = stmt.executeQuery(sqlGenerator.addForUpdateClause(query))) {
-      return rs.next() ? Optional.ofNullable(
-          TxnType.findByValue(rs.getInt(1))) : Optional.empty();
+      return rs.next() ? TxnType.findByValue(rs.getInt(1)) : null;
     }
   }
 
@@ -2659,8 +2658,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         stmt = dbConn.createStatement();
         if (isValidTxn(txnid)) {
           //this also ensures that txn is still there in expected state
-          Optional<TxnType> txnType = getOpenTxnTypeAndLock(stmt, txnid);
-          if (!txnType.isPresent()) {
+          TxnType txnType = getOpenTxnTypeAndLock(stmt, txnid);
+          if (txnType == null) {
             ensureValidTxn(dbConn, txnid, stmt);
             shouldNeverHappen(txnid);
           }
@@ -3486,7 +3485,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   }
 
   @Override
-  @RetrySemantics.Idempotent
+  @RetrySemantics.SafeToRetry
   public boolean submitForCleanup(CompactionRequest rqst, long highestWriteId, long txnId) throws MetaException {
     // Put a compaction request in the queue.
     try {
@@ -3504,7 +3503,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           cqId = generateCompactionQueueId(stmt);
         }
         StringBuilder buf = new StringBuilder(
-          "INSERT INTO \"COMPACTION_QUEUE\" (\"CQ_ID\", \"CQ_HIGHEST_WRITE_ID\", \"CQ_TXN_ID\", \"CQ_ENQUEUE_TIME\", \"CQ_DATABASE\", \"CQ_TABLE\", ");
+            "INSERT INTO \"COMPACTION_QUEUE\" (\"CQ_ID\", \"CQ_HIGHEST_WRITE_ID\", \"CQ_TXN_ID\", \"CQ_ENQUEUE_TIME\", \"CQ_DATABASE\", \"CQ_TABLE\", ");
         String partName = rqst.getPartitionname();
         if (partName != null) {
           buf.append("\"CQ_PARTITION\", ");
@@ -3793,8 +3792,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         lockInternal();
         dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
         stmt = dbConn.createStatement();
-        Optional<TxnType> txnType = getOpenTxnTypeAndLock(stmt, rqst.getTxnid());
-        if (!txnType.isPresent()) {
+        TxnType txnType = getOpenTxnTypeAndLock(stmt, rqst.getTxnid());
+        if (txnType == null) {
           //ensures txn is still there and in expected state
           ensureValidTxn(dbConn, rqst.getTxnid(), stmt);
           shouldNeverHappen(rqst.getTxnid());
@@ -3862,7 +3861,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   @Override
   @RetrySemantics.Idempotent
   public void cleanupRecords(HiveObjectType type, Database db, Table table,
-                             Iterator<Partition> partitionIterator) throws MetaException {
+      Iterator<Partition> partitionIterator, boolean keepTxnToWriteIdMetaData) throws MetaException {
+
     // cleanup should be done only for objects belonging to default catalog
     final String defaultCatalog = getDefaultCatalog(conf);
 
@@ -3964,22 +3964,23 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             buff.append("'");
             queries.add(buff.toString());
 
-            buff.setLength(0);
-            buff.append("DELETE FROM \"TXN_TO_WRITE_ID\" WHERE \"T2W_DATABASE\"='");
-            buff.append(dbName.toLowerCase());
-            buff.append("' AND \"T2W_TABLE\"='");
-            buff.append(tblName.toLowerCase());
-            buff.append("'");
-            queries.add(buff.toString());
+            if (!keepTxnToWriteIdMetaData) {
+              buff.setLength(0);
+              buff.append("DELETE FROM \"TXN_TO_WRITE_ID\" WHERE \"T2W_DATABASE\"='");
+              buff.append(dbName.toLowerCase());
+              buff.append("' AND \"T2W_TABLE\"='");
+              buff.append(tblName.toLowerCase());
+              buff.append("'");
+              queries.add(buff.toString());
 
-            buff.setLength(0);
-            buff.append("DELETE FROM \"NEXT_WRITE_ID\" WHERE \"NWI_DATABASE\"='");
-            buff.append(dbName.toLowerCase());
-            buff.append("' AND \"NWI_TABLE\"='");
-            buff.append(tblName.toLowerCase());
-            buff.append("'");
-            queries.add(buff.toString());
-
+              buff.setLength(0);
+              buff.append("DELETE FROM \"NEXT_WRITE_ID\" WHERE \"NWI_DATABASE\"='");
+              buff.append(dbName.toLowerCase());
+              buff.append("' AND \"NWI_TABLE\"='");
+              buff.append(tblName.toLowerCase());
+              buff.append("'");
+              queries.add(buff.toString());
+            }
             break;
           }
           case PARTITION: {
@@ -4070,7 +4071,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         closeDbConn(dbConn);
       }
     } catch (RetryException e) {
-      cleanupRecords(type, db, table, partitionIterator);
+      cleanupRecords(type, db, table, partitionIterator, keepTxnToWriteIdMetaData);
     }
   }
   /**
