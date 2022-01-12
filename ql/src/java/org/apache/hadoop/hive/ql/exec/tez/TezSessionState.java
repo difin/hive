@@ -45,6 +45,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConfUtil;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.llap.LlapUtil;
 import org.apache.hadoop.hive.llap.coordinator.LlapCoordinator;
@@ -362,6 +363,16 @@ public class TezSessionState implements TezSession {
           TezConfiguration.TEZ_AM_SESSION_MIN_HELD_CONTAINERS_DEFAULT), n);
       tezConfig.setInt(TezConfiguration.TEZ_AM_SESSION_MIN_HELD_CONTAINERS, n);
     }
+
+    /*
+     * Update HADOOP_CREDSTORE_PASSWORD for the TezAM.
+     * If there is a job specific credential store, it will be set.
+     * HiveConfUtil.updateJobCredentialProviders should not be used here,
+     * as it changes the credential store path too, which causes the dag submission fail,
+     * as this config has an effect in HS2 (on TezClient codepath), and the original hadoop
+     * credential store should be used.
+     */
+    HiveConfUtil.updateCredentialProviderPasswordForJobs(tezConfig);
 
     TezClient session = createTezClientObject(
         tezConfig, commonLocalResources, conf, llapCredentials, spd);

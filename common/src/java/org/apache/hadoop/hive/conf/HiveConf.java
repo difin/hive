@@ -3086,11 +3086,11 @@ public class HiveConf extends Configuration {
 
     HIVE_ACID_LOCKLESS_READS_ENABLED("hive.acid.lockless.reads.enabled", false,
         "Enables lockless reads"),
-     
+
     HIVE_ACID_CREATE_TABLE_USE_SUFFIX("hive.acid.createtable.softdelete", false,
         "Enables non-blocking DROP TABLE operation.\n" +
         "If enabled, every table directory would be suffixed with the corresponding table creation txnId."),
-    
+
     HIVE_ACID_TRUNCATE_USE_BASE("hive.acid.truncate.usebase", false,
         "If enabled, truncate for transactional tables will not delete the data directories,\n" +
         "rather create a new base directory with no datafiles."),
@@ -3104,7 +3104,7 @@ public class HiveConf extends Configuration {
       "Enables non-blocking RENAME PARTITION operation.\n" +
         "If enabled, rename for transactional tables will not rename the partition directory,\n" +
         "rather create a copy of it under the new path.\")"),
-    
+
     // Configs having to do with DeltaFilesMetricReporter, which collects lists of most recently active tables
     // with the most number of active/obsolete deltas.
     HIVE_TXN_ACID_METRICS_MAX_CACHE_SIZE("hive.txn.acid.metrics.max.cache.size", 100,
@@ -4377,7 +4377,7 @@ public class HiveConf extends Configuration {
     HIVE_SERVER2_JOB_CREDENTIAL_PROVIDER_PATH("hive.server2.job.credential.provider.path", "",
         "If set, this configuration property should provide a comma-separated list of URLs that indicates the type and " +
         "location of providers to be used by hadoop credential provider API. It provides HiveServer2 the ability to provide job-specific " +
-        "credential providers for jobs run using MR execution engine. This functionality has not been tested against Tez."),
+        "credential providers for jobs run using Tez, MR execution engines."),
     HIVE_MOVE_FILES_THREAD_COUNT("hive.mv.files.thread", 15, new  SizeValidator(0L, true, 1024L, true), "Number of threads"
          + " used to move files in move task. Set it to 0 to disable multi-threaded file moves. This parameter is also used by"
          + " MSCK to check tables."),
@@ -5554,7 +5554,7 @@ public class HiveConf extends Configuration {
 
     HIVE_DESCRIBE_PARTITIONED_TABLE_IGNORE_STATS("hive.describe.partitionedtable.ignore.stats", false,
         "Disable partitioned table stats collection for 'DESCRIBE FORMATTED' or 'DESCRIBE EXTENDED' commands."),
-    
+
     /* BLOBSTORE section */
 
     HIVE_BLOBSTORE_SUPPORTED_SCHEMES("hive.blobstore.supported.schemes", "s3,s3a,s3n",
