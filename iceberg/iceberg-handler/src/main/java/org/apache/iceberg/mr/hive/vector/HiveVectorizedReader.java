@@ -20,6 +20,7 @@
 package org.apache.iceberg.mr.hive.vector;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
@@ -46,6 +47,7 @@ import org.apache.iceberg.mr.mapred.MapredIcebergInputFormat;
 import org.apache.iceberg.orc.VectorizedReadUtils;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.types.Types;
+import org.apache.orc.impl.OrcTail;
 
 /**
  * Utility class to create vectorized readers for Hive.
@@ -112,12 +114,22 @@ public class HiveVectorizedReader {
           // Need to turn positional schema evolution off since we use column name based schema evolution for projection
           // and Iceberg will make a mapping between the file schema and the current reading schema.
           job.setBoolean(OrcConf.FORCE_POSITIONAL_EVOLUTION.getHiveConfName(), false);
-          VectorizedReadUtils.handleIcebergProjection(inputFile, task, job);
 
-          InputSplit split = new OrcSplit(path, null, task.start(), task.length(), (String[]) null, null,
-              false, false, com.google.common.collect.Lists.newArrayList(), 0, task.length(), path.getParent(), null);
+          // Metadata information has to be passed along in the OrcSplit. Without specifying this, the vectorized
+          // reader will assume that the ORC file ends at the task's start + length, and might fail reading the tail..
+          ByteBuffer serializedOrcTail = VectorizedReadUtils.getSerializedOrcTail(inputFile, job);
+          OrcTail orcTail = VectorizedReadUtils.deserializeToOrcTail(serializedOrcTail);
+
+          VectorizedReadUtils.handleIcebergProjection(task, job,
+              VectorizedReadUtils.deserializeToShadedOrcTail(serializedOrcTail).getSchema());
+
           RecordReader<NullWritable, VectorizedRowBatch> recordReader = null;
 
+          long start = task.start();
+          long length = task.length();
+
+          InputSplit split = new OrcSplit(path, null, start, length, (String[]) null, orcTail,
+              false, false, com.google.common.collect.Lists.newArrayList(), 0, length, path.getParent(), null);
           recordReader = new VectorizedOrcInputFormat().getRecordReader(split, job, reporter);
           return createVectorizedRowBatchIterable(recordReader, job, partitionColIndices, partitionValues);
 
