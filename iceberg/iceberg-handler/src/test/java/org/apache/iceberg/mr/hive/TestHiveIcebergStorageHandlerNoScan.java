@@ -1204,7 +1204,7 @@ public class TestHiveIcebergStorageHandlerNoScan {
     storageHandler.setConf(shell.getHiveConf());
     URI uriForAuth = storageHandler.getURIForAuth(hmsTable);
 
-    Assert.assertEquals("iceberg://" + table.location(), uriForAuth.toString());
+    Assert.assertEquals("iceberg://" + target, uriForAuth.toString());
   }
 
   /**

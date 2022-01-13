@@ -366,8 +366,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
 
   @Override
   public URI getURIForAuth(org.apache.hadoop.hive.metastore.api.Table hmsTable) throws URISyntaxException {
-    Table table = IcebergTableUtil.getTable(conf, hmsTable);
-    return new URI(ICEBERG_URI_PREFIX + table.location());
+    return new URI(ICEBERG_URI_PREFIX + hmsTable.getDbName() + "." + hmsTable.getTableName());
   }
 
   @Override
