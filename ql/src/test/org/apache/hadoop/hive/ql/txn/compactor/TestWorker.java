@@ -1191,7 +1191,7 @@ public class TestWorker extends CompactorTest {
     }
 
     @Override
-    protected Boolean findNextCompactionAndExecute(boolean computeStats) {
+    protected Boolean findNextCompactionAndExecute(boolean collectGenericStats, boolean collectMrStats) {
       if (runForever) {
         while (!stop.get()) {
           try {

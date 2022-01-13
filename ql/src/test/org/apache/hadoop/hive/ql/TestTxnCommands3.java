@@ -484,7 +484,7 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
       invocationOnMock.callRealMethod();
       throw new RuntimeException(
         "Will cause CompactorMR to fail all opening txn and creating directories for compaction.");
-    }).when(compactorMr).run(any(), any(), any(), any(), any(), any(), any(), any(), any(), any());
+    }).when(compactorMr).run(any(), any(), any(), any(), any(), any(), any(), any(), any());
 
     Worker worker = Mockito.spy(new Worker());
     worker.setConf(hiveConf);
@@ -539,7 +539,7 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
       invocationOnMock.callRealMethod();
       throw new RuntimeException(
         "Will cause CompactorMR to fail all opening txn and creating directories for compaction.");
-    }).when(compactorMr).run(any(), any(), any(), any(), any(), any(), any(), any(), any(), any());
+    }).when(compactorMr).run(any(), any(), any(), any(), any(), any(), any(), any(), any());
 
     Worker worker = Mockito.spy(new Worker());
     worker.setConf(hiveConf);

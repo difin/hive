@@ -46,7 +46,7 @@ public class TestMaterializedViewRebuild extends CompactorOnTezTest {
   private static final List<String> INCREMENTAL_REBUILD_PLAN = Arrays.asList(
       "CBO PLAN:",
       "HiveProject(a=[$0], b=[$1], c=[$2])",
-      "  HiveFilter(condition=[AND(<(2, $5.writeid), OR(>($0, 0), IS NULL($0)))])",
+      "  HiveFilter(condition=[AND(<(3, $5.writeid), OR(>($0, 0), IS NULL($0)))])",
       "    HiveTableScan(table=[[default, t1]], table:alias=[t1])",
       ""
   );

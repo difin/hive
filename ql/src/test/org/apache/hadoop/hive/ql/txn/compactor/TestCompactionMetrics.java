@@ -52,6 +52,7 @@ import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -180,6 +181,7 @@ public class TestCompactionMetrics  extends CompactorTest {
   }
 
   @Test
+  @Ignore("Flaky CDPD-31488")
   public void testOldestReadyForCleaningAge() throws Exception {
     conf.setIntVar(HiveConf.ConfVars.COMPACTOR_MAX_NUM_DELTA, 1);
 
