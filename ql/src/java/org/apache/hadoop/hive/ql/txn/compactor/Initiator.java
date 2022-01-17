@@ -88,7 +88,6 @@ public class Initiator extends MetaStoreCompactorThread {
   static final private String COMPACTORTHRESHOLD_PREFIX = "compactorthreshold.";
 
   private long checkInterval;
-  private long prevStart = -1;
   private ExecutorService compactionExecutor;
 
   @Override
@@ -114,6 +113,7 @@ public class Initiator extends MetaStoreCompactorThread {
       do {
         PerfLogger perfLogger = PerfLogger.getPerfLogger(false);
         long startedAt = -1;
+        long prevStart;
         TxnStore.MutexAPI.LockHandle handle = null;
 
         // Wrap the inner parts of the loop in a catch throwable so that any errors in the loop
@@ -124,9 +124,8 @@ public class Initiator extends MetaStoreCompactorThread {
             perfLogger.PerfLogBegin(CLASS_NAME, MetricsConstants.COMPACTION_INITIATOR_CYCLE);
           }
           startedAt = System.currentTimeMillis();
-
-          long compactionInterval = (prevStart < 0) ? prevStart : (startedAt - prevStart)/1000;
-          prevStart = startedAt;
+          prevStart = handle.getLastUpdateTime();
+          long compactionInterval = (prevStart <= 0) ? prevStart : (startedAt - prevStart) / 1000;
 
           final ShowCompactResponse currentCompactions = txnHandler.showCompact(new ShowCompactRequest());
 
@@ -186,7 +185,7 @@ public class Initiator extends MetaStoreCompactorThread {
         }
         finally {
           if (handle != null) {
-            handle.releaseLocks();
+            handle.releaseLocks(startedAt);
           }
           if (metricsEnabled) {
             perfLogger.PerfLogEnd(CLASS_NAME, MetricsConstants.COMPACTION_INITIATOR_CYCLE);
