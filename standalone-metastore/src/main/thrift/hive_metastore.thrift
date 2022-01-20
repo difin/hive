@@ -449,13 +449,6 @@ struct StorageDescriptor {
   12: optional bool   storedAsSubDirectories       // stored as subdirectories or not
 }
 
-struct SourceTable {
-    1: required Table table,
-    2: required i64 insertedCount,
-    3: required i64 updatedCount,
-    4: required i64 deletedCount
-}
-
 struct CreationMetadata {
     1: required string catName,
     2: required string dbName,
@@ -463,7 +456,7 @@ struct CreationMetadata {
     4: required set<string> tablesUsed,
     5: optional string validTxnList,
     6: optional i64 materializationTime,
-    7: optional set<SourceTable> sourceTables
+    7: optional list<SourceTable> sourceTables
 }
 
 // column statistics
@@ -620,6 +613,13 @@ struct Table {
                                          // for certain execution engines
   28: optional ObjectDictionary dictionary,
   29: optional i64 txnId               // txnId associated with the table creation
+}
+
+struct SourceTable {
+  1: required Table table,
+  2: required i64 insertedCount,
+  3: required i64 updatedCount,
+  4: required i64 deletedCount
 }
 
 struct Partition {

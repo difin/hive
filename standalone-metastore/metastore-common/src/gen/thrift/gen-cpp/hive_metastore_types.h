@@ -515,6 +515,8 @@ class ColumnStatistics;
 
 class Table;
 
+class SourceTable;
+
 class Partition;
 
 class PartitionWithoutSD;

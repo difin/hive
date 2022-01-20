@@ -154,13 +154,13 @@ class TableStatsRequest
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->colNames = array();
-                        $_size499 = 0;
-                        $_etype502 = 0;
-                        $xfer += $input->readListBegin($_etype502, $_size499);
-                        for ($_i503 = 0; $_i503 < $_size499; ++$_i503) {
-                            $elem504 = null;
-                            $xfer += $input->readString($elem504);
-                            $this->colNames []= $elem504;
+                        $_size498 = 0;
+                        $_etype501 = 0;
+                        $xfer += $input->readListBegin($_etype501, $_size498);
+                        for ($_i502 = 0; $_i502 < $_size498; ++$_i502) {
+                            $elem503 = null;
+                            $xfer += $input->readString($elem503);
+                            $this->colNames []= $elem503;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -225,8 +225,8 @@ class TableStatsRequest
             }
             $xfer += $output->writeFieldBegin('colNames', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->colNames));
-            foreach ($this->colNames as $iter505) {
-                $xfer += $output->writeString($iter505);
+            foreach ($this->colNames as $iter504) {
+                $xfer += $output->writeString($iter504);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

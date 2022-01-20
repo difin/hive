@@ -1206,15 +1206,10 @@ public class TestTablesCreateDropAlterTruncate extends MetaStoreClientTest {
 
     // test getAllTables
     Set<String> fetchedNames = new HashSet<>(client.getAllTables(catName, dbName));
-<<<<<<< HEAD
-    Assert.assertEquals(tableNames.length, fetchedNames.size());
+    Assert.assertEquals(tableNames.length + 1, fetchedNames.size());
     for (String tableName : tableNames) {
       Assert.assertTrue(fetchedNames.contains(tableName));
     }
-=======
-    Assert.assertEquals(tableNames.length + 1, fetchedNames.size());
-    for (String tableName : tableNames) Assert.assertTrue(fetchedNames.contains(tableName));
->>>>>>> 24a6777e38 (CDPD-19702: HIVE-25656: Get materialized view state based on number of affected rows of transactions (Krisztian Kasa, reviewed by Zoltan Haindrich, Stephen Carlin))
 
     fetchedNames = new HashSet<>(client.getAllTables(DEFAULT_DATABASE_NAME));
     for (String tableName : tableNames) {

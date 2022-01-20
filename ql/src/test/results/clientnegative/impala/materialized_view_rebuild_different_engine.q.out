@@ -41,6 +41,7 @@ PREHOOK: Input: default@cmv_basetable
 PREHOOK: Output: database:default
 PREHOOK: Output: default@cmv_mat_view
 HMS CALL get_table_req FOR cmv_mat_view
+HMS CALL get_table_req FOR cmv_basetable
 HMS CALL get_table_req FOR cmv_mat_view
 HMS CALL get_table_req FOR cmv_mat_view
 HMS CALL get_table_req FOR cmv_mat_view
