@@ -150,7 +150,7 @@ public class Initiator extends MetaStoreCompactorThread {
               "checking to see if we should compact any of them");
 
           Map<String, String> tblNameOwners = new HashMap<>();
-          List<CompletableFuture> compactionList = new ArrayList<>();
+          List<CompletableFuture<Void>> compactionList = new ArrayList<>();
 
           if (!potentials.isEmpty()) {
             ValidTxnList validTxnList = TxnUtils.createValidReadTxnList(
