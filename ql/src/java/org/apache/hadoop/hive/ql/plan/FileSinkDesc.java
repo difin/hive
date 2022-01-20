@@ -111,7 +111,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
 
   private Set<FileStatus> filesToFetch = null;
 
-  private Set<String> dynPartitionValues = new HashSet<>();
+  private Set<String> dynPartitionValues;
 
   /**
    * Whether is a HiveServer query, and the destination table is
