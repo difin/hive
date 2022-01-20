@@ -481,7 +481,7 @@ class EncodedReaderImpl implements EncodedReader {
                   // Offset before which this RG is guaranteed to end. Can only be estimated.
                   // We estimate the same way for compressed and uncompressed for now.
                   long endCOffset = sctx.offset + RecordReaderUtils.estimateRgEndOffset(
-                      isCompressed, isLastRg, nextCOffsetRel, sctx.length, bufferSize);
+                      isCompressed, bufferSize, isLastRg, nextCOffsetRel, sctx.length);
                   // As we read, we can unlock initial refcounts for the buffers that end before
                   // the data that we need for this RG.
                   long unlockUntilCOffset = sctx.offset + nextCOffsetRel;
