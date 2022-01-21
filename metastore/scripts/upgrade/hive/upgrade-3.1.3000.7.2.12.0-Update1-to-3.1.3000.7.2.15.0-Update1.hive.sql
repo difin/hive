@@ -1,4 +1,4 @@
-SELECT 'Upgrading MetaStore schema from 3.1.3000.7.2.8.0 to 3.1.3000.7.2.8.0-update1';
+SELECT 'Upgrading MetaStore schema from 3.1.3000.7.2.12.0-Update1 to 3.1.3000.7.2.15.0-Update1';
 
 USE SYS;
 
@@ -30,7 +30,7 @@ TBLPROPERTIES (
 FROM \"NOTIFICATION_LOG\""
 );
 
-CREATE OR REPLACE VIEW SYS.CDH_VERSION AS SELECT 1 AS VER_ID, '3.1.3000.7.2.8.0-update1' AS SCHEMA_VERSION,
-  'Hive release version 3.1.3000 for CDH 7.2.8.0-update1' AS VERSION_COMMENT;
+CREATE OR REPLACE VIEW SYS.CDH_VERSION AS SELECT 1 AS VER_ID, '3.1.3000.7.2.15.0-Update1' AS SCHEMA_VERSION,
+  'Hive release version 3.1.3000 for CDH 7.2.15.0-Update1' AS VERSION_COMMENT;
 
-SELECT 'Finished upgrading MetaStore schema from 3.1.3000.7.2.8.0 to 3.1.3000.7.2.8.0-update1';
+SELECT 'Finished upgrading MetaStore schema from 3.1.3000.7.2.12.0-Update1 to 3.1.3000.7.2.15.0-Update1';
