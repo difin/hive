@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.apache.hadoop.fs.Path;
@@ -42,6 +44,7 @@ import org.apache.hadoop.hive.ql.parse.SemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.plan.FileSinkDesc;
 import org.apache.impala.analysis.Analyzer;
+import org.apache.impala.analysis.CastExpr;
 import org.apache.impala.analysis.Expr;
 import org.apache.impala.analysis.JoinOperator;
 import org.apache.impala.analysis.LiteralExpr;
@@ -385,8 +388,8 @@ public class ImpalaPlanner {
     List<Expr> mappedResultExprs = new ArrayList<Expr>();
     Map<String, String> colNameToDefaultVal = null;
 
-    // See if we need to fetch default constraints from metastore
-    if (targetCol2Projection.size() < targetTableColNames.size()) {
+    // See if we need to fetch default constraints from metastore.
+    if (targetCol2Projection.size() < targetTableColNames.size() + target.getPartCols().size()) {
       colNameToDefaultVal = SemanticAnalyzer.getColNameToDefaultValueMap(target);
     }
 
@@ -396,9 +399,12 @@ public class ImpalaPlanner {
       if (targetCol2Projection.containsKey(f)) {
         // Put existing column in new list to make sure it is in the right position
         exp = targetCol2Projection.get(f);
+        if (targetTable.getColumn(f).getType() != exp.getType()) {
+          exp = new CastExpr(targetTable.getColumn(f).getType(), exp);
+        }
       } else {
         // Add new 'synthetic' columns for projections not provided by Select
-        assert(colNameToDefaultVal != null);
+        Preconditions.checkNotNull(colNameToDefaultVal);
         if (colNameToDefaultVal.containsKey(f)) {
           // Make an expression for default value
           String defaultValue = colNameToDefaultVal.get(f);
@@ -419,32 +425,24 @@ public class ImpalaPlanner {
     return mappedResultExprs;
   }
 
+  /**
+   * Map result expressions from the SELECT result expressions to the INSERT target
+   * table datatypes.
+   * We only need to be concerned about mapping expressions when it is an INSERT INTO <tbl>
+   * statement. We check if qlTable == null because CTAS and CREATE MATERIALIZED VIEW
+   * statements do not need result expression manipulation.
+   */
   private List<Expr> mapResultExprs(List<Expr> resultExprs,
-      org.apache.hadoop.hive.ql.metadata.Table qlTable, Partition partition,
+      org.apache.hadoop.hive.ql.metadata.Table qlTable,
       FeTable targetTable) throws AnalysisException {
-    // We need to update 'resultExprs' only if the query corresponds to an INSERT
-    // via VALUES() statement for a non-partitioned table where all the column names are
-    // not explicitly provided. For an INSERT via VALUES() statement,
-    // "stmtType_ == TStmtType.DML" evaluates to true and at least one of 'qlTable' and
-    // 'partition' is non-null. Recall that both of them would be null for
-    // a CREATE MATERIALIZED VIEW with specified partitions or a CREATE TABLE AS SELECT.
-    if (!(stmtType_ == TStmtType.DML) || (qlTable == null && partition == null)) {
+    if (stmtType_ != TStmtType.DML || qlTable == null) {
       return resultExprs;
     }
+
     Preconditions.checkState(targetTable != null);
 
-    List<FieldSchema> targetTableCols = qlTable != null ?
-        qlTable.getCols() : partition.getCols();
-    // Insertion of well-formed values into a partitioned table has already been
-    // supported before CDPD-20967. Thus, we do not handle insertion into a partitioned
-    // table here. This includes the case when we specify the partition to insert the row
-    // and the case when we do not specify the partition to insert the row. In the former
-    // case, 'qlTable' would be null and in the latter case, the size of 'resultExprs'
-    // would be larger than the size of 'targetTableCols' if the values in the VALUES
-    // clause are well-formed.
-    if (qlTable == null || resultExprs.size() != targetTableCols.size()) {
-      return resultExprs;
-    }
+    List<FieldSchema> targetTableCols = qlTable.getCols();
+
     // Mismatched data types would be caught in different places under different
     // scenarios. For instance, if we insert a value into a DATE column but the value
     // could not be cast to DATE, then this would be caught at
@@ -471,14 +469,13 @@ public class ImpalaPlanner {
     Partition partition = (target == null) ?
         getQB().getMetaData().getDestPartitionForAlias(dest) : null;
     // This case corresponds to an INSERT statement where each column name in an inserted
-    // row is explicitly provided.
+    // row is explicitly provided, e.g. "INSERT INTO TBL (c1, c2, p1) values..."
     if (targetTableSchema != null) {
       resultExprs = mapResultExprsWithSchema(ctx_.getResultExprs(), dest,
           targetTableSchema, target, partition);
       return resultExprs;
     } else {
-      resultExprs = mapResultExprs(ctx_.getResultExprs(), target, partition,
-          targetTable);
+      resultExprs = mapResultExprs(ctx_.getResultExprs(), target, targetTable);
     }
     return resultExprs;
   }
@@ -544,25 +541,49 @@ public class ImpalaPlanner {
           for (int i = 0; i < numStaticColumns; i++) {
             FieldSchema fs = part_field_schema.get(i);
             String value = part_values.get(i);
-            partitionKeyExprs.add(LiteralExpr.createFromUnescapedStr(value, targetTable.getColumn(fs.getName()).getType()));
+            partitionKeyExprs.add(LiteralExpr.createFromUnescapedStr(value,
+                targetTable.getColumn(fs.getName()).getType()));
           }
         } else {
           Map<String, String> partSpec = getQB().getMetaData().getDPCtx(dest).getPartSpec();
           int numPartitionColumns = partSpec.size();
+          int numDynamicColumns = 0;
           for (Map.Entry<String,String> partEntry : partSpec.entrySet()) {
             String value = partEntry.getValue();
             String columnName = partEntry.getKey();
-            if (value == null) {
-              // We've hit the first dynamic partition
+            if (value != null) {
+              // in this case, the value was declared statically in the insert statement and
+              // we grab the parsed value. One example of this is "insert into tbl (c3, p1=5, c2)"
+              // where p1 is the partitioned column.
+              partitionKeyExprs.add(LiteralExpr.createFromUnescapedStr(value,
+                  targetTable.getColumn(columnName).getType()));
+              numStaticColumns++;
+            } else if (targetTableSchema != null) {
+              // in this case, the columns were declared in the insert statement
+              // (e.g. insert into tbl (c3, p1, c2) values ...)  and we grab the partition value
+              // from the result expression specified by the values clause (or select clause).
+              // Note that in this example, the partitioned column (p1) can be anywhere in
+              // the insert clause.
+              int partitionPosition = targetTableSchema.indexOf(columnName);
+              Preconditions.checkState(partitionPosition >= 0);
+              partitionKeyExprs.add(ctx_.getResultExprs().get(partitionPosition));
+              numDynamicColumns++;
+            } else {
+              // We've hit the first dynamic partition. which is not specified in the insert
+              // clause (e.g. insert into tbl (c3, p1, c2)... but the table also has a partition
+              // "p2" column not specified in the clause).. The result expressions for dynamic
+              // partitions are at the end and populated immediately after this for loop.
               break;
             }
-            partitionKeyExprs.add(LiteralExpr.createFromUnescapedStr(value, targetTable.getColumn(columnName).getType()));
-            numStaticColumns++;
           }
           int numResultExprs = ctx_.getResultExprs().size();
-          int numDynamicColumns = numPartitionColumns - numStaticColumns;
-          // partition columns are at the end of resultExprs
-          partitionKeyExprs.addAll(ctx_.getResultExprs().subList(numResultExprs - numDynamicColumns, numResultExprs));
+          int numDynamicColumnsAtEnd = numPartitionColumns - numStaticColumns - numDynamicColumns;
+          if (targetTableSchema == null) {
+            Preconditions.checkState(numResultExprs - numDynamicColumnsAtEnd >= 0);
+            // partition columns are at the end of resultExprs
+            partitionKeyExprs.addAll(ctx_.getResultExprs().subList(
+                numResultExprs - numDynamicColumnsAtEnd, numResultExprs));
+          }
 
           if (!ctx_.isSingleNodeExec()) {
             // This InsertStmt is a mock that just provides the necessary information to be able to rely
@@ -580,16 +601,19 @@ public class ImpalaPlanner {
           SortInfo sortInfo = new SortInfo(orderingExprs, isAscOrder, nullsFirstParams);
           sortInfo.createSortTupleInfo(ctx_.getResultExprs(), ctx_.getRootAnalyzer());
           sortInfo.getSortTupleDescriptor().materializeSlots();
-          ctx_.setResultExprs(Expr.substituteList(ctx_.getResultExprs(), sortInfo.getOutputSmap(), ctx_.getRootAnalyzer(), true));
-          resultExprs = Expr.substituteList(resultExprs, sortInfo.getOutputSmap(), ctx_.getRootAnalyzer(), true);
-          partitionKeyExprs = Expr.substituteList(partitionKeyExprs, sortInfo.getOutputSmap(), ctx_.getRootAnalyzer(), true);
-          PlanNode node = SortNode.createTotalSortNode(this.ctx_.getNextNodeId(), rootFragment.getPlanRoot(), sortInfo, 0L);
-          node.init(ctx_.getRootAnalyzer());
-          rootFragment.setPlanRoot(node);
+          if (sortInfo.getSortTupleDescriptor().getSlots().size() > 0) {
+            ctx_.setResultExprs(Expr.substituteList(ctx_.getResultExprs(), sortInfo.getOutputSmap(), ctx_.getRootAnalyzer(), true));
+            resultExprs = Expr.substituteList(resultExprs, sortInfo.getOutputSmap(), ctx_.getRootAnalyzer(), true);
+            partitionKeyExprs = Expr.substituteList(partitionKeyExprs, sortInfo.getOutputSmap(), ctx_.getRootAnalyzer(), true);
+            PlanNode node = SortNode.createTotalSortNode(this.ctx_.getNextNodeId(), rootFragment.getPlanRoot(), sortInfo, 0L);
+            node.init(ctx_.getRootAnalyzer());
+            rootFragment.setPlanRoot(node);
 
-          inputIsClustered = true;
+            inputIsClustered = true;
 
-          IntStream.range(numResultExprs - numDynamicColumns, numResultExprs).forEach(sortColumns::add); // Sort column positions
+            IntStream.range(numResultExprs - numDynamicColumnsAtEnd,
+                numResultExprs).forEach(sortColumns::add); // Sort column positions
+          }
         }
       }
 

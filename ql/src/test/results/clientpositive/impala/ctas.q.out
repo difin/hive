@@ -467,7 +467,7 @@ F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=12.00MB mem-reservation=12.00MB thread-reservation=1
   WRITE TO HDFS [default.tab1_imp0_part, OVERWRITE=false, PARTITION-KEYS=(name)]
   |  partitions=unavailable
-  |  output exprs: empid, deptno, name
+  |  output exprs: empid, deptno
   |  mem-estimate=20B mem-reservation=0B thread-reservation=0
   |
   01:SORT
@@ -532,7 +532,7 @@ F02:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=12.02MB mem-reservation=12.00MB thread-reservation=1
   WRITE TO HDFS [default.tab1_imp0_part, OVERWRITE=false, PARTITION-KEYS=(default.emps_imp0.name)]
   |  partitions=unavailable
-  |  output exprs: default.emps_imp0.empid, default.emps_imp0.deptno, default.emps_imp0.name
+  |  output exprs: default.emps_imp0.empid, default.emps_imp0.deptno
   |  mem-estimate=20B mem-reservation=0B thread-reservation=0
   |
   03:SORT
