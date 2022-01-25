@@ -5,12 +5,19 @@ set -x
 
 DOWNLOAD_PATH="/custom-jars"
 
+if [ "${USE_KERBEROS}" == "true" ]; then
+	SERVICE_KEYTAB=${SERVICE_KEYTAB:?SERVICE_KEYTAB is required for kinit}
+	SERVICE_PRINCIPAL=${SERVICE_PRINCIPAL:?SERVICE_PRINCIPAL is required for kinit}
+	kinit -V -k -t ${SERVICE_KEYTAB} ${SERVICE_PRINCIPAL}
+	klist
+fi
+
 if [[ -z "${CUSTOM_JARS_URL}" ]]; then
 	echo "CUSTOM_JARS_URL is not defined. Skipping jar download from url.."
 else
 	echo "CUSTOM_JARS_URL is set to ${CUSTOM_JARS_URL}. Downloading jar/tar to ${DOWNLOAD_PATH}.."
 	cd ${DOWNLOAD_PATH}
-	wget "${CUSTOM_JARS_URL}"
+	wget --no-verbose ${CUSTOM_JARS_URL}
 fi
 
 if [[ -z "${CUSTOM_JARS_PATH}" ]]; then

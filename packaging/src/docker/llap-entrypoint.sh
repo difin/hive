@@ -18,5 +18,5 @@ if [ $exit_status -eq 0 ]; then
     echo "Public ip address of ${FQDN} is ${PUBLIC_HOST_IP}"
 fi
 
-export LLAP_DAEMON_USER_CLASSPATH=${HIVE_HOME}/lib/*:`${HADOOP_HOME}/bin/hadoop classpath`:${TEZ_HOME}/*:${TEZ_HOME}/lib/*
+export LLAP_DAEMON_USER_CLASSPATH=${HIVE_HOME}/lib/*:`${HADOOP_HOME}/bin/hadoop classpath`:${TEZ_HOME}/*:${TEZ_HOME}/lib/*:/aux-jars/*
 exec ${HIVE_HOME}/scripts/llap/bin/llapDaemon.sh start

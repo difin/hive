@@ -182,7 +182,9 @@ ENV HIVE_CONF_DIR /etc/hive/conf
 ENV LLAP_DAEMON_CONF_DIR /etc/hive/conf
 
 COPY entrypoint.sh hive-entrypoint.sh tez-entrypoint.sh llap-entrypoint.sh \
-     custom-jars-localizer.sh udf-jars-localizer.sh sys-entrypoint.sh sys-db-proto-hooks.sql ranger-create-repo.sh ranger-drop-repo.sh /
+     custom-jars-localizer.sh udf-jars-localizer.sh sys-entrypoint.sh \
+     sys-db-proto-hooks.sql ranger-create-repo.sh ranger-drop-repo.sh \
+     aux-jars-localizer.sh /
 
 # TODO: add support for foreground execution of these scripts?
 COPY llapDaemon.sh runLlapDaemon.sh ${HIVE_HOME}/scripts/llap/bin/

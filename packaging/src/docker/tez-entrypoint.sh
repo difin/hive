@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 
-CLASSPATH=${HIVE_CONF_DIR}:/custom-jars/*:/custom-jars/lib/*:${HIVE_HOME}/lib/*:${TEZ_CONF_DIR}:${TEZ_HOME}/*:${TEZ_HOME}/lib/*:`${HADOOP_HOME}/bin/hadoop classpath`:${UDF_JARS_PATH}/conf:${UDF_JARS_PATH}/lib/udfs/*:/usr/lib/hadoop/share/hadoop/tools/lib/*
+CLASSPATH=${HIVE_CONF_DIR}:/custom-jars/*:/custom-jars/lib/*:${HIVE_HOME}/lib/*:${TEZ_CONF_DIR}:${TEZ_HOME}/*:${TEZ_HOME}/lib/*:`${HADOOP_HOME}/bin/hadoop classpath`:${UDF_JARS_PATH}/conf:${UDF_JARS_PATH}/lib/udfs/*:/usr/lib/hadoop/share/hadoop/tools/lib/*:/aux-jars/*
 
 # unix epoch time in ms
 export APP_SUBMIT_TIME_ENV=`echo $(($(date +%s%N)/1000000))`

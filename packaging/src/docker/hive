@@ -155,23 +155,29 @@ done
 #  fi
 # done
 
+add_to_aux_path() {
+  INPUT_PATH=$1
+  if [ -f $1 ]; then
+    if $cygwin; then
+      INPUT_PATH=`cygpath -w "$INPUT_PATH"`
+    fi
+    AUX_CLASSPATH="$AUX_CLASSPATH:$INPUT_PATH"
+    if [ "${AUX_PARAM}" == ""]; then
+      AUX_PARAM=file://$INPUT_PATH
+    else
+      AUX_PARAM=${AUX_PARAM},file://$INPUT_PATH
+    fi
+  elif [ -d $INPUT_PATH ]; then
+    for f in $INPUT_PATH/*.jar; do
+      add_to_aux_path $f
+    done
+  fi
+}
+
 # add the auxillary jars such as serdes
 if [ -d "${HIVE_AUX_JARS_PATH}" ]; then
   hive_aux_jars_abspath=`cd ${HIVE_AUX_JARS_PATH} && pwd`
-  for f in $hive_aux_jars_abspath/*.jar; do
-    if [[ ! -f $f ]]; then
-        continue;
-    fi
-    if $cygwin; then
-	f=`cygpath -w "$f"`
-    fi
-    AUX_CLASSPATH=${AUX_CLASSPATH}:$f
-    if [ "${AUX_PARAM}" == "" ]; then
-        AUX_PARAM=file://$f
-    else
-        AUX_PARAM=${AUX_PARAM},file://$f;
-    fi
-  done
+  add_to_aux_path $hive_aux_jars_abspath
 elif [ "${HIVE_AUX_JARS_PATH}" != "" ]; then
   HIVE_AUX_JARS_PATH=`echo $HIVE_AUX_JARS_PATH | sed 's/,/:/g'`
   if $cygwin; then
@@ -182,24 +188,12 @@ elif [ "${HIVE_AUX_JARS_PATH}" != "" ]; then
   AUX_PARAM="file://$(echo ${HIVE_AUX_JARS_PATH} | sed 's/:/,file:\/\//g')"
 fi
 
-# adding jars from auxlib directory
-for f in ${HIVE_HOME}/auxlib/*.jar; do
-  if [[ ! -f $f ]]; then
-      continue;
-  fi
-  if $cygwin; then
-      f=`cygpath -w "$f"`
-  fi
-  AUX_CLASSPATH=${AUX_CLASSPATH}:$f
-  if [ "${AUX_PARAM}" == "" ]; then
-    AUX_PARAM=file://$f
-  else
-    AUX_PARAM=${AUX_PARAM},file://$f;
-  fi
-done
+add_to_aux_path "${HIVE_HOME}/auxlib"
+add_to_aux_path "/aux-jars"
+
 if $cygwin; then
     CLASSPATH=`cygpath -p -w "$CLASSPATH"`
-    CLASSPATH=${CLASSPATH};${AUX_CLASSPATH}
+    CLASSPATH="${CLASSPATH};${AUX_CLASSPATH}"
 else
     CLASSPATH=${CLASSPATH}:${AUX_CLASSPATH}
 fi
