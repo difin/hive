@@ -382,7 +382,7 @@ public class HiveTableTest extends HiveTableBaseTest {
     catalog.createTable(TABLE_IDENTIFIER, schema, PartitionSpec.unpartitioned());
     org.apache.hadoop.hive.metastore.api.Table hmsTable = metastoreClient.getTable(DB_NAME, TABLE_NAME);
 
-    assertHiveEnabled(hmsTable, false);
+    assertHiveEnabled(hmsTable, true);
   }
 
   @Test
