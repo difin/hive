@@ -1157,6 +1157,17 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
+    public boolean update_compaction_metrics_data(CompactionMetricsDataStruct struct) throws MetaException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
+    public void remove_compaction_metrics_data(CompactionMetricsDataRequest request)
+        throws MetaException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public void mark_refused(CompactionInfoStruct cr) throws MetaException, TException {
         throw new UnsupportedOperationException("this method is not supported");
     }

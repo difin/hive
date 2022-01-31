@@ -217,6 +217,8 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('  void mark_cleaned(CompactionInfoStruct cr)')
     print('  void mark_compacted(CompactionInfoStruct cr)')
     print('  void mark_failed(CompactionInfoStruct cr)')
+    print('  bool update_compaction_metrics_data(CompactionMetricsDataStruct data)')
+    print('  void remove_compaction_metrics_data(CompactionMetricsDataRequest request)')
     print('  void mark_refused(CompactionInfoStruct cr)')
     print('  void set_hadoop_jobid(string jobId, i64 cq_id)')
     print('  GetLatestCommittedCompactionInfoResponse get_latest_committed_compaction_info(GetLatestCommittedCompactionInfoRequest rqst)')
@@ -1534,6 +1536,18 @@ elif cmd == 'mark_failed':
         print('mark_failed requires 1 args')
         sys.exit(1)
     pp.pprint(client.mark_failed(eval(args[0]),))
+
+elif cmd == 'update_compaction_metrics_data':
+    if len(args) != 1:
+        print('update_compaction_metrics_data requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.update_compaction_metrics_data(eval(args[0]),))
+
+elif cmd == 'remove_compaction_metrics_data':
+    if len(args) != 1:
+        print('remove_compaction_metrics_data requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.remove_compaction_metrics_data(eval(args[0]),))
 
 elif cmd == 'mark_refused':
     if len(args) != 1:

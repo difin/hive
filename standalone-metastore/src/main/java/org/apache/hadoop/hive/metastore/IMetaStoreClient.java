@@ -4138,6 +4138,24 @@ public interface IMetaStoreClient {
   void markFailed(CompactionInfoStruct cr) throws MetaException, TException;
 
   /**
+   * Update or create one record in the compaction metrics cache. This operation uses an optimistic locking mechanism.
+   * If update fails, due to version mismatch, the operation won't be retried.
+   * @param struct the object that is used for the update, always non-null
+   * @return true, if update finished successfully
+   * @throws MetaException
+   * @throws TException
+   */
+  boolean updateCompactionMetricsData(CompactionMetricsDataStruct struct) throws MetaException, TException;
+
+  /**
+   * Remove records from the compaction metrics cache matching the filter criteria passed in as parameters
+   * @param request the request object, that contains the filter parameters, must be non-null
+   * @throws MetaException
+   * @throws TException
+   */
+  void removeCompactionMetricsData(CompactionMetricsDataRequest request) throws MetaException, TException;
+
+   /**
    * Mark a compaction as refused (to run).
    * @param cr compaction job.
    * @throws MetaException

@@ -56,7 +56,6 @@ import org.apache.hadoop.hive.ql.plan.PlanUtils;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.plan.TableScanDesc;
 import org.apache.hadoop.hive.ql.session.SessionState;
-import org.apache.hadoop.hive.ql.txn.compactor.metrics.DeltaFilesMetricReporter;
 import org.apache.hadoop.hive.serde2.ColumnProjectionUtils;
 import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hadoop.hive.serde2.SerDeUtils;
@@ -889,7 +888,6 @@ public class HiveInputFormat<K extends WritableComparable, V extends Writable>
           currentInputFormatClass, currentDirs.size()*(numSplits / dirs.length),
           currentTable, result);
     }
-    DeltaFilesMetricReporter.backPropagateAcidMetrics(job, newjob);
 
     Utilities.clearWorkMapForConf(job);
     if (LOG.isInfoEnabled()) {

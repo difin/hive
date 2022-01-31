@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.21"
+const string HMS_API = "1.2.22"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -1267,6 +1267,32 @@ struct CompactionInfoStruct {
 struct OptionalCompactionInfoStruct {
     1: optional CompactionInfoStruct ci,
 }
+
+enum CompactionMetricsMetricType {
+  NUM_OBSOLETE_DELTAS,
+  NUM_DELTAS,
+  NUM_SMALL_DELTAS,
+}
+
+  struct CompactionMetricsDataStruct {
+    1: required string dbname
+    2: required string tblname
+    3: optional string partitionname
+    4: required CompactionMetricsMetricType type
+    5: required i32 metricvalue
+    6: required i32 version
+    }
+
+    struct CompactionMetricsDataResponse {
+    1: optional CompactionMetricsDataStruct data
+    }
+
+    struct CompactionMetricsDataRequest {
+    1: required string dbName,
+    2: required string tblName,
+    3: required string partitionName
+    4: required CompactionMetricsMetricType type
+    }
 
 struct CompactionResponse {
     1: required i64 id,
@@ -2847,6 +2873,8 @@ service ThriftHiveMetastore extends fb303.FacebookService
   void mark_cleaned(1:CompactionInfoStruct cr) throws(1:MetaException o1)
   void mark_compacted(1: CompactionInfoStruct cr) throws(1:MetaException o1)
   void mark_failed(1: CompactionInfoStruct cr) throws(1:MetaException o1)
+  bool update_compaction_metrics_data(1: CompactionMetricsDataStruct data) throws(1:MetaException o1)
+  void remove_compaction_metrics_data(1: CompactionMetricsDataRequest request) throws(1:MetaException o1)
   void mark_refused(1: CompactionInfoStruct cr) throws(1:MetaException o1)
   void set_hadoop_jobid(1: string jobId, 2: i64 cq_id)
   GetLatestCommittedCompactionInfoResponse get_latest_committed_compaction_info(1:GetLatestCommittedCompactionInfoRequest rqst)

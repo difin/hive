@@ -192,6 +192,14 @@ public final class TestTxnDbUtil {
           " CC_INITIATOR_VERSION varchar(128)," +
           " CC_WORKER_VERSION varchar(128))");
 
+      stmt.execute("CREATE TABLE COMPACTION_METRICS_CACHE (" +
+          " CMC_DATABASE varchar(128) NOT NULL," +
+          " CMC_TABLE varchar(128) NOT NULL," +
+          " CMC_PARTITION varchar(767)," +
+          " CMC_METRIC_TYPE varchar(128) NOT NULL," +
+          " CMC_METRIC_VALUE integer NOT NULL," +
+          " CMC_VERSION integer NOT NULL)");
+
       stmt.execute("CREATE INDEX COMPLETED_COMPACTIONS_RES ON COMPLETED_COMPACTIONS ("
           + "CC_DATABASE,CC_TABLE,CC_PARTITION)");
 
@@ -444,6 +452,7 @@ public final class TestTxnDbUtil {
         success &= dropTable(stmt, "AUX_TABLE", retryCount);
         success &= dropTable(stmt, "WRITE_SET", retryCount);
         success &= dropTable(stmt, "REPL_TXN_MAP", retryCount);
+        success &= dropTable(stmt, "COMPACTION_METRICS_CACHE", retryCount);
         /*
          * Don't drop NOTIFICATION_LOG, SEQUENCE_TABLE and NOTIFICATION_SEQUENCE as its used by other
          * table which are not txn related to generate primary key. So if these tables are dropped
