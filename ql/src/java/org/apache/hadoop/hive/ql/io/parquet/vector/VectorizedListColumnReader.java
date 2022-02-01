@@ -398,6 +398,7 @@ public class VectorizedListColumnReader extends BaseVectorizedColumnReader {
       System.arraycopy(((DecimalColumnVector) lcv.child).vector, start,
           ((DecimalColumnVector) resultCV).vector, 0, length);
     }
+    System.arraycopy(lcv.child.isNull, start, resultCV.isNull, 0, length);
     return resultCV;
   }
 
@@ -477,22 +478,34 @@ public class VectorizedListColumnReader extends BaseVectorizedColumnReader {
   private boolean compareBytesColumnVector(BytesColumnVector cv1, BytesColumnVector cv2) {
     int length1 = cv1.vector.length;
     int length2 = cv2.vector.length;
-    if (length1 == length2) {
-      for (int i = 0; i < length1; i++) {
-        int innerLen1 = cv1.vector[i].length;
-        int innerLen2 = cv2.vector[i].length;
-        if (innerLen1 == innerLen2) {
-          for (int j = 0; j < innerLen1; j++) {
-            if (cv1.vector[i][j] != cv2.vector[i][j]) {
-              return false;
-            }
-          }
-        } else {
+    if (length1 != length2) {
+      return false;
+    }
+
+    for (int i = 0; i < length1; i++) {
+      // check for different nulls
+      if ((cv1.isNull[i] && !cv2.isNull[i]) || (!cv1.isNull[i] && cv2.isNull[i])) {
+        return false;
+      }
+
+      // if they are both null, continue
+      if (cv1.isNull[i] && cv2.isNull[i]) {
+        continue;
+      }
+
+      // check if value lengths are the same
+      int innerLen1 = cv1.vector[i].length;
+      int innerLen2 = cv2.vector[i].length;
+      if (innerLen1 != innerLen2) {
+        return false;
+      }
+
+      // compare value stored
+      for (int j = 0; j < innerLen1; j++) {
+        if (cv1.vector[i][j] != cv2.vector[i][j]) {
           return false;
         }
       }
-    } else {
-      return false;
     }
     return true;
   }
