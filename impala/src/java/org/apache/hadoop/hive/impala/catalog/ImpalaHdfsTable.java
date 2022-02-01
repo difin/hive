@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
 public class ImpalaHdfsTable extends HdfsTable {
 
   private final HiveConf conf;
@@ -102,6 +103,7 @@ public class ImpalaHdfsTable extends HdfsTable {
       IMetaStoreClient msc = Hive.get().getMSC();
       loadAllColumnStats(msc);
       loadConstraintsInfo(msc, msTbl);
+      setAvroSchema(msc, msTbl);
       validWriteIds_ = compileTimeWriteIdList != null ?
           new MutableValidReaderWriteIdList(compileTimeWriteIdList) : null;
       initializePartitionMetadata(msTbl);
@@ -127,7 +129,7 @@ public class ImpalaHdfsTable extends HdfsTable {
           basicHdfsTable.getNumClusteringCols(), partitionInfo.locationPrefixes);
 
       setTableStats(msTable_);
-    } catch (IOException|ImpalaException e) {
+    } catch (Exception e) {
       throw new HiveException(e);
     }
   }
