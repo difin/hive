@@ -312,6 +312,19 @@ public final class HiveMaterializedViewsRegistry {
   }
 
   /**
+   * Update the materialized view in the registry (if materialized view exists).
+   */
+  public void refreshMaterializedView(HiveConf conf, Hive db, Table materializedViewTable) {
+    RelOptMaterialization cached = materializedViewsCache.get(
+        materializedViewTable.getDbName(), materializedViewTable.getTableName());
+    if (cached == null) {
+      return;
+    }
+    Table cachedTable = HiveMaterializedViewUtils.extractTable(cached);
+    refreshMaterializedView(conf, db, cachedTable, materializedViewTable);
+  }
+
+  /**
    * Update the materialized view in the registry (if existing materialized view matches).
    */
   public void refreshMaterializedView(HiveConf conf, Hive db, Table oldMaterializedViewTable, Table materializedViewTable) {

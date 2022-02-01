@@ -62,7 +62,7 @@ public class MaterializedViewUpdateOperation extends DDLOperation<MaterializedVi
         cm.setValidTxnList(context.getConf().get(ValidTxnWriteIdList.VALID_TABLES_WRITEIDS_KEY));
         context.getDb().updateCreationMetadata(mvTable.getDbName(), mvTable.getTableName(), cm);
         mvTable.setCreationMetadata(cm);
-        HiveMaterializedViewsRegistry.get().createMaterializedView(context.getDb().getConf(), context.getDb(), mvTable);
+        HiveMaterializedViewsRegistry.get().refreshMaterializedView(context.getDb().getConf(), context.getDb(), mvTable);
       }
     } catch (HiveException e) {
       LOG.debug("Exception during materialized view cache update", e);
