@@ -400,6 +400,10 @@ public final class HiveMaterializedViewsRegistry {
     return materializedViewsCache.get(querySql);
   }
 
+  public boolean isEmpty() {
+    return materializedViewsCache.isEmpty();
+  }
+
   private static RelNode createMaterializedViewScan(HiveConf conf, Hive db, Table viewTable) {
     // 0. Recreate cluster
     final RelDataTypeSystem typeSystem =
