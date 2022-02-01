@@ -39,13 +39,13 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.TxnType;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
+import org.apache.hadoop.hive.metastore.metrics.AcidMetricService;
 import org.apache.hadoop.hive.metastore.metrics.MetricsConstants;
 import org.apache.hadoop.hive.metastore.txn.TxnStatus;
 import org.apache.hadoop.hive.ql.DriverUtils;
 import org.apache.hadoop.hive.ql.io.AcidDirectory;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.log.PerfLogger;
-import org.apache.hadoop.hive.ql.txn.compactor.metrics.DeltaFilesMetricReporter;
 import org.apache.hive.common.util.Ref;
 import org.apache.tez.dag.api.TezConfiguration;
 import org.apache.thrift.TException;
@@ -158,9 +158,6 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
     super.init(stop);
     this.workerName = getWorkerId();
     setName(workerName);
-    // To enable delta metrics collection, initiator must be enabled on HMS side
-    metricsEnabled = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.METRICS_ENABLED) &&
-        MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.METASTORE_ACIDMETRICS_EXT_ON);
   }
 
   @VisibleForTesting
@@ -494,7 +491,8 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
         msc.markCompacted(CompactionInfo.compactionInfoToStruct(ci));
         compactionTxn.wasSuccessful();
 
-        updateDeltaFilesMetrics(dir, ci.dbname, ci.tableName, ci.partName, ci.type);
+        AcidMetricService.updateMetricsFromWorker(ci.dbname, ci.tableName, ci.partName, ci.type,
+            dir.getCurrentDirectories().size(), dir.getDeleteDeltas().size(), conf, msc);
 
       } catch (Exception e) {
         LOG.error("Caught exception while trying to compact " + ci +
@@ -540,13 +538,6 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
               CompactorUtil.getCompactorJobQueueName(conf, ci, t1));
     }
     return true;
-  }
-
-  private void updateDeltaFilesMetrics(AcidDirectory directory, String dbName, String tableName, String partName,
-      CompactionType type) {
-    if (metricsEnabled) {
-      DeltaFilesMetricReporter.updateMetricsFromWorker(directory, dbName, tableName, partName, type, conf, msc);
-    }
   }
 
   /**

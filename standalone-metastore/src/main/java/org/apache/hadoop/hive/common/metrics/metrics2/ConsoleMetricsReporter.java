@@ -20,10 +20,9 @@ package org.apache.hadoop.hive.common.metrics.metrics2;
 
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Reporter;
-import java.io.Closeable;
+import org.apache.hadoop.conf.Configuration;
+
 import java.util.concurrent.TimeUnit;
-import org.apache.hadoop.hive.conf.HiveConf;
 
 
 /**
@@ -33,7 +32,7 @@ public class ConsoleMetricsReporter implements CodahaleReporter {
 
   private final ConsoleReporter reporter;
 
-  public ConsoleMetricsReporter(MetricRegistry registry, HiveConf conf) {
+  public ConsoleMetricsReporter(MetricRegistry registry, Configuration conf) {
 
     reporter = ConsoleReporter.forRegistry(registry)
         .convertRatesTo(TimeUnit.SECONDS)

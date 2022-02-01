@@ -22,6 +22,7 @@ import org.apache.hadoop.hive.common.FileUtils;
 import org.apache.hadoop.hive.common.ValidReadTxnList;
 import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.metastore.ReplChangeManager;
+import org.apache.hadoop.hive.metastore.metrics.AcidMetricService;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.api.DataOperationType;
 import org.apache.hadoop.hive.metastore.api.GetValidWriteIdsRequest;
@@ -45,7 +46,6 @@ import org.apache.hadoop.hive.metastore.metrics.PerfLogger;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.ql.io.AcidDirectory;
 import org.apache.hadoop.hive.ql.txn.compactor.CompactorUtil.ThrowingRunnable;
-import org.apache.hadoop.hive.ql.txn.compactor.metrics.DeltaFilesMetricReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.fs.FileSystem;
@@ -112,8 +112,7 @@ public class Cleaner extends MetaStoreCompactorThread {
             conf.getIntVar(HiveConf.ConfVars.HIVE_COMPACTOR_CLEANER_THREADS_NUM),
             COMPACTOR_CLEANER_THREAD_NAME_FORMAT);
     metricsEnabled = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.METRICS_ENABLED) &&
-            MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.METASTORE_ACIDMETRICS_EXT_ON) &&
-            MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON);
+            MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.METASTORE_ACIDMETRICS_EXT_ON);
   }
 
 
@@ -192,12 +191,6 @@ public class Cleaner extends MetaStoreCompactorThread {
       if (cleanerExecutor != null) {
         this.cleanerExecutor.shutdownNow();
       }
-    }
-  }
-
-  private void updateDeltaFilesMetrics(String dbName, String tableName, String partName, List<Path> obsoleteDirs) {
-    if (metricsEnabled) {
-      DeltaFilesMetricReporter.updateMetricsFromCleaner(dbName, tableName, partName, obsoleteDirs, conf, txnHandler);
     }
   }
 
@@ -423,7 +416,10 @@ public class Cleaner extends MetaStoreCompactorThread {
       ci.setWriteIds(dir.hasUncompactedAborts(), dir.getAbortedWriteIds());
     }
     List<Path> deleted = remove(location, ci, obsoleteDirs, true, fs);
-    
+    if (dir.getObsolete().size() > 0) {
+      AcidMetricService.updateMetricsFromCleaner(ci.dbname, ci.tableName, ci.partName, dir.getObsolete(), conf,
+          txnHandler);
+    }
     // Make sure there are no leftovers below the compacted watermark
     conf.set(ValidTxnList.VALID_TXNS_KEY, new ValidReadTxnList().toString());
     dir = AcidUtils.getAcidState(fs, path, conf, new ValidReaderWriteIdList(

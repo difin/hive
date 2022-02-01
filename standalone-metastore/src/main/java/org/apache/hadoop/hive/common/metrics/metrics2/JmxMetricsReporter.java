@@ -19,10 +19,9 @@ package org.apache.hadoop.hive.common.metrics.metrics2;
 
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Reporter;
-import java.io.Closeable;
+import org.apache.hadoop.conf.Configuration;
+
 import java.util.concurrent.TimeUnit;
-import org.apache.hadoop.hive.conf.HiveConf;
 
 /**
  * A wrapper around Codahale JmxReporter to make it a pluggable/configurable Hive Metrics reporter.
@@ -30,10 +29,10 @@ import org.apache.hadoop.hive.conf.HiveConf;
 public class JmxMetricsReporter implements CodahaleReporter {
 
   private final MetricRegistry registry;
-  private final HiveConf conf;
+  private final Configuration conf;
   private final JmxReporter jmxReporter;
 
-  public JmxMetricsReporter(MetricRegistry registry, HiveConf conf) {
+  public JmxMetricsReporter(MetricRegistry registry, Configuration conf) {
     this.registry = registry;
     this.conf = conf;
 

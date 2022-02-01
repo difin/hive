@@ -84,6 +84,7 @@ import org.slf4j.LoggerFactory;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,6 +98,11 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtilities.CompactorThreadType;
+
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanInfo;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 /**
  * Super class for all of the compactor test modules.
@@ -115,8 +121,12 @@ public abstract class CompactorTest {
 
   @Before
   public void setup() throws Exception {
-    conf = new HiveConf();
+    setup(new HiveConf());
+  }
+
+  protected void setup(HiveConf conf) throws Exception {
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON, true);
+    this.conf = conf;
     TestTxnDbUtil.setConfValues(conf);
     TestTxnDbUtil.cleanDb(conf);
     TestTxnDbUtil.prepDb(conf);
@@ -673,6 +683,18 @@ public abstract class CompactorTest {
     txnHandler.markCompacted(ci);
     txnHandler.commitTxn(new CommitTxnRequest(compactorTxnId));
     return compactorTxnId;
+  }
+
+  protected Map<String, String> gaugeToMap(String metric) throws Exception {
+    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+    ObjectName oname = new ObjectName(AcidMetricService.OBJECT_NAME_PREFIX + metric);
+    MBeanInfo mbeanInfo = mbs.getMBeanInfo(oname);
+
+    Map<String, String> result = new HashMap<>();
+    for (MBeanAttributeInfo attr : mbeanInfo.getAttributes()) {
+      result.put(attr.getName(), String.valueOf(mbs.getAttribute(oname, attr.getName())));
+    }
+    return result;
   }
 
 }

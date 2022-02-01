@@ -103,6 +103,7 @@ import org.apache.hadoop.hive.common.ValidReaderWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.common.ZKDeRegisterWatcher;
 import org.apache.hadoop.hive.common.ZooKeeperHiveHelper;
+import org.apache.hadoop.hive.common.metrics.common.MetricsFactory;
 import org.apache.hadoop.hive.common.repl.ReplConst;
 import org.apache.hadoop.hive.metastore.api.*;
 import org.apache.hadoop.hive.metastore.api.Package;
@@ -10967,6 +10968,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         if (MetastoreConf.getBoolVar(conf, ConfVars.METRICS_ENABLED)) {
           try {
             Metrics.shutdown();
+            MetricsFactory.close();
           } catch (Exception e) {
             LOG.error("error in Metrics deinit: " + e.getClass().getName() + " "
                 + e.getMessage(), e);
@@ -10988,6 +10990,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       if (MetastoreConf.getBoolVar(conf, ConfVars.METRICS_ENABLED)) {
         try {
           Metrics.initialize(conf);
+          MetricsFactory.init(conf);
         } catch (Exception e) {
           // log exception, but ignore inability to start
           LOG.error("error in Metrics init: " + e.getClass().getName() + " "

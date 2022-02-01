@@ -1290,7 +1290,7 @@ enum CompactionMetricsMetricType {
     struct CompactionMetricsDataRequest {
     1: required string dbName,
     2: required string tblName,
-    3: required string partitionName
+    3: optional string partitionName
     4: required CompactionMetricsMetricType type
     }
 
