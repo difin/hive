@@ -45,6 +45,7 @@ import org.apache.hadoop.hive.common.metrics.common.MetricsConstant;
 import org.apache.hadoop.hive.common.metrics.common.MetricsFactory;
 import org.apache.hadoop.hive.common.metrics.common.MetricsScope;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConf.Engine;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Schema;
 import org.apache.hadoop.hive.ql.DriverFactory;
@@ -258,9 +259,12 @@ public class SQLOperation extends ExecuteStatementOperation {
     setState(OperationState.PENDING);
 
     boolean runAsync = shouldRunAsync();
+    HiveConf conf = queryState.getConf();
     final boolean asyncPrepare = runAsync
-      && HiveConf.getBoolVar(queryState.getConf(),
-        HiveConf.ConfVars.HIVE_SERVER2_ASYNC_EXEC_ASYNC_COMPILE);
+        && HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_SERVER2_ASYNC_EXEC_ASYNC_COMPILE)
+        // Impala tools generally expect hasResultSet to be set in the response from ExecuteStatement.
+        // When compilation is async this does not get filled in.
+        && conf.getEngine() != Engine.IMPALA;
     if (!asyncPrepare) {
       prepare(queryState);
     }
