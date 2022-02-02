@@ -120,7 +120,6 @@ public class Cleaner extends MetaStoreCompactorThread {
   public void run() {
     LOG.info("Starting Cleaner thread");
     try {
-      Counter failuresCounter = Metrics.getOrCreateCounter(MetricsConstants.COMPACTION_CLEANER_FAILURE_COUNTER);
       do {
         TxnStore.MutexAPI.LockHandle handle = null;
         long startedAt = -1;
@@ -145,7 +144,8 @@ public class Cleaner extends MetaStoreCompactorThread {
           List<CompactionInfo> readyToClean = txnHandler.findReadyToClean(minOpenTxnId, retentionTime);
           if (!readyToClean.isEmpty()) {
             long minTxnIdSeenOpen = txnHandler.findMinTxnIdSeenOpen();
-            final long cleanerWaterMark = minTxnIdSeenOpen < 0 ? minOpenTxnId : Math.min(minOpenTxnId, minTxnIdSeenOpen);
+            final long cleanerWaterMark =
+                minTxnIdSeenOpen < 0 ? minOpenTxnId : Math.min(minOpenTxnId, minTxnIdSeenOpen);
 
             LOG.info("Cleaning based on min open txn id: " + cleanerWaterMark);
             List<CompletableFuture<Void>> cleanerList = new ArrayList<>();
@@ -156,20 +156,23 @@ public class Cleaner extends MetaStoreCompactorThread {
             // when min_history_level is finally dropped, than every HMS will commit compaction the new way
             // and minTxnIdSeenOpen can be removed and minOpenTxnId can be used instead.
             for (CompactionInfo compactionInfo : readyToClean) {
-              CompletableFuture<Void> asyncJob = CompletableFuture.runAsync(
-                  ThrowingRunnable.unchecked(() -> clean(compactionInfo, cleanerWaterMark, metricsEnabled)), 
-                cleanerExecutor);
+              String tableName = compactionInfo.getFullTableName();
+              String partition = compactionInfo.getFullPartitionName();
+              CompletableFuture<Void> asyncJob =
+                  CompletableFuture.runAsync(
+                          ThrowingRunnable.unchecked(() -> clean(compactionInfo, cleanerWaterMark, metricsEnabled)),
+                          cleanerExecutor)
+                      .exceptionally(t -> {
+                        LOG.error("Error during the cleaning the table {} / partition {}", tableName, partition, t);
+                        return null;
+                      });
               cleanerList.add(asyncJob);
             }
             CompletableFuture.allOf(cleanerList.toArray(new CompletableFuture[0])).join();
           }
         } catch (Throwable t) {
-          // the lock timeout on AUX lock, should be ignored.
-          if (metricsEnabled && handle != null) {
-            failuresCounter.inc();
-          }
           LOG.error("Caught an exception in the main loop of compactor cleaner, " +
-                  StringUtils.stringifyException(t));
+              StringUtils.stringifyException(t));
         } finally {
           if (handle != null) {
             handle.releaseLocks();
@@ -269,6 +272,9 @@ public class Cleaner extends MetaStoreCompactorThread {
       LOG.error("Caught exception when cleaning, unable to complete cleaning of " + ci + " " +
           StringUtils.stringifyException(e));
       ci.errorMessage = e.getMessage();
+      if (metricsEnabled) {
+        Metrics.getOrCreateCounter(MetricsConstants.COMPACTION_CLEANER_FAILURE_COUNTER).inc();
+      }
       handleCleanerAttemptFailure(ci);
     }  finally {
       if (metricsEnabled) {
