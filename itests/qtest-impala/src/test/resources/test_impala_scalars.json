@@ -4857,38 +4857,6 @@
         "userVisible": "false",
         "isAgg": "false",
         "hasVarArgs": "false",
-        "retType": "VARCHAR",
-        "isPersistent": "true",
-        "binaryType": "BUILTIN",
-        "argTypes": [
-            "VARCHAR"
-        ],
-        "symbolName": "",
-        "hdfsUriLoc": ""
-    },
-    {
-        "impalaFnName": "decode",
-        "dbName": "_impala_builtins",
-        "fnName": "decode",
-        "userVisible": "false",
-        "isAgg": "false",
-        "hasVarArgs": "false",
-        "retType": "VARCHAR",
-        "isPersistent": "true",
-        "binaryType": "BUILTIN",
-        "argTypes": [
-            "VARCHAR"
-        ],
-        "symbolName": "",
-        "hdfsUriLoc": ""
-    },
-    {
-        "impalaFnName": "case",
-        "dbName": "_impala_builtins",
-        "fnName": "case",
-        "userVisible": "false",
-        "isAgg": "false",
-        "hasVarArgs": "false",
         "retType": "TIMESTAMP",
         "isPersistent": "true",
         "binaryType": "BUILTIN",

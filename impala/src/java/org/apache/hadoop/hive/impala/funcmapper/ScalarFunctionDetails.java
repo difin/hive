@@ -146,6 +146,13 @@ public class ScalarFunctionDetails implements FunctionDetails {
         for (String fnName : getFunctionNames(func.functionName())) {
           ScalarFunctionWrapper funcWrapper = new ScalarFunctionWrapperImpl(func, false);
           ScalarFunctionDetails sfd = new ScalarFunctionDetails(fnName, funcWrapper);
+          // Do not add the varchar flavor of the case function. The varchar version causes
+          // problems getting all the variables at the right size. Impala code uses String
+          // at exec time anyway for varchar fields, so there's no real point of keeping these
+          // as varchar.
+          if (fnName.toLowerCase().equals("case") && funcWrapper.getRetType() == Type.VARCHAR) {
+            continue;
+          }
           result.add(sfd);
         }
       }
