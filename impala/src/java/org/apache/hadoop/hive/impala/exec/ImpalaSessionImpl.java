@@ -102,6 +102,7 @@ public class ImpalaSessionImpl implements EngineSession {
     public void init(HiveConf conf) {
       this.address = conf.getVar(HiveConf.ConfVars.HIVE_IMPALA_ADDRESS);
       this.connectionTimeout = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_CONNECT_TIMEOUT);
+      this.impalaMaxTimerError = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_MAX_TIMER_ERROR);
       this.socketBufferSize = conf.getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_SOCKET_BUFFER_SIZE);
     }
 
@@ -223,9 +224,13 @@ public class ImpalaSessionImpl implements EngineSession {
                   TPingImpalaHS2ServiceResp resp = client.PingImpalaHS2Service(req);
                   checkThriftStatus(resp.getStatus()); // Check errors on every iteration
                   // Move the coordinator timestamp forward by half of the RPC latency
-                  // to compensate for overlap between the frontend and backend timelines.
-                  resp.timestamp += ((System.nanoTime() - ping_send_ts) / 2);
-                  return resp; 
+                  // to compensate for overlap between the frontend and backend timelines
+                  // if the roundtrip time is not too short compared to
+                  // HIVE_IMPALA_MAX_TIMER_ERROR.
+                  long roundtripTime = System.nanoTime() - ping_send_ts;
+                  long estimatedOneWayTime = roundtripTime >= impalaMaxTimerError ? roundtripTime / 2 : 0;
+                  resp.timestamp += estimatedOneWayTime;
+                  return resp;
                 });
     }
 

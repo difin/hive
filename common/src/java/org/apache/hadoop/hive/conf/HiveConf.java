@@ -4427,6 +4427,8 @@ public class HiveConf extends Configuration {
     HIVE_IMPALA_FETCH_SIZE("hive.impala.fetch.size", 1024L,
         new RangeValidator(1L, (long)Long.MAX_VALUE),
         "Determines the number of rows per fetch when streaming results from an Impala coordinator"),
+    HIVE_IMPALA_MAX_TIMER_ERROR("hive.impala.max.timer.error", 8000000L, "Maximum timer " +
+            "error on the Impala server in nanoseconds"),
     HIVE_IMPALA_ROW_FETCH_EARLY_CLOSE("hive.impala.fetch.early.close", false,
         "Controls whether the Impala backend operation handle is closed at " +
         "the end of fetch. Leaving the operation handle open allows the Impala " +
