@@ -116,6 +116,7 @@ public class FunctionDetailStatics {
       .add(Pair.of(Type.CHAR, Type.DATE))
       .add(Pair.of(Type.DECIMAL, Type.FLOAT))
       .add(Pair.of(Type.DECIMAL, Type.DOUBLE))
+      .add(Pair.of(Type.DECIMAL, Type.DECIMAL))
       .add(Pair.of(Type.DATE, Type.TIMESTAMP))
       .build();
 

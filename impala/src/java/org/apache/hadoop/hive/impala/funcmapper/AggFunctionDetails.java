@@ -161,8 +161,8 @@ public class AggFunctionDetails implements FunctionDetails {
     // Also add functions that don't map directly into Impala (which are stored in a "json"
     // resources file.
     for (NonImpalaFunction nif : NonImpalaFunction.getNonImpalaFunctionsFromFile("/impala_aggs.json")) {
-      ImpalaFunctionSignature ifs = ImpalaFunctionSignature.create(nif.fnName, nif.getArgTypes(),
-          nif.getRetType(), false, false);
+      ImpalaFunctionSignature ifs = ImpalaFunctionSignature.createFuncSignatureForStorage(
+          nif.fnName, nif.getArgTypes(), nif.getRetType(), false, false);
       AggFunctionDetails afd = new AggFunctionDetails(nif);
       AGG_BUILTINS_MAP.put(afd.ifs, afd);
       if (nif.isAnalyticFn) {
@@ -232,8 +232,8 @@ public class AggFunctionDetails implements FunctionDetails {
     ignoresDistinct = func.ignoresDistinct();
     returnsNonNullOnEmpty = func.returnsNonNullOnEmpty();
     isAgg = func.isAggregateFn();
-    ifs = ImpalaFunctionSignature.create(fnName.toLowerCase(), getArgTypes(), getRetType(),
-        false, false);
+    ifs = ImpalaFunctionSignature.createFuncSignatureForStorage(fnName.toLowerCase(),
+        getArgTypes(), getRetType(), false, false);
   }
 
   public AggFunctionDetails(AggFunctionWrapper func) {
@@ -261,8 +261,8 @@ public class AggFunctionDetails implements FunctionDetails {
     ignoresDistinct = func.ignoresDistinct();
     returnsNonNullOnEmpty = func.returnsNonNullOnEmpty();
     isAgg = func.isAggregateFn();
-    ifs = ImpalaFunctionSignature.create(fnName.toLowerCase(), getArgTypes(), getRetType(),
-        false, false);
+    ifs = ImpalaFunctionSignature.createFuncSignatureForStorage(fnName.toLowerCase(),
+        getArgTypes(), getRetType(), false, false);
   }
 
   public AggFunctionDetails(NonImpalaFunction func) {
@@ -289,7 +289,8 @@ public class AggFunctionDetails implements FunctionDetails {
     ignoresDistinct = false;
     returnsNonNullOnEmpty = false;
     isAgg = func.isAgg;
-    ifs = ImpalaFunctionSignature.create(fnName, getArgTypes(), getRetType(), false, false);
+    ifs = ImpalaFunctionSignature.createFuncSignatureForStorage(fnName, getArgTypes(),
+        getRetType(), false, false);
   }
 
   public static Collection<AggFunctionDetails> getAllFuncDetails() {
@@ -352,18 +353,6 @@ public class AggFunctionDetails implements FunctionDetails {
 
   public static boolean isAnalyticFunction(String name) {
     return ANALYTIC_BUILTINS.contains(name.toLowerCase());
-  }
-
-  public static AggFunctionDetails get(String name, List<Type> operandTypes,
-      Type retType, boolean hasVarArgs) {
-
-    ImpalaFunctionSignature sig = ImpalaFunctionSignature.create(name.toLowerCase(), operandTypes, retType,
-        hasVarArgs, null);
-
-    if (sig != null) {
-      return ALL_AGG_MAP.get(sig);
-    }
-    return null;
   }
 
   public static AggFunctionDetails get(ImpalaFunctionSignature ifs) {

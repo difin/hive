@@ -103,7 +103,7 @@ public class CaseFunctionResolver extends ImpalaFunctionResolverImpl {
     // if there are less input nodes than cast types, then we have an implicit "else null" that
     // we need to create.
     if (newInputs.size() < castTypes.size()) {
-      newInputs.add(rexBuilder.makeNullLiteral(castTypes.get(castTypes.size() - 1)));
+      newInputs.add(rexBuilder.makeNullLiteral(SqlTypeName.NULL));
     }
     return castInputs(newInputs, castTypes);
   }

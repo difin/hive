@@ -35,6 +35,7 @@ import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.ConversionUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.hive.impala.calcite.ImpalaTypeSystemImpl;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteSemanticException;
 import org.apache.hadoop.hive.ql.optimizer.calcite.functions.CalciteUDFInfo;
@@ -50,7 +51,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
-
   protected final String func;
 
   protected final ImmutableList<RelDataType> argTypes;
@@ -135,12 +135,18 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
               Charset.forName(ConversionUtil.NATIVE_UTF16_CHARSET_NAME), SqlCollation.IMPLICIT);
         return rexBuilder.getTypeFactory().createTypeWithNullability(rdt, isNullable);
       }
-      case CHAR:
       case DECIMAL:
-        // This could fail if there are Impala functions which are not mapped into Calcite
-        // and have a return type of char or decimal. We will have to figure out some way
-        // to handle these types, since it might not be wise to pick a default.
-        Preconditions.checkNotNull(op);
+        // If the function signature explicitly defines its decimal return type, we use it.
+        // This can only happen with native UDFs defined by the user.
+        if (funcSig.hasNonWildCardDecimal()) {
+          return funcSig.getRetType();
+        }
+        // Logic for special operations are built into ImpalaRelDataSystemImpl. If there is
+        // no "op" specified, we just go to the common decimal logic.
+        return op != null
+            ? op.inferReturnType(rexBuilder.getTypeFactory(), RexUtil.types(operands))
+            : getCommonDecimalType(rexBuilder.getTypeFactory(), operands);
+      case CHAR:
         return op.inferReturnType(rexBuilder.getTypeFactory(), RexUtil.types(operands));
       // For the default case, we can just create a RelDataType.
       default: {
@@ -280,35 +286,31 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     Preconditions.checkState(inputs.size() == castTypes.size());
     RelDataTypeFactory typeFactory = rexBuilder.getTypeFactory();
 
-    // Some functions (e.g. IN) require all decimal parameters to use the same precision
-    // and scale. The commonDecimalType will hold a value only for these functions.
+    // We calculate a common decimal type to use across the cast inputs if the function
+    // requires this.  For instance, this is required for case statements because each
+    // individual condition of the case statement returns a decimal type and these types
+    // need to be consistent.
     RelDataType commonDecimalType =
         getCommonDecimalTypeIfNeeded(typeFactory, inputs, castTypes);
 
     for (int i = 0; i < inputs.size(); ++i) {
       RelDataType preCastDataType =  inputs.get(i).getType();
-      boolean strictDecimalComparison = (commonDecimalType != null);
-      RelDataType postCastDataType =
-          (strictDecimalComparison && castTypes.get(i).getSqlTypeName() == SqlTypeName.DECIMAL)
-              ? commonDecimalType : castTypes.get(i);
-      // If the datatypes are compatible, we don't want to cast it.
-      // If the datatype is null, they are compatible, but we always want to cast it
-      // to its proper datatype.
-      // The strictDecimalComparison boolean is false (normal case) when we don't want to cast
-      // decimal types with different precisions (e.g. for multiplication, it's ok to multiply
-      // dec(3,2) * dec(8,1). For "IN" clauses, the params need a compatible decimal
-      // precision/scale.
-      if (preCastDataType.getSqlTypeName() != SqlTypeName.NULL &&
-          ImpalaFunctionSignature.areCompatibleDataTypes(preCastDataType, postCastDataType,
-              strictDecimalComparison)) {
-        newOperands.add(inputs.get(i));
-      } else {
-        RelDataType castedRelDataType = (castTypes.get(i).getSqlTypeName() == SqlTypeName.DECIMAL)
-            ? getCastedDecimalDataType(typeFactory, commonDecimalType, preCastDataType)
-            : getCastedDataType(typeFactory, castTypes.get(i), preCastDataType);
-        // cast to appropriate type
-        newOperands.add(rexBuilder.makeCast(castedRelDataType, inputs.get(i), true));
+      RelDataType postCastDataType = castTypes.get(i);
+      // We only want to use the commonDecimalType for the inputs that are decimal.
+      if (commonDecimalType != null && castTypes.get(i).getSqlTypeName() == SqlTypeName.DECIMAL) {
+        postCastDataType = commonDecimalType;
       }
+
+      RexNode operandToAdd = inputs.get(i);
+      // Check if we the input needs to be cast. Decimal casting requires different logic from
+      // all other types. The castedRelDataType will be null if no casting is needed.
+      RelDataType castedRelDataType = postCastDataType.getSqlTypeName() == SqlTypeName.DECIMAL
+          ? getCastedDecimalDataType(typeFactory, postCastDataType, preCastDataType)
+          : getCastedNonDecimalDataType(typeFactory, postCastDataType, preCastDataType);
+      if (castedRelDataType != null) {
+        operandToAdd = rexBuilder.makeCast(castedRelDataType, inputs.get(i), true);
+      }
+      newOperands.add(operandToAdd);
     }
     return newOperands;
   }
@@ -389,6 +391,11 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     boolean isNullable = false;
     for (RexNode input : getCommonDecimalInputs(inputs)) {
       RelDataType dt = input.getType();
+      // Can't determine a common decimal type off of a wildcard decimal.
+      if (dt.getPrecision() == ImpalaTypeSystemImpl.PRECISION_NOT_SPECIFIED) {
+        continue;
+      }
+      Preconditions.checkState(dt.getScale() >= 0);
       isNullable |= dt.isNullable();
       ScalarType impalaType = (ScalarType) ImpalaTypeConverter.createImpalaType(dt);
       // get minimum resolution decimal (e.g. tinyint returns dec(3,0))
@@ -414,19 +421,55 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     return inputs;
   }
 
+  /**
+   * Return a casted datatype for nondecimal values, if the datatype needs to be
+   * cast. Return null if no casting is needed.
+   */
+  private RelDataType getCastedNonDecimalDataType(RelDataTypeFactory dtFactory,
+      RelDataType postCastDataType, RelDataType preCastDataType) {
+    // If the datatypes match, no casting is needed. Null values always need casting.
+    if (preCastDataType.getSqlTypeName() != SqlTypeName.NULL &&
+        ImpalaFunctionSignature.areCompatibleDataTypes(preCastDataType, postCastDataType)) {
+      return null;
+    }
+    return getCastedDataType(dtFactory, postCastDataType, preCastDataType);
+  }
+
+  /**
+   * Return a casted datatype for decimal values, if the datatype needs to be
+   * cast. Return null if no casting is needed.
+   */
   private RelDataType getCastedDecimalDataType(RelDataTypeFactory dtFactory,
-      RelDataType commonDecimalType, RelDataType preCastRelDataType) {
-    // if there is no common decimal type, the appropriate size decimal will be created based
-    // on the datatype that is going to be case.
-    // If there is a common datatype, the common datatype is created with the appropriate
-    // nullability.
-    return commonDecimalType == null
-        ? ImpalaTypeConverter.createDecimalType(dtFactory, preCastRelDataType)
-        : dtFactory.createTypeWithNullability(commonDecimalType, preCastRelDataType.isNullable());
+      RelDataType postCastDecimalType, RelDataType preCastDataType) {
+    // Check for when the casted to type is a wildcard decimal.
+    if (postCastDecimalType.getPrecision() == -1) {
+      // if the type is already of type decimal, no casting is needed. We just
+      // use the already existing type.
+      if (preCastDataType.getSqlTypeName() == SqlTypeName.DECIMAL) {
+        return null;
+      }
+      // If the type is some other type, like BIGINT, an appropriate decimal
+      // type is selected. For instance, in the case of BIGINT, Decimal(19,0)
+      // will be returned.
+      return ImpalaTypeConverter.createDecimalType(dtFactory, preCastDataType);
+    }
+
+    if (preCastDataType.getSqlTypeName() != SqlTypeName.NULL &&
+        ImpalaFunctionSignature.areCompatibleDataTypes(preCastDataType,
+        postCastDecimalType, true)) {
+      return null;
+    }
+
+    // If the decimal type is explicitly defined (which happens with Native UDFs),
+    // the cast datatype is of the type defined by the UDF
+    return dtFactory.createTypeWithNullability(postCastDecimalType, preCastDataType.isNullable());
   }
 
   /**
    * Return the casted RelDatatype of the provided postCastSqlTypeName
+   * TODO: this code is only called during INSERT mode and with complex types.
+   * Once complex types are supported, this should be merged in with the
+   * other code that handles casting types.
    */
   private RelDataType getCastedDataType(RelDataTypeFactory dtFactory,
       RelDataType postCastRelType, RelDataType preCastRelDataType) {

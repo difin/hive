@@ -147,27 +147,6 @@ public class ImpalaTypeConverter {
     }
   }
 
-  /**
-   * Given RexNode operands, return the normalized RelDataType associated with it. See
-   * the class description on the definition of normalized.
-   */
-  public static List<RelDataType> getNormalizedImpalaTypeList(List<RexNode> rexNodes) {
-    return Lists.transform(rexNodes, ImpalaTypeConverter::getNormalizedImpalaType);
-  }
-
-  public static RelDataType getNormalizedImpalaType(RexNode node) {
-    SqlTypeName sqlTypeName = node.getType().getSqlTypeName();
-    if (node instanceof RexLiteral &&
-        SqlTypeName.CHAR_TYPES.contains(sqlTypeName)) {
-      return getInterpretationType((RexLiteral) node);
-    } else if (SqlTypeName.INTERVAL_TYPES.contains(sqlTypeName)) {
-      return node.getType();
-    } else {
-      Type impalaType = getNormalizedImpalaType(node.getType());
-      return getRelDataType(impalaType, node.getType().isNullable());
-    }
-  }
-
   public static List<Type> getNormalizedTypeList(List<Type> types) {
     return Lists.transform(types, ImpalaTypeConverter::getNormalizedType);
   }
@@ -184,7 +163,6 @@ public class ImpalaTypeConverter {
     }
     return impalaType;
   }
-
 
   // helper function to handle translation of lists.
   public static List<RelDataType> getRelDataTypesForArgs(List<Type> impalaTypes) {
@@ -205,6 +183,38 @@ public class ImpalaTypeConverter {
       return null;
     }
     TPrimitiveType primitiveType = impalaType.getPrimitiveType().toThrift();
+    Type normalizedImpalaType = getImpalaType(primitiveType);
+    Map<Type, RelDataType> mapToUse = (nullable) ? nullableImpalaToCalciteMap : impalaToCalciteMap;
+    return mapToUse.get(normalizedImpalaType);
+  }
+
+  // helper function to handle translation of lists.
+  public static List<RelDataType> createRelDataTypesForArgs(List<Type> impalaTypes) {
+    List<RelDataType> result = Lists.newArrayList();
+    for (Type t : impalaTypes) {
+      result.add(createRelDataType(t, true));
+    }
+    return result;
+  }
+
+  /**
+   * Create a new RelDataType given the Impala type.
+   */
+  public static RelDataType createRelDataType(Type impalaType, boolean nullable) {
+    if (impalaType == null) {
+      return null;
+    }
+    TPrimitiveType primitiveType = impalaType.getPrimitiveType().toThrift();
+    if (primitiveType == TPrimitiveType.DECIMAL) {
+      ScalarType scalarType = (ScalarType) impalaType;
+      RexBuilder rexBuilder = new RexBuilder(new JavaTypeFactoryImpl(new ImpalaTypeSystemImpl()));
+      RelDataTypeFactory factory = rexBuilder.getTypeFactory();
+      RelDataType decimalDefinedRetType = factory.createSqlType(SqlTypeName.DECIMAL,
+          scalarType.decimalPrecision(), scalarType.decimalScale());
+      return factory.createTypeWithNullability(decimalDefinedRetType, nullable);
+    }
+    // for all other arguments besides decimal, we just normalize the datatype and return the
+    // previously created RelDataType.
     Type normalizedImpalaType = getImpalaType(primitiveType);
     Map<Type, RelDataType> mapToUse = (nullable) ? nullableImpalaToCalciteMap : impalaToCalciteMap;
     return mapToUse.get(normalizedImpalaType);
@@ -239,6 +249,9 @@ public class ImpalaTypeConverter {
       case VARCHAR:
         return ScalarType.createVarcharType(precision);
       case DECIMAL:
+        if (precision == -1) {
+          return Type.DECIMAL;
+        }
         return ScalarType.createDecimalType(precision, scale);
       case FIXED_UDA_INTERMEDIATE:
         return ScalarType.createFixedUdaIntermediateType(precision);

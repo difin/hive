@@ -56,11 +56,22 @@ public class ImpalaRelUtil {
 
     String funcName = ImpalaFunctionHelper.getFuncName(AggFunctionDetails.getAllAggs(),
         aggFunction.getName(), currentDatabase);
+    return getAggregateFunction(funcName, retType, operandTypes);
+  }
+
+  /**
+   * Returns the aggregation function for the provided parameters. In Impala,
+   * this could be either an aggregation or analytic function.
+   */
+  public static AggregateFunction getAggregateFunction(String funcName,
+      RelDataType retType,
+      List<RelDataType> operandTypes) throws HiveException {
+
     AggFunctionDetails funcDetails = AggFunctionDetails.get(funcName, operandTypes,
         retType);
 
     if (funcDetails == null) {
-      throw new SemanticException("Could not find function \"" + aggFunction.getName() + "\"");
+      throw new SemanticException("Could not find function \"" + funcName + "\"");
     }
 
     List<Type> argTypes = ImpalaTypeConverter.createImpalaTypes(operandTypes);
@@ -73,31 +84,6 @@ public class ImpalaRelUtil {
 
     return createAggFunction(funcDetails, funcDetails.getName(), argTypes, impalaRetType,
         intermediateType);
-  }
-
-  public static AggregateFunction getAggregateFunction(String aggFuncName, Type retType,
-      List<Type> operandTypes) throws HiveException {
-
-    AggFunctionDetails funcDetails = AggFunctionDetails.get(aggFuncName, operandTypes, retType, false);
-
-    if (funcDetails == null) {
-      throw new SemanticException("Could not find function \"" + aggFuncName + "\" " +
-          "for operands: " + operandTypes + " and return type: " + retType);
-    }
-
-    int intermediateTypePrecision = funcDetails.intermediateTypeLength != 0 ?
-        funcDetails.intermediateTypeLength :
-        // use getColumnSize() instead of getPrecision() because getPrecision()
-        // is only applicable to numeric types
-        retType.getColumnSize();
-
-    int intermediateTypeScale = retType.isDecimal() ? ((ScalarType) retType).decimalScale() : 0;
-    Type intermediateType = ImpalaTypeConverter
-        .createImpalaType(funcDetails.getIntermediateType(), intermediateTypePrecision,
-            intermediateTypeScale);
-
-    return createAggFunction(funcDetails, funcDetails.getName(), operandTypes,
-        retType, intermediateType);
   }
 
   private static AggregateFunction createAggFunction(AggFunctionDetails funcDetails, String aggFuncName,

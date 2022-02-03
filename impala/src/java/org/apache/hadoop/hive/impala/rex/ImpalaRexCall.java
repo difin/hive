@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -181,19 +182,19 @@ public class ImpalaRexCall {
       // shiftRight expr
       BigDecimal value = new BigDecimal(((NumericLiteral) params.get(1)).getIntValue());
       NumericLiteral numPositions = new NumericLiteral(value, Type.INT);
-      Type impalaRefType = ImpalaTypeConverter.createImpalaType(refType);
-      List<Type> shiftRightArgs = ImmutableList.of(impalaRefType, Type.INT);
+      List<RelDataType> shiftRightArgs = ImmutableList.of(refType, ImpalaTypeConverter.getRelDataType(Type.INT, true));
       ScalarFunctionDetails shiftRightFuncDetails =
-          ScalarFunctionDetails.get("shiftright", shiftRightArgs, impalaRefType);
+          ScalarFunctionDetails.get("shiftright", shiftRightArgs, refType);
       Preconditions.checkNotNull(shiftRightFuncDetails);
       Function shiftRightFn = ImpalaFunctionUtil.create(shiftRightFuncDetails, analyzer);
+      Type impalaRefType = ImpalaTypeConverter.createImpalaType(refType);
       Expr shiftRightExpr = new ImpalaFunctionCallExpr(analyzer, shiftRightFn,
           ImmutableList.of(params.get(0), numPositions), rexCall, impalaRefType);
       // bitAnd expr
       NumericLiteral mask = new NumericLiteral(new BigDecimal(1), impalaRefType);
-      List<Type> bitAndArgs = ImmutableList.of(impalaRefType, impalaRefType);
+      List<RelDataType> bitAndArgs = ImmutableList.of(refType, refType);
       ScalarFunctionDetails bitAndFuncDetails =
-          ScalarFunctionDetails.get("bitand", bitAndArgs, impalaRefType);
+          ScalarFunctionDetails.get("bitand", bitAndArgs, refType);
       Preconditions.checkNotNull(bitAndFuncDetails);
       Function bitAndFn = ImpalaFunctionUtil.create(bitAndFuncDetails, analyzer);
       Expr bitAndExpr = new ImpalaFunctionCallExpr(analyzer, bitAndFn,
@@ -362,9 +363,10 @@ public class ImpalaRexCall {
     CompoundPredicate.Operator op =
         invert ? CompoundPredicate.Operator.OR : CompoundPredicate.Operator.AND;
 
-    List<Type> fnArgs = ImmutableList.of(Type.BOOLEAN, Type.BOOLEAN);
+    RelDataType booleanType = ImpalaTypeConverter.getRelDataType(Type.BOOLEAN, true);
+    List<RelDataType> fnArgs = ImmutableList.of(booleanType, booleanType);
     ScalarFunctionDetails compoundFuncDetails =
-        ScalarFunctionDetails.get(fnKind.toString().toLowerCase(), fnArgs, Type.BOOLEAN);
+        ScalarFunctionDetails.get(fnKind.toString().toLowerCase(), fnArgs, booleanType);
     Preconditions.checkNotNull(compoundFuncDetails);
     Function fnCompound = ImpalaFunctionUtil.create(compoundFuncDetails, analyzer);
     return createCompoundExpr(analyzer, op, fnCompound, impalaExprList, retType);
@@ -374,10 +376,10 @@ public class ImpalaRexCall {
        ) throws HiveException {
     List<RexNode> operands = rexCall.getOperands();
 
-    Type impalaRetType = ImpalaTypeConverter.getNormalizedImpalaType(rexCall.getType());
-    Type impalaParamType = params.get(0).getType();
+    Type impalaRetType = ImpalaTypeConverter.createImpalaType(rexCall.getType());
+    RelDataType paramType = ImpalaTypeConverter.createRelDataType(params.get(0).getType(), true);
     ScalarFunctionDetails sfd =
-        ScalarFunctionDetails.get("cast", Lists.newArrayList(impalaParamType), impalaRetType);
+        ScalarFunctionDetails.get("cast", Lists.newArrayList(paramType), rexCall.getType());
     Function fn = ImpalaFunctionUtil.create(sfd, analyzer);
     return new ImpalaCastExpr(analyzer, fn, impalaRetType, params.get(0),
         RexLiteral.stringValue(operands.get(1)));
@@ -420,9 +422,9 @@ public class ImpalaRexCall {
   }
 
   private static List<RexNode> castRexNodesToString(List<RexNode> operands, RexBuilder rexBuilder) {
-    List<RexNode> castOperands = Lists.newArrayList(); 
+    List<RexNode> castOperands = Lists.newArrayList();
     for (RexNode operand : operands) {
-      RelDataType relDataType = ImpalaTypeConverter.getNormalizedImpalaType(operand);
+      RelDataType relDataType = operand.getType();
       SqlTypeName sqlTypeName = relDataType.getSqlTypeName();
       if ((sqlTypeName == SqlTypeName.CHAR) || ((sqlTypeName == SqlTypeName.VARCHAR) &&
         relDataType.getPrecision() != Integer.MAX_VALUE)) {
@@ -438,7 +440,7 @@ public class ImpalaRexCall {
 
   private static Function getFunction(String name, List<RexNode> args,
       RelDataType retType, Analyzer analyzer) throws HiveException {
-    List<RelDataType> argTypes = ImpalaTypeConverter.getNormalizedImpalaTypeList(args);
+    List<RelDataType> argTypes = Lists.transform(args, RexNode::getType);
     ScalarFunctionDetails details = ScalarFunctionDetails.get(
         name, argTypes, retType);
     if (details == null) {

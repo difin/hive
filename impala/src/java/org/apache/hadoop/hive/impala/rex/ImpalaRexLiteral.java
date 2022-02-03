@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.impala.rex;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexLiteral;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.DateString;
@@ -108,13 +109,14 @@ public class ImpalaRexLiteral {
    */
   private static Expr createCastTimestampExpr(Analyzer analyzer, RexLiteral rexLiteral)
       throws HiveException {
-    List<Type> typeNames = ImmutableList.of(Type.STRING);
- 
+    List<RelDataType> typeNames =
+        ImmutableList.of(ImpalaTypeConverter.getRelDataType(Type.STRING, true));
+
     String timestamp = rexLiteral.getValueAs(TimestampString.class).toString();
     List<Expr> argList =
         Lists.newArrayList(new StringLiteral(timestamp, Type.STRING, false));
     ScalarFunctionDetails castFuncDetails = ScalarFunctionDetails.get("cast", typeNames,
-        Type.TIMESTAMP);
+        ImpalaTypeConverter.getRelDataType(Type.TIMESTAMP, true));
     Function castFunc = ImpalaFunctionUtil.create(castFuncDetails);
     return new ImpalaFunctionCallExpr(analyzer, castFunc, argList, null, Type.TIMESTAMP);
   }

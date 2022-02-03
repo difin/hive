@@ -177,8 +177,9 @@ public class ScalarFunctionDetails implements FunctionDetails {
     // Also add functions that don't map directly into Impala (which are stored in a "json"
     // resources file.
     for (NonImpalaFunction nif : NonImpalaFunction.getNonImpalaFunctionsFromFile("/impala_scalars.json")) {
-      ImpalaFunctionSignature ifs = ImpalaFunctionSignature.create(nif.fnName.toLowerCase(),
-          nif.getArgTypes(), nif.getRetType(), nif.hasVarArgs, nif.retTypeAlwaysNullable);
+      ImpalaFunctionSignature ifs = ImpalaFunctionSignature.createFuncSignatureForStorage(
+          nif.fnName.toLowerCase(), nif.getArgTypes(), nif.getRetType(), nif.hasVarArgs,
+          nif.retTypeAlwaysNullable);
       SCALAR_BUILTINS.add(nif.fnName.toLowerCase());
       ifsList.add(ifs);
     }
@@ -233,9 +234,9 @@ public class ScalarFunctionDetails implements FunctionDetails {
 
     this.impalaFnName = func.functionName();
 
-    this.impalaRetType = ImpalaTypeConverter.getNormalizedType(func.getRetType());
+    this.impalaRetType = func.getRetType();
 
-    this.impalaArgTypes = ImpalaTypeConverter.getNormalizedTypeList(func.getArgTypes());
+    this.impalaArgTypes = func.getArgTypes();
 
     this.symbolName = func.getSymbolName();
 
@@ -260,8 +261,8 @@ public class ScalarFunctionDetails implements FunctionDetails {
     this.retTypeAlwaysNullable =
         FunctionDetailStatics.RET_TYPE_ALWAYS_NULLABLE_FUNCS.contains(fnName);
 
-    this.ifs = ImpalaFunctionSignature.create(fnName.toLowerCase(), getArgTypes(),
-        getRetType(), hasVarArgs, retTypeAlwaysNullable);
+    this.ifs = ImpalaFunctionSignature.createFuncSignatureForStorage(fnName.toLowerCase(),
+        getArgTypes(), getRetType(), hasVarArgs, retTypeAlwaysNullable);
 
     // All functions defined by the user are considered to be stateful and avoid constant
     // folding for safety purposes.
@@ -290,19 +291,6 @@ public class ScalarFunctionDetails implements FunctionDetails {
     return FunctionDetailStatics.SUPPORTED_IMPLICIT_CASTS.contains(
         Pair.of(ImpalaTypeConverter.getNormalizedType(toCast),
             ImpalaTypeConverter.getNormalizedType(fromCast)));
-  }
-
-  /**
-   * Shortcut for getting the ScalarFunctionDetails when the Impala operand types,
-   * the return type, and the function name are hardcoded.
-   */
-  public static ScalarFunctionDetails get(String name, List<Type> operandTypes,
-       Type retType) {
-
-    ImpalaFunctionSignature sig = ImpalaFunctionSignature.create(name.toLowerCase(),
-        operandTypes, retType, false, null);
-
-    return ALL_SCALARS_MAP.get(sig);
   }
 
   public static ScalarFunctionDetails get(String name, List<RelDataType> operandTypes,

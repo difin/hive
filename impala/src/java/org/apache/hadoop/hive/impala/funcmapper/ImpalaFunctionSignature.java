@@ -24,15 +24,18 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.calcite.jdbc.JavaTypeFactoryImpl;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.rel.type.RelDataTypeField;
 import org.apache.calcite.rel.type.RelDataTypeFieldImpl;
 import org.apache.calcite.rel.type.RelRecordType;
+import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.hive.impala.calcite.ImpalaTypeSystemImpl;
 import org.apache.impala.analysis.TypesUtil;
 import org.apache.impala.catalog.ScalarType;
 import org.apache.impala.catalog.Type;
@@ -48,10 +51,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+/**
+ * Class representing the signature of an Impala function. The signature is represented
+ * by the function name, the return type, and the input parameters.
+ *
+ * There are two constructors for this class.  One is used exclusively for creating
+ * signatures for all existing functions in Impala. These objects are meant to be placed
+ * in memory at server initialization time. They can also be created via the "create
+ * function" sql command.
+ *
+ * The second constructor is used for creating signatures to query the signatures created
+ * by the first constructor. 
+ *
+ * The "equals" and "hashCode" methods are a little special. The query signature will need
+ * to use normalized decimal types when comparing against native Impala functions. For instance,
+ * if the queried signature contains a decimal(3,2) as a parameter, it will convert the type
+ * to a decimal(-1,-1) which is how the function is stored for the stored signatures. The
+ * exception to this rule is for native UDF Impala functions. These functions use explicit
+ * decimal types. So when the lookup for the function signature is done, we need to use the
+ * non-normalized version to check for the signature.
+ *
+ * The hashCode may contain a couple more collisions than normal, but it uses the function name
+ * and the first parameter type to determine the bucket, so it should be mostly unique. The
+ * equals function is used explicitly for storage and querying. Because the query side objects
+ * vary depending on the storage side signature, it would be incorrect to compare two query
+ * side signatures (and a precondition check has been added to prevent this).
+ */
 public class ImpalaFunctionSignature {
-  protected static final Logger LOG = LoggerFactory.getLogger(ImpalaFunctionSignature.class);
   private enum SqlTypeOrdering {
     BOOLEAN,
     TINYINT,
@@ -104,11 +130,19 @@ public class ImpalaFunctionSignature {
     CAST_CHECK_FUNCS_INSTANCE = new HashMap<>(tmpMap);
   }
 
+  // True if this is a stored ImpalaFunctionSignature and not a query ImpalaFunctionSignature
+  private final boolean isStoredImpalaSignature;
+
   private final String func;
 
+  // The types of the arguments. For the database flavor, the origArgTypes
+  // will be the same as the argTypes.  For ImpalaFunctionSignature used
+  // in queries, the argTypes will be a normalized datatype where the decimals
+  // are wildcards.
   private final List<Type> argTypes;
-
+  private final List<Type> origArgTypes;
   private final Type retType;
+  private final Type origRetType;
 
   private final boolean hasVarArgs;
 
@@ -116,35 +150,49 @@ public class ImpalaFunctionSignature {
 
   private final List<RelDataType> argRelDataTypes;
 
-  // flag to specify if the function
+  // flag to specify if the function will return a null if it has issues
+  // executing. One example is from_timestamp, where if the input isn't
+  // in a timestamp format, it will return null.
   private final Boolean retTypeAlwaysNullable;
+
+  // True if this is a stored ImpalaFunctionSignature that has a decimal
+  // type that is not a wildcard. Only happens for Native UDFs defined by
+  // a user.
+  private final boolean checkExactDecimal;
 
   private ImpalaFunctionSignature(String func, List<Type> argTypes, Type retType,
       boolean hasVarArgs, Boolean retTypeAlwaysNullable) {
     Preconditions.checkNotNull(func);
+    this.isStoredImpalaSignature = true;
     this.func = func;
     this.argTypes = ImmutableList.copyOf(argTypes);
-    this.argRelDataTypes = ImpalaTypeConverter.getRelDataTypesForArgs(this.argTypes);
+    this.origArgTypes = argTypes;
+    this.argRelDataTypes = ImpalaTypeConverter.createRelDataTypesForArgs(this.argTypes);
     this.retType = retType;
-    this.retRelDataType =
-        (this.retType == null) ? null : ImpalaTypeConverter.getRelDataType(this.retType, true);
+    this.origRetType = retType;
+    this.retRelDataType = ImpalaTypeConverter.createRelDataType(this.retType, true);
     this.hasVarArgs = hasVarArgs;
-    // "from_timestamp" is a function that changes the input into a null if it cannot be processed.
-    // If we find other functions that can turn non-nulls into nulls, we probably should make
-    // this an attribute in the json file.
     this.retTypeAlwaysNullable = retTypeAlwaysNullable;
+
+    this.checkExactDecimal = getCheckExactDecimalValue();
   }
 
   private ImpalaFunctionSignature(String func, List<RelDataType> argTypes, RelDataType retType) {
     Preconditions.checkNotNull(func);
+    this.isStoredImpalaSignature = false;
     this.func = func;
     this.argTypes = ImpalaTypeConverter.getNormalizedImpalaTypes(argTypes);
-    this.argRelDataTypes = ImpalaTypeConverter.getRelDataTypesForArgs(this.argTypes);
+    this.origArgTypes = ImpalaTypeConverter.createImpalaTypes(argTypes);
+    this.argRelDataTypes = ImpalaTypeConverter.createRelDataTypesForArgs(this.argTypes);
     this.retType = retType != null ? ImpalaTypeConverter.getNormalizedImpalaType(retType) : null;
+    this.origRetType = retType != null ? ImpalaTypeConverter.createImpalaType(retType) : null;
     this.retRelDataType =
-        (this.retType == null) ? null : ImpalaTypeConverter.getRelDataType(this.retType, true);
+        (this.retType == null) ? null : ImpalaTypeConverter.createRelDataType(this.retType, true);
     this.hasVarArgs = false;
     this.retTypeAlwaysNullable = null;
+
+    // Only stored signatures use this variable.
+    this.checkExactDecimal = false;
   }
 
   public String getFunc() {
@@ -152,11 +200,11 @@ public class ImpalaFunctionSignature {
   }
 
   public RelDataType getRetType() {
-    return ImpalaTypeConverter.getRelDataType(retType, true);
+    return retRelDataType;
   }
 
   public List<RelDataType> getArgTypes() {
-    return ImpalaTypeConverter.getRelDataTypesForArgs(argTypes);
+    return argRelDataTypes;
   }
 
   public boolean hasVarArgs() {
@@ -166,6 +214,29 @@ public class ImpalaFunctionSignature {
   public boolean retTypeAlwaysNullable() {
     Preconditions.checkNotNull(retTypeAlwaysNullable);
     return retTypeAlwaysNullable;
+  }
+
+  public boolean hasNonWildCardDecimal() {
+    return checkExactDecimal;
+  }
+
+  /**
+   * Used for stored ImpalaFunctionSignatures. Check if any of the parameters or
+   * return value has its decimal explicitly defined (not a wildcard).
+   */
+  private boolean getCheckExactDecimalValue() {
+    if (retRelDataType != null && retRelDataType.getSqlTypeName() == SqlTypeName.DECIMAL
+        && retRelDataType.getPrecision() != ImpalaTypeSystemImpl.PRECISION_NOT_SPECIFIED) {
+      return true;
+    }
+
+    for (RelDataType paramDataType : argRelDataTypes) {
+      if (paramDataType.getSqlTypeName() == SqlTypeName.DECIMAL
+          && paramDataType.getPrecision() != ImpalaTypeSystemImpl.PRECISION_NOT_SPECIFIED) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -194,19 +265,40 @@ public class ImpalaFunctionSignature {
     }
 
     ImpalaFunctionSignature other = (ImpalaFunctionSignature) obj;
+
+    // The equals method only works when either both signatures are stored (used when storing
+    // in the hash table) or we are querying against the hash table. Two query
+    // ImpalaFunctionSignatures should never be compared against each other. If you hit this
+    // assertion and need this functionality, the class will need to be redesigned, since
+    // special logic is done to compare a query signature against a stored one.
+    Preconditions.checkState(this.isStoredImpalaSignature || other.isStoredImpalaSignature);
+
     if (!this.func.equals(other.func)) {
       return false;
     }
 
+    // If the stored signature has an exact precision defined, use the non-normalized
+    // original types to check equality. Otherwise, use the normalized version.
+    return (this.checkExactDecimal || other.checkExactDecimal)
+        ? areParamsAndRetEqual(this.origRetType, other.origRetType,
+            this.origArgTypes, other.origArgTypes,
+            this.hasVarArgs, other.hasVarArgs)
+        : areParamsAndRetEqual(this.retType, other.retType, this.argTypes, other.argTypes,
+          this.hasVarArgs, other.hasVarArgs);
+  }
+
+  private boolean areParamsAndRetEqual(Type thisRetType, Type otherRetType,
+      List<Type> thisArgTypes, List<Type> otherArgTypes,
+      boolean thisHasVarArgs, boolean otherHasVarArgs) {
     // If one of the return types is null, then don't compare the return type
     // for equality
-    if (this.retType != null && other.retType != null) {
-      if (!this.retType.equals(other.retType)) {
+    if (thisRetType != null && otherRetType != null) {
+      if (!thisRetType.equals(otherRetType)) {
         return false;
       }
     }
 
-    int argsToCheck = this.argTypes.size();
+    int argsToCheck = thisArgTypes.size();
 
     // if the number of arguments for both objects are the same, we just need
     // to check them.  If they are not the same, we check if either one has
@@ -214,10 +306,10 @@ public class ImpalaFunctionSignature {
     // If one of the arguments has variable arguments, we only check the arguments
     // specified by the signature of the object with the variable arguments for
     // equality.
-    if (this.argTypes.size() != other.argTypes.size()) {
-      if (other.hasVarArgs()) {
-        argsToCheck = other.argTypes.size();
-      } else if (!this.hasVarArgs()) {
+    if (thisArgTypes.size() != otherArgTypes.size()) {
+      if (otherHasVarArgs) {
+        argsToCheck = otherArgTypes.size();
+      } else if (!thisHasVarArgs) {
         return false;
       }
     }
@@ -226,10 +318,10 @@ public class ImpalaFunctionSignature {
     for (int i = 0; i < argsToCheck; ++i) {
       // if either arg type is null, the signature will match because nulls can be
       // used for any datatype.
-      if (this.argTypes.get(i) == Type.NULL || other.argTypes.get(i) == Type.NULL) {
+      if (thisArgTypes.get(i) == Type.NULL || otherArgTypes.get(i) == Type.NULL) {
         continue;
       }
-      if (!this.argTypes.get(i).equals(other.argTypes.get(i))) {
+      if (!thisArgTypes.get(i).equals(otherArgTypes.get(i))) {
         retVal = false;
         break;
       }
@@ -246,7 +338,7 @@ public class ImpalaFunctionSignature {
     if (argTypes.size() == 0) {
       return Objects.hash(func);
     }
-    return Objects.hash(func, argTypes.get(0).toString());
+    return Objects.hash(func, argTypes.get(0).getPrimitiveType().toString());
   }
 
   @Override
@@ -337,7 +429,7 @@ public class ImpalaFunctionSignature {
           dt2.getSqlTypeName() == SqlTypeName.VARCHAR) {
         // Impala treaats a string type different from a varchar type. So varchar(5) is compatible
         // So if varchars have the same precision, they're compatible.
-        // If varchars have different precisions, they are compabible unless it's a string type, and
+        // If varchars have different precisions, they are compatible unless it's a string type, and
         // string types are denoted by a precision of Integer.MAX_VALUE
         if (dt1.getPrecision() == dt2.getPrecision()) {
           return true;
@@ -429,9 +521,14 @@ public class ImpalaFunctionSignature {
     return ifs.getMatchingSignature(functionDetailsMap);
   }
 
-  public static ImpalaFunctionSignature create(String func, List<Type> argTypes, Type retType,
-      boolean hasVarArgs, Boolean retTypeAlwaysNullable) {
+  public static ImpalaFunctionSignature createFuncSignatureForStorage(String func,
+      List<Type> argTypes, Type retType, boolean hasVarArgs, Boolean retTypeAlwaysNullable) {
     return new ImpalaFunctionSignature(func, argTypes, retType, hasVarArgs, retTypeAlwaysNullable);
+  }
+
+  public static ImpalaFunctionSignature createFuncSignatureForLookup(String func,
+      List<RelDataType> argTypes, RelDataType retType) {
+    return new ImpalaFunctionSignature(func, argTypes, retType);
   }
 
   public static RelDataType getCastType(RelDataType dt1, RelDataType dt2, RelDataTypeFactory typeFactory) {
@@ -509,13 +606,15 @@ public class ImpalaFunctionSignature {
       return true;
     }
 
-    if (areCompatibleDataTypes(castFrom, castTo)) {
+    // Pass in true because we want to do casting if they are both decimals
+    // and the precision and scales are different.
+    if (areCompatibleDataTypes(castFrom, castTo, true)) {
       return true;
     }
 
-    ImpalaFunctionSignature castSig =
-        new ImpalaFunctionSignature("cast", Lists.newArrayList(castFrom), castTo);
-    ScalarFunctionDetails details = ScalarFunctionDetails.get(castSig);
+    List<RelDataType> rr = Lists.newArrayList(castFrom);
+    ScalarFunctionDetails details =
+        ScalarFunctionDetails.get("cast", Lists.newArrayList(castFrom), castTo);
     return details != null && details.castUp;
   }
 

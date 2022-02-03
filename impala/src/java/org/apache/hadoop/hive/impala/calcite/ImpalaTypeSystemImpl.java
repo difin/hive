@@ -31,7 +31,9 @@ import org.apache.impala.catalog.Type;
 public class ImpalaTypeSystemImpl extends RelDataTypeSystemImpl {
   private static final int MAX_DECIMAL_PRECISION     = 38;
   private static final int MAX_DECIMAL_SCALE         = 38;
-  private static final int DEFAULT_DECIMAL_PRECISION = 10;
+  // Default precision needs to match the Impala wildcard. The default is
+  // "not specified" which is a value of -1.
+  public static final int PRECISION_NOT_SPECIFIED = -1;
   // STRING type in FENG is represented as VARCHAR with precision Integer.MAX_VALUE.
   // In turn, the max VARCHAR precision should be 65535. However, the value is not
   // used for validation, but rather only internally by the optimizer to know the max
@@ -92,7 +94,7 @@ public class ImpalaTypeSystemImpl extends RelDataTypeSystemImpl {
     case VARCHAR:
       return DEFAULT_VARCHAR_PRECISION;
     case DECIMAL:
-      return DEFAULT_DECIMAL_PRECISION;
+      return PRECISION_NOT_SPECIFIED;
     case INTERVAL_YEAR:
     case INTERVAL_MONTH:
     case INTERVAL_YEAR_MONTH:

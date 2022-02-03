@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import org.apache.calcite.rex.RexCall;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.hadoop.hive.impala.node.ImpalaRelUtil;
+import org.apache.hadoop.hive.impala.funcmapper.ImpalaTypeConverter;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.impala.analysis.Analyzer;
 import org.apache.impala.analysis.Expr;
@@ -196,7 +197,9 @@ public class ImpalaFunctionCallExpr extends FunctionCallExpr {
           operandTypes.set(2, operandTypes.get(0));
           uncheckedCastChild(operandTypes.get(0), 2);
         }
-        fn_ = ImpalaRelUtil.getAggregateFunction(getFnName().getFunction(), getReturnType(), operandTypes);
+        fn_ = ImpalaRelUtil.getAggregateFunction(getFnName().getFunction(),
+            ImpalaTypeConverter.createRelDataType(getReturnType(), true),
+            ImpalaTypeConverter.createRelDataTypesForArgs(operandTypes));
         type_ = fn_.getReturnType();
         break;
       default:
@@ -218,7 +221,8 @@ public class ImpalaFunctionCallExpr extends FunctionCallExpr {
     }
     String newName = funcName.getFunction().toLowerCase();
     Function newFn = ImpalaRelUtil.getAggregateFunction(newName,
-        getReturnType(), operandTypes);
+        ImpalaTypeConverter.createRelDataType(getReturnType(), true),
+        ImpalaTypeConverter.createRelDataTypesForArgs(operandTypes));
     Type retType = newFn.getReturnType();
     return new ImpalaFunctionCallExpr(analyzer, newFn, funcParams,
         this.addedCost, retType);

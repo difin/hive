@@ -114,8 +114,8 @@ public class ImpalaAggregateRel extends ImpalaPlanRel {
     // affect the parent/ancestor nodes because in any case the aggregate was not being
     // referenced by the parent.
     if (groupingExprs.isEmpty() && aggExprs.isEmpty()) {
-      Function countFunc =
-          ImpalaRelUtil.getAggregateFunction("count", Type.BIGINT, Lists.newArrayList());
+      Function countFunc = ImpalaRelUtil.getAggregateFunction("count",
+          ImpalaTypeConverter.getRelDataType(Type.BIGINT, true), Lists.newArrayList());
       FunctionParams params = FunctionParams.createStarParam();
       aggExprs.add(new ImpalaFunctionCallExpr(ctx.getRootAnalyzer(), countFunc, params,
           null, Type.BIGINT));
@@ -172,8 +172,8 @@ public class ImpalaAggregateRel extends ImpalaPlanRel {
   }
 
   private FunctionCallExpr getGroupingIdExpr(ImpalaPlannerContext ctx) throws HiveException {
-    AggregateFunction gidFn =
-        ImpalaRelUtil.getAggregateFunction("grouping_id", Type.BIGINT, new ArrayList<>());
+    AggregateFunction gidFn = ImpalaRelUtil.getAggregateFunction("grouping_id",
+        ImpalaTypeConverter.getRelDataType(Type.BIGINT, true), new ArrayList<>());
     FunctionParams params = new FunctionParams(false, new ArrayList<>());
     ImpalaFunctionCallExpr groupingIdExpr =
         new ImpalaFunctionCallExpr(ctx.getRootAnalyzer(), gidFn, params,
