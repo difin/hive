@@ -88,6 +88,16 @@ public class ImpalaArithmeticOperators {
       InferTypes.FIRST_KNOWN,
       OperandTypes.DIVISION_OPERATOR);
 
+  static final SqlOperator MOD =
+      new SqlBinaryOperator(
+      "%",
+      SqlKind.MOD,
+      60,
+      true,
+      ARITHMETIC_INFERENCE,
+      InferTypes.FIRST_KNOWN,
+      OperandTypes.EXACT_NUMERIC_EXACT_NUMERIC);
+
   public static RelDataType deriveReturnType(RelDataTypeFactory factory, SqlOperator op,
       List<RelDataType> inputTypes) {
     ArithmeticExpr.Operator impalaOp = ImpalaTypeSystemImpl.getImpalaArithOp(op.getKind());

@@ -270,6 +270,8 @@ public class ImpalaTypeSystemImpl extends RelDataTypeSystemImpl {
         return ArithmeticExpr.Operator.DIVIDE;
       case TIMES:
         return ArithmeticExpr.Operator.MULTIPLY;
+      case MOD:
+        return ArithmeticExpr.Operator.MOD;
       default:
         throw new RuntimeException("Op not supported for impala: " + kind);
     }

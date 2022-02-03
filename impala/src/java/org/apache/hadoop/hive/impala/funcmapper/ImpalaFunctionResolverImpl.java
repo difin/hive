@@ -595,6 +595,7 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
             : new ArithmeticFunctionResolver(helper, op, inputs);
       case TIMES:
       case DIVIDE:
+      case MOD:
         return new ArithmeticFunctionResolver(helper, op, inputs);
       case OTHER:
       case OTHER_FUNCTION:
