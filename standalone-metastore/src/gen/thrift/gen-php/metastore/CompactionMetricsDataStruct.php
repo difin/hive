@@ -51,6 +51,11 @@ class CompactionMetricsDataStruct
             'isRequired' => true,
             'type' => TType::I32,
         ),
+        7 => array(
+            'var' => 'threshold',
+            'isRequired' => true,
+            'type' => TType::I32,
+        ),
     );
 
     /**
@@ -77,6 +82,10 @@ class CompactionMetricsDataStruct
      * @var int
      */
     public $version = null;
+    /**
+     * @var int
+     */
+    public $threshold = null;
 
     public function __construct($vals = null)
     {
@@ -98,6 +107,9 @@ class CompactionMetricsDataStruct
             }
             if (isset($vals['version'])) {
                 $this->version = $vals['version'];
+            }
+            if (isset($vals['threshold'])) {
+                $this->threshold = $vals['threshold'];
             }
         }
     }
@@ -163,6 +175,13 @@ class CompactionMetricsDataStruct
                         $xfer += $input->skip($ftype);
                     }
                     break;
+                case 7:
+                    if ($ftype == TType::I32) {
+                        $xfer += $input->readI32($this->threshold);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
                 default:
                     $xfer += $input->skip($ftype);
                     break;
@@ -205,6 +224,11 @@ class CompactionMetricsDataStruct
         if ($this->version !== null) {
             $xfer += $output->writeFieldBegin('version', TType::I32, 6);
             $xfer += $output->writeI32($this->version);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->threshold !== null) {
+            $xfer += $output->writeFieldBegin('threshold', TType::I32, 7);
+            $xfer += $output->writeI32($this->threshold);
             $xfer += $output->writeFieldEnd();
         }
         $xfer += $output->writeFieldStop();

@@ -26618,6 +26618,10 @@ void CompactionMetricsDataStruct::__set_metricvalue(const int32_t val) {
 void CompactionMetricsDataStruct::__set_version(const int32_t val) {
   this->version = val;
 }
+
+void CompactionMetricsDataStruct::__set_threshold(const int32_t val) {
+  this->threshold = val;
+}
 std::ostream& operator<<(std::ostream& out, const CompactionMetricsDataStruct& obj)
 {
   obj.printTo(out);
@@ -26642,6 +26646,7 @@ uint32_t CompactionMetricsDataStruct::read(::apache::thrift::protocol::TProtocol
   bool isset_type = false;
   bool isset_metricvalue = false;
   bool isset_version = false;
+  bool isset_threshold = false;
 
   while (true)
   {
@@ -26701,6 +26706,14 @@ uint32_t CompactionMetricsDataStruct::read(::apache::thrift::protocol::TProtocol
           xfer += iprot->skip(ftype);
         }
         break;
+      case 7:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->threshold);
+          isset_threshold = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -26719,6 +26732,8 @@ uint32_t CompactionMetricsDataStruct::read(::apache::thrift::protocol::TProtocol
   if (!isset_metricvalue)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_version)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_threshold)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
 }
@@ -26753,6 +26768,10 @@ uint32_t CompactionMetricsDataStruct::write(::apache::thrift::protocol::TProtoco
   xfer += oprot->writeI32(this->version);
   xfer += oprot->writeFieldEnd();
 
+  xfer += oprot->writeFieldBegin("threshold", ::apache::thrift::protocol::T_I32, 7);
+  xfer += oprot->writeI32(this->threshold);
+  xfer += oprot->writeFieldEnd();
+
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -26766,6 +26785,7 @@ void swap(CompactionMetricsDataStruct &a, CompactionMetricsDataStruct &b) {
   swap(a.type, b.type);
   swap(a.metricvalue, b.metricvalue);
   swap(a.version, b.version);
+  swap(a.threshold, b.threshold);
   swap(a.__isset, b.__isset);
 }
 
@@ -26776,6 +26796,7 @@ CompactionMetricsDataStruct::CompactionMetricsDataStruct(const CompactionMetrics
   type = other962.type;
   metricvalue = other962.metricvalue;
   version = other962.version;
+  threshold = other962.threshold;
   __isset = other962.__isset;
 }
 CompactionMetricsDataStruct& CompactionMetricsDataStruct::operator=(const CompactionMetricsDataStruct& other963) {
@@ -26785,6 +26806,7 @@ CompactionMetricsDataStruct& CompactionMetricsDataStruct::operator=(const Compac
   type = other963.type;
   metricvalue = other963.metricvalue;
   version = other963.version;
+  threshold = other963.threshold;
   __isset = other963.__isset;
   return *this;
 }
@@ -26797,6 +26819,7 @@ void CompactionMetricsDataStruct::printTo(std::ostream& out) const {
   out << ", " << "type=" << to_string(type);
   out << ", " << "metricvalue=" << to_string(metricvalue);
   out << ", " << "version=" << to_string(version);
+  out << ", " << "threshold=" << to_string(threshold);
   out << ")";
 }
 
@@ -26909,6 +26932,7 @@ void CompactionMetricsDataRequest::__set_tblName(const std::string& val) {
 
 void CompactionMetricsDataRequest::__set_partitionName(const std::string& val) {
   this->partitionName = val;
+__isset.partitionName = true;
 }
 
 void CompactionMetricsDataRequest::__set_type(const CompactionMetricsMetricType::type val) {
@@ -26935,7 +26959,6 @@ uint32_t CompactionMetricsDataRequest::read(::apache::thrift::protocol::TProtoco
 
   bool isset_dbName = false;
   bool isset_tblName = false;
-  bool isset_partitionName = false;
   bool isset_type = false;
 
   while (true)
@@ -26965,7 +26988,7 @@ uint32_t CompactionMetricsDataRequest::read(::apache::thrift::protocol::TProtoco
       case 3:
         if (ftype == ::apache::thrift::protocol::T_STRING) {
           xfer += iprot->readString(this->partitionName);
-          isset_partitionName = true;
+          this->__isset.partitionName = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -26993,8 +27016,6 @@ uint32_t CompactionMetricsDataRequest::read(::apache::thrift::protocol::TProtoco
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_tblName)
     throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_partitionName)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_type)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
@@ -27013,10 +27034,11 @@ uint32_t CompactionMetricsDataRequest::write(::apache::thrift::protocol::TProtoc
   xfer += oprot->writeString(this->tblName);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("partitionName", ::apache::thrift::protocol::T_STRING, 3);
-  xfer += oprot->writeString(this->partitionName);
-  xfer += oprot->writeFieldEnd();
-
+  if (this->__isset.partitionName) {
+    xfer += oprot->writeFieldBegin("partitionName", ::apache::thrift::protocol::T_STRING, 3);
+    xfer += oprot->writeString(this->partitionName);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldBegin("type", ::apache::thrift::protocol::T_I32, 4);
   xfer += oprot->writeI32((int32_t)this->type);
   xfer += oprot->writeFieldEnd();
@@ -27032,6 +27054,7 @@ void swap(CompactionMetricsDataRequest &a, CompactionMetricsDataRequest &b) {
   swap(a.tblName, b.tblName);
   swap(a.partitionName, b.partitionName);
   swap(a.type, b.type);
+  swap(a.__isset, b.__isset);
 }
 
 CompactionMetricsDataRequest::CompactionMetricsDataRequest(const CompactionMetricsDataRequest& other967) {
@@ -27039,12 +27062,14 @@ CompactionMetricsDataRequest::CompactionMetricsDataRequest(const CompactionMetri
   tblName = other967.tblName;
   partitionName = other967.partitionName;
   type = other967.type;
+  __isset = other967.__isset;
 }
 CompactionMetricsDataRequest& CompactionMetricsDataRequest::operator=(const CompactionMetricsDataRequest& other968) {
   dbName = other968.dbName;
   tblName = other968.tblName;
   partitionName = other968.partitionName;
   type = other968.type;
+  __isset = other968.__isset;
   return *this;
 }
 void CompactionMetricsDataRequest::printTo(std::ostream& out) const {
@@ -27052,7 +27077,7 @@ void CompactionMetricsDataRequest::printTo(std::ostream& out) const {
   out << "CompactionMetricsDataRequest(";
   out << "dbName=" << to_string(dbName);
   out << ", " << "tblName=" << to_string(tblName);
-  out << ", " << "partitionName=" << to_string(partitionName);
+  out << ", " << "partitionName="; (__isset.partitionName ? (out << to_string(partitionName)) : (out << "<null>"));
   out << ", " << "type=" << to_string(type);
   out << ")";
 }
