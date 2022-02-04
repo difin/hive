@@ -47,6 +47,9 @@ import org.apache.hadoop.hive.impala.parse.ImpalaCompiler;
 import org.apache.hadoop.hive.impala.plan.ImpalaHMSConverter;
 import org.apache.hadoop.hive.impala.plan.ImpalaQueryHelperImpl;
 import org.apache.hadoop.hive.impala.calcite.ImpalaTypeSystemImpl;
+import org.apache.impala.hive.executor.HiveJavaFunction;
+import org.apache.impala.hive.executor.HiveJavaFunctionFactory;
+import org.apache.impala.hive.executor.HiveJavaFunctionFactoryImpl;
 import org.apache.impala.thrift.TBackendGflags;
 import org.apache.impala.thrift.TPrimitiveType;
 import org.apache.impala.util.FunctionUtils;
@@ -150,7 +153,9 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
     for (org.apache.hadoop.hive.metastore.api.Function hiveFunc : hiveFunctions) {
       String db = hiveFunc.getDbName();
       try {
-        allFunctions.addAll(FunctionUtils.extractFunctions(db, hiveFunc, localLibPath));
+        HiveJavaFunctionFactory factory = new HiveJavaFunctionFactoryImpl();
+        HiveJavaFunction javaFunc = factory.create(localLibPath, hiveFunc);
+        allFunctions.addAll(javaFunc.extract());
       } catch (Exception e) {
         LOG.info("Failed to add udf " + hiveFunc.getFunctionName() + ": " + e);
       }
