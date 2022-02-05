@@ -1058,7 +1058,6 @@ public class ShuffleHandler implements AttemptRegistrationListener {
     protected void sendError(ChannelHandlerContext ctx, String message, HttpResponseStatus status) {
       FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, status);
       sendError(ctx, message, response);
-      response.release();
     }
 
     protected void sendError(ChannelHandlerContext ctx, String message, FullHttpResponse response) {
@@ -1076,7 +1075,6 @@ public class ShuffleHandler implements AttemptRegistrationListener {
       header.write(out);
 
       sendError(ctx, wrappedBuffer(out.getData(), 0, out.getLength()), fullResponse);
-      fullResponse.release();
     }
 
     protected void sendError(ChannelHandlerContext ctx, ByteBuf content,
@@ -1092,6 +1090,11 @@ public class ShuffleHandler implements AttemptRegistrationListener {
 
       // Close the connection as soon as the error message is sent.
       ctx.channel().writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+      /*
+       * The general rule of thumb is that the party that accesses a reference-counted object last
+       * is also responsible for the destruction of that reference-counted object.
+       */
+      content.release();
     }
 
     @Override
