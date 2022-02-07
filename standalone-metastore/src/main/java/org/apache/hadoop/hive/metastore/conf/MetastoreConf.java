@@ -585,8 +585,7 @@ public class MetastoreConf {
         "hive.metastore.compactor.worker.detect.multiple.versions.threshold", 24, TimeUnit.HOURS,
         "Defines a time-window in hours from the current time backwards\n," +
             "in which a warning is being raised if multiple worker version are detected.\n" +
-            "The setting has no effect if the metastore.metrics.enabled is disabled \n" +
-            "or the metastore.acidmetrics.thread.on is turned off."),
+            "The setting has no effect if the metastore.compactor.acid.metrics.logger.frequency is 0."),
     HIVE_COMPACTOR_CLEANER_MAX_RETRY_ATTEMPTS("hive.compactor.cleaner.retry.maxattempts",
         "hive.compactor.cleaner.retry.maxattempts", 5, new RangeValidator(0, 10),
         "Maximum number of attempts to clean a table again after a failed cycle. Must be between 0 and 10," +
