@@ -3094,11 +3094,15 @@ private void constructOneLBLocationMap(FileStatus fSta,
       }
     });
 
+    boolean fetchPartitionInfo = true;
     final boolean scanPartitionsByName =
         HiveConf.getBoolVar(conf, ConfVars.HIVE_LOAD_DYNAMIC_PARTITIONS_SCAN_SPECIFIC_PARTITIONS);
 
+    // ACID table can be a bigger change. Filed HIVE-25817 for an appropriate fix for ACID tables
+    // For now, for ACID tables, skip getting all partitions for a table from HMS (since that
+    // can degrade performance for large partitioned tables) and instead make getPartition() call
+    // for every dynamic partition
     if (scanPartitionsByName && !isDirectInsert && !AcidUtils.isTransactionalTable(tbl)) {
-      //TODO: Need to create separate ticket for ACID table; ACID table can be a bigger change.
       //Fetch only relevant partitions from HMS for checking old partitions
       List<String> partitionNames = new LinkedList<>();
       for(PartitionDetails details : partitionDetailsMap.values()) {
@@ -3116,36 +3120,30 @@ private void constructOneLBLocationMap(FileStatus fSta,
           entry.getValue().hasOldPartition = true;
         });
       }
-    } else {
-
-      // fetch all the partitions matching the part spec using the partition iterable
-      // this way the maximum batch size configuration parameter is considered
-      PartitionIterable partitionIterable = new PartitionIterable(Hive.get(), tbl, partSpec,
-                conf.getInt(MetastoreConf.ConfVars.BATCH_RETRIEVE_MAX.getVarname(), 300));
-      Iterator<Partition> iterator = partitionIterable.iterator();
-
-      // Match valid partition path to partitions
-      while (iterator.hasNext()) {
-        Partition partition = iterator.next();
-        partitionDetailsMap.entrySet().parallelStream()
-                .filter(entry -> entry.getValue().fullSpec.equals(partition.getSpec()))
-                .findAny().ifPresent(entry -> {
-                  entry.getValue().partition = partition;
-                  entry.getValue().hasOldPartition = true;
-                });
-      }
+      // no need to fetch partition again in tasks since we have already fetched partitions
+      // info in getPartitionsByNames()
+      fetchPartitionInfo = false;
     }
 
     boolean isTxnTable = AcidUtils.isTransactionalTable(tbl);
     AcidUtils.TableSnapshot tableSnapshot = isTxnTable ? getTableSnapshot(tbl, writeId) : null;
 
     for (Entry<Path, PartitionDetails> entry : partitionDetailsMap.entrySet()) {
+      final boolean getPartitionFromHms = fetchPartitionInfo;
       tasks.add(() -> {
         PartitionDetails partitionDetails = entry.getValue();
         Map<String, String> fullPartSpec = partitionDetails.fullSpec;
         try {
 
           SessionState.setCurrentSessionState(parentSession);
+          if (getPartitionFromHms) {
+            // didn't fetch partition info from HMS. Getting from HMS now.
+            Partition existing = getPartition(tbl, fullPartSpec, false);
+            if (existing != null) {
+              partitionDetails.partition = existing;
+              partitionDetails.hasOldPartition = true;
+            }
+          }
           LOG.info("New loading path = " + entry.getKey() + " withPartSpec " + fullPartSpec);
 
           List<FileStatus> newFiles = Collections.synchronizedList(new ArrayList<>());
