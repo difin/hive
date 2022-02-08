@@ -367,6 +367,7 @@ import static org.apache.hadoop.hive.ql.plan.HiveOperation.ALTERVIEW_PROPERTIES;
 
 public class CalcitePlanner extends SemanticAnalyzer {
 
+  private static final String EXCLUDED_RULES_PREFIX = "Excluded rules: ";
   /**
    * {@link org.antlr.runtime.TokenRewriteStream} offers the opportunity of multiple rewrites of the same
    * input text (in our case the sql query text). These rewrites are called programs and identified by a string.
@@ -609,8 +610,9 @@ public class CalcitePlanner extends SemanticAnalyzer {
               LOG.debug("Propagating hints to QB: " + oldHints);
               getQB().getParseInfo().setHintList(oldHints);
             }
-            LOG.info("CBO Succeeded; optimized plan.");
-            this.ctx.setCboInfo("Plan optimized by CBO.");
+            LOG.info("CBO Succeeded; optimized logical plan.");
+
+            this.ctx.setCboInfo(getOptimizedByCboInfo());
             this.ctx.setCboSucceeded(true);
           } else {
             // 1. Convert Plan to AST
@@ -657,7 +659,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
             disableJoinMerge = defaultJoinMerge;
             sinkOp = genPlan(getQB());
             LOG.info("CBO Succeeded; optimized logical plan.");
-            this.ctx.setCboInfo("Plan optimized by CBO.");
+
+            this.ctx.setCboInfo(getOptimizedByCboInfo());
             this.ctx.setCboSucceeded(true);
             if (this.ctx.isExplainPlan()) {
               doExplainPlan(newPlan);
@@ -745,6 +748,15 @@ public class CalcitePlanner extends SemanticAnalyzer {
     }
 
     return sinkOp;
+  }
+
+  private String getOptimizedByCboInfo() {
+    String ruleExclusionRegex = conf.get(ConfVars.HIVE_CBO_RULE_EXCLUSION_REGEX.varname, "");
+    String cboInfo = "Plan optimized by CBO.";
+    if (!ruleExclusionRegex.isEmpty()) {
+      cboInfo = cboInfo + (" " + EXCLUDED_RULES_PREFIX + ruleExclusionRegex);
+    }
+    return cboInfo;
   }
 
   private ASTNode handleCreateViewDDL(ASTNode ast) throws SemanticException {
@@ -2237,6 +2249,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
       // Optimize plan
       if (!ruleExclusionRegex.isEmpty()) {
+        LOG.info("The CBO rules matching the following regex are excluded from planning: {}",
+            ruleExclusionRegex);
         planner.setRuleDescExclusionFilter(Pattern.compile(ruleExclusionRegex));
       }
       planner.setRoot(basePlan);
@@ -2785,6 +2799,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
       }
 
       if (!ruleExclusionRegex.isEmpty()) {
+        LOG.info("The CBO rules matching the following regex are excluded from planning: {}",
+            ruleExclusionRegex);
         planner.setRuleDescExclusionFilter(Pattern.compile(ruleExclusionRegex));
       }
       planner.setRoot(basePlan);

@@ -93,8 +93,12 @@ public class ExplainTask extends Task<ExplainWork> implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(ExplainTask.class.getName());
 
   public static final String STAGE_DEPENDENCIES = "STAGE DEPENDENCIES";
+  private static final String EXCLUDED_RULES_PREFIX = "Excluded rules: ";
   private static final long serialVersionUID = 1L;
   public static final String EXPL_COLUMN_NAME = "Explain";
+  private static final String CBO_INFO_JSON_LABEL = "cboInfo";
+  private static final String CBO_PLAN_JSON_LABEL = "CBOPlan";
+  private static final String CBO_PLAN_TEXT_LABEL = "CBO PLAN:";
   private final Set<Operator<?>> visitedOps = new HashSet<Operator<?>>();
   private boolean isLogical = false;
 
@@ -144,15 +148,22 @@ public class ExplainTask extends Task<ExplainWork> implements Serializable {
     return outJSONObject;
   }
 
-  public JSONObject getJSONCBOPlan(PrintStream out, ExplainWork work) throws Exception {
+  public JSONObject getJSONCBOPlan(PrintStream out, ExplainWork work) {
     JSONObject outJSONObject = new JSONObject(new LinkedHashMap<>());
     boolean jsonOutput = work.isFormatted();
     String cboPlan = work.getCboPlan();
     if (cboPlan != null) {
+      String ruleExclusionRegex = getRuleExcludedRegex();
       if (jsonOutput) {
-        outJSONObject.put("CBOPlan", cboPlan);
+        outJSONObject.put(CBO_PLAN_JSON_LABEL, cboPlan);
+        if (!ruleExclusionRegex.isEmpty()) {
+          outJSONObject.put(CBO_INFO_JSON_LABEL, EXCLUDED_RULES_PREFIX + ruleExclusionRegex);
+        }
       } else {
-        out.println("CBO PLAN:");
+        if (!ruleExclusionRegex.isEmpty()) {
+          out.println(EXCLUDED_RULES_PREFIX + ruleExclusionRegex + "\n");
+        }
+        out.println(CBO_PLAN_TEXT_LABEL);
         out.println(cboPlan);
       }
     }
@@ -248,6 +259,8 @@ public class ExplainTask extends Task<ExplainWork> implements Serializable {
       boolean jsonOutput, boolean isExtended, boolean appendTaskType, String cboInfo,
       String cboPlan, String optimizedSQL) throws Exception {
 
+    String ruleExclusionRegex = getRuleExcludedRegex();
+
     // If the user asked for a formatted output, dump the json output
     // in the output stream
     JSONObject outJSONObject = new JSONObject(new LinkedHashMap<>());
@@ -258,9 +271,15 @@ public class ExplainTask extends Task<ExplainWork> implements Serializable {
 
     if (cboPlan != null) {
       if (jsonOutput) {
-        outJSONObject.put("CBOPlan", cboPlan);
+        outJSONObject.put(CBO_PLAN_JSON_LABEL, cboPlan);
+        if (!ruleExclusionRegex.isEmpty()) {
+          outJSONObject.put(CBO_INFO_JSON_LABEL, EXCLUDED_RULES_PREFIX + ruleExclusionRegex);
+        }
       } else {
-        out.print("CBO PLAN:");
+        if (!ruleExclusionRegex.isEmpty()) {
+          out.println(EXCLUDED_RULES_PREFIX + ruleExclusionRegex);
+        }
+        out.print(CBO_PLAN_TEXT_LABEL);
         out.println(cboPlan);
       }
     }
@@ -303,6 +322,10 @@ public class ExplainTask extends Task<ExplainWork> implements Serializable {
     }
 
     if (!suppressOthersForVectorization) {
+      if (!jsonOutput && !ruleExclusionRegex.isEmpty()) {
+        out.println(EXCLUDED_RULES_PREFIX + ruleExclusionRegex + "\n");
+      }
+
       JSONObject jsonDependencies = outputDependencies(out, jsonOutput, appendTaskType, ordered);
 
       if (out != null) {
@@ -311,7 +334,7 @@ public class ExplainTask extends Task<ExplainWork> implements Serializable {
 
       if (jsonOutput) {
         if (cboInfo != null) {
-          outJSONObject.put("cboInfo", cboInfo);
+          outJSONObject.put(CBO_INFO_JSON_LABEL, cboInfo);
         }
         outJSONObject.put(STAGE_DEPENDENCIES, jsonDependencies);
       }
@@ -828,6 +851,10 @@ public class ExplainTask extends Task<ExplainWork> implements Serializable {
     }
 
     return invokeFlag;
+  }
+
+  private String getRuleExcludedRegex() {
+    return conf == null ? "" : conf.get(ConfVars.HIVE_CBO_RULE_EXCLUSION_REGEX.varname, "");
   }
 
   @VisibleForTesting
