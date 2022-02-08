@@ -76,7 +76,7 @@ select sum(ss_quantity) over() from tab_sales_n1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@tab_sales_n1
 CBO PLAN:
-ImpalaProjectPassthroughRel(sum_window_0=[sum($1) OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)])
+ImpalaProjectPassthroughRel(_o__c0=[sum($1) OVER ()])
   ImpalaProjectRel(ss_quantity=[$10], $func_0=[CAST($10):BIGINT])
     ImpalaHdfsScanRel(table=[[default, tab_sales_n1]])
 
@@ -153,7 +153,7 @@ select sum(ss_net_profit) over() from tab_sales_n1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@tab_sales_n1
 CBO PLAN:
-ImpalaProjectPassthroughRel(sum_window_0=[sum($22) OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)])
+ImpalaProjectPassthroughRel(_o__c0=[sum($22) OVER ()])
   ImpalaHdfsScanRel(table=[[default, tab_sales_n1]])
 
 HMS CALL get_table_req FOR tab_sales_n1

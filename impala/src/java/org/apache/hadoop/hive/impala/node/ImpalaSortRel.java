@@ -45,7 +45,6 @@ import org.apache.impala.analysis.SortInfo;
 import org.apache.impala.common.AnalysisException;
 import org.apache.impala.common.ImpalaException;
 import org.apache.impala.planner.PlanNode;
-import org.apache.impala.planner.SingleNodePlanner;
 import org.apache.impala.planner.SortNode;
 
 import java.math.BigDecimal;
@@ -141,12 +140,12 @@ public class ImpalaSortRel extends ImpalaPlanRel {
   public RelWriter explainTerms(RelWriter pw) {
     RelWriter rw = super.explainTerms(pw);
     Preconditions.checkState(
-        sortLimit.getChildExps().size() == sortLimit.getCollation().getFieldCollations().size());
+        sortLimit.getSortExps().size() == sortLimit.getCollation().getFieldCollations().size());
     if (rw.nest()) {
       rw.item("collation", sortLimit.getCollation());
     } else {
-      for (int i = 0; i < sortLimit.getChildExps().size(); i++) {
-        RexNode e = sortLimit.getChildExps().get(i);
+      for (int i = 0; i < sortLimit.getSortExps().size(); i++) {
+        RexNode e = sortLimit.getSortExps().get(i);
         rw.item("sort" + i, e);
       }
       for (int i = 0; i < sortLimit.getCollation().getFieldCollations().size(); i++) {

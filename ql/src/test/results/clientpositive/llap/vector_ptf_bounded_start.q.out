@@ -5464,10 +5464,10 @@ STAGE PLANS:
                     predicate: (p_decimal = 1800.7) (type: boolean)
                     Statistics: Num rows: 2 Data size: 880 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
-                      key expressions: CAST( 1800.7 AS decimal(10,4)) (type: decimal(10,4))
+                      key expressions: CAST( CAST( 1800.7 AS decimal(5,1)) AS decimal(10,4)) (type: decimal(10,4))
                       null sort order: a
                       sort order: +
-                      Map-reduce partition columns: CAST( 1800.7 AS decimal(10,4)) (type: decimal(10,4))
+                      Map-reduce partition columns: CAST( CAST( 1800.7 AS decimal(5,1)) AS decimal(10,4)) (type: decimal(10,4))
                       Reduce Sink Vectorization:
                           className: VectorReduceSinkMultiKeyOperator
                           keyColumns: 13:decimal(10,4)
@@ -5527,8 +5527,8 @@ STAGE PLANS:
                       Windowing table definition
                         input alias: ptf_1
                         name: windowingtablefunction
-                        order by: CAST( 1800.7 AS decimal(10,4)) ASC NULLS FIRST
-                        partition by: CAST( 1800.7 AS decimal(10,4))
+                        order by: CAST( CAST( 1800.7 AS decimal(5,1)) AS decimal(10,4)) ASC NULLS FIRST
+                        partition by: CAST( CAST( 1800.7 AS decimal(5,1)) AS decimal(10,4))
                         raw input shape:
                         window functions:
                             window function definition

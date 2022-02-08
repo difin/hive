@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -488,7 +489,7 @@ public class HiveRelOptUtil extends RelOptUtil {
               ImmutableList.of(i), -1, 0, rel, null, null));
     }
 
-    return aggregateFactory.createAggregate(rel, false, ImmutableBitSet.of(), null, aggCalls);
+    return aggregateFactory.createAggregate(rel, Collections.emptyList(), ImmutableBitSet.of(), null, aggCalls);
   }
 
   /**
@@ -1087,8 +1088,8 @@ public class HiveRelOptUtil extends RelOptUtil {
       }
     }
     Map<Integer, Integer> m = new HashMap<>();
-    for (int projPos = 0; projPos < project.getChildExps().size(); projPos++) {
-      RexNode expr = project.getChildExps().get(projPos);
+    for (int projPos = 0; projPos < project.getProjects().size(); projPos++) {
+      RexNode expr = project.getProjects().get(projPos);
       if (expr instanceof RexInputRef) {
         Set<Integer> positions = HiveCalciteUtil.getInputRefs(expr);
         if (positions.size() <= 1) {
@@ -1121,8 +1122,8 @@ public class HiveRelOptUtil extends RelOptUtil {
           HiveProject project, RelDistribution distribution) {
     Set<Integer> needed = new HashSet<>(distribution.getKeys());
     Map<Integer, Integer> m = new HashMap<>();
-    for (int projPos = 0; projPos < project.getChildExps().size(); projPos++) {
-      RexNode expr = project.getChildExps().get(projPos);
+    for (int projPos = 0; projPos < project.getProjects().size(); projPos++) {
+      RexNode expr = project.getProjects().get(projPos);
       if (expr instanceof RexInputRef) {
         Set<Integer> positions = HiveCalciteUtil.getInputRefs(expr);
         if (positions.size() <= 1) {

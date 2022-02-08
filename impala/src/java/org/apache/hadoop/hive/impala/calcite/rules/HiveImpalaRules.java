@@ -439,7 +439,7 @@ public class HiveImpalaRules {
       ImpalaProjectRel newBottomProject = new ImpalaProjectRel(bottomProject);
       RelNode newTopProject = topProject.copy(
           topProject.getTraitSet(), newBottomProject,
-          topProject.getChildExps(), topProject.getRowType());
+          topProject.getProjects(), topProject.getRowType());
 
       call.transformTo(newTopProject);
     }

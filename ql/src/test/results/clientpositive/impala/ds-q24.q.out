@@ -129,7 +129,7 @@ POSTHOOK: Input: default@impala_tpcds_store_returns
 POSTHOOK: Input: default@impala_tpcds_store_sales
 CBO PLAN:
 ImpalaSortRel(sort0=[$0], sort1=[$1], sort2=[$2], dir0=[ASC], dir1=[ASC], dir2=[ASC])
-  ImpalaProjectRel($f0=[$0], $f1=[$1], $f2=[$2], $f3=[$3])
+  ImpalaProjectRel(c_last_name=[$0], c_first_name=[$1], s_store_name=[$2], paid=[$3])
     ImpalaJoinRel(condition=[>($3, $4)], joinType=[inner])
       ImpalaProjectRel(c_last_name=[$2], c_first_name=[$1], s_store_name=[$0], $f3=[$3], condition=[IS NOT NULL($3)])
         ImpalaAggregateRel(group=[{5, 7, 8}], agg#0=[sum($9)])

@@ -90,7 +90,7 @@ POSTHOOK: Input: default@impala_tpch_supplier
 CBO PLAN:
 ImpalaSortRel(sort0=[$0], sort1=[$1], dir0=[ASC], dir1=[DESC])
   ImpalaAggregateRel(group=[{0, 1}], agg#0=[sum($2)])
-    ImpalaProjectPassthroughRel(nation=[$9], o_year=[$11], amount=[-($4, *($14, $3))])
+    ImpalaProjectPassthroughRel($f0=[$9], $f1=[$11], $f2=[-($4, *($14, $3))])
       ImpalaJoinRel(condition=[AND(=($13, $2), =($12, $1))], joinType=[inner])
         ImpalaJoinRel(condition=[=($10, $0)], joinType=[inner])
           ImpalaJoinRel(condition=[=($6, $2)], joinType=[inner])

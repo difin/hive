@@ -76,7 +76,7 @@ where t1.c not in
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@my_test_table
 CBO PLAN:
-ImpalaProjectPassthroughRel(_o__col2=[count($0) OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)])
+ImpalaProjectPassthroughRel(_o__c0=[count($0) OVER ()])
   ImpalaProjectRel($f0=[$2], c=[$3], ck=[$4], _o__c0=[$0], literalTrue=[$1], condition=[OR(=($1, 0), AND(IS NULL($4), >=($2, $1), IS NOT NULL($0)))])
     ImpalaJoinRel(condition=[true], joinType=[inner])
       ImpalaJoinRel(condition=[=(CAST($2):BIGINT, $0)], joinType=[right])
@@ -236,6 +236,6 @@ ImpalaSortRel(sort0=[$0], dir0=[ASC])
       ImpalaProjectPassthroughRel(id=[$0])
         ImpalaHdfsScanRel(table=[[default, my_test_table]])
       ImpalaAggregateRel(group=[{0}])
-        ImpalaProjectPassthroughRel($f0=[true])
+        ImpalaProjectPassthroughRel(literalTrue=[true])
           ImpalaHdfsScanRel(table=[[default, my_test_table]])
 

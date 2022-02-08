@@ -296,7 +296,7 @@ CBO PLAN:
 HiveUnion(all=[true])
   HiveProject(a=[CAST($0):INTEGER])
     HiveTableScan(table=[[default, t]], table:alias=[t])
-  HiveProject($f0=[1])
+  HiveProject(_o__c0=[1])
     HiveTableScan(table=[[_dummy_database, _dummy_table]], table:alias=[_dummy_table])
 
 PREHOOK: query: explain cbo

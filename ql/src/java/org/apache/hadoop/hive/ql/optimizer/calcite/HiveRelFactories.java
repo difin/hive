@@ -39,7 +39,7 @@ import org.apache.calcite.rel.core.RelFactories.ProjectFactory;
 import org.apache.calcite.rel.core.RelFactories.SemiJoinFactory;
 import org.apache.calcite.rel.core.RelFactories.SetOpFactory;
 import org.apache.calcite.rel.core.RelFactories.SortFactory;
-import org.apache.calcite.rel.rel2sql.SqlImplementor;
+import org.apache.calcite.rel.hint.RelHint;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexLiteral;
 import org.apache.calcite.rex.RexNode;
@@ -115,7 +115,7 @@ public class HiveRelFactories {
    */
   private static class HiveProjectFactoryImpl implements ProjectFactory {
     @Override
-    public RelNode createProject(RelNode child,
+    public RelNode createProject(RelNode child, List<RelHint> hints,
         List<? extends RexNode> childExprs, List<String> fieldNames) {
       RelOptCluster cluster = child.getCluster();
       RelDataType rowType = RexUtil.createStructType(
@@ -162,23 +162,9 @@ public class HiveRelFactories {
      *          Whether this join has been translated to a semi-join
      */
     @Override
-    public RelNode createJoin(RelNode left, RelNode right, RexNode condition, JoinRelType joinType,
-        Set<String> variablesStopped, boolean semiJoinDone) {
+    public RelNode createJoin(RelNode left, RelNode right, List<RelHint> hints, RexNode condition,
+                              Set<CorrelationId> variablesStopped, JoinRelType joinType, boolean semiJoinDone) {
       if (joinType == JoinRelType.SEMI) {
-        final JoinInfo joinInfo = JoinInfo.of(left, right, condition);
-        final RelOptCluster cluster = left.getCluster();
-        return HiveSemiJoin.getSemiJoin(cluster, left.getTraitSet(), left, right, condition);
-      }
-      return HiveJoin.getJoin(left.getCluster(), left, right, condition, joinType);
-    }
-
-    @Override
-    public RelNode createJoin(RelNode left, RelNode right, RexNode condition,
-        Set<CorrelationId> variablesSet, JoinRelType joinType, boolean semiJoinDone) {
-      // According to calcite, it is going to be removed before Calcite-2.0
-      // TODO: to handle CorrelationId
-      if (joinType == JoinRelType.SEMI) {
-        final JoinInfo joinInfo = JoinInfo.of(left, right, condition);
         final RelOptCluster cluster = left.getCluster();
         return HiveSemiJoin.getSemiJoin(cluster, left.getTraitSet(), left, right, condition);
       }
@@ -232,7 +218,7 @@ public class HiveRelFactories {
 
   private static class HiveAggregateFactoryImpl implements AggregateFactory {
     @Override
-    public RelNode createAggregate(RelNode child,
+    public RelNode createAggregate(RelNode child, List<RelHint> hints,
             ImmutableBitSet groupSet, ImmutableList<ImmutableBitSet> groupSets,
             List<AggregateCall> aggCalls) {
       return new HiveAggregate(child.getCluster(), child.getTraitSet(), child,

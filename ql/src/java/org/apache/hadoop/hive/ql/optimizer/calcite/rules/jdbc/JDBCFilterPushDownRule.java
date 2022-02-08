@@ -67,7 +67,7 @@ public class JDBCFilterPushDownRule extends RelOptRule {
     final HiveJdbcConverter converter = call.rel(1);
 
     Filter newHiveFilter = filter.copy(filter.getTraitSet(), converter.getInput(), filter.getCondition());
-    JdbcFilter newJdbcFilter = (JdbcFilter) new JdbcFilterRule(converter.getJdbcConvention()).convert(newHiveFilter);
+    JdbcFilter newJdbcFilter = (JdbcFilter) JdbcFilterRule.create(converter.getJdbcConvention()).convert(newHiveFilter);
     if (newJdbcFilter != null) {
       RelNode converterRes = converter.copy(converter.getTraitSet(), Arrays.asList(newJdbcFilter));
 

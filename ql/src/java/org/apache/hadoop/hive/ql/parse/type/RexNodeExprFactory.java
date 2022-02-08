@@ -17,7 +17,6 @@
  */
 package org.apache.hadoop.hive.ql.parse.type;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -83,7 +82,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils.PrimitiveTypeEntry;
 import org.apache.hadoop.hive.serde2.typeinfo.CharTypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.DecimalTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.StructTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
@@ -293,10 +291,10 @@ public class RexNodeExprFactory extends ExprFactory<RexNode> {
 
   @Override
   protected TypeInfo adjustConstantType(PrimitiveTypeInfo targetType, Object constantValue) {
-    if (constantValue instanceof HiveDecimal) {
-      Preconditions.checkState(functionHelper instanceof HiveFunctionHelper);
+    if (functionHelper instanceof HiveFunctionHelper &&
+      PrimitiveObjectInspectorUtils.decimalTypeEntry.equals(targetType.getPrimitiveTypeEntry())) {
       HiveFunctionHelper helper = (HiveFunctionHelper) functionHelper;
-      return helper.adjustType((HiveDecimal) constantValue);
+      return helper.adjustType((BigDecimal) constantValue);
     }
     return targetType;
   }

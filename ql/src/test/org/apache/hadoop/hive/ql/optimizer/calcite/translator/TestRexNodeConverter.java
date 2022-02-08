@@ -47,6 +47,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.doReturn;
@@ -103,7 +104,7 @@ public class TestRexNodeConverter {
   @Before
   public void before() {
     doReturn(tableType).when(tableMock).getRowType();
-    tableScan = LogicalTableScan.create(relOptCluster, tableMock);
+    tableScan = LogicalTableScan.create(relOptCluster, tableMock, Collections.emptyList());
     relBuilder = HiveRelFactories.HIVE_BUILDER.create(relOptCluster, schemaMock);
   }
 

@@ -222,7 +222,7 @@ public class HiveSemiJoinRule {
 
     @Override
     protected ImmutableBitSet extractUsedFields(Project project) {
-      return RelOptUtil.InputFinder.bits(project.getChildExps(), null);
+      return RelOptUtil.InputFinder.bits(project.getProjects(), null);
     }
 
     @Override
@@ -371,7 +371,7 @@ public class HiveSemiJoinRule {
 
     @Override
     protected ImmutableBitSet extractUsedFields(Project project) {
-      return RelOptUtil.InputFinder.bits(project.getChildExps(), null);
+      return RelOptUtil.InputFinder.bits(project.getProjects(), null);
     }
 
     @Override

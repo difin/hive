@@ -36,6 +36,7 @@ import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeField;
 import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexNode;
+import org.apache.calcite.sql.SqlExplainLevel;
 import org.apache.calcite.tools.RelBuilder;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.commons.lang3.tuple.Triple;
@@ -200,14 +201,19 @@ public class HiveTableScan extends TableScan implements HiveRelNode {
         newRowtype, this.useQBIdInDigest, this.insideView, this.tableScanTrait);
   }
 
+  // We need to include isInsideView inside digest to differentiate direct
+  // tables and tables inside view. Otherwise, Calcite will treat them as the same.
+  // Also include partition list key to trigger cost evaluation even if an
+  // expression was already generated.
   @Override public RelWriter explainTerms(RelWriter pw) {
-    if (this.useQBIdInDigest) {
-      // TODO: Only the qualified name should be left here
-      return super.explainTerms(pw)
-          .item("qbid:alias", concatQbIDAlias);
-    } else {
-      return super.explainTerms(pw).item("table:alias", tblAlias);
-    }
+    return super.explainTerms(pw)
+      .itemIf("qbid:alias", concatQbIDAlias, this.useQBIdInDigest)
+      .itemIf("htColumns", this.neededColIndxsFrmReloptHT, pw.getDetailLevel() == SqlExplainLevel.DIGEST_ATTRIBUTES)
+      .itemIf("insideView", this.isInsideView(), pw.getDetailLevel() == SqlExplainLevel.DIGEST_ATTRIBUTES)
+      .itemIf("plKey", ((RelOptHiveTable) table).getPartitionListKey(), pw.getDetailLevel() == SqlExplainLevel.DIGEST_ATTRIBUTES)
+      .itemIf("table:alias", tblAlias, !this.useQBIdInDigest)
+      .itemIf("fetchDeleted", HiveTableScanTrait.FetchDeletedRows,
+        pw.getDetailLevel() == SqlExplainLevel.DIGEST_ATTRIBUTES);
   }
 
   @Override
@@ -324,22 +330,6 @@ public class HiveTableScan extends TableScan implements HiveRelNode {
 
   public HiveTableScanTrait getTableScanTrait() {
     return tableScanTrait;
-  }
-
-  // We need to include isInsideView inside digest to differentiate direct
-  // tables and tables inside view. Otherwise, Calcite will treat them as the same.
-  // Also include partition list key to trigger cost evaluation even if an
-  // expression was already generated.
-  public String computeDigest() {
-    String digest = super.computeDigest() +
-        "[" + this.neededColIndxsFrmReloptHT + "]" +
-        "[" + this.isInsideView() + "]" +
-        "[" + this.tableScanTrait + "]";
-    String partitionListKey = ((RelOptHiveTable) table).getPartitionListKey();
-    if (partitionListKey != null) {
-      return digest + "[" + partitionListKey + "]";
-    }
-    return digest;
   }
 
   @Override

@@ -126,13 +126,15 @@ public final class HiveRewriteToDataSketchesRules {
       for (int i = 0; i < vb.newProjectsBelow.size(); i++) {
         fieldNames.add("ff_" + i);
       }
-      RelNode newProjectBelow = projectFactory.createProject(aggregate.getInput(), vb.newProjectsBelow, fieldNames);
+      RelNode newProjectBelow = projectFactory.createProject(aggregate.getInput(), Collections.emptyList(),
+        vb.newProjectsBelow, fieldNames);
 
       RelNode newAgg = aggregate.copy(aggregate.getTraitSet(), newProjectBelow, aggregate.getGroupSet(),
           aggregate.getGroupSets(), newAggCalls);
 
       RelNode newProject =
-          projectFactory.createProject(newAgg, vb.newProjectsAbove, aggregate.getRowType().getFieldNames());
+          projectFactory.createProject(newAgg, Collections.emptyList(),
+            vb.newProjectsAbove, aggregate.getRowType().getFieldNames());
 
       call.transformTo(newProject);
     }
@@ -414,7 +416,7 @@ public final class HiveRewriteToDataSketchesRules {
             RelCollations.EMPTY, type, name);
 
         Integer origFractionIdx = aggCall.getArgList().get(0);
-        RexNode fraction = aggInput.getChildExps().get(origFractionIdx);
+        RexNode fraction = aggInput.getProjects().get(origFractionIdx);
         fraction = rexBuilder.makeCast(floatType, fraction);
 
         RexNode projRex = rexBuilder.makeInputRef(newAgg.getType(), newProjectsAbove.size());
@@ -479,7 +481,7 @@ public final class HiveRewriteToDataSketchesRules {
         relBuilder.push(origInput);
         RexShuttle shuttle = new ProcessShuttle();
         List<RexNode> newProjects = new ArrayList<RexNode>();
-        for (RexNode expr : project.getChildExps()) {
+        for (RexNode expr : project.getProjects()) {
           newProjects.add(expr.accept(shuttle));
         }
         if (relBuilder.peek() == origInput) {

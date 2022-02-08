@@ -59,7 +59,7 @@ POSTHOOK: Input: default@impala_tpcds_item
 POSTHOOK: Input: default@impala_tpcds_promotion
 CBO PLAN:
 ImpalaSortRel(sort0=[$0], dir0=[ASC], fetch=[100])
-  ImpalaProjectRel($f0=[$0], $f1=[/(CAST($1):DOUBLE, CAST($2):DOUBLE)], $f2=[CAST(/($3, CAST($4):DECIMAL(19, 0))):DECIMAL(11, 6)], $f3=[CAST(/($5, CAST($6):DECIMAL(19, 0))):DECIMAL(11, 6)], $f4=[CAST(/($7, CAST($8):DECIMAL(19, 0))):DECIMAL(11, 6)])
+  ImpalaProjectRel(i_item_id=[$0], agg1=[/(CAST($1):DOUBLE, CAST($2):DOUBLE)], agg2=[CAST(/($3, CAST($4):DECIMAL(19, 0))):DECIMAL(11, 6)], agg3=[CAST(/($5, CAST($6):DECIMAL(19, 0))):DECIMAL(11, 6)], agg4=[CAST(/($7, CAST($8):DECIMAL(19, 0))):DECIMAL(11, 6)])
     ImpalaAggregateRel(group=[{12}], agg#0=[sum($7)], agg#1=[count($7)], agg#2=[sum($4)], agg#3=[count($4)], agg#4=[sum($6)], agg#5=[count($6)], agg#6=[sum($5)], agg#7=[count($5)])
       ImpalaJoinRel(condition=[=($2, $11)], joinType=[inner])
         ImpalaJoinRel(condition=[=($3, $10)], joinType=[inner])

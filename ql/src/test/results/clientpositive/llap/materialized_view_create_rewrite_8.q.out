@@ -111,7 +111,7 @@ HiveProject(a=[$0])
       HiveFilter(condition=[IS NOT NULL($0)])
         HiveTableScan(table=[[default, cmv_basetable_n6]], table:alias=[cmv_basetable_n6])
     HiveProject(a=[$0])
-      HiveFilter(condition=[AND(>($2, 10.1), IS NOT NULL($0))])
+      HiveFilter(condition=[AND(>($2, 10.1:DECIMAL(3, 1)), IS NOT NULL($0))])
         HiveTableScan(table=[[default, cmv_basetable_2_n3]], table:alias=[cmv_basetable_2_n3])
 
 PREHOOK: query: SELECT cmv_basetable_n6.a
@@ -324,7 +324,7 @@ POSTHOOK: Input: default@cmv_mat_view_n6
 #### A masked pattern was here ####
 CBO PLAN:
 HiveProject(a=[$0])
-  HiveFilter(condition=[<(10.1, $1)])
+  HiveFilter(condition=[<(10.1:DECIMAL(3, 1), $1)])
     HiveTableScan(table=[[default, cmv_mat_view_n6]], table:alias=[default.cmv_mat_view_n6])
 
 PREHOOK: query: SELECT cmv_basetable_n6.a
@@ -656,7 +656,7 @@ POSTHOOK: Input: default@cmv_mat_view_n6
 #### A masked pattern was here ####
 CBO PLAN:
 HiveProject(a=[$0])
-  HiveFilter(condition=[<(10.1, $1)])
+  HiveFilter(condition=[<(10.1:DECIMAL(3, 1), $1)])
     HiveTableScan(table=[[default, cmv_mat_view_n6]], table:alias=[default.cmv_mat_view_n6])
 
 PREHOOK: query: SELECT cmv_basetable_n6.a

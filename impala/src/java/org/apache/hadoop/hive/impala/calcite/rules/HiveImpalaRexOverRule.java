@@ -19,6 +19,7 @@ package org.apache.hadoop.hive.impala.calcite.rules;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.apache.calcite.jdbc.JavaTypeFactoryImpl;
@@ -77,7 +78,7 @@ public class HiveImpalaRexOverRule extends RelOptRule {
     RexOverReplacer replacer = new RexOverReplacer(rexBuilder);
 
     List<RexNode> exprs = new ArrayList<>();
-    for (RexNode r : project.getChildExps()) {
+    for (RexNode r : project.getProjects()) {
       exprs.add(replacer.apply(r));
     }
 
@@ -86,7 +87,7 @@ public class HiveImpalaRexOverRule extends RelOptRule {
     }
 
     RelNode newProject = projectFactory.createProject(
-        input, exprs, project.getRowType().getFieldNames());
+        input, Collections.emptyList(), exprs, project.getRowType().getFieldNames());
 
     call.transformTo(newProject);
   }

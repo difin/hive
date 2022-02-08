@@ -25,7 +25,7 @@ HiveProject(order count=[$0], total shipping cost=[$1], total net profit=[$2])
               HiveProject(cs_warehouse_sk=[$13], cs_order_number=[$16])
                 HiveFilter(condition=[IS NOT NULL($13)])
                   HiveTableScan(table=[[default, catalog_sales]], table:alias=[cs2])
-            HiveProject(literalTrue=[true], cr_order_number0=[$0])
+            HiveProject(literalTrue=[true], cr_order_number=[$0])
               HiveAggregate(group=[{15}])
                 HiveTableScan(table=[[default, catalog_returns]], table:alias=[cr1])
 

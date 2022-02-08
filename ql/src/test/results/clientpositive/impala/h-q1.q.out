@@ -49,7 +49,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@impala_tpch_lineitem
 CBO PLAN:
 ImpalaSortRel(sort0=[$0], sort1=[$1], dir0=[ASC], dir1=[ASC])
-  ImpalaProjectRel($f0=[$0], $f1=[$1], $f2=[$2], $f3=[$3], $f4=[$4], $f5=[$5], $f6=[CAST(/($2, CAST($6):DECIMAL(19, 0))):DECIMAL(16, 6)], $f7=[CAST(/($3, CAST($7):DECIMAL(19, 0))):DECIMAL(16, 6)], $f8=[CAST(/($8, CAST($9):DECIMAL(19, 0))):DECIMAL(16, 6)], $f9=[$10])
+  ImpalaProjectRel(l_returnflag=[$0], l_linestatus=[$1], sum_qty=[$2], sum_base_price=[$3], sum_disc_price=[$4], sum_charge=[$5], avg_qty=[CAST(/($2, CAST($6):DECIMAL(19, 0))):DECIMAL(16, 6)], avg_price=[CAST(/($3, CAST($7):DECIMAL(19, 0))):DECIMAL(16, 6)], avg_disc=[CAST(/($8, CAST($9):DECIMAL(19, 0))):DECIMAL(16, 6)], count_order=[$10])
     ImpalaAggregateRel(group=[{0, 1}], agg#0=[sum($2)], agg#1=[sum($3)], agg#2=[sum($4)], agg#3=[sum($5)], agg#4=[count($2)], agg#5=[count($3)], agg#6=[sum($6)], agg#7=[count($6)], agg#8=[count()])
       ImpalaProjectPassthroughRel($f0=[$8], $f1=[$9], $f2=[$4], $f3=[$5], $f4=[*($5, -(1:DECIMAL(3, 0), $6))], $f5=[*(*($5, -(1:DECIMAL(3, 0), $6)), +(1:DECIMAL(3, 0), $7))], $f6=[$6])
         ImpalaHdfsScanRel(table=[[default, impala_tpch_lineitem]], condition=[<=($10, _UTF-16LE'1998-09-02')])

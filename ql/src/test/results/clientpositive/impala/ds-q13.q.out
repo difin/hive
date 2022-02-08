@@ -122,7 +122,7 @@ POSTHOOK: Input: default@impala_tpcds_household_demographics
 POSTHOOK: Input: default@impala_tpcds_store
 POSTHOOK: Input: default@impala_tpcds_store_sales
 CBO PLAN:
-ImpalaProjectPassthroughRel($f0=[/(CAST($0):DOUBLE, CAST($1):DOUBLE)], $f1=[CAST(/($2, CAST($3):DECIMAL(19, 0))):DECIMAL(11, 6)], $f2=[CAST(/($4, CAST($5):DECIMAL(19, 0))):DECIMAL(11, 6)], $f3=[CAST($4):DECIMAL(38, 2)])
+ImpalaProjectPassthroughRel(_o__c0=[/(CAST($0):DOUBLE, CAST($1):DOUBLE)], _o__c1=[CAST(/($2, CAST($3):DECIMAL(19, 0))):DECIMAL(11, 6)], _o__c2=[CAST(/($4, CAST($5):DECIMAL(19, 0))):DECIMAL(11, 6)], _o__c3=[CAST($4):DECIMAL(38, 2)])
   ImpalaAggregateRel(group=[{}], agg#0=[sum($7)], agg#1=[count($7)], agg#2=[sum($4)], agg#3=[count($4)], agg#4=[sum($5)], agg#5=[count($5)])
     ImpalaJoinRel(condition=[AND(=($23, $0), OR(AND($24, $25, $11, $17), AND($26, $27, $12, $18), AND($28, $29, $13, $18)))], joinType=[inner])
       ImpalaJoinRel(condition=[AND(=($2, $19), OR(AND($20, $8), AND($21, $9), AND($22, $10)))], joinType=[inner])

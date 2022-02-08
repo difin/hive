@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.impala.node;
 
 import com.google.common.base.Preconditions;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.calcite.plan.RelOptCost;
 import org.apache.calcite.plan.RelOptPlanner;
 import org.apache.calcite.rel.RelNode;
@@ -59,7 +60,7 @@ public class ImpalaTableFunctionScanRel extends ImpalaPlanRel {
   // Get the nth row from the inline(array(row(expr,...), ...)) UDTFS
   // Return null for any other function structure or rowNum out of bound
   private static RexCall getDataRow(HiveTableFunctionScan scan, int rowNum) {
-    for(RexNode expr: scan.getChildExps()) {
+    for(RexNode expr: ImmutableList.of(scan.getCall())) {
       if (expr instanceof RexCall) {
         RexCall inlineCall = (RexCall)expr;
         if (inlineCall.getOperator().getName().equalsIgnoreCase("inline") &&

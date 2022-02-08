@@ -25,6 +25,7 @@ import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.plan.hep.HepPlanner;
 import org.apache.calcite.plan.hep.HepProgramBuilder;
 import org.apache.calcite.rel.RelNode;
+import org.apache.calcite.rel.logical.LogicalTableScan;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexNode;
@@ -36,12 +37,14 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.RelOptHiveTable;
 import org.apache.hadoop.hive.ql.parse.type.HiveFunctionHelper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestHiveUnionPullUpConstantsRule {
@@ -79,8 +82,10 @@ public class TestHiveUnionPullUpConstantsRule {
 
     final RelOptCluster optCluster = RelOptCluster.create(planner, rexBuilder);
     RelDataType rowTypeMock = JAVA_TYPE_FACTORY.createStructType(clazz);
-    doReturn(rowTypeMock).when(tableMock).getRowType();
-    doReturn(tableMock).when(schemaMock).getTableForMember(any());
+    Mockito.doReturn(rowTypeMock).when(tableMock).getRowType();
+    LogicalTableScan tableScan = LogicalTableScan.create(optCluster, tableMock, Collections.emptyList());
+    Mockito.doReturn(tableScan).when(tableMock).toRel(Matchers.any());
+    Mockito.doReturn(tableMock).when(schemaMock).getTableForMember(Matchers.any());
 
     relBuilder = HiveRelFactories.HIVE_BUILDER.create(optCluster, schemaMock);
   }

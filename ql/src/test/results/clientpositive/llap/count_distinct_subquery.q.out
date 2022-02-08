@@ -48,7 +48,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@t_test
 #### A masked pattern was here ####
 CBO PLAN:
-HiveProject($f0=[1])
+HiveProject(_o__c0=[1])
   HiveProject($f0=[$0])
     HiveAggregate(group=[{}], agg#0=[count($0)])
       HiveProject(a=[$0])

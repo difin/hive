@@ -22,6 +22,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.apache.calcite.avatica.util.TimeUnitRange;
 import org.apache.calcite.plan.Context;
+import org.apache.calcite.plan.Contexts;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptSchema;
 import org.apache.calcite.rel.RelNode;
@@ -63,7 +64,15 @@ public class HiveRelBuilder extends RelBuilder {
   /** Creates a {@link RelBuilderFactory}, a partially-created RelBuilder.
    * Just add a {@link RelOptCluster} and a {@link RelOptSchema} */
   public static RelBuilderFactory proto(final Context context) {
-    return (cluster, schema) -> new HiveRelBuilder(context, cluster, schema);
+    return (cluster, schema) -> {
+      Context confContext = Contexts.of(Config.DEFAULT.withPruneInputOfAggregate(Bug.CALCITE_4513_FIXED));
+      return new HiveRelBuilder(Contexts.chain(context, confContext), cluster, schema);
+    };
+  }
+
+  /** Creates a {@link RelBuilderFactory} that uses a given set of factories. */
+  public static RelBuilderFactory proto(Object... factories) {
+    return proto(Contexts.of(factories));
   }
 
   @Override
@@ -114,14 +123,6 @@ public class HiveRelBuilder extends RelBuilder {
           countAgg.getOperandTypeInference(), countAgg.getOperandTypeChecker());
     }
     return null;
-  }
-
-  @Override
-  protected boolean shouldMergeProject() {
-    /* CALCITE-2470 added ability to merge Project-s together.
-     * The problem with it is that it may merge 2 windowing expressions.
-     */
-    return false;
   }
 
   @Override

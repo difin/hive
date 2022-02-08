@@ -219,7 +219,7 @@ POSTHOOK: Input: default@t1
 POSTHOOK: Input: default@t2
 #### A masked pattern was here ####
 CBO PLAN:
-HiveProject($f0=[$0], $f1=[$1], $f2=[$2], $f3=[/(CAST($1):DOUBLE, $2)], $f4=[$3])
+HiveProject(a=[$0], _o__c1=[$1], _o__c2=[$2], _o__c3=[/(CAST($1):DOUBLE, $2)], _o__c4=[$3])
   HiveAggregate(group=[{0}], agg#0=[sum($1)], agg#1=[count($1)], agg#2=[count()])
     HiveJoin(condition=[=($0, $2)], joinType=[inner])
       HiveProject(a=[$0], b=[$1])
@@ -248,7 +248,7 @@ POSTHOOK: Output: default@mat1
 POSTHOOK: Output: default@mat1
 POSTHOOK: Output: default@mat1
 CBO PLAN:
-HiveProject($f0=[$5], $f1=[CASE(IS NULL($1), $6, IS NULL($6), $1, +($6, $1))], $f2=[CASE(IS NULL($2), $7, +($7, $2))], $f3=[/(CAST(CASE(IS NULL($1), $6, IS NULL($6), $1, +($6, $1))):DOUBLE, CASE(IS NULL($2), $7, +($7, $2)))], $f4=[CASE(IS NULL($3), $8, +($8, $3))])
+HiveProject(a=[$5], _o__c1=[CASE(IS NULL($1), $6, IS NULL($6), $1, +($6, $1))], _o__c2=[CASE(IS NULL($2), $7, +($7, $2))], _o__c3=[/(CAST(CASE(IS NULL($1), $6, IS NULL($6), $1, +($6, $1))):DOUBLE, CASE(IS NULL($2), $7, +($7, $2)))], _o__c4=[CASE(IS NULL($3), $8, +($8, $3))])
   HiveFilter(condition=[OR(AND($4, OR(AND(IS NULL($3), =($8, 0)), AND(=(+($8, $3), 0), IS NOT NULL($3)))), AND(IS NULL($4), OR(AND(IS NULL($3), >($8, 0)), AND(>(+($8, $3), 0), IS NOT NULL($3)))), AND($4, OR(AND(IS NULL($3), >($8, 0)), AND(>(+($8, $3), 0), IS NOT NULL($3)))))])
     HiveJoin(condition=[IS NOT DISTINCT FROM($0, $5)], joinType=[right])
       HiveProject(a=[$0], _c1=[$1], _c2=[$2], _c4=[$4], $f4=[true])

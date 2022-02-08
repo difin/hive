@@ -233,7 +233,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 CBO PLAN:
 ImpalaSortRel(sort0=[$0], dir0=[ASC])
-  ImpalaProjectRel(id=[$0], _o__c1=[rank() OVER (ORDER BY $0 NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)], _o__c2=[CASE(<(CAST(ds_kll_n($1)):DOUBLE, +(CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), CAST(ds_kll_n($1)):DOUBLE)), 1)), CAST(ds_kll_n($1)):DOUBLE, +(CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), CAST(ds_kll_n($1)):DOUBLE)), 1))])
+  ImpalaProjectRel(id=[$0], _o__c1=[rank() OVER (ORDER BY $0 NULLS LAST)], _o__c2=[CASE(<(CAST(ds_kll_n($1)):DOUBLE, +(CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), CAST(ds_kll_n($1)):DOUBLE)), 1)), CAST(ds_kll_n($1)):DOUBLE, +(CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), CAST(ds_kll_n($1)):DOUBLE)), 1))])
     ImpalaJoinRel(condition=[true], joinType=[inner])
       ImpalaProjectPassthroughRel(id=[$0])
         ImpalaHdfsScanRel(table=[[default, sketch_input]])
@@ -388,7 +388,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 CBO PLAN:
 ImpalaSortRel(sort0=[$1], sort1=[$0], dir0=[ASC], dir1=[ASC])
-  ImpalaProjectRel(id=[$0], category=[$1], _o__c2=[rank() OVER (PARTITION BY $1 ORDER BY $0 NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)], _o__c3=[CASE(<(CAST(ds_kll_n($3)):DOUBLE, +(CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), CAST(ds_kll_n($3)):DOUBLE)), 1)), CAST(ds_kll_n($3)):DOUBLE, +(CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), CAST(ds_kll_n($3)):DOUBLE)), 1))])
+  ImpalaProjectRel(id=[$0], category=[$1], _o__c2=[rank() OVER (PARTITION BY $1 ORDER BY $0 NULLS LAST)], _o__c3=[CASE(<(CAST(ds_kll_n($3)):DOUBLE, +(CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), CAST(ds_kll_n($3)):DOUBLE)), 1)), CAST(ds_kll_n($3)):DOUBLE, +(CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), CAST(ds_kll_n($3)):DOUBLE)), 1))])
     ImpalaJoinRel(condition=[=($2, $1)], joinType=[inner])
       ImpalaHdfsScanRel(table=[[default, sketch_input]], condition=[IS NOT NULL($1)])
       ImpalaAggregateRel(group=[{0}], agg#0=[ds_kll_sketch($1)])
@@ -567,7 +567,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 CBO PLAN:
 ImpalaSortRel(sort0=[$0], dir0=[ASC])
-  ImpalaProjectRel(id=[$0], _o__c1=[+(int_divide(*(least(COUNT() OVER (RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 4:BIGINT), -(ROW_NUMBER() OVER (ORDER BY $0 NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 1)), COUNT() OVER (RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)), 1)], _o__c2=[CASE(<(CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), 4)), 1), 1:DOUBLE, CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), 4)))])
+  ImpalaProjectRel(id=[$0], _o__c1=[+(int_divide(*(least(COUNT() OVER (), 4:BIGINT), -(ROW_NUMBER() OVER (ORDER BY $0 NULLS LAST), 1)), COUNT() OVER ()), 1)], _o__c2=[CASE(<(CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), 4)), 1), 1:DOUBLE, CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), 4)))])
     ImpalaJoinRel(condition=[true], joinType=[inner])
       ImpalaProjectPassthroughRel(id=[$0])
         ImpalaHdfsScanRel(table=[[default, sketch_input]])
@@ -726,7 +726,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 CBO PLAN:
 ImpalaSortRel(sort0=[$1], sort1=[$0], dir0=[ASC], dir1=[ASC])
-  ImpalaProjectRel(id=[$0], category=[$1], _o__c2=[+(int_divide(*(least(COUNT() OVER (PARTITION BY $1 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 4:BIGINT), -(ROW_NUMBER() OVER (PARTITION BY $1 ORDER BY $0 NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 1)), COUNT() OVER (PARTITION BY $1 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)), 1)], _o__c3=[CASE(<(CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), 4)), 1), 1:DOUBLE, CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), 4)))])
+  ImpalaProjectRel(id=[$0], category=[$1], _o__c2=[+(int_divide(*(least(COUNT() OVER (PARTITION BY $1), 4:BIGINT), -(ROW_NUMBER() OVER (PARTITION BY $1 ORDER BY $0 NULLS LAST), 1)), COUNT() OVER (PARTITION BY $1)), 1)], _o__c3=[CASE(<(CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), 4)), 1), 1:DOUBLE, CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), 4)))])
     ImpalaJoinRel(condition=[=($2, $1)], joinType=[inner])
       ImpalaHdfsScanRel(table=[[default, sketch_input]], condition=[IS NOT NULL($1)])
       ImpalaAggregateRel(group=[{0}], agg#0=[ds_kll_sketch($1)])
@@ -908,7 +908,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 CBO PLAN:
 ImpalaSortRel(sort0=[$1], sort1=[$0], dir0=[ASC], dir1=[ASC])
-  ImpalaProjectRel(id=[$0], category=[$1], _o__c2=[/(CAST(+(-(COUNT() OVER (PARTITION BY $1 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), RANK() OVER (PARTITION BY $1 ORDER BY $0 DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)), 1)):DOUBLE, CAST(COUNT() OVER (PARTITION BY $1 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)):DOUBLE)], _o__c3=[ds_kll_rank($3, CAST($0):FLOAT)])
+  ImpalaProjectRel(id=[$0], category=[$1], _o__c2=[/(CAST(+(-(COUNT() OVER (PARTITION BY $1), RANK() OVER (PARTITION BY $1 ORDER BY $0 DESC)), 1)):DOUBLE, CAST(COUNT() OVER (PARTITION BY $1)):DOUBLE)], _o__c3=[ds_kll_rank($3, CAST($0):FLOAT)])
     ImpalaJoinRel(condition=[=($2, $1)], joinType=[inner])
       ImpalaHdfsScanRel(table=[[default, sketch_input]], condition=[IS NOT NULL($1)])
       ImpalaAggregateRel(group=[{0}], agg#0=[ds_kll_sketch($1)])

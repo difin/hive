@@ -93,7 +93,7 @@ ImpalaProjectPassthroughRel(order count=[$0], total shipping cost=[$1], total ne
                 ImpalaHdfsScanRel(table=[[default, impala_tpcds_web_site]], condition=[AND(=($14, _UTF-16LE'pri'), IS NOT NULL($0))])
             ImpalaProjectPassthroughRel(ws_warehouse_sk=[$15], ws_order_number=[$17])
               ImpalaHdfsScanRel(table=[[default, impala_tpcds_web_sales]], condition=[AND(IS NOT NULL($17), IS NOT NULL($15))])
-          ImpalaProjectPassthroughRel(literalTrue=[true], wr_order_number0=[$0])
+          ImpalaProjectPassthroughRel(literalTrue=[true], wr_order_number=[$0])
             ImpalaAggregateRel(group=[{13}])
               ImpalaHdfsScanRel(table=[[default, impala_tpcds_web_returns]], condition=[IS NOT NULL($13)])
 

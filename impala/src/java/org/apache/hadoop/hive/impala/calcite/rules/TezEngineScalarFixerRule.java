@@ -39,6 +39,7 @@ import org.apache.hadoop.hive.impala.funcmapper.ImpalaTypeConverter;
 import org.apache.impala.catalog.Type;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -165,7 +166,7 @@ public class TezEngineScalarFixerRule extends RelOptRule {
       projList.add(r);
     }
 
-    RelNode newProject = projectFactory.createProject(oldProject.getInput(), projList,
+    RelNode newProject = projectFactory.createProject(oldProject.getInput(), Collections.emptyList(), projList,
         oldProject.getRowType().getFieldNames());
     call.transformTo(newProject);
   }

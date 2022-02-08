@@ -86,7 +86,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class RelOptHiveTable implements RelOptTable {
 
@@ -262,6 +261,11 @@ public class RelOptHiveTable implements RelOptTable {
       }
     }
     return false;
+  }
+
+  @Override
+  public List<ImmutableBitSet> getKeys() {
+    return keys;
   }
 
   public boolean hasReferentialConstraints() {

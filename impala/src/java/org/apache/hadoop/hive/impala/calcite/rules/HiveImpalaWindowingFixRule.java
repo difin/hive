@@ -18,6 +18,7 @@
 package org.apache.hadoop.hive.impala.calcite.rules;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -78,7 +79,7 @@ public class HiveImpalaWindowingFixRule extends RelOptRule {
 
     // 1. Gather all functions within over clause
     FunctionWithinRexOverCollector collector = new FunctionWithinRexOverCollector();
-    for (RexNode r : project.getChildExps()) {
+    for (RexNode r : project.getProjects()) {
       r.accept(collector);
     }
     // If there are none, bail out
@@ -108,17 +109,17 @@ public class HiveImpalaWindowingFixRule extends RelOptRule {
 
     // 3. Create bottom project
     RelNode bottomProject = projectFactory.createProject(
-        project.getInput(), bottomExprs, bottomFieldNames);
+        project.getInput(), Collections.emptyList(), bottomExprs, bottomFieldNames);
 
     // 4. Replace expressions within over clause in top project
     FunctionWithinRexOverReplacer replacer =
         new FunctionWithinRexOverReplacer(mapping);
     List<RexNode> topExprs = new ArrayList<>();
-    for (RexNode r : project.getChildExps()) {
+    for (RexNode r : project.getProjects()) {
       topExprs.add(replacer.apply(r));
     }
     RelNode topProject = projectFactory.createProject(
-        bottomProject, topExprs, project.getRowType().getFieldNames());
+        bottomProject, Collections.emptyList(), topExprs, project.getRowType().getFieldNames());
 
     call.transformTo(topProject);
   }

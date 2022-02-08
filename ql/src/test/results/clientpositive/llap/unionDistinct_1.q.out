@@ -3909,7 +3909,7 @@ FROM `default`.`dst_union22_n0`
 WHERE `k1` > 20) AS `t2`
 LEFT JOIN (SELECT `k1`, `k3`, `k4`
 FROM `default`.`dst_union22_delta_n0`
-WHERE `k0` > 50 AND `k1` > 20 AND `ds` = '1') AS `t4` ON `t2`.`EXPR$0` AND `t2`.`k1` = `t4`.`k1`)
+WHERE `k0` > 50 AND (`k1` > 20 AND `ds` = '1')) AS `t4` ON `t2`.`EXPR$0` AND `t2`.`k1` = `t4`.`k1`) AS `t6`
 GROUP BY `k1`, `k2`, `k3`, `k4`
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
@@ -5205,18 +5205,18 @@ WHERE `key` < 10
 UNION ALL
 SELECT `key`, `count`
 FROM `default`.`src3`
-WHERE `key` < 10)
+WHERE `key` < 10) AS `t3`
 GROUP BY `key`, `count`
 UNION ALL
 SELECT `key`, `count`
 FROM `default`.`src4`
-WHERE `key` < 10)
+WHERE `key` < 10) AS `t9`
 GROUP BY `key`, `count`
 UNION ALL
 SELECT `key`, COUNT(*) AS `$f1`
 FROM `default`.`src5_n1`
 WHERE `key` < 10
-GROUP BY `key`)
+GROUP BY `key`) AS `t16`
 GROUP BY `key`, `count`
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
@@ -5714,16 +5714,16 @@ WHERE `key` < 10
 UNION ALL
 SELECT `key`, `count`
 FROM `default`.`src3`
-WHERE `key` < 10)
+WHERE `key` < 10) AS `t3`
 GROUP BY `key`, `count`
 UNION ALL
-SELECT `t6`.`key`, `t8`.`count`
+SELECT `t8`.`key`, `t10`.`count`
 FROM (SELECT `key`
 FROM `default`.`src4`
-WHERE `key` < 10) AS `t6`
+WHERE `key` < 10) AS `t8`
 INNER JOIN (SELECT `key`, `count`
 FROM `default`.`src5_n1`
-WHERE `key` < 10) AS `t8` ON `t6`.`key` = `t8`.`key`)
+WHERE `key` < 10) AS `t10` ON `t8`.`key` = `t10`.`key`) AS `t12`
 GROUP BY `key`, `count`
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
@@ -6173,17 +6173,17 @@ WHERE `key` < 10
 UNION ALL
 SELECT `key`, `count`
 FROM `default`.`src3`
-WHERE `key` < 10)
+WHERE `key` < 10) AS `t3`
 GROUP BY `key`, `count`
 UNION ALL
-SELECT `t6`.`key`, COUNT(*) AS `$f1`
+SELECT `t8`.`key`, COUNT(*) AS `$f1`
 FROM (SELECT `key`
 FROM `default`.`src4`
-WHERE `key` < 10) AS `t6`
+WHERE `key` < 10) AS `t8`
 INNER JOIN (SELECT `key`
 FROM `default`.`src5_n1`
-WHERE `key` < 10) AS `t8` ON `t6`.`key` = `t8`.`key`
-GROUP BY `t6`.`key`)
+WHERE `key` < 10) AS `t10` ON `t8`.`key` = `t10`.`key`
+GROUP BY `t8`.`key`) AS `t13`
 GROUP BY `key`, `count`
 STAGE DEPENDENCIES:
   Stage-1 is a root stage

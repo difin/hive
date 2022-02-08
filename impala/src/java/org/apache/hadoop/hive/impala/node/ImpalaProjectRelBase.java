@@ -20,7 +20,6 @@ package org.apache.hadoop.hive.impala.node;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
@@ -46,7 +45,6 @@ import org.apache.calcite.rex.RexWindowBound;
 import org.apache.calcite.sql.SqlAggFunction;
 import org.apache.calcite.sql.SqlExplainLevel;
 import org.apache.calcite.sql.SqlKind;
-import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -81,6 +79,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
  * Impala Project relnode base. This serves as a shared base class for
  * Impala Project relnodes.
@@ -104,7 +103,7 @@ abstract public class ImpalaProjectRelBase extends ImpalaPlanRel {
       throws HiveException, ImpalaException, MetaException {
     ImpalaPlanRel inputRel = getImpalaRelInput(0);
 
-    List<RexOver> overExprs = gatherRexOver(project.getChildExps());
+    List<RexOver> overExprs = gatherRexOver(project.getProjects());
     ImpalaRexVisitor visitor = overExprs.isEmpty()
         ? generateVisitor(ctx, inputRel)
         : generateAnalyticVisitor(ctx, inputRel, overExprs);
@@ -164,7 +163,7 @@ abstract public class ImpalaProjectRelBase extends ImpalaPlanRel {
     ExprSubstitutionMap outputExprMap = planNode.getOutputSmap();
     // We populate the outputs from the expressions
     Map<RexNode, Expr> mapping = new LinkedHashMap<>();
-    for (int pos : HiveCalciteUtil.getInputRefs(project.getChildExps())) {
+    for (int pos : HiveCalciteUtil.getInputRefs(project.getProjects())) {
       // Get the Impala expr after substituting its operands based on the expression map
       Expr e = inputRel.getExpr(pos).substitute(outputExprMap, ctx.getRootAnalyzer(),
           /* preserveRootType = */true);
@@ -190,7 +189,7 @@ abstract public class ImpalaProjectRelBase extends ImpalaPlanRel {
     RelWriter rw = super.explainTerms(pw);
     if (rw.nest()) {
       rw.item("fields", project.getRowType().getFieldNames());
-      rw.item("exprs", project.getChildExps());
+      rw.item("exprs", project.getProjects());
     } else {
       int i = 0;
       for (RelDataTypeField e : project.getRowType().getFieldList()) {
@@ -198,7 +197,7 @@ abstract public class ImpalaProjectRelBase extends ImpalaPlanRel {
         if (fieldName == null) {
           fieldName = "field#" + i;
         }
-        rw.item(fieldName, project.getChildExps().get(i));
+        rw.item(fieldName, project.getProjects().get(i));
         i++;
       }
     }
