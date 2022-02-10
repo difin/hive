@@ -329,7 +329,7 @@ F00:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
   WRITE TO HDFS [default.perm_nopart, OVERWRITE=false]
   |  partitions=1
-  |  output exprs: CAST(CAST(1 AS TINYINT) AS INT), 'str', CAST(CAST(2 AS TINYINT) AS INT)
+  |  output exprs: CAST(1 AS INT), 'str', CAST(2 AS INT)
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |
   00:UNION
@@ -373,7 +373,7 @@ F00:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
   WRITE TO HDFS [default.perm_nopart, OVERWRITE=false]
   |  partitions=1
-  |  output exprs: CAST(CAST(2 AS TINYINT) AS INT), 'str', CAST(CAST(1 AS TINYINT) AS INT)
+  |  output exprs: CAST(2 AS INT), 'str', CAST(1 AS INT)
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |
   00:UNION
@@ -417,7 +417,7 @@ F00:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
   WRITE TO HDFS [default.perm_nopart, OVERWRITE=false]
   |  partitions=1
-  |  output exprs: NULL, NULL, CAST(CAST(1 AS TINYINT) AS INT)
+  |  output exprs: NULL, NULL, CAST(1 AS INT)
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |
   00:UNION
@@ -461,7 +461,7 @@ F00:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
   WRITE TO HDFS [default.perm_part, OVERWRITE=false, PARTITION-KEYS=(10,'hello')]
   |  partitions=1
-  |  output exprs: CAST(CAST(1 AS TINYINT) AS INT), 'str'
+  |  output exprs: CAST(1 AS INT), 'str'
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |
   00:UNION
@@ -508,7 +508,7 @@ F00:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
   WRITE TO HDFS [default.perm_part, OVERWRITE=false, PARTITION-KEYS=(10,'hello')]
   |  partitions=1
-  |  output exprs: CAST(CAST(1 AS TINYINT) AS INT), 'str'
+  |  output exprs: CAST(1 AS INT), 'str'
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |
   00:UNION
@@ -854,7 +854,7 @@ F00:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=1B mem-reservation=0B thread-reservation=1
   WRITE TO HDFS [default.insertonly_part, OVERWRITE=false, PARTITION-KEYS=(2)]
   |  partitions=1
-  |  output exprs: _col0
+  |  output exprs: CAST(_col0 AS INT)
   |  mem-estimate=1B mem-reservation=0B thread-reservation=0
   |
   00:UNION
