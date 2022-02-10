@@ -97,7 +97,7 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 
-import static org.apache.hadoop.hive.metastore.HMSHandler.cleanupRawStore;
+import static org.apache.hadoop.hive.metastore.HMSHandler.cleanupHandlerContext;
 
 /**
  * TODO:pc remove application logic to a separate interface.
@@ -499,7 +499,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         if (LOG.isDebugEnabled()) {
           LOG.debug("request: " + baseRequest + " destroyed " + ", http channel: " + channel);
         }
-        cleanupRawStore();
+        cleanupHandlerContext();
       }
       @Override
       public void requestInitialized(ServletRequestEvent servletRequestEvent) {
@@ -664,7 +664,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         Metrics.getOpenConnectionsCounter().dec();
         // If the IMetaStoreClient#close was called, HMSHandler#shutdown would have already
         // cleaned up thread local RawStore. Otherwise, do it now.
-        cleanupRawStore();
+        cleanupHandlerContext();
       }
 
       @Override
