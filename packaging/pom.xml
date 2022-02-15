@@ -446,7 +446,7 @@
           <plugin>
             <groupId>io.fabric8</groupId>
             <artifactId>docker-maven-plugin</artifactId>
-            <version>0.33.0</version>
+            <version>0.38.0</version>
             <configuration>
               <imagePullPolicy>IfNotPresent</imagePullPolicy>
               <images>
@@ -470,6 +470,20 @@
                       <mode>dir</mode>
                       <descriptor>${project.basedir}/src/main/assembly/bin.xml</descriptor>
                     </assembly>
+                  </build>
+                </image>
+                <image>
+                  <alias>feng</alias>
+                  <name>feng</name>
+                  <build>
+                    <contextDir>${project.basedir}/src/docker-feng</contextDir>
+                    <args>
+                      <HIVE_VERSION>${project.version}</HIVE_VERSION>
+                      <IMPALA_VERSION>${impala.version}</IMPALA_VERSION>
+                    </args>
+                    <tags>
+                      <tag>${project.version}</tag>
+                    </tags>
                   </build>
                 </image>
               </images>
