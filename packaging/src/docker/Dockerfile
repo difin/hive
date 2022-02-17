@@ -1,17 +1,53 @@
 # Copyright (c) 2020 Cloudera, Inc. All rights reserved.
 # UBI8 has issues with ranger-knox plugin not able to find Python
-FROM registry.access.redhat.com/ubi7/ubi:latest as base-ubi-jdk
+FROM registry.access.redhat.com/ubi7/ubi:latest as hadoop-base
+ARG HADOOP_VERSION
+ADD hadoop-${HADOOP_VERSION}.tar.gz  /usr/lib/
+RUN ln -s /usr/lib/hadoop-${HADOOP_VERSION} /usr/lib/hadoop
+COPY remove-unwanted.sh /
+RUN /remove-unwanted.sh
 
+FROM registry.access.redhat.com/ubi7/ubi:latest as ranger-base
+ARG RANGER_VERSION
+ADD ranger-${RANGER_VERSION}-hive-plugin.tar.gz /usr/lib/
+RUN ln -s /usr/lib/ranger-${RANGER_VERSION}-hive-plugin /usr/lib/ranger-hive-plugin
+COPY remove-unwanted.sh /
+RUN /remove-unwanted.sh
+
+FROM registry.access.redhat.com/ubi7/ubi:latest as solr-base
+ARG SOLR_VERSION
+ADD solr-${SOLR_VERSION}.tar.gz /usr/lib/
+COPY remove-unwanted.sh /
+RUN /remove-unwanted.sh
+
+FROM registry.access.redhat.com/ubi7/ubi:latest as atlas-base
+ARG ATLAS_VERSION
+ADD apache-atlas-${ATLAS_VERSION}-hive-hook.tar.gz /usr/lib/
+RUN rm /usr/lib/apache-atlas-hive-hook-${ATLAS_VERSION}/hook/hive/atlas-hive-plugin-impl/kafka-*.jar
+COPY remove-unwanted.sh /
+RUN /remove-unwanted.sh
+
+FROM registry.access.redhat.com/ubi7/ubi:latest as tez-base
+ARG TEZ_VERSION
+ADD tez-${TEZ_VERSION}.tar.gz /usr/lib/tez/
+COPY remove-unwanted.sh /
+RUN /remove-unwanted.sh
+
+FROM registry.access.redhat.com/ubi7/ubi:latest as hive-base
+ARG CDH_VERSION
+COPY maven/apache-hive-${CDH_VERSION}-bin /usr/lib/hive/
+COPY remove-unwanted.sh /
+RUN /remove-unwanted.sh
+
+FROM registry.access.redhat.com/ubi7/ubi:latest as hive
+# setup os and install packages
 RUN curl -o /etc/yum.repos.d/rhel7_mirrors.repo http://mirror.infra.cloudera.com/repos/rhel/server/7/7.8/rhel7.8_cldr_mirrors.repo
-
-# jdk and other debugging tools
-RUN yum -y update && yum install -y java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation krb5-auth-dialog gettext epel-release zstd libzstd iftop && \
+# install debugging tools and other dependencies
+RUN yum -y update && \
+  yum install -y java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation krb5-auth-dialog gettext epel-release zstd libzstd iftop mysql-connector-java && \
   yum clean all && \
   rm -rf /var/cache/yum
-
-# Skip mirror if it's unavailable
 RUN yum-config-manager --save --setopt=ubi-server-rhscl-7-rpms.skip_if_unavailable=true
-
 RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 # add NOTICES directory
@@ -23,15 +59,12 @@ ENV JAVA_HOME /etc/alternatives/jre
 # so we set TTL for DNS cache to non-zero value.
 RUN echo "networkaddress.cache.ttl=30" >> $JAVA_HOME/lib/security/java.security
 
-## base-ubi-jdk end
-
 ARG CDH_VERSION
 ARG HADOOP_VERSION
 ARG TEZ_VERSION
 ARG RANGER_VERSION
 ARG ATLAS_VERSION
 ARG SOLR_VERSION
-WORKDIR /usr/lib/
 
 LABEL "com.cloudera.dwx.cdh.version"="${CDH_VERSION}"
 LABEL \
@@ -43,23 +76,17 @@ LABEL \
 ENV CDH_VERSION="${CDH_VERSION}"
 ENV HADOOP_VERSION="${HADOOP_VERSION}"
 
-WORKDIR /usr/lib/
 RUN useradd -ms /bin/bash hive
-COPY remove-unwanted.sh /
 
 # async-profiler for perf profiling
 RUN mkdir /async-profiler && \
-   cd /async-profiler && \
    wget https://github.com/jvm-profiling-tools/async-profiler/releases/download/v1.5/async-profiler-1.5-linux-x64.tar.gz && \
-   tar -xvf async-profiler-1.5-linux-x64.tar.gz && \
-   rm async-profiler-1.5-linux-x64.tar.gz && \
-   cd -
+   tar -xvf async-profiler-1.5-linux-x64.tar.gz -C /async-profiler && \
+   rm async-profiler-1.5-linux-x64.tar.gz
 
 # jmx-exporter for prometheus metrics
 RUN mkdir /jmx-exporter && \
-   cd /jmx-exporter && \
-   wget https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.11.0/jmx_prometheus_javaagent-0.11.0.jar && \
-   cd -
+   wget https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.11.0/jmx_prometheus_javaagent-0.11.0.jar -O /jmx-exporter/jmx_prometheus_javaagent-0.11.0.jar
 
 # llap work directory and logs directory, Ranger cache and audit directories
 RUN mkdir -p /apps/llap/work && \
@@ -82,81 +109,50 @@ RUN mkdir -p /apps/llap/work && \
    mkdir -p /var/lib/ranger/hive/policy-cache && \
    chown -R hive:hive /var/lib/ranger/hive/policy-cache
 
-# This expects that the haddop.tar.gz is provided
-COPY hadoop-${HADOOP_VERSION}.tar.gz createSymlink.sh remove-unwanted.sh healthz.sh healthz-ha.sh healthz-hms.sh /
-COPY ranger-${RANGER_VERSION}-hive-plugin.tar.gz /
-COPY tez-${TEZ_VERSION}.tar.gz /
-COPY apache-atlas-${ATLAS_VERSION}-hive-hook.tar.gz /
-COPY solr-${SOLR_VERSION}.tar.gz /
+COPY createSymlink.sh remove-unwanted.sh healthz.sh healthz-ha.sh healthz-hms.sh /
 
-## Add hadoop from tar.gz
-RUN mkdir -p /usr/lib/hadoop && \
-    tar -zxf /hadoop-${HADOOP_VERSION}.tar.gz --strip-components=1 -C /usr/lib/hadoop && \
-    cp /usr/lib/hadoop/bin/hadoop /usr/bin/hadoop && \
-    cp /usr/lib/hadoop/bin/hdfs /usr/bin/hdfs && \
-    mkdir -p /etc/hadoop/conf && \
-    mkdir -p /usr/lib/hadoop-hdfs && \
-    mkdir -p /usr/lib/hadoop-mapreduce && \
-    mkdir -p /usr/lib/hadoop-yarn && \
-    cp -R /usr/lib/hadoop/etc/hadoop/* /etc/hadoop/conf && \
-    cp -R /usr/lib/hadoop/share/hadoop/hdfs/ /usr/lib/hadoop-hdfs && \
-    cp -R /usr/lib/hadoop/share/hadoop/mapreduce/ /usr/lib/hadoop-mapreduce && \
-    cp -R /usr/lib/hadoop/share/hadoop/yarn/ /usr/lib/hadoop-yarn && \
-    cp /usr/lib/hadoop/share/hadoop/tools/lib/hadoop-aws-${HADOOP_VERSION}.jar /usr/lib/hadoop && \
-    rm /hadoop-${HADOOP_VERSION}.tar.gz && \
-    /remove-unwanted.sh
+COPY --from=hadoop-base /usr/lib/hadoop-${HADOOP_VERSION}/ /usr/lib/hadoop/
+RUN mkdir -p /etc/hadoop/conf
+RUN mkdir -p /usr/lib/hadoop-hdfs
+RUN mkdir -p /usr/lib/hadoop-mapreduce
+RUN mkdir -p /usr/lib/hadoop-yarn
+RUN ln -s /usr/lib/hadoop/etc/hadoop/* /etc/hadoop/conf
+RUN ln -s /usr/lib/hadoop/share/hadoop/hdfs/ /usr/lib/hadoop-hdfs
+RUN ln -s /usr/lib/hadoop/share/hadoop/mapreduce/ /usr/lib/hadoop-mapreduce
+RUN ln -s /usr/lib/hadoop/share/hadoop/yarn/ /usr/lib/hadoop-yarn
+RUN ln -s /usr/lib/hadoop/bin/hadoop /usr/bin/hadoop
+RUN ln -s /usr/lib/hadoop/bin/hdfs /usr/bin/hdfs
+RUN ln -s /usr/lib/hadoop/share/hadoop/tools/lib/hadoop-aws-${HADOOP_VERSION}.jar /usr/lib/hadoop/hadoop-aws-${HADOOP_VERSION}.jar
 
-# Add ranger jars from tar.gz
-RUN mkdir -p /usr/lib/ranger-hive-plugin && \
-    tar -xzf /ranger-${RANGER_VERSION}-hive-plugin.tar.gz --strip-components=1 -C /usr/lib/ranger-hive-plugin && \
-    mkdir -p /usr/lib/hive/lib/ranger-hive-plugin-impl && \
-    cp -R /usr/lib/ranger-hive-plugin/lib/* /usr/lib/hive/lib && \
-    rm /ranger-${RANGER_VERSION}-hive-plugin.tar.gz && \
-    /remove-unwanted.sh
+COPY --from=ranger-base /usr/lib/ranger-${RANGER_VERSION}-hive-plugin /usr/lib/ranger-hive-plugin
+RUN mkdir -p /usr/lib/hive/lib/
+RUN ln -s /usr/lib/ranger-hive-plugin/lib/* /usr/lib/hive/lib/
 
-# solr jar replacement
-RUN mkdir -p /tmp/solr && \
-    tar -xvf /solr-${SOLR_VERSION}.tar.gz --strip-components=1 -C /tmp/solr && \
-    yes | cp /tmp/solr/dist/solr-solrj-${SOLR_VERSION}.jar /usr/lib/hive/lib/ranger-hive-plugin-impl/solr-solrj-${SOLR_VERSION}.jar && \
-    chmod 644 /usr/lib/hive/lib/ranger-hive-plugin-impl/solr-solrj-${SOLR_VERSION}.jar && \
-    rm /solr-${SOLR_VERSION}.tar.gz && \
-    /remove-unwanted.sh
+COPY --from=solr-base /usr/lib/solr-${SOLR_VERSION}/dist/solr-solrj-${SOLR_VERSION}.jar  /usr/lib/hive/lib/ranger-hive-plugin-impl/
+RUN chmod 644 /usr/lib/hive/lib/ranger-hive-plugin-impl/solr-solrj-${SOLR_VERSION}.jar
 
-# Add atlas jars from tar.gz
-RUN mkdir -p /usr/lib/atlas && \
-    tar -xzf /apache-atlas-${ATLAS_VERSION}-hive-hook.tar.gz --strip-components=1 -C /usr/lib/atlas && \
-    mkdir -p /usr/lib/hive/lib/atlas-hive-plugin-impl && \
-    cp -R /usr/lib/atlas/hook/hive/* /usr/lib/hive/lib/ && \
-    rm /apache-atlas-${ATLAS_VERSION}-hive-hook.tar.gz && \
-    rm /usr/lib/hive/lib/atlas-hive-plugin-impl/kafka-*.jar && \
-    /remove-unwanted.sh
+COPY --from=atlas-base  /usr/lib/apache-atlas-hive-hook-${ATLAS_VERSION}/ /usr/lib/atlas/
+RUN ln -s /usr/lib/atlas/hook/hive/* /usr/lib/hive/lib/
 
-# Add tez jars from tar.gz
-RUN mkdir -p /usr/lib/tez && \
-    tar -xzf /tez-${TEZ_VERSION}.tar.gz -C /usr/lib/tez && \
-    cp /usr/lib/tez/*.jar /usr/lib/hive && \
-    cp /usr/lib/tez/lib/*.jar /usr/lib/hive && \
-    /remove-unwanted.sh
+COPY --from=tez-base /usr/lib/tez /usr/lib/tez
+RUN ln -s /usr/lib/tez/*.jar /usr/lib/hive/
+RUN ln -s /usr/lib/tez/lib/*.jar /usr/lib/hive
 
-# copy hive jars, dependencies and static resources
-COPY maven/apache-hive-${CDH_VERSION}-bin /usr/lib/hive/
-RUN mkdir -p /etc/hive/conf && \
-    cp -R /usr/lib/hive/conf/* /etc/hive/conf && \
-    cp /usr/lib/hive/bin/hive /usr/bin/hive && \
-    mkdir -p /etc/tez/conf && \
-    /createSymlink.sh ${CDH_VERSION} && \
-    /remove-unwanted.sh
+COPY --from=hive-base /usr/lib/hive /usr/lib/hive
+RUN mkdir -p /etc/hive/conf
+RUN ln -s /usr/lib/hive/conf/* /etc/hive/conf
+RUN ln -s /usr/lib/hive/bin/hive /usr/bin/hive
+RUN mkdir -p /etc/tez/conf
+RUN /createSymlink.sh ${CDH_VERSION}
 
-# install postgres client for debugging usage
-# install mysql JDBC connector for mysql and mariadb and postgres JDBC driver, then move them where the schematool can find them
-RUN mkdir -p /usr/lib/hive/lib/ && \
-    yum -y update
-RUN yum -y install postgresql mysql-connector-java postgresql-jdbc
+RUN mkdir -p /usr/lib/hive/lib/
+
 RUN yum -y clean all && \
+    yum -y install postgresql mysql-connector-java postgresql-jdbc && \
     rm -rf /var/cache/yum && \
-    /remove-unwanted.sh && \
-    cp /usr/share/java/mysql-connector-java.jar /usr/lib/hive/lib/ && \
-    cp /usr/share/java/postgresql-jdbc.jar /usr/lib/hive/lib/
+    /remove-unwanted.sh
+RUN ln -sF /usr/share/java/mysql-connector-java.jar /usr/lib/hive/lib/mysql-connector-java.jar
+RUN ln -sF /usr/share/java/postgresql-jdbc.jar /usr/lib/hive/lib/postgresql-jdbc.jar
 
 # switch user and all related env
 USER hive
@@ -169,11 +165,11 @@ ENV HADOOP_LIBEXEC_DIR /usr/lib/hadoop/libexec
 ENV HADOOP_COMMON_HOME /usr/lib/hadoop
 ENV TEZ_HOME /usr/lib/hive
 ENV HIVE_HOME /usr/lib/hive
-ENV LLAP_DAEMON_HOME ${HIVE_HOME}
-ENV LLAP_DAEMON_BIN_HOME ${HIVE_HOME}/scripts/llap/bin
+ENV LLAP_DAEMON_HOME /usr/lib/hive
+ENV LLAP_DAEMON_BIN_HOME /usr/lib/hive/scripts/llap/bin
 
 # zlib native are present here in debian. also adding hadoop native libs
-ENV LD_LIBRARY_PATH /lib/x86_64-linux-gnu:${HADOOP_HOME}/lib/native
+ENV LD_LIBRARY_PATH /lib/x86_64-linux-gnu:/usr/lib/hadoop/lib/native
 
 # conf directories
 ENV HADOOP_CONF_DIR /etc/hadoop/conf
@@ -187,15 +183,14 @@ COPY entrypoint.sh hive-entrypoint.sh tez-entrypoint.sh llap-entrypoint.sh \
      aux-jars-localizer.sh /
 
 # TODO: add support for foreground execution of these scripts?
-COPY llapDaemon.sh runLlapDaemon.sh ${HIVE_HOME}/scripts/llap/bin/
+COPY llapDaemon.sh runLlapDaemon.sh /usr/lib/hive/scripts/llap/bin/
 
 # TODO: temp change for now to revert HIVE-18472
-ADD hive ${HIVE_HOME}/bin/hive
+ADD hive /usr/lib/hive/bin/hive
 
 ADD healthz.sh /
 ADD healthz-ha.sh /
 ADD healthz-hms.sh /
-
 
 ENTRYPOINT ["/entrypoint.sh"]
 

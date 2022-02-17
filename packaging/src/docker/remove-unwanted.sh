@@ -24,5 +24,3 @@ rm -rf /usr/lib/hive/lib/hbase*
 rm -rf /usr/lib/hive/lib/accumulo*
 rm -rf /usr/lib/hive/lib/druid*
 rm -rf /tmp/solr
-rm -rf /usr/lib/tez/lib
-
