@@ -103,8 +103,8 @@ public final class HiveRewriteToDataSketchesRules {
 
     private final ProjectFactory projectFactory;
 
-    public AggregateToProjectAggregateProject(RelOptRuleOperand operand) {
-      super(operand);
+    public AggregateToProjectAggregateProject(RelOptRuleOperand operand, String description) {
+      super(operand, description);
       projectFactory = HiveRelFactories.HIVE_PROJECT_FACTORY;
     }
 
@@ -260,7 +260,8 @@ public final class HiveRewriteToDataSketchesRules {
     private final String sketchType;
 
     public CountDistinctRewrite(String sketchType) {
-      super(operand(HiveAggregate.class, any()));
+      super(operand(HiveAggregate.class, any()),
+          "AggregateToProjectAggregateProject(CountDistinctRewrite)");
       this.sketchType = sketchType;
     }
 
@@ -344,7 +345,8 @@ public final class HiveRewriteToDataSketchesRules {
     private final String sketchType;
 
     public PercentileDiscRewrite(String sketchType) {
-      super(operand(HiveAggregate.class, operand(HiveProject.class, any())));
+      super(operand(HiveAggregate.class, operand(HiveProject.class, any())),
+          "AggregateToProjectAggregateProject(PercentileDiscRewrite)");
       this.sketchType = sketchType;
     }
 
@@ -437,8 +439,8 @@ public final class HiveRewriteToDataSketchesRules {
 
     protected final String sketchType;
 
-    public WindowingToProjectAggregateJoinProject(String sketchType) {
-      super(operand(HiveProject.class, any()), HiveRelFactories.HIVE_BUILDER, null);
+    public WindowingToProjectAggregateJoinProject(String sketchType, String description) {
+      super(operand(HiveProject.class, any()), HiveRelFactories.HIVE_BUILDER, description);
       this.sketchType = sketchType;
     }
 
@@ -572,8 +574,8 @@ public final class HiveRewriteToDataSketchesRules {
    */
   public static abstract class AbstractRankBasedRewriteRule extends WindowingToProjectAggregateJoinProject {
 
-    public AbstractRankBasedRewriteRule(String sketchType) {
-      super(sketchType);
+    public AbstractRankBasedRewriteRule(String sketchType, String description) {
+      super(sketchType, description);
     }
 
     protected static abstract class AbstractRankBasedRewriteBuilder extends VbuilderPAP {
@@ -686,7 +688,7 @@ public final class HiveRewriteToDataSketchesRules {
   public static class CumeDistRewriteRule extends AbstractRankBasedRewriteRule {
 
     public CumeDistRewriteRule(String sketchType) {
-      super(sketchType);
+      super(sketchType, "WindowingToProjectAggregateJoinProject(CumeDistRewriteRule)");
     }
 
     @Override
@@ -731,7 +733,7 @@ public final class HiveRewriteToDataSketchesRules {
   public static class NTileRewrite extends AbstractRankBasedRewriteRule {
 
     public NTileRewrite(String sketchType) {
-      super(sketchType);
+      super(sketchType, "WindowingToProjectAggregateJoinProject(NTileRewrite)");
     }
 
     @Override
@@ -790,7 +792,7 @@ public final class HiveRewriteToDataSketchesRules {
   public static class RankRewriteRule extends AbstractRankBasedRewriteRule {
 
     public RankRewriteRule(String sketchType) {
-      super(sketchType);
+      super(sketchType, "WindowingToProjectAggregateJoinProject(RankRewriteRule)");
     }
 
     @Override

@@ -20,7 +20,6 @@ package org.apache.hadoop.hive.ql.optimizer.calcite.rules;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import org.apache.calcite.plan.RelOptRule;
@@ -96,7 +95,7 @@ public abstract class HiveFilterJoinRule extends FilterJoinRule {
   public static class HiveFilterJoinMergeRule extends HiveFilterJoinRule {
     public HiveFilterJoinMergeRule() {
       super(operand(Filter.class, operand(Join.class, any())),
-          "filter-join", true, HiveRelFactories.HIVE_BUILDER);
+          HiveFilterJoinMergeRule.class.getSimpleName(), true, HiveRelFactories.HIVE_BUILDER);
     }
 
     @Override
@@ -118,8 +117,8 @@ public abstract class HiveFilterJoinRule extends FilterJoinRule {
 
   public static class HiveFilterJoinTransposeRule extends HiveFilterJoinRule {
     public HiveFilterJoinTransposeRule() {
-      super(RelOptRule.operand(Join.class, RelOptRule.any()), "no-filter", true,
-          HiveRelFactories.HIVE_BUILDER);
+      super(RelOptRule.operand(Join.class, RelOptRule.any()),
+          HiveFilterJoinTransposeRule.class.getSimpleName(), true, HiveRelFactories.HIVE_BUILDER);
     }
 
     @Override

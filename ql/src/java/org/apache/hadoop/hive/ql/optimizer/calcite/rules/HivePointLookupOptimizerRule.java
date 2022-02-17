@@ -37,12 +37,10 @@ import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.plan.RelOptRuleCall;
 import org.apache.calcite.plan.RelOptRuleOperand;
 import org.apache.calcite.plan.RelOptUtil;
-import org.apache.calcite.rel.AbstractRelNode;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.core.Filter;
 import org.apache.calcite.rel.core.Project;
 import org.apache.calcite.rel.core.Join;
-import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexCall;
 import org.apache.calcite.rex.RexNode;
@@ -53,7 +51,6 @@ import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.tools.RelBuilder;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveCalciteUtil;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveBetween;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveIn;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
@@ -86,7 +83,8 @@ public abstract class HivePointLookupOptimizerRule extends RelOptRule {
   /** Rule adapter to apply the transformation to Filter conditions. */
   public static class FilterCondition extends HivePointLookupOptimizerRule {
     public FilterCondition (int minNumORClauses, boolean multiColumnClauseSupported) {
-      super(operand(Filter.class, any()), minNumORClauses, multiColumnClauseSupported);
+      super(operand(Filter.class, any()), minNumORClauses, multiColumnClauseSupported,
+          "HivePointLookupOptimizerRule(FilterCondition)");
     }
 
     @Override
@@ -111,7 +109,8 @@ public abstract class HivePointLookupOptimizerRule extends RelOptRule {
   /** Rule adapter to apply the transformation to Join conditions. */
   public static class JoinCondition extends HivePointLookupOptimizerRule {
     public JoinCondition (int minNumORClauses, boolean multiColumnClauseSupported) {
-      super(operand(Join.class, any()), minNumORClauses, multiColumnClauseSupported);
+      super(operand(Join.class, any()), minNumORClauses, multiColumnClauseSupported,
+          "HivePointLookupOptimizerRule(JoinCondition)");
     }
 
     @Override
@@ -142,7 +141,8 @@ public abstract class HivePointLookupOptimizerRule extends RelOptRule {
   /** Rule adapter to apply the transformation to Projections. */
   public static class ProjectionExpressions extends HivePointLookupOptimizerRule {
     public ProjectionExpressions(int minNumORClauses, boolean multiColumnClauseSupported) {
-      super(operand(Project.class, any()), minNumORClauses, multiColumnClauseSupported);
+      super(operand(Project.class, any()), minNumORClauses, multiColumnClauseSupported,
+          "HivePointLookupOptimizerRule(ProjectionExpressions)");
     }
 
     @Override
@@ -179,8 +179,8 @@ public abstract class HivePointLookupOptimizerRule extends RelOptRule {
   protected final boolean multiColumnClauseSupported;
 
   protected HivePointLookupOptimizerRule(
-    RelOptRuleOperand operand, int minNumORClauses, boolean multiColumnClauseSupported) {
-    super(operand, HiveRelFactories.HIVE_BUILDER, "HivePointLookupOptimizerRule");
+      RelOptRuleOperand operand, int minNumORClauses, boolean multiColumnClauseSupported, String description) {
+    super(operand, description);
     this.minNumORClauses = minNumORClauses;
     this.multiColumnClauseSupported = multiColumnClauseSupported;
   }
