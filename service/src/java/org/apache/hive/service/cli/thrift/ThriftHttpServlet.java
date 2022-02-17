@@ -22,9 +22,11 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivilegedExceptionAction;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +43,7 @@ import javax.ws.rs.core.NewCookie;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.ByteStreams;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.StringUtils;
+
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.shims.HadoopShims.KerberosNameShim;
@@ -50,6 +51,7 @@ import org.apache.hadoop.hive.shims.ShimLoader;
 import org.apache.hadoop.hive.shims.Utils;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hive.service.CookieSigner;
+import org.apache.hive.service.auth.AuthType;
 import org.apache.hive.service.auth.AuthenticationProviderFactory;
 import org.apache.hive.service.auth.AuthenticationProviderFactory.AuthMethods;
 import org.apache.hive.service.auth.HiveAuthConstants;
@@ -90,7 +92,7 @@ public class ThriftHttpServlet extends TServlet {
 
   private static final long serialVersionUID = 1L;
   public static final Logger LOG = LoggerFactory.getLogger(ThriftHttpServlet.class.getName());
-  private final String authType;
+  private final AuthType authType;
   private final UserGroupInformation serviceUGI;
   private final UserGroupInformation httpUGI;
   private final HiveConf hiveConf;
@@ -111,10 +113,10 @@ public class ThriftHttpServlet extends TServlet {
 
   public ThriftHttpServlet(TProcessor processor, TProtocolFactory protocolFactory,
       String authType, UserGroupInformation serviceUGI, UserGroupInformation httpUGI,
-      HiveAuthFactory hiveAuthFactory, HiveConf hiveConf) {
+      HiveAuthFactory hiveAuthFactory, HiveConf hiveConf) throws Exception {
     super(processor, protocolFactory);
     this.hiveConf = hiveConf;
-    this.authType = authType;
+    this.authType = new AuthType(authType);
     this.serviceUGI = serviceUGI;
     this.httpUGI = httpUGI;
     this.hiveAuthFactory = hiveAuthFactory;
@@ -183,7 +185,7 @@ public class ThriftHttpServlet extends TServlet {
       if (clientUserName == null) {
         String proxyHeader = HiveConf.getVar(hiveConf, ConfVars.HIVE_SERVER2_TRUSTED_PROXY_TRUSTHEADER).trim();
         if (!proxyHeader.equals("") && request.getHeader(proxyHeader) != null) { //Trusted header is present, which means the user is already authenticated.
-          clientUserName = getUsername(request, authType);
+          clientUserName = getUsername(request);
         } else {
           String trustedDomain = HiveConf.getVar(hiveConf, ConfVars.HIVE_SERVER2_TRUSTED_DOMAIN).trim();
           final boolean useXff = HiveConf.getBoolVar(hiveConf, ConfVars.HIVE_SERVER2_TRUSTED_DOMAIN_USE_XFF_HEADER);
@@ -216,22 +218,22 @@ public class ThriftHttpServlet extends TServlet {
               } else {
                 clientUserName = doKerberosAuth(request);
               }
-            } else if (HiveSamlUtils.isSamlAuthMode(authType)) {
+            } else if (authType.isEnabled(HiveAuthConstants.AuthTypes.SAML)) {
               // check if this request needs a SAML redirect
               String authHeader = request.getHeader(HttpAuthUtils.AUTHORIZATION);
               if ((authHeader == null || authHeader.isEmpty()) && needsRedirect(request, response)) {
                 doSamlRedirect(request, response);
                 return;
               } else if(authHeader.toLowerCase().startsWith(HttpAuthUtils.BASIC.toLowerCase())) {
-                //LDAP Authentication if the header starts with Basic
-                clientUserName = doPasswdAuth(request, HiveAuthConstants.AuthTypes.NONE.toString());
+                // fall back to password based authentication if the header starts with Basic
+                clientUserName = doPasswdAuth(request, authType.getPasswordBasedAuthStr());
               } else {
                 // redirect is not needed. Do SAML auth.
                 clientUserName = doSamlAuth(request, response);
               }
             } else {
               // For password based authentication
-              clientUserName = doPasswdAuth(request, authType);
+              clientUserName = doPasswdAuth(request, authType.getPasswordBasedAuthStr());
             }
           }
         }
@@ -251,7 +253,7 @@ public class ThriftHttpServlet extends TServlet {
 
       // Generate new cookie and add it to the response
       if (requireNewCookie &&
-          !authType.toLowerCase().contains(HiveAuthConstants.AuthTypes.NOSASL.toString().toLowerCase())) {
+          !authType.isEnabled(HiveAuthConstants.AuthTypes.NOSASL)) {
         String cookieToken = HttpAuthUtils.createCookieToken(clientUserName);
         Cookie hs2Cookie = createCookie(signer.signCookie(cookieToken));
 
@@ -285,7 +287,7 @@ public class ThriftHttpServlet extends TServlet {
       } else {
         try {
           LOG.error("Login attempt is failed for user : " +
-              getUsername(request, authType) + ". Error Messsage :" + e.getMessage());
+              getUsername(request) + ". Error Messsage :" + e.getMessage());
         } catch (Exception ex) {
           // Ignore Exception
         }
@@ -512,15 +514,14 @@ public class ThriftHttpServlet extends TServlet {
    */
   private String doPasswdAuth(HttpServletRequest request, String authType)
       throws HttpAuthenticationException {
-    String userName = getUsername(request, authType);
+    String userName = getUsername(request);
     // No-op when authType is NOSASL
     if (!authType.toLowerCase().contains(HiveAuthConstants.AuthTypes.NOSASL.toString().toLowerCase())) {
       try {
         AuthMethods authMethod = AuthMethods.getValidAuthMethod(authType);
         PasswdAuthenticationProvider provider =
             AuthenticationProviderFactory.getAuthenticationProvider(authMethod, hiveConf);
-        provider.Authenticate(userName, getPassword(request, authType));
-
+        provider.Authenticate(userName, getPassword(request));
       } catch (Exception e) {
         throw new HttpAuthenticationException(e);
       }
@@ -553,7 +554,7 @@ public class ThriftHttpServlet extends TServlet {
       throws HttpAuthenticationException {
     // Each http request must have an Authorization header
     // Check before trying to do kerberos authentication twice
-    getAuthHeader(request, authType);
+    getAuthHeader(request);
 
     // Try authenticating with the HTTP/_HOST principal
     if (httpUGI != null) {
@@ -610,23 +611,20 @@ public class ThriftHttpServlet extends TServlet {
         // Create a GSS context
         gssContext = manager.createContext(serverCreds);
         // Get service ticket from the authorization header
-        String serviceTicketBase64 = getAuthHeader(request, authType);
-        byte[] inToken = Base64.decodeBase64(serviceTicketBase64.getBytes());
+        String serviceTicketBase64 = getAuthHeader(request);
+        byte[] inToken = Base64.getDecoder().decode(serviceTicketBase64);
         gssContext.acceptSecContext(inToken, 0, inToken.length);
         // Authenticate or deny based on its context completion
         if (!gssContext.isEstablished()) {
           throw new HttpAuthenticationException("Kerberos authentication failed: " +
               "unable to establish context with the service ticket " +
               "provided by the client.");
-        }
-        else {
+        } else {
           return getPrincipalWithoutRealmAndHost(gssContext.getSrcName().toString());
         }
-      }
-      catch (GSSException e) {
+      } catch (GSSException e) {
         throw new HttpAuthenticationException("Kerberos authentication failed: ", e);
-      }
-      finally {
+      } finally {
         if (gssContext != null) {
           try {
             gssContext.dispose();
@@ -666,9 +664,9 @@ public class ThriftHttpServlet extends TServlet {
     }
   }
 
-  private String getUsername(HttpServletRequest request, String authType)
+  private String getUsername(HttpServletRequest request)
       throws HttpAuthenticationException {
-    String creds[] = getAuthHeaderTokens(request, authType);
+    String creds[] = getAuthHeaderTokens(request);
     // Username must be present
     if (creds[0] == null || creds[0].isEmpty()) {
       throw new HttpAuthenticationException("Authorization header received " +
@@ -677,9 +675,9 @@ public class ThriftHttpServlet extends TServlet {
     return creds[0];
   }
 
-  private String getPassword(HttpServletRequest request, String authType)
+  private String getPassword(HttpServletRequest request)
       throws HttpAuthenticationException {
-    String creds[] = getAuthHeaderTokens(request, authType);
+    String[] creds = getAuthHeaderTokens(request);
     // Password must be present
     if (creds[1] == null || creds[1].isEmpty()) {
       throw new HttpAuthenticationException("Authorization header received " +
@@ -688,23 +686,19 @@ public class ThriftHttpServlet extends TServlet {
     return creds[1];
   }
 
-  private String[] getAuthHeaderTokens(HttpServletRequest request,
-      String authType) throws HttpAuthenticationException {
-    String authHeaderBase64 = getAuthHeader(request, authType);
-    String authHeaderString = StringUtils.newStringUtf8(
-        Base64.decodeBase64(authHeaderBase64.getBytes()));
-    String[] creds = authHeaderString.split(":");
-    return creds;
+  private String[] getAuthHeaderTokens(HttpServletRequest request) throws HttpAuthenticationException {
+    String authHeaderBase64Str = getAuthHeader(request);
+    String authHeaderString = new String(Base64.getDecoder().decode(authHeaderBase64Str), StandardCharsets.UTF_8);
+    return authHeaderString.split(":");
   }
 
   /**
    * Returns the base64 encoded auth header payload
    * @param request request to interrogate
-   * @param authType Either BASIC or NEGOTIATE
    * @return base64 encoded auth header payload
    * @throws HttpAuthenticationException exception if header is missing or empty
    */
-  private String getAuthHeader(HttpServletRequest request, String authType)
+  private String getAuthHeader(HttpServletRequest request)
       throws HttpAuthenticationException {
     String authHeader = request.getHeader(HttpAuthUtils.AUTHORIZATION);
     // Each http request must have an Authorization header
@@ -713,15 +707,13 @@ public class ThriftHttpServlet extends TServlet {
           "from the client is empty.");
     }
 
-    String authHeaderBase64String;
-    int beginIndex;
-    if (isKerberosAuthMode(authType)) {
-      beginIndex = (HttpAuthUtils.NEGOTIATE + " ").length();
-    }
-    else {
-      beginIndex = (HttpAuthUtils.BASIC + " ").length();
-    }
-    authHeaderBase64String = authHeader.substring(beginIndex);
+    LOG.debug("HTTP Auth Header [{}]", authHeader);
+
+    String[] parts = authHeader.split(" ");
+
+    // Assume the Base-64 string is always the last thing in the header
+    String authHeaderBase64String = parts[parts.length - 1];
+
     // Authorization header must have a payload
     if (authHeaderBase64String.isEmpty()) {
       throw new HttpAuthenticationException("Authorization header received " +
@@ -730,8 +722,8 @@ public class ThriftHttpServlet extends TServlet {
     return authHeaderBase64String;
   }
 
-  private boolean isKerberosAuthMode(String authType) {
-    return authType.equalsIgnoreCase(HiveAuthConstants.AuthTypes.KERBEROS.toString());
+  private boolean isKerberosAuthMode(AuthType authType) {
+    return authType.isEnabled(HiveAuthConstants.AuthTypes.KERBEROS);
   }
 
   private static String getDoAsQueryParam(String queryString) {
