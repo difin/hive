@@ -8790,6 +8790,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     }
 
     @Override
+    public void mark_refused(CompactionInfoStruct cr) throws MetaException {
+      getTxnHandler().markRefused(CompactionInfo.compactionStructToInfo(cr));
+    }
+
+    @Override
     public List<String> find_columns_with_stats(CompactionInfoStruct cr) throws MetaException {
       return getTxnHandler().findColumnsWithStats(CompactionInfo.compactionStructToInfo(cr));
     }

@@ -1151,6 +1151,11 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
+    public void mark_refused(CompactionInfoStruct cr) throws MetaException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public void set_hadoop_jobid(String jobId, long cq_id) throws TException {
         throw new UnsupportedOperationException("this method is not supported");
     }

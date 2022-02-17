@@ -226,14 +226,14 @@ public class Initiator extends MetaStoreCompactorThread {
       ValidWriteIdList validWriteIds = resolveValidWriteIds(t);
       CompactionType type = checkForCompaction(ci, validWriteIds, sd, t.getParameters(), runAs);
       if (type != null) {
-        requestCompaction(ci, runAs, type);
+        ci.type = type;
+        requestCompaction(ci, runAs);
       }
     } catch (Throwable ex) {
       String errorMessage = "Caught exception while trying to determine if we should compact " + ci + ". Marking "
           + "failed to avoid repeated failures, " + ex;
       LOG.error(errorMessage);
       ci.errorMessage = errorMessage;
-      ci.errorMessage = ex.getMessage();
       txnHandler.markFailed(ci);
     }
   }
@@ -480,7 +480,9 @@ public class Initiator extends MetaStoreCompactorThread {
     // If there's no base file, do a major compaction
     LOG.debug("Found " + deltas.size() + " delta files, and " + (noBase ? "no" : "has") + " base," +
         "requesting " + (noBase ? "major" : "minor") + " compaction");
-    return noBase ? CompactionType.MAJOR : CompactionType.MINOR;
+
+    return noBase || !isMinorCompactionSupported(tblproperties, dir) ?
+            CompactionType.MAJOR : CompactionType.MINOR;
   }
 
   private long sumDirSize(FileSystem fs, ParsedDirectory dir) throws IOException {
@@ -491,8 +493,8 @@ public class Initiator extends MetaStoreCompactorThread {
     return size;
   }
 
-  private void requestCompaction(CompactionInfo ci, String runAs, CompactionType type) throws MetaException {
-    CompactionRequest rqst = new CompactionRequest(ci.dbname, ci.tableName, type);
+  private void requestCompaction(CompactionInfo ci, String runAs) throws MetaException {
+    CompactionRequest rqst = new CompactionRequest(ci.dbname, ci.tableName, ci.type);
     if (ci.partName != null) rqst.setPartitionname(ci.partName);
     rqst.setRunas(runAs);
     rqst.setInitiatorId(getInitiatorId(Thread.currentThread().getId()));

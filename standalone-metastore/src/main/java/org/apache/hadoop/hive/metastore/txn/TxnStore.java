@@ -56,6 +56,7 @@ public interface TxnStore extends Configurable {
   String FAILED_RESPONSE = "failed";
   String SUCCEEDED_RESPONSE = "succeeded";
   String DID_NOT_INITIATE_RESPONSE = "did not initiate";
+  String REFUSED_RESPONSE = "refused";
 
   String[] COMPACTION_STATES = new String[] {INITIATED_RESPONSE, WORKING_RESPONSE, CLEANING_RESPONSE, FAILED_RESPONSE,
       SUCCEEDED_RESPONSE, DID_NOT_INITIATE_RESPONSE };
@@ -450,6 +451,14 @@ public interface TxnStore extends Configurable {
    */
   @RetrySemantics.CannotRetry
   void markFailed(CompactionInfo info) throws MetaException;
+
+  /**
+   * Mark a compaction as refused (to run). This can happen if a manual compaction is requested by the user,
+   * but for some reason, the table is not suitable for compation.
+   * @param info compaction job.
+   * @throws MetaException
+   */
+  void markRefused(CompactionInfo info) throws MetaException;
 
   /**
    * Stores the value of {@link CompactionInfo#retryRetention} and {@link CompactionInfo#errorMessage} fields

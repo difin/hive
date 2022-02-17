@@ -311,7 +311,7 @@ class CompactionTxnHandler extends TxnHandler {
   public List<CompactionInfo> findReadyToClean(long minOpenTxnWaterMark, long retentionTime) throws MetaException {
     try {
       List<CompactionInfo> rc = new ArrayList<>();
-      
+
       try (Connection dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
            Statement stmt = dbConn.createStatement()) {
         /*
@@ -328,14 +328,14 @@ class CompactionTxnHandler extends TxnHandler {
           "  FROM \"COMPACTION_QUEUE\" \"cq1\" " +
           "INNER JOIN (" +
           "  SELECT MIN(\"CQ_HIGHEST_WRITE_ID\") \"WRITE_ID\", \"CQ_DATABASE\", \"CQ_TABLE\", \"CQ_PARTITION\"" +
-          "  FROM \"COMPACTION_QUEUE\"" 
-          + whereClause + 
+          "  FROM \"COMPACTION_QUEUE\""
+          + whereClause +
           "  GROUP BY \"CQ_DATABASE\", \"CQ_TABLE\", \"CQ_PARTITION\") \"cq2\" " +
           "ON \"cq1\".\"CQ_DATABASE\" = \"cq2\".\"CQ_DATABASE\""+
           "  AND \"cq1\".\"CQ_TABLE\" = \"cq2\".\"CQ_TABLE\""+
           "  AND (\"cq1\".\"CQ_PARTITION\" = \"cq2\".\"CQ_PARTITION\"" +
           "    OR \"cq1\".\"CQ_PARTITION\" IS NULL AND \"cq2\".\"CQ_PARTITION\" IS NULL)"
-          + whereClause + 
+          + whereClause +
           "  AND \"CQ_HIGHEST_WRITE_ID\" = \"WRITE_ID\"" +
           "  ORDER BY \"CQ_ID\"";
         LOG.debug("Going to execute query <" + s + ">");
@@ -364,7 +364,7 @@ class CompactionTxnHandler extends TxnHandler {
         checkRetryable(e, "findReadyToClean");
         throw new MetaException("Unable to connect to transaction database " +
           StringUtils.stringifyException(e));
-      } 
+      }
     } catch (RetryException e) {
       return findReadyToClean(minOpenTxnWaterMark, retentionTime);
     }
@@ -1176,15 +1176,9 @@ class CompactionTxnHandler extends TxnHandler {
       return checkFailedCompactions(ci);
     }
   }
-  /**
-   * If there is an entry in compaction_queue with ci.id, remove it
-   * Make entry in completed_compactions with status 'f'.
-   * If there is no entry in compaction_queue, it means Initiator failed to even schedule a compaction,
-   * which we record as DID_NOT_INITIATE entry in history.
-   */
-  @Override
-  @RetrySemantics.CannotRetry
-  public void markFailed(CompactionInfo ci) throws MetaException {//todo: this should not throw
+
+
+  private void updateStatus(CompactionInfo ci) throws MetaException { //todo: this should not throw
     if (LOG.isDebugEnabled()) {
 	  LOG.debug("Marking as failed: CompactionInfo: " + ci.toString());
 	}
@@ -1193,9 +1187,6 @@ class CompactionTxnHandler extends TxnHandler {
       Statement stmt = null;
       PreparedStatement pStmt = null;
       ResultSet rs = null;
-      // the error message related to the failure is wrapped inside CompactionInfo
-      // fetch this info, since ci will be reused in subsequent queries
-      String errorMessage = ci.errorMessage;
       try {
         dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
         stmt = dbConn.createStatement();
@@ -1207,12 +1198,18 @@ class CompactionTxnHandler extends TxnHandler {
         pStmt.setLong(1, ci.id);
         rs = pStmt.executeQuery();
         if (rs.next()) {
+          //preserve errorMessage and state
+          String errorMessage = ci.errorMessage;
+          char state = ci.state;
           ci = CompactionInfo.loadFullFromCompactionQueue(rs);
+          ci.errorMessage = errorMessage;
+          ci.state = state;
+
           String s = "DELETE FROM \"COMPACTION_QUEUE\" WHERE \"CQ_ID\" = ?";
           pStmt = dbConn.prepareStatement(s);
           pStmt.setLong(1, ci.id);
           LOG.debug("Going to execute update <" + s + ">");
-          int updCnt = pStmt.executeUpdate();
+          pStmt.executeUpdate();
         }
         else {
           if(ci.id > 0) {
@@ -1224,9 +1221,6 @@ class CompactionTxnHandler extends TxnHandler {
           //The failure occurred before we even made an entry in COMPACTION_QUEUE
           //generate ID so that we can make an entry in COMPLETED_COMPACTIONS
           ci.id = generateCompactionQueueId(stmt);
-          //mostly this indicates that the Initiator is paying attention to some table even though
-          //compactions are not happening.
-          ci.state = DID_NOT_INITIATE;
           //this is not strictly accurate, but 'type' cannot be null.
           if(ci.type == null) {
             ci.type = CompactionType.MINOR;
@@ -1234,21 +1228,16 @@ class CompactionTxnHandler extends TxnHandler {
           ci.start = getDbTime(dbConn);
           LOG.debug("The failure occurred before we even made an entry in COMPACTION_QUEUE. Generated ID so that we "
             + "can make an entry in COMPLETED_COMPACTIONS. New Id: " + ci.id);
-        } else {
-          ci.state = FAILED_STATE;
         }
         close(rs, stmt, null);
         closeStmt(pStmt);
 
         pStmt = dbConn.prepareStatement("INSERT INTO \"COMPLETED_COMPACTIONS\" "
-            + "(\"CC_ID\", \"CC_DATABASE\", \"CC_TABLE\", \"CC_PARTITION\", \"CC_STATE\", \"CC_TYPE\", "
-            + "\"CC_TBLPROPERTIES\", \"CC_WORKER_ID\", \"CC_START\", \"CC_END\", \"CC_RUN_AS\", "
-            + "\"CC_HIGHEST_WRITE_ID\", \"CC_META_INFO\", \"CC_HADOOP_JOB_ID\", \"CC_ERROR_MESSAGE\", "
-            + "\"CC_ENQUEUE_TIME\", \"CC_WORKER_VERSION\", \"CC_INITIATOR_ID\", \"CC_INITIATOR_VERSION\") "
-            + "VALUES(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?,?,?,?,?)");
-        if (errorMessage != null) {
-          ci.errorMessage = errorMessage;
-        }
+                + "(\"CC_ID\", \"CC_DATABASE\", \"CC_TABLE\", \"CC_PARTITION\", \"CC_STATE\", \"CC_TYPE\", "
+                + "\"CC_TBLPROPERTIES\", \"CC_WORKER_ID\", \"CC_START\", \"CC_END\", \"CC_RUN_AS\", "
+                + "\"CC_HIGHEST_WRITE_ID\", \"CC_META_INFO\", \"CC_HADOOP_JOB_ID\", \"CC_ERROR_MESSAGE\", "
+                + "\"CC_ENQUEUE_TIME\", \"CC_WORKER_VERSION\", \"CC_INITIATOR_ID\", \"CC_INITIATOR_VERSION\") "
+                + "VALUES(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?,?,?,?,?)");
         CompactionInfo.insertIntoCompletedCompactions(pStmt, ci, getDbTime(dbConn));
         int updCount = pStmt.executeUpdate();
         LOG.debug("Inserted " + updCount + " entries into COMPLETED_COMPACTIONS");
@@ -1266,9 +1255,35 @@ class CompactionTxnHandler extends TxnHandler {
         close(null, pStmt, dbConn);
       }
     } catch (RetryException e) {
-      markFailed(ci);
+      updateStatus(ci);
     }
   }
+
+  /**
+   * If there is an entry in compaction_queue with ci.id, remove it
+   * Make entry in completed_compactions with status 'f'.
+   * If there is no entry in compaction_queue, it means Initiator failed to even schedule a compaction,
+   * which we record as DID_NOT_INITIATE entry in history.
+   */
+  @Override
+  @RetrySemantics.CannotRetry
+  public void markFailed(CompactionInfo ci) throws MetaException {
+    ci.state = ci.id == 0 ? DID_NOT_INITIATE : FAILED_STATE;
+    updateStatus(ci);
+  }
+
+  /**
+   * Mark a compaction as refused (to run).
+   * @param info compaction job.
+   * @throws MetaException
+   */
+  @Override
+  @RetrySemantics.CannotRetry
+  public void markRefused(CompactionInfo info) throws MetaException {
+    info.state = REFUSED_STATE;
+    updateStatus(info);
+  }
+
   @Override
   @RetrySemantics.Idempotent
   public void setHadoopJobId(String hadoopJobId, long id) {

@@ -474,7 +474,18 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
         compactionTxn.wasSuccessful();
         return false;
       }
-
+      if (!ci.isMajorCompaction() && !isMinorCompactionSupported(t.getParameters(), dir)) {
+        ci.errorMessage = String.format("Query based Minor compaction is not possible for full acid tables having raw " +
+                "format (non-acid) data in them. Compaction type: %s, Partition: %s, Compaction id: %d",
+                ci.type.toString(), ci.getFullPartitionName(), ci.id);
+        LOG.error(ci.errorMessage);
+        try {
+          msc.markRefused(CompactionInfo.compactionInfoToStruct(ci));
+        } catch (Throwable tr) {
+          LOG.error("Caught an exception while trying to mark compaction {} as failed: {}", ci, tr);
+        }
+        return false;
+      }
       checkInterrupt();
 
       try {
@@ -509,7 +520,7 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
         LOG.error("Caught exception while trying to compact " + ci +
             ". Marking failed to avoid repeated failures", e);
         final CompactionType ctype = ci.type;
-        markFailed(ci, e);
+        markFailed(ci, e.getMessage());
 
         if (runJobAsSelf(ci.runAs)) {
           cleanupResultDirs(sd, tblValidWriteIds, ctype, dir);
@@ -531,7 +542,7 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
       }
     } catch (TException | IOException t) {
       LOG.error("Caught an exception in the main loop of compactor worker " + workerName, t);
-      markFailed(ci, t);
+      markFailed(ci, t.getMessage());
       if (msc != null) {
         msc.close();
         msc = null;
@@ -630,9 +641,9 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
     return new CompactorMR();
   }
 
-  private void markFailed(CompactionInfo ci, Throwable e) {
-    if (ci != null) {
-      ci.errorMessage = e.getMessage();
+  private void markFailed(CompactionInfo ci, String errorMessage) {
+    if (ci != null && org.apache.commons.lang3.StringUtils.isNotBlank(errorMessage)) {
+      ci.errorMessage = errorMessage;
     }
     if (msc == null) {
       LOG.warn("Metastore client was null. Could not mark failed: {}", ci);

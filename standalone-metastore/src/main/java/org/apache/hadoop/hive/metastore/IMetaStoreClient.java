@@ -4100,6 +4100,14 @@ public interface IMetaStoreClient {
   void markFailed(CompactionInfoStruct cr) throws MetaException, TException;
 
   /**
+   * Mark a compaction as refused (to run).
+   * @param cr compaction job.
+   * @throws MetaException
+   * @throws TException
+   */
+  void markRefused(CompactionInfoStruct cr) throws MetaException, TException;
+
+  /**
    * Set the hadoop id for a compaction.
    * @param jobId mapreduce job id that will do the compaction.
    * @param cqId compaction id.

@@ -3781,7 +3781,7 @@ public class HiveMetaStoreClientPreCatalog implements IMetaStoreClient, AutoClos
     throws TException {
     throw new UnsupportedOperationException();
   }
-  
+
   @Override
   @Deprecated
   public OptionalCompactionInfoStruct findNextCompact(String workerId) throws MetaException, TException {
@@ -3816,6 +3816,11 @@ public class HiveMetaStoreClientPreCatalog implements IMetaStoreClient, AutoClos
   @Override
   public void markFailed(CompactionInfoStruct cr) throws MetaException, TException {
     client.mark_failed(cr);
+  }
+
+  @Override
+  public void markRefused(CompactionInfoStruct cr) throws MetaException, TException {
+    client.mark_refused(cr);
   }
 
   @Override

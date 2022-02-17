@@ -4634,6 +4634,11 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   }
 
   @Override
+  public void markRefused(CompactionInfoStruct cr) throws MetaException, TException {
+    client.mark_refused(cr);
+  }
+
+  @Override
   public void setHadoopJobid(String jobId, long cqId) throws MetaException, TException {
     client.set_hadoop_jobid(jobId, cqId);
   }

@@ -968,6 +968,11 @@ class ThriftHiveMetastoreHandler : virtual public ThriftHiveMetastoreIf {
     printf("mark_failed\n");
   }
 
+  void mark_refused(const CompactionInfoStruct& cr) {
+    // Your implementation goes here
+    printf("mark_refused\n");
+  }
+
   void set_hadoop_jobid(const std::string& jobId, const int64_t cq_id) {
     // Your implementation goes here
     printf("set_hadoop_jobid\n");

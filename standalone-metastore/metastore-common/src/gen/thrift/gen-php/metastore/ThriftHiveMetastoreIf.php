@@ -1447,6 +1447,11 @@ interface ThriftHiveMetastoreIf extends \FacebookServiceIf
      */
     public function mark_failed(\metastore\CompactionInfoStruct $cr);
     /**
+     * @param \metastore\CompactionInfoStruct $cr
+     * @throws \metastore\MetaException
+     */
+    public function mark_refused(\metastore\CompactionInfoStruct $cr);
+    /**
      * @param string $jobId
      * @param int $cq_id
      */
