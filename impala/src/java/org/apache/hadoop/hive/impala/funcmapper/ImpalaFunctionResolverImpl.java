@@ -159,8 +159,8 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     SqlOperator opToUse = op;
     if (opToUse == null) {
       CalciteUDFInfo udfInfo = CalciteUDFInfo.createUDFInfo(func, argTypes, returnDataType);
-      boolean deterministic =
-          helper.isConsistentWithinQuery(new ImpalaFunctionInfo(candidate.getFunc()));
+      ScalarFunctionDetails s = ScalarFunctionDetails.get(candidate);
+      boolean deterministic = (s != null && !s.isStateful());
       opToUse = new HiveSqlFunction(func, SqlKind.OTHER_FUNCTION, udfInfo.returnTypeInference,
           udfInfo.operandTypeInference, udfInfo.operandTypeChecker,
           SqlFunctionCategory.USER_DEFINED_FUNCTION, deterministic, false);

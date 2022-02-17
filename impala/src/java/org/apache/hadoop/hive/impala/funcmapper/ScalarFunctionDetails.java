@@ -108,6 +108,13 @@ public class ScalarFunctionDetails implements FunctionDetails {
 
   public final ImpalaFunctionSignature ifs;
 
+  // The isStateful boolean describes whether the function may change its output across
+  // calls within the same query. For instance, the now() function will return different
+  // values for each call. This is necessary to track because constant folding is not
+  // allowed on these functions. Also, since we do not know what kind of code a user
+  // created UDF will contain, we will default the flag to be turned on for these functions.
+  public final boolean isStateful;
+
   // Set of all scalar functions available in Impala
   // This contains just the builtins.
   private static final Set<String> SCALAR_BUILTINS = new HashSet<>();
@@ -145,7 +152,7 @@ public class ScalarFunctionDetails implements FunctionDetails {
         // names mapping to the same Impala function. For instance, both "or" and "||" map to
         // Impala's "or".
         for (String fnName : getFunctionNames(func.functionName())) {
-          ScalarFunctionWrapper funcWrapper = new ScalarFunctionWrapperImpl(func);
+          ScalarFunctionWrapper funcWrapper = new ScalarFunctionWrapperImpl(func, false);
           ScalarFunctionDetails sfd = new ScalarFunctionDetails(fnName, funcWrapper);
           result.add(sfd);
         }
@@ -197,7 +204,7 @@ public class ScalarFunctionDetails implements FunctionDetails {
       String fullFunctionName = func.getFunctionName().toString();
       LOG.info("Registering function " + fullFunctionName);
       fullFunctionName = fullFunctionName.toLowerCase();
-      ScalarFunctionWrapper funcWrapper = new ScalarFunctionWrapperImpl(func);
+      ScalarFunctionWrapper funcWrapper = new ScalarFunctionWrapperImpl(func, true);
       ScalarFunctionDetails sfd = new ScalarFunctionDetails(fullFunctionName, funcWrapper);
       allFuncsMap.put(sfd.ifs, sfd);
       allFuncs.add(fullFunctionName);
@@ -255,6 +262,11 @@ public class ScalarFunctionDetails implements FunctionDetails {
 
     this.ifs = ImpalaFunctionSignature.create(fnName.toLowerCase(), getArgTypes(),
         getRetType(), hasVarArgs, retTypeAlwaysNullable);
+
+    // All functions defined by the user are considered to be stateful and avoid constant
+    // folding for safety purposes.
+    this.isStateful = func.isUDF() ||
+        FunctionDetailStatics.STATEFUL_FUNCS.contains(fnName.toLowerCase());
   }
 
   public List<Type> getArgTypes() {
@@ -268,6 +280,10 @@ public class ScalarFunctionDetails implements FunctionDetails {
   @Override
   public ImpalaFunctionSignature getSignature() {
     return ifs;
+  }
+
+  public boolean isStateful() {
+    return isStateful;
   }
 
   private boolean isSupportedCast(Type toCast, Type fromCast) {
@@ -314,11 +330,13 @@ public class ScalarFunctionDetails implements FunctionDetails {
     return ALL_SCALARS_FUNCS.contains(name.toLowerCase());
   }
 
-  public static class ScalarFunctionWrapperImpl implements ScalarFunctionWrapper {
+  private static class ScalarFunctionWrapperImpl implements ScalarFunctionWrapper {
     private final ScalarFunction func;
+    private final boolean isUDF;
 
-    public ScalarFunctionWrapperImpl(Function func) {
+    public ScalarFunctionWrapperImpl(Function func, boolean isUDF) {
       this.func = (ScalarFunction) func;
+      this.isUDF = isUDF;
     }
 
     public String dbName() {
@@ -363,6 +381,10 @@ public class ScalarFunctionDetails implements FunctionDetails {
 
     public HdfsUri getLocation() {
       return func.getLocation();
+    }
+
+    public boolean isUDF() {
+      return isUDF;
     }
   }
 }

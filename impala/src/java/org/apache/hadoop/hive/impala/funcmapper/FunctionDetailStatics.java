@@ -140,4 +140,13 @@ public class FunctionDetailStatics {
       .add("or")
       .add("and")
       .build();
+
+  // Set of stateful funcs used to avoid constant folding while optimizing.
+  public static Set<String> STATEFUL_FUNCS =
+      ImmutableSet.<String> builder()
+      .add("rand")
+      .add("random")
+      .add("uuid")
+      .add("sleep")
+      .build();
 }

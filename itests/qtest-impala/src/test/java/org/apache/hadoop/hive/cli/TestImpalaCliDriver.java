@@ -238,6 +238,10 @@ public class TestImpalaCliDriver {
     public HdfsUri getLocation() {
       return hdfsUri;
     }
+
+    public boolean isUDF() {
+      return false;
+    }
   }
 
   static class TestAggNonImpalaFunction implements AggFunctionWrapper {

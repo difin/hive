@@ -51,5 +51,7 @@ public interface ScalarFunctionWrapper {
   public TFunctionBinaryType getBinaryType();
 
   public HdfsUri getLocation();
+
+  public boolean isUDF();
 }
 
