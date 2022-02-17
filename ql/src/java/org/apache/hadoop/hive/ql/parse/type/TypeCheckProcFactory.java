@@ -1053,6 +1053,10 @@ public class TypeCheckProcFactory<T> {
             fi = exprFactory.getFunctionInfo("not");
             expr = exprFactory.createFuncCallExpr(node.getTypeInfo(), fi, "not", Lists.newArrayList(expr));
           }
+        } else if (ctx.isFoldExpr() && exprFactory.convertCASEIntoIFFuncCallExpr(fi, children)) {
+          // Rewrite CASE(C,A,B) into IF(C,A,B)
+          fi = exprFactory.getFunctionInfo("if");
+          expr = exprFactory.createFuncCallExpr(node.getTypeInfo(), fi, "if", children);
         } else {
           TypeInfo t = (node.getTypeInfo() != null) ? node.getTypeInfo() : typeInfo;
           expr = exprFactory.createFuncCallExpr(t, fi, funcText, children);

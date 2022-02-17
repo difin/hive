@@ -38,8 +38,8 @@ POSTHOOK: Output: database:default
 POSTHOOK: Output: default@mv_1
 POSTHOOK: Lineage: mv_1._c1 EXPRESSION [(sketch_input)sketch_input.FieldSchema(name:id, type:int, comment:null), ]
 POSTHOOK: Lineage: mv_1.category SIMPLE [(sketch_input)sketch_input.FieldSchema(name:category, type:char(1), comment:null), ]
-WARNING: Comparing a bigint and a double may result in a loss of precision.
-Warning: Shuffle Join MERGEJOIN[16][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
+WARNING: Comparing bigint and double may result in loss of information.
+Warning: Shuffle Join MERGEJOIN[17][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: explain
 select 'rewrite; mv matching', id, ntile(4) over (order by id) from sketch_input order by id
 PREHOOK: type: QUERY
@@ -63,7 +63,7 @@ STAGE PLANS:
       Edges:
         Reducer 2 <- Map 1 (XPROD_EDGE), Reducer 5 (XPROD_EDGE)
         Reducer 3 <- Reducer 2 (SIMPLE_EDGE)
-        Reducer 5 <- Map 4 (CUSTOM_SIMPLE_EDGE)
+        Reducer 5 <- Map 4 (SIMPLE_EDGE)
 #### A masked pattern was here ####
       Vertices:
         Map 1 
@@ -72,7 +72,7 @@ STAGE PLANS:
                   alias: sketch_input
                   Statistics: Num rows: 22 Data size: 88 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
-                    expressions: id (type: int), COALESCE(UDFToFloat(id),3.402823E38) (type: float)
+                    expressions: id (type: int), UDFToFloat(COALESCE(UDFToFloat(id),3.4028234663852886E38D)) (type: float)
                     outputColumnNames: _col0, _col1
                     Statistics: Num rows: 22 Data size: 176 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
@@ -89,19 +89,22 @@ STAGE PLANS:
                   Statistics: Num rows: 2 Data size: 240 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: _c1 (type: binary)
-                    outputColumnNames: _c1
+                    outputColumnNames: _col0
                     Statistics: Num rows: 2 Data size: 240 Basic stats: COMPLETE Column stats: COMPLETE
                     Group By Operator
-                      aggregations: ds_kll_union(_c1)
+                      aggregations: ds_kll_union(_col0)
+                      keys: true (type: boolean)
                       minReductionHashAggr: 0.5
                       mode: hash
-                      outputColumnNames: _col0
-                      Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
+                      outputColumnNames: _col0, _col1
+                      Statistics: Num rows: 1 Data size: 148 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
-                        null sort order: 
-                        sort order: 
-                        Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
-                        value expressions: _col0 (type: binary)
+                        key expressions: _col0 (type: boolean)
+                        null sort order: z
+                        sort order: +
+                        Map-reduce partition columns: _col0 (type: boolean)
+                        Statistics: Num rows: 1 Data size: 148 Basic stats: COMPLETE Column stats: COMPLETE
+                        value expressions: _col1 (type: binary)
             Execution mode: llap
             LLAP IO: all inputs
         Reducer 2 
@@ -116,7 +119,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2
                 Statistics: Num rows: 22 Data size: 3344 Basic stats: COMPLETE Column stats: COMPLETE
                 Select Operator
-                  expressions: _col0 (type: int), UDFToInteger(CASE WHEN ((ceil((ds_kll_rank(_col2, _col1) * 4.0D)) < 1.0D)) THEN (1.0D) ELSE (ceil((ds_kll_rank(_col2, _col1) * 4.0D))) END) (type: int)
+                  expressions: _col0 (type: int), UDFToInteger(if((ceil((ds_kll_rank(_col2, _col1) * 4)) < 1.0D), 1.0D, ceil((ds_kll_rank(_col2, _col1) * 4)))) (type: int)
                   outputColumnNames: _col0, _col1
                   Statistics: Num rows: 22 Data size: 176 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
@@ -144,14 +147,19 @@ STAGE PLANS:
             Reduce Operator Tree:
               Group By Operator
                 aggregations: ds_kll_union(VALUE._col0)
+                keys: KEY._col0 (type: boolean)
                 mode: mergepartial
-                outputColumnNames: _col0
-                Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
-                Reduce Output Operator
-                  null sort order: 
-                  sort order: 
+                outputColumnNames: _col0, _col1
+                Statistics: Num rows: 1 Data size: 148 Basic stats: COMPLETE Column stats: COMPLETE
+                Select Operator
+                  expressions: _col1 (type: binary)
+                  outputColumnNames: _col0
                   Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
-                  value expressions: _col0 (type: binary)
+                  Reduce Output Operator
+                    null sort order: 
+                    sort order: 
+                    Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
+                    value expressions: _col0 (type: binary)
 
   Stage: Stage-0
     Fetch Operator
@@ -159,8 +167,8 @@ STAGE PLANS:
       Processor Tree:
         ListSink
 
-WARNING: Comparing a bigint and a double may result in a loss of precision.
-Warning: Shuffle Join MERGEJOIN[16][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
+WARNING: Comparing bigint and double may result in loss of information.
+Warning: Shuffle Join MERGEJOIN[17][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: select 'rewrite; mv matching', id, ntile(4) over (order by id) from sketch_input order by id
 PREHOOK: type: QUERY
 PREHOOK: Input: default@mv_1
@@ -235,7 +243,7 @@ STAGE PLANS:
               Select Operator
                 expressions: KEY.reducesinkkey1 (type: int)
                 outputColumnNames: _col0
-                Statistics: Num rows: 22 Data size: 6072 Basic stats: COMPLETE Column stats: COMPLETE
+                Statistics: Num rows: 22 Data size: 88 Basic stats: COMPLETE Column stats: COMPLETE
                 PTF Operator
                   Function definitions:
                       Input definition
@@ -256,7 +264,7 @@ STAGE PLANS:
                               window function: GenericUDAFNTileEvaluator
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isPivotResult: true
-                  Statistics: Num rows: 22 Data size: 6072 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 22 Data size: 88 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: _col0 (type: int), ntile_window_0 (type: int)
                     outputColumnNames: _col0, _col1
@@ -332,7 +340,7 @@ POSTHOOK: Input: _dummy_database@_dummy_table
 POSTHOOK: Output: default@sketch_input
 POSTHOOK: Lineage: sketch_input.category SCRIPT []
 POSTHOOK: Lineage: sketch_input.id SCRIPT []
-WARNING: Comparing a bigint and a double may result in a loss of precision.
+WARNING: Comparing bigint and double may result in loss of information.
 Warning: Shuffle Join MERGEJOIN[17][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: explain
 select 'rewrite; no mv matching', id, ntile(4) over (order by id) from sketch_input order by id
@@ -355,7 +363,7 @@ STAGE PLANS:
       Edges:
         Reducer 2 <- Map 1 (XPROD_EDGE), Reducer 4 (XPROD_EDGE)
         Reducer 3 <- Reducer 2 (SIMPLE_EDGE)
-        Reducer 4 <- Map 1 (CUSTOM_SIMPLE_EDGE)
+        Reducer 4 <- Map 1 (SIMPLE_EDGE)
 #### A masked pattern was here ####
       Vertices:
         Map 1 
@@ -364,7 +372,7 @@ STAGE PLANS:
                   alias: sketch_input
                   Statistics: Num rows: 44 Data size: 176 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
-                    expressions: id (type: int), COALESCE(UDFToFloat(id),3.402823E38) (type: float)
+                    expressions: id (type: int), UDFToFloat(COALESCE(UDFToFloat(id),3.4028234663852886E38D)) (type: float)
                     outputColumnNames: _col0, _col1
                     Statistics: Num rows: 44 Data size: 352 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
@@ -374,20 +382,23 @@ STAGE PLANS:
                       value expressions: _col0 (type: int), _col1 (type: float)
                   Select Operator
                     expressions: UDFToFloat(id) (type: float)
-                    outputColumnNames: _col0
+                    outputColumnNames: _col1
                     Statistics: Num rows: 44 Data size: 176 Basic stats: COMPLETE Column stats: COMPLETE
                     Group By Operator
-                      aggregations: ds_kll_sketch(_col0)
+                      aggregations: ds_kll_sketch(_col1)
+                      keys: true (type: boolean)
                       minReductionHashAggr: 0.97727275
                       mode: hash
-                      outputColumnNames: _col0
-                      Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
+                      outputColumnNames: _col0, _col1
+                      Statistics: Num rows: 1 Data size: 148 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
-                        null sort order: 
-                        sort order: 
-                        Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
-                        value expressions: _col0 (type: binary)
-            Execution mode: vectorized, llap
+                        key expressions: _col0 (type: boolean)
+                        null sort order: z
+                        sort order: +
+                        Map-reduce partition columns: _col0 (type: boolean)
+                        Statistics: Num rows: 1 Data size: 148 Basic stats: COMPLETE Column stats: COMPLETE
+                        value expressions: _col1 (type: binary)
+            Execution mode: llap
             LLAP IO: may be used (ACID table)
         Reducer 2 
             Execution mode: llap
@@ -401,7 +412,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2
                 Statistics: Num rows: 44 Data size: 6688 Basic stats: COMPLETE Column stats: COMPLETE
                 Select Operator
-                  expressions: _col0 (type: int), UDFToInteger(CASE WHEN ((ceil((ds_kll_rank(_col2, _col1) * 4.0D)) < 1.0D)) THEN (1.0D) ELSE (ceil((ds_kll_rank(_col2, _col1) * 4.0D))) END) (type: int)
+                  expressions: _col0 (type: int), UDFToInteger(if((ceil((ds_kll_rank(_col2, _col1) * 4)) < 1.0D), 1.0D, ceil((ds_kll_rank(_col2, _col1) * 4)))) (type: int)
                   outputColumnNames: _col0, _col1
                   Statistics: Num rows: 44 Data size: 352 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
@@ -425,18 +436,23 @@ STAGE PLANS:
                       output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
                       serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
         Reducer 4 
-            Execution mode: vectorized, llap
+            Execution mode: llap
             Reduce Operator Tree:
               Group By Operator
                 aggregations: ds_kll_sketch(VALUE._col0)
+                keys: KEY._col0 (type: boolean)
                 mode: mergepartial
-                outputColumnNames: _col0
-                Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
-                Reduce Output Operator
-                  null sort order: 
-                  sort order: 
+                outputColumnNames: _col0, _col1
+                Statistics: Num rows: 1 Data size: 148 Basic stats: COMPLETE Column stats: COMPLETE
+                Select Operator
+                  expressions: _col1 (type: binary)
+                  outputColumnNames: _col0
                   Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
-                  value expressions: _col0 (type: binary)
+                  Reduce Output Operator
+                    null sort order: 
+                    sort order: 
+                    Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
+                    value expressions: _col0 (type: binary)
 
   Stage: Stage-0
     Fetch Operator
@@ -444,7 +460,7 @@ STAGE PLANS:
       Processor Tree:
         ListSink
 
-WARNING: Comparing a bigint and a double may result in a loss of precision.
+WARNING: Comparing bigint and double may result in loss of information.
 Warning: Shuffle Join MERGEJOIN[17][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: select 'rewrite; no mv matching', id, ntile(4) over (order by id) from sketch_input order by id
 PREHOOK: type: QUERY
@@ -555,7 +571,7 @@ STAGE PLANS:
                           Map-reduce partition columns: _col0 (type: char(1))
                           Statistics: Num rows: 2 Data size: 458 Basic stats: COMPLETE Column stats: COMPLETE
                           value expressions: _col1 (type: binary)
-            Execution mode: vectorized, llap
+            Execution mode: llap
             LLAP IO: may be used (ACID table)
         Map 6 
             Map Operator Tree:
@@ -697,8 +713,8 @@ POSTHOOK: Input: default@sketch_input
 POSTHOOK: Output: default@mv_1
 POSTHOOK: Lineage: mv_1._c1 EXPRESSION [(sketch_input)sketch_input.FieldSchema(name:id, type:int, comment:null), (mv_1)default.mv_1.FieldSchema(name:_c1, type:binary, comment:null), ]
 POSTHOOK: Lineage: mv_1.category EXPRESSION [(sketch_input)sketch_input.FieldSchema(name:category, type:char(1), comment:null), (mv_1)default.mv_1.FieldSchema(name:category, type:char(1), comment:null), ]
-WARNING: Comparing a bigint and a double may result in a loss of precision.
-Warning: Shuffle Join MERGEJOIN[16][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
+WARNING: Comparing bigint and double may result in loss of information.
+Warning: Shuffle Join MERGEJOIN[17][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: explain
 select 'rewrite; mv matching', id, ntile(4) over (order by id) from sketch_input order by id
 PREHOOK: type: QUERY
@@ -722,7 +738,7 @@ STAGE PLANS:
       Edges:
         Reducer 2 <- Map 1 (XPROD_EDGE), Reducer 5 (XPROD_EDGE)
         Reducer 3 <- Reducer 2 (SIMPLE_EDGE)
-        Reducer 5 <- Map 4 (CUSTOM_SIMPLE_EDGE)
+        Reducer 5 <- Map 4 (SIMPLE_EDGE)
 #### A masked pattern was here ####
       Vertices:
         Map 1 
@@ -731,7 +747,7 @@ STAGE PLANS:
                   alias: sketch_input
                   Statistics: Num rows: 44 Data size: 176 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
-                    expressions: id (type: int), COALESCE(UDFToFloat(id),3.402823E38) (type: float)
+                    expressions: id (type: int), UDFToFloat(COALESCE(UDFToFloat(id),3.4028234663852886E38D)) (type: float)
                     outputColumnNames: _col0, _col1
                     Statistics: Num rows: 44 Data size: 352 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
@@ -748,19 +764,22 @@ STAGE PLANS:
                   Statistics: Num rows: 2 Data size: 320 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: _c1 (type: binary)
-                    outputColumnNames: _c1
+                    outputColumnNames: _col0
                     Statistics: Num rows: 2 Data size: 320 Basic stats: COMPLETE Column stats: COMPLETE
                     Group By Operator
-                      aggregations: ds_kll_union(_c1)
+                      aggregations: ds_kll_union(_col0)
+                      keys: true (type: boolean)
                       minReductionHashAggr: 0.5
                       mode: hash
-                      outputColumnNames: _col0
-                      Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
+                      outputColumnNames: _col0, _col1
+                      Statistics: Num rows: 1 Data size: 148 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
-                        null sort order: 
-                        sort order: 
-                        Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
-                        value expressions: _col0 (type: binary)
+                        key expressions: _col0 (type: boolean)
+                        null sort order: z
+                        sort order: +
+                        Map-reduce partition columns: _col0 (type: boolean)
+                        Statistics: Num rows: 1 Data size: 148 Basic stats: COMPLETE Column stats: COMPLETE
+                        value expressions: _col1 (type: binary)
             Execution mode: llap
             LLAP IO: all inputs
         Reducer 2 
@@ -775,7 +794,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2
                 Statistics: Num rows: 44 Data size: 6688 Basic stats: COMPLETE Column stats: COMPLETE
                 Select Operator
-                  expressions: _col0 (type: int), UDFToInteger(CASE WHEN ((ceil((ds_kll_rank(_col2, _col1) * 4.0D)) < 1.0D)) THEN (1.0D) ELSE (ceil((ds_kll_rank(_col2, _col1) * 4.0D))) END) (type: int)
+                  expressions: _col0 (type: int), UDFToInteger(if((ceil((ds_kll_rank(_col2, _col1) * 4)) < 1.0D), 1.0D, ceil((ds_kll_rank(_col2, _col1) * 4)))) (type: int)
                   outputColumnNames: _col0, _col1
                   Statistics: Num rows: 44 Data size: 352 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
@@ -803,14 +822,19 @@ STAGE PLANS:
             Reduce Operator Tree:
               Group By Operator
                 aggregations: ds_kll_union(VALUE._col0)
+                keys: KEY._col0 (type: boolean)
                 mode: mergepartial
-                outputColumnNames: _col0
-                Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
-                Reduce Output Operator
-                  null sort order: 
-                  sort order: 
+                outputColumnNames: _col0, _col1
+                Statistics: Num rows: 1 Data size: 148 Basic stats: COMPLETE Column stats: COMPLETE
+                Select Operator
+                  expressions: _col1 (type: binary)
+                  outputColumnNames: _col0
                   Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
-                  value expressions: _col0 (type: binary)
+                  Reduce Output Operator
+                    null sort order: 
+                    sort order: 
+                    Statistics: Num rows: 1 Data size: 144 Basic stats: COMPLETE Column stats: COMPLETE
+                    value expressions: _col0 (type: binary)
 
   Stage: Stage-0
     Fetch Operator
@@ -818,8 +842,8 @@ STAGE PLANS:
       Processor Tree:
         ListSink
 
-WARNING: Comparing a bigint and a double may result in a loss of precision.
-Warning: Shuffle Join MERGEJOIN[16][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
+WARNING: Comparing bigint and double may result in loss of information.
+Warning: Shuffle Join MERGEJOIN[17][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: select 'rewrite; mv matching', id, ntile(4) over (order by id) from sketch_input order by id
 PREHOOK: type: QUERY
 PREHOOK: Input: default@mv_1
@@ -874,7 +898,7 @@ rewrite; mv matching	14	4
 rewrite; mv matching	14	4
 rewrite; mv matching	15	4
 rewrite; mv matching	15	4
-WARNING: Comparing a bigint and a double may result in a loss of precision.
+WARNING: Comparing bigint and double may result in loss of information.
 PREHOOK: query: explain
 select 'rewrite; mv matching', category, id, ntile(4) over (partition by category order by id) from sketch_input order by category,id
 PREHOOK: type: QUERY
@@ -906,7 +930,7 @@ STAGE PLANS:
                   alias: sketch_input
                   Statistics: Num rows: 44 Data size: 3916 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
-                    expressions: id (type: int), category (type: char(1)), COALESCE(UDFToFloat(id),3.402823E38) (type: float)
+                    expressions: id (type: int), category (type: char(1)), UDFToFloat(COALESCE(UDFToFloat(id),3.4028234663852886E38D)) (type: float)
                     outputColumnNames: _col0, _col1, _col2
                     Statistics: Num rows: 44 Data size: 4092 Basic stats: COMPLETE Column stats: COMPLETE
                     Reduce Output Operator
@@ -945,7 +969,7 @@ STAGE PLANS:
                 outputColumnNames: _col0, _col1, _col2, _col4
                 Statistics: Num rows: 44 Data size: 11132 Basic stats: COMPLETE Column stats: COMPLETE
                 Select Operator
-                  expressions: _col1 (type: char(1)), _col0 (type: int), UDFToInteger(CASE WHEN ((ceil((ds_kll_rank(_col4, _col2) * 4.0D)) < 1.0D)) THEN (1.0D) ELSE (ceil((ds_kll_rank(_col4, _col2) * 4.0D))) END) (type: int)
+                  expressions: _col1 (type: char(1)), _col0 (type: int), UDFToInteger(if((ceil((ds_kll_rank(_col4, _col2) * 4)) < 1.0D), 1.0D, ceil((ds_kll_rank(_col4, _col2) * 4)))) (type: int)
                   outputColumnNames: _col0, _col1, _col2
                   Statistics: Num rows: 44 Data size: 4092 Basic stats: COMPLETE Column stats: COMPLETE
                   Reduce Output Operator
@@ -975,7 +999,7 @@ STAGE PLANS:
       Processor Tree:
         ListSink
 
-WARNING: Comparing a bigint and a double may result in a loss of precision.
+WARNING: Comparing bigint and double may result in loss of information.
 PREHOOK: query: select 'rewrite; mv matching', category, id, ntile(4) over (partition by category order by id) from sketch_input order by category,id
 PREHOOK: type: QUERY
 PREHOOK: Input: default@mv_1
