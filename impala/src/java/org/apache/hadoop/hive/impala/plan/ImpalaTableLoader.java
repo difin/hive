@@ -51,7 +51,7 @@ public class ImpalaTableLoader {
   private static final Logger LOG = LoggerFactory.getLogger(ImpalaTableLoader.class);
 
   private final Map<HdfsTable, Set<String>> tablePartitionMap;
-  private final Map<org.apache.hadoop.hive.metastore.api.Table, ImpalaHdfsTable> tableMap;
+  private final Map<String, ImpalaHdfsTable> tableMap;
   private final Map<String, org.apache.hadoop.hive.metastore.api.Database> dbMap;
   private final EventSequence timeline;
   private final ImpalaQueryContext queryContext;
@@ -72,18 +72,23 @@ public class ImpalaTableLoader {
       msDb = db.getDatabase(msTbl.getDbName());
       dbMap.put(msTbl.getDbName(), msDb);
     }
-    ImpalaHdfsTable hdfsTable = tableMap.get(msTbl);
+    String fqn = getFullyQualifiedName(msTbl);
+    ImpalaHdfsTable hdfsTable = tableMap.get(fqn);
     if (hdfsTable == null) {
       org.apache.impala.catalog.Db impalaDb = new Db(msTbl.getDbName(), msDb);
       hdfsTable = new ImpalaHdfsTable(conf, msTbl, impalaDb, msTbl.getTableName(), msTbl.getOwner());
-      tableMap.put(msTbl, hdfsTable);
+      tableMap.put(fqn, hdfsTable);
       tablePartitionMap.put(hdfsTable, new HashSet<>());
     }
     return hdfsTable;
   }
 
   public ImpalaHdfsTable getHdfsTable(org.apache.hadoop.hive.metastore.api.Table table) {
-    return tableMap.get(table);
+    return tableMap.get(getFullyQualifiedName(table));
+  }
+
+  private static String getFullyQualifiedName(org.apache.hadoop.hive.metastore.api.Table msTbl) {
+    return msTbl.getDbName() + "." + msTbl.getTableName();
   }
 
   public void loadTablesAndPartitions(Hive db, ValidTxnWriteIdList txnWriteIdList) throws HiveException {
@@ -98,8 +103,9 @@ public class ImpalaTableLoader {
           // Lets get this specific table's write id list
           validWriteIdList = txnWriteIdList.getTableValidWriteIdList(basicTable.getFullName());
         }
-        tableMap.put(basicTable.getMetaStoreTable(), ImpalaHdfsTable.create(queryContext.getConf(),
-            basicTable, tableWithNames.getPartitionNames(), validWriteIdList));
+        tableMap.put(getFullyQualifiedName(basicTable.getMetaStoreTable()),
+            ImpalaHdfsTable.create(queryContext.getConf(), basicTable,
+                tableWithNames.getPartitionNames(), validWriteIdList));
       } catch (ImpalaException|MetaException e) {
         timeline.markEvent("Metadata load failed for table " + basicTable.getName() + ". Completed" +
             " for " + tableMap.entrySet().size() + " tables.");
