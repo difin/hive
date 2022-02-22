@@ -8,4 +8,15 @@ STORED BY 'org.apache.hadoop.hive.ql.metadata.DefaultStorageHandler'
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@non_native1
-FAILED: SemanticException [Error 10134]: ALTER TABLE can only be used for [ADDPROPS, DROPPROPS, ADDCOLS] to a non-native table  non_native1
+PREHOOK: query: ALTER TABLE non_native1 RENAME TO new_non_native
+PREHOOK: type: ALTERTABLE_RENAME
+PREHOOK: Input: default@non_native1
+PREHOOK: Output: database:default
+PREHOOK: Output: default@new_non_native
+POSTHOOK: query: ALTER TABLE non_native1 RENAME TO new_non_native
+POSTHOOK: type: ALTERTABLE_RENAME
+POSTHOOK: Input: default@non_native1
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@new_non_native
+FAILED: AssertionError java.lang.AssertionError: Client Execution was expected to fail, but succeeded with error code 0 for fname=alter_non_native.q 
+See ./ql/target/tmp/log/hive.log or ./itests/qtest/target/tmp/log/hive.log, or check ./ql/target/surefire-reports or ./itests/qtest/target/surefire-reports/ for specific test cases logs.
