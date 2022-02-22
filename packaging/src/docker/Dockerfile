@@ -182,6 +182,9 @@ COPY entrypoint.sh hive-entrypoint.sh tez-entrypoint.sh llap-entrypoint.sh \
      sys-db-proto-hooks.sql ranger-create-repo.sh ranger-drop-repo.sh \
      aux-jars-localizer.sh /
 
+# for sample data loading
+ADD airlines-data /airlines-data
+
 # TODO: add support for foreground execution of these scripts?
 COPY llapDaemon.sh runLlapDaemon.sh /usr/lib/hive/scripts/llap/bin/
 
