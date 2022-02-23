@@ -1320,7 +1320,7 @@ public class TestHiveIcebergStorageHandlerNoScan {
   @Test
   public void testAuthzURI() throws TException, InterruptedException, URISyntaxException {
     TableIdentifier target = TableIdentifier.of("default", "target");
-    Table table = testTables.createTable(shell, target.name(), HiveIcebergStorageHandlerTestUtils.CUSTOMER_SCHEMA,
+    testTables.createTable(shell, target.name(), HiveIcebergStorageHandlerTestUtils.CUSTOMER_SCHEMA,
         PartitionSpec.unpartitioned(), FileFormat.PARQUET, ImmutableList.of());
     org.apache.hadoop.hive.metastore.api.Table hmsTable = shell.metastore().getTable(target);
 
@@ -1328,7 +1328,7 @@ public class TestHiveIcebergStorageHandlerNoScan {
     storageHandler.setConf(shell.getHiveConf());
     URI uriForAuth = storageHandler.getURIForAuth(hmsTable);
 
-    Assert.assertEquals("iceberg://" + target, uriForAuth.toString());
+    Assert.assertEquals("iceberg://" + hmsTable.getDbName() + "/" + hmsTable.getTableName(), uriForAuth.toString());
   }
 
   /**
