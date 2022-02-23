@@ -44,8 +44,6 @@ import org.slf4j.LoggerFactory;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -80,9 +78,6 @@ import static org.apache.hadoop.hive.metastore.metrics.MetricsConstants.TABLES_W
 import static org.apache.hadoop.hive.metastore.txn.CompactionMetricsData.MetricType.NUM_DELTAS;
 import static org.apache.hadoop.hive.metastore.txn.CompactionMetricsData.MetricType.NUM_OBSOLETE_DELTAS;
 import static org.apache.hadoop.hive.metastore.txn.CompactionMetricsData.MetricType.NUM_SMALL_DELTAS;
-import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.NO_VAL;
-import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getHostFromId;
-import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getThreadIdFromId;
 
 /**
  * Collect and publish ACID and compaction related metrics.
@@ -271,23 +266,29 @@ public class AcidMetricService implements MetastoreTaskThread {
         Map<String, Integer> deltasMap = deltas.stream().filter(d -> d.getMetricType() == NUM_DELTAS).collect(
             Collectors.toMap(item -> getDeltaCountKey(item.getDbName(), item.getTblName(), item.getPartitionName()),
                 CompactionMetricsData::getMetricValue));
-        deltaObject.updateAll(deltasMap);
+        updateDeltaMBeanAndMetric(deltaObject, COMPACTION_NUM_DELTAS, deltasMap);
 
         Map<String, Integer> smallDeltasMap = deltas.stream().filter(d -> d.getMetricType() == NUM_SMALL_DELTAS)
             .collect(
                 Collectors.toMap(item -> getDeltaCountKey(item.getDbName(), item.getTblName(), item.getPartitionName()),
                     CompactionMetricsData::getMetricValue));
-        smallDeltaObject.updateAll(smallDeltasMap);
+        updateDeltaMBeanAndMetric(smallDeltaObject, COMPACTION_NUM_SMALL_DELTAS, smallDeltasMap);
 
         Map<String, Integer> obsoleteDeltasMap = deltas.stream().filter(d -> d.getMetricType() == NUM_OBSOLETE_DELTAS)
             .collect(
                 Collectors.toMap(item -> getDeltaCountKey(item.getDbName(), item.getTblName(), item.getPartitionName()),
                     CompactionMetricsData::getMetricValue));
-        obsoleteDeltaObject.updateAll(obsoleteDeltasMap);
+        updateDeltaMBeanAndMetric(obsoleteDeltaObject, COMPACTION_NUM_OBSOLETE_DELTAS, obsoleteDeltasMap);
       } catch (Throwable e) {
         LOG.warn("Caught exception while trying to fetch compaction metrics from metastore backend db.", e);
       }
     }
+  }
+
+  private void updateDeltaMBeanAndMetric(MetricsMBeanImpl mbean, String metricName, Map<String, Integer> update) {
+    mbean.updateAll(update);
+    Metrics.getOrCreateMapMetrics(metricName)
+        .update(update);
   }
 
   private void updateMetrics() throws MetaException {
@@ -406,13 +407,13 @@ public class AcidMetricService implements MetastoreTaskThread {
 
     obsoleteDeltaObject = new MetricsMBeanImpl();
     mbs.registerMBean(obsoleteDeltaObject,
-            new ObjectName(OBJECT_NAME_PREFIX + COMPACTION_NUM_OBSOLETE_DELTAS));
+        new ObjectName(OBJECT_NAME_PREFIX + COMPACTION_NUM_OBSOLETE_DELTAS));
     deltaObject = new MetricsMBeanImpl();
     mbs.registerMBean(deltaObject,
-            new ObjectName(OBJECT_NAME_PREFIX + COMPACTION_NUM_DELTAS));
+        new ObjectName(OBJECT_NAME_PREFIX + COMPACTION_NUM_DELTAS));
     smallDeltaObject = new MetricsMBeanImpl();
     mbs.registerMBean(smallDeltaObject,
-            new ObjectName(OBJECT_NAME_PREFIX + COMPACTION_NUM_SMALL_DELTAS));
+        new ObjectName(OBJECT_NAME_PREFIX + COMPACTION_NUM_SMALL_DELTAS));
   }
 
   static String getDeltaCountKey(String dbName, String tableName, String partitionName) {

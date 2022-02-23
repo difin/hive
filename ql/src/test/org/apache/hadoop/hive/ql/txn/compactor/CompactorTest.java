@@ -159,7 +159,7 @@ public abstract class CompactorTest {
   }
 
   protected Table newTable(String dbName, String tableName, boolean partitioned) throws TException {
-    return newTable(dbName, tableName, partitioned, new HashMap<String, String>(), null, false);
+    return newTable(dbName, tableName, partitioned, new HashMap<>(), null, false);
   }
 
   protected Table newTable(String dbName, String tableName, boolean partitioned,
@@ -178,7 +178,7 @@ public abstract class CompactorTest {
     table.setDbName(dbName);
     table.setOwner("me");
     table.setSd(newStorageDescriptor(getLocation(tableName, null), sortCols));
-    List<FieldSchema> partKeys = new ArrayList<FieldSchema>(1);
+    List<FieldSchema> partKeys = new ArrayList<>(1);
     if (partitioned) {
       partKeys.add(new FieldSchema("ds", "string", "no comment"));
       table.setPartitionKeys(partKeys);
@@ -684,14 +684,15 @@ public abstract class CompactorTest {
     return compactorTxnId;
   }
 
-  protected Map<String, String> gaugeToMap(String metric) throws Exception {
+  protected static Map<String, Integer> gaugeToMap(String metric) throws Exception {
     MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
     ObjectName oname = new ObjectName(AcidMetricService.OBJECT_NAME_PREFIX + metric);
     MBeanInfo mbeanInfo = mbs.getMBeanInfo(oname);
 
-    Map<String, String> result = new HashMap<>();
+    Map<String, Integer> result = new HashMap<>();
     for (MBeanAttributeInfo attr : mbeanInfo.getAttributes()) {
-      result.put(attr.getName(), String.valueOf(mbs.getAttribute(oname, attr.getName())));
+      Object attribute = mbs.getAttribute(oname, attr.getName());
+      result.put(attr.getName(), Integer.valueOf(String.valueOf(attribute)));
     }
     return result;
   }
