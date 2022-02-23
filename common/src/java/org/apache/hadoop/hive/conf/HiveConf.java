@@ -815,6 +815,10 @@ public class HiveConf extends Configuration {
     ATSHOOKQUEUECAPACITY("hive.ats.hook.queue.capacity", 64,
         "Queue size for the ATS Hook executor. If the number of outstanding submissions \n" +
         "to the ATS executor exceed this amount, the Hive ATS Hook will not try to log queries to ATS."),
+    BASICSTATSTASKSMAXTHREADSFACTOR("hive.basic.stats.max.threads.factor", 2, "Determines the maximum number of "
+        + "threads that can be used for collection of file level statistics. If the value configured is x, then the "
+        + "maximum number of threads that can be used is x multiplied by the number of available processors.  A value"
+        + " of less than 1, makes stats collection sequential."),
     EXECPARALLEL("hive.exec.parallel", false, "Whether to execute jobs in parallel"),
     EXECPARALLETHREADNUMBER("hive.exec.parallel.thread.number", 8,
         "How many jobs at most can be executed in parallel"),
