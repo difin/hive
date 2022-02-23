@@ -297,7 +297,6 @@ public class AcidMetricService implements MetastoreTaskThread {
     updateDBMetrics();
   }
 
-
   private void updateDBMetrics() throws MetaException {
     MetricsInfo metrics = txnHandler.getMetricsInfo();
     Metrics.getOrCreateGauge(NUM_TXN_TO_WRITEID).set(metrics.getTxnToWriteIdCount());
@@ -335,15 +334,6 @@ public class AcidMetricService implements MetastoreTaskThread {
         Metrics.getOrCreateGauge(key)
             .set(0);
       }
-    }
-
-    Long numFailedComp = counts.get(TxnStore.FAILED_RESPONSE);
-    Long numNotInitiatedComp = counts.get(TxnStore.DID_NOT_INITIATE_RESPONSE);
-    Long numSucceededComp = counts.get(TxnStore.SUCCEEDED_RESPONSE);
-    if (numFailedComp != null && numNotInitiatedComp != null && numSucceededComp != null &&
-        ((numFailedComp + numNotInitiatedComp) / (numFailedComp + numNotInitiatedComp + numSucceededComp) >
-            MetastoreConf.getDoubleVar(conf, MetastoreConf.ConfVars.COMPACTOR_FAILED_COMPACTION_RATIO_THRESHOLD))) {
-      LOG.warn("Many compactions are failing. Check root cause of failed/not initiated compactions.");
     }
 
     updateOldestCompactionMetric(COMPACTION_OLDEST_ENQUEUE_AGE, metricData.getOldestEnqueueTime(), conf);
