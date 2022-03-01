@@ -385,7 +385,18 @@ public class TestObjectStore {
     int numPartitions = objectStore.getNumPartitionsByFilter(DEFAULT_CATALOG_NAME, DB1, TABLE1, "");
     Assert.assertEquals(partitions.size(), numPartitions);
 
+    List<String> partVal = Collections.singletonList("");
+    numPartitions = objectStore.getNumPartitionsByPs(DEFAULT_CATALOG_NAME, DB1, TABLE1, partVal);
+    Assert.assertEquals(partitions.size(), numPartitions);
+
     numPartitions = objectStore.getNumPartitionsByFilter(DEFAULT_CATALOG_NAME, DB1, TABLE1, "country = \"US\"");
+
+    Assert.assertEquals(2, numPartitions);
+
+    partVal = Collections.singletonList("US");
+
+    numPartitions = objectStore.getNumPartitionsByPs(DEFAULT_CATALOG_NAME, DB1, TABLE1, partVal);
+
     Assert.assertEquals(2, numPartitions);
 
     objectStore.dropPartition(DEFAULT_CATALOG_NAME, DB1, TABLE1, value1);
@@ -614,11 +625,9 @@ public class TestObjectStore {
     createPartitionedTable(true, true);
 
     List<List<ColumnStatistics>> stat;
-    try (AutoCloseable c = deadline()) {
-      stat = objectStore.getPartitionColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
-              Arrays.asList("test_part_col=a0", "test_part_col=a1", "test_part_col=a2"),
-              Arrays.asList("test_part_col"));
-    }
+    stat = objectStore.getPartitionColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
+            Arrays.asList("test_part_col=a0", "test_part_col=a1", "test_part_col=a2"),
+            Arrays.asList("test_part_col"));
 
     Assert.assertEquals(1, stat.size());
     Assert.assertEquals(3, stat.get(0).size());
