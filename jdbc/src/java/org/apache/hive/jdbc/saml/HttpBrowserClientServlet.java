@@ -50,7 +50,14 @@ public class HttpBrowserClientServlet extends HttpServlet {
     HiveJdbcBrowserServerResponse response = new HiveJdbcBrowserServerResponse(status,
         msg, token);
     if (response.isSuccessful()) {
-      resp.getWriter().write("Successfully authenticated. You may close this window.");
+      resp.getWriter().write("<body onload=\"waitAndClose()\"> Successfully authenticated. Auto-closing this browser. You may close this window if not automatically closed. </body>" +
+              "<script>" +
+              "  function waitAndClose() {" +
+              "    setTimeout(function() {" +
+              "      window.close()" +
+              "    }, 100);" +
+              "  }" +
+              "</script>"+"</html>");
     } else {
       resp.getWriter().write(
           "Authentication failed. Please check server logs for details. "
