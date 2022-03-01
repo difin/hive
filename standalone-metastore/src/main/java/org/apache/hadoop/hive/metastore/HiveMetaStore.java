@@ -2303,12 +2303,13 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       Database db = null;
       boolean isReplicated = false;
       try {
-        firePreEvent(new PreCreateTableEvent(tbl, this));
 
         ms.openTransaction();
 
         db = ms.getDatabase(tbl.getCatName(), tbl.getDbName());
         isReplicated = isDbReplicationTarget(db);
+
+        firePreEvent(new PreCreateTableEvent(tbl, db, this));
 
         // get_table checks whether database exists, it should be moved here
         if (is_table_exists(ms, tbl.getCatName(), tbl.getDbName(), tbl.getTableName())) {
