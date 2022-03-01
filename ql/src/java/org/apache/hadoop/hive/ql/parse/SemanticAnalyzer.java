@@ -32,6 +32,7 @@ import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.hadoop.hive.common.AcidConstants.SOFT_DELETE_TABLE;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.DYNAMICPARTITIONCONVERT;
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVEARCHIVEENABLED;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_DEFAULT_STORAGE_HANDLER;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVESTATSDBCLASS;
 import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.*;
@@ -13781,8 +13782,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
           LOG.debug("validated " + usedp.getName());
           LOG.debug(usedp.getTable().getTableName());
-          WriteEntity.WriteType writeType = writeEntity.getWriteType();
-          if (writeType != WriteType.UPDATE && writeType != WriteType.DELETE) {
+          if (!AcidUtils.isTransactionalTable(tbl) && conf.getBoolVar(HIVEARCHIVEENABLED)) {
             // Do not check for ACID; it does not create new parts and this is expensive as hell.
             // TODO: add an API to get table name list for archived parts with a single call;
             //       nobody uses this so we could skip the whole thing.
