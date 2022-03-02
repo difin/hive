@@ -24,7 +24,18 @@ import java.io.FileReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.QTestMiniClusters.MiniClusterType;
+
+import org.junit.Assert;
+import org.junit.Test;
+import static org.junit.Assert.fail;
 
 /**
  * Suite for testing location. e.g. if "alter table alter partition
@@ -125,6 +136,46 @@ public class TestLocationQueries extends BaseTestQueries {
 
     boolean success = QTestRunnerUtils.queryListRunnerSingleThreaded(qfiles, qt);
     if (!success) {
+      fail("One or more queries failed");
+    }
+  }
+
+  /**
+   * Verify the delta directory name of the load data inpath command for MM acid tables.
+   */
+  @Test
+  public void testAcidLoadDataLocation() throws Exception {
+    String[] testNames = new String[]{"acid_load_data.q"};
+
+    File[] qfiles = setupQFiles(testNames);
+
+    QTestUtil qt = new QTestUtil(QTestArguments.QTestArgumentsBuilder.instance()
+            .withOutDir(resDir + "/llap")
+            .withLogDir(logDir)
+            .withClusterType(MiniClusterType.LLAP_LOCAL)
+            .withConfDir(null)
+            .withInitScript("")
+            .withCleanupScript("")
+            .withLlapIo(false)
+            .build());
+
+    HiveConf hiveConf = qt.getConf();
+    TestTxnDbUtil.setConfValues(hiveConf);
+    TestTxnDbUtil.cleanDb(hiveConf);
+    TestTxnDbUtil.prepDb(hiveConf);
+    qt.newSession();
+    qt.addFile(qfiles[0].getPath());
+    qt.clearTestSideEffects();
+
+    boolean success = QTestRunnerUtils.queryListRunnerSingleThreaded(qfiles, new QTestUtil[]{qt});
+    if (success) {
+      IMetaStoreClient hmsClient = new HiveMetaStoreClient(hiveConf);
+      Table table = hmsClient.getTable("default", "kv_mm");
+      FileSystem fs = FileSystem.get(hiveConf);
+      String location = table.getSd().getLocation();
+      Path delta = fs.listStatus(new Path(location))[0].getPath();
+      Assert.assertEquals("Delta directory name mismatch!", "delta_0000001_0000001_0000", delta.getName());
+    } else {
       fail("One or more queries failed");
     }
   }
