@@ -3740,8 +3740,8 @@ public class ObjectStore implements RawStore, Configurable {
       boolean allowSql, boolean allowJdo) throws TException {
     assert result != null;
 
-    final ExpressionTree exprTree = PartFilterExprUtil.makeExpressionTree(expressionProxy, expr,
-                                                    getDefaultPartitionName(defaultPartitionName));
+    final ExpressionTree exprTree = expr.length != 0 ? PartFilterExprUtil.makeExpressionTree(expressionProxy, expr,
+        getDefaultPartitionName(defaultPartitionName)) : ExpressionTree.EMPTY_TREE;;
     final AtomicBoolean hasUnknownPartitions = new AtomicBoolean(false);
 
     catName = normalizeIdentifier(catName);
