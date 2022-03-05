@@ -65,11 +65,14 @@ import org.apache.impala.thrift.TQueryOptions;
 import org.apache.impala.thrift.TReservedWordsVersion;
 import org.apache.impala.thrift.TRuntimeFilterMode;
 import org.apache.impala.thrift.TStmtType;
+import org.apache.impala.thrift.TRuntimeFilterType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -325,8 +328,12 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     // Collect the option settings that are returned in the HS2 session
     // config and generate a comma separated string apply using FeSupport
     // http_addr is added by HS2 and will cause an error if not removed
+    // We filter out the key-value pair associated with 'ENABLED_RUNTIME_FILTER_TYPES'
+    // since FeSupport#ParseQueryOptions() is not able to parse this query option when
+    // the value contains commas.
     String csvQueryOptions = configurations.entrySet().stream()
         .filter(e -> !e.getKey().equals("http_addr"))
+        .filter(e -> !e.getKey().equals("ENABLED_RUNTIME_FILTER_TYPES"))
         .map(e -> e.getKey() + "=" + e.getValue())
         .collect(Collectors.joining(","));
 
@@ -335,7 +342,11 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
           .filter(e -> !e.getKey().equals("core-site.overridden"))
           .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
 
+    // We filter out the key-value pair associated with 'ENABLED_RUNTIME_FILTER_TYPES'
+    // since FeSupport#ParseQueryOptions() is not able to parse this query option when
+    // the value contains commas.
     String csvSessionOptions = sessionOptions.entrySet().stream()
+          .filter(e -> !e.getKey().equals("ENABLED_RUNTIME_FILTER_TYPES"))
           .map(e -> e.getKey() + "=" + e.getValue())
           .collect(Collectors.joining(","));
 
@@ -344,11 +355,33 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     try {
       options = FeSupport.ParseQueryOptions(csvQueryOptions,
           new TQueryOptions());
+      updateEnabledRuntimeFilterTypes(options, configurations);
+
       options = FeSupport.ParseQueryOptions(csvSessionOptions, options);
+      updateEnabledRuntimeFilterTypes(options, sessionOptions);
     } catch (InternalException e) {
       throw new HiveException(e);
     }
     return options;
+  }
+
+  /**
+   * As a workaround, this method updates the query option of
+   * 'ENABLED_RUNTIME_FILTER_TYPES' based on the corresponding configuration in
+   * 'impalaOptions'.
+   */
+  private void updateEnabledRuntimeFilterTypes(TQueryOptions updatedOptions,
+      Map<String, String> impalaOptions) {
+    if (impalaOptions.containsKey("ENABLED_RUNTIME_FILTER_TYPES")) {
+      String rawValue = impalaOptions.get("ENABLED_RUNTIME_FILTER_TYPES");
+      String rawTypes[] = rawValue.split(",");
+      Set<TRuntimeFilterType> types = new HashSet<>();
+      for (String rawType : rawTypes) {
+        TRuntimeFilterType type = TRuntimeFilterType.valueOf(rawType);
+        types.add(type);
+      }
+      updatedOptions.setEnabled_runtime_filter_types(types);
+    }
   }
 
   private void filterUnsupportedImpalaQueryOptions(HiveConf conf) {
@@ -385,7 +418,14 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
       TQueryOptions._Fields field = TQueryOptions._Fields.findByName(
               key.toLowerCase());
       if (field != null) {
-        impalaProps.put("impala.".concat((String) e.getKey()), e.getValue());
+        // Convert the key to upper case so that in createDefaultQueryOptions() we could
+        // filter out the query option that could not be correctly parsed by
+        // FeSupport#ParseQueryOptions(). Otherwise, a key-value pair like
+        // "enabled_runtime_filter_types=BLOOM,MIN_MAX" could not be filtered out
+        // before a string of comma-separated key-value pairs is passed to
+        // FeSupport#ParseQueryOptions().
+        impalaProps.put(
+            "impala.".concat(((String) e.getKey()).toUpperCase()), e.getValue());
         origImpalaProps.add((String) e.getKey());
       }
     }
