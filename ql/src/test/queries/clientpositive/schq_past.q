@@ -1,3 +1,4 @@
+--! qt:disabled: CDPD-34831
 --! qt:authorizer
 --! qt:scheduledqueryservice
 
