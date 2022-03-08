@@ -2,7 +2,9 @@
 # Copyright (c) 2020 Cloudera, Inc. All rights reserved.
 set -x
 
-SCHEMATOOL_COMMAND="$HIVE_HOME/bin/schematool -dbType postgres"
+: ${DB_DRIVER:=postgres}
+
+SCHEMATOOL_COMMAND="$HIVE_HOME/bin/schematool -dbType $DB_DRIVER"
 SKIP_SCHEMA_INIT="${IS_RESUME:-false}"
 
 function is_metastore_initialized {
@@ -15,7 +17,7 @@ function initialize_hive {
   ${HADOOP_HDFS_HOME}/bin/hdfs dfs -mkdir -p ${HIVE_MANAGED_WAREHOUSE_PATH} ${HIVE_EXTERNAL_WAREHOUSE_PATH}
 
   # Metastore DB
-  $HIVE_HOME/bin/schematool -dbType postgres -initOrUpgradeSchema
+  $HIVE_HOME/bin/schematool -dbType $DB_DRIVER -initOrUpgradeSchema
   if [ $? -eq 0 ]; then
     echo "Initialized schema successfully.."
   else

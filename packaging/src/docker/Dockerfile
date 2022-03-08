@@ -44,7 +44,7 @@ FROM registry.access.redhat.com/ubi7/ubi:latest as hive
 RUN curl -o /etc/yum.repos.d/rhel7_mirrors.repo http://mirror.infra.cloudera.com/repos/rhel/server/7/7.8/rhel7.8_cldr_mirrors.repo
 # install debugging tools and other dependencies
 RUN yum -y update && \
-  yum install -y java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop mysql-connector-java && \
+  yum install -y java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop && \
   yum clean all && \
   rm -rf /var/cache/yum
 RUN yum-config-manager --save --setopt=ubi-server-rhscl-7-rpms.skip_if_unavailable=true
@@ -146,11 +146,13 @@ RUN /createSymlink.sh ${CDH_VERSION}
 
 RUN mkdir -p /usr/lib/hive/lib/
 
+# install mysql JDBC connector for mysql and mariadb, and Oracle JDBC driver, then move them where the schematool can find them
 RUN yum -y clean all && \
-    yum -y install postgresql mysql-connector-java postgresql-jdbc && \
+    yum -y install postgresql postgresql-jdbc && \
     rm -rf /var/cache/yum && \
+    wget --no-verbose https://s3.amazonaws.com/dev.hortonworks.com/ARTIFACTS/jdbc/1911/ojdbc8.jar -O /usr/lib/hive/lib/oracle-connector-java.jar && \
+    wget --no-verbose https://mirror.infra.cloudera.com/mysql/mysql-connector-java-8.0.28.jar -O /usr/lib/hive/lib/mysql-connector-java-8.0.28.jar && \
     /remove-unwanted.sh
-RUN ln -sF /usr/share/java/mysql-connector-java.jar /usr/lib/hive/lib/mysql-connector-java.jar
 RUN ln -sF /usr/share/java/postgresql-jdbc.jar /usr/lib/hive/lib/postgresql-jdbc.jar
 
 COPY bigtop-hive /usr/bin/hive
