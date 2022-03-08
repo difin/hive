@@ -61,7 +61,6 @@
         <module>hive-minikdc</module>
         <module>qtest-druid</module>
         <module>qtest-kudu</module>
-        <module>qtest-iceberg</module>
       </modules>
     </profile>
     <profile>
@@ -73,6 +72,7 @@
       </activation>
       <modules>
         <module>catalogd-unit</module>
+        <module>qtest-iceberg</module>
         <module>qtest-impala</module>
       </modules>
     </profile>

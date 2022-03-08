@@ -1647,7 +1647,6 @@
         <module>testutils</module>
         <module>upgrade-acid</module>
         <module>kafka-handler</module>
-        <module>iceberg</module>
         <module>packaging</module>
       </modules>
     </profile>
@@ -1660,6 +1659,7 @@
         </file>
       </activation>
       <modules>
+        <module>iceberg</module>
         <module>impala</module>
       </modules>
     </profile>
