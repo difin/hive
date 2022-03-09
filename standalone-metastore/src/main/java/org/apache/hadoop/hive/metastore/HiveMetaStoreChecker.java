@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -48,6 +49,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -68,6 +71,7 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import com.google.common.collect.Sets;
@@ -321,52 +325,98 @@ public class HiveMetaStoreChecker {
 
     Set<Path> partPaths = new HashSet<>();
 
-    // check that the partition folders exist on disk
-    for (Partition partition : parts) {
-      if (partition == null) {
-        // most likely the user specified an invalid partition
-        continue;
-      }
-      Path partPath = getDataLocation(table, partition);
-      if (partPath == null) {
-        continue;
-      }
-      fs = partPath.getFileSystem(conf);
+    int threadCount = MetastoreConf.getIntVar(conf, MetastoreConf.ConfVars.METASTORE_MSCK_FS_HANDLER_THREADS_COUNT);
 
-      CheckResult.PartitionResult prFromMetastore = new CheckResult.PartitionResult();
-      prFromMetastore.setPartitionName(getPartitionName(table, partition));
-      prFromMetastore.setTableName(partition.getTableName());
-      if (!fs.exists(partPath)) {
-        result.getPartitionsNotOnFs().add(prFromMetastore);
-      } else {
-        result.getCorrectPartitions().add(prFromMetastore);
-      }
+    Preconditions.checkArgument(!(threadCount < 1),"METASTORE_MSCK_FS_HANDLER_THREADS_COUNT cannot be less than 1");
+    Preconditions.checkArgument(!(threadCount > 30),"METASTORE_MSCK_FS_HANDLER_THREADS_COUNT cannot be more than 30");
 
-      if (partitionExpirySeconds > 0) {
-        long currentEpochSecs = Instant.now().getEpochSecond();
-        long createdTime = partition.getCreateTime();
-        long partitionAgeSeconds = currentEpochSecs - createdTime;
-        if (partitionAgeSeconds > partitionExpirySeconds) {
-          CheckResult.PartitionResult pr = new CheckResult.PartitionResult();
-          pr.setPartitionName(getPartitionName(table, partition));
-          pr.setTableName(partition.getTableName());
-          result.getExpiredPartitions().add(pr);
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("{}.{}.{}.{} expired. createdAt: {} current: {} age: {}s expiry: {}s", partition.getCatName(),
-              partition.getDbName(), partition.getTableName(), pr.getPartitionName(), createdTime, currentEpochSecs,
-              partitionAgeSeconds, partitionExpirySeconds);
-          }
+    LOG.debug("Running with threads {}",threadCount);
+
+    // For Multi Threaded run, we do not want to wait for All partitions in queue to be processed,
+    // instead we run in batch to avoid OOM, we set Min and Max Pool Size = METASTORE_MSCK_FS_HANDLER_THREADS_COUNT
+    // and Waiting Queue size = METASTORE_MSCK_FS_HANDLER_THREADS_COUNT
+
+    final ExecutorService pool = new ThreadPoolExecutor(threadCount,
+            threadCount,
+            0L,
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(threadCount),
+            new ThreadPoolExecutor.CallerRunsPolicy());
+
+    ArrayList<String> processedPartitions = new ArrayList<String>();
+
+    try {
+      Queue<Future<String>> futures = new LinkedList<>();
+      // check that the partition folders exist on disk
+      for (Partition partition : parts) {
+        if (partition == null) {
+          // most likely the user specified an invalid partition
+          continue;
         }
-      }
+        Path partPath = getDataLocation(table, partition);
+        if (partPath == null) {
+          continue;
+        }
+        futures.add(pool.submit(new Callable() {
+          @Override
+          public Object call() throws Exception {
+            Path tempPartPath = partPath;
+            FileSystem tempFs = tempPartPath.getFileSystem(conf);
+            CheckResult.PartitionResult prFromMetastore = new CheckResult.PartitionResult();
+            String partName = getPartitionName(table, partition);
+            prFromMetastore.setPartitionName(partName);
+            prFromMetastore.setTableName(partition.getTableName());
 
-      for (int i = 0; i < getPartitionSpec(table, partition).size(); i++) {
-        Path qualifiedPath = partPath.makeQualified(fs);
-        pathInterner.intern(qualifiedPath);
-        partPaths.add(qualifiedPath);
-        partPath = partPath.getParent();
+            synchronized (this) {
+              if (!tempFs.exists(tempPartPath)) {
+                result.getPartitionsNotOnFs().add(prFromMetastore);
+              } else {
+                result.getCorrectPartitions().add(prFromMetastore);
+              }
+            }
+            if (partitionExpirySeconds > 0) {
+              long currentEpochSecs = Instant.now().getEpochSecond();
+              long createdTime = partition.getCreateTime();
+              long partitionAgeSeconds = currentEpochSecs - createdTime;
+              if (partitionAgeSeconds > partitionExpirySeconds) {
+                CheckResult.PartitionResult pr = new CheckResult.PartitionResult();
+                pr.setPartitionName(getPartitionName(table, partition));
+                pr.setTableName(partition.getTableName());
+                synchronized (result) {
+                  result.getExpiredPartitions().add(pr);
+                }
+                if (LOG.isDebugEnabled()) {
+                  LOG.debug("{}.{}.{}.{} expired. createdAt: {} current: {} age: {}s expiry: {}s", partition.getCatName(),
+                          partition.getDbName(), partition.getTableName(), pr.getPartitionName(), createdTime, currentEpochSecs,
+                          partitionAgeSeconds, partitionExpirySeconds);
+                }
+              }
+            }
+            synchronized (this) {
+              for (int i = 0; i < getPartitionSpec(table, partition).size(); i++) {
+                Path qualifiedPath = tempPartPath.makeQualified(tempFs);
+                pathInterner.intern(qualifiedPath);
+                partPaths.add(qualifiedPath);
+                tempPartPath = tempPartPath.getParent();
+              }
+            }
+            return processedPartitions.add(getPartitionName(table, partition));
+          }
+        }));
+      }
+      while (!futures.isEmpty()) {
+        futures.poll().get();
+      }
+    } catch (ExecutionException | InterruptedException e) {
+      LOG.error("Exception occurred while processing partitions {}",e);
+    }
+    finally {
+      LOG.debug("Partition exists check complete for table {}.{}.{} partitions {}", table.getCatName(), table.getDbName(), table.getTableName(), processedPartitions);
+      if (pool != null) {
+        pool.shutdownNow();
       }
     }
-
+    
     if (findUnknownPartitions) {
       findUnknownPartitions(table, partPaths, result);
     }
