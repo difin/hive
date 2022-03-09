@@ -53,7 +53,6 @@ import org.apache.hadoop.hive.common.ValidReaderWriteIdList;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
-import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.txn.CompactionInfo;
@@ -193,7 +192,7 @@ public class Cleaner extends MetaStoreCompactorThread {
 
       Callable<Boolean> cleanUpTask;
       Table t = null;
-      Partition p = resolvePartition(ci);
+      Partition p = null;
 
       if (!location.isPresent()) {
         t = resolveTable(ci);
@@ -205,6 +204,7 @@ public class Cleaner extends MetaStoreCompactorThread {
           return;
         }
         if (ci.partName != null) {
+          p = resolvePartition(ci);
           if (p == null) {
             // The partition was dropped before we got around to cleaning it.
             LOG.info("Unable to find partition " + ci.getFullPartitionName() +
@@ -214,11 +214,12 @@ public class Cleaner extends MetaStoreCompactorThread {
           }
         }
       }
-      
-      if (t != null) {
-        StorageDescriptor sd = resolveStorageDescriptor(t, p);
-        cleanUpTask = () -> removeFiles(location.orElse(sd.getLocation()), minOpenTxnGLB, ci,
-            ci.partName != null && p == null);
+
+      if (t != null || ci.partName != null) {
+        Table finalT = t; Partition finalP = p;
+        String path = location.orElseGet(() -> resolveStorageDescriptor(finalT, finalP).getLocation());
+        boolean dropPartition = ci.partName != null && p == null;
+        cleanUpTask = () -> removeFiles(path, minOpenTxnGLB, ci, dropPartition);
       } else {
         cleanUpTask = () -> removeFiles(location.get(), ci);
       }
