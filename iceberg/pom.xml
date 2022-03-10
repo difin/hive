@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -10,9 +9,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.apache.hive</groupId>
         <artifactId>hive</artifactId>
@@ -29,7 +26,7 @@
     <properties>
         <hive.path.to.root>..</hive.path.to.root>
         <path.to.iceberg.root>.</path.to.iceberg.root>
-        <iceberg.version>0.13.0</iceberg.version>
+        <iceberg.version>0.13.1.2022.0.7.0-SNAPSHOT</iceberg.version>
         <kryo-shaded.version>4.0.2</kryo-shaded.version>
         <iceberg.mockito-core.version>3.4.4</iceberg.mockito-core.version>
         <iceberg.avro.version>1.9.2</iceberg.avro.version>
@@ -263,8 +260,8 @@
                             <!-- normal imports, static imports -->
                             <order>,\# </order>
                         </importOrder>
-                        <trimTrailingWhitespace/>
-                        <endWithNewline/>
+                        <trimTrailingWhitespace />
+                        <endWithNewline />
                         <indent>
                             <spaces>true</spaces>
                             <spacesPerTab>2</spacesPerTab>
