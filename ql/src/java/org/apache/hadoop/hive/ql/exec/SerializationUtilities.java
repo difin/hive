@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ import org.apache.hadoop.hive.ql.io.RCFileInputFormat;
 import org.apache.hadoop.hive.ql.log.PerfLogger;
 import org.apache.hadoop.hive.ql.plan.AbstractOperatorDesc;
 import org.apache.hadoop.hive.ql.plan.BaseWork;
+import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.ql.plan.MapWork;
 import org.apache.hadoop.hive.ql.plan.MapredWork;
@@ -760,12 +762,20 @@ public class SerializationUtilities {
   }
 
   /**
-   * Serializes expression via Kryo.
-   * @param expr Expression.
+   * Serializes any object via Kryo. Type information will be serialized as well, allowing dynamic deserialization
+   * without the need to pass the class.
+   * @param object The object to serialize.
    * @return Bytes.
    */
-  public static byte[] serializeExpressionToKryo(ExprNodeGenericFuncDesc expr) {
-    return serializeObjectToKryo(expr);
+  public static byte[] serializeObjectWithTypeInformation(Serializable object) {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    Kryo kryo = borrowKryo();
+    try (Output output = new Output(baos)) {
+      kryo.writeClassAndObject(output, object);
+    } finally {
+      releaseKryo(kryo);
+    }
+    return baos.toByteArray();
   }
 
   /**
@@ -773,26 +783,22 @@ public class SerializationUtilities {
    * @param bytes Bytes containing the expression.
    * @return Expression; null if deserialization succeeded, but the result type is incorrect.
    */
-  public static ExprNodeGenericFuncDesc deserializeExpressionFromKryo(byte[] bytes) {
-    return deserializeObjectFromKryo(bytes, ExprNodeGenericFuncDesc.class);
+  public static <T> T deserializeObjectWithTypeInformation(byte[] bytes) {
+    Kryo kryo = borrowKryo();
+    try (Input inp = new Input(new ByteArrayInputStream(bytes))) {
+      return (T) kryo.readClassAndObject(inp);
+    } finally {
+      releaseKryo(kryo);
+    }
   }
 
   public static String serializeExpression(ExprNodeGenericFuncDesc expr) {
-    try {
-      return new String(Base64.encodeBase64(serializeExpressionToKryo(expr)), "UTF-8");
-    } catch (UnsupportedEncodingException ex) {
-      throw new RuntimeException("UTF-8 support required", ex);
-    }
+    return new String(Base64.encodeBase64(serializeObjectToKryo(expr)), StandardCharsets.UTF_8);
   }
 
   public static ExprNodeGenericFuncDesc deserializeExpression(String s) {
-    byte[] bytes;
-    try {
-      bytes = Base64.decodeBase64(s.getBytes("UTF-8"));
-    } catch (UnsupportedEncodingException ex) {
-      throw new RuntimeException("UTF-8 support required", ex);
-    }
-    return deserializeExpressionFromKryo(bytes);
+    byte[] bytes = Base64.decodeBase64(s.getBytes(StandardCharsets.UTF_8));
+    return deserializeObjectFromKryo(bytes, ExprNodeGenericFuncDesc.class);
   }
 
   private static byte[] serializeObjectToKryo(Serializable object) {
@@ -830,11 +836,7 @@ public class SerializationUtilities {
   }
 
   public static <T extends Serializable> T deserializeObject(String s, Class<T> clazz) {
-    try {
-      return deserializeObjectFromKryo(Base64.decodeBase64(s.getBytes("UTF-8")), clazz);
-    } catch (UnsupportedEncodingException ex) {
-      throw new RuntimeException("UTF-8 support required", ex);
-    }
+    return deserializeObjectFromKryo(Base64.decodeBase64(s.getBytes(StandardCharsets.UTF_8)), clazz);
   }
 
 }

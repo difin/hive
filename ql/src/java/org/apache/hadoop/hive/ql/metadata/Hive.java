@@ -218,6 +218,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializedV
 import org.apache.hadoop.hive.ql.optimizer.listbucketingpruner.ListBucketingPrunerUtils;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.ql.plan.LoadTableDesc;
 import org.apache.hadoop.hive.ql.plan.LoadTableDesc.LoadFileType;
@@ -4157,13 +4158,13 @@ private void constructOneLBLocationMap(FileStatus fSta,
    * @param result the resulting list of partitions
    * @return whether the resulting list contains partitions which may or may not match the expr
    */
-  public boolean getPartitionsByExpr(Table tbl, ExprNodeGenericFuncDesc expr, HiveConf conf,
+  public boolean getPartitionsByExpr(Table tbl, ExprNodeDesc expr, HiveConf conf,
       List<Partition> result) throws HiveException, TException {
     PerfLogger perfLogger = SessionState.getPerfLogger();
     perfLogger.PerfLogBegin(CLASS_NAME, PerfLogger.HIVE_GET_PARTITIONS_BY_EXPR);
     try {
       assert result != null;
-      byte[] exprBytes = SerializationUtilities.serializeExpressionToKryo(expr);
+      byte[] exprBytes = SerializationUtilities.serializeObjectWithTypeInformation(expr);
       String defaultPartitionName = HiveConf.getVar(conf, ConfVars.DEFAULTPARTITIONNAME);
       List<org.apache.hadoop.hive.metastore.api.Partition> msParts =
           new ArrayList<org.apache.hadoop.hive.metastore.api.Partition>();

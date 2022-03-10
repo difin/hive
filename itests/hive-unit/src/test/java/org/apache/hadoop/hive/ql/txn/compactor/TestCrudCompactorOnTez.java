@@ -22,12 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -39,9 +35,9 @@ import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.CompactionRequest;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.Partition;
-import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.ShowCompactRequest;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponse;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponseElement;
@@ -76,6 +72,7 @@ import org.apache.tez.dag.history.logging.proto.ProtoMessageReader;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.hadoop.hive.ql.TxnCommandsBaseForTests.runWorker;
 import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeStatementOnDriver;
 import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeStatementOnDriverAndReturnResults;
 import static org.apache.hadoop.hive.ql.txn.compactor.TestCompactor.execSelectAndDumpData;
@@ -149,6 +146,42 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     Assert.assertEquals("The number of files is differing from the expected", "1", parameters.get("numFiles"));
     Assert.assertEquals("The number of rows is differing from the expected", "2", parameters.get("numRows"));
     Assert.assertEquals("The total table size is differing from the expected", "727", parameters.get("totalSize"));
+  }
+
+  @Test
+  public void testCompactionShouldNotFailOnPartitionsWithBooleanField() throws Exception {
+    conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
+
+    final String dbName = "default";
+    final String tableName = "compaction_test";
+    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    executeStatementOnDriver("CREATE TABLE " + tableName + "(id string, value string) PARTITIONED BY (bval boolean) CLUSTERED BY(id) " +
+            "INTO 10 BUCKETS STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
+
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('1','one',true),('2','two', true)," +
+            "('4','four', false),('5','five', true),('6','six', false),('7','seven', false),('8','eight', false)," +
+            "('11','eleven', true),('12','twelve', false),('13','thirteen', false),('14','fourteen', false)," +
+            "('17','seventeen', true),('18','eighteen', false),('19','nineteen', false),('20','twenty', true)", driver);
+
+    executeStatementOnDriver("insert into " + tableName + " values ('21', 'value21', false),('84', 'value84', false)", driver);
+    executeStatementOnDriver("insert into " + tableName + " values ('22', 'value22', false),('34', 'value34', true)", driver);
+    executeStatementOnDriver("insert into " + tableName + " values ('75', 'value75', true),('99', 'value99', true)", driver);
+
+    TxnStore txnHandler = TxnUtils.getTxnStore(conf);
+
+    //Try to do a major compaction directly
+    CompactionRequest rqst = new CompactionRequest(dbName, tableName, CompactionType.MAJOR);
+    rqst.setPartitionname("bval=true");
+    txnHandler.compact(rqst);
+
+    runWorker(conf);
+
+    //Check if the compaction succeed
+    ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
+    List<ShowCompactResponseElement> compacts = rsp.getCompacts();
+    Assert.assertEquals("Expecting 1 rows and found " + compacts.size(), 1, compacts.size());
+    Assert.assertEquals("Expecting compaction state 'ready for cleaning' and found:" + compacts.get(0).getState(),
+            "ready for cleaning", compacts.get(0).getState());
   }
 
   @Test

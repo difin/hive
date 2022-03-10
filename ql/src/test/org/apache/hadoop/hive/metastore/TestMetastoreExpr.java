@@ -174,7 +174,7 @@ public class TestMetastoreExpr extends TestCase {
       String dbName, String tblName, ExprNodeGenericFuncDesc expr) throws Exception {
     List<Partition> parts = new ArrayList<Partition>();
     client.listPartitionsByExpr(dbName, tblName,
-        SerializationUtilities.serializeExpressionToKryo(expr), null, (short)-1, parts);
+        SerializationUtilities.serializeObjectWithTypeInformation(expr), null, (short)-1, parts);
     assertEquals("Partition check failed: " + expr.getExprString(), numParts, parts.size());
   }
 

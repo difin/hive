@@ -254,7 +254,7 @@ public class TestSessionHiveMetastoreClientListPartitionsTempTable
   public void testListPartitionsByExprNullResult() throws Exception {
     createTable4PartColsParts(getClient());
     TestMetastoreExpr.ExprBuilder e = new TestMetastoreExpr.ExprBuilder(TABLE_NAME);
-    getClient().listPartitionsByExpr(DB_NAME, TABLE_NAME, SerializationUtilities.serializeExpressionToKryo(
+    getClient().listPartitionsByExpr(DB_NAME, TABLE_NAME, SerializationUtilities.serializeObjectWithTypeInformation(
         e.strCol("yyyy").val("2017").pred("=", 2).build()), null, (short)-1, null);
   }
 
@@ -263,7 +263,7 @@ public class TestSessionHiveMetastoreClientListPartitionsTempTable
     createTable4PartColsParts(getClient());
     TestMetastoreExpr.ExprBuilder e = new TestMetastoreExpr.ExprBuilder(TABLE_NAME);
     List<Partition> result = new ArrayList<>();
-    getClient().listPartitionsByExpr(DB_NAME, TABLE_NAME, SerializationUtilities.serializeExpressionToKryo(
+    getClient().listPartitionsByExpr(DB_NAME, TABLE_NAME, SerializationUtilities.serializeObjectWithTypeInformation(
         e.strCol("yyyy").val("2017").pred(">=", 2).build()), null, (short)3, result);
     assertEquals(3, result.size());
   }
@@ -273,7 +273,7 @@ public class TestSessionHiveMetastoreClientListPartitionsTempTable
     createTable4PartColsParts(getClient());
     TestMetastoreExpr.ExprBuilder e = new TestMetastoreExpr.ExprBuilder(TABLE_NAME);
     List<Partition> result = new ArrayList<>();
-    getClient().listPartitionsByExpr(DB_NAME, TABLE_NAME, SerializationUtilities.serializeExpressionToKryo(
+    getClient().listPartitionsByExpr(DB_NAME, TABLE_NAME, SerializationUtilities.serializeObjectWithTypeInformation(
         e.strCol("yyyy").val("2017").pred(">=", 2).build()), null, (short)100, result);
     assertEquals(4, result.size());
   }
@@ -318,7 +318,7 @@ public class TestSessionHiveMetastoreClientListPartitionsTempTable
 
   private void checkExpr(int numParts, ExprNodeGenericFuncDesc expr) throws Exception {
     List<Partition> parts = new ArrayList<>();
-    getClient().listPartitionsByExpr(DB_NAME, TABLE_NAME, SerializationUtilities.serializeExpressionToKryo(expr),
+    getClient().listPartitionsByExpr(DB_NAME, TABLE_NAME, SerializationUtilities.serializeObjectWithTypeInformation(expr),
         null, (short) -1, parts);
     assertEquals("Partition check failed: " + expr.getExprString(), numParts, parts.size());
   }
