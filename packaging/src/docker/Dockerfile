@@ -44,7 +44,7 @@ FROM registry.access.redhat.com/ubi7/ubi:latest as hive
 RUN curl -o /etc/yum.repos.d/rhel7_mirrors.repo http://mirror.infra.cloudera.com/repos/rhel/server/7/7.8/rhel7.8_cldr_mirrors.repo
 # install debugging tools and other dependencies
 RUN yum -y update && \
-  yum install -y java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation krb5-auth-dialog gettext epel-release zstd libzstd iftop mysql-connector-java && \
+  yum install -y java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop mysql-connector-java && \
   yum clean all && \
   rm -rf /var/cache/yum
 RUN yum-config-manager --save --setopt=ubi-server-rhscl-7-rpms.skip_if_unavailable=true
@@ -141,7 +141,6 @@ RUN ln -s /usr/lib/tez/lib/*.jar /usr/lib/hive
 COPY --from=hive-base /usr/lib/hive /usr/lib/hive
 RUN mkdir -p /etc/hive/conf
 RUN ln -s /usr/lib/hive/conf/* /etc/hive/conf
-RUN ln -s /usr/lib/hive/bin/hive /usr/bin/hive
 RUN mkdir -p /etc/tez/conf
 RUN /createSymlink.sh ${CDH_VERSION}
 
@@ -153,6 +152,10 @@ RUN yum -y clean all && \
     /remove-unwanted.sh
 RUN ln -sF /usr/share/java/mysql-connector-java.jar /usr/lib/hive/lib/mysql-connector-java.jar
 RUN ln -sF /usr/share/java/postgresql-jdbc.jar /usr/lib/hive/lib/postgresql-jdbc.jar
+
+COPY bigtop-hive /usr/bin/hive
+RUN ln -s /usr/bin/hive /usr/bin/beeline
+RUN ln -s /usr/bin/hive /usr/bin/hiveserver2
 
 # switch user and all related env
 USER hive
