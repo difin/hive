@@ -9,7 +9,7 @@ require 'hive_metastore_types'
 
 DDL_TIME = %q"transient_lastDdlTime"
 
-HMS_API = %q"1.2.17"
+HMS_API = %q"1.2.18"
 
 ACCESSTYPE_NONE = 1
 

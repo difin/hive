@@ -26087,6 +26087,11 @@ void CompactionInfoStruct::__set_enqueueTime(const int64_t val) {
   this->enqueueTime = val;
 __isset.enqueueTime = true;
 }
+
+void CompactionInfoStruct::__set_retryRetention(const int64_t val) {
+  this->retryRetention = val;
+__isset.retryRetention = true;
+}
 std::ostream& operator<<(std::ostream& out, const CompactionInfoStruct& obj)
 {
   obj.printTo(out);
@@ -26241,6 +26246,14 @@ uint32_t CompactionInfoStruct::read(::apache::thrift::protocol::TProtocol* iprot
           xfer += iprot->skip(ftype);
         }
         break;
+      case 16:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->retryRetention);
+          this->__isset.retryRetention = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -26337,6 +26350,11 @@ uint32_t CompactionInfoStruct::write(::apache::thrift::protocol::TProtocol* opro
     xfer += oprot->writeI64(this->enqueueTime);
     xfer += oprot->writeFieldEnd();
   }
+  if (this->__isset.retryRetention) {
+    xfer += oprot->writeFieldBegin("retryRetention", ::apache::thrift::protocol::T_I64, 16);
+    xfer += oprot->writeI64(this->retryRetention);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -26359,6 +26377,7 @@ void swap(CompactionInfoStruct &a, CompactionInfoStruct &b) {
   swap(a.errorMessage, b.errorMessage);
   swap(a.hasoldabort, b.hasoldabort);
   swap(a.enqueueTime, b.enqueueTime);
+  swap(a.retryRetention, b.retryRetention);
   swap(a.__isset, b.__isset);
 }
 
@@ -26378,6 +26397,7 @@ CompactionInfoStruct::CompactionInfoStruct(const CompactionInfoStruct& other957)
   errorMessage = other957.errorMessage;
   hasoldabort = other957.hasoldabort;
   enqueueTime = other957.enqueueTime;
+  retryRetention = other957.retryRetention;
   __isset = other957.__isset;
 }
 CompactionInfoStruct& CompactionInfoStruct::operator=(const CompactionInfoStruct& other958) {
@@ -26396,6 +26416,7 @@ CompactionInfoStruct& CompactionInfoStruct::operator=(const CompactionInfoStruct
   errorMessage = other958.errorMessage;
   hasoldabort = other958.hasoldabort;
   enqueueTime = other958.enqueueTime;
+  retryRetention = other958.retryRetention;
   __isset = other958.__isset;
   return *this;
 }
@@ -26417,6 +26438,7 @@ void CompactionInfoStruct::printTo(std::ostream& out) const {
   out << ", " << "errorMessage="; (__isset.errorMessage ? (out << to_string(errorMessage)) : (out << "<null>"));
   out << ", " << "hasoldabort="; (__isset.hasoldabort ? (out << to_string(hasoldabort)) : (out << "<null>"));
   out << ", " << "enqueueTime="; (__isset.enqueueTime ? (out << to_string(enqueueTime)) : (out << "<null>"));
+  out << ", " << "retryRetention="; (__isset.retryRetention ? (out << to_string(retryRetention)) : (out << "<null>"));
   out << ")";
 }
 

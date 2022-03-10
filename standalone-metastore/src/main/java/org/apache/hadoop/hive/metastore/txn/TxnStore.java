@@ -452,6 +452,15 @@ public interface TxnStore extends Configurable {
   void markFailed(CompactionInfo info) throws MetaException;
 
   /**
+   * Stores the value of {@link CompactionInfo#retryRetention} and {@link CompactionInfo#errorMessage} fields
+   * of the CompactionInfo in the HMS database.
+   * @param info The {@link CompactionInfo} object holding the values.
+   * @throws MetaException
+   */
+  @RetrySemantics.CannotRetry
+  void setCleanerRetryRetentionTimeOnError(CompactionInfo info) throws MetaException;
+
+  /**
    * Clean up entries from TXN_TO_WRITE_ID table less than min_uncommited_txnid as found by
    * min(NEXT_TXN_ID.ntxn_next, min(MIN_HISTORY_LEVEL.mhl_min_open_txnid), min(Aborted TXNS.txn_id)).
    */

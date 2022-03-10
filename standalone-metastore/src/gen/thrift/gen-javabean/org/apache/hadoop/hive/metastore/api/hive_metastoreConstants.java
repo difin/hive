@@ -11,7 +11,7 @@ package org.apache.hadoop.hive.metastore.api;
 
   public static final java.lang.String DDL_TIME = "transient_lastDdlTime";
 
-  public static final java.lang.String HMS_API = "1.2.17";
+  public static final java.lang.String HMS_API = "1.2.18";
 
   public static final byte ACCESSTYPE_NONE = (byte)1;
 

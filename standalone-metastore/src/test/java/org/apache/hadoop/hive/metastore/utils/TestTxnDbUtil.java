@@ -164,7 +164,8 @@ public final class TestTxnDbUtil {
           " CQ_COMMIT_TIME bigint," +
           " CQ_INITIATOR_ID varchar(128)," +
           " CQ_INITIATOR_VERSION varchar(128)," +
-          " CQ_WORKER_VERSION varchar(128))");
+          " CQ_WORKER_VERSION varchar(128)," +
+          " CQ_RETRY_RETENTION bigint NOT NULL DEFAULT 0)");
 
       stmt.execute("CREATE TABLE NEXT_COMPACTION_QUEUE_ID (NCQ_NEXT bigint NOT NULL)");
       stmt.execute("INSERT INTO NEXT_COMPACTION_QUEUE_ID VALUES(1)");

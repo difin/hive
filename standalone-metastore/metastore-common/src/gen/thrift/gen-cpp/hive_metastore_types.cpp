@@ -27176,6 +27176,14 @@ uint32_t NotificationEventsCountRequest::read(::apache::thrift::protocol::TProto
           xfer += iprot->skip(ftype);
         }
         break;
+      case 16:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->retryRetention);
+          this->__isset.retryRetention = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -27218,6 +27226,11 @@ uint32_t NotificationEventsCountRequest::write(::apache::thrift::protocol::TProt
   if (this->__isset.limit) {
     xfer += oprot->writeFieldBegin("limit", ::apache::thrift::protocol::T_I64, 5);
     xfer += oprot->writeI64(this->limit);
+    xfer += oprot->writeFieldEnd();
+  }
+  if (this->__isset.retryRetention) {
+    xfer += oprot->writeFieldBegin("retryRetention", ::apache::thrift::protocol::T_I64, 16);
+    xfer += oprot->writeI64(this->retryRetention);
     xfer += oprot->writeFieldEnd();
   }
   xfer += oprot->writeFieldStop();
