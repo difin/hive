@@ -74,6 +74,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -110,6 +111,7 @@ import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Order;
@@ -267,6 +269,7 @@ public final class Utilities {
 
   private static final Object INPUT_SUMMARY_LOCK = new Object();
   private static final Object ROOT_HDFS_DIR_LOCK  = new Object();
+  public static final String BLOB_MANIFEST_FILE = "_blob_manifest_file";
 
   /**
    * ReduceField:
@@ -1586,7 +1589,13 @@ public final class Utilities {
           // for CTAS or Create MV statements
           perfLogger.PerfLogBegin("FileSinkOperator", "moveSpecifiedFileStatus");
           LOG.debug("CTAS/Create MV: Files being renamed:  " + filesKept.toString());
-          moveSpecifiedFilesInParallel(hconf, fs, tmpPath, specPath, filesKept);
+          if (conf.getTable() != null && conf.getTable().getTableType().equals(TableType.EXTERNAL_TABLE)) {
+            // Do this optimisation only for External tables.
+            createFileList(filesKept, tmpPath, specPath, fs);
+          } else {
+            Set<String> filesKeptPaths = filesKept.stream().map(x -> x.getPath().toString()).collect(Collectors.toSet());
+            moveSpecifiedFilesInParallel(hconf, fs, tmpPath, specPath, filesKeptPaths);
+          }
           perfLogger.PerfLogEnd("FileSinkOperator", "moveSpecifiedFileStatus");
         } else {
           // for rest of the statement e.g. INSERT, LOAD etc
@@ -1604,6 +1613,19 @@ public final class Utilities {
     fs.delete(taskTmpPath, true);
   }
 
+  private static void createFileList(Set<FileStatus> filesKept, Path srcPath, Path targetPath, FileSystem fs)
+      throws IOException {
+    try (FSDataOutputStream outStream = fs.create(new Path(targetPath, BLOB_MANIFEST_FILE))) {
+      // Adding the first entry in the manifest file as the source path, the entries post that are the files to be
+      // copied.
+      outStream.writeBytes(srcPath.toString() + System.lineSeparator());
+      for (FileStatus file : filesKept) {
+        outStream.writeBytes(file.getPath().toString() + System.lineSeparator());
+      }
+    }
+    LOG.debug("Created path list at path: {}", new Path(targetPath, BLOB_MANIFEST_FILE));
+  }
+
   /**
    * move specified files to destination in parallel mode.
    * Spins up multiple threads, schedules transfer and shuts down the pool.
@@ -1616,8 +1638,8 @@ public final class Utilities {
    * @throws HiveException
    * @throws IOException
    */
-  private static void moveSpecifiedFilesInParallel(Configuration conf, FileSystem fs,
-      Path srcPath, Path destPath, Set<FileStatus> filesToMove)
+  public static void moveSpecifiedFilesInParallel(Configuration conf, FileSystem fs,
+      Path srcPath, Path destPath, Set<String> filesToMove)
       throws HiveException, IOException {
 
     LOG.info("rename {} files from {} to dest {}",
@@ -1647,7 +1669,7 @@ public final class Utilities {
    * @throws IOException
    */
   private static void moveSpecifiedFilesInParallel(FileSystem fs,
-      Path src, Path dst, Set<FileStatus> filesToMove, List<Future<Void>> futures,
+      Path src, Path dst, Set<String> filesToMove, List<Future<Void>> futures,
       ExecutorService pool) throws IOException {
     if (!fs.exists(dst)) {
       LOG.info("Creating {}", dst);
@@ -1656,7 +1678,7 @@ public final class Utilities {
 
     FileStatus[] files = fs.listStatus(src);
     for (FileStatus fileStatus : files) {
-      if (filesToMove.contains(fileStatus)) {
+      if (filesToMove.contains(fileStatus.getPath().toString())) {
         futures.add(pool.submit(new Callable<Void>() {
           @Override
           public Void call() throws HiveException {
