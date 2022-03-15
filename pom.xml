@@ -165,7 +165,7 @@
     <mockito-core.version>3.4.4</mockito-core.version>
     <powermock.version>1.7.4</powermock.version>
     <mina.version>2.0.0-M5</mina.version>
-    <netty.version>4.1.51.Final</netty.version>
+    <netty.version>4.1.75.Final</netty.version>
     <netty3.version>3.10.5.Final</netty3.version> <!-- used by druid storage handler -->
     <netty.hadoop.version>4.0.52.Final</netty.hadoop.version>
     <pac4j-saml.version>4.0.3</pac4j-saml.version>
