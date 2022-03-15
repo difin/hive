@@ -168,7 +168,7 @@
     <netty.version>4.1.51.Final</netty.version>
     <netty3.version>3.10.5.Final</netty3.version> <!-- used by druid storage handler -->
     <netty.hadoop.version>4.0.52.Final</netty.hadoop.version>
-    <pac4j-saml.version>4.0.3</pac4j-saml.version>
+    <pac4j-saml.version>4.5.5</pac4j-saml.version>
     <paranamer.version>2.8</paranamer.version>
     <parquet.version>1.10.99.2022.0.7.0-SNAPSHOT</parquet.version>
     <pig.version> 0.16.0</pig.version>
