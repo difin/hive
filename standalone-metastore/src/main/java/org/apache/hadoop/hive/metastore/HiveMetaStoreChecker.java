@@ -367,7 +367,7 @@ public class HiveMetaStoreChecker {
             prFromMetastore.setPartitionName(partName);
             prFromMetastore.setTableName(partition.getTableName());
 
-            synchronized (this) {
+            synchronized (result) {
               if (!tempFs.exists(tempPartPath)) {
                 result.getPartitionsNotOnFs().add(prFromMetastore);
               } else {
@@ -392,7 +392,7 @@ public class HiveMetaStoreChecker {
                 }
               }
             }
-            synchronized (this) {
+            synchronized (partPaths) {
               for (int i = 0; i < getPartitionSpec(table, partition).size(); i++) {
                 Path qualifiedPath = tempPartPath.makeQualified(tempFs);
                 pathInterner.intern(qualifiedPath);
