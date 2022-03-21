@@ -128,6 +128,7 @@ import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.REPL_SNAPSHOT_DIFF_F
 import static org.apache.hadoop.hive.metastore.ReplChangeManager.SOURCE_OF_REPLICATION;
 import static org.apache.hadoop.hive.metastore.ReplChangeManager.getReplPolicyIdString;
 import static org.apache.hadoop.hive.ql.exec.repl.ReplAck.LOAD_ACKNOWLEDGEMENT;
+import static org.apache.hadoop.hive.ql.exec.repl.ReplAck.NON_RECOVERABLE_MARKER;
 import static org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils.RANGER_AUTHORIZER;
 import static org.apache.hadoop.hive.ql.exec.repl.util.SnapshotUtils.cleanupSnapshots;
 import static org.apache.hadoop.hive.ql.exec.repl.util.SnapshotUtils.getDFS;
@@ -182,8 +183,11 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
         initiateDataCopyTasks();
       } else {
         Path dumpRoot = ReplUtils.getEncodedDumpRootPath(conf, work.dbNameOrPattern.toLowerCase());
-        if (ReplUtils.failedWithNonRecoverableError(ReplUtils.getLatestDumpPath(dumpRoot, conf), conf)) {
+        Path latestDumpPath = ReplUtils.getLatestDumpPath(dumpRoot, conf);
+        if (ReplUtils.failedWithNonRecoverableError(latestDumpPath, conf)) {
           LOG.error("Previous dump failed with non recoverable error. Needs manual intervention. ");
+          Path nonRecoverableFile = new Path(latestDumpPath, NON_RECOVERABLE_MARKER.toString());
+          ReplUtils.reportStatusInReplicationMetrics(getName(), Status.SKIPPED, nonRecoverableFile.toString(), conf);
           setException(new SemanticException(ErrorMsg.REPL_FAILED_WITH_NON_RECOVERABLE_ERROR.format()));
           return ErrorMsg.REPL_FAILED_WITH_NON_RECOVERABLE_ERROR.getErrorCode();
         }
@@ -236,6 +240,7 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
           } else {
             LOG.info("Previous Dump is not yet loaded. Skipping this iteration.");
           }
+          ReplUtils.reportStatusInReplicationMetrics(getName(), Status.SKIPPED, null, conf);
         }
       }
     } catch (RuntimeException e) {
