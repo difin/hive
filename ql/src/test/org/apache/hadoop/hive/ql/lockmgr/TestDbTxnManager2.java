@@ -3716,4 +3716,119 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     driver.getFetchTask().fetch(res);
     Assert.assertEquals("No records found", 2, res.size());
   }
+  
+  @Test
+  public void testRenameTableNonBlocking() throws Exception {
+    testRenameTable(false);
+  }
+  @Test
+  public void testRenameTableBlocking() throws Exception {
+    testRenameTable(true);
+  }
+
+  private void testRenameTable(boolean blocking) throws Exception {
+    dropTable(new String[] {"tab_acid", "tab_acid_v2"});
+    FileSystem fs = FileSystem.get(conf);
+    AccessibilityChanger changer = new AccessibilityChanger();
+
+    Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
+    changer.enableAccess(validTxnManager);
+    Object obj = validTxnManager.get(driver);
+
+    HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
+    HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
+    driver = Mockito.spy(driver);
+    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
+    changer.safelyDisableAccess(validTxnManager);
+
+    validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
+    changer.enableAccess(validTxnManager);
+    obj = validTxnManager.get(driver2);
+
+    HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
+    driver2 = Mockito.spy(driver2);
+    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
+    changer.safelyDisableAccess(validTxnManager);
+
+    driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
+      "stored as orc TBLPROPERTIES ('transactional'='true')");
+    driver.run("insert into tab_acid partition(p) (a,b,p) values(1,2,'foo'),(3,4,'bar')");
+
+    driver.compileAndRespond("select * from tab_acid");
+    List<String> res = new ArrayList<>();
+
+    driver.lockAndRespond();
+    List<ShowLocksResponseElement> locks = getLocks();
+    Assert.assertEquals("Unexpected lock count", 1, locks.size());
+
+    checkLock(LockType.SHARED_READ,
+      LockState.ACQUIRED, "default", "tab_acid", null, locks);
+
+    DbTxnManager txnMgr2 = (DbTxnManager) TxnManagerFactory.getTxnManagerFactory().getTxnManager(conf);
+    swapTxnManager(txnMgr2);
+    driver2.compileAndRespond("alter table tab_acid rename to tab_acid_v2");
+
+    if (blocking) {
+      txnMgr2.acquireLocks(driver2.getPlan(), ctx, null, false);
+      locks = getLocks();
+
+      ShowLocksResponseElement checkLock = checkLock(LockType.EXCLUSIVE,
+        LockState.WAITING, "default", "tab_acid", null, locks);
+
+      swapTxnManager(txnMgr);
+      Mockito.doNothing().when(driver).lockAndRespond();
+      driver.run();
+
+      driver.getFetchTask().fetch(res);
+      swapTxnManager(txnMgr2);
+
+      FieldSetter.setField(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements"), 0);
+      txnMgr2.getMS().unlock(checkLock.getLockid());
+    }
+    driver2.lockAndRespond();
+    locks = getLocks();
+    Assert.assertEquals("Unexpected lock count", blocking ? 1 : 2, locks.size());
+
+    checkLock(blocking ? LockType.EXCLUSIVE : LockType.EXCL_WRITE,
+      LockState.ACQUIRED, "default", "tab_acid", null, locks);
+
+    Mockito.doNothing().when(driver2).lockAndRespond();
+    driver2.run();
+
+    if (!blocking) {
+      swapTxnManager(txnMgr);
+      Mockito.doNothing().when(driver).lockAndRespond();
+      driver.run();
+    }
+    Mockito.reset(driver, driver2);
+
+    FileStatus[] stat = fs.listStatus(new Path(getWarehouseDir()),
+      t -> t.getName().matches("tab_acid" + (blocking ? "_v2" : SOFT_DELETE_TABLE_PATTERN)));
+    if (1 != stat.length) {
+      Assert.fail("Table couldn't be found on FS");
+    }
+    driver.getFetchTask().fetch(res);
+    Assert.assertEquals("Expecting 2 rows and found " + res.size(), 2, res.size());
+
+    try {
+      driver.run("select * from tab_acid");
+    } catch (CommandProcessorException ex) {
+      Assert.assertEquals(ErrorMsg.INVALID_TABLE.getErrorCode(), ex.getResponseCode());
+    }
+
+    driver.run("select * from tab_acid_v2");
+    res = new ArrayList<>();
+    driver.getFetchTask().fetch(res);
+    Assert.assertEquals("Expecting 2 rows and found " + res.size(), 2, res.size());
+
+    //create table with the same name
+    driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
+      "stored as orc TBLPROPERTIES ('transactional'='true')");
+    driver.run("insert into tab_acid partition(p) (a,b,p) values(1,2,'foo'),(3,4,'bar')");
+
+    driver.run("select * from tab_acid ");
+    res = new ArrayList<>();
+    driver.getFetchTask().fetch(res);
+    Assert.assertEquals("Expecting 2 rows and found " + res.size(), 2, res.size());
+  }
 }
