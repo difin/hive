@@ -397,6 +397,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
   // flag for no scan during analyze ... compute statistics
   private boolean noscan;
 
+  // flag indicating that the analyzations should go only till resultSchema is ready
+  protected boolean forViewCreation;
+
   // whether this is a mv rebuild rewritten expression
   protected MaterializationRebuildMode mvRebuildMode = MaterializationRebuildMode.NONE;
   protected String mvRebuildDbName; // Db name for materialization to rebuild
@@ -14249,6 +14252,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
   protected ASTNode analyzeCreateView(ASTNode ast, QB qb, PlannerContext plannerCtx) throws SemanticException {
     TableName qualTabName = getQualifiedTableName((ASTNode) ast.getChild(0));
+    if (ast.getToken().getType() == HiveParser.TOK_CREATE_MATERIALIZED_VIEW ||
+        ast.getToken().getType() == HiveParser.TOK_CREATEVIEW) {
+      forViewCreation();
+    }
     final String dbDotTable = qualTabName.getNotEmptyDbTable();
     List<FieldSchema> cols = null;
     boolean ifNotExists = false;
@@ -15982,6 +15989,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
   public boolean isValidQueryCaching() {
     return (invalidResultCacheReason == null);
+  }
+
+  public void forViewCreation() {
+    this.forViewCreation = true;
   }
 
   protected enum MaterializationRebuildMode {

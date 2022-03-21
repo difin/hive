@@ -2305,7 +2305,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
               mvRebuildMode == MaterializationRebuildMode.NONE &&
               !rootQB.isMaterializedView() && !ctx.isLoadingMaterializedView() && !getQB().isCTAS() &&
               rootQB.getIsQuery() &&
-              rootQB.hasTableDefined();
+              rootQB.hasTableDefined() &&
+              !forViewCreation;
     }
 
     private RelNode applyMaterializedViewRewritingByText(
