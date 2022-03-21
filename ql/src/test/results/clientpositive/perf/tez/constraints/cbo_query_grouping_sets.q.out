@@ -420,7 +420,6 @@ STAGE PLANS:
                       null sort order: zza
                       sort order: +++
                       Statistics: Num rows: 1243096 Data size: 769476424 Basic stats: COMPLETE Column stats: COMPLETE
-                      TopN Hash Memory Usage: 0.1
                       value expressions: _col3 (type: decimal(16,6)), _col4 (type: decimal(16,6)), _col5 (type: decimal(16,6))
         Reducer 6 
             Execution mode: vectorized

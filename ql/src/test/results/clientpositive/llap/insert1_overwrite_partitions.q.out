@@ -80,7 +80,6 @@ STAGE PLANS:
                         null sort order: aa
                         sort order: --
                         Statistics: Num rows: 98 Data size: 31280 Basic stats: PARTIAL Column stats: NONE
-                        TopN Hash Memory Usage: 0.1
             Execution mode: vectorized, llap
             LLAP IO: all inputs
         Reducer 2 
@@ -212,7 +211,6 @@ STAGE PLANS:
                         null sort order: aa
                         sort order: --
                         Statistics: Num rows: 98 Data size: 31280 Basic stats: PARTIAL Column stats: NONE
-                        TopN Hash Memory Usage: 0.1
             Execution mode: vectorized, llap
             LLAP IO: all inputs
         Reducer 2 
@@ -438,7 +436,6 @@ STAGE PLANS:
                         null sort order: aa
                         sort order: --
                         Statistics: Num rows: 98 Data size: 31280 Basic stats: PARTIAL Column stats: NONE
-                        TopN Hash Memory Usage: 0.1
             Execution mode: vectorized, llap
             LLAP IO: all inputs
         Reducer 2 
@@ -561,7 +558,6 @@ STAGE PLANS:
                         null sort order: aa
                         sort order: --
                         Statistics: Num rows: 98 Data size: 31280 Basic stats: PARTIAL Column stats: NONE
-                        TopN Hash Memory Usage: 0.1
             Execution mode: vectorized, llap
             LLAP IO: all inputs
         Reducer 2 
@@ -751,7 +747,6 @@ STAGE PLANS:
                         null sort order: aa
                         sort order: --
                         Statistics: Num rows: 98 Data size: 31280 Basic stats: PARTIAL Column stats: NONE
-                        TopN Hash Memory Usage: 0.1
             Execution mode: vectorized, llap
             LLAP IO: all inputs
         Reducer 2 
@@ -883,7 +878,6 @@ STAGE PLANS:
                         null sort order: aa
                         sort order: --
                         Statistics: Num rows: 98 Data size: 31280 Basic stats: PARTIAL Column stats: NONE
-                        TopN Hash Memory Usage: 0.1
             Execution mode: vectorized, llap
             LLAP IO: all inputs
         Reducer 2 

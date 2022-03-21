@@ -91,7 +91,6 @@ STAGE PLANS:
                         null sort order: aa
                         sort order: --
                         Statistics: Num rows: 123 Data size: 40112 Basic stats: PARTIAL Column stats: NONE
-                        TopN Hash Memory Usage: 0.1
             Execution mode: vectorized, llap
             LLAP IO: all inputs
         Reducer 2 
@@ -251,7 +250,6 @@ STAGE PLANS:
                         null sort order: aa
                         sort order: --
                         Statistics: Num rows: 123 Data size: 40112 Basic stats: PARTIAL Column stats: NONE
-                        TopN Hash Memory Usage: 0.1
             Execution mode: vectorized, llap
             LLAP IO: all inputs
         Reducer 2 
