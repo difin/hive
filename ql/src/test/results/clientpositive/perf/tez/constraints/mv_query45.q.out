@@ -45,7 +45,6 @@ POSTHOOK: Lineage: mv_customer_customer_address_n101.ca_street_number SIMPLE [(c
 POSTHOOK: Lineage: mv_customer_customer_address_n101.ca_street_type SIMPLE [(customer_address)ca.FieldSchema(name:ca_street_type, type:string, comment:null), ]
 POSTHOOK: Lineage: mv_customer_customer_address_n101.ca_suite_number SIMPLE [(customer_address)ca.FieldSchema(name:ca_suite_number, type:string, comment:null), ]
 POSTHOOK: Lineage: mv_customer_customer_address_n101.ca_zip SIMPLE [(customer_address)ca.FieldSchema(name:ca_zip, type:string, comment:null), ]
-Warning: Shuffle Join MERGEJOIN[110][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
 PREHOOK: query: explain cbo
 select  ca_zip, ca_county, sum(ws_sales_price)
  from web_sales, customer, customer_address, date_dim, item
@@ -102,17 +101,12 @@ CBO PLAN:
 HiveSortLimit(sort0=[$0], sort1=[$1], dir0=[ASC], dir1=[ASC], fetch=[100])
   HiveProject(ca_zip=[$1], ca_county=[$0], $f2=[$2])
     HiveAggregate(group=[{3, 4}], agg#0=[sum($2)])
-      HiveFilter(condition=[OR(AND(<>($8, 0), IS NOT NULL($10)), IN(substr($4, 1, 5), _UTF-16LE'85669':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'86197':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'88274':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'83405':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'86475':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'85392':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'85460':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'80348':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'81792':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"))])
-        HiveProject(ws_sold_date_sk=[$6], ws_item_sk=[$7], ws_sales_price=[$9], ca_county=[$11], ca_zip=[$12], d_date_sk=[$5], i_item_sk=[$0], i_item_id=[$1], c=[$2], i_item_id0=[$3], literalTrue=[$4])
-          HiveJoin(condition=[=($7, $0)], joinType=[inner])
-            HiveJoin(condition=[=($1, $3)], joinType=[left])
-              HiveJoin(condition=[true], joinType=[inner])
-                HiveProject(i_item_sk=[$0], i_item_id=[$1])
-                  HiveTableScan(table=[[default, item]], table:alias=[item])
-                HiveProject(c=[$0])
-                  HiveAggregate(group=[{}], c=[COUNT()])
-                    HiveFilter(condition=[IN($0, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29)])
-                      HiveTableScan(table=[[default, item]], table:alias=[item])
+      HiveFilter(condition=[OR(IS NOT NULL($9), IN(substr($4, 1, 5), _UTF-16LE'85669':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'86197':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'88274':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'83405':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'86475':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'85392':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'85460':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'80348':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", _UTF-16LE'81792':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"))])
+        HiveProject(ws_sold_date_sk=[$5], ws_item_sk=[$6], ws_sales_price=[$8], ca_county=[$10], ca_zip=[$11], d_date_sk=[$4], i_item_sk=[$0], i_item_id=[$1], i_item_id0=[$2], literalTrue=[$3])
+          HiveJoin(condition=[=($6, $0)], joinType=[inner])
+            HiveJoin(condition=[=($1, $2)], joinType=[left])
+              HiveProject(i_item_sk=[$0], i_item_id=[$1])
+                HiveTableScan(table=[[default, item]], table:alias=[item])
               HiveProject(i_item_id=[$0], literalTrue=[true])
                 HiveAggregate(group=[{1}])
                   HiveFilter(condition=[IN($0, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29)])
