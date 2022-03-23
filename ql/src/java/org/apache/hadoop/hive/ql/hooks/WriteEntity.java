@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql.hooks;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.ql.ddl.table.AlterTableType;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
@@ -40,7 +41,7 @@ public class WriteEntity extends Entity implements Serializable {
   private transient boolean isDynamicPartitionWrite = false;
   private transient boolean isTxnAnalyze = false;
 
-  public static enum WriteType {
+  public enum WriteType {
     DDL_EXCLUSIVE, // for use in DDL statements that require an exclusive lock,
                    // such as dropping a table or partition
     DDL_EXCL_WRITE, // for use in DDL operations that can allow concurrent reads, like truncate in acid
@@ -51,7 +52,7 @@ public class WriteEntity extends Entity implements Serializable {
     UPDATE,
     DELETE,
     PATH_WRITE, // Write to a URI, no locking done for this
-  };
+  }
 
   private WriteType writeType;
 
@@ -198,7 +199,7 @@ public class WriteEntity extends Entity implements Serializable {
    * @param op Operation type from the alter table description
    * @return the write type this should use.
    */
-  public static WriteType determineAlterTableWriteType(AlterTableType op, Table table, Configuration conf) {
+  public static WriteType determineAlterTableWriteType(AlterTableType op, Table table, HiveConf conf) {
     switch (op) {
     case RENAME_COLUMN:
     case CLUSTERED_BY:
