@@ -186,12 +186,4 @@ public abstract class VectorPTFEvaluatorBase {
   public boolean isCacheableForRange() {
     return true;
   }
-
-  /**
-   * VectorPTFGroupBatches class works on a subset of columns, which are mapped by an array of
-   * changed indices. Some evaluators might refer to column indices, so they can adapt to the
-   * changed column layout by this call.
-   */
-  public void mapCustomColumns(int[] bufferedColumnMap) {
-  }
 }

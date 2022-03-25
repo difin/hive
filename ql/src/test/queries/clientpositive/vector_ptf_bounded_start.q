@@ -44,9 +44,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 
@@ -73,9 +71,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 
@@ -102,9 +98,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 
@@ -131,9 +125,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 
@@ -160,9 +152,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 
@@ -189,9 +179,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 
@@ -219,9 +207,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 
@@ -248,9 +234,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 
@@ -278,9 +262,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 
@@ -307,9 +289,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 select "************ FOLLOWING ROWS ************";
@@ -337,9 +317,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 select p_mfgr, p_name, rowindex, p_date, p_retailprice,
@@ -362,9 +340,7 @@ dense_rank() over(partition by p_mfgr) as dr,
 rank() over(partition by p_mfgr order by p_date) as r_date,
 dense_rank() over(partition by p_mfgr order by p_date) as dr_date,
 first_value(p_retailprice) over(partition by p_mfgr) as fv,
-last_value(p_retailprice) over(partition by p_mfgr) as lv,
-lead(p_retailprice) over(partition by p_mfgr) as lead1,
-lag(p_retailprice) over(partition by p_mfgr) as lag1
+last_value(p_retailprice) over(partition by p_mfgr) as lv
 from vector_ptf_part_simple_orc;
 
 

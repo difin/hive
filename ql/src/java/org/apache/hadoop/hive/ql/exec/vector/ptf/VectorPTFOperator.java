@@ -507,7 +507,6 @@ public class VectorPTFOperator extends Operator<PTFDesc>
               .filter(j -> bufferedColumnMap[j] == evaluator.inputVecExpr.outputColumnNum)
               .findFirst().orElseGet(() -> evaluator.inputVecExpr.outputColumnNum);
         }
-        evaluator.mapCustomColumns(bufferedColumnMap);
       }
     }
   }
