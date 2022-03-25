@@ -122,6 +122,7 @@ RUN ln -s /usr/lib/hadoop/share/hadoop/mapreduce/ /usr/lib/hadoop-mapreduce
 RUN ln -s /usr/lib/hadoop/share/hadoop/yarn/ /usr/lib/hadoop-yarn
 RUN ln -s /usr/lib/hadoop/bin/hadoop /usr/bin/hadoop
 RUN ln -s /usr/lib/hadoop/bin/hdfs /usr/bin/hdfs
+RUN ln -s /usr/lib/hadoop/share/hadoop/tools/lib/* /usr/lib/hadoop/share/hadoop/common
 RUN ln -s /usr/lib/hadoop/share/hadoop/tools/lib/hadoop-aws-${HADOOP_VERSION}.jar /usr/lib/hadoop/hadoop-aws-${HADOOP_VERSION}.jar
 
 COPY --from=ranger-base /usr/lib/ranger-${RANGER_VERSION}-hive-plugin /usr/lib/ranger-hive-plugin
