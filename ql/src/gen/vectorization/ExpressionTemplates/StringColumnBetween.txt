@@ -31,6 +31,8 @@ import java.util.Arrays;
 public class <ClassName> extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  protected final int inputCol;
+
   private final byte[] left;
   private final byte[] right;
 
@@ -38,12 +40,14 @@ public class <ClassName> extends VectorExpression {
     super();
 
     // Dummy final assignments.
+    inputCol = -1;
     left = null;
     right = null;
   }
 
   public <ClassName>(int colNum, byte[] left, byte[] right, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.inputCol = colNum;
     this.left = left;
     this.right = right;
   }
@@ -55,7 +59,7 @@ public class <ClassName> extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumnNum[0]];
+    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputCol];
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColVector.isNull;
@@ -181,7 +185,7 @@ public class <ClassName> extends VectorExpression {
   @Override
   public String vectorExpressionParameters() {
     return
-        getColumnParamString(0, inputColumnNum[0]) +
+        getColumnParamString(0, inputCol) +
         ", left " + displayUtf8Bytes(left) + ", right " + displayUtf8Bytes(right);
   }
 }

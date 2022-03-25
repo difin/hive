@@ -30,8 +30,11 @@ import org.apache.hadoop.hive.ql.util.TimestampUtils;
 public class CastDoubleToTimestamp extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private int colNum;
+
   public CastDoubleToTimestamp(int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
   }
 
   public CastDoubleToTimestamp() {
@@ -51,7 +54,7 @@ public class CastDoubleToTimestamp extends VectorExpression {
       this.evaluateChildren(batch);
     }
 
-    DoubleColumnVector inputColVector = (DoubleColumnVector) batch.cols[inputColumnNum[0]];
+    DoubleColumnVector inputColVector = (DoubleColumnVector) batch.cols[colNum];
     TimestampColumnVector outputColVector = (TimestampColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColVector.isNull;
@@ -145,7 +148,7 @@ public class CastDoubleToTimestamp extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, colNum);
   }
 
   @Override

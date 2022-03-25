@@ -34,6 +34,7 @@ public class DoubleColumnInList extends VectorExpression implements IDoubleInExp
 
   private static final long serialVersionUID = 1L;
 
+  private int colNum;
   private double[] inListValues;
 
   // The set object containing the IN list. This is optimized for lookup
@@ -41,7 +42,8 @@ public class DoubleColumnInList extends VectorExpression implements IDoubleInExp
   private transient CuckooSetDouble inSet;
 
   public DoubleColumnInList(int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
   }
 
   public DoubleColumnInList() {
@@ -61,7 +63,7 @@ public class DoubleColumnInList extends VectorExpression implements IDoubleInExp
       inSet.load(inListValues);
     }
 
-    DoubleColumnVector inputColVector = (DoubleColumnVector) batch.cols[inputColumnNum[0]];
+    DoubleColumnVector inputColVector = (DoubleColumnVector) batch.cols[colNum];
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColVector.isNull;
@@ -151,7 +153,7 @@ public class DoubleColumnInList extends VectorExpression implements IDoubleInExp
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]) + ", values " + Arrays.toString(inListValues);
+    return getColumnParamString(0, colNum) + ", values " + Arrays.toString(inListValues);
   }
 
   @Override

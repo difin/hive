@@ -46,16 +46,21 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
  */
 public class CastStringToLong extends VectorExpression {
   private static final long serialVersionUID = 1L;
+  int inputColumn;
 
   // Transient members initialized by transientInit method.
   protected transient PrimitiveCategory integerPrimitiveCategory;
 
   public CastStringToLong(int inputColumn, int outputColumnNum) {
-    super(inputColumn, outputColumnNum);
+    super(outputColumnNum);
+    this.inputColumn = inputColumn;
   }
 
   public CastStringToLong() {
     super();
+
+    // Dummy final assignments.
+    inputColumn = -1;
   }
 
   @Override
@@ -176,7 +181,7 @@ public class CastStringToLong extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumnNum[0]];
+    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumn];
     int[] sel = batch.selected;
     int n = batch.size;
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
@@ -271,7 +276,7 @@ public class CastStringToLong extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, inputColumn);
   }
 
   @Override

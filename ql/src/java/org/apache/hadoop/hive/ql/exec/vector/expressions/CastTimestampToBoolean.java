@@ -28,12 +28,18 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public class CastTimestampToBoolean extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int colNum;
+
   public CastTimestampToBoolean(int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
   }
 
   public CastTimestampToBoolean() {
     super();
+
+    // Dummy final assignments.
+    colNum = -1;
   }
 
   private int toBool(TimestampColumnVector timestampColVector, int index) {
@@ -48,7 +54,7 @@ public class CastTimestampToBoolean extends VectorExpression {
       this.evaluateChildren(batch);
     }
 
-    TimestampColumnVector inputColVector = (TimestampColumnVector) batch.cols[inputColumnNum[0]];
+    TimestampColumnVector inputColVector = (TimestampColumnVector) batch.cols[colNum];
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColVector.isNull;
@@ -111,7 +117,7 @@ public class CastTimestampToBoolean extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, colNum);
   }
 
   @Override

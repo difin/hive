@@ -34,10 +34,12 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public class LongScalarDivideLongColumn extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int colNum;
   private final double value;
 
   public LongScalarDivideLongColumn(long value, int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
     this.value = (double) value;
   }
 
@@ -45,6 +47,7 @@ public class LongScalarDivideLongColumn extends VectorExpression {
     super();
 
     // Dummy final assignments.
+    colNum = -1;
     value = 0;
   }
 
@@ -55,7 +58,7 @@ public class LongScalarDivideLongColumn extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    LongColumnVector inputColVector = (LongColumnVector) batch.cols[inputColumnNum[0]];
+    LongColumnVector inputColVector = (LongColumnVector) batch.cols[colNum];
     DoubleColumnVector outputColVector = (DoubleColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColVector.isNull;
@@ -157,7 +160,7 @@ public class LongScalarDivideLongColumn extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return "val " + value + ", " + getColumnParamString(1, inputColumnNum[0]);
+    return "val " + value + ", " + getColumnParamString(1, colNum);
   }
 
   @Override

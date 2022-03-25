@@ -68,7 +68,7 @@ public class DynamicValueVectorExpression extends VectorExpression {
 
   public DynamicValueVectorExpression(int outputColumnNum, TypeInfo typeInfo,
       DynamicValue dynamicValue) throws HiveException {
-    super(-1, outputColumnNum);
+    super(outputColumnNum);
     this.type = VectorizationContext.getColumnVectorTypeFromTypeInfo(typeInfo);
     this.dynamicValue = dynamicValue;
     this.typeInfo = typeInfo;

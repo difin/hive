@@ -33,12 +33,14 @@ public class DateScalarSubtractDateColumn extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
   private final Timestamp value;
+  private final int colNum;
 
   private transient final Timestamp scratchTimestamp2 = new Timestamp(0);
   private transient final DateTimeMath dtm = new DateTimeMath();
 
   public DateScalarSubtractDateColumn(long value, int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
     this.value = new Timestamp(0);
     this.value.setTime(DateWritableV2.daysToMillis((int) value));
   }
@@ -48,6 +50,7 @@ public class DateScalarSubtractDateColumn extends VectorExpression {
 
     // Dummy final assignments.
     value = null;
+    colNum = -1;
   }
 
   @Override
@@ -63,7 +66,7 @@ public class DateScalarSubtractDateColumn extends VectorExpression {
     }
 
     // Input #2 is type date (epochDays).
-    LongColumnVector inputColVector2 = (LongColumnVector) batch.cols[inputColumnNum[0]];
+    LongColumnVector inputColVector2 = (LongColumnVector) batch.cols[colNum];
 
     // Output is type HiveIntervalDayTime.
     IntervalDayTimeColumnVector outputColVector = (IntervalDayTimeColumnVector) batch.cols[outputColumnNum];
@@ -143,7 +146,7 @@ public class DateScalarSubtractDateColumn extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return "val " + org.apache.hadoop.hive.common.type.Date.ofEpochMilli(value.getTime()) + ", " + getColumnParamString(1, inputColumnNum[0]);
+    return "val " + org.apache.hadoop.hive.common.type.Date.ofEpochMilli(value.getTime()) + ", " + getColumnParamString(1, colNum);
   }
 
   @Override

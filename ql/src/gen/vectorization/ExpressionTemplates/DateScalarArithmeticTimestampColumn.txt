@@ -49,14 +49,16 @@ public class <ClassName> extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
   private final Timestamp value;
+  private final int colNum;
 
   private transient final DateTimeMath dtm = new DateTimeMath();
 
   public <ClassName>(long value, int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
     // Scalar input #1 is type date (days).  For the math we convert it to a timestamp.
     this.value = new Timestamp(0);
     this.value.setTime(DateWritableV2.daysToMillis((int) value));
+    this.colNum = colNum;
   }
 
   public <ClassName>() {
@@ -64,6 +66,7 @@ public class <ClassName> extends VectorExpression {
 
     // Dummy final assignments.
     value = null;
+    colNum = -1;
   }
 
   @Override
@@ -85,7 +88,7 @@ public class <ClassName> extends VectorExpression {
     }
 
     // Input #2 is type <OperandType2>.
-    <InputColumnVectorType2> inputColVector2 = (<InputColumnVectorType2>) batch.cols[inputColumnNum[0]];
+    <InputColumnVectorType2> inputColVector2 = (<InputColumnVectorType2>) batch.cols[colNum];
 
     // Output is type <ReturnType>.
     <OutputColumnVectorType> outputColVector = (<OutputColumnVectorType>) batch.cols[outputColumnNum];
@@ -186,7 +189,7 @@ public class <ClassName> extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return "val " + org.apache.hadoop.hive.common.type.Date.ofEpochMilli(value.getTime()) + ", " + getColumnParamString(1, inputColumnNum[0]);
+    return "val " + org.apache.hadoop.hive.common.type.Date.ofEpochMilli(value.getTime()) + ", " + getColumnParamString(1, colNum);
   }
 
   @Override

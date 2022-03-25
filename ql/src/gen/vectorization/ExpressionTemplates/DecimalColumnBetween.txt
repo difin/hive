@@ -38,6 +38,8 @@ import java.util.HashSet;
 public class <ClassName> extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int inputColumn;
+
   protected final HiveDecimal leftValue;
   protected final HiveDecimal rightValue;
 
@@ -45,6 +47,7 @@ public class <ClassName> extends VectorExpression {
     super();
 
     // Dummy final assignments.
+    inputColumn = -1;
     leftValue = null;
     rightValue = null;
   }
@@ -54,7 +57,8 @@ public class <ClassName> extends VectorExpression {
    */
   public <ClassName>(int colNum, HiveDecimal leftValue, HiveDecimal rightValue,
       int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.inputColumn = colNum;
     this.leftValue = leftValue;
     this.rightValue = rightValue;
   }
@@ -66,7 +70,7 @@ public class <ClassName> extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    DecimalColumnVector inputColumnVector = (DecimalColumnVector) batch.cols[inputColumnNum[0]];
+    DecimalColumnVector inputColumnVector = (DecimalColumnVector) batch.cols[inputColumn];
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColumnVector.isNull;
@@ -177,7 +181,7 @@ public class <ClassName> extends VectorExpression {
   @Override
   public String vectorExpressionParameters() {
     return
-        getColumnParamString(0, inputColumnNum[0]) +
+        getColumnParamString(0, inputColumn) +
         ", left " + leftValue.toString() + ", right " + rightValue.toString();
   }
 

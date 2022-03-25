@@ -42,12 +42,14 @@ public abstract class VectorUDFTimestampFieldTimestamp extends VectorExpression 
 
   private static final long serialVersionUID = 1L;
 
+  protected final int colNum;
   protected final int field;
 
   protected final transient Calendar calendar = DateTimeMath.getProlepticGregorianCalendarUTC();
 
   public VectorUDFTimestampFieldTimestamp(int field, int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
     this.field = field;
   }
 
@@ -55,6 +57,7 @@ public abstract class VectorUDFTimestampFieldTimestamp extends VectorExpression 
     super();
 
     // Dummy final assignments.
+    colNum = -1;
     field = -1;
   }
 
@@ -83,7 +86,7 @@ public abstract class VectorUDFTimestampFieldTimestamp extends VectorExpression 
       }
 
     LongColumnVector outV = (LongColumnVector) batch.cols[outputColumnNum];
-    ColumnVector inputColVec = batch.cols[this.inputColumnNum[0]];
+    ColumnVector inputColVec = batch.cols[this.colNum];
 
     /* every line below this is identical for evaluateLong & evaluateString */
     final int n = inputColVec.isRepeating ? 1 : batch.size;
@@ -151,9 +154,9 @@ public abstract class VectorUDFTimestampFieldTimestamp extends VectorExpression 
 
   public String vectorExpressionParameters() {
     if (field == -1) {
-      return getColumnParamString(0, inputColumnNum[0]);
+      return getColumnParamString(0, colNum);
     } else {
-      return getColumnParamString(0, inputColumnNum[0]) + ", field " + DateUtils.getFieldName(field);
+      return getColumnParamString(0, colNum) + ", field " + DateUtils.getFieldName(field);
     }
   }
 

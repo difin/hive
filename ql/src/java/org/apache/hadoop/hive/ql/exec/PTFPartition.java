@@ -38,6 +38,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 /*
  * represents a collection of rows that is acted upon by a TableFunction or a WindowFunction.
  */
+@SuppressWarnings("deprecation")
 public class PTFPartition {
   protected static Logger LOG = LoggerFactory.getLogger(PTFPartition.class);
 
@@ -45,19 +46,7 @@ public class PTFPartition {
   StructObjectInspector inputOI;
   StructObjectInspector outputOI;
   private final PTFRowContainer<List<Object>> elems;
-  protected BoundaryCache boundaryCache;
-  protected PTFValueCache valueCache;
-
-  /*
-   * Used by VectorPTFGroupBatches. Currently, VectorPTFGroupBatches extends from PTFPartition in
-   * order to use already implemented classes for range calculation (e.g. BoundaryScanner) on
-   * vectorized codepaths. The optimal solution would be to change PTFPartition to be an interface
-   * and put the used methods there, e.g. getAt(i).
-   */
-  protected PTFPartition() {
-    elems = null;
-    boundaryCache = null;
-  }
+  private final BoundaryCache boundaryCache;
 
   protected PTFPartition(Configuration cfg,
       AbstractSerDe serDe, StructObjectInspector inputOI,
@@ -82,21 +71,8 @@ public class PTFPartition {
     } else {
       elems = null;
     }
-    initBoundaryCache(cfg);
-    initValueCache(cfg);
-  }
-
-  protected void initBoundaryCache(Configuration cfg) {
     int boundaryCacheSize = HiveConf.getIntVar(cfg, ConfVars.HIVE_PTF_RANGECACHE_SIZE);
-    boundaryCache = boundaryCacheSize >= 1 ? new BoundaryCache(boundaryCacheSize) : null;
-  }
-
-  protected void initValueCache(Configuration cfg) {
-    int valueCacheSize = HiveConf.getIntVar(cfg, ConfVars.HIVE_PTF_VALUECACHE_SIZE);
-    boolean valueCacheCollectStatistics =
-        HiveConf.getBoolVar(cfg, ConfVars.HIVE_PTF_VALUECACHE_COLLECT_STATISTICS);
-    valueCache =
-        valueCacheSize >= 1 ? new PTFValueCache(valueCacheSize, valueCacheCollectStatistics) : null;
+    boundaryCache = boundaryCacheSize > 1 ? new BoundaryCache(boundaryCacheSize) : null;
   }
 
   public void reset() throws HiveException {

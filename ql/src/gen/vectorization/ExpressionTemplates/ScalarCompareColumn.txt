@@ -38,10 +38,12 @@ public class <ClassName> extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
   protected final <OperandType1> value;
+  protected final int colNum;
 
   public <ClassName>(<OperandType1> value, int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
     this.value = value;
+    this.colNum = colNum;
   }
 
   public <ClassName>() {
@@ -49,6 +51,7 @@ public class <ClassName> extends VectorExpression {
 
     // Dummy final assignments.
     value = 0;
+    colNum = -1;
   }
 
   @Override
@@ -64,7 +67,7 @@ public class <ClassName> extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    <InputColumnVectorType> inputColVector = (<InputColumnVectorType>) batch.cols[inputColumnNum[0]];
+    <InputColumnVectorType> inputColVector = (<InputColumnVectorType>) batch.cols[colNum];
     <OutputColumnVectorType> outputColVector = (<OutputColumnVectorType>) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColVector.isNull;
@@ -152,7 +155,7 @@ public class <ClassName> extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return "val " + value + ", " + getColumnParamString(1, inputColumnNum[0]);
+    return "val " + value + ", " + getColumnParamString(1, colNum);
   }
 
   @Override

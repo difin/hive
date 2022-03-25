@@ -35,12 +35,18 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 public class CastStringToTimestamp extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int inputColumn;
+
   public CastStringToTimestamp() {
     super();
+
+    // Dummy final assignments.
+    inputColumn = -1;
   }
 
-  public CastStringToTimestamp(int inputColumnNum, int outputColumnNum) {
-    super(inputColumnNum, outputColumnNum);
+  public CastStringToTimestamp(int inputColumn, int outputColumnNum) {
+    super(outputColumnNum);
+    this.inputColumn = inputColumn;
   }
 
   @Override
@@ -50,7 +56,7 @@ public class CastStringToTimestamp extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumnNum[0]];
+    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumn];
     int[] sel = batch.selected;
     int n = batch.size;
     TimestampColumnVector outputColVector = (TimestampColumnVector) batch.cols[outputColumnNum];
@@ -158,7 +164,7 @@ public class CastStringToTimestamp extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, inputColumn);
   }
 
   @Override

@@ -44,7 +44,7 @@ public class GroupingColumn extends MathFuncLongToLong {
 
   @Override
   public String vectorExpressionParameters() {
-    return "col " + inputColumnNum[0] + ", mask " + mask;
+    return "col " + colNum + ", mask " + mask;
   }
 
   @Override

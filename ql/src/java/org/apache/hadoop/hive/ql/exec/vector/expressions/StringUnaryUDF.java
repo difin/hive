@@ -39,12 +39,14 @@ public class StringUnaryUDF extends VectorExpression {
 
   private static final long serialVersionUID = 1L;
 
+  private final int colNum;
   private final IUDFUnaryString func;
 
   private Text s;
 
   StringUnaryUDF(int colNum, int outputColumnNum, IUDFUnaryString func) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
     this.func = func;
     s = new Text();
   }
@@ -53,6 +55,7 @@ public class StringUnaryUDF extends VectorExpression {
     super();
 
     // Dummy final assignments.
+    colNum = -1;
     func = null;
   }
 
@@ -63,7 +66,7 @@ public class StringUnaryUDF extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumnNum[0]];
+    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[colNum];
     int[] sel = batch.selected;
     int n = batch.size;
     byte[][] vector = inputColVector.vector;
@@ -184,7 +187,7 @@ public class StringUnaryUDF extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, colNum);
   }
 
   @Override

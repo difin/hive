@@ -30,12 +30,18 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public class NotCol extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int colNum;
+
   public NotCol(int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
   }
 
   public NotCol() {
     super();
+
+    // Dummy final assignments.
+    colNum = -1;
   }
 
   @Override
@@ -45,7 +51,7 @@ public class NotCol extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    LongColumnVector inputColVector = (LongColumnVector) batch.cols[inputColumnNum[0]];
+    LongColumnVector inputColVector = (LongColumnVector) batch.cols[colNum];
     int[] sel = batch.selected;
     int n = batch.size;
     long[] vector = inputColVector.vector;
@@ -116,7 +122,7 @@ public class NotCol extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, colNum);
   }
 
   @Override

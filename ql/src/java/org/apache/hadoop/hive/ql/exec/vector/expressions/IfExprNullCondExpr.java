@@ -27,12 +27,18 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public class IfExprNullCondExpr extends IfExprCondExprBase {
   private static final long serialVersionUID = 1L;
 
+  protected final int arg3Column;
+
   public IfExprNullCondExpr(int arg1Column, int arg3Column, int outputColumnNum) {
-    super(arg1Column, arg3Column, outputColumnNum);
+    super(arg1Column, outputColumnNum);
+    this.arg3Column = arg3Column;
   }
 
   public IfExprNullCondExpr() {
     super();
+
+    // Dummy final assignments.
+    arg3Column = -1;
   }
 
   @Override
@@ -69,7 +75,7 @@ public class IfExprNullCondExpr extends IfExprCondExprBase {
     //           work on BytesColumnVector output columns???
     outputColVector.init();
 
-    ColumnVector elseColVector = batch.cols[inputColumnNum[1]];
+    ColumnVector elseColVector = batch.cols[arg3Column];
 
     final int thenCount = thenSelectedCount;
     final int elseCount = elseSelectedCount;
@@ -107,6 +113,6 @@ public class IfExprNullCondExpr extends IfExprCondExprBase {
   @Override
   public String vectorExpressionParameters() {
     // Second input parameter but 3rd column.
-    return getColumnParamString(0, inputColumnNum[0]) + ", null, " + getColumnParamString(2, inputColumnNum[1]);
+    return getColumnParamString(0, arg1Column) + ", null, " + getColumnParamString(2, arg3Column);
   }
 }

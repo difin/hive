@@ -33,12 +33,18 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 abstract public class TimestampToStringUnaryUDF extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  protected final int inputColumn;
+
   public TimestampToStringUnaryUDF(int inputColumn, int outputColumnNum) {
-    super(inputColumn, outputColumnNum);
+    super(outputColumnNum);
+    this.inputColumn = inputColumn;
   }
 
   public TimestampToStringUnaryUDF() {
     super();
+
+    // Dummy final assignments.
+    inputColumn = -1;
   }
 
   abstract protected void func(BytesColumnVector outputColVector, TimestampColumnVector inV, int i);
@@ -50,7 +56,7 @@ abstract public class TimestampToStringUnaryUDF extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    TimestampColumnVector inputColVector = (TimestampColumnVector) batch.cols[inputColumnNum[0]];
+    TimestampColumnVector inputColVector = (TimestampColumnVector) batch.cols[inputColumn];
     int[] sel = batch.selected;
     int n = batch.size;
     BytesColumnVector outputColVector = (BytesColumnVector) batch.cols[outputColumnNum];
@@ -134,7 +140,7 @@ abstract public class TimestampToStringUnaryUDF extends VectorExpression {
   }
 
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, inputColumn);
   }
 
   @Override

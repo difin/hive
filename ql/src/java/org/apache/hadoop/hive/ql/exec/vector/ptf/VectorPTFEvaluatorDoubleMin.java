@@ -129,7 +129,7 @@ public class VectorPTFEvaluatorDoubleMin extends VectorPTFEvaluatorBase {
   }
 
   @Override
-  public Object getGroupResult() {
+  public double getDoubleGroupResult() {
     return min;
   }
 

@@ -37,15 +37,21 @@ import org.apache.hadoop.hive.ql.util.DateTimeMath;
 public abstract class FuncLongToString extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int inputColumn;
+
   // Transient members initialized by transientInit method.
   protected byte[] bytes;
 
   FuncLongToString(int inputColumn, int outputColumnNum) {
-    super(inputColumn, outputColumnNum);
+    super(outputColumnNum);
+    this.inputColumn = inputColumn;
   }
 
   FuncLongToString() {
     super();
+
+    // Dummy final assignments.
+    inputColumn = -1;
   }
 
   @Override
@@ -62,7 +68,7 @@ public abstract class FuncLongToString extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    LongColumnVector inputColVector = (LongColumnVector) batch.cols[inputColumnNum[0]];
+    LongColumnVector inputColVector = (LongColumnVector) batch.cols[inputColumn];
     int[] sel = batch.selected;
     int n = batch.size;
     long[] vector = inputColVector.vector;
@@ -154,7 +160,7 @@ public abstract class FuncLongToString extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, inputColumn);
   }
 
   @Override

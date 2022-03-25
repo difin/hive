@@ -30,7 +30,10 @@ import com.google.common.base.Preconditions;
 /**
  * This class evaluates double sum() for a PTF group.
  */
-public class VectorPTFEvaluatorDoubleSum extends VectorPTFEvaluatorAbstractSum<Double> {
+public class VectorPTFEvaluatorDoubleSum extends VectorPTFEvaluatorBase {
+
+  protected boolean isGroupResultNull;
+  protected double sum;
 
   public VectorPTFEvaluatorDoubleSum(WindowFrameDef windowFrameDef, VectorExpression inputVecExpr,
       int outputColumnNum) {
@@ -107,23 +110,24 @@ public class VectorPTFEvaluatorDoubleSum extends VectorPTFEvaluatorAbstractSum<D
   }
 
   @Override
+  public boolean streamsResult() {
+    // We must evaluate whole group before producing a result.
+    return false;
+  }
+
+  @Override
+  public boolean isGroupResultNull() {
+    return isGroupResultNull;
+  }
+
+  @Override
   public Type getResultColumnVectorType() {
     return Type.DOUBLE;
   }
 
   @Override
-  protected Double computeValue(Double number) {
-    return VectorPTFEvaluatorHelper.computeValue(number);
-  }
-
-  @Override
-  protected Double plus(Double number1, Double number2) {
-    return VectorPTFEvaluatorHelper.plus(number1, number2);
-  }
-
-  @Override
-  protected Double minus(Double number1, Double number2) {
-    return VectorPTFEvaluatorHelper.minus(number1, number2);
+  public double getDoubleGroupResult() {
+    return sum;
   }
 
   @Override

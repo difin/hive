@@ -32,7 +32,7 @@ public class IdentityExpression extends VectorExpression {
   }
 
   public IdentityExpression(int colNum) {
-    super(-1, colNum);
+    super(colNum);
   }
 
   @Override

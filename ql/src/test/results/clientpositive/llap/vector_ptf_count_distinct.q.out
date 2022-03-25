@@ -293,7 +293,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorBytesCountDistinct]
                       functionInputExpressions: [col 0:string]
@@ -304,7 +303,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:string]
                       outputColumns: [2, 0, 1]
                       outputTypes: [bigint, string, string]
-                      partitionExpressions: [col 0:string]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 932 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -373,7 +371,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorBytesCountDistinct]
                       functionInputExpressions: [col 0:string]
@@ -384,7 +381,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:string]
                       outputColumns: [3, 1, 2, 0]
                       outputTypes: [bigint, bigint, string, string]
-                      partitionExpressions: [col 0:string]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 948 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -718,7 +714,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorBytesCountDistinct]
                       functionInputExpressions: [col 1:string]
@@ -729,7 +724,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:string]
                       outputColumns: [2, 1, 0]
                       outputTypes: [bigint, string, string]
-                      partitionExpressions: [col 0:string]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 932 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -798,7 +792,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorBytesCountDistinct]
                       functionInputExpressions: [col 2:string]
@@ -809,7 +802,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:string]
                       outputColumns: [3, 1, 0, 2]
                       outputTypes: [bigint, bigint, string, string]
-                      partitionExpressions: [col 0:string]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 948 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -1222,7 +1214,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorBytesCountDistinct]
                       functionInputExpressions: [col 1:string]
@@ -1233,7 +1224,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:string]
                       outputColumns: [2, 1, 0]
                       outputTypes: [bigint, string, string]
-                      partitionExpressions: [col 0:string]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 932 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -1302,7 +1292,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorBytesCountDistinct]
                       functionInputExpressions: [col 2:string]
@@ -1313,7 +1302,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:string]
                       outputColumns: [3, 1, 0, 2]
                       outputTypes: [bigint, bigint, string, string]
-                      partitionExpressions: [col 0:string]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 948 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -1529,7 +1517,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorBytesCountDistinct]
                       functionInputExpressions: [col 0:string]
@@ -1540,7 +1527,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:string]
                       outputColumns: [2, 0, 1]
                       outputTypes: [bigint, string, string]
-                      partitionExpressions: [col 0:string]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 932 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -1609,7 +1595,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorBytesCountDistinct]
                       functionInputExpressions: [col 0:string]
@@ -1620,7 +1605,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:string]
                       outputColumns: [3, 1, 2, 0]
                       outputTypes: [bigint, bigint, string, string]
-                      partitionExpressions: [col 0:string]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 948 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -2344,7 +2328,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorLongCountDistinct]
                       functionInputExpressions: [col 1:int]
@@ -2355,7 +2338,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:int]
                       outputColumns: [2, 1, 0]
                       outputTypes: [bigint, int, int]
-                      partitionExpressions: [col 0:int]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 560 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -2424,7 +2406,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorLongCountDistinct]
                       functionInputExpressions: [col 2:int]
@@ -2435,7 +2416,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:int]
                       outputColumns: [3, 1, 0, 2]
                       outputTypes: [bigint, bigint, int, int]
-                      partitionExpressions: [col 0:int]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 576 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -2651,7 +2631,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorLongCountDistinct]
                       functionInputExpressions: [col 0:int]
@@ -2662,7 +2641,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:int]
                       outputColumns: [2, 0, 1]
                       outputTypes: [bigint, int, int]
-                      partitionExpressions: [col 0:int]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 560 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -2731,7 +2709,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorLongCountDistinct]
                       functionInputExpressions: [col 0:int]
@@ -2742,7 +2719,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:int]
                       outputColumns: [3, 1, 2, 0]
                       outputTypes: [bigint, bigint, int, int]
-                      partitionExpressions: [col 0:int]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 576 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -3466,7 +3442,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorDoubleCountDistinct]
                       functionInputExpressions: [col 1:double]
@@ -3477,7 +3452,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:double]
                       outputColumns: [2, 1, 0]
                       outputTypes: [bigint, double, double]
-                      partitionExpressions: [col 0:double]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 576 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -3546,7 +3520,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorDoubleCountDistinct]
                       functionInputExpressions: [col 2:double]
@@ -3557,7 +3530,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:double]
                       outputColumns: [3, 1, 0, 2]
                       outputTypes: [bigint, bigint, double, double]
-                      partitionExpressions: [col 0:double]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 592 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -3773,7 +3745,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorDoubleCountDistinct]
                       functionInputExpressions: [col 0:double]
@@ -3784,7 +3755,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:double]
                       outputColumns: [2, 0, 1]
                       outputTypes: [bigint, double, double]
-                      partitionExpressions: [col 0:double]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 576 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -3853,7 +3823,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorDoubleCountDistinct]
                       functionInputExpressions: [col 0:double]
@@ -3864,7 +3833,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:double]
                       outputColumns: [3, 1, 2, 0]
                       outputTypes: [bigint, bigint, double, double]
-                      partitionExpressions: [col 0:double]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 592 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -4588,7 +4556,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorDecimalCountDistinct]
                       functionInputExpressions: [ConvertDecimal64ToDecimal(col 1:decimal(10,0)/DECIMAL_64) -> 3:decimal(10,0)]
@@ -4599,7 +4566,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:decimal(10,0)]
                       outputColumns: [2, 1, 0]
                       outputTypes: [bigint, decimal(10,0), decimal(10,0)]
-                      partitionExpressions: [col 0:decimal(10,0)]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 992 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -4668,7 +4634,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorDecimalCountDistinct]
                       functionInputExpressions: [ConvertDecimal64ToDecimal(col 2:decimal(10,0)/DECIMAL_64) -> 4:decimal(10,0)]
@@ -4679,7 +4644,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:decimal(10,0)]
                       outputColumns: [3, 1, 0, 2]
                       outputTypes: [bigint, bigint, decimal(10,0), decimal(10,0)]
-                      partitionExpressions: [col 0:decimal(10,0)]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 1008 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -4895,7 +4859,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorDecimalCountDistinct]
                       functionInputExpressions: [col 0:decimal(10,0)]
@@ -4906,7 +4869,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:decimal(10,0)]
                       outputColumns: [2, 0, 1]
                       outputTypes: [bigint, decimal(10,0), decimal(10,0)]
-                      partitionExpressions: [col 0:decimal(10,0)]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 992 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -4975,7 +4937,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorDecimalCountDistinct]
                       functionInputExpressions: [col 0:decimal(10,0)]
@@ -4986,7 +4947,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:decimal(10,0)]
                       outputColumns: [3, 1, 2, 0]
                       outputTypes: [bigint, bigint, decimal(10,0), decimal(10,0)]
-                      partitionExpressions: [col 0:decimal(10,0)]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 1008 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -5710,7 +5670,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorTimestampCountDistinct]
                       functionInputExpressions: [col 1:timestamp]
@@ -5721,7 +5680,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:timestamp]
                       outputColumns: [2, 1, 0]
                       outputTypes: [bigint, timestamp, timestamp]
-                      partitionExpressions: [col 0:timestamp]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 704 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -5790,7 +5748,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorTimestampCountDistinct]
                       functionInputExpressions: [col 2:timestamp]
@@ -5801,7 +5758,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:timestamp]
                       outputColumns: [3, 1, 0, 2]
                       outputTypes: [bigint, bigint, timestamp, timestamp]
-                      partitionExpressions: [col 0:timestamp]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 720 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -6017,7 +5973,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorTimestampCountDistinct]
                       functionInputExpressions: [col 0:timestamp]
@@ -6028,7 +5983,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:timestamp]
                       outputColumns: [2, 0, 1]
                       outputTypes: [bigint, timestamp, timestamp]
-                      partitionExpressions: [col 0:timestamp]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 704 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -6097,7 +6051,6 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isDistinct: true
                   PTF Vectorization:
-                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorTimestampCountDistinct]
                       functionInputExpressions: [col 0:timestamp]
@@ -6108,7 +6061,6 @@ STAGE PLANS:
                       orderExpressions: [col 0:timestamp]
                       outputColumns: [3, 1, 2, 0]
                       outputTypes: [bigint, bigint, timestamp, timestamp]
-                      partitionExpressions: [col 0:timestamp]
                       streamingColumns: []
                   Statistics: Num rows: 2 Data size: 720 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator

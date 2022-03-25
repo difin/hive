@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.ql.exec.vector.ptf;
 
+import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector.Type;
 import org.apache.hadoop.hive.ql.exec.vector.DecimalColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
@@ -133,7 +134,7 @@ public class VectorPTFEvaluatorDecimalMin extends VectorPTFEvaluatorBase {
   }
 
   @Override
-  public Object getGroupResult() {
+  public HiveDecimalWritable getDecimalGroupResult() {
     return min;
   }
 

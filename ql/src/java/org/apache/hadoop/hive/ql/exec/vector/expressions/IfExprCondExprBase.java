@@ -29,6 +29,8 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public abstract class IfExprCondExprBase extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  protected final int arg1Column;
+
   // Whether the IF statement boolean expression was repeating.
   protected transient boolean isIfStatementResultRepeated;
   protected transient boolean isIfStatementResultThen;
@@ -41,20 +43,15 @@ public abstract class IfExprCondExprBase extends VectorExpression {
   protected transient int[] elseSelected;
 
   public IfExprCondExprBase(int arg1Column, int outputColumnNum) {
-    super(arg1Column, outputColumnNum);
-  }
-
-  /* These constructors are used by subclasses */
-  public IfExprCondExprBase(int arg1Column, int arg2Column, int outputColumnNum) {
-    super(arg1Column, arg2Column, outputColumnNum);
-  }
-
-  public IfExprCondExprBase(int arg1Column, int arg2Column, int arg3Column, int outputColumnNum) {
-    super(arg1Column, arg2Column, arg3Column, outputColumnNum);
+    super(outputColumnNum);
+    this.arg1Column = arg1Column;
   }
 
   public IfExprCondExprBase() {
     super();
+
+    // Dummy final assignments.
+    arg1Column = -1;
   }
 
   public void conditionalEvaluate(VectorizedRowBatch batch, VectorExpression condVecExpr,
@@ -93,7 +90,7 @@ public abstract class IfExprCondExprBase extends VectorExpression {
 
     // Child #1 is the IF boolean expression.
     childExpressions[0].evaluate(batch);
-    LongColumnVector ifExprColVector = (LongColumnVector) batch.cols[inputColumnNum[0]];
+    LongColumnVector ifExprColVector = (LongColumnVector) batch.cols[arg1Column];
     if (ifExprColVector.isRepeating) {
       isIfStatementResultRepeated = true;
       isIfStatementResultThen =

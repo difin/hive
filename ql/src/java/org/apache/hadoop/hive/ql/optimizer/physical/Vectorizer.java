@@ -115,7 +115,6 @@ import org.apache.hadoop.hive.ql.lib.TaskGraphWalker;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
-import org.apache.hadoop.hive.ql.parse.WindowingSpec.WindowType;
 import org.apache.hadoop.hive.ql.plan.AbstractOperatorDesc;
 import org.apache.hadoop.hive.ql.plan.AggregationDesc;
 import org.apache.hadoop.hive.ql.plan.AppMasterEventDesc;
@@ -2947,7 +2946,10 @@ public class Vectorizer implements PhysicalPlanResolver {
       }
 
       WindowFrameDef windowFrameDef = evaluatorWindowFrameDefs[i];
-
+      if (!windowFrameDef.isStartUnbounded()) {
+        setOperatorIssue(functionName + " only UNBOUNDED start frame is supported");
+        return false;
+      }
       List<ExprNodeDesc> exprNodeDescList = evaluatorInputExprNodeDescLists[i];
       final boolean isSingleParameter =
           (exprNodeDescList != null &&
@@ -3032,20 +3034,6 @@ public class Vectorizer implements PhysicalPlanResolver {
               return false;
             }
           }
-        }
-      }
-      if (vectorPTFDesc.getOrderExprNodeDescs().length > 1) {
-        /*
-         * Currently, we need to rule out here all cases where a range boundary scanner can run,
-         * basically: 1. bounded start 2. bounded end which is not current row
-         */
-        if (windowFrameDef.getWindowType() == WindowType.RANGE
-            && (!windowFrameDef.isStartUnbounded()
-                || !(windowFrameDef.getEnd().isCurrentRow() || windowFrameDef.isEndUnbounded()))) {
-          setOperatorIssue(
-              "Multi-column ordered RANGE boundary scanner is not supported in vectorized mode (window: "
-                  + windowFrameDef + ")");
-          return false;
         }
       }
     }
@@ -5107,18 +5095,24 @@ public class Vectorizer implements PhysicalPlanResolver {
     Type[] partitionColumnVectorTypes;
     VectorExpression[] partitionExpressions;
 
-    final int partitionKeyCount = partitionExprNodeDescs.length;
-    partitionColumnMap = new int[partitionKeyCount];
-    partitionColumnVectorTypes = new Type[partitionKeyCount];
-    partitionExpressions = new VectorExpression[partitionKeyCount];
+    if (!isPartitionOrderBy) {
+      partitionColumnMap = null;
+      partitionColumnVectorTypes = null;
+      partitionExpressions = null;
+    } else {
+      final int partitionKeyCount = partitionExprNodeDescs.length;
+      partitionColumnMap = new int[partitionKeyCount];
+      partitionColumnVectorTypes = new Type[partitionKeyCount];
+      partitionExpressions = new VectorExpression[partitionKeyCount];
 
-    for (int i = 0; i < partitionKeyCount; i++) {
-      VectorExpression partitionExpression = vContext.getVectorExpression(partitionExprNodeDescs[i]);
-      TypeInfo typeInfo = partitionExpression.getOutputTypeInfo();
-      Type columnVectorType = VectorizationContext.getColumnVectorTypeFromTypeInfo(typeInfo);
-      partitionColumnVectorTypes[i] = columnVectorType;
-      partitionColumnMap[i] = partitionExpression.getOutputColumnNum();
-      partitionExpressions[i] = partitionExpression;
+      for (int i = 0; i < partitionKeyCount; i++) {
+        VectorExpression partitionExpression = vContext.getVectorExpression(partitionExprNodeDescs[i]);
+        TypeInfo typeInfo = partitionExpression.getOutputTypeInfo();
+        Type columnVectorType = VectorizationContext.getColumnVectorTypeFromTypeInfo(typeInfo);
+        partitionColumnVectorTypes[i] = columnVectorType;
+        partitionColumnMap[i] = partitionExpression.getOutputColumnNum();
+        partitionExpressions[i] = partitionExpression;
+      }
     }
 
     final int orderKeyCount = orderExprNodeDescs.length;

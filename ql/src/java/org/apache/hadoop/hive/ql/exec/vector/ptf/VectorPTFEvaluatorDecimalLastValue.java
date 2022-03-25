@@ -102,7 +102,7 @@ public class VectorPTFEvaluatorDecimalLastValue extends VectorPTFEvaluatorBase {
   }
 
   @Override
-  public Object getGroupResult() {
+  public HiveDecimalWritable getDecimalGroupResult() {
     return lastValue;
   }
 
@@ -110,9 +110,5 @@ public class VectorPTFEvaluatorDecimalLastValue extends VectorPTFEvaluatorBase {
   public void resetEvaluator() {
     isGroupResultNull = true;
     lastValue.set(HiveDecimal.ZERO);
-  }
-
-  public boolean isCacheableForRange() {
-    return false;
   }
 }

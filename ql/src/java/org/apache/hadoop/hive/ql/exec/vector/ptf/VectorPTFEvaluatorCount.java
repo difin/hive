@@ -100,7 +100,7 @@ public class VectorPTFEvaluatorCount extends VectorPTFEvaluatorBase {
   }
 
   @Override
-  public Object getGroupResult() {
+  public long getLongGroupResult() {
     return count;
   }
 

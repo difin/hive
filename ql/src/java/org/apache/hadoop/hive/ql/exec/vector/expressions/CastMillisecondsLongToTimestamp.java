@@ -26,8 +26,11 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public class CastMillisecondsLongToTimestamp extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private int colNum;
+
   public CastMillisecondsLongToTimestamp(int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
   }
 
   public CastMillisecondsLongToTimestamp() {
@@ -47,7 +50,7 @@ public class CastMillisecondsLongToTimestamp extends VectorExpression {
       this.evaluateChildren(batch);
     }
 
-    LongColumnVector inputColVector = (LongColumnVector) batch.cols[inputColumnNum[0]];
+    LongColumnVector inputColVector = (LongColumnVector) batch.cols[colNum];
     TimestampColumnVector outputColVector = (TimestampColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColVector.isNull;
@@ -143,7 +146,7 @@ public class CastMillisecondsLongToTimestamp extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, colNum);
   }
 
   @Override

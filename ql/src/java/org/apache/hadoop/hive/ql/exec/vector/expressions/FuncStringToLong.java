@@ -34,8 +34,13 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public abstract class FuncStringToLong extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private int inputCol;
+  private int outputCol;
+
   public FuncStringToLong(int inputCol, int outputCol) {
-    super(inputCol, outputCol);
+    super(outputCol);
+    this.inputCol = inputCol;
+    this.outputCol = outputCol;
   }
 
   public FuncStringToLong() {
@@ -48,10 +53,10 @@ public abstract class FuncStringToLong extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumnNum[0]];
+    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputCol];
     int[] sel = batch.selected;
     int n = batch.size;
-    LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
+    LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputCol];
     boolean[] inputIsNull = inputColVector.isNull;
     boolean[] outputIsNull = outputColVector.isNull;
 
@@ -136,24 +141,24 @@ public abstract class FuncStringToLong extends VectorExpression {
   protected abstract void func(LongColumnVector outputColVector, BytesColumnVector inputColVector, int i);
 
   public int getOutputCol() {
-    return outputColumnNum;
+    return outputCol;
   }
 
   public void setOutputCol(int outputCol) {
-    this.outputColumnNum = outputCol;
+    this.outputCol = outputCol;
   }
 
   public int getInputCol() {
-    return inputColumnNum[0];
+    return inputCol;
   }
 
   public void setInputCol(int inputCol) {
-    this.inputColumnNum[0] = inputCol;
+    this.inputCol = inputCol;
   }
 
   @Override
   public String vectorExpressionParameters() {
-    return "col " + inputColumnNum[0];
+    return "col " + inputCol;
   }
 
   @Override

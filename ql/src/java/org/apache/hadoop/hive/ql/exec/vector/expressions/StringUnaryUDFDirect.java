@@ -33,12 +33,18 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 abstract public class StringUnaryUDFDirect extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  protected final int inputColumn;
+
   public StringUnaryUDFDirect(int inputColumn, int outputColumnNum) {
-    super(inputColumn, outputColumnNum);
+    super(outputColumnNum);
+    this.inputColumn = inputColumn;
   }
 
   public StringUnaryUDFDirect() {
     super();
+
+    // Dummy final assignments.
+    inputColumn = -1;
   }
 
   abstract protected void func(BytesColumnVector outputColVector, byte[][] vector, int[] start, int[] length, int i);
@@ -50,7 +56,7 @@ abstract public class StringUnaryUDFDirect extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumnNum[0]];
+    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumn];
     int[] sel = batch.selected;
     int n = batch.size;
     byte[][] vector = inputColVector.vector;
@@ -137,7 +143,7 @@ abstract public class StringUnaryUDFDirect extends VectorExpression {
   }
 
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, inputColumn);
   }
 
   @Override

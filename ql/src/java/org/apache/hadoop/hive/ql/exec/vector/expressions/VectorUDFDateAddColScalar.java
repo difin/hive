@@ -37,6 +37,7 @@ import java.util.Arrays;
 public class VectorUDFDateAddColScalar extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int colNum;
   private final int numDays;
 
   protected boolean isPositive = true;
@@ -48,7 +49,8 @@ public class VectorUDFDateAddColScalar extends VectorExpression {
   private transient PrimitiveCategory primitiveCategory;
 
   public VectorUDFDateAddColScalar(int colNum, long numDays, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
     this.numDays = (int) numDays;
   }
 
@@ -56,6 +58,7 @@ public class VectorUDFDateAddColScalar extends VectorExpression {
     super();
 
     // Dummy final assignments.
+    colNum = -1;
     numDays = 0;
   }
 
@@ -75,7 +78,7 @@ public class VectorUDFDateAddColScalar extends VectorExpression {
     }
 
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
-    ColumnVector inputCol = batch.cols[this.inputColumnNum[0]];
+    ColumnVector inputCol = batch.cols[this.colNum];
     /* every line below this is identical for evaluateLong & evaluateString */
     final int n = inputCol.isRepeating ? 1 : batch.size;
     int[] sel = batch.selected;
@@ -342,7 +345,7 @@ public class VectorUDFDateAddColScalar extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]) + ", val " + numDays;
+    return getColumnParamString(0, colNum) + ", val " + numDays;
   }
 
   @Override

@@ -31,13 +31,25 @@ public class IfExprLongColumnLongColumn extends VectorExpression {
 
   private static final long serialVersionUID = 1L;
 
+  protected final int arg1Column;
+  protected final int arg2Column;
+  protected final int arg3Column;
+
   public IfExprLongColumnLongColumn(int arg1Column, int arg2Column, int arg3Column,
       int outputColumnNum) {
-    super(arg1Column, arg2Column, arg3Column, outputColumnNum);
+    super(outputColumnNum);
+    this.arg1Column = arg1Column;
+    this.arg2Column = arg2Column;
+    this.arg3Column = arg3Column;
   }
 
   public IfExprLongColumnLongColumn() {
     super();
+
+    // Dummy final assignments.
+    arg1Column = -1;
+    arg2Column = -1;
+    arg3Column = -1;
   }
 
   @Override
@@ -47,10 +59,10 @@ public class IfExprLongColumnLongColumn extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    LongColumnVector arg1ColVector = (LongColumnVector) batch.cols[inputColumnNum[0]];
+    LongColumnVector arg1ColVector = (LongColumnVector) batch.cols[arg1Column];
     boolean[] arg1IsNull = arg1ColVector.isNull;
-    LongColumnVector arg2ColVector = (LongColumnVector) batch.cols[inputColumnNum[1]];
-    LongColumnVector arg3ColVector = (LongColumnVector) batch.cols[inputColumnNum[2]];
+    LongColumnVector arg2ColVector = (LongColumnVector) batch.cols[arg2Column];
+    LongColumnVector arg3ColVector = (LongColumnVector) batch.cols[arg3Column];
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] outputIsNull = outputColVector.isNull;
@@ -132,8 +144,8 @@ public class IfExprLongColumnLongColumn extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]) + ", " + getColumnParamString(1, inputColumnNum[1]) +
-        ", " + getColumnParamString(1, inputColumnNum[2]);
+    return getColumnParamString(0, arg1Column) + ", " + getColumnParamString(1, arg2Column) +
+        ", " + getColumnParamString(1, arg3Column);
   }
 
   @Override

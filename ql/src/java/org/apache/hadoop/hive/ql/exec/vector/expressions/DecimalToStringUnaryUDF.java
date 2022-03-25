@@ -32,13 +32,18 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
  */
 abstract public class DecimalToStringUnaryUDF extends VectorExpression {
   private static final long serialVersionUID = 1L;
+  protected final int inputColumn;
 
   public DecimalToStringUnaryUDF(int inputColumn, int outputColumnNum) {
-    super(inputColumn, outputColumnNum);
+    super(outputColumnNum);
+    this.inputColumn = inputColumn;
   }
 
   public DecimalToStringUnaryUDF() {
     super();
+
+    // Dummy final assignments.
+    inputColumn = -1;
   }
 
   abstract protected void func(BytesColumnVector outputColVector, DecimalColumnVector inputColVector, int i);
@@ -50,7 +55,7 @@ abstract public class DecimalToStringUnaryUDF extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    DecimalColumnVector inputColVector = (DecimalColumnVector) batch.cols[inputColumnNum[0]];
+    DecimalColumnVector inputColVector = (DecimalColumnVector) batch.cols[inputColumn];
     int[] sel = batch.selected;
     int n = batch.size;
     BytesColumnVector outputColVector = (BytesColumnVector) batch.cols[outputColumnNum];
@@ -136,7 +141,7 @@ abstract public class DecimalToStringUnaryUDF extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, inputColumn);
   }
 
   @Override

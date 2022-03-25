@@ -32,9 +32,12 @@ import com.google.common.base.Preconditions;
  *
  * Sum up non-null column values; group result is sum / non-null count.
  */
-public class VectorPTFEvaluatorLongAvg extends VectorPTFEvaluatorAbstractAvg<Long> {
+public class VectorPTFEvaluatorLongAvg extends VectorPTFEvaluatorBase {
 
-  protected double avg;
+  protected boolean isGroupResultNull;
+  protected long sum;
+  private int nonNullGroupCount;
+  private double avg;
 
   public VectorPTFEvaluatorLongAvg(WindowFrameDef windowFrameDef, VectorExpression inputVecExpr,
       int outputColumnNum) {
@@ -125,40 +128,30 @@ public class VectorPTFEvaluatorLongAvg extends VectorPTFEvaluatorAbstractAvg<Lon
   }
 
   @Override
+  public boolean streamsResult() {
+    // We must evaluate whole group before producing a result.
+    return false;
+  }
+
+  @Override
+  public boolean isGroupResultNull() {
+    return isGroupResultNull;
+  }
+
+  @Override
   public Type getResultColumnVectorType() {
     return Type.DOUBLE;
   }
 
   @Override
-  public Object getGroupResult() {
-    doLastBatchWork(); // make sure we have a fresh avg
+  public double getDoubleGroupResult() {
     return avg;
-  }
-
-  @Override
-  protected Long computeValue(Long number) {
-    return VectorPTFEvaluatorHelper.computeValue(number);
-  }
-
-  @Override
-  protected Long plus(Long number1, Long number2) {
-    return VectorPTFEvaluatorHelper.plus(number1, number2);
-  }
-
-  @Override
-  protected Long minus(Long number1, Long number2) {
-    return VectorPTFEvaluatorHelper.minus(number1, number2);
-  }
-
-  @Override
-  protected Double divide(Long number, long divisor) {
-    return VectorPTFEvaluatorHelper.divide(number, divisor);
   }
 
   @Override
   public void resetEvaluator() {
     isGroupResultNull = true;
-    sum = 0L;
+    sum = 0;
     nonNullGroupCount = 0;
     avg = 0.0;
   }

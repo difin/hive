@@ -25,7 +25,6 @@ import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.VectorExpression;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.plan.ptf.WindowFrameDef;
-import org.apache.hadoop.hive.ql.udf.ptf.Range;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 
 import com.google.common.base.Preconditions;
@@ -35,11 +34,13 @@ import com.google.common.base.Preconditions;
  *
  * Sum up non-null column values; group result is sum / non-null count.
  */
-public class VectorPTFEvaluatorDecimalAvg
-    extends VectorPTFEvaluatorAbstractAvg<HiveDecimalWritable> {
+public class VectorPTFEvaluatorDecimalAvg extends VectorPTFEvaluatorBase {
 
-  protected HiveDecimalWritable temp;
-  protected HiveDecimalWritable avg;
+  protected boolean isGroupResultNull;
+  protected HiveDecimalWritable sum;
+  private int nonNullGroupCount;
+  private HiveDecimalWritable temp;
+  private HiveDecimalWritable avg;
 
   public VectorPTFEvaluatorDecimalAvg(WindowFrameDef windowFrameDef, VectorExpression inputVecExpr,
       int outputColumnNum) {
@@ -136,34 +137,24 @@ public class VectorPTFEvaluatorDecimalAvg
   }
 
   @Override
+  public boolean streamsResult() {
+    // We must evaluate whole group before producing a result.
+    return false;
+  }
+
+  @Override
+  public boolean isGroupResultNull() {
+    return isGroupResultNull;
+  }
+
+  @Override
   public Type getResultColumnVectorType() {
     return Type.DECIMAL;
   }
 
   @Override
-  public Object getGroupResult() {
-    doLastBatchWork(); // make sure we have a fresh avg
+  public HiveDecimalWritable getDecimalGroupResult() {
     return avg;
-  }
-
-  @Override
-  protected HiveDecimalWritable computeValue(HiveDecimalWritable number) {
-    return VectorPTFEvaluatorHelper.computeValue(number);
-  }
-
-  @Override
-  public HiveDecimalWritable plus(HiveDecimalWritable t1, HiveDecimalWritable t2) {
-    return VectorPTFEvaluatorHelper.plus(t1, t2);
-  }
-
-  @Override
-  public HiveDecimalWritable minus(HiveDecimalWritable t1, HiveDecimalWritable t2) {
-    return VectorPTFEvaluatorHelper.minus(t1, t2);
-  }
-
-  @Override
-  protected HiveDecimalWritable divide(HiveDecimalWritable number, long divisor) {
-    return VectorPTFEvaluatorHelper.divide(number, divisor);
   }
 
   @Override

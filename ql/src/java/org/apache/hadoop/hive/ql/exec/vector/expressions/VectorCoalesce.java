@@ -18,6 +18,7 @@
 package org.apache.hadoop.hive.ql.exec.vector.expressions;
 
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorExpressionDescriptor;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -33,17 +34,23 @@ import java.util.Arrays;
 public class VectorCoalesce extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int[] inputColumns;
+
   // The unassigned batchIndex for the rows that have not received a non-NULL value yet.
   // A temporary work array.
   private transient int[] unassignedBatchIndices;
 
   public VectorCoalesce(int [] inputColumns, int outputColumnNum) {
-    super(inputColumns, outputColumnNum);
-    Preconditions.checkArgument(inputColumns.length > 0);
+    super(outputColumnNum);
+    this.inputColumns = inputColumns;
+    Preconditions.checkArgument(this.inputColumns.length > 0);
   }
 
   public VectorCoalesce() {
     super();
+
+    // Dummy final assignments.
+    inputColumns = null;
   }
 
   @Override
@@ -78,7 +85,7 @@ public class VectorCoalesce extends VectorExpression {
     //           work on BytesColumnVector output columns???
     outputColVector.init();
 
-    final int columnCount = inputColumnNum.length;
+    final int columnCount = inputColumns.length;
 
     /*
      * Process the input columns to find a non-NULL value for each row.
@@ -89,8 +96,8 @@ public class VectorCoalesce extends VectorExpression {
     boolean isAllUnassigned = true;
     int unassignedColumnCount = 0;
 
-    for (int k = 0; k < inputColumnNum.length; k++) {
-      ColumnVector cv = batch.cols[inputColumnNum[k]];
+    for (int k = 0; k < inputColumns.length; k++) {
+      ColumnVector cv = batch.cols[inputColumns[k]];
       if (cv.isRepeating) {
 
         if (cv.noNulls || !cv.isNull[0]) {
@@ -232,7 +239,7 @@ public class VectorCoalesce extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return "columns " + Arrays.toString(inputColumnNum);
+    return "columns " + Arrays.toString(inputColumns);
   }
 
   @Override

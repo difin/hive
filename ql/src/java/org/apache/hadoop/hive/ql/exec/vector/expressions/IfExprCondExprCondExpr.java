@@ -27,13 +27,22 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public class IfExprCondExprCondExpr extends IfExprCondExprBase {
   private static final long serialVersionUID = 1L;
 
+  protected final int arg2Column;
+  protected final int arg3Column;
+
   public IfExprCondExprCondExpr(int arg1Column, int arg2Column, int arg3Column,
       int outputColumnNum) {
-    super(arg1Column, arg2Column, arg3Column, outputColumnNum);
+    super(arg1Column, outputColumnNum);
+    this.arg2Column = arg2Column;
+    this.arg3Column = arg3Column;
   }
 
   public IfExprCondExprCondExpr() {
     super();
+
+    // Dummy final assignments.
+    arg2Column = -1;
+    arg3Column = -1;
   }
 
   @Override
@@ -70,8 +79,8 @@ public class IfExprCondExprCondExpr extends IfExprCondExprBase {
     //           work on BytesColumnVector output columns???
     outputColVector.init();
 
-    ColumnVector thenColVector = batch.cols[inputColumnNum[1]];
-    ColumnVector elseColVector = batch.cols[inputColumnNum[2]];
+    ColumnVector thenColVector = batch.cols[arg2Column];
+    ColumnVector elseColVector = batch.cols[arg3Column];
 
     final int thenCount = thenSelectedCount;
     final int elseCount = elseSelectedCount;
@@ -108,7 +117,7 @@ public class IfExprCondExprCondExpr extends IfExprCondExprBase {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]) + ", " + getColumnParamString(1, inputColumnNum[1]) +
-        getColumnParamString(2, inputColumnNum[2]);
+    return getColumnParamString(0, arg1Column) + ", " + getColumnParamString(1, arg2Column) +
+        getColumnParamString(2, arg3Column);
   }
 }

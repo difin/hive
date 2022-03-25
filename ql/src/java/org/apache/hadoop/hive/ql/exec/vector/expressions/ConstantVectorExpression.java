@@ -68,7 +68,7 @@ public class ConstantVectorExpression extends VectorExpression {
   }
 
   ConstantVectorExpression(int outputColumnNum, TypeInfo outputTypeInfo) throws HiveException {
-    super(-1, outputColumnNum);
+    super(outputColumnNum);
 
     this.outputTypeInfo = outputTypeInfo;
     outputDataTypePhysicalVariation = DataTypePhysicalVariation.NONE;

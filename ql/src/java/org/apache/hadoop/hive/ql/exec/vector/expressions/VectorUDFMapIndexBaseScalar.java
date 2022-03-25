@@ -33,12 +33,15 @@ public abstract class VectorUDFMapIndexBaseScalar extends VectorExpression {
 
   private static final long serialVersionUID = 1L;
 
+  private int mapColumnNum;
+
   public VectorUDFMapIndexBaseScalar() {
     super();
   }
 
   public VectorUDFMapIndexBaseScalar(int mapColumnNum, int outputColumnNum) {
-    super(mapColumnNum, outputColumnNum);
+    super(outputColumnNum);
+    this.mapColumnNum = mapColumnNum;
   }
 
   @Override
@@ -55,7 +58,7 @@ public abstract class VectorUDFMapIndexBaseScalar extends VectorExpression {
     }
 
     ColumnVector outV = batch.cols[outputColumnNum];
-    MapColumnVector mapV = (MapColumnVector) batch.cols[inputColumnNum[0]];
+    MapColumnVector mapV = (MapColumnVector) batch.cols[mapColumnNum];
     ColumnVector valuesV = mapV.values;
 
     int[] sel = batch.selected;
@@ -182,6 +185,6 @@ public abstract class VectorUDFMapIndexBaseScalar extends VectorExpression {
   }
 
   public int getMapColumnNum() {
-    return inputColumnNum[0];
+    return mapColumnNum;
   }
 }

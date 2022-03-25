@@ -32,13 +32,18 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
  */
 public abstract class FuncDoubleToDecimal extends VectorExpression {
   private static final long serialVersionUID = 1L;
+  private final int inputColumn;
 
   public FuncDoubleToDecimal(int inputColumn, int outputColumnNum) {
-    super(inputColumn, outputColumnNum);
+    super(outputColumnNum);
+    this.inputColumn = inputColumn;
   }
 
   public FuncDoubleToDecimal() {
     super();
+
+    // Dummy final assignments.
+    inputColumn = -1;
   }
 
   abstract protected void func(DecimalColumnVector outputColVector, DoubleColumnVector inputColVector, int i);
@@ -50,7 +55,7 @@ public abstract class FuncDoubleToDecimal extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    DoubleColumnVector inputColVector = (DoubleColumnVector) batch.cols[inputColumnNum[0]];
+    DoubleColumnVector inputColVector = (DoubleColumnVector) batch.cols[inputColumn];
     int[] sel = batch.selected;
     int n = batch.size;
     DecimalColumnVector outputColVector = (DecimalColumnVector) batch.cols[outputColumnNum];
@@ -135,7 +140,7 @@ public abstract class FuncDoubleToDecimal extends VectorExpression {
   }
 
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, inputColumn);
   }
 
   @Override

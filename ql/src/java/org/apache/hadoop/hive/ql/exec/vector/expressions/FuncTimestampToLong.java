@@ -34,12 +34,18 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public abstract class FuncTimestampToLong extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int inputColumn;
+
   public FuncTimestampToLong(int inputColumn, int outputColumnNum) {
-    super(inputColumn, outputColumnNum);
+    super(outputColumnNum);
+    this.inputColumn = inputColumn;
   }
 
   public FuncTimestampToLong() {
     super();
+
+    // Dummy final assignments.
+    inputColumn = -1;
   }
 
   abstract protected void func(LongColumnVector outputColVector, TimestampColumnVector inputColVector, int i);
@@ -51,7 +57,7 @@ public abstract class FuncTimestampToLong extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    TimestampColumnVector inputColVector = (TimestampColumnVector) batch.cols[inputColumnNum[0]];
+    TimestampColumnVector inputColVector = (TimestampColumnVector) batch.cols[inputColumn];
     int[] sel = batch.selected;
     int n = batch.size;
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
@@ -136,7 +142,7 @@ public abstract class FuncTimestampToLong extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, inputColumn);
   }
 
   @Override

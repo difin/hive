@@ -129,7 +129,7 @@ public class VectorPTFEvaluatorLongMin extends VectorPTFEvaluatorBase {
   }
 
   @Override
-  public Object getGroupResult() {
+  public long getLongGroupResult() {
     return min;
   }
 

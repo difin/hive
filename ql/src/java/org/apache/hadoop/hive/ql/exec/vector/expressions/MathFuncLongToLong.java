@@ -36,15 +36,21 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public abstract class MathFuncLongToLong extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  protected final int colNum;
+
   // Subclasses must override this with a function that implements the desired logic.
   protected abstract long func(long d);
 
   public MathFuncLongToLong(int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
   }
 
   public MathFuncLongToLong() {
     super();
+
+    // Dummy final assignments.
+    colNum = -1;
   }
 
   @Override
@@ -54,7 +60,7 @@ public abstract class MathFuncLongToLong extends VectorExpression {
       this.evaluateChildren(batch);
     }
 
-    LongColumnVector inputColVector = (LongColumnVector) batch.cols[inputColumnNum[0]];
+    LongColumnVector inputColVector = (LongColumnVector) batch.cols[colNum];
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColVector.isNull;
@@ -135,6 +141,6 @@ public abstract class MathFuncLongToLong extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, colNum);
   }
 }

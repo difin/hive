@@ -41,10 +41,12 @@ public class <ClassName> extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
   private final <HiveOperandType> value;
+  private final int colNum;
 
   public <ClassName>(<HiveOperandType> value, int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
     this.value = value;
+    this.colNum = colNum;
   }
 
   public <ClassName>() {
@@ -52,6 +54,7 @@ public class <ClassName> extends VectorExpression {
 
     // Dummy final assignments.
     value = null;
+    colNum = -1;
   }
 
   @Override
@@ -68,7 +71,7 @@ public class <ClassName> extends VectorExpression {
     }
 
      // Input #2 is type <OperandType>.
-    <InputColumnVectorType> inputColVector2 = (<InputColumnVectorType>) batch.cols[inputColumnNum[0]];
+    <InputColumnVectorType> inputColVector2 = (<InputColumnVectorType>) batch.cols[colNum];
 
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
 
@@ -159,7 +162,7 @@ public class <ClassName> extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return "val " + TimestampUtils.timestampScalarTypeToString(value) + ", "  + getColumnParamString(1, inputColumnNum[0]);
+    return "val " + TimestampUtils.timestampScalarTypeToString(value) + ", "  + getColumnParamString(1, colNum);
   }
 
   @Override

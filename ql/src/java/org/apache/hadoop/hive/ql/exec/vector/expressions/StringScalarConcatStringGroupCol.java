@@ -33,10 +33,12 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public class StringScalarConcatStringGroupCol extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int colNum;
   private final byte[] value;
 
   public StringScalarConcatStringGroupCol(byte[] value, int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
     this.value = value;
   }
 
@@ -44,6 +46,7 @@ public class StringScalarConcatStringGroupCol extends VectorExpression {
     super();
 
     // Dummy final assignments.
+    colNum = -1;
     value = null;
   }
 
@@ -54,7 +57,7 @@ public class StringScalarConcatStringGroupCol extends VectorExpression {
         super.evaluateChildren(batch);
       }
 
-    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumnNum[0]];
+    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[colNum];
     BytesColumnVector outputColVector = (BytesColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     int n = batch.size;
@@ -150,7 +153,7 @@ public class StringScalarConcatStringGroupCol extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return "val " + displayUtf8Bytes(value) + ", " + getColumnParamString(1, inputColumnNum[0]);
+    return "val " + displayUtf8Bytes(value) + ", " + getColumnParamString(1, colNum);
   }
 
   @Override

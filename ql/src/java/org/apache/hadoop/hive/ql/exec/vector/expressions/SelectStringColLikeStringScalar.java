@@ -33,16 +33,22 @@ public class SelectStringColLikeStringScalar extends VectorExpression {
 
   private static final long serialVersionUID = 1L;
 
+  private final int colNum;
+
   private byte[] pattern;
 
   transient Checker checker = null;
 
   public SelectStringColLikeStringScalar() {
     super();
+
+    // Dummy final assignments.
+    colNum = -1;
   }
 
   public SelectStringColLikeStringScalar(int colNum, byte[] pattern, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
     this.pattern = pattern;
   }
 
@@ -56,7 +62,7 @@ public class SelectStringColLikeStringScalar extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumnNum[0]];
+    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[colNum];
     int[] sel = batch.selected;
     boolean[] nullPos = inputColVector.isNull;
     int n = batch.size;
@@ -146,7 +152,7 @@ public class SelectStringColLikeStringScalar extends VectorExpression {
   }
 
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, colNum);
   }
 
   @Override

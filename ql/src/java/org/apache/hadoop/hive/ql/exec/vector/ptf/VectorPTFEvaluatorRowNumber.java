@@ -32,7 +32,7 @@ import org.apache.hadoop.hive.ql.plan.ptf.WindowFrameDef;
  */
 public class VectorPTFEvaluatorRowNumber extends VectorPTFEvaluatorBase {
 
-  private long rowNumber;
+  private int rowNumber;
 
   public VectorPTFEvaluatorRowNumber(WindowFrameDef windowFrameDef, VectorExpression inputVecExpr,
       int outputColumnNum) {
@@ -63,10 +63,6 @@ public class VectorPTFEvaluatorRowNumber extends VectorPTFEvaluatorBase {
   @Override
   public boolean isGroupResultNull() {
     return false;
-  }
-
-  public Object getGroupResult(){
-    return rowNumber;
   }
 
   @Override

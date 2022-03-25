@@ -36,15 +36,18 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public class VectorElt extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int[] inputColumns;
+
   public VectorElt(int [] inputColumns, int outputColumnNum) {
-    super(inputColumns, outputColumnNum);
+    super(outputColumnNum);
+    this.inputColumns = inputColumns;
   }
 
   public VectorElt() {
     super();
 
     // Dummy final assignments.
-    inputColumnNum = null;
+    inputColumns = null;
   }
 
   @Override
@@ -65,15 +68,15 @@ public class VectorElt extends VectorExpression {
 
     outputVector.isRepeating = false;
 
-    final int limit = inputColumnNum.length;
-    LongColumnVector inputIndexVector = (LongColumnVector) batch.cols[inputColumnNum[0]];
+    final int limit = inputColumns.length;
+    LongColumnVector inputIndexVector = (LongColumnVector) batch.cols[inputColumns[0]];
     boolean[] inputIndexIsNull = inputIndexVector.isNull;
     long[] indexVector = inputIndexVector.vector;
     if (inputIndexVector.isRepeating) {
       if (inputIndexVector.noNulls || !inputIndexIsNull[0]) {
         int repeatedIndex = (int) indexVector[0];
         if (repeatedIndex > 0 && repeatedIndex < limit) {
-          BytesColumnVector cv = (BytesColumnVector) batch.cols[inputColumnNum[repeatedIndex]];
+          BytesColumnVector cv = (BytesColumnVector) batch.cols[inputColumns[repeatedIndex]];
           if (cv.isRepeating) {
             outputVector.isNull[0] = false;
             outputVector.setElement(0, 0, cv);
@@ -134,7 +137,7 @@ public class VectorElt extends VectorExpression {
           int i = sel[j];
           int index = (int) indexVector[i];
           if (index > 0 && index < limit) {
-            BytesColumnVector cv = (BytesColumnVector) batch.cols[inputColumnNum[index]];
+            BytesColumnVector cv = (BytesColumnVector) batch.cols[inputColumns[index]];
             int adjusted = cv.isRepeating ? 0 : i;
             if (!cv.isNull[adjusted]) {
               outputVector.isNull[i] = false;
@@ -152,7 +155,7 @@ public class VectorElt extends VectorExpression {
         for (int i = 0; i != n; i++) {
           int index = (int) indexVector[i];
           if (index > 0 && index < limit) {
-            BytesColumnVector cv = (BytesColumnVector) batch.cols[inputColumnNum[index]];
+            BytesColumnVector cv = (BytesColumnVector) batch.cols[inputColumns[index]];
             int adjusted = cv.isRepeating ? 0 : i;
             if (!cv.isNull[adjusted]) {
               outputVector.isNull[i] = false;
@@ -174,7 +177,7 @@ public class VectorElt extends VectorExpression {
           if (!inputIndexVector.isNull[i]) {
             int index = (int) indexVector[i];
             if (index > 0 && index < limit) {
-              BytesColumnVector cv = (BytesColumnVector) batch.cols[inputColumnNum[index]];
+              BytesColumnVector cv = (BytesColumnVector) batch.cols[inputColumns[index]];
               int adjusted = cv.isRepeating ? 0 : i;
               if (cv.noNulls || !cv.isNull[adjusted]) {
                 outputVector.isNull[i] = false;
@@ -197,7 +200,7 @@ public class VectorElt extends VectorExpression {
           if (!inputIndexVector.isNull[i]) {
             int index = (int) indexVector[i];
             if (index > 0 && index < limit) {
-              BytesColumnVector cv = (BytesColumnVector) batch.cols[inputColumnNum[index]];
+              BytesColumnVector cv = (BytesColumnVector) batch.cols[inputColumns[index]];
               int adjusted = cv.isRepeating ? 0 : i;
               if (cv.noNulls || !cv.isNull[adjusted]) {
                 outputVector.isNull[i] = false;
@@ -221,7 +224,7 @@ public class VectorElt extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return "columns " + Arrays.toString(inputColumnNum);
+    return "columns " + Arrays.toString(inputColumns);
   }
 
   @Override

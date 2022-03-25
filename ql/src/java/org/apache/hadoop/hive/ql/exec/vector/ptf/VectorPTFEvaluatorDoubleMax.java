@@ -129,7 +129,7 @@ public class VectorPTFEvaluatorDoubleMax extends VectorPTFEvaluatorBase {
   }
 
   @Override
-  public Object getGroupResult() {
+  public double getDoubleGroupResult() {
     return max;
   }
 

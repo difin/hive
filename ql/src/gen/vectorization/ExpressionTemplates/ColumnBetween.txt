@@ -34,11 +34,14 @@ public class <ClassName> extends VectorExpression {
 
   private static final long serialVersionUID = 1L;
 
+  protected int colNum;
+
   protected final <OperandType> leftValue;
   protected final <OperandType> rightValue;
 
   public <ClassName>(int colNum, <OperandType> leftValue, <OperandType> rightValue, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
     this.leftValue = leftValue;
     this.rightValue = rightValue;
   }
@@ -47,6 +50,7 @@ public class <ClassName> extends VectorExpression {
     super();
 
     // Dummy final assignments.
+    colNum = -1;
     leftValue = 0;
     rightValue = 0;
   }
@@ -58,7 +62,7 @@ public class <ClassName> extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    <InputColumnVectorType> inputColVector = (<InputColumnVectorType>) batch.cols[inputColumnNum[0]];
+    <InputColumnVectorType> inputColVector = (<InputColumnVectorType>) batch.cols[colNum];
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColVector.isNull;
@@ -146,7 +150,7 @@ public class <ClassName> extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]) + ", left " + leftValue + ", right " + rightValue;
+    return getColumnParamString(0, colNum) + ", left " + leftValue + ", right " + rightValue;
   }
 
   @Override

@@ -98,7 +98,7 @@ public class VectorPTFEvaluatorDoubleLastValue extends VectorPTFEvaluatorBase {
   }
 
   @Override
-  public Object getGroupResult() {
+  public double getDoubleGroupResult() {
     return lastValue;
   }
 
@@ -106,9 +106,5 @@ public class VectorPTFEvaluatorDoubleLastValue extends VectorPTFEvaluatorBase {
   public void resetEvaluator() {
     isGroupResultNull = true;
     lastValue = 0.0;
-  }
-
-  public boolean isCacheableForRange() {
-    return false;
   }
 }

@@ -37,12 +37,18 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 public class CastStringToDecimal extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
+  private final int inputColumn;
+
   public CastStringToDecimal(int inputColumn, int outputColumnNum) {
-    super(inputColumn, outputColumnNum);
+    super(outputColumnNum);
+    this.inputColumn = inputColumn;
   }
 
   public CastStringToDecimal() {
     super();
+
+    // Dummy final assignments.
+    inputColumn = -1;
   }
 
   /**
@@ -73,7 +79,7 @@ public class CastStringToDecimal extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumnNum[0]];
+    BytesColumnVector inputColVector = (BytesColumnVector) batch.cols[inputColumn];
     int[] sel = batch.selected;
     int n = batch.size;
     DecimalColumnVector outputColVector = (DecimalColumnVector) batch.cols[outputColumnNum];
@@ -169,7 +175,7 @@ public class CastStringToDecimal extends VectorExpression {
 
   @Override
   public String vectorExpressionParameters() {
-    return getColumnParamString(0, inputColumnNum[0]);
+    return getColumnParamString(0, inputColumn);
   }
 
   @Override

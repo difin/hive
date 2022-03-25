@@ -33,6 +33,7 @@ public class LongColumnInList extends VectorExpression implements ILongInExpr {
 
   private static final long serialVersionUID = 1L;
 
+  protected int colNum;
   protected long[] inListValues;
 
   // The set object containing the IN list. This is optimized for lookup
@@ -40,7 +41,8 @@ public class LongColumnInList extends VectorExpression implements ILongInExpr {
   private transient CuckooSetLong inSet;
 
   public LongColumnInList(int colNum, int outputColumnNum) {
-    super(colNum, outputColumnNum);
+    super(outputColumnNum);
+    this.colNum = colNum;
     inSet = null;
   }
 
@@ -60,7 +62,7 @@ public class LongColumnInList extends VectorExpression implements ILongInExpr {
       inSet.load(inListValues);
     }
 
-    LongColumnVector inputColVector = (LongColumnVector) batch.cols[inputColumnNum[0]];
+    LongColumnVector inputColVector = (LongColumnVector) batch.cols[colNum];
     LongColumnVector outputColVector = (LongColumnVector) batch.cols[outputColumnNum];
     int[] sel = batch.selected;
     boolean[] inputIsNull = inputColVector.isNull;
@@ -149,7 +151,7 @@ public class LongColumnInList extends VectorExpression implements ILongInExpr {
   }
 
   public String vectorExpressionParameters() {
-    return "col " + inputColumnNum[0] + ", values " + Arrays.toString(inListValues);
+    return "col " + colNum + ", values " + Arrays.toString(inListValues);
   }
 
   @Override
