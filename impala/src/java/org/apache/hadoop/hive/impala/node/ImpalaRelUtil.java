@@ -79,8 +79,11 @@ public class ImpalaRelUtil {
     int intermediateTypePrecision = funcDetails.intermediateTypeLength != 0
         ? funcDetails.intermediateTypeLength
         : retType.getPrecision();
+    int intermediateTypeScale = funcDetails.intermediateTypeScale != -1
+        ? funcDetails.intermediateTypeScale
+        : retType.getScale();
     Type intermediateType = ImpalaTypeConverter.createImpalaType(funcDetails.getIntermediateType(),
-        intermediateTypePrecision, retType.getScale());
+        intermediateTypePrecision, intermediateTypeScale);
 
     return createAggFunction(funcDetails, funcDetails.getName(), argTypes, impalaRetType,
         intermediateType);

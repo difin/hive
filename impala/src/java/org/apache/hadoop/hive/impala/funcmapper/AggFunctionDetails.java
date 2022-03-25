@@ -34,6 +34,7 @@ import org.apache.impala.analysis.HdfsUri;
 import org.apache.impala.catalog.AggregateFunction;
 import org.apache.impala.catalog.BuiltinsDb;
 import org.apache.impala.catalog.Function;
+import org.apache.impala.catalog.PrimitiveType;
 import org.apache.impala.catalog.ScalarType;
 import org.apache.impala.catalog.Type;
 import org.apache.impala.thrift.TFunctionBinaryType;
@@ -63,7 +64,6 @@ import org.slf4j.LoggerFactory;
  */
 public class AggFunctionDetails implements FunctionDetails {
   protected static final Logger LOG = LoggerFactory.getLogger(AggFunctionDetails.class);
-
   public final String dbName;
   public final String fnName;
   public final String impalaFnName;
@@ -74,6 +74,7 @@ public class AggFunctionDetails implements FunctionDetails {
   @Expose(serialize=false,deserialize=false)
   private final Type impalaIntermediateType;
   public final int intermediateTypeLength;
+  public final int intermediateTypeScale;
   public final boolean isAnalyticFn;
   public final boolean isPersistent;
   public final String updateFnSymbol;
@@ -221,6 +222,9 @@ public class AggFunctionDetails implements FunctionDetails {
         ? impalaRetType : func.getIntermediateType();
     intermediateTypeLength = (func.getIntermediateType() == null)
         ? 0 : ((ScalarType)func.getIntermediateType()).getSlotSize();
+    intermediateTypeScale = (func.getIntermediateType() == null ||
+            func.getIntermediateType().getPrimitiveType() != PrimitiveType.DECIMAL)
+        ? -1 : ((ScalarType)func.getIntermediateType()).decimalScale();
     isAnalyticFn = func.isAnalyticFn();
     updateFnSymbol = func.getUpdateFnSymbol();
     initFnSymbol = func.getInitFnSymbol();
@@ -249,6 +253,7 @@ public class AggFunctionDetails implements FunctionDetails {
         ? impalaRetType : func.getIntermediateType();
 
     intermediateTypeLength = func.getIntermediateTypeLength();
+    intermediateTypeScale = -1;
 
     isAnalyticFn = func.isAnalyticFn();
     updateFnSymbol = func.getUpdateFnSymbol();
@@ -277,6 +282,7 @@ public class AggFunctionDetails implements FunctionDetails {
     impalaIntermediateType = impalaRetType;
 
     intermediateTypeLength = 0;
+    intermediateTypeScale = -1;
 
     isAnalyticFn = func.isAnalyticFn;
     updateFnSymbol = null;
