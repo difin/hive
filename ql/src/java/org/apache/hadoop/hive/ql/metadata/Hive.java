@@ -1353,6 +1353,8 @@ public class Hive {
       getMSC().dropTable(table, deleteData, ignoreUnknownTab, ifPurge);
     } catch (Exception e) {
       throw new HiveException(e);
+    } finally {
+      AcidUtils.tryInvalidateDirCache(table);
     }
   }
 
