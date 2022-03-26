@@ -30,8 +30,8 @@
     <hive.jdbc.driver.jar>apache-hive-${project.version}-jdbc.jar</hive.jdbc.driver.jar>
     <atlas.version>2.1.0.7.2.14.0-149</atlas.version>
     <oozie.version>5.1.0.7.2.13.0-SNAPSHOT</oozie.version>
-    <ranger.version>2.1.0.7.2.11.6-1</ranger.version>
-    <solr.version>8.4.1.7.2.11.6-1</solr.version>
+    <ranger.version>2.1.0.7.2.14.0-149</ranger.version>
+    <solr.version>8.4.1.7.2.14.0-149</solr.version>
   </properties>
 
   <profiles>
