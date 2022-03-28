@@ -1,0 +1,18 @@
+PREHOOK: query: create table source(id integer)
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@source
+POSTHOOK: query: create table source(id integer)
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@source
+PREHOOK: query: create table full_acid_target(id integer, value string default 'def') stored as orc TBLPROPERTIES ('transactional'='true')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@full_acid_target
+POSTHOOK: query: create table full_acid_target(id integer, value string default 'def') stored as orc TBLPROPERTIES ('transactional'='true')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@full_acid_target
+HMS CALL get_table_req FOR full_acid_target
+FAILED: SemanticException MERGE operation not supported on transactional table default.full_acid_target by Impala

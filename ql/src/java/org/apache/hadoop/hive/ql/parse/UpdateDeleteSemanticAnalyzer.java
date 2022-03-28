@@ -97,6 +97,8 @@ public class UpdateDeleteSemanticAnalyzer extends RewriteSemanticAnalyzer {
     Table mTable = getTargetTable(tabName);
     validateTargetTable(mTable);
 
+    checkUpdateDeleteMergeSupported(operation, mTable);
+
     StringBuilder rewrittenQueryStr = new StringBuilder();
     rewrittenQueryStr.append("insert into table ");
     rewrittenQueryStr.append(getFullTableNameForSQL(tabName));

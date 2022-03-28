@@ -186,6 +186,8 @@ public class MergeSemanticAnalyzer extends RewriteSemanticAnalyzer {
     }
     Table targetTable = getTargetTable(target);
     validateTargetTable(targetTable);
+    checkUpdateDeleteMergeSupported(Context.Operation.MERGE, targetTable);
+
     List<ASTNode> whenClauses = findWhenClauses(tree, whenClauseBegins);
 
     StringBuilder rewrittenQueryStr = new StringBuilder("FROM\n");

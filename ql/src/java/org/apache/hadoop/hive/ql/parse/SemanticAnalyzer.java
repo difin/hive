@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.ql.parse;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
@@ -36,7 +37,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.AccessControlException;
-import java.time.ZoneId;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +72,6 @@ import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.runtime.tree.TreeWizard.ContextVisitor;
-import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -90,10 +89,6 @@ import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.common.metrics.common.MetricsConstant;
-import org.apache.hadoop.hive.common.type.Timestamp;
-import org.apache.hadoop.hive.common.type.TimestampTZ;
-import org.apache.hadoop.hive.common.type.TimestampTZUtil;
-import org.apache.hadoop.hive.common.type.TimestampUtils;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
@@ -184,7 +179,6 @@ import org.apache.hadoop.hive.ql.lib.Node;
 import org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.lockmgr.LockException;
-import org.apache.hadoop.hive.ql.metadata.CheckConstraint;
 import org.apache.hadoop.hive.ql.metadata.DefaultConstraint;
 import org.apache.hadoop.hive.ql.metadata.DummyPartition;
 import org.apache.hadoop.hive.ql.metadata.Hive;
@@ -192,7 +186,6 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
 import org.apache.hadoop.hive.ql.metadata.InvalidTableException;
-import org.apache.hadoop.hive.ql.metadata.NotNullConstraint;
 import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.SessionHiveMetaStoreClient;
 import org.apache.hadoop.hive.ql.metadata.Table;
@@ -7438,6 +7431,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       // Is the user trying to insert into a external tables
       checkExternalTable(destinationTable);
 
+      // Check if the execution engine supports write into full acid table if
+      // such an operation is being performed
+      checkWriteIntoFullAcidTable(destTableIsFullAcid, dest, destinationTable);
+
       partSpec = qbm.getPartSpecForAlias(dest);
       destinationPath = destinationTable.getPath();
 
@@ -8537,6 +8534,43 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         (dest_tab.getTableType().equals(TableType.EXTERNAL_TABLE))) {
       throw new SemanticException(
           ErrorMsg.INSERT_EXTERNAL_TABLE.getMsg(dest_tab.getTableName()));
+    }
+  }
+
+  // Check if the underlying query engine supports writes (insert/update/delete) to
+  // a full acid table. Currently, this check is done only for Impala engine since
+  // it has restrictions on the types of writes supported.
+  protected void checkWriteIntoFullAcidTable(boolean destTableIsFullAcid,
+      String dest, Table destTable) throws SemanticException {
+    if (isImpalaPlan(conf) && !isETLEngineSet() && destTableIsFullAcid) {
+      // Note that although updates and deletes are going through the
+      // UpdateDeleteSemanticAnalyzer, here we check for all 3: insert, update, delete
+      // since there could be some code path where one of these is invoked.
+      String op = inserting(dest) ? "INSERT" :
+          (updating(dest) ? "UPDATE" : (deleting(dest) ? "DELETE" : null));
+      if (op != null) {
+        throw new SemanticException(
+            op + " operation not " + "supported on full transactional (ACID) table " +
+            destTable.getFullyQualifiedName() + " by Impala");
+      }
+    }
+  }
+
+  // Check if the underlying query engine supports update/delete/merge operation
+  // on the target table. Currently, this check is done only for Impala engine
+  // since it has restrictions on the types of writes supported.
+  protected void checkUpdateDeleteMergeSupported(Context.Operation operation,
+      Table destTable) throws SemanticException {
+    Preconditions.checkArgument(operation == Context.Operation.UPDATE ||
+        operation == Context.Operation.DELETE || operation == Context.Operation.MERGE);
+    // Only check for transactional tables here since external tables are
+    // disallowed anyways through a different code path
+    if (isImpalaPlan(conf) && !isETLEngineSet()) {
+      if(AcidUtils.isTransactionalTable(destTable)) {
+        throw new SemanticException(
+            operation + " operation not supported on transactional table " +
+            destTable.getFullyQualifiedName() + " by Impala");
+      }
     }
   }
 
@@ -12849,6 +12883,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
            etlEngine, conf.getVar(ConfVars.HIVE_EXECUTION_ENGINE));
        conf.setVar(ConfVars.HIVE_EXECUTION_ENGINE, etlEngine);
     }
+  }
+
+  private boolean isETLEngineSet() {
+    return !conf.getVar(ConfVars.HIVE_ETL_EXECUTION_ENGINE).isEmpty();
   }
 
   void analyzeInternal(ASTNode ast, PlannerContextFactory pcf) throws SemanticException {

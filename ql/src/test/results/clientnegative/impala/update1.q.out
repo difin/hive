@@ -1,0 +1,10 @@
+PREHOOK: query: CREATE TABLE full_acid_tbl (id int, value int) stored as orc TBLPROPERTIES ('transactional'='true')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@full_acid_tbl
+POSTHOOK: query: CREATE TABLE full_acid_tbl (id int, value int) stored as orc TBLPROPERTIES ('transactional'='true')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@full_acid_tbl
+HMS CALL get_table_req FOR full_acid_tbl
+FAILED: SemanticException UPDATE operation not supported on transactional table default.full_acid_tbl by Impala

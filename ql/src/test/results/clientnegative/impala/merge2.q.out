@@ -1,0 +1,18 @@
+PREHOOK: query: create table source(id integer)
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@source
+POSTHOOK: query: create table source(id integer)
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@source
+PREHOOK: query: CREATE TABLE insert_only_target (id int, value int) stored as orc TBLPROPERTIES ('transactional'='true', 'transactional_properties' = 'insert_only')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@insert_only_target
+POSTHOOK: query: CREATE TABLE insert_only_target (id int, value int) stored as orc TBLPROPERTIES ('transactional'='true', 'transactional_properties' = 'insert_only')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@insert_only_target
+HMS CALL get_table_req FOR insert_only_target
+FAILED: SemanticException MERGE operation not supported on transactional table default.insert_only_target by Impala
