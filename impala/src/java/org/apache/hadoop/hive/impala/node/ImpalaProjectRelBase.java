@@ -66,6 +66,7 @@ import org.apache.impala.analysis.AnalyticWindow.Boundary;
 import org.apache.impala.analysis.Expr;
 import org.apache.impala.analysis.ExprSubstitutionMap;
 import org.apache.impala.analysis.FunctionCallExpr;
+import org.apache.impala.analysis.FunctionParams;
 import org.apache.impala.analysis.OrderByElement;
 import org.apache.impala.analysis.SlotDescriptor;
 import org.apache.impala.analysis.SlotRef;
@@ -129,24 +130,28 @@ abstract public class ImpalaProjectRelBase extends ImpalaPlanRel {
       ImpalaPlanRel inputRel, List<RexOver> overExprs)
       throws ImpalaException, HiveException, MetaException {
     PlanNode inputPlanNode = inputRel.getPlanNode(ctx);
-    // We generate the analytic expressions
+    // We iterate through the RexOver nodes generating an Impala AnalyticExpr for each one.
+    // If the generated AnalyticExpr for a RexOver node matches an AnalyticExpr from another
+    // RexOver node, we throw away the generated AnalyticExpr and associate the RexOver node
+    // with that previously generated AnalyticExpr
+    // Note: While it would be preferable to associate the RexOver list with a Map, the Expr
+    // object is not allowed to be a key in the map because hashCode was not implemented.
     List<AnalyticExpr> analyticExprs = new ArrayList<>();
-    Set<RexOver> overExprsSet = new LinkedHashSet<>();
+    List<List<RexOver>> overExprsList = new ArrayList<>();
     for (RexOver over : overExprs) {
-      // remove duplicate RexOver exprs (note that Impala's
-      // AnalyticInfo.create() call further below removes duplicate
-      // AnalyticExprs but we also want that list to be consistent
-      // with the list of RexOver exprs)
-      if (!overExprsSet.contains(over)) {
-        overExprsSet.add(over);
-        analyticExprs.add(getAnalyticExpr(over, ctx, inputRel));
+      AnalyticExpr analyticExpr = getAnalyticExpr(over, ctx, inputRel);
+      int index = analyticExprs.indexOf(analyticExpr);
+      if (index == -1) {
+        analyticExprs.add(analyticExpr);
+        overExprsList.add(Lists.newArrayList(over));
+      } else {
+        overExprsList.get(index).add(over);
       }
     }
 
     // We create the analytic info from them
     AnalyticInfo analyticInfo = AnalyticInfo.create(
         analyticExprs, ctx.getRootAnalyzer());
-    Preconditions.checkArgument(overExprsSet.size() == analyticExprs.size());
     AnalyticPlanner analyticPlanner =
         new AnalyticPlanner(analyticInfo, ctx.getRootAnalyzer(), ctx);
     // TODO: We should either pass the existing partitioning coming from
@@ -165,13 +170,15 @@ abstract public class ImpalaProjectRelBase extends ImpalaPlanRel {
           /* preserveRootType = */true);
       mapping.put(RexInputRef.of(pos, inputRel.getRowType()), e);
     }
-    Iterator<RexOver> overExprsIter = overExprsSet.iterator();
+    // The analyticExprs list is associated 1:1 with the overExprsList
+    Preconditions.checkState(analyticExprs.size() == overExprsList.size());
     for (int i = 0; i < analyticExprs.size(); i++) {
       SlotDescriptor slotDesc =
           analyticInfo.getOutputTupleDesc().getSlots().get(i);
       SlotRef logicalOutputSlot = new SlotRef(slotDesc);
-      mapping.put(overExprsIter.next(),
-          outputExprMap.get(logicalOutputSlot));
+      for (RexOver over : overExprsList.get(i)) {
+        mapping.put(over, outputExprMap.get(logicalOutputSlot));
+      }
     }
     LOG.debug("Mapping from nodes created by analytic planner : {}", mapping);
     return new ImpalaProvidedMappingRexVisitor(ctx.getRootAnalyzer(),
@@ -219,8 +226,10 @@ abstract public class ImpalaProjectRelBase extends ImpalaPlanRel {
       operands = ImpalaRelUtil.getExprs(rexOver.operands,
           ctx.getRootAnalyzer(), inputRel);
     }
+    FunctionParams params = new FunctionParams(rexOver.isDistinct(),
+        rexOver.ignoreNulls(), operands);
     FunctionCallExpr fnCall = new ImpalaFunctionCallExpr(
-        ctx.getRootAnalyzer(), fn, operands, null, impalaRetType);
+        ctx.getRootAnalyzer(), fn, params, null, impalaRetType);
     // Second parameter are the partition expressions
     List<Expr> partitionExprs = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(rexWindow.partitionKeys)) {

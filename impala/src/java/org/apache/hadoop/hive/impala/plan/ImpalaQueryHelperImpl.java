@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.impala.calcite.rules.HiveImpalaRexOverRule;
 import org.apache.hadoop.hive.impala.calcite.rules.HiveImpalaRules;
 import org.apache.hadoop.hive.impala.calcite.rules.HiveImpalaWindowingFixRule;
 import org.apache.hadoop.hive.impala.exec.ImpalaSessionManager;
@@ -124,6 +125,8 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
   public HepProgram getHepProgram(Hive db) {
     HepProgramBuilder programBuilder = new HepProgramBuilder();
     programBuilder.addMatchOrder(HepMatchOrder.DEPTH_FIRST);
+    programBuilder.addRuleInstance(
+        HiveImpalaRexOverRule.INSTANCE);
     programBuilder.addRuleInstance(
         HiveImpalaWindowingFixRule.INSTANCE);
     programBuilder.addRuleInstance(

@@ -567,7 +567,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 CBO PLAN:
 ImpalaSortRel(sort0=[$0], dir0=[ASC])
-  ImpalaProjectRel(id=[$0], _o__c1=[ntile(4:BIGINT) OVER (ORDER BY $0 NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)], _o__c2=[CASE(<(CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), 4)), 1), 1:DOUBLE, CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), 4)))])
+  ImpalaProjectRel(id=[$0], _o__c1=[+(int_divide(*(least(COUNT() OVER (RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 4:BIGINT), -(ROW_NUMBER() OVER (ORDER BY $0 NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 1)), COUNT() OVER (RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)), 1)], _o__c2=[CASE(<(CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), 4)), 1), 1:DOUBLE, CEIL(*(ds_kll_rank($1, CAST($0):FLOAT), 4)))])
     ImpalaJoinRel(condition=[true], joinType=[inner])
       ImpalaProjectPassthroughRel(id=[$0])
         ImpalaHdfsScanRel(table=[[default, sketch_input]])
@@ -604,60 +604,66 @@ STAGE PLANS:
     Impala
       Impala Plan: 
 F03:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
-Per-Host Resources: mem-estimate=22.03MB mem-reservation=22.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=26.03MB mem-reservation=26.00MB thread-reservation=1
   PLAN-ROOT SINK
-  |  output exprs: id, ntile(4), CASE WHEN ceil(multiply(ds_kll_rank(ds_kll_sketch(casttofloat(default.sketch_input_0.id)), casttofloat(id)), 4)) < 1 THEN 1 ELSE ceil(multiply(ds_kll_rank(ds_kll_sketch(casttofloat(default.sketch_input_0.id)), casttofloat(id)), 4)) END
+  |  output exprs: id, add(int_divide(multiply(least(count(), 4), subtract(row_number(), 1)), count()), 1), CASE WHEN ceil(multiply(ds_kll_rank(ds_kll_sketch(casttofloat(default.sketch_input_0.id)), casttofloat(id)), 4)) < 1 THEN 1 ELSE ceil(multiply(ds_kll_rank(ds_kll_sketch(casttofloat(default.sketch_input_0.id)), casttofloat(id)), 4)) END
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |
-  07:SORT
+  08:SORT
   |  order by: id ASC NULLS LAST
   |  mem-estimate=6.00MB mem-reservation=6.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=10 row-size=20B cardinality=0
-  |  in pipelines: 07(GETNEXT), 05(OPEN)
+  |  tuple-ids=9 row-size=20B cardinality=0
+  |  in pipelines: 08(GETNEXT), 05(OPEN)
   |
   00:UNION
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
-  |  tuple-ids=9 row-size=20B cardinality=0
+  |  tuple-ids=8 row-size=20B cardinality=0
+  |  in pipelines: 05(GETNEXT)
+  |
+  07:ANALYTIC
+  |  functions: count()
+  |  mem-estimate=4.00MB mem-reservation=4.00MB spill-buffer=2.00MB thread-reservation=0
+  |  tuple-ids=6,5,4 row-size=32B cardinality=0
   |  in pipelines: 05(GETNEXT)
   |
   06:ANALYTIC
-  |  functions: ntile(4)
+  |  functions: row_number()
   |  order by: id ASC
-  |  window: RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   |  mem-estimate=4.00MB mem-reservation=4.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=7,6 row-size=24B cardinality=0
+  |  tuple-ids=6,5 row-size=24B cardinality=0
   |  in pipelines: 05(GETNEXT)
   |
   05:SORT
   |  order by: id ASC NULLS LAST
   |  mem-estimate=12.00MB mem-reservation=12.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=7 row-size=16B cardinality=0
-  |  in pipelines: 05(GETNEXT), 09(OPEN)
+  |  tuple-ids=6 row-size=16B cardinality=0
+  |  in pipelines: 05(GETNEXT), 10(OPEN)
   |
   04:NESTED LOOP JOIN [CROSS JOIN, BROADCAST]
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |  tuple-ids=2,0 row-size=16B cardinality=0
-  |  in pipelines: 09(GETNEXT), 01(OPEN)
+  |  in pipelines: 10(GETNEXT), 01(OPEN)
   |
-  |--10:EXCHANGE [UNPARTITIONED]
+  |--11:EXCHANGE [UNPARTITIONED]
   |     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
   |     tuple-ids=0 row-size=4B cardinality=0
   |     in pipelines: 01(GETNEXT)
   |
-  09:AGGREGATE [FINALIZE]
+  10:AGGREGATE [FINALIZE]
   |  output: ds_kll_sketch:merge(casttofloat(default.sketch_input_0.id))
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
   |  tuple-ids=2 row-size=12B cardinality=1
-  |  in pipelines: 09(GETNEXT), 03(OPEN)
+  |  in pipelines: 10(GETNEXT), 03(OPEN)
   |
-  08:EXCHANGE [UNPARTITIONED]
+  09:EXCHANGE [UNPARTITIONED]
      mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
      tuple-ids=2 row-size=12B cardinality=1
      in pipelines: 03(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=80.00KB mem-reservation=0B thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F03, EXCHANGE=08, UNPARTITIONED]
+  DATASTREAM SINK [FRAGMENT=F03, EXCHANGE=09, UNPARTITIONED]
   |  mem-estimate=64.00KB mem-reservation=0B thread-reservation=0
   03:AGGREGATE
   |  output: ds_kll_sketch(casttofloat(default.sketch_input_0.id))
@@ -678,7 +684,7 @@ Per-Host Resources: mem-estimate=80.00KB mem-reservation=0B thread-reservation=1
 
 F02:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F03, EXCHANGE=10, UNPARTITIONED]
+  DATASTREAM SINK [FRAGMENT=F03, EXCHANGE=11, UNPARTITIONED]
   |  mem-estimate=32.00KB mem-reservation=0B thread-reservation=0
   01:SCAN HDFS [default.sketch_input, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
@@ -720,7 +726,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 CBO PLAN:
 ImpalaSortRel(sort0=[$1], sort1=[$0], dir0=[ASC], dir1=[ASC])
-  ImpalaProjectRel(id=[$0], category=[$1], _o__c2=[ntile(4:BIGINT) OVER (PARTITION BY $1 ORDER BY $0 NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)], _o__c3=[CASE(<(CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), 4)), 1), 1:DOUBLE, CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), 4)))])
+  ImpalaProjectRel(id=[$0], category=[$1], _o__c2=[+(int_divide(*(least(COUNT() OVER (PARTITION BY $1 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 4:BIGINT), -(ROW_NUMBER() OVER (PARTITION BY $1 ORDER BY $0 NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 1)), COUNT() OVER (PARTITION BY $1 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)), 1)], _o__c3=[CASE(<(CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), 4)), 1), 1:DOUBLE, CEIL(*(ds_kll_rank($3, CAST($0):FLOAT), 4)))])
     ImpalaJoinRel(condition=[=($2, $1)], joinType=[inner])
       ImpalaHdfsScanRel(table=[[default, sketch_input]], condition=[IS NOT NULL($1)])
       ImpalaAggregateRel(group=[{0}], agg#0=[ds_kll_sketch($1)])
@@ -758,65 +764,73 @@ STAGE PLANS:
 F05:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=25.00KB mem-reservation=0B thread-reservation=1
   PLAN-ROOT SINK
-  |  output exprs: id, category, ntile(4), CASE WHEN ceil(multiply(ds_kll_rank(ds_kll_sketch(casttofloat(default.sketch_input_0.id)), casttofloat(id)), 4)) < 1 THEN 1 ELSE ceil(multiply(ds_kll_rank(ds_kll_sketch(casttofloat(default.sketch_input_0.id)), casttofloat(id)), 4)) END
+  |  output exprs: id, category, add(int_divide(multiply(least(count(), 4), subtract(row_number(), 1)), count()), 1), CASE WHEN ceil(multiply(ds_kll_rank(ds_kll_sketch(casttofloat(default.sketch_input_0.id)), casttofloat(id)), 4)) < 1 THEN 1 ELSE ceil(multiply(ds_kll_rank(ds_kll_sketch(casttofloat(default.sketch_input_0.id)), casttofloat(id)), 4)) END
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |
-  12:MERGING-EXCHANGE [UNPARTITIONED]
+  13:MERGING-EXCHANGE [UNPARTITIONED]
      order by: category ASC NULLS LAST, id ASC NULLS LAST
      mem-estimate=25.00KB mem-reservation=0B thread-reservation=0
      tuple-ids=10 row-size=21B cardinality=0
-     in pipelines: 07(GETNEXT)
+     in pipelines: 08(GETNEXT)
 
 F04:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=22.03MB mem-reservation=22.00MB thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=12, UNPARTITIONED]
+Per-Host Resources: mem-estimate=26.03MB mem-reservation=26.00MB thread-reservation=1
+  DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=13, UNPARTITIONED]
   |  mem-estimate=100.00KB mem-reservation=0B thread-reservation=0
-  07:SORT
+  08:SORT
   |  order by: category ASC NULLS LAST, id ASC NULLS LAST
   |  mem-estimate=6.00MB mem-reservation=6.00MB spill-buffer=2.00MB thread-reservation=0
   |  tuple-ids=10 row-size=21B cardinality=0
-  |  in pipelines: 07(GETNEXT), 05(OPEN)
+  |  in pipelines: 08(GETNEXT), 05(OPEN)
   |
   00:UNION
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |  tuple-ids=9 row-size=21B cardinality=0
   |  in pipelines: 05(GETNEXT)
   |
-  06:ANALYTIC
-  |  functions: ntile(4)
+  07:ANALYTIC
+  |  functions: count()
   |  partition by: default.sketch_input.category
-  |  order by: id ASC
   |  window: RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   |  mem-estimate=4.00MB mem-reservation=4.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=7,6 row-size=26B cardinality=0
+  |  tuple-ids=6,5,4 row-size=34B cardinality=0
+  |  in pipelines: 05(GETNEXT)
+  |
+  06:ANALYTIC
+  |  functions: row_number()
+  |  partition by: default.sketch_input.category
+  |  order by: id ASC
+  |  window: ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  |  mem-estimate=4.00MB mem-reservation=4.00MB spill-buffer=2.00MB thread-reservation=0
+  |  tuple-ids=6,5 row-size=26B cardinality=0
   |  in pipelines: 05(GETNEXT)
   |
   05:SORT
   |  order by: category ASC NULLS LAST, id ASC NULLS LAST
   |  mem-estimate=12.00MB mem-reservation=12.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=7 row-size=18B cardinality=0
+  |  tuple-ids=6 row-size=18B cardinality=0
   |  in pipelines: 05(GETNEXT), 01(OPEN)
   |
-  11:EXCHANGE [HASH(default.sketch_input.category)]
+  12:EXCHANGE [HASH(default.sketch_input.category)]
      mem-estimate=26.00KB mem-reservation=0B thread-reservation=0
      tuple-ids=0,2 row-size=18B cardinality=0
      in pipelines: 01(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=2.04MB mem-reservation=1.94MB thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F04, EXCHANGE=11, HASH(default.sketch_input.category)]
+  DATASTREAM SINK [FRAGMENT=F04, EXCHANGE=12, HASH(default.sketch_input.category)]
   |  mem-estimate=104.00KB mem-reservation=0B thread-reservation=0
   04:HASH JOIN [INNER JOIN, BROADCAST]
   |  hash predicates: default.sketch_input.category = default.sketch_input_0.category
   |  fk/pk conjuncts: assumed fk/pk
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
   |  tuple-ids=0,2 row-size=18B cardinality=0
-  |  in pipelines: 01(GETNEXT), 09(OPEN)
+  |  in pipelines: 01(GETNEXT), 10(OPEN)
   |
-  |--10:EXCHANGE [BROADCAST]
+  |--11:EXCHANGE [BROADCAST]
   |     mem-estimate=17.00KB mem-reservation=0B thread-reservation=0
   |     tuple-ids=2 row-size=13B cardinality=0
-  |     in pipelines: 09(GETNEXT)
+  |     in pipelines: 10(GETNEXT)
   |
   01:SCAN HDFS [default.sketch_input, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
@@ -832,23 +846,23 @@ Per-Host Resources: mem-estimate=2.04MB mem-reservation=1.94MB thread-reservatio
 
 F02:PLAN FRAGMENT [HASH(default.sketch_input_0.category)] hosts=1 instances=1
 Per-Host Resources: mem-estimate=128.07MB mem-reservation=36.00MB thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=10, BROADCAST]
+  DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=11, BROADCAST]
   |  mem-estimate=68.00KB mem-reservation=0B thread-reservation=0
-  09:AGGREGATE [FINALIZE]
+  10:AGGREGATE [FINALIZE]
   |  output: ds_kll_sketch:merge(casttofloat(default.sketch_input_0.id))
   |  group by: default.sketch_input_0.category
   |  mem-estimate=128.00MB mem-reservation=36.00MB spill-buffer=2.00MB thread-reservation=0
   |  tuple-ids=2 row-size=13B cardinality=0
-  |  in pipelines: 09(GETNEXT), 02(OPEN)
+  |  in pipelines: 10(GETNEXT), 02(OPEN)
   |
-  08:EXCHANGE [HASH(default.sketch_input_0.category)]
+  09:EXCHANGE [HASH(default.sketch_input_0.category)]
      mem-estimate=17.00KB mem-reservation=0B thread-reservation=0
      tuple-ids=2 row-size=13B cardinality=0
      in pipelines: 02(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=128.07MB mem-reservation=34.00MB thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=08, HASH(default.sketch_input_0.category)]
+  DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=09, HASH(default.sketch_input_0.category)]
   |  mem-estimate=68.00KB mem-reservation=0B thread-reservation=0
   03:AGGREGATE [STREAMING]
   |  output: ds_kll_sketch(casttofloat(default.sketch_input_0.id))
@@ -894,7 +908,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@sketch_input
 CBO PLAN:
 ImpalaSortRel(sort0=[$1], sort1=[$0], dir0=[ASC], dir1=[ASC])
-  ImpalaProjectRel(id=[$0], category=[$1], _o__c2=[cume_dist() OVER (PARTITION BY $1 ORDER BY $0 NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)], _o__c3=[ds_kll_rank($3, CAST($0):FLOAT)])
+  ImpalaProjectRel(id=[$0], category=[$1], _o__c2=[/(CAST(+(-(COUNT() OVER (PARTITION BY $1 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), RANK() OVER (PARTITION BY $1 ORDER BY $0 DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)), 1)):DOUBLE, CAST(COUNT() OVER (PARTITION BY $1 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)):DOUBLE)], _o__c3=[ds_kll_rank($3, CAST($0):FLOAT)])
     ImpalaJoinRel(condition=[=($2, $1)], joinType=[inner])
       ImpalaHdfsScanRel(table=[[default, sketch_input]], condition=[IS NOT NULL($1)])
       ImpalaAggregateRel(group=[{0}], agg#0=[ds_kll_sketch($1)])
@@ -928,65 +942,73 @@ STAGE PLANS:
 F05:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=25.00KB mem-reservation=0B thread-reservation=1
   PLAN-ROOT SINK
-  |  output exprs: id, category, cume_dist(), ds_kll_rank(ds_kll_sketch(casttofloat(default.sketch_input_0.id)), casttofloat(id))
+  |  output exprs: id, category, divide(casttodouble(add(subtract(count(), rank()), 1)), casttodouble(count())), ds_kll_rank(ds_kll_sketch(casttofloat(default.sketch_input_0.id)), casttofloat(id))
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |
-  12:MERGING-EXCHANGE [UNPARTITIONED]
+  13:MERGING-EXCHANGE [UNPARTITIONED]
      order by: category ASC NULLS LAST, id ASC NULLS LAST
      mem-estimate=25.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=10 row-size=21B cardinality=0
-     in pipelines: 07(GETNEXT)
+     tuple-ids=12 row-size=21B cardinality=0
+     in pipelines: 08(GETNEXT)
 
 F04:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=22.03MB mem-reservation=22.00MB thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=12, UNPARTITIONED]
+Per-Host Resources: mem-estimate=26.03MB mem-reservation=26.00MB thread-reservation=1
+  DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=13, UNPARTITIONED]
   |  mem-estimate=100.00KB mem-reservation=0B thread-reservation=0
-  07:SORT
+  08:SORT
   |  order by: category ASC NULLS LAST, id ASC NULLS LAST
   |  mem-estimate=6.00MB mem-reservation=6.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=10 row-size=21B cardinality=0
-  |  in pipelines: 07(GETNEXT), 05(OPEN)
+  |  tuple-ids=12 row-size=21B cardinality=0
+  |  in pipelines: 08(GETNEXT), 05(OPEN)
   |
   00:UNION
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
-  |  tuple-ids=9 row-size=21B cardinality=0
+  |  tuple-ids=11 row-size=21B cardinality=0
+  |  in pipelines: 05(GETNEXT)
+  |
+  07:ANALYTIC
+  |  functions: count()
+  |  partition by: default.sketch_input.category
+  |  window: RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  |  mem-estimate=4.00MB mem-reservation=4.00MB spill-buffer=2.00MB thread-reservation=0
+  |  tuple-ids=8,7,5 row-size=34B cardinality=0
   |  in pipelines: 05(GETNEXT)
   |
   06:ANALYTIC
-  |  functions: cume_dist()
+  |  functions: rank()
   |  partition by: default.sketch_input.category
-  |  order by: id ASC
+  |  order by: id DESC NULLS LAST
   |  window: RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   |  mem-estimate=4.00MB mem-reservation=4.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=7,6 row-size=26B cardinality=0
+  |  tuple-ids=8,7 row-size=26B cardinality=0
   |  in pipelines: 05(GETNEXT)
   |
   05:SORT
-  |  order by: category ASC NULLS LAST, id ASC NULLS LAST
+  |  order by: category ASC NULLS LAST, id DESC NULLS LAST
   |  mem-estimate=12.00MB mem-reservation=12.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=7 row-size=18B cardinality=0
+  |  tuple-ids=8 row-size=18B cardinality=0
   |  in pipelines: 05(GETNEXT), 01(OPEN)
   |
-  11:EXCHANGE [HASH(default.sketch_input.category)]
+  12:EXCHANGE [HASH(default.sketch_input.category)]
      mem-estimate=26.00KB mem-reservation=0B thread-reservation=0
      tuple-ids=0,2 row-size=18B cardinality=0
      in pipelines: 01(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=2.04MB mem-reservation=1.94MB thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F04, EXCHANGE=11, HASH(default.sketch_input.category)]
+  DATASTREAM SINK [FRAGMENT=F04, EXCHANGE=12, HASH(default.sketch_input.category)]
   |  mem-estimate=104.00KB mem-reservation=0B thread-reservation=0
   04:HASH JOIN [INNER JOIN, BROADCAST]
   |  hash predicates: default.sketch_input.category = default.sketch_input_0.category
   |  fk/pk conjuncts: assumed fk/pk
   |  mem-estimate=1.94MB mem-reservation=1.94MB spill-buffer=64.00KB thread-reservation=0
   |  tuple-ids=0,2 row-size=18B cardinality=0
-  |  in pipelines: 01(GETNEXT), 09(OPEN)
+  |  in pipelines: 01(GETNEXT), 10(OPEN)
   |
-  |--10:EXCHANGE [BROADCAST]
+  |--11:EXCHANGE [BROADCAST]
   |     mem-estimate=17.00KB mem-reservation=0B thread-reservation=0
   |     tuple-ids=2 row-size=13B cardinality=0
-  |     in pipelines: 09(GETNEXT)
+  |     in pipelines: 10(GETNEXT)
   |
   01:SCAN HDFS [default.sketch_input, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
@@ -1002,23 +1024,23 @@ Per-Host Resources: mem-estimate=2.04MB mem-reservation=1.94MB thread-reservatio
 
 F02:PLAN FRAGMENT [HASH(default.sketch_input_0.category)] hosts=1 instances=1
 Per-Host Resources: mem-estimate=128.07MB mem-reservation=36.00MB thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=10, BROADCAST]
+  DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=11, BROADCAST]
   |  mem-estimate=68.00KB mem-reservation=0B thread-reservation=0
-  09:AGGREGATE [FINALIZE]
+  10:AGGREGATE [FINALIZE]
   |  output: ds_kll_sketch:merge(casttofloat(default.sketch_input_0.id))
   |  group by: default.sketch_input_0.category
   |  mem-estimate=128.00MB mem-reservation=36.00MB spill-buffer=2.00MB thread-reservation=0
   |  tuple-ids=2 row-size=13B cardinality=0
-  |  in pipelines: 09(GETNEXT), 02(OPEN)
+  |  in pipelines: 10(GETNEXT), 02(OPEN)
   |
-  08:EXCHANGE [HASH(default.sketch_input_0.category)]
+  09:EXCHANGE [HASH(default.sketch_input_0.category)]
      mem-estimate=17.00KB mem-reservation=0B thread-reservation=0
      tuple-ids=2 row-size=13B cardinality=0
      in pipelines: 02(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=128.07MB mem-reservation=34.00MB thread-reservation=1
-  DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=08, HASH(default.sketch_input_0.category)]
+  DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=09, HASH(default.sketch_input_0.category)]
   |  mem-estimate=68.00KB mem-reservation=0B thread-reservation=0
   03:AGGREGATE [STREAMING]
   |  output: ds_kll_sketch(casttofloat(default.sketch_input_0.id))
