@@ -92,7 +92,7 @@ public class DescTableOperation extends DDLOperation<DescTableDesc> {
         if (desc.isFormatted()) {
           getColumnDataColPathSpecified(table, part, cols, colStats, deserializer);
         } else {
-          cols.addAll(Hive.getFieldsFromDeserializer(desc.getColumnPath(), deserializer));
+          cols.addAll(Hive.getFieldsFromDeserializer(desc.getColumnPath(), deserializer, context.getConf()));
         }
       }
       fixDecimalColumnTypeName(cols);
@@ -212,7 +212,7 @@ public class DescTableOperation extends DDLOperation<DescTableDesc> {
         }
         table.setParameters(tableProps);
       } else {
-        cols.addAll(Hive.getFieldsFromDeserializer(desc.getColumnPath(), deserializer));
+        cols.addAll(Hive.getFieldsFromDeserializer(desc.getColumnPath(), deserializer, context.getConf()));
         colStats.addAll(
             context.getDb().getTableColumnStatistics(dbTab[0].toLowerCase(), dbTab[1].toLowerCase(), colNames, false));
       }
@@ -222,7 +222,7 @@ public class DescTableOperation extends DDLOperation<DescTableDesc> {
       // lower case name to get the stats.
       String partName = HiveMetaStore.HMSHandler.lowerCaseConvertPartName(part.getName());
       partitions.add(partName);
-      cols.addAll(Hive.getFieldsFromDeserializer(desc.getColumnPath(), deserializer));
+      cols.addAll(Hive.getFieldsFromDeserializer(desc.getColumnPath(), deserializer, context.getConf()));
       List<ColumnStatisticsObj> partitionColStat = context.getDb().getPartitionColumnStatistics(dbTab[0].toLowerCase(),
           dbTab[1].toLowerCase(), partitions, colNames, false).get(partName);
       if (partitionColStat != null) {
@@ -256,7 +256,7 @@ public class DescTableOperation extends DDLOperation<DescTableDesc> {
   private void getColumnsForNotPartitionKeyColumn(List<FieldSchema> cols, List<ColumnStatisticsObj> colStats,
       Deserializer deserializer, List<String> colNames, String[] dbTab, Map<String, String> tableProps)
       throws HiveException {
-    cols.addAll(Hive.getFieldsFromDeserializer(desc.getColumnPath(), deserializer));
+    cols.addAll(Hive.getFieldsFromDeserializer(desc.getColumnPath(), deserializer, context.getConf()));
     List<String> parts = context.getDb().getPartitionNames(dbTab[0].toLowerCase(), dbTab[1].toLowerCase(),
         (short) -1);
     AggrStats aggrStats = context.getDb().getAggrColStatsFor(

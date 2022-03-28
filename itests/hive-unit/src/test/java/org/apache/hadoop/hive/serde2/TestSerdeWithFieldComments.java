@@ -18,6 +18,7 @@
 package org.apache.hadoop.hive.serde2;
 
 import junit.framework.TestCase;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreUtils;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
@@ -61,7 +62,7 @@ public class TestSerdeWithFieldComments extends TestCase {
     Deserializer mockDe = mock(Deserializer.class);
     when(mockDe.getObjectInspector()).thenReturn(mockSOI);
     List<FieldSchema> result =
-        HiveMetaStoreUtils.getFieldsFromDeserializer("testTable", mockDe);
+        HiveMetaStoreUtils.getFieldsFromDeserializer("testTable", mockDe, new HiveConf());
 
     assertEquals(2, result.size());
     assertEquals("first", result.get(0).getName());
