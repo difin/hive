@@ -4,6 +4,7 @@ FROM registry.access.redhat.com/ubi7/ubi:latest as hadoop-base
 ARG HADOOP_VERSION
 ADD hadoop-${HADOOP_VERSION}.tar.gz  /usr/lib/
 RUN ln -s /usr/lib/hadoop-${HADOOP_VERSION} /usr/lib/hadoop
+RUN rm -f /usr/lib/hadoop/share/hadoop/tools/lib/kafka-clients-0.8.2.1.jar
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
@@ -23,7 +24,6 @@ RUN /remove-unwanted.sh
 FROM registry.access.redhat.com/ubi7/ubi:latest as atlas-base
 ARG ATLAS_VERSION
 ADD apache-atlas-${ATLAS_VERSION}-hive-hook.tar.gz /usr/lib/
-RUN rm /usr/lib/apache-atlas-hive-hook-${ATLAS_VERSION}/hook/hive/atlas-hive-plugin-impl/kafka-*.jar
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
