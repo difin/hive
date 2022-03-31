@@ -352,9 +352,11 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
 
     try (CompactionTxn compactionTxn = new CompactionTxn()) {
 
-      ci = CompactionInfo.optionalCompactionInfoStructToInfo(
-              msc.findNextCompact(new FindNextCompactRequest(workerName, runtimeVersion)));
-      LOG.debug("Processing compaction request " + ci);
+      FindNextCompactRequest findNextCompactRequest = new FindNextCompactRequest();
+      findNextCompactRequest.setWorkerId(workerName);
+      findNextCompactRequest.setWorkerVersion(runtimeVersion);
+      ci = CompactionInfo.optionalCompactionInfoStructToInfo(msc.findNextCompact(findNextCompactRequest));
+      LOG.info("Processing compaction request {}", ci);
 
       if (ci == null && !stop.get()) {
         try {
@@ -380,13 +382,15 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
       try {
         t1 = resolveTable(ci);
         if (t1 == null) {
-          LOG.info("Unable to find table " + ci.getFullTableName() +
-                       ", assuming it was dropped and moving on.");
-          msc.markCleaned(CompactionInfo.compactionInfoToStruct(ci));
+          ci.errorMessage = "Unable to find table " + ci.getFullTableName() + ", assuming it was dropped and moving on.";
+          LOG.warn(ci.errorMessage + " Compaction info: {}", ci);
+          msc.markRefused(CompactionInfo.compactionInfoToStruct(ci));
           return false;
         }
       } catch (MetaException e) {
-        msc.markCleaned(CompactionInfo.compactionInfoToStruct(ci));
+        LOG.error("Unexpected error during resolving table. Compaction info: " + ci, e);
+        ci.errorMessage = e.getMessage();
+        msc.markFailed(CompactionInfo.compactionInfoToStruct(ci));
         return false;
       }
 
@@ -402,13 +406,15 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
       try {
         p = resolvePartition(ci);
         if (p == null && ci.partName != null) {
-          LOG.info("Unable to find partition " + ci.getFullPartitionName() +
-                       ", assuming it was dropped and moving on.");
-          msc.markCleaned(CompactionInfo.compactionInfoToStruct(ci));
+          ci.errorMessage = "Unable to find partition " + ci.getFullPartitionName() + ", assuming it was dropped and moving on.";
+          LOG.warn(ci.errorMessage + " Compaction info: {}", ci);
+          msc.markRefused(CompactionInfo.compactionInfoToStruct(ci));
           return false;
         }
       } catch (Exception e) {
-        msc.markCleaned(CompactionInfo.compactionInfoToStruct(ci));
+        LOG.error("Unexpected error during resolving partition.", e);
+        ci.errorMessage = e.getMessage();
+        msc.markFailed(CompactionInfo.compactionInfoToStruct(ci));
         return false;
       }
 
@@ -419,8 +425,9 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
 
       // Check that the table or partition isn't sorted, as we don't yet support that.
       if (sd.getSortCols() != null && !sd.getSortCols().isEmpty()) {
-        LOG.error("Attempt to compact sorted table, which is not yet supported!");
-        msc.markCleaned(CompactionInfo.compactionInfoToStruct(ci));
+        ci.errorMessage = "Attempt to compact sorted table " + ci.getFullTableName() + ", which is not yet supported!";
+        LOG.warn(ci.errorMessage + " Compaction info: {}", ci);
+        msc.markRefused(CompactionInfo.compactionInfoToStruct(ci));
         return false;
       }
 
@@ -469,16 +476,17 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
           msc.markCompacted(CompactionInfo.compactionInfoToStruct(ci));
         } else {
           // do nothing
-          msc.markCleaned(CompactionInfo.compactionInfoToStruct(ci));
+          ci.errorMessage = "None of the compaction thresholds met, compaction request is refused!";
+          LOG.debug(ci.errorMessage + " Compaction info: {}", ci);
+          msc.markRefused(CompactionInfo.compactionInfoToStruct(ci));
         }
         compactionTxn.wasSuccessful();
         return false;
       }
       if (!ci.isMajorCompaction() && !isMinorCompactionSupported(t.getParameters(), dir)) {
-        ci.errorMessage = String.format("Query based Minor compaction is not possible for full acid tables having raw " +
-                "format (non-acid) data in them. Compaction type: %s, Partition: %s, Compaction id: %d",
-                ci.type.toString(), ci.getFullPartitionName(), ci.id);
-        LOG.error(ci.errorMessage);
+        ci.errorMessage = "Query based Minor compaction is not possible for full acid tables having raw format " +
+            "(non-acid) data in them.";
+        LOG.error(ci.errorMessage + " Compaction info: {}", ci);
         try {
           msc.markRefused(CompactionInfo.compactionInfoToStruct(ci));
         } catch (Throwable tr) {
