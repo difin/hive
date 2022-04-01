@@ -26,6 +26,7 @@ import org.apache.calcite.plan.hep.HepProgramBuilder;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rex.RexBuilder;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
+import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.impala.calcite.rules.HiveImpalaRules;
@@ -327,38 +328,45 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
 
     // Collect the option settings that are returned in the HS2 session
     // config and generate a comma separated string apply using FeSupport
-    // http_addr is added by HS2 and will cause an error if not removed
+    // http_addr is added by HS2 and will cause an error if not removed.
     // We filter out the key-value pair associated with 'ENABLED_RUNTIME_FILTER_TYPES'
     // since FeSupport#ParseQueryOptions() is not able to parse this query option when
-    // the value contains commas.
+    // the value contains commas. We use uppercase letters because in 'configurations'
+    // the keys are in upper case.
     String csvQueryOptions = configurations.entrySet().stream()
         .filter(e -> !e.getKey().equals("http_addr"))
         .filter(e -> !e.getKey().equals("ENABLED_RUNTIME_FILTER_TYPES"))
         .map(e -> e.getKey() + "=" + e.getValue())
         .collect(Collectors.joining(","));
 
-    Map<String, String> sessionOptions = 
+    Map<String, String> sessionOptions =
       SessionState.get().getConf().subtree("impala").entrySet().stream()
           .filter(e -> !e.getKey().equals("core-site.overridden"))
           .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
 
-    // We filter out the key-value pair associated with 'ENABLED_RUNTIME_FILTER_TYPES'
+    // We filter out the key-value pair associated with 'enabled_runtime_filter_types'
     // since FeSupport#ParseQueryOptions() is not able to parse this query option when
-    // the value contains commas.
+    // the value contains commas. We use lowercase letters because the keys of Impala's
+    // query options are converted to lower case letters in updateImpalaQueryOptions().
+    // If a user explicitly set up an Impala's query option, we will see the
+    // corresponding key-value pair in 'sessionOptions' and the key would be in lower
+    // case due to updateImpalaQueryOptions().
     String csvSessionOptions = sessionOptions.entrySet().stream()
-          .filter(e -> !e.getKey().equals("ENABLED_RUNTIME_FILTER_TYPES"))
-          .map(e -> e.getKey() + "=" + e.getValue())
-          .collect(Collectors.joining(","));
+        .filter(e -> !e.getKey().equals("enabled_runtime_filter_types"))
+        .map(e -> e.getKey() + "=" + e.getValue())
+        .collect(Collectors.joining(","));
 
     // Overlay defaults from Impala backend option settings
     TQueryOptions options;
     try {
       options = FeSupport.ParseQueryOptions(csvQueryOptions,
           new TQueryOptions());
-      updateEnabledRuntimeFilterTypes(options, configurations);
+      updateEnabledRuntimeFilterTypes(options, configurations,
+          "ENABLED_RUNTIME_FILTER_TYPES");
 
       options = FeSupport.ParseQueryOptions(csvSessionOptions, options);
-      updateEnabledRuntimeFilterTypes(options, sessionOptions);
+      updateEnabledRuntimeFilterTypes(options, sessionOptions,
+          "enabled_runtime_filter_types");
     } catch (InternalException e) {
       throw new HiveException(e);
     }
@@ -371,9 +379,9 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
    * 'impalaOptions'.
    */
   private void updateEnabledRuntimeFilterTypes(TQueryOptions updatedOptions,
-      Map<String, String> impalaOptions) {
-    if (impalaOptions.containsKey("ENABLED_RUNTIME_FILTER_TYPES")) {
-      String rawValue = impalaOptions.get("ENABLED_RUNTIME_FILTER_TYPES");
+      Map<String, String> impalaOptions, String key) {
+    if (impalaOptions.containsKey(key)) {
+      String rawValue = impalaOptions.get(key);
       String rawTypes[] = rawValue.split(",");
       Set<TRuntimeFilterType> types = new HashSet<>();
       for (String rawType : rawTypes) {
@@ -389,16 +397,17 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
 
     for (Map.Entry<Object, Object> e : props.entrySet()) {
       String key = (String) e.getKey();
-      if (key.startsWith("impala")) {
-        if (key.length() > "impala.".length()) {
-          String keyWithoutNameSpace = key.substring("impala.".length()).toLowerCase();
+      if (key.startsWith(Constants.IMPALA_PREFIX)) {
+        if (key.length() > Constants.IMPALA_PREFIX.length()) {
+          String keyWithoutNameSpace =
+              key.substring(Constants.IMPALA_PREFIX.length()).toLowerCase();
           TQueryOptions._Fields field = TQueryOptions._Fields.findByName(
               keyWithoutNameSpace);
           if (field == null) {
             conf.unset(key);
             // Recall that in HiveConf#verifyAndSet() we called HiveConf#set() on a key
-            // prefixed by "impala." so we have to call unset() here if the key is
-            // actually unsupported by Impala.
+            // prefixed by Constants.IMPALA_PREFIX so we have to call unset() here if the
+            // key is actually unsupported by Impala.
             conf.unset(keyWithoutNameSpace);
           }
         } else {
@@ -418,14 +427,24 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
       TQueryOptions._Fields field = TQueryOptions._Fields.findByName(
               key.toLowerCase());
       if (field != null) {
-        // Convert the key to upper case so that in createDefaultQueryOptions() we could
+        // Convert the key to lower case so that in createDefaultQueryOptions() we could
         // filter out the query option that could not be correctly parsed by
-        // FeSupport#ParseQueryOptions(). Otherwise, a key-value pair like
-        // "enabled_runtime_filter_types=BLOOM,MIN_MAX" could not be filtered out
-        // before a string of comma-separated key-value pairs is passed to
-        // FeSupport#ParseQueryOptions().
+        // FeSupport#ParseQueryOptions(). Recall that in createDefaultQueryOptions() to
+        // compute 'csvSessionOptions' we filter out each key-value pair in which the key
+        // equals "enabled_runtime_filter_types" and thus we will not be able to filter
+        // out a key-value pair like "ENABLED_RUNTIME_filter_types=BLOOM,MIN_MAX" if the
+        // key in such key-value pairs is not converted to lower case since some letters
+        // in the key are in upper case.
+        // We choose not to convert the key to upper case because in the unit tests
+        // the keys of Impala's query options are in lower case and thus a key-value pair
+        // like "impala.EXPLAIN_LEVEL=MINIMAL" could not override
+        // "impala.explain_level=VERBOSE" in 'impalaProps', which could cause some unit
+        // tests to fail. Refer to data/conf/impala/hive-site.xml for Impala's query
+        // options that we use in Hive's unit tests.
         impalaProps.put(
-            "impala.".concat(((String) e.getKey()).toUpperCase()), e.getValue());
+            Constants.IMPALA_PREFIX.concat(((String) e.getKey()).toLowerCase()),
+            e.getValue());
+
         origImpalaProps.add((String) e.getKey());
       }
     }

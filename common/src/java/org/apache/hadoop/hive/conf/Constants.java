@@ -21,6 +21,8 @@ public class Constants {
   /* Constants for stats */
   public static final String HIVE_ENGINE = "hive";
   public static final String IMPALA_ENGINE = "impala";
+  /* Constants for Impala config options */
+  public static final String IMPALA_PREFIX = "impala.";
 
   /* Constants for LLAP */
   public static final String LLAP_LOGGER_NAME_QUERY_ROUTING = "query-routing";

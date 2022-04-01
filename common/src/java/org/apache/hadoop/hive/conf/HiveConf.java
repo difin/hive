@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.common.ZooKeeperHiveHelper;
 import org.apache.hadoop.hive.common.classification.InterfaceAudience;
 import org.apache.hadoop.hive.common.classification.InterfaceAudience.LimitedPrivate;
 import org.apache.hadoop.hive.common.type.TimestampTZUtil;
+import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.Validator.PatternSet;
 import org.apache.hadoop.hive.conf.Validator.RangeValidator;
 import org.apache.hadoop.hive.conf.Validator.RatioValidator;
@@ -5907,8 +5908,14 @@ public class HiveConf extends Configuration {
     String oldValue = name != null ? get(name) : null;
     if (name == null || value == null || !value.equals(oldValue)) {
       // When either name or value is null, the set method below will fail,
-      // and throw IllegalArgumentException
-      set(name, value);
+      // and throw IllegalArgumentException.
+      // Note that for a key-value pair where the key does not start with
+      // Constants.IMPALA_PREFIX, conflicting key-value pairs could be added, which could
+      // not be prevented now because within this method, Impala's TQueryOptions is not
+      // available. Refer to CDPD-18048 for further details.
+      if (!isImpalaRelatedConfig(name)) {
+        set(name, value);
+      }
       if (isSparkRelatedConfig(name)) {
         isSparkConfigUpdated = true;
       }
@@ -5920,9 +5927,17 @@ public class HiveConf extends Configuration {
       // available.
       if (isImpalaRelatedConfig(name)) {
         // If 'name' starts with "impala", we also add the corresponding query option
-        // without Impala's namespace when appropriate.
-        if (name.length() > "impala.".length()) {
-          set(name.substring("impala.".length()), value);
+        // without Impala's namespace when appropriate. We convert the portion of the
+        // key following Constants.IMPALA_PREFIX to lowercase letters to make sure there
+        // will not be conflicting key-value pairs for keys that start with
+        // Constants.IMPALA_PREFIX. For instance, we will not have both
+        // "impala.explain_level=VERBOSE" and "impala.EXPLAIN_LEVEL=MINIMAL" added to
+        // this HiveConf. Depending on the order of the SET statements, only one
+        // key-value pair could exist.
+        if (name.length() > Constants.IMPALA_PREFIX.length()) {
+          String impalaQueryOptionKey = name.substring(Constants.IMPALA_PREFIX.length());
+          set(Constants.IMPALA_PREFIX.concat(impalaQueryOptionKey.toLowerCase()), value);
+          set(impalaQueryOptionKey.toLowerCase(), value);
         }
         isImpalaConfigUpdated = true;
       }
@@ -5989,7 +6004,7 @@ public class HiveConf extends Configuration {
    */
   //XXX: CDPD-20696: Need to get rid of Impala references
   private boolean isImpalaRelatedConfig(String name) {
-    return name.startsWith("impala");
+    return name.startsWith(Constants.IMPALA_PREFIX);
   }
 
   public static int getIntVar(Configuration conf, ConfVars var) {
