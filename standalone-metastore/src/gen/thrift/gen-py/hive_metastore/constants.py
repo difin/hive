@@ -13,7 +13,7 @@ from thrift.TRecursive import fix_spec
 import sys
 from .ttypes import *
 DDL_TIME = "transient_lastDdlTime"
-HMS_API = "1.2.20"
+HMS_API = "1.2.21"
 ACCESSTYPE_NONE = 1
 ACCESSTYPE_READONLY = 2
 ACCESSTYPE_WRITEONLY = 4
@@ -48,5 +48,6 @@ TABLE_IS_CTAS = "created_with_ctas"
 PARTITION_TRANSFORM_SPEC = "partition_transform_spec"
 CTAS_LEGACY_CONFIG = "create_table_as_external"
 DEFAULT_TABLE_TYPE = "defaultTableType"
+TABLE_IS_CTLT = "created_with_ctlt"
 TXN_ID = "txnId"
 WRITE_ID = "writeId"

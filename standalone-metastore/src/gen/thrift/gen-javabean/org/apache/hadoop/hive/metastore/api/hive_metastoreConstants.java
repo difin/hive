@@ -11,7 +11,7 @@ package org.apache.hadoop.hive.metastore.api;
 
   public static final java.lang.String DDL_TIME = "transient_lastDdlTime";
 
-  public static final java.lang.String HMS_API = "1.2.20";
+  public static final java.lang.String HMS_API = "1.2.21";
 
   public static final byte ACCESSTYPE_NONE = (byte)1;
 
@@ -80,6 +80,8 @@ package org.apache.hadoop.hive.metastore.api;
   public static final java.lang.String CTAS_LEGACY_CONFIG = "create_table_as_external";
 
   public static final java.lang.String DEFAULT_TABLE_TYPE = "defaultTableType";
+
+  public static final java.lang.String TABLE_IS_CTLT = "created_with_ctlt";
 
   public static final java.lang.String TXN_ID = "txnId";
 

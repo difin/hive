@@ -54,6 +54,7 @@ final class Constant extends \Thrift\Type\TConstant
     static protected $PARTITION_TRANSFORM_SPEC;
     static protected $CTAS_LEGACY_CONFIG;
     static protected $DEFAULT_TABLE_TYPE;
+    static protected $TABLE_IS_CTLT;
     static protected $TXN_ID;
     static protected $WRITE_ID;
 
@@ -64,7 +65,7 @@ final class Constant extends \Thrift\Type\TConstant
 
     protected static function init_HMS_API()
     {
-        return "1.2.20";
+        return "1.2.21";
     }
 
     protected static function init_ACCESSTYPE_NONE()
@@ -235,6 +236,11 @@ final class Constant extends \Thrift\Type\TConstant
     protected static function init_DEFAULT_TABLE_TYPE()
     {
         return "defaultTableType";
+    }
+
+    protected static function init_TABLE_IS_CTLT()
+    {
+        return "created_with_ctlt";
     }
 
     protected static function init_TXN_ID()

@@ -13,7 +13,7 @@ const hive_metastoreConstants g_hive_metastore_constants;
 hive_metastoreConstants::hive_metastoreConstants() {
   DDL_TIME = "transient_lastDdlTime";
 
-  HMS_API = "1.2.20";
+  HMS_API = "1.2.21";
 
   ACCESSTYPE_NONE = 1;
 
@@ -82,6 +82,8 @@ hive_metastoreConstants::hive_metastoreConstants() {
   CTAS_LEGACY_CONFIG = "create_table_as_external";
 
   DEFAULT_TABLE_TYPE = "defaultTableType";
+
+  TABLE_IS_CTLT = "created_with_ctlt";
 
   TXN_ID = "txnId";
 

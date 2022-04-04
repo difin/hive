@@ -9,7 +9,7 @@ require 'hive_metastore_types'
 
 DDL_TIME = %q"transient_lastDdlTime"
 
-HMS_API = %q"1.2.20"
+HMS_API = %q"1.2.21"
 
 ACCESSTYPE_NONE = 1
 
@@ -78,6 +78,8 @@ PARTITION_TRANSFORM_SPEC = %q"partition_transform_spec"
 CTAS_LEGACY_CONFIG = %q"create_table_as_external"
 
 DEFAULT_TABLE_TYPE = %q"defaultTableType"
+
+TABLE_IS_CTLT = %q"created_with_ctlt"
 
 TXN_ID = %q"txnId"
 

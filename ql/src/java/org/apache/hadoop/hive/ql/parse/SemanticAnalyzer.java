@@ -14335,6 +14335,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           isTransactional, isManaged, new String[]{qualifiedTabName.getDb(), qualifiedTabName.getTable()}, isDefaultTableTypeChanged);
 
       isExt = isExternalTableChanged(tblProps, isTransactional, isExt, isDefaultTableTypeChanged);
+      tblProps.put(hive_metastoreConstants.TABLE_IS_CTLT, "true");
       addDbAndTabToOutputs(new String[] {qualifiedTabName.getDb(), qualifiedTabName.getTable()},
           TableType.MANAGED_TABLE, isTemporary, tblProps, storageFormat);
 
