@@ -1,0 +1,51 @@
+SELECT 'Upgrading MetaStore schema from 3.1.3000.7.2.15.0-Update6 to 7.2.16.0-Update1' AS MESSAGE;
+
+-- HIVE-24396
+-- Create DataConnectors and DataConnector_Params tables
+CREATE TABLE "DATACONNECTORS" (
+  "NAME" nvarchar(128) NOT NULL,
+  "TYPE" nvarchar(32) NOT NULL,
+  "URL" nvarchar(4000) NOT NULL,
+  "COMMENT" nvarchar(256),
+  "OWNER_NAME" nvarchar(256),
+  "OWNER_TYPE" nvarchar(10),
+  "CREATE_TIME" int NOT NULL,
+  PRIMARY KEY ("NAME")
+);
+CREATE TABLE "DATACONNECTOR_PARAMS"(
+  "NAME" nvarchar(128) NOT NULL,
+  "PARAM_KEY" nvarchar(180) NOT NULL,
+  "PARAM_VALUE" nvarchar(4000),
+  PRIMARY KEY ("NAME", "PARAM_KEY"),
+  CONSTRAINT DATACONNECTOR_NAME_FK1 FOREIGN KEY ("NAME") REFERENCES "DATACONNECTORS" ("NAME") ON DELETE CASCADE
+);
+ALTER TABLE "DBS" ADD "TYPE" nvarchar(32) DEFAULT "NATIVE" NOT NULL;
+ALTER TABLE "DBS" ADD "DATACONNECTOR_NAME" nvarchar(128) NULL;
+ALTER TABLE "DBS" ADD "REMOTE_DBNAME" nvarchar(128) NULL;
+UPDATE "DBS" SET TYPE='NATIVE' WHERE TYPE IS NULL;
+
+-- Table DC_PRIVS for classes [org.apache.hadoop.hive.metastore.model.MDCPrivilege]
+CREATE TABLE DC_PRIVS
+(
+  "DC_GRANT_ID" bigint NOT NULL,
+  "CREATE_TIME" int NOT NULL,
+  "NAME" nvarchar(128) NULL,
+  "GRANT_OPTION" smallint NOT NULL CHECK (GRANT_OPTION IN (0,1)),
+  "GRANTOR" nvarchar(128) NULL,
+  "GRANTOR_TYPE" nvarchar(128) NULL,
+  "PRINCIPAL_NAME" nvarchar(128) NULL,
+  "PRINCIPAL_TYPE" nvarchar(128) NULL,
+  "DC_PRIV" nvarchar(128) NULL,
+  "AUTHORIZER" nvarchar(128) NULL
+);
+
+ALTER TABLE "DC_PRIVS" ADD CONSTRAINT "DC_PRIVS_PK" PRIMARY KEY ("DC_GRANT_ID");
+
+-- Constraints for table DC_PRIVS for class(es) [org.apache.hadoop.hive.metastore.model.MDCPrivilege]
+ALTER TABLE "DC_PRIVS" ADD CONSTRAINT "DC_PRIVS_FK1" FOREIGN KEY ("NAME") REFERENCES "DATACONNECTORS" ("NAME") ;
+CREATE UNIQUE INDEX "DCPRIVILEGEINDEX" ON "DC_PRIVS" ("AUTHORIZER","NAME","PRINCIPAL_NAME","PRINCIPAL_TYPE","DC_PRIV","GRANTOR","GRANTOR_TYPE");
+CREATE INDEX "DC_PRIVS_N49" ON "DC_PRIVS" ("NAME");
+
+-- These lines need to be last.  Insert any changes above.
+UPDATE CDH_VERSION SET SCHEMA_VERSION='3.1.3000.7.2.16.0-Update1', VERSION_COMMENT='Hive release version 3.1.3000 for CDH 7.2.16.0-Update1' where VER_ID=1;
+SELECT 'Finished upgrading MetaStore schema from 3.1.3000.7.2.15.0-Update6 to 3.1.3000.7.2.16.0-Update1' AS MESSAGE;
