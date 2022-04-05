@@ -25,9 +25,8 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.metastore.events.AddPartitionEvent;
+import org.apache.hadoop.hive.common.AcidMetaDataFile.DataFormat;
 import org.apache.hadoop.hive.common.repl.ReplConst;
-import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.events.AlterPartitionEvent;
 import org.apache.hadoop.hive.metastore.events.AlterTableEvent;
 import org.apache.hadoop.hive.metastore.messaging.EventMessage;
@@ -64,10 +63,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
+import static org.apache.hadoop.hive.metastore.HiveMetaStore.HMSHandler.addTruncateBaseFile;
 import static org.apache.hadoop.hive.metastore.HiveMetaHook.ALTERLOCATION;
 import static org.apache.hadoop.hive.metastore.HiveMetaHook.ALTER_TABLE_OPERATION_TYPE;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_CATALOG_NAME;
+import static org.apache.hadoop.hive.metastore.HiveMetaStoreClient.RENAME_PARTITION_MAKE_COPY;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCatalog;
 import static org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdentifier;
 
@@ -672,10 +674,26 @@ public class HiveAlterHandler implements AlterHandler {
               if (!wh.mkdirs(destParentPath)) {
                   throw new MetaException("Unable to create path " + destParentPath);
               }
+              
+              boolean clonePart = Optional.ofNullable(environmentContext)
+                  .map(EnvironmentContext::getProperties)
+                  .map(prop -> prop.get(RENAME_PARTITION_MAKE_COPY))
+                  .map(Boolean::parseBoolean)
+                  .orElse(false);
+              long writeId = new_part.getWriteId();
 
-
-              //rename the data directory
-              wh.renameDir(srcPath, destPath, ReplChangeManager.shouldEnableCm(db, tbl));
+              if (writeId > 0 && clonePart) {
+                LOG.debug("Making a copy of the partition directory: {} under a new location: {}", srcPath, destPath);
+                
+                if (!wh.copyDir(srcPath, destPath, ReplChangeManager.shouldEnableCm(db, tbl))) {
+                  LOG.error("Copy failed for source: " + srcPath + " to destination: " + destPath);
+                  throw new IOException("File copy failed.");
+                }
+                addTruncateBaseFile(srcPath, writeId, conf, DataFormat.DROPPED);
+              } else {
+                //rename the data directory
+                wh.renameDir(srcPath, destPath, ReplChangeManager.shouldEnableCm(db, tbl));
+              }
               LOG.info("Partition directory rename from " + srcPath + " to " + destPath + " done.");
               dataWasMoved = true;
             }
