@@ -28,6 +28,7 @@ import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc;
 import org.apache.hadoop.hive.serde2.ByteStream.Output;
 import org.apache.hadoop.hive.serde2.binarysortable.fast.BinarySortableSerializeWrite;
 import org.apache.hadoop.io.BytesWritable;
+import org.apache.hive.common.util.HashCodeUtil;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -187,7 +188,9 @@ public abstract class AbstractProbeHashTableBench {
       if (((VectorMapJoinFastBytesHashMap)ht).lookup(bcv.vector[selected_row], bcv.start[selected_row], bcv.length[selected_row],
           result) != JoinUtil.JoinResult.MATCH) {
         ((VectorMapJoinFastStringHashMap) ht).
-            putRow(new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())), new BytesWritable(Arrays.copyOf(strRandValue, 10)));
+            putRow(HashCodeUtil.murmurHash(currKeyOut.getData(), 0, currKeyOut.getLength()),
+                new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())),
+                new BytesWritable(Arrays.copyOf(strRandValue, 10)));
         row_num ++;
       }
     }
@@ -221,7 +224,9 @@ public abstract class AbstractProbeHashTableBench {
       if (((VectorMapJoinFastStringHashSet)ht).contains(bcv.vector[selected_row], bcv.start[selected_row], bcv.length[selected_row],
           result) != JoinUtil.JoinResult.MATCH) {
         ((VectorMapJoinFastStringHashSet) ht).
-            putRow(new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())), new BytesWritable(Arrays.copyOf(strRandValue, 10)));
+            putRow(HashCodeUtil.murmurHash(currKeyOut.getData(), 0, currKeyOut.getLength()),
+                new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())),
+                new BytesWritable(Arrays.copyOf(strRandValue, 10)));
         row_num ++;
       }
     }
@@ -255,7 +260,9 @@ public abstract class AbstractProbeHashTableBench {
       if (((VectorMapJoinFastStringHashMultiSet)ht).contains(bcv.vector[selected_row], bcv.start[selected_row], bcv.length[selected_row],
           result) != JoinUtil.JoinResult.MATCH) {
         ((VectorMapJoinFastStringHashMultiSet) ht).
-            putRow(new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())), new BytesWritable(Arrays.copyOf(strRandValue, 10)));
+            putRow(HashCodeUtil.murmurHash(currKeyOut.getData(), 0, currKeyOut.getLength()),
+                new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())),
+                new BytesWritable(Arrays.copyOf(strRandValue, 10)));
         row_num ++;
       }
     }
@@ -297,7 +304,8 @@ public abstract class AbstractProbeHashTableBench {
       if (((VectorMapJoinFastBytesHashMap)ht).lookup(currKeyOut.getData(), 0, currKeyOut.getLength(),
           result) != JoinUtil.JoinResult.MATCH) {
         ((VectorMapJoinFastBytesHashMap) ht)
-            .putRow(new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())),
+            .putRow(HashCodeUtil.murmurHash(currKeyOut.getData(), 0, currKeyOut.getLength()),
+                new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())),
                 new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())));
         row_num++;
       }
@@ -331,7 +339,8 @@ public abstract class AbstractProbeHashTableBench {
       if (((VectorMapJoinFastMultiKeyHashSet)ht).contains(currKeyOut.getData(), 0, currKeyOut.getLength(),
           result) != JoinUtil.JoinResult.MATCH) {
         ((VectorMapJoinFastMultiKeyHashSet) ht)
-            .putRow(new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())),
+            .putRow(HashCodeUtil.murmurHash(currKeyOut.getData(), 0, currKeyOut.getLength()),
+                new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())),
                 new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())));
         row_num++;
       }
@@ -365,7 +374,8 @@ public abstract class AbstractProbeHashTableBench {
       if (((VectorMapJoinFastMultiKeyHashMultiSet)ht).contains(currKeyOut.getData(), 0, currKeyOut.getLength(),
           result) != JoinUtil.JoinResult.MATCH) {
         ((VectorMapJoinFastMultiKeyHashMultiSet) ht)
-            .putRow(new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())),
+            .putRow(HashCodeUtil.murmurHash(currKeyOut.getData(), 0, currKeyOut.getLength()),
+                new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())),
                 new BytesWritable(Arrays.copyOf(currKeyOut.getData(), currKeyOut.getLength())));
         row_num++;
       }

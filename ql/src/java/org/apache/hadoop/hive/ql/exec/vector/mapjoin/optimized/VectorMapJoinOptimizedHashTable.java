@@ -19,6 +19,7 @@
 package org.apache.hadoop.hive.ql.exec.vector.mapjoin.optimized;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import org.apache.hadoop.hive.ql.util.JavaDataModel;
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public abstract class VectorMapJoinOptimizedHashTable
 
   @Override
   public VectorMapJoinNonMatchedIterator createNonMatchedIterator(MatchTracker matchTracker) {
-    throw new RuntimeException("Not implemented");
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -69,10 +70,10 @@ public abstract class VectorMapJoinOptimizedHashTable
   }
 
   @Override
-  public void putRow(BytesWritable currentKey, BytesWritable currentValue)
+  public void putRow(long hashCode, BytesWritable currentKey, BytesWritable currentValue)
       throws SerDeException, HiveException, IOException {
-
-    putRowInternal(currentKey, currentValue);
+    // Method only supported by FAST HashTable implementations
+    throw new UnsupportedEncodingException();
   }
 
   protected void putRowInternal(BytesWritable key, BytesWritable value)

@@ -27,7 +27,6 @@ import org.apache.hadoop.hive.ql.exec.vector.mapjoin.hashtable.VectorMapJoinHash
 import org.apache.hadoop.hive.ql.exec.vector.mapjoin.hashtable.VectorMapJoinLongHashMultiSet;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc.HashTableKeyType;
-import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hive.common.util.HashCodeUtil;
 
@@ -50,10 +49,10 @@ public class VectorMapJoinFastLongHashMultiSet
   }
 
   @Override
-  public void putRow(BytesWritable currentKey, BytesWritable currentValue)
+  public void putRow(long hashCode, BytesWritable currentKey, BytesWritable currentValue)
       throws HiveException, IOException {
 
-    if (!adaptPutRow(currentKey, currentValue)) {
+    if (!adaptPutRow(hashCode, currentKey, currentValue)) {
 
       // Ignore NULL keys, except for FULL OUTER.
       if (isFullOuter) {
@@ -69,7 +68,8 @@ public class VectorMapJoinFastLongHashMultiSet
    */
   @VisibleForTesting
   public void testPutRow(long currentKey) throws HiveException, IOException {
-    add(currentKey, null);
+    long hashCode = HashCodeUtil.calculateLongHashCode(currentKey);
+    add(hashCode, currentKey, null);
   }
 
   @Override

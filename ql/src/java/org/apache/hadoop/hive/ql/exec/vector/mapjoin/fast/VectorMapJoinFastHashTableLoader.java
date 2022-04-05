@@ -120,7 +120,7 @@ public class VectorMapJoinFastHashTableLoader implements org.apache.hadoop.hive.
         long keyCount = (keyCountObj == null) ? -1 : keyCountObj.longValue();
 
         VectorMapJoinFastTableContainer vectorMapJoinFastTableContainer =
-                new VectorMapJoinFastTableContainer(desc, hconf, keyCount);
+                new VectorMapJoinFastTableContainer(desc, hconf, keyCount, 1);
 
         LOG.info("Loading hash table for input: {} cacheKey: {} tableContainer: {} smallTablePos: {}", inputName,
           cacheKey, vectorMapJoinFastTableContainer.getClass().getSimpleName(), pos);

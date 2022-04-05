@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.serde2.binarysortable.fast.BinarySortableDeseriali
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.io.BytesWritable;
+import org.apache.hive.common.util.HashCodeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ public class VectorMapJoinFastStringCommon {
   private BinarySortableDeserializeRead keyBinarySortableDeserializeRead;
 
   public boolean adaptPutRow(VectorMapJoinFastBytesHashTable hashTable,
-          BytesWritable currentKey, BytesWritable currentValue) throws HiveException, IOException {
+      BytesWritable currentKey, BytesWritable currentValue, long hashCode) throws HiveException, IOException {
 
     byte[] keyBytes = currentKey.getBytes();
     int keyLength = currentKey.getLength();
@@ -48,18 +49,32 @@ public class VectorMapJoinFastStringCommon {
         return false;
       }
     } catch (Exception e) {
-      throw new HiveException(
-          "\nDeserializeRead details: " +
-              keyBinarySortableDeserializeRead.getDetailedReadPositionString() +
-          "\nException: " + e.toString());
+      throw new HiveException("DeserializeRead details: " +
+          keyBinarySortableDeserializeRead.getDetailedReadPositionString(), e);
     }
 
     hashTable.add(
         keyBinarySortableDeserializeRead.currentBytes,
         keyBinarySortableDeserializeRead.currentBytesStart,
         keyBinarySortableDeserializeRead.currentBytesLength,
-        currentValue);
+        currentValue, hashCode);
     return true;
+  }
+
+  public long calculateLongHashCode(BytesWritable currentKey) throws HiveException, IOException {
+    byte[] keyBytes = currentKey.getBytes();
+    int keyLength = currentKey.getLength();
+    keyBinarySortableDeserializeRead.set(keyBytes, 0, keyLength);
+    try {
+      if (!keyBinarySortableDeserializeRead.readNextField()) {
+        return 0;
+      }
+    } catch (Exception e) {
+      throw new HiveException("DeserializeRead details: " +
+          keyBinarySortableDeserializeRead.getDetailedReadPositionString(), e);
+    }
+    return HashCodeUtil.murmurHash(keyBinarySortableDeserializeRead.currentBytes, keyBinarySortableDeserializeRead.currentBytesStart,
+            keyBinarySortableDeserializeRead.currentBytesLength);
   }
 
   public VectorMapJoinFastStringCommon() {

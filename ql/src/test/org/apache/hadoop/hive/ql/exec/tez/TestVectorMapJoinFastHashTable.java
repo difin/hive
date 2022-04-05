@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -30,6 +31,7 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.optimizer.ConvertJoinMapJoin;
 import org.apache.hadoop.hive.ql.plan.MapJoinDesc;
 import org.apache.hadoop.hive.ql.plan.Statistics;
+import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc;
 import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc.HashTableImplementationType;
 import org.apache.hadoop.hive.ql.plan.VectorMapJoinDesc.HashTableKeyType;
@@ -44,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 public class TestVectorMapJoinFastHashTable {
 
+  // TODO HIVE-25145
   long keyCount = 15_000_000;
 
   private static final Logger LOG = LoggerFactory.getLogger(TestVectorMapJoinFastHashTable.class.getName());
@@ -59,7 +62,11 @@ public class TestVectorMapJoinFastHashTable {
   }
 
   private void runEstimationCheck(HashTableKeyType l) throws SerDeException, IOException, HiveException {
+    Properties p = new Properties();
+    TableDesc tableDesc = new TableDesc();
+    tableDesc.setProperties(p);
     MapJoinDesc desc = new MapJoinDesc();
+    desc.setKeyTblDesc(tableDesc);
     VectorMapJoinDesc vectorDesc = new VectorMapJoinDesc();
     vectorDesc.setHashTableKeyType(l);
     vectorDesc.setIsFastHashTableEnabled(true);
@@ -67,7 +74,7 @@ public class TestVectorMapJoinFastHashTable {
     vectorDesc.setHashTableKind(HashTableKind.HASH_MAP);
     desc.setVectorDesc(vectorDesc);
     Configuration hconf = new HiveConf();
-    VectorMapJoinFastTableContainer container = new VectorMapJoinFastTableContainer(desc, hconf, keyCount);
+    VectorMapJoinFastTableContainer container = new VectorMapJoinFastTableContainer(desc, hconf, keyCount, 1);
 
     container.setSerde(null, null);
 

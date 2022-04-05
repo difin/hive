@@ -23,7 +23,9 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
+import java.util.Properties;
 
+import org.apache.hadoop.hive.serde2.binarysortable.BinarySortableUtils;
 import org.apache.hadoop.hive.common.type.DataTypePhysicalVariation;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
@@ -57,6 +59,39 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
  */
 public final class BinarySortableDeserializeRead extends DeserializeRead {
   public static final Logger LOG = LoggerFactory.getLogger(BinarySortableDeserializeRead.class.getName());
+
+  public static BinarySortableDeserializeRead with(TypeInfo[] typeInfos, boolean useExternalBuffer, Properties tbl) {
+    boolean[] columnSortOrderIsDesc = new boolean[typeInfos.length];
+    byte[] columnNullMarker = new byte[typeInfos.length];
+    byte[] columnNotNullMarker = new byte[typeInfos.length];
+
+    BinarySortableUtils.fillOrderArrays(tbl, columnSortOrderIsDesc, columnNullMarker, columnNotNullMarker);
+
+    return new BinarySortableDeserializeRead(
+        typeInfos, useExternalBuffer, columnSortOrderIsDesc, columnNullMarker, columnNotNullMarker);
+  }
+
+  /*
+   * Use this factory method when only ascending sort order is used.
+   */
+  public static BinarySortableDeserializeRead ascendingNullsFirst(TypeInfo[] typeInfos, boolean useExternalBuffer) {
+    final int count = typeInfos.length;
+
+    boolean[] columnSortOrderIsDesc = new boolean[count];
+    Arrays.fill(columnSortOrderIsDesc, false);
+
+    byte[] columnNullMarker = new byte[count];
+    byte[] columnNotNullMarker = new byte[count];
+    for (int i = 0; i < count; i++) {
+      // Ascending
+      // Null first (default for ascending order)
+      columnNullMarker[i] = BinarySortableSerDe.ZERO;
+      columnNotNullMarker[i] = BinarySortableSerDe.ONE;
+    }
+
+    return new BinarySortableDeserializeRead(
+        typeInfos, useExternalBuffer, columnSortOrderIsDesc, columnNullMarker, columnNotNullMarker);
+  }
 
   // The sort order (ascending/descending) for each field. Set to true when descending (invert).
   private boolean[] columnSortOrderIsDesc;
