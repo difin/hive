@@ -41,6 +41,7 @@ import org.apache.hadoop.hive.metastore.api.ColumnStatisticsData;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsDesc;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.DatabaseType;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.Partition;
@@ -1053,6 +1054,7 @@ public class TestCachedStore {
     db.setOwnerType(PrincipalType.USER);
     db.setCatalogName(DEFAULT_CATALOG_NAME);
     db.setCreateTime((int) (System.currentTimeMillis() / 1000));
+    db.setType(DatabaseType.NATIVE);
     return db;
   }
 

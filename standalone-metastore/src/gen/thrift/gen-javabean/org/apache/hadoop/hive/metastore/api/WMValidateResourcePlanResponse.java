@@ -419,13 +419,13 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // ERRORS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list1146 = iprot.readListBegin();
-                struct.errors = new java.util.ArrayList<java.lang.String>(_list1146.size);
-                @org.apache.thrift.annotation.Nullable java.lang.String _elem1147;
-                for (int _i1148 = 0; _i1148 < _list1146.size; ++_i1148)
+                org.apache.thrift.protocol.TList _list1156 = iprot.readListBegin();
+                struct.errors = new java.util.ArrayList<java.lang.String>(_list1156.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem1157;
+                for (int _i1158 = 0; _i1158 < _list1156.size; ++_i1158)
                 {
-                  _elem1147 = iprot.readString();
-                  struct.errors.add(_elem1147);
+                  _elem1157 = iprot.readString();
+                  struct.errors.add(_elem1157);
                 }
                 iprot.readListEnd();
               }
@@ -437,13 +437,13 @@ package org.apache.hadoop.hive.metastore.api;
           case 2: // WARNINGS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list1149 = iprot.readListBegin();
-                struct.warnings = new java.util.ArrayList<java.lang.String>(_list1149.size);
-                @org.apache.thrift.annotation.Nullable java.lang.String _elem1150;
-                for (int _i1151 = 0; _i1151 < _list1149.size; ++_i1151)
+                org.apache.thrift.protocol.TList _list1159 = iprot.readListBegin();
+                struct.warnings = new java.util.ArrayList<java.lang.String>(_list1159.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem1160;
+                for (int _i1161 = 0; _i1161 < _list1159.size; ++_i1161)
                 {
-                  _elem1150 = iprot.readString();
-                  struct.warnings.add(_elem1150);
+                  _elem1160 = iprot.readString();
+                  struct.warnings.add(_elem1160);
                 }
                 iprot.readListEnd();
               }
@@ -470,9 +470,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(ERRORS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.errors.size()));
-            for (java.lang.String _iter1152 : struct.errors)
+            for (java.lang.String _iter1162 : struct.errors)
             {
-              oprot.writeString(_iter1152);
+              oprot.writeString(_iter1162);
             }
             oprot.writeListEnd();
           }
@@ -484,9 +484,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(WARNINGS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.warnings.size()));
-            for (java.lang.String _iter1153 : struct.warnings)
+            for (java.lang.String _iter1163 : struct.warnings)
             {
-              oprot.writeString(_iter1153);
+              oprot.writeString(_iter1163);
             }
             oprot.writeListEnd();
           }
@@ -521,18 +521,18 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetErrors()) {
         {
           oprot.writeI32(struct.errors.size());
-          for (java.lang.String _iter1154 : struct.errors)
+          for (java.lang.String _iter1164 : struct.errors)
           {
-            oprot.writeString(_iter1154);
+            oprot.writeString(_iter1164);
           }
         }
       }
       if (struct.isSetWarnings()) {
         {
           oprot.writeI32(struct.warnings.size());
-          for (java.lang.String _iter1155 : struct.warnings)
+          for (java.lang.String _iter1165 : struct.warnings)
           {
-            oprot.writeString(_iter1155);
+            oprot.writeString(_iter1165);
           }
         }
       }
@@ -544,26 +544,26 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list1156 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.errors = new java.util.ArrayList<java.lang.String>(_list1156.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _elem1157;
-          for (int _i1158 = 0; _i1158 < _list1156.size; ++_i1158)
+          org.apache.thrift.protocol.TList _list1166 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.errors = new java.util.ArrayList<java.lang.String>(_list1166.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem1167;
+          for (int _i1168 = 0; _i1168 < _list1166.size; ++_i1168)
           {
-            _elem1157 = iprot.readString();
-            struct.errors.add(_elem1157);
+            _elem1167 = iprot.readString();
+            struct.errors.add(_elem1167);
           }
         }
         struct.setErrorsIsSet(true);
       }
       if (incoming.get(1)) {
         {
-          org.apache.thrift.protocol.TList _list1159 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.warnings = new java.util.ArrayList<java.lang.String>(_list1159.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _elem1160;
-          for (int _i1161 = 0; _i1161 < _list1159.size; ++_i1161)
+          org.apache.thrift.protocol.TList _list1169 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.warnings = new java.util.ArrayList<java.lang.String>(_list1169.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem1170;
+          for (int _i1171 = 0; _i1171 < _list1169.size; ++_i1171)
           {
-            _elem1160 = iprot.readString();
-            struct.warnings.add(_elem1160);
+            _elem1170 = iprot.readString();
+            struct.warnings.add(_elem1170);
           }
         }
         struct.setWarningsIsSet(true);

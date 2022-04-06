@@ -38,6 +38,7 @@ import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
 import org.apache.hadoop.hive.metastore.api.CreationMetadata;
 import org.apache.hadoop.hive.metastore.api.CurrentNotificationEventId;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.DataConnector;
 import org.apache.hadoop.hive.metastore.api.AddPackageRequest;
 import org.apache.hadoop.hive.metastore.api.DefaultConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.DropPackageRequest;
@@ -254,6 +255,52 @@ public interface RawStore extends Configurable {
    * @throws MetaException something went wrong, usually with the database.
    */
   List<String> getAllDatabases(String catalogName) throws MetaException;
+
+  /**
+   * Create a dataconnector.
+   * @param dataConnector dataconnector to create.
+   * @throws InvalidObjectException not sure it actually ever throws this.
+   * @throws MetaException if something goes wrong, usually in writing it to the dataconnector.
+   */
+  void createDataConnector(DataConnector dataConnector)
+      throws InvalidObjectException, MetaException;
+
+  /**
+   * Drop a dataconnector.
+   * @param dcName name of the dataconnector.
+   * @return true if the database was dropped, pretty much always returns this if it returns.
+   * @throws NoSuchObjectException no database in this catalog of this name to drop
+   * @throws MetaException something went wrong, usually with the database.
+   */
+  boolean dropDataConnector(String dcName)
+      throws NoSuchObjectException, MetaException;
+
+  /**
+   * Alter a dataconnector.
+   * @param dcName name of the dataconnector to alter
+   * @param connector new version of the dataconnector.  This should be complete as it will fully replace the
+   *          existing db object.
+   * @return true if the change succeeds, false otherwise.
+   * @throws NoSuchObjectException no dataconnector of this name exists to alter.
+   * @throws MetaException something went wrong, usually with the backend HMSDB.
+   */
+  boolean alterDataConnector(String dcName, DataConnector connector)
+      throws NoSuchObjectException, MetaException;
+
+  /**
+   * Get the dataconnector with a given name, if exists.
+   * @param dcName pattern names should match
+   * @return DataConnector object.
+   * @throws MetaException something went wrong, usually with the database.
+   */
+  DataConnector getDataConnector(String dcName) throws NoSuchObjectException;
+
+  /**
+   * Get names of all the databases in a catalog.
+   * @return list of names of all dataconnectors
+   * @throws MetaException something went wrong, usually with the database.
+   */
+  List<String> getAllDataConnectorNames() throws MetaException;
 
   boolean createType(Type type);
 
@@ -773,6 +820,19 @@ public interface RawStore extends Configurable {
       List<String> groupNames)  throws InvalidObjectException, MetaException;
 
   /**
+   * Get privileges for a connector for a user.
+   * @param catName catalog name
+   * @param connectorName connector name
+   * @param userName user name
+   * @param groupNames list of groups the user is in
+   * @return privileges for that user on indicated connector
+   * @throws InvalidObjectException no such database
+   * @throws MetaException error accessing the RDBMS
+   */
+  PrincipalPrivilegeSet getConnectorPrivilegeSet (String catName, String connectorName, String userName,
+       List<String> groupNames)  throws InvalidObjectException, MetaException;
+
+  /**
    * Get privileges for a table for a user.
    * @param catName catalog name
    * @param dbName database name
@@ -830,6 +890,16 @@ public interface RawStore extends Configurable {
    */
   List<HiveObjectPrivilege> listPrincipalDBGrants(String principalName,
       PrincipalType principalType, String catName, String dbName);
+
+  /**
+   * For a given principal name and type, list the DC Grants
+   * @param principalName principal name
+   * @param principalType type
+   * @param dcName data connector name
+   * @return list of privileges for that principal on the specified data connector.
+   */
+  List<HiveObjectPrivilege> listPrincipalDCGrants(String principalName,
+      PrincipalType principalType, String dcName);
 
   /**
    * For a given principal name and type, list the Table Grants
@@ -1207,6 +1277,15 @@ public interface RawStore extends Configurable {
       String principalName, PrincipalType principalType);
 
   /**
+   * List all DC grants for a given principal.
+   * @param principalName principal name
+   * @param principalType type
+   * @return all DC grants for this principal
+   */
+  List<HiveObjectPrivilege> listPrincipalDCGrantsAll(
+      String principalName, PrincipalType principalType);
+
+  /**
    * List all Table grants for a given principal
    * @param principalName principal name
    * @param principalType type
@@ -1251,6 +1330,13 @@ public interface RawStore extends Configurable {
    * @return list of all privileges.
    */
   List<HiveObjectPrivilege> listDBGrantsAll(String catName, String dbName);
+
+  /**
+   * Find all the privileges for a given data connector.
+   * @param dcName data connector name
+   * @return list of all privileges.
+   */
+  List<HiveObjectPrivilege> listDCGrantsAll(String dcName);
 
   /**
    * Find all of the privileges for a given column in a given partition.

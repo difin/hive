@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql.ddl;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,7 @@ import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hive.common.util.HiveStringUtils;
 import org.apache.hive.common.util.ReflectionUtil;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,6 +208,17 @@ public final class DDLUtils {
     }
     if (value != null) {
       builder.append(value);
+    }
+  }
+
+  /**
+   * Convert the map to a JSON string.
+   */
+  public static void asJson(OutputStream out, Map<String, Object> data) throws HiveException {
+    try {
+      new ObjectMapper().writeValue(out, data);
+    } catch (IOException e) {
+      throw new HiveException("Unable to convert to json", e);
     }
   }
 

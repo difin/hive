@@ -1232,6 +1232,74 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   }
 
   /**
+   * Create a new DataConnector // TODO
+   *
+   * @param connector
+   * @throws AlreadyExistsException
+   * @throws InvalidObjectException
+   * @throws MetaException
+   * @throws TException
+   * @see org.apache.hadoop.hive.metastore.api.ThriftHiveMetastore.Iface#create_dataconnector(DataConnector)
+   */
+  @Override
+  public void createDataConnector(DataConnector connector)
+      throws AlreadyExistsException, InvalidObjectException, MetaException, TException {
+    client.create_dataconnector(connector);
+  }
+
+  /**
+   * Drop an existing DataConnector by name // TODO
+   * @param name name of the dataconnector to drop.
+   * @throws NoSuchObjectException
+   * @throws InvalidOperationException
+   * @throws MetaException
+   * @throws TException
+   */
+  @Override
+  public void dropDataConnector(String name, boolean ifNotExists, boolean checkReferences)
+      throws NoSuchObjectException, InvalidOperationException, MetaException, TException {
+    client.drop_dataconnector(name, ifNotExists, checkReferences);
+  }
+
+  /**
+   * Alter an existing dataconnector.
+   * @param name dataconnector name.
+   * @param connector new dataconnector object.
+   * @throws NoSuchObjectException No dataconnector with this name exists.
+   * @throws MetaException Operation could not be completed, usually in the RDBMS.
+   * @throws TException thrift transport layer error.
+   */
+  @Override
+  public void alterDataConnector(String name, DataConnector connector)
+      throws NoSuchObjectException, MetaException, TException {
+    client.alter_dataconnector(name, connector);
+  }
+
+  /**
+   * Get the dataconnector by name
+   * @return DataConnector if there is a match
+   * @throws MetaException error complete the operation
+   * @throws TException thrift transport error
+   */
+  @Override
+  public DataConnector getDataConnector(String name)
+      throws MetaException, TException {
+    GetDataConnectorRequest request = new GetDataConnectorRequest(name);
+    return client.get_dataconnector_req(request);
+  }
+
+  /**
+   * Get the names of all dataconnectors in the MetaStore.
+   * @return List of dataconnector names.
+   * @throws MetaException error accessing RDBMS.
+   * @throws TException thrift transport error
+   */
+  @Override
+  public List<String> getAllDataConnectorNames() throws MetaException, TException {
+    return client.get_dataconnectors();
+  }
+
+  /**
    * @param tbl
    * @throws MetaException
    * @throws NoSuchObjectException
@@ -1484,10 +1552,10 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
       // Note that this logic may drop some of the tables of the database
       // even if the drop database fail for any reason
       // TODO: Fix this
-      List<String> materializedViews = getTables(req.getName(), ".*", TableType.MATERIALIZED_VIEW);
+      List<String> materializedViews = getTables(req.getCatalogName(), req.getName(), ".*", TableType.MATERIALIZED_VIEW);
       for (String table : materializedViews) {
         // First we delete the materialized views
-        Table materializedView = getTable(getDefaultCatalog(conf), req.getName(), table);
+        Table materializedView = getTable(req.getCatalogName(), req.getName(), table);
         boolean isSoftDelete = TxnUtils.isTableSoftDeleteEnabled(materializedView, req.isSoftDelete());
         materializedView.setTxnId(req.getTxnId());
         dropTable(materializedView, req.isDeleteData() && !isSoftDelete, true, false);

@@ -53,6 +53,8 @@ import org.apache.hadoop.hive.cli.control.AbstractCliConfig;
 import org.apache.hadoop.hive.common.io.CachingPrintStream;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.DatabaseType;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.QTestMiniClusters.FsType;
@@ -456,6 +458,12 @@ public class QTestUtil {
 
     // First delete any MVs to avoid race conditions
     for (String dbName : db.getAllDatabases()) {
+       Database database = db.getDatabase(dbName);
+       // Drop tables in remote DB are not supported, so skip
+       if (database.getType() == DatabaseType.REMOTE) {
+         continue;
+       }
+
       SessionState.get().setCurrentDatabase(dbName);
       for (String tblName : db.getAllTables()) {
         Table tblObj = null;
@@ -477,6 +485,11 @@ public class QTestUtil {
     // Delete any tables other than the source tables
     // and any databases other than the default database.
     for (String dbName : db.getAllDatabases()) {
+       Database database = db.getDatabase(dbName);
+       // Drop tables in remote DB are not supported, so skip
+       if (database.getType() == DatabaseType.REMOTE) {
+         continue;
+       }
       SessionState.get().setCurrentDatabase(dbName);
       for (String tblName : db.getAllTables()) {
         if (!DEFAULT_DATABASE_NAME.equals(dbName) || !QTestDatasetHandler.isSourceTable(tblName)) {

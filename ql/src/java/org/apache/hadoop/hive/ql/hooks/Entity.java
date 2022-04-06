@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.DataConnector;
 import org.apache.hadoop.hive.ql.metadata.DummyPartition;
 import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
@@ -43,13 +44,19 @@ public class Entity implements Serializable {
    * The type of the entity.
    */
   public static enum Type {
-    DATABASE, TABLE, PARTITION, DUMMYPARTITION, DFS_DIR, LOCAL_DIR, FUNCTION, SERVICE_NAME, STREAMING
+    DATABASE, TABLE, PARTITION, DUMMYPARTITION, DFS_DIR, LOCAL_DIR, FUNCTION, SERVICE_NAME, STREAMING,
+    DATACONNECTOR
   }
 
   /**
    * The database if this is a database.
    */
   private Database database;
+
+  /**
+   * The dataconnector if this is a dataconnector.
+   */
+  private DataConnector connector;
 
   /**
    * The type.
@@ -112,6 +119,14 @@ public class Entity implements Serializable {
 
   public void setDatabase(Database database) {
     this.database = database;
+  }
+
+  public DataConnector getDataConnector() {
+    return connector;
+  }
+
+  public void setDataConnector(DataConnector connector) {
+    this.connector = connector;
   }
 
   public Type getTyp() {
@@ -194,6 +209,21 @@ public class Entity implements Serializable {
   public Entity(Database database, boolean complete) {
     this.database = database;
     this.typ = Type.DATABASE;
+    this.name = computeName();
+    this.complete = complete;
+  }
+
+  /**
+   * Constructor for a dataconnector.
+   *
+   * @param dataconnector
+   *          Database that is read or written to.
+   * @param complete
+   *          Means the dataconnector is target
+   */
+  public Entity(DataConnector dataconnector, boolean complete) {
+    this.connector = dataconnector;
+    this.typ = Type.DATACONNECTOR;
     this.name = computeName();
     this.complete = complete;
   }
@@ -387,6 +417,8 @@ public class Entity implements Serializable {
     case STREAMING:
     case SERVICE_NAME:
       return stringObject;
+    case DATACONNECTOR:
+      return "connector:" + connector.getName();
     default:
       return d.toString();
     }

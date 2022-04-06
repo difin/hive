@@ -55,6 +55,7 @@ import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
 import org.apache.hadoop.hive.metastore.api.CurrentNotificationEventId;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.DataConnector;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.FileMetadataExprType;
 import org.apache.hadoop.hive.metastore.api.Function;
@@ -239,6 +240,34 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
   @Override
   public List<String> getAllDatabases(String catName) throws MetaException {
     return objectStore.getAllDatabases(catName);
+  }
+
+  @Override
+  public void createDataConnector(DataConnector connector) throws InvalidObjectException, MetaException {
+    objectStore.createDataConnector(connector);
+  }
+
+  @Override
+  public DataConnector getDataConnector(String dcName) throws NoSuchObjectException {
+    return objectStore.getDataConnector(dcName);
+  }
+
+  @Override
+  public boolean dropDataConnector(String dcName)
+      throws NoSuchObjectException, MetaException {
+    return objectStore.dropDataConnector(dcName);
+  }
+
+  @Override
+  public boolean alterDataConnector(String dcName, DataConnector connector)
+      throws NoSuchObjectException, MetaException {
+
+    return objectStore.alterDataConnector(dcName, connector);
+  }
+
+  @Override
+  public List<String> getAllDataConnectorNames() throws MetaException {
+    return objectStore.getAllDataConnectorNames();
   }
 
   @Override
@@ -500,6 +529,12 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
   }
 
   @Override
+  public PrincipalPrivilegeSet getConnectorPrivilegeSet(String catName, String connectorName, String userName,
+      List<String> groupNames) throws InvalidObjectException, MetaException {
+    return objectStore.getConnectorPrivilegeSet(catName, connectorName, userName, groupNames);
+  }
+
+  @Override
   public PrincipalPrivilegeSet getTablePrivilegeSet(String catName, String dbName, String tableName,
       String userName, List<String> groupNames)
       throws InvalidObjectException, MetaException {
@@ -532,6 +567,12 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
   public List<HiveObjectPrivilege> listPrincipalDBGrants(String principalName,
       PrincipalType principalType, String catName, String dbName) {
     return objectStore.listPrincipalDBGrants(principalName, principalType, catName, dbName);
+  }
+
+  @Override
+  public List<HiveObjectPrivilege> listPrincipalDCGrants(String principalName,
+      PrincipalType principalType, String dbName) {
+    return objectStore.listPrincipalDCGrants(principalName, principalType, dbName);
   }
 
   @Override
@@ -650,6 +691,12 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
   }
 
   @Override
+  public List<HiveObjectPrivilege> listPrincipalDCGrantsAll(
+      String principalName, PrincipalType principalType) {
+    return objectStore.listPrincipalDCGrantsAll(principalName, principalType);
+  }
+
+  @Override
   public List<HiveObjectPrivilege> listPrincipalTableGrantsAll(
       String principalName, PrincipalType principalType) {
     return objectStore.listPrincipalTableGrantsAll(principalName, principalType);
@@ -681,6 +728,11 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
   @Override
   public List<HiveObjectPrivilege> listDBGrantsAll(String catName, String dbName) {
     return objectStore.listDBGrantsAll(catName, dbName);
+  }
+
+  @Override
+  public List<HiveObjectPrivilege> listDCGrantsAll(String dcName) {
+    return objectStore.listDCGrantsAll(dcName);
   }
 
   @Override

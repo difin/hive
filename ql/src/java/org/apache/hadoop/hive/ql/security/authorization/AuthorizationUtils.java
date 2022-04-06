@@ -101,6 +101,8 @@ public class AuthorizationUtils {
       return HivePrivilegeObjectType.FUNCTION;
     case SERVICE_NAME:
       return HivePrivilegeObjectType.SERVICE_NAME;
+    case DATACONNECTOR:
+      return HivePrivilegeObjectType.STORAGEHANDLER_URI;
     default:
       return null;
     }
@@ -224,6 +226,8 @@ public class AuthorizationUtils {
       return HiveObjectType.PARTITION;
     case COLUMN:
       return HiveObjectType.COLUMN;
+    case DATACONNECTOR:
+      return HiveObjectType.DATACONNECTOR;
     default:
       throw new HiveException("Unsupported type " + type);
     }
@@ -251,6 +255,8 @@ public class AuthorizationUtils {
           throw new HiveException(ErrorMsg.UNSUPPORTED_AUTHORIZATION_RESOURCE_TYPE_COLUMN);
         }
         return HivePrivilegeObjectType.COLUMN;
+      case DATACONNECTOR:
+        return HivePrivilegeObjectType.STORAGEHANDLER_URI;
       default:
         //should not happen as we have accounted for all types
         throw new AssertionError("Unsupported type " + type);

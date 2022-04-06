@@ -111,70 +111,8 @@ import org.apache.hadoop.hive.metastore.events.AcidWriteEvent;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.StatsUpdateMode;
-import org.apache.hadoop.hive.metastore.events.AbortTxnEvent;
-import org.apache.hadoop.hive.metastore.events.AddNotNullConstraintEvent;
-import org.apache.hadoop.hive.metastore.events.AddPartitionEvent;
-import org.apache.hadoop.hive.metastore.events.AddPrimaryKeyEvent;
-import org.apache.hadoop.hive.metastore.events.AddUniqueConstraintEvent;
-import org.apache.hadoop.hive.metastore.events.AllocWriteIdEvent;
-import org.apache.hadoop.hive.metastore.events.AlterCatalogEvent;
-import org.apache.hadoop.hive.metastore.events.AlterDatabaseEvent;
-import org.apache.hadoop.hive.metastore.events.AlterISchemaEvent;
-import org.apache.hadoop.hive.metastore.events.AlterPartitionEvent;
-import org.apache.hadoop.hive.metastore.events.AlterSchemaVersionEvent;
-import org.apache.hadoop.hive.metastore.events.AlterTableEvent;
-import org.apache.hadoop.hive.metastore.events.CommitCompactionEvent;
-import org.apache.hadoop.hive.metastore.events.CommitTxnEvent;
-import org.apache.hadoop.hive.metastore.events.ConfigChangeEvent;
-import org.apache.hadoop.hive.metastore.events.CreateCatalogEvent;
-import org.apache.hadoop.hive.metastore.events.CreateDatabaseEvent;
-import org.apache.hadoop.hive.metastore.events.CreateFunctionEvent;
-import org.apache.hadoop.hive.metastore.events.CreateISchemaEvent;
-import org.apache.hadoop.hive.metastore.events.AddSchemaVersionEvent;
-import org.apache.hadoop.hive.metastore.events.CreateTableEvent;
-import org.apache.hadoop.hive.metastore.events.DropCatalogEvent;
-import org.apache.hadoop.hive.metastore.events.DropConstraintEvent;
-import org.apache.hadoop.hive.metastore.events.DropDatabaseEvent;
-import org.apache.hadoop.hive.metastore.events.DropFunctionEvent;
-import org.apache.hadoop.hive.metastore.events.DropISchemaEvent;
-import org.apache.hadoop.hive.metastore.events.DropPartitionEvent;
-import org.apache.hadoop.hive.metastore.events.DropSchemaVersionEvent;
-import org.apache.hadoop.hive.metastore.events.DropTableEvent;
-import org.apache.hadoop.hive.metastore.events.InsertEvent;
-import org.apache.hadoop.hive.metastore.events.LoadPartitionDoneEvent;
-import org.apache.hadoop.hive.metastore.events.OpenTxnEvent;
-import org.apache.hadoop.hive.metastore.events.UpdateTableColumnStatEvent;
-import org.apache.hadoop.hive.metastore.events.PreAddPartitionEvent;
-import org.apache.hadoop.hive.metastore.events.PreAlterCatalogEvent;
-import org.apache.hadoop.hive.metastore.events.PreAlterDatabaseEvent;
-import org.apache.hadoop.hive.metastore.events.PreAlterISchemaEvent;
-import org.apache.hadoop.hive.metastore.events.PreAlterPartitionEvent;
-import org.apache.hadoop.hive.metastore.events.PreAlterSchemaVersionEvent;
-import org.apache.hadoop.hive.metastore.events.PreAlterTableEvent;
-import org.apache.hadoop.hive.metastore.events.PreAuthorizationCallEvent;
-import org.apache.hadoop.hive.metastore.events.PreCreateCatalogEvent;
-import org.apache.hadoop.hive.metastore.events.PreCreateDatabaseEvent;
-import org.apache.hadoop.hive.metastore.events.PreCreateISchemaEvent;
-import org.apache.hadoop.hive.metastore.events.PreCreateFunctionEvent;
-import org.apache.hadoop.hive.metastore.events.PreAddSchemaVersionEvent;
-import org.apache.hadoop.hive.metastore.events.PreCreateTableEvent;
-import org.apache.hadoop.hive.metastore.events.PreDropCatalogEvent;
-import org.apache.hadoop.hive.metastore.events.PreDropDatabaseEvent;
-import org.apache.hadoop.hive.metastore.events.PreDropISchemaEvent;
-import org.apache.hadoop.hive.metastore.events.PreDropFunctionEvent;
-import org.apache.hadoop.hive.metastore.events.PreDropPartitionEvent;
-import org.apache.hadoop.hive.metastore.events.PreDropSchemaVersionEvent;
-import org.apache.hadoop.hive.metastore.events.PreDropTableEvent;
-import org.apache.hadoop.hive.metastore.events.PreEventContext;
-import org.apache.hadoop.hive.metastore.events.PreLoadPartitionDoneEvent;
-import org.apache.hadoop.hive.metastore.events.PreReadCatalogEvent;
-import org.apache.hadoop.hive.metastore.events.PreReadDatabaseEvent;
-import org.apache.hadoop.hive.metastore.events.PreReadISchemaEvent;
-import org.apache.hadoop.hive.metastore.events.PreReadTableEvent;
-import org.apache.hadoop.hive.metastore.events.PreReadhSchemaVersionEvent;
-import org.apache.hadoop.hive.metastore.events.DeletePartitionColumnStatEvent;
-import org.apache.hadoop.hive.metastore.events.DeleteTableColumnStatEvent;
-import org.apache.hadoop.hive.metastore.events.UpdatePartitionColumnStatEvent;
+import org.apache.hadoop.hive.metastore.dataconnector.DataConnectorProviderFactory;
+import org.apache.hadoop.hive.metastore.events.*;
 import org.apache.hadoop.hive.metastore.messaging.EventMessage.EventType;
 import org.apache.hadoop.hive.metastore.metrics.JvmPauseMonitor;
 import org.apache.hadoop.hive.metastore.metrics.Metrics;
@@ -297,6 +235,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     private PartitionExpressionProxy expressionProxy;
     private StorageSchemaReader storageSchemaReader;
     private IMetaStoreMetadataTransformer transformer;
+    private static DataConnectorProviderFactory dataconnectorFactory = null;
 
     // Variables for metrics
     // Package visible so that HMSMetricsListener can see them.
@@ -633,7 +572,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       // these threads are started along with the other housekeeping threads only in the leader
       // HMS.
       String leaderHost = MetastoreConf.getVar(conf,
-              MetastoreConf.ConfVars.METASTORE_HOUSEKEEPING_LEADER_HOSTNAME);
+              ConfVars.METASTORE_HOUSEKEEPING_LEADER_HOSTNAME);
       if (!isMetaStoreRemote() && ((leaderHost == null) || leaderHost.trim().isEmpty())) {
         startAlwaysTaskThreads(conf);
       } else if (!isMetaStoreRemote()) {
@@ -646,7 +585,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       isServerFilterEnabled = getIfServerFilterenabled();
       filterHook = isServerFilterEnabled ? loadFilterHooks() : null;
 
-      String className = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.METASTORE_METADATA_TRANSFORMER_CLASS);
+      String className = MetastoreConf.getVar(conf, ConfVars.METASTORE_METADATA_TRANSFORMER_CLASS);
       if (className != null && !className.trim().isEmpty()) {
         Class<?> clazz;
         try {
@@ -666,6 +605,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           throw new IllegalArgumentException(e);
         }
       }
+      dataconnectorFactory = DataConnectorProviderFactory.getInstance(this);
     }
 
     private static void startAlwaysTaskThreads(Configuration conf) throws MetaException {
@@ -930,6 +870,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         db.setCatalogName(DEFAULT_CATALOG_NAME);
         long time = System.currentTimeMillis() / 1000;
         db.setCreateTime((int) time);
+        db.setType(DatabaseType.NATIVE);
         ms.createDatabase(db);
         LOG.info("Successfully created a default database with name: "+DEFAULT_DATABASE_NAME);
       }
@@ -1795,6 +1736,10 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       try {
         ms.openTransaction();
         db = ms.getDatabase(req.getCatalogName(), req.getName());
+        if (db.getType() == DatabaseType.REMOTE) {
+          success = drop_remote_database_core(ms, db);
+          return;
+        }
         isReplicated = isDbReplicationTarget(db);
 
         if (!isInTest && ReplChangeManager.isSourceOfReplication(db)) {
@@ -2035,6 +1980,16 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
     }
 
+    private boolean drop_remote_database_core(RawStore ms, final Database db) throws MetaException, NoSuchObjectException {
+      boolean success = false;
+      firePreEvent(new PreDropDatabaseEvent(db, this));
+
+      if (ms.dropDatabase(db.getCatalogName(), db.getName())) {
+        success = ms.commitTransaction();
+      }
+      return success;
+    }
+
     @Override
     public void drop_database(final String dbName, final boolean deleteData, final boolean cascade)
         throws NoSuchObjectException, InvalidOperationException, MetaException {
@@ -2108,6 +2063,243 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public List<String> get_all_databases() throws MetaException {
       // get_databases filters results already. No need to filter here
       return get_databases(MetaStoreUtils.prependCatalogToDbName(null, null, conf));
+    }
+
+    private void create_dataconnector_core(RawStore ms, final DataConnector connector)
+            throws AlreadyExistsException, InvalidObjectException, MetaException {
+      if (!MetaStoreUtils.validateName(connector.getName(), conf)) {
+        throw new InvalidObjectException(connector.getName() + " is not a valid dataconnector name");
+      }
+
+      if (connector.getOwnerName() == null){
+        try {
+          connector.setOwnerName(SecurityUtils.getUGI().getShortUserName());
+        }catch (Exception e){
+          LOG.warn("Failed to get owner name for create dataconnector operation.", e);
+        }
+      }
+      long time = System.currentTimeMillis()/1000;
+      connector.setCreateTime((int) time);
+      boolean success = false;
+      Map<String, String> transactionalListenersResponses = Collections.emptyMap();
+      try {
+        firePreEvent(new PreCreateDataConnectorEvent(connector, this));
+
+        ms.openTransaction();
+        ms.createDataConnector(connector);
+
+        if (!transactionalListeners.isEmpty()) {
+          transactionalListenersResponses =
+                  MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
+                          EventType.CREATE_DATACONNECTOR,
+                          new CreateDataConnectorEvent(connector, true, this));
+        }
+
+        success = ms.commitTransaction();
+      } finally {
+        if (!success) {
+          ms.rollbackTransaction();
+        }
+
+        if (!listeners.isEmpty()) {
+          MetaStoreListenerNotifier.notifyEvent(listeners,
+                  EventType.CREATE_DATACONNECTOR,
+                  new CreateDataConnectorEvent(connector, success, this),
+                  null,
+                  transactionalListenersResponses, ms);
+        }
+      }
+    }
+
+    @Override
+    public void create_dataconnector(final DataConnector connector)
+            throws AlreadyExistsException, InvalidObjectException, MetaException {
+      startFunction("create_dataconnector", ": " + connector.toString());
+      boolean success = false;
+      Exception ex = null;
+      try {
+        try {
+          if (null != get_dataconnector_core(connector.getName())) {
+            throw new AlreadyExistsException("DataConnector " + connector.getName() + " already exists");
+          }
+        } catch (NoSuchObjectException e) {
+          // expected
+        }
+
+        create_dataconnector_core(getMS(), connector);
+        success = true;
+      } catch (MetaException | InvalidObjectException | AlreadyExistsException e) {
+        ex = e;
+        throw e;
+      } catch (Exception e) {
+        ex = e;
+        throw newMetaException(e);
+      } finally {
+        endFunction("create_connector", success, ex);
+      }
+    }
+
+    @Override
+    public DataConnector get_dataconnector_core(final String name) throws NoSuchObjectException, MetaException {
+      DataConnector connector = null;
+      if (name == null) {
+        throw new MetaException("Data connector name cannot be null.");
+      }
+      try {
+        connector = getMS().getDataConnector(name);
+      } catch (MetaException | NoSuchObjectException e) {
+        throw e;
+      } catch (Exception e) {
+        assert (e instanceof RuntimeException);
+        throw (RuntimeException) e;
+      }
+      return connector;
+    }
+
+    @Override
+    public DataConnector get_dataconnector_req(GetDataConnectorRequest request) throws NoSuchObjectException, MetaException {
+      startFunction("get_dataconnector", ": " + request.getConnectorName());
+      DataConnector connector = null;
+      Exception ex = null;
+      try {
+        connector = get_dataconnector_core(request.getConnectorName());
+      } catch (MetaException | NoSuchObjectException e) {
+        ex = e;
+        throw e;
+      } catch (Exception e) {
+        assert (e instanceof RuntimeException);
+        throw (RuntimeException) e;
+      } finally {
+        endFunction("get_dataconnector", connector != null, ex);
+      }
+      return connector;
+    }
+
+    @Override
+    public void alter_dataconnector(final String dcName, final DataConnector newDC) throws TException {
+      startFunction("alter_dataconnector " + dcName);
+      boolean success = false;
+      Exception ex = null;
+      RawStore ms = getMS();
+      DataConnector oldDC = null;
+      Map<String, String> transactionalListenersResponses = Collections.emptyMap();
+
+      try {
+        oldDC = get_dataconnector_core(dcName);
+        if (oldDC == null) {
+          throw new MetaException("Could not alter dataconnector \"" + dcName +
+                  "\". Could not retrieve old definition.");
+        }
+        // firePreEvent(new PreAlterDatabaseEvent(oldDC, newDC, this));
+
+        ms.openTransaction();
+        ms.alterDataConnector(dcName, newDC);
+
+        /*
+        if (!transactionalListeners.isEmpty()) {
+          transactionalListenersResponses =
+              MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
+                  EventType.ALTER_DATACONNECTOR,
+                  new AlterDataConnectorEvent(oldDC, newDC, true, this));
+        }
+         */
+
+        success = ms.commitTransaction();
+      } catch (MetaException|NoSuchObjectException e) {
+        ex = e;
+        throw e;
+      } finally {
+        if (!success) {
+          ms.rollbackTransaction();
+        }
+/*
+        if ((null != oldDC) && (!listeners.isEmpty())) {
+          MetaStoreListenerNotifier.notifyEvent(listeners,
+              EventType.ALTER_DATACONNECTOR,
+              new AlterDataConnectorEvent(oldDC, newDC, success, this),
+              null,
+              transactionalListenersResponses, ms);
+        }
+ */
+        endFunction("alter_database", success, ex);
+      }
+    }
+
+    @Override
+    public List<String> get_dataconnectors() throws MetaException {
+      startFunction("get_dataconnectors");
+
+      List<String> ret = null;
+      Exception ex = null;
+      try {
+        ret = getMS().getAllDataConnectorNames();
+        ret = FilterUtils.filterDataConnectorsIfEnabled(isServerFilterEnabled, filterHook, ret);
+      } catch (MetaException e) {
+        ex = e;
+        throw e;
+      } catch (Exception e) {
+        ex = e;
+        throw newMetaException(e);
+      } finally {
+        endFunction("get_dataconnectors", ret != null, ex);
+      }
+      return ret;
+    }
+
+    @Override
+    public void drop_dataconnector(final String dcName, boolean ifNotExists, boolean checkReferences) throws NoSuchObjectException, InvalidOperationException, MetaException {
+      startFunction("drop_dataconnector", ": " + dcName);
+      boolean success = false;
+      DataConnector connector = null;
+      Exception ex = null;
+      RawStore ms = getMS();
+      try {
+        ms.openTransaction();
+        connector = getMS().getDataConnector(dcName);
+
+        if (connector == null) {
+          if (!ifNotExists) {
+            throw new NoSuchObjectException("DataConnector " + dcName + " doesn't exist");
+          } else {
+            return;
+          }
+        }
+        // TODO find DBs with references to this connector
+        // if any existing references and checkReferences=true, do not drop
+
+        // firePreEvent(new PreDropTableEvent(tbl, deleteData, this));
+
+        if (!ms.dropDataConnector(dcName)) {
+          throw new MetaException("Unable to drop dataconnector " + dcName);
+        } else {
+/*
+          // TODO
+          if (!transactionalListeners.isEmpty()) {
+            transactionalListenerResponses =
+                MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
+                    EventType.DROP_TABLE,
+                    new DropTableEvent(tbl, true, deleteData,
+                        this, isReplicated),
+                    envContext);
+          }
+ */
+          success = ms.commitTransaction();
+        }
+      } finally {
+        if (!success) {
+          ms.rollbackTransaction();
+        }
+/*
+        if (!listeners.isEmpty()) {
+          MetaStoreListenerNotifier.notifyEvent(listeners,
+              EventType.DROP_TABLE,
+              new DropTableEvent(tbl, success, deleteData, this, isReplicated),
+              envContext,
+              transactionalListenerResponses, ms);
+        }
+ */
+        endFunction("drop_dataconnector", success, ex);
+      }
     }
 
     private void create_type_core(final RawStore ms, final Type type)
@@ -2284,6 +2476,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         throw new InvalidObjectException("Null database name is not allowed");
       }
 
+      if (!MetaStoreUtils.validateName(tbl.getTableName(), conf)) {
+        throw new InvalidObjectException(tbl.getTableName()
+                + " is not a valid object name");
+      }
+
       if (!tbl.isSetCatName()) {
         tbl.setCatName(getDefaultCatalog(conf));
       }
@@ -2291,6 +2488,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       if (is_table_exists(ms, tbl.getCatName(), tbl.getDbName(), tbl.getTableName())) {
         throw new AlreadyExistsException("Table " + getCatalogQualifiedTableName(tbl)
             + " already exists");
+      }
+
+      Database db = get_database_core(tbl.getCatName(), tbl.getDbName());
+      if (db != null && db.getType().equals(DatabaseType.REMOTE)) {
+        // HIVE-24425: Create table in REMOTE db should fail
+        throw new MetaException("Create table in REMOTE database " + db.getName() + " is not allowed");
       }
 
       if (transformer != null) {
@@ -2344,7 +2547,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       Map<String, String> transactionalListenerResponses = Collections.emptyMap();
       Path tblPath = null;
       boolean success = false, madeDir = false;
-      Database db = null;
       boolean isReplicated = false;
       try {
 
@@ -3071,7 +3273,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       boolean isReplicated = false;
       try {
         ms.openTransaction();
+
+        // HIVE-25282: Drop/Alter table in REMOTE db should fail
         db = ms.getDatabase(catName, dbname);
+        if (db.getType() == DatabaseType.REMOTE) {
+          throw new MetaException("Drop table in REMOTE database " + db.getName() + " is not allowed");
+        }
         isReplicated = isDbReplicationTarget(db);
 
         // drop any partitions
@@ -3660,7 +3867,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             if (transformer != null) {
               Map<Table, List<String>> retMap = transformer.transform(tObjects, processorCapabilities, processorId);
 
-              for (Map.Entry<Table, List<String>> entry : retMap.entrySet())  {
+              for (Entry<Table, List<String>> entry : retMap.entrySet())  {
                 LOG.debug("Table " + entry.getKey().getTableName() + " requires " + Arrays.toString((entry.getValue()).toArray()));
                 ret.add(convertTableToExtendedTable(entry.getKey(), entry.getValue(), req.getRequestedFields()));
               }
@@ -3724,9 +3931,27 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             "Hive tests", "get_table_req");
       }
 
+      Database db = null;
       Table t = null;
       startTableFunction("get_table", catName, dbname, name);
       Exception ex = null;
+
+      try {
+        db = get_database_core(catName, dbname);
+      } catch (Exception e) { /* appears exception is not thrown currently if db doesnt exist */ }
+
+      if (db != null) {
+        if (db.getType().equals(DatabaseType.REMOTE)) {
+          t = DataConnectorProviderFactory.getDataConnectorProvider(db).getTable(name);
+          if (t == null) {
+            throw new NoSuchObjectException(TableName.getQualified(catName, dbname, name) +
+                    " table not found");
+          }
+          t.setDbName(dbname);
+          return t;
+        }
+      }
+
       try {
         t = get_table_core(catName, dbname, name, writeIdList, getColumnStats, engine);
         if (MetaStoreUtils.isInsertOnlyTableParam(t.getParameters())) {
@@ -3859,8 +4084,45 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     @Override
     public GetTablesResult get_table_objects_by_name_req(GetTablesRequest req) throws TException {
       String catName = req.isSetCatName() ? req.getCatName() : getDefaultCatalog(conf);
+      if (isDatabaseRemote(req.getDbName())) {
+        return new GetTablesResult(getRemoteTableObjectsInternal(req.getDbName(), req.getTblNames(), req.getTablesPattern()));
+      }
       return new GetTablesResult(getTableObjectsInternal(catName, req.getDbName(),
           req.getTblNames(), req.getCapabilities(), req.getProjectionSpec(), req.getTablesPattern()));
+    }
+
+    private List<Table> filterTablesByName(List<Table> tables, List<String> tableNames) {
+      List<Table> filteredTables = new ArrayList<>();
+      for (Table table : tables) {
+        if (tableNames.contains(table.getTableName())) {
+          filteredTables.add(table);
+        }
+      }
+      return filteredTables;
+    }
+
+    private List<Table> getRemoteTableObjectsInternal(String dbname, List<String> tableNames, String pattern) throws MetaException {
+      String[] parsedDbName = parseDbName(dbname, conf);
+      try {
+        // retrieve tables from remote database
+        Database db = get_database_core(parsedDbName[CAT_NAME], parsedDbName[DB_NAME]);
+        List<Table> tables = DataConnectorProviderFactory.getDataConnectorProvider(db).getTables(null);
+
+        // filtered out undesired tables
+        if (tableNames != null) {
+          tables = filterTablesByName(tables, tableNames);
+        }
+
+        // set remote tables' local hive database reference
+        for (Table table : tables) {
+          table.setDbName(dbname);
+        }
+
+        return FilterUtils.filterTablesIfEnabled(isServerFilterEnabled, filterHook, tables);
+      } catch (Exception e) {
+        LOG.warn("Unexpected exception while getting table(s) in remote database " + dbname, e);
+        return new ArrayList<Table>();
+      }
     }
 
     private List<Table> getTableObjectsInternal(String catName, String dbName,
@@ -4232,6 +4494,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       List<ColumnStatistics> partsColStats = new ArrayList<>(parts.size());
       List<Long> partsWriteIds = new ArrayList<>(parts.size());
 
+      throwUnsupportedExceptionIfRemoteDB(dbName, "add_partitions");
+
       try {
         ms.openTransaction();
         tbl = ms.getTable(catName, dbName, tblName);
@@ -4341,7 +4605,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
      */
     private void cleanupPartitionFolders(final Map<PartValEqWrapperLite, Boolean> addedPartitions,
         Database db) throws MetaException, IllegalArgumentException {
-      for (Map.Entry<PartValEqWrapperLite, Boolean> e : addedPartitions.entrySet()) {
+      for (Entry<PartValEqWrapperLite, Boolean> e : addedPartitions.entrySet()) {
         if (e.getValue()) {
           // we just created this directory - it's not a case of pre-creation, so we nuke.
           wh.deleteDir(new Path(e.getKey().location), true, db);
@@ -4615,13 +4879,20 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       Database db = null;
       try {
         ms.openTransaction();
+        try {
+          db = ms.getDatabase(catName, dbName);
+        } catch (NoSuchObjectException notExists) {
+          throw new InvalidObjectException("Unable to add partitions because "
+                  + "database or table " + dbName + "." + tblName + " does not exist");
+        }
+        if (db.getType() == DatabaseType.REMOTE)
+          throw new MetaException("Operation add_partitions_pspec not supported on tables in REMOTE database");
         tbl = ms.getTable(catName, dbName, tblName, null);
         if (tbl == null) {
           throw new InvalidObjectException("Unable to add partitions because "
               + "database or table " + dbName + "." + tblName + " does not exist");
         }
 
-        db = ms.getDatabase(catName, dbName);
         firePreEvent(new PreAddPartitionEvent(tbl, partitionSpecProxy, this));
         Set<PartValEqWrapperLite> partsToAdd = new HashSet<>(partitionSpecProxy.size());
         List<Partition> partitionsToAdd = new ArrayList<>(partitionSpecProxy.size());
@@ -5190,6 +5461,25 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         .orElse(0L);
     }
     
+    private void throwUnsupportedExceptionIfRemoteDB(String dbName, String operationName) throws MetaException {
+      if (isDatabaseRemote(dbName)) {
+        throw new MetaException("Operation " + operationName + " not supported for REMOTE database " + dbName);
+      }
+    }
+
+    private boolean isDatabaseRemote(String name) {
+      try {
+        String[] parsedDbName = parseDbName(name, conf);
+        Database db = get_database_core(parsedDbName[CAT_NAME], parsedDbName[DB_NAME]);
+        if (db != null && db.getType() != null && db.getType() == DatabaseType.REMOTE) {
+          return true;
+        }
+      } catch (Exception e) {
+        return false;
+      }
+      return false;
+    }
+
     private void deleteParentRecursive(Path parent, int depth, boolean mustPurge, boolean needRecycle)
             throws IOException, MetaException {
       if (depth > 0 && parent != null && wh.isWritable(parent)) {
@@ -6063,6 +6353,16 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         catName = MetaStoreUtils.getDefaultCatalog(conf);
       }
 
+      // HIVE-25282: Drop/Alter table in REMOTE db should fail
+      try {
+        Database db = get_database_core(catName, dbname);
+        if (db != null && db.getType().equals(DatabaseType.REMOTE)) {
+          throw new MetaException("Alter table in REMOTE database " + db.getName() + " is not allowed");
+        }
+      } catch (NoSuchObjectException e) {
+        throw new InvalidOperationException("Alter table in REMOTE database is not allowed");
+      }
+
       // Update the time if it hasn't been specified.
       if (newTable.getParameters() == null ||
           newTable.getParameters().get(hive_metastoreConstants.DDL_TIME) == null) {
@@ -6119,7 +6419,16 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
       List<String> ret = null;
       Exception ex = null;
+      Database db = null;
       String[] parsedDbName = parseDbName(dbname, conf);
+      try {
+        db = get_database_core(parsedDbName[CAT_NAME], parsedDbName[DB_NAME]);
+        if (db != null && db.getType() != null) {
+          if (db.getType().equals(DatabaseType.REMOTE)) {
+            return DataConnectorProviderFactory.getDataConnectorProvider(db).getTableNames();
+          }
+        }
+      } catch (Exception e) { /* appears we return empty set instead of throwing an exception */ }
       try {
         ret = getMS().getTables(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], pattern);
         if(ret !=  null && !ret.isEmpty()) {
@@ -6151,8 +6460,15 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
       List<String> ret = null;
       Exception ex = null;
+      Database db = null;
       String[] parsedDbName = parseDbName(dbname, conf);
       try {
+        db = get_database_core(parsedDbName[CAT_NAME], parsedDbName[DB_NAME]);
+        if (db != null) {
+          if (db.getType().equals(DatabaseType.REMOTE)) {
+            return DataConnectorProviderFactory.getDataConnectorProvider(db).getTableNames();
+          }
+        }
         ret = getTablesByTypeCore(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], pattern, tableType);
         ret = FilterUtils.filterTableNamesIfEnabled(isServerFilterEnabled, filterHook,
             parsedDbName[CAT_NAME], parsedDbName[DB_NAME], ret);
@@ -6332,7 +6648,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     private StorageSchemaReader getStorageSchemaReader() throws MetaException {
       if (storageSchemaReader == null) {
         String className =
-            MetastoreConf.getVar(conf, MetastoreConf.ConfVars.STORAGE_SCHEMA_READER_IMPL);
+            MetastoreConf.getVar(conf, ConfVars.STORAGE_SCHEMA_READER_IMPL);
         Class<? extends StorageSchemaReader> readerClass =
             JavaUtils.getClass(className, StorageSchemaReader.class);
         try {
@@ -6795,7 +7111,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       Map<String, String> partSpec = Warehouse.makeEscSpecFromName(partName);
       String convertedPartName = new String();
 
-      for (Map.Entry<String, String> entry : partSpec.entrySet()) {
+      for (Entry<String, String> entry : partSpec.entrySet()) {
         String partColName = entry.getKey();
         String partColVal = entry.getValue();
 
@@ -7519,6 +7835,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       } else if (hiveObject.getObjectType() == HiveObjectType.DATABASE) {
         return this.get_db_privilege_set(catName, hiveObject.getDbName(), userName,
             groupNames);
+      } else if (hiveObject.getObjectType() == HiveObjectType.DATACONNECTOR) {
+        return this.get_connector_privilege_set(catName, hiveObject.getObjectName(), userName, groupNames);
       } else if (hiveObject.getObjectType() == HiveObjectType.TABLE) {
         return this.get_table_privilege_set(catName, hiveObject.getDbName(), hiveObject
             .getObjectName(), userName, groupNames);
@@ -7576,6 +7894,22 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         throw new RuntimeException(e);
       }
       return ret;
+    }
+
+    private PrincipalPrivilegeSet get_connector_privilege_set(String catName, final String connectorName,
+                                                              final String userName, final List<String> groupNames) throws TException {
+      incrementCounter("get_connector_privilege_set");
+
+      PrincipalPrivilegeSet ret;
+      try {
+        ret = getMS().getConnectorPrivilegeSet(catName, connectorName, userName, groupNames);
+      } catch (MetaException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+      return ret;
+
     }
 
     private PrincipalPrivilegeSet get_partition_privilege_set(
@@ -7909,6 +8243,10 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         return list_db_privileges(principalName, principalType, catName, hiveObject
             .getDbName());
       }
+      if (hiveObject.getObjectType() == HiveObjectType.DATACONNECTOR) {
+        return list_dc_privileges(principalName, principalType, hiveObject
+                .getObjectName());
+      }
       if (hiveObject.getObjectType() == HiveObjectType.TABLE) {
         return list_table_privileges(principalName, principalType,
             catName, hiveObject.getDbName(), hiveObject.getObjectName());
@@ -7935,6 +8273,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       List<HiveObjectPrivilege> privs = new ArrayList<>();
       privs.addAll(list_global_privileges(principalName, principalType));
       privs.addAll(list_db_privileges(principalName, principalType, catName, null));
+      privs.addAll(list_dc_privileges(principalName, principalType, null));
       privs.addAll(list_table_privileges(principalName, principalType, catName, null, null));
       privs.addAll(list_partition_privileges(principalName, principalType, catName, null, null, null));
       privs.addAll(list_table_column_privileges(principalName, principalType, catName, null, null, null));
@@ -8004,6 +8343,24 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
       } catch (MetaException e) {
         throw e;
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    private List<HiveObjectPrivilege> list_dc_privileges(final String principalName,
+                                                         final PrincipalType principalType, final String dcName) throws TException {
+      incrementCounter("list_security_dc_grant");
+
+      try {
+        if (dcName == null) {
+          return getMS().listPrincipalDCGrantsAll(principalName, principalType);
+        }
+        if (principalName == null) {
+          return getMS().listDCGrantsAll(dcName);
+        } else {
+          return getMS().listPrincipalDCGrants(principalName, principalType, dcName);
+        }
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
@@ -8462,6 +8819,10 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         Database db = ms.getDatabase(catName, func.getDbName());
         if (db == null) {
           throw new NoSuchObjectException("The database " + func.getDbName() + " does not exist");
+        }
+
+        if (db.getType() == DatabaseType.REMOTE) {
+          throw new MetaException("Operation create_function not support for REMOTE database");
         }
 
         Function existingFunc = ms.getFunction(catName, func.getDbName(), func.getFunctionName());
@@ -9801,7 +10162,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public WMCreateResourcePlanResponse create_resource_plan(WMCreateResourcePlanRequest request)
         throws AlreadyExistsException, InvalidObjectException, MetaException, TException {
       int defaultPoolSize = MetastoreConf.getIntVar(
-          conf, MetastoreConf.ConfVars.WM_DEFAULT_POOL_SIZE);
+          conf, ConfVars.WM_DEFAULT_POOL_SIZE);
       WMResourcePlan plan = request.getResourcePlan();
       if (defaultPoolSize > 0 && plan.isSetQueryParallelism()) {
         // If the default pool is not disabled, override the size with the specified parallelism.
@@ -10635,6 +10996,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public void create_stored_procedure(StoredProcedure proc) throws NoSuchObjectException, MetaException {
       startFunction("create_stored_procedure");
       Exception ex = null;
+      throwUnsupportedExceptionIfRemoteDB(proc.getDbName(), "create_stored_procedure");
       try {
         getMS().createOrUpdateStoredProcedure(proc);
       } catch (Exception e) {
@@ -10697,7 +11059,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
     }
 
-    public Package find_package(GetPackageRequest request) throws MetaException, NoSuchObjectException {
+  public Package find_package(GetPackageRequest request) throws MetaException, NoSuchObjectException {
       startFunction("find_package");
       Exception ex = null;
       try {
@@ -10798,7 +11160,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     if (!className.equals("")) {
       return RetryingHMSHandler.getProxy(className, name, conf, local, false);
     }
-    HMSHandler baseHandler = new HiveMetaStore.HMSHandler(name, conf, false);
+    HMSHandler baseHandler = new HMSHandler(name, conf, false);
     return RetryingHMSHandler.getProxy(conf, baseHandler, local);
   }
 
@@ -10947,7 +11309,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
 
       // set all properties specified on the command line
-      for (Map.Entry<Object, Object> item : hiveconf.entrySet()) {
+      for (Entry<Object, Object> item : hiveconf.entrySet()) {
         conf.set((String) item.getKey(), (String) item.getValue());
       }
 
@@ -11180,7 +11542,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     boolean tcpKeepAlive = MetastoreConf.getBoolVar(conf, ConfVars.TCP_KEEP_ALIVE);
     boolean useCompactProtocol = MetastoreConf.getBoolVar(conf, ConfVars.USE_THRIFT_COMPACT_PROTOCOL);
     boolean useSSL = MetastoreConf.getBoolVar(conf, ConfVars.USE_SSL);
-    HiveMetaStore.HMSHandler baseHandler = new HiveMetaStore.HMSHandler("new db based metaserver",
+    HMSHandler baseHandler = new HMSHandler("new db based metaserver",
         conf,false);
     AuthFactory authFactory = new AuthFactory(bridge, conf, baseHandler);
     useSasl = authFactory.isSASLWithKerberizedHadoop();
@@ -11415,7 +11777,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       LOG.warn("Compactor Initiator is turned Off. Automatic compaction will not be triggered.");
     }
 
-    if (MetastoreConf.getVar(conf, MetastoreConf.ConfVars.HIVE_METASTORE_RUNWORKER_IN).equals("metastore")) {
+    if (MetastoreConf.getVar(conf, ConfVars.HIVE_METASTORE_RUNWORKER_IN).equals("metastore")) {
       int numThreads = MetastoreConf.getIntVar(conf, ConfVars.COMPACTOR_WORKER_THREADS);
       if (numThreads < 1) {
         LOG.warn("Invalid number of Compactor Worker threads({}) on HMS", numThreads);
@@ -11424,7 +11786,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
   }
 
   static boolean isMetaStoreHousekeepingLeader(Configuration conf) throws Exception {
-    String leaderHost = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.METASTORE_HOUSEKEEPING_LEADER_HOSTNAME);
+    String leaderHost = MetastoreConf.getVar(conf, ConfVars.METASTORE_HOUSEKEEPING_LEADER_HOSTNAME);
     String serverHost = getServerHostName();
 
     // For the sake of backward compatibility, when the current HMS becomes the leader when no
@@ -11547,13 +11909,13 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             startCompactorCleaner(conf);
             startRemoteOnlyTasks(conf);
             startStatsUpdater(conf);
-            HiveMetaStore.HMSHandler.startAlwaysTaskThreads(conf);
+            HMSHandler.startAlwaysTaskThreads(conf);
           }
 
           // The leader HMS may not necessarily have sufficient compute capacity required to run
           // actual compaction work. So it can run on a non-leader HMS with sufficient capacity
           // or a configured HS2 instance.
-          if (MetastoreConf.getVar(conf, MetastoreConf.ConfVars.HIVE_METASTORE_RUNWORKER_IN).equals("metastore")) {
+          if (MetastoreConf.getVar(conf, ConfVars.HIVE_METASTORE_RUNWORKER_IN).equals("metastore")) {
             startCompactorWorkers(conf);
           }
         } catch (Throwable e) {
@@ -11654,7 +12016,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
    * @param LOG the target log object
    */
   private static void startupShutdownMessage(Class<?> clazz, String[] args,
-                                             final org.slf4j.Logger LOG) {
+                                             final Logger LOG) {
     final String hostname = getHostname();
     final String classname = clazz.getSimpleName();
     LOG.info(

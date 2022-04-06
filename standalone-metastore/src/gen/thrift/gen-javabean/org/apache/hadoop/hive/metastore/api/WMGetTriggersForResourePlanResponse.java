@@ -323,14 +323,14 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // TRIGGERS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list1162 = iprot.readListBegin();
-                struct.triggers = new java.util.ArrayList<WMTrigger>(_list1162.size);
-                @org.apache.thrift.annotation.Nullable WMTrigger _elem1163;
-                for (int _i1164 = 0; _i1164 < _list1162.size; ++_i1164)
+                org.apache.thrift.protocol.TList _list1172 = iprot.readListBegin();
+                struct.triggers = new java.util.ArrayList<WMTrigger>(_list1172.size);
+                @org.apache.thrift.annotation.Nullable WMTrigger _elem1173;
+                for (int _i1174 = 0; _i1174 < _list1172.size; ++_i1174)
                 {
-                  _elem1163 = new WMTrigger();
-                  _elem1163.read(iprot);
-                  struct.triggers.add(_elem1163);
+                  _elem1173 = new WMTrigger();
+                  _elem1173.read(iprot);
+                  struct.triggers.add(_elem1173);
                 }
                 iprot.readListEnd();
               }
@@ -357,9 +357,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(TRIGGERS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.triggers.size()));
-            for (WMTrigger _iter1165 : struct.triggers)
+            for (WMTrigger _iter1175 : struct.triggers)
             {
-              _iter1165.write(oprot);
+              _iter1175.write(oprot);
             }
             oprot.writeListEnd();
           }
@@ -391,9 +391,9 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetTriggers()) {
         {
           oprot.writeI32(struct.triggers.size());
-          for (WMTrigger _iter1166 : struct.triggers)
+          for (WMTrigger _iter1176 : struct.triggers)
           {
-            _iter1166.write(oprot);
+            _iter1176.write(oprot);
           }
         }
       }
@@ -405,14 +405,14 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list1167 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.triggers = new java.util.ArrayList<WMTrigger>(_list1167.size);
-          @org.apache.thrift.annotation.Nullable WMTrigger _elem1168;
-          for (int _i1169 = 0; _i1169 < _list1167.size; ++_i1169)
+          org.apache.thrift.protocol.TList _list1177 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.triggers = new java.util.ArrayList<WMTrigger>(_list1177.size);
+          @org.apache.thrift.annotation.Nullable WMTrigger _elem1178;
+          for (int _i1179 = 0; _i1179 < _list1177.size; ++_i1179)
           {
-            _elem1168 = new WMTrigger();
-            _elem1168.read(iprot);
-            struct.triggers.add(_elem1168);
+            _elem1178 = new WMTrigger();
+            _elem1178.read(iprot);
+            struct.triggers.add(_elem1178);
           }
         }
         struct.setTriggersIsSet(true);

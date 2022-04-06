@@ -33,8 +33,11 @@ public class DescDatabaseDesc implements DDLDesc, Serializable {
   private static final long serialVersionUID = 1L;
 
   public static final String DESC_DATABASE_SCHEMA =
-      "db_name,comment,location,managedLocation,owner_name,owner_type,parameters#" +
-      "string:string:string:string:string:string:string";
+      "db_name,comment,location,managedLocation,owner_name,owner_type,connector_name,remote_dbname#string:string:string:string:string:string,string,string";
+
+  public static final String DESC_DATABASE_SCHEMA_EXTENDED =
+      "db_name,comment,location,managedLocation,owner_name,owner_type,connector_name,remote_dbname,parameters#" +
+      "string:string:string:string:string:string:string,string,string";
 
   private final String resFile;
   private final String dbName;
@@ -58,5 +61,9 @@ public class DescDatabaseDesc implements DDLDesc, Serializable {
   @Explain(displayName = "result file", explainLevels = { Level.EXTENDED })
   public String getResFile() {
     return resFile;
+  }
+
+  public String getSchema() {
+    return isExt ? DESC_DATABASE_SCHEMA_EXTENDED : DESC_DATABASE_SCHEMA;
   }
 }

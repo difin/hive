@@ -56,11 +56,13 @@ import org.apache.hadoop.hive.metastore.api.AllTableConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.Catalog;
 import org.apache.hadoop.hive.metastore.api.CheckConstraintsRequest;
+import org.apache.hadoop.hive.metastore.api.DatabaseType;
 import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.CreationMetadata;
 import org.apache.hadoop.hive.metastore.api.CurrentNotificationEventId;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.DataConnector;
 import org.apache.hadoop.hive.metastore.api.DefaultConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.DropPackageRequest;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
@@ -1125,6 +1127,9 @@ public class CachedStore implements RawStore, Configurable {
 
   @Override
   public void createDatabase(Database db) throws InvalidObjectException, MetaException {
+    if (db.getType() == null) {
+      db.setType(DatabaseType.NATIVE);
+    }
     rawStore.createDatabase(db);
     // in case of event based cache update, cache will be updated during commit.
     if (!canUseEvents) {
@@ -1186,6 +1191,32 @@ public class CachedStore implements RawStore, Configurable {
       return rawStore.getAllDatabases(catName);
     }
     return sharedCache.listCachedDatabases(catName);
+  }
+
+  @Override public void createDataConnector(DataConnector connector) throws InvalidObjectException, MetaException {
+    rawStore.createDataConnector(connector);
+  }
+
+  @Override public DataConnector getDataConnector(String dcName) throws NoSuchObjectException {
+    // in case of  event based cache update, cache will be updated during commit. So within active transaction, read
+    // directly from rawStore to avoid reading stale data as the data updated during same transaction will not be
+    // updated in the cache.
+    return rawStore.getDataConnector(dcName);
+  }
+
+  @Override
+  public boolean dropDataConnector(String dcName) throws NoSuchObjectException, MetaException {
+    return rawStore.dropDataConnector(dcName);
+  }
+
+  @Override public boolean alterDataConnector(String dcName, DataConnector connector)
+          throws NoSuchObjectException, MetaException {
+    return rawStore.alterDataConnector(dcName, connector);
+  }
+
+  @Override
+  public List<String> getAllDataConnectorNames() throws MetaException {
+    return rawStore.getAllDataConnectorNames();
   }
 
   @Override
@@ -1870,6 +1901,12 @@ public class CachedStore implements RawStore, Configurable {
   }
 
   @Override
+  public PrincipalPrivilegeSet getConnectorPrivilegeSet(String catName, String connectorName, String userName,
+      List<String> groupNames) throws InvalidObjectException, MetaException {
+    return rawStore.getConnectorPrivilegeSet(catName, connectorName, userName, groupNames);
+  }
+
+  @Override
   public PrincipalPrivilegeSet getTablePrivilegeSet(String catName, String dbName,
       String tableName, String userName, List<String> groupNames)
       throws InvalidObjectException, MetaException {
@@ -1901,6 +1938,12 @@ public class CachedStore implements RawStore, Configurable {
   public List<HiveObjectPrivilege> listPrincipalDBGrants(String principalName,
       PrincipalType principalType, String catName, String dbName) {
     return rawStore.listPrincipalDBGrants(principalName, principalType, catName, dbName);
+  }
+
+  @Override
+  public List<HiveObjectPrivilege> listPrincipalDCGrants(String principalName,
+      PrincipalType principalType, String dcName) {
+    return rawStore.listPrincipalDCGrants(principalName, principalType, dcName);
   }
 
   @Override
@@ -2583,6 +2626,11 @@ public class CachedStore implements RawStore, Configurable {
     return rawStore.listPrincipalDBGrantsAll(principalName, principalType);
   }
 
+  @Override public List<HiveObjectPrivilege> listPrincipalDCGrantsAll(
+      String principalName, PrincipalType principalType) {
+    return rawStore.listPrincipalDCGrantsAll(principalName, principalType);
+  }
+
   @Override
   public List<HiveObjectPrivilege> listPrincipalTableGrantsAll(
       String principalName, PrincipalType principalType) {
@@ -2615,6 +2663,11 @@ public class CachedStore implements RawStore, Configurable {
   @Override
   public List<HiveObjectPrivilege> listDBGrantsAll(String catName, String dbName) {
     return rawStore.listDBGrantsAll(catName, dbName);
+  }
+
+  @Override
+  public List<HiveObjectPrivilege> listDCGrantsAll(String dcName) {
+    return rawStore.listDCGrantsAll(dcName);
   }
 
   @Override

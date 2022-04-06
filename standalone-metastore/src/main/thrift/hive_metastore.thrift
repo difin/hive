@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.22"
+const string HMS_API = "1.2.23"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -153,6 +153,7 @@ enum HiveObjectType {
   TABLE = 3,
   PARTITION = 4,
   COLUMN = 5,
+  DATACONNECTOR = 6,
 }
 
 enum PrincipalType {
@@ -254,6 +255,11 @@ enum SchemaVersionState {
   DISABLED = 6,
   ARCHIVED = 7,
   DELETED = 8
+}
+
+enum DatabaseType {
+  NATIVE = 1,
+  REMOTE = 2
 }
 
 struct HiveObjectRef{
@@ -405,8 +411,11 @@ struct Database {
   6: optional string ownerName,
   7: optional PrincipalType ownerType,
   8: optional string catalogName,
-  9: optional i32 createTime               // creation time of database in seconds since epoch
-  10: optional string managedLocationUri // directory for managed tables
+  9: optional i32 createTime,             // creation time of database in seconds since epoch
+  10: optional string managedLocationUri, // directory for managed tables
+  11: optional DatabaseType type,
+  12: optional string connector_name,
+  13: optional string remote_dbname
 }
 
 // This object holds the information needed by SerDes
@@ -944,6 +953,17 @@ struct GetPartitionsByNamesRequest {
 struct GetPartitionsByNamesResult {
   1: required list<Partition> partitions
   2: optional ObjectDictionary dictionary
+}
+
+struct DataConnector {
+  1: string name,
+  2: string type,
+  3: string url,
+  4: optional string description,
+  5: optional map<string,string> parameters,
+  6: optional string ownerName,
+  7: optional PrincipalType ownerType,
+  8: optional i32 createTime
 }
 
 enum FunctionType {
@@ -1967,6 +1987,29 @@ struct CreateTableRequest {
    10: optional string processorIdentifier
 }
 
+struct CreateDatabaseRequest {
+  1: required string databaseName,
+  2: optional string description,
+  3: optional string locationUri,
+  4: optional map<string, string> parameters,
+  5: optional PrincipalPrivilegeSet privileges,
+  6: optional string ownerName,
+  7: optional PrincipalType ownerType,
+  8: optional string catalogName,
+  9: optional i32 createTime,
+  10: optional string managedLocationUri,
+  11: optional string type,
+  12: optional string dataConnectorName
+}
+
+struct CreateDataConnectorRequest {
+  1: DataConnector connector
+}
+
+struct GetDataConnectorRequest {
+  1: required string connectorName
+}
+
 struct ScheduledQueryPollRequest {
   1: required string clusterNamespace
 }
@@ -2344,7 +2387,13 @@ service ThriftHiveMetastore extends fb303.FacebookService
   list<string> get_all_databases() throws(1:MetaException o1)
   void alter_database(1:string dbname, 2:Database db) throws(1:MetaException o1, 2:NoSuchObjectException o2)
 
-  // returns the type with given name (make seperate calls for the dependent types if needed)
+  void create_dataconnector(1:DataConnector connector) throws(1:AlreadyExistsException o1, 2:InvalidObjectException o2, 3:MetaException o3)
+  DataConnector get_dataconnector_req(1:GetDataConnectorRequest request) throws(1:NoSuchObjectException o1, 2:MetaException o2)
+  void drop_dataconnector(1:string name, bool ifNotExists, bool checkReferences) throws(1:NoSuchObjectException o1, 2:InvalidOperationException o2, 3:MetaException o3)
+  list<string> get_dataconnectors() throws(1:MetaException o1)
+  void alter_dataconnector(1:string name, 2:DataConnector connector) throws(1:MetaException o1, 2:NoSuchObjectException o2)
+
+    // returns the type with given name (make seperate calls for the dependent types if needed)
   Type get_type(1:string name)  throws(1:MetaException o1, 2:NoSuchObjectException o2)
   bool create_type(1:Type type) throws(1:AlreadyExistsException o1, 2:InvalidObjectException o2, 3:MetaException o3)
   bool drop_type(1:string type) throws(1:MetaException o1, 2:NoSuchObjectException o2)

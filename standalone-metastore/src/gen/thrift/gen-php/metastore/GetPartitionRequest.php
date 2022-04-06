@@ -149,13 +149,13 @@ class GetPartitionRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->partVals = array();
-                        $_size1157 = 0;
-                        $_etype1160 = 0;
-                        $xfer += $input->readListBegin($_etype1160, $_size1157);
-                        for ($_i1161 = 0; $_i1161 < $_size1157; ++$_i1161) {
-                            $elem1162 = null;
-                            $xfer += $input->readString($elem1162);
-                            $this->partVals []= $elem1162;
+                        $_size1175 = 0;
+                        $_etype1178 = 0;
+                        $xfer += $input->readListBegin($_etype1178, $_size1175);
+                        for ($_i1179 = 0; $_i1179 < $_size1175; ++$_i1179) {
+                            $elem1180 = null;
+                            $xfer += $input->readString($elem1180);
+                            $this->partVals []= $elem1180;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -211,8 +211,8 @@ class GetPartitionRequest
             }
             $xfer += $output->writeFieldBegin('partVals', TType::LST, 4);
             $output->writeListBegin(TType::STRING, count($this->partVals));
-            foreach ($this->partVals as $iter1163) {
-                $xfer += $output->writeString($iter1163);
+            foreach ($this->partVals as $iter1181) {
+                $xfer += $output->writeString($iter1181);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

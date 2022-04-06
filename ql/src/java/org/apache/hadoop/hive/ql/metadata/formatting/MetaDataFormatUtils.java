@@ -94,6 +94,10 @@ public final class MetaDataFormatUtils {
   private MetaDataFormatUtils() {
   }
 
+  public static boolean isJson(HiveConf conf) {
+    return "json".equals(conf.get(HiveConf.ConfVars.HIVE_DDL_OUTPUT_FORMAT.varname, "text"));
+  }
+
   public static String convertToString(Decimal val) {
     if (val == null) {
       return "";

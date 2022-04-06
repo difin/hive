@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql.hooks;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.api.DataConnector;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.ql.ddl.table.AlterTableType;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
@@ -65,6 +66,11 @@ public class WriteEntity extends Entity implements Serializable {
 
   public WriteEntity(Database database, WriteType type) {
     super(database, true);
+    setWriteTypeInternal(type);
+  }
+
+  public WriteEntity(DataConnector connector, WriteType type) {
+    super(connector, true);
     setWriteTypeInternal(type);
   }
 

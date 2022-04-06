@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.TableType;
+import org.apache.hadoop.hive.metastore.api.DataConnector;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.ql.exec.FunctionInfo;
 import org.apache.hadoop.hive.ql.exec.FunctionUtils;
@@ -225,6 +226,11 @@ final class CommandAuthorizerV2 {
     case SERVICE_NAME:
       hivePrivObject = new HivePrivilegeObject(privObjType, null, privObject.getServiceName(), null,
           null, actionType, null, null, null, null);
+      break;
+    case DATACONNECTOR:
+      DataConnector connector = privObject.getDataConnector();
+      hivePrivObject = new HivePrivilegeObject(privObjType, null, connector.getName(), null, null, actionType, null,
+          null, connector.getOwnerName(), connector.getOwnerType());
       break;
     default:
       throw new AssertionError("Unexpected object type");
