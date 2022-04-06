@@ -12,7 +12,7 @@ create external table if not exists airports (
     lat double,
     lon double
 )
-stored as orc;
+stored as parquet;
 
 load data inpath '${datapath}/airline_ontime_iceberg.db/airports' into table airports;
 
@@ -20,7 +20,7 @@ create external table if not exists airlines (
     code string,
     description string
 )
-stored as orc;
+stored as parquet;
 
 load data inpath '${datapath}/airline_ontime_iceberg.db/airlines' into table airlines;
 
@@ -35,7 +35,7 @@ create external table if not exists planes (
     engine_type string,
     year int
 )
-stored as orc;
+stored as parquet;
 
 load data inpath '${datapath}/airline_ontime_iceberg.db/planes' into table planes;
 
@@ -70,7 +70,7 @@ create external table if not exists flights (
     lateaircraftdelay int
 )
 partitioned by (year int)
-stored as orc;
+stored as parquet;
 
 load data inpath '${datapath}/airline_ontime_iceberg.db/flights/year=1995' into table flights partition (year=1995);
 load data inpath '${datapath}/airline_ontime_iceberg.db/flights/year=1996' into table flights partition (year=1996);
