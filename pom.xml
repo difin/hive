@@ -1653,6 +1653,7 @@
         <module>llap-ext-client</module>
         <module>llap-tez</module>
         <module>llap-server</module>
+        <module>spark-client</module>
         <module>kryo-registrator</module>
         <module>kudu-handler</module>
         <module>testutils</module>
