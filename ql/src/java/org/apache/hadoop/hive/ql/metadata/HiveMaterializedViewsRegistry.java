@@ -65,6 +65,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HivePartitionPruneRuleH
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializedViewUtils;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.MaterializedViewIncrementalRewritingRelVisitor;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.TypeConverter;
+import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.CBOPlan;
 import org.apache.hadoop.hive.ql.parse.CalcitePlanner;
 import org.apache.hadoop.hive.ql.parse.ParseUtils;
@@ -265,7 +266,7 @@ public final class HiveMaterializedViewsRegistry {
             null, viewScan.getTable().getQualifiedName(),
             isBlank(plan.getInvalidAutomaticRewritingMaterializationReason()) ?
             EnumSet.allOf(HiveRelOptMaterialization.RewriteAlgorithm.class) : EnumSet.of(TEXT),
-            determineIncrementalRebuildMode(plan.getPlan()));
+            determineIncrementalRebuildMode(plan.getPlan()), plan.getAst());
   }
 
 
@@ -396,8 +397,8 @@ public final class HiveMaterializedViewsRegistry {
     return materialization;
   }
 
-  public List<HiveRelOptMaterialization> getRewritingMaterializedViews(String querySql) {
-    return materializedViewsCache.get(querySql);
+  public List<HiveRelOptMaterialization> getRewritingMaterializedViews(ASTNode ast) {
+    return materializedViewsCache.get(ast);
   }
 
   public boolean isEmpty() {

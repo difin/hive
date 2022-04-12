@@ -30,7 +30,6 @@ import com.google.common.collect.Multimap;
 
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.antlr.runtime.ClassicToken;
 import org.antlr.runtime.CommonToken;
@@ -142,6 +141,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.conf.HiveConf.StrictChecks;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.QueryProperties;
 import org.apache.hadoop.hive.ql.QueryState;
@@ -175,6 +175,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteViewSemanticException;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveCalciteUtil;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveConfPlannerContext;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveDefaultRelMetadataProvider;
+import org.apache.hadoop.hive.ql.optimizer.calcite.HiveMaterializedViewASTSubQueryRewriteShuttle;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HivePlannerContext;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelDistribution;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
@@ -356,10 +357,9 @@ import java.util.stream.IntStream;
 
 import javax.sql.DataSource;
 
-import static java.util.Collections.singletonList;
 import static org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization.RewriteAlgorithm.ANY;
-import static org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization.RewriteAlgorithm.NON_CALCITE;
-import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializedViewUtils.extractTable;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.HiveMaterializedViewASTSubQueryRewriteShuttle.getMaterializedViewByAST;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializedViewUtils.checkPrivilegeForMaterializedViews;
 import static org.apache.hadoop.hive.ql.plan.HiveOperation.CREATEVIEW;
 import static org.apache.hadoop.hive.ql.plan.HiveOperation.ALTERVIEW_AS;
 import static org.apache.hadoop.hive.ql.plan.HiveOperation.ALTERVIEW_RENAME;
@@ -1290,6 +1290,16 @@ public class CalcitePlanner extends SemanticAnalyzer {
   public static class ASTSearcher {
     private final LinkedList<ASTNode> searchQueue = new LinkedList<ASTNode>();
 
+    public ASTNode simpleBreadthFirstSearch(ASTNode ast, Collection<Integer> tokens) {
+      int[] tokenArray = new int[tokens.size()];
+      int i = 0;
+      for (Integer token : tokens) {
+        tokenArray[i] = token;
+        ++i;
+      }
+      return simpleBreadthFirstSearch(ast, tokenArray);
+    }
+
     /**
      * Performs breadth-first search of the AST for a nested set of tokens. Tokens
      * don't have to be each others' direct children, they can be separated by
@@ -1758,6 +1768,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
     LinkedHashMap<RelNode, RowResolver>                   relToHiveRR                   = new LinkedHashMap<RelNode, RowResolver>();
     LinkedHashMap<RelNode, ImmutableMap<String, Integer>> relToHiveColNameCalcitePosMap = new LinkedHashMap<RelNode, ImmutableMap<String, Integer>>();
 
+    Map<RelNode, ASTNode> subQueryMap = new HashMap<>();
+
     protected CalcitePlannerAction(
         boolean generateEnginePlan,
         Map<String, PrunedPartitionList> partitionCache,
@@ -1818,22 +1830,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       optCluster.invalidateMetadataQuery();
       RelMetadataQuery.THREAD_PROVIDERS.set(JaninoRelMetadataProvider.of(mdProvider.getMetadataProvider()));
 
-      RelNode rewrittenPlan = applyMaterializedViewRewritingByText(ast, calciteGenPlan, optCluster, ANY);
-      if (rewrittenPlan != null) {
-        calciteOptimizedPlan = rewrittenPlan;
-        // We need to execute the partition prune rule to make sure
-        // the metadata for the tables is correctly retrieved.
-        callAndCacheValidTxnWriteIdList(calciteOptimizedPlan);
-        HepProgramBuilder program = new HepProgramBuilder();
-        generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
-            HivePartitionPruneRule.createRules(conf));
-        calciteOptimizedPlan = executeProgram(calciteOptimizedPlan, program.build(),
-            mdProvider.getMetadataProvider(), executorProvider);
-        // We generate the engine-specific plan (if needed).
-        calciteEnginePlan = generateEnginePlan ?
-            generateEnginePlan(calciteOptimizedPlan, mdProvider.getMetadataProvider(), executorProvider) : null;
-        return CalcitePlan.of(calciteOptimizedPlan, calciteEnginePlan);
-      }
+      calciteGenPlan = applyMaterializedViewRewritingByText(ast, calciteGenPlan, optCluster);
 
       // We need to get the ColumnAccessInfo and viewToTableSchema for views.
       HiveRelFieldTrimmer.get()
@@ -2306,56 +2303,43 @@ public class CalcitePlanner extends SemanticAnalyzer {
               !rootQB.isMaterializedView() && !ctx.isLoadingMaterializedView() && !getQB().isCTAS() &&
               rootQB.getIsQuery() &&
               rootQB.hasTableDefined() &&
-              !forViewCreation;
+              !forViewCreation &&
+              conf.getEngine() == HiveConf.Engine.HIVE;
     }
 
     private RelNode applyMaterializedViewRewritingByText(
-            ASTNode queryToRewrite, RelNode calciteGenPlan, RelOptCluster optCluster,
-            Predicate<EnumSet<HiveRelOptMaterialization.RewriteAlgorithm>> filter) {
+        ASTNode queryToRewriteAST, RelNode originalPlan, RelOptCluster optCluster) {
       if (!isMaterializedViewRewritingByTextEnabled()) {
-        return null;
+        return originalPlan;
       }
 
-      unparseTranslator.applyTranslations(ctx.getTokenRewriteStream(), EXPANDED_QUERY_TOKEN_REWRITE_PROGRAM);
-      String expandedQueryText = ctx.getTokenRewriteStream().toString(
-              EXPANDED_QUERY_TOKEN_REWRITE_PROGRAM,
-              queryToRewrite.getTokenStartIndex(),
-              queryToRewrite.getTokenStopIndex());
-      return getMaterializedViewByQueryText(expandedQueryText, calciteGenPlan, optCluster, filter);
-    }
-
-    private RelNode getMaterializedViewByQueryText(
-            String expandedQueryText, RelNode calciteGenPlan, RelOptCluster optCluster,
-            Predicate<EnumSet<HiveRelOptMaterialization.RewriteAlgorithm>> filter) {
+      String expandedQueryText = null;
       try {
-        List<HiveRelOptMaterialization> relOptMaterializationList = db.getMaterializedViewsBySql(
-                expandedQueryText, getTablesUsed(calciteGenPlan), getTxnMgr());
-        for (HiveRelOptMaterialization relOptMaterialization : relOptMaterializationList) {
-          if (!filter.test(relOptMaterialization.getScope())) {
-            LOG.debug("Filter out materialized view {} scope {}",
-                    relOptMaterialization.qualifiedTableName, relOptMaterialization.getScope());
-            continue;
-          }
+        unparseTranslator.applyTranslations(ctx.getTokenRewriteStream(), EXPANDED_QUERY_TOKEN_REWRITE_PROGRAM);
+        expandedQueryText = ctx.getTokenRewriteStream().toString(
+                EXPANDED_QUERY_TOKEN_REWRITE_PROGRAM,
+                queryToRewriteAST.getTokenStartIndex(),
+                queryToRewriteAST.getTokenStopIndex());
 
-          try {
-            Table hiveTableMD = extractTable(relOptMaterialization);
-            Set<TableName> sourceTables = new HashSet<>(1);
-            sourceTables.add(hiveTableMD.getFullTableName());
-            if (db.validateMaterializedViewsFromRegistry(
-                singletonList(hiveTableMD), sourceTables, getTxnMgr())) {
-              return relOptMaterialization.copyToNewCluster(
-                      optCluster, functionHelper.getPartitionPruneRuleHelper()).tableRel;
-            }
-          } catch (HiveException e) {
-            LOG.warn("Skipping materialized view due to validation failure: " +
-                    relOptMaterialization.qualifiedTableName, e);
-          }
+        ASTNode expandedAST = ParseUtils.parse(expandedQueryText, new Context(conf));
+        Set<TableName> tablesUsedByOriginalPlan = getTablesUsed(originalPlan);
+        RelNode mvScan = getMaterializedViewByAST(
+            expandedAST, optCluster, ANY, db, tablesUsedByOriginalPlan, getTxnMgr(), functionHelper);
+        if (mvScan != null) {
+          return mvScan;
         }
-      } catch (HiveException e) {
-        LOG.warn(String.format("Exception while looking up materialized views for query '%s'", expandedQueryText), e);
-      }
 
-      return null;
+        if (!conf.getBoolVar(ConfVars.HIVE_MATERIALIZED_VIEW_ENABLE_AUTO_REWRITING_SUBQUERY_SQL)) {
+          return originalPlan;
+        }
+        return new HiveMaterializedViewASTSubQueryRewriteShuttle(subQueryMap, queryToRewriteAST, expandedAST,
+                HiveRelFactories.HIVE_BUILDER.create(optCluster, null),
+                db, tablesUsedByOriginalPlan, getTxnMgr(), functionHelper).rewrite(originalPlan);
+      } catch (Exception e) {
+        LOG.warn("Automatic materialized view query rewrite failed. expanded query text: {} AST string {} ",
+                expandedQueryText, queryToRewriteAST.toStringTree(), e);
+        return originalPlan;
+      }
     }
 
     /**
@@ -2650,38 +2634,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
         }
       }.go(plan);
       return tablesUsed;
-    }
-
-    /**
-     * Validate if given materialized view has SELECT privileges for current user
-     * @param cachedMVTable
-     * @return false if user does not have privilege otherwise true
-     * @throws HiveException
-     */
-    private boolean checkPrivilegeForMaterializedViews(List<Table> cachedMVTableList) throws HiveException {
-      List<HivePrivilegeObject> privObjects = new ArrayList<HivePrivilegeObject>();
-
-      for (Table cachedMVTable:cachedMVTableList) {
-        List<String> colNames =
-            cachedMVTable.getAllCols().stream()
-                .map(FieldSchema::getName)
-                .collect(Collectors.toList());
-
-        HivePrivilegeObject privObject = new HivePrivilegeObject(cachedMVTable.getDbName(),
-            cachedMVTable.getTableName(), colNames);
-        privObjects.add(privObject);
-      }
-
-      try {
-        SessionState.get().getAuthorizerV2().
-            checkPrivileges(HiveOperationType.QUERY, privObjects, privObjects, new HiveAuthzContext.Builder().build());
-      } catch (HiveException e) {
-        if (e instanceof HiveAccessControlException) {
-          return false;
-        }
-        throw e;
-      }
-      return true;
     }
 
     protected List<Table> getMaterializedViewsUsed(RelNode plan) {
@@ -3715,22 +3667,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
           RelNode subQueryRelNode =
               genLogicalPlan(qbSQ, false, relToHiveColNameCalcitePosMap.get(srcRel), relToHiveRR.get(srcRel));
 
-          if (conf.getBoolVar(ConfVars.HIVE_MATERIALIZED_VIEW_ENABLE_AUTO_REWRITING_SUBQUERY_SQL) &&
-                  isMaterializedViewRewritingByTextEnabled()) {
-            unparseTranslator.applyTranslations(ctx.getTokenRewriteStream(), EXPANDED_QUERY_TOKEN_REWRITE_PROGRAM);
-            String expandedSubQueryText = ctx.getTokenRewriteStream().toString(
-                    EXPANDED_QUERY_TOKEN_REWRITE_PROGRAM,
-                    subQueryRoot.getTokenStartIndex(),
-                    subQueryRoot.getTokenStopIndex());
-
-            if (expandedSubQueryText.length() >= 2) {
-              expandedSubQueryText = expandedSubQueryText.substring(1, expandedSubQueryText.length() - 1).trim();
-            }
-
-            RelNode mv = getMaterializedViewByQueryText(expandedSubQueryText, subQueryRelNode, cluster, NON_CALCITE);
-            if (mv != null) {
-              subQueryRelNode = mv;
-            }
+          if (subQueryRelNode instanceof HiveProject) {
+            subQueryMap.put(subQueryRelNode, subQueryRoot);
           }
 
           subQueryToRelNode.put(next, parseInfo.setSubQueryRelNode(subQueryRelNode));
@@ -5328,15 +5266,9 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
         ASTNode subqueryRoot = qbexpr.getSubQueryRoot();
         if (subqueryRoot != null &&
-                conf.getBoolVar(ConfVars.HIVE_MATERIALIZED_VIEW_ENABLE_AUTO_REWRITING_SUBQUERY_SQL)) {
-          RelNode mv = applyMaterializedViewRewritingByText(subqueryRoot, relNode, cluster, NON_CALCITE);
-          if (mv != null) {
-            RowResolver rr = relToHiveRR.remove(relNode);
-            relToHiveRR.put(mv, rr);
-            ImmutableMap<String, Integer> tmp = relToHiveColNameCalcitePosMap.remove(relNode);
-            relToHiveColNameCalcitePosMap.put(mv, tmp);
-            relNode = mv;
-          }
+                conf.getBoolVar(ConfVars.HIVE_MATERIALIZED_VIEW_ENABLE_AUTO_REWRITING_SUBQUERY_SQL) &&
+                relNode instanceof HiveProject) {
+          subQueryMap.put(relNode, subqueryRoot);
         }
 
         aliasToRel.put(subqAlias, relNode);

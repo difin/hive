@@ -51,9 +51,11 @@ import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.metastore.api.CreationMetadata;
+import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.SourceTable;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.lockmgr.LockException;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization;
 import org.apache.hadoop.hive.ql.metadata.MaterializedViewMetadata;
 import org.apache.hadoop.hive.ql.metadata.Table;
@@ -66,6 +68,10 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveRelNode;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTableScan;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.PartitionPruneRuleHelper;
 import org.apache.hadoop.hive.ql.parse.DruidSqlOperatorConverter;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAccessControlException;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthzContext;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveOperationType;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hive.common.util.TxnIdUtils;
 import org.slf4j.Logger;
@@ -194,7 +200,8 @@ public class HiveMaterializedViewUtils {
     augmentMaterializationPlanner.setRoot(materialization.queryRel);
     final RelNode modifiedQueryRel = augmentMaterializationPlanner.findBestExp();
     return new HiveRelOptMaterialization(materialization.tableRel, modifiedQueryRel,
-        null, materialization.qualifiedTableName, materialization.getScope(), materialization.getRebuildMode());
+        null, materialization.qualifiedTableName, materialization.getScope(), materialization.getRebuildMode(),
+            materialization.getAst());
   }
 
   /**
@@ -316,7 +323,8 @@ public class HiveMaterializedViewUtils {
       materializationList.add(
           new HiveRelOptMaterialization(newTableRel, newQueryRel, null,
               ImmutableList.of(scanTable.getDbName(), scanTable.getTableName(),
-                  "#" + materializationList.size()), materialization.getScope(), materialization.getRebuildMode()));
+                  "#" + materializationList.size()), materialization.getScope(), materialization.getRebuildMode(),
+                  materialization.getAst()));
     }
     return materializationList;
   }
@@ -375,5 +383,37 @@ public class HiveMaterializedViewUtils {
         newTable, ((RelOptHiveTable) scan.getTable()).getName(), null, false, false);
     }
     return newScan;
+  }
+
+  /**
+   * Validate if given materialized view has SELECT privileges for current user
+   * @param cachedMVTable
+   * @return false if user does not have privilege otherwise true
+   * @throws HiveException
+   */
+  public static boolean checkPrivilegeForMaterializedViews(List<Table> cachedMVTableList) throws HiveException {
+    List<HivePrivilegeObject> privObjects = new ArrayList<HivePrivilegeObject>();
+
+    for (Table cachedMVTable:cachedMVTableList) {
+      List<String> colNames =
+          cachedMVTable.getAllCols().stream()
+              .map(FieldSchema::getName)
+              .collect(Collectors.toList());
+
+      HivePrivilegeObject privObject = new HivePrivilegeObject(cachedMVTable.getDbName(),
+          cachedMVTable.getTableName(), colNames);
+      privObjects.add(privObject);
+    }
+
+    try {
+      SessionState.get().getAuthorizerV2().
+          checkPrivileges(HiveOperationType.QUERY, privObjects, privObjects, new HiveAuthzContext.Builder().build());
+    } catch (HiveException e) {
+      if (e instanceof HiveAccessControlException) {
+        return false;
+      }
+      throw e;
+    }
+    return true;
   }
 }
