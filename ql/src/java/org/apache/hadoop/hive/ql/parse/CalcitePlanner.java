@@ -158,6 +158,7 @@ import org.apache.hadoop.hive.ql.exec.TableScanOperator;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.engine.EngineEventSequence;
 import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
+import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.lib.Node;
 import org.apache.hadoop.hive.ql.log.PerfLogger;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -3208,16 +3209,17 @@ public class CalcitePlanner extends SemanticAnalyzer {
         final TableType tableType = HiveCalciteUtil.obtainTableType(tabMetaData);
 
         // 3.3 Add column info corresponding to virtual columns
-        List<VirtualColumn> virtualCols = new ArrayList<VirtualColumn>();
+        List<VirtualColumn> virtualCols = new ArrayList<>();
         if (tableType == TableType.NATIVE) {
-          Iterator<VirtualColumn> vcs = VirtualColumn.getRegistry(conf).iterator();
-          while (vcs.hasNext()) {
-            VirtualColumn vc = vcs.next();
+          virtualCols = VirtualColumn.getRegistry(conf);
+          if (AcidUtils.isNonNativeAcidTable(tabMetaData)) {
+            virtualCols.addAll(tabMetaData.getStorageHandler().acidVirtualColumns());
+          }
+          for (VirtualColumn vc : virtualCols) {
             colInfo = new ColumnInfo(vc.getName(), vc.getTypeInfo(), tableAlias, true,
                 vc.getIsHidden());
             rr.put(tableAlias, vc.getName().toLowerCase(), colInfo);
             cInfoLst.add(colInfo);
-            virtualCols.add(vc);
           }
         }
 

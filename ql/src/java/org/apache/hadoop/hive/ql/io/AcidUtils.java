@@ -3282,6 +3282,16 @@ public class AcidUtils {
     }
   }
 
+  public static boolean isNonNativeAcidTable(Table table) {
+    return table != null && table.getStorageHandler() != null &&
+        table.getStorageHandler().supportsAcidOperations() != HiveStorageHandler.AcidSupportType.NONE;
+  }
+
+  public static boolean acidTableWithoutTransactions(Table table) {
+    return table != null && table.getStorageHandler() != null &&
+        table.getStorageHandler().supportsAcidOperations() == HiveStorageHandler.AcidSupportType.WITHOUT_TRANSACTIONS;
+  }
+
   static class DirInfoValue {
     private String txnString;
     private AcidDirectory dirInfo;
