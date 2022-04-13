@@ -136,7 +136,7 @@ STAGE PLANS:
                         className: VectorSelectOperator
                         native: true
                         projectedOutputColumnNums: [7, 14, 19]
-                        selectExpressions: StringGroupColConcatStringScalar(col 13:string, val       )(children: StringScalarConcatStringGroupCol(val       , col 7:string) -> 13:string) -> 14:string, StringGroupColConcatStringScalar(col 18:string, val |)(children: StringScalarConcatStringGroupCol(val |, col 17:string)(children: StringRTrim(col 16:string)(children: StringGroupColConcatStringScalar(col 15:string, val       )(children: StringScalarConcatStringGroupCol(val       , col 7:string) -> 15:string) -> 16:string) -> 17:string) -> 18:string) -> 19:string
+                        selectExpressions: StringGroupColConcatStringScalar(col 13:string, val       )(children: StringScalarConcatStringGroupCol(val       , col 7:string) -> 13:string) -> 14:string, StringGroupColConcatStringScalar(col 18:string, val |)(children: StringScalarConcatStringGroupCol(val |, col 17:string)(children: StringRTrimCol(col 16:string)(children: StringGroupColConcatStringScalar(col 15:string, val       )(children: StringScalarConcatStringGroupCol(val       , col 7:string) -> 15:string) -> 16:string) -> 17:string) -> 18:string) -> 19:string
                     Statistics: Num rows: 1049 Data size: 487785 Basic stats: COMPLETE Column stats: COMPLETE
                     Limit
                       Number of rows: 20

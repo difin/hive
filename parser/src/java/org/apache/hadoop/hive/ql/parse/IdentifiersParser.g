@@ -249,11 +249,22 @@ sortByClause
     )
     ;
 
+// TRIM([LEADING|TRAILING|BOTH] trim_characters FROM str)
+trimFunction
+    :
+    KW_TRIM LPAREN (leading=KW_LEADING | trailing=KW_TRAILING | KW_BOTH)? (trim_characters=selectExpression)? KW_FROM (str=selectExpression) RPAREN
+    -> {$leading != null}? ^(TOK_FUNCTION {adaptor.create(Identifier, "ltrim")} $str $trim_characters?)
+    -> {$trailing != null}? ^(TOK_FUNCTION {adaptor.create(Identifier, "rtrim")} $str $trim_characters?)
+    -> ^(TOK_FUNCTION {adaptor.create(Identifier, "trim")} $str $trim_characters?)
+    ;
+
 // fun(par1, par2, par3)
 function
 @init { gParent.pushMsg("function specification", state); }
 @after { gParent.popMsg(state); }
     :
+    (trimFunction) => (trimFunction)
+    |
     functionName
     LPAREN
       (
@@ -922,6 +933,7 @@ nonReserved
     | KW_WITHIN | KW_REFRESH
     | KW_SPEC
     | KW_SYSTEM_TIME | KW_SYSTEM_VERSION
+    | KW_TRIM
 ;
 
 //The following SQL2011 reserved keywords are used as function name only, but not as identifiers.

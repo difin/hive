@@ -1546,7 +1546,7 @@ STAGE PLANS:
                         className: VectorSelectOperator
                         native: true
                         projectedOutputColumnNums: [10, 11, 14]
-                        selectExpressions: StringLTrim(col 1:string) -> 10:string, StringLTrim(col 3:varchar(20)) -> 11:string, StringGroupColEqualStringGroupColumn(col 12:string, col 13:string)(children: StringLTrim(col 1:string) -> 12:string, StringLTrim(col 3:varchar(20)) -> 13:string) -> 14:boolean
+                        selectExpressions: StringLTrimCol(col 1:string) -> 10:string, StringLTrimCol(col 3:varchar(20)) -> 11:string, StringGroupColEqualStringGroupColumn(col 12:string, col 13:string)(children: StringLTrimCol(col 1:string) -> 12:string, StringLTrimCol(col 3:varchar(20)) -> 13:string) -> 14:boolean
                     Statistics: Num rows: 1 Data size: 372 Basic stats: COMPLETE Column stats: COMPLETE
                     Limit
                       Number of rows: 1
@@ -2176,7 +2176,7 @@ STAGE PLANS:
                         className: VectorSelectOperator
                         native: true
                         projectedOutputColumnNums: [10, 11, 14]
-                        selectExpressions: StringRTrim(col 1:string) -> 10:string, StringRTrim(col 3:varchar(20)) -> 11:string, StringGroupColEqualStringGroupColumn(col 12:string, col 13:string)(children: StringRTrim(col 1:string) -> 12:string, StringRTrim(col 3:varchar(20)) -> 13:string) -> 14:boolean
+                        selectExpressions: StringRTrimCol(col 1:string) -> 10:string, StringRTrimCol(col 3:varchar(20)) -> 11:string, StringGroupColEqualStringGroupColumn(col 12:string, col 13:string)(children: StringRTrimCol(col 1:string) -> 12:string, StringRTrimCol(col 3:varchar(20)) -> 13:string) -> 14:boolean
                     Statistics: Num rows: 1 Data size: 372 Basic stats: COMPLETE Column stats: COMPLETE
                     Limit
                       Number of rows: 1
@@ -2689,7 +2689,7 @@ STAGE PLANS:
                         className: VectorSelectOperator
                         native: true
                         projectedOutputColumnNums: [10, 11, 14]
-                        selectExpressions: StringTrim(col 1:string) -> 10:string, StringTrim(col 3:varchar(20)) -> 11:string, StringGroupColEqualStringGroupColumn(col 12:string, col 13:string)(children: StringTrim(col 1:string) -> 12:string, StringTrim(col 3:varchar(20)) -> 13:string) -> 14:boolean
+                        selectExpressions: StringTrimCol(col 1:string) -> 10:string, StringTrimCol(col 3:varchar(20)) -> 11:string, StringGroupColEqualStringGroupColumn(col 12:string, col 13:string)(children: StringTrimCol(col 1:string) -> 12:string, StringTrimCol(col 3:varchar(20)) -> 13:string) -> 14:boolean
                     Statistics: Num rows: 1 Data size: 372 Basic stats: COMPLETE Column stats: COMPLETE
                     Limit
                       Number of rows: 1

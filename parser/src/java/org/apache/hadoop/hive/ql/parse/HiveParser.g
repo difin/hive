@@ -679,6 +679,9 @@ import org.apache.hadoop.hive.conf.HiveConf;
     xlateMap.put("KW_HOUR", "HOUR");
     xlateMap.put("KW_BUCKET", "BUCKET");
     xlateMap.put("KW_TRUNCATE", "TRUNCATE");
+    xlateMap.put("KW_LEADING", "LEADING");
+    xlateMap.put("KW_TRAILING", "TRAILING");
+    xlateMap.put("KW_BOTH", "BOTH");
 
     // Operators
     xlateMap.put("DOT", ".");
