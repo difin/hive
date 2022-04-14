@@ -136,8 +136,6 @@ COPY --from=atlas-base  /usr/lib/apache-atlas-hive-hook-${ATLAS_VERSION}/ /usr/l
 RUN ln -s /usr/lib/atlas/hook/hive/* /usr/lib/hive/lib/
 
 COPY --from=tez-base /usr/lib/tez /usr/lib/tez
-RUN ln -s /usr/lib/tez/*.jar /usr/lib/hive/
-RUN ln -s /usr/lib/tez/lib/*.jar /usr/lib/hive
 
 COPY --from=hive-base /usr/lib/hive /usr/lib/hive
 RUN mkdir -p /etc/hive/conf
@@ -169,7 +167,7 @@ ENV HADOOP_HOME_WARN_SUPPRESS true
 ENV HADOOP_HOME /usr/lib/hadoop
 ENV HADOOP_LIBEXEC_DIR /usr/lib/hadoop/libexec
 ENV HADOOP_COMMON_HOME /usr/lib/hadoop
-ENV TEZ_HOME /usr/lib/hive
+ENV TEZ_HOME /usr/lib/tez
 ENV HIVE_HOME /usr/lib/hive
 ENV LLAP_DAEMON_HOME /usr/lib/hive
 ENV LLAP_DAEMON_BIN_HOME /usr/lib/hive/scripts/llap/bin

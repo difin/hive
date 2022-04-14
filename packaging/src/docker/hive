@@ -229,8 +229,7 @@ if [ "$HADOOP_HOME" == "" ]; then
 fi
 
 # add distcp to classpath, hive depends on it
-# add /usr/lib/hadoop/share/hadoop/tools/lib to classpath
-for f in ${HADOOP_HOME}/share/hadoop/tools/lib/*.jar; do
+for f in ${HADOOP_HOME}/share/hadoop/tools/lib/hadoop-distcp-*.jar; do
   export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:$f;
 done
 
