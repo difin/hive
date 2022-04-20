@@ -130,7 +130,7 @@ STAGE PLANS:
                     dataColumnCount: 1
                     dataColumns: KEY.reducesinkkey0:int
                     partitionColumnCount: 0
-                    scratchColumnTypeNames: [bigint, bigint]
+                    scratchColumnTypeNames: [bigint, bigint, bigint]
             Reduce Operator Tree:
               PTF Operator
                 Function definitions:
@@ -152,6 +152,7 @@ STAGE PLANS:
                             window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                             isPivotResult: true
                 PTF Vectorization:
+                    allEvaluatorsAreStreaming: true
                     className: VectorPTFOperator
                     evaluatorClasses: [VectorPTFEvaluatorRowNumber]
                     functionInputExpressions: [null]
@@ -159,9 +160,10 @@ STAGE PLANS:
                     keyInputColumns: []
                     native: true
                     nonKeyInputColumns: []
-                    orderExpressions: [ConstantVectorExpression(val 0) -> 2:int]
+                    orderExpressions: [ConstantVectorExpression(val 0) -> 3:int]
                     outputColumns: [1]
                     outputTypes: [int]
+                    partitionExpressions: [ConstantVectorExpression(val 0) -> 2:int]
                     streamingColumns: [1]
                 Statistics: Num rows: 2 Data size: 174 Basic stats: COMPLETE Column stats: COMPLETE
                 Select Operator
@@ -310,6 +312,7 @@ STAGE PLANS:
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                               isPivotResult: true
                   PTF Vectorization:
+                      allEvaluatorsAreStreaming: true
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorRowNumber]
                       functionInputExpressions: [null]
@@ -1029,6 +1032,7 @@ STAGE PLANS:
                               window function: GenericUDAFLastValueEvaluator
                               window frame: RANGE PRECEDING(MAX)~CURRENT
                   PTF Vectorization:
+                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorLongLastValue]
                       functionInputExpressions: [col 2:tinyint]
@@ -1529,6 +1533,7 @@ STAGE PLANS:
                               window function: GenericUDAFLastValueEvaluator
                               window frame: RANGE PRECEDING(MAX)~CURRENT
                   PTF Vectorization:
+                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorLongLastValue]
                       functionInputExpressions: [col 2:int]
@@ -1686,7 +1691,7 @@ STAGE PLANS:
             Reduce Vectorization:
                 enabled: true
                 enableConditionsMet: hive.vectorized.execution.reduce.enabled IS true, hive.execution.engine tez IN [tez, spark] IS true
-                notVectorizedReason: PTF operator: first_value only UNBOUNDED start frame is supported
+                notVectorizedReason: PTF operator: first_value UNBOUNDED end frame is required for ROWS window type
                 vectorized: false
             Reduce Operator Tree:
               Select Operator
@@ -1862,7 +1867,7 @@ STAGE PLANS:
             Reduce Vectorization:
                 enabled: true
                 enableConditionsMet: hive.vectorized.execution.reduce.enabled IS true, hive.execution.engine tez IN [tez, spark] IS true
-                notVectorizedReason: PTF operator: first_value only UNBOUNDED start frame is supported
+                notVectorizedReason: PTF operator: first_value UNBOUNDED end frame is required for ROWS window type
                 vectorized: false
             Reduce Operator Tree:
               Select Operator
@@ -2038,7 +2043,7 @@ STAGE PLANS:
             Reduce Vectorization:
                 enabled: true
                 enableConditionsMet: hive.vectorized.execution.reduce.enabled IS true, hive.execution.engine tez IN [tez, spark] IS true
-                notVectorizedReason: PTF operator: last_value only UNBOUNDED start frame is supported
+                notVectorizedReason: PTF operator: last_value UNBOUNDED end frame is required for ROWS window type
                 vectorized: false
             Reduce Operator Tree:
               Select Operator
@@ -2214,7 +2219,7 @@ STAGE PLANS:
             Reduce Vectorization:
                 enabled: true
                 enableConditionsMet: hive.vectorized.execution.reduce.enabled IS true, hive.execution.engine tez IN [tez, spark] IS true
-                notVectorizedReason: PTF operator: last_value only UNBOUNDED start frame is supported
+                notVectorizedReason: PTF operator: last_value UNBOUNDED end frame is required for ROWS window type
                 vectorized: false
             Reduce Operator Tree:
               Select Operator

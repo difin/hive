@@ -37,8 +37,6 @@ import java.util.Arrays;
 public class VectorUDFDateAddScalarCol extends VectorExpression {
   private static final long serialVersionUID = 1L;
 
-  private final int colNum;
-
   private Object object;
   private long longValue = 0;
   private Timestamp timestampValue = null;
@@ -54,14 +52,10 @@ public class VectorUDFDateAddScalarCol extends VectorExpression {
 
   public VectorUDFDateAddScalarCol() {
     super();
-
-    // Dummy final assignments.
-    colNum = -1;
   }
 
   public VectorUDFDateAddScalarCol(Object object, int colNum, int outputColumnNum) {
-    super(outputColumnNum);
-    this.colNum = colNum;
+    super(colNum, outputColumnNum);
 
     this.object = object;
     if (object instanceof Long) {
@@ -90,7 +84,7 @@ public class VectorUDFDateAddScalarCol extends VectorExpression {
       super.evaluateChildren(batch);
     }
 
-    LongColumnVector inputCol = (LongColumnVector) batch.cols[this.colNum];
+    LongColumnVector inputCol = (LongColumnVector) batch.cols[this.inputColumnNum[0]];
     /* every line below this is identical for evaluateLong & evaluateString */
     final int n = inputCol.isRepeating ? 1 : batch.size;
     int[] sel = batch.selected;
@@ -257,7 +251,7 @@ public class VectorUDFDateAddScalarCol extends VectorExpression {
     } else {
       value = "unknown";
     }
-    return "val " + value + ", " + getColumnParamString(0, colNum);
+    return "val " + value + ", " + getColumnParamString(0, inputColumnNum[0]);
   }
 
   public VectorExpressionDescriptor.Descriptor getDescriptor() {

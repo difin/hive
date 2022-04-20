@@ -314,6 +314,7 @@ STAGE PLANS:
                               window function: GenericUDAFSumHiveDecimal
                               window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
                   PTF Vectorization:
+                      allEvaluatorsAreStreaming: false
                       className: VectorPTFOperator
                       evaluatorClasses: [VectorPTFEvaluatorDecimalSum]
                       functionInputExpressions: [ConvertDecimal64ToDecimal(col 1:decimal(17,2)/DECIMAL_64) -> 3:decimal(17,2)]
@@ -324,6 +325,7 @@ STAGE PLANS:
                       orderExpressions: [col 0:char(50)]
                       outputColumns: [2, 0, 1]
                       outputTypes: [decimal(27,2), char(50), decimal(17,2)]
+                      partitionExpressions: [col 0:char(50)]
                       streamingColumns: []
                   Statistics: Num rows: 1 Data size: 202 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
