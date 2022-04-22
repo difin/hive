@@ -43,7 +43,7 @@
     <checkstyle.conf.dir>${basedir}/${hive.path.to.root}/checkstyle</checkstyle.conf.dir>
 
     <!-- Test Properties -->
-    <test.extra.path></test.extra.path>
+    <test.extra.path />
     <!--suppress UnresolvedMavenProperty -->
     <test.hive.hadoop.classpath>${maven.test.classpath}</test.hive.hadoop.classpath>
     <test.log4j.scheme>file://</test.log4j.scheme>
