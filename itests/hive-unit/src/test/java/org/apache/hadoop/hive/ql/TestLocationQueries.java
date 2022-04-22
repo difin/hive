@@ -164,6 +164,7 @@ public class TestLocationQueries extends BaseTestQueries {
     TestTxnDbUtil.setConfValues(hiveConf);
     TestTxnDbUtil.cleanDb(hiveConf);
     TestTxnDbUtil.prepDb(hiveConf);
+    qt.postInit();
     qt.newSession();
     qt.addFile(qfiles[0].getPath());
     qt.clearTestSideEffects();
