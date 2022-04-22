@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.hadoop.hive.ql.QTestMetaStoreHandler;
 import org.apache.hadoop.hive.ql.QTestUtil;
 import org.junit.rules.TestRule;
@@ -35,6 +36,13 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class CliAdapter {
 
+  /**
+   * Set of tests to run forcefully in the last split.
+   * 
+   * This is a workaround for HIVE-25965. It changes the split where certain tests run thus avoiding the failure for
+   * the moment without disabling the test.
+   */
+  private static final Set<String> TESTS_FOR_LAST_SPLIT = ImmutableSet.of("load_static_ptn_into_bucketed_table");
   protected final AbstractCliConfig cliConfig;
   protected QTestMetaStoreHandler metaStoreHandler;
   boolean firstTestNotYetRun = true; // this can protect class/test level logic from each other
@@ -48,11 +56,18 @@ public abstract class CliAdapter {
   public final List<Object[]> getParameters() throws Exception {
     Set<File> f = cliConfig.getQueryFiles();
     List<Object[]> ret = new ArrayList<>();
+    List<Object[]> lastParams = new ArrayList<>();
 
     for (File file : f) {
       String label = file.getName().replaceAll("\\.[^\\.]+$", "");
-      ret.add(new Object[] { label, file });
+      Object[] test = new Object[] { label, file };
+      if (TESTS_FOR_LAST_SPLIT.contains(label)) {
+        lastParams.add(test);
+      } else {
+        ret.add(test);
+      }
     }
+    ret.addAll(lastParams);
     return ret;
   }
 
