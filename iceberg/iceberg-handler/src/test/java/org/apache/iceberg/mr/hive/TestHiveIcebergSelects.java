@@ -62,7 +62,6 @@ public class TestHiveIcebergSelects extends HiveIcebergStorageHandlerWithEngineB
   @Test
   public void testCBOWithSelectedColumnsNonOverlapJoin() throws IOException {
     shell.setHiveSessionValue("hive.cbo.enable", true);
-
     testTables.createTable(shell, "products", PRODUCT_SCHEMA, fileFormat, PRODUCT_RECORDS);
     testTables.createTable(shell, "orders", ORDER_SCHEMA, fileFormat, ORDER_RECORDS);
 
@@ -189,6 +188,7 @@ public class TestHiveIcebergSelects extends HiveIcebergStorageHandlerWithEngineB
 
   @Test
   public void testScanTableCaseInsensitive() throws IOException {
+    shell.setHiveSessionValue(InputFormatConfig.CASE_SENSITIVE, false);
     testTables.createTable(shell, "customers",
         HiveIcebergStorageHandlerTestUtils.CUSTOMER_SCHEMA_WITH_UPPERCASE, fileFormat,
         HiveIcebergStorageHandlerTestUtils.CUSTOMER_RECORDS);
