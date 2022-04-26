@@ -6579,6 +6579,13 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       Exception ex = null;
       String[] parsedDbName = parseDbName(dbname, conf);
       try {
+        if (isDatabaseRemote(dbname)) {
+          Database db = get_database_core(parsedDbName[CAT_NAME], parsedDbName[DB_NAME]);
+          return DataConnectorProviderFactory.getDataConnectorProvider(db).getTableNames();
+        }
+      } catch (Exception e) { /* ignore */ }
+      
+      try {
         ret = getMS().getAllTables(parsedDbName[CAT_NAME], parsedDbName[DB_NAME]);
         ret = FilterUtils.filterTableNamesIfEnabled(isServerFilterEnabled, filterHook,
             parsedDbName[CAT_NAME], parsedDbName[DB_NAME], ret);
