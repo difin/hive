@@ -17,6 +17,13 @@
  */
 package org.apache.hadoop.hive.metastore.utils;
 
+import com.google.common.base.Preconditions;
+import java.io.FileInputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import javax.net.ssl.SSLContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
@@ -40,10 +47,19 @@ import org.apache.hadoop.security.token.TokenSelector;
 import org.apache.zookeeper.client.ZooKeeperSaslClient;
 
 import javax.security.auth.login.AppConfigurationEntry;
+import org.apache.thrift.transport.THttpClient;
 import org.apache.thrift.transport.TSSLTransportFactory;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.ssl.DefaultHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -332,6 +348,33 @@ public class SecurityUtils {
     int bufferSize = MetastoreConf.getIntVar(conf, ConfVars.THRIFT_SOCKET_BUFFER_SIZE);
     return new TCustomSocket(sslSocket, bufferSize);
   }
+
+  public static THttpClient getThriftHttpsClient(String httpsUrl, String trustStorePath,
+      String trustStorePasswd, String trustStoreAlgorithm, String trustStoreType,
+      HttpClientBuilder underlyingHttpClientBuilder) throws TTransportException, IOException,
+      KeyStoreException, NoSuchAlgorithmException, CertificateException,
+      KeyManagementException {
+    Preconditions.checkNotNull(underlyingHttpClientBuilder, "httpClientBuilder should not be null");
+    if (trustStoreType == null || trustStoreType.isEmpty()) {
+      trustStoreType = KeyStore.getDefaultType();
+    }
+    KeyStore sslTrustStore = KeyStore.getInstance(trustStoreType);
+    try (FileInputStream fis = new FileInputStream(trustStorePath)) {
+      sslTrustStore.load(fis, trustStorePasswd.toCharArray());
+    }
+
+    SSLContext sslContext =
+        SSLContexts.custom().setTrustManagerFactoryAlgorithm(trustStoreAlgorithm).
+            loadTrustMaterial(sslTrustStore, null).build();
+    SSLConnectionSocketFactory socketFactory =
+        new SSLConnectionSocketFactory(sslContext, new DefaultHostnameVerifier(null));
+    final Registry<ConnectionSocketFactory> registry =
+        RegistryBuilder.<ConnectionSocketFactory> create().register("https", socketFactory)
+            .build();
+    underlyingHttpClientBuilder.setConnectionManager(new BasicHttpClientConnectionManager(registry));
+    return new THttpClient(httpsUrl, underlyingHttpClientBuilder.build());
+  }
+
 
   /**
    * Relogin if login user is logged in using keytab

@@ -91,6 +91,7 @@
     <zookeeper.version>3.5.5.7.2.15.0-147</zookeeper.version>
     <curator.version>4.3.0.7.2.15.0-147</curator.version>
     <cron-utils.version>9.1.6</cron-utils.version>
+    <httpcomponents.core.version>4.4.13</httpcomponents.core.version>
     <!-- Thrift properties -->
     <thrift.home>you-must-set-this-to-run-thrift</thrift.home>
     <thrift.gen.dir>${basedir}/src/gen/thrift</thrift.gen.dir>
@@ -414,6 +415,21 @@
       <artifactId>caffeine</artifactId>
       <version>${caffeine.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>${httpcomponents.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>nimbus-jose-jwt</artifactId>
+      <version>9.20</version>
+    </dependency>
+    <dependency>
+      <groupId>org.pac4j</groupId>
+      <artifactId>pac4j-core</artifactId>
+      <version>4.5.5</version>
+    </dependency>
     <!-- JDBC drivers -->
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
@@ -492,6 +508,12 @@
       <groupId>org.apache.curator</groupId>
       <artifactId>curator-test</artifactId>
       <version>${curator.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock-jre8-standalone</artifactId>
+      <version>2.32.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -866,6 +888,7 @@
             <exclude>**/gen/**</exclude>
             <exclude>**/patchprocess/**</exclude>
             <exclude>**/metastore_db/**</exclude>
+            <exclude>**/test/resources/**/*.json</exclude>
           </excludes>
         </configuration>
       </plugin>

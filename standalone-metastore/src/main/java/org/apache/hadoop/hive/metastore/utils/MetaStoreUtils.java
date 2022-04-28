@@ -241,6 +241,7 @@ public class MetaStoreUtils {
   };
 
   public static final String NO_VAL = " --- ";
+  public static final String USER_NAME_HTTP_HEADER = "x-actor-username";
 
   /**
    * Catches exceptions that can't be handled and bundles them to MetaException
@@ -2547,5 +2548,28 @@ public class MetaStoreUtils {
       return NO_VAL;
     }
     return id.substring(id.lastIndexOf('-') + 1);
+  }
+
+  /**
+   * The config parameter can be like "path", "/path", "/path/", "path/*", "/path1/path2/*" and so on.
+   * httpPath should end up as "/*", "/path/*" or "/path1/../pathN/*"
+   * @param httpPath
+   * @return
+   */
+  public static String getHttpPath(String httpPath) {
+    if (httpPath == null || httpPath.equals("")) {
+      httpPath = "/*";
+    } else {
+      if (!httpPath.startsWith("/")) {
+        httpPath = "/" + httpPath;
+      }
+      if (httpPath.endsWith("/")) {
+        httpPath = httpPath + "*";
+      }
+      if (!httpPath.endsWith("/*")) {
+        httpPath = httpPath + "/*";
+      }
+    }
+    return httpPath;
   }
 }
