@@ -1830,7 +1830,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
       optCluster.invalidateMetadataQuery();
       RelMetadataQuery.THREAD_PROVIDERS.set(JaninoRelMetadataProvider.of(mdProvider.getMetadataProvider()));
 
-      calciteGenPlan = applyMaterializedViewRewritingByText(ast, calciteGenPlan, optCluster);
+      calciteGenPlan = applyMaterializedViewRewritingByText(
+          ast, calciteGenPlan, optCluster, mdProvider.getMetadataProvider());
 
       // We need to get the ColumnAccessInfo and viewToTableSchema for views.
       HiveRelFieldTrimmer.get()
@@ -2307,7 +2308,10 @@ public class CalcitePlanner extends SemanticAnalyzer {
     }
 
     private RelNode applyMaterializedViewRewritingByText(
-        ASTNode queryToRewriteAST, RelNode originalPlan, RelOptCluster optCluster) {
+        ASTNode queryToRewriteAST,
+        RelNode originalPlan,
+        RelOptCluster optCluster,
+        RelMetadataProvider metadataProvider) {
       if (!isMaterializedViewRewritingByTextEnabled()) {
         return originalPlan;
       }
@@ -2321,7 +2325,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
                 queryToRewriteAST.getTokenStopIndex());
 
         ASTNode expandedAST = ParseUtils.parse(expandedQueryText, new Context(conf));
-        Set<TableName> tablesUsedByOriginalPlan = getTablesUsed(originalPlan);
+        Set<TableName> tablesUsedByOriginalPlan = getTablesUsed(removeSubqueries(originalPlan, metadataProvider));
         RelNode mvScan = getMaterializedViewByAST(
             expandedAST, optCluster, ANY, db, tablesUsedByOriginalPlan, getTxnMgr(), functionHelper);
         if (mvScan != null) {
