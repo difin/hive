@@ -39,6 +39,14 @@ public class DerbySQLConnectorProvider extends AbstractJDBCConnectorProvider {
     return rs;
   }
 
+  @Override protected String getCatalogName() {
+    return scoped_db;
+  }
+
+  @Override protected String getDatabaseName() {
+    return null;
+  }
+
   /**
    * Fetch a single table with the given name, returns a Hive Table object from the remote database
    * @return Table A Table object for the matching table, null otherwise.
