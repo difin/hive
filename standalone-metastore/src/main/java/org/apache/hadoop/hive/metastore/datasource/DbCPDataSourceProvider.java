@@ -57,7 +57,7 @@ public class DbCPDataSourceProvider implements DataSourceProvider {
   private static final String CONNECTION_LIFO = DBCP + ".lifo";
 
   @Override
-  public DataSource create(Configuration hdpConfig) throws SQLException {
+  public DataSource create(Configuration hdpConfig, int maxPoolSize) throws SQLException {
     LOG.debug("Creating dbcp connection pool for the MetaStore");
 
     String driverUrl = DataSourceProvider.getMetastoreJdbcDriverUrl(hdpConfig);
@@ -79,9 +79,7 @@ public class DbCPDataSourceProvider implements DataSourceProvider {
         dbcpDs.setConnectionProperties("reWriteBatchedInserts=true");
         break;
     }
-    int maxPoolSize = hdpConfig.getInt(
-            MetastoreConf.ConfVars.CONNECTION_POOLING_MAX_CONNECTIONS.getVarname(),
-            ((Long) MetastoreConf.ConfVars.CONNECTION_POOLING_MAX_CONNECTIONS.getDefaultVal()).intValue());
+
     long connectionTimeout = hdpConfig.getLong(CONNECTION_TIMEOUT_PROPERTY, 30000L);
     int connectionMaxIlde = hdpConfig.getInt(CONNECTION_MAX_IDLE_PROPERTY, GenericObjectPool.DEFAULT_MAX_IDLE);
     int connectionMinIlde = hdpConfig.getInt(CONNECTION_MIN_IDLE_PROPERTY, GenericObjectPool.DEFAULT_MIN_IDLE);
