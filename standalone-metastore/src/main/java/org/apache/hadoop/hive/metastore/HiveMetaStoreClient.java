@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.metastore;
 
+import static org.apache.hadoop.hive.common.AcidConstants.SOFT_DELETE_TABLE;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_NAME;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCatalog;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.parseDbName;
@@ -39,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -50,14 +50,12 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.lang3.tuple.Pair;
-import com.google.common.base.Preconditions;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
@@ -1452,39 +1450,42 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
 
   @Override
   public void dropDatabase(String name, boolean deleteData, boolean ignoreUnknownDb)
-      throws NoSuchObjectException, InvalidOperationException, MetaException, TException {
+      throws TException {
     dropDatabase(getDefaultCatalog(conf), name, deleteData, ignoreUnknownDb, false);
   }
 
   @Override
   public void dropDatabase(String name, boolean deleteData, boolean ignoreUnknownDb, boolean cascade)
-      throws NoSuchObjectException, InvalidOperationException, MetaException, TException {
+      throws TException {
     dropDatabase(getDefaultCatalog(conf), name, deleteData, ignoreUnknownDb, cascade);
   }
 
   @Override
-  public void dropDatabase(String catalogName, String dbName, boolean deleteData,
-                           boolean ignoreUnknownDb, boolean cascade)
-      throws NoSuchObjectException, InvalidOperationException, MetaException, TException {
+  public void dropDatabase(DropDatabaseRequest req)
+      throws TException {
     try {
-      getDatabase(catalogName, dbName);
+      getDatabase(req.getCatalogName(), req.getName());
     } catch (NoSuchObjectException e) {
-      if (!ignoreUnknownDb) {
+      if (!req.isIgnoreUnknownDb()) {
         throw e;
       }
       return;
     }
 
-    String dbNameWithCatalog = prependCatalogToDbName(catalogName, dbName, conf);
+    String dbNameWithCatalog = prependCatalogToDbName(req.getCatalogName(), req.getName(), conf);
 
-    if (cascade) {
+    if (req.isCascade()) {
       // Note that this logic may drop some of the tables of the database
       // even if the drop database fail for any reason
       // TODO: Fix this
-      List<String> materializedViews = getTables(dbName, ".*", TableType.MATERIALIZED_VIEW);
+      List<String> materializedViews = getTables(req.getName(), ".*", TableType.MATERIALIZED_VIEW);
       for (String table : materializedViews) {
         // First we delete the materialized views
-        dropTable(dbName, table, deleteData, true);
+        Table mview = getTable(getDefaultCatalog(conf), req.getName(), table);
+        boolean isSoftDelete = req.isSoftDelete() && Boolean.parseBoolean(
+          mview.getParameters().getOrDefault(SOFT_DELETE_TABLE, "false"));
+        mview.setTxnId(req.getTxnId());
+        dropTable(mview, req.isDeleteData() && !isSoftDelete, true, false);
       }
 
       /**
@@ -1495,22 +1496,22 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
        * {@link #dropTable(String, String, boolean, boolean, EnvironmentContext) dropTable} call to
        * ensure transactionality.
        */
-      List<String> tableNameList = getAllTables(dbName);
+      List<String> tableNameList = getAllTables(req.getName());
       int tableCount = tableNameList.size();
       int maxBatchSize = MetastoreConf.getIntVar(conf, ConfVars.BATCH_RETRIEVE_MAX);
-      LOG.debug("Selecting dropDatabase method for " + dbName + " (" + tableCount + " tables), " +
-                    ConfVars.BATCH_RETRIEVE_MAX.getVarname() + "=" + maxBatchSize);
+      LOG.debug("Selecting dropDatabase method for " + req.getName() + " (" + tableCount + " tables), " +
+             ConfVars.BATCH_RETRIEVE_MAX.getVarname() + "=" + maxBatchSize);
 
       if (tableCount > maxBatchSize) {
         LOG.debug("Dropping database in a per table batch manner.");
-        dropDatabaseCascadePerTable(catalogName, dbName, tableNameList, deleteData, maxBatchSize);
+        dropDatabaseCascadePerTable(req, tableNameList, maxBatchSize);
       } else {
         LOG.debug("Dropping database in a per DB manner.");
-        dropDatabaseCascadePerDb(catalogName, dbName, tableNameList, deleteData);
+        dropDatabaseCascadePerDb(req, tableNameList);
       }
 
     } else {
-      client.drop_database(dbNameWithCatalog, deleteData, cascade);
+      client.drop_database(dbNameWithCatalog, req.isDeleteData(), req.isCascade());
     }
   }
 
@@ -1529,43 +1530,50 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
    * @param maxBatchSize
    * @throws TException
    */
-  private void dropDatabaseCascadePerTable(String catName, String dbName, List<String> tableList,
-                                           boolean deleteData, int maxBatchSize) throws TException {
-    String dbNameWithCatalog = prependCatalogToDbName(catName, dbName, conf);
-    for (Table table : new TableIterable(this, catName, dbName, tableList, maxBatchSize)) {
+  private void dropDatabaseCascadePerTable(DropDatabaseRequest req, List<String> tableList, int maxBatchSize) 
+      throws TException {
+    String dbNameWithCatalog = prependCatalogToDbName(req.getCatalogName(), req.getName(), conf);
+    for (Table table : new TableIterable(
+        this, req.getCatalogName(), req.getName(), tableList, maxBatchSize)) {
       boolean success = false;
       HiveMetaHook hook = getHook(table);
-      if (hook == null) {
-        continue;
-      }
       try {
-        hook.preDropTable(table);
-        client.drop_table_with_environment_context(dbNameWithCatalog, table.getTableName(), deleteData, null);
-        hook.commitDropTable(table, deleteData);
+        if (hook != null) {
+          hook.preDropTable(table);
+        }
+        boolean isSoftDelete = req.isSoftDelete() && Boolean.parseBoolean(
+          table.getParameters().getOrDefault(SOFT_DELETE_TABLE, "false"));
+        EnvironmentContext context = null;
+        if (req.isSetTxnId()) {
+          context = new EnvironmentContext();
+          context.putToProperties("txnId", String.valueOf(req.getTxnId()));
+          req.setDeleteManagedDir(false);
+        }
+        client.drop_table_with_environment_context(dbNameWithCatalog, table.getTableName(), 
+            req.isDeleteData() && !isSoftDelete, context);
+        if (hook != null) {
+          hook.commitDropTable(table, req.isDeleteData());
+        }
         success = true;
       } finally {
-        if (!success) {
+        if (!success && hook != null) {
           hook.rollbackDropTable(table);
         }
       }
     }
-    client.drop_database(dbNameWithCatalog, deleteData, true);
+    client.drop_database_req(req);
   }
 
   /**
    * Handles dropDatabase by invoking drop_database in HMS.
    * Useful when table list in DB can fit in memory, it will retrieve all tables at once and
    * call drop_database once. Also handles drop_table hooks.
-   * @param catName
-   * @param dbName
+   * @param req
    * @param tableList
-   * @param deleteData
    * @throws TException
    */
-  private void dropDatabaseCascadePerDb(String catName, String dbName, List<String> tableList,
-                                        boolean deleteData) throws TException {
-    String dbNameWithCatalog = prependCatalogToDbName(catName, dbName, conf);
-    List<Table> tables = getTableObjectsByName(catName, dbName, tableList);
+  private void dropDatabaseCascadePerDb(DropDatabaseRequest req, List<String> tableList) throws TException {
+    List<Table> tables = getTableObjectsByName(req.getCatalogName(), req.getName(), tableList);
     boolean success = false;
     try {
       for (Table table : tables) {
@@ -1575,13 +1583,13 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
         }
         hook.preDropTable(table);
       }
-      client.drop_database(dbNameWithCatalog, deleteData, true);
+      client.drop_database_req(req);
       for (Table table : tables) {
         HiveMetaHook hook = getHook(table);
         if (hook == null) {
           continue;
         }
-        hook.commitDropTable(table, deleteData);
+        hook.commitDropTable(table, req.isDeleteData());
       }
       success = true;
     } finally {

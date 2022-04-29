@@ -1385,7 +1385,13 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           // It might just be the default, in which case we can drop that one if it's empty
           if (allDbs.size() == 1 && allDbs.get(0).equals(DEFAULT_DATABASE_NAME)) {
             try {
-              drop_database_core(ms, catName, DEFAULT_DATABASE_NAME, true, false);
+              DropDatabaseRequest req = new DropDatabaseRequest();
+              req.setName(DEFAULT_DATABASE_NAME);
+              req.setCatalogName(catName);
+              req.setDeleteData(true);
+              req.setCascade(false);
+
+              drop_database_core(ms, req);
             } catch (InvalidOperationException e) {
               // This means there are tables of something in the database
               throw new InvalidOperationException("There are still objects in the default " +
@@ -1778,22 +1784,20 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
     }
 
-    private void drop_database_core(RawStore ms, String catName,
-        final String name, final boolean deleteData, final boolean cascade)
-        throws NoSuchObjectException, InvalidOperationException, MetaException,
-        IOException, InvalidObjectException, InvalidInputException {
+    private void drop_database_core(RawStore ms, DropDatabaseRequest req) throws NoSuchObjectException,
+        InvalidOperationException, MetaException, IOException, InvalidObjectException, InvalidInputException {
       boolean success = false;
       Database db = null;
       List<Path> tablePaths = new ArrayList<>();
       List<Path> partitionPaths = new ArrayList<>();
       Map<String, String> transactionalListenerResponses = Collections.emptyMap();
-      if (name == null) {
+      if (req.getName() == null) {
         throw new MetaException("Database name cannot be null.");
       }
       boolean isReplicated = false;
       try {
         ms.openTransaction();
-        db = ms.getDatabase(catName, name);
+        db = ms.getDatabase(req.getCatalogName(), req.getName());
         isReplicated = isDbReplicationTarget(db);
 
         if (!isInTest && ReplChangeManager.isSourceOfReplication(db)) {
@@ -1801,18 +1805,18 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
 
         firePreEvent(new PreDropDatabaseEvent(db, this));
-        String catPrependedName = MetaStoreUtils.prependCatalogToDbName(catName, name, conf);
+        String catPrependedName = MetaStoreUtils.prependCatalogToDbName(req.getCatalogName(), req.getName(), conf);
 
         Set<String> uniqueTableNames = new HashSet<>(get_all_tables(catPrependedName));
         List<String> allFunctions = get_functions(catPrependedName, "*");
-        ListStoredProcedureRequest request = new ListStoredProcedureRequest(catName);
-        request.setDbName(name);
+        ListStoredProcedureRequest request = new ListStoredProcedureRequest(req.getCatalogName());
+        request.setDbName(req.getName());
         List<String> allProcedures = get_all_stored_procedures(request);
-        ListPackageRequest pkgRequest = new ListPackageRequest(catName);
-        pkgRequest.setDbName(name);
+        ListPackageRequest pkgRequest = new ListPackageRequest(req.getCatalogName());
+        pkgRequest.setDbName(req.getName());
         List<String> allPackages = get_all_packages(pkgRequest);
 
-        if (!cascade) {
+        if (!req.isCascade()) {
           if (!uniqueTableNames.isEmpty()) {
             throw new InvalidOperationException(
                 "Database " + db.getName() + " is not empty. One or more tables exist.");
@@ -1849,17 +1853,17 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
 
         for (String procName : allProcedures) {
-          drop_stored_procedure(new StoredProcedureRequest(catName, name, procName));
+          drop_stored_procedure(new StoredProcedureRequest(req.getCatalogName(), req.getName(), procName));
         }
         for (String pkgName : allPackages) {
-          drop_package(new DropPackageRequest(catName, name, pkgName));
+          drop_package(new DropPackageRequest(req.getCatalogName(), req.getName(), pkgName));
         }
 
         final int tableBatchSize = MetastoreConf.getIntVar(conf,
             ConfVars.BATCH_RETRIEVE_MAX);
 
         // First pass will drop the materialized views
-        List<String> materializedViewNames = getTablesByTypeCore(catName, name, ".*",
+        List<String> materializedViewNames = getTablesByTypeCore(req.getCatalogName(), req.getName(), ".*",
             TableType.MATERIALIZED_VIEW.toString());
         int startIndex = 0;
         // retrieve the tables from the metastore in batches to alleviate memory constraints
@@ -1868,7 +1872,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
           List<Table> materializedViews;
           try {
-            materializedViews = ms.getTableObjectsByName(catName, name, materializedViewNames.subList(startIndex, endIndex));
+            materializedViews = ms.getTableObjectsByName(req.getCatalogName(), req.getName(), materializedViewNames.subList(startIndex, endIndex));
           } catch (UnknownDBException e) {
             throw new MetaException(e.getMessage());
           }
@@ -1889,7 +1893,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
                 }
               }
               // Drop the materialized view but not its data
-              drop_table(name, materializedView.getTableName(), false);
+              drop_table(req.getName(), materializedView.getTableName(), false);
               // Remove from all tables
               uniqueTableNames.remove(materializedView.getTableName());
             }
@@ -1900,13 +1904,14 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         // drop tables before dropping db
         List<String> allTables = new ArrayList<>(uniqueTableNames);
         startIndex = 0;
+        
         // retrieve the tables from the metastore in batches to alleviate memory constraints
         while (startIndex < allTables.size()) {
           int endIndex = Math.min(startIndex + tableBatchSize, allTables.size());
 
           List<Table> tables;
           try {
-            tables = ms.getTableObjectsByName(catName, name, allTables.subList(startIndex, endIndex));
+            tables = ms.getTableObjectsByName(req.getCatalogName(), req.getName(), allTables.subList(startIndex, endIndex));
           } catch (UnknownDBException e) {
             throw new MetaException(e.getMessage());
           }
@@ -1917,7 +1922,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
               // If the table is not external and it might not be in a subdirectory of the database
               // add it's locations to the list of paths to delete
               Path tablePath = null;
-              boolean tableDataShouldBeDeleted = checkTableDataShouldBeDeleted(table, deleteData);
+              boolean isSoftDelete = req.isSoftDelete() && TxnUtils.isTransactionalTable(table)
+                && Boolean.parseBoolean(table.getParameters().getOrDefault(SOFT_DELETE_TABLE, "false"));
+
+              boolean tableDataShouldBeDeleted = checkTableDataShouldBeDeleted(table, req.isDeleteData())
+                && !isSoftDelete;
               if (table.getSd().getLocation() != null && tableDataShouldBeDeleted) {
                 tablePath = wh.getDnsPath(new Path(table.getSd().getLocation()));
                 if (!wh.isWritable(tablePath.getParent())) {
@@ -1933,32 +1942,38 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
               // For each partition in each table, drop the partitions and get a list of
               // partitions' locations which might need to be deleted
-              partitionPaths = dropPartitionsAndGetLocations(ms, catName, name, table.getTableName(),
+              partitionPaths = dropPartitionsAndGetLocations(ms, req.getCatalogName(), req.getName(), table.getTableName(),
                   tablePath, tableDataShouldBeDeleted);
 
+              EnvironmentContext context = null;
+              if (isSoftDelete) {
+                context = new EnvironmentContext();
+                context.putToProperties("txnId", String.valueOf(req.getTxnId()));
+                req.setDeleteManagedDir(false);
+              }
               // Drop the table but not its data
-              drop_table(MetaStoreUtils.prependCatalogToDbName(table.getCatName(), table.getDbName(), conf),
-                  table.getTableName(), false);
+              drop_table_with_environment_context(
+                  MetaStoreUtils.prependCatalogToDbName(table.getCatName(), table.getDbName(), conf),
+                  table.getTableName(), false, context );
             }
           }
 
           startIndex = endIndex;
         }
 
-        if (ms.dropDatabase(catName, name)) {
+        if (ms.dropDatabase(req.getCatalogName(), req.getName())) {
           if (!transactionalListeners.isEmpty()) {
             transactionalListenerResponses =
                 MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
                                                       EventType.DROP_DATABASE,
                                                       new DropDatabaseEvent(db, true, this, isReplicated));
           }
-
           success = ms.commitTransaction();
         }
       } finally {
         if (!success) {
           ms.rollbackTransaction();
-        } else if (deleteData) {
+        } else if (req.isDeleteData()) {
           // Delete the data in the partitions which have other locations
           deletePartitionData(partitionPaths, false, db);
           // Delete the data in the tables which have other locations
@@ -1980,17 +1995,20 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             final Database dbFinal = db;
             final Path path = (dbFinal.getManagedLocationUri() != null) ?
                 new Path(dbFinal.getManagedLocationUri()) : wh.getDatabaseManagedPath(dbFinal);
-            try {
-              Boolean deleted = UserGroupInformation.getLoginUser().doAs(new PrivilegedExceptionAction<Boolean>() {
-                @Override public Boolean run() throws MetaException {
-                  return wh.deleteDir(path, true, dbFinal);
+            if (req.isDeleteManagedDir()) {
+              try {
+                Boolean deleted = UserGroupInformation.getLoginUser().doAs(new PrivilegedExceptionAction<Boolean>() {
+                  @Override
+                  public Boolean run() throws MetaException {
+                    return wh.deleteDir(path, true, dbFinal);
+                  }
+                });
+                if (!deleted) {
+                  LOG.error("Failed to delete database folder " + db.getLocationUri());
                 }
-              });
-              if (!deleted) {
-                LOG.error("Failed to delete database folder " + db.getLocationUri());
+              } catch (Exception e) {
+                LOG.error("Failed to delete database's managed warehouse directory: " + path + " " + e.getMessage());
               }
-            } catch (Exception e) {
-              LOG.error("Failed to delete database's managed warehouse directory: " + path + " " + e.getMessage());
             }
 
             try {
@@ -2022,20 +2040,32 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     @Override
     public void drop_database(final String dbName, final boolean deleteData, final boolean cascade)
         throws NoSuchObjectException, InvalidOperationException, MetaException {
-      startFunction("drop_database", ": " + dbName);
       String[] parsedDbName = parseDbName(dbName, conf);
-      if (DEFAULT_CATALOG_NAME.equalsIgnoreCase(parsedDbName[CAT_NAME]) &&
-          DEFAULT_DATABASE_NAME.equalsIgnoreCase(parsedDbName[DB_NAME])) {
+
+      DropDatabaseRequest req = new DropDatabaseRequest();
+      req.setName(parsedDbName[DB_NAME]);
+      req.setCatalogName(parsedDbName[CAT_NAME]);
+      req.setDeleteData(deleteData);
+      req.setCascade(cascade);
+      drop_database_req(req);
+    }
+
+    @Override
+    public void drop_database_req(final DropDatabaseRequest req)
+        throws NoSuchObjectException, InvalidOperationException, MetaException {
+      startFunction("drop_database", ": " + req.getName());
+      
+      if (DEFAULT_CATALOG_NAME.equalsIgnoreCase(req.getCatalogName())
+            && DEFAULT_DATABASE_NAME.equalsIgnoreCase(req.getName())) {
         endFunction("drop_database", false, null);
         throw new MetaException("Can not drop " + DEFAULT_DATABASE_NAME + " database in catalog "
-            + DEFAULT_CATALOG_NAME);
+          + DEFAULT_CATALOG_NAME);
       }
 
       boolean success = false;
       Exception ex = null;
       try {
-        drop_database_core(getMS(), parsedDbName[CAT_NAME], parsedDbName[DB_NAME], deleteData,
-            cascade);
+        drop_database_core(getMS(), req);
         success = true;
       } catch (NoSuchObjectException|InvalidOperationException|MetaException e) {
         ex = e;
@@ -2047,8 +2077,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         endFunction("drop_database", success, ex);
       }
     }
-
-
+    
     @Override
     public List<String> get_databases(final String pattern) throws MetaException {
       startFunction("get_databases", ": " + pattern);

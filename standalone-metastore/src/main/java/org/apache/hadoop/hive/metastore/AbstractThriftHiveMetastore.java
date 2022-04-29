@@ -102,6 +102,12 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
+    public void drop_database_req(final DropDatabaseRequest req)
+            throws NoSuchObjectException, InvalidOperationException, MetaException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public List<String> get_databases(String pattern) throws MetaException, TException {
         throw new UnsupportedOperationException("this method is not supported");
     }

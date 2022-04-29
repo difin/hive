@@ -290,7 +290,7 @@ public class TestDatabases extends MetaStoreClientTest {
   @Test(expected = MetaException.class)
   public void testDropDatabaseNullName() throws Exception {
     // Missing database in the query
-    client.dropDatabase(null);
+    client.dropDatabase((String) null);
   }
 
   @Test(expected = MetaException.class)
