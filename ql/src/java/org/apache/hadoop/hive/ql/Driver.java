@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import org.apache.hadoop.conf.Configurable;
@@ -167,10 +168,6 @@ public class Driver implements IDriver {
     driverContext = new DriverContext(queryState, queryInfo, userName, new HookRunner(queryState.getConf(), CONSOLE),
         txnManager);
     validTxnManager = new ValidTxnManager(this, driverContext);
-
-    if (SessionState.get() != null) {
-      SessionState.get().addQueryState(getConf().get(HiveConf.ConfVars.HIVEQUERYID.varname), queryState);
-    }
   }
 
   /**
@@ -280,6 +277,11 @@ public class Driver implements IDriver {
     context.setHiveTxnManager(driverContext.getTxnManager());
     context.setStatsSource(driverContext.getStatsSource());
     context.setHDFSCleanup(true);
+
+    if (SessionState.get() != null) {
+      QueryState queryState = getQueryState();
+      SessionState.get().addQueryState(queryState.getQueryId(), queryState);
+    }
   }
 
   private void setQueryId() {
@@ -821,11 +823,6 @@ public class Driver implements IDriver {
         releaseResources();
       }
 
-      if (SessionState.get() != null) {
-        // Remove any query state reference from the session state
-        SessionState.get().removeQueryState(getConf().get(HiveConf.ConfVars.HIVEQUERYID.varname));
-      }
-
       driverState.lock();
       try {
         driverState.executionFinished(isFinishedWithError);
@@ -1049,6 +1046,18 @@ public class Driver implements IDriver {
           context.setHiveLocks(null);
         }
         context = null;
+      }
+
+      if (SessionState.get() != null) {
+        QueryState queryState = getQueryState();
+        // If the driver object is reused for several queries, make sure we empty the HMS query cache
+        Map<Object, Object> queryCache = SessionState.get().getQueryCache(queryState.getQueryId());
+        if (queryCache != null) {
+          queryCache.clear();
+        }
+        queryState.disableHMSCache();
+        // Remove any query state reference from the session state
+        SessionState.get().removeQueryState(queryState.getQueryId());
       }
     } catch (Exception e) {
       LOG.debug("Exception while clearing the context ", e);
