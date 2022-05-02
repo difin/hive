@@ -1916,13 +1916,13 @@ JOIN
 WHERE
   SE.SCHEDULED_QUERY_ID=SQ.SCHEDULED_QUERY_ID;
 
-SELECT 'Upgrading MetaStore schema from 3.1.3000 to 3.1.3000.7.2.15.0-Update2';
+SELECT 'Upgrading MetaStore schema from 3.1.3000 to 3.1.3000.7.2.15.0-Update3';
 
 USE SYS;
 
-CREATE OR REPLACE VIEW `CDH_VERSION` AS SELECT 1 AS `VER_ID`, '3.1.3000.7.2.15.0-Update2' AS `SCHEMA_VERSION`,
-  'Hive release version 3.1.3000 for CDH 7.2.15.0-Update2' AS `VERSION_COMMENT`;
+CREATE OR REPLACE VIEW `CDH_VERSION` AS SELECT 1 AS `VER_ID`, '3.1.3000.7.2.15.0-Update3' AS `SCHEMA_VERSION`,
+  'Hive release version 3.1.3000 for CDH 7.2.15.0-Update3' AS `VERSION_COMMENT`;
 
-SELECT 'Finished initializing schema to 3.1.3000.7.2.15.0-Update2';
+SELECT 'Finished initializing schema to 3.1.3000.7.2.15.0-Update3';
 
 

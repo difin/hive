@@ -1,4 +1,4 @@
-SELECT 'Upgrading MetaStore schema from 3.1.3000.7.2.15.0-Update1 to 3.1.3000.7.2.15.0-Update2';
+SELECT 'Upgrading MetaStore schema from 3.1.3000.7.2.15.0-Update2 to 3.1.3000.7.2.15.0-Update3';
 
 USE SYS;
 
