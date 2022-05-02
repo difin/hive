@@ -157,11 +157,16 @@ public class Driver implements IDriver {
     this(queryState, userName, queryInfo, null);
   }
 
-  public Driver(QueryState queryState, String userName, QueryInfo queryInfo, HiveTxnManager txnManager,
-      ValidWriteIdList compactionWriteIds, long compactorTxnId) {
-    this(queryState, userName, queryInfo, txnManager);
+  public Driver(QueryState queryState, String userName, ValidWriteIdList compactionWriteIds,
+                long compactorTxnId) {
+    this(queryState, userName);
     driverContext.setCompactionWriteIds(compactionWriteIds);
     driverContext.setCompactorTxnId(compactorTxnId);
+  }
+
+  public Driver(QueryState queryState, String userName, long analyzeTableWriteId) {
+    this(queryState, userName);
+    driverContext.setAnalyzeTableWriteId(analyzeTableWriteId);
   }
 
   public Driver(QueryState queryState, String userName, QueryInfo queryInfo, HiveTxnManager txnManager) {
@@ -370,6 +375,14 @@ public class Driver implements IDriver {
     }
   }
 
+  private void allocateWriteIdForAcidAnalyzeTable() throws LockException {
+    if (driverContext.getPlan().getAcidAnalyzeTable() != null) {
+      Table table = driverContext.getPlan().getAcidAnalyzeTable().getTable();
+      driverContext.getTxnManager().setTableWriteId(
+          table.getDbName(), table.getTableName(), driverContext.getAnalyzeTableWriteId());
+    }
+  }
+
   /**
    * Acquire read and write locks needed by the statement. The list of objects to be locked are
    * obtained from the inputs and outputs populated by the compiler.  Locking strategy depends on
@@ -394,12 +407,7 @@ public class Driver implements IDriver {
       String userFromUGI = DriverUtils.getUserFromUGI(driverContext);
       driverContext.getQueryState().disableHMSCache();
       setWriteIdForAcidFileSinks();
-
-      if (driverContext.getPlan().getAcidAnalyzeTable() != null) {
-        // Allocate write ID for the table being analyzed.
-        Table t = driverContext.getPlan().getAcidAnalyzeTable().getTable();
-        driverContext.getTxnManager().getTableWriteId(t.getDbName(), t.getTableName());
-      }
+      allocateWriteIdForAcidAnalyzeTable();
 
       DDLDescWithWriteId acidDdlDesc = driverContext.getPlan().getAcidDdlDesc();
       boolean hasAcidDdl = acidDdlDesc != null && acidDdlDesc.mayNeedWriteId();

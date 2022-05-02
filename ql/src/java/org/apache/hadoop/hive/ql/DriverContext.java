@@ -74,6 +74,7 @@ public class DriverContext {
   private CacheEntry usedCacheEntry;
   private ValidWriteIdList compactionWriteIds = null;
   private long compactorTxnId = 0;
+  private long analyzeTableWriteId = 0;
 
   private Context backupContext = null;
   private boolean retrial = false;
@@ -223,6 +224,14 @@ public class DriverContext {
 
   public void setCompactorTxnId(long compactorTxnId) {
     this.compactorTxnId = compactorTxnId;
+  }
+
+  public long getAnalyzeTableWriteId() {
+    return analyzeTableWriteId;
+  }
+
+  public void setAnalyzeTableWriteId(long analyzeTableWriteId) {
+    this.analyzeTableWriteId = analyzeTableWriteId;
   }
 
   public Context getBackupContext() {
