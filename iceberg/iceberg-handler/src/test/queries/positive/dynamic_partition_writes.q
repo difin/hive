@@ -4,6 +4,8 @@
 --! qt:replace:/((ORC|PARQUET|AVRO)\s+\d+\s+)\d+/$1#Masked#/
 --! qt:replace:/(\}\s+\d\s+)\d+(\s+\{)/$1#Masked#$2/
 
+set hive.vectorized.execution.enabled=false;
+
 drop table if exists tbl_src;
 drop table if exists tbl_target_identity;
 drop table if exists tbl_target_bucket;
@@ -31,7 +33,7 @@ create external table tbl_target_mixed (a int, ccy string, c bigint) partitioned
 explain insert into table tbl_target_mixed select * from tbl_src;
 insert into table tbl_target_mixed select * from tbl_src;
 select * from tbl_target_mixed order by a, ccy;
-select * from default.tbl_target_mixed.partitions;
+select * from default.tbl_target_mixed.partitions order by `partition`;
 select * from default.tbl_target_mixed.files;
 
 --1 of 2 partition cols is folded with constant - should still sort
