@@ -191,15 +191,21 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.hive</groupId>
-                <artifactId>hive-iceberg-catalog</artifactId>
+                <artifactId>hive-standalone-metastore</artifactId>
                 <classifier>tests</classifier>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.hive</groupId>
-                <artifactId>hive-standalone-metastore</artifactId>
+                <artifactId>hive-iceberg-catalog</artifactId>
                 <classifier>tests</classifier>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.iceberg</groupId>
+                <artifactId>iceberg-core</artifactId>
+                <classifier>tests</classifier>
+                <version>${iceberg.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
