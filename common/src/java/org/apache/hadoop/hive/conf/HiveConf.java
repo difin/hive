@@ -4667,7 +4667,7 @@ public class HiveConf extends Configuration {
     HIVE_ACID_DIRECT_INSERT_ENABLED("hive.acid.direct.insert.enabled", true,
         "Enable writing the data files directly to the table's final destination instead of the staging directory."
         + "This optimization only applies on INSERT operations on ACID tables."),
-    HIVE_ACID_DIRECT_UPDATE_AND_DELETE_ENABLED("hive.acid.direct.update.and.delete.enabled", false,
+    HIVE_ACID_DIRECT_UPDATE_AND_DELETE_ENABLED("hive.acid.direct.update.and.delete.enabled", true,
             "Enable writing the data files directly to the table's final destination instead of the staging directory."
             + "This optimization only applies on UPDATE and DELETE operations on ACID tables."),
     // role names are case-insensitive
