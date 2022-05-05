@@ -24,7 +24,7 @@ public class Oracle extends DatabaseRule {
 
   @Override
   public String getDockerImageName() {
-    return "orangehrm/oracle-xe-11g";
+    return EXTERNAL_DB_DOCKER_PREFIX + "orangehrm/oracle-xe-11g";
   }
 
   @Override

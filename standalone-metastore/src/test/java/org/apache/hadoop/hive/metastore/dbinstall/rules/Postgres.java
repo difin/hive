@@ -23,7 +23,7 @@ package org.apache.hadoop.hive.metastore.dbinstall.rules;
 public class Postgres extends DatabaseRule {
   @Override
   public String getDockerImageName() {
-    return "postgres:11.6";
+    return EXTERNAL_DB_DOCKER_PREFIX + "postgres:11.6";
   }
 
   @Override

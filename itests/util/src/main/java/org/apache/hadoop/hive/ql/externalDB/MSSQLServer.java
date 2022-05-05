@@ -41,7 +41,7 @@ public class MSSQLServer extends AbstractExternalDB {
 
   @Override
   public String getDockerImageName() {
-    return "mcr.microsoft.com/mssql/server:2019-latest";
+    return EXTERNAL_DB_DOCKER_PREFIX + "mssql/server:2019-latest";
   }
 
   @Override

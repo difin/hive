@@ -44,6 +44,7 @@ public abstract class AbstractExternalDB {
     protected static final Logger LOG = LoggerFactory.getLogger(AbstractExternalDB.class);
 
     protected static final String dbName = "qtestDB";
+    protected static final String EXTERNAL_DB_DOCKER_PREFIX = "docker-private.infra.cloudera.com/cloudera_thirdparty/";
 
     private static final int MAX_STARTUP_WAIT = 5 * 60 * 1000;
 

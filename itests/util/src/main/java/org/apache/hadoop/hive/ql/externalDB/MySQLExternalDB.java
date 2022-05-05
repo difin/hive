@@ -42,7 +42,9 @@ public class MySQLExternalDB extends AbstractExternalDB {
         return "com.mysql.jdbc.Driver";
     }
 
-    public String getDockerImageName() { return "mysql:5.7"; }
+    public String getDockerImageName() {
+      return EXTERNAL_DB_DOCKER_PREFIX + "mysql:5.7";
+    }
 
     public String[] getDockerAdditionalArgs() {
         return new String[] {"-p", "3306:3306",

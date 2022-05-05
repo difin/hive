@@ -40,7 +40,7 @@ public class Oracle extends AbstractExternalDB {
 
   @Override
   protected String getDockerImageName() {
-    return "pvargacl/oracle-xe-18.4.0";
+    return EXTERNAL_DB_DOCKER_PREFIX + "pvargacl/oracle-xe-18.4.0";
   }
 
   @Override

@@ -35,7 +35,7 @@ public class PostgresExternalDB extends AbstractExternalDB {
     }
 
     public String getDockerImageName() {
-        return "postgres:9.3";
+        return EXTERNAL_DB_DOCKER_PREFIX + "postgres:9.3";
     }
 
     public String[] getDockerAdditionalArgs() {
