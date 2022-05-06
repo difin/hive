@@ -71,15 +71,6 @@ create table if not exists flights (
 partitioned by (year int)
 stored as orc;
 
-load data inpath '${datapath}/airline_ontime_orc.db/flights/year=1995' into table flights partition (year=1995);
-load data inpath '${datapath}/airline_ontime_orc.db/flights/year=1996' into table flights partition (year=1996);
-load data inpath '${datapath}/airline_ontime_orc.db/flights/year=1997' into table flights partition (year=1997);
-load data inpath '${datapath}/airline_ontime_orc.db/flights/year=1998' into table flights partition (year=1998);
-load data inpath '${datapath}/airline_ontime_orc.db/flights/year=1999' into table flights partition (year=1999);
-load data inpath '${datapath}/airline_ontime_orc.db/flights/year=2000' into table flights partition (year=2000);
-load data inpath '${datapath}/airline_ontime_orc.db/flights/year=2001' into table flights partition (year=2001);
-load data inpath '${datapath}/airline_ontime_orc.db/flights/year=2002' into table flights partition (year=2002);
-load data inpath '${datapath}/airline_ontime_orc.db/flights/year=2003' into table flights partition (year=2003);
 load data inpath '${datapath}/airline_ontime_orc.db/flights/year=2004' into table flights partition (year=2004);
 load data inpath '${datapath}/airline_ontime_orc.db/flights/year=2005' into table flights partition (year=2005);
 load data inpath '${datapath}/airline_ontime_orc.db/flights/year=2006' into table flights partition (year=2006);
