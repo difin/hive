@@ -168,4 +168,11 @@ public interface HiveMetaHook {
     // Do nothing
   }
 
+  /**
+   * Returns true if the HMS table should be created by the implementing class.
+   * @return
+   */
+  default boolean createHMSTableInHook() {
+    return false;
+  }
 }
