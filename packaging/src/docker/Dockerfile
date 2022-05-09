@@ -39,16 +39,15 @@ COPY maven/apache-hive-${CDH_VERSION}-bin /usr/lib/hive/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi7/ubi:latest as hive
+FROM registry.access.redhat.com/ubi8/ubi:latest as hive
 # setup os and install packages
-RUN curl -o /etc/yum.repos.d/rhel7_mirrors.repo http://mirror.infra.cloudera.com/repos/rhel/server/7/7.8/rhel7.8_cldr_mirrors.repo
+RUN curl -o /etc/yum.repos.d/rhel8_mirrors.repo http://mirror.infra.cloudera.com/repos/rhel/server/8/8.4/rhel8.4_cldr_mirrors.repo
 # install debugging tools and other dependencies
+RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN yum -y update && \
   yum install -y java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop && \
   yum clean all && \
   rm -rf /var/cache/yum
-RUN yum-config-manager --save --setopt=ubi-server-rhscl-7-rpms.skip_if_unavailable=true
-RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 # add NOTICES directory
 ADD /notices-files /NOTICES
