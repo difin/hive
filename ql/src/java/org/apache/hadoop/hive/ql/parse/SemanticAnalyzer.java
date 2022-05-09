@@ -60,6 +60,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
@@ -7099,7 +7100,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         partnCols = getPartitionColsFromBucketCols(dest, qb, dest_tab, table_desc, input, false);
       }
     } else {
-      if (updating(dest) || deleting(dest)) {
+      // Non-native acid tables should handle their own bucketing for updates/deletes
+      if ((updating(dest) || deleting(dest)) && !AcidUtils.isNonNativeAcidTable(dest_tab)) {
         partnCols = getPartitionColsFromBucketColsForUpdateDelete(input, true);
         enforceBucketing = true;
       }
@@ -7498,7 +7500,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       input = genConstraintsPlan(dest, qb, input);
 
       if (!qb.getIsQuery()) {
-        input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx);
+        input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx, destinationTable);
       }
 
       if (destinationTable.isMaterializedView() &&
@@ -7648,7 +7650,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       input = genConstraintsPlan(dest, qb, input);
 
       if (!qb.getIsQuery()) {
-        input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx);
+        input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx, destinationTable);
       }
 
       if (destinationTable.isMaterializedView() &&
@@ -8697,7 +8699,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
    * types that are expected by the table_desc.
    */
   private Operator genConversionSelectOperator(String dest, QB qb, Operator input,
-                                       TableDesc table_desc, DynamicPartitionCtx dpCtx) throws SemanticException {
+      TableDesc table_desc, DynamicPartitionCtx dpCtx, Table table)
+      throws SemanticException {
     StructObjectInspector oi = null;
     try {
       Deserializer deserializer = table_desc.getDeserializerClass()
@@ -8747,7 +8750,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     }
 
     // Check column types
-    boolean converted = false;
+    AtomicBoolean converted = new AtomicBoolean(false);
     int columnNumber = tableFields.size();
     List<ExprNodeDesc> expressions = new ArrayList<ExprNodeDesc>(columnNumber);
 
@@ -8759,49 +8762,30 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         LazySimpleSerDe.class);
     if (!isMetaDataSerDe && !deleting(dest)) {
 
-      // If we're updating, add the ROW__ID expression, then make the following column accesses
-      // offset by 1 so that we don't try to convert the ROW__ID
-      if (updating(dest)) {
-        expressions.add(new ExprNodeColumnDesc(rowFields.get(0).getType(),
-            rowFields.get(0).getInternalName(), "", true));
+      // If we're updating, add the required virtual columns.
+      int virtualColumnSize = updating(dest) ? AcidUtils.getAcidVirtualColumns(table).size() : 0;
+      for (int i = 0; i < virtualColumnSize; i++) {
+        expressions.add(new ExprNodeColumnDesc(rowFields.get(i).getType(),
+            rowFields.get(i).getInternalName(), "", true));
       }
 
       // here only deals with non-partition columns. We deal with partition columns next
+      int rowFieldsOffset = expressions.size();
       for (int i = 0; i < columnNumber; i++) {
-        int rowFieldsOffset = updating(dest) ? i + 1 : i;
-        ObjectInspector tableFieldOI = tableFields.get(i)
-            .getFieldObjectInspector();
-        TypeInfo tableFieldTypeInfo = TypeInfoUtils
-            .getTypeInfoFromObjectInspector(tableFieldOI);
-        if (rowFieldsOffset >= rowFields.size() && isImpalaPlan(conf) && inserting(dest)) {
+        if (rowFieldsOffset + i >= rowFields.size() && isImpalaPlan(conf) && inserting(dest)) {
           continue;
         }
-        TypeInfo rowFieldTypeInfo = rowFields.get(rowFieldsOffset).getType();
-        ExprNodeDesc column = new ExprNodeColumnDesc(rowFieldTypeInfo,
-            rowFields.get(rowFieldsOffset).getInternalName(), "", false,
-            rowFields.get(rowFieldsOffset).isSkewedCol());
-        // LazySimpleSerDe can convert any types to String type using
-        // JSON-format. However, we may add more operators.
-        // Thus, we still keep the conversion.
-        if (!tableFieldTypeInfo.equals(rowFieldTypeInfo)) {
-          // need to do some conversions here
-          converted = true;
-          if (tableFieldTypeInfo.getCategory() != Category.PRIMITIVE) {
-            // cannot convert to complex types
-            column = null;
-          } else {
-            column = ExprNodeTypeCheck.getExprNodeDefaultExprProcessor()
-                .createConversionCast(column, (PrimitiveTypeInfo)tableFieldTypeInfo);
-          }
-          if (column == null) {
-            String reason = "Cannot convert column " + i + " from "
-                + rowFieldTypeInfo + " to " + tableFieldTypeInfo + ".";
-            throw new SemanticException(ASTErrorUtils.getMsg(
-                ErrorMsg.TARGET_TABLE_COLUMN_MISMATCH.getMsg(),
-                qb.getParseInfo().getDestForClause(dest), reason));
-          }
-        }
+        ExprNodeDesc column = handleConversion(tableFields.get(i), rowFields.get(rowFieldsOffset + i), converted, dest, i);
         expressions.add(column);
+      }
+
+      // For Non-Native ACID tables we should convert the new values as well
+      rowFieldsOffset = expressions.size();
+      if (updating(dest) && AcidUtils.isNonNativeAcidTable(table)) {
+        for (int i = 0; i < columnNumber; i++) {
+          ExprNodeDesc column = handleConversion(tableFields.get(i), rowFields.get(rowFieldsOffset + i), converted, dest, i);
+          expressions.add(column);
+        }
       }
     }
 
@@ -8817,7 +8801,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       // converted = true; // [TODO]: should we check & convert type to String and set it to true?
     }
 
-    if (converted) {
+    if (converted.get()) {
       // add the select operator
       RowResolver rowResolver = new RowResolver();
       List<String> colNames = new ArrayList<String>();
@@ -8835,6 +8819,53 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       input.setColumnExprMap(colExprMap);
     }
     return input;
+  }
+
+  /**
+   * Creates an expression for converting from a table column to a row column. For example:
+   * The table column is int but the query provides a string in the row, then we need to cast automatically.
+   * @param tableField The target table column
+   * @param rowField The source row column
+   * @param conversion The value of this boolean is set to true if we detect that a conversion is needed. This is a
+   *                   hidden return value hidden here, to notify the caller that a cast was needed.
+   * @param dest The destination table for the error message
+   * @param columnNum The destination column id for the error message
+   * @return The Expression describing the selected column. Note that `conversion` can be considered as a return value
+   *         as well
+   * @throws SemanticException If conversion were needed, but automatic conversion is not available
+   */
+  private ExprNodeDesc handleConversion(StructField tableField, ColumnInfo rowField, AtomicBoolean conversion, String dest, int columnNum)
+      throws SemanticException {
+    ObjectInspector tableFieldOI = tableField
+        .getFieldObjectInspector();
+    TypeInfo tableFieldTypeInfo = TypeInfoUtils
+        .getTypeInfoFromObjectInspector(tableFieldOI);
+    TypeInfo rowFieldTypeInfo = rowField.getType();
+    ExprNodeDesc column = new ExprNodeColumnDesc(rowFieldTypeInfo,
+        rowField.getInternalName(), "", false,
+        rowField.isSkewedCol());
+    // LazySimpleSerDe can convert any types to String type using
+    // JSON-format. However, we may add more operators.
+    // Thus, we still keep the conversion.
+    if (!tableFieldTypeInfo.equals(rowFieldTypeInfo)) {
+      // need to do some conversions here
+      conversion.set(true);
+      if (tableFieldTypeInfo.getCategory() != Category.PRIMITIVE) {
+        // cannot convert to complex types
+        column = null;
+      } else {
+        column = ExprNodeTypeCheck.getExprNodeDefaultExprProcessor()
+            .createConversionCast(column, (PrimitiveTypeInfo)tableFieldTypeInfo);
+      }
+      if (column == null) {
+        String reason = "Cannot convert column " + columnNum + " from "
+            + rowFieldTypeInfo + " to " + tableFieldTypeInfo + ".";
+        throw new SemanticException(ASTErrorUtils.getMsg(
+            ErrorMsg.TARGET_TABLE_COLUMN_MISMATCH.getMsg(),
+            qb.getParseInfo().getDestForClause(dest), reason));
+      }
+    }
+    return column;
   }
 
   @SuppressWarnings("nls")
@@ -11667,7 +11698,14 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
   private List<VirtualColumn> getTableVirtualColumns(Table tab) {
     if (tab.isNonNative()) {
-      return new ArrayList<VirtualColumn>();
+      boolean nonNativeAcid = AcidUtils.isNonNativeAcidTable(tab);
+      boolean isUpdateDelete = this instanceof UpdateDeleteSemanticAnalyzer;
+
+      if (nonNativeAcid && isUpdateDelete) {
+        return tab.getStorageHandler().acidVirtualColumns();
+      } else {
+        return new ArrayList<VirtualColumn>();
+      }
     }
     return VirtualColumn.getRegistry(conf);
   }
