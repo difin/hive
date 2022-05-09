@@ -406,6 +406,9 @@ public class MetastoreConf {
     COMPACTOR_RUN_AS_USER("metastore.compactor.run.as.user", "hive.compactor.run.as.user", "",
         "Specify the user to run compactor Initiator and Worker as. If empty string, defaults to table/partition " +
             "directory owner."),
+    COMPACTOR_USE_CUSTOM_POOL("metastore.compactor.use.custom.pool", "hive.compactor.use.custom.pool",
+            false, "internal usage only -- use custom connection pool specific to compactor components."
+    ),
     COMPACTOR_OLDEST_REPLICATION_OPENTXN_THRESHOLD_WARNING(
         "metastore.compactor.oldest.replication.open.txn.threshold.warning",
         "hive.compactor.oldest.replication.open.txn.threshold.warning",
@@ -1376,7 +1379,7 @@ public class MetastoreConf {
             "Can notification events from notification log table be used for updating the metastore cache."),
     TRANSACTIONAL_EVENT_LISTENERS("metastore.transactional.event.listeners",
         "hive.metastore.transactional.event.listeners", "",
-        "A comma separated list of Java classes that implement the org.apache.riven.MetaStoreEventListener" + 
+        "A comma separated list of Java classes that implement the org.apache.riven.MetaStoreEventListener" +
             " interface. Both the metastore event and corresponding listener method will be invoked in the same JDO transaction." +
             " If org.apache.hive.hcatalog.listener.DbNotificationListener is configured along with other transactional event" +
             " listener implementation classes, make sure org.apache.hive.hcatalog.listener.DbNotificationListener is placed at" +

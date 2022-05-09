@@ -54,15 +54,12 @@ public class BoneCPDataSourceProvider implements DataSourceProvider {
   private static final String PARTITION_COUNT_PROPERTY= BONECP + ".partitionCount";
 
   @Override
-  public DataSource create(Configuration hdpConfig) throws SQLException {
+  public DataSource create(Configuration hdpConfig, int maxPoolSize) throws SQLException {
     LOG.debug("Creating BoneCP connection pool for the MetaStore");
 
     String driverUrl = DataSourceProvider.getMetastoreJdbcDriverUrl(hdpConfig);
     String user = DataSourceProvider.getMetastoreJdbcUser(hdpConfig);
     String passwd = DataSourceProvider.getMetastoreJdbcPasswd(hdpConfig);
-
-    int maxPoolSize = MetastoreConf.getIntVar(hdpConfig,
-        MetastoreConf.ConfVars.CONNECTION_POOLING_MAX_CONNECTIONS);
 
     Properties properties = DataSourceProvider.getPrefixedProperties(hdpConfig, BONECP);
     long connectionTimeout = hdpConfig.getLong(CONNECTION_TIMEOUT_PROPERTY, 30000L);
