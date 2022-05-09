@@ -17,7 +17,12 @@ if [ ! -d "${TMP_UDF_PATH}" ]; then
   exit 1
 fi
 
-${HIVE_HOME}/bin/hive --service jar ${HIVE_HOME}/lib/hive-llap-server.jar org.apache.hadoop.hive.llap.cli.service.LlapServiceDriver -i 1 --directory ${TMP_UDF_PATH} --skipValidateConf --partialDownload --downloadType udffile
+UDF_JAR_LOCALIZER_KERBEROS_OPTS=
+if [ "${USE_KERBEROS}" == "true" ]; then
+  UDF_JAR_LOCALIZER_KERBEROS_OPTS="--hiveconf hive.metastore.sasl.enabled=true --hiveconf hive.metastore.kerberos.principal=${METASTORE_SERVICE_PRINCIPAL}"
+fi
+
+${HIVE_HOME}/bin/hive --service jar ${HIVE_HOME}/lib/hive-llap-server-${CDH_VERSION}.jar org.apache.hadoop.hive.llap.cli.service.LlapServiceDriver -i 1 --directory ${TMP_UDF_PATH} --skipValidateConf --partialDownload --downloadType udffile $UDF_JAR_LOCALIZER_KERBEROS_OPTS
 
 if [ $? -ne 0 ]; then
   echo "Failed to localize UDF JARs to ${TMP_UDF_PATH}!"
