@@ -4802,7 +4802,7 @@ public class Vectorizer implements PhysicalPlanResolver {
           VectorUDFAdaptor parentAdaptor = (VectorUDFAdaptor) parent;
           VectorUDFArgDesc[] argDescs = parentAdaptor.getArgDescs();
           for (int i = 0; i < argDescs.length; ++i) {
-            if (argDescs[i].getColumnNum() == children[i].getOutputColumnNum()) {
+            if (argDescs[i].getColumnNum() != children[i].getOutputColumnNum()) {
               argDescs[i].setColumnNum(children[i].getOutputColumnNum());
               break;
             }
