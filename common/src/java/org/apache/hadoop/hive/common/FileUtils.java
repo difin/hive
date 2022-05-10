@@ -515,6 +515,20 @@ public final class FileUtils {
   }
 
   public static boolean isActionPermittedForFileHierarchy(FileSystem fs, FileStatus fileStatus,
+      String userName, FsAction action, boolean recurse) throws Exception {
+    UserGroupInformation proxyUser = null;
+    boolean isPermitted;
+    try {
+      proxyUser = getProxyUser(userName);
+      FileSystem fsAsUser = getFsAsUser(fs, proxyUser);
+      isPermitted = isActionPermittedForFileHierarchy(fs, fileStatus, userName, action, recurse, fsAsUser);
+    } finally {
+      closeFs(proxyUser);
+    }
+    return isPermitted;
+  }  
+
+  public static boolean isActionPermittedForFileHierarchy(FileSystem fs, FileStatus fileStatus,
       String userName, FsAction action, boolean recurse, FileSystem fsAsUser) throws Exception {
     boolean isDir = fileStatus.isDir();
 
