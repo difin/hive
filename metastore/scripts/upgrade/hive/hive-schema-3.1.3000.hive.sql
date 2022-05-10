@@ -1515,6 +1515,21 @@ SELECT DISTINCT
     HL.`HL_BLOCKEDBY_INT_ID`
 FROM SYS.`HIVE_LOCKS` AS HL;
 
+CREATE EXTERNAL TABLE IF NOT EXISTS `MIN_HISTORY_LEVEL` (
+    `MHL_TXNID` bigint,
+    `MHL_MIN_OPEN_TXNID` bigint
+)
+STORED BY 'org.apache.hive.storage.jdbc.JdbcStorageHandler'
+TBLPROPERTIES (
+"hive.sql.database.type" = "METASTORE",
+"hive.sql.query" =
+"SELECT
+    \"MHL_TXNID\",
+    \"MHL_MIN_OPEN_TXNID\",
+FROM \"MIN_HISTORY_LEVEL\""
+);
+
+
 CREATE DATABASE IF NOT EXISTS INFORMATION_SCHEMA;
 
 USE INFORMATION_SCHEMA;
@@ -1916,13 +1931,13 @@ JOIN
 WHERE
   SE.SCHEDULED_QUERY_ID=SQ.SCHEDULED_QUERY_ID;
 
-SELECT 'Upgrading MetaStore schema from 3.1.3000 to 3.1.3000.7.2.15.0-Update3';
+SELECT 'Upgrading MetaStore schema from 3.1.3000 to 3.1.3000.7.2.15.0-Update4';
 
 USE SYS;
 
-CREATE OR REPLACE VIEW `CDH_VERSION` AS SELECT 1 AS `VER_ID`, '3.1.3000.7.2.15.0-Update3' AS `SCHEMA_VERSION`,
-  'Hive release version 3.1.3000 for CDH 7.2.15.0-Update3' AS `VERSION_COMMENT`;
+CREATE OR REPLACE VIEW `CDH_VERSION` AS SELECT 1 AS `VER_ID`, '3.1.3000.7.2.15.0-Update4' AS `SCHEMA_VERSION`,
+  'Hive release version 3.1.3000 for CDH 7.2.15.0-Update4' AS `VERSION_COMMENT`;
 
-SELECT 'Finished initializing schema to 3.1.3000.7.2.15.0-Update3';
+SELECT 'Finished initializing schema to 3.1.3000.7.2.15.0-Update4';
 
 
