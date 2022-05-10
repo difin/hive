@@ -63,6 +63,8 @@ import org.apache.hive.common.util.ShutdownHookManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.security.auth.login.LoginException;
+
 /**
  * Collection of file manipulation utilities common across Hive.
  */
@@ -390,10 +392,16 @@ public final class FileUtils {
     return getPathOrParentThatExists(fs, parentPath);
   }
 
-  public static void checkFileAccessWithImpersonation(final FileSystem fs, final FileStatus stat,
-      final FsAction action, final String user)
-      throws IOException, AccessControlException, InterruptedException, Exception {
-    checkFileAccessWithImpersonation(fs, stat, action, user, null);
+  public static void checkFileAccessWithImpersonation(final FileSystem fs, final FileStatus stat, final FsAction action,
+      final String user) throws Exception {
+    UserGroupInformation proxyUser = null;
+    try {
+      proxyUser = getProxyUser(user);
+      FileSystem fsAsUser = FileUtils.getFsAsUser(fs, proxyUser);
+      checkFileAccessWithImpersonation(fs, stat, action, user, null, fsAsUser);
+    } finally {
+      closeFs(proxyUser);
+    }
   }
 
   /**
@@ -417,9 +425,9 @@ public final class FileUtils {
    * @throws InterruptedException
    * @throws Exception
    */
-  public static void checkFileAccessWithImpersonation(final FileSystem fs,
-      final FileStatus stat, final FsAction action, final String user, final List<FileStatus> children)
-          throws IOException, AccessControlException, InterruptedException, Exception {
+  public static void checkFileAccessWithImpersonation(final FileSystem fs, final FileStatus stat, final FsAction action,
+      final String user, final List<FileStatus> children, final FileSystem fsAsUser)
+      throws IOException, AccessControlException, InterruptedException, Exception {
     UserGroupInformation ugi = Utils.getUGI();
     String currentUser = ugi.getShortUserName();
 
@@ -431,25 +439,17 @@ public final class FileUtils {
     }
 
     // Otherwise, try user impersonation. Current user must be configured to do user impersonation.
-    UserGroupInformation proxyUser = UserGroupInformation.createProxyUser(
-        user, UserGroupInformation.getLoginUser());
-    try {
-      proxyUser.doAs(new PrivilegedExceptionAction<Object>() {
-        @Override
-        public Object run() throws Exception {
-          FileSystem fsAsUser = FileSystem.get(fs.getUri(), fs.getConf());
-          ShimLoader.getHadoopShims().checkFileAccess(fsAsUser, stat, action);
-          addChildren(fsAsUser, stat.getPath(), children);
-          return null;
-        }
-      });
-    } finally {
-      FileSystem.closeAllForUGI(proxyUser);
-    }
+    UserGroupInformation proxyUser = UserGroupInformation.createProxyUser(user, UserGroupInformation.getLoginUser());
+    proxyUser.doAs(new PrivilegedExceptionAction<Object>() {
+      @Override public Object run() throws Exception {
+        ShimLoader.getHadoopShims().checkFileAccess(fsAsUser, stat, action);
+        addChildren(fsAsUser, stat.getPath(), children);
+        return null;
+      }
+    });
   }
 
-  private static void addChildren(FileSystem fsAsUser, Path path, List<FileStatus> children)
-      throws IOException {
+  private static void addChildren(FileSystem fsAsUser, Path path, List<FileStatus> children) throws IOException {
     if (children != null) {
       FileStatus[] listStatus;
       try {
@@ -462,6 +462,33 @@ public final class FileUtils {
     }
   }
 
+  public static UserGroupInformation getProxyUser(final String user) throws LoginException, IOException {
+    UserGroupInformation ugi = Utils.getUGI();
+    String currentUser = ugi.getShortUserName();
+    UserGroupInformation proxyUser = null;
+    if (user != null && !user.equals(currentUser)) {
+      proxyUser = UserGroupInformation.createProxyUser(user, UserGroupInformation.getLoginUser());
+    }
+    return proxyUser;
+  }
+
+  public static void closeFs(UserGroupInformation proxyUser) throws IOException {
+    if (proxyUser != null) {
+      FileSystem.closeAllForUGI(proxyUser);
+    }
+  }
+
+  public static FileSystem getFsAsUser(FileSystem fs, UserGroupInformation proxyUser) throws IOException, InterruptedException {
+    if (proxyUser == null) {
+      return null;
+    }
+    FileSystem fsAsUser = proxyUser.doAs(new PrivilegedExceptionAction<FileSystem>() {
+      @Override public FileSystem run() throws Exception {
+        return FileSystem.get(fs.getUri(), fs.getConf());
+      }
+    });
+    return fsAsUser;
+  }
   /**
    * Check if user userName has permissions to perform the given FsAction action
    * on all files under the file whose FileStatus fileStatus is provided
@@ -475,11 +502,20 @@ public final class FileUtils {
    */
   public static boolean isActionPermittedForFileHierarchy(FileSystem fs, FileStatus fileStatus,
                                                           String userName, FsAction action) throws Exception {
-    return isActionPermittedForFileHierarchy(fs,fileStatus,userName, action, true);
+    UserGroupInformation proxyUser = null;
+    boolean isPermitted = false;
+    try {
+      proxyUser = getProxyUser(userName);
+      FileSystem fsAsUser = getFsAsUser(fs, proxyUser);
+      isPermitted = isActionPermittedForFileHierarchy(fs, fileStatus, userName, action, true, fsAsUser);
+    } finally {
+      closeFs(proxyUser);
+    }
+    return isPermitted;
   }
 
   public static boolean isActionPermittedForFileHierarchy(FileSystem fs, FileStatus fileStatus,
-      String userName, FsAction action, boolean recurse) throws Exception {
+      String userName, FsAction action, boolean recurse, FileSystem fsAsUser) throws Exception {
     boolean isDir = fileStatus.isDir();
 
     FsAction dirActionNeeded = action;
@@ -494,7 +530,7 @@ public final class FileUtils {
     }
 
     try {
-      checkFileAccessWithImpersonation(fs, fileStatus, action, userName, subDirsToCheck);
+      checkFileAccessWithImpersonation(fs, fileStatus, action, userName, subDirsToCheck, fsAsUser);
     } catch (AccessControlException err) {
       // Action not permitted for user
       LOG.warn("Action " + action + " denied on " + fileStatus.getPath() + " for user " + userName);
@@ -509,7 +545,7 @@ public final class FileUtils {
     // check all children
     for (FileStatus childStatus : subDirsToCheck) {
       // check children recursively - recurse is true if we're here.
-      if (!isActionPermittedForFileHierarchy(fs, childStatus, userName, action, true)) {
+      if (!isActionPermittedForFileHierarchy(fs, childStatus, userName, action, true, fsAsUser)) {
         return false;
       }
     }
