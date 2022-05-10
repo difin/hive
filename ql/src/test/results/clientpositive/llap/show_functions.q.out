@@ -328,6 +328,7 @@ sort_array_by
 soundex
 space
 split
+split_map_privs
 sq_count_check
 sqrt
 st_aggr_convexhull
@@ -923,6 +924,7 @@ sort_array_by
 soundex
 space
 split
+split_map_privs
 sq_count_check
 sqrt
 st_aggr_convexhull
