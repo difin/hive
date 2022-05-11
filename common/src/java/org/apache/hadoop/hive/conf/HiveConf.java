@@ -99,21 +99,12 @@ public class HiveConf extends Configuration {
   private final List<String> rscList = new ArrayList<>();
 
   private Pattern modWhiteListPattern = null;
-  private volatile boolean isSparkConfigUpdated = false;
   private volatile boolean isImpalaConfigUpdated = false;
   private static final int LOG_PREFIX_LENGTH = 64;
-
-  public boolean getSparkConfigUpdated() {
-    return isSparkConfigUpdated;
-  }
 
   //XXX: CDPD-20696: need to get rid of Impala reference
   public boolean getImpalaConfigUpdated() {
     return isImpalaConfigUpdated;
-  }
-
-  public void setSparkConfigUpdated(boolean isSparkConfigUpdated) {
-    this.isSparkConfigUpdated = isSparkConfigUpdated;
   }
 
   public void setImpalaConfigUpdated(boolean isImpalaConfigUpdated) {
@@ -168,7 +159,7 @@ public class HiveConf extends Configuration {
   /**
    * Supported runtimes for engines in FENG.
    * Currently, they are compatible as follows:
-   * HIVE -> MR, TEZ, SPARK
+   * HIVE -> MR, TEZ
    * IMPALA -> IMPALA
    */
   public enum Runtime {
@@ -188,12 +179,6 @@ public class HiveConf extends Configuration {
       @Override
       public String toString() {
         return "tez";
-      }
-    },
-    SPARK  {
-      @Override
-      public String toString() {
-        return "spark";
       }
     },
     IMPALA {
@@ -2012,7 +1997,7 @@ public class HiveConf extends Configuration {
 
     HIVEMAPJOINUSEOPTIMIZEDTABLE("hive.mapjoin.optimized.hashtable", true,
         "Whether Hive should use memory-optimized hash table for MapJoin.\n" +
-        "Only works on Tez and Spark, because memory-optimized hashtable cannot be serialized."),
+        "Only works on Tez because memory-optimized hashtable cannot be serialized."),
     HIVEMAPJOINOPTIMIZEDTABLEPROBEPERCENT("hive.mapjoin.optimized.hashtable.probe.percent",
         (float) 0.5, "Probing space percentage of the optimized hashtable"),
     HIVEMAPJOINPARALELHASHTABLETHREADS("hive.mapjoin.hashtable.load.threads", 2,
@@ -2249,7 +2234,6 @@ public class HiveConf extends Configuration {
     HIVEMERGEMAPREDFILES("hive.merge.mapredfiles", false,
         "Merge small files at the end of a map-reduce job"),
     HIVEMERGETEZFILES("hive.merge.tezfiles", false, "Merge small files at the end of a Tez DAG"),
-    HIVEMERGESPARKFILES("hive.merge.sparkfiles", false, "Merge small files at the end of a Spark DAG Transformation"),
     HIVEMERGEMAPFILESSIZE("hive.merge.size.per.task", (long) (256 * 1000 * 1000),
         "Size of merged files at the end of the job"),
     HIVEMERGEMAPFILESAVGSIZE("hive.merge.smallfiles.avgsize", (long) (16 * 1000 * 1000),
@@ -2503,8 +2487,7 @@ public class HiveConf extends Configuration {
         "Whether to grant access to the hs2/hive user for queries"),
     HIVEQUERYNAME ("hive.query.name", null,
         "This named is used by Tez to set the dag name. This name in turn will appear on \n" +
-        "the Tez UI representing the work that was done. Used by Spark to set the query name, will show up in the\n" +
-        "Spark UI."),
+        "the Tez UI representing the work that was done."),
     HIVETEZJOBNAME("tez.job.name", "HIVE-%s",
         "This named is used by Tez to set the job name. This name in turn will appear on \n" +
         "the Yarn UI representing the Yarn Application Name. And The job name may be a \n" +
@@ -2734,9 +2717,6 @@ public class HiveConf extends Configuration {
         "When shared work optimizer is enabled, whether we should reuse the cache for the broadcast side\n" +
         "of mapjoin operators that share same broadcast input. Requires hive.optimize.shared.work\n" +
         "to be set to true. Tez only."),
-    HIVE_COMBINE_EQUIVALENT_WORK_OPTIMIZATION("hive.combine.equivalent.work.optimization", true, "Whether to " +
-            "combine equivalent work objects during physical optimization.\n This optimization looks for equivalent " +
-            "work objects and combines them if they meet certain preconditions. Spark only."),
     HIVE_REMOVE_SQ_COUNT_CHECK("hive.optimize.remove.sq_count_check", true,
         "Whether to remove an extra join with sq_count_check for scalar subqueries "
             + "with constant group by keys."),
@@ -3667,9 +3647,6 @@ public class HiveConf extends Configuration {
     HIVE_EXPLAIN_USER("hive.explain.user", true,
         "Whether to show explain result at user level.\n" +
         "When enabled, will log EXPLAIN output for the query at user level. Tez only."),
-    HIVE_SPARK_EXPLAIN_USER("hive.spark.explain.user", false,
-        "Whether to show explain result at user level.\n" +
-        "When enabled, will log EXPLAIN output for the query at user level. Spark only."),
 
     // prefix used to auto generated column aliases (this should be started with '_')
     HIVE_AUTOGEN_COLUMNALIAS_PREFIX_LABEL("hive.autogen.columnalias.prefix.label", "_c",
@@ -4374,7 +4351,7 @@ public class HiveConf extends Configuration {
     HIVE_SERVER2_JOB_CREDENTIAL_PROVIDER_PATH("hive.server2.job.credential.provider.path", "",
         "If set, this configuration property should provide a comma-separated list of URLs that indicates the type and " +
         "location of providers to be used by hadoop credential provider API. It provides HiveServer2 the ability to provide job-specific " +
-        "credential providers for jobs run using MR and Spark execution engines. This functionality has not been tested against Tez."),
+        "credential providers for jobs run using MR execution engine. This functionality has not been tested against Tez."),
     HIVE_MOVE_FILES_THREAD_COUNT("hive.mv.files.thread", 15, new  SizeValidator(0L, true, 1024L, true), "Number of threads"
          + " used to move files in move task. Set it to 0 to disable multi-threaded file moves. This parameter is also used by"
          + " MSCK to check tables."),
@@ -4440,8 +4417,8 @@ public class HiveConf extends Configuration {
 
     HIVE_EXECUTION_ENGINE("hive.execution.engine", Runtime.TEZ.toString(),
             new StringSet(true,  Runtime.MR.toString(), Runtime.TEZ.toString(),
-                Runtime.SPARK.toString(), Runtime.IMPALA.toString()),
-        "Chooses execution engine. Options are: mr (Map reduce, default), tez, spark, and impala. While MR\n" +
+                Runtime.IMPALA.toString()),
+        "Chooses execution engine. Options are: mr (Map reduce, default), tez, and impala. While MR\n" +
         "remains the default engine for historical reasons, it is itself a historical engine\n" +
         "and is deprecated in Hive 2 line. It may be removed without further warning.", "execution.engine"),
 
@@ -4631,11 +4608,8 @@ public class HiveConf extends Configuration {
         "Whether to generate the splits locally or in the AM (tez only)"),
     HIVE_TEZ_GENERATE_CONSISTENT_SPLITS("hive.tez.input.generate.consistent.splits", true,
         "Whether to generate consistent split locations when generating splits in the AM"),
-    HIVE_PREWARM_ENABLED("hive.prewarm.enabled", false, "Enables container prewarm for Tez/Spark (Hadoop 2 only)"),
-    HIVE_PREWARM_NUM_CONTAINERS("hive.prewarm.numcontainers", 10, "Controls the number of containers to prewarm for Tez/Spark (Hadoop 2 only)"),
-    HIVE_PREWARM_SPARK_TIMEOUT("hive.prewarm.spark.timeout", "5000ms",
-         new TimeValidator(TimeUnit.MILLISECONDS),
-         "Time to wait to finish prewarming spark executors"),
+    HIVE_PREWARM_ENABLED("hive.prewarm.enabled", false, "Enables container prewarm for Tez(Hadoop 2 only)"),
+    HIVE_PREWARM_NUM_CONTAINERS("hive.prewarm.numcontainers", 10, "Controls the number of containers to prewarm for Tez (Hadoop 2 only)"),
     HIVESTAGEIDREARRANGE("hive.stageid.rearrange", "none", new StringSet("none", "idonly", "traverse", "execution"), ""),
     HIVEEXPLAINDEPENDENCYAPPENDTASKTYPES("hive.explain.dependency.append.tasktype", false, ""),
     HIVEUSEGOOGLEREGEXENGINE("hive.use.googleregex.engine",false,"whether to use google regex engine or not, default regex engine is java.util.regex"),
@@ -4785,8 +4759,6 @@ public class HiveConf extends Configuration {
             + " only if the execution engine is tez."),
     TEZ_DAG_STATUS_CHECK_INTERVAL("hive.tez.dag.status.check.interval", "500ms",
       new TimeValidator(TimeUnit.MILLISECONDS), "Interval between subsequent DAG status invocation."),
-    SPARK_EXEC_INPLACE_PROGRESS("hive.spark.exec.inplace.progress", true,
-        "Updates spark job execution progress in-place in the terminal."),
     TEZ_CONTAINER_MAX_JAVA_HEAP_FRACTION("hive.tez.container.max.java.heap.fraction", 0.8f,
         "This is to override the tez setting with the same name"),
     TEZ_TASK_SCALE_MEMORY_RESERVE_FRACTION_MIN("hive.tez.task.scale.memory.reserve-fraction.min",
@@ -5342,68 +5314,6 @@ public class HiveConf extends Configuration {
         "validated for all SQL operations after every defined interval (default: 500ms) and corresponding action\n" +
         "defined in the trigger will be taken"),
 
-    SPARK_USE_OP_STATS("hive.spark.use.op.stats", true,
-        "Whether to use operator stats to determine reducer parallelism for Hive on Spark.\n" +
-        "If this is false, Hive will use source table stats to determine reducer\n" +
-        "parallelism for all first level reduce tasks, and the maximum reducer parallelism\n" +
-        "from all parents for all the rest (second level and onward) reducer tasks."),
-    SPARK_USE_TS_STATS_FOR_MAPJOIN("hive.spark.use.ts.stats.for.mapjoin", false,
-        "If this is set to true, mapjoin optimization in Hive/Spark will use statistics from\n" +
-        "TableScan operators at the root of operator tree, instead of parent ReduceSink\n" +
-        "operators of the Join operator."),
-    SPARK_OPTIMIZE_SHUFFLE_SERDE("hive.spark.optimize.shuffle.serde", true,
-        "If this is set to true, Hive on Spark will register custom serializers for data types\n" +
-        "in shuffle. This should result in less shuffled data."),
-    SPARK_CLIENT_FUTURE_TIMEOUT("hive.spark.client.future.timeout",
-      "60s", new TimeValidator(TimeUnit.SECONDS),
-      "Timeout for requests from Hive client to remote Spark driver."),
-    SPARK_JOB_MONITOR_TIMEOUT("hive.spark.job.monitor.timeout",
-      "60s", new TimeValidator(TimeUnit.SECONDS),
-      "Timeout for job monitor to get Spark job state."),
-    SPARK_RPC_CLIENT_CONNECT_TIMEOUT("hive.spark.client.connect.timeout",
-      "1000ms", new TimeValidator(TimeUnit.MILLISECONDS),
-      "Timeout for remote Spark driver in connecting back to Hive client."),
-    SPARK_RPC_CLIENT_HANDSHAKE_TIMEOUT("hive.spark.client.server.connect.timeout",
-      "90000ms", new TimeValidator(TimeUnit.MILLISECONDS),
-      "Timeout for handshake between Hive client and remote Spark driver.  Checked by both processes."),
-    SPARK_RPC_SECRET_RANDOM_BITS("hive.spark.client.secret.bits", "256",
-      "Number of bits of randomness in the generated secret for communication between Hive client and remote Spark driver. " +
-      "Rounded down to the nearest multiple of 8."),
-    SPARK_RPC_MAX_THREADS("hive.spark.client.rpc.threads", 8,
-      "Maximum number of threads for remote Spark driver's RPC event loop."),
-    SPARK_RPC_MAX_MESSAGE_SIZE("hive.spark.client.rpc.max.size", 50 * 1024 * 1024,
-      "Maximum message size in bytes for communication between Hive client and remote Spark driver. Default is 50MB."),
-    SPARK_RPC_CHANNEL_LOG_LEVEL("hive.spark.client.channel.log.level", null,
-      "Channel logging level for remote Spark driver.  One of {DEBUG, ERROR, INFO, TRACE, WARN}."),
-    SPARK_RPC_SASL_MECHANISM("hive.spark.client.rpc.sasl.mechanisms", "DIGEST-MD5",
-      "Name of the SASL mechanism to use for authentication."),
-    SPARK_RPC_SERVER_ADDRESS("hive.spark.client.rpc.server.address", "",
-      "The server address of HiverServer2 host to be used for communication between Hive client and remote Spark driver. " +
-      "Default is empty, which means the address will be determined in the same way as for hive.server2.thrift.bind.host." +
-      "This is only necessary if the host has multiple network addresses and if a different network address other than " +
-      "hive.server2.thrift.bind.host is to be used."),
-    SPARK_RPC_SERVER_PORT("hive.spark.client.rpc.server.port", "", "A list of port ranges which can be used by RPC server " +
-        "with the format of 49152-49222,49228 and a random one is selected from the list. Default is empty, which randomly " +
-        "selects one port from all available ones."),
-    SPARK_DYNAMIC_PARTITION_PRUNING(
-        "hive.spark.dynamic.partition.pruning", false,
-        "When dynamic pruning is enabled, joins on partition keys will be processed by writing\n" +
-            "to a temporary HDFS file, and read later for removing unnecessary partitions."),
-    SPARK_DYNAMIC_PARTITION_PRUNING_MAX_DATA_SIZE(
-        "hive.spark.dynamic.partition.pruning.max.data.size", 100*1024*1024L,
-        "Maximum total data size in dynamic pruning."),
-    SPARK_DYNAMIC_PARTITION_PRUNING_MAP_JOIN_ONLY(
-        "hive.spark.dynamic.partition.pruning.map.join.only", false,
-        "Turn on dynamic partition pruning only for map joins.\n" +
-        "If hive.spark.dynamic.partition.pruning is set to true, this parameter value is ignored."),
-    SPARK_USE_GROUPBY_SHUFFLE(
-        "hive.spark.use.groupby.shuffle", true,
-        "Spark groupByKey transformation has better performance but uses unbounded memory." +
-            "Turn this off when there is a memory issue."),
-    SPARK_JOB_MAX_TASKS("hive.spark.job.max.tasks", -1, "The maximum number of tasks a Spark job may have.\n" +
-            "If a Spark job contains more tasks than the maximum, it will be cancelled. A value of -1 means no limit."),
-    SPARK_STAGE_MAX_TASKS("hive.spark.stage.max.tasks", -1, "The maximum number of tasks a stage in a Spark job may have.\n" +
-        "If a Spark job stage contains more tasks than the maximum, the job will be cancelled. A value of -1 means no limit."),
     NWAYJOINREORDER("hive.reorder.nway.joins", true,
       "Runs reordering of tables within single n-way join (i.e.: picks streamtable)"),
     HIVE_MERGE_NWAY_JOINS("hive.merge.nway.joins", false,
@@ -5472,23 +5382,13 @@ public class HiveConf extends Configuration {
             "hive.server2.authentication.ldap.groupClassKey," +
             "hive.server2.authentication.ldap.customLDAPQuery," +
             "hive.privilege.synchronizer.interval," +
-            "hive.spark.client.connect.timeout," +
-            "hive.spark.client.server.connect.timeout," +
-            "hive.spark.client.channel.log.level," +
-            "hive.spark.client.rpc.max.size," +
-            "hive.spark.client.rpc.threads," +
-            "hive.spark.client.secret.bits," +
             "hive.query.max.length," +
-            "hive.spark.client.rpc.server.address," +
-            "hive.spark.client.rpc.server.port," +
-            "hive.spark.client.rpc.sasl.mechanisms," +
             "bonecp.," +
             "hive.druid.broker.address.default," +
             "hive.druid.coordinator.address.default," +
             "hikaricp.," +
             "hadoop.bin.path," +
             "yarn.bin.path," +
-            "spark.home," +
             "hive.driver.parallel.compilation.global.limit," +
             "hive.zookeeper.ssl.keystore.location," +
             "hive.zookeeper.ssl.keystore.password," +
@@ -5508,11 +5408,6 @@ public class HiveConf extends Configuration {
     HIVE_CONF_INTERNAL_VARIABLE_LIST("hive.conf.internal.variable.list",
         "hive.added.files.path,hive.added.jars.path,hive.added.archives.path",
         "Comma separated list of variables which are used internally and should not be configurable."),
-    HIVE_SPARK_RSC_CONF_LIST("hive.spark.rsc.conf.list",
-        SPARK_OPTIMIZE_SHUFFLE_SERDE.varname + "," +
-            SPARK_CLIENT_FUTURE_TIMEOUT.varname,
-        "Comma separated list of variables which are related to remote spark context.\n" +
-            "Changing these variables will result in re-creating the spark session."),
     HIVE_QUERY_MAX_LENGTH("hive.query.max.length", "10Mb", new SizeValidator(), "The maximum" +
             " size of a query string. Enforced after variable substitutions."),
     HIVE_QUERY_TIMEOUT_SECONDS("hive.query.timeout.seconds", "0s",
@@ -5642,7 +5537,7 @@ public class HiveConf extends Configuration {
 
     HIVE_ADDITIONAL_CONFIG_FILES("hive.additional.config.files", "",
             "The names of additional config files, such as ldap-site.xml," +
-                    "spark-site.xml, etc in comma separated list.");
+                    "tez-site.xml, etc in comma separated list.");
 
     public final String varname;
     public final String altName;
@@ -5933,9 +5828,6 @@ public class HiveConf extends Configuration {
       if (!isImpalaRelatedConfig(name)) {
         set(name, value);
       }
-      if (isSparkRelatedConfig(name)) {
-        isSparkConfigUpdated = true;
-      }
       // After CDPD-13549, we allow a user to set up Impala's query options without
       // having to prepend Impala's namespace, and since the class of TQueryOptions is
       // not available here, we are not able to tell whether 'name' corresponds to an
@@ -5986,32 +5878,6 @@ public class HiveConf extends Configuration {
       }
     }
     return false;
-  }
-
-  /**
-   * check whether spark related property is updated, which includes spark configurations,
-   * RSC configurations and yarn configuration in Spark on YARN mode.
-   * @param name
-   * @return
-   */
-  private boolean isSparkRelatedConfig(String name) {
-    boolean result = false;
-    if (name.startsWith("spark")) { // Spark property.
-      // for now we don't support changing spark app name on the fly
-      result = !name.equals("spark.app.name");
-    } else if (name.startsWith("yarn")) { // YARN property in Spark on YARN mode.
-      String sparkMaster = get("spark.master");
-      if (sparkMaster != null && sparkMaster.startsWith("yarn")) {
-        result = true;
-      }
-    } else if (rscList.stream().anyMatch(rscVar -> rscVar.equals(name))) { // Remote Spark Context property.
-      result = true;
-    } else if (name.equals("mapreduce.job.queuename")) {
-      // a special property starting with mapreduce that we would also like to effect if it changes
-      result = true;
-    }
-
-    return result;
   }
 
   /**
@@ -6241,17 +6107,6 @@ public class HiveConf extends Configuration {
     conf.setBoolean(var.varname, val);
   }
 
-  /* Dynamic partition pruning is enabled in some or all cases if either
-   * hive.spark.dynamic.partition.pruning is true or
-   * hive.spark.dynamic.partition.pruning.map.join.only is true
-   */
-  public static boolean isSparkDPPAny(Configuration conf) {
-    return (conf.getBoolean(ConfVars.SPARK_DYNAMIC_PARTITION_PRUNING.varname,
-            ConfVars.SPARK_DYNAMIC_PARTITION_PRUNING.defaultBoolVal) ||
-            conf.getBoolean(ConfVars.SPARK_DYNAMIC_PARTITION_PRUNING_MAP_JOIN_ONLY.varname,
-            ConfVars.SPARK_DYNAMIC_PARTITION_PRUNING_MAP_JOIN_ONLY.defaultBoolVal));
-  }
-
   public boolean getBoolVar(ConfVars var) {
     return getBoolVar(this, var);
   }
@@ -6423,7 +6278,6 @@ public class HiveConf extends Configuration {
     super(other);
     hiveJar = other.hiveJar;
     auxJars = other.auxJars;
-    isSparkConfigUpdated = other.isSparkConfigUpdated;
     isImpalaConfigUpdated = other.isImpalaConfigUpdated;
     origProp = (Properties)other.origProp.clone();
     restrictList.addAll(other.restrictList);
@@ -6563,7 +6417,6 @@ public class HiveConf extends Configuration {
     setupRestrictList();
     hiddenSet.clear();
     hiddenSet.addAll(HiveConfUtil.getHiddenSet(this));
-    setupRSCList();
   }
 
   /**
@@ -6609,7 +6462,6 @@ public class HiveConf extends Configuration {
     switch (runtime) {
       case MR:
       case TEZ:
-      case SPARK:
         engine = Engine.HIVE;
         break;
       case IMPALA:
@@ -7052,17 +6904,6 @@ public class HiveConf extends Configuration {
     restrictList.add(ConfVars.HIVE_CONF_RESTRICTED_LIST.varname);
     restrictList.add(ConfVars.HIVE_CONF_HIDDEN_LIST.varname);
     restrictList.add(ConfVars.HIVE_CONF_INTERNAL_VARIABLE_LIST.varname);
-    restrictList.add(ConfVars.HIVE_SPARK_RSC_CONF_LIST.varname);
-  }
-
-  private void setupRSCList() {
-    rscList.clear();
-    String vars = this.getVar(ConfVars.HIVE_SPARK_RSC_CONF_LIST);
-    if (vars != null) {
-      for (String var : vars.split(",")) {
-        rscList.add(var.trim());
-      }
-    }
   }
 
   /**
@@ -7084,21 +6925,6 @@ public class HiveConf extends Configuration {
    */
   public boolean isWebUiQueryInfoCacheEnabled() {
     return isWebUiEnabled() && this.getIntVar(ConfVars.HIVE_SERVER2_WEBUI_MAX_HISTORIC_QUERIES) > 0;
-  }
-
-  /* Dynamic partition pruning is enabled in some or all cases
-   */
-  public boolean isSparkDPPAny() {
-    return isSparkDPPAny(this);
-  }
-
-  /* Dynamic partition pruning is enabled only for map join
-   * hive.spark.dynamic.partition.pruning is false and
-   * hive.spark.dynamic.partition.pruning.map.join.only is true
-   */
-  public boolean isSparkDPPOnlyMapjoin() {
-    return (!this.getBoolVar(ConfVars.SPARK_DYNAMIC_PARTITION_PRUNING) &&
-            this.getBoolVar(ConfVars.SPARK_DYNAMIC_PARTITION_PRUNING_MAP_JOIN_ONLY));
   }
 
   public static boolean isLoadMetastoreConfig() {

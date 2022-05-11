@@ -11423,7 +11423,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       unionoutRR.put(unionalias, field, unionColInfo);
     }
 
-    // For Spark,TEZ we rely on the generated SelectOperator to do the type casting.
+    // For TEZ we rely on the generated SelectOperator to do the type casting.
     // Consider:
     //    SEL_1 (int)   SEL_2 (int)    SEL_3 (double)
     // If we first merge SEL_1 and SEL_2 into a UNION_1, and then merge UNION_1
@@ -15901,10 +15901,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       return false;
     }
 
-    // At least one mr/tez/spark job or an impala plan that is not streaming
+    // At least one mr/tez job or an impala plan that is not streaming
     if (Utilities.getNumClusterJobs(getRootTasks()) == 0 &&
         (!isImpalaPlan(conf) || conf.getResultMethod() == ResultMethod.STREAMING)) {
-      LOG.info("Not eligible for results caching - no mr/tez/spark/impala jobs");
+      LOG.info("Not eligible for results caching - no mr/tez/impala jobs");
       return false;
     }
 

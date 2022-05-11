@@ -216,7 +216,7 @@ public class TestHiveShell {
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_IN_TEST_IDE, true);
 
     // CDPD only change since mr is deprecated and throws an exception
-    hiveConf.set(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "spark");
+    hiveConf.set(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "tez");
 
     // set lifecycle hooks
     hiveConf.setVar(HiveConf.ConfVars.HIVE_QUERY_LIFETIME_HOOKS, HiveIcebergQueryLifeTimeHook.class.getName());

@@ -1025,13 +1025,6 @@ public class Context {
     if (conf instanceof HiveConf) {
       HiveConf hconf = (HiveConf) conf;
 
-      // Always allow spark to run in a cluster mode. Without this, depending on
-      // user's local hadoop settings, true may be returned, which causes plan to be
-      // stored in local path.
-      if (hconf.getRuntime() == Runtime.SPARK) {
-        return false;
-      }
-
       if (hconf.getRuntime() == Runtime.IMPALA) {
         return false;
       }

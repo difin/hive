@@ -35,12 +35,6 @@
 
   <profiles>
     <profile>
-      <id>spark-test</id>
-      <modules>
-        <module>qtest-spark</module>
-      </modules>
-    </profile>
-    <profile>
       <id>hive-build</id>
       <activation>
         <file>

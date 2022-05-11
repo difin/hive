@@ -52,7 +52,6 @@ import org.apache.hadoop.hive.ql.exec.persistence.MapJoinTableContainerSerDe;
 import org.apache.hadoop.hive.ql.exec.persistence.MatchTracker;
 import org.apache.hadoop.hive.ql.exec.persistence.ObjectContainer;
 import org.apache.hadoop.hive.ql.exec.persistence.UnwrapRowContainer;
-import org.apache.hadoop.hive.ql.exec.spark.SparkUtilities;
 import org.apache.hadoop.hive.ql.exec.tez.LlapObjectCache;
 import org.apache.hadoop.hive.ql.exec.tez.LlapObjectSubCache;
 import org.apache.hadoop.hive.ql.io.HiveKey;
@@ -828,12 +827,8 @@ public class MapJoinOperator extends AbstractMapJoinOperator<MapJoinDesc> implem
 
     // in mapreduce case, we need to always clear up as mapreduce doesn't have object registry.
     if ((this.getExecContext() != null) && (this.getExecContext().getLocalWork() != null)
-        && (this.getExecContext().getLocalWork().getInputFileChangeSensitive())
-        && !(HiveConf.getVar(hconf, ConfVars.HIVE_EXECUTION_ENGINE).equals("spark")
-            && SparkUtilities.isDedicatedCluster(hconf))) {
-      if (LOG.isInfoEnabled()) {
-        LOG.info("MR: Clearing all map join table containers.");
-      }
+        && (this.getExecContext().getLocalWork().getInputFileChangeSensitive())) {
+      LOG.info("MR: Clearing all map join table containers.");
       clearAllTableContainers();
     }
 

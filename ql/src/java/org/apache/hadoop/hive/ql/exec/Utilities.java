@@ -42,7 +42,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
-import java.security.AccessController;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -128,7 +127,6 @@ import org.apache.hadoop.hive.ql.exec.mr.ExecDriver;
 import org.apache.hadoop.hive.ql.exec.mr.ExecMapper;
 import org.apache.hadoop.hive.ql.exec.mr.ExecReducer;
 import org.apache.hadoop.hive.ql.exec.mr.MapRedTask;
-import org.apache.hadoop.hive.ql.exec.spark.SparkTask;
 import org.apache.hadoop.hive.ql.exec.tez.DagUtils;
 import org.apache.hadoop.hive.ql.exec.tez.TezTask;
 import org.apache.hadoop.hive.ql.exec.util.DAGTraversal;
@@ -444,19 +442,6 @@ public final class Utilities {
     Kryo kryo = SerializationUtilities.borrowKryo();
     try {
       String engine = HiveConf.getVar(conf, ConfVars.HIVE_EXECUTION_ENGINE);
-      if (engine.equals("spark")) {
-        // TODO Add jar into current thread context classloader as it may be invoked by Spark driver inside
-        // threads, should be unnecessary while SPARK-5377 is resolved.
-        String addedJars = conf.get(HIVE_ADDED_JARS);
-        if (StringUtils.isNotEmpty(addedJars)) {
-          AddToClassPathAction addAction = new AddToClassPathAction(
-              Thread.currentThread().getContextClassLoader(), Arrays.asList(addedJars.split(";"))
-          );
-          ClassLoader newLoader = AccessController.doPrivileged(addAction);
-          Thread.currentThread().setContextClassLoader(newLoader);
-          kryo.setClassLoader(newLoader);
-        }
-      }
 
       path = getPlanPath(conf, name);
       LOG.info("PLAN PATH = {}", path);
@@ -2921,16 +2906,12 @@ public final class Utilities {
     return getTasks(tasks, new TaskFilterFunction<>(TezTask.class));
   }
 
-  public static List<SparkTask> getSparkTasks(List<Task<? extends Serializable>> tasks) {
-    return getTasks(tasks, new TaskFilterFunction<>(SparkTask.class));
-  }
-
   public static List<ExecDriver> getMRTasks(List<Task<? extends Serializable>> tasks) {
     return getTasks(tasks, new TaskFilterFunction<>(ExecDriver.class));
   }
 
   public static int getNumClusterJobs(List<Task<? extends Serializable>> tasks) {
-    return getMRTasks(tasks).size() + getTezTasks(tasks).size() + getSparkTasks(tasks).size();
+    return getMRTasks(tasks).size() + getTezTasks(tasks).size();
   }
 
   static class TaskFilterFunction<T> implements DAGTraversal.Function {

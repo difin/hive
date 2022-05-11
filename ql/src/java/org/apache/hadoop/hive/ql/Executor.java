@@ -309,8 +309,7 @@ public class Executor {
 
   private int getJobCount() {
     int mrJobCount = Utilities.getMRTasks(driverContext.getPlan().getRootTasks()).size();
-    int jobCount = mrJobCount + Utilities.getTezTasks(driverContext.getPlan().getRootTasks()).size()
-        + Utilities.getSparkTasks(driverContext.getPlan().getRootTasks()).size();
+    int jobCount = mrJobCount + Utilities.getTezTasks(driverContext.getPlan().getRootTasks()).size();
     if (jobCount > 0) {
       if (mrJobCount > 0 && "mr".equals(HiveConf.getVar(driverContext.getConf(), ConfVars.HIVE_EXECUTION_ENGINE))) {
         LOG.warn(HiveConf.generateMrDeprecationWarning());

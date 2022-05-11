@@ -44,7 +44,6 @@ import org.apache.hadoop.hive.ql.exec.repl.AckWork;
 import org.apache.hadoop.hive.ql.exec.repl.ReplStateLogTask;
 import org.apache.hadoop.hive.ql.exec.repl.ReplStateLogWork;
 import org.apache.hadoop.hive.ql.exec.schq.ScheduledQueryMaintenanceTask;
-import org.apache.hadoop.hive.ql.exec.spark.SparkTask;
 import org.apache.hadoop.hive.ql.exec.tez.TezTask;
 import org.apache.hadoop.hive.ql.engine.EngineHelper;
 import org.apache.hadoop.hive.ql.engine.EngineLoader;
@@ -68,7 +67,6 @@ import org.apache.hadoop.hive.ql.exec.repl.RangerLoadWork;
 import org.apache.hadoop.hive.ql.exec.repl.RangerLoadTask;
 import org.apache.hadoop.hive.ql.exec.repl.RangerDumpWork;
 import org.apache.hadoop.hive.ql.exec.repl.RangerDumpTask;
-import org.apache.hadoop.hive.ql.plan.SparkWork;
 import org.apache.hadoop.hive.ql.plan.StatsWork;
 import org.apache.hadoop.hive.ql.plan.TezWork;
 import org.apache.hadoop.hive.ql.scheduled.ScheduledQueryMaintenanceWork;
@@ -121,7 +119,6 @@ public final class TaskFactory {
     taskvec.add(new TaskTuple<DependencyCollectionWork>(DependencyCollectionWork.class,
         DependencyCollectionTask.class));
     taskvec.add(new TaskTuple<TezWork>(TezWork.class, TezTask.class));
-    taskvec.add(new TaskTuple<SparkWork>(SparkWork.class, SparkTask.class));
     EngineHelper helper = EngineLoader.getExternalInstance();
     if (helper != null) {
       taskvec.add(new TaskTuple<EngineWork>(EngineWork.class, helper.getRuntimeHelper().getTaskClass()));

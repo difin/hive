@@ -50,7 +50,6 @@ import org.apache.hadoop.hive.ql.exec.vector.expressions.gen.DecimalColDivideDec
 import org.apache.hadoop.hive.ql.exec.vector.reducesink.*;
 import org.apache.hadoop.hive.ql.exec.vector.udf.VectorUDFArgDesc;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
-import org.apache.hadoop.hive.ql.parse.spark.SparkPartitionPruningSinkOperator;
 import org.apache.hadoop.hive.serde2.lazybinary.LazyBinarySerDe2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +62,6 @@ import org.apache.hadoop.hive.ql.CompilationOpContext;
 import org.apache.hadoop.hive.ql.exec.*;
 import org.apache.hadoop.hive.ql.exec.mr.MapRedTask;
 import org.apache.hadoop.hive.ql.exec.persistence.MapJoinKey;
-import org.apache.hadoop.hive.ql.exec.spark.SparkTask;
 import org.apache.hadoop.hive.ql.exec.tez.TezTask;
 import org.apache.hadoop.hive.ql.exec.vector.VectorExpressionDescriptor;
 import org.apache.hadoop.hive.ql.exec.vector.filesink.VectorFileSinkArrowOperator;
@@ -147,8 +145,6 @@ import org.apache.hadoop.hive.ql.plan.VectorPTFInfo;
 import org.apache.hadoop.hive.ql.plan.VectorPTFDesc.SupportedFunctionType;
 import org.apache.hadoop.hive.ql.plan.VectorTableScanDesc;
 import org.apache.hadoop.hive.ql.plan.VectorGroupByDesc.ProcessingMode;
-import org.apache.hadoop.hive.ql.plan.VectorSparkHashTableSinkDesc;
-import org.apache.hadoop.hive.ql.plan.VectorSparkPartitionPruningSinkDesc;
 import org.apache.hadoop.hive.ql.plan.VectorTopNKeyDesc;
 import org.apache.hadoop.hive.ql.plan.VectorLimitDesc;
 import org.apache.hadoop.hive.ql.plan.VectorMapJoinInfo;
@@ -157,9 +153,6 @@ import org.apache.hadoop.hive.ql.plan.PartitionDesc;
 import org.apache.hadoop.hive.ql.plan.ReduceSinkDesc;
 import org.apache.hadoop.hive.ql.plan.ReduceWork;
 import org.apache.hadoop.hive.ql.plan.SMBJoinDesc;
-import org.apache.hadoop.hive.ql.plan.SparkHashTableSinkDesc;
-import org.apache.hadoop.hive.ql.optimizer.spark.SparkPartitionPruningSinkDesc;
-import org.apache.hadoop.hive.ql.plan.SparkWork;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.plan.TableScanDesc;
 import org.apache.hadoop.hive.ql.plan.TezWork;
@@ -799,7 +792,7 @@ public class Vectorizer implements PhysicalPlanResolver {
 
   private Operator<? extends OperatorDesc> validateAndVectorizeOperatorTree(
       Operator<? extends OperatorDesc> nonVecRootOperator,
-      boolean isReduce, boolean isTezOrSpark,
+      boolean isReduce, boolean isTez,
       VectorTaskColumnInfo vectorTaskColumnInfo)
           throws VectorizerCannotVectorizeException {
 
@@ -844,7 +837,7 @@ public class Vectorizer implements PhysicalPlanResolver {
          */
         doProcessChildren(
             parent, vectorParent, nextParentList, nextVectorParentList,
-            isReduce, isTezOrSpark, vectorTaskColumnInfo);
+            isReduce, isTez, vectorTaskColumnInfo);
 
       }
       currentParentList = nextParentList;
@@ -861,7 +854,7 @@ public class Vectorizer implements PhysicalPlanResolver {
       Operator<? extends OperatorDesc> vectorParent,
       List<Operator<? extends OperatorDesc>> nextParentList,
       List<Operator<? extends OperatorDesc>> nextVectorParentList,
-      boolean isReduce, boolean isTezOrSpark,
+      boolean isReduce, boolean isTez,
       VectorTaskColumnInfo vectorTaskColumnInfo)
           throws VectorizerCannotVectorizeException {
 
@@ -876,7 +869,7 @@ public class Vectorizer implements PhysicalPlanResolver {
       Operator<? extends OperatorDesc> child = children.get(i);
       Operator<? extends OperatorDesc> vectorChild =
           doProcessChild(
-              child, vectorParent, isReduce, isTezOrSpark, vectorTaskColumnInfo);
+              child, vectorParent, isReduce, isTez, vectorTaskColumnInfo);
 
       fixupNewVectorChild(
           parent,
@@ -972,7 +965,7 @@ public class Vectorizer implements PhysicalPlanResolver {
   private Operator<? extends OperatorDesc> doProcessChild(
       Operator<? extends OperatorDesc> child,
       Operator<? extends OperatorDesc> vectorParent,
-      boolean isReduce, boolean isTezOrSpark,
+      boolean isReduce, boolean isTez,
       VectorTaskColumnInfo vectorTaskColumnInfo)
           throws VectorizerCannotVectorizeException {
 
@@ -989,7 +982,7 @@ public class Vectorizer implements PhysicalPlanResolver {
 
     try {
       vectorChild =
-          validateAndVectorizeOperator(child, vContext, isReduce, isTezOrSpark, vectorTaskColumnInfo);
+          validateAndVectorizeOperator(child, vContext, isReduce, isTez, vectorTaskColumnInfo);
     } catch (HiveException e) {
       String issue = "exception: " + VectorizationContext.getStackTraceAsSingleLine(e);
       setNodeIssue(issue);
@@ -1010,7 +1003,7 @@ public class Vectorizer implements PhysicalPlanResolver {
 
         MapWork mapWork = mapredWork.getMapWork();
         setMapWorkExplainConditions(mapWork);
-        convertMapWork(mapredWork.getMapWork(), /* isTezOrSpark */ false);
+        convertMapWork(mapredWork.getMapWork(), /* isTez */ false);
         logMapWorkExplainVectorization(mapWork);
 
         ReduceWork reduceWork = mapredWork.getReduceWork();
@@ -1029,7 +1022,7 @@ public class Vectorizer implements PhysicalPlanResolver {
           if (baseWork instanceof MapWork) {
             MapWork mapWork = (MapWork) baseWork;
             setMapWorkExplainConditions(mapWork);
-            convertMapWork(mapWork, /* isTezOrSpark */ true);
+            convertMapWork(mapWork, /* isTez */ true);
             logMapWorkExplainVectorization(mapWork);
           } else if (baseWork instanceof ReduceWork) {
             ReduceWork reduceWork = (ReduceWork) baseWork;
@@ -1037,7 +1030,7 @@ public class Vectorizer implements PhysicalPlanResolver {
             // Always set the EXPLAIN conditions.
             setReduceWorkExplainConditions(reduceWork);
 
-            // We are only vectorizing Reduce under Tez/Spark.
+            // We are only vectorizing Reduce under Tez.
             if (isReduceVectorizationEnabled) {
               convertReduceWork(reduceWork);
             }
@@ -1049,27 +1042,6 @@ public class Vectorizer implements PhysicalPlanResolver {
             setMergeJoinWorkExplainConditions(mergeJoinWork);
 
             logMergeJoinWorkExplainVectorization(mergeJoinWork);
-          }
-        }
-      } else if (currTask instanceof SparkTask) {
-        SparkWork sparkWork = (SparkWork) currTask.getWork();
-        for (BaseWork baseWork : sparkWork.getAllWork()) {
-          if (baseWork instanceof MapWork) {
-            MapWork mapWork = (MapWork) baseWork;
-            setMapWorkExplainConditions(mapWork);
-            convertMapWork(mapWork, /* isTezOrSpark */ true);
-            logMapWorkExplainVectorization(mapWork);
-          } else if (baseWork instanceof ReduceWork) {
-            ReduceWork reduceWork = (ReduceWork) baseWork;
-
-            // Always set the EXPLAIN conditions.
-            setReduceWorkExplainConditions(reduceWork);
-
-            if (isReduceVectorizationEnabled) {
-              convertReduceWork(reduceWork);
-            }
-
-            logReduceWorkExplainVectorization(reduceWork);
           }
         }
       } else if (currTask instanceof FetchTask) {
@@ -1189,7 +1161,7 @@ public class Vectorizer implements PhysicalPlanResolver {
       }
     }
 
-    private void convertMapWork(MapWork mapWork, boolean isTezOrSpark) throws SemanticException {
+    private void convertMapWork(MapWork mapWork, boolean isTez) throws SemanticException {
 
       // We have to evaluate the input format to see if vectorization is enabled, so
       // we do not set it right here.
@@ -1197,7 +1169,7 @@ public class Vectorizer implements PhysicalPlanResolver {
       VectorTaskColumnInfo vectorTaskColumnInfo = new VectorTaskColumnInfo();
       vectorTaskColumnInfo.assume();
 
-      validateAndVectorizeMapWork(mapWork, vectorTaskColumnInfo, isTezOrSpark);
+      validateAndVectorizeMapWork(mapWork, vectorTaskColumnInfo, isTez);
     }
 
     private void addMapWorkRules(Map<Rule, NodeProcessor> opRules, NodeProcessor np) {
@@ -1950,7 +1922,7 @@ public class Vectorizer implements PhysicalPlanResolver {
     }
 
     private void validateAndVectorizeMapWork(MapWork mapWork, VectorTaskColumnInfo vectorTaskColumnInfo,
-        boolean isTezOrSpark) throws SemanticException {
+        boolean isTez) throws SemanticException {
 
       //--------------------------------------------------------------------------------------------
 
@@ -2050,7 +2022,7 @@ public class Vectorizer implements PhysicalPlanResolver {
       /*
        * Validate and vectorize the Map operator tree.
        */
-      if (!validateAndVectorizeMapOperators(mapWork, tableScanOperator, isTezOrSpark, vectorTaskColumnInfo)) {
+      if (!validateAndVectorizeMapOperators(mapWork, tableScanOperator, isTez, vectorTaskColumnInfo)) {
         return;
       }
 
@@ -2064,7 +2036,7 @@ public class Vectorizer implements PhysicalPlanResolver {
     }
 
     private boolean validateAndVectorizeMapOperators(MapWork mapWork, TableScanOperator tableScanOperator,
-        boolean isTezOrSpark, VectorTaskColumnInfo vectorTaskColumnInfo) throws SemanticException {
+        boolean isTez, VectorTaskColumnInfo vectorTaskColumnInfo) throws SemanticException {
 
       LOG.info("Validating and vectorizing MapWork... (vectorizedVertexNum " + vectorizedVertexNum + ")");
 
@@ -2077,7 +2049,7 @@ public class Vectorizer implements PhysicalPlanResolver {
         return false;
       }
       try {
-        validateAndVectorizeMapOperators(tableScanOperator, isTezOrSpark, vectorTaskColumnInfo);
+        validateAndVectorizeMapOperators(tableScanOperator, isTez, vectorTaskColumnInfo);
       } catch (VectorizerCannotVectorizeException e) {
 
         // The "not vectorized" information has been stored in the MapWork vertex.
@@ -2121,11 +2093,11 @@ public class Vectorizer implements PhysicalPlanResolver {
     }
 
     private void validateAndVectorizeMapOperators(TableScanOperator tableScanOperator,
-        boolean isTezOrSpark, VectorTaskColumnInfo vectorTaskColumnInfo)
+        boolean isTez, VectorTaskColumnInfo vectorTaskColumnInfo)
             throws VectorizerCannotVectorizeException {
 
       Operator<? extends OperatorDesc> dummyVectorOperator =
-          validateAndVectorizeOperatorTree(tableScanOperator, false, isTezOrSpark, vectorTaskColumnInfo);
+          validateAndVectorizeOperatorTree(tableScanOperator, false, isTez, vectorTaskColumnInfo);
 
       // Fixup parent and child relations.
       List<Operator<? extends OperatorDesc>> vectorChildren = dummyVectorOperator.getChildOperators();
@@ -2633,18 +2605,6 @@ public class Vectorizer implements PhysicalPlanResolver {
     return true;
   }
 
-  private boolean validateSparkHashTableSinkOperator(SparkHashTableSinkOperator op) {
-    SparkHashTableSinkDesc desc = op.getConf();
-    byte tag = desc.getTag();
-    // it's essentially a MapJoinDesc
-    List<ExprNodeDesc> filterExprs = desc.getFilters().get(tag);
-    List<ExprNodeDesc> keyExprs = desc.getKeys().get(tag);
-    List<ExprNodeDesc> valueExprs = desc.getExprs().get(tag);
-    return validateExprNodeDesc(
-        filterExprs, "Filter", VectorExpressionDescriptor.Mode.FILTER, /* allowComplex */ true) &&
-        validateExprNodeDesc(keyExprs, "Key") && validateExprNodeDesc(valueExprs, "Value");
-  }
-
   private boolean validateReduceSinkOperator(ReduceSinkOperator op) {
     List<ExprNodeDesc> keyDescs = op.getConf().getKeyCols();
     List<ExprNodeDesc> partitionDescs = op.getConf().getPartitionCols();
@@ -2680,7 +2640,7 @@ public class Vectorizer implements PhysicalPlanResolver {
   }
 
   private boolean validateGroupByOperator(GroupByOperator op, boolean isReduce,
-      boolean isTezOrSpark, VectorGroupByDesc vectorGroupByDesc) {
+      boolean isTez, VectorGroupByDesc vectorGroupByDesc) {
 
     GroupByDesc desc = op.getConf();
 
@@ -3607,7 +3567,7 @@ public class Vectorizer implements PhysicalPlanResolver {
   }
 
   private boolean canSpecializeMapJoin(Operator<? extends OperatorDesc> op, MapJoinDesc desc,
-      boolean isTezOrSpark, VectorizationContext vContext, VectorMapJoinDesc vectorDesc)
+      boolean isTez, VectorizationContext vContext, VectorMapJoinDesc vectorDesc)
           throws HiveException {
 
     Preconditions.checkState(op instanceof MapJoinOperator);
@@ -3973,7 +3933,7 @@ public class Vectorizer implements PhysicalPlanResolver {
     boolean result = true;    // Assume.
     if (!useOptimizedTable ||
         !isVectorizationMapJoinNativeEnabled ||
-        !isTezOrSpark ||
+        !isTez ||
         !oneMapJoinCondition ||
         hasNullSafes ||
         !smallTableExprVectorizes ||
@@ -4124,7 +4084,7 @@ public class Vectorizer implements PhysicalPlanResolver {
   }
 
   private boolean canSpecializeReduceSink(ReduceSinkDesc desc,
-      boolean isTezOrSpark, VectorizationContext vContext,
+      boolean isTez, VectorizationContext vContext,
       VectorReduceSinkDesc vectorDesc) throws HiveException {
 
     VectorReduceSinkInfo vectorReduceSinkInfo = new VectorReduceSinkInfo();
@@ -4338,7 +4298,7 @@ public class Vectorizer implements PhysicalPlanResolver {
 
     // Many restrictions.
     if (!isVectorizationReduceSinkNativeEnabled ||
-        !isTezOrSpark ||
+        !isTez ||
         hasPTFTopN ||
         hasDistinctColumns ||
         !isKeyBinarySortable ||
@@ -4351,7 +4311,7 @@ public class Vectorizer implements PhysicalPlanResolver {
   }
 
   private boolean checkForArrowFileSink(FileSinkDesc fileSinkDesc,
-      boolean isTezOrSpark, VectorizationContext vContext,
+      boolean isTez, VectorizationContext vContext,
       VectorFileSinkDesc vectorDesc) throws HiveException {
 
     // Various restrictions.
@@ -5221,10 +5181,10 @@ public class Vectorizer implements PhysicalPlanResolver {
 
   // UNDONE: Used by tests...
   public Operator<? extends OperatorDesc> vectorizeOperator(Operator<? extends OperatorDesc> op,
-      VectorizationContext vContext, boolean isReduce, boolean isTezOrSpark, VectorTaskColumnInfo vectorTaskColumnInfo)
+      VectorizationContext vContext, boolean isReduce, boolean isTez, VectorTaskColumnInfo vectorTaskColumnInfo)
           throws HiveException, VectorizerCannotVectorizeException {
     Operator<? extends OperatorDesc> vectorOp =
-        validateAndVectorizeOperator(op, vContext, isReduce, isTezOrSpark, vectorTaskColumnInfo);
+        validateAndVectorizeOperator(op, vContext, isReduce, isTez, vectorTaskColumnInfo);
     if (vectorOp != op) {
       fixupParentChildOperators(op, vectorOp);
     }
@@ -5232,7 +5192,7 @@ public class Vectorizer implements PhysicalPlanResolver {
   }
 
   public Operator<? extends OperatorDesc> validateAndVectorizeOperator(Operator<? extends OperatorDesc> op,
-      VectorizationContext vContext, boolean isReduce, boolean isTezOrSpark,
+      VectorizationContext vContext, boolean isReduce, boolean isTez,
       VectorTaskColumnInfo vectorTaskColumnInfo)
           throws HiveException, VectorizerCannotVectorizeException {
     Operator<? extends OperatorDesc> vectorOp = null;
@@ -5265,7 +5225,7 @@ public class Vectorizer implements PhysicalPlanResolver {
 
               VectorMapJoinDesc vectorMapJoinDesc = new VectorMapJoinDesc();
               boolean specialize =
-                  canSpecializeMapJoin(op, desc, isTezOrSpark, vContext, vectorMapJoinDesc);
+                  canSpecializeMapJoin(op, desc, isTez, vContext, vectorMapJoinDesc);
 
               if (!specialize) {
 
@@ -5337,7 +5297,7 @@ public class Vectorizer implements PhysicalPlanResolver {
 
             VectorReduceSinkDesc vectorReduceSinkDesc = new VectorReduceSinkDesc();
             boolean specialize =
-                canSpecializeReduceSink(reduceDesc, isTezOrSpark, vContext, vectorReduceSinkDesc);
+                canSpecializeReduceSink(reduceDesc, isTez, vContext, vectorReduceSinkDesc);
 
             if (!specialize) {
 
@@ -5416,7 +5376,7 @@ public class Vectorizer implements PhysicalPlanResolver {
           {
             // The validateGroupByOperator method will update vectorGroupByDesc.
             VectorGroupByDesc vectorGroupByDesc = new VectorGroupByDesc();
-            if (!validateGroupByOperator((GroupByOperator) op, isReduce, isTezOrSpark,
+            if (!validateGroupByOperator((GroupByOperator) op, isReduce, isTez,
                 vectorGroupByDesc)) {
               throw new VectorizerCannotVectorizeException();
             }
@@ -5454,7 +5414,7 @@ public class Vectorizer implements PhysicalPlanResolver {
 
             VectorFileSinkDesc vectorFileSinkDesc = new VectorFileSinkDesc();
             boolean isArrowSpecialization =
-                checkForArrowFileSink(fileSinkDesc, isTezOrSpark, vContext, vectorFileSinkDesc);
+                checkForArrowFileSink(fileSinkDesc, isTez, vContext, vectorFileSinkDesc);
 
             if (isArrowSpecialization) {
               vectorOp =
@@ -5502,38 +5462,6 @@ public class Vectorizer implements PhysicalPlanResolver {
             }
 
             vectorOp = vectorizePTFOperator(op, vContext, vectorPTFDesc);
-            isNative = true;
-          }
-          break;
-        case HASHTABLESINK:
-          {
-            // No validation.
-
-            SparkHashTableSinkDesc sparkHashTableSinkDesc = (SparkHashTableSinkDesc) op.getConf();
-
-            VectorSparkHashTableSinkDesc vectorSparkHashTableSinkDesc = new VectorSparkHashTableSinkDesc();
-            vectorOp = OperatorFactory.getVectorOperator(
-                op.getCompilationOpContext(), sparkHashTableSinkDesc,
-                vContext, vectorSparkHashTableSinkDesc);
-            isNative = true;
-          }
-          break;
-        case SPARKPRUNINGSINK:
-          {
-            // No validation.
-
-            SparkPartitionPruningSinkDesc sparkPartitionPruningSinkDesc =
-                (SparkPartitionPruningSinkDesc) op.getConf();
-
-            VectorSparkPartitionPruningSinkDesc vectorSparkPartitionPruningSinkDesc =
-                new VectorSparkPartitionPruningSinkDesc();
-            vectorOp = OperatorFactory.getVectorOperator(
-                op.getCompilationOpContext(), sparkPartitionPruningSinkDesc,
-                vContext, vectorSparkPartitionPruningSinkDesc);
-            // need to maintain the unique ID so that target map works can
-            // read the output
-            ((SparkPartitionPruningSinkOperator) vectorOp).setUniqueId(
-                ((SparkPartitionPruningSinkOperator) op).getUniqueId());
             isNative = true;
           }
           break;

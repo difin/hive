@@ -38,7 +38,6 @@ import org.apache.hadoop.hive.ql.parse.MapReduceCompiler;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.parse.TaskCompiler;
 import org.apache.hadoop.hive.ql.parse.TezCompiler;
-import org.apache.hadoop.hive.ql.parse.spark.SparkCompiler;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -93,8 +92,6 @@ public class NativeEngineCompileHelper implements EngineCompileHelper {
         return new MapReduceCompiler();
       case TEZ:
         return new TezCompiler();
-      case SPARK:
-        return new SparkCompiler();
       case INVALID_RUNTIME:
         throw new UnsupportedOperationException("Invalid execution engine specified.");
     }

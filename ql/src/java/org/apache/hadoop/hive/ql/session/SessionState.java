@@ -85,8 +85,6 @@ import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
 import org.apache.hadoop.hive.ql.engine.EngineLoader;
 import org.apache.hadoop.hive.ql.engine.EngineSession;
-import org.apache.hadoop.hive.ql.exec.spark.session.SparkSession;
-import org.apache.hadoop.hive.ql.exec.spark.session.SparkSessionManagerImpl;
 import org.apache.hadoop.hive.ql.exec.tez.ExternalSessionsRegistry;
 import org.apache.hadoop.hive.ql.exec.tez.TezExternalSessionState;
 import org.apache.hadoop.hive.ql.exec.tez.TezSessionPoolManager;
@@ -104,6 +102,7 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.metadata.TempTable;
+import org.apache.hadoop.hive.ql.parse.SemanticAnalyzer;
 import org.apache.hadoop.hive.ql.security.HiveAuthenticationProvider;
 import org.apache.hadoop.hive.ql.security.authorization.HiveAuthorizationProvider;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.AuthorizationMetaStoreFilterHook;
@@ -271,8 +270,6 @@ public class SessionState {
   private String userIpAddress;
 
   private EngineSession engineSession;
-
-  private SparkSession sparkSession;
 
   /**
    * Gets information about HDFS encryption
@@ -1921,7 +1918,6 @@ public class SessionState {
     }
 
     try {
-      closeSparkSession();
       closeExternalSession();
       registry.closeCUDFLoaders();
       dropSessionPaths(sessionConf);
@@ -1964,18 +1960,6 @@ public class SessionState {
       }
     } catch (Exception e) {
       LOG.info("Failed to remove classloaders from DataNucleus ", e);
-    }
-  }
-
-  public void closeSparkSession() {
-    if (sparkSession != null) {
-      try {
-        SparkSessionManagerImpl.getInstance().closeSession(sparkSession);
-      } catch (Exception ex) {
-        LOG.error("Error closing spark session.", ex);
-      } finally {
-        sparkSession = null;
-      }
     }
   }
 
@@ -2103,14 +2087,6 @@ public class SessionState {
 
   public void setEngineSession(EngineSession engineSession) {
     this.engineSession = engineSession;
-  }
-
-  public SparkSession getSparkSession() {
-    return sparkSession;
-  }
-
-  public void setSparkSession(SparkSession sparkSession) {
-    this.sparkSession = sparkSession;
   }
 
   public void addDynamicVar(Object object) {
