@@ -774,14 +774,26 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
    * <ul>
    *   <li>iceberg format-version is "2"</li>
    *   <li>fileformat is set to avro</li>
+   *   <li>fileformat is set to parquet, and table schema has timestamp (without zone) type column</li>
    * </ul>
    * @param tableProps table properties, must be not null
    */
   private void fallbackToNonVectorizedModeBasedOnProperties(Properties tableProps) {
     if ("2".equals(tableProps.get(TableProperties.FORMAT_VERSION)) ||
-        FileFormat.AVRO.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT))) {
+        FileFormat.AVRO.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT)) ||
+        hasParquetTimestampInSchema(tableProps)) {
       conf.setBoolean(HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED.varname, false);
     }
+  }
+
+  // TODO: revert this check once long term solution for CDPD-36560 is merged
+  private static boolean hasParquetTimestampInSchema(Properties tableProps) {
+    if (!FileFormat.PARQUET.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT))) {
+      return false;
+    }
+    Schema tableSchema = SchemaParser.fromJson(tableProps.getProperty(InputFormatConfig.TABLE_SCHEMA));
+    return tableSchema.columns().stream()
+        .anyMatch(f -> Types.TimestampType.withoutZone().typeId() == f.type().typeId());
   }
 
   /**

@@ -181,8 +181,6 @@ public class TestHiveIcebergPartitions extends HiveIcebergStorageHandlerWithEngi
 
   @Test
   public void testDayTransform() throws IOException {
-    // TODO: remove below assume once Parquet version is 1.11.1+
-    Assume.assumeFalse(isVectorized && fileFormat == FileFormat.PARQUET);
     Schema schema = new Schema(
         optional(1, "id", Types.LongType.get()),
         optional(2, "part_field", Types.TimestampType.withoutZone()));
@@ -200,8 +198,6 @@ public class TestHiveIcebergPartitions extends HiveIcebergStorageHandlerWithEngi
 
   @Test
   public void testHourTransform() throws IOException {
-    // TODO: remove below assume once Parquet version is 1.11.1+
-    Assume.assumeFalse(isVectorized && fileFormat == FileFormat.PARQUET);
     Schema schema = new Schema(
         optional(1, "id", Types.LongType.get()),
         optional(2, "part_field", Types.TimestampType.withoutZone()));

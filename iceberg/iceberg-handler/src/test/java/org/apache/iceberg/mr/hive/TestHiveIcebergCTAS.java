@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.List;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.iceberg.AssertHelpers;
-import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.PartitionSpecParser;
 import org.apache.iceberg.Schema;
@@ -131,8 +130,6 @@ public class TestHiveIcebergCTAS extends HiveIcebergStorageHandlerWithEngineBase
   @Test
   public void testCTASPartitionedBySpec() throws TException, InterruptedException {
     Assume.assumeTrue(HiveIcebergSerDe.CTAS_EXCEPTION_MSG, testTableType == TestTables.TestTableType.HIVE_CATALOG);
-    Assume.assumeFalse("PARQUET vectorization is not working for timestamp with TZ",
-        fileFormat.equals(FileFormat.PARQUET) && isVectorized);
 
     Schema schema = new Schema(
         optional(1, "id", Types.LongType.get()),
