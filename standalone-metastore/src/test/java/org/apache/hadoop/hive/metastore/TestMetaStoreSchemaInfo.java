@@ -86,6 +86,8 @@ public class TestMetaStoreSchemaInfo {
     Assert.assertEquals(ver1.getCdhVersionString(), "2021.0.0.0");
     ver1 = new CDHMetaStoreSchemaInfo.CDHVersion("3.1.3000.2021.0.0-h10");
     Assert.assertEquals(ver1.getCdhVersionString(), "2021.0.0.10");
+    ver1 = new CDHMetaStoreSchemaInfo.CDHVersion("3.1.3000.7.2.15.0-update1");
+    Assert.assertEquals(ver1.getCdhVersionString(), "7.2.15.0update1");
   }
 
 }

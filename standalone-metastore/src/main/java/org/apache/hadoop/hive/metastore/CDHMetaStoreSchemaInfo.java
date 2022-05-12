@@ -457,18 +457,24 @@ public class CDHMetaStoreSchemaInfo extends MetaStoreSchemaInfo {
     // This method will convert hiveversion.YYYY.Major.Minor-hNum1-bNum
     // To the hiveversion.YYYY.Major.Minor.Num1-bNum, in order to compare with
     // old style version like hiveversion.7.2.1.0-79
+    // CDPD-39854: It also converts schemaVersion like hiveversion.7.2.15.0-update1 to
+    // hiveversion.7.2.15.0update1
     public static String convertToUnifiedVersionString(String cdpVersion) {
       String hfVersion = ".*\\d{4}(\\.\\d+){2}-h\\d+(-b\\d+)?";
       String normalVersion = ".*\\d{4}(\\.\\d+){2}-b\\d+";
+      String schemaVersion = ".*\\d{4}(\\.\\d+){4}-update\\d+";
       if (Pattern.matches(hfVersion, cdpVersion)) {
         return cdpVersion.replaceAll("-h", ".");
       } else if (Pattern.matches(normalVersion, cdpVersion)) {
         return cdpVersion.replace("-b", ".0-b");
+      } else if (Pattern.matches(schemaVersion, cdpVersion)) {
+        return cdpVersion.replace("-", "");
       } else if (StringUtils.countMatches(cdpVersion, ".") == 5) { //The version after -SNAPSHOT is removed.
         return cdpVersion + ".0";
       }
       return cdpVersion;
     }
+
     private static int compareVersionStrings(String aVersion, String bVersion) {
       String aUnifiedVer = convertToUnifiedVersionString(aVersion);
       String bUnifiedVer = convertToUnifiedVersionString(bVersion);
