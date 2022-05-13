@@ -18,10 +18,8 @@
 
 package org.apache.hadoop.hive.ql.plan;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -113,10 +111,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
 
   private Set<FileStatus> filesToFetch = null;
 
-  // contains the partition values for each dynamic Partition written by this FileSink
-  // and the committed files for each partition
-  // CDPD-33826: dynPartitionValues should be initialized to null.
-  private Map<String, List<Path>> dynPartitionValues;
+  private Set<String> dynPartitionValues;
 
   /**
    * Whether is a HiveServer query, and the destination table is
@@ -723,11 +718,11 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
     this.moveTaskId = moveTaskId;
   }
 
-  public Map<String, List<Path>> getDynPartitionValues() {
+  public Set<String> getDynPartitionValues() {
     return dynPartitionValues;
   }
 
-  public void setDynPartitionValues(Map<String, List<Path>> dynPartitionValues) {
+  public void setDynPartitionValues(Set<String> dynPartitionValues) {
     this.dynPartitionValues = dynPartitionValues;
   }
 
