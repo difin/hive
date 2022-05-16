@@ -30,7 +30,23 @@ if [[ -z "${CDW_HIVE_AUX_JARS_PATH}" ]]; then
 else
   cd ${DOWNLOAD_PATH}
   for f in $(echo $CDW_HIVE_AUX_JARS_PATH | tr ':' ' '); do
+    # Store single words which are most likely scheme Ex: s3a, file, abfs, hdfs, ...
+    if [[ "$f" =~ ^[A-Za-z][-A-Za-z0-9+.]*$ ]]; then
+      prev="$f"
+      continue
+    fi
+    # If prev was set and current file starts with "//" prepend scheme
+    # this is to create full path i.e s3a://bucket, hdfs://path ...
+    if ! test -z "$prev"; then
+      if [[ "$f" =~ ^// ]]; then
+        f="$prev:$f"
+      else
+        # The match did not happen, we missed the prev, just try downloading it.
+        download_and_copy $prev
+      fi
+    fi
     download_and_copy $f
+    prev=""
   done
   ls -l .
 fi
