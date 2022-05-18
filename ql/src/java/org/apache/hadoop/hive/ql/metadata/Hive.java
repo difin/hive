@@ -2550,8 +2550,13 @@ public class Hive {
               + ", Direct insert = " + isDirectInsert + ")");
         }
         if (newFiles != null) {
-          newFileStatuses = listFilesCreatedByQuery(loadPath, writeId, stmtId);
-          newFiles.addAll(newFileStatuses);
+          if (!newFiles.isEmpty()) {
+            newFileStatuses = new ArrayList<>();
+            newFileStatuses.addAll(newFiles);
+          } else {
+            newFileStatuses = listFilesCreatedByQuery(loadPath, writeId, stmtId);
+            newFiles.addAll(newFileStatuses);
+          }
         }
         if (Utilities.FILE_OP_LOGGER.isTraceEnabled()) {
           Utilities.FILE_OP_LOGGER.trace("maybe deleting stuff from " + oldPartPath
@@ -3040,7 +3045,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
     AcidUtils.TableSnapshot tableSnapshot = isTxnTable ? getTableSnapshot(tbl, writeId) : null;
 
     for (Entry<Path, PartitionDetails> entry : partitionDetailsMap.entrySet()) {
-      final boolean getPartitionFromHms = fetchPartitionInfo;
+      boolean getPartitionFromHms = fetchPartitionInfo;
       tasks.add(() -> {
         PartitionDetails partitionDetails = entry.getValue();
         Map<String, String> fullPartSpec = partitionDetails.fullSpec;
@@ -3056,9 +3061,15 @@ private void constructOneLBLocationMap(FileStatus fSta,
             }
           }
           LOG.info("New loading path = " + entry.getKey() + " withPartSpec " + fullPartSpec);
-
-          List<FileStatus> newFiles = Collections.synchronizedList(new ArrayList<>());
           Partition oldPartition = partitionDetails.partition;
+          List<FileStatus> newFiles = null;
+          if (partitionDetails.newFiles != null) {
+            // If we already know the files from the direct insert manifest, use them
+            newFiles = partitionDetails.newFiles;
+          } else if (conf.getBoolVar(ConfVars.FIRE_EVENTS_FOR_DML) && !tbl.isTemporary() && oldPartition == null) {
+            // Otherwise only collect them, if we are going to fire write notifications
+            newFiles = Collections.synchronizedList(new ArrayList<>());
+          }
           // load the partition
           Partition partition = loadPartitionInternal(entry.getKey(), tbl,
                   fullPartSpec, oldPartition, tbd.getLoadFileType(), true, false, numLB > 0, false, isAcid,
