@@ -1,7 +1,6 @@
 create database if not exists airline_ontime_iceberg;
 use airline_ontime_iceberg;
 set hive.vectorized.execution.enabled=false;
-set hive.stats.column.autogather=false;
 
 create external table if not exists airports (
     iata string,
