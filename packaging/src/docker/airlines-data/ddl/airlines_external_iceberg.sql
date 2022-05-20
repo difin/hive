@@ -91,3 +91,8 @@ ALTER TABLE airports SET TBLPROPERTIES ('storage_handler'='org.apache.iceberg.mr
 ALTER TABLE airlines SET TBLPROPERTIES ('storage_handler'='org.apache.iceberg.mr.hive.HiveIcebergStorageHandler');
 ALTER TABLE planes SET TBLPROPERTIES ('storage_handler'='org.apache.iceberg.mr.hive.HiveIcebergStorageHandler');
 ALTER TABLE flights SET TBLPROPERTIES ('storage_handler'='org.apache.iceberg.mr.hive.HiveIcebergStorageHandler');
+
+analyze table airports compute statistics;
+analyze table airlines compute statistics;
+analyze table planes compute statistics;
+analyze table flights compute statistics;
