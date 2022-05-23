@@ -786,13 +786,15 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
    *   <li>iceberg format-version is "2"</li>
    *   <li>fileformat is set to avro</li>
    *   <li>fileformat is set to parquet, and table schema has timestamp (without zone) type column</li>
+   *   <li>querying metadata tables</li>
    * </ul>
    * @param tableProps table properties, must be not null
    */
   private void fallbackToNonVectorizedModeBasedOnProperties(Properties tableProps) {
     if ("2".equals(tableProps.get(TableProperties.FORMAT_VERSION)) ||
         FileFormat.AVRO.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT)) ||
-        hasParquetTimestampInSchema(tableProps)) {
+        hasParquetTimestampInSchema(tableProps) ||
+        (tableProps.containsKey("metaTable") && isValidMetadataTable(tableProps.getProperty("metaTable")))) {
       conf.setBoolean(HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED.varname, false);
     }
   }
