@@ -1329,9 +1329,7 @@ public class TestTxnHandler {
 
     rqst.setType(CompactionType.MINOR);
     resp = txnHandler.compact(rqst);
-    Assert.assertFalse(resp.isAccepted());
-    Assert.assertEquals(TxnStore.REFUSED_RESPONSE, resp.getState());
-    Assert.assertEquals("Compaction is already scheduled with state='initiated' and id=1", resp.getErrormessage());
+    Assert.assertEquals(resp, new CompactionResponse(1, TxnStore.INITIATED_RESPONSE, false));
 
     rsp = txnHandler.showCompact(new ShowCompactRequest());
     compacts = rsp.getCompacts();

@@ -14,7 +14,6 @@ package org.apache.hadoop.hive.metastore.api;
   private static final org.apache.thrift.protocol.TField ID_FIELD_DESC = new org.apache.thrift.protocol.TField("id", org.apache.thrift.protocol.TType.I64, (short)1);
   private static final org.apache.thrift.protocol.TField STATE_FIELD_DESC = new org.apache.thrift.protocol.TField("state", org.apache.thrift.protocol.TType.STRING, (short)2);
   private static final org.apache.thrift.protocol.TField ACCEPTED_FIELD_DESC = new org.apache.thrift.protocol.TField("accepted", org.apache.thrift.protocol.TType.BOOL, (short)3);
-  private static final org.apache.thrift.protocol.TField ERRORMESSAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("errormessage", org.apache.thrift.protocol.TType.STRING, (short)4);
 
   private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new CompactionResponseStandardSchemeFactory();
   private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new CompactionResponseTupleSchemeFactory();
@@ -22,14 +21,12 @@ package org.apache.hadoop.hive.metastore.api;
   private long id; // required
   private @org.apache.thrift.annotation.Nullable java.lang.String state; // required
   private boolean accepted; // required
-  private @org.apache.thrift.annotation.Nullable java.lang.String errormessage; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     ID((short)1, "id"),
     STATE((short)2, "state"),
-    ACCEPTED((short)3, "accepted"),
-    ERRORMESSAGE((short)4, "errormessage");
+    ACCEPTED((short)3, "accepted");
 
     private static final java.util.Map<java.lang.String, _Fields> byName = new java.util.HashMap<java.lang.String, _Fields>();
 
@@ -51,8 +48,6 @@ package org.apache.hadoop.hive.metastore.api;
           return STATE;
         case 3: // ACCEPTED
           return ACCEPTED;
-        case 4: // ERRORMESSAGE
-          return ERRORMESSAGE;
         default:
           return null;
       }
@@ -97,7 +92,6 @@ package org.apache.hadoop.hive.metastore.api;
   private static final int __ID_ISSET_ID = 0;
   private static final int __ACCEPTED_ISSET_ID = 1;
   private byte __isset_bitfield = 0;
-  private static final _Fields optionals[] = {_Fields.ERRORMESSAGE};
   public static final java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new java.util.EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -107,8 +101,6 @@ package org.apache.hadoop.hive.metastore.api;
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.ACCEPTED, new org.apache.thrift.meta_data.FieldMetaData("accepted", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
-    tmpMap.put(_Fields.ERRORMESSAGE, new org.apache.thrift.meta_data.FieldMetaData("errormessage", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = java.util.Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(CompactionResponse.class, metaDataMap);
   }
@@ -139,9 +131,6 @@ package org.apache.hadoop.hive.metastore.api;
       this.state = other.state;
     }
     this.accepted = other.accepted;
-    if (other.isSetErrormessage()) {
-      this.errormessage = other.errormessage;
-    }
   }
 
   public CompactionResponse deepCopy() {
@@ -155,7 +144,6 @@ package org.apache.hadoop.hive.metastore.api;
     this.state = null;
     setAcceptedIsSet(false);
     this.accepted = false;
-    this.errormessage = null;
   }
 
   public long getId() {
@@ -226,30 +214,6 @@ package org.apache.hadoop.hive.metastore.api;
     __isset_bitfield = org.apache.thrift.EncodingUtils.setBit(__isset_bitfield, __ACCEPTED_ISSET_ID, value);
   }
 
-  @org.apache.thrift.annotation.Nullable
-  public java.lang.String getErrormessage() {
-    return this.errormessage;
-  }
-
-  public void setErrormessage(@org.apache.thrift.annotation.Nullable java.lang.String errormessage) {
-    this.errormessage = errormessage;
-  }
-
-  public void unsetErrormessage() {
-    this.errormessage = null;
-  }
-
-  /** Returns true if field errormessage is set (has been assigned a value) and false otherwise */
-  public boolean isSetErrormessage() {
-    return this.errormessage != null;
-  }
-
-  public void setErrormessageIsSet(boolean value) {
-    if (!value) {
-      this.errormessage = null;
-    }
-  }
-
   public void setFieldValue(_Fields field, @org.apache.thrift.annotation.Nullable java.lang.Object value) {
     switch (field) {
     case ID:
@@ -276,14 +240,6 @@ package org.apache.hadoop.hive.metastore.api;
       }
       break;
 
-    case ERRORMESSAGE:
-      if (value == null) {
-        unsetErrormessage();
-      } else {
-        setErrormessage((java.lang.String)value);
-      }
-      break;
-
     }
   }
 
@@ -298,9 +254,6 @@ package org.apache.hadoop.hive.metastore.api;
 
     case ACCEPTED:
       return isAccepted();
-
-    case ERRORMESSAGE:
-      return getErrormessage();
 
     }
     throw new java.lang.IllegalStateException();
@@ -319,8 +272,6 @@ package org.apache.hadoop.hive.metastore.api;
       return isSetState();
     case ACCEPTED:
       return isSetAccepted();
-    case ERRORMESSAGE:
-      return isSetErrormessage();
     }
     throw new java.lang.IllegalStateException();
   }
@@ -367,15 +318,6 @@ package org.apache.hadoop.hive.metastore.api;
         return false;
     }
 
-    boolean this_present_errormessage = true && this.isSetErrormessage();
-    boolean that_present_errormessage = true && that.isSetErrormessage();
-    if (this_present_errormessage || that_present_errormessage) {
-      if (!(this_present_errormessage && that_present_errormessage))
-        return false;
-      if (!this.errormessage.equals(that.errormessage))
-        return false;
-    }
-
     return true;
   }
 
@@ -390,10 +332,6 @@ package org.apache.hadoop.hive.metastore.api;
       hashCode = hashCode * 8191 + state.hashCode();
 
     hashCode = hashCode * 8191 + ((accepted) ? 131071 : 524287);
-
-    hashCode = hashCode * 8191 + ((isSetErrormessage()) ? 131071 : 524287);
-    if (isSetErrormessage())
-      hashCode = hashCode * 8191 + errormessage.hashCode();
 
     return hashCode;
   }
@@ -436,16 +374,6 @@ package org.apache.hadoop.hive.metastore.api;
         return lastComparison;
       }
     }
-    lastComparison = java.lang.Boolean.valueOf(isSetErrormessage()).compareTo(other.isSetErrormessage());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    if (isSetErrormessage()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.errormessage, other.errormessage);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-    }
     return 0;
   }
 
@@ -482,16 +410,6 @@ package org.apache.hadoop.hive.metastore.api;
     sb.append("accepted:");
     sb.append(this.accepted);
     first = false;
-    if (isSetErrormessage()) {
-      if (!first) sb.append(", ");
-      sb.append("errormessage:");
-      if (this.errormessage == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.errormessage);
-      }
-      first = false;
-    }
     sb.append(")");
     return sb.toString();
   }
@@ -573,14 +491,6 @@ package org.apache.hadoop.hive.metastore.api;
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 4: // ERRORMESSAGE
-            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
-              struct.errormessage = iprot.readString();
-              struct.setErrormessageIsSet(true);
-            } else { 
-              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-            }
-            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -605,13 +515,6 @@ package org.apache.hadoop.hive.metastore.api;
       oprot.writeFieldBegin(ACCEPTED_FIELD_DESC);
       oprot.writeBool(struct.accepted);
       oprot.writeFieldEnd();
-      if (struct.errormessage != null) {
-        if (struct.isSetErrormessage()) {
-          oprot.writeFieldBegin(ERRORMESSAGE_FIELD_DESC);
-          oprot.writeString(struct.errormessage);
-          oprot.writeFieldEnd();
-        }
-      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -632,14 +535,6 @@ package org.apache.hadoop.hive.metastore.api;
       oprot.writeI64(struct.id);
       oprot.writeString(struct.state);
       oprot.writeBool(struct.accepted);
-      java.util.BitSet optionals = new java.util.BitSet();
-      if (struct.isSetErrormessage()) {
-        optionals.set(0);
-      }
-      oprot.writeBitSet(optionals, 1);
-      if (struct.isSetErrormessage()) {
-        oprot.writeString(struct.errormessage);
-      }
     }
 
     @Override
@@ -651,11 +546,6 @@ package org.apache.hadoop.hive.metastore.api;
       struct.setStateIsSet(true);
       struct.accepted = iprot.readBool();
       struct.setAcceptedIsSet(true);
-      java.util.BitSet incoming = iprot.readBitSet(1);
-      if (incoming.get(0)) {
-        struct.errormessage = iprot.readString();
-        struct.setErrormessageIsSet(true);
-      }
     }
   }
 

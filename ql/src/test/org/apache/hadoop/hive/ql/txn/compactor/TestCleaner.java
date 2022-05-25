@@ -23,7 +23,6 @@ import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.CommitTxnRequest;
 import org.apache.hadoop.hive.metastore.api.CompactionRequest;
-import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.FindNextCompactRequest;
 import org.apache.hadoop.hive.metastore.api.GetValidWriteIdsRequest;
@@ -867,17 +866,14 @@ public class TestCleaner extends CompactorTest {
     CompactionRequest rqst = new CompactionRequest(dbName, tableName, CompactionType.MAJOR);
     addBaseFile(t, null, 22L, 22);
     compactInTxn(rqst);
-
-    CompactionResponse response = txnHandler.compact(rqst);
-
-    Assert.assertFalse(response.isAccepted());
-    Assert.assertEquals("Compaction is already scheduled with state='ready for cleaning' and id=1", response.getErrormessage());
+    compactInTxn(rqst);
 
     startCleaner();
 
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
-    Assert.assertEquals(1, rsp.getCompactsSize());
+    Assert.assertEquals(2, rsp.getCompactsSize());
     Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(0).getState());
+    Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(1).getState());
 
     List<Path> paths = getDirectories(conf, t, null);
     Assert.assertEquals(1, paths.size());
@@ -898,16 +894,15 @@ public class TestCleaner extends CompactorTest {
     CompactionRequest rqst = new CompactionRequest(dbName, tableName, CompactionType.MAJOR);
 
     compactInTxn(rqst);
-    CompactionResponse response = txnHandler.compact(rqst);
+    compactInTxn(rqst);
 
-    Assert.assertFalse(response.isAccepted());
-    Assert.assertEquals("Compaction is already scheduled with state='ready for cleaning' and id=1", response.getErrormessage());
-
+    startCleaner();
     startCleaner();
 
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
-    Assert.assertEquals(1, rsp.getCompactsSize());
+    Assert.assertEquals(2, rsp.getCompactsSize());
     Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(0).getState());
+    Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(1).getState());
 
     List<Path> paths = getDirectories(conf, t, null);
     Assert.assertEquals(1, paths.size());
@@ -928,16 +923,15 @@ public class TestCleaner extends CompactorTest {
     CompactionRequest rqst = new CompactionRequest(dbName, tableName, CompactionType.MAJOR);
 
     compactInTxn(rqst);
-    CompactionResponse response = txnHandler.compact(rqst);
+    compactInTxn(rqst);
 
-    Assert.assertFalse(response.isAccepted());
-    Assert.assertEquals("Compaction is already scheduled with state='ready for cleaning' and id=1", response.getErrormessage());
-
+    startCleaner();
     startCleaner();
 
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
-    Assert.assertEquals(1, rsp.getCompactsSize());
+    Assert.assertEquals(2, rsp.getCompactsSize());
     Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(0).getState());
+    Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(1).getState());
 
     List<Path> paths = getDirectories(conf, t, null);
     Assert.assertEquals(1, paths.size());

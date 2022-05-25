@@ -79,12 +79,6 @@ class DummyTxnManager extends HiveTxnManagerImpl {
   public long getCurrentTxnId() {
     return 0L;
   }
-
-  @Override
-  public void setTableWriteId(String dbName, String tableName, long writeId) throws LockException {
-
-  }
-
   @Override
   public int getStmtIdAndIncrement() {
     return 0;

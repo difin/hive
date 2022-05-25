@@ -26552,11 +26552,6 @@ void CompactionResponse::__set_state(const std::string& val) {
 void CompactionResponse::__set_accepted(const bool val) {
   this->accepted = val;
 }
-
-void CompactionResponse::__set_errormessage(const std::string& val) {
-  this->errormessage = val;
-__isset.errormessage = true;
-}
 std::ostream& operator<<(std::ostream& out, const CompactionResponse& obj)
 {
   obj.printTo(out);
@@ -26612,14 +26607,6 @@ uint32_t CompactionResponse::read(::apache::thrift::protocol::TProtocol* iprot) 
           xfer += iprot->skip(ftype);
         }
         break;
-      case 4:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->errormessage);
-          this->__isset.errormessage = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -26655,11 +26642,6 @@ uint32_t CompactionResponse::write(::apache::thrift::protocol::TProtocol* oprot)
   xfer += oprot->writeBool(this->accepted);
   xfer += oprot->writeFieldEnd();
 
-  if (this->__isset.errormessage) {
-    xfer += oprot->writeFieldBegin("errormessage", ::apache::thrift::protocol::T_STRING, 4);
-    xfer += oprot->writeString(this->errormessage);
-    xfer += oprot->writeFieldEnd();
-  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -26670,23 +26652,17 @@ void swap(CompactionResponse &a, CompactionResponse &b) {
   swap(a.id, b.id);
   swap(a.state, b.state);
   swap(a.accepted, b.accepted);
-  swap(a.errormessage, b.errormessage);
-  swap(a.__isset, b.__isset);
 }
 
 CompactionResponse::CompactionResponse(const CompactionResponse& other961) {
   id = other961.id;
   state = other961.state;
   accepted = other961.accepted;
-  errormessage = other961.errormessage;
-  __isset = other961.__isset;
 }
 CompactionResponse& CompactionResponse::operator=(const CompactionResponse& other962) {
   id = other962.id;
   state = other962.state;
   accepted = other962.accepted;
-  errormessage = other962.errormessage;
-  __isset = other962.__isset;
   return *this;
 }
 void CompactionResponse::printTo(std::ostream& out) const {
@@ -26695,7 +26671,6 @@ void CompactionResponse::printTo(std::ostream& out) const {
   out << "id=" << to_string(id);
   out << ", " << "state=" << to_string(state);
   out << ", " << "accepted=" << to_string(accepted);
-  out << ", " << "errormessage="; (__isset.errormessage ? (out << to_string(errormessage)) : (out << "<null>"));
   out << ")";
 }
 

@@ -36,11 +36,6 @@ class CompactionResponse
             'isRequired' => true,
             'type' => TType::BOOL,
         ),
-        4 => array(
-            'var' => 'errormessage',
-            'isRequired' => false,
-            'type' => TType::STRING,
-        ),
     );
 
     /**
@@ -55,10 +50,6 @@ class CompactionResponse
      * @var bool
      */
     public $accepted = null;
-    /**
-     * @var string
-     */
-    public $errormessage = null;
 
     public function __construct($vals = null)
     {
@@ -71,9 +62,6 @@ class CompactionResponse
             }
             if (isset($vals['accepted'])) {
                 $this->accepted = $vals['accepted'];
-            }
-            if (isset($vals['errormessage'])) {
-                $this->errormessage = $vals['errormessage'];
             }
         }
     }
@@ -118,13 +106,6 @@ class CompactionResponse
                         $xfer += $input->skip($ftype);
                     }
                     break;
-                case 4:
-                    if ($ftype == TType::STRING) {
-                        $xfer += $input->readString($this->errormessage);
-                    } else {
-                        $xfer += $input->skip($ftype);
-                    }
-                    break;
                 default:
                     $xfer += $input->skip($ftype);
                     break;
@@ -152,11 +133,6 @@ class CompactionResponse
         if ($this->accepted !== null) {
             $xfer += $output->writeFieldBegin('accepted', TType::BOOL, 3);
             $xfer += $output->writeBool($this->accepted);
-            $xfer += $output->writeFieldEnd();
-        }
-        if ($this->errormessage !== null) {
-            $xfer += $output->writeFieldBegin('errormessage', TType::STRING, 4);
-            $xfer += $output->writeString($this->errormessage);
             $xfer += $output->writeFieldEnd();
         }
         $xfer += $output->writeFieldStop();

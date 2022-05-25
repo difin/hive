@@ -69,6 +69,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -210,7 +211,7 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
           statusUpdaterConf.set(TezConfiguration.TEZ_QUEUE_NAME, compactionQueueName);
         }
         SessionState sessionState = DriverUtils.setUpSessionState(statusUpdaterConf, userName, true);
-        DriverUtils.runOnDriver(statusUpdaterConf, userName, sessionState, sb.toString(), ci.highestWriteId);
+        DriverUtils.runOnDriver(statusUpdaterConf, userName, sessionState, sb.toString());
       } catch (Throwable t) {
         LOG.error(ci + ": gatherStats(" + ci.dbname + "," + ci.tableName + "," + ci.partName +
                       ") failed due to: " + t.getMessage(), t);
