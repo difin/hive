@@ -2891,7 +2891,6 @@ PREHOOK: Input: default@acidtable
 PREHOOK: Input: default@nonacid_n1
 PREHOOK: Output: default@acidtable
 PREHOOK: Output: default@acidtable
-PREHOOK: Output: default@acidtable
 PREHOOK: Output: default@merge_tmp_table
 POSTHOOK: query: explain MERGE INTO acidTable as t using nonacid_n1 as s ON t.key = s.key
 WHEN MATCHED AND s.key < 3 THEN DELETE
@@ -3187,7 +3186,7 @@ STAGE PLANS:
               name: default.acidtable
           Write Type: DELETE
 
-  Stage: Stage-6
+  Stage: Stage-7
     Stats Work
       Basic Stats Work:
 
@@ -3248,7 +3247,6 @@ PREHOOK: Input: default@acidtable
 PREHOOK: Input: default@nonacid_n1
 PREHOOK: Output: default@acidtable
 PREHOOK: Output: default@acidtable
-PREHOOK: Output: default@acidtable
 PREHOOK: Output: default@merge_tmp_table
 POSTHOOK: query: MERGE INTO acidTable as t using nonacid_n1 as s ON t.key = s.key
 WHEN MATCHED AND s.key < 3 THEN DELETE
@@ -3259,10 +3257,12 @@ POSTHOOK: Input: default@acidtable
 POSTHOOK: Input: default@nonacid_n1
 POSTHOOK: Output: default@acidtable
 POSTHOOK: Output: default@acidtable
-POSTHOOK: Output: default@acidtable
 POSTHOOK: Output: default@merge_tmp_table
 POSTHOOK: Lineage: acidtable.a1 SIMPLE [(nonacid_n1)s.FieldSchema(name:a1, type:string, comment:null), ]
+POSTHOOK: Lineage: acidtable.a1 SIMPLE [(nonacid_n1)s.FieldSchema(name:a1, type:string, comment:null), ]
 POSTHOOK: Lineage: acidtable.key SIMPLE [(nonacid_n1)s.FieldSchema(name:key, type:int, comment:null), ]
+POSTHOOK: Lineage: acidtable.key SIMPLE [(nonacid_n1)s.FieldSchema(name:key, type:int, comment:null), ]
+POSTHOOK: Lineage: acidtable.value EXPRESSION []
 POSTHOOK: Lineage: acidtable.value EXPRESSION []
 POSTHOOK: Lineage: merge_tmp_table.val EXPRESSION [(acidtable)t.FieldSchema(name:ROW__ID, type:struct<writeId:bigint,bucketId:int,rowId:bigint>, comment:), ]
 PREHOOK: query: select * from acidTable
