@@ -85,6 +85,23 @@ public class TestParquetTimestampsHive2Compatibility {
   }
 
   /**
+   * Tests that timestamps written using Hive2 APIs are read correctly by Hive4 APIs when legacy conversion is on.
+   */
+  @Test
+  public void testWriteHive2ReadHive4UsingLegacyConversionWithZone() {
+    TimeZone original = TimeZone.getDefault();
+    try {
+      String zoneId = "US/Pacific";
+      TimeZone.setDefault(TimeZone.getTimeZone(zoneId));
+      NanoTime nt = writeHive2(timestampString);
+      Timestamp ts = readHive4(nt, zoneId, true);
+      assertEquals(timestampString, ts.toString());
+    } finally {
+      TimeZone.setDefault(original);
+    }
+  }
+
+  /**
    * Tests that timestamps written using Hive4 APIs are read correctly by Hive4 APIs when legacy conversion is on. 
    */
   @Test
@@ -157,6 +174,7 @@ public class TestParquetTimestampsHive2Compatibility {
         timestamps.add(new Object[] { ts });
       }
     }
+    timestamps.add(new Object[] { "9999-12-31 23:59:59.999" });
     return timestamps;
   }
 
