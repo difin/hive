@@ -663,6 +663,13 @@ public class MetaStoreUtils {
     return isExternal(params);
   }
 
+  public static boolean isTranslatedToExternalTable(Table table) {
+    Map<String, String> params = table.getParameters();
+    return params != null && MetaStoreUtils.isPropertyTrue(params, "EXTERNAL")
+        && MetaStoreUtils.isPropertyTrue(params, "TRANSLATED_TO_EXTERNAL") && table.getSd() != null
+        && table.getSd().isSetLocation();
+  }
+
   public static String getDbNameFromReplPolicy(String replPolicy) {
     assert replPolicy != null;
     return replPolicy.split(Pattern.quote("."))[0];
@@ -2102,14 +2109,19 @@ public class MetaStoreUtils {
    */
   public static String prependCatalogToDbName(@Nullable String catalogName, @Nullable String dbName,
                                               Configuration conf) {
-    if (catalogName == null) catalogName = getDefaultCatalog(conf);
+    if (catalogName == null) {
+      catalogName = getDefaultCatalog(conf);
+    }
     StringBuilder buf = new StringBuilder()
         .append(CATALOG_DB_THRIFT_NAME_MARKER)
         .append(catalogName)
         .append(CATALOG_DB_SEPARATOR);
     if (dbName != null) {
-      if (dbName.isEmpty()) buf.append(DB_EMPTY_MARKER);
-      else buf.append(dbName);
+      if (dbName.isEmpty()) {
+        buf.append(DB_EMPTY_MARKER);
+      } else {
+        buf.append(dbName);
+      }
     }
     return buf.toString();
   }
@@ -2186,7 +2198,9 @@ public class MetaStoreUtils {
       return Warehouse.DEFAULT_CATALOG_NAME;
     }
     String catName = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.CATALOG_DEFAULT);
-    if (catName == null || "".equals(catName)) catName = Warehouse.DEFAULT_CATALOG_NAME;
+    if (catName == null || "".equals(catName)) {
+      catName = Warehouse.DEFAULT_CATALOG_NAME;
+    }
     return catName;
   }
 

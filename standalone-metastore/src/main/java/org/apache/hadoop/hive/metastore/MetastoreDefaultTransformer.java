@@ -754,7 +754,6 @@ public class MetastoreDefaultTransformer implements IMetaStoreMetadataTransforme
       if (oldTable.getSd().getLocation().equals(oldPath.toString())) {
         Path newPath = getTranslatedToExternalTableDefaultLocation(newDb, newTable);
         newTable.getSd().setLocation(newPath.toString());
-        hmsHandler.getWh().renameDir(oldPath, newPath, ReplChangeManager.shouldEnableCm(oldDb, oldTable));
       }
     }
 
@@ -777,11 +776,9 @@ public class MetastoreDefaultTransformer implements IMetaStoreMetadataTransforme
 
   private boolean isTranslatedToExternalTable(Table table) {
     Map<String, String> p = table.getParameters();
-    ;
     return p != null && MetaStoreUtils.isPropertyTrue(p, "EXTERNAL")
         && MetaStoreUtils.isPropertyTrue(p, "TRANSLATED_TO_EXTERNAL") && table.getSd() != null
         && table.getSd().isSetLocation();
-
   }
 
   private boolean tableLocationChanged(Table oldTable, Table newTable) throws MetaException {

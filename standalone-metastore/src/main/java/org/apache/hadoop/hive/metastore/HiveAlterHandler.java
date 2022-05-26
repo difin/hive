@@ -213,12 +213,17 @@ public class HiveAlterHandler implements AlterHandler {
       // 2) the table is not an external table, and
       // 3) the user didn't change the default location (or new location is empty), and
       // 4) the table was not initially created with a specified location
-      if (replDataLocationChanged
-              || (rename
-              && !oldt.getTableType().equals(TableType.VIRTUAL_VIEW.toString())
-              && (oldt.getSd().getLocation().compareTo(newt.getSd().getLocation()) == 0
+      boolean renamedManagedTable = rename && !oldt.getTableType().equals(TableType.VIRTUAL_VIEW.toString())
+          && (oldt.getSd().getLocation().compareTo(newt.getSd().getLocation()) == 0
               || StringUtils.isEmpty(newt.getSd().getLocation()))
-              && !MetaStoreUtils.isExternalTable(oldt))) {
+          && (!MetaStoreUtils.isExternalTable(oldt));
+
+      Database db = msdb.getDatabase(catName, newDbName);
+
+      boolean renamedTranslatedToExternalTable = rename && MetaStoreUtils.isTranslatedToExternalTable(oldt)
+          && MetaStoreUtils.isTranslatedToExternalTable(newt);
+      if (replDataLocationChanged
+          || renamedManagedTable || renamedTranslatedToExternalTable) {
         srcPath = new Path(oldt.getSd().getLocation());
 
         if (replDataLocationChanged) {
@@ -240,17 +245,22 @@ public class HiveAlterHandler implements AlterHandler {
               .relativize(srcPath.toUri()).toString();
           boolean tableInSpecifiedLoc = !oldtRelativePath.equalsIgnoreCase(name)
                   && !oldtRelativePath.equalsIgnoreCase(name + Path.SEPARATOR);
-          if (!tableInSpecifiedLoc) {
+
+
+          if (renamedTranslatedToExternalTable || !tableInSpecifiedLoc) {
             srcFs = wh.getFs(srcPath);
 
             // get new location
-            Database db = msdb.getDatabase(catName, newDbName);
             assert(isReplicated == HiveMetaStore.HMSHandler.isDbReplicationTarget(db));
-            Path databasePath = constructRenamedPath(wh.getDatabaseManagedPath(db), srcPath);
-            destPath = new Path(databasePath, newTblName);
-            destFs = wh.getFs(destPath);
+            if (renamedTranslatedToExternalTable) {
+              destPath = new Path(newt.getSd().getLocation());
+            } else {
+              Path databasePath = constructRenamedPath(wh.getDatabaseManagedPath(db), srcPath);
+              destPath = new Path(databasePath, newTblName);
+              newt.getSd().setLocation(destPath.toString());
+            }
 
-            newt.getSd().setLocation(destPath.toString());
+            destFs = wh.getFs(destPath);
 
             // check that destination does not exist otherwise we will be
             // overwriting data
@@ -352,7 +362,6 @@ public class HiveAlterHandler implements AlterHandler {
         // operations other than table rename
         if (MetaStoreUtils.requireCalStats(null, null, newt, environmentContext) &&
             !isPartitionedTable) {
-          Database db = msdb.getDatabase(catName, newDbName);
           assert(isReplicated == HiveMetaStore.HMSHandler.isDbReplicationTarget(db));
           // Update table stats. For partitioned table, we update stats in alterPartition()
           MetaStoreUtils.updateTableStatsSlow(db, newt, wh, false, true, environmentContext);
@@ -662,6 +671,7 @@ public class HiveAlterHandler implements AlterHandler {
               if (!wh.mkdirs(destParentPath)) {
                   throw new MetaException("Unable to create path " + destParentPath);
               }
+
 
               //rename the data directory
               wh.renameDir(srcPath, destPath, ReplChangeManager.shouldEnableCm(db, tbl));
