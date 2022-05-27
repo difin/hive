@@ -20,7 +20,7 @@ package org.apache.hadoop.hive.ql.ddl.function.desc;
 
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.ddl.DDLUtils;
-import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
+import org.apache.hadoop.hive.ql.engine.EngineRuntimeHelper;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.FunctionInfo;
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
@@ -50,7 +50,7 @@ public class DescFunctionOperation extends DDLOperation<DescFunctionDesc> {
   @Override
   public int execute() throws HiveException {
     try (DataOutputStream outStream = DDLUtils.getOutputStream(desc.getResFile(), context)) {
-      EngineCompileHelper helper = EngineCompileHelper.getInstance(SessionState.get().getConf());
+      EngineRuntimeHelper helper = EngineRuntimeHelper.getInstance(SessionState.get().getConf());
       return helper.fetchFunctionInfo(outStream, desc.getName(), desc.isExtended());
     } catch (IOException e) {
       LOG.warn("describe function: ", e);

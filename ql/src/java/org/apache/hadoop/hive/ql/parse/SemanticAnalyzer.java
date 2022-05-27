@@ -135,7 +135,7 @@ import org.apache.hadoop.hive.ql.ddl.table.misc.properties.AlterTableUnsetProper
 import org.apache.hadoop.hive.ql.ddl.table.storage.skewed.SkewedTableUtils;
 import org.apache.hadoop.hive.ql.ddl.view.create.CreateViewDesc;
 import org.apache.hadoop.hive.ql.ddl.view.materialized.update.MaterializedViewUpdateDesc;
-import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
+import org.apache.hadoop.hive.ql.engine.EngineRuntimeHelper;
 import org.apache.hadoop.hive.ql.exec.AbstractMapJoinOperator;
 import org.apache.hadoop.hive.ql.exec.ArchiveUtils;
 import org.apache.hadoop.hive.ql.exec.ColumnInfo;
@@ -506,9 +506,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
   }
 
   protected void markEvent(String event) {
-    // NOOP if this is not an Impala plan. Maybe in the future we will make this generic and useful
-    // for other engines.
-    if (impalaHelper == null) {
+    if (!queryHelper.supportsMarkEvent()) {
       return;
     }
     ctx.getTimeline().markEvent(event);
@@ -13252,7 +13250,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     // 9. Optimize Physical op tree & Translate to target execution engine (MR,
     // TEZ..)
     if (!ctx.getExplainLogical()) {
-      TaskCompiler compiler = EngineCompileHelper.getInstance(conf).getCompiler(conf);
+      TaskCompiler compiler = EngineRuntimeHelper.getInstance(conf).getCompiler(conf);
       compiler.init(queryState, console, db);
       compiler.compile(pCtx, rootTasks, inputs, outputs);
       fetchTask = pCtx.getFetchTask();

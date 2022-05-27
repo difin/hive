@@ -22,17 +22,11 @@ import org.apache.calcite.rel.type.RelDataTypeSystem;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HMSConverter;
-import org.apache.hadoop.hive.metastore.IMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryState;
-import org.apache.hadoop.hive.ql.ddl.function.desc.DescFunctionOperation;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
-import org.apache.hadoop.hive.ql.parse.TaskCompiler;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -42,14 +36,6 @@ import java.util.Set;
  */
 @InterfaceStability.Unstable
 public interface EngineCompileHelper {
-
-  public void reloadFunctions(List<Function> functions, HiveConf conf, IMetaStoreClient msc);
-
-  public int fetchFunctions(DataOutputStream outStream, String pattern)
-      throws IOException;
-
-  public int fetchFunctionInfo(DataOutputStream outStream, String func, boolean isExtended)
-      throws IOException, SemanticException;
 
   public HMSConverter getHMSConverter();
 
@@ -63,8 +49,6 @@ public interface EngineCompileHelper {
       EngineQueryHelper queryHelper) throws SemanticException;
 
   public RelDataTypeSystem getRelDataTypeSystem();
-
-  public TaskCompiler getCompiler(HiveConf conf);
 
   public static EngineCompileHelper getInstance(HiveConf conf) {
     return EngineLoader.getInstance(conf).getCompileHelper();

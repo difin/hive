@@ -20,15 +20,22 @@ package org.apache.hadoop.hive.ql.engine;
 
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.metastore.api.Schema;
+import org.apache.hadoop.hive.ql.ddl.function.desc.DescFunctionOperation;
 import org.apache.hadoop.hive.ql.exec.FetchOperator;
 import org.apache.hadoop.hive.ql.exec.Operator;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
+import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.parse.TaskCompiler;
 import org.apache.hadoop.hive.ql.plan.FetchWork;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
 import org.apache.hadoop.mapred.JobConf;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -51,4 +58,14 @@ public interface EngineRuntimeHelper {
   public static EngineRuntimeHelper getInstance(HiveConf conf) {
     return EngineLoader.getInstance(conf).getRuntimeHelper();
   }
+
+  public TaskCompiler getCompiler(HiveConf conf);
+
+  public void reloadFunctions(List<Function> functions, HiveConf conf, IMetaStoreClient msc);
+
+  public int fetchFunctions(DataOutputStream outStream, String pattern)
+      throws IOException;
+
+  public int fetchFunctionInfo(DataOutputStream outStream, String func, boolean isExtended)
+      throws IOException, SemanticException;
 }

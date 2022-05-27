@@ -4499,6 +4499,11 @@ public class HiveConf extends Configuration {
         "Modify this parameter to set a different execution engine for only etl queries. The same engine " +
             "is used for all the queries if empty."),
 
+    HIVE_FUNCTION_RESOLVER_ENGINE("hive.function.resolver.engine", "default",
+        new StringSet("default", Runtime.TEZ.toString(), Runtime.IMPALA.toString()),
+        "Modify this parameter to set a different execution engine for function resolving. If " +
+            "set to default, it will use the hive.etl.execution.engine parameter."),
+
     HIVE_EXECUTION_MODE("hive.execution.mode", "container", new StringSet("container", "llap"),
         "Chooses whether query fragments will run in container or in llap"),
 
@@ -6543,8 +6548,10 @@ public class HiveConf extends Configuration {
    * @return Currently configured execution engine.
    */
   public Engine getEngine() {
-    //XXX: CDPD-??? Need to handle other engines besides Impala
-    Runtime runtime = getRuntime();
+    return getEngine(getRuntime());
+  }
+
+  public Engine getEngine(Runtime runtime) {
     Engine engine = Engine.INVALID_ENGINE;
     switch (runtime) {
       case MR:
@@ -6558,6 +6565,17 @@ public class HiveConf extends Configuration {
         throw new RuntimeException(Runtime.INVALID_RUNTIME.toString());
     }
     return engine;
+  }
+
+  /**
+   * @return Currently configured function resolver engine.
+   */
+  public Engine getFunctionResolverEngine() {
+    String funcResolverEngine = this.getVar(ConfVars.HIVE_FUNCTION_RESOLVER_ENGINE).toUpperCase();
+    if (funcResolverEngine.equals("DEFAULT")) {
+      return getEngine();
+    }
+    return getEngine(Runtime.valueOf(funcResolverEngine));
   }
 
   /**

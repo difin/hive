@@ -538,4 +538,14 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     }
     return queryOptions;
   }
+
+  @Override
+  public boolean supportsMarkEvent() {
+    return true;
+  }
+
+  @Override
+  public boolean supportsValidateFunction() {
+    return true;
+  }
 }

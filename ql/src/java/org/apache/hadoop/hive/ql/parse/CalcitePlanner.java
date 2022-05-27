@@ -1519,7 +1519,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
    */
   Operator getImpalaSinkOperator(RelNode impalaRel, PreCboCtx cboCtx) throws SemanticException {
     try {
-      Preconditions.checkNotNull(this.impalaHelper);
+      Preconditions.checkNotNull(this.queryHelper);
       final String dbname = SessionState.get().getCurrentDatabase();
       final String username = StringUtils.defaultString(SessionState.get().getUserName());
 
@@ -1552,7 +1552,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
       String dest = getQB().getParseInfo().getClauseNames().iterator().next();
       FileSinkOperator fso = (FileSinkOperator) genFileSinkPlan(dest, getQB(), tableScanOp);
-      FileSinkDesc impalaQueryDesc = this.impalaHelper.compilePlan(
+      FileSinkDesc impalaQueryDesc = this.queryHelper.compilePlan(
           getDb(), impalaRel, fso.getConf(), ctx.isExplainPlan(), getQB(), cboCtx.type,
           conf.get(ValidTxnList.VALID_TXNS_KEY), getTxnMgr(), resultSchema);
       markEvent("Impala plan generated");
@@ -1610,12 +1610,11 @@ public class CalcitePlanner extends SemanticAnalyzer {
   protected boolean validateFunction(ASTNode expressionTree, String functionName, boolean windowSpec)
       throws SemanticException {
     String db = SessionState.get().getCurrentDatabase();
-    if (isImpalaPlan(conf)) {
-      impalaHelper.createFunctionHelper(null).validateFunction(functionName, db, windowSpec);
+    if (queryHelper != null && queryHelper.supportsValidateFunction()) {
+      queryHelper.createFunctionHelper(null).validateFunction(functionName, db, windowSpec);
+      return queryHelper.createFunctionHelper(null).isAggregateFunction(functionName, db);
     }
-    return isImpalaPlan(conf)
-        ? impalaHelper.createFunctionHelper(null).isAggregateFunction(functionName, db)
-        : super.validateFunction(expressionTree, functionName, windowSpec);
+    return super.validateFunction(expressionTree, functionName, windowSpec);
   }
 
   /***
@@ -1802,7 +1801,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
        * recreate cluster, so that it picks up the additional traitDef
        */
       final RexBuilder rexBuilder = cluster.getRexBuilder();
-      this.functionHelper = createFunctionHelper(rexBuilder);
+      this.functionHelper = queryHelper.createFunctionHelper(rexBuilder);
       RelOptPlanner planner = createPlanner(conf, ctx.getTimeline(),
           functionHelper, corrScalarRexSQWithAgg, ctx.isExplainPlan());
       final RelOptCluster optCluster = RelOptCluster.create(planner, rexBuilder);
@@ -2572,7 +2571,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       switch (conf.getEngine()) {
       case IMPALA:
         perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.OPTIMIZER);
-        HepProgram hepProgram = impalaHelper.getHepProgram(getDb());
+        HepProgram hepProgram = queryHelper.getHepProgram(getDb());
         // The last parameter here (noDag="true") allows for the creation of separate nodes
         // even if they are equivalent.
         // While this does have the potential to have a bigger memory footprint, the nodes being
@@ -2935,7 +2934,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
           genAllExprNodeDesc(joinCond, input, jCtx);
         }
         Map<ASTNode, RexNode> exprNodes = RexNodeTypeCheck.genExprNodeJoinCond(
-            joinCond, jCtx, createFunctionHelper(cluster.getRexBuilder()));
+            joinCond, jCtx, queryHelper.createFunctionHelper(cluster.getRexBuilder()));
         if (jCtx.getError() != null) {
           throw new SemanticException(SemanticAnalyzer.generateErrorMessage(jCtx.getErrorSrcNode(),
               jCtx.getError()));
@@ -5114,7 +5113,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
           colList, excludeCols, input, colSrcRR, pos, output, aliases, ensureUniqueCols);
       for (org.apache.commons.lang3.tuple.Pair<ColumnInfo, RowResolver> p : colList) {
         exprList.add(RexNodeTypeCheck.toExprNode(p.getLeft(), p.getRight(), 0,
-            createFunctionHelper(cluster.getRexBuilder())));
+            queryHelper.createFunctionHelper(cluster.getRexBuilder())));
       }
       return i;
     }
@@ -5689,12 +5688,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
     return cached;
   }
 
-  private FunctionHelper createFunctionHelper(RexBuilder rexBuilder) {
-    return isImpalaPlan(conf)
-        ? impalaHelper.createFunctionHelper(rexBuilder)
-        : new HiveFunctionHelper(rexBuilder);
-  }
-
   /**
    * Find RexNode for the expression cached in the RowResolver. Returns null if not exists.
    */
@@ -5706,7 +5699,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
       if (source != null) {
         unparseTranslator.addCopyTranslation(node, source);
       }
-      return RexNodeTypeCheck.toExprNode(colInfo, input, 0, createFunctionHelper(tcCtx.getRexBuilder()));
+      return RexNodeTypeCheck.toExprNode(colInfo, input, 0,
+          queryHelper.createFunctionHelper(tcCtx.getRexBuilder()));
     }
     return null;
   }
@@ -5730,8 +5724,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
     // Create the walker and  the rules dispatcher.
     tcCtx.setUnparseTranslator(unparseTranslator);
 
-    Map<ASTNode, RexNode> nodeOutputs =
-        RexNodeTypeCheck.genExprNode(expr, tcCtx, createFunctionHelper(tcCtx.getRexBuilder()));
+    Map<ASTNode, RexNode> nodeOutputs = RexNodeTypeCheck.genExprNode(expr, tcCtx,
+        queryHelper.createFunctionHelper(tcCtx.getRexBuilder()));
     RexNode desc = nodeOutputs.get(expr);
     if (desc == null) {
       String tableOrCol = BaseSemanticAnalyzer.unescapeIdentifier(expr

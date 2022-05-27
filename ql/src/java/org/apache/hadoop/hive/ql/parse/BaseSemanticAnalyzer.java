@@ -146,7 +146,7 @@ public abstract class BaseSemanticAnalyzer {
   protected Context ctx;
   protected Map<String, String> idToTableNameMap;
   protected QueryProperties queryProperties;
-  protected EngineQueryHelper impalaHelper;
+  protected EngineQueryHelper queryHelper;
   ParseContext pCtx = null;
 
   /**
@@ -297,12 +297,10 @@ public abstract class BaseSemanticAnalyzer {
   public void initCtx(Context ctx) {
     this.ctx = ctx;
     try {
-      impalaHelper = isImpalaPlan(conf)
-          ? EngineCompileHelper.getInstance(conf).getQueryHelper(conf,
+      queryHelper = EngineCompileHelper.getInstance(conf).getQueryHelper(conf,
              SessionState.get().getCurrentDatabase(),
              StringUtils.defaultString(SessionState.get().getUserName()), getTxnMgr(), ctx,
-             queryState)
-          : null;
+             queryState);
     } catch (SemanticException e) {
       throw new RuntimeException(e);
     }
@@ -341,9 +339,9 @@ public abstract class BaseSemanticAnalyzer {
     rootTasks = new ArrayList<Task<? extends Serializable>>();
     //TODO: clean up Impala reference, make it more generic.
     try {
-      impalaHelper = isImpalaPlan(conf) && impalaHelper != null
-          ? EngineCompileHelper.getInstance(conf).resetQueryHelper(impalaHelper)
-          : null;
+      if (queryHelper != null) {
+        queryHelper = EngineCompileHelper.getInstance(conf).resetQueryHelper(queryHelper);
+      }
     } catch (SemanticException e) {
       throw new RuntimeException(e);
     }

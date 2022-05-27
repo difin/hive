@@ -32,6 +32,8 @@ import com.google.common.collect.Iterables;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.classification.InterfaceAudience;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.conf.HiveConf.Engine;
 import org.apache.hadoop.hive.ql.exec.ColumnInfo;
 import org.apache.hadoop.hive.ql.io.RecordIdentifier;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
@@ -110,6 +112,11 @@ public enum VirtualColumn {
   public static List<VirtualColumn> getRegistry(HiveConf conf) {
     // Virtual columns are dependent on the engine too
     ArrayList<VirtualColumn> l = new ArrayList<>();
+    // TODO: CDPD-11988: if the function resolver engine is Impala, then it is
+    // using Impala semantics and cannot handle the virtual columns.
+    if (conf.getFunctionResolverEngine().equals(Engine.IMPALA)) {
+      return l;
+    }
     switch (conf.getEngine()) {
     case HIVE:
       l.add(BLOCKOFFSET);

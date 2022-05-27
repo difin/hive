@@ -19,17 +19,28 @@
 package org.apache.hadoop.hive.ql.engine.internal;
 
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.metastore.api.Schema;
+import org.apache.hadoop.hive.ql.ddl.function.desc.DescFunctionOperation;
+import org.apache.hadoop.hive.ql.ddl.function.show.ShowFunctionsOperation;
 import org.apache.hadoop.hive.ql.engine.EngineRuntimeHelper;
 import org.apache.hadoop.hive.ql.exec.FetchOperator;
 import org.apache.hadoop.hive.ql.exec.Operator;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
+import org.apache.hadoop.hive.ql.parse.MapReduceCompiler;
+import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.parse.TaskCompiler;
+import org.apache.hadoop.hive.ql.parse.TezCompiler;
 import org.apache.hadoop.hive.ql.plan.FetchWork;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
 import org.apache.hadoop.mapred.JobConf;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.List;
+
 public class NativeEngineRuntimeHelper implements EngineRuntimeHelper {
 
   public Class getTaskClass() {
@@ -48,5 +59,31 @@ public class NativeEngineRuntimeHelper implements EngineRuntimeHelper {
       Operator<?> op, List<VirtualColumn> vcCols, Schema resultSchema,
       HiveOperation hiveOp) throws HiveException {
     return new FetchOperator(work, job, op, vcCols);
+  }
+
+  public TaskCompiler getCompiler(HiveConf conf) {
+    switch (conf.getRuntime()) {
+      case MR:
+        return new MapReduceCompiler();
+      case TEZ:
+        return new TezCompiler();
+      case INVALID_RUNTIME:
+        throw new UnsupportedOperationException("Invalid execution engine specified.");
+    }
+
+    throw new UnsupportedOperationException("Invalid execution engine specified.");
+  }
+
+  public void reloadFunctions(List<Function> functions, HiveConf conf, IMetaStoreClient msc) {
+  }
+
+  public int fetchFunctions(DataOutputStream outStream, String pattern)
+      throws IOException {
+    return ShowFunctionsOperation.execute(outStream, pattern);
+  }
+
+  public int fetchFunctionInfo(DataOutputStream outStream, String func, boolean isExtended) 
+      throws IOException, SemanticException {
+    return DescFunctionOperation.execute(outStream, func, isExtended);
   }
 }

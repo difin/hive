@@ -43,11 +43,19 @@ import java.util.List;
 @InterfaceStability.Unstable
 public interface EngineQueryHelper {
 
-  public HepProgram getHepProgram(Hive db);
+  default HepProgram getHepProgram(Hive db) {
+    throw new RuntimeException("Method not supported.");
+  }
 
-  public FileSinkDesc compilePlan(Hive db, RelNode rootRelNode,
+  default public FileSinkDesc compilePlan(Hive db, RelNode rootRelNode,
       FileSinkDesc fileSinkDesc, boolean isExplain, QB qb, CalcitePlanner.PreCboCtx.Type stmtType,
-      String txnString, HiveTxnManager txnManager, List<FieldSchema> resultSchema) throws HiveException;
+      String txnString, HiveTxnManager txnManager, List<FieldSchema> resultSchema) throws HiveException {
+    throw new RuntimeException("Method not supported.");
+  }
+
+  public boolean supportsMarkEvent();
+
+  public boolean supportsValidateFunction();
 
   public FunctionHelper createFunctionHelper(RexBuilder rexBuilder);
 

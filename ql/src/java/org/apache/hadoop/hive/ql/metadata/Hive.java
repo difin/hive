@@ -375,7 +375,7 @@ public class Hive {
 
     // Allow third party engines to reload their functions.
     try {
-      EngineLoader.getExternalInstance().getCompileHelper().reloadFunctions(allFunctions, conf,
+      EngineLoader.getExternalInstance().getRuntimeHelper().reloadFunctions(allFunctions, conf,
           getMSC());
     } catch (Exception e) {
       LOG.warn("Failed to register udf functions in external driver.");
