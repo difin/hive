@@ -83,6 +83,11 @@ abstract public class BaseJsonSerDe extends AbstractSerDe {
    */ ArrayList<Writable> rowBase;
   ArrayList<Writable> row;
 
+  public void initialize(Configuration conf, Properties tbl)
+      throws SerDeException {
+    initialize(conf, tbl, null);
+  }
+
   @Override
   public void initialize(Configuration cfg, Properties tbl, Properties partitionProperties) throws SerDeException {
 
