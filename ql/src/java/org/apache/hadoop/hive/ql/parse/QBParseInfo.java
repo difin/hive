@@ -129,6 +129,9 @@ public class QBParseInfo {
   // used by Windowing
   private final Map<String, Map<String, ASTNode>> destToWindowingExprs;
 
+  // is the query insert overwrite directory
+  private boolean isInsertOverwriteDir = false;
+
 
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(QBParseInfo.class.getName());
@@ -226,6 +229,10 @@ public class QBParseInfo {
    */
   public boolean isInsertIntoTable(String fullTableName) {
     return insertIntoTables.containsKey(fullTableName.toLowerCase());
+  }
+
+  public void setInsertOverwriteDirectory(boolean isInsertOverwriteDir) {
+    this.isInsertOverwriteDir = isInsertOverwriteDir;
   }
 
   public Map<String, ASTNode> getAggregationExprsForClause(String clause) {
@@ -720,6 +727,10 @@ public class QBParseInfo {
 
   public boolean hasInsertTables() {
     return this.insertIntoTables.size() > 0 || this.insertOverwriteTables.size() > 0;
+  }
+
+  public boolean isInsertOverwriteDirectory() {
+    return isInsertOverwriteDir;
   }
 
   /**
