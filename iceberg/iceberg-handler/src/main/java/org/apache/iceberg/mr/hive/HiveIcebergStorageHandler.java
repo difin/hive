@@ -787,6 +787,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
    *   <li>fileformat is set to avro</li>
    *   <li>fileformat is set to parquet, and table schema has timestamp (without zone) type column</li>
    *   <li>querying metadata tables</li>
+   *   <li>fileformat is set to ORC, and table schema has time type column</li>
    * </ul>
    * @param tableProps table properties, must be not null
    */
@@ -794,7 +795,8 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
     if ("2".equals(tableProps.get(TableProperties.FORMAT_VERSION)) ||
         FileFormat.AVRO.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT)) ||
         hasParquetTimestampInSchema(tableProps) ||
-        (tableProps.containsKey("metaTable") && isValidMetadataTable(tableProps.getProperty("metaTable")))) {
+        (tableProps.containsKey("metaTable") && isValidMetadataTable(tableProps.getProperty("metaTable"))) ||
+        hasOrcTimeInSchema(tableProps)) {
       conf.setBoolean(HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED.varname, false);
     }
   }
@@ -807,6 +809,17 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
     Schema tableSchema = SchemaParser.fromJson(tableProps.getProperty(InputFormatConfig.TABLE_SCHEMA));
     return tableSchema.columns().stream()
         .anyMatch(f -> Types.TimestampType.withoutZone().typeId() == f.type().typeId());
+  }
+
+  // Iceberg Time type columns are written as longs into ORC files. There is no Time type in Hive, so it is represented
+  // as String instead. For ORC there's no automatic conversion from long to string during vectorized reading such as
+  // for example in Parquet (in Parquet files Time type is an int64 with 'time' logical annotation).
+  private static boolean hasOrcTimeInSchema(Properties tableProps) {
+    if (!FileFormat.ORC.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT))) {
+      return false;
+    }
+    Schema tableSchema = SchemaParser.fromJson(tableProps.getProperty(InputFormatConfig.TABLE_SCHEMA));
+    return tableSchema.columns().stream().anyMatch(f -> Types.TimeType.get().typeId() == f.type().typeId());
   }
 
   /**
