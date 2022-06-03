@@ -200,6 +200,7 @@ TOK_ALTERTABLE_ADDCONSTRAINT;
 TOK_ALTERTABLE_UPDATECOLUMNS;
 TOK_ALTERTABLE_OWNER;
 TOK_ALTERTABLE_SETPARTSPEC;
+TOK_ALTERTABLE_EXECUTE;
 TOK_MSCK;
 TOK_SHOWDATABASES;
 TOK_SHOWTABLES;
@@ -1220,6 +1221,7 @@ alterTableStatementSuffix
     | partitionSpec alterTblPartitionStatementSuffix[true] -> alterTblPartitionStatementSuffix partitionSpec
     | alterStatementSuffixSetOwner
     | alterStatementSuffixSetPartSpec
+    | alterStatementSuffixExecute
     ;
 
 alterTblPartitionStatementSuffix[boolean partition]
@@ -1594,6 +1596,13 @@ alterStatementSuffixSetPartSpec
 @after { popMsg(state); }
     : KW_SET KW_PARTITION KW_SPEC LPAREN (spec = partitionTransformSpec) RPAREN
     -> ^(TOK_ALTERTABLE_SETPARTSPEC $spec)
+    ;
+
+alterStatementSuffixExecute
+@init { pushMsg("alter table execute", state); }
+@after { popMsg(state); }
+    : KW_EXECUTE KW_ROLLBACK LPAREN (rollbackParam=(StringLiteral | Number)) RPAREN
+    -> ^(TOK_ALTERTABLE_EXECUTE KW_ROLLBACK $rollbackParam)
     ;
 
 fileFormat
