@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * EngineLoader.  Tracks all database specific engines. There is a native engine
  * automatically loaded, but this also allows external engines to be loaded as well.
@@ -46,7 +47,8 @@ public class EngineLoader {
           Class.forName("org.apache.hadoop.hive.impala.ImpalaHelper").newInstance();
       engineHelpers.put(Engine.IMPALA, impalaHelper);
     } catch (Throwable e) {
-      LOG.info("Could not load Impala Helper class.", e);
+      LOG.info("Could not load Impala Helper class.");
+      LOG.debug("Exception information: ", e);
     }
     EngineHelper defaultHelper = new NativeEngineHelper();
     engineHelpers.put(Engine.HIVE, defaultHelper);
