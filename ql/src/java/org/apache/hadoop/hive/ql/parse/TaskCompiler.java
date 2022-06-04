@@ -96,9 +96,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.apache.hadoop.hive.common.AcidConstants.SOFT_DELETE_PATH_SUFFIX;
-import static org.apache.hadoop.hive.ql.io.AcidUtils.DELTA_DIGITS;
-
 /**
  * TaskCompiler is a the base class for classes that compile
  * operator pipelines into tasks.
@@ -521,21 +518,18 @@ public abstract class TaskCompiler {
     try {
       String protoName = null, suffix = "";
       boolean isExternal = false;
-      
+      boolean createTableOrMVUseSuffix = HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_CREATE_TABLE_USE_SUFFIX)
+              || HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED);
+
       if (pCtx.getQueryProperties().isCTAS()) {
         protoName = pCtx.getCreateTable().getDbTableName();
         isExternal = pCtx.getCreateTable().isExternal();
-      
+        createTableOrMVUseSuffix &= AcidUtils.isTransactionalTable(pCtx.getCreateTable());
+        suffix = getTableOrMVSuffix(pCtx, createTableOrMVUseSuffix);
       } else if (pCtx.getQueryProperties().isMaterializedView()) {
         protoName = pCtx.getCreateViewDesc().getViewName();
-        boolean createMVUseSuffix = HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_CREATE_TABLE_USE_SUFFIX)
-          || HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED);
-
-        if (createMVUseSuffix) {
-          long txnId = Optional.ofNullable(pCtx.getContext())
-            .map(ctx -> ctx.getHiveTxnManager().getCurrentTxnId()).orElse(0L);
-          suffix = SOFT_DELETE_PATH_SUFFIX + String.format(DELTA_DIGITS, txnId);
-        }
+        createTableOrMVUseSuffix &= AcidUtils.isTransactionalView(pCtx.getCreateViewDesc());
+        suffix = getTableOrMVSuffix(pCtx, createTableOrMVUseSuffix);
       }
       String[] names = Utilities.getDbTableName(protoName);
       if (!db.databaseExists(names[0])) {
@@ -546,6 +540,18 @@ public abstract class TaskCompiler {
     } catch (HiveException | MetaException e) {
       throw new SemanticException(e);
     }
+  }
+
+  public String getTableOrMVSuffix(ParseContext pCtx, boolean createTableOrMVUseSuffix) {
+    String suffix = "";
+    if (createTableOrMVUseSuffix) {
+      long txnId = Optional.ofNullable(pCtx.getContext())
+              .map(ctx -> ctx.getHiveTxnManager().getCurrentTxnId()).orElse(0L);
+      if (txnId != 0) {
+        suffix = AcidUtils.getPathSuffix(txnId);
+      }
+    }
+    return suffix;
   }
 
   private void patchUpAfterCTASorMaterializedView(List<Task<?>> rootTasks,
