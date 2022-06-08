@@ -4,7 +4,7 @@ CREATE TABLE table_18_n0 (timestamp_col_1 TIMESTAMP, double_col_2 DOUBLE, boolea
 
 set hive.cbo.enable = false;
 
-explain
+explain vectorization
 SELECT
 COALESCE(498, LEAD(COALESCE(-973, -684, 515)) OVER (PARTITION BY (t2.int_col_2 + t1.smallint_col_25) ORDER BY (t2.int_col_2 + t1.smallint_col_25), FLOOR(t1.double_col_61) DESC), 524) AS int_col,
 (t2.int_col_2) + (t1.smallint_col_25) AS int_col_1,

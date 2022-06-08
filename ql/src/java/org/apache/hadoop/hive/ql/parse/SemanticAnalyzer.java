@@ -28,7 +28,7 @@ import com.google.common.collect.Sets;
 import com.google.common.math.IntMath;
 import com.google.common.math.LongMath;
 
-import static java.util.Objects.nonNull;
+import static java.util.Collections.emptyList;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.DYNAMICPARTITIONCONVERT;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_DEFAULT_STORAGE_HANDLER;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVESTATSDBCLASS;
@@ -2122,7 +2122,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
   protected List<String> processTableColumnNames(ASTNode tabColName, String tableName) throws SemanticException {
     if (tabColName == null) {
-      return Collections.emptyList();
+      return emptyList();
     }
     List<String> targetColNames = new ArrayList<>(tabColName.getChildren().size());
     for(Node col : tabColName.getChildren()) {
@@ -8350,6 +8350,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
                                           RowSchema fsRS, boolean canBeMerged, Table dest_tab, Long mmWriteId, boolean isMmCtas,
                                           Integer dest_type, QB qb, boolean isDirectInsert, AcidUtils.Operation acidOperation, String moveTaskId) throws SemanticException {
     boolean isInsertOverwrite = false;
+    Context.Operation writeOperation = getWriteOperation(dest);
     boolean isStreaming = false;
     switch (dest_type) {
     case QBMetaData.DEST_PARTITION:
@@ -8366,7 +8367,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       // Some non-native tables might be partitioned without partition spec information being present in the Table object
       HiveStorageHandler storageHandler = dest_tab.getStorageHandler();
       if (storageHandler != null && storageHandler.alwaysUnpartitioned()) {
-        DynamicPartitionCtx nonNativeDpCtx = storageHandler.createDPContext(conf, dest_tab);
+        DynamicPartitionCtx nonNativeDpCtx = storageHandler.createDPContext(conf, dest_tab, writeOperation);
         if (dpCtx == null && nonNativeDpCtx != null) {
           dpCtx = nonNativeDpCtx;
         }
@@ -8409,6 +8410,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       fileSinkDesc.setWriteType(wt);
       acidFileSinks.add(fileSinkDesc);
     }
+
+    fileSinkDesc.setWriteOperation(writeOperation);
 
     fileSinkDesc.setTemporary(destTableIsTemporary);
     fileSinkDesc.setMaterialization(destTableIsMaterialization);
@@ -11745,14 +11748,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
   private List<VirtualColumn> getTableVirtualColumns(Table tab) {
     if (tab.isNonNative()) {
-      boolean nonNativeAcid = AcidUtils.isNonNativeAcidTable(tab);
-      boolean isUpdateDelete = this instanceof UpdateDeleteSemanticAnalyzer;
-
-      if (nonNativeAcid && isUpdateDelete) {
-        return tab.getStorageHandler().acidVirtualColumns();
-      } else {
-        return new ArrayList<VirtualColumn>();
-      }
+      return new ArrayList<>(
+          AcidUtils.isNonNativeAcidTable(tab) ? tab.getStorageHandler().acidVirtualColumns() : emptyList());
     }
     return VirtualColumn.getRegistry(conf);
   }
@@ -11767,7 +11764,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       for (StructField field : roi.getAllStructFieldRefs()) {
         ColumnInfo colInfo = new ColumnInfo(field.getFieldName(),
             TypeInfoUtils.getTypeInfoFromObjectInspector(field.getFieldObjectInspector()),
-              alias, false);
+            alias, false);
         colInfo.setSkewedCol(isSkewedCol(alias, qb, field.getFieldName()));
         rwsch.put(alias, field.getFieldName(), colInfo);
       }
@@ -11779,23 +11776,21 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     for (FieldSchema part_col : tab.getPartCols()) {
       LOG.trace("Adding partition col: " + part_col);
       rwsch.put(alias, part_col.getName(), new ColumnInfo(part_col.getName(),
-            TypeInfoFactory.getPrimitiveTypeInfo(part_col.getType()), alias, true));
+          TypeInfoFactory.getPrimitiveTypeInfo(part_col.getType()), alias, true));
     }
 
+    // put virtual columns into RowResolver.
     List<VirtualColumn> vcList = new ArrayList<>();
-    boolean nonNativeAcid = AcidUtils.isNonNativeAcidTable(tab);
-    boolean isUpdateDelete = this instanceof UpdateDeleteSemanticAnalyzer;
-    // put all virtual columns in RowResolver.
-    if (!tab.isNonNative() || (nonNativeAcid && isUpdateDelete)) {
-      vcList = VirtualColumn.getRegistry(conf);
-      if (nonNativeAcid && isUpdateDelete) {
-        vcList.addAll(tab.getStorageHandler().acidVirtualColumns());
-      }
-      vcList.forEach(vc -> rwsch.put(alias, vc.getName().toLowerCase(), new ColumnInfo(vc.getName(),
-          vc.getTypeInfo(), alias, true, vc.getIsHidden()
-      )));
+    if (!tab.isNonNative()) {
+      vcList.addAll(VirtualColumn.getRegistry(conf));
+    }
+    if (tab.isNonNative() && AcidUtils.isNonNativeAcidTable(tab)) {
+      vcList.addAll(tab.getStorageHandler().acidVirtualColumns());
     }
 
+    vcList.forEach(vc -> rwsch.put(alias, vc.getName().toLowerCase(), new ColumnInfo(vc.getName(),
+        vc.getTypeInfo(), alias, true, vc.getIsHidden()
+    )));
     return rwsch;
   }
 
@@ -15710,6 +15705,12 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     return deleting(destination) ? AcidUtils.Operation.DELETE :
         (updating(destination) ? AcidUtils.Operation.UPDATE :
             AcidUtils.Operation.INSERT);
+  }
+
+  private Context.Operation getWriteOperation(String destination) {
+    return deleting(destination) ? Context.Operation.DELETE :
+        (updating(destination) ? Context.Operation.UPDATE :
+            Context.Operation.OTHER);
   }
 
   private AcidUtils.Operation getAcidType(Class<? extends OutputFormat> of, String dest,
