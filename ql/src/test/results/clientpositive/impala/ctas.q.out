@@ -168,6 +168,7 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
       columns: deptno int
       name: default.tab1_imp0_out_of_order_partitions
       input format: org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
+      location: hdfs://### HDFS PATH ###
       output format: org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
       partition columns: empid int
       serde name: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
