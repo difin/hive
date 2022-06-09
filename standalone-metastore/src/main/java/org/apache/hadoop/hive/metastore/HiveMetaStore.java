@@ -24,6 +24,7 @@ import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_NAME;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_CATALOG_NAME;
 import static org.apache.hadoop.hive.metastore.Warehouse.getCatalogQualifiedTableName;
 import static org.apache.hadoop.hive.common.AcidConstants.SOFT_DELETE_PATH_SUFFIX;
+import static org.apache.hadoop.hive.common.AcidConstants.SOFT_DELETE_TABLE_PATTERN;
 import static org.apache.hadoop.hive.common.AcidConstants.SOFT_DELETE_TABLE;
 import static org.apache.hadoop.hive.common.AcidConstants.DELTA_DIGITS;
 
@@ -64,7 +65,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -83,10 +83,7 @@ import javax.jdo.JDOException;
 import com.codahale.metrics.Counter;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimaps;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
@@ -107,7 +104,6 @@ import org.apache.hadoop.hive.common.ZKDeRegisterWatcher;
 import org.apache.hadoop.hive.common.ZooKeeperHiveHelper;
 import org.apache.hadoop.hive.common.repl.ReplConst;
 import org.apache.hadoop.hive.metastore.api.*;
-import org.apache.hadoop.hive.metastore.api.FireEventRequestData._Fields;
 import org.apache.hadoop.hive.metastore.api.Package;
 import org.apache.hadoop.hive.metastore.events.AddForeignKeyEvent;
 import org.apache.hadoop.hive.metastore.events.AcidWriteEvent;
@@ -217,7 +213,6 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TServerEventHandler;
 import org.apache.thrift.server.TServlet;
 import org.apache.thrift.server.TThreadPoolServer;
-import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportFactory;
 
@@ -1923,7 +1918,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
               // add it's locations to the list of paths to delete
               Path tablePath = null;
               boolean isSoftDelete = req.isSoftDelete() && TxnUtils.isTransactionalTable(table)
-                && Boolean.parseBoolean(table.getParameters().getOrDefault(SOFT_DELETE_TABLE, "false"));
+                && Boolean.parseBoolean(table.getParameters().get(SOFT_DELETE_TABLE));
 
               boolean tableDataShouldBeDeleted = checkTableDataShouldBeDeleted(table, req.isDeleteData())
                 && !isSoftDelete;
@@ -1963,10 +1958,16 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
         if (ms.dropDatabase(req.getCatalogName(), req.getName())) {
           if (!transactionalListeners.isEmpty()) {
+            DropDatabaseEvent dropEvent = new DropDatabaseEvent(db, true, this, isReplicated);
+            EnvironmentContext context = null;
+            if (!req.isDeleteManagedDir()) {
+              context = new EnvironmentContext();
+              context.putToProperties("txnId", String.valueOf(req.getTxnId()));
+            }
+            dropEvent.setEnvironmentContext(context);
             transactionalListenerResponses =
                 MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
-                                                      EventType.DROP_DATABASE,
-                                                      new DropDatabaseEvent(db, true, this, isReplicated));
+                    EventType.DROP_DATABASE, dropEvent);
           }
           success = ms.commitTransaction();
         }
@@ -1976,7 +1977,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         } else if (req.isDeleteData()) {
           // Delete the data in the partitions which have other locations
           deletePartitionData(partitionPaths, false, db);
-          // Delete the data in the tables which have other locations
+          // Delete the data in the tables which have other locations or soft-delete is enabled
           for (Path tablePath : tablePaths) {
             deleteTableData(tablePath, false, db);
           }
@@ -2365,13 +2366,17 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         if (!TableType.VIRTUAL_VIEW.toString().equals(tbl.getTableType())) {
           if (tbl.getSd().getLocation() == null
               || tbl.getSd().getLocation().isEmpty()) {
-            tblPath = wh.getDefaultTablePath(db, getTableName(tbl), isExternal(tbl));
+            tblPath = wh.getDefaultTablePath(db, tbl.getTableName() + getTableSuffix(tbl), isExternal(tbl));
           } else {
             if (!isExternal(tbl) && !MetaStoreUtils.isNonNativeTable(tbl)) {
               LOG.warn("Location: " + tbl.getSd().getLocation()
                   + " specified for non-external table:" + tbl.getTableName());
             }
             tblPath = wh.getDnsPath(new Path(tbl.getSd().getLocation()));
+            // ignore suffix if it's already there (direct-write CTAS)
+            if (!tblPath.getName().matches("(.*)" + SOFT_DELETE_TABLE_PATTERN)) {
+              tblPath = new Path(tblPath + getTableSuffix(tbl));
+            }
           }
           tbl.getSd().setLocation(tblPath.toString());
         }
@@ -2559,10 +2564,10 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
     }
 
-    private String getTableName(Table tbl) {
-      return tbl.getTableName() + (tbl.isSetTxnId() &&
-        tbl.getParameters() != null && Boolean.parseBoolean(tbl.getParameters().get(SOFT_DELETE_TABLE)) ?
-            SOFT_DELETE_PATH_SUFFIX + String.format(DELTA_DIGITS, tbl.getTxnId()) : "");
+    private String getTableSuffix(Table tbl) {
+      return tbl.isSetTxnId() && tbl.getParameters() != null
+          && Boolean.parseBoolean(tbl.getParameters().get(SOFT_DELETE_TABLE)) ?
+        SOFT_DELETE_PATH_SUFFIX + String.format(DELTA_DIGITS, tbl.getTxnId()) : "";
     }
     
     @Override
@@ -5181,8 +5186,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         || (tbl.isSetParameters() && "true".equalsIgnoreCase(tbl.getParameters().get("auto.purge")));
 
     }
-    
-    private long getWriteId(EnvironmentContext context){
+
+    static long getWriteId(EnvironmentContext context) {
       return Optional.ofNullable(context)
         .map(EnvironmentContext::getProperties)
         .map(prop -> prop.get("writeId"))
