@@ -1,0 +1,13 @@
+SELECT 'Upgrading MetaStore schema from 3.1.3000.7.2.15.0-Update5 to 3.1.3000.7.2.15.0-Update6';
+
+-- HIVE-26049
+ALTER TABLE "TXN_COMPONENTS" ALTER "TC_TABLE" TYPE varchar(256);
+ALTER TABLE "HIVE_LOCKS" ALTER "HL_TABLE" TYPE varchar(256);
+ALTER TABLE "COMPACTION_QUEUE" ALTER "CQ_TABLE" TYPE varchar(256);
+ALTER TABLE "COMPLETED_COMPACTIONS" ALTER "CC_TABLE" TYPE varchar(256);
+ALTER TABLE "WRITE_SET" ALTER "WS_TABLE" TYPE varchar(256);
+ALTER TABLE "TXN_WRITE_NOTIFICATION_LOG" ALTER "WNL_TABLE" TYPE varchar(256);
+
+-- These lines need to be last.  Insert any changes above.
+UPDATE "CDH_VERSION" SET "SCHEMA_VERSION"='3.1.3000.7.2.15.0-Update6', "VERSION_COMMENT"='Hive release version 3.1.3000 for CDH 7.2.15.0-Update6' where "VER_ID"=1;
+SELECT 'Finished upgrading MetaStore schema from 3.1.3000.7.2.15.0-Update5 to 3.1.3000.7.2.15.0-Update6';
