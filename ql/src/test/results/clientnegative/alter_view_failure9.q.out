@@ -18,15 +18,4 @@ POSTHOOK: Output: database:default
 POSTHOOK: Output: default@xxx4
 POSTHOOK: Lineage: xxx4.key SIMPLE [(src)src.FieldSchema(name:key, type:string, comment:default), ]
 POSTHOOK: Lineage: xxx4.value SIMPLE [(src)src.FieldSchema(name:value, type:string, comment:default), ]
-PREHOOK: query: ALTER TABLE xxx4 RENAME TO xxx4a
-PREHOOK: type: ALTERTABLE_RENAME
-PREHOOK: Input: default@xxx4
-PREHOOK: Output: database:default
-PREHOOK: Output: default@xxx4a
-POSTHOOK: query: ALTER TABLE xxx4 RENAME TO xxx4a
-POSTHOOK: type: ALTERTABLE_RENAME
-POSTHOOK: Input: default@xxx4
-POSTHOOK: Output: database:default
-POSTHOOK: Output: default@xxx4a
-FAILED: AssertionError java.lang.AssertionError: Client Execution was expected to fail, but succeeded with error code 0 for fname=alter_view_failure9.q 
-See ./ql/target/tmp/log/hive.log or ./itests/qtest/target/tmp/log/hive.log, or check ./ql/target/surefire-reports or ./itests/qtest/target/surefire-reports/ for specific test cases logs.
+FAILED: SemanticException [Error 10131]: To alter a view you need to use the ALTER VIEW command.
