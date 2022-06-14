@@ -3254,6 +3254,18 @@ public abstract class TestHiveMetaStore {
     }
   }
 
+  @Test(expected = NoSuchObjectException.class)
+  public void testDropDataConnectorIfNotExistsFalse() throws Exception {
+    // No such data connector, throw NoSuchObjectException
+    client.dropDataConnector("no_such_data_connector", false, false);
+  }
+
+  @Test
+  public void testDropDataConnectorIfNotExistsTrue() throws Exception {
+    // No such data connector, ignore NoSuchObjectException
+    client.dropDataConnector("no_such_data_connector", true, false);
+  }
+
   private void checkDbOwnerType(String dbName, String ownerName, PrincipalType ownerType)
       throws TException {
     Database db = client.getDatabase(dbName);
