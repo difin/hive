@@ -250,4 +250,4 @@ STAGE PLANS:
       Processor Tree:
         ListSink
 
-FAILED: SemanticException [Error 10136]: Bucketed mapjoin cannot be performed. This can be due to multiple reasons:  . Join columns dont match bucketed columns.  . Number of buckets are not a multiple of each other. If you really want to perform the operation, either remove the mapjoin hint from your query or set hive.enforce.bucketmapjoin to false.
+FAILED: SemanticException [Error 10136]: Bucketed mapjoin cannot be performed. This can be due to multiple reasons:  . Join columns don't match bucketed columns.  . Number of buckets are not a multiple of each other. If you really want to perform the operation, either remove the mapjoin hint from your query or set hive.enforce.bucketmapjoin to false.

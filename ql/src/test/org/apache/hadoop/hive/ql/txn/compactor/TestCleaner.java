@@ -23,6 +23,7 @@ import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.CommitTxnRequest;
 import org.apache.hadoop.hive.metastore.api.CompactionRequest;
+import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.FindNextCompactRequest;
 import org.apache.hadoop.hive.metastore.api.GetValidWriteIdsRequest;
@@ -106,13 +107,13 @@ public class TestCleaner extends CompactorTest {
     //Prevent cleaner from marking the compaction as cleaned
     TxnStore mockedHandler = spy(txnHandler);
     doThrow(new RuntimeException(errorMessage)).when(mockedHandler).markCleaned(nullable(CompactionInfo.class));
-    
+
     //delayed start retention time
     long retentionTime = delayEnabled ? conf.getTimeVar(HIVE_COMPACTOR_CLEANER_RETENTION_TIME, TimeUnit.MILLISECONDS) : 0;
     //retry retention time
     long retryRetentionTime = getTimeVar(conf, HIVE_COMPACTOR_CLEANER_RETRY_RETENTION_TIME, TimeUnit.MILLISECONDS);
     Thread.sleep(retentionTime + 100);
-    
+
     for (int i = 1; i < 4; i++) {
       Cleaner cleaner = new Cleaner();
       cleaner.setConf(conf);
@@ -128,7 +129,7 @@ public class TestCleaner extends CompactorTest {
       List<CompactionInfo> compcationInfos = txnHandler.findReadyToClean(0, 0);
       Assert.assertEquals(String.format("Expected %d CompactionInfo, but got %d", 1, compcationInfos.size()), 1, compcationInfos.size());
       CompactionInfo ci = compcationInfos.get(0);
-      
+
       int cleanAttempts = (int)(Math.log(ci.retryRetention / retryRetentionTime) / Math.log(2)) + 1;
       Assert.assertEquals(String.format("Expected %d clean attempts, but got %d", i, cleanAttempts), i, cleanAttempts);
 
@@ -784,7 +785,7 @@ public class TestCleaner extends CompactorTest {
   public void tearDown() throws Exception {
     compactorTestCleanup();
   }
-  
+
   @Test
   public void withSingleBaseCleanerSucceeds() throws Exception {
     Map<String, String> parameters = new HashMap<>();
@@ -866,14 +867,17 @@ public class TestCleaner extends CompactorTest {
     CompactionRequest rqst = new CompactionRequest(dbName, tableName, CompactionType.MAJOR);
     addBaseFile(t, null, 22L, 22);
     compactInTxn(rqst);
-    compactInTxn(rqst);
+
+    CompactionResponse response = txnHandler.compact(rqst);
+
+    Assert.assertFalse(response.isAccepted());
+    Assert.assertEquals("Compaction is already scheduled with state='ready for cleaning' and id=1", response.getErrormessage());
 
     startCleaner();
 
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
-    Assert.assertEquals(2, rsp.getCompactsSize());
+    Assert.assertEquals(1, rsp.getCompactsSize());
     Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(0).getState());
-    Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(1).getState());
 
     List<Path> paths = getDirectories(conf, t, null);
     Assert.assertEquals(1, paths.size());
@@ -894,15 +898,16 @@ public class TestCleaner extends CompactorTest {
     CompactionRequest rqst = new CompactionRequest(dbName, tableName, CompactionType.MAJOR);
 
     compactInTxn(rqst);
-    compactInTxn(rqst);
+    CompactionResponse response = txnHandler.compact(rqst);
 
-    startCleaner();
+    Assert.assertFalse(response.isAccepted());
+    Assert.assertEquals("Compaction is already scheduled with state='ready for cleaning' and id=1", response.getErrormessage());
+
     startCleaner();
 
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
-    Assert.assertEquals(2, rsp.getCompactsSize());
+    Assert.assertEquals(1, rsp.getCompactsSize());
     Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(0).getState());
-    Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(1).getState());
 
     List<Path> paths = getDirectories(conf, t, null);
     Assert.assertEquals(1, paths.size());
@@ -923,15 +928,16 @@ public class TestCleaner extends CompactorTest {
     CompactionRequest rqst = new CompactionRequest(dbName, tableName, CompactionType.MAJOR);
 
     compactInTxn(rqst);
-    compactInTxn(rqst);
+    CompactionResponse response = txnHandler.compact(rqst);
 
-    startCleaner();
+    Assert.assertFalse(response.isAccepted());
+    Assert.assertEquals("Compaction is already scheduled with state='ready for cleaning' and id=1", response.getErrormessage());
+
     startCleaner();
 
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
-    Assert.assertEquals(2, rsp.getCompactsSize());
+    Assert.assertEquals(1, rsp.getCompactsSize());
     Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(0).getState());
-    Assert.assertEquals(TxnStore.SUCCEEDED_RESPONSE, rsp.getCompacts().get(1).getState());
 
     List<Path> paths = getDirectories(conf, t, null);
     Assert.assertEquals(1, paths.size());
