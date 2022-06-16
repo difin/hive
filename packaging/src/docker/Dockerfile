@@ -1,6 +1,5 @@
 # Copyright (c) 2020 Cloudera, Inc. All rights reserved.
-# UBI8 has issues with ranger-knox plugin not able to find Python
-FROM registry.access.redhat.com/ubi7/ubi:latest as hadoop-base
+FROM registry.access.redhat.com/ubi8/ubi:latest as hadoop-base
 ARG HADOOP_VERSION
 ADD hadoop-${HADOOP_VERSION}.tar.gz  /usr/lib/
 RUN ln -s /usr/lib/hadoop-${HADOOP_VERSION} /usr/lib/hadoop
@@ -8,32 +7,32 @@ RUN rm -f /usr/lib/hadoop/share/hadoop/tools/lib/kafka-clients-0.8.2.1.jar
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi7/ubi:latest as ranger-base
+FROM registry.access.redhat.com/ubi8/ubi:latest as ranger-base
 ARG RANGER_VERSION
 ADD ranger-${RANGER_VERSION}-hive-plugin.tar.gz /usr/lib/
 RUN ln -s /usr/lib/ranger-${RANGER_VERSION}-hive-plugin /usr/lib/ranger-hive-plugin
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi7/ubi:latest as solr-base
+FROM registry.access.redhat.com/ubi8/ubi:latest as solr-base
 ARG SOLR_VERSION
 ADD solr-${SOLR_VERSION}.tar.gz /usr/lib/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi7/ubi:latest as atlas-base
+FROM registry.access.redhat.com/ubi8/ubi:latest as atlas-base
 ARG ATLAS_VERSION
 ADD apache-atlas-${ATLAS_VERSION}-hive-hook.tar.gz /usr/lib/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi7/ubi:latest as tez-base
+FROM registry.access.redhat.com/ubi8/ubi:latest as tez-base
 ARG TEZ_VERSION
 ADD tez-${TEZ_VERSION}.tar.gz /usr/lib/tez/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi7/ubi:latest as hive-base
+FROM registry.access.redhat.com/ubi8/ubi:latest as hive-base
 ARG CDH_VERSION
 COPY maven/apache-hive-${CDH_VERSION}-bin /usr/lib/hive/
 COPY remove-unwanted.sh /
@@ -45,7 +44,7 @@ RUN curl -o /etc/yum.repos.d/rhel8_mirrors.repo http://mirror.infra.cloudera.com
 # install debugging tools and other dependencies
 RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN yum -y update && \
-  yum install -y java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop && \
+  yum install -y java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop procps && \
   yum clean all && \
   rm -rf /var/cache/yum
 
