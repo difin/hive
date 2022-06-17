@@ -49,20 +49,4 @@ public abstract  class DataSourceProviderFactory {
       return poolingType != null && poolingType.equalsIgnoreCase(configuredPoolingType);
     }).orNull();
   }
-
-  /**
-   * @param hdpConfig hadoop configuration
-   * @return true if the configuration contains settings specifically aimed for one
-   * of the supported conntection pool implementations.
-   */
-  public static boolean hasProviderSpecificConfigurations(Configuration hdpConfig) {
-
-    String poolingType = MetastoreConf.getVar(hdpConfig, MetastoreConf.ConfVars.CONNECTION_POOLING_TYPE).toLowerCase();
-
-    return Iterables.any(hdpConfig, entry ->
-    {
-      String key = entry.getKey();
-      return key != null && (key.startsWith(poolingType));
-    });
-  }
 }
