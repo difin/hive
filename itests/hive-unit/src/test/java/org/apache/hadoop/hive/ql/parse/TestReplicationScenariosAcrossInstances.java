@@ -1004,14 +1004,14 @@ public class TestReplicationScenariosAcrossInstances extends BaseReplicationAcro
             .status(replicatedDbName)
             .verifyResult(tuple.lastReplicationId);
 
-    // Incremental load to non existing db should return database not exist error.
-    tuple = primary.dump("someJunkDB", Collections.emptyList());
+    // Bootstrap dump should fail if source database does not exist.
+    String nonExistingDb = "someJunkDB";
+    assertEquals (primary.getDatabase(nonExistingDb), null);
     try {
-      replica.runCommand("REPL LOAD someJunkDB into someJunkDB");
+      primary.run("REPL DUMP " + nonExistingDb);
       assert false;
-    } catch (CommandProcessorException e) {
-      assertTrue(e.getErrorMessage().toLowerCase()
-              .contains("semanticException no data to load in path".toLowerCase()));
+    } catch (Exception e) {
+      assertEquals (ErrorMsg.REPL_SOURCE_DATABASE_NOT_FOUND.format(nonExistingDb), e.getMessage());
     }
     primary.run(" drop database if exists " + testDbName + " cascade");
   }
