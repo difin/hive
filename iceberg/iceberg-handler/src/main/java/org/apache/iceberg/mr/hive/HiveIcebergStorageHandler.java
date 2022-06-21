@@ -810,22 +810,11 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
     Schema tableSchema = SchemaParser.fromJson(tableProps.getProperty(InputFormatConfig.TABLE_SCHEMA));
     if ("2".equals(tableProps.get(TableProperties.FORMAT_VERSION)) ||
         FileFormat.AVRO.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT)) ||
-        hasParquetTimestampInSchema(tableProps) ||
         (tableProps.containsKey("metaTable") && isValidMetadataTable(tableProps.getProperty("metaTable"))) ||
         hasOrcTimeInSchema(tableProps, tableSchema) ||
         !hasParquetListColumnSupport(tableProps, tableSchema)) {
       conf.setBoolean(HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED.varname, false);
     }
-  }
-
-  // TODO: revert this check once long term solution for CDPD-36560 is merged
-  private static boolean hasParquetTimestampInSchema(Properties tableProps) {
-    if (!FileFormat.PARQUET.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT))) {
-      return false;
-    }
-    Schema tableSchema = SchemaParser.fromJson(tableProps.getProperty(InputFormatConfig.TABLE_SCHEMA));
-    return tableSchema.columns().stream()
-        .anyMatch(f -> Types.TimestampType.withoutZone().typeId() == f.type().typeId());
   }
 
   /**

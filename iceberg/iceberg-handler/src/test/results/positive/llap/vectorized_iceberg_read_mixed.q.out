@@ -229,10 +229,10 @@ STAGE PLANS:
                         Map-reduce partition columns: _col0 (type: double), _col1 (type: boolean), _col2 (type: int), _col3 (type: bigint), _col4 (type: binary), _col5 (type: string), _col6 (type: timestamp), _col7 (type: date), _col8 (type: decimal(4,2))
                         Statistics: Num rows: 1 Data size: 373 Basic stats: COMPLETE Column stats: COMPLETE
                         value expressions: _col9 (type: float)
-            Execution mode: llap
-            LLAP IO: no inputs
+            Execution mode: vectorized, llap
+            LLAP IO: all inputs (cache only)
         Reducer 2 
-            Execution mode: llap
+            Execution mode: vectorized, llap
             Reduce Operator Tree:
               Group By Operator
                 aggregations: max(VALUE._col0)
@@ -268,8 +268,8 @@ POSTHOOK: query: select max(t_float), t_double, t_boolean, t_int, t_bigint, t_bi
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@tbl_ice_mixed_all_types
 #### A masked pattern was here ####
-1.1	1.2	false	4	567890123456789	6	col7	2012-10-03 19:58:08	1234-09-09	10.01
-5.1	6.2	true	40	567890123456780	8	col07	2012-10-03 19:58:09	1234-09-10	10.02
+1.1	1.2	false	4	567890123456789	6	col7	2012-10-03 19:58:08	1234-09-02	10.01
+5.1	6.2	true	40	567890123456780	8	col07	2012-10-03 19:58:09	1234-09-03	10.02
 PREHOOK: query: create external table tbl_ice_mixed_parted (
     a int,
     b string
