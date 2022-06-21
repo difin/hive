@@ -171,7 +171,7 @@
     <snappy.version>1.1.4</snappy.version>
     <wadl-resourcedoc-doclet.version>1.4</wadl-resourcedoc-doclet.version>
     <velocity.version>2.3</velocity.version>
-    <xerces.version>2.12.0</xerces.version>
+    <xerces.version>2.12.2</xerces.version>
     <xmlsec.version>2.3.0</xmlsec.version>
     <zookeeper.version>3.5.5.7.2.15.0-147</zookeeper.version>
     <jpam.version>1.1</jpam.version>
