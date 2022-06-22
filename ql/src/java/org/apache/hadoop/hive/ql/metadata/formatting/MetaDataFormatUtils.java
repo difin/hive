@@ -345,7 +345,7 @@ public final class MetaDataFormatUtils {
     // Storage information.
     if (part.getTable().getTableType() != TableType.VIRTUAL_VIEW) {
       tableInfo.append(LINE_DELIM).append("# Storage Information").append(LINE_DELIM);
-      getStorageDescriptorInfo(tableInfo, part.getTPartition().getSd());
+      getStorageDescriptorInfo(part.getTable(), tableInfo, part.getTPartition().getSd());
     }
 
     return tableInfo.toString();
@@ -360,7 +360,7 @@ public final class MetaDataFormatUtils {
 
     // Storage information.
     tableInfo.append(LINE_DELIM).append("# Storage Information").append(LINE_DELIM);
-    getStorageDescriptorInfo(tableInfo, table.getTTable().getSd());
+    getStorageDescriptorInfo(table, tableInfo, table.getTTable().getSd());
 
     if (table.isView() || table.isMaterializedView()) {
       tableInfo.append(LINE_DELIM).append(table.isView() ? "# View Information" : "# Materialized View Information").append(LINE_DELIM);
@@ -397,15 +397,19 @@ public final class MetaDataFormatUtils {
     }
   }
 
-  private static void getStorageDescriptorInfo(StringBuilder tableInfo,
+  private static void getStorageDescriptorInfo(Table table, StringBuilder tableInfo,
       StorageDescriptor storageDesc) {
 
     formatOutput("SerDe Library:", storageDesc.getSerdeInfo().getSerializationLib(), tableInfo);
     formatOutput("InputFormat:", storageDesc.getInputFormat(), tableInfo);
     formatOutput("OutputFormat:", storageDesc.getOutputFormat(), tableInfo);
     formatOutput("Compressed:", storageDesc.isCompressed() ? "Yes" : "No", tableInfo);
-    formatOutput("Num Buckets:", String.valueOf(storageDesc.getNumBuckets()), tableInfo);
-    formatOutput("Bucket Columns:", storageDesc.getBucketCols().toString(), tableInfo);
+    if (!table.isNonNative() || table.getStorageHandler() == null ||
+        !table.getStorageHandler().supportsPartitionTransform()) {
+      // The Iceberg partition transform already contains the bucketing information, and these are not relevant there
+      formatOutput("Num Buckets:", String.valueOf(storageDesc.getNumBuckets()), tableInfo);
+      formatOutput("Bucket Columns:", storageDesc.getBucketCols().toString(), tableInfo);
+    }
     formatOutput("Sort Columns:", storageDesc.getSortCols().toString(), tableInfo);
     if (storageDesc.isStoredAsSubDirectories()) {// optional parameter
       formatOutput("Stored As SubDirectories:", "Yes", tableInfo);
