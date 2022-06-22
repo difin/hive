@@ -1874,21 +1874,28 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
           if (materializedViews != null && !materializedViews.isEmpty()) {
             for (Table materializedView : materializedViews) {
-              if (materializedView.getSd().getLocation() != null) {
+              boolean isSoftDelete = TxnUtils.isTableSoftDeleteEnabled(materializedView, req.isSoftDelete());
+              
+              if (materializedView.getSd().getLocation() != null && !isSoftDelete) {
                 Path materializedViewPath = wh.getDnsPath(new Path(materializedView.getSd().getLocation()));
                 if (!wh.isWritable(materializedViewPath.getParent())) {
                   throw new MetaException("Database metadata not deleted since table: " +
                       materializedView.getTableName() + " has a parent location " + materializedViewPath.getParent() +
                       " which is not writable by " + SecurityUtils.getUser());
                 }
-
-                if (!FileUtils.isSubdirectory(databasePath.toString(),
-                    materializedViewPath.toString())) {
+                if (!FileUtils.isSubdirectory(databasePath.toString(), materializedViewPath.toString()) || req.isSoftDelete()) {
                   tablePaths.add(materializedViewPath);
                 }
               }
+              EnvironmentContext context = null;
+              if (isSoftDelete) {
+                context = new EnvironmentContext();
+                context.putToProperties(hive_metastoreConstants.TXN_ID, String.valueOf(req.getTxnId()));
+              }
               // Drop the materialized view but not its data
-              drop_table(req.getName(), materializedView.getTableName(), false);
+              drop_table_with_environment_context(
+                  req.getName(), materializedView.getTableName(), false, context);
+
               // Remove from all tables
               uniqueTableNames.remove(materializedView.getTableName());
             }
@@ -1913,13 +1920,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
           if (tables != null && !tables.isEmpty()) {
             for (Table table : tables) {
-
               // If the table is not external and it might not be in a subdirectory of the database
               // add it's locations to the list of paths to delete
+              boolean isSoftDelete = TxnUtils.isTableSoftDeleteEnabled(table, req.isSoftDelete());
               Path tablePath = null;
-              boolean isSoftDelete = req.isSoftDelete() && TxnUtils.isTransactionalTable(table)
-                && Boolean.parseBoolean(table.getParameters().get(SOFT_DELETE_TABLE));
-
+              
               boolean tableDataShouldBeDeleted = checkTableDataShouldBeDeleted(table, req.isDeleteData())
                 && !isSoftDelete;
               if (table.getSd().getLocation() != null && tableDataShouldBeDeleted) {
@@ -1929,8 +1934,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
                       table.getTableName() + " has a parent location " + tablePath.getParent() +
                       " which is not writable by " + SecurityUtils.getUser());
                 }
-
-                if (!FileUtils.isSubdirectory(databasePath.toString(), tablePath.toString())) {
+                if (!FileUtils.isSubdirectory(databasePath.toString(), tablePath.toString()) || req.isSoftDelete()) {
                   tablePaths.add(tablePath);
                 }
               }
@@ -1943,16 +1947,15 @@ public class HiveMetaStore extends ThriftHiveMetastore {
               EnvironmentContext context = null;
               if (isSoftDelete) {
                 context = new EnvironmentContext();
-                context.putToProperties("txnId", String.valueOf(req.getTxnId()));
+                context.putToProperties(hive_metastoreConstants.TXN_ID, String.valueOf(req.getTxnId()));
                 req.setDeleteManagedDir(false);
               }
               // Drop the table but not its data
               drop_table_with_environment_context(
                   MetaStoreUtils.prependCatalogToDbName(table.getCatName(), table.getDbName(), conf),
-                  table.getTableName(), false, context );
+                  table.getTableName(), false, context);
             }
           }
-
           startIndex = endIndex;
         }
 
@@ -1962,7 +1965,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             EnvironmentContext context = null;
             if (!req.isDeleteManagedDir()) {
               context = new EnvironmentContext();
-              context.putToProperties("txnId", String.valueOf(req.getTxnId()));
+              context.putToProperties(hive_metastoreConstants.TXN_ID, String.valueOf(req.getTxnId()));
             }
             dropEvent.setEnvironmentContext(context);
             transactionalListenerResponses =
@@ -1998,26 +2001,18 @@ public class HiveMetaStore extends ThriftHiveMetastore {
                 new Path(dbFinal.getManagedLocationUri()) : wh.getDatabaseManagedPath(dbFinal);
             if (req.isDeleteManagedDir()) {
               try {
-                Boolean deleted = UserGroupInformation.getLoginUser().doAs(new PrivilegedExceptionAction<Boolean>() {
-                  @Override
-                  public Boolean run() throws MetaException {
-                    return wh.deleteDir(path, true, dbFinal);
-                  }
-                });
+                Boolean deleted = UserGroupInformation.getLoginUser().doAs((PrivilegedExceptionAction<Boolean>) 
+                  () -> wh.deleteDir(path, true, dbFinal));
                 if (!deleted) {
-                  LOG.error("Failed to delete database folder " + db.getLocationUri());
+                  LOG.error("Failed to delete database's managed warehouse directory: " + path);
                 }
               } catch (Exception e) {
                 LOG.error("Failed to delete database's managed warehouse directory: " + path + " " + e.getMessage());
               }
             }
-
             try {
-              Boolean deleted = UserGroupInformation.getCurrentUser().doAs(new PrivilegedExceptionAction<Boolean>() {
-                @Override public Boolean run() throws MetaException {
-                  return wh.deleteDir(new Path(dbFinal.getLocationUri()), true, dbFinal);
-                }
-              });
+              Boolean deleted = UserGroupInformation.getCurrentUser().doAs((PrivilegedExceptionAction<Boolean>) 
+                () -> wh.deleteDir(new Path(dbFinal.getLocationUri()), true, dbFinal));
               if (!deleted) {
                 LOG.error("Failed to delete database external warehouse directory " + db.getLocationUri());
               }
@@ -5190,7 +5185,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     static long getWriteId(EnvironmentContext context) {
       return Optional.ofNullable(context)
         .map(EnvironmentContext::getProperties)
-        .map(prop -> prop.get("writeId"))
+        .map(prop -> prop.get(hive_metastoreConstants.WRITE_ID))
         .map(Long::parseLong)
         .orElse(0L);
     }
@@ -5828,7 +5823,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public RenamePartitionResponse rename_partition_req(RenamePartitionRequest req) throws TException {
       EnvironmentContext context = new EnvironmentContext();
       context.putToProperties(RENAME_PARTITION_MAKE_COPY, String.valueOf(req.isClonePart()));
-      context.putToProperties("txnId", String.valueOf(req.getTxnId()));
+      context.putToProperties(hive_metastoreConstants.TXN_ID, String.valueOf(req.getTxnId()));
 
       rename_partition(req.getCatName(), req.getDbName(), req.getTableName(), req.getPartVals(),
           req.getNewPart(), context, req.getValidWriteIdList());

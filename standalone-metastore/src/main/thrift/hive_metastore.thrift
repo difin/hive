@@ -3024,3 +3024,7 @@ const string TABLE_IS_CTAS = "created_with_ctas",
 const string PARTITION_TRANSFORM_SPEC = "partition_transform_spec",
 const string CTAS_LEGACY_CONFIG = "create_table_as_external",
 const string DEFAULT_TABLE_TYPE = "defaultTableType",
+  
+// ACID
+const string TXN_ID = "txnId",
+const string WRITE_ID = "writeId",
