@@ -52,6 +52,7 @@ import org.apache.impala.thrift.TColumnDescriptor;
 import org.apache.impala.thrift.THdfsFileFormat;
 import org.apache.impala.thrift.THdfsPartition;
 import org.apache.impala.thrift.THdfsTable;
+import org.apache.impala.thrift.TImpalaTableType;
 import org.apache.impala.thrift.TNetworkAddress;
 import org.apache.impala.thrift.TResultSet;
 import org.apache.impala.thrift.TTableDescriptor;
@@ -477,6 +478,14 @@ public class ImpalaResultLocation implements FeFsTable {
   }
 
   public SqlConstraints getSqlConstraints() {
+    throw new IllegalStateException("Not implemented");
+  }
+
+  public String getTableComment() {
+    throw new IllegalStateException("Not implemented");
+  }
+
+  public TImpalaTableType getTableType() {
     throw new IllegalStateException("Not implemented");
   }
 }
