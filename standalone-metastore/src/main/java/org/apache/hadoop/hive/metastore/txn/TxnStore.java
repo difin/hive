@@ -77,14 +77,14 @@ import org.apache.hadoop.hive.metastore.txn.jdbc.MultiDataSourceJdbcResource;
 import org.apache.hadoop.hive.metastore.txn.retry.SqlRetry;
 import org.apache.hadoop.hive.metastore.txn.retry.SqlRetryException;
 import org.apache.hadoop.hive.metastore.txn.retry.SqlRetryHandler;
+import org.apache.hadoop.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.sql.Statement;
+import java.util.*;
 
 /**
  * A handler to answer transaction related calls that come into the metastore
@@ -955,5 +955,17 @@ public interface TxnStore extends Configurable {
   @Transactional(POOL_COMPACTOR)
   @RetrySemantics.Idempotent
   boolean updateCompactionMetricsData(CompactionMetricsData data) throws MetaException;
+
+  /**
+   * Returns the databases updated by txnId.
+   * Queries TXN_TO_WRITE_ID using txnId.
+   *
+   * @param txnId
+   * @throws MetaException
+   */
+  @SqlRetry
+  @Transactional(POOL_TX)
+  @RetrySemantics.ReadOnly
+  List<String> getTxnDbsUpdated(long txnId) throws MetaException;
 
 }

@@ -289,8 +289,8 @@ public class MessageBuilder {
     return new JSONCommitTxnMessage(MS_SERVER_URL, MS_SERVICE_PRINCIPAL, txnId, now());
   }
 
-  public AbortTxnMessage buildAbortTxnMessage(Long txnId) {
-    return new JSONAbortTxnMessage(MS_SERVER_URL, MS_SERVICE_PRINCIPAL, txnId, now());
+  public AbortTxnMessage buildAbortTxnMessage(Long txnId, List<String> dbsUpdated) {
+    return new JSONAbortTxnMessage(MS_SERVER_URL, MS_SERVICE_PRINCIPAL, txnId, now(), dbsUpdated);
   }
 
   public AllocWriteIdMessage buildAllocWriteIdMessage(List<TxnToWriteId> txnToWriteIdList,

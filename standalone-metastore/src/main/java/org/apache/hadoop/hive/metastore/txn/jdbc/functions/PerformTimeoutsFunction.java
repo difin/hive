@@ -130,7 +130,7 @@ public class PerformTimeoutsFunction implements TransactionalFunction<Void> {
               for (Map.Entry<Long, TxnType> txnEntry : batchToAbort.entrySet()) {
                 MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners,
                     EventMessage.EventType.ABORT_TXN,
-                    new AbortTxnEvent(txnEntry.getKey(), txnEntry.getValue(), null),
+                    new AbortTxnEvent(txnEntry.getKey(), txnEntry.getValue(), null,null),
                     jdbcResource.getConnection(), jdbcResource.getSqlGenerator());
               }
               LOG.debug("Added Notifications for the transactions that are aborted due to timeout: {}", batchToAbort);

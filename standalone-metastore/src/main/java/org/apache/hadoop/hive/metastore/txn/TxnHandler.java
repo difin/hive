@@ -412,7 +412,7 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     if (txnType != null) {
       if (transactionalListeners != null && (!rqst.isSetReplPolicy() || !TxnType.DEFAULT.equals(rqst.getTxn_type()))) {
         MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners, EventMessage.EventType.ABORT_TXN,
-            new AbortTxnEvent(rqst.getTxnid(), txnType, null), jdbcResource.getConnection(), sqlGenerator);
+            new AbortTxnEvent(rqst.getTxnid(), txnType, null,getTxnDbsUpdated(rqst.getTxnid())), jdbcResource.getConnection(), sqlGenerator);
       }
     }
   }
@@ -456,9 +456,10 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
       if (transactionalListeners != null) {
         for (Long txnId : txnIds) {
+          List<String> dbsUpdated = getTxnDbsUpdated(txnId);
           MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners,
               EventMessage.EventType.ABORT_TXN, new AbortTxnEvent(txnId,
-                  nonReadOnlyTxns.getOrDefault(txnId, TxnType.READ_ONLY), null), dbConn, sqlGenerator);
+                  nonReadOnlyTxns.getOrDefault(txnId, TxnType.READ_ONLY), null, dbsUpdated), dbConn, sqlGenerator);
         }
       }
     } catch (SQLException e) {
@@ -785,6 +786,24 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     metrics.setTablesWithXAbortedTxnsCount(resourceNames.size());
     metrics.setTablesWithXAbortedTxns(resourceNames);
     return metrics;
+  }
+
+  @Override
+  public List<String> getTxnDbsUpdated(long txnId) throws MetaException {
+    List<String> dbsUpdated = new ArrayList<String>();
+    String query = "SELECT DISTINCT T2W_DATABASE " + " FROM \"TXN_TO_WRITE_ID\" \"COMMITTED\"" + "   WHERE \"T2W_TXNID\" = " + txnId;
+    Connection dbConn = jdbcResource.getConnection();
+    LOG.debug("Going to execute query <{}>", query);
+    try (Statement stmt = dbConn.createStatement(); ResultSet rs = stmt.executeQuery(
+        sqlGenerator.addForUpdateClause(query))) {
+      while (rs.next()) {
+        dbsUpdated.add(rs.getString(1));
+      }
+    } catch (SQLException e) {
+      throw new MetaException(StringUtils.stringifyException(e));
+    }
+    return dbsUpdated;
+
   }
 
   /**

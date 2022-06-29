@@ -9266,6 +9266,9 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       getTxnHandler().abortTxn(rqst);
       boolean isHiveReplTxn = rqst.isSetReplPolicy() && TxnType.DEFAULT.equals(rqst.getTxn_type());
       if (listeners != null && !listeners.isEmpty() && !isHiveReplTxn) {
+        // Not adding dbsUpdated to AbortTxnEvent because
+        // only DbNotificationListener cares about it, and this is already
+        // handled with transactional listeners in TxnHandler.
         MetaStoreListenerNotifier.notifyEvent(listeners, EventType.ABORT_TXN,
                 new AbortTxnEvent(rqst.getTxnid(), this));
       }
@@ -9276,6 +9279,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       getTxnHandler().abortTxns(rqst);
       if (listeners != null && !listeners.isEmpty()) {
         for (Long txnId : rqst.getTxn_ids()) {
+          // See above abort_txn() note about not adding dbsUpdated.
           MetaStoreListenerNotifier.notifyEvent(listeners, EventType.ABORT_TXN,
                   new AbortTxnEvent(txnId, this));
         }
