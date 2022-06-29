@@ -253,6 +253,7 @@ public class StatsUtils {
         HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_STATS_FETCH_COLUMN_STATS);
     boolean estimateStats = HiveConf.getBoolVar(conf, ConfVars.HIVE_STATS_ESTIMATE_STATS);
     boolean estimateStatsUsingFileSystem = conf.isFileSystemStatsEnabled();
+    boolean metaTable = table.getMetaTable() != null;
 
     if (!table.isPartitioned()) {
 
@@ -275,7 +276,7 @@ public class StatsUtils {
 
       long numErasureCodedFiles = getErasureCodedFiles(table);
 
-      if (needColStats) {
+      if (needColStats && !metaTable) {
         colStats = getTableColumnStats(table, schema, neededColumns, colStatsCache, fetchColStats);
         estimateStatsForMissingCols(neededColumns, colStats, table, conf, nr, schema);
         // we should have stats for all columns (estimated or actual)
