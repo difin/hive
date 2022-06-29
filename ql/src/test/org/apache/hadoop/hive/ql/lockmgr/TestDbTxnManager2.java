@@ -2373,6 +2373,35 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   }
 
   @Test
+  public void testCtasLockingExclWrite() throws Exception {
+    dropTable(new String[]{"target", "source"});
+    conf.setBoolVar(HiveConf.ConfVars.TXN_CTAS_X_LOCK, true);
+    
+    driver.run("create table source (a int, b int) stored as orc TBLPROPERTIES ('transactional'='true')");
+    driver.run("insert into source values (1,2), (3,4)");
+
+    driver.compileAndRespond("create table target stored as orc TBLPROPERTIES ('transactional'='true') as select * from source");
+    txnMgr.acquireLocks(driver.getPlan(), ctx, "T1");
+
+    DbTxnManager txnMgr2 = (DbTxnManager) TxnManagerFactory.getTxnManagerFactory().getTxnManager(conf);
+    swapTxnManager(txnMgr2);
+
+    driver.compileAndRespond("create table target stored as orc TBLPROPERTIES ('transactional'='true') as select * from source");
+    try {
+      //Query should fail with Table already exists exception
+      txnMgr2.acquireLocks(driver.getPlan(), driver.getContext(), "T2", false);
+    } catch (LockException e) {
+      Assert.assertTrue(e.getMessage().contains("Failed to initiate a concurrent CTAS operation"));
+    }
+    List<ShowLocksResponseElement> locks = getLocks();
+    Assert.assertEquals("Unexpected lock count", 3, locks.size());
+
+    checkLock(LockType.EXCL_WRITE, LockState.ACQUIRED, "default", "target", null, locks);
+    checkLock(LockType.SHARED_READ, LockState.ACQUIRED, "default", "source", null, locks);
+    checkLock(LockType.SHARED_READ, LockState.ACQUIRED, "default", null, null, locks);
+  }
+
+  @Test
   public void testConcurrent2MergeUpdatesConflict() throws Exception {
     testConcurrent2MergeUpdatesConflict(false);
   }
@@ -2989,7 +3018,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       Assert.assertTrue(zeroWaitRead);
       Assert.assertEquals("Exception msg didn't match",
         ErrorMsg.LOCK_CANNOT_BE_ACQUIRED.getMsg() + " LockResponse(lockid:" + (extLockId + 1) +
-          ", state:NOT_ACQUIRED, errorMessage:Unable to acquire read lock due to an exclusive lock" +
+          ", state:NOT_ACQUIRED, errorMessage:Unable to acquire read lock due to an existing exclusive lock" +
           " {lockid:" + extLockId + " intLockId:1 txnid:" + txnMgr2.getCurrentTxnId() +
           " db:default table:t6 partition:null state:WAITING type:EXCLUSIVE})",
         ex.getMessage());
@@ -3053,7 +3082,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       Assert.assertTrue(zeroWaitRead);
       Assert.assertEquals("Exception msg didn't match",
         ErrorMsg.LOCK_CANNOT_BE_ACQUIRED.getMsg() + " LockResponse(lockid:" + (extLockId + 1) +
-          ", state:NOT_ACQUIRED, errorMessage:Unable to acquire read lock due to an exclusive lock" +
+          ", state:NOT_ACQUIRED, errorMessage:Unable to acquire read lock due to an existing exclusive lock" +
           " {lockid:" + extLockId + " intLockId:1 txnid:" + txnMgr2.getCurrentTxnId() +
           " db:default table:t7 partition:p=1 state:WAITING type:EXCLUSIVE})",
         ex.getMessage());
@@ -3842,7 +3871,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     driver.close();
 
     driver.compileAndRespond("drop view if exists v_tab_acid");
-    
+
     driver.lockAndRespond();
     locks = getLocks();
     Assert.assertEquals("Unexpected lock count", 0, locks.size());
@@ -4445,7 +4474,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   public void testAlterTableClusteredBy() throws Exception {
     dropTable(new String[] {"tab_acid"});
     HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, true);
-    
+
     driver.run("create table if not exists tab_acid (a int, b int) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
     driver.run("insert into tab_acid (a,b) values(1,2),(3,4)");
@@ -4465,11 +4494,11 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     Assert.assertEquals("Unexpected lock count", 2, locks.size());
     checkLock(LockType.EXCL_WRITE, LockState.ACQUIRED, "default", "tab_acid", null, locks);
     checkLock(LockType.SHARED_WRITE, LockState.WAITING, "default", "tab_acid", null, locks);
-    
+
     txnMgr2.rollbackTxn();
     txnMgr.commitTxn();
   }
-  
+
   @Test
   public void testMsckRepair() throws Exception {
     dropTable(new String[] { "tab_acid", "tab_acid_msck"});
@@ -4478,11 +4507,11 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       "stored as orc TBLPROPERTIES ('transactional'='true')");
     driver.run("insert into tab_acid partition(p) values (1,1,'p1'),(2,2,'p1'),(3,3,'p1')");
     driver.run("insert into tab_acid partition(p) values (1,2,'p1'),(2,3,'p1'),(3,4,'p1')");
-    
+
     // Create target table
-    driver.run("create table tab_acid_msck (a int, b int) partitioned by (p string) " + 
+    driver.run("create table tab_acid_msck (a int, b int) partitioned by (p string) " +
       " stored as orc TBLPROPERTIES ('transactional'='true')");
-    
+
     // copy files on fs
     FileSystem fs = FileSystem.get(conf);
     FileUtil.copy(fs, new Path(getWarehouseDir() + "/tab_acid/p=p1"), fs,
@@ -4508,7 +4537,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     Assert.assertEquals("Unexpected lock count", 2, locks.size());
     checkLock(LockType.EXCL_WRITE, LockState.ACQUIRED, "default", "tab_acid_msck", null, locks);
     checkLock(LockType.SHARED_WRITE, LockState.WAITING, "default", "tab_acid_msck", null, locks);
-    
+
     txnMgr2.rollbackTxn();
     txnMgr.commitTxn();
   }
@@ -4517,13 +4546,13 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   public void testAlterTableSetPropertiesNonBlocking() throws Exception {
     dropTable(new String[]{"tab_acid"});
     HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, true);
-    
+
     driver.run("create table tab_acid (a int, b int) partitioned by (p string) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
-    
+
     driver.compileAndRespond("alter table tab_acid set tblproperties ('DO_NOT_UPDATE_STATS'='true')");
     driver.lockAndRespond();
-    
+
     List<ShowLocksResponseElement> locks = getLocks();
     Assert.assertEquals("Unexpected lock count", 1, locks.size());
     checkLock(LockType.SHARED_READ,
@@ -4532,13 +4561,13 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
 
     driver.compileAndRespond("alter table tab_acid unset tblproperties ('transactional')");
     driver.lockAndRespond();
-    
+
     locks = getLocks();
     Assert.assertEquals("Unexpected lock count", 1, locks.size());
     checkLock(LockType.EXCL_WRITE,
       LockState.ACQUIRED, "default", "tab_acid", null, locks);
   }
-  
+
   @Test
   public void testSetSerdeAndFileFormatNonBlocking() throws Exception {
     dropTable(new String[] {"tab_acid"});
@@ -4558,13 +4587,13 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     driver2 = Mockito.spy(driver2);
     FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
     changer.safelyDisableAccess(validTxnManager);
-    
+
     DbTxnManager txnMgr2 = (DbTxnManager) TxnManagerFactory.getTxnManagerFactory().getTxnManager(conf);
     swapTxnManager(txnMgr2);
-    
+
     driver2.compileAndRespond("alter table tab_acid set serde 'org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe'");
     driver2.lockAndRespond();
-    
+
     List<ShowLocksResponseElement> locks = getLocks();
     Assert.assertEquals("Unexpected lock count", 1, locks.size());
     checkLock(LockType.EXCL_WRITE,
@@ -4573,10 +4602,10 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     Mockito.doNothing().when(driver2).lockAndRespond();
     driver2.run();
     Mockito.reset(driver2);
-    
+
     driver2.compileAndRespond("alter table tab_acid set fileformat rcfile");
     driver2.lockAndRespond();
-    
+
     locks = getLocks();
     Assert.assertEquals("Unexpected lock count", 1, locks.size());
     checkLock(LockType.EXCL_WRITE,
@@ -4585,9 +4614,9 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     Mockito.doNothing().when(driver2).lockAndRespond();
     driver2.run();
     Mockito.reset(driver2);
-    
+
     driver2.run("insert into tab_acid partition(p) (a,b,p) values(1,2,'foo')");
-    
+
     swapTxnManager(txnMgr);
     driver.run();
 
@@ -4604,20 +4633,20 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
     driver.run("insert into tab_acid partition(p) (a,b,p) values(1,2,'foo'),(3,4,'bar')");
-    
+
     driver.run("create materialized view mv_tab_acid partitioned on (p) " +
       "stored as orc TBLPROPERTIES ('transactional'='true') as select a, p from tab_acid where b > 1");
-    
+
     driver.compileAndRespond("alter materialized view mv_tab_acid rebuild");
     driver.lockAndRespond();
     List<ShowLocksResponseElement> locks = getLocks();
-    // FIXME: two rebuilds should not run in parallel 
+    // FIXME: two rebuilds should not run in parallel
     Assert.assertEquals("Unexpected lock count", 0, locks.size());
     // cleanup
     txnMgr.rollbackTxn();
     driver.run("drop materialized view mv_tab_acid");
   }
-  
+
   @Test
   public void testMaterializedViewEnableRewriteNonBlocking() throws Exception {
     driver.run("drop materialized view if exists mv_tab_acid");

@@ -24049,6 +24049,11 @@ void LockRequest::__set_zeroWaitReadEnabled(const bool val) {
   this->zeroWaitReadEnabled = val;
 __isset.zeroWaitReadEnabled = true;
 }
+
+void LockRequest::__set_exclusiveCTAS(const bool val) {
+  this->exclusiveCTAS = val;
+__isset.exclusiveCTAS = true;
+}
 std::ostream& operator<<(std::ostream& out, const LockRequest& obj)
 {
   obj.printTo(out);
@@ -24140,6 +24145,14 @@ uint32_t LockRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
+      case 7:
+        if (ftype == ::apache::thrift::protocol::T_BOOL) {
+          xfer += iprot->readBool(this->exclusiveCTAS);
+          this->__isset.exclusiveCTAS = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -24198,6 +24211,11 @@ uint32_t LockRequest::write(::apache::thrift::protocol::TProtocol* oprot) const 
     xfer += oprot->writeBool(this->zeroWaitReadEnabled);
     xfer += oprot->writeFieldEnd();
   }
+  if (this->__isset.exclusiveCTAS) {
+    xfer += oprot->writeFieldBegin("exclusiveCTAS", ::apache::thrift::protocol::T_BOOL, 7);
+    xfer += oprot->writeBool(this->exclusiveCTAS);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -24211,6 +24229,7 @@ void swap(LockRequest &a, LockRequest &b) {
   swap(a.hostname, b.hostname);
   swap(a.agentInfo, b.agentInfo);
   swap(a.zeroWaitReadEnabled, b.zeroWaitReadEnabled);
+  swap(a.exclusiveCTAS, b.exclusiveCTAS);
   swap(a.__isset, b.__isset);
 }
 
@@ -24221,6 +24240,7 @@ LockRequest::LockRequest(const LockRequest& other902) {
   hostname = other902.hostname;
   agentInfo = other902.agentInfo;
   zeroWaitReadEnabled = other902.zeroWaitReadEnabled;
+  exclusiveCTAS = other902.exclusiveCTAS;
   __isset = other902.__isset;
 }
 LockRequest& LockRequest::operator=(const LockRequest& other903) {
@@ -24230,6 +24250,7 @@ LockRequest& LockRequest::operator=(const LockRequest& other903) {
   hostname = other903.hostname;
   agentInfo = other903.agentInfo;
   zeroWaitReadEnabled = other903.zeroWaitReadEnabled;
+  exclusiveCTAS = other903.exclusiveCTAS;
   __isset = other903.__isset;
   return *this;
 }
@@ -24242,6 +24263,7 @@ void LockRequest::printTo(std::ostream& out) const {
   out << ", " << "hostname=" << to_string(hostname);
   out << ", " << "agentInfo="; (__isset.agentInfo ? (out << to_string(agentInfo)) : (out << "<null>"));
   out << ", " << "zeroWaitReadEnabled="; (__isset.zeroWaitReadEnabled ? (out << to_string(zeroWaitReadEnabled)) : (out << "<null>"));
+  out << ", " << "exclusiveCTAS="; (__isset.exclusiveCTAS ? (out << to_string(exclusiveCTAS)) : (out << "<null>"));
   out << ")";
 }
 
