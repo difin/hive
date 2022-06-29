@@ -8161,11 +8161,11 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     // and it is an insert overwrite or insert into table
     if (conf.isAutogatherStatsEnabled()
         && conf.isAutogatherColumnStatsEnabled()
+        && enableColumnStatsCollecting()
         && destinationTable != null
         && (!destinationTable.isNonNative() || destinationTable.getStorageHandler().commitInMoveTask())
         && !destTableIsTemporary && !destTableIsMaterialization
-        && ColumnStatsAutoGatherContext.canRunAutogatherStats(fso)
-        && !(this instanceof UpdateDeleteSemanticAnalyzer)) {
+        && ColumnStatsAutoGatherContext.canRunAutogatherStats(fso)) {
       if (destType == QBMetaData.DEST_TABLE) {
         genAutoColumnStatsGatheringPipeline(qb, destinationTable, partSpec, input,
             qb.getParseInfo().isInsertIntoTable(destinationTable.getDbName(), destinationTable.getTableName()),
@@ -8199,7 +8199,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
       Warehouse wh = new Warehouse(conf);
       if (tbl.getSd() == null
-              || tbl.getSd().getLocation() == null) {
+          || tbl.getSd().getLocation() == null) {
         location = wh.getDefaultTablePath(db.getDatabase(names[0]), names[1], false);
       } else {
         location = wh.getDnsPath(new Path(tbl.getSd().getLocation()));
@@ -8210,6 +8210,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     } catch (HiveException | MetaException e) {
       throw new SemanticException(e);
     }
+  }
+
+  protected boolean enableColumnStatsCollecting() {
+    return true;
   }
 
   private boolean isDirectInsert(boolean destTableIsFullAcid, AcidUtils.Operation acidOp) {
