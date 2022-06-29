@@ -782,6 +782,18 @@ public class Driver implements IDriver {
         taskQueue = new TaskQueue(context); // for canceling the query (should be bound to session?)
         Executor executor = new Executor(context, driverContext, driverState, taskQueue);
         executor.execute();
+
+        FetchTask fetchTask = driverContext.getPlan().getFetchTask();
+        if (fetchTask != null) {
+          fetchTask.setTaskQueue(null);
+          fetchTask.setQueryPlan(null);
+          try {
+            fetchTask.execute();
+            driverContext.setFetchTask(fetchTask);
+          } catch (Throwable e) {
+            throw new CommandProcessorException(e);
+          }
+        }
       } catch (CommandProcessorException cpe) {
         rollback(cpe);
         throw cpe;
@@ -927,7 +939,7 @@ public class Driver implements IDriver {
     return driverContext.getFetchTask() != null;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public boolean getResults(List res) throws IOException {
     if (driverState.isDestroyed() || driverState.isClosed()) {
@@ -1000,12 +1012,10 @@ public class Driver implements IDriver {
     }
     if (isFetchingTable()) {
       try {
-        driverContext.getFetchTask().clearFetch();
+        driverContext.getFetchTask().resetFetch();
       } catch (Exception e) {
-        throw new IOException("Error closing the current fetch task", e);
+        throw new IOException("Error resetting the current fetch task", e);
       }
-      // FetchTask should not depend on the plan.
-      driverContext.getFetchTask().initialize(driverContext.getQueryState(), null, null, context);
     } else {
       context.resetStream();
       driverContext.setResStream(null);
@@ -1030,14 +1040,6 @@ public class Driver implements IDriver {
 
   private void releasePlan() {
     try {
-      if (driverContext.getPlan() != null) {
-        FetchTask fetchTask = driverContext.getPlan().getFetchTask();
-        if (fetchTask != null) {
-          fetchTask.setTaskQueue(null);
-          fetchTask.setQueryPlan(null);
-        }
-        driverContext.setFetchTask(fetchTask);
-      }
       driverContext.setPlan(null);
     } catch (Exception e) {
       LOG.debug("Exception while clearing the Fetch task", e);
