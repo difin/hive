@@ -676,8 +676,8 @@ precedenceSimilarExpressionAtom[CommonTree t]
 
 precedenceSimilarExpressionQuantifierPredicate[CommonTree t]
     :
-    partitionSelectorOperator quantifierType subQueryExpression
-    -> ^(TOK_SUBQUERY_EXPR ^(TOK_SUBQUERY_OP quantifierType partitionSelectorOperator ) subQueryExpression {$t})
+    subQuerySelectorOperator quantifierType subQueryExpression
+    -> ^(TOK_SUBQUERY_EXPR ^(TOK_SUBQUERY_OP quantifierType subQuerySelectorOperator ) subQueryExpression {$t})
     ;
 
 quantifierType
@@ -800,7 +800,12 @@ partitionSelectorVal
 
 partitionSelectorOperator
     :
-    EQUAL | NOTEQUAL | LESSTHANOREQUALTO | LESSTHAN | GREATERTHANOREQUALTO | GREATERTHAN | KW_LIKE
+    KW_LIKE | subQuerySelectorOperator
+    ;
+
+subQuerySelectorOperator
+    :
+    EQUAL | NOTEQUAL | LESSTHANOREQUALTO | LESSTHAN | GREATERTHANOREQUALTO | GREATERTHAN
     ;
 
 sysFuncNames
