@@ -3159,8 +3159,15 @@ deleteStatement
 /*SET <columName> = (3 + col2)*/
 columnAssignmentClause
    :
-   tableOrColumn EQUAL^ precedencePlusExpression
+   | tableOrColumn EQUAL^ precedencePlusExpressionOrDefault
    ;
+
+precedencePlusExpressionOrDefault
+    :
+    (KW_DEFAULT (~DOT|EOF)) => defaultValue
+    | precedencePlusExpression
+    ;
+
 
 /*SET col1 = 5, col2 = (4 + col4), ...*/
 setColumnsClause
