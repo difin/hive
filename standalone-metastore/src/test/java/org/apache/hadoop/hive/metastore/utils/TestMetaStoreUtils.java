@@ -26,7 +26,15 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hive.common.StatsSetupConst;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.annotation.MetastoreUnitTest;
-import org.apache.hadoop.hive.metastore.api.*;
+import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.EnvironmentContext;
+import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.Partition;
+import org.apache.hadoop.hive.metastore.api.PartitionSpec;
+import org.apache.hadoop.hive.metastore.api.PartitionSpecWithSharedSD;
+import org.apache.hadoop.hive.metastore.api.PartitionWithoutSD;
+import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.client.builder.DatabaseBuilder;
 import org.apache.hadoop.hive.metastore.client.builder.PartitionBuilder;
@@ -855,4 +863,33 @@ public class TestMetaStoreUtils {
     assertThat(partition.getSd().getLocation(), is("/a/b"));
     assertThat(partition.getValues(), is(Collections.singletonList("val2")));
   }
+
+  @Test
+  public void testSameColumns() {
+    FieldSchema col1 = new FieldSchema("col1", "string", "col1 comment");
+    FieldSchema Col1 = new FieldSchema("Col1", "string", "col1 comment");
+    FieldSchema col2 = new FieldSchema("col2", "string", "col2 comment");
+    Assert.assertTrue(MetaStoreUtils.areSameColumns(null, null));
+    Assert.assertFalse(MetaStoreUtils.areSameColumns(Arrays.asList(col1), null));
+    Assert.assertFalse(MetaStoreUtils.areSameColumns(null, Arrays.asList(col1)));
+    Assert.assertTrue(MetaStoreUtils.areSameColumns(Arrays.asList(col1), Arrays.asList(col1)));
+    Assert.assertTrue(MetaStoreUtils.areSameColumns(Arrays.asList(col1, col2), Arrays.asList(col1, col2)));
+    Assert.assertTrue(MetaStoreUtils.areSameColumns(Arrays.asList(Col1, col2), Arrays.asList(col1, col2)));
+  }
+
+  @Test
+  public void testPrefixColumns() {
+    FieldSchema col1 = new FieldSchema("col1", "string", "col1 comment");
+    FieldSchema Col1 = new FieldSchema("Col1", "string", "col1 comment");
+    FieldSchema col2 = new FieldSchema("col2", "string", "col2 comment");
+    FieldSchema col3 = new FieldSchema("col3", "string", "col3 comment");
+    Assert.assertTrue(MetaStoreUtils.arePrefixColumns(null, null));
+    Assert.assertFalse(MetaStoreUtils.arePrefixColumns(Arrays.asList(col1), null));
+    Assert.assertFalse(MetaStoreUtils.arePrefixColumns(null, Arrays.asList(col1)));
+    Assert.assertTrue(MetaStoreUtils.arePrefixColumns(Arrays.asList(col1), Arrays.asList(col1)));
+    Assert.assertTrue(MetaStoreUtils.arePrefixColumns(Arrays.asList(col1, col2), Arrays.asList(col1, col2, col3)));
+    Assert.assertTrue(MetaStoreUtils.arePrefixColumns(Arrays.asList(Col1, col2), Arrays.asList(col1, col2, col3)));
+    Assert.assertFalse(MetaStoreUtils.arePrefixColumns(Arrays.asList(col1, col2, col3), Arrays.asList(col1, col2)));
+  }
 }
+

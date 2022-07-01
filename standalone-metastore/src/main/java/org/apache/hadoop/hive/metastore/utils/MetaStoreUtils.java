@@ -275,7 +275,7 @@ public class MetaStoreUtils {
   public static void throwMetaException(Exception e) throws MetaException {
     throw new MetaException("Got exception: " + e.getClass().getName() + " " + e.getMessage());
   }
-  
+
   public static String encodeTableName(String name) {
     // The encoding method is simple, e.g., replace
     // all the special characters with the corresponding number in ASCII.
@@ -998,20 +998,35 @@ public class MetaStoreUtils {
   }
 
   public static boolean areSameColumns(List<FieldSchema> oldCols, List<FieldSchema> newCols) {
-    return ListUtils.isEqualList(oldCols, newCols);
+    if (oldCols == newCols) {
+      return true;
+    }
+    if (oldCols == null || newCols == null || oldCols.size() != newCols.size()) {
+      return false;
+    }
+    // We should ignore the case of field names, because some computing engines are case-sensitive, such as Spark.
+    List<FieldSchema> transformedOldCols = oldCols.stream()
+        .map(col -> new FieldSchema(col.getName().toLowerCase(), col.getType(), col.getComment()))
+        .collect(Collectors.toList());
+    List<FieldSchema> transformedNewCols = newCols.stream()
+        .map(col -> new FieldSchema(col.getName().toLowerCase(), col.getType(), col.getComment()))
+        .collect(Collectors.toList());
+    return ListUtils.isEqualList(transformedOldCols, transformedNewCols);
   }
 
   /**
    * Returns true if p is a prefix of s.
+   * <p>
+   * The compare of {@link FieldSchema} is the same as {@link #areSameColumns(List, List)}.
    */
   public static boolean arePrefixColumns(List<FieldSchema> p, List<FieldSchema> s) {
     if (p == s) {
       return true;
     }
-    if (p.size() > s.size()) {
+    if (p == null || s == null || p.size() > s.size()) {
       return false;
     }
-    return ListUtils.isEqualList(p, s.subList(0, p.size()));
+    return areSameColumns(p, s.subList(0, p.size()));
   }
 
   public static void updateBasicState(EnvironmentContext environmentContext, Map<String,String>
@@ -1045,6 +1060,7 @@ public class MetaStoreUtils {
     return updatePartitionStatsFast(new PartitionSpecProxy.SimplePartitionWrapperIterator(part),
         tbl, wh, madeDir, forceRecompute, environmentContext, isCreate);
   }
+
   /**
    * Updates the numFiles and totalSize parameters for the passed Partition by querying
    *  the warehouse if the passed Partition does not already have values for these parameters.
@@ -2001,6 +2017,21 @@ public class MetaStoreUtils {
           if (input.getSd() == null) {
             return StorageDescriptorKey.UNSET_KEY;
           }
+
+          // if sd has skewed columns we better not group partition, since different partitions
+          // could have different skewed info like skewed location
+          if (input.getSd().getSkewedInfo() != null
+              && input.getSd().getSkewedInfo().getSkewedColNames() != null
+              && !input.getSd().getSkewedInfo().getSkewedColNames().isEmpty()) {
+            return new StorageDescriptorKey(input.getSd());
+          }
+
+          // if partitions don't have the same number of buckets we can not group their SD,
+          // this could lead to incorrect number of buckets
+          if (input.getSd().getNumBuckets()
+              != partitions.iterator().next().getSd().getNumBuckets()) {
+            return new StorageDescriptorKey(input.getSd());
+          }
           // if the partition is within table, use the tableSDKey to group it with other partitions
           // within the table directory
           if (input.getSd().getLocation() != null && input.getSd().getLocation()
@@ -2059,6 +2090,7 @@ public class MetaStoreUtils {
     }
     if (!partitionsOutsideTableDir.isEmpty()) {
       PartitionSpec partListSpec = new PartitionSpec();
+      partListSpec.setCatName(table.getCatName());
       partListSpec.setDbName(table.getDbName());
       partListSpec.setTableName(table.getTableName());
       partListSpec.setPartitionList(new PartitionListComposingSpec(partitionsOutsideTableDir));
@@ -2089,6 +2121,7 @@ public class MetaStoreUtils {
     ret.setSharedSDPartitionSpec(sharedSDPartSpec);
     ret.setDbName(table.getDbName());
     ret.setTableName(table.getTableName());
+    ret.setCatName(table.getCatName());
 
     return ret;
   }
@@ -2142,6 +2175,7 @@ public class MetaStoreUtils {
           org.apache.hadoop.hive.metastore.utils.StringUtils.stringifyException(e));
     }
   }
+
 
   // ColumnStatisticsObj with info about its db, table, partition (if table is partitioned)
   public static class ColStatsObjWithSourceInfo {
@@ -2454,7 +2488,7 @@ public class MetaStoreUtils {
       // key value pairs - thrift cannot handle null return values, hence
       // getPartition() throws NoSuchObjectException to indicate null partition
     } catch (Exception e) {
-      LOG.error(org.apache.hadoop.util.StringUtils.stringifyException(e));
+      LOG.error("Failed to get partition", e);
       throw new MetastoreException(e);
     }
 
@@ -2674,7 +2708,7 @@ public class MetaStoreUtils {
   public static List<Predicate<String>> compilePatternsToPredicates(List<String> patterns) {
     return patterns.stream().map(pattern -> compile(pattern).asPredicate()).collect(Collectors.toList());
   }
-    
+
   public static TableName getTableNameFor(Table table) {
     return TableName.fromString(table.getTableName().toLowerCase(), table.getCatName().toLowerCase(), table.getDbName().toLowerCase());
   }
