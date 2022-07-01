@@ -42,8 +42,8 @@ import org.datanucleus.NucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.jdo.JDOPersistenceManager;
 import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
-import org.datanucleus.util.ConcurrentReferenceHashMap;
-import org.datanucleus.store.types.scostore.Store;
+import org.datanucleus.store.scostore.Store;
+import org.datanucleus.util.WeakValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -393,23 +393,23 @@ public class PersistenceManagerProvider {
     if (clr != null) {
       if (clr instanceof ClassLoaderResolverImpl) {
         ClassLoaderResolverImpl clri = (ClassLoaderResolverImpl) clr;
-        int resourcesCleared = clearFieldMap(clri, "resources");
-        int loadedClassesCleared = clearFieldMap(clri, "loadedClasses");
-        int unloadedClassesCleared = clearFieldMap(clri, "unloadedClasses");
+        long resourcesCleared = clearFieldMap(clri, "resources");
+        long loadedClassesCleared = clearFieldMap(clri, "loadedClasses");
+        long unloadedClassesCleared = clearFieldMap(clri, "unloadedClasses");
         LOG.debug("Cleared ClassLoaderResolverImpl: {}, {}, {}", resourcesCleared,
             loadedClassesCleared, unloadedClassesCleared);
       }
     }
   }
 
-  private static int clearFieldMap(ClassLoaderResolverImpl clri, String mapFieldName)
+  private static long clearFieldMap(ClassLoaderResolverImpl clri, String mapFieldName)
       throws Exception {
     Field mapField = ClassLoaderResolverImpl.class.getDeclaredField(mapFieldName);
     mapField.setAccessible(true);
 
-    Map map = (Map) mapField.get(clri);
-    final int sz = map.size();
-    mapField.set(clri, new ConcurrentReferenceHashMap<>());
+    Map<String, Class> map = (Map<String, Class>) mapField.get(clri);
+    long sz = map.size();
+    mapField.set(clri, Collections.synchronizedMap(new WeakValueMap()));
     return sz;
   }
 
