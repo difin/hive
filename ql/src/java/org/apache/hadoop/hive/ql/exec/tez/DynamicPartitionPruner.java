@@ -143,7 +143,7 @@ public class DynamicPartitionPruner {
       }
     }
 
-    LOG.info("Waiting for events (" + sourceInfoCount + " sources) ...");
+    LOG.info("Waiting for events ({} sources) ...", sourceInfoCount);
     // synchronous event processing loop. Won't return until all events have
     // been processed.
     this.processEvents();
@@ -227,7 +227,7 @@ public class DynamicPartitionPruner {
       String source = entry.getKey();
       for (SourceInfo si : entry.getValue()) {
         int taskNum = context.getVertexNumTasks(source);
-        LOG.info("Expecting " + taskNum + " events for vertex " + source + ", for column " + si.columnName);
+        LOG.info("Expecting {} events for vertex {}, for column {}", taskNum, source, si.columnName);
         expectedEvents += taskNum;
         ExprNodeDesc prunerExpr = prunePartitionSingleSource(jobConf, source, si);
         if (prunerExpr != null) {
@@ -252,7 +252,7 @@ public class DynamicPartitionPruner {
 
     // sanity check. all tasks must submit events for us to succeed.
     if (expectedEvents != totalEventCount) {
-      LOG.error("Expecting: " + expectedEvents + ", received: " + totalEventCount);
+      LOG.error("Expecting: {} events, received: {}", expectedEvents, totalEventCount);
       throw new HiveException("Incorrect event count in dynamic partition pruning");
     }
   }
@@ -264,7 +264,7 @@ public class DynamicPartitionPruner {
     if (si.skipPruning.get()) {
       // in this case we've determined that there's too much data
       // to prune dynamically.
-      LOG.info("Skip pruning on " + source + ", column " + si.columnName);
+      LOG.info("Skip pruning on {}, column {}", source, si.columnName);
       return null;
     }
 
@@ -348,7 +348,7 @@ public class DynamicPartitionPruner {
       }
 
       if (!values.contains(partValue) && (!mustKeepOnePartition || work.getPathToPartitionInfo().size() > 1)) {
-        LOG.info("Pruning path: " + p);
+        LOG.info("Pruning path: {}", p);
         it.remove();
         // work.removePathToPartitionInfo(p);
         work.removePathToAlias(p);
@@ -409,7 +409,7 @@ public class DynamicPartitionPruner {
       deserializer.initialize(jobConf, table.getProperties());
 
       ObjectInspector inspector = deserializer.getObjectInspector();
-      LOG.debug("Type of obj insp: " + inspector.getTypeName());
+      LOG.debug("Type of obj insp: {}", inspector.getTypeName());
 
       soi = (StructObjectInspector) inspector;
       List<? extends StructField> fields = soi.getAllStructFieldRefs();
@@ -436,16 +436,16 @@ public class DynamicPartitionPruner {
       }
 
       InputInitializerEvent event = (InputInitializerEvent) element;
+      ByteBuffer payload = event.getUserPayload();
 
-      LOG.info("Input event: " + event.getTargetInputName() + ", " + event.getTargetVertexName()
-          + ", " + (event.getUserPayload().limit() - event.getUserPayload().position()));
+      LOG.info("Input event ({} -> {} {}), event payload size: {}", event.getSourceVertexName(),
+          event.getTargetVertexName(), event.getTargetInputName(), (payload.limit() - payload.position()));
       processPayload(event.getUserPayload(), event.getSourceVertexName());
       eventCount += 1;
     }
-    LOG.info("Received events: " + eventCount);
+    LOG.info("Received events: {}", eventCount);
   }
 
-  @SuppressWarnings("deprecation")
   @VisibleForTesting
   protected String processPayload(ByteBuffer payload, String sourceName) throws SerDeException,
       IOException {
@@ -480,6 +480,7 @@ public class DynamicPartitionPruner {
         if (skip) {
           info.skipPruning.set(true);
         } else {
+          int partitionCount = 0;
           while (payload.hasRemaining()) {
             writable.readFields(in);
 
@@ -492,7 +493,9 @@ public class DynamicPartitionPruner {
               LOG.debug("Adding: " + value + " to list of required partitions");
             }
             info.values.add(value);
+            partitionCount++;
           }
+          LOG.info("Received {} partitions (source: {}, column: {})", partitionCount, sourceName, columnName);
         }
       }
     } finally {
@@ -545,7 +548,7 @@ public class DynamicPartitionPruner {
   }
 
   public void processVertex(String name) {
-    LOG.info("Vertex succeeded: " + name);
+    LOG.info("Vertex succeeded: {}", name);
     synchronized(sourcesWaitingForEvents) {
       // Get a deterministic count of number of tasks for the vertex.
       MutableInt prevVal = numExpectedEventsPerSource.get(name);
@@ -572,7 +575,7 @@ public class DynamicPartitionPruner {
             throw new IllegalStateException("Queue full");
           }
         } else {
-          LOG.info("Waiting for " + sourcesWaitingForEvents.size() + " sources.");
+          LOG.info("Waiting for {} sources.", sourcesWaitingForEvents.size());
         }
       } else if (processedEvents > expectedEvents) {
         throw new IllegalStateException(
