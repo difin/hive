@@ -168,7 +168,8 @@ CREATE OR REPLACE VIEW `COLUMNS`
   AND C.`COLUMN_NAME` = P.`COLUMN_NAME`
   AND (P.`PRINCIPAL_NAME`=current_user() AND P.`PRINCIPAL_TYPE`='USER'
   OR ((array_contains(current_groups(), P.`PRINCIPAL_NAME`) OR P.`PRINCIPAL_NAME` = 'public') AND P.`PRINCIPAL_TYPE`='GROUP'))
-  AND array_contains(split_map_privs(P.`TBL_COL_PRIV`),"SELECT") AND P.`AUTHORIZER`=current_authorizer();
+  AND ((P.`TBL_COL_PRIV`='SELECT' AND P.`AUTHORIZER`=current_authorizer())
+  OR (array_contains(split_map_privs(P.`TBL_COL_PRIV`),"SELECT") AND P.`AUTHORIZER`=current_authorizer()));
 
 
 CREATE OR REPLACE VIEW `COLUMN_PRIVILEGES`
