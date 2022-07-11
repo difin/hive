@@ -131,6 +131,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   private boolean isDirectInsert = false;
 
   private AcidUtils.Operation acidOperation = null;
+  private boolean deleteOfSplitUpdate;
 
   private boolean isQuery = false;
 
@@ -147,7 +148,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
       final boolean canBeMerged, final int numFiles, final int totalFiles,
       final List<ExprNodeDesc> partitionCols, final DynamicPartitionCtx dpCtx, Path destPath,
       Long mmWriteId, boolean isMmCtas, boolean isInsertOverwrite, boolean isQuery, boolean isCTASorCM, boolean isDirectInsert,
-      AcidUtils.Operation acidOperation) {
+      AcidUtils.Operation acidOperation, boolean deleteOfSplitUpdate) {
     this.dirName = dirName;
     setTableInfo(tableInfo);
     this.partition = partition;
@@ -168,6 +169,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
     this.isCTASorCM = isCTASorCM;
     this.isDirectInsert = isDirectInsert;
     this.acidOperation = acidOperation;
+    this.deleteOfSplitUpdate = deleteOfSplitUpdate;
   }
 
   public FileSinkDesc(final Path dirName, final TableDesc tableInfo,
@@ -189,7 +191,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
     this(other.dirName, other.tableInfo, other.partition, other.compressed, other.destTableId, other.multiFileSpray,
         other.canBeMerged, other.numFiles, other.totalFiles, other.partitionCols, other.dpCtx,
         other.destPath, other.mmWriteId, other.isMmCtas, other.isInsertOverwrite, other.isQuery,
-        other.isCTASorCM, other.isDirectInsert, other.acidOperation);
+        other.isCTASorCM, other.isDirectInsert, other.acidOperation, other.deleteOfSplitUpdate);
   }
 
   @Override
@@ -197,7 +199,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
     FileSinkDesc ret = new FileSinkDesc(dirName, tableInfo, partition, compressed,
         destTableId, multiFileSpray, canBeMerged, numFiles, totalFiles,
         partitionCols, dpCtx, destPath, mmWriteId, isMmCtas, isInsertOverwrite, isQuery,
-        isCTASorCM, isDirectInsert, acidOperation);
+        isCTASorCM, isDirectInsert, acidOperation, deleteOfSplitUpdate);
     ret.setCompressCodec(compressCodec);
     ret.setCompressType(compressType);
     ret.setGatherStats(gatherStats);
@@ -267,11 +269,15 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
 
   public void setAcidOperation(AcidUtils.Operation acidOperation) {
     this.acidOperation = acidOperation;
-   }
+  }
 
-   public AcidUtils.Operation getAcidOperation() {
-     return acidOperation;
-   }
+  public AcidUtils.Operation getAcidOperation() {
+   return acidOperation;
+  }
+
+  public boolean isDeleteOfSplitUpdate() {
+    return deleteOfSplitUpdate;
+  }
 
   @Explain(displayName = "directory", explainLevels = { Level.EXTENDED })
   public Path getDirName() {

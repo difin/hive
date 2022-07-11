@@ -50,6 +50,5 @@ PREHOOK: Input: default@testt
 PREHOOK: Output: default@merge_tmp_table
 PREHOOK: Output: default@testt
 PREHOOK: Output: default@testt
-PREHOOK: Output: default@testt
 #### A masked pattern was here ####
 FAILED: Execution Error, return code 2 from org.apache.hadoop.hive.ql.exec.mr.MapRedTask

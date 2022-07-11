@@ -612,6 +612,7 @@ PREHOOK: type: QUERY
 PREHOOK: Input: default@stats_part
 PREHOOK: Input: default@stats_part@p=101
 PREHOOK: Input: default@stats_part@p=102
+PREHOOK: Output: default@stats_part
 PREHOOK: Output: default@stats_part@p=101
 PREHOOK: Output: default@stats_part@p=102
 POSTHOOK: query: update stats_part set key = key + 100 where key in(-50,40) and p > 100
@@ -619,8 +620,12 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@stats_part
 POSTHOOK: Input: default@stats_part@p=101
 POSTHOOK: Input: default@stats_part@p=102
+POSTHOOK: Output: default@stats_part
+POSTHOOK: Output: default@stats_part@p=101
 POSTHOOK: Output: default@stats_part@p=101
 POSTHOOK: Output: default@stats_part@p=102
+POSTHOOK: Lineage: stats_part PARTITION(p=101).key EXPRESSION [(stats_part)stats_part.FieldSchema(name:key, type:int, comment:null), ]
+POSTHOOK: Lineage: stats_part PARTITION(p=101).value SIMPLE [(stats_part)stats_part.FieldSchema(name:value, type:string, comment:null), ]
 PREHOOK: query: explain select max(key) from stats_part where p > 100
 PREHOOK: type: QUERY
 PREHOOK: Input: default@stats_part
@@ -650,14 +655,14 @@ STAGE PLANS:
                 TableScan
                   alias: stats_part
                   filterExpr: (p > 100) (type: boolean)
-                  Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: key (type: int)
                     outputColumnNames: key
-                    Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
                     Group By Operator
                       aggregations: max(key)
-                      minReductionHashAggr: 0.8333333
+                      minReductionHashAggr: 0.85714287
                       mode: hash
                       outputColumnNames: _col0
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
@@ -760,9 +765,9 @@ Table:              	stats_part
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	numFiles            	4                   
-	numRows             	2                   
+	numRows             	3                   
 	rawDataSize         	0                   
-	totalSize           	2913                
+	totalSize           	2919                
 #### A masked pattern was here ####
 	 	 
 # Storage Information	 	 
@@ -828,6 +833,7 @@ PREHOOK: type: QUERY
 PREHOOK: Input: default@stats_part
 PREHOOK: Input: default@stats_part@p=101
 PREHOOK: Input: default@stats_part@p=102
+PREHOOK: Output: default@stats_part
 PREHOOK: Output: default@stats_part@p=101
 PREHOOK: Output: default@stats_part@p=102
 POSTHOOK: query: update stats_part set value = concat(value, 'updated') where cast(key as integer) in(40,53) and p > 100
@@ -835,6 +841,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@stats_part
 POSTHOOK: Input: default@stats_part@p=101
 POSTHOOK: Input: default@stats_part@p=102
+POSTHOOK: Output: default@stats_part
 POSTHOOK: Output: default@stats_part@p=101
 POSTHOOK: Output: default@stats_part@p=102
 PREHOOK: query: desc formatted stats_part partition(p = 100)
@@ -894,9 +901,9 @@ Table:              	stats_part
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	numFiles            	4                   
-	numRows             	2                   
+	numRows             	3                   
 	rawDataSize         	0                   
-	totalSize           	2913                
+	totalSize           	2919                
 #### A masked pattern was here ####
 	 	 
 # Storage Information	 	 
@@ -1032,9 +1039,9 @@ Table:              	stats_part
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	numFiles            	5                   
-	numRows             	1                   
+	numRows             	2                   
 	rawDataSize         	0                   
-	totalSize           	3611                
+	totalSize           	3617                
 #### A masked pattern was here ####
 	 	 
 # Storage Information	 	 
@@ -1133,7 +1140,7 @@ POSTHOOK: query: select count(*) from stats_part where p > 100
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@stats_part
 #### A masked pattern was here ####
-5
+6
 PREHOOK: query: explain select count(key) from stats_part
 PREHOOK: type: QUERY
 PREHOOK: Input: default@stats_part
@@ -1164,14 +1171,14 @@ STAGE PLANS:
             Map Operator Tree:
                 TableScan
                   alias: stats_part
-                  Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: key (type: int)
                     outputColumnNames: key
-                    Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
                     Group By Operator
                       aggregations: count(key)
-                      minReductionHashAggr: 0.8333333
+                      minReductionHashAggr: 0.85714287
                       mode: hash
                       outputColumnNames: _col0
                       Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1245,7 +1252,7 @@ POSTHOOK: query: select count(*) from stats_part where p > 100
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@stats_part
 #### A masked pattern was here ####
-5
+6
 PREHOOK: query: explain select max(key) from stats_part where p > 100
 PREHOOK: type: QUERY
 PREHOOK: Input: default@stats_part
@@ -1275,14 +1282,14 @@ STAGE PLANS:
                 TableScan
                   alias: stats_part
                   filterExpr: (p > 100) (type: boolean)
-                  Statistics: Num rows: 5 Data size: 20 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: key (type: int)
                     outputColumnNames: key
-                    Statistics: Num rows: 5 Data size: 20 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
                     Group By Operator
                       aggregations: max(key)
-                      minReductionHashAggr: 0.8
+                      minReductionHashAggr: 0.8333333
                       mode: hash
                       outputColumnNames: _col0
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE

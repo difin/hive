@@ -84,10 +84,14 @@ PREHOOK: query: update stats3 set value = "baz" where key = 4
 PREHOOK: type: QUERY
 PREHOOK: Input: default@stats3
 PREHOOK: Output: default@stats3
+PREHOOK: Output: default@stats3
 POSTHOOK: query: update stats3 set value = "baz" where key = 4
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@stats3
 POSTHOOK: Output: default@stats3
+POSTHOOK: Output: default@stats3
+POSTHOOK: Lineage: stats3.key SIMPLE []
+POSTHOOK: Lineage: stats3.value SIMPLE []
 PREHOOK: query: explain select count(*) from stats3
 PREHOOK: type: QUERY
 PREHOOK: Input: default@stats3
@@ -119,10 +123,14 @@ PREHOOK: query: update stats3 set value = "baz" where key = 1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@stats3
 PREHOOK: Output: default@stats3
+PREHOOK: Output: default@stats3
 POSTHOOK: query: update stats3 set value = "baz" where key = 1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@stats3
 POSTHOOK: Output: default@stats3
+POSTHOOK: Output: default@stats3
+POSTHOOK: Lineage: stats3.key SIMPLE []
+POSTHOOK: Lineage: stats3.value SIMPLE []
 PREHOOK: query: explain select count(*) from stats3
 PREHOOK: type: QUERY
 PREHOOK: Input: default@stats3
