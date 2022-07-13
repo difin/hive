@@ -97,7 +97,6 @@
     <derby.version>10.14.2.0</derby.version>
     <dropwizard.version>3.1.0</dropwizard.version>
     <dropwizard-metrics-hadoop-metrics2-reporter.version>0.1.2</dropwizard-metrics-hadoop-metrics2-reporter.version>
-    <druid.version>0.17.1.2022.0.10.0-SNAPSHOT</druid.version>
     <esri.version>2.2.4</esri.version>
     <flatbuffers.version>1.9.0</flatbuffers.version>
     <guava.version>28.1-jre</guava.version>
@@ -1645,7 +1644,6 @@
         <module>beeline</module>
         <module>cli</module>
         <module>contrib</module>
-        <module>druid-handler</module>
         <module>hbase-handler</module>
         <module>jdbc-handler</module>
         <module>hcatalog</module>
