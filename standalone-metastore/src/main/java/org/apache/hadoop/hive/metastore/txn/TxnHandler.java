@@ -834,7 +834,11 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   @Override
   public List<String> getTxnDbsUpdated(long txnId) throws MetaException {
     List<String> dbsUpdated = new ArrayList<String>();
-    String query = "SELECT DISTINCT T2W_DATABASE " + " FROM \"TXN_TO_WRITE_ID\" \"COMMITTED\"" + "   WHERE \"T2W_TXNID\" = " + txnId;
+    
+    String query = "SELECT DISTINCT \"T2W_DATABASE\" " +
+            " FROM \"TXN_TO_WRITE_ID\" \"COMMITTED\"" +
+            "   WHERE \"T2W_TXNID\" = " + txnId;
+    
     Connection dbConn = jdbcResource.getConnection();
     LOG.debug("Going to execute query <{}>", query);
     try (Statement stmt = dbConn.createStatement(); ResultSet rs = stmt.executeQuery(
