@@ -655,14 +655,14 @@ STAGE PLANS:
                 TableScan
                   alias: stats_part
                   filterExpr: (p > 100) (type: boolean)
-                  Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: key (type: int)
                     outputColumnNames: key
-                    Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
                     Group By Operator
                       aggregations: max(key)
-                      minReductionHashAggr: 0.85714287
+                      minReductionHashAggr: 0.8333333
                       mode: hash
                       outputColumnNames: _col0
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
@@ -765,7 +765,7 @@ Table:              	stats_part
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	numFiles            	4                   
-	numRows             	3                   
+	numRows             	2                   
 	rawDataSize         	0                   
 	totalSize           	2919                
 #### A masked pattern was here ####
@@ -901,7 +901,7 @@ Table:              	stats_part
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	numFiles            	4                   
-	numRows             	3                   
+	numRows             	2                   
 	rawDataSize         	0                   
 	totalSize           	2919                
 #### A masked pattern was here ####
@@ -1039,7 +1039,7 @@ Table:              	stats_part
 Partition Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
 	numFiles            	5                   
-	numRows             	2                   
+	numRows             	1                   
 	rawDataSize         	0                   
 	totalSize           	3617                
 #### A masked pattern was here ####
@@ -1140,7 +1140,7 @@ POSTHOOK: query: select count(*) from stats_part where p > 100
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@stats_part
 #### A masked pattern was here ####
-6
+5
 PREHOOK: query: explain select count(key) from stats_part
 PREHOOK: type: QUERY
 PREHOOK: Input: default@stats_part
@@ -1171,14 +1171,14 @@ STAGE PLANS:
             Map Operator Tree:
                 TableScan
                   alias: stats_part
-                  Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: key (type: int)
                     outputColumnNames: key
-                    Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
                     Group By Operator
                       aggregations: count(key)
-                      minReductionHashAggr: 0.85714287
+                      minReductionHashAggr: 0.8333333
                       mode: hash
                       outputColumnNames: _col0
                       Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1252,7 +1252,7 @@ POSTHOOK: query: select count(*) from stats_part where p > 100
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@stats_part
 #### A masked pattern was here ####
-6
+5
 PREHOOK: query: explain select max(key) from stats_part where p > 100
 PREHOOK: type: QUERY
 PREHOOK: Input: default@stats_part
@@ -1282,14 +1282,14 @@ STAGE PLANS:
                 TableScan
                   alias: stats_part
                   filterExpr: (p > 100) (type: boolean)
-                  Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 5 Data size: 20 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: key (type: int)
                     outputColumnNames: key
-                    Statistics: Num rows: 6 Data size: 24 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 5 Data size: 20 Basic stats: COMPLETE Column stats: COMPLETE
                     Group By Operator
                       aggregations: max(key)
-                      minReductionHashAggr: 0.8333333
+                      minReductionHashAggr: 0.8
                       mode: hash
                       outputColumnNames: _col0
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE

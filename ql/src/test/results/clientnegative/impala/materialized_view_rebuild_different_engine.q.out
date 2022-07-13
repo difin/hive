@@ -45,12 +45,6 @@ HMS CALL get_table_req FOR cmv_basetable
 HMS CALL get_table_req FOR cmv_mat_view
 HMS CALL get_table_req FOR cmv_mat_view
 HMS CALL get_table_req FOR cmv_mat_view
-HMS CALL get_table_req FOR cmv_mat_view
-HMS CALL get_table_req FOR cmv_mat_view
-HMS CALL get_table_req FOR cmv_basetable
-HMS CALL get_table_req FOR cmv_basetable
-HMS CALL get_table_req FOR cmv_basetable
-HMS CALL get_table_req FOR cmv_basetable
 HMS CALL get_table_req FOR cmv_basetable
 POSTHOOK: query: create materialized view cmv_mat_view as
 select a, b, c from cmv_basetable
