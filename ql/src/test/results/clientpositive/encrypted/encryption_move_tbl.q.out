@@ -96,10 +96,13 @@ COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"key\":\"true
 PREHOOK: query: ALTER TABLE default.encrypted_table_n1 RENAME TO encrypted_db.encrypted_table_2
 PREHOOK: type: ALTERTABLE_RENAME
 PREHOOK: Input: default@encrypted_table_n1
+PREHOOK: Output: database:encrypted_db
 PREHOOK: Output: default@encrypted_table_n1
+PREHOOK: Output: encrypted_db@encrypted_table_2
 POSTHOOK: query: ALTER TABLE default.encrypted_table_n1 RENAME TO encrypted_db.encrypted_table_2
 POSTHOOK: type: ALTERTABLE_RENAME
 POSTHOOK: Input: default@encrypted_table_n1
+POSTHOOK: Output: database:encrypted_db
 POSTHOOK: Output: default@encrypted_table_n1
 POSTHOOK: Output: encrypted_db@encrypted_table_2
 PREHOOK: query: SHOW TABLES
@@ -134,10 +137,13 @@ Encryption zone created: '/build/ql/test/data/specified_table_location' using ke
 PREHOOK: query: ALTER TABLE encrypted_table_outloc RENAME TO renamed_encrypted_table_outloc
 PREHOOK: type: ALTERTABLE_RENAME
 PREHOOK: Input: default@encrypted_table_outloc
+PREHOOK: Output: database:default
 PREHOOK: Output: default@encrypted_table_outloc
+PREHOOK: Output: default@renamed_encrypted_table_outloc
 POSTHOOK: query: ALTER TABLE encrypted_table_outloc RENAME TO renamed_encrypted_table_outloc
 POSTHOOK: type: ALTERTABLE_RENAME
 POSTHOOK: Input: default@encrypted_table_outloc
+POSTHOOK: Output: database:default
 POSTHOOK: Output: default@encrypted_table_outloc
 POSTHOOK: Output: default@renamed_encrypted_table_outloc
 PREHOOK: query: SHOW TABLES
@@ -185,10 +191,13 @@ POSTHOOK: Lineage: encrypted_table_n1.value SIMPLE [(src)src.FieldSchema(name:va
 PREHOOK: query: ALTER TABLE encrypted_table_n1 RENAME TO renamed_encrypted_table_n1
 PREHOOK: type: ALTERTABLE_RENAME
 PREHOOK: Input: encrypted_db_outloc@encrypted_table_n1
+PREHOOK: Output: database:encrypted_db_outloc
 PREHOOK: Output: encrypted_db_outloc@encrypted_table_n1
+PREHOOK: Output: encrypted_db_outloc@renamed_encrypted_table_n1
 POSTHOOK: query: ALTER TABLE encrypted_table_n1 RENAME TO renamed_encrypted_table_n1
 POSTHOOK: type: ALTERTABLE_RENAME
 POSTHOOK: Input: encrypted_db_outloc@encrypted_table_n1
+POSTHOOK: Output: database:encrypted_db_outloc
 POSTHOOK: Output: encrypted_db_outloc@encrypted_table_n1
 POSTHOOK: Output: encrypted_db_outloc@renamed_encrypted_table_n1
 PREHOOK: query: SHOW TABLES
@@ -201,10 +210,13 @@ renamed_encrypted_table_n1
 PREHOOK: query: ALTER TABLE encrypted_db_outloc.renamed_encrypted_table_n1 RENAME TO default.plain_table_2
 PREHOOK: type: ALTERTABLE_RENAME
 PREHOOK: Input: encrypted_db_outloc@renamed_encrypted_table_n1
+PREHOOK: Output: database:default
+PREHOOK: Output: default@plain_table_2
 PREHOOK: Output: encrypted_db_outloc@renamed_encrypted_table_n1
 POSTHOOK: query: ALTER TABLE encrypted_db_outloc.renamed_encrypted_table_n1 RENAME TO default.plain_table_2
 POSTHOOK: type: ALTERTABLE_RENAME
 POSTHOOK: Input: encrypted_db_outloc@renamed_encrypted_table_n1
+POSTHOOK: Output: database:default
 POSTHOOK: Output: default@plain_table_2
 POSTHOOK: Output: encrypted_db_outloc@renamed_encrypted_table_n1
 PREHOOK: query: SHOW TABLES
