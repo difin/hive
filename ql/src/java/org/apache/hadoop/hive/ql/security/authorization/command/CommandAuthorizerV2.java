@@ -189,8 +189,7 @@ final class CommandAuthorizerV2 {
       hivePrivObject = new HivePrivilegeObject(privObjType, table.getDbName(), table.getTableName(),
           null, columns, actionType, null, null, table.getOwner(), table.getOwnerType());
       if (HiveConf.getBoolVar(SessionState.getSessionConf(), HiveConf.ConfVars.HIVE_AUTHORIZATION_TABLES_ON_STORAGEHANDLERS, false)) {
-        if (table.getStorageHandler() != null && HiveConf.getBoolVar(SessionState.getSessionConf(),
-          HiveConf.ConfVars.HIVE_AUTHORIZATION_TABLES_ON_STORAGEHANDLERS)) {
+        if (table.getStorageHandler() != null) {
           //TODO: add hive privilege object for storage based handlers for create and alter table commands.
           if (hiveOpType == HiveOperationType.CREATETABLE ||
                   hiveOpType == HiveOperationType.ALTERTABLE_PROPERTIES ||
