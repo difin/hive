@@ -5,7 +5,7 @@ set -x
 : ${DB_DRIVER:=postgres}
 
 # Information schema
-$HIVE_HOME/bin/schematool -dbType hive -metaDbType $DB_DRIVER -initSchema
+$HIVE_HOME/bin/schematool -dbType hive -metaDbType $DB_DRIVER -initOrUpgradeSchema
 if [ $? -eq 0 ]; then
   echo "Initialized information schema successfully.."
 else
