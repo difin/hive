@@ -46,13 +46,10 @@ if [ "${GET_TEZ_TOKEN}" == "true" ] ; then
 fi
 
 echo "Localizing UDF JARS"
-#point to kerberized hadoop config
-export CONF_DIRS=/etc/hadoop/conf-kerberos
 /udf-jars-localizer.sh
 if [ $? -ne 0 ]; then
     echo " Localization of UDF JARS failed"
 fi
-unset CONF_DIRS #back to non-kerberized
 
 # JAVA_OPTS is additional jvm options that can be passed during container launch
 exec $JAVA_HOME/bin/java -Dproc_querycoordinator -classpath "$CLASSPATH" ${JVM_OPTS} ${JAVA_OPTS} ${SERVICE_OPTS} org.apache.tez.dag.app.DAGAppMaster --session

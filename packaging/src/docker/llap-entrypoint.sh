@@ -18,14 +18,5 @@ if [ $exit_status -eq 0 ]; then
     echo "Public ip address of ${FQDN} is ${PUBLIC_HOST_IP}"
 fi
 
-echo "Localizing UDF JARS"
-#point to kerberized hadoop config
-export CONF_DIRS=/etc/hadoop/conf-kerberos
-/udf-jars-localizer.sh
-if [ $? -ne 0 ]; then
-    echo " Localization of UDF JARS failed"
-fi
-unset CONF_DIRS #back to non-kerberized
-
 export LLAP_DAEMON_USER_CLASSPATH=${HIVE_HOME}/lib/*:`${HADOOP_HOME}/bin/hadoop classpath`:${TEZ_HOME}/*:${TEZ_HOME}/lib/*:/aux-jars/*
 exec ${HIVE_HOME}/scripts/llap/bin/llapDaemon.sh start
