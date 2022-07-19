@@ -477,6 +477,7 @@ public enum ErrorMsg {
   TIME_TRAVEL_NOT_ALLOWED(10429, "Time travel is not allowed for {0}. Please choose a storage format which supports the feature.", true),
   CBO_IS_REQUIRED(10433,
       "The following functionality requires CBO (" + HiveConf.ConfVars.HIVE_CBO_ENABLED.varname + "): {0}", true),
+  CTLF_UNSUPPORTED_FORMAT(10434, "CREATE TABLE LIKE FILE is not supported by the ''{0}'' file format", true),
   REBUILD_MATERIALIZED_VIEW_DIFFERENT_ENGINE(10500, "Cannot rebuild materialized view in strict mode with different engine. " +
       "Materialized view engine: {0}", true),
   REFRESH_VIEW(10501, "REFRESH is not supported for views"),
@@ -515,6 +516,12 @@ public enum ErrorMsg {
 
   REPL_FILE_MISSING_FROM_SRC_AND_CM_PATH(20016, "File is missing from both source and cm path."),
   REPL_EXTERNAL_SERVICE_CONNECTION_ERROR(20017, "Failed to connect to {0} service. Error code {1}.",true),
+
+  CTLF_FAILED_INFERENCE(20019, "Failed to infer schema:"),
+  CTLF_CLASS_NOT_FOUND(20020, "Failed to find SerDe class ({0}) for ''{1}''", true),
+  CTLF_MISSING_STORAGE_FORMAT_DESCRIPTOR(20021, "Failed to find StorageFormatDescriptor for file format ''{0}''", true),
+  PARQUET_FOOTER_ERROR(20022, "Failed to read parquet footer:"),
+  PARQUET_UNHANDLED_TYPE(20023, "Unhandled type {0}", true),
 
   // An exception from runtime that will show the full stack to client
   UNRESOLVED_RT_EXCEPTION(29999, "Runtime Error: {0}", "58004", true),
