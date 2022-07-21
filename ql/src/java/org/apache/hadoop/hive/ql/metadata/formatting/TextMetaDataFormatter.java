@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
-import org.apache.hadoop.hive.ql.parse.PartitionTransformSpec;
+import org.apache.hadoop.hive.ql.parse.TransformSpec;
 import org.apache.hive.common.util.HiveStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -341,12 +341,12 @@ class TextMetaDataFormatter implements MetaDataFormatter {
     if (table.isNonNative() && table.getStorageHandler() != null &&
             table.getStorageHandler().supportsPartitionTransform()) {
 
-      List<PartitionTransformSpec> partSpecs = table.getStorageHandler().getPartitionTransformSpec(table);
+      List<TransformSpec> partSpecs = table.getStorageHandler().getPartitionTransformSpec(table);
       if (partSpecs != null && !partSpecs.isEmpty()) {
         TextMetaDataTable metaDataTable = new TextMetaDataTable();
         partitionTransformOutput += MetaDataFormatUtils.LINE_DELIM + "# Partition Transform Information" + MetaDataFormatUtils.LINE_DELIM + "# ";
         metaDataTable.addRow(DescTableDesc.PARTITION_TRANSFORM_SPEC_SCHEMA.split("#")[0].split(","));
-        for (PartitionTransformSpec spec : partSpecs) {
+        for (TransformSpec spec : partSpecs) {
           String[] row = new String[2];
           row[0] = spec.getColumnName();
           if (spec.getTransformType() != null) {

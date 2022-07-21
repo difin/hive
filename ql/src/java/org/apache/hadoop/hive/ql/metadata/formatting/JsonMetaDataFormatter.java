@@ -34,8 +34,19 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.hive.ql.metadata.*;
-import org.apache.hadoop.hive.ql.parse.PartitionTransformSpec;
+import org.apache.hadoop.hive.ql.metadata.CheckConstraint;
+import org.apache.hadoop.hive.ql.metadata.DefaultConstraint;
+import org.apache.hadoop.hive.ql.metadata.ForeignKeyInfo;
+import org.apache.hadoop.hive.ql.metadata.Hive;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.metadata.HiveMaterializedViewsRegistry;
+import org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization;
+import org.apache.hadoop.hive.ql.metadata.NotNullConstraint;
+import org.apache.hadoop.hive.ql.metadata.Partition;
+import org.apache.hadoop.hive.ql.metadata.PrimaryKeyInfo;
+import org.apache.hadoop.hive.ql.metadata.Table;
+import org.apache.hadoop.hive.ql.metadata.UniqueConstraint;
+import org.apache.hadoop.hive.ql.parse.TransformSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -223,7 +234,7 @@ public class JsonMetaDataFormatter implements MetaDataFormatter {
       }
       if (tbl.isNonNative() && tbl.getStorageHandler() != null &&
               tbl.getStorageHandler().supportsPartitionTransform()) {
-        List<PartitionTransformSpec> specs = tbl.getStorageHandler().getPartitionTransformSpec(tbl);
+        List<TransformSpec> specs = tbl.getStorageHandler().getPartitionTransformSpec(tbl);
         if (!specs.isEmpty()) {
           builder.put("partitionSpecInfo", specs.stream().map(s -> {
             Map<String, String> result = new LinkedHashMap<>();
