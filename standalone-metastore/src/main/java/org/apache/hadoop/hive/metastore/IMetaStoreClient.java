@@ -795,18 +795,18 @@ public interface IMetaStoreClient {
   List<Table> getTableObjectsByName(String catName, String dbName, List<String> tableNames)
       throws MetaException, InvalidOperationException, UnknownDBException, TException;
 
+  @Deprecated
   /**
-   * Returns the invalidation information for the materialized views given as input.
+   * Use {@link IMetaStoreClient#getMaterializationInvalidationInfo(CreationMetadata, String)} instead.
    */
   Materialization getMaterializationInvalidationInfo(CreationMetadata cm)
       throws MetaException, InvalidOperationException, UnknownDBException, TException;
 
-  @Deprecated
   /**
-   * Use {@link IMetaStoreClient#getMaterializationInvalidationInfo(CreationMetadata)} instead.
+   * Returns the invalidation information for the materialized views given as input.
    */
   Materialization getMaterializationInvalidationInfo(CreationMetadata cm, String validTxnList)
-      throws MetaException, InvalidOperationException, UnknownDBException, TException;
+          throws MetaException, InvalidOperationException, UnknownDBException, TException;
 
   /**
    * Updates the creation metadata for the materialized view.
