@@ -993,7 +993,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
     if (msg == null) {
       return Pair.of(true, msg);
     }
-    msg = msg.substring(0, msg.length() - 2);
+
     if (needToLogMessage) {
       STATIC_LOG.info("Not invoking CBO because the statement " + msg);
     }
@@ -1049,10 +1049,10 @@ public class CalcitePlanner extends SemanticAnalyzer {
       if (queryProperties.hasLateralViews()) {
         msg += "has lateral views; ";
       }
-
       if (msg.isEmpty()) {
         msg += "has some unspecified limitations; ";
       }
+      msg = msg.substring(0, msg.length() - 2);
     }
     return msg;
   }
