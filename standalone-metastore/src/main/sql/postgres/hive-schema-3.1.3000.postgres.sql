@@ -1747,8 +1747,8 @@ CREATE TABLE "COMPACTION_QUEUE" (
   "CQ_INITIATOR_ID" varchar(128),
   "CQ_INITIATOR_VERSION" varchar(128),
   "CQ_WORKER_VERSION" varchar(128),
-  "CQ_CLEANER_START" bigint,
-  "CQ_RETRY_RETENTION" bigint not null default 0
+  "CQ_RETRY_RETENTION" bigint not null default 0,
+  "CQ_CLEANER_START" bigint
 );
 
 CREATE TABLE "NEXT_COMPACTION_QUEUE_ID" (
