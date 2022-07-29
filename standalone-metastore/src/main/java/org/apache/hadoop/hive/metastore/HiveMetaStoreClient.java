@@ -562,22 +562,42 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
     String path = MetaStoreUtils.getHttpPath(MetastoreConf.getVar(conf, ConfVars.THRIFT_HTTP_PATH));
     String httpUrl = (useSSL ? "https://" : "http://") + store.getHost() + ":" + store.getPort() + path;
     HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-    String user = MetastoreConf.getVar(conf, ConfVars.METASTORE_CLIENT_PLAIN_USERNAME);
-    if (user == null || user.equals("")) {
-      try {
-        user = UserGroupInformation.getCurrentUser().getShortUserName();
-      } catch (IOException e) {
-        throw new MetaException("Failed to get client username from UGI");
+    String authType = MetastoreConf.getAsString(conf, ConfVars.METASTORE_CLIENT_AUTH_MODE).toLowerCase(
+        Locale.ROOT);
+    String user = null;
+    if (authType.equals("jwt")) {
+      // fetch JWT token from environment and set it in Auth Header in HTTP request
+      String jwtToken = System.getenv("HMS_JWT");
+      if (jwtToken == null || jwtToken.isEmpty()) {
+        LOG.debug("No jwt token set in environment variable: HMS_JWT");
+        throw new MetaException("For auth mode JWT, valid signed jwt token must be provided in the "
+            + "environment variable HMS_JWT");
       }
+      httpClientBuilder.addInterceptorFirst(new HttpRequestInterceptor() {
+        @Override
+        public void process(HttpRequest httpRequest, HttpContext httpContext)
+            throws HttpException, IOException {
+          httpRequest.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken);
+        }
+      });
+    } else {
+      user = MetastoreConf.getVar(conf, ConfVars.METASTORE_CLIENT_PLAIN_USERNAME);
+      if (user == null || user.equals("")) {
+        try {
+          user = UserGroupInformation.getCurrentUser().getShortUserName();
+        } catch (IOException e) {
+          throw new MetaException("Failed to get client username from UGI");
+        }
+      }
+      final String httpUser = user;
+      httpClientBuilder.addInterceptorFirst(new HttpRequestInterceptor() {
+        @Override
+        public void process(HttpRequest httpRequest, HttpContext httpContext)
+            throws HttpException, IOException {
+          httpRequest.addHeader(MetaStoreUtils.USER_NAME_HTTP_HEADER, httpUser);
+        }
+      });
     }
-    final String httpUser = user;
-    httpClientBuilder.addInterceptorFirst(new HttpRequestInterceptor() {
-      @Override
-      public void process(HttpRequest httpRequest, HttpContext httpContext)
-          throws HttpException, IOException {
-        httpRequest.addHeader(MetaStoreUtils.USER_NAME_HTTP_HEADER, httpUser);
-      }
-    });
     THttpClient tHttpClient;
     try {
       if (useSSL) {

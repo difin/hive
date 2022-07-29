@@ -77,6 +77,7 @@
     <hikaricp.version>2.6.1</hikaricp.version>
     <jackson.version>2.10.5.20201202</jackson.version>
     <javolution.version>5.5.1</javolution.version>
+    <jetty.version>9.4.31.v20200723</jetty.version>
     <junit.version>4.11</junit.version>
     <libfb303.version>0.9.3</libfb303.version>
     <libthrift.version>0.13.0</libthrift.version>
@@ -180,6 +181,21 @@
       <version>${dropwizard.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-util</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
       <groupId>javolution</groupId>
       <artifactId>javolution</artifactId>
       <version>${javolution.version}</version>
@@ -233,6 +249,10 @@
           <groupId>org.apache.curator</groupId>
           <artifactId>curator-recipes</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -261,6 +281,10 @@
         </exclusion>
         <exclusion>
           <groupId>io.netty</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.eclipse.jetty</groupId>
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
@@ -452,6 +476,7 @@
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
+    <!-- test scope dependencies -->
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>

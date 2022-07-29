@@ -88,7 +88,6 @@ import com.google.common.collect.Lists;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -156,8 +155,10 @@ import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportFactory;
 
+import org.eclipse.jetty.server.HttpChannel;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -173,7 +174,11 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import java.util.concurrent.ThreadPoolExecutor;
+
+import javax.servlet.ServletRequestEvent;
+import javax.servlet.ServletRequestListener;
 
 /**
  * TODO:pc remove application logic to a separate interface.
@@ -11399,19 +11404,16 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     // Server thread pool
     // Start with minWorkerThreads, expand till maxWorkerThreads and reject
     // subsequent requests
-    final String threadPoolNamePrefix = "HiveMetastore-HttpHandler-Pool";
-    ExecutorService executorService = new ThreadPoolExecutor(
-        minWorkerThreads, maxWorkerThreads, 60, TimeUnit.SECONDS,
-        new SynchronousQueue<>(), new ThreadFactory() {
-      @Override
-      public Thread newThread(Runnable r) {
-        Thread newThread = new Thread(r);
-        newThread.setName(threadPoolNamePrefix + ": Thread-" + newThread.getId());
-        return newThread;
-      }
+    // TODO: Add a config for keepAlive time of threads ?
+    ThreadPoolExecutor executor = new ThreadPoolExecutor(minWorkerThreads, maxWorkerThreads, 60L,
+            TimeUnit.SECONDS, new SynchronousQueue<>(), r -> {
+      Thread thread = new Thread(r);
+      thread.setDaemon(true);
+      thread.setName("Metastore-HttpHandler-Pool: Thread-" + thread.getId());
+      return thread;
     });
 
-    ExecutorThreadPool threadPool = new ExecutorThreadPool((ThreadPoolExecutor) executorService);
+    ExecutorThreadPool threadPool = new ExecutorThreadPool(executor);
 
     // HTTP Server
     org.eclipse.jetty.server.Server server = new Server(threadPool);
@@ -11489,7 +11491,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     IHMSHandler handler = newRetryingHMSHandler(baseHandler, conf);
     processor = new ThriftHiveMetastore.Processor<>(handler);
     LOG.info("Starting DB backed MetaStore Server with generic processor");
-    TServlet thriftHttpServlet = new HmsThriftHttpServlet(processor, inputProtoFactory, protocolFactory);
+    TServlet thriftHttpServlet = new HmsThriftHttpServlet(processor, protocolFactory, conf);
 
     boolean directSqlEnabled = MetastoreConf.getBoolVar(conf, ConfVars.TRY_DIRECT_SQL);
     HMSHandler.LOG.info("Direct SQL optimization = {}",  directSqlEnabled);
@@ -11504,24 +11506,37 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
     // Tons of stuff skipped as compared the HS2.
     // Sesions, XSRF, Compression, path configuration, constraining the methods allowed, etc.
-    server.setHandler(context);
 
     context.addServlet(new ServletHolder(thriftHttpServlet), httpPath);
-
-
+    // adding a listener on servlet request so as to clean up
+    // rawStore when http request is completed
+    context.addEventListener(new ServletRequestListener() {
+      @Override
+      public void requestDestroyed(ServletRequestEvent servletRequestEvent) {
+        Request baseRequest = Request.getBaseRequest(servletRequestEvent.getServletRequest());
+        HttpChannel channel = baseRequest.getHttpChannel();
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("request: " + baseRequest + " destroyed " + ", http channel: " + channel);
+        }
+        cleanupRawStore();
+      }
+      @Override
+      public void requestInitialized(ServletRequestEvent servletRequestEvent) {
+        Request baseRequest = Request.getBaseRequest(servletRequestEvent.getServletRequest());
+        HttpChannel channel = baseRequest.getHttpChannel();
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("request: " + baseRequest + " initialized " + ", http channel: " + channel);
+        }
+      }
+    });
+    server.setHandler(context);
     return new ThriftServer() {
       @Override
       public void start() throws Throwable {
-        HMSHandler.LOG.debug("Starting HTTPServer for HMS");
+        HMSHandler.LOG.info("Starting HTTPServer for HMS");
         server.setStopAtShutdown(true);
         server.start();
-        HMSHandler.LOG.info("Started the new HTTPServer for metastore on port [" + port
-            + "]...");
-        HMSHandler.LOG.info("Options.minWorkerThreads = "
-            + minWorkerThreads);
-        HMSHandler.LOG.info("Options.maxWorkerThreads = "
-            + maxWorkerThreads);
-        HMSHandler.LOG.info("Enable SSL = " + useSsl);
+        HMSHandler.LOG.info("Started HTTPServer for HMS");
       }
 
       @Override
@@ -11568,13 +11583,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       protocolFactory = new TBinaryProtocol.Factory();
       inputProtoFactory = new TBinaryProtocol.Factory(true, true, maxMessageSize, maxMessageSize);
     }
-
-    msHost = MetastoreConf.getVar(conf, ConfVars.THRIFT_BIND_HOST);
-    if (msHost != null && !msHost.trim().isEmpty()) {
-      LOG.info("Binding host " + msHost + " for metastore server");
-    }
-
     IHMSHandler handler = newRetryingHMSHandler(baseHandler, conf);
+
     TCustomServerSocket serverSocket;
 
     if (useSasl) {
@@ -11590,6 +11600,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         processor = new TSetIpAddressProcessor<>(handler);
         LOG.info("Starting DB backed MetaStore Server");
       }
+    }
+
+    msHost = MetastoreConf.getVar(conf, ConfVars.THRIFT_BIND_HOST);
+    if (msHost != null && !msHost.trim().isEmpty()) {
+      LOG.info("Binding host " + msHost + " for metastore server");
     }
 
     if (!useSSL) {
@@ -11728,7 +11743,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
       if (startLock != null) {
         startMetaStoreThreads(conf, startLock, startCondition, startedServing,
-            isMetaStoreHousekeepingLeader(conf));
+                isMetaStoreHousekeepingLeader(conf));
         signalOtherThreadsToStart(thriftServer, startLock, startCondition, startedServing);
       }
 
