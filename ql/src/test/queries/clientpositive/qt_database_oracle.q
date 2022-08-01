@@ -1,3 +1,4 @@
+--!qt:disabled:test unstable CDPD-43236
 --!qt:database:oracle:q_test_country_table.sql
 CREATE EXTERNAL TABLE country
 (

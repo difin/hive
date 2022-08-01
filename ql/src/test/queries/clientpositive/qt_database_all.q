@@ -1,3 +1,4 @@
+--!qt:disabled:test unstable CDPD-43236
 --!qt:database:postgres:q_test_country_table.sql
 --!qt:database:mysql:q_test_state_table.sql
 --!qt:database:mariadb:q_test_city_table.sql
