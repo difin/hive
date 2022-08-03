@@ -13,7 +13,7 @@ from thrift.TRecursive import fix_spec
 import sys
 from .ttypes import *
 DDL_TIME = "transient_lastDdlTime"
-HMS_API = "1.2.23"
+HMS_API = "1.2.24"
 ACCESSTYPE_NONE = 1
 ACCESSTYPE_READONLY = 2
 ACCESSTYPE_WRITEONLY = 4
@@ -29,6 +29,7 @@ META_TABLE_COLUMN_TYPES = "columns.types"
 BUCKET_FIELD_NAME = "bucket_field_name"
 BUCKET_COUNT = "bucket_count"
 FIELD_TO_DIMENSION = "field_to_dimension"
+IF_PURGE = "ifPurge"
 META_TABLE_NAME = "name"
 META_TABLE_DB = "db"
 META_TABLE_LOCATION = "location"

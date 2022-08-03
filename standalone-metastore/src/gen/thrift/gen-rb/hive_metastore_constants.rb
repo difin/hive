@@ -9,7 +9,7 @@ require 'hive_metastore_types'
 
 DDL_TIME = %q"transient_lastDdlTime"
 
-HMS_API = %q"1.2.23"
+HMS_API = %q"1.2.24"
 
 ACCESSTYPE_NONE = 1
 
@@ -40,6 +40,8 @@ BUCKET_FIELD_NAME = %q"bucket_field_name"
 BUCKET_COUNT = %q"bucket_count"
 
 FIELD_TO_DIMENSION = %q"field_to_dimension"
+
+IF_PURGE = %q"ifPurge"
 
 META_TABLE_NAME = %q"name"
 

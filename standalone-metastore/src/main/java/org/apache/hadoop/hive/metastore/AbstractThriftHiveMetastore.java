@@ -1143,6 +1143,12 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
+    public boolean submit_for_cleanup(CompactionRequest rqst, long highestWriteId,
+                                      long txnId) throws TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public void add_dynamic_partitions(AddDynamicPartitions rqst)
             throws NoSuchTxnException, TxnAbortedException, TException {
         throw new UnsupportedOperationException("this method is not supported");

@@ -35,6 +35,7 @@ final class Constant extends \Thrift\Type\TConstant
     static protected $BUCKET_FIELD_NAME;
     static protected $BUCKET_COUNT;
     static protected $FIELD_TO_DIMENSION;
+    static protected $IF_PURGE;
     static protected $META_TABLE_NAME;
     static protected $META_TABLE_DB;
     static protected $META_TABLE_LOCATION;
@@ -65,7 +66,7 @@ final class Constant extends \Thrift\Type\TConstant
 
     protected static function init_HMS_API()
     {
-        return "1.2.23";
+        return "1.2.24";
     }
 
     protected static function init_ACCESSTYPE_NONE()
@@ -141,6 +142,11 @@ final class Constant extends \Thrift\Type\TConstant
     protected static function init_FIELD_TO_DIMENSION()
     {
         return "field_to_dimension";
+    }
+
+    protected static function init_IF_PURGE()
+    {
+        return "ifPurge";
     }
 
     protected static function init_META_TABLE_NAME()

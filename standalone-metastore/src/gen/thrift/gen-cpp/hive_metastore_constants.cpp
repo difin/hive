@@ -13,7 +13,7 @@ const hive_metastoreConstants g_hive_metastore_constants;
 hive_metastoreConstants::hive_metastoreConstants() {
   DDL_TIME = "transient_lastDdlTime";
 
-  HMS_API = "1.2.23";
+  HMS_API = "1.2.24";
 
   ACCESSTYPE_NONE = 1;
 
@@ -44,6 +44,8 @@ hive_metastoreConstants::hive_metastoreConstants() {
   BUCKET_COUNT = "bucket_count";
 
   FIELD_TO_DIMENSION = "field_to_dimension";
+
+  IF_PURGE = "ifPurge";
 
   META_TABLE_NAME = "name";
 

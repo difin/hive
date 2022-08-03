@@ -195,6 +195,8 @@ public class Context {
 
   private List<Pair<String, String>> parsedTables = new ArrayList<>();
 
+  private Path location;
+
   public void setTimeline(EngineEventSequence timeline) {
     this.timeline = timeline;
   }
@@ -240,6 +242,14 @@ public class Context {
     }
 
     return false;
+  }
+
+  public Path getLocation() {
+    return location;
+  }
+
+  public void setLocation(Path location) {
+    this.location = location;
   }
 
   public List<Pair<String, String>> getParsedTables() {

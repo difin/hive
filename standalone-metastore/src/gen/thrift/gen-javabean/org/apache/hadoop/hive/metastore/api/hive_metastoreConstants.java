@@ -11,7 +11,7 @@ package org.apache.hadoop.hive.metastore.api;
 
   public static final java.lang.String DDL_TIME = "transient_lastDdlTime";
 
-  public static final java.lang.String HMS_API = "1.2.23";
+  public static final java.lang.String HMS_API = "1.2.24";
 
   public static final byte ACCESSTYPE_NONE = (byte)1;
 
@@ -42,6 +42,8 @@ package org.apache.hadoop.hive.metastore.api;
   public static final java.lang.String BUCKET_COUNT = "bucket_count";
 
   public static final java.lang.String FIELD_TO_DIMENSION = "field_to_dimension";
+
+  public static final java.lang.String IF_PURGE = "ifPurge";
 
   public static final java.lang.String META_TABLE_NAME = "name";
 

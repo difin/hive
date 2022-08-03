@@ -9387,6 +9387,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     }
 
     @Override
+    public boolean submit_for_cleanup(CompactionRequest rqst, long highestWriteId, long txnId)
+            throws TException {
+      return getTxnHandler().submitForCleanup(rqst, highestWriteId, txnId);
+    }
+
+    @Override
     public void flushCache() throws TException {
       getMS().flushCache();
     }
