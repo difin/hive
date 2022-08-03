@@ -719,4 +719,10 @@
   <name>impala.scratch_limit</name>
   <value>0</value>
 </property>
+
+<property>
+  <name>hive.txn.xlock.ctas</name>
+  <value>false</value>
+</property>
+
 </configuration>
