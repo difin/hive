@@ -24,7 +24,7 @@ public class Oracle extends DatabaseRule {
 
   @Override
   public String getDockerImageName() {
-    return EXTERNAL_DB_DOCKER_PREFIX + "orangehrm/oracle-xe-11g";
+    return EXTERNAL_DB_DOCKER_PREFIX + "abstractdog/oracle-xe:18.4.0-slim";
   }
 
   @Override
@@ -36,7 +36,9 @@ public class Oracle extends DatabaseRule {
         "DEFAULT_SYS_PASS=" + getDbRootPassword(),
         "-e",
         "ORACLE_ALLOW_REMOTE=true",
-        "-d"
+        "-d",
+        "-e",
+        "ORACLE_PASSWORD=" + getDbRootPassword()
     );
   }
 
