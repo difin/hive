@@ -287,12 +287,13 @@ POSTHOOK: Output: default@acidtlb
 POSTHOOK: Output: default@acidtlb
 POSTHOOK: Output: default@merge_tmp_table
 CBO PLAN:
-HiveJoin(condition=[=($0, $2)], joinType=[right])
-  HiveProject(a=[$0], ROW__ID=[$4])
-    HiveFilter(condition=[IS NOT NULL($0)])
-      HiveTableScan(table=[[default, acidtlb]], table:alias=[t])
-  HiveProject(c=[$0], d=[$1])
-    HiveTableScan(table=[[default, othertlb]], table:alias=[s])
+HiveProject(col0=[$3], col1=[$2], col2=[$0], col3=[$1])
+  HiveJoin(condition=[=($3, $0)], joinType=[left])
+    HiveProject(c=[$0], d=[$1])
+      HiveTableScan(table=[[default, othertlb]], table:alias=[s])
+    HiveProject(row__id=[$4], a=[$0])
+      HiveFilter(condition=[IS NOT NULL($0)])
+        HiveTableScan(table=[[default, acidtlb]], table:alias=[acidtlb])
 
 PREHOOK: query: merge into acidtlb as t using othertlb as s on t.a = s.c
 when matched and s.c < 30 then delete
@@ -318,7 +319,7 @@ POSTHOOK: Lineage: acidtlb.a SIMPLE [(othertlb)s.FieldSchema(name:c, type:int, c
 POSTHOOK: Lineage: acidtlb.a SIMPLE [(othertlb)s.FieldSchema(name:c, type:int, comment:null), ]
 POSTHOOK: Lineage: acidtlb.b EXPRESSION [(othertlb)s.FieldSchema(name:d, type:int, comment:null), ]
 POSTHOOK: Lineage: acidtlb.b EXPRESSION [(othertlb)s.FieldSchema(name:d, type:int, comment:null), ]
-POSTHOOK: Lineage: merge_tmp_table.val EXPRESSION [(acidtlb)t.FieldSchema(name:ROW__ID, type:struct<writeId:bigint,bucketId:int,rowId:bigint>, comment:), ]
+POSTHOOK: Lineage: merge_tmp_table.val EXPRESSION [(acidtlb)acidtlb.FieldSchema(name:ROW__ID, type:struct<writeId:bigint,bucketId:int,rowId:bigint>, comment:), ]
 PREHOOK: query: select * from acidtlb
 PREHOOK: type: QUERY
 PREHOOK: Input: default@acidtlb
