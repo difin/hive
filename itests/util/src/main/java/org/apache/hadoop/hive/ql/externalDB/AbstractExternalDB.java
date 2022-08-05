@@ -46,6 +46,8 @@ public abstract class AbstractExternalDB {
     protected static final String dbName = "qtestDB";
     protected static final String EXTERNAL_DB_DOCKER_PREFIX = "docker-private.infra.cloudera.com/cloudera_thirdparty/";
 
+    private static final int DOCKER_COMMAND_TIMEOUT_SECONDS = 1800;
+
     private static final int MAX_STARTUP_WAIT = 5 * 60 * 1000;
 
     protected static class ProcessResults {
@@ -113,8 +115,8 @@ public abstract class AbstractExternalDB {
 
 
     public void launchDockerContainer() throws Exception {
-        runCmdAndPrintStreams(buildRmCmd(), 600);
-        if (runCmdAndPrintStreams(buildRunCmd(), 600) != 0) {
+        runCmdAndPrintStreams(buildRmCmd(), DOCKER_COMMAND_TIMEOUT_SECONDS);
+        if (runCmdAndPrintStreams(buildRunCmd(), DOCKER_COMMAND_TIMEOUT_SECONDS) != 0) {
             throw new RuntimeException("Unable to start docker container");
         }
         long startTime = System.currentTimeMillis();
@@ -133,7 +135,7 @@ public abstract class AbstractExternalDB {
     }
 
     public void cleanupDockerContainer() throws IOException, InterruptedException {
-        if (runCmdAndPrintStreams(buildRmCmd(), 600) != 0) {
+        if (runCmdAndPrintStreams(buildRmCmd(), DOCKER_COMMAND_TIMEOUT_SECONDS) != 0) {
             throw new RuntimeException("Unable to remove docker container");
         }
     }
