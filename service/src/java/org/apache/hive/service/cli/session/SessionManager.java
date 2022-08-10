@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SessionManager extends CompositeService {
 
-  private static final String INACTIVE_ERROR_MESSAGE =
+  public static final String INACTIVE_ERROR_MESSAGE =
           "Cannot open sessions on an inactive HS2 instance, " +
                   "or the HS2 server leader is not ready; please use service discovery to " +
                   "connect the server leader again";
@@ -378,6 +378,11 @@ public class SessionManager extends CompositeService {
     }
   }
 
+  @Override
+  public synchronized void decommission() {
+    allowSessions(false);
+    super.decommission();
+  }
 
   @Override
   public synchronized void stop() {
@@ -394,6 +399,7 @@ public class SessionManager extends CompositeService {
         LOG.warn("HIVE_SERVER2_ASYNC_EXEC_SHUTDOWN_TIMEOUT = " + timeout +
             " seconds has been exceeded. RUNNING background operations will be shut down", e);
       }
+      backgroundOperationPool.shutdownNow();
       backgroundOperationPool = null;
     }
     cleanupLoggingRootDir();

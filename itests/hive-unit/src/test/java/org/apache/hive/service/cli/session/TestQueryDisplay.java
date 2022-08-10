@@ -49,6 +49,7 @@ public class TestQueryDisplay {
 
     sessionManager = new SessionManager(null, true);
     sessionManager.init(conf);
+    sessionManager.start();
   }
 
   /**

@@ -89,6 +89,7 @@ public class TestRestrictedList {
     addToExpectedRestrictedMap("hive.server2.authentication.ldap.userMembershipKey");
     addToExpectedRestrictedMap("hive.server2.authentication.ldap.groupClassKey");
     addToExpectedRestrictedMap("hive.server2.authentication.ldap.customLDAPQuery");
+    addToExpectedRestrictedMap("hive.server2.graceful.stop.timeout");
     addToExpectedRestrictedMap("hive.query.max.length");
     addToExpectedRestrictedMap("bonecp.test");
     addToExpectedRestrictedMap("hive.druid.broker.address.default");
