@@ -242,6 +242,11 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
     return list;
   }
 
+  @Override
+  public List<String> filterDataConnectors(List<String> dcList) throws MetaException {
+    return dcList;
+  }
+
   private List<String> filterDatabaseObjects(HiveMetaStoreAuthzInfo hiveMetaStoreAuthzInfo) throws MetaException {
     List<String> ret = null;
 
