@@ -25,9 +25,12 @@ import org.apache.hadoop.hive.cli.TestImpalaCliDriver.TestScalarFunctionWrapper;
 import org.apache.hadoop.hive.cli.TestImpalaCliDriver.TestAggNonImpalaFunction;
 import org.apache.hadoop.hive.cli.control.CliAdapter;
 import org.apache.hadoop.hive.cli.control.CliConfigs;
+import org.apache.hadoop.hive.cli.control.CoreImpalaNegativeCliDriver;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.impala.funcmapper.AggFunctionDetails;
 import org.apache.hadoop.hive.impala.funcmapper.ScalarFunctionDetails;
 import org.apache.impala.catalog.BuiltinsDb;
+import org.apache.impala.service.BackendConfig;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -68,8 +71,15 @@ public class TestNegativeImpalaCliDriver {
     this.qfile = qfile;
   }
 
+  public void initializeBackendConfig() {
+    HiveConf conf = ((CoreImpalaNegativeCliDriver) adapter).getQTestUtil().getConf();
+    BackendConfig.create(BackendConfigUtil.getBackendConfig(conf), false);
+  }
+
   @Test
   public void testCliDriver() throws Exception {
+    // We initialize Impala's BackendConfig before running each q file.
+    initializeBackendConfig();
     adapter.runTest(name, qfile);
   }
 

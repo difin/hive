@@ -47,6 +47,18 @@ public class CoreImpalaCliDriver extends CoreCliDriver {
   }
 
   @Override
+  public void setUp() {
+    super.setUp();
+    // Due to RELENG-18563, we are not really able to reference the classes within the
+    // artifact of impala-frontend. To overcome this limitation, we initialize Impala's
+    // backend configuration in TestImpalaCliDriver under hive-it-impala, which is less
+    // elegant.
+    // BackendConfigUtil.initializeBackendConfig(getQt().getConf());
+  }
+
+  public QTestUtil getQTestUtil() { return getQt(); }
+
+  @Override
   @After
   public void tearDown() {
     try {

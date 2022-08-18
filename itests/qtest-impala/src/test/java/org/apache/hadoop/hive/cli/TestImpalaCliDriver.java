@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.hadoop.hive.cli.control.CliAdapter;
 import org.apache.hadoop.hive.cli.control.CliConfigs;
+import org.apache.hadoop.hive.cli.control.CoreImpalaCliDriver;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +32,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.google.common.collect.Lists;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.impala.funcmapper.AggFunctionDetails;
 import org.apache.hadoop.hive.impala.funcmapper.AggFunctionWrapper;
 import org.apache.hadoop.hive.impala.funcmapper.ImpalaFunctionSignature;
@@ -43,6 +45,7 @@ import org.apache.impala.catalog.Function;
 import org.apache.impala.catalog.ScalarFunction;
 import org.apache.impala.catalog.ScalarType;
 import org.apache.impala.catalog.Type;
+import org.apache.impala.service.BackendConfig;
 import org.apache.impala.thrift.TFunctionBinaryType;
 import org.apache.impala.thrift.TPrimitiveType;
 import com.google.gson.Gson;
@@ -84,8 +87,15 @@ public class TestImpalaCliDriver {
     this.qfile = qfile;
   }
 
+  public void initializeBackendConfig() {
+    HiveConf conf = ((CoreImpalaCliDriver) adapter).getQTestUtil().getConf();
+    BackendConfig.create(BackendConfigUtil.getBackendConfig(conf), false);
+  }
+
   @Test
   public void testCliDriver() throws Exception {
+    // We initialize Impala's BackendConfig before running each q file.
+    initializeBackendConfig();
     adapter.runTest(name, qfile);
   }
 
