@@ -266,7 +266,7 @@ public class CliConfigs {
 
   public static class ImpalaNegativeCliConfig extends AbstractCliConfig {
     public ImpalaNegativeCliConfig() {
-      super(CoreNegativeCliDriver.class);
+      super(CoreImpalaNegativeCliDriver.class);
       try {
         setQueryDir("ql/src/test/queries/clientnegative/impala");
 
