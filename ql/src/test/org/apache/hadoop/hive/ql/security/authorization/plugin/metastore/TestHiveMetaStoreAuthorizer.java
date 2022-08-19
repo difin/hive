@@ -43,6 +43,7 @@ import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /*
 Test whether HiveAuthorizer for MetaStore operation is trigger and HiveMetaStoreAuthzInfo is created by HiveMetaStoreAuthorizer
@@ -54,6 +55,7 @@ public class TestHiveMetaStoreAuthorizer {
   private static final String viewName         = "tmpview";
   private static final String roleName         = "tmpRole";
   private static final String catalogName      = "testCatalog";
+  private static final String dcName           = "testDC";
   private static final String unAuthorizedUser = "bob";
   private static final String authorizedUser   = "sam";
   private static final String superUser        = "hive";
@@ -90,6 +92,7 @@ public class TestHiveMetaStoreAuthorizer {
     // Create the 'hive' catalog with new warehouse directory
     HiveMetaStore.HMSHandler.createDefaultCatalog(rawStore, new Warehouse(conf));
     try {
+      hmsHandler.drop_dataconnector(dcName, true ,true);
       hmsHandler.drop_table(dbName, tblName, true);
       hmsHandler.drop_database(dbName, true, false);
       hmsHandler.drop_catalog(new DropCatalogRequest(catalogName));
@@ -376,14 +379,14 @@ public class TestHiveMetaStoreAuthorizer {
               .build(conf);
       hmsHandler.create_table(tblObj);
       UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(unAuthorizedUser));
-      hmsHandler.get_partition_names(default_db, new_tblName, (short)-1);
+      hmsHandler.get_partition_names(default_db, new_tblName, (short) -1);
       System.out.println("execution over");
     } catch (Exception e) {
       String err = e.getMessage();
       String expected = "Operation type " + HiveOperationType.QUERY + " not allowed for user:" + unAuthorizedUser;
       assertEquals(expected, err);
       UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
-      hmsHandler.drop_table(default_db,new_tblName,true);
+      hmsHandler.drop_table(default_db, new_tblName, true);
     }
   }
 
@@ -400,13 +403,13 @@ public class TestHiveMetaStoreAuthorizer {
               .build(conf);
       hmsHandler.create_table(tblObj);
       UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(unAuthorizedUser));
-      hmsHandler.get_partitions_ps_with_auth(default_db, new_tblName, Lists.newArrayList("1999"), (short)-1, unAuthorizedUser, null);
+      hmsHandler.get_partitions_ps_with_auth(default_db, new_tblName, Lists.newArrayList("1999"), (short) -1, unAuthorizedUser, null);
     } catch (Exception e) {
       String err = e.getMessage();
       String expected = "Operation type " + HiveOperationType.QUERY + " not allowed for user:" + unAuthorizedUser;
       assertEquals(expected, err);
       UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
-      hmsHandler.drop_table(default_db,new_tblName,true);
+      hmsHandler.drop_table(default_db, new_tblName, true);
     }
   }
 
@@ -429,7 +432,55 @@ public class TestHiveMetaStoreAuthorizer {
       String expected = "Operation type " + HiveOperationType.QUERY + " not allowed for user:" + unAuthorizedUser;
       assertEquals(expected, err);
       UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
-      hmsHandler.drop_table(default_db,new_tblName,true);
+      hmsHandler.drop_table(default_db, new_tblName, true);
+    }
+  }
+
+  @Test
+  public void testR_CreateDataConnector_unAuthorizedUser() {
+    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(unAuthorizedUser));
+    try {
+      DataConnector connector = new DataConnector(dcName, "mysql", "jdbc:mysql://localhost:3306/hive");
+      hmsHandler.create_dataconnector(connector);
+    } catch (Exception e) {
+      String err = e.getMessage();
+      String expected = "Operation type " + HiveOperationType.CREATEDATACONNECTOR+ " not allowed for user:" + unAuthorizedUser;
+      assertEquals(expected, err);
+    }
+  }
+
+  @Test
+  public void testS_CreateDataConnector_authorizedUser() {
+    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
+    try {
+      DataConnector connector = new DataConnector(dcName, "mysql", "jdbc:mysql://localhost:3306/hive");
+      hmsHandler.create_dataconnector(connector);
+    } catch (Exception e) {
+      fail("testS_CreateDataConnector_authorizedUser() failed with " + e);
+    }
+  }
+
+  @Test
+  public void testT_AlterDataConnector_AuthorizedUser() {
+    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
+    try {
+      DataConnector connector = new DataConnector(dcName, "mysql", "jdbc:mysql://localhost:3306/hive");
+      hmsHandler.create_dataconnector(connector);
+
+      DataConnector newConnector = new DataConnector(dcName, "mysql", "jdbc:mysql://localhost:3308/hive");
+      hmsHandler.alter_dataconnector(dcName, newConnector);
+    } catch (Exception e) {
+      fail("testT_AlterDataConnector_AuthorizedUser() failed with " + e);
+    }
+  }
+
+  @Test
+  public void testU_DropDataConnector_authorizedUser() {
+    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
+    try {
+      hmsHandler.drop_dataconnector(dcName, true, true);
+    } catch (Exception e) {
+      fail("testU_DropDataConnector_authorizedUser() failed with " + e);
     }
   }
 }

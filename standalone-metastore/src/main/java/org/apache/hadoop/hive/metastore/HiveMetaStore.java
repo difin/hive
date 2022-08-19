@@ -2130,7 +2130,14 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         } catch (NoSuchObjectException e) {
           // expected
         }
-
+        if (TEST_TIMEOUT_ENABLED) {
+          try {
+            Thread.sleep(TEST_TIMEOUT_VALUE);
+          } catch (InterruptedException e) {
+            // do nothing
+          }
+          Deadline.checkTimeout();
+        }
         create_dataconnector_core(getMS(), connector);
         success = true;
       } catch (MetaException | InvalidObjectException | AlreadyExistsException e) {
@@ -2195,7 +2202,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           throw new MetaException("Could not alter dataconnector \"" + dcName +
                   "\". Could not retrieve old definition.");
         }
-        // firePreEvent(new PreAlterDatabaseEvent(oldDC, newDC, this));
+        firePreEvent(new PreAlterDataConnectorEvent(oldDC, newDC, this));
 
         ms.openTransaction();
         ms.alterDataConnector(dcName, newDC);
@@ -2272,7 +2279,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         // TODO find DBs with references to this connector
         // if any existing references and checkReferences=true, do not drop
 
-        // firePreEvent(new PreDropTableEvent(tbl, deleteData, this));
+        firePreEvent(new PreDropDataConnectorEvent(connector, this));
 
         if (!ms.dropDataConnector(dcName)) {
           throw new MetaException("Unable to drop dataconnector " + dcName);
