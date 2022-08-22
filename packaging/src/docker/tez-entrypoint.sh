@@ -52,4 +52,5 @@ if [ $? -ne 0 ]; then
 fi
 
 # JAVA_OPTS is additional jvm options that can be passed during container launch
+JAVA_OPTS="${JAVA_OPTS_JDK11:-$JAVA_OPTS}"
 exec $JAVA_HOME/bin/java -Dproc_querycoordinator -classpath "$CLASSPATH" ${JVM_OPTS} ${JAVA_OPTS} ${SERVICE_OPTS} org.apache.tez.dag.app.DAGAppMaster --session

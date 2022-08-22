@@ -26,6 +26,10 @@ function initialize_hive {
   fi
 }
 
+if [[ "${EDWS_SERVICE_NAME}" == "metastore" || "${EDWS_SERVICE_NAME}" == "hiveserver2" ]]; then
+  export HADOOP_CLIENT_OPTS="${HADOOP_CLIENT_OPTS_JDK11:-$HADOOP_CLIENT_OPTS} ${SERVICE_OPTS}"
+fi
+
 # handles schema initialization
 if [[ "${EDWS_SERVICE_NAME}" == "metastore" && "${SKIP_SCHEMA_INIT}" == "false" ]]; then
   initialize_hive
@@ -46,10 +50,6 @@ if [ "${EDWS_SERVICE_NAME}" == "hiveserver2" ]; then
     # Disable failure here until new hive image is pushed with HIVE-22050, or hs2 will never start
     #exit 1
   fi
-fi
-
-if [[ "${EDWS_SERVICE_NAME}" == "metastore" || "${EDWS_SERVICE_NAME}" == "hiveserver2" ]]; then
-    export HADOOP_CLIENT_OPTS="${HADOOP_CLIENT_OPTS} ${SERVICE_OPTS}"
 fi
 
 exec ${HIVE_HOME}/bin/hive --skiphadoopversion --skiphbasecp --service ${EDWS_SERVICE_NAME}

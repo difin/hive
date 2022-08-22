@@ -44,7 +44,7 @@ RUN curl -o /etc/yum.repos.d/rhel8_mirrors.repo http://mirror.infra.cloudera.com
 # install debugging tools and other dependencies
 RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN yum -y update && \
-  yum install -y java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop procps && \
+  yum install -y java-11-openjdk-headless java-11-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop procps && \
   yum clean all && \
   rm -rf /var/cache/yum
 
@@ -151,6 +151,9 @@ RUN yum -y clean all && \
     wget --no-verbose https://mirror.infra.cloudera.com/mysql/mysql-connector-java-8.0.28.jar -O /usr/lib/hive/lib/mysql-connector-java-8.0.28.jar && \
     /remove-unwanted.sh
 RUN ln -sF /usr/share/java/postgresql-jdbc.jar /usr/lib/hive/lib/postgresql-jdbc.jar
+
+# postgres-jdbc fetches java-8 as a dependency, let's make java11 as default, pointed by /etc/alternatives/java
+RUN alternatives --set java java-11-openjdk.x86_64
 
 COPY bigtop-hive /usr/bin/hive
 RUN ln -s /usr/bin/hive /usr/bin/beeline
