@@ -117,6 +117,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
    * The local cache of table write IDs allocated/created by the current transaction
    */
   private Map<String, Long> tableWriteIds = new HashMap<>();
+  private boolean shouldReallocateWriteIds = false;
 
   /**
    * assigns a unique monotonically increasing ID to each statement
@@ -228,6 +229,13 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
   }
 
   @Override
+  public void clearCaches() {
+    LOG.info("Clearing writeId cache for {}", JavaUtils.txnIdToString(txnId));
+    tableWriteIds.clear();
+    shouldReallocateWriteIds = true;
+  }
+
+  @Override
   public long openTxn(Context ctx, String user) throws LockException {
     return openTxn(ctx, user, TxnType.DEFAULT, 0);
   }
@@ -259,6 +267,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
       stmtId = 0;
       numStatements = 0;
       tableWriteIds.clear();
+      shouldReallocateWriteIds = false;
       isExplicitTransaction = false;
       startTransactionCount = 0;
       this.queryId = ctx.getConf().get(HiveConf.ConfVars.HIVEQUERYID.varname);
@@ -514,6 +523,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
     stmtId = -1;
     numStatements = 0;
     tableWriteIds.clear();
+    shouldReallocateWriteIds = false;
     queryId = null;
     replPolicy = null;
   }
@@ -987,10 +997,11 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
     assert isTxnOpen();
     return stmtId;
   }
+
   @Override
   public long getTableWriteId(String dbName, String tableName) throws LockException {
     assert isTxnOpen();
-    return getTableWriteId(dbName, tableName, true);
+    return getTableWriteId(dbName, tableName, true, shouldReallocateWriteIds);
   }
 
   @Override
@@ -1000,7 +1011,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
     // to return 0 if the dbName:tableName's writeId is yet allocated.
     // This happens when the current context is before
     // Driver.acquireLocks() is called.
-    return getTableWriteId(dbName, tableName, false);
+    return getTableWriteId(dbName, tableName, false, false);
   }
 
   @Override
@@ -1013,8 +1024,8 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
     }
   }
 
-  private long getTableWriteId(
-      String dbName, String tableName, boolean allocateIfNotYet) throws LockException {
+  private long getTableWriteId(String dbName, String tableName, boolean allocateIfNotYet,
+                 boolean shouldReallocate) throws LockException {
     String fullTableName = AcidUtils.getFullTableName(dbName, tableName);
     if (tableWriteIds.containsKey(fullTableName)) {
       return tableWriteIds.get(fullTableName);
@@ -1022,8 +1033,9 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
       return 0;
     }
     try {
-      long writeId = getMS().allocateTableWriteId(txnId, dbName, tableName);
-      LOG.debug("Allocated write ID {} for {}.{}", writeId, dbName, tableName);
+      long writeId = getMS().allocateTableWriteId(txnId, dbName, tableName, shouldReallocate);
+      LOG.info("Allocated write ID {} for {}.{} and {} (shouldReallocate: {}) ", writeId, dbName,
+          tableName, JavaUtils.txnIdToString(txnId), shouldReallocate);
       tableWriteIds.put(fullTableName, writeId);
       return writeId;
     } catch (TException e) {
