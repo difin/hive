@@ -118,6 +118,8 @@ public class FunctionDetailStatics {
       .add(Pair.of(Type.DECIMAL, Type.DOUBLE))
       .add(Pair.of(Type.DECIMAL, Type.DECIMAL))
       .add(Pair.of(Type.DATE, Type.TIMESTAMP))
+      .add(Pair.of(Type.STRING, Type.BINARY))
+      .add(Pair.of(Type.VARCHAR, Type.BINARY))
       .build();
 
   // Set containing functions where the return type should always

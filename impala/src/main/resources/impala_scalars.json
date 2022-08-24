@@ -291,5 +291,21 @@
             "TIMESTAMP",
             "STRING"
         ]
+    },
+    {
+        "impalaFnName": "casttobinary",
+        "fnName": "cast",
+        "retType": "BINARY",
+        "argTypes": [
+            "STRING"
+        ]
+    },
+    {
+        "impalaFnName": "casttobinary",
+        "fnName": "cast",
+        "retType": "BINARY",
+        "argTypes": [
+            "VARCHAR"
+        ]
     }
 ]

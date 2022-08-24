@@ -490,7 +490,12 @@ public class SessionState {
         HiveConf.getVar(conf, ConfVars.DOWNLOADED_RESOURCES_DIR), udfCacheMap, udfCacheDir);
     killQuery = new NullKillQuery();
     this.cleanupService = cleanupService;
-    externalEngineHmsConverter = EngineCompileHelper.getInstance(conf).getHMSConverter();
+    try {
+      externalEngineHmsConverter = EngineCompileHelper.getInstance(conf).getHMSConverter();
+    } catch (Exception e) {
+      // if exception thrown here, there was a problem loading external Engine. Setting to null
+      // here is fine as this error will be caught elsewhere if the external engine is used.
+    }
   }
 
   public Map<String, String> getHiveVariables() {

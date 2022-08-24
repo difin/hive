@@ -37,8 +37,11 @@ public class ImpalaTypeUnificationHelper extends EngineHelper {
 
   private static final Logger LOG = LoggerFactory.getLogger(ImpalaTypeUnificationHelper.class);
 
-  public ImpalaTypeUnificationHelper() {
+  public ImpalaTypeUnificationHelper() throws Throwable {
     super(new ImpalaCompileHelper(), new NativeEngineRuntimeHelper(),
         new NativeEngineSessionHelper());
+    if (ImpalaHelper.initializationError != null) {
+      throw ImpalaHelper.initializationError;
+    }
   }
 }

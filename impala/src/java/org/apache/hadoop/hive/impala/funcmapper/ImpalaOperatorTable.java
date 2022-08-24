@@ -99,6 +99,7 @@ public class ImpalaOperatorTable {
     map.put("VARCHAR", SqlStdOperatorTable.CAST);
     map.put("TIMESTAMP", SqlStdOperatorTable.CAST);
     map.put("TINYINT", SqlStdOperatorTable.CAST);
+    map.put("BINARY", SqlStdOperatorTable.CAST);
     map.put("CAST_FORMAT", SqlStdOperatorTable.CAST);
 
     map.put("IN_ITERATE", InIterateOperator.IN_ITERATE);

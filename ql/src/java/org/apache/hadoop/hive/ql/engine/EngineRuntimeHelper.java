@@ -56,7 +56,11 @@ public interface EngineRuntimeHelper {
       HiveOperation hiveOp) throws HiveException;
 
   public static EngineRuntimeHelper getInstance(HiveConf conf) {
-    return EngineLoader.getInstance(conf).getRuntimeHelper();
+    try {
+      return EngineLoader.getInstance(conf).getRuntimeHelper();
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
+    }
   }
 
   public TaskCompiler getCompiler(HiveConf conf);

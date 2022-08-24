@@ -91,7 +91,8 @@ public class ImpalaFunctionSignature {
     STRING,
     DECIMAL,
     DATE,
-    TIMESTAMP
+    TIMESTAMP,
+    BINARY
   }
 
   // A map of the function name to a list of possible signatures.

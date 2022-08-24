@@ -32,6 +32,8 @@ public class ImpalaHelper extends EngineHelper {
 
   private static final Logger LOG = LoggerFactory.getLogger(ImpalaHelper.class);
 
+  static Throwable initializationError = null;
+
   static {
     try {
       // Need to setExternalFE before calling into any Impala function.
@@ -55,11 +57,15 @@ public class ImpalaHelper extends EngineHelper {
       }
     } catch (Exception e) {
       LOG.warn("Unable to load Impala functions: ", e);
+      initializationError = e;
     }
   }
 
-  public ImpalaHelper() {
+  public ImpalaHelper() throws Throwable {
     super(new ImpalaCompileHelper(), new ImpalaRuntimeHelper(),
         new ImpalaSessionHelper());
+    if (initializationError != null) {
+      throw initializationError;
+    }
   }
 }

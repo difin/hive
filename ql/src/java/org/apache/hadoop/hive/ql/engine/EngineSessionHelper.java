@@ -34,6 +34,10 @@ public interface EngineSessionHelper {
   public void shutdown() throws HiveException;
 
   public static EngineSessionHelper getInstance(HiveConf conf) {
-    return EngineLoader.getInstance(conf).getSessionHelper();
+    try {
+      return EngineLoader.getInstance(conf).getSessionHelper();
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
+    }
   }
 }

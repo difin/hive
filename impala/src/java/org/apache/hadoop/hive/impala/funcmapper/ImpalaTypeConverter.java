@@ -81,6 +81,7 @@ public class ImpalaTypeConverter {
     map.put(Type.TIMESTAMP, factory.createSqlType(SqlTypeName.TIMESTAMP));
     map.put(Type.DATE, factory.createSqlType(SqlTypeName.DATE));
     map.put(Type.DECIMAL, factory.createSqlType(SqlTypeName.DECIMAL));
+    map.put(Type.BINARY, factory.createSqlType(SqlTypeName.BINARY));
     map.put(Type.CHAR, createCharType(factory, 1));
     Charset charSetName = Charset.forName(ConversionUtil.NATIVE_UTF16_CHARSET_NAME);
     RelDataType varcharType = factory.createTypeWithCharsetAndCollation(
@@ -138,6 +139,8 @@ public class ImpalaTypeConverter {
         return Type.TIMESTAMP;
       case DATE:
         return Type.DATE;
+      case BINARY:
+        return Type.BINARY;
       case SYMBOL:
         return null;
       case NULL:
@@ -323,6 +326,8 @@ public class ImpalaTypeConverter {
         return Type.FIXED_UDA_INTERMEDIATE;
       case NULL_TYPE:
         return Type.NULL;
+      case BINARY:
+        return Type.BINARY;
       default:
         throw new RuntimeException("Unknown type " + argType);
     }
@@ -393,6 +398,8 @@ public class ImpalaTypeConverter {
         return Type.DATE;
       case NULL:
         return Type.NULL;
+      case BINARY:
+        return Type.BINARY;
       default:
         throw new RuntimeException("Type " + calciteTypeName + "  not supported yet.");
     }

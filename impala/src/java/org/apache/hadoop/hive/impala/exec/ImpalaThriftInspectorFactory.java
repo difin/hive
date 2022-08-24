@@ -30,6 +30,8 @@ public class ImpalaThriftInspectorFactory {
                 return new ImpalaThriftLongInspector();
             case INT:
                 return new ImpalaThriftIntInspector();
+            case BINARY:
+                return new ImpalaThriftBinaryInspector();
             case STRING:
                 return new ImpalaThriftStringInspector();
             case TIMESTAMP:
@@ -58,7 +60,6 @@ public class ImpalaThriftInspectorFactory {
             case INTERVAL_YEAR_MONTH: // Not transmitted
             case INTERVAL_DAY_TIME: // Not transmitted
             case TIMESTAMPLOCALTZ: // Impala does not support timestamp with local timezone
-            case BINARY: // Impala does not support binary type
             default:
                 throw new HiveException("Unhandled primitive type " + typeInfo.getPrimitiveCategory());
         }

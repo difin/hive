@@ -45,6 +45,8 @@ public class EngineLoader {
     HIVE
   }
 
+  private static Map<Loader, Throwable> failedLoaders = new HashMap<>();
+
   private static Map<Loader, EngineHelper> engineHelpers = new HashMap<>();
 
   static {
@@ -53,13 +55,21 @@ public class EngineLoader {
       EngineHelper impalaHelper = (EngineHelper)
           Class.forName("org.apache.hadoop.hive.impala.ImpalaHelper").newInstance();
       engineHelpers.put(Loader.IMPALA, impalaHelper);
+    } catch (Throwable e) {
+      LOG.info("Could not load Impala Helper class.");
+      LOG.debug("Exception information: ", e);
+      failedLoaders.put(Loader.IMPALA, e);
+    }
+
+    try {
       EngineHelper impalaTypeUnificationHelper = (EngineHelper)
           Class.forName("org.apache.hadoop.hive.impala.ImpalaTypeUnificationHelper").newInstance();
       engineHelpers.put(Loader.HIVE_WITH_IMPALA_RESOLVER, impalaTypeUnificationHelper);
     } catch (Throwable e) {
-      LOG.info("Could not load Impala Helper class.");
       LOG.debug("Exception information: ", e);
+      failedLoaders.put(Loader.HIVE_WITH_IMPALA_RESOLVER, e);
     }
+
     EngineHelper defaultHelper = new NativeEngineHelper();
     engineHelpers.put(Loader.HIVE, defaultHelper);
   }
@@ -73,9 +83,15 @@ public class EngineLoader {
 
   public static EngineHelper getInstance(HiveConf conf) {
     if (conf.getEngine() == Engine.IMPALA) {
+      if (failedLoaders.containsKey(Loader.IMPALA)) {
+        throw new RuntimeException(failedLoaders.get(Loader.IMPALA));
+      }
       return engineHelpers.get(Loader.IMPALA);
     } else {
       if (conf.getFunctionResolverEngine() == Engine.IMPALA) {
+        if (failedLoaders.containsKey(Loader.HIVE_WITH_IMPALA_RESOLVER)) {
+          throw new RuntimeException(failedLoaders.get(Loader.HIVE_WITH_IMPALA_RESOLVER));
+        }
         return engineHelpers.get(Loader.HIVE_WITH_IMPALA_RESOLVER);
       }
     }

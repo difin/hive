@@ -89,6 +89,10 @@ public class ImpalaRexCall {
       return createCastFormatExpr(analyzer, rexCall, params);
     }
 
+    if (funcName.equals("cast") && rexCall.getType().getSqlTypeName() == SqlTypeName.BINARY) {
+      return createCastToBinary(params);
+    }
+
     List<RexNode> operands = rexCall.getOperands();
 
     Function fn = getFunction(funcName, operands, rexCall.getType(), analyzer);
@@ -370,6 +374,19 @@ public class ImpalaRexCall {
     Preconditions.checkNotNull(compoundFuncDetails);
     Function fnCompound = ImpalaFunctionUtil.create(compoundFuncDetails, analyzer);
     return createCompoundExpr(analyzer, op, fnCompound, impalaExprList, retType);
+  }
+
+  private static Expr createCastToBinary(List<Expr> params) throws HiveException {
+    if (params.size() != 1) {
+      throw new HiveException("Number of parameters for casting to binary needs to be 1.");
+    }
+
+    if (!params.get(0).getType().isStringType()) {
+      throw new HiveException("Can only cast a string type to binary.");
+    }
+
+    // Do not need a casting function, just return the parameter.
+    return params.get(0);
   }
 
   private static Expr createCastFormatExpr(Analyzer analyzer, RexCall rexCall, List<Expr> params

@@ -51,6 +51,10 @@ public interface EngineCompileHelper {
   public RelDataTypeSystem getRelDataTypeSystem();
 
   public static EngineCompileHelper getInstance(HiveConf conf) {
-    return EngineLoader.getInstance(conf).getCompileHelper();
+    try {
+      return EngineLoader.getInstance(conf).getCompileHelper();
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
+    }
   }
 }
