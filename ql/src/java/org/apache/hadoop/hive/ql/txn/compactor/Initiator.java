@@ -17,7 +17,6 @@
  */
 package org.apache.hadoop.hive.ql.txn.compactor;
 
-import com.codahale.metrics.Counter;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -29,7 +28,6 @@ import org.apache.hadoop.hive.common.ServerUtils;
 import org.apache.hadoop.hive.common.ValidReadTxnList;
 import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
-import org.apache.hadoop.hive.common.metrics.common.MetricsFactory;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.CompactionRequest;
 import org.apache.hadoop.hive.metastore.api.CompactionResponse;
@@ -112,8 +110,6 @@ public class Initiator extends MetaStoreCompactorThread {
       long abortedTimeThreshold = HiveConf
           .getTimeVar(conf, HiveConf.ConfVars.HIVE_COMPACTOR_ABORTEDTXN_TIME_THRESHOLD,
               TimeUnit.MILLISECONDS);
-      boolean metricsEnabled = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.METRICS_ENABLED) &&
-          MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.METASTORE_ACIDMETRICS_EXT_ON);
 
       // Make sure we run through the loop once before checking to stop as this makes testing
       // much easier.  The stop value is only for testing anyway and not used when called from
@@ -123,6 +119,7 @@ public class Initiator extends MetaStoreCompactorThread {
         long startedAt = -1;
         long prevStart;
         TxnStore.MutexAPI.LockHandle handle = null;
+        boolean exceptionally = false;
 
         // Wrap the inner parts of the loop in a catch throwable so that any errors in the loop
         // don't doom the entire thread.
@@ -131,7 +128,6 @@ public class Initiator extends MetaStoreCompactorThread {
 
           startedAt = System.currentTimeMillis();
           prevStart = handle.getLastUpdateTime();
-          long compactionInterval = (prevStart < 0) ? prevStart : (startedAt - prevStart) / 1000;
 
           if (metricsEnabled) {
             perfLogger.PerfLogBegin(CLASS_NAME, MetricsConstants.COMPACTION_INITIATOR_CYCLE);
@@ -152,12 +148,13 @@ public class Initiator extends MetaStoreCompactorThread {
 
           // Currently we invalidate all entries after each cycle, because the bootstrap replication is marked via
           // table property hive.repl.first.inc.pending which would be cached.
-          tableCache.ifPresent(c -> c.invalidateAll());
+          tableCache.ifPresent(Cache::invalidateAll);
+          
           Set<String> skipDBs = Sets.newConcurrentHashSet();
           Set<String> skipTables = Sets.newConcurrentHashSet();
 
           Set<CompactionInfo> potentials = compactionExecutor.submit(() ->
-            txnHandler.findPotentialCompactions(abortedThreshold, abortedTimeThreshold, compactionInterval)
+            txnHandler.findPotentialCompactions(abortedThreshold, abortedTimeThreshold, prevStart)
               .parallelStream()
               .filter(ci -> isEligibleForCompaction(ci, currentCompactions, skipDBs, skipTables))
               .collect(Collectors.toSet())).get();
@@ -191,7 +188,7 @@ public class Initiator extends MetaStoreCompactorThread {
               CompletableFuture<Void> asyncJob =
                   CompletableFuture.runAsync(
                           CompactorUtil.ThrowingRunnable.unchecked(() ->
-                              scheduleCompactionIfRequired(ci, t, p, runAs, metricsEnabled)), compactionExecutor)
+                              scheduleCompactionIfRequired(ci, t, p, runAs)), compactionExecutor)
                       .exceptionally(exc -> {
                         LOG.error("Error while running scheduling the compaction on the table {} / partition {}.", tableName, partition, exc);
                         return null;
@@ -211,9 +208,10 @@ public class Initiator extends MetaStoreCompactorThread {
         } catch (Throwable t) {
           LOG.error("Initiator loop caught unexpected exception this time through the loop: " +
               StringUtils.stringifyException(t));
+          exceptionally = true;
         } finally {
           if (handle != null) {
-            handle.releaseLocks(startedAt);
+            if (!exceptionally) handle.releaseLocks(startedAt); else handle.releaseLocks();
           }
           if (metricsEnabled) {
             perfLogger.PerfLogEnd(CLASS_NAME, MetricsConstants.COMPACTION_INITIATOR_CYCLE);
@@ -239,7 +237,7 @@ public class Initiator extends MetaStoreCompactorThread {
     }
   }
 
-  private void scheduleCompactionIfRequired(CompactionInfo ci, Table t, Partition p, String runAs, boolean metricsEnabled)
+  private void scheduleCompactionIfRequired(CompactionInfo ci, Table t, Partition p, String runAs)
       throws MetaException {
     StorageDescriptor sd = resolveStorageDescriptor(t, p);
     try {
@@ -444,7 +442,7 @@ public class Initiator extends MetaStoreCompactorThread {
   }
 
   private CompactionType determineCompactionType(CompactionInfo ci, AcidDirectory dir, Map<String,
-      String> tblproperties, long baseSize, long deltaSize) throws IOException {
+      String> tblproperties, long baseSize, long deltaSize) {
 
     boolean noBase = false;
     List<AcidUtils.ParsedDelta> deltas = dir.getCurrentDirectories();
@@ -459,7 +457,7 @@ public class Initiator extends MetaStoreCompactorThread {
           Float.parseFloat(deltaPctProp);
       boolean bigEnough =   (float)deltaSize/(float)baseSize > deltaPctThreshold;
       boolean multiBase = dir.getObsolete().stream()
-              .filter(path -> path.getName().startsWith(AcidUtils.BASE_PREFIX)).findAny().isPresent();
+          .anyMatch(path -> path.getName().startsWith(AcidUtils.BASE_PREFIX));
 
       boolean initiateMajor =  bigEnough || (deltaSize == 0  && multiBase);
       if (LOG.isDebugEnabled()) {

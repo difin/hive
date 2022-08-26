@@ -117,7 +117,7 @@ class CompactionTxnHandler extends TxnHandler {
   @Override
   @RetrySemantics.ReadOnly
   public Set<CompactionInfo> findPotentialCompactions(int abortedThreshold,
-      long abortedTimeThreshold, long checkInterval) throws MetaException {
+      long abortedTimeThreshold, long lastChecked) throws MetaException {
     Connection dbConn = null;
     Set<CompactionInfo> response = new HashSet<>();
     Statement stmt = null;
@@ -126,6 +126,9 @@ class CompactionTxnHandler extends TxnHandler {
       try {
         dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED, connPoolCompaction);
         stmt = dbConn.createStatement();
+
+        long startedAt = System.currentTimeMillis();
+        long checkInterval = (lastChecked <= 0) ? lastChecked : (startedAt - lastChecked + 500) / 1000;
 
         // Check for completed transactions
         final String s = "SELECT DISTINCT \"TC\".\"CTC_DATABASE\", \"TC\".\"CTC_TABLE\", \"TC\".\"CTC_PARTITION\" " +
@@ -194,7 +197,7 @@ class CompactionTxnHandler extends TxnHandler {
       return response;
     }
     catch (RetryException e) {
-      return findPotentialCompactions(abortedThreshold, abortedTimeThreshold, checkInterval);
+      return findPotentialCompactions(abortedThreshold, abortedTimeThreshold, lastChecked);
     }
   }
 
@@ -483,10 +486,9 @@ class CompactionTxnHandler extends TxnHandler {
   }
 
   private void setCleanerStart(Connection dbConn, CompactionInfo info, Long timestamp)
-      throws RetryException, SQLException {
+      throws SQLException {
     long id = info.id;
     PreparedStatement pStmt = null;
-    ResultSet rs = null;
     try {
       String query = "" +
           " UPDATE " +
@@ -510,7 +512,6 @@ class CompactionTxnHandler extends TxnHandler {
         dbConn.commit();
       }
     } finally {
-      close(rs);
       closeStmt(pStmt);
     }
   }
@@ -853,7 +854,6 @@ class CompactionTxnHandler extends TxnHandler {
 
         // Delete from TXNS.
         prefix.append("DELETE FROM \"TXNS\" WHERE ");
-        suffix.append("");
 
         TxnUtils.buildQueryWithINClause(conf, queries, prefix, suffix, txnids, "\"TXN_ID\"", false, false);
 
@@ -1281,7 +1281,7 @@ class CompactionTxnHandler extends TxnHandler {
    */
   @Override
   @RetrySemantics.ReadOnly
-  public boolean checkFailedCompactions(CompactionInfo ci) throws MetaException {
+  public boolean checkFailedCompactions(CompactionInfo ci) {
     Connection dbConn = null;
     PreparedStatement pStmt = null;
     ResultSet rs = null;
