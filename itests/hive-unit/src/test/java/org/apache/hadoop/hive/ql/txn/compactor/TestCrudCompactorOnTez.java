@@ -79,6 +79,7 @@ import org.apache.orc.TypeDescription;
 import org.apache.orc.impl.RecordReaderImpl;
 import org.apache.tez.dag.history.logging.proto.ProtoMessageReader;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -93,6 +94,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("deprecation")
+@Ignore("CDPD-44432")
 public class TestCrudCompactorOnTez extends CompactorOnTezTest {
 
   @After
