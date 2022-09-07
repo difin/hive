@@ -291,7 +291,7 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
         acidJoinConjuncts, /*otherJoinConjuncts=*/Collections.emptyList());
     acidJoin.setId(ctx.getNextNodeId());
     acidJoin.init(analyzer);
-    acidJoin.setIsAcidJoin();
+    acidJoin.setIsDeleteRowsJoin();
     return acidJoin;
   }
 }
