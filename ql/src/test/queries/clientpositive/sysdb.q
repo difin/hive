@@ -1,7 +1,7 @@
 --! qt:dataset:src,part,srcbucket:ONLY
 --! qt:sysdb
 -- Mask the enqueue time which is based on current time
---! qt:replace:/(initiated\s+NULL\s+NULL\s+NULL\s+)[0-9]*(\s+NULL)/$1#Masked#$2/
+--! qt:replace:/(initiated\s+NULL\s+NULL\s+NULL\s+)[0-9\-]* [0-9:]*(\s+NULL)/$1#Masked#$2/
 -- Mask the hostname and version in compaction view
 --! qt:replace:/(NULL\s+)[\S]*(\s+manual\s+)[\S]*(\s+NULL)/$1#Masked#$2#Masked#$3/
 
