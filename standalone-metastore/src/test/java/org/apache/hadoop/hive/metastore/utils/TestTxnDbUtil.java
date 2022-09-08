@@ -166,7 +166,8 @@ public final class TestTxnDbUtil {
           " CQ_INITIATOR_VERSION varchar(128)," +
           " CQ_WORKER_VERSION varchar(128)," +
           " CQ_CLEANER_START bigint," +
-          " CQ_RETRY_RETENTION bigint NOT NULL DEFAULT 0)");
+          " CQ_RETRY_RETENTION bigint NOT NULL DEFAULT 0," +
+          " CQ_POOL_NAME varchar(128))");
 
       stmt.execute("CREATE TABLE NEXT_COMPACTION_QUEUE_ID (NCQ_NEXT bigint NOT NULL)");
       stmt.execute("INSERT INTO NEXT_COMPACTION_QUEUE_ID VALUES(1)");
@@ -193,7 +194,8 @@ public final class TestTxnDbUtil {
           " CC_COMMIT_TIME bigint," +
           " CC_INITIATOR_ID varchar(128)," +
           " CC_INITIATOR_VERSION varchar(128)," +
-          " CC_WORKER_VERSION varchar(128))");
+          " CC_WORKER_VERSION varchar(128)," +
+          " CC_POOL_NAME varchar(128))");
 
       stmt.execute("CREATE TABLE COMPACTION_METRICS_CACHE (" +
           " CMC_DATABASE varchar(128) NOT NULL," +

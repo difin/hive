@@ -19,6 +19,7 @@ package org.apache.hadoop.hive.ql.txn.compactor;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.ValidCompactorWriteIdList;
@@ -55,7 +56,6 @@ import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.util.StringUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -264,6 +264,7 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
       FindNextCompactRequest findNextCompactRequest = new FindNextCompactRequest();
       findNextCompactRequest.setWorkerId(workerName);
       findNextCompactRequest.setWorkerVersion(runtimeVersion);
+      findNextCompactRequest.setPoolName(this.getPoolName());
       ci = CompactionInfo.optionalCompactionInfoStructToInfo(msc.findNextCompact(findNextCompactRequest));
       LOG.info("Processing compaction request {}", ci);
 
@@ -278,6 +279,14 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
       }
       if ((runtimeVersion != null || ci.initiatorVersion != null) && !runtimeVersion.equals(ci.initiatorVersion)) {
         LOG.warn("Worker and Initiator versions do not match. Worker: v{}, Initiator: v{}", runtimeVersion, ci.initiatorVersion);
+      }
+
+      if (StringUtils.isBlank(getPoolName()) && StringUtils.isNotBlank(ci.poolName)) {
+        LOG.warn("A timed out copmaction pool entry ({}) is picked up by one of the default compaction pool workers.", ci);
+      }
+      if (StringUtils.isNotBlank(getPoolName()) && StringUtils.isNotBlank(ci.poolName) && !getPoolName().equals(ci.poolName)) {
+        LOG.warn("The returned compaction request ({}) belong to a different pool. Altough the worker is assigned to the {} pool," +
+            " it will process the request.", ci, getPoolName());
       }
       checkInterrupt();
 
@@ -473,8 +482,7 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
         msc = null;
       }
     } catch (Throwable t) {
-      LOG.error("Caught an exception in the main loop of compactor worker " + workerName + ", " +
-                    StringUtils.stringifyException(t));
+      LOG.error("Caught an exception in the main loop of compactor worker " + workerName, t);
     } finally {
       if (workerMetric != null && MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.METASTORE_ACIDMETRICS_EXT_ON)) {
         perfLogger.PerfLogEnd(CLASS_NAME, workerMetric);

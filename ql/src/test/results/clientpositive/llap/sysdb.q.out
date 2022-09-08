@@ -488,6 +488,7 @@ compaction_queue	cq_initiator_id
 compaction_queue	cq_initiator_version
 compaction_queue	cq_next_txn_id
 compaction_queue	cq_partition
+compaction_queue	cq_pool_name
 compaction_queue	cq_run_as
 compaction_queue	cq_start
 compaction_queue	cq_state
@@ -523,6 +524,8 @@ compactions	c_initiator_version
 compactions	c_next_txn_id
 compactions	c_partition
 compactions	c_partition
+compactions	c_pool_name
+compactions	c_pool_name
 compactions	c_run_as
 compactions	c_run_as
 compactions	c_start
@@ -553,6 +556,7 @@ completed_compactions	cc_initiator_id
 completed_compactions	cc_initiator_version
 completed_compactions	cc_next_txn_id
 completed_compactions	cc_partition
+completed_compactions	cc_pool_name
 completed_compactions	cc_run_as
 completed_compactions	cc_start
 completed_compactions	cc_state
@@ -1574,8 +1578,8 @@ POSTHOOK: Input: sys@compaction_queue
 POSTHOOK: Input: sys@compactions
 POSTHOOK: Input: sys@completed_compactions
 #### A masked pattern was here ####
-1	default	default	scr_txn	NULL	major	initiated	NULL	NULL	NULL	#Masked#	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	#Masked#	manual	#Masked#	NULL	NULL
-2	default	default	scr_txn_2	NULL	minor	initiated	NULL	NULL	NULL	#Masked#	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	#Masked#	manual	#Masked#	NULL	NULL
+1	default	default	scr_txn	NULL	major	initiated	NULL	NULL	NULL	#Masked#	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	#Masked#	manual	#Masked#	NULL	default	NULL
+2	default	default	scr_txn_2	NULL	minor	initiated	NULL	NULL	NULL	#Masked#	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	#Masked#	manual	#Masked#	NULL	default	NULL
 PREHOOK: query: use INFORMATION_SCHEMA
 PREHOOK: type: SWITCHDATABASE
 PREHOOK: Input: database:information_schema
@@ -1786,3 +1790,23 @@ sys	replication_metrics
 sys	table_stats_view
 sys	transactions
 sys	version
+PREHOOK: query: select * from compactions
+PREHOOK: type: QUERY
+PREHOOK: Input: information_schema@compactions
+PREHOOK: Input: sys@compaction_queue
+PREHOOK: Input: sys@compactions
+PREHOOK: Input: sys@completed_compactions
+PREHOOK: Input: sys@dbs
+PREHOOK: Input: sys@tbl_privs
+PREHOOK: Input: sys@tbls
+#### A masked pattern was here ####
+POSTHOOK: query: select * from compactions
+POSTHOOK: type: QUERY
+POSTHOOK: Input: information_schema@compactions
+POSTHOOK: Input: sys@compaction_queue
+POSTHOOK: Input: sys@compactions
+POSTHOOK: Input: sys@completed_compactions
+POSTHOOK: Input: sys@dbs
+POSTHOOK: Input: sys@tbl_privs
+POSTHOOK: Input: sys@tbls
+#### A masked pattern was here ####

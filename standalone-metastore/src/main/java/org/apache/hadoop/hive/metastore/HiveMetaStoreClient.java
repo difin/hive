@@ -4140,10 +4140,25 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   }
 
   @Override
+  public CompactionResponse compact2(CompactionRequest request) throws TException {
+    return client.compact2(request);
+  }
+
+  @Override
   public ShowCompactResponse showCompactions() throws TException {
     ShowCompactResponse response = client.show_compact(new ShowCompactRequest());
     response.setCompacts(FilterUtils.filterCompactionsIfEnabled(isClientFilterEnabled,
             filterHook, getDefaultCatalog(conf), response.getCompacts()));
+    return response;
+  }
+
+  @Override
+  public ShowCompactResponse showCompactions(String poolName) throws TException {
+    ShowCompactRequest request = new ShowCompactRequest();
+    request.setPoolName(poolName);
+    ShowCompactResponse response = client.show_compact(request);
+    response.setCompacts(FilterUtils.filterCompactionsIfEnabled(isClientFilterEnabled,
+        filterHook, getDefaultCatalog(conf), response.getCompacts()));
     return response;
   }
 
@@ -4882,12 +4897,12 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
 
   @Deprecated
   @Override
-  public OptionalCompactionInfoStruct findNextCompact(String workerId) throws MetaException, TException {
+  public OptionalCompactionInfoStruct findNextCompact(String workerId) throws TException {
     return client.find_next_compact(workerId);
   }
 
   @Override
-  public OptionalCompactionInfoStruct findNextCompact(FindNextCompactRequest rqst) throws MetaException, TException {
+  public OptionalCompactionInfoStruct findNextCompact(FindNextCompactRequest rqst) throws TException {
     return client.find_next_compact2(rqst);
   }
 
@@ -4899,6 +4914,7 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   @Override
   public List<String> findColumnsWithStats(CompactionInfoStruct cr) throws TException {
     return client.find_columns_with_stats(cr);
+
   }
 
   @Override
