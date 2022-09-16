@@ -29,6 +29,7 @@ import com.google.common.math.IntMath;
 import com.google.common.math.LongMath;
 
 import static java.util.Collections.emptyList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.hadoop.hive.common.AcidConstants.SOFT_DELETE_TABLE;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.DYNAMICPARTITIONCONVERT;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_DEFAULT_STORAGE_HANDLER;
@@ -14728,6 +14729,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     try {
       Table oldView = getTable(createVwDesc.getViewName(), false);
 
+      int nativeAcidCount = 0;
+      int supportsSnapshotCount = 0;
       // Do not allow view to be defined on temp table or other materialized view
       for (TableScanOperator ts : topOps.values()) {
         if (ts.getConf() == null || ts.getConf().getTableMetadata() == null) {
@@ -14743,11 +14746,24 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         if (table.isMaterializedView()) {
           throw new SemanticException("View definition references materialized view " + table.getCompleteName());
         }
-        if (createVwDesc.isMaterialized() && createVwDesc.isRewriteEnabled() &&
-            !AcidUtils.isTransactionalTable(table)) {
-          throw new SemanticException("Automatic rewriting for materialized view cannot "
-              + "be enabled if the materialized view uses non-transactional tables");
+        if (createVwDesc.isMaterialized() && createVwDesc.isRewriteEnabled()) {
+          if (AcidUtils.isTransactionalTable(table)) {
+            ++nativeAcidCount;
+          } else if (AcidUtils.isNonNativeAcidTable(table) && table.getStorageHandler().areSnapshotsSupported()) {
+            ++supportsSnapshotCount;
+          } else {
+            throw new SemanticException("Automatic rewriting for materialized view cannot "
+                + "be enabled if the materialized view uses non-transactional tables");
+          }
+          if (isNotBlank(ts.getConf().getAsOfTimestamp()) || isNotBlank(ts.getConf().getAsOfVersion())) {
+            throw new SemanticException("Automatic rewriting for materialized view cannot "
+                    + "be enabled if the materialized view uses time travel query.");
+          }
         }
+      }
+      if (nativeAcidCount > 0 && supportsSnapshotCount > 0) {
+        throw new SemanticException("All materialized view source tables either must be native ACID tables or " +
+                "must support table snapshots.");
       }
 
       if (createVwDesc.isMaterialized() && createVwDesc.isRewriteEnabled()) {

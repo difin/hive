@@ -43,6 +43,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializedViewUtils.getSnapshotOf;
+
 /**
  * Operation process of creating a view.
  */
@@ -119,7 +121,7 @@ public class CreateViewOperation extends DDLOperation<CreateViewDesc> {
             tbl.getDbName(),
             tbl.getTableName(),
             sourceTables,
-            context.getConf().get(ValidTxnWriteIdList.VALID_TABLES_WRITEIDS_KEY));
+            getSnapshotOf(context, desc.getTablesUsed()));
         tbl.setMaterializedViewMetadata(metadata);
       }
       context.getDb().createTable(tbl, desc.getIfNotExists());
