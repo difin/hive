@@ -1103,6 +1103,9 @@ CREATE TABLE COMPLETED_COMPACTIONS (
   CC_META_INFO varbinary(2048),
   CC_HADOOP_JOB_ID varchar(32),
   CC_ERROR_MESSAGE mediumtext,
+  CC_NEXT_TXN_ID bigint,
+  CC_TXN_ID bigint,
+  CC_COMMIT_TIME bigint,
   CC_INITIATOR_ID varchar(128),
   CC_INITIATOR_VERSION varchar(128),
   CC_WORKER_VERSION varchar(128)
@@ -1368,9 +1371,9 @@ CREATE TABLE IF NOT EXISTS `DC_PRIVS` (
   CONSTRAINT `DC_PRIVS_FK1` FOREIGN KEY (`NAME`) REFERENCES `DATACONNECTORS` (`NAME`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO CDH_VERSION (VER_ID, SCHEMA_VERSION, VERSION_COMMENT) VALUES (1, '3.1.3000.7.2.16.0-Update1', 'Hive release version 3.1.3000 for CDH 7.2.16.0');
+INSERT INTO CDH_VERSION (VER_ID, SCHEMA_VERSION, VERSION_COMMENT) VALUES (1, '3.1.3000.7.2.16.0-Update2', 'Hive release version 3.1.3000 for CDH 7.2.16.0-Update2');
 
-SELECT 'Initialized metastore schema to 3.1.3000.7.2.16.0-Update1';
+SELECT 'Initialized metastore schema to 3.1.3000.7.2.16.0-Update2';
 
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
