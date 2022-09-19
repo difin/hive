@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.ql.engine;
 
+import org.apache.calcite.plan.hep.HepProgram;
 import org.apache.calcite.rel.type.RelDataTypeSystem;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -56,5 +57,9 @@ public interface EngineCompileHelper {
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
+  }
+
+  default public HepProgram adjustPlanForEngine() {
+    return null;
   }
 }

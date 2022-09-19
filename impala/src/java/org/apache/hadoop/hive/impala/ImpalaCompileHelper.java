@@ -18,6 +18,8 @@
 
 package org.apache.hadoop.hive.impala;
 
+import org.apache.calcite.plan.hep.HepProgram;
+import org.apache.calcite.plan.hep.HepProgramBuilder;
 import org.apache.calcite.rel.type.RelDataTypeSystem;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HMSConverter;
@@ -30,6 +32,7 @@ import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.impala.calcite.rules.TezEngineScalarFixerRule;
 import org.apache.hadoop.hive.impala.plan.ImpalaHMSConverter;
 import org.apache.hadoop.hive.impala.plan.ImpalaQueryHelperImpl;
 import org.apache.hadoop.hive.impala.calcite.ImpalaTypeSystemImpl;
@@ -57,5 +60,12 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
 
   public RelDataTypeSystem getRelDataTypeSystem() {
     return new ImpalaTypeSystemImpl();
+  }
+
+  @Override
+  public HepProgram adjustPlanForEngine() {
+    HepProgramBuilder programBuilder = new HepProgramBuilder();
+    programBuilder.addRuleInstance(TezEngineScalarFixerRule.INSTANCE);
+    return programBuilder.build();
   }
 }

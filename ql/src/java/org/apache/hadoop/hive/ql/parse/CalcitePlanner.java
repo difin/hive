@@ -2152,6 +2152,17 @@ public class CalcitePlanner extends SemanticAnalyzer {
       return basePlan;
     }
 
+    private RelNode getAdjustedEnginePlan(RelNode relNode,
+        RelMetadataProvider metadataProvider, RexExecutor executorProvider) {
+      HepProgram program =
+          EngineCompileHelper.getInstance(conf).adjustPlanForEngine();
+      if (program == null) {
+        return relNode;
+      }
+      return executeProgram(relNode, program, metadataProvider, executorProvider,
+          null, false, null);
+    }
+
     /**
      * Returns true if MV is being loaded, constructed or being rebuilt.
      */
@@ -2560,7 +2571,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
     private RelNode generateEnginePlan(RelNode calciteOptimizedPlan,
         RelMetadataProvider metadataProvider, RexExecutor executorProvider) {
-      RelNode calciteEnginePlan = null;
+      RelNode calciteEnginePlan = calciteOptimizedPlan;
       PerfLogger perfLogger = SessionState.getPerfLogger();
       switch (conf.getEngine()) {
       case IMPALA:
@@ -2606,6 +2617,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
           perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.OPTIMIZER);
           calciteEnginePlan = executeProgram(calciteOptimizedPlan, program.build(), metadataProvider,
               executorProvider);
+
           perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.OPTIMIZER,
               "Calcite: Hive transformation rules");
 
@@ -2613,6 +2625,13 @@ public class CalcitePlanner extends SemanticAnalyzer {
             LOG.debug("Hive plan:\n{}", RelOptUtil.toString(calciteEnginePlan));
           }
         }
+
+        // Call the compiler helper to make adjustments in the Calcite plan for
+        // an engine. For a typical Hive query, this is a nop. A case where we
+        // need adjustment is if we are running through the Tez engine, but used
+        // the Impala Function Resolver to resolve functions.
+        calciteEnginePlan =
+            getAdjustedEnginePlan(calciteEnginePlan, metadataProvider, executorProvider);
       default:
         // Nothing to do for other engines for the time being
       }
