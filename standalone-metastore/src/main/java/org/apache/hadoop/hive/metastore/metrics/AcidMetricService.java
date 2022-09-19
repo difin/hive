@@ -58,6 +58,7 @@ import static org.apache.hadoop.hive.metastore.metrics.MetricsConstants.COMPACTI
 import static org.apache.hadoop.hive.metastore.metrics.MetricsConstants.COMPACTION_OLDEST_CLEANING_AGE;
 import static org.apache.hadoop.hive.metastore.metrics.MetricsConstants.COMPACTION_OLDEST_ENQUEUE_AGE;
 import static org.apache.hadoop.hive.metastore.metrics.MetricsConstants.COMPACTION_OLDEST_WORKING_AGE;
+import static org.apache.hadoop.hive.metastore.metrics.MetricsConstants.COMPACTION_POOLS_ITEM_COUNT;
 import static org.apache.hadoop.hive.metastore.metrics.MetricsConstants.COMPACTION_STATUS_PREFIX;
 import static org.apache.hadoop.hive.metastore.metrics.MetricsConstants.NUM_ABORTED_TXNS;
 import static org.apache.hadoop.hive.metastore.metrics.MetricsConstants.NUM_COMPLETED_TXN_COMPONENTS;
@@ -331,6 +332,8 @@ public class AcidMetricService implements MetastoreTaskThread {
             .set(0);
       }
     }
+
+    Metrics.getOrCreateMapMetrics(COMPACTION_POOLS_ITEM_COUNT).update(metricData.getPoolCount());
 
     updateOldestCompactionMetric(COMPACTION_OLDEST_ENQUEUE_AGE, metricData.getOldestEnqueueTime());
     updateOldestCompactionMetric(COMPACTION_OLDEST_WORKING_AGE, metricData.getOldestWorkingTime());
