@@ -151,6 +151,7 @@ public class TestTxnCommands2 extends TxnCommandsBaseForTests {
     HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVEOPTIMIZEMETADATAQUERIES, false);
     HiveConf.setVar(hiveConf, HiveConf.ConfVars.DYNAMICPARTITIONINGMODE, "nonstrict");
     HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_ACID_DIRECT_UPDATE_AND_DELETE_ENABLED, true);
+    HiveConf.setBoolVar(hiveConf, HiveConf.ConfVars.HIVE_ACID_TRUNCATE_USE_BASE, false);
   }
   
   @Override
