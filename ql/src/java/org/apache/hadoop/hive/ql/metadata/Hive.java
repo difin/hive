@@ -1325,7 +1325,9 @@ public class Hive {
                 && (tbl.getSd().getLocation() == null || tbl.getSd().getLocation().isEmpty())) {
             tbl.setProperty(SOFT_DELETE_TABLE, Boolean.TRUE.toString());
           }
-          tTbl.setTxnId(ss.getTxnMgr().getCurrentTxnId());
+          if (ss.getTxnMgr() != null) {
+            tTbl.setTxnId(ss.getTxnMgr().getCurrentTxnId());
+          }
         }
       }
       // Set table snapshot to api.Table to make it persistent. A transactional table being
