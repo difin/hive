@@ -38,10 +38,16 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.CopyOnFirstWriteProperties;
 import org.apache.hadoop.hive.common.type.TimestampTZ;
+import org.apache.hadoop.hive.llap.LlapOutputFormat;
 import org.apache.hadoop.hive.ql.CompilationOpContext;
+import org.apache.hadoop.hive.ql.exec.vector.VectorFileSinkOperator;
+import org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat;
+import org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat;
+import org.apache.hadoop.hive.ql.io.RCFileInputFormat;
 import org.apache.hadoop.hive.ql.log.PerfLogger;
 import org.apache.hadoop.hive.ql.plan.AbstractOperatorDesc;
 import org.apache.hadoop.hive.ql.plan.BaseWork;
@@ -50,18 +56,24 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
 import org.apache.hadoop.hive.ql.plan.MapWork;
 import org.apache.hadoop.hive.ql.plan.MapredWork;
 import org.apache.hadoop.hive.ql.plan.PartitionDesc;
+import org.apache.hadoop.hive.ql.plan.ReduceWork;
+import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.serde2.Serializer;
+import org.apache.hadoop.hive.serde2.objectinspector.StandardConstantListObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.StandardConstantMapObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.StandardConstantStructObjectInspector;
+import org.apache.hadoop.mapred.SequenceFileInputFormat;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 import com.esotericsoftware.kryo.Registration;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.kryo.util.Pool;
+import com.esotericsoftware.kryo.pool.KryoFactory;
+import com.esotericsoftware.kryo.pool.KryoPool;
 import com.esotericsoftware.kryo.serializers.FieldSerializer;
 
 /**
@@ -212,41 +224,49 @@ public class SerializationUtilities {
 
   private static final Object FAKE_REFERENCE = new Object();
 
-  // Bounded queue could be specified here but that will lead to blocking.
-  // ConcurrentLinkedQueue is unbounded and will release soft referenced kryo instances under
-  // memory pressure.
-  private static Pool<Kryo> kryoPool = new Pool<Kryo>(true, true, 32) {
-    protected Kryo create() {
-      return createNewKryo();
+  private static KryoFactory factory = new KryoFactory() {
+    @Override
+    public Kryo create() {
+      KryoWithHooks kryo = new KryoWithHooks();
+      kryo.register(java.sql.Date.class, new SqlDateSerializer());
+      kryo.register(java.sql.Timestamp.class, new TimestampSerializer());
+      kryo.register(TimestampTZ.class, new TimestampTZSerializer());
+      kryo.register(Path.class, new PathSerializer());
+      kryo.register(Arrays.asList("").getClass(), new ArraysAsListSerializer());
+      kryo.register(new java.util.ArrayList().subList(0,0).getClass(), new ArrayListSubListSerializer());
+      kryo.register(CopyOnFirstWriteProperties.class, new CopyOnFirstWritePropertiesSerializer());
+      kryo.register(PartitionDesc.class, new PartitionDescSerializer(kryo, PartitionDesc.class));
+
+      ((Kryo.DefaultInstantiatorStrategy) kryo.getInstantiatorStrategy())
+          .setFallbackInstantiatorStrategy(
+              new StdInstantiatorStrategy());
+      removeField(kryo, AbstractOperatorDesc.class, "colExprMap");
+      removeField(kryo, AbstractOperatorDesc.class, "statistics");
+      kryo.register(ReduceWork.class);
+      kryo.register(TableDesc.class);
+      kryo.register(UnionOperator.class);
+      kryo.register(FileSinkOperator.class);
+      kryo.register(VectorFileSinkOperator.class);
+      kryo.register(HiveIgnoreKeyTextOutputFormat.class);
+      kryo.register(StandardConstantListObjectInspector.class);
+      kryo.register(StandardConstantMapObjectInspector.class);
+      kryo.register(StandardConstantStructObjectInspector.class);
+      kryo.register(SequenceFileInputFormat.class);
+      kryo.register(RCFileInputFormat.class);
+      kryo.register(HiveSequenceFileOutputFormat.class);
+      kryo.register(LlapOutputFormat.class);
+      kryo.register(Pair.class);
+      kryo.register(MemoryMonitorInfo.class);
+
+      // This must be called after all the explicit register calls.
+      return kryo.processHooks(kryoTypeHooks, globalHook);
     }
   };
 
-  public static Kryo createNewKryo() {
-    KryoWithHooks kryo = new KryoWithHooks();
-
-    // references was true by default in kryo4, so we need to set this here for unchanged behavior
-    kryo.setReferences(true);
-    // registrationRequired=false lets kryo users skip the kryo.register call for all serialized classes
-    kryo.setRegistrationRequired(false);
-
-    kryo.register(java.sql.Date.class, new SqlDateSerializer());
-    kryo.register(java.sql.Timestamp.class, new TimestampSerializer());
-    kryo.register(TimestampTZ.class, new TimestampTZSerializer());
-    kryo.register(Path.class, new PathSerializer());
-    kryo.register(Arrays.asList("").getClass(), new ArraysAsListSerializer());
-    kryo.register(new java.util.ArrayList().subList(0,0).getClass(), new ArrayListSubListSerializer());
-    kryo.register(CopyOnFirstWriteProperties.class, new CopyOnFirstWritePropertiesSerializer());
-    kryo.register(PartitionDesc.class, new PartitionDescSerializer(kryo, PartitionDesc.class));
-
-    ((DefaultInstantiatorStrategy) kryo.getInstantiatorStrategy())
-        .setFallbackInstantiatorStrategy(
-            new StdInstantiatorStrategy());
-    removeField(kryo, AbstractOperatorDesc.class, "colExprMap");
-    removeField(kryo, AbstractOperatorDesc.class, "statistics");
-
-    // This must be called after all the explicit register calls.
-    return kryo.processHooks(kryoTypeHooks, globalHook);
-  }
+  // Bounded queue could be specified here but that will lead to blocking.
+  // ConcurrentLinkedQueue is unbounded and will release soft referenced kryo instances under
+  // memory pressure.
+  private static KryoPool kryoPool = new KryoPool.Builder(factory).softReferences().build();
 
   /**
    * By default, kryo pool uses ConcurrentLinkedQueue which is unbounded. To facilitate reuse of
@@ -256,7 +276,7 @@ public class SerializationUtilities {
    * @return kryo instance
    */
   public static Kryo borrowKryo() {
-    Kryo kryo = kryoPool.obtain();
+    Kryo kryo = kryoPool.borrow();
     kryo.setClassLoader(Thread.currentThread().getContextClassLoader());
     return kryo;
   }
@@ -267,7 +287,7 @@ public class SerializationUtilities {
    * @param kryo - kryo instance to be released
    */
   public static void releaseKryo(Kryo kryo) {
-    kryoPool.free(kryo);
+    kryoPool.release(kryo);
   }
 
   private static void removeField(Kryo kryo, Class type, String fieldName) {
@@ -283,7 +303,7 @@ public class SerializationUtilities {
       com.esotericsoftware.kryo.Serializer<Timestamp> {
 
     @Override
-    public Timestamp read(Kryo kryo, Input input, Class<? extends Timestamp> clazz) {
+    public Timestamp read(Kryo kryo, Input input, Class<Timestamp> clazz) {
       Timestamp ts = new Timestamp(input.readLong());
       ts.setNanos(input.readInt());
       return ts;
@@ -306,7 +326,7 @@ public class SerializationUtilities {
     }
 
     @Override
-    public TimestampTZ read(Kryo kryo, Input input, Class<? extends TimestampTZ> type) {
+    public TimestampTZ read(Kryo kryo, Input input, Class<TimestampTZ> type) {
       long seconds = input.readLong();
       int nanos = input.readInt();
       String zoneId = input.readString();
@@ -322,7 +342,7 @@ public class SerializationUtilities {
       com.esotericsoftware.kryo.Serializer<java.sql.Date> {
 
     @Override
-    public java.sql.Date read(Kryo kryo, Input input, Class<? extends java.sql.Date> clazz) {
+    public java.sql.Date read(Kryo kryo, Input input, Class<java.sql.Date> clazz) {
       return new java.sql.Date(input.readLong());
     }
 
@@ -340,7 +360,7 @@ public class SerializationUtilities {
     }
 
     @Override
-    public Path read(Kryo kryo, Input input, Class<? extends Path> type) {
+    public Path read(Kryo kryo, Input input, Class<Path> type) {
       return new Path(URI.create(input.readString()));
     }
   }
@@ -389,7 +409,7 @@ public class SerializationUtilities {
     }
 
     @Override
-    public List<?> read(final Kryo kryo, final Input input, final Class<? extends List<?>> clazz) {
+    public List<?> read(final Kryo kryo, final Input input, final Class<List<?>> clazz) {
       kryo.reference(FAKE_REFERENCE);
       final List<?> list = (List<?>) kryo.readClassAndObject(input);
       final int fromIndex = input.readInt(true);
@@ -456,7 +476,7 @@ public class SerializationUtilities {
     }
 
     @Override
-    public List<?> read(final Kryo kryo, final Input input, final Class<? extends List<?>> type) {
+    public List<?> read(final Kryo kryo, final Input input, final Class<List<?>> type) {
       final int length = input.readInt(true);
       Class<?> componentType = kryo.readClass(input).getType();
       if (componentType.isPrimitive()) {
@@ -524,7 +544,7 @@ public class SerializationUtilities {
    * superclass declares most of its fields transient.
    */
   private static class CopyOnFirstWritePropertiesSerializer extends
-      com.esotericsoftware.kryo.serializers.MapSerializer<Map> {
+      com.esotericsoftware.kryo.serializers.MapSerializer {
 
     @Override
     public void write(Kryo kryo, Output output, Map map) {
@@ -535,7 +555,7 @@ public class SerializationUtilities {
     }
 
     @Override
-    public Map read(Kryo kryo, Input input, Class<? extends Map> type) {
+    public Map read(Kryo kryo, Input input, Class<Map> type) {
       Map map = super.read(kryo, input, type);
       Properties ip = kryo.readObjectOrNull(input, Properties.class);
       ((CopyOnFirstWriteProperties) map).setInterned(ip);
@@ -556,7 +576,7 @@ public class SerializationUtilities {
     }
 
     @Override
-    public PartitionDesc read(Kryo kryo, Input input, Class<? extends PartitionDesc> type) {
+    public PartitionDesc read(Kryo kryo, Input input, Class<PartitionDesc> type) {
       PartitionDesc partitionDesc = super.read(kryo, input, type);
       // The set methods in PartitionDesc intern the any duplicate strings which is why we call them
       // during de-serialization

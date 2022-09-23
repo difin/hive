@@ -170,11 +170,8 @@
     </dependency>
     <dependency>
       <groupId>com.esotericsoftware</groupId>
-      <artifactId>kryo</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>com.esotericsoftware</groupId>
-        <artifactId>reflectasm</artifactId>
+      <artifactId>kryo-shaded</artifactId>
+      <version>${kryo.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
@@ -1056,8 +1053,7 @@
                   <include>org.apache.hive:hive-metastore</include>
                   <include>org.apache.hive:hive-standalone-metastore</include>
                   <include>org.apache.hive:hive-service-rpc</include>
-                  <include>com.esotericsoftware:kryo</include>
-                  <include>com.esotericsoftware:reflectasm</include>
+                  <include>com.esotericsoftware:kryo-shaded</include>
                   <include>com.esotericsoftware:minlog</include>
                   <include>org.objenesis:objenesis</include>
                   <include>org.apache.parquet:parquet-hadoop-bundle</include>

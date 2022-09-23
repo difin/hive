@@ -191,7 +191,7 @@ public class KeyValueContainer {
             pair.setRight(readValue(input));
           }
 
-          if (input.end()) {
+          if (input.eof()) {
             input.close();
             input = null;
           }
