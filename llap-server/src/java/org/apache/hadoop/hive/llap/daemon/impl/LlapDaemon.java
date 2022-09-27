@@ -69,6 +69,7 @@ import org.apache.hadoop.hive.llap.metrics.LlapMetricsSystem;
 import org.apache.hadoop.hive.llap.metrics.MetricsUtils;
 import org.apache.hadoop.hive.llap.registry.impl.LlapRegistryService;
 import org.apache.hadoop.hive.llap.security.LlapUgiFactoryFactory;
+import org.apache.hadoop.hive.llap.security.LlapTokenIdentifier;
 import org.apache.hadoop.hive.llap.security.SecretManager;
 import org.apache.hadoop.hive.llap.shufflehandler.ShuffleHandler;
 import org.apache.hadoop.hive.ql.exec.SerializationUtilities;
@@ -79,6 +80,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDFBridge.UdfWhitelistChecke
 import org.apache.hadoop.metrics2.util.MBeans;
 import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.service.CompositeService;
 import org.apache.hadoop.util.ExitUtil;
 import org.apache.hadoop.util.StringUtils;
@@ -121,6 +123,7 @@ public class LlapDaemon extends CompositeService implements ContainerRunner, Lla
   private final String[] localDirs;
   private final DaemonId daemonId;
   private final SocketFactory socketFactory;
+  private final LlapTokenManager llapTokenManager;
 
   // TODO Not the best way to share the address
   private final AtomicReference<InetSocketAddress> srvAddress = new AtomicReference<>(),
@@ -312,10 +315,14 @@ public class LlapDaemon extends CompositeService implements ContainerRunner, Lla
     SecretManager sm = null;
     if (UserGroupInformation.isSecurityEnabled()) {
       sm = SecretManager.createSecretManager(daemonConf, daemonId.getClusterString());
+      this.llapTokenManager = new DefaultLlapTokenManager(daemonConf, sm);
+    } else {
+      this.llapTokenManager = new DummyTokenManager();
     }
+
     this.secretManager = sm;
-    this.server = new LlapProtocolServerImpl(secretManager,
-        numHandlers, this, srvAddress, mngAddress, srvPort, mngPort, daemonId, metrics);
+    this.server = new LlapProtocolServerImpl(secretManager, numHandlers, this, srvAddress, mngAddress,
+        srvPort, mngPort, daemonId, metrics).withTokenManager(this.llapTokenManager);
 
     UgiFactory fsUgiFactory = null;
     try {
@@ -505,6 +512,10 @@ public class LlapDaemon extends CompositeService implements ContainerRunner, Lla
 
   public void shutdown() {
     LOG.info("LlapDaemon shutdown invoked");
+
+    // invalidate tokens
+    this.llapTokenManager.close();
+
     if (llapDaemonInfoBean != null) {
       try {
         MBeans.unregister(llapDaemonInfoBean);
