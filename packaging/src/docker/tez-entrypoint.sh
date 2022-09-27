@@ -22,6 +22,16 @@ if [ "${TEZ_ASYNC_LOG_ENABLED}" = true ] ; then
     export JVM_OPTS="${JVM_OPTS} -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -Dlog4j2.asyncLoggerRingBufferSize=1000000"
 fi
 
+# TODO: Change back to ${HIVE_LIB} once we are done with the workaround hack from DWX-3985
+AUTOSCALING_JAR=/custom-jars/dwx-autoscaling-*.jar
+
+echo 'Waiting for LLAP'
+hive --service jar ${AUTOSCALING_JAR} com.github.cloudera.llap.WaitForLlap;
+if [ $? -ne 0 ]; then
+    echo "Failed while waiting for LLAP instances, possibly timed out."
+    exit 1
+fi
+
 if [ "${GET_TEZ_TOKEN}" == "true" ] ; then
     export HIVE_LOG4J2_PROPERTIES_FILE_NAME=hive-edws-log4j2.properties
     # HADOOP_TOKEN_FILE_LOCATION cannot be set while we are trying to generate the tokens because it tries to load credentials from that location.
@@ -33,10 +43,7 @@ if [ "${GET_TEZ_TOKEN}" == "true" ] ; then
         printf 'HDFS fetch token failed\n'
         exit 1
     fi
-    # TODO: Change back to ${HIVE_LIB} once we are done with the workaround hack from DWX-3985
-    FETCH_LLAP_DT_JAR=/custom-jars/dwx-autoscaling-*.jar
-
-    if hive --service jar ${FETCH_LLAP_DT_JAR} com.github.cloudera.llap.FetchLlapDT -principal ${SERVICE_PRINCIPAL} -keytab ${SERVICE_KEYTAB} ${TOKEN_FILE_PATH}; then
+    if hive --service jar ${AUTOSCALING_JAR} com.github.cloudera.llap.FetchLlapDT -principal ${SERVICE_PRINCIPAL} -keytab ${SERVICE_KEYTAB} ${TOKEN_FILE_PATH}; then
         printf 'LLAP token succeeded\n'
     else
         printf 'LLAP token failed\n'
