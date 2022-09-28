@@ -296,6 +296,7 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     updateImpalaQueryOptions(sessionConf);
     Map<String, String> queryOptions = sessionConf.subtree("impala").entrySet().stream()
         .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
+    BackendConfig.create(getBackendConfig(queryOptions), false);
     return parseQueryOptions(queryOptions);
   }
 
@@ -466,6 +467,30 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     // We do not call unset() for each query option 'name' in 'origImpalaProps' so that a
     // user is able to get the value for the query option via "SET 'name'" instead of
     // "SET impala.'name'";
+  }
+
+
+
+  /**
+   * This method is only used for test purposes.
+   */
+  private TBackendGflags getBackendConfig(Map<String, String> options) {
+    final TBackendGflags cfg = new TBackendGflags();
+    if (options.size() == 0) {
+      return cfg;
+    }
+    for (Entry<String, String> kv: options.entrySet()) {
+      if (kv.getKey().length() == 0) {
+        continue;
+      }
+      TBackendGflags._Fields field = TBackendGflags._Fields.findByName(
+          kv.getKey().toLowerCase());
+      if (field == null) {
+        continue;
+      }
+      cfg.setFieldValue(field, kv.getValue());
+    }
+    return cfg;
   }
 
   /**

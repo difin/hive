@@ -47,12 +47,6 @@ public class CoreImpalaCliDriver extends CoreCliDriver {
   }
 
   @Override
-  public void setUp() {
-    super.setUp();
-    BackendConfigUtil.initializeBackendConfig(getQt().getConf());
-  }
-
-  @Override
   @After
   public void tearDown() {
     try {

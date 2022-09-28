@@ -400,10 +400,6 @@
   <value>HIVEFULLACIDREAD,HIVEMANAGEDINSERTREAD</value>
 </property>
 
-<!-- The following are Impala's TBackendGflags that will be loaded for FENG's q tests.
-A property will not be loaded if its value is not specified. We have to explicitly
-specify the value of a flag if we require it to be a non-null value, e.g.,
-'impala.ignored_dir_prefix_list'. -->
 <property>
   <name>impala.sentry_config</name>
   <value></value>
@@ -455,6 +451,11 @@ specify the value of a flag if we require it to be a non-null value, e.g.,
 </property>
 
 <property>
+  <name>impala.authorization_policy_provider_class</name>
+  <value>org.apache.sentry.provider.common.HadoopGroupResourceAuthorizationProvider</value>
+</property>
+
+<property>
   <name>impala.kudu_master_hosts</name>
   <value>localhost</value>
 </property>
@@ -485,6 +486,11 @@ specify the value of a flag if we require it to be a non-null value, e.g.,
 </property>
 
 <property>
+  <name>impala.sentry_catalog_polling_frequency_s</name>
+  <value>60</value>
+</property>
+
+<property>
   <name>impala.max_hdfs_partitions_parallel_load</name>
   <value>5</value>
 </property>
@@ -507,6 +513,11 @@ specify the value of a flag if we require it to be a non-null value, e.g.,
 <property>
   <name>impala.min_buffer_size</name>
   <value>8192</value>
+</property>
+
+<property>
+  <name>impala.enable_orc_scanner</name>
+  <value>true</value>
 </property>
 
 <property>
@@ -615,6 +626,11 @@ specify the value of a flag if we require it to be a non-null value, e.g.,
 </property>
 
 <property>
+  <name>impala.unlock_mt_dop</name>
+  <value>false</value>
+</property>
+
+<property>
   <name>impala.ranger_service_type</name>
   <value>hive</value>
 </property>
@@ -674,14 +690,11 @@ specify the value of a flag if we require it to be a non-null value, e.g.,
   <value></value>
 </property>
 
-<!-- This flag was added in IMPALA-11469. We require this value to be non-null so that
-FileSystemUtil can be initialized. -->
 <property>
-  <name>impala.ignored_dir_prefix_list</name>
-  <value>.,_tmp.,_spark_metadata</value>
+  <name>impala.mt_dop_auto_fallback</name>
+  <value>false</value>
 </property>
 
-<!-- The following are Impala's TQueryOptions. -->
 <property>
   <name>impala.num_nodes</name>
   <value>2</value>
