@@ -6,8 +6,16 @@
 # 5. Prints a recommended way to build hive image from hive repo root folder
 
 PLATFORM="${PLATFORM:-redhat7}"
-CDH_PREFIX="7.2.15.0"       #TODO: get last from https://release.infra.cloudera.com/hwre-api/releasedbuilds?stack=CDH&type=public
-CDWH_PREFIX="2022.0.9.0"
+CDH_PREFIX="7.2.16.0"       #TODO: get last from https://release.infra.cloudera.com/hwre-api/releasedbuilds?stack=CDH&type=public
+CDWH_PREFIX="2022.0.11.0"
+
+function get_component_version(){
+    COMPONENT=$1
+    CDH_VERSION=$2
+    STACK=$3
+    METADATA_URL="https://release.infra.cloudera.com/hwre-api/getbuildmetadata?stack=${STACK}&release=${CDH_VERSION}"
+    echo $(curl -s ${METADATA_URL} | jq '.'\"$COMPONENT\"'.component_version' | tr -d '"')
+}
 
 if [ -n "$ZSH_VERSION" ]; then
    SCRIPT_DIR="${0:a:h}"
@@ -17,13 +25,17 @@ fi
 DOCKER_FENG_DIR="$SCRIPT_DIR/../docker-feng"
 CDWH_YEAR="${CDWH_PREFIX%%\.*}"
 
-export CDH_REPO_DETAILS_URL="http://release.infra.cloudera.com/hwre-api/versioninfo?stack=CDH&stack_version=${CDH_PREFIX}&per_page=1"
-if [ -z $CDH_VERSION ]; then #CDH_VERSION can be forced from ENV
-    CDH_VERSION=$(curl -s $CDH_REPO_DETAILS_URL | jq 'keys[0]' | tr -d '"')
+BUILD_INFO_URL="https://release.infra.cloudera.com/hwre-api/latestcompiledbuild?stack=CDH&release=${CDH_PREFIX}&os{PLATFORM}"
+
+if [ -z $CDH_VERSION ]; then
+    CDH_VERSION=$(curl -s $BUILD_INFO_URL | jq '.build' | tr -d '"')
+else #CDH_VERSION can be forced from ENV, in this case version specific latestcompiledbuild can be called
+    BUILD_INFO_URL="https://release.infra.cloudera.com/hwre-api/latestcompiledbuild?stack=CDH&release=${CDH_VERSION}&os{PLATFORM}"
 fi
+
 echo "CDH_VERSION=${CDH_VERSION}"
-CDH_REPO_URL=$(curl -s $CDH_REPO_DETAILS_URL | jq '.["'${CDH_VERSION}'"]'.platforms.${PLATFORM}.repo_url | tr -d '"')
-CDH_GBN=$(curl -s $CDH_REPO_DETAILS_URL | jq '.["'${CDH_VERSION}'"]'.gbn | tr -d '"')
+
+CDH_GBN=$(curl -s $BUILD_INFO_URL | jq '.gbn' | tr -d '"')
 CDH_TARS_URL=http://cloudera-build-us-west-1.vpc.cloudera.com/s3/build/${CDH_GBN}/cdh/7.x/$PLATFORM/yum/tars/
 echo "CDH_TARS_URL=${CDH_TARS_URL}"
 
@@ -40,12 +52,12 @@ CDWH_GBN=$(curl -s $CDWH_REPO_DETAILS_URL | jq '.["'${CDWH_VERSION}'"]'.gbn | tr
 CDWH_TARS_URL=http://cloudera-build-us-west-1.vpc.cloudera.com/s3/build/${CDWH_GBN}/cdwh/${CDWH_YEAR}.x/$PLATFORM/yum/tars/
 echo "CDWH_TARS_URL=${CDWH_TARS_URL}"
 
-TEZ_VERSION=0.9.1.$CDWH_VERSION
-HADOOP_VERSION=3.1.1.$CDH_VERSION
-SOLR_VERSION=8.4.1.$CDH_VERSION
-RANGER_VERSION=2.1.0.$CDH_VERSION
-ATLAS_VERSION=2.1.0.$CDH_VERSION
-IMPALA_VERSION=4.0.0.$CDWH_VERSION
+TEZ_VERSION=$(get_component_version "tez" $CDWH_VERSION, "CDWH")
+HADOOP_VERSION=$(get_component_version "hadoop" $CDH_VERSION, "CDH")
+SOLR_VERSION=$(get_component_version "solr" $CDH_VERSION, "CDH")
+RANGER_VERSION=$(get_component_version "ranger" $CDH_VERSION, "CDH")
+ATLAS_VERSION=$(get_component_version "atlas" $CDH_VERSION, "CDH")
+IMPALA_VERSION=$(get_component_version "impala" $CDH_VERSION, "CDH")
 
 HADOOP_TAR_FILE=hadoop-$HADOOP_VERSION.tar.gz
 HADOOP_TAR_URL="$CDH_TARS_URL/hadoop/$HADOOP_TAR_FILE"
