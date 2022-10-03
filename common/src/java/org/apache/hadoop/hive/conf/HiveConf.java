@@ -2944,10 +2944,6 @@ public class HiveConf extends Configuration {
         "filter operators."),
     HIVE_STATS_IN_MIN_RATIO("hive.stats.filter.in.min.ratio", 0.0f,
         "Output estimation of an IN filter can't be lower than this ratio"),
-    HIVE_STATS_LOCK_ENABLED("hive.stats.lock.enabled", false,
-        "Whether stat tasks should be processing under a table-level HMS lock."),
-    HIVE_STATS_LOCK_TIMEOUT("hive.stats.lock.timeout", "3m", new TimeValidator(TimeUnit.MINUTES),
-        "Timeout for stat tasks to acquire the table-level HMS lock."),
     // Concurrency
     HIVE_SUPPORT_CONCURRENCY("hive.support.concurrency", false,
         "Whether Hive supports concurrency control or not. \n" +

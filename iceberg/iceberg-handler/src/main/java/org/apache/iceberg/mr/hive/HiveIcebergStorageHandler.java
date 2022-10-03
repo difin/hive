@@ -123,8 +123,6 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   private static final String ICEBERG_URI_PREFIX = "iceberg://";
   private static final Splitter TABLE_NAME_SPLITTER = Splitter.on("..");
   private static final String TABLE_NAME_SEPARATOR = "..";
-  private static final String HIVE_REQUEST_LOCK_ON_STATS_TASK = "iceberg.hive.request-lock-on-stats-task";
-  private static final boolean HIVE_REQUEST_LOCK_ON_STATS_TASK_DEFAULT = true;
   /**
    * Function template for producing a custom sort expression function:
    * Takes the source column index and the bucket count to creat a function where Iceberg bucket UDF is used to build
@@ -191,9 +189,6 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   @Override
   public void configureOutputJobProperties(TableDesc tableDesc, Map<String, String> map) {
     overlayTableProperties(conf, tableDesc, map);
-    if (conf.getBoolean(HIVE_REQUEST_LOCK_ON_STATS_TASK, HIVE_REQUEST_LOCK_ON_STATS_TASK_DEFAULT)) {
-      HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_STATS_LOCK_ENABLED, true);
-    }
     // Until the vectorized reader can handle delete files, let's fall back to non-vector mode for V2 tables
     fallbackToNonVectorizedModeBasedOnProperties(tableDesc.getProperties());
     // For Tez, setting the committer here is enough to make sure it'll be part of the jobConf
