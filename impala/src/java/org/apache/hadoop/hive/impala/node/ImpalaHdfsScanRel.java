@@ -181,7 +181,7 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
 
   // Create tuple and slot descriptors for this base table
   public static TupleDescriptor createTupleAndSlotDesc(BaseTableRef baseTblRef,
-      RelDataType relDataType, Analyzer analyzer) throws ImpalaException {
+      RelDataType relDataType, Analyzer analyzer) throws ImpalaException, HiveException {
     // create the tuple descriptor via the analyzer
     baseTblRef.analyze(analyzer);
 
@@ -189,9 +189,14 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
     // by supplying the field names from Calcite's output schema for this node
     List<String> fieldNames = relDataType.getFieldNames();
     for (int i = 0; i < fieldNames.size(); i++) {
-      SlotRef slotref = new SlotRef(Path.createRawPath(baseTblRef.getUniqueAlias(), fieldNames.get(i)));
+      String fieldName = fieldNames.get(i);
+      SlotRef slotref = new SlotRef(Path.createRawPath(baseTblRef.getUniqueAlias(), fieldName));
       slotref.analyze(analyzer);
       SlotDescriptor slotDesc = slotref.getDesc();
+      if (slotDesc.getType().isCollectionType()) {
+        throw new HiveException(String.format(fieldName + " "
+            + "is a complex type (array/map/struct) column. This is not currently supported."));
+      }
       slotDesc.setIsMaterialized(true);
     }
     TupleDescriptor tupleDesc = baseTblRef.getDesc();
