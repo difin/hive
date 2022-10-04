@@ -103,6 +103,17 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
       return hdfsScanNode;
     }
 
+    String tableName = scan.getTable().getQualifiedName().get(1);
+
+    // Check if this is an Iceberg table (Hive classifies it as non-native Acid table)
+    // Use fully qualified AcidUtils path otherwise it conflicts with the same
+    // class name in Impala which is used later in this file
+    if (org.apache.hadoop.hive.ql.io.AcidUtils.isNonNativeAcidTable
+        (((RelOptHiveTable) scan.getTable()).getHiveTableMD())) {
+      throw new HiveException(String.format
+          ("Table %s is an Iceberg table format which is not currently supported.", tableName));
+    }
+
     List<FeFsPartition> feFsPartitions = Lists.newArrayList();
 
     ImpalaPrunedPartitionList prunedPartList =
@@ -117,7 +128,6 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
     // we will pass a null and re-visit this later.
     MultiAggregateInfo aggInfo = null;
 
-    String tableName = scan.getTable().getQualifiedName().get(1);
     TableName impalaTblName = TableName.parse(tableName);
     String alias = null;
     // Impala assumes that if an alias was supplied it is an explicit alias.
