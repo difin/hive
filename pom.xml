@@ -179,7 +179,7 @@
     <curator.version>4.3.0.7.2.15.0-147</curator.version>
     <jsr305.version>3.0.0</jsr305.version>
     <tephra.version>0.6.0</tephra.version>
-    <gson.version>2.8.9</gson.version>
+    <gson.version>2.9.0</gson.version>
     <re2j.version>1.2</re2j.version>
     <rs-api.version>2.0.1</rs-api.version>
     <json-path.version>2.7.0</json-path.version>
