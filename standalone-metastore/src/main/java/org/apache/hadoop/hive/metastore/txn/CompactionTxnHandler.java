@@ -146,7 +146,7 @@ class CompactionTxnHandler extends TxnHandler {
           "  AND (\"TC\".\"CTC_PARTITION\" = \"C\".\"CC_PARTITION\" OR (\"TC\".\"CTC_PARTITION\" IS NULL AND \"C\".\"CC_PARTITION\" IS NULL)) " +
           "WHERE \"C\".\"CC_ID\" IS NOT NULL OR " + isWithinCheckInterval("\"TC\".\"CTC_TIMESTAMP\"", checkInterval) : "");
 
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
         rs = stmt.executeQuery(s);
         while (rs.next()) {
           CompactionInfo info = new CompactionInfo();
@@ -166,7 +166,7 @@ class CompactionTxnHandler extends TxnHandler {
           "GROUP BY \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\" " +
               (checkAbortedTimeThreshold ? "" : " HAVING COUNT(*) > " + abortedThreshold);
 
-        LOG.debug("Going to execute query <" + sCheckAborted + ">");
+        LOG.debug("Going to execute query <{}>", sCheckAborted);
         rs = stmt.executeQuery(sCheckAborted);
         long systemTime = System.currentTimeMillis();
         while (rs.next()) {
@@ -180,9 +180,7 @@ class CompactionTxnHandler extends TxnHandler {
             info.partName = rs.getString(3);
             info.tooManyAborts = numAbortedTxns > abortedThreshold;
             info.hasOldAbort = pastTimeThreshold;
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("Found potential compaction: " + info.toString());
-            }
+            LOG.debug("Found potential compaction: {}", info);
             response.add(info);
           }
         }
@@ -241,8 +239,8 @@ class CompactionTxnHandler extends TxnHandler {
         stmt = dbConn.createStatement();
         String query = "SELECT \"CQ_ID\", \"CQ_DATABASE\", \"CQ_TABLE\", \"CQ_PARTITION\", " +
           "\"CQ_TYPE\", \"CQ_TBLPROPERTIES\" FROM \"COMPACTION_QUEUE\" WHERE \"CQ_STATE\" = '" + INITIATED_STATE + "'";
-        LOG.debug("Going to execute query <" + query + ">");
-        rs = stmt.executeQuery(query);
+          LOG.debug("Going to execute query <{}>", query);
+          rs = stmt.executeQuery(query);
         if (!rs.next()) {
           LOG.debug("No compactions found ready to compact");
           dbConn.rollback();
@@ -275,7 +273,7 @@ class CompactionTxnHandler extends TxnHandler {
               "WHERE \"CQ_ID\" = " + info.id +
               "  AND \"CQ_STATE\"='" + INITIATED_STATE + "'";
 
-          LOG.debug("Going to execute update <" + query + ">");
+          LOG.debug("Going to execute update <{}>", query);
           int updCount = updStmt.executeUpdate(query);
           if(updCount == 1) {
             dbConn.commit();
@@ -285,9 +283,8 @@ class CompactionTxnHandler extends TxnHandler {
             LOG.debug("Worker {} (version: {}) picked up {}", workerId, workerVersion, info);
             continue;
           }
-          LOG.error("Unable to set to cq_state=" + WORKING_STATE + " for compaction record: " +
-            info + ". updCnt=" + updCount + ". workerId=" + workerId +
-            ". workerVersion=" + workerVersion);
+          LOG.error("Unable to set to cq_state={} for compaction record: {}. updCnt={}. workerId={}. workerVersion={}",
+              WORKING_STATE, info, updCount, workerId, workerVersion);
           dbConn.rollback();
           return null;
         } while( rs.next());
@@ -326,10 +323,10 @@ class CompactionTxnHandler extends TxnHandler {
         String s = "UPDATE \"COMPACTION_QUEUE\" SET \"CQ_STATE\" = '" + READY_FOR_CLEANING + "', "
             + "\"CQ_WORKER_ID\" = NULL"
             + " WHERE \"CQ_ID\" = " + info.id;
-        LOG.debug("Going to execute update <" + s + ">");
+        LOG.debug("Going to execute update <{}>", s);
         int updCnt = stmt.executeUpdate(s);
         if (updCnt != 1) {
-          LOG.error("Unable to set cq_state=" + READY_FOR_CLEANING + " for compaction record: " + info + ". updCnt=" + updCnt);
+          LOG.error("Unable to set cq_state={} for compaction record: {}. updCnt={}", READY_FOR_CLEANING, info, updCnt);
           LOG.debug("Going to rollback");
           dbConn.rollback();
         }
@@ -389,7 +386,7 @@ class CompactionTxnHandler extends TxnHandler {
           + whereClause +
           "  AND \"CQ_HIGHEST_WRITE_ID\" = \"WRITE_ID\"" +
           "  ORDER BY \"CQ_ID\"";
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
 
         try (ResultSet rs = stmt.executeQuery(s)) {
           while (rs.next()) {
@@ -403,9 +400,7 @@ class CompactionTxnHandler extends TxnHandler {
             info.highestWriteId = rs.getLong(7);
             info.properties = rs.getString(8);
             info.retryRetention = rs.getInt(9);
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("Found ready to clean: " + info);
-            }
+            LOG.debug("Found ready to clean: {}", info);
             rc.add(info);
           }
         }
@@ -430,9 +425,7 @@ class CompactionTxnHandler extends TxnHandler {
   @Override
   @RetrySemantics.ReadOnly
   public void markCleanerStart(CompactionInfo info) throws MetaException {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Running markCleanerStart with CompactionInfo: " + info.toString());
-    }
+    LOG.debug("Running markCleanerStart with CompactionInfo: {}", info);
 
     try {
       Connection dbConn = null;
@@ -462,9 +455,7 @@ class CompactionTxnHandler extends TxnHandler {
   @Override
   @RetrySemantics.ReadOnly
   public void clearCleanerStart(CompactionInfo info) throws MetaException {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Running clearCleanerStart with CompactionInfo: " + info.toString());
-    }
+    LOG.debug("Running clearCleanerStart with CompactionInfo: {}", info);
 
     try {
       Connection dbConn = null;
@@ -501,10 +492,10 @@ class CompactionTxnHandler extends TxnHandler {
           "  \"CQ_STATE\"='" + READY_FOR_CLEANING + "'";
 
       pStmt = dbConn.prepareStatement(query);
-      LOG.debug("Going to execute update <" + query + "> for CQ_ID=" + id);
+      LOG.debug("Going to execute update <{}> for CQ_ID={}", query, id);
       int updCount = pStmt.executeUpdate();
       if (updCount != 1) {
-        LOG.error("Unable to update compaction record: " + info + ".  Update count=" + updCount);
+        LOG.error("Unable to update compaction record: {}.  Update count={}", info, updCount);
         LOG.debug("Going to rollback");
         dbConn.rollback();
       } else {
@@ -525,9 +516,7 @@ class CompactionTxnHandler extends TxnHandler {
   @Override
   @RetrySemantics.CannotRetry
   public void markCleaned(CompactionInfo info) throws MetaException {
-    if (LOG.isDebugEnabled()) {
-	  LOG.debug("Running markCleaned with CompactionInfo: " + info.toString());
-    }
+    LOG.debug("Running markCleaned with CompactionInfo: {}", info);
     try {
       Connection dbConn = null;
       PreparedStatement pStmt = null;
@@ -549,16 +538,16 @@ class CompactionTxnHandler extends TxnHandler {
             + "FROM \"COMPACTION_QUEUE\" WHERE \"CQ_ID\" = ?";
         pStmt = dbConn.prepareStatement(s);
         pStmt.setLong(1, info.id);
-        LOG.debug("Going to execute update <" + s + "> for CQ_ID=" + info.id);
+        LOG.debug("Going to execute update <{}> for CQ_ID={}", s, info.id);
         pStmt.executeUpdate();
 
         s = "DELETE FROM \"COMPACTION_QUEUE\" WHERE \"CQ_ID\" = ?";
         pStmt = dbConn.prepareStatement(s);
         pStmt.setLong(1, info.id);
-        LOG.debug("Going to execute update <" + s + ">");
+        LOG.debug("Going to execute update <{}>", s);
         int updCount = pStmt.executeUpdate();
         if (updCount != 1) {
-          LOG.error("Unable to delete compaction record: " + info +  ".  Update count=" + updCount);
+          LOG.error("Unable to delete compaction record: {}.  Update count={}", info, updCount);
           LOG.debug("Going to rollback");
           dbConn.rollback();
         }
@@ -582,12 +571,12 @@ class CompactionTxnHandler extends TxnHandler {
         if(info.highestWriteId != 0) {
           pStmt.setLong(paramCount, info.highestWriteId);
         }
-        LOG.debug("Going to execute update <" + s + ">");
+        LOG.debug("Going to execute update <{}>", s);
         if ((updCount = pStmt.executeUpdate()) < 1) {
           LOG.warn("Expected to remove at least one row from completed_txn_components when " +
             "marking compaction entry as clean!");
         }
-        LOG.debug("Removed " + updCount + " records from completed_txn_components");
+        LOG.debug("Removed {} records from completed_txn_components", updCount);
         /*
          * compaction may remove data from aborted txns above tc_writeid bit it only guarantees to
          * remove it up to (inclusive) tc_writeid, so it's critical to not remove metadata about
@@ -621,7 +610,7 @@ class CompactionTxnHandler extends TxnHandler {
           String query = queries.get(i);
           int writeIdCount = (counts != null) ? counts.get(i) : 0;
 
-          LOG.debug("Going to execute update <" + query + ">");
+          LOG.debug("Going to execute update <{}>", query);
           pStmt = dbConn.prepareStatement(query);
           paramCount = 1;
 
@@ -639,7 +628,7 @@ class CompactionTxnHandler extends TxnHandler {
             }
           }
           int rc = pStmt.executeUpdate();
-          LOG.debug("Removed " + rc + " records from txn_components");
+          LOG.debug("Removed {} records from txn_components", rc);
           // Don't bother cleaning from the txns table.  A separate call will do that.  We don't
           // know here which txns still have components from other tables or partitions in the
           // table, so we don't know which ones we can and cannot clean.
@@ -694,7 +683,7 @@ class CompactionTxnHandler extends TxnHandler {
           "   OR \"TXN_STATE\" = " + TxnStatus.OPEN) +
           " ) \"RES\"";
 
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
         rs = stmt.executeQuery(s);
         if (!rs.next()) {
           throw new MetaException("Transaction tables not properly initialized, no record found in NEXT_TXN_ID");
@@ -704,9 +693,9 @@ class CompactionTxnHandler extends TxnHandler {
         // As all txns below min_uncommitted_txnid are either committed or empty_aborted, we are allowed
         // to cleanup the entries less than min_uncommitted_txnid from the TXN_TO_WRITE_ID table.
         s = "DELETE FROM \"TXN_TO_WRITE_ID\" WHERE \"T2W_TXNID\" < " + minUncommitedTxnid;
-        LOG.debug("Going to execute delete <" + s + ">");
+        LOG.debug("Going to execute delete <{}>", s);
         int rc = stmt.executeUpdate(s);
-        LOG.info("Removed " + rc + " rows from TXN_TO_WRITE_ID with Txn Low-Water-Mark: " + minUncommitedTxnid);
+        LOG.info("Removed {} rows from TXN_TO_WRITE_ID with Txn Low-Water-Mark: {}", rc, minUncommitedTxnid);
 
         LOG.debug("Going to commit");
         dbConn.commit();
@@ -797,9 +786,9 @@ class CompactionTxnHandler extends TxnHandler {
             LOG.error(msg);
             throw new MetaException(msg);
         }
-        LOG.debug("Going to execute delete <" + s + ">");
+        LOG.debug("Going to execute delete <{}>", s);
         int rc = stmt.executeUpdate(s);
-        LOG.info("Removed " + rc + " rows from COMPLETED_TXN_COMPONENTS");
+        LOG.info("Removed {} rows from COMPLETED_TXN_COMPONENTS", rc);
 
         LOG.debug("Going to commit");
         dbConn.commit();
@@ -838,7 +827,7 @@ class CompactionTxnHandler extends TxnHandler {
         String s = "SELECT \"TXN_ID\" FROM \"TXNS\" WHERE " +
             "\"TXN_ID\" NOT IN (SELECT \"TC_TXNID\" FROM \"TXN_COMPONENTS\") AND " +
             "\"TXN_STATE\" = " + TxnStatus.ABORTED;
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
         rs = stmt.executeQuery(s);
         List<Long> txnids = new ArrayList<>();
         while (rs.next()) txnids.add(rs.getLong(1));
@@ -858,11 +847,11 @@ class CompactionTxnHandler extends TxnHandler {
         TxnUtils.buildQueryWithINClause(conf, queries, prefix, suffix, txnids, "\"TXN_ID\"", false, false);
 
         for (String query : queries) {
-          LOG.debug("Going to execute update <" + query + ">");
+          LOG.debug("Going to execute update <{}>", query);
           int rc = stmt.executeUpdate(query);
-          LOG.info("Removed " + rc + "  empty Aborted transactions from TXNS");
+          LOG.debug("Removed {} empty Aborted transactions from TXNS", rc);
         }
-        LOG.info("Aborted transactions removed from TXNS: " + txnids);
+        LOG.info("Aborted transactions removed from TXNS: {}", txnids);
         LOG.debug("Going to commit");
         dbConn.commit();
       } catch (SQLException e) {
@@ -901,12 +890,11 @@ class CompactionTxnHandler extends TxnHandler {
         String s = "UPDATE \"COMPACTION_QUEUE\" SET \"CQ_WORKER_ID\" = NULL, \"CQ_START\" = NULL, \"CQ_STATE\" = '"
           + INITIATED_STATE+ "' WHERE \"CQ_STATE\" = '" + WORKING_STATE + "' AND \"CQ_WORKER_ID\" LIKE '"
           +  hostname + "%'";
-        LOG.debug("Going to execute update <" + s + ">");
+        LOG.debug("Going to execute update <{}>", s);
         // It isn't an error if the following returns no rows, as the local workers could have died
         // with  nothing assigned to them.
         int updated = stmt.executeUpdate(s);
-        LOG.debug("Set " + updated + " compaction queue entries to " + INITIATED_RESPONSE + " state for host "
-          + hostname);
+        LOG.debug("Set {} compaction queue entries to {} state for host {}", updated, INITIATED_RESPONSE, hostname);
         LOG.debug("Going to commit");
         dbConn.commit();
       } catch (SQLException e) {
@@ -948,12 +936,12 @@ class CompactionTxnHandler extends TxnHandler {
         String s = "UPDATE \"COMPACTION_QUEUE\" SET \"CQ_WORKER_ID\" = NULL, \"CQ_START\" = NULL, \"CQ_STATE\" = '"
           + INITIATED_STATE+ "' WHERE \"CQ_STATE\" = '" + WORKING_STATE + "' AND \"CQ_START\" < "
           +  latestValidStart;
-        LOG.debug("Going to execute update <" + s + ">");
+        LOG.debug("Going to execute update <{}", s);
         // It isn't an error if the following returns no rows, as the local workers could have died
         // with  nothing assigned to them.
         int updated = stmt.executeUpdate(s);
-        LOG.info(updated + " compaction queue entries timed out, set back to " + INITIATED_RESPONSE + " state. Latest "
-            + "valid start: " + latestValidStart);
+        LOG.info("{} compaction queue entries timed out, set back to {} state. Latest valid start: {}", updated,
+            INITIATED_RESPONSE, latestValidStart);
         LOG.debug("Going to commit");
         dbConn.commit();
       } catch (SQLException e) {
@@ -982,9 +970,7 @@ class CompactionTxnHandler extends TxnHandler {
   @Override
   @RetrySemantics.ReadOnly
   public List<String> findColumnsWithStats(CompactionInfo ci) throws MetaException {
-    if (LOG.isDebugEnabled()) {
-	  LOG.debug("Finding columns with statistics info for CompactionInfo: " + ci.toString());
-	}
+    LOG.debug("Finding columns with statistics info for CompactionInfo: {}",  ci);
     Connection dbConn = null;
     PreparedStatement pStmt = null;
     ResultSet rs = null;
@@ -1016,14 +1002,16 @@ class CompactionTxnHandler extends TxnHandler {
           "PART_COL_STATS")
          + " WHERE DB_NAME='" + ci.dbname + "' AND TABLE_NAME='" + ci.tableName + "'"
         + (ci.partName == null ? "" : " AND PARTITION_NAME='" + ci.partName + "'");*/
-        LOG.debug("Going to execute <" + s + ">");
+        LOG.debug("Going to execute <{}>", s);
         rs = pStmt.executeQuery();
         List<String> columns = new ArrayList<>();
         while (rs.next()) {
           columns.add(rs.getString(1));
         }
-        LOG.debug("Found columns to update stats: " + columns + " on " + ci.tableName +
-          (ci.partName == null ? "" : "/" + ci.partName));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Found columns to update stats: {} on {}{}", columns, ci.tableName,
+              (ci.partName == null ? "" : "/" + ci.partName));
+        }
         dbConn.commit();
         return columns;
       } catch (SQLException e) {
@@ -1050,9 +1038,7 @@ class CompactionTxnHandler extends TxnHandler {
         String sqlText = "UPDATE \"COMPACTION_QUEUE\" SET \"CQ_HIGHEST_WRITE_ID\" = " +
             ci.highestWriteId + ", \"CQ_RUN_AS\" = " + quoteString(ci.runAs) + ", \"CQ_TXN_ID\" = " + compactionTxnId +
             " WHERE \"CQ_ID\" = " + ci.id;
-        if(LOG.isDebugEnabled()) {
-          LOG.debug("About to execute: " + sqlText);
-        }
+        LOG.debug("About to execute: {}", sqlText);
         int updCount = stmt.executeUpdate(sqlText);
         if(updCount != 1) {
           throw new IllegalStateException("Could not find record in COMPACTION_QUEUE for " + ci);
@@ -1079,9 +1065,7 @@ class CompactionTxnHandler extends TxnHandler {
             (ci.partName == null ? "" : quoteString(ci.partName) + ",") +
             ci.highestWriteId + ", " +
             OperationType.COMPACT + ")";
-        if(LOG.isDebugEnabled()) {
-          LOG.debug("About to execute: " + sqlText);
-        }
+        LOG.debug("About to execute: {}", sqlText);
         updCount = stmt.executeUpdate(sqlText);
         if(updCount != 1) {
           throw new IllegalStateException("Could not find record in COMPACTION_QUEUE for " + ci);
@@ -1231,14 +1215,14 @@ class CompactionTxnHandler extends TxnHandler {
         for (int i = 0; i < queries.size(); i++) {
           String query = queries.get(i);
           long insertCount = counts.get(i);
-          LOG.debug("Going to execute update <" + query + ">");
+          LOG.debug("Going to execute update <{}>", query);
           pStmt = dbConn.prepareStatement(query);
           for (int j = 0; j < insertCount; j++) {
             pStmt.setLong(j + 1, deleteSet.get(totalCount + j));
           }
           totalCount += insertCount;
           int count = pStmt.executeUpdate();
-          LOG.debug("Removed " + count + " records from COMPLETED_COMPACTIONS");
+          LOG.debug("Removed {} records from COMPLETED_COMPACTIONS", count);
         }
         dbConn.commit();
       } catch (SQLException e) {
@@ -1262,10 +1246,10 @@ class CompactionTxnHandler extends TxnHandler {
     int failedThreshold = MetastoreConf.getIntVar(conf, ConfVars.COMPACTOR_INITIATOR_FAILED_THRESHOLD);
     int failedRetention = MetastoreConf.getIntVar(conf, ConfVars.COMPACTOR_HISTORY_RETENTION_FAILED);
     if(failedRetention < failedThreshold) {
-      LOG.warn("Invalid configuration " + ConfVars.COMPACTOR_INITIATOR_FAILED_THRESHOLD.getVarname() +
-        "=" + failedRetention + " < " + ConfVars.COMPACTOR_HISTORY_RETENTION_FAILED + "=" +
-        failedRetention + ".  Will use " + ConfVars.COMPACTOR_INITIATOR_FAILED_THRESHOLD.getVarname() +
-        "=" + failedRetention);
+      LOG.warn("Invalid configuration {}={} < {}={}.  Will use {}={}",
+          ConfVars.COMPACTOR_INITIATOR_FAILED_THRESHOLD.getVarname(), failedRetention,
+          ConfVars.COMPACTOR_HISTORY_RETENTION_FAILED, failedRetention,
+          ConfVars.COMPACTOR_INITIATOR_FAILED_THRESHOLD.getVarname(), failedRetention);
       failedRetention = failedThreshold;
     }
     return failedRetention;
@@ -1339,9 +1323,7 @@ class CompactionTxnHandler extends TxnHandler {
 
   private void updateStatus(CompactionInfo ci) throws MetaException {
     String strState = compactorStateToResponse(ci.state);
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Marking as " + strState + ": CompactionInfo: " + ci);
-    }
+    LOG.debug("Marking as {}: CompactionInfo: {}", strState, ci);
     try {
       Connection dbConn = null;
       Statement stmt = null;
@@ -1368,7 +1350,7 @@ class CompactionTxnHandler extends TxnHandler {
           String s = "DELETE FROM \"COMPACTION_QUEUE\" WHERE \"CQ_ID\" = ?";
           pStmt = dbConn.prepareStatement(s);
           pStmt.setLong(1, ci.id);
-          LOG.debug("Going to execute update <" + s + ">");
+          LOG.debug("Going to execute update <{}>", s);
           pStmt.executeUpdate();
         }
         else {
@@ -1387,7 +1369,7 @@ class CompactionTxnHandler extends TxnHandler {
           }
           ci.start = getDbTime(dbConn);
           LOG.debug("The failure occurred before we even made an entry in COMPACTION_QUEUE. Generated ID so that we "
-            + "can make an entry in COMPLETED_COMPACTIONS. New Id: " + ci.id);
+                  + "can make an entry in COMPLETED_COMPACTIONS. New Id: {}", ci.id);
         }
         close(rs, stmt, null);
         closeStmt(pStmt);
@@ -1401,7 +1383,7 @@ class CompactionTxnHandler extends TxnHandler {
                 + "VALUES(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?,?,?,?,?,?,?,?)");
         CompactionInfo.insertIntoCompletedCompactions(pStmt, ci, getDbTime(dbConn));
         int updCount = pStmt.executeUpdate();
-        LOG.debug("Inserted " + updCount + " entries into COMPLETED_COMPACTIONS");
+        LOG.debug("Inserted {} entries into COMPLETED_COMPACTIONS", updCount);
         closeStmt(pStmt);
         dbConn.commit();
       } catch (SQLException e) {
@@ -1485,7 +1467,7 @@ class CompactionTxnHandler extends TxnHandler {
           stmt.setLong(3, info.id);
           int updCnt = stmt.executeUpdate();
           if (updCnt != 1) {
-            LOG.error("Unable to update compaction queue record: " + info + ". updCnt=" + updCnt);
+            LOG.error("Unable to update compaction queue record: {}. updCnt={}", info, updCnt);
             dbConn.rollback();
             throw new MetaException("No record with CQ_ID=" + info.id + " found in COMPACTION_QUEUE");
           }

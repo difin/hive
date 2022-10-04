@@ -517,7 +517,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
          */
         stmt = dbConn.createStatement();
         String s = "SELECT \"NTXN_NEXT\" - 1 FROM \"NEXT_TXN_ID\"";
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
         rs = stmt.executeQuery(s);
         if (!rs.next()) {
           throw new MetaException("Transaction tables not properly " +
@@ -532,7 +532,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         List<OpenTxn> txnInfos = new ArrayList<>();
         // need the WHERE clause below to ensure consistent results with READ_COMMITTED
         String txnsQuery = String.format(infoFields ? OpenTxn.OPEN_TXNS_INFO_QUERY : OpenTxn.OPEN_TXNS_QUERY, hwm);
-        LOG.debug("Going to execute query<" + txnsQuery + ">");
+        LOG.debug("Going to execute query<{}>", txnsQuery);
         rs = stmt.executeQuery(txnsQuery);
         while (rs.next()) {
           long txnId = rs.getLong(1);
@@ -574,8 +574,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       if (numOpenTxns.get() < maxOpenTxns * 0.9) {
         tooManyOpenTxns = false;
       } else {
-        LOG.warn("Maximum allowed number of open transactions (" + maxOpenTxns + ") has been " +
-            "reached. Current number of open transactions: " + numOpenTxns);
+        LOG.warn("Maximum allowed number of open transactions ({}) has been "
+            + "reached. Current number of open transactions: {}", maxOpenTxns, numOpenTxns);
         throw new MetaException("Maximum allowed number of open transactions has been reached. " +
             "See hive.max.open.txns.");
       }
@@ -649,17 +649,17 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
         if (!targetTxnIdList.isEmpty()) {
           if (targetTxnIdList.size() != rqst.getReplSrcTxnIds().size()) {
-            LOG.warn("target txn id number " + targetTxnIdList.toString() +
-                    " is not matching with source txn id number " + rqst.getReplSrcTxnIds().toString());
+            LOG.warn("target txn id number {} is not matching with source txn id number {}",
+                targetTxnIdList, rqst.getReplSrcTxnIds());
           }
-          LOG.info("Target transactions " + targetTxnIdList.toString() + " are present for repl policy :" +
-                  rqst.getReplPolicy() + " and Source transaction id : " + rqst.getReplSrcTxnIds().toString());
+          LOG.info("Target transactions {} are present for repl policy : {} and Source transaction id : {}",
+              targetTxnIdList.toString(), rqst.getReplPolicy(), rqst.getReplSrcTxnIds().toString());
           return targetTxnIdList;
         }
       }
 
       String s = sqlGenerator.addForUpdateClause("SELECT \"NTXN_NEXT\" FROM \"NEXT_TXN_ID\"");
-      LOG.debug("Going to execute query <" + s + ">");
+      LOG.debug("Going to execute query <{}>", s);
       rs = stmt.executeQuery(s);
       if (!rs.next()) {
         throw new MetaException("Transaction database not properly " +
@@ -667,7 +667,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       }
       long first = rs.getLong(1);
       s = "UPDATE \"NEXT_TXN_ID\" SET \"NTXN_NEXT\" = " + (first + numTxns);
-      LOG.debug("Going to execute update <" + s + ">");
+      LOG.debug("Going to execute update <{}>", s);
       stmt.executeUpdate(s);
 
       long minOpenTxnId = 0;
@@ -750,7 +750,9 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
               "\"RTM_SRC_TXN_ID\"", false, false);
       List<String> params = Arrays.asList(replPolicy);
       for (String query : inQueries) {
-        LOG.debug("Going to execute select <" + query.replaceAll("\\?", "{}") + ">", quoteString(replPolicy));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Going to execute select <" + query.replace("?", "{}") + ">", quoteString(replPolicy));
+        }
         pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, params);
         rs = pst.executeQuery();
         while (rs.next()) {
@@ -758,7 +760,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         }
         closeStmt(pst);
       }
-      LOG.debug("targetTxnid for srcTxnId " + sourceTxnIdList.toString() + " is " + targetTxnIdList.toString());
+      LOG.debug("targetTxnid for srcTxnId {} is {}", sourceTxnIdList, targetTxnIdList);
       return targetTxnIdList;
     }  catch (SQLException e) {
       LOG.warn("failed to get target txn ids " + e.getMessage());
@@ -811,7 +813,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       TxnUtils.buildQueryWithINClause(conf, inQueries, prefix, new StringBuilder(), targetTxnIds,
               "\"RTM_TARGET_TXN_ID\"", false, false);
       for (String query : inQueries) {
-        LOG.debug("Going to execute select <" + query + ">");
+        LOG.debug("Going to execute select <{}>", query);
         pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, null);
         rs = pst.executeQuery();
         while (rs.next()) {
@@ -819,9 +821,6 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         }
       }
       return dbNames;
-    } catch (SQLException e) {
-      LOG.warn("Failed to get ReplPolicies for replayed txns: " + e.getMessage());
-      throw e;
     } finally {
       closeStmt(pst);
       close(rs);
@@ -831,7 +830,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   private void deleteReplTxnMapEntry(Connection dbConn, long sourceTxnId, String replPolicy) throws SQLException {
     String s = "DELETE FROM \"REPL_TXN_MAP\" WHERE \"RTM_SRC_TXN_ID\" = " + sourceTxnId + " AND \"RTM_REPL_POLICY\" = ?";
     try (PreparedStatement pst = sqlGenerator.prepareStmtWithParameters(dbConn, s, Arrays.asList(replPolicy))) {
-      LOG.info("Going to execute  <" + s.replaceAll("\\?", "{}") + ">", quoteString(replPolicy));
+      LOG.info("Going to execute  <" + s.replace("?", "{}") + ">", quoteString(replPolicy));
       pst.executeUpdate();
     }
   }
@@ -859,8 +858,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           if (targetTxnIds.isEmpty()) {
             // Idempotent case where txn was already closed or abort txn event received without
             // corresponding open txn event.
-            LOG.info("Target txn id is missing for source txn id : " + sourceTxnId +
-                    " and repl policy " + rqst.getReplPolicy());
+            LOG.info("Target txn id is missing for source txn id : {} and repl policy {}", sourceTxnId,
+                rqst.getReplPolicy());
             return;
           }
           assert targetTxnIds.size() == 1;
@@ -876,8 +875,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
               LOG.warn("Invalid state ABORTED for transactions started using replication replay task");
               deleteReplTxnMapEntry(dbConn, sourceTxnId, rqst.getReplPolicy());
             }
-            LOG.info("abortTxn(" + JavaUtils.txnIdToString(txnid) +
-              ") requested by it is already " + TxnStatus.ABORTED);
+            LOG.info("abortTxn({}) requested by it is already {}", JavaUtils.txnIdToString(txnid), TxnStatus.ABORTED);
             return;
           }
           raiseTxnUnexpectedState(status, txnid);
@@ -931,7 +929,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
         Map<Long, TxnType> nonReadOnlyTxns = new HashMap<>();
         for (String query : queries) {
-          LOG.debug("Going to execute query<" + query + ">");
+          LOG.debug("Going to execute query <{}>", query);
           try (ResultSet rs = stmt.executeQuery(sqlGenerator.addForUpdateClause(query))) {
             while (rs.next()) {
               TxnType txnType = TxnType.findByValue(rs.getInt(2));
@@ -941,10 +939,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         }
         int numAborted = abortTxns(dbConn, txnIds, false, false);
         if (numAborted != txnIds.size()) {
-          LOG.warn("Abort Transactions command only aborted " + numAborted + " out of " +
-              txnIds.size() + " transactions. It's possible that the other " +
-              (txnIds.size() - numAborted) +
-              " transactions have been aborted or committed, or the transaction ids are invalid.");
+          LOG.warn(
+              "Abort Transactions command only aborted {} out of {} transactions. It's possible that the other"
+                  + " {} transactions have been aborted or committed, or the transaction ids are invalid.",
+              numAborted, txnIds.size(), (txnIds.size() - numAborted));
         }
 
         if (transactionalListeners != null){
@@ -977,8 +975,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     try {
       String query = "select \"DB_ID\" from \"DBS\" where \"NAME\" = ?  and \"CTLG_NAME\" = ?";
       pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, Arrays.asList(database, catalog));
-      LOG.debug("Going to execute query <" + query.replaceAll("\\?", "{}") + ">",
-              quoteString(database), quoteString(catalog));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Going to execute query <" + query.replace("?", "{}") + ">",
+            quoteString(database), quoteString(catalog));
+      }
       rs = pst.executeQuery();
       if (!rs.next()) {
         throw new MetaException("DB with name " + database + " does not exist in catalog " + catalog);
@@ -1008,11 +1008,13 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       }
       closeStmt(pst);
       if (query == null) {
-        LOG.info("Database property: " + prop + " with value: " + propValue + " already updated for db: " + database);
+        LOG.info("Database property: {} with value: {} already updated for db: {}", prop, propValue, database);
         return;
       }
       pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, Arrays.asList(propValue));
-      LOG.debug("Updating " + prop + " for db: " + database + " <" + query.replaceAll("\\?", "{}") + ">", propValue);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Updating " + prop + " for db: " + database + " <" + query.replace("?", "{}") + ">", propValue);
+      }
       if (pst.executeUpdate() != 1) {
         //only one row insert or update should happen
         throw new RuntimeException("DATABASE_PARAMS is corrupted for database: " + database);
@@ -1070,7 +1072,9 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       query = "SELECT \"TBL_ID\" FROM \"TBLS\" WHERE \"TBL_NAME\" = ? AND \"DB_ID\" = " + dbId;
       params = Arrays.asList(table);
       pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, params);
-      LOG.debug("Going to execute query <" + query.replaceAll("\\?", "{}") + ">", quoteString(table));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Going to execute query <" + query.replace("?", "{}") + ">", quoteString(table));
+      }
 
       rs = pst.executeQuery();
       if (rs == null || !rs.next()) {
@@ -1097,7 +1101,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         query = "SELECT \"PART_ID\" FROM \"PARTITIONS\" WHERE \"TBL_ID\" = " + tblId + " and " + "\"PART_NAME\" = ? ";
         params = Arrays.asList(part);
         pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, params);
-        LOG.debug("Going to execute query <" + query.replaceAll("\\?", "{}") + ">", quoteString(part));
+        LOG.debug("Going to execute query <" + query.replace("?", "{}") + ">", quoteString(part));
 
         rs = pst.executeQuery();
         if (rs == null || !rs.next()) {
@@ -1179,8 +1183,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           if (targetTxnIds.isEmpty()) {
             // Idempotent case where txn was already closed or commit txn event received without
             // corresponding open txn event.
-            LOG.info("Target txn id is missing for source txn id : " + sourceTxnId +
-                    " and repl policy " + rqst.getReplPolicy());
+            LOG.info("Target txn id is missing for source txn id : {} and repl policy {}", sourceTxnId,
+                rqst.getReplPolicy());
             return;
           }
           assert targetTxnIds.size() == 1;
@@ -1206,7 +1210,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
              * This makes the operation idempotent
              * (assume that this is most likely due to retry logic)
              */
-            LOG.info("Nth commitTxn(" + JavaUtils.txnIdToString(txnid) + ") msg");
+            LOG.info("Nth commitTxn({}) msg", JavaUtils.txnIdToString(txnid));
             return;
           }
           raiseTxnUnexpectedState(actualTxnStatus, txnid);
@@ -1335,12 +1339,12 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
                 pstmt.addBatch();
                 insertCounter++;
                 if (insertCounter % maxBatchSize == 0) {
-                  LOG.debug("Executing a batch of <" + sql + "> queries. Batch size: " + maxBatchSize);
+                  LOG.debug("Executing a batch of <{}> queries. Batch size: {}", sql, maxBatchSize);
                   pstmt.executeBatch();
                 }
               }
               if (insertCounter % maxBatchSize != 0) {
-                LOG.debug("Executing a batch of <" + sql + "> queries. Batch size: " + insertCounter % maxBatchSize);
+                LOG.debug("Executing a batch of <{}> queries. Batch size: {}", sql, insertCounter % maxBatchSize);
                 pstmt.executeBatch();
               }
             }
@@ -1435,7 +1439,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           // txns overlap
           " WHERE \"CUR\".\"TC_TXNID\" <= \"COMMITTED\".\"WS_COMMIT_ID\"";
 
-        LOG.debug("Going to execute query: <" + writeConflictQuery + ">");
+        LOG.debug("Going to execute query: <{}>", writeConflictQuery);
         try (ResultSet rs = stmt.executeQuery(writeConflictQuery)) {
           return rs.next() ? rs.getLong(1) : -1;
         }
@@ -1474,7 +1478,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             ", " + OperationType.DELETE +
             ") AND \"CUR\".\"WS_OPERATION_TYPE\" IN(" + OperationType.UPDATE + ", "
             + OperationType.DELETE + "))");
-    LOG.debug("Going to execute query: <" + writeConflictQuery + ">");
+    LOG.debug("Going to execute query: <{}>", writeConflictQuery);
     return stmt.executeQuery(writeConflictQuery);
   }
 
@@ -1488,13 +1492,13 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         //we only track compactor activity in TXN_COMPONENTS to handle the case where the
         //compactor txn aborts - so don't bother copying it to COMPLETED_TXN_COMPONENTS
         " AND \"TC_OPERATION_TYPE\" <> " + OperationType.COMPACT;
-    LOG.debug("Going to execute insert <" + s + ">");
+    LOG.debug("Going to execute insert <{}>", s);
 
     if ((stmt.executeUpdate(s)) < 1) {
       //this can be reasonable for an empty txn START/COMMIT or read-only txn
       //also an IUD with DP that didn't match any rows.
-      LOG.info("Expected to move at least one record from txn_components to " +
-              "completed_txn_components when committing txn! " + JavaUtils.txnIdToString(txnid));
+      LOG.info("Expected to move at least one record from txn_components to "
+          + "completed_txn_components when committing txn! {}", JavaUtils.txnIdToString(txnid));
     }
   }
   /**
@@ -1535,7 +1539,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         + " \"PARAM_VALUE\" = " + quoteString(rqst.getKeyValue().getValue())
         + " WHERE \"TBL_ID\" = " + rqst.getKeyValue().getTableId()
         + " AND \"PARAM_KEY\" = " + quoteString(rqst.getKeyValue().getKey());
-    LOG.debug("Going to execute update <" + s + ">");
+    LOG.debug("Going to execute update <{}>", s);
     int affectedRows = stmt.executeUpdate(s);
     if (affectedRows != 1) {
       String errorMsg = "Error updating key/value in the sql backend with"
@@ -1581,12 +1585,14 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         // idempotent case and just return.
         String sql = "SELECT \"NWI_NEXT\" FROM \"NEXT_WRITE_ID\" WHERE \"NWI_DATABASE\" = ? AND \"NWI_TABLE\" = ?";
         pStmt = sqlGenerator.prepareStmtWithParameters(dbConn, sql, params);
-        LOG.debug("Going to execute query <" + sql.replaceAll("\\?", "{}") + ">",
-                quoteString(dbName), quoteString(tblName));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Going to execute query <" + sql.replace("?", "{}") + ">",
+              quoteString(dbName), quoteString(tblName));
+        }
         rs = pStmt.executeQuery();
         if (rs.next()) {
-          LOG.info("Idempotent flow: WriteId state <" + validWriteIdList + "> is already applied for the table: "
-                  + dbName + "." + tblName);
+          LOG.info("Idempotent flow: WriteId state <{}> is already applied for the table: {}.{}", validWriteIdList,
+              dbName, tblName);
           rollbackDBConn(dbConn);
           return;
         }
@@ -1605,7 +1611,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             long writeId = abortedWriteIds.get(i++);
             rows.add(txn + ", ?, ?, " + writeId);
             paramsList.add(params);
-            LOG.info("Allocated writeID: " + writeId + " for txnId: " + txn);
+            LOG.info("Allocated writeID: {} for txnId: {}", writeId, txn);
           }
 
           // Insert entries to TXN_TO_WRITE_ID for aborted write ids
@@ -1631,11 +1637,13 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
                 + Long.toString(nextWriteId) + ")";
         closeStmt(pStmt);
         pStmt = sqlGenerator.prepareStmtWithParameters(dbConn, sql, params);
-        LOG.debug("Going to execute insert <" + sql.replaceAll("\\?", "{}") + ">",
-                quoteString(dbName), quoteString(tblName));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Going to execute insert <" + sql.replace("?", "{}") + ">",
+              quoteString(dbName), quoteString(tblName));
+        }
         pStmt.execute();
 
-        LOG.info("WriteId state <" + validWriteIdList + "> is applied for the table: " + dbName + "." + tblName);
+        LOG.info("WriteId state <{}> is applied for the table: {}.{}", validWriteIdList, dbName, tblName);
         LOG.debug("Going to commit");
         dbConn.commit();
       } catch (SQLException e) {
@@ -1692,8 +1700,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       pst.setString(1, names[0]);
       pst.setString(2, names[1]);
       pst.setLong(3, writeId);
-      LOG.debug("Going to execute query <" + s.replaceAll("\\?", "{}") + ">", quoteString(names[0]),
-              quoteString(names[1]), writeId);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Going to execute query <" + s.replace("?", "{}") + ">", quoteString(names[0]),
+                quoteString(names[1]), writeId);
+      }
       rs = pst.executeQuery();
       if (rs.next()) {
         long txnId = rs.getLong(1);
@@ -1786,8 +1796,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       String s = "SELECT MAX(\"T2W_WRITEID\") FROM \"TXN_TO_WRITE_ID\" WHERE \"T2W_TXNID\" <= " + txnHwm
               + " AND \"T2W_DATABASE\" = ? AND \"T2W_TABLE\" = ?";
       pst = sqlGenerator.prepareStmtWithParameters(dbConn, s, params);
-      LOG.debug("Going to execute query<" + s.replaceAll("\\?", "{}") + ">",
-              quoteString(names[0]), quoteString(names[1]));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Going to execute query<" + s.replace("?", "{}") + ">",
+            quoteString(names[0]), quoteString(names[1]));
+      }
       rs = pst.executeQuery();
       if (rs.next()) {
         writeIdHwm = rs.getLong(1);
@@ -1800,8 +1812,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         s = "SELECT \"NWI_NEXT\"-1 FROM \"NEXT_WRITE_ID\" WHERE \"NWI_DATABASE\" = ? AND \"NWI_TABLE\" = ?";
         closeStmt(pst);
         pst = sqlGenerator.prepareStmtWithParameters(dbConn, s, params);
-        LOG.debug("Going to execute query<" + s.replaceAll("\\?", "{}") + ">",
-                quoteString(names[0]), quoteString(names[1]));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Going to execute query<" + s.replace("?", "{}") + ">",
+              quoteString(names[0]), quoteString(names[1]));
+        }
         rs = pst.executeQuery();
         if (rs.next()) {
           writeIdHwm = rs.getLong(1);
@@ -1817,8 +1831,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
               + " AND \"T2W_DATABASE\" = ? AND \"T2W_TABLE\" = ? ORDER BY \"T2W_WRITEID\" ASC";
       closeStmt(pst);
       pst = sqlGenerator.prepareStmtWithParameters(dbConn, s, params);
-      LOG.debug("Going to execute query<" + s.replaceAll("\\?", "{}") + ">",
-              quoteString(names[0]), quoteString(names[1]));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Going to execute query<" + s.replace("?", "{}") + ">",
+            quoteString(names[0]), quoteString(names[1]));
+      }
       rs = pst.executeQuery();
       while (rs.next()) {
         long txnId = rs.getLong(1);
@@ -1896,8 +1912,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           if (srcTxnIds.size() != txnIds.size()) {
             // Idempotent case where txn was already closed but gets allocate write id event.
             // So, just ignore it and return empty list.
-            LOG.info("Idempotent case: Target txn id is missing for source txn id : " + srcTxnIds.toString() +
-                    " and repl policy " + rqst.getReplPolicy());
+            LOG.info("Idempotent case: Target txn id is missing for source txn id : {} and repl policy {}", srcTxnIds,
+                rqst.getReplPolicy());
             return new AllocateTableWriteIdsResponse(txnToWriteIds);
           }
         } else {
@@ -1941,8 +1957,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
               txnIds, "\"T2W_TXNID\"", false, false);
           for (String query : queries) {
             pStmt = sqlGenerator.prepareStmtWithParameters(dbConn, query, params);
-            LOG.debug("Going to execute delete <" + query.replaceAll("\\?", "{}") + ">",
-                quoteString(dbName), quoteString(tblName));
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Going to execute delete <" + query.replace("?", "{}") + ">",
+                  quoteString(dbName), quoteString(tblName));
+            }
             int numRowsDeleted = pStmt.executeUpdate();
             LOG.info("Removed {} prior writeIds during reallocation", numRowsDeleted);
             closeStmt(pStmt);
@@ -1958,8 +1976,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
               txnIds, "\"T2W_TXNID\"", false, false);
           for (String query : queries) {
             pStmt = sqlGenerator.prepareStmtWithParameters(dbConn, query, params);
-            LOG.debug("Going to execute query <" + query.replaceAll("\\?", "{}") + ">",
-                quoteString(dbName), quoteString(tblName));
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Going to execute query <" + query.replace("?", "{}") + ">",
+                  quoteString(dbName), quoteString(tblName));
+            }
             rs = pStmt.executeQuery();
             while (rs.next()) {
               // If table write ID is already allocated for the given transaction, then just use it
@@ -1997,8 +2017,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             "SELECT \"NWI_NEXT\" FROM \"NEXT_WRITE_ID\" WHERE \"NWI_DATABASE\" = ? AND \"NWI_TABLE\" = ?");
         closeStmt(pStmt);
         pStmt = sqlGenerator.prepareStmtWithParameters(dbConn, s, params);
-        LOG.debug("Going to execute query <" + s.replaceAll("\\?", "{}") + ">",
-                quoteString(dbName), quoteString(tblName));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Going to execute query <" + s.replace("?", "{}") + ">",
+              quoteString(dbName), quoteString(tblName));
+        }
         rs = pStmt.executeQuery();
         if (!rs.next()) {
           // First allocation of write id should add the table to the next_write_id meta table
@@ -2009,8 +2031,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
                   + (writeId + numOfWriteIds) + ")";
           closeStmt(pStmt);
           pStmt = sqlGenerator.prepareStmtWithParameters(dbConn, s, params);
-          LOG.debug("Going to execute insert <" + s.replaceAll("\\?", "{}") + ">",
-                  quoteString(dbName), quoteString(tblName));
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Going to execute insert <" + s.replace("?", "{}") + ">",
+                quoteString(dbName), quoteString(tblName));
+          }
           pStmt.execute();
         } else {
           long nextWriteId = rs.getLong(1);
@@ -2021,8 +2045,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
                   + " WHERE \"NWI_DATABASE\" = ? AND \"NWI_TABLE\" = ?";
           closeStmt(pStmt);
           pStmt = sqlGenerator.prepareStmtWithParameters(dbConn, s, params);
-          LOG.debug("Going to execute update <" + s.replaceAll("\\?", "{}") + ">",
-                  quoteString(dbName), quoteString(tblName));
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Going to execute update <" + s.replace("?", "{}") + ">",
+                quoteString(dbName), quoteString(tblName));
+          }
           pStmt.executeUpdate();
 
           // For repl flow, if the source write id is mismatching with target next write id, then current
@@ -2033,8 +2059,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             s = "DELETE FROM \"TXN_TO_WRITE_ID\" WHERE \"T2W_DATABASE\" = ? AND \"T2W_TABLE\" = ?";
             closeStmt(pStmt);
             pStmt = sqlGenerator.prepareStmtWithParameters(dbConn, s, params);
-            LOG.debug("Going to execute delete <" + s.replaceAll("\\?", "{}") + ">",
-                    quoteString(dbName), quoteString(tblName));
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("Going to execute delete <" + s.replace("?", "{}") + ">",
+                  quoteString(dbName), quoteString(tblName));
+            }
             pStmt.executeUpdate();
           }
         }
@@ -2049,17 +2077,17 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             pstmt.addBatch();
 
             txnToWriteIds.add(new TxnToWriteId(txnId, writeId));
-            LOG.info("Allocated writeId: " + writeId + " for txnId: " + txnId);
+            LOG.info("Allocated writeId: {} for txnId: {}", writeId, txnId);
             writeId++;
             if (txnToWriteIds.size() % maxBatchSize == 0) {
-              LOG.debug("Executing a batch of <" + TXN_TO_WRITE_ID_INSERT_QUERY + "> queries. " +
-                  "Batch size: " + maxBatchSize);
+              LOG.debug("Executing a batch of <{}> queries. Batch size: {}", TXN_TO_WRITE_ID_INSERT_QUERY,
+                  maxBatchSize);
               pstmt.executeBatch();
             }
           }
           if (txnToWriteIds.size() % maxBatchSize != 0) {
-            LOG.debug("Executing a batch of <" + TXN_TO_WRITE_ID_INSERT_QUERY + "> queries. " +
-                "Batch size: " + txnToWriteIds.size() % maxBatchSize);
+            LOG.debug("Executing a batch of <{}> queries. Batch size: {}", TXN_TO_WRITE_ID_INSERT_QUERY,
+                txnToWriteIds.size() % maxBatchSize);
             pstmt.executeBatch();
           }
         }
@@ -2101,8 +2129,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
         pStmt = sqlGenerator.prepareStmtWithParameters(dbConn, SELECT_NWI_NEXT_FROM_NEXT_WRITE_ID,
             Arrays.asList(dbName, tableName));
-        LOG.debug("Going to execute query <" + SELECT_NWI_NEXT_FROM_NEXT_WRITE_ID.replaceAll("\\?", "{}") + ">",
-            quoteString(dbName), quoteString(tableName));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Going to execute query <" + SELECT_NWI_NEXT_FROM_NEXT_WRITE_ID.replace("?", "{}") + ">",
+              quoteString(dbName), quoteString(tableName));
+        }
         rs = pStmt.executeQuery();
         // If there is no record, we never allocated anything
         long maxWriteId = 0l;
@@ -2143,8 +2173,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         String s = "INSERT INTO \"NEXT_WRITE_ID\" (\"NWI_DATABASE\", \"NWI_TABLE\", \"NWI_NEXT\") VALUES (?, ?, "
             + Long.toString(rqst.getSeedWriteId() + 1) + ")";
         pst = sqlGenerator.prepareStmtWithParameters(dbConn, s, Arrays.asList(rqst.getDbName(), rqst.getTableName()));
-        LOG.debug("Going to execute insert <" + s.replaceAll("\\?", "{}") + ">",
-            quoteString(rqst.getDbName()), quoteString(rqst.getTableName()));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Going to execute insert <" + s.replace("?", "{}") + ">",
+              quoteString(rqst.getDbName()), quoteString(rqst.getTableName()));
+        }
         pst.execute();
         LOG.debug("Going to commit");
         dbConn.commit();
@@ -2175,7 +2207,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
          * if there are concurrent open transactions
          */
         String s = sqlGenerator.addForUpdateClause("SELECT \"NTXN_NEXT\" -1 FROM \"NEXT_TXN_ID\"");
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
         rs = stmt.executeQuery(s);
         if (!rs.next()) {
           throw new MetaException("Transaction database not properly " +
@@ -2454,9 +2486,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     try {
       dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
       // Execute query
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Going to execute query <" + queryText + ">");
-      }
+      LOG.debug("Going to execute query <{}>", queryText);
       pst = sqlGenerator.prepareStmtWithParameters(dbConn, queryText, params);
       pst.setMaxRows(1);
       rs = pst.executeQuery();
@@ -2497,12 +2527,13 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       String selectQ = "SELECT \"MRL_TXN_ID\" FROM \"MATERIALIZATION_REBUILD_LOCKS\" WHERE" +
           " \"MRL_DB_NAME\" = ? AND \"MRL_TBL_NAME\" = ?";
       pst = sqlGenerator.prepareStmtWithParameters(dbConn, selectQ, params);
-      LOG.debug("Going to execute query <" + selectQ.replaceAll("\\?", "{}") + ">",
-              quoteString(dbName), quoteString(tableName));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Going to execute query <" + selectQ.replace("?", "{}") + ">",
+            quoteString(dbName), quoteString(tableName));
+      }
       rs = pst.executeQuery();
       if(rs.next()) {
-        LOG.info("Ignoring request to rebuild " + dbName + "/" + tableName +
-            " since it is already being rebuilt");
+        LOG.info("Ignoring request to rebuild {}/{} since it is already being rebuilt", dbName, tableName);
         return new LockResponse(txnId, LockState.NOT_ACQUIRED);
       }
       String insertQ = "INSERT INTO \"MATERIALIZATION_REBUILD_LOCKS\" " +
@@ -2510,8 +2541,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           ", ?, ?, " + Instant.now().toEpochMilli() + ")";
       closeStmt(pst);
       pst = sqlGenerator.prepareStmtWithParameters(dbConn, insertQ, params);
-      LOG.debug("Going to execute update <" + insertQ.replaceAll("\\?", "{}") + ">",
-              quoteString(dbName), quoteString(tableName));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Going to execute update <" + insertQ.replace("?", "{}") + ">",
+            quoteString(dbName), quoteString(tableName));
+      }
       pst.executeUpdate();
       LOG.debug("Going to commit");
       dbConn.commit();
@@ -2544,14 +2577,15 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             " AND \"MRL_DB_NAME\" = ?" +
             " AND \"MRL_TBL_NAME\" = ?";
         pst = sqlGenerator.prepareStmtWithParameters(dbConn, s, Arrays.asList(dbName, tableName));
-        LOG.debug("Going to execute update <" + s.replaceAll("\\?", "{}") + ">",
-                quoteString(dbName), quoteString(tableName));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Going to execute update <" + s.replace("?", "{}") + ">",
+              quoteString(dbName), quoteString(tableName));
+        }
         int rc = pst.executeUpdate();
         if (rc < 1) {
           LOG.debug("Going to rollback");
           dbConn.rollback();
-          LOG.info("No lock found for rebuild of " + TableName.getDbTable(dbName, tableName) +
-              " when trying to heartbeat");
+          LOG.info("No lock found for rebuild of {} when trying to heartbeat", TableName.getDbTable(dbName, tableName));
           // It could not be renewed, return that information
           return false;
         }
@@ -2592,7 +2626,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         stmt = dbConn.createStatement();
 
         String selectQ = "SELECT \"MRL_TXN_ID\", \"MRL_LAST_HEARTBEAT\" FROM \"MATERIALIZATION_REBUILD_LOCKS\"";
-        LOG.debug("Going to execute query <" + selectQ + ">");
+        LOG.debug("Going to execute query <{}>", selectQ);
         rs = stmt.executeQuery(selectQ);
         while(rs.next()) {
           long lastHeartbeat = rs.getLong(2);
@@ -2609,7 +2643,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         if (!txnIds.isEmpty()) {
           String deleteQ = "DELETE FROM \"MATERIALIZATION_REBUILD_LOCKS\" WHERE" +
               " \"MRL_TXN_ID\" IN(" + StringUtils.join(",", txnIds) + ") ";
-          LOG.debug("Going to execute update <" + deleteQ + ">");
+          LOG.debug("Going to execute update <{}>", deleteQ);
           cnt = stmt.executeUpdate(deleteQ);
         }
         LOG.debug("Going to commit");
@@ -2755,7 +2789,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
   private long getNextLockIdForUpdate(Connection dbConn, Statement stmt) throws SQLException, MetaException {
     String s = sqlGenerator.addForUpdateClause("SELECT \"NL_NEXT\" FROM \"NEXT_LOCK_ID\"");
-    LOG.debug("Going to execute query <" + s + ">");
+    LOG.debug("Going to execute query <{}>", s);
     try (ResultSet rs = stmt.executeQuery(s)) {
       if (!rs.next()) {
         LOG.error("Failure to get next lock ID for update! SELECT query returned empty ResultSet.");
@@ -2771,7 +2805,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     String incrCmd = String.format(INCREMENT_NEXT_LOCK_ID_QUERY, (extLockId + 1));
     // update hive locks entries with the real EXT_LOCK_ID (replace temp ID)
     String updateLocksCmd = String.format(UPDATE_HIVE_LOCKS_EXT_ID_QUERY, extLockId, tempId);
-    LOG.debug("Going to execute updates in batch: <" + incrCmd + ">, and <" + updateLocksCmd + ">");
+    LOG.debug("Going to execute updates in batch: <{}>, and <{}>", incrCmd, updateLocksCmd);
     stmt.addBatch(incrCmd);
     stmt.addBatch(updateLocksCmd);
     stmt.executeBatch();
@@ -2826,12 +2860,13 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           pstmt.addBatch();
           insertCounter++;
           if (insertCounter % maxBatchSize == 0) {
-            LOG.debug("Executing a batch of <" + TXN_COMPONENTS_INSERT_QUERY + "> queries. Batch size: " + maxBatchSize);
+            LOG.debug("Executing a batch of <{}> queries. Batch size: {}", TXN_COMPONENTS_INSERT_QUERY, maxBatchSize);
             pstmt.executeBatch();
           }
         }
         if (insertCounter % maxBatchSize != 0) {
-          LOG.debug("Executing a batch of <" + TXN_COMPONENTS_INSERT_QUERY + "> queries. Batch size: " + insertCounter % maxBatchSize);
+          LOG.debug("Executing a batch of <{}> queries. Batch size: {}", TXN_COMPONENTS_INSERT_QUERY,
+              insertCounter % maxBatchSize);
           pstmt.executeBatch();
         }
       }
@@ -2861,7 +2896,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         pstmt.setString(1, dbName);
         pstmt.setString(2, tblName);
         pstmt.setLong(3, txnid);
-        LOG.debug("Going to execute query <" + SELECT_WRITE_ID_QUERY + ">");
+        LOG.debug("Going to execute query <{}>", SELECT_WRITE_ID_QUERY);
         try (ResultSet rs = pstmt.executeQuery()) {
           if (rs.next()) {
             return Optional.of(rs.getLong(1));
@@ -2938,12 +2973,12 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
         pstmt.addBatch();
         if (intLockId % maxBatchSize == 0) {
-          LOG.debug("Executing a batch of <" + insertLocksQuery + "> queries. Batch size: " + maxBatchSize);
+          LOG.debug("Executing a batch of <{}> queries. Batch size: {}", insertLocksQuery, maxBatchSize);
           pstmt.executeBatch();
         }
       }
       if (intLockId % maxBatchSize != 0) {
-        LOG.debug("Executing a batch of <" + insertLocksQuery + "> queries. Batch size: " + intLockId % maxBatchSize);
+        LOG.debug("Executing a batch of <{}> queries. Batch size: {}", insertLocksQuery, intLockId % maxBatchSize);
         pstmt.executeBatch();
       }
     }
@@ -3087,7 +3122,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           " (\"HL_TXNID\" <> 0 AND \"HL_LOCK_STATE\" = '" + LOCK_WAITING + "'))";
         //(hl_txnid <> 0 AND hl_lock_state = '" + LOCK_WAITING + "') is for multi-statement txns where
         //some query attempted to lock (thus LOCK_WAITING state) but is giving up due to timeout for example
-        LOG.debug("Going to execute update <" + s + ">");
+        LOG.debug("Going to execute update <{}>", s);
         int rc = stmt.executeUpdate(s);
         if (rc < 1) {
           LOG.info("Failure to unlock any locks with extLockId={}.", extLockId);
@@ -3096,8 +3131,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           if (!optLockInfo.isPresent()) {
             //didn't find any lock with extLockId but at ReadCommitted there is a possibility that
             //it existed when above delete ran but it didn't have the expected state.
-            LOG.info("No lock in " + LOCK_WAITING + " mode found for unlock(" +
-              JavaUtils.lockIdToString(rqst.getLockid()) + ")");
+            LOG.info("No lock in {} mode found for unlock({})", LOCK_WAITING,
+                JavaUtils.lockIdToString(rqst.getLockid()));
             //bail here to make the operation idempotent
             return;
           }
@@ -3196,7 +3231,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         }
 
         pst = sqlGenerator.prepareStmtWithParameters(dbConn, s, params);
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
         ResultSet rs = pst.executeQuery();
         while (rs.next()) {
           ShowLocksResponseElement e = new ShowLocksResponseElement();
@@ -3317,7 +3352,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           new StringBuilder(""), txnIds, "\"TXN_ID\"", true, false);
         int updateCnt = 0;
         for (String query : queries) {
-          LOG.debug("Going to execute update <" + query + ">");
+          LOG.debug("Going to execute update <{}>", query);
           updateCnt += stmt.executeUpdate(query);
         }
         if (updateCnt == numTxnsToHeartbeat) {
@@ -3354,7 +3389,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   long generateCompactionQueueId(Statement stmt) throws SQLException, MetaException {
     // Get the id for the next entry in the queue
     String s = sqlGenerator.addForUpdateClause("SELECT \"NCQ_NEXT\" FROM \"NEXT_COMPACTION_QUEUE_ID\"");
-    LOG.debug("going to execute query <" + s + ">");
+    LOG.debug("going to execute query <{}>", s);
     try (ResultSet rs = stmt.executeQuery(s)) {
       if (!rs.next()) {
         throw new IllegalStateException("Transaction tables not properly initiated, "
@@ -3362,7 +3397,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       }
       long id = rs.getLong(1);
       s = "UPDATE \"NEXT_COMPACTION_QUEUE_ID\" SET \"NCQ_NEXT\" = " + (id + 1);
-      LOG.debug("Going to execute update <" + s + ">");
+      LOG.debug("Going to execute update <{}>", s);
       stmt.executeUpdate(s);
       return id;
     }
@@ -3384,8 +3419,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         String query = "SELECT \"T2W_TXNID\" FROM \"TXN_TO_WRITE_ID\" WHERE"
             + " \"T2W_DATABASE\" = ? AND \"T2W_TABLE\" = ? AND \"T2W_WRITEID\" = " + writeId;
         pst = sqlGenerator.prepareStmtWithParameters(dbConn, query, Arrays.asList(dbName, tblName));
-        LOG.debug("Going to execute query <" + query.replaceAll("\\?", "{}") + ">",
-                quoteString(dbName), quoteString(tblName));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Going to execute query <" + query.replace("?", "{}") + ">",
+              quoteString(dbName), quoteString(tblName));
+        }
         ResultSet rs  = pst.executeQuery();
         long txnId = -1;
         if (rs.next()) {
@@ -3428,7 +3465,9 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
                 Collections.singletonList(getFullTableName(rqst.getDbname(), rqst.getTablename())));
             final ValidCompactorWriteIdList tblValidWriteIds =
                 TxnUtils.createValidCompactWriteIdList(getValidWriteIds(request).getTblValidWriteIds().get(0));
-            LOG.debug("ValidCompactWriteIdList: " + tblValidWriteIds.writeToString());
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("ValidCompactWriteIdList: {}", tblValidWriteIds.writeToString());
+            }
 
             StringBuilder sb = new StringBuilder("SELECT \"CQ_ID\", \"CQ_STATE\" FROM \"COMPACTION_QUEUE\" WHERE").
                 append(" (\"CQ_STATE\" IN(").
@@ -3450,14 +3489,13 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
               if (rqst.getPartitionname() != null) {
                 pst.setString(4, rqst.getPartitionname());
               }
-              LOG.debug("Going to execute query <" + sb + ">");
+              LOG.debug("Going to execute query <{}>", sb);
               try (ResultSet rs = pst.executeQuery()) {
                 if(rs.next()) {
                   long enqueuedId = rs.getLong(1);
                   String state = compactorStateToResponse(rs.getString(2).charAt(0));
-                  LOG.info("Ignoring request to compact " + rqst.getDbname() + "/" + rqst.getTablename() +
-                      "/" + rqst.getPartitionname() + " since it is already " + quoteString(state) +
-                      " with id=" + enqueuedId);
+                  LOG.info("Ignoring request to compact {}/{}/{} since it is already {} with id={}", rqst.getDbname(),
+                      rqst.getTablename(), rqst.getPartitionname(), quoteString(state), enqueuedId);
                   CompactionResponse resp = new CompactionResponse(-1, REFUSED_RESPONSE, false);
                   resp.setErrormessage("Compaction is already scheduled with state=" + quoteString(state) +
                       " and id=" + enqueuedId);
@@ -3521,7 +3559,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             String s = buf.toString();
 
             try (PreparedStatement pst = sqlGenerator.prepareStmtWithParameters(dbConn, s, params)) {
-              LOG.debug("Going to execute update <" + s + ">");
+              LOG.debug("Going to execute update <{}>", s);
               pst.executeUpdate();
             }
             LOG.debug("Going to commit");
@@ -3595,7 +3633,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
         String s = buf.toString();
         try (PreparedStatement pst = sqlGenerator.prepareStmtWithParameters(dbConn, s, params)) {
-          LOG.debug("Going to execute update <" + s + ">");
+          LOG.debug("Going to execute update <{}>", s);
           pst.executeUpdate();
         }
         LOG.debug("Going to commit");
@@ -3660,7 +3698,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         //to sort so that currently running jobs are at the end of the list (bottom of screen)
         //and currently running ones are in sorted by start time
         //w/o order by likely currently running compactions will be first (LHS of Union)
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
         ResultSet rs = stmt.executeQuery(s);
         while (rs.next()) {
           ShowCompactResponseElement e = new ShowCompactResponseElement();
@@ -3899,12 +3937,13 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             pstmt.addBatch();
             insertCounter++;
             if (insertCounter % maxBatchSize == 0) {
-              LOG.debug("Executing a batch of <" + TXN_COMPONENTS_INSERT_QUERY + "> queries. Batch size: " + maxBatchSize);
+              LOG.debug("Executing a batch of <{}> queries. Batch size: {}", TXN_COMPONENTS_INSERT_QUERY, maxBatchSize);
               pstmt.executeBatch();
             }
           }
           if (insertCounter % maxBatchSize != 0) {
-            LOG.debug("Executing a batch of <" + TXN_COMPONENTS_INSERT_QUERY + "> queries. Batch size: " + insertCounter % maxBatchSize);
+            LOG.debug("Executing a batch of <{}> queries. Batch size: {}", TXN_COMPONENTS_INSERT_QUERY,
+                insertCounter % maxBatchSize);
             pstmt.executeBatch();
           }
         }
@@ -4027,8 +4066,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             dbName = table.getDbName();
             tblName = table.getTableName();
             if(!defaultCatalog.equals(table.getCatName())) {
-              LOG.debug("Skipping cleanup because table: " + tblName + " belongs to catalog "
-                  + "other than default catalog: " + table.getCatName());
+              LOG.debug("Skipping cleanup because table: {} belongs to catalog other than default catalog: {}", tblName,
+                  table.getCatName());
               return;
             }
 
@@ -4094,8 +4133,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             tblName = table.getTableName();
 
             if(!defaultCatalog.equals(table.getCatName())) {
-              LOG.debug("Skipping cleanup because partitions belong to catalog "
-                  + "other than default catalog: " + table.getCatName());
+              LOG.debug("Skipping cleanup because partitions belong to catalog other than default catalog: {}",
+                  table.getCatName());
               return;
             }
 
@@ -4167,7 +4206,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         }
 
         for (String query : queries) {
-          LOG.debug("Going to execute update <" + query + ">");
+          LOG.debug("Going to execute update <{}>", query);
           stmt.executeUpdate(query);
         }
 
@@ -4357,18 +4396,18 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         queries.add(update + where);
 
         for (String query : queries) {
-          LOG.debug("Going to execute update <" + query + ">");
+          LOG.debug("Going to execute update <{}>", query);
           stmt.executeUpdate(query);
         }
 
-        LOG.debug("Going to commit: " + callSig);
+        LOG.debug("Going to commit: {}", callSig);
         dbConn.commit();
       } catch (SQLException e) {
-        LOG.debug("Going to rollback: " + callSig);
+        LOG.debug("Going to rollback: {}", callSig);
         rollbackDBConn(dbConn);
         checkRetryable(e, callSig);
         if (e.getMessage().contains("does not exist")) {
-          LOG.warn("Cannot perform " + callSig + " since metastore table does not exist");
+          LOG.warn("Cannot perform {} since metastore table does not exist", callSig);
         } else {
           throw new MetaException("Unable to " + callSig + ":" + StringUtils.stringifyException(e));
         }
@@ -4393,7 +4432,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
       stmt = dbConn.createStatement();
       String s = "SELECT COUNT(*) FROM \"HIVE_LOCKS\"";
-      LOG.debug("Going to execute query <" + s + ">");
+      LOG.debug("Going to execute query <{}>", s);
       rs = stmt.executeQuery(s);
       rs.next();
       int rc = rs.getInt(1);
@@ -4495,8 +4534,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
   private boolean waitForRetry(String caller, String errMsg) {
     if (retryNum++ < retryLimit) {
-      LOG.warn("Retryable error detected in " + caller + ".  Will wait " + retryInterval +
-              "ms and retry up to " + (retryLimit - retryNum + 1) + " times.  Error: " + errMsg);
+      LOG.warn("Retryable error detected in {}. Will wait {} ms and retry up to {} times. Error: {}", caller,
+          retryInterval, (retryLimit - retryNum + 1), errMsg);
       try {
         Thread.sleep(retryInterval);
       } catch (InterruptedException ex) {
@@ -4504,7 +4543,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       }
       return true;
     } else {
-      LOG.error("Fatal error in " + caller + ". Retry limit (" + retryLimit + ") reached. Last error: " + errMsg);
+      LOG.error("Fatal error in {}. Retry limit ({}) reached. Last error: {}", caller, retryLimit, errMsg);
     }
     return false;
   }
@@ -4544,8 +4583,8 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       if (DatabaseProduct.isDeadlock(dbProduct, e)) {
         if (deadlockCnt++ < ALLOWED_REPEATED_DEADLOCKS) {
           long waitInterval = deadlockRetryInterval * deadlockCnt;
-          LOG.warn("Deadlock detected in " + caller + ". Will wait " + waitInterval +
-            "ms try again up to " + (ALLOWED_REPEATED_DEADLOCKS - deadlockCnt + 1) + " times.");
+          LOG.warn("Deadlock detected in {}. Will wait {} ms try again up to {} times.", caller, waitInterval,
+              (ALLOWED_REPEATED_DEADLOCKS - deadlockCnt + 1));
           // Pause for a just a bit for retrying to avoid immediately jumping back into the deadlock.
           try {
             Thread.sleep(waitInterval);
@@ -4554,7 +4593,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           }
           sendRetrySignal = true;
         } else {
-          LOG.error("Too many repeated deadlocks in " + caller + ", giving up.");
+          LOG.error("Too many repeated deadlocks in {}, giving up.", caller);
         }
       } else if (isRetryable(conf, e)) {
         //in MSSQL this means Communication Link Failure
@@ -4564,7 +4603,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       }
       else {
         //make sure we know we saw an error that we don't recognize
-        LOG.info("Non-retryable error in " + caller + " : " + getMessage(e));
+        LOG.info("Non-retryable error in {} : {}", caller, getMessage(e));
       }
     }
     finally {
@@ -4611,7 +4650,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           LOG.error(msg);
           throw new MetaException(msg);
       }
-      LOG.debug("Going to execute query <" + s + ">");
+      LOG.debug("Going to execute query <{}>", s);
       ResultSet rs = stmt.executeQuery(s);
       if (!rs.next()) throw new MetaException("No results from date query");
       return rs.getTimestamp(1).getTime();
@@ -5031,7 +5070,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       String query = String.join(" UNION ALL ", subQuery);
 
       stmt = dbConn.createStatement();
-      LOG.debug("Going to execute query <" + query + ">");
+      LOG.debug("Going to execute query <{}>", query);
       rs = stmt.executeQuery(query);
 
       if (rs.next()) {
@@ -5039,16 +5078,17 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         LockInfo blockedBy = new LockInfo(rs);
         long intLockId = rs.getLong("LOCK_INT_ID");
         char lockChar = rs.getString("LOCK_TYPE").charAt(0);
-        
-        LOG.debug("Failure to acquire lock({} intLockId:{} {}), blocked by ({})", JavaUtils.lockIdToString(extLockId),
-            intLockId, JavaUtils.txnIdToString(txnId), blockedBy);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Failure to acquire lock({} intLockId:{} {}), blocked by ({})", JavaUtils.lockIdToString(extLockId),
+              intLockId, JavaUtils.txnIdToString(txnId), blockedBy);
+        }
 
         LockType lockType = LockTypeUtil.getLockTypeFromEncoding(lockChar)
             .orElseThrow(() -> new MetaException("Unknown lock type: " + lockChar));
         
         if ((zeroWaitReadEnabled && LockType.SHARED_READ == lockType || isExclusiveCTAS) && isValidTxn(txnId)) {
           String cleanupQuery = "DELETE FROM \"HIVE_LOCKS\" WHERE \"HL_LOCK_EXT_ID\" = " + extLockId;
-          LOG.debug("Going to execute query: <" + cleanupQuery + ">");
+          LOG.debug("Going to execute query: <{}>", cleanupQuery);
           stmt.executeUpdate(cleanupQuery);
           dbConn.commit();
 
@@ -5062,7 +5102,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             ", \"HL_BLOCKEDBY_INT_ID\" = " + blockedBy.intLockId +
             " WHERE \"HL_LOCK_EXT_ID\" = " + extLockId + " AND \"HL_LOCK_INT_ID\" = " + intLockId;
 
-        LOG.debug("Going to execute query: <" + updateBlockedByQuery + ">");
+        LOG.debug("Going to execute query: <{}>", updateBlockedByQuery);
         int updCnt = stmt.executeUpdate(updateBlockedByQuery);
 
         if (updCnt != 1) {
@@ -5079,7 +5119,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       acquire(dbConn, stmt, locksBeingChecked);
 
       // We acquired all the locks, so commit and return acquired.
-      LOG.debug("Successfully acquired locks: " + locksBeingChecked);
+      LOG.debug("Successfully acquired locks: {}", locksBeingChecked);
       dbConn.commit();
       response.setState(LockState.ACQUIRED);
     } finally {
@@ -5101,7 +5141,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       ",\"HL_ACQUIRED_AT\" = " + getEpochFn(dbProduct) +
       ",\"HL_BLOCKEDBY_EXT_ID\"=NULL,\"HL_BLOCKEDBY_INT_ID\"=NULL" +
       " WHERE \"HL_LOCK_EXT_ID\" = " +  extLockId;
-    LOG.debug("Going to execute update <" + s + ">");
+    LOG.debug("Going to execute update <{}>", s);
     int rc = stmt.executeUpdate(s);
     if (rc < locksBeingChecked.size()) {
       LOG.error("Failure to acquire all locks (acquired: {}, total needed: {}).", rc, locksBeingChecked.size());
@@ -5112,7 +5152,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
               .map(lockInfo -> Long.toString(lockInfo.intLockId))
               .collect(Collectors.toSet());
       String getIntIdsQuery = "SELECT \"HL_LOCK_INT_ID\" FROM \"HIVE_LOCKS\" WHERE \"HL_LOCK_EXT_ID\" = " + extLockId;
-      LOG.debug("Going to execute query: <" + getIntIdsQuery + ">");
+      LOG.debug("Going to execute query: <{}>", getIntIdsQuery);
       try (ResultSet rs = stmt.executeQuery(getIntIdsQuery)) {
         while (rs.next()) {
           notFoundIds.remove(rs.getString(1));
@@ -5137,7 +5177,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     try (Statement stmt = dbConn.createStatement()) {
       String updateHeartbeatQuery = "UPDATE \"HIVE_LOCKS\" SET \"HL_LAST_HEARTBEAT\" = " +
           getEpochFn(dbProduct) + " WHERE \"HL_LOCK_EXT_ID\" = " + extLockId;
-      LOG.debug("Going to execute update <" + updateHeartbeatQuery + ">");
+      LOG.debug("Going to execute update <{}>", updateHeartbeatQuery);
       int rc = stmt.executeUpdate(updateHeartbeatQuery);
       if (rc < 1) {
         LOG.error("Failure to update last heartbeat for extLockId={}.", extLockId);
@@ -5159,7 +5199,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     try (Statement stmt = dbConn.createStatement()) {
       String s = "UPDATE \"TXNS\" SET \"TXN_LAST_HEARTBEAT\" = " + getEpochFn(dbProduct) +
         " WHERE \"TXN_ID\" = " + txnid + " AND \"TXN_STATE\" = " + TxnStatus.OPEN;
-      LOG.debug("Going to execute update <" + s + ">");
+      LOG.debug("Going to execute update <{}>", s);
       int rc = stmt.executeUpdate(s);
       if (rc < 1) {
         ensureValidTxn(dbConn, txnid, stmt); // This should now throw some useful exception.
@@ -5179,13 +5219,13 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
    */
   private TxnStatus findTxnState(long txnid, Statement stmt) throws SQLException, MetaException {
     String s = "SELECT \"TXN_STATE\" FROM \"TXNS\" WHERE \"TXN_ID\" = " + txnid;
-    LOG.debug("Going to execute query <" + s + ">");
+    LOG.debug("Going to execute query <{}>", s);
     try (ResultSet rs = stmt.executeQuery(s)) {
       if (!rs.next()) {
         s =
             sqlGenerator.addLimitClause(1, "1 FROM \"COMPLETED_TXN_COMPONENTS\" WHERE \"CTC_TXNID\" = "
                 + txnid);
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
         try (ResultSet rs2 = stmt.executeQuery(s)) {
           if (rs2.next()) {
             return TxnStatus.COMMITTED;
@@ -5218,7 +5258,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
     long count = 0;
     for (String query : queries) {
-      LOG.debug("Going to execute query <" + query + ">");
+      LOG.debug("Going to execute query <{}>", query);
       try (ResultSet rs = stmt.executeQuery(query)) {
         if (rs.next()) {
           count += rs.getLong(1);
@@ -5244,7 +5284,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     StringBuilder txnInfo = new StringBuilder();
 
     for (String query : queries) {
-      LOG.debug("Going to execute query <" + query + ">");
+      LOG.debug("Going to execute query <{}>", query);
       try (ResultSet rs = stmt.executeQuery(query)) {
         while (rs.next()) {
           long txnId = rs.getLong(1);
@@ -5278,7 +5318,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     StringBuilder txnInfo = new StringBuilder();
 
     for (String query : queries) {
-      LOG.debug("Going to execute query <" + query + ">");
+      LOG.debug("Going to execute query <{}>", query);
       try (ResultSet rs = stmt.executeQuery(query)) {
         while (rs.next()) {
           long txnId = rs.getLong(1);
@@ -5315,7 +5355,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       throws SQLException, NoSuchTxnException, TxnAbortedException {
     // We need to check whether this transaction is valid and open
     String s = "SELECT \"TXN_STATE\" FROM \"TXNS\" WHERE \"TXN_ID\" = " + txnid;
-    LOG.debug("Going to execute query <" + s + ">");
+    LOG.debug("Going to execute query <{}>", s);
     try (ResultSet rs = stmt.executeQuery(s)) {
       if (!rs.next()) {
         // todo: add LIMIT 1 instead of count - should be more efficient
@@ -5348,13 +5388,13 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   private Optional<LockInfo> getLockFromLockId(Connection dbConn, long extLockId) throws MetaException, SQLException {
     try (PreparedStatement pstmt = dbConn.prepareStatement(SELECT_LOCKS_FOR_LOCK_ID_QUERY)) {
       pstmt.setLong(1, extLockId);
-      LOG.debug("Going to execute query <" + SELECT_LOCKS_FOR_LOCK_ID_QUERY + "> for extLockId={}", extLockId);
+      LOG.debug("Going to execute query <{}> for extLockId={}", SELECT_LOCKS_FOR_LOCK_ID_QUERY, extLockId);
       try (ResultSet rs = pstmt.executeQuery()) {
         if (!rs.next()) {
           return Optional.empty();
         }
         LockInfo info = new LockInfo(rs);
-        LOG.debug("getTxnIdFromLockId(" + extLockId + ") Return " + JavaUtils.txnIdToString(info.txnId));
+        LOG.debug("getTxnIdFromLockId({}) Return {}", extLockId, JavaUtils.txnIdToString(info.txnId));
         return Optional.of(info);
       }
     }
@@ -5365,7 +5405,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     try (PreparedStatement pstmt = dbConn.prepareStatement(SELECT_LOCKS_FOR_LOCK_ID_QUERY)) {
       List<LockInfo> locks = new ArrayList<>();
       pstmt.setLong(1, extLockId);
-      LOG.debug("Going to execute query <" + SELECT_LOCKS_FOR_LOCK_ID_QUERY + "> for extLockId={}", extLockId);
+      LOG.debug("Going to execute query <{}> for extLockId={}", SELECT_LOCKS_FOR_LOCK_ID_QUERY, extLockId);
       try (ResultSet rs = pstmt.executeQuery()) {
         while (rs.next()) {
           locks.add(new LockInfo(rs));
@@ -5392,7 +5432,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     try (PreparedStatement pstmt = dbConn.prepareStatement(
             String.format(SELECT_TIMED_OUT_LOCKS_QUERY, getEpochFn(dbProduct)))) {
       pstmt.setLong(1, timeout);
-      LOG.debug("Going to execute query: <" + SELECT_TIMED_OUT_LOCKS_QUERY + ">");
+      LOG.debug("Going to execute query: <{}>", SELECT_TIMED_OUT_LOCKS_QUERY);
       try (ResultSet rs = pstmt.executeQuery()) {
         while (rs.next()) {
           timedOutLockIds.add(rs.getLong(1));
@@ -5419,7 +5459,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       try (Statement stmt = dbConn.createStatement()) {
         int deletedLocks = 0;
         for (String query : queries) {
-          LOG.debug("Going to execute update: <" + query + ">");
+          LOG.debug("Going to execute update: <{}>", query);
           deletedLocks += stmt.executeUpdate(query);
         }
         if (deletedLocks > 0) {
@@ -5473,7 +5513,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
              ")";
         //safety valve for extreme cases
         s = sqlGenerator.addLimitClause(10 * TIMED_OUT_TXN_ABORT_BATCH_SIZE, s);
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
         rs = stmt.executeQuery(s);
         if(!rs.next()) {
           return;//no more timedout txns
@@ -5497,7 +5537,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             numTxnsAborted += batchToAbort.size();
             //todo: add TXNS.COMMENT filed and set it to 'aborted by system due to timeout'
             Collections.sort(batchToAbort);//easier to read logs
-            LOG.info("Aborted the following transactions due to timeout: " + batchToAbort.toString());
+            LOG.info("Aborted the following transactions due to timeout: {}", batchToAbort.toString());
           }
           else {
             //could not abort all txns in this batch - this may happen because in parallel with this
@@ -5508,7 +5548,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             dbConn.rollback();
           }
         }
-        LOG.info("Aborted " + numTxnsAborted + " transactions due to timeout");
+        LOG.info("Aborted {} transactions due to timeout", numTxnsAborted);
         if (MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.METASTORE_ACIDMETRICS_EXT_ON)) {
           Metrics.getOrCreateCounter(MetricsConstants.TOTAL_NUM_TIMED_OUT_TXNS).inc(numTxnsAborted);
         }
@@ -5534,16 +5574,14 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
         stmt = dbConn.createStatement();
         String s = "SELECT COUNT(*) FROM \"TXNS\" WHERE \"TXN_STATE\" = " + TxnStatus.OPEN;
-        LOG.debug("Going to execute query <" + s + ">");
+        LOG.debug("Going to execute query <{}>", s);
         rs = stmt.executeQuery(s);
         if (!rs.next()) {
-          LOG.error("Transaction database not properly configured, " +
-              "can't find txn_state from TXNS.");
+          LOG.error("Transaction database not properly configured, can't find txn_state from TXNS.");
         } else {
           Long numOpen = rs.getLong(1);
           if (numOpen > Integer.MAX_VALUE) {
-            LOG.error("Open transaction count above " + Integer.MAX_VALUE +
-                ", can't count that high!");
+            LOG.error("Open transaction count above {}, can't count that high!", Integer.MAX_VALUE);
           } else {
             numOpenTxns.set(numOpen.intValue());
           }
@@ -5578,10 +5616,10 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       List<String> inserts =
           sqlGenerator.createInsertValuesStmt("\"MIN_HISTORY_LEVEL\" (\"MHL_TXNID\", \"MHL_MIN_OPEN_TXNID\")", rows);
       for (String insert : inserts) {
-        LOG.debug("Going to execute insert <" + insert + ">");
+        LOG.debug("Going to execute insert <{}>", insert);
         stmt.execute(insert);
       }
-      LOG.info("Added entries to MIN_HISTORY_LEVEL for current txns: (" + txnIds + ") with min_open_txn: " + minOpenTxnId);
+      LOG.info("Added entries to MIN_HISTORY_LEVEL for current txns: ({}) with min_open_txn: {}", txnIds, minOpenTxnId);
     } catch (SQLException e) {
       if (DatabaseProduct.isTableNotExistsError(dbProduct, e)) {
         // If the table does not exists anymore, we disable the flag and start to work the new way
@@ -5611,7 +5649,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       TxnUtils.buildQueryWithINClause(conf, queries, prefix, new StringBuilder(), txnids, "\"MHL_TXNID\"", false,
           false);
       executeQueriesInBatchNoCount(dbProduct, stmt, queries, maxBatchSize);
-      LOG.info("Removed transactions: (" + txnids + ") from MIN_HISTORY_LEVEL");
+      LOG.info("Removed transactions: ({}) from MIN_HISTORY_LEVEL", txnids);
     } catch (SQLException e) {
       if (DatabaseProduct.isTableNotExistsError(dbProduct, e)) {
         // If the table does not exists anymore, we disable the flag and start to work the new way
@@ -5750,9 +5788,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         lockInternal();
         dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED, connPoolMutex);
         stmt = dbConn.createStatement();
-        if(LOG.isDebugEnabled()) {
-          LOG.debug("About to execute SQL: " + sqlStmt);
-        }
+        LOG.debug("About to execute SQL: {}", sqlStmt);
         rs = stmt.executeQuery(sqlStmt);
         if (!rs.next()) {
           close(rs);
@@ -5780,7 +5816,9 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           derbySemaphore =  derbyKey2Lock.get(key);
           derbySemaphore.acquire();
         }
-        LOG.debug(quoteString(key) + " locked by " + quoteString(TxnHandler.hostname));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("{} locked by {}", quoteString(key), quoteString(TxnHandler.hostname));
+        }
         needToCloseConn = false;  //The connection is good, we need not close it
         //OK, so now we have a lock
         return new LockHandleImpl(dbConn, stmt, rs, key, derbySemaphore);
@@ -5842,7 +5880,9 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       if(derbySemaphore != null) {
         derbySemaphore.release();
       }
-      LOG.debug(quoteString(key) + " unlocked by " + quoteString(TxnHandler.hostname));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("{} unlocked by {}", quoteString(key), quoteString(TxnHandler.hostname));
+      }
     }
 
     @Override
@@ -5863,7 +5903,9 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       if(derbySemaphore != null) {
         derbySemaphore.release();
       }
-      LOG.debug(quoteString(key) + " unlocked by " + quoteString(TxnHandler.hostname));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("{} unlocked by {}", quoteString(key), quoteString(TxnHandler.hostname));
+      }
     }
   }
 
@@ -5902,7 +5944,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           throw new RuntimeException(msg);
         }
         try {
-          LOG.info("Going to load JDBC driver " + driverName);
+          LOG.info("Going to load JDBC driver {}", driverName);
           driver = (Driver) Class.forName(driverName).newInstance();
         } catch (InstantiationException e) {
           throw new RuntimeException("Unable to instantiate driver " + driverName + ", " +
@@ -5919,7 +5961,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       }
 
       try {
-        LOG.info("Connecting to transaction db with connection string " + connString);
+        LOG.info("Connecting to transaction db with connection string {}", connString);
         Properties connectionProps = new Properties();
         connectionProps.setProperty("user", username);
         connectionProps.setProperty("password", password);
