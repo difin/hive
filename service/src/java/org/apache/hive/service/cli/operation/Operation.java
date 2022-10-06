@@ -229,7 +229,8 @@ public abstract class Operation {
 
   protected void createOperationLog() {
     if (parentSession.isOperationLogEnabled()) {
-      operationLog = OperationLogManager.createOperationLog(this, queryState);
+      File operationLogFile = new File(parentSession.getOperationLogSessionDir(), queryState.getQueryId());
+      operationLog = new OperationLog(opHandle.toString(), operationLogFile, parentSession.getHiveConf());
       isOperationLogEnabled = true;
     }
   }
@@ -293,8 +294,10 @@ public abstract class Operation {
   private static class OperationLogCleaner implements Runnable {
     public static final Logger LOG = LoggerFactory.getLogger(OperationLogCleaner.class.getName());
     private OperationLog operationLog;
+    private Operation operation;
 
-    public OperationLogCleaner(OperationLog operationLog) {
+    public OperationLogCleaner(Operation operation, OperationLog operationLog) {
+      this.operation = operation;
       this.operationLog = operationLog;
     }
 
@@ -303,6 +306,7 @@ public abstract class Operation {
       if (operationLog != null) {
         LOG.info("Closing operation log {}", operationLog);
         operationLog.close();
+        OperationLogManager.closeOperation(operation);
       }
     }
   }
@@ -320,12 +324,13 @@ public abstract class Operation {
       } else {
         if (operationLogCleanupDelayMs > 0) {
           ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
-          scheduledExecutorService.schedule(new OperationLogCleaner(operationLog), operationLogCleanupDelayMs,
+          scheduledExecutorService.schedule(new OperationLogCleaner(this, operationLog), operationLogCleanupDelayMs,
             TimeUnit.MILLISECONDS);
           scheduledExecutorService.shutdown();
         } else {
           LOG.info("Closing operation log {} without delay", operationLog);
           operationLog.close();
+          OperationLogManager.closeOperation(this);
         }
       }
     }

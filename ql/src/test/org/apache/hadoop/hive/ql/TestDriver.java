@@ -114,7 +114,7 @@ public class TestDriver {
   }
 
   private Driver getDriver() {
-    QueryInfo queryInfo = new QueryInfo(null, null, null, null);
+    QueryInfo queryInfo = new QueryInfo(null, null, null, null, null);
     return new Driver(new QueryState.Builder().withHiveConf(conf).build(), null, queryInfo, new DummyTxnManager());
   }
 }

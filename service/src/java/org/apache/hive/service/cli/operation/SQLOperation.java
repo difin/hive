@@ -130,7 +130,8 @@ public class SQLOperation extends ExecuteStatementOperation {
     setupSessionIO(parentSession.getSessionState());
 
     queryInfo = new QueryInfo(getState().toString(), getParentSession().getUserName(),
-            getExecutionEngine(), getHandle().getHandleIdentifier().toString());
+        getExecutionEngine(), getParentSession().getSessionHandle().getHandleIdentifier().toString(),
+        getHandle().getHandleIdentifier().toString());
 
     Metrics metrics = MetricsFactory.getInstance();
     if (metrics != null) {

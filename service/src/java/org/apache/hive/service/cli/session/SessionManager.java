@@ -318,7 +318,7 @@ public class SessionManager extends CompositeService {
         LOG.warn("Failed to schedule cleanup HS2 operation logging root dir: " +
             operationLogRootDir.getAbsolutePath(), e);
       }
-      logManager = Optional.of(new OperationLogManager(this, hiveConf));
+      logManager = Optional.of(new OperationLogManager(operationManager, hiveConf));
     }
   }
 
