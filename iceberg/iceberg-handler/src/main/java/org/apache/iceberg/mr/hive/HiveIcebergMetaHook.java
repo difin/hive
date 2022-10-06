@@ -128,6 +128,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
       Lists.newArrayList(org.apache.commons.lang3.tuple.Pair.of(1, new byte[0]));
   static final String MIGRATED_TO_ICEBERG = "MIGRATED_TO_ICEBERG";
   static final String MANUAL_ICEBERG_METADATA_LOCATION_CHANGE = "MANUAL_ICEBERG_METADATA_LOCATION_CHANGE";
+  static final String ORC_FILES_ONLY = "iceberg.orc.files.only";
 
   private final Configuration conf;
   private Table icebergTable = null;
@@ -215,6 +216,9 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
     }
 
     assertFileFormat(catalogProperties.getProperty(TableProperties.DEFAULT_FILE_FORMAT));
+
+    // Set whether the format is ORC, to be used during vectorization.
+    setOrcOnlyFilesParam(hmsTable);
   }
 
   @Override
@@ -324,6 +328,8 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
       // If so, we will create the iceberg table in commitAlterTable and go ahead with the migration
       assertTableCanBeMigrated(hmsTable);
       isTableMigration = true;
+      // Set whether the format is ORC, to be used during vectorization.
+      setOrcOnlyFilesParam(hmsTable);
 
       StorageDescriptor sd = hmsTable.getSd();
       preAlterTableProperties = new PreAlterTableProperties();
@@ -383,6 +389,14 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
     } else {
       assertNotCrossTableMetadataLocationChange(hmsTable.getParameters(), context);
     }
+
+    // Migration case is already handled above, in case of migration we don't have all the properties set till this
+    // point.
+    if (!isTableMigration) {
+      // Set whether the format is ORC, to be used during vectorization.
+      setOrcOnlyFilesParam(hmsTable);
+    }
+
   }
 
   /**
@@ -863,6 +877,24 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
           field.getName(), newType));
     }
     return (Type.PrimitiveType) newType;
+  }
+
+  private void setOrcOnlyFilesParam(org.apache.hadoop.hive.metastore.api.Table hmsTable) {
+    if (isOrcOnlyFiles(hmsTable)) {
+      hmsTable.getParameters().put(ORC_FILES_ONLY, "true");
+    } else {
+      hmsTable.getParameters().put(ORC_FILES_ONLY, "false");
+    }
+  }
+
+  private boolean isOrcOnlyFiles(org.apache.hadoop.hive.metastore.api.Table hmsTable) {
+    return !"FALSE".equalsIgnoreCase(hmsTable.getParameters().get(ORC_FILES_ONLY)) &&
+        ((hmsTable.getSd().getInputFormat() != null &&
+            hmsTable.getSd().getInputFormat().toUpperCase().contains(org.apache.iceberg.FileFormat.ORC.name())) ||
+            org.apache.iceberg.FileFormat.ORC.name()
+                .equalsIgnoreCase(hmsTable.getSd().getSerdeInfo().getParameters().get("write.format.default")) ||
+            org.apache.iceberg.FileFormat.ORC.name()
+                .equalsIgnoreCase(hmsTable.getParameters().get("write.format.default")));
   }
 
   private class PreAlterTableProperties {
