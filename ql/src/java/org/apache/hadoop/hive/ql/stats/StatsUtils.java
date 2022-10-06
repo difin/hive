@@ -34,7 +34,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -81,6 +83,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFBridge;
 import org.apache.hadoop.hive.ql.udf.generic.NDV;
 import org.apache.hadoop.hive.ql.util.JavaDataModel;
+import org.apache.hadoop.hive.ql.util.NamedForkJoinWorkerThreadFactory;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.hive.serde2.objectinspector.ConstantObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
@@ -132,6 +135,17 @@ public class StatsUtils {
 
   private static final Logger LOG = LoggerFactory.getLogger(StatsUtils.class.getName());
 
+
+  private static final ForkJoinPool statsForkJoinPool = new ForkJoinPool(
+          Runtime.getRuntime().availableProcessors(),
+          new NamedForkJoinWorkerThreadFactory("basic-stats-"),
+          getUncaughtExceptionHandler(),
+          false
+  );
+
+  private static Thread.UncaughtExceptionHandler getUncaughtExceptionHandler() {
+    return (t, e) -> LOG.error(String.format("Thread %s exited with error", t.getName()), e);
+  }
 
   /**
    * Collect table, partition and column level statistics
@@ -304,12 +318,17 @@ public class StatsUtils {
         basicStatsFactory.addEnhancer(new BasicStats.RowNumEstimator(estimateRowSizeFromSchema(conf, schema)));
       }
 
-      List<BasicStats> partStats = new ArrayList<>();
-
-      for (Partition p : partList.getNotDeniedPartns()) {
-        BasicStats basicStats = basicStatsFactory.build(Partish.buildFor(table, p));
-        partStats.add(basicStats);
+      List<BasicStats> partStats = null;
+      try {
+        partStats = statsForkJoinPool.submit(() ->
+          partList.getNotDeniedPartns().parallelStream().
+                  map(p -> basicStatsFactory.build(Partish.buildFor(table, p))).
+                  collect(Collectors.toList())
+        ).get();
+      } catch (Exception e) {
+        throw new HiveException(e);
       }
+
       BasicStats bbs = BasicStats.buildFrom(partStats);
 
       List<Long> rowCounts = Lists.newArrayList();
