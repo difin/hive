@@ -27,7 +27,6 @@ import org.apache.calcite.plan.Contexts;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptSchema;
 import org.apache.calcite.plan.RelOptUtil;
-import org.apache.calcite.rel.RelCollations;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.core.CorrelationId;
 import org.apache.calcite.rel.core.Join;
@@ -57,7 +56,6 @@ import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.parse.type.FunctionHelper;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -263,12 +261,5 @@ public class HiveRelBuilder extends RelBuilder {
         throw new RuntimeException(e);
       }
     }
-  }
-
-  /** Make the method visible */
-  @Override
-  public AggCall aggregateCall(SqlAggFunction aggFunction, boolean distinct, boolean approximate, boolean ignoreNulls,
-      RexNode filter, ImmutableList<RexNode> orderKeys, String alias, ImmutableList<RexNode> operands) {
-    return super.aggregateCall(aggFunction, distinct, approximate, ignoreNulls, filter, orderKeys, alias, operands);
   }
 }
