@@ -25,11 +25,11 @@ STAGE PLANS:
         Map 1 
             Map Operator Tree:
                 TableScan
-                  alias: src2
-                  filterExpr: ((UDFToDouble(key) > 9.0D) and (UDFToDouble(key) < 11.0D)) (type: boolean)
+                  alias: src1
+                  filterExpr: ((UDFToDouble(key) < 11.0D) and (UDFToDouble(key) > 9.0D)) (type: boolean)
                   Statistics: Num rows: 500 Data size: 89000 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
-                    predicate: ((UDFToDouble(key) > 9.0D) and (UDFToDouble(key) < 11.0D)) (type: boolean)
+                    predicate: ((UDFToDouble(key) < 11.0D) and (UDFToDouble(key) > 9.0D)) (type: boolean)
                     Statistics: Num rows: 55 Data size: 9790 Basic stats: COMPLETE Column stats: COMPLETE
                     Select Operator
                       expressions: key (type: string), value (type: string)
@@ -44,7 +44,7 @@ STAGE PLANS:
                         value expressions: _col1 (type: string)
             Execution mode: vectorized, llap
             LLAP IO: all inputs
-        Map 5 
+        Map 5
             Map Operator Tree:
                 TableScan
                   alias: src3
@@ -61,7 +61,7 @@ STAGE PLANS:
                       Statistics: Num rows: 500 Data size: 91000 Basic stats: COMPLETE Column stats: COMPLETE
                       value expressions: _col1 (type: string), _col2 (type: boolean)
                   Filter Operator
-                    predicate: ((UDFToDouble(key) < 11.0D) and (UDFToDouble(key) > 9.0D)) (type: boolean)
+                    predicate: ((UDFToDouble(key) > 9.0D) and (UDFToDouble(key) < 11.0D)) (type: boolean)
                     Statistics: Num rows: 55 Data size: 9790 Basic stats: COMPLETE Column stats: COMPLETE
                     Select Operator
                       expressions: key (type: string), value (type: string)

@@ -180,6 +180,13 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.HiveCalciteUtil;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveConfPlannerContext;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveDefaultRelMetadataProvider;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveMaterializedViewASTSubQueryRewriteShuttle;
+import org.apache.hadoop.hive.ql.optimizer.calcite.HiveTezModelRelMetadataProvider;
+import org.apache.hadoop.hive.ql.optimizer.calcite.RuleEventLogger;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateSortLimitRule;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveJoinSwapConstraintsRule;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRemoveEmptySingleRules;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSemiJoinProjectTransposeRule;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializationRelMetadataProvider;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HivePlannerContext;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelDistribution;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
@@ -320,11 +327,8 @@ import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFArray;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTFInline;
-import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hadoop.hive.ql.util.DirectionUtils;
 import org.apache.hadoop.hive.ql.util.NullOrdering;
-import org.apache.hadoop.hive.serde2.Deserializer;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
@@ -2167,6 +2171,19 @@ public class CalcitePlanner extends SemanticAnalyzer {
         generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
                 HiveAntiSemiJoinRule.INSTANCE);
       }
+
+      generatePartialProgram(program, true, HepMatchOrder.DEPTH_FIRST,
+              HiveRemoveEmptySingleRules.PROJECT_INSTANCE,
+              HiveRemoveEmptySingleRules.FILTER_INSTANCE,
+              HiveRemoveEmptySingleRules.JOIN_LEFT_INSTANCE,
+              HiveRemoveEmptySingleRules.SEMI_JOIN_LEFT_INSTANCE,
+              HiveRemoveEmptySingleRules.JOIN_RIGHT_INSTANCE,
+              HiveRemoveEmptySingleRules.SEMI_JOIN_RIGHT_INSTANCE,
+              HiveRemoveEmptySingleRules.ANTI_JOIN_RIGHT_INSTANCE,
+              HiveRemoveEmptySingleRules.SORT_INSTANCE,
+              HiveRemoveEmptySingleRules.SORT_FETCH_ZERO_INSTANCE,
+              HiveRemoveEmptySingleRules.AGGREGATE_INSTANCE,
+              HiveRemoveEmptySingleRules.UNION_INSTANCE);
 
       // Trigger program
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.OPTIMIZER);

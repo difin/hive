@@ -24,9 +24,7 @@ import org.apache.calcite.plan.RelTraitSet;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.core.Values;
 import org.apache.calcite.rel.type.RelDataType;
-import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.rex.RexLiteral;
-import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteSemanticException;
 
 import java.util.List;
 
@@ -34,7 +32,7 @@ import java.util.List;
  * Subclass of {@link org.apache.calcite.rel.core.Values}.
  * Specialized to Hive engine.
  */
-public class HiveValues extends Values implements HiveRelNode {
+public class HiveValues extends Values {
 
   public HiveValues(RelOptCluster cluster, RelDataType rowType, ImmutableList<ImmutableList<RexLiteral>> tuples,
                     RelTraitSet traits) {
@@ -44,19 +42,5 @@ public class HiveValues extends Values implements HiveRelNode {
   @Override
   public RelNode copy(RelTraitSet traitSet, List<RelNode> inputs) {
     return new HiveValues(getCluster(), getRowType(), tuples, getTraitSet());
-  }
-
-  public RelNode copy(List<String> newColumnNames) throws CalciteSemanticException {
-    if (newColumnNames.size() != getRowType().getFieldCount()) {
-      throw new CalciteSemanticException("The number of new column names and columns in the schema does not match!");
-    }
-
-    RelDataTypeFactory.Builder builder = getCluster().getTypeFactory().builder();
-
-    for (int i = 0; i < getRowType().getFieldCount(); ++i) {
-      builder.add(newColumnNames.get(i), getRowType().getFieldList().get(i).getType());
-    }
-
-    return new HiveValues(getCluster(), builder.uniquify().build(), tuples, getTraitSet());
   }
 }
