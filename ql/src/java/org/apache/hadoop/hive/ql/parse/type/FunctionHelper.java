@@ -29,9 +29,10 @@ import org.apache.hadoop.hive.common.classification.InterfaceStability.Evolving;
 import org.apache.hadoop.hive.ql.exec.FunctionInfo;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.PartitionPruneRuleHelper;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
+import org.apache.hadoop.hive.ql.util.NullOrdering;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -127,8 +128,8 @@ public interface FunctionHelper {
    * Returns aggregation information based on given parameters.
    */
   AggregateInfo getAggregateFunctionInfo(boolean isDistinct, boolean isAllColumns,
-      String aggregateName, List<RexNode> aggregateParameters)
-      throws SemanticException;
+                                         String aggregateName, List<RexNode> aggregateParameters,
+                                         List<FieldCollation> fieldCollations) throws SemanticException;
 
   /**
    * Returns aggregation information for analytical function based on given parameters.
@@ -212,6 +213,30 @@ public interface FunctionHelper {
 
   boolean isAggregateFunction(String functionName, String dbName);
 
+  class FieldCollation {
+    private final RexNode sortExpression;
+    private final int sortDirection;
+    private final NullOrdering nullOrdering;
+
+    public FieldCollation(RexNode sortExpression, int sortDirection, NullOrdering nullSortOrder) {
+      this.sortExpression = sortExpression;
+      this.sortDirection = sortDirection;
+      this.nullOrdering = nullSortOrder;
+    }
+
+    public RexNode getSortExpression() {
+      return sortExpression;
+    }
+
+    public int getSortDirection() {
+      return sortDirection;
+    }
+
+    public NullOrdering getNullOrdering() {
+      return nullOrdering;
+    }
+  }
+
   /**
    * Class to store aggregate function related information.
    */
@@ -220,6 +245,7 @@ public interface FunctionHelper {
     private final TypeInfo returnType;
     private final String aggregateName;
     private final boolean distinct;
+    private final List<FieldCollation> collation;
 
     public AggregateInfo(List<RexNode> parameters, TypeInfo returnType, String aggregateName,
         boolean distinct) {
@@ -227,6 +253,16 @@ public interface FunctionHelper {
       this.returnType = returnType;
       this.aggregateName = aggregateName;
       this.distinct = distinct;
+      this.collation = Collections.emptyList();
+    }
+
+    public AggregateInfo(List<RexNode> parameters, TypeInfo returnType, String aggregateName,
+        boolean distinct, List<FieldCollation> collation) {
+      this.parameters = ImmutableList.copyOf(parameters);
+      this.returnType = returnType;
+      this.aggregateName = aggregateName;
+      this.distinct = distinct;
+      this.collation = collation;
     }
 
     public List<RexNode> getParameters() {
@@ -243,6 +279,10 @@ public interface FunctionHelper {
 
     public boolean isDistinct() {
       return distinct;
+    }
+
+    public List<FieldCollation> getCollation() {
+      return collation;
     }
   }
 

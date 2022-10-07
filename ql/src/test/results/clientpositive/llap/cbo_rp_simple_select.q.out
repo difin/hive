@@ -833,13 +833,11 @@ PREHOOK: query: -- c_int is not null
 EXPLAIN select * from cbo_t2 where (cbo_t2.c_int) IN (NULL)
 PREHOOK: type: QUERY
 PREHOOK: Input: default@cbo_t2
-PREHOOK: Input: default@cbo_t2@dt=2014
 #### A masked pattern was here ####
 POSTHOOK: query: -- c_int is not null
 EXPLAIN select * from cbo_t2 where (cbo_t2.c_int) IN (NULL)
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@cbo_t2
-POSTHOOK: Input: default@cbo_t2@dt=2014
 #### A masked pattern was here ####
 STAGE DEPENDENCIES:
   Stage-0 is a root stage
@@ -847,19 +845,9 @@ STAGE DEPENDENCIES:
 STAGE PLANS:
   Stage: Stage-0
     Fetch Operator
-      limit: -1
+      limit: 0
       Processor Tree:
-        TableScan
-          alias: cbo_t2
-          Limit
-            Number of rows: 0
-            Select Operator
-              expressions: key (type: string), value (type: string), c_float (type: float), c_boolean (type: boolean), dt (type: string)
-              outputColumnNames: key, value, c_float, c_boolean, dt
-              Select Operator
-                expressions: key (type: string), value (type: string), null (type: int), c_float (type: float), c_boolean (type: boolean), dt (type: string)
-                outputColumnNames: key, value, c_int, c_float, c_boolean, dt
-                ListSink
+        ListSink
 
 PREHOOK: query: -- rewrite to NULL
 EXPLAIN select * from cbo_t2 where (cbo_t2.c_int) IN (cbo_t2.c_int, 2*cbo_t2.c_int)
@@ -965,14 +953,14 @@ POSTHOOK: Input: default@cbo_t2@dt=2014
 PREHOOK: query: -- c_int is not null
 select count(*) from cbo_t2 where (cbo_t2.c_int) IN (NULL)
 PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
 PREHOOK: Input: default@cbo_t2
-PREHOOK: Input: default@cbo_t2@dt=2014
 #### A masked pattern was here ####
 POSTHOOK: query: -- c_int is not null
 select count(*) from cbo_t2 where (cbo_t2.c_int) IN (NULL)
 POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
 POSTHOOK: Input: default@cbo_t2
-POSTHOOK: Input: default@cbo_t2@dt=2014
 #### A masked pattern was here ####
 0
 PREHOOK: query: -- rewrite to NULL

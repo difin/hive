@@ -29,6 +29,7 @@ import org.apache.calcite.rex.RexLiteral;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSortLimit;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveValues;
 
 import org.apache.hadoop.hive.impala.plan.ImpalaPlannerContext;
 
@@ -50,14 +51,19 @@ public class ImpalaEmptySetRel extends ImpalaPlanRel {
 
   private PlanNode retNode = null;
 
-  private final HiveSortLimit sortLimit;
+  private final RelNode relNode;
+
+  public ImpalaEmptySetRel(HiveValues values) {
+    super(values.getCluster(), values.getTraitSet(), new ArrayList<>(), values.getRowType());
+    this.relNode = values;
+  }
 
   public ImpalaEmptySetRel(HiveSortLimit sortLimit) {
     super(sortLimit.getCluster(), sortLimit.getTraitSet(), new ArrayList<>(), sortLimit.getRowType());
     Preconditions.checkNotNull(sortLimit.getFetchExpr());
     Preconditions.checkArgument(
         ((BigDecimal) RexLiteral.value(sortLimit.getFetchExpr())).longValue() == 0);
-    this.sortLimit = sortLimit;
+    this.relNode = sortLimit;
   }
 
   @Override
@@ -68,7 +74,7 @@ public class ImpalaEmptySetRel extends ImpalaPlanRel {
     }
     PlanNodeId nodeId = ctx.getNextNodeId();
 
-    RelDataType rowType = sortLimit.getRowType();
+    RelDataType rowType = relNode.getRowType();
 
     TupleDescriptorCreator tupleDescCreator = new TupleDescriptorCreator("empty set", rowType);
     TupleDescriptor tupleDesc = tupleDescCreator.create(ctx.getRootAnalyzer());
@@ -88,7 +94,7 @@ public class ImpalaEmptySetRel extends ImpalaPlanRel {
 
   @Override
   public RelOptCost computeSelfCost(RelOptPlanner planner, RelMetadataQuery mq) {
-    return mq.getNonCumulativeCost(sortLimit);
+    return mq.getNonCumulativeCost(relNode);
   }
 
   @Override

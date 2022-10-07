@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,8 @@ import org.apache.calcite.rel.core.Sort;
 import org.apache.calcite.rel.core.TableFunctionScan;
 import org.apache.calcite.rel.core.TableScan;
 import org.apache.calcite.rel.core.Union;
+import org.apache.calcite.rel.core.Values;
+import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeField;
 import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexCall;
@@ -67,6 +70,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteSemanticException;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveAggregate;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveGroupingID;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSortExchange;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveValues;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.jdbc.HiveJdbcConverter;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSortLimit;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTableFunctionScan;
@@ -76,10 +80,14 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.translator.SqlFunctionConvert
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.HiveParser;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
+import org.apache.hadoop.hive.ql.util.DirectionUtils;
+import org.apache.hadoop.hive.ql.util.NullOrdering;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
+
+import static org.apache.calcite.rel.core.Values.isEmpty;
 
 public class ASTConverter {
   private static final Logger LOG = LoggerFactory.getLogger(ASTConverter.class);
@@ -110,7 +118,126 @@ public class ASTConverter {
     return c.convert();
   }
 
+  /**
+   * This method generates the abstract syntax tree of a query does not return any rows.
+   * All projected columns are null and the data types are come from the passed {@link RelDataType}.
+   * <pre>
+   * SELECT NULL alias0 ... NULL aliasn LIMIT 0;
+   * </pre>
+   * Due to a subsequent optimization when converting the plan to TEZ tasks
+   * adding a limit 0 enables Hive not submitting the query to TEZ application manager
+   * but returns empty result set immediately.
+   * <pre>
+   * TOK_QUERY
+   *   TOK_INSERT
+   *      TOK_DESTINATION
+   *         TOK_DIR
+   *            TOK_TMP_FILE
+   *      TOK_SELECT
+   *         TOK_SELEXPR
+   *            TOK_FUNCTION
+   *               TOK_&lt;type&gt;
+   *               TOK_NULL
+   *            alias0
+   *         ...
+   *         TOK_SELEXPR
+   *            TOK_FUNCTION
+   *               TOK_&lt;type&gt;
+   *               TOK_NULL
+   *            aliasn
+   *      TOK_LIMIT
+   *         0
+   *         0
+   * </pre>
+   * @param dataType - Schema
+   * @return Root {@link ASTNode} of the result plan.
+   *
+   * @see QueryProperties#getOuterQueryLimit()
+   * @see org.apache.hadoop.hive.ql.parse.TaskCompiler#compile(ParseContext, List, Set, Set)
+   */
+  public static ASTNode emptyPlan(RelDataType dataType) {
+    if (dataType.getFieldCount() == 0) {
+      throw new IllegalArgumentException("Schema is empty.");
+    }
+
+    ASTBuilder select = ASTBuilder.construct(HiveParser.TOK_SELECT, "TOK_SELECT");
+    for (int i = 0; i < dataType.getFieldCount(); ++i) {
+      RelDataTypeField fieldType = dataType.getFieldList().get(i);
+      select.add(ASTBuilder.selectExpr(
+              createNullField(fieldType.getType()),
+              fieldType.getName()));
+    }
+
+    ASTNode insert = ASTBuilder.
+            construct(HiveParser.TOK_INSERT, "TOK_INSERT").
+            add(ASTBuilder.destNode()).
+            add(select).
+            add(ASTBuilder.limit(0, 0)).
+            node();
+
+    return ASTBuilder.
+            construct(HiveParser.TOK_QUERY, "TOK_QUERY").
+            add(insert).
+            node();
+  }
+
+  private static ASTNode createNullField(RelDataType fieldType) {
+    if (fieldType.getSqlTypeName() == SqlTypeName.NULL) {
+      return ASTBuilder.construct(HiveParser.TOK_NULL, "TOK_NULL").node();
+    }
+
+    if (fieldType.getSqlTypeName() == SqlTypeName.ROW) {
+      ASTBuilder namedStructCallNode = ASTBuilder.construct(HiveParser.TOK_FUNCTION, "TOK_FUNCTION");
+      namedStructCallNode.add(HiveParser.Identifier, "named_struct");
+      for (RelDataTypeField structFieldType : fieldType.getFieldList()) {
+        namedStructCallNode.add(HiveParser.Identifier, structFieldType.getName());
+        namedStructCallNode.add(createNullField(structFieldType.getType()));
+      }
+      return namedStructCallNode.node();
+    }
+
+    if (fieldType.getSqlTypeName() == SqlTypeName.MAP) {
+      ASTBuilder mapCallNode = ASTBuilder.construct(HiveParser.TOK_FUNCTION, "TOK_FUNCTION");
+      mapCallNode.add(HiveParser.Identifier, "map");
+      mapCallNode.add(createNullField(fieldType.getKeyType()));
+      mapCallNode.add(createNullField(fieldType.getValueType()));
+      return mapCallNode.node();
+    }
+
+    return createCastNull(fieldType);
+  }
+
+  private static ASTNode createCastNull(RelDataType fieldType) {
+    HiveToken ht = TypeConverter.hiveToken(fieldType);
+    ASTNode typeNode;
+    if (ht == null) {
+      typeNode = ASTBuilder.construct(
+              HiveParser.Identifier, fieldType.getSqlTypeName().getName().toLowerCase()).node();
+    } else {
+      ASTBuilder typeNodeBuilder = ASTBuilder.construct(ht.type, ht.text);
+      if (ht.args != null) {
+        for (String castArg : ht.args) {
+          typeNodeBuilder.add(HiveParser.Identifier, castArg);
+        }
+      }
+      typeNode = typeNodeBuilder.node();
+    }
+    return ASTBuilder.construct(HiveParser.TOK_FUNCTION, "TOK_FUNCTION")
+            .add(typeNode)
+            .add(HiveParser.TOK_NULL, "TOK_NULL")
+            .node();
+  }
+
   private ASTNode convert() throws CalciteSemanticException {
+    if (root instanceof HiveValues) {
+      HiveValues values = (HiveValues) root;
+      if (isEmpty(values)) {
+        select = values;
+        return emptyPlan(values.getRowType());
+      } else {
+        throw new UnsupportedOperationException("Values with non-empty tuples are not supported.");
+      }
+    }
     /*
      * 1. Walk RelNode Graph; note from, where, gBy.. nodes.
      */
@@ -364,8 +491,10 @@ public class ASTConverter {
   private Schema getRowSchema(String tblAlias) {
     if (select instanceof Project) {
       return new Schema((Project) select, tblAlias);
-    } else {
+    } else if (select instanceof TableFunctionScan) {
       return new Schema((TableFunctionScan) select, tblAlias);
+    } else {
+      return new Schema(tblAlias, select.getRowType().getFieldList());
     }
   }
 
@@ -458,6 +587,14 @@ public class ASTConverter {
       }
     }
 
+    public void handle(Values values) {
+      if (ASTConverter.this.select == null) {
+        ASTConverter.this.select = values;
+      } else {
+        ASTConverter.this.from = values;
+      }
+    }
+
     @Override
     public void visit(RelNode node, int ordinal, RelNode parent) {
 
@@ -483,6 +620,8 @@ public class ASTConverter {
         } else {
           ASTConverter.this.orderLimit = node;
         }
+      } else if (node instanceof Values) {
+        handle((HiveValues) node);
       }
       /*
        * once the source node is reached; stop traversal for this QB
@@ -879,10 +1018,22 @@ public class ASTConverter {
             "TOK_FUNCTIONDI") : argCount == 0 ? ASTBuilder.construct(HiveParser.TOK_FUNCTIONSTAR,
             "TOK_FUNCTIONSTAR") : ASTBuilder.construct(HiveParser.TOK_FUNCTION, "TOK_FUNCTION");
         b.add(HiveParser.Identifier, agg.getAggregation().getName());
+        Iterator<RelFieldCollation> collationIterator = agg.collation.getFieldCollations().listIterator();
+        RexBuilder rexBuilder = gBy.getCluster().getRexBuilder();
         for (int i : agg.getArgList()) {
           RexInputRef iRef = new RexInputRef(i, gBy.getCluster().getTypeFactory()
               .createSqlType(SqlTypeName.ANY));
           b.add(iRef.accept(new RexVisitor(src, false, gBy.getCluster().getRexBuilder())));
+          if (collationIterator.hasNext()) {
+            RelFieldCollation fieldCollation = collationIterator.next();
+            RexInputRef inputRef = new RexInputRef(fieldCollation.getFieldIndex(),
+                    gBy.getCluster().getTypeFactory().createSqlType(SqlTypeName.ANY));
+            b.add(inputRef.accept(new RexVisitor(src, false, rexBuilder)));
+            b.add(ASTBuilder.createAST(HiveParser.NumberLiteral,
+                    Integer.toString(DirectionUtils.directionToCode(fieldCollation.getDirection()))));
+            b.add(ASTBuilder.createAST(HiveParser.NumberLiteral,
+                    Integer.toString(NullOrdering.fromDirection(fieldCollation.nullDirection).getCode())));
+          }
         }
         add(new ColumnInfo(null, b.node()));
       }

@@ -491,8 +491,8 @@ public class RelFieldTrimmer implements ReflectiveVisitor {
 
     // Use copy rather than relBuilder so that correlating variables get set.
     final RelBuilder relBuilder = REL_BUILDER.get();
-    relBuilder.push(
-        filter.copy(filter.getTraitSet(), newInput, newConditionExpr));
+    relBuilder.push(newInput)
+        .filter(newConditionExpr);
 
     // The result has the same mapping as the input gave us. Sometimes we
     // return fields that the consumer didn't ask for, because the filter
@@ -662,7 +662,7 @@ public class RelFieldTrimmer implements ReflectiveVisitor {
 
     if (changeCount == 0
         && mapping.isIdentity()) {
-      return result(join, Mappings.createIdentity(fieldCount));
+      return result(join, Mappings.createIdentity(join.getRowType().getFieldCount()));
     }
 
     // Build new join.

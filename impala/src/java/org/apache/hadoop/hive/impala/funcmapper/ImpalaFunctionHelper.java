@@ -446,7 +446,9 @@ public class ImpalaFunctionHelper implements FunctionHelper {
    * {@inheritDoc}
    */
   @Override
-  public AggregateInfo getAggregateFunctionInfo(boolean isDistinct, boolean isAllColumns, String aggregateName, List<RexNode> aggregateParameters) throws SemanticException {
+  public AggregateInfo getAggregateFunctionInfo(boolean isDistinct, boolean isAllColumns,
+                                                String aggregateName, List<RexNode> aggregateParameters,
+                                                List<FieldCollation> fieldCollations) throws SemanticException {
     return getAggregateCommon(isDistinct, isAllColumns, aggregateName, aggregateParameters);
   }
 

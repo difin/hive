@@ -20,7 +20,6 @@ HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 PREHOOK: query: explain cbo physical
 select * from (select t.* from impala_tpch_lineitem t
 inner join (select 10 bigint_col) d where
@@ -37,11 +36,7 @@ where l_linenumber = 10
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@impala_tpch_lineitem
 CBO PLAN:
-ImpalaProjectPassthroughRel(l_orderkey=[$0], l_partkey=[$1], l_suppkey=[$2], l_linenumber=[CAST(10):INTEGER], l_quantity=[$3], l_extendedprice=[$4], l_discount=[$5], l_tax=[$6], l_returnflag=[$7], l_linestatus=[$8], l_shipdate=[$9], l_commitdate=[$10], l_receiptdate=[$11], l_shipinstruct=[$12], l_shipmode=[$13], l_comment=[$14])
-  ImpalaJoinRel(condition=[true], joinType=[inner])
-    ImpalaEmptySetRel
-    ImpalaProjectPassthroughRel(DUMMY=[0])
-      ImpalaEmptySetRel
+ImpalaEmptySetRel
 
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
@@ -88,7 +83,6 @@ HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
 HMS CALL get_table_req FOR _dummy_table
-HMS CALL get_foreign_keys FOR impala_tpch_lineitem
 PREHOOK: query: explain
 select * from (select t.* from impala_tpch_lineitem t
 inner join (select 10 bigint_col) d where
@@ -115,18 +109,8 @@ STAGE PLANS:
 F00:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
   PLAN-ROOT SINK
-  |  output exprs: l_orderkey, l_partkey, l_suppkey, CAST(10 AS INT), l_quantity, l_extendedprice, l_discount, l_tax, l_returnflag, l_linestatus, l_shipdate, l_commitdate, l_receiptdate, l_shipinstruct, l_shipmode, l_comment
+  |  output exprs: l_orderkey, l_partkey, l_suppkey, l_linenumber, l_quantity, l_extendedprice, l_discount, l_tax, l_returnflag, l_linestatus, l_shipdate, l_commitdate, l_receiptdate, l_shipinstruct, l_shipmode, l_comment
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
-  |
-  02:NESTED LOOP JOIN [CROSS JOIN]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
-  |  tuple-ids=0,1 row-size=152B cardinality=0
-  |  in pipelines: 00(GETNEXT), 01(OPEN)
-  |
-  |--01:EMPTYSET
-  |     mem-estimate=0B mem-reservation=0B thread-reservation=0
-  |     tuple-ids=1
-  |     in pipelines: 01(GETNEXT)
   |
   00:EMPTYSET
      mem-estimate=0B mem-reservation=0B thread-reservation=0

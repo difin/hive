@@ -156,6 +156,10 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
         new HiveImpalaRules.ImpalaSemiJoinRule(HiveRelFactories.HIVE_BUILDER));
     programBuilder.addRuleInstance(
         new HiveImpalaRules.ImpalaUnionRule(HiveRelFactories.HIVE_BUILDER));
+    programBuilder.addRuleInstance(
+        new HiveImpalaRules.ImpalaValuesRule(HiveRelFactories.HIVE_BUILDER));
+    programBuilder.addRuleInstance(
+        new HiveImpalaRules.ImpalaEmptyValuesRule(HiveRelFactories.HIVE_BUILDER));
     return programBuilder.build();
   }
 

@@ -40,6 +40,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSortLimit;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTableFunctionScan;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTableScan;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveUnion;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveValues;
 import org.apache.hadoop.hive.impala.node.ImpalaAggregateRel;
 import org.apache.hadoop.hive.impala.node.ImpalaCardinalityCheckRel;
 import org.apache.hadoop.hive.impala.node.ImpalaEmptySetRel;
@@ -325,6 +326,34 @@ public class HiveImpalaRules {
       ImpalaUnionRel newUnion = new ImpalaUnionRel(union);
 
       call.transformTo(newUnion);
+    }
+  }
+
+  public static class ImpalaEmptyValuesRule extends RelOptRule {
+    public ImpalaEmptyValuesRule(RelBuilderFactory relBuilderFactory) {
+      super(operand(HiveValues.class, none()),
+          relBuilderFactory, "ImpalaEmptyValues");
+    }
+
+    @Override
+    public void onMatch(RelOptRuleCall call) {
+      final HiveValues values = call.rel(0);
+
+      call.transformTo(new ImpalaEmptySetRel(values));
+    }
+  }
+
+  public static class ImpalaValuesRule extends RelOptRule {
+    public ImpalaValuesRule(RelBuilderFactory relBuilderFactory) {
+      super(operand(HiveValues.class, operand(RelNode.class, any())),
+          relBuilderFactory, "ImpalaValues");
+    }
+
+    @Override
+    public void onMatch(RelOptRuleCall call) {
+      final HiveValues values = call.rel(0);
+
+      call.transformTo(new ImpalaEmptySetRel(values));
     }
   }
 

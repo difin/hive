@@ -99,16 +99,9 @@ STAGE DEPENDENCIES:
 STAGE PLANS:
   Stage: Stage-0
     Fetch Operator
-      limit: -1
+      limit: 0
       Processor Tree:
-        TableScan
-          alias: loc_orc_n0
-          Filter Operator
-            predicate: false (type: boolean)
-            Select Operator
-              expressions: state (type: string), locid (type: int), zip (type: bigint), year (type: int)
-              outputColumnNames: _col0, _col1, _col2, _col3
-              ListSink
+        ListSink
 
 PREHOOK: query: explain select * from loc_orc_n0 where locid <= 30
 PREHOOK: type: QUERY
@@ -147,16 +140,9 @@ STAGE DEPENDENCIES:
 STAGE PLANS:
   Stage: Stage-0
     Fetch Operator
-      limit: -1
+      limit: 0
       Processor Tree:
-        TableScan
-          alias: loc_orc_n0
-          Filter Operator
-            predicate: false (type: boolean)
-            Select Operator
-              expressions: state (type: string), locid (type: int), zip (type: bigint), year (type: int)
-              outputColumnNames: _col0, _col1, _col2, _col3
-              ListSink
+        ListSink
 
 PREHOOK: query: explain select * from loc_orc_n0 where locid < 6
 PREHOOK: type: QUERY
@@ -198,16 +184,9 @@ STAGE DEPENDENCIES:
 STAGE PLANS:
   Stage: Stage-0
     Fetch Operator
-      limit: -1
+      limit: 0
       Processor Tree:
-        TableScan
-          alias: loc_orc_n0
-          Filter Operator
-            predicate: false (type: boolean)
-            Select Operator
-              expressions: state (type: string), locid (type: int), zip (type: bigint), year (type: int)
-              outputColumnNames: _col0, _col1, _col2, _col3
-              ListSink
+        ListSink
 
 PREHOOK: query: explain select * from loc_orc_n0 where locid <= 6
 PREHOOK: type: QUERY
@@ -272,16 +251,9 @@ STAGE DEPENDENCIES:
 STAGE PLANS:
   Stage: Stage-0
     Fetch Operator
-      limit: -1
+      limit: 0
       Processor Tree:
-        TableScan
-          alias: loc_orc_n0
-          Filter Operator
-            predicate: false (type: boolean)
-            Select Operator
-              expressions: state (type: string), locid (type: int), zip (type: bigint), year (type: int)
-              outputColumnNames: _col0, _col1, _col2, _col3
-              ListSink
+        ListSink
 
 PREHOOK: query: explain select * from loc_orc_n0 where locid > 1
 PREHOOK: type: QUERY
@@ -450,16 +422,9 @@ STAGE DEPENDENCIES:
 STAGE PLANS:
   Stage: Stage-0
     Fetch Operator
-      limit: -1
+      limit: 0
       Processor Tree:
-        TableScan
-          alias: loc_orc_n0
-          Filter Operator
-            predicate: false (type: boolean)
-            Select Operator
-              expressions: state (type: string), locid (type: int), zip (type: bigint), year (type: int)
-              outputColumnNames: _col0, _col1, _col2, _col3
-              ListSink
+        ListSink
 
 PREHOOK: query: create table t_n7 ( s string)
 PREHOOK: type: CREATETABLE
@@ -548,16 +513,9 @@ STAGE DEPENDENCIES:
 STAGE PLANS:
   Stage: Stage-0
     Fetch Operator
-      limit: -1
+      limit: 0
       Processor Tree:
-        TableScan
-          alias: t_n7
-          Filter Operator
-            predicate: false (type: boolean)
-            Select Operator
-              expressions: s (type: string)
-              outputColumnNames: _col0
-              ListSink
+        ListSink
 
 PREHOOK: query: explain select * from loc_orc_n0 where locid is null
 PREHOOK: type: QUERY
@@ -573,16 +531,9 @@ STAGE DEPENDENCIES:
 STAGE PLANS:
   Stage: Stage-0
     Fetch Operator
-      limit: -1
+      limit: 0
       Processor Tree:
-        TableScan
-          alias: loc_orc_n0
-          Filter Operator
-            predicate: false (type: boolean)
-            Select Operator
-              expressions: state (type: string), null (type: int), zip (type: bigint), year (type: int)
-              outputColumnNames: _col0, _col1, _col2, _col3
-              ListSink
+        ListSink
 
 PREHOOK: query: insert into t_n7 values ('val1')
 PREHOOK: type: QUERY

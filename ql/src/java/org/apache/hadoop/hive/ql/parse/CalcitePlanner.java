@@ -253,6 +253,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveReduceExpressionsRu
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveReduceExpressionsWithStatsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRelDecorrelator;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRelFieldTrimmer;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRemoveEmptySingleRules;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRemoveGBYSemiJoinRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRemoveSqCountCheck;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRewriteToDataSketchesRules;
@@ -288,7 +289,6 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.translator.ASTBuilder;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.ASTConverter;
 import org.apache.hadoop.hive.ql.parse.type.FunctionHelper;
 import org.apache.hadoop.hive.ql.parse.type.FunctionHelper.AggregateInfo;
-import org.apache.hadoop.hive.ql.parse.type.HiveFunctionHelper;
 import org.apache.hadoop.hive.ql.parse.type.JoinTypeCheckCtx;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.PlanModifierForReturnPath;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.SqlFunctionConverter;
@@ -313,15 +313,13 @@ import org.apache.hadoop.hive.ql.plan.TableScanDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
 import org.apache.hadoop.hive.ql.plan.SelectDesc;
-import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAccessControlException;
-import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthzContext;
-import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveOperationType;
-import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFArray;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTFInline;
 import org.apache.hadoop.hive.serde2.Deserializer;
+import org.apache.hadoop.hive.ql.util.DirectionUtils;
+import org.apache.hadoop.hive.ql.util.NullOrdering;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
@@ -2122,6 +2120,18 @@ public class CalcitePlanner extends SemanticAnalyzer {
             HiveRemoveSqCountCheck.INSTANCE);
       }
 
+      generatePartialProgram(program, true, HepMatchOrder.DEPTH_FIRST,
+          HiveRemoveEmptySingleRules.PROJECT_INSTANCE,
+          HiveRemoveEmptySingleRules.FILTER_INSTANCE,
+          HiveRemoveEmptySingleRules.JOIN_LEFT_INSTANCE,
+          HiveRemoveEmptySingleRules.SEMI_JOIN_LEFT_INSTANCE,
+          HiveRemoveEmptySingleRules.JOIN_RIGHT_INSTANCE,
+          HiveRemoveEmptySingleRules.SEMI_JOIN_RIGHT_INSTANCE,
+          HiveRemoveEmptySingleRules.SORT_INSTANCE,
+          HiveRemoveEmptySingleRules.SORT_FETCH_ZERO_INSTANCE,
+          HiveRemoveEmptySingleRules.AGGREGATE_INSTANCE,
+          HiveRemoveEmptySingleRules.UNION_INSTANCE);
+
       RuleStatisticsListener listener = null;
       if (LOG.isDebugEnabled()) {
         listener = new RuleStatisticsListener();
@@ -3797,7 +3807,23 @@ public class CalcitePlanner extends SemanticAnalyzer {
           agg.getAggregateName(), agg.isDistinct(),
           aggArgRelDTBldr.build(), aggFnRetType);
 
-      return new AggregateCall(aggregation, agg.isDistinct(), argList, aggFnRetType, null);
+      List<RelFieldCollation> collationList = new ArrayList<>(agg.getCollation().size());
+      for (FunctionHelper.FieldCollation fieldCollation : agg.getCollation()) {
+        Integer inputIndx = rexNodeToPosMap.get(fieldCollation.getSortExpression().toString());
+        if (inputIndx == null) {
+          gbChildProjLst.add(fieldCollation.getSortExpression());
+          rexNodeToPosMap.put(fieldCollation.getSortExpression().toString(), childProjLstIndx);
+          inputIndx = childProjLstIndx;
+          childProjLstIndx++;
+        }
+
+        collationList.add(new RelFieldCollation(inputIndx,
+                DirectionUtils.codeToDirection(fieldCollation.getSortDirection()),
+                fieldCollation.getNullOrdering().getDirection()));
+      }
+
+      return AggregateCall.create(aggregation, agg.isDistinct(), false, false, argList, -1,
+              RelCollations.of(collationList), aggFnRetType, null);
     }
 
     private RelNode genGBRelNode(List<RexNode> gbExprs, List<AggregateInfo> aggInfoLst,
@@ -4063,14 +4089,35 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
             // 6.2 Convert UDAF Params to ExprNodeDesc
             List<RexNode> aggParameters = new ArrayList<>();
+            List<FunctionHelper.FieldCollation> fieldCollations = new ArrayList<>();
             for (int i = 1; i < value.getChildCount(); i++) {
+              if (value.getChild(i).getType() == HiveParser.TOK_WITHIN_GROUP) {
+                Tree orderByNode = value.getChild(i).getChild(0);
+                if (aggParameters.size() != orderByNode.getChildCount()) {
+                  throw new SemanticException(ErrorMsg.WITHIN_GROUP_PARAMETER_MISMATCH,
+                          Integer.toString(aggParameters.size()), Integer.toString(orderByNode.getChildCount()));
+                }
+
+                for (int j = 0; j < orderByNode.getChildCount(); ++j) {
+                  Tree tabSortColNameNode = orderByNode.getChild(j);
+                  Tree nullsNode = tabSortColNameNode.getChild(0);
+                  ASTNode sortKey = (ASTNode) tabSortColNameNode.getChild(0).getChild(0);
+                  RexNode sortExpr = genRexNode(sortKey, groupByInputRowResolver, cluster.getRexBuilder());
+                  fieldCollations.add(new FunctionHelper.FieldCollation(
+                          sortExpr,
+                          DirectionUtils.tokenToCode(tabSortColNameNode.getType()),
+                          NullOrdering.fromToken(nullsNode.getType())));
+                }
+
+                continue;
+              }
               RexNode parameterExpr = genRexNode(
                   (ASTNode) value.getChild(i), groupByInputRowResolver, cluster.getRexBuilder());
               aggParameters.add(parameterExpr);
             }
 
             AggregateInfo aInfo = functionHelper.getAggregateFunctionInfo(
-              isDistinct, isAllColumns, aggName, aggParameters);
+              isDistinct, isAllColumns, aggName, aggParameters, fieldCollations);
             aggregations.add(aInfo);
             String field = getColumnInternalName(groupingColsSize + aggregations.size() - 1);
             outputColumnNames.add(field);
