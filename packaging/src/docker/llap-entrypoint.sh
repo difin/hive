@@ -3,6 +3,8 @@
 
 # retrieve ec2 instance's public hostname and ip via metadata API
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html
+export HIVE_LOG4J2_PROPERTIES_FILE_NAME=${LLAP_LOG4J2_PROPERTIES_FILE_NAME} #make services run by hive executable log properly
+
 RESP=`curl --connect-timeout 2 -s -f http://169.254.169.254/latest/meta-data/public-hostname`
 exit_status=$?
 FQDN=`hostname -f`

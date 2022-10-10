@@ -16,6 +16,7 @@ export TEZ_LOG4J2_PROPERTIES_FILE_NAME="${TEZ_LOG4J2_PROPERTIES_FILE_NAME:-tez-e
 HIVE_LIB=${HIVE_HOME}/lib
 
 export JVM_OPTS="-server -Djava.net.preferIPv4Stack=true -Dlog4j.configurationFile=${TEZ_LOG4J2_PROPERTIES_FILE_NAME} -DisThreadContextMapInheritable=true"
+export HIVE_LOG4J2_PROPERTIES_FILE_NAME=${TEZ_LOG4J2_PROPERTIES_FILE_NAME} #make services run by hive executable log properly
 
 if [ "${TEZ_ASYNC_LOG_ENABLED}" = true ] ; then
     echo "Async log enabled for tez.."
