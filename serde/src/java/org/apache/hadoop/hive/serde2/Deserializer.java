@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.serde2;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.io.Writable;
 
@@ -72,4 +73,12 @@ public interface Deserializer {
    * @return {@link SerDeStats} object; or in case not supported: null
    */
   SerDeStats getSerDeStats();
+
+  /**
+   * Adds SerDe specific configurations to job conf.
+   * @param conf the job conf.
+   */
+  default void handleJobLevelConfiguration(HiveConf conf) {
+    // Do nothing
+  }
 }

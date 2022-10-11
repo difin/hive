@@ -11873,7 +11873,11 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     RowResolver rwsch = new RowResolver();
     try {
       // Obtain inspector for schema
-      StructObjectInspector roi = (StructObjectInspector) tab.getDeserializer().getObjectInspector();
+      final Deserializer deserializer = tab.getDeserializer();
+      StructObjectInspector roi =
+          (StructObjectInspector) deserializer.getObjectInspector();
+
+      deserializer.handleJobLevelConfiguration(conf);
       for (StructField field : roi.getAllStructFieldRefs()) {
         ColumnInfo colInfo = new ColumnInfo(field.getFieldName(),
             TypeInfoUtils.getTypeInfoFromObjectInspector(field.getFieldObjectInspector()),
