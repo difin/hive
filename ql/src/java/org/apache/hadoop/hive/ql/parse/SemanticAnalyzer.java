@@ -1157,7 +1157,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       String asOfVersionFrom =
           asOfVersionFromIndex == -1 ? null : tabref.getChild(asOfVersionFromIndex).getChild(0).getText();
       String asOfTime = null;
-      
+
       if (asOfTimeIndex != -1) {
         ASTNode expr = (ASTNode) tabref.getChild(asOfTimeIndex).getChild(0);
         if (expr.getChildCount() > 0) {
@@ -11932,17 +11932,21 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     RowResolver rwsch = new RowResolver();
     try {
       // Obtain inspector for schema
-      final Deserializer deserializer = tab.getDeserializer();
-      StructObjectInspector roi =
-          (StructObjectInspector) deserializer.getObjectInspector();
+        final Deserializer deserializer = tab.getDeserializer();
+        StructObjectInspector rowObjectInspector = (StructObjectInspector) deserializer.getObjectInspector();
 
-      deserializer.handleJobLevelConfiguration(conf);
-      for (StructField field : roi.getAllStructFieldRefs()) {
-        ColumnInfo colInfo = new ColumnInfo(field.getFieldName(),
-            TypeInfoUtils.getTypeInfoFromObjectInspector(field.getFieldObjectInspector()),
-            alias, false);
-        colInfo.setSkewedCol(isSkewedCol(alias, qb, field.getFieldName()));
-        rwsch.put(alias, field.getFieldName(), colInfo);
+        deserializer.handleJobLevelConfiguration(conf);
+        List<? extends StructField> fields = rowObjectInspector
+            .getAllStructFieldRefs();
+        for (int i = 0; i < fields.size(); i++) {
+          /**
+           * if the column is a skewed column, use ColumnInfo accordingly
+           */
+          ColumnInfo colInfo = new ColumnInfo(fields.get(i).getFieldName(),
+              TypeInfoUtils.getTypeInfoFromObjectInspector(fields.get(i)
+                  .getFieldObjectInspector()), alias, false);
+          colInfo.setSkewedCol(isSkewedCol(alias, qb, fields.get(i).getFieldName()));
+          rwsch.put(alias, fields.get(i).getFieldName(), colInfo);
       }
     } catch (SerDeException e) {
       throw new RuntimeException(e);
