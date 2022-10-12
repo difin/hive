@@ -24,7 +24,7 @@ if [ "${TEZ_ASYNC_LOG_ENABLED}" = true ] ; then
 fi
 
 # TODO: Change back to ${HIVE_LIB} once we are done with the workaround hack from DWX-3985
-AUTOSCALING_JAR=/custom-jars/dwx-autoscaling-*.jar
+AUTOSCALING_JAR=$(ls /custom-jars/dwx-autoscaling-*.jar | tail -n 1)
 
 echo 'Waiting for LLAP'
 hive --service jar ${AUTOSCALING_JAR} com.github.cloudera.llap.WaitForLlap;
