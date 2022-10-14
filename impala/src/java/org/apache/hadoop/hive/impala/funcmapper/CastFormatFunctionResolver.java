@@ -49,7 +49,7 @@ public class CastFormatFunctionResolver extends ImpalaFunctionResolverImpl {
    *    2: the format of the column (e.g. 'YYYY/MM/DD').
    */
   CastFormatFunctionResolver(FunctionHelper helper, List<RexNode> inputNodes) {
-    super(helper, SqlStdOperatorTable.CAST, "cast", inputNodes.subList(1,3));
+    super(helper, "cast", inputNodes.subList(1,3));
 
     int token = RexLiteral.intValue(inputNodes.get(0));
     switch(token) {
@@ -95,8 +95,8 @@ public class CastFormatFunctionResolver extends ImpalaFunctionResolverImpl {
     if (intermediateType == null) {
       return super.createRexNode(candidate, inputs, returnType);
     }
-    RexNode intermediateRexNode = rexBuilder.makeCall(intermediateType, op, inputs);
-    RexNode r = rexBuilder.makeCall(returnType, op, ImmutableList.of(intermediateRexNode));
-    return r;
+    SqlOperator opToUse = getNonstandardOp(candidate, inputs, retType);
+    RexNode intermediateRexNode = rexBuilder.makeCall(intermediateType, opToUse, inputs);
+    return rexBuilder.makeCall(returnType, opToUse, ImmutableList.of(intermediateRexNode));
   }
 }

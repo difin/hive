@@ -162,15 +162,7 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
 
   public RexNode createRexNode(ImpalaFunctionSignature candidate, List<RexNode> inputs,
       RelDataType returnDataType) {
-    SqlOperator opToUse = op;
-    if (opToUse == null) {
-      CalciteUDFInfo udfInfo = CalciteUDFInfo.createUDFInfo(func, argTypes, returnDataType);
-      ScalarFunctionDetails s = ScalarFunctionDetails.get(candidate);
-      boolean deterministic = (s != null && !s.isStateful());
-      opToUse = new HiveSqlFunction(func, SqlKind.OTHER_FUNCTION, udfInfo.returnTypeInference,
-          udfInfo.operandTypeInference, udfInfo.operandTypeChecker,
-          SqlFunctionCategory.USER_DEFINED_FUNCTION, deterministic, false);
-    }
+    SqlOperator opToUse = op != null ? op : getNonstandardOp(candidate, inputs, returnDataType);
     return rexBuilder.makeCall(returnDataType, opToUse, inputs);
   }
 
@@ -421,6 +413,15 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
     return inputs;
   }
 
+  protected SqlOperator getNonstandardOp(ImpalaFunctionSignature candidate, List<RexNode> inputs,
+      RelDataType returnDataType) {
+    CalciteUDFInfo udfInfo = CalciteUDFInfo.createUDFInfo(func, argTypes, returnDataType);
+    ScalarFunctionDetails s = ScalarFunctionDetails.get(candidate);
+    boolean deterministic = (s != null && !s.isStateful());
+    return new HiveSqlFunction(func, SqlKind.OTHER_FUNCTION, udfInfo.returnTypeInference,
+        udfInfo.operandTypeInference, udfInfo.operandTypeChecker,
+        SqlFunctionCategory.USER_DEFINED_FUNCTION, deterministic, false);
+  }
   /**
    * Return a casted datatype for nondecimal values, if the datatype needs to be
    * cast. Return null if no casting is needed.
