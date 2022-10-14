@@ -567,7 +567,7 @@ public final class Utilities {
   }
 
   private static Path setBaseWork(Configuration conf, BaseWork w, Path hiveScratchDir, String name, boolean useCache) {
-    Kryo kryo = SerializationUtilities.borrowKryo();
+    Kryo kryo = SerializationUtilities.borrowKryo(conf);
     try {
       setPlanPath(conf, hiveScratchDir);
 
