@@ -98,12 +98,18 @@ import org.apache.thrift.transport.TTransportException;
      wrapped.consumeBuffer(len);
    }
 
-  @Override
-  public void checkReadBytesAvailable(long numBytes) throws TTransportException { wrapped.checkReadBytesAvailable(numBytes); }
+   @Override
+   public TConfiguration getConfiguration() {
+     return wrapped.getConfiguration();
+   }
 
-  @Override
-  public void updateKnownMessageSize(long size) throws TTransportException { wrapped.updateKnownMessageSize(size); }
+   @Override
+   public void updateKnownMessageSize(long l) throws TTransportException {
+     wrapped.updateKnownMessageSize(l);
+   }
 
-  @Override
-  public TConfiguration getConfiguration(){ return wrapped.getConfiguration(); }
- }
+   @Override
+   public void checkReadBytesAvailable(long l) throws TTransportException {
+     wrapped.checkReadBytesAvailable(l);
+   }
+}

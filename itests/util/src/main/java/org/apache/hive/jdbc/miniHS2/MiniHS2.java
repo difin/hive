@@ -87,6 +87,7 @@ public class MiniHS2 extends AbstractHiveService {
   private boolean usePortsFromConf = false;
   private PamAuthenticator pamAuthenticator;
   private boolean createTransactionalTables;
+  private int hmsPort = 0;
 
   public enum MiniClusterType {
     MR,
@@ -368,7 +369,7 @@ public class MiniHS2 extends AbstractHiveService {
 
   public void start(Map<String, String> confOverlay) throws Exception {
     if (isMetastoreRemote) {
-      MetaStoreTestUtils.startMetaStoreWithRetry(HadoopThriftAuthBridge.getBridge(), getHiveConf(),
+      hmsPort = MetaStoreTestUtils.startMetaStoreWithRetry(HadoopThriftAuthBridge.getBridge(), getHiveConf(),
               false, false, false, createTransactionalTables);
       setWareHouseDir(MetastoreConf.getVar(getHiveConf(), MetastoreConf.ConfVars.WAREHOUSE));
     }
@@ -723,5 +724,9 @@ public class MiniHS2 extends AbstractHiveService {
     } catch (FileNotFoundException e) {
       // Ignore. Safe if it does not exist.
     }
+  }
+
+  public int getHmsPort() {
+    return hmsPort;
   }
 }
