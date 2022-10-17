@@ -46,4 +46,9 @@ public final class Bug {
    * Whether <a href="https://issues.apache.org/jira/browse/CALCITE-4704">CALCITE-4704</a> is fixed.
    */
   public static final boolean CALCITE_4704_FIXED = false;
+
+  /**
+   * Whether <a href="https://issues.apache.org/jira/browse/CALCITE-5337">CALCITE-5337</a> is fixed.
+   */
+  public static final boolean CALCITE_5337_FIXED = false;
 }
