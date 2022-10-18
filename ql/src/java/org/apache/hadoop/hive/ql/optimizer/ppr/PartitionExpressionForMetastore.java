@@ -107,7 +107,7 @@ public class PartitionExpressionForMetastore implements PartitionExpressionProxy
   private ExprNodeDesc deserializeExpr(byte[] exprBytes) throws MetaException {
     ExprNodeDesc expr = null;
     try {
-      expr = SerializationUtilities.deserializeObjectWithTypeInformation(exprBytes);
+      expr = SerializationUtilities.deserializeObjectWithTypeInformation(exprBytes, true);
     } catch (Exception ex) {
       LOG.error("Failed to deserialize the expression", ex);
       throw new MetaException(ex.getMessage());
