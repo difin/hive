@@ -9,7 +9,7 @@ if [ "${EDWS_DRIVER}" == "yarn" ]; then
   start_fluentd
 fi
 
-if [ "${USE_KERBEROS}" == "true" ]; then
+if [[ "${USE_KERBEROS}" == "true" && -n "$SERVICE_KEYTAB" ]]; then
   SERVICE_KEYTAB=${SERVICE_KEYTAB:?SERVICE_KEYTAB is required for kinit}
   SERVICE_PRINCIPAL=${SERVICE_PRINCIPAL:?SERVICE_PRINCIPAL is required for kinit}
   kinit -V -k -t ${SERVICE_KEYTAB} ${SERVICE_PRINCIPAL}
