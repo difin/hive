@@ -2350,6 +2350,7 @@ public class HiveConf extends Configuration {
       "Whether orc writers should use llap-aware memory manager. LLAP aware memory manager will use memory\n" +
         "per executor instead of entire heap memory when concurrent orc writers are involved. This will let\n" +
         "task fragments to use memory within its limit (memory per executor) when performing ETL in LLAP."),
+    HIVE_ORC_VECTORED_READ("hive.exec.orc.use.hadoop-vectored.api", false, "Enable or disable async vectored reads."),
 
     // hive streaming ingest settings
     HIVE_STREAMING_AUTO_FLUSH_ENABLED("hive.streaming.auto.flush.enabled", true, "Whether to enable memory \n" +
