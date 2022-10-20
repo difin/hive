@@ -73,6 +73,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
 
 import static org.apache.hadoop.hive.common.AcidConstants.VISIBILITY_PATTERN;
 import static org.apache.hadoop.hive.ql.TestTxnCommands2.runCleaner;
@@ -1251,7 +1252,6 @@ public class TestCompactor extends TestCompactorBase {
 
 
   @Test
-  @Ignore("flaky")
   public void testCleanDynPartAbortNoDataLoss() throws Exception {
     String dbName = "default";
     String tblName = "cws";
@@ -1297,11 +1297,21 @@ public class TestCompactor extends TestCompactorBase {
 
     FileSystem fs = FileSystem.get(conf);
     verifyDeltaCount(p1.getSd(), fs, 0);
-    verifyHasBase(p1.getSd(), fs, "base_0000002_v0000010");
+    verifyHasBase(p1.getSd(), fs,  Pattern.compile("base_0000002_v000001[0-9]"));
     verifyDeltaCount(p2.getSd(), fs, 0);
-    verifyHasBase(p2.getSd(), fs, "base_0000004_v0000012");
+    verifyHasBase(p2.getSd(), fs,  Pattern.compile("base_0000004_v000001[0-9]"));
     verifyDeltaCount(p3.getSd(), fs, 0);
-    verifyHasBase(p3.getSd(), fs, "base_0000007_v0000014");
+    verifyHasBase(p3.getSd(), fs,  Pattern.compile("base_0000007_v000001[0-9]"));
+  }
+
+  private void verifyHasBase(StorageDescriptor sd, FileSystem fs, Pattern regex) throws Exception {
+    FileStatus[] stat = fs.listStatus(new Path(sd.getLocation()), AcidUtils.baseFileFilter);
+    for (FileStatus file : stat) {
+      if (regex.matcher(file.getPath().getName()).matches()) {
+        return;
+      }
+    }
+    Assert.fail("There is no folder matching the regex: " + regex);
   }
 
   @Test
