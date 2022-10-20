@@ -36,7 +36,7 @@
       <outputDirectory>lib</outputDirectory>
       <unpack>false</unpack>
       <useProjectArtifact>false</useProjectArtifact>
-      <useStrictFiltering>true</useStrictFiltering>
+      <useStrictFiltering>false</useStrictFiltering>
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <excludes>
         <exclude>org.apache.hadoop:*</exclude>
@@ -47,6 +47,7 @@
         <exclude>co.cask.tephra:*</exclude>
         <exclude>commons-configuration:commons-configuration</exclude>
         <exclude>org.apache.hive:hive-jdbc:*:standalone</exclude>
+        <exclude>ch.qos.reload4j:* </exclude>
       </excludes>
     </dependencySet>
     <dependencySet>
