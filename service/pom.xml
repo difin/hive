@@ -354,6 +354,10 @@
                 <groupId>org.apache.directory.client.ldap</groupId>
                 <artifactId>ldap-client-api</artifactId>
             </exclusion>
+            <exclusion>
+                <groupId>dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+            </exclusion>
         </exclusions>
     </dependency>
 
