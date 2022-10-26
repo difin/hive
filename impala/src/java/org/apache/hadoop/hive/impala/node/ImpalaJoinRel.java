@@ -57,6 +57,7 @@ import org.apache.impala.analysis.Expr;
 import org.apache.impala.analysis.ExprSubstitutionMap;
 import org.apache.impala.analysis.FunctionCallExpr;
 import org.apache.impala.analysis.JoinOperator;
+import org.apache.impala.analysis.SlotRef;
 import org.apache.impala.analysis.TupleId;
 import org.apache.impala.analysis.TupleIsNullPredicate;
 import org.apache.impala.catalog.Function;
@@ -155,8 +156,8 @@ public class ImpalaJoinRel extends ImpalaPlanRel {
       // register the equi and non-equi join conjuncts with the analyzer such that
       // value transfer graph creation can consume it
       List<Expr> equiJoinExprs = new ArrayList<Expr>(equiJoinConjuncts);
-      ctx.getRootAnalyzer().registerConjuncts(equiJoinExprs);
-      ctx.getRootAnalyzer().registerConjuncts(nonEquiJoinConjuncts);
+      ctx.getRootAnalyzer().registerConjuncts(getJoinConjunctListToRegister(equiJoinExprs));
+      ctx.getRootAnalyzer().registerConjuncts(getJoinConjunctListToRegister(nonEquiJoinConjuncts));
     }
 
     joinNode.setId(ctx.getNextNodeId());
@@ -454,6 +455,97 @@ public class ImpalaJoinRel extends ImpalaPlanRel {
   public double estimateRowCount(RelMetadataQuery mq) {
     return filter != null ?
         mq.getRowCount(filter) : mq.getRowCount(join);
+  }
+
+  /**
+   * Get all the join conjuncts that need registering.
+   */
+  public List<Expr> getJoinConjunctListToRegister(List<Expr> joinConjuncts) {
+    List<Expr> conjunctsToRegister = new ArrayList<>();
+    for (Expr joinConjunct : joinConjuncts) {
+      conjunctsToRegister.addAll(getJoinConjunctToRegister(joinConjunct));
+    }
+    return conjunctsToRegister;
+  }
+
+  /**
+   * Given a join conjunct, derive the join conjunct that needs to be registered
+   * with the analyzer. We need this to work around an issue that exists within
+   * Impala as detailed in CDPD-43511.
+   *
+   * The expression produced here will get registered in the Impala value transfer
+   * graph. This value transfer graph is then used to calculate the runtime filter
+   * generators that can be created.
+   *
+   * There are two major differences between the runtime filter generators generated
+   * within Impala verstus the ones generated within Unified Analytics.
+   *
+   * 1) Impala only seems to generate one runtime filter generator for each join
+   * conjunct. It traces down the SlotRef used on the probe side down to the
+   * scan node.  Unified Analytics, however, makes liberal use of the value transfer
+   * graph. Once it goes down the probe side, it can apply the runtime filter to
+   * either side of join conjuncts below the current join node.
+   *
+   * 2) Because Impala only generates one runtime filter generator off of the given
+   * SlotRef, the data type always matches. There is never any casting adjustment
+   * that needs to be done. However, if a lower conjunct within Unified Analytics
+   * is comparing two expressions with different SlotRef types, there will need to
+   * be a casting adjustment. This has not been coded into Impala so this will cause
+   * impalad to crash.
+   *
+   * An example query where we the casting adjustment is needed within the Impala test
+   * framewhere is:
+   *
+   * select straight_join count(*) from functional.alltypessmall a
+   * inner join
+   *   (select straight_join t2.* from functional.alltypessmall t1
+   *    inner join functional.alltypessmall t2 on t1.tinyint_col = t2.smallint_col) b
+   *    on a.int_col = b.smallint_col
+   *   inner join
+   *   (select distinct tinyint_col from functional.alltypessmall) c
+   * on a.int_col = c.tinyint_col
+   *
+   * Ultimately, it would be better to code the casting adjustment within Impala.
+   * However, there is no end to end test that can be created within Impala until
+   * that feature is implemented, thus making it impossible to test there.
+   * Because of the limitation within Impala, we cannot allow a runtime filter generator
+   * to be generated on SlotRefs that don't match the top level SlotRef.
+   *
+   * The value transfer graph is used to show expressions that are similar. So if we
+   * detect a mismatch of SlotRef types, the full conjunct cannot be entered into
+   * the value transfer graph which would show equivalentce of the SlotRefs. We do still
+   * need to put in the left side of the conjunct into the value transfer graph to show
+   * its existence.
+   *
+   * TL:DR; We only register the full conjunct if the SlotRef types match on both sides
+   * of the join conjunct expression.
+   */
+  public List<Expr> getJoinConjunctToRegister(Expr joinConjunct) {
+    Preconditions.checkState(joinConjunct.getChildren().size() > 0);
+    List<SlotRef> leftSideSlotRefs = new ArrayList<>();
+    List<SlotRef> rightSideSlotRefs = new ArrayList<>();
+    joinConjunct.getChild(0).collect(SlotRef.class, leftSideSlotRefs);
+    joinConjunct.getChild(1).collect(SlotRef.class, rightSideSlotRefs);
+
+    if (leftSideSlotRefs.size() == 0) {
+      return Lists.newArrayList();
+    }
+
+    if (rightSideSlotRefs.size() == 0) {
+      return Lists.newArrayList(joinConjunct.getChild(0));
+    }
+
+    // If there is more than one slotRef on either side of the conjunct, we play it
+    // safe and don't put in the SlotRef equivalency. Only return the left hand side.
+    if (leftSideSlotRefs.size() > 1 || rightSideSlotRefs.size() > 1) {
+      return Lists.newArrayList(joinConjunct.getChild(0), joinConjunct.getChild(1));
+    }
+
+    if (leftSideSlotRefs.get(0).getType() != rightSideSlotRefs.get(0).getType()) {
+      return Lists.newArrayList(joinConjunct.getChild(0), joinConjunct.getChild(1));
+    }
+
+    return Lists.newArrayList(joinConjunct);
   }
 
 }
