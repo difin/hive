@@ -104,4 +104,6 @@ public class Constants {
   public static final String ORC_INPUT_FORMAT = "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat";
   public static final String ORC_OUTPUT_FORMAT = "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat";
 
+  public static final String HTTP_HEADER_REQUEST_TRACK = "Request-Track";
+  public static final String TIME_POSTFIX_REQUEST_TRACK = "_TIME";
 }

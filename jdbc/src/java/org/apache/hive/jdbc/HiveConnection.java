@@ -62,7 +62,6 @@ import org.apache.hive.service.rpc.thrift.TRenewDelegationTokenResp;
 import org.apache.hive.service.rpc.thrift.TSessionHandle;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NoHttpResponseException;
@@ -86,6 +85,7 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.Args;
+import org.apache.thrift.TBaseHelper;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.THttpClient;
@@ -147,6 +147,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 /**
  * HiveConnection.
@@ -550,7 +551,7 @@ public class HiveConnection implements java.sql.Connection {
     CookieStore cookieStore = isCookieEnabled ? new BasicCookieStore() : null;
     HttpClientBuilder httpClientBuilder = null;
     // Request interceptor for any request pre-processing logic
-    HttpRequestInterceptor requestInterceptor;
+    HttpRequestInterceptorBase requestInterceptor;
     Map<String, String> additionalHttpHeaders = new HashMap<String, String>();
     Map<String, String> customCookies = new HashMap<String, String>();
 
@@ -741,8 +742,12 @@ public class HiveConnection implements java.sql.Connection {
       httpClientBuilder
           .setRedirectStrategy(new HiveJdbcSamlRedirectStrategy(browserClient));
     }
+
+    requestInterceptor.setRequestTrackingEnabled(isRequestTrackingEnabled());
+
     // Add the request interceptor to the client builder
-    httpClientBuilder.addInterceptorFirst(requestInterceptor);
+    httpClientBuilder.addInterceptorFirst(requestInterceptor.sessionId(getSessionId()));
+    httpClientBuilder.addInterceptorLast(new HttpDefaultResponseInterceptor());
 
     // Add an interceptor to add in an XSRF header
     httpClientBuilder.addInterceptorLast(new XsrfHttpRequestInterceptor());
@@ -800,6 +805,22 @@ public class HiveConnection implements java.sql.Connection {
       }
     }
     return httpClientBuilder.build();
+  }
+
+  private boolean isRequestTrackingEnabled() {
+    return Boolean.parseBoolean(sessConfMap.get(JdbcConnectionParams.JDBC_PARAM_REQUEST_TRACK));
+  }
+
+  private Supplier<String> getSessionId() {
+    Supplier<String> sessionId = () -> {
+      if (sessHandle == null) {
+        return "NO_SESSION";
+      }
+      StringBuilder b = new StringBuilder();
+      TBaseHelper.toString(sessHandle.getSessionId().bufferForGuid(), b);
+      return b.toString().replaceAll("\\s", "");
+    };
+    return sessionId;
   }
 
   private String getJWT() {
