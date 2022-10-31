@@ -32,6 +32,7 @@ import org.apache.hadoop.hive.metastore.messaging.AlterDatabaseMessage;
 import org.apache.hadoop.hive.metastore.messaging.AlterPartitionMessage;
 import org.apache.hadoop.hive.metastore.messaging.AlterTableMessage;
 import org.apache.hadoop.hive.metastore.messaging.CommitTxnMessage;
+import org.apache.hadoop.hive.metastore.messaging.CommitCompactionMessage;
 import org.apache.hadoop.hive.metastore.messaging.CreateDatabaseMessage;
 import org.apache.hadoop.hive.metastore.messaging.CreateFunctionMessage;
 import org.apache.hadoop.hive.metastore.messaging.CreateTableMessage;
@@ -225,6 +226,12 @@ public class DeSerializer extends JSONMessageDeserializer {
   public ReloadMessage getReloadMessage(String messageBody) {
     return super.getReloadMessage(deCompress(messageBody));
   }
+
+  @Override
+  public CommitCompactionMessage getCommitCompactionMessage(String messageBody) {
+    return super.getCommitCompactionMessage(deCompress(messageBody));
+  }
+
   public String deSerializeGenericString(String messageBody) {
     return deCompress(messageBody);
   }
