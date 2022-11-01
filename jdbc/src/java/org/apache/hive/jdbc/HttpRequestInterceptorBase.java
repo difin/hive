@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
-
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.util.Time;
 import org.apache.http.Header;
@@ -117,7 +116,7 @@ public abstract class HttpRequestInterceptorBase implements HttpRequestIntercept
         httpRequest.addHeader("Cookie", cookieHeaderKeyValues);
       }
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new HttpException(e.getMessage(), e);
     }
   }
 

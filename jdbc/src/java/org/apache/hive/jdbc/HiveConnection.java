@@ -811,6 +811,11 @@ public class HiveConnection implements java.sql.Connection {
     return Boolean.parseBoolean(sessConfMap.get(JdbcConnectionParams.JDBC_PARAM_REQUEST_TRACK));
   }
 
+  /**
+   * Creates a sessionId Supplier for interceptors. When interceptors are instantiated,
+   * there is no session yet (sessHandle is null) so this Supplier can take care
+   * of the sessionId in a lazy way.
+   */
   private Supplier<String> getSessionId() {
     Supplier<String> sessionId = () -> {
       if (sessHandle == null) {
