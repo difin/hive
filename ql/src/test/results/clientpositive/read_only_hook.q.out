@@ -72,3 +72,6 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@src
 #### A masked pattern was here ####
 238	val_238
+POSTHOOK: query: ALTER DATABASE default SET DBPROPERTIES('readonly' = 'false')
+POSTHOOK: type: ALTERDATABASE
+POSTHOOK: Output: database:default

@@ -17,10 +17,16 @@
  */
 package org.apache.hadoop.hive.ql.exec.repl;
 
+import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.common.repl.ReplConst;
 import org.apache.hadoop.fs.Options;
+import org.apache.hadoop.hive.metastore.ReplChangeManager;
+import org.apache.hadoop.hive.metastore.api.NotificationEvent;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
+import org.apache.hadoop.hive.ql.ddl.database.alter.owner.AlterDatabaseSetOwnerDesc;
+import org.apache.hadoop.hive.ql.ddl.privilege.PrincipalDesc;
 import org.apache.hadoop.hive.ql.exec.repl.util.SnapshotUtils;
+import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.parse.repl.load.log.IncrementalLoadLogger;
 import org.apache.thrift.TException;
 import com.google.common.collect.Collections2;
@@ -79,14 +85,11 @@ import org.apache.hadoop.mapreduce.JobContext;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedList;
+import java.util.*;
 
+import static org.apache.hadoop.hive.ql.hooks.EnforceReadOnlyDatabaseHook.READONLY;
+import static org.apache.hadoop.hive.common.repl.ReplConst.READ_ONLY_HOOK;
+import static org.apache.hadoop.hive.common.repl.ReplConst.REPL_DB_UNDER_FAILOVER_REV_SYNC_PENDING;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.REPL_DUMP_SKIP_IMMUTABLE_DATA_COPY;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.REPL_SNAPSHOT_DIFF_FOR_EXTERNAL_TABLE_COPY;
 import static org.apache.hadoop.hive.ql.exec.repl.ReplAck.LOAD_METADATA;
@@ -97,6 +100,7 @@ import static org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils.RANGER_AUTHORIZ
 import static org.apache.hadoop.hive.ql.exec.repl.util.SnapshotUtils.cleanupSnapshots;
 
 public class ReplLoadTask extends Task<ReplLoadWork> implements Serializable {
+
   private static final long serialVersionUID = 1L;
   private final static int ZERO_TASKS = 0;
   private final String STAGE_NAME = "REPL_LOAD";
@@ -417,7 +421,38 @@ public class ReplLoadTask extends Task<ReplLoadWork> implements Serializable {
         // Ignore if no file.
       }
     }
+
+    if(isReadOnlyHookRegistered()) {
+      LOG.info("Setting database {} read-only", work.dbNameToLoadIn);
+      setDbReadOnly();
+    }
     return 0;
+  }
+
+  private boolean isReadOnlyHookRegistered() {
+    return conf.get(HiveConf.ConfVars.PREEXECHOOKS.varname) != null &&
+      conf.get(HiveConf.ConfVars.PREEXECHOOKS.varname).contains(READ_ONLY_HOOK);
+  }
+
+  /**
+   * Following hook should be registered before using readonly feature.
+   * 1. SET hive.exec.pre.hooks = "org.apache.hadoop.hive.ql.hooks.EnforceReadOnlyDatabaseHook";
+   * If not set 'readonly' has no effect on the database.
+   */
+  private void setDbReadOnly() {
+    Map<String, String> props = new HashMap<>();
+    props.put(READONLY, Boolean.TRUE.toString());
+
+    AlterDatabaseSetPropertiesDesc setTargetReadOnly =
+      new AlterDatabaseSetPropertiesDesc(work.dbNameToLoadIn, props, null);
+    DDLWork alterDbPropWork = new DDLWork(new HashSet<>(), new HashSet<>(), setTargetReadOnly, true,
+      work.dumpDirectory, work.getMetricCollector());
+
+    Task<?> addReadOnlyTargetPropTask = TaskFactory.get(alterDbPropWork, conf);
+    if (this.childTasks == null) {
+      this.childTasks = new ArrayList<>();
+    }
+    this.childTasks.add(addReadOnlyTargetPropTask);
   }
 
   private void addLazyDataCopyTask(TaskTracker loadTaskTracker, ReplLogger replLogger) throws IOException {
@@ -691,6 +726,12 @@ public class ReplLoadTask extends Task<ReplLoadWork> implements Serializable {
     }
     Database targetDb = getHive().getDatabase(work.dbNameToLoadIn);
     Map<String, String> props = new HashMap<>();
+
+    // check if db is set READ_ONLY, if not then set it. Basically this ensures backward
+    // compatibility.
+    if(!(isDbReadOnly(targetDb)) && isReadOnlyHookRegistered()) {
+      setDbReadOnly();
+    }
     if (!MetaStoreUtils.isTargetOfReplication(targetDb)) {
       props.put(ReplConst.TARGET_OF_REPLICATION, ReplConst.TRUE);
     }
@@ -775,5 +816,10 @@ public class ReplLoadTask extends Task<ReplLoadWork> implements Serializable {
     ((IncrementalLoadLogger)work.incrementalLoadTasksBuilder().getReplLogger()).initiateEventTimestamp(currentTimestamp);
     LOG.info("REPL_INCREMENTAL_LOAD stage duration : {} ms", currentTimestamp - loadStartTime);
     return 0;
+  }
+
+  private boolean isDbReadOnly(Database db) {
+    Map<String, String> dbParameters = db.getParameters();
+    return dbParameters != null && Boolean.parseBoolean(dbParameters.get(READONLY)) ;
   }
 }
