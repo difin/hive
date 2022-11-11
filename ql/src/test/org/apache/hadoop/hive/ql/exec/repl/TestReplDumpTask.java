@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.ql.exec.repl.util.FileList;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.parse.EximUtil;
+import org.apache.hadoop.hive.ql.parse.repl.dump.ExportService;
 import org.apache.hadoop.hive.ql.parse.repl.dump.HiveWrapper;
 import org.apache.hadoop.hive.ql.parse.repl.dump.Utils;
 import org.apache.hadoop.hive.ql.parse.repl.load.DumpMetaData;
@@ -122,8 +123,8 @@ public class TestReplDumpTask {
       ReplDumpTask task = new StubReplDumpTask() {
         private int tableDumpCount = 0;
 
-        @Override
-      void dumpTable(String dbName, String tblName, String validTxnList,
+      @Override
+      void dumpTable(ExportService exportService, String dbName, String tblName, String validTxnList,
                      Path dbRootMetadata, Path dbRootData,
                      long lastReplId, Hive hiveDb,
                      HiveWrapper.Tuple<Table> tuple, FileList managedTableDirFileList, boolean dataCopyAtLoad)
