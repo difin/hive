@@ -521,17 +521,17 @@ STAGE PLANS:
                 TableScan
                   alias: srcpart_small_n3
                   filterExpr: ds is not null (type: boolean)
-                  Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                  Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                   Select Operator
                     expressions: ds (type: string)
                     outputColumnNames: _col0
-                    Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                    Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col0 (type: string)
                       null sort order: a
                       sort order: +
                       Map-reduce partition columns: _col0 (type: string)
-                      Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                      Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
             Execution mode: vectorized, llap
             LLAP IO: all inputs
         Reducer 2 
@@ -3134,32 +3134,32 @@ STAGE PLANS:
                 TableScan
                   alias: srcpart_small_n3
                   filterExpr: ds is not null (type: boolean)
-                  Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                  Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                   Select Operator
                     expressions: ds (type: string)
                     outputColumnNames: _col0
-                    Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                    Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col0 (type: string)
                       null sort order: a
                       sort order: +
                       Map-reduce partition columns: _col0 (type: string)
-                      Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                      Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                     Select Operator
                       expressions: _col0 (type: string)
                       outputColumnNames: _col0
-                      Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                      Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                       Group By Operator
                         keys: _col0 (type: string)
                         minReductionHashAggr: 0.99
                         mode: hash
                         outputColumnNames: _col0
-                        Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                        Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                         Dynamic Partitioning Event Operator
                           Target column: ds (string)
                           Target Input: srcpart_date_n7
                           Partition key expr: ds
-                          Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                          Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                           Target Vertex: Map 1
             Execution mode: vectorized, llap
             LLAP IO: all inputs
@@ -3311,32 +3311,32 @@ STAGE PLANS:
                 TableScan
                   alias: srcpart_small_n3
                   filterExpr: ds is not null (type: boolean)
-                  Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                  Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                   Select Operator
                     expressions: ds (type: string)
                     outputColumnNames: _col0
-                    Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                    Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                     Reduce Output Operator
                       key expressions: _col0 (type: string)
                       null sort order: a
                       sort order: +
                       Map-reduce partition columns: _col0 (type: string)
-                      Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                      Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                     Select Operator
                       expressions: _col0 (type: string)
                       outputColumnNames: _col0
-                      Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                      Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                       Group By Operator
                         keys: _col0 (type: string)
                         minReductionHashAggr: 0.99
                         mode: hash
                         outputColumnNames: _col0
-                        Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                        Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                         Dynamic Partitioning Event Operator
                           Target column: ds (string)
                           Target Input: srcpart_date_n7
                           Partition key expr: ds
-                          Statistics: Num rows: 20 Data size: 7200 Basic stats: PARTIAL Column stats: COMPLETE
+                          Statistics: Num rows: 20 Data size: 7280 Basic stats: PARTIAL Column stats: COMPLETE
                           Target Vertex: Map 1
             Execution mode: vectorized, llap
             LLAP IO: all inputs
@@ -3517,7 +3517,7 @@ STAGE PLANS:
                 TableScan
                   alias: srcpart_date_n7
                   filterExpr: ds is not null (type: boolean)
-                  Statistics: Num rows: 2000 Data size: 720000 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 2000 Data size: 728000 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: ds (type: string)
                     outputColumnNames: _col0
@@ -3711,7 +3711,7 @@ STAGE PLANS:
                 TableScan
                   alias: srcpart_date_n7
                   filterExpr: ds is not null (type: boolean)
-                  Statistics: Num rows: 2000 Data size: 720000 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 2000 Data size: 728000 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: ds (type: string)
                     outputColumnNames: _col0
@@ -3918,7 +3918,7 @@ STAGE PLANS:
                 TableScan
                   alias: srcpart_date_n7
                   filterExpr: ds is not null (type: boolean)
-                  Statistics: Num rows: 2000 Data size: 720000 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 2000 Data size: 728000 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: ds (type: string)
                     outputColumnNames: _col0
@@ -4088,7 +4088,7 @@ STAGE PLANS:
                 TableScan
                   alias: srcpart_date_n7
                   filterExpr: ds is not null (type: boolean)
-                  Statistics: Num rows: 2000 Data size: 720000 Basic stats: COMPLETE Column stats: COMPLETE
+                  Statistics: Num rows: 2000 Data size: 728000 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: ds (type: string)
                     outputColumnNames: _col0
