@@ -102,7 +102,7 @@ public class AuthorizationUtils {
     case SERVICE_NAME:
       return HivePrivilegeObjectType.SERVICE_NAME;
     case DATACONNECTOR:
-      return HivePrivilegeObjectType.STORAGEHANDLER_URI;
+      return HivePrivilegeObjectType.DFS_URI;
     default:
       return null;
     }

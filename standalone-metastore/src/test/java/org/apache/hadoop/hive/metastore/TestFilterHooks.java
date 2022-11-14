@@ -433,6 +433,6 @@ public class TestFilterHooks {
 
   protected void testFilterForDataConnector() throws Exception {
     assertNotNull(client.getDataConnector(DCNAME1));
-    assertEquals(0, client.getAllDataConnectorNames().size());
+    assertEquals(2, client.getAllDataConnectorNames().size());
   }
 }

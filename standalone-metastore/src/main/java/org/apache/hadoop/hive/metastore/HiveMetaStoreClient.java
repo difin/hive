@@ -1345,7 +1345,7 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   @Override
   public List<String> getAllDataConnectorNames() throws MetaException, TException {
     List<String> connectorNames = client.get_dataconnectors();
-    return FilterUtils.filterDataConnectorsIfEnabled(isClientFilterEnabled, filterHook, connectorNames);
+    return connectorNames; //FilterUtils.filterDataConnectorsIfEnabled(isClientFilterEnabled, filterHook, connectorNames); -- reverted after CDPD-26882
   }
 
   /**

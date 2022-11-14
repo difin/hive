@@ -5574,6 +5574,9 @@ public class HiveConf extends Configuration {
     HIVE_SECURITY_AUTHORIZATION_SCHEDULED_QUERIES_SERVICEADMIN_CHECK(
         "hive.security.authorization.scheduled.queries.serviceadmin.check", false,
         "An internal flag to change the normal authorization check wether the user is a ServiceAdmin."),
+    HIVE_SECURITY_AUTHORIZATION_FOR_DATACONNECTORS("hive.security.temporary.authorization.for.data.connectors",
+            false, "A config to enable to use Data connectors in Hive. Set this flag to 'true' to" +
+            "use data connectors in hive. This config will be removed after CDPD-26882"),
 
     HIVE_SCHEDULED_QUERIES_MAX_EXECUTORS("hive.scheduled.queries.max.executors", 4, new RangeValidator(1, null),
         "Maximal number of scheduled query executors to allow."),

@@ -228,6 +228,12 @@ final class CommandAuthorizerV2 {
           null, actionType, null, null, null, null);
       break;
     case DATACONNECTOR:
+      if (!HiveConf.getBoolVar(SessionState.getSessionConf(), HiveConf.ConfVars.HIVE_SECURITY_AUTHORIZATION_FOR_DATACONNECTORS, false)) {
+        LOG.error("Data Connector authorization is not enabled. please set 'hive.security.temporary.authorization.for.data.connectors'=true" +
+                "to use Data Connectors in Hive.");
+        throw new HiveException("Data Connector authorization is not enabled. please set 'hive.security.temporary.authorization.for.data.connectors'=true" +
+                "to use Data Connectors in Hive.");
+      }
       DataConnector connector = privObject.getDataConnector();
       hivePrivObject = new HivePrivilegeObject(privObjType, null, connector.getName(), null, null, actionType, null,
           null, connector.getOwnerName(), connector.getOwnerType());
