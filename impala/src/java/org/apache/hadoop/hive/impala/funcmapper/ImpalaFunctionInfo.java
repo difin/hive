@@ -54,4 +54,27 @@ public class ImpalaFunctionInfo extends FunctionInfo {
   public boolean isGenericUDAFResolver() {
     return AggFunctionDetails.isAggFunction(getDisplayName());
   }
+
+  /**
+   * isGenericUDF returns true when the function is a scalar. The logic
+   * below is not fool-proof. There are two checks here.  It should be
+   * in the ScalarFunctionDetails. However, there are some CAST functions that
+   * exist in Hive but do not exist in Impala, and therefore are not in the
+   * ScalarFunctionDetails. To rectify this, there is also a call to the
+   * IMPALA_OPERATOR_MAP which can identify the relevant Calcite operator
+   * type. In this case, the operator will be CAST which is not an aggregate
+   * function.
+   *
+   * The isGenericUDF function is only called in a special case for CDPD-46776,
+   * so this logic should work. The one worry here is that there may be some
+   * scalar functions that slip through the cracks with this call. It is possible
+   * a future change might be needed so that all scalar functions are definitely
+   * returning true with this call, but because of the limited use of isGenericUDF
+   * the below logic should be good enough.
+   */
+  @Override
+  public boolean isGenericUDF() {
+    return ScalarFunctionDetails.isScalarFunction(getDisplayName()) ||
+        !ImpalaOperatorTable.IMPALA_OPERATOR_MAP.get(getDisplayName().toUpperCase()).isAggregator();
+  }
 }
