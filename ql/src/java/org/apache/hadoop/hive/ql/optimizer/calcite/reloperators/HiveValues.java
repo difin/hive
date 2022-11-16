@@ -44,8 +44,4 @@ public class HiveValues extends Values implements HiveRelNode {
     return new HiveValues(getCluster(), getRowType(), tuples, getTraitSet());
   }
 
-  @Override
-  public void implement(Implementor implementor) {
-
-  }
 }

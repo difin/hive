@@ -94,8 +94,4 @@ public class HiveSemiJoin extends Join implements HiveRelNode {
     }
   }
 
-  @Override
-  public void implement(Implementor implementor) {
-  }
-
 }

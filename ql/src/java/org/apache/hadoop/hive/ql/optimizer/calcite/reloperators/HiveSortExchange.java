@@ -106,7 +106,4 @@ public final class HiveSortExchange extends SortExchange implements HiveRelNode 
     this.keyExpressions = keyExpressions;
   }
 
-  @Override
-  public void implement(Implementor implementor) {
-  }
 }

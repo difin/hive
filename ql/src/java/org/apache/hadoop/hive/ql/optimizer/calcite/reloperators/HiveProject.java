@@ -175,10 +175,6 @@ public class HiveProject extends Project implements HiveRelNode {
     return hp;
   }
 
-  @Override
-  public void implement(Implementor implementor) {
-  }
-
   public List<Integer> getVirtualCols() {
     return virtualCols;
   }
