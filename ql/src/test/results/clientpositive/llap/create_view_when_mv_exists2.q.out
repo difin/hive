@@ -48,7 +48,7 @@ POSTHOOK: Output: default@v1
 CBO PLAN:
 HiveProject(col0=[CAST(10):INTEGER])
   HiveAggregate(group=[{0}])
-    HiveProject($f0=[true])
+    HiveProject($f0=[CAST(10):INTEGER])
       HiveFilter(condition=[=($0, 10)])
         HiveTableScan(table=[[default, t1]], table:alias=[t1])
 
