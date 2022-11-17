@@ -204,7 +204,7 @@ Per-Host Resources: mem-estimate=180.00KB mem-reservation=0B thread-reservation=
 F11:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=4.01MB mem-reservation=3.88MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F12, EXCHANGE=33, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=720.00KB mem-reservation=0B thread-reservation=0
   19:TOP-N [LIMIT=100]
   |  order by: default.impala_tpcds_customer.c_customer_id ASC NULLS LAST, default.impala_tpcds_customer.c_salutation ASC NULLS LAST, default.impala_tpcds_customer.c_first_name ASC NULLS LAST, default.impala_tpcds_customer.c_last_name ASC NULLS LAST, default.impala_tpcds_customer_address.ca_street_number ASC NULLS LAST, default.impala_tpcds_customer_address.ca_street_name ASC NULLS LAST, default.impala_tpcds_customer_address.ca_street_type ASC NULLS LAST, default.impala_tpcds_customer_address.ca_suite_number ASC NULLS LAST, default.impala_tpcds_customer_address.ca_city ASC NULLS LAST, default.impala_tpcds_customer_address.ca_county ASC NULLS LAST, default.impala_tpcds_customer_address.ca_zip ASC NULLS LAST, default.impala_tpcds_customer_address.ca_country ASC NULLS LAST, default.impala_tpcds_customer_address.ca_gmt_offset ASC NULLS LAST, default.impala_tpcds_customer_address.ca_location_type ASC NULLS LAST, sum(default.impala_tpcds_catalog_returns.cr_return_amt_inc_tax) ASC NULLS LAST
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
@@ -254,9 +254,9 @@ Per-Host Resources: mem-estimate=4.01MB mem-reservation=3.88MB thread-reservatio
      in pipelines: 01(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=240.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F11, EXCHANGE=20, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=240.00KB mem-reservation=0B thread-reservation=0
   02:SCAN HDFS [default.impala_tpcds_customer, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_customer.c_current_addr_sk IS NOT NULL, default.impala_tpcds_customer.c_customer_sk IS NOT NULL
@@ -270,9 +270,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 02(GETNEXT)
 
 F05:PLAN FRAGMENT [HASH(default.impala_tpcds_catalog_returns.cr_returning_customer_sk,default.impala_tpcds_customer_address_0.ca_state)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=130.01MB mem-reservation=35.94MB thread-reservation=1
+Per-Host Resources: mem-estimate=130.23MB mem-reservation=35.94MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F11, EXCHANGE=32, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=304.00KB mem-reservation=0B thread-reservation=0
   17:HASH JOIN [INNER JOIN, BROADCAST]
   |  hash predicates: default.impala_tpcds_customer_address_0.ca_state = default.impala_tpcds_customer_address_1.ca_state
   |  fk/pk conjuncts: assumed fk/pk
@@ -300,9 +300,9 @@ Per-Host Resources: mem-estimate=130.01MB mem-reservation=35.94MB thread-reserva
      in pipelines: 04(GETNEXT)
 
 F02:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=131.91MB mem-reservation=37.88MB thread-reservation=1
+Per-Host Resources: mem-estimate=132.02MB mem-reservation=37.88MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=23, HASH(default.impala_tpcds_catalog_returns.cr_returning_customer_sk,default.impala_tpcds_customer_address_0.ca_state)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=144.00KB mem-reservation=0B thread-reservation=0
   09:AGGREGATE [STREAMING]
   |  output: sum(default.impala_tpcds_catalog_returns.cr_return_amt_inc_tax)
   |  group by: default.impala_tpcds_catalog_returns.cr_returning_customer_sk, default.impala_tpcds_customer_address_0.ca_state
@@ -347,9 +347,9 @@ Per-Host Resources: mem-estimate=131.91MB mem-reservation=37.88MB thread-reserva
      in pipelines: 04(GETNEXT)
 
 F03:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=48.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=21, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   05:SCAN HDFS [default.impala_tpcds_date_dim, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_date_dim.d_date_sk IS NOT NULL, default.impala_tpcds_date_dim.d_year = CAST(1998 AS INT)
@@ -364,9 +364,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 05(GETNEXT)
 
 F04:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=80.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=22, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   07:SCAN HDFS [default.impala_tpcds_customer_address, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_customer_address_0.ca_address_sk IS NOT NULL, default.impala_tpcds_customer_address_0.ca_state IS NOT NULL
@@ -380,9 +380,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 07(GETNEXT)
 
 F10:PLAN FRAGMENT [HASH(default.impala_tpcds_customer_address_1.ca_state)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.04MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.16MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=31, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=160.00KB mem-reservation=0B thread-reservation=0
   30:AGGREGATE [FINALIZE]
   |  output: sum:merge(sum(default.impala_tpcds_catalog_returns_0.cr_return_amt_inc_tax)), count:merge(sum(default.impala_tpcds_catalog_returns_0.cr_return_amt_inc_tax))
   |  group by: default.impala_tpcds_customer_address_1.ca_state
@@ -397,9 +397,9 @@ Per-Host Resources: mem-estimate=128.04MB mem-reservation=34.00MB thread-reserva
      in pipelines: 28(GETNEXT)
 
 F09:PLAN FRAGMENT [HASH(default.impala_tpcds_catalog_returns_0.cr_returning_customer_sk,default.impala_tpcds_customer_address_1.ca_state)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=256.04MB mem-reservation=68.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=256.16MB mem-reservation=68.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F10, EXCHANGE=29, HASH(default.impala_tpcds_customer_address_1.ca_state)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=160.00KB mem-reservation=0B thread-reservation=0
   16:AGGREGATE [STREAMING]
   |  output: sum(sum(default.impala_tpcds_catalog_returns_0.cr_return_amt_inc_tax)), count(sum(default.impala_tpcds_catalog_returns_0.cr_return_amt_inc_tax))
   |  group by: default.impala_tpcds_customer_address_1.ca_state
@@ -420,9 +420,9 @@ Per-Host Resources: mem-estimate=256.04MB mem-reservation=68.00MB thread-reserva
      in pipelines: 10(GETNEXT)
 
 F06:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=131.91MB mem-reservation=37.88MB thread-reservation=1
+Per-Host Resources: mem-estimate=132.02MB mem-reservation=37.88MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F09, EXCHANGE=27, HASH(default.impala_tpcds_catalog_returns_0.cr_returning_customer_sk,default.impala_tpcds_customer_address_1.ca_state)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=144.00KB mem-reservation=0B thread-reservation=0
   15:AGGREGATE [STREAMING]
   |  output: sum(default.impala_tpcds_catalog_returns_0.cr_return_amt_inc_tax)
   |  group by: default.impala_tpcds_catalog_returns_0.cr_returning_customer_sk, default.impala_tpcds_customer_address_1.ca_state
@@ -467,9 +467,9 @@ Per-Host Resources: mem-estimate=131.91MB mem-reservation=37.88MB thread-reserva
      in pipelines: 10(GETNEXT)
 
 F07:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=48.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F06, EXCHANGE=25, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   11:SCAN HDFS [default.impala_tpcds_date_dim, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_date_dim_0.d_date_sk IS NOT NULL, default.impala_tpcds_date_dim_0.d_year = CAST(1998 AS INT)
@@ -484,9 +484,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 11(GETNEXT)
 
 F08:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=80.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F06, EXCHANGE=26, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   13:SCAN HDFS [default.impala_tpcds_customer_address, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_customer_address_1.ca_address_sk IS NOT NULL, default.impala_tpcds_customer_address_1.ca_state IS NOT NULL

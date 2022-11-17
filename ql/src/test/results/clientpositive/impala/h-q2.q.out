@@ -274,7 +274,7 @@ Per-Host Resources: mem-estimate=92.00KB mem-reservation=0B thread-reservation=1
 F10:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=5.98MB mem-reservation=5.81MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F11, EXCHANGE=30, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=368.00KB mem-reservation=0B thread-reservation=0
   19:TOP-N [LIMIT=100]
   |  order by: default.impala_tpch_supplier.s_acctbal DESC NULLS FIRST, default.impala_tpch_nation.n_name ASC NULLS LAST, default.impala_tpch_supplier.s_name ASC NULLS LAST, default.impala_tpch_part.p_partkey ASC NULLS LAST
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
@@ -335,9 +335,9 @@ Per-Host Resources: mem-estimate=5.98MB mem-reservation=5.81MB thread-reservatio
      in pipelines: 01(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=72.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F10, EXCHANGE=20, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=72.00KB mem-reservation=0B thread-reservation=0
   02:SCAN HDFS [default.impala_tpch_region, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpch_region.r_regionkey IS NOT NULL, default.impala_tpch_region.r_name = 'EUROPE'
@@ -352,9 +352,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 02(GETNEXT)
 
 F02:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=280.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F10, EXCHANGE=21, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=280.00KB mem-reservation=0B thread-reservation=0
   04:SCAN HDFS [default.impala_tpch_supplier, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpch_supplier.s_nationkey IS NOT NULL, default.impala_tpch_supplier.s_suppkey IS NOT NULL
@@ -368,9 +368,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 04(GETNEXT)
 
 F03:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=3.93MB mem-reservation=3.88MB thread-reservation=1
+Per-Host Resources: mem-estimate=4.22MB mem-reservation=3.88MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F10, EXCHANGE=29, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=352.00KB mem-reservation=0B thread-reservation=0
   17:HASH JOIN [INNER JOIN, BROADCAST]
   |  hash predicates: default.impala_tpch_part.p_partkey = default.impala_tpch_partsupp_0.ps_partkey, default.impala_tpch_partsupp.ps_supplycost = min(default.impala_tpch_partsupp_0.ps_supplycost)
   |  fk/pk conjuncts: assumed fk/pk
@@ -408,9 +408,9 @@ Per-Host Resources: mem-estimate=3.93MB mem-reservation=3.88MB thread-reservatio
      in pipelines: 06(GETNEXT)
 
 F04:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=160.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F03, EXCHANGE=22, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=160.00KB mem-reservation=0B thread-reservation=0
   07:SCAN HDFS [default.impala_tpch_part, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpch_part.p_partkey IS NOT NULL, default.impala_tpch_part.p_size = CAST(15 AS INT), like(default.impala_tpch_part.p_type, '%BRASS')
@@ -425,9 +425,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 07(GETNEXT)
 
 F09:PLAN FRAGMENT [HASH(default.impala_tpch_partsupp_0.ps_partkey)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.02MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.08MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F03, EXCHANGE=28, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   27:AGGREGATE [FINALIZE]
   |  output: min:merge(default.impala_tpch_partsupp_0.ps_supplycost)
   |  group by: default.impala_tpch_partsupp_0.ps_partkey
@@ -442,9 +442,9 @@ Per-Host Resources: mem-estimate=128.02MB mem-reservation=34.00MB thread-reserva
      in pipelines: 09(GETNEXT)
 
 F05:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=131.92MB mem-reservation=37.88MB thread-reservation=1
+Per-Host Resources: mem-estimate=131.95MB mem-reservation=37.88MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F09, EXCHANGE=26, HASH(default.impala_tpch_partsupp_0.ps_partkey)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   16:AGGREGATE [STREAMING]
   |  output: min(default.impala_tpch_partsupp_0.ps_supplycost)
   |  group by: default.impala_tpch_partsupp_0.ps_partkey
@@ -489,9 +489,9 @@ Per-Host Resources: mem-estimate=131.92MB mem-reservation=37.88MB thread-reserva
      in pipelines: 09(GETNEXT)
 
 F06:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=56.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=23, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=56.00KB mem-reservation=0B thread-reservation=0
   10:SCAN HDFS [default.impala_tpch_supplier, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpch_supplier_0.s_nationkey IS NOT NULL, default.impala_tpch_supplier_0.s_suppkey IS NOT NULL
@@ -505,9 +505,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 10(GETNEXT)
 
 F07:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=1.96MB mem-reservation=1.94MB thread-reservation=1
+Per-Host Resources: mem-estimate=2.04MB mem-reservation=1.94MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=25, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=104.00KB mem-reservation=0B thread-reservation=0
   14:HASH JOIN [INNER JOIN, BROADCAST]
   |  hash predicates: default.impala_tpch_nation_0.n_regionkey = default.impala_tpch_region_0.r_regionkey
   |  fk/pk conjuncts: assumed fk/pk
@@ -533,9 +533,9 @@ Per-Host Resources: mem-estimate=1.96MB mem-reservation=1.94MB thread-reservatio
      in pipelines: 12(GETNEXT)
 
 F08:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=72.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F07, EXCHANGE=24, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=72.00KB mem-reservation=0B thread-reservation=0
   13:SCAN HDFS [default.impala_tpch_region, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpch_region_0.r_regionkey IS NOT NULL, default.impala_tpch_region_0.r_name = 'EUROPE'

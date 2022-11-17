@@ -133,7 +133,7 @@ Per-Host Resources: mem-estimate=20.00KB mem-reservation=0B thread-reservation=1
 F03:PLAN FRAGMENT [HASH(count(default.impala_tpch_orders.o_orderkey))] hosts=1 instances=1
 Per-Host Resources: mem-estimate=134.00MB mem-reservation=40.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F04, EXCHANGE=11, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   05:SORT
   |  order by: count(*) DESC NULLS FIRST, count(default.impala_tpch_orders.o_orderkey) DESC NULLS FIRST
   |  mem-estimate=6.00MB mem-reservation=6.00MB spill-buffer=2.00MB thread-reservation=0
@@ -153,9 +153,9 @@ Per-Host Resources: mem-estimate=134.00MB mem-reservation=40.00MB thread-reserva
      in pipelines: 08(GETNEXT)
 
 F02:PLAN FRAGMENT [HASH(default.impala_tpch_customer.c_custkey)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=256.02MB mem-reservation=68.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=256.08MB mem-reservation=68.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F03, EXCHANGE=09, HASH(count(default.impala_tpch_orders.o_orderkey))]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   04:AGGREGATE [STREAMING]
   |  output: count(*)
   |  group by: count(default.impala_tpch_orders.o_orderkey)
@@ -176,9 +176,9 @@ Per-Host Resources: mem-estimate=256.02MB mem-reservation=68.00MB thread-reserva
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=129.97MB mem-reservation=35.94MB thread-reservation=1
+Per-Host Resources: mem-estimate=130.02MB mem-reservation=35.94MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=07, HASH(default.impala_tpch_customer.c_custkey)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   03:AGGREGATE [STREAMING]
   |  output: count(default.impala_tpch_orders.o_orderkey)
   |  group by: default.impala_tpch_customer.c_custkey
@@ -210,9 +210,9 @@ Per-Host Resources: mem-estimate=129.97MB mem-reservation=35.94MB thread-reserva
      in pipelines: 00(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=06, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=128.00KB mem-reservation=0B thread-reservation=0
   01:SCAN HDFS [default.impala_tpch_orders, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpch_orders.o_custkey IS NOT NULL, not(like(default.impala_tpch_orders.o_comment, '%special%requests%'))

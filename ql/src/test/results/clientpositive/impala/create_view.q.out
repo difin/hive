@@ -122,7 +122,7 @@ Per-Host Resources: mem-estimate=124.00KB mem-reservation=0B thread-reservation=
 F02:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=140.14MB mem-reservation=46.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F03, EXCHANGE=06, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=496.00KB mem-reservation=0B thread-reservation=0
   03:SORT
   |  order by: default.impala_tpch_lineitem.l_returnflag ASC NULLS LAST, default.impala_tpch_lineitem.l_linestatus ASC NULLS LAST
   |  mem-estimate=12.00MB mem-reservation=12.00MB spill-buffer=2.00MB thread-reservation=0
@@ -147,9 +147,9 @@ Per-Host Resources: mem-estimate=140.14MB mem-reservation=46.00MB thread-reserva
      in pipelines: 01(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.55MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=04, HASH(default.impala_tpch_lineitem.l_returnflag,default.impala_tpch_lineitem.l_linestatus)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=560.00KB mem-reservation=0B thread-reservation=0
   02:AGGREGATE [STREAMING]
   |  output: sum(default.impala_tpch_lineitem.l_quantity), sum(default.impala_tpch_lineitem.l_extendedprice), sum(multiply(default.impala_tpch_lineitem.l_extendedprice, subtract(CAST(1 AS DECIMAL(3,0)), default.impala_tpch_lineitem.l_discount))), sum(multiply(multiply(default.impala_tpch_lineitem.l_extendedprice, subtract(CAST(1 AS DECIMAL(3,0)), default.impala_tpch_lineitem.l_discount)), add(CAST(1 AS DECIMAL(3,0)), default.impala_tpch_lineitem.l_tax))), count(default.impala_tpch_lineitem.l_quantity), count(default.impala_tpch_lineitem.l_extendedprice), sum(default.impala_tpch_lineitem.l_discount), count(default.impala_tpch_lineitem.l_discount), count(*)
   |  group by: default.impala_tpch_lineitem.l_returnflag, default.impala_tpch_lineitem.l_linestatus

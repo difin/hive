@@ -36,9 +36,9 @@ Per-Host Resources: mem-estimate=24.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 03(GETNEXT)
 
 F01:PLAN FRAGMENT [HASH(default.impala_tpch_lineitem.l_orderkey)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.02MB mem-reservation=36.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.09MB mem-reservation=36.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=04, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=96.00KB mem-reservation=0B thread-reservation=0
   03:AGGREGATE [FINALIZE]
   |  output: group_concat:merge(casttostring(default.impala_tpch_lineitem.l_suppkey), ':')
   |  group by: default.impala_tpch_lineitem.l_orderkey
@@ -53,9 +53,9 @@ Per-Host Resources: mem-estimate=128.02MB mem-reservation=36.00MB thread-reserva
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.09MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=02, HASH(default.impala_tpch_lineitem.l_orderkey)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=96.00KB mem-reservation=0B thread-reservation=0
   01:AGGREGATE [STREAMING]
   |  output: group_concat(casttostring(default.impala_tpch_lineitem.l_suppkey), ':')
   |  group by: default.impala_tpch_lineitem.l_orderkey

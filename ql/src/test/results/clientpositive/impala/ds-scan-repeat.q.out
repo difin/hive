@@ -112,9 +112,9 @@ Per-Host Resources: mem-estimate=44.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 23(GETNEXT)
 
 F08:PLAN FRAGMENT [HASH(default.impala_tpcds_customer_address.ca_county,default.impala_tpcds_customer_address.ca_zip)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.04MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.17MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F09, EXCHANGE=24, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=176.00KB mem-reservation=0B thread-reservation=0
   23:AGGREGATE [FINALIZE]
   |  output: sum:merge(default.impala_tpcds_web_sales.ws_sales_price)
   |  group by: default.impala_tpcds_customer_address.ca_county, default.impala_tpcds_customer_address.ca_zip
@@ -128,9 +128,9 @@ Per-Host Resources: mem-estimate=128.04MB mem-reservation=34.00MB thread-reserva
      in pipelines: 01(GETNEXT)
 
 F07:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=130.01MB mem-reservation=35.94MB thread-reservation=1
+Per-Host Resources: mem-estimate=130.18MB mem-reservation=35.94MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F08, EXCHANGE=22, HASH(default.impala_tpcds_customer_address.ca_county,default.impala_tpcds_customer_address.ca_zip)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=176.00KB mem-reservation=0B thread-reservation=0
   13:AGGREGATE [STREAMING]
   |  output: sum(default.impala_tpcds_web_sales.ws_sales_price)
   |  group by: default.impala_tpcds_customer_address.ca_county, default.impala_tpcds_customer_address.ca_zip
@@ -194,9 +194,9 @@ Per-Host Resources: mem-estimate=130.01MB mem-reservation=35.94MB thread-reserva
      in pipelines: 01(GETNEXT)
 
 F02:PLAN FRAGMENT [HASH(default.impala_tpcds_item_0.i_item_id)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.02MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.06MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F07, EXCHANGE=16, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=64.00KB mem-reservation=0B thread-reservation=0
   15:AGGREGATE [FINALIZE]
   |  group by: default.impala_tpcds_item_0.i_item_id
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
@@ -209,9 +209,9 @@ Per-Host Resources: mem-estimate=128.02MB mem-reservation=34.00MB thread-reserva
      in pipelines: 02(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.06MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=14, HASH(default.impala_tpcds_item_0.i_item_id)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=64.00KB mem-reservation=0B thread-reservation=0
   03:AGGREGATE [STREAMING]
   |  group by: default.impala_tpcds_item_0.i_item_id
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
@@ -232,9 +232,9 @@ Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reserva
      in pipelines: 02(GETNEXT)
 
 F03:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F07, EXCHANGE=17, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=64.00KB mem-reservation=0B thread-reservation=0
   05:SCAN HDFS [default.impala_tpcds_web_sales, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      stored statistics:
@@ -247,9 +247,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 05(GETNEXT)
 
 F05:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
-Per-Host Resources: mem-estimate=60.00KB mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=204.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F07, EXCHANGE=21, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=160.00KB mem-reservation=0B thread-reservation=0
   10:NESTED LOOP JOIN [CROSS JOIN, BROADCAST]
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |  tuple-ids=11,7 row-size=32B cardinality=0
@@ -272,9 +272,9 @@ Per-Host Resources: mem-estimate=60.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 09(GETNEXT)
 
 F04:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=18, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   09:AGGREGATE
   |  output: count(*)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
@@ -295,9 +295,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 08(GETNEXT)
 
 F06:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=112.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=20, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=112.00KB mem-reservation=0B thread-reservation=0
   07:SCAN HDFS [default.impala_tpcds_customer_address, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      stored statistics:

@@ -190,7 +190,7 @@ Per-Host Resources: mem-estimate=60.00KB mem-reservation=0B thread-reservation=1
 F05:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=135.99MB mem-reservation=41.94MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F12, EXCHANGE=33, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=240.00KB mem-reservation=0B thread-reservation=0
   21:SORT
   |  order by: default.impala_tpcds_warehouse.w_warehouse_sk ASC NULLS LAST, default.impala_tpcds_item.i_item_sk ASC NULLS LAST, divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand)))) ASC NULLS LAST, CASE WHEN divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand)))) = 0 THEN NULL ELSE divide(stddev_samp(default.impala_tpcds_inventory.inv_quantity_on_hand), divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand))))) END ASC NULLS LAST, divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand)))) ASC NULLS LAST, CASE WHEN divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand)))) = 0 THEN NULL ELSE divide(stddev_samp(default.impala_tpcds_inventory_0.inv_quantity_on_hand), divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))))) END ASC NULLS LAST
   |  materialized: divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand)))), CASE WHEN divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand)))) = 0 THEN NULL ELSE divide(stddev_samp(default.impala_tpcds_inventory.inv_quantity_on_hand), divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand))))) END, divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand)))), CASE WHEN divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand)))) = 0 THEN NULL ELSE divide(stddev_samp(default.impala_tpcds_inventory_0.inv_quantity_on_hand), divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))))) END
@@ -234,9 +234,9 @@ Per-Host Resources: mem-estimate=135.99MB mem-reservation=41.94MB thread-reserva
      in pipelines: 01(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=133.86MB mem-reservation=39.81MB thread-reservation=1
+Per-Host Resources: mem-estimate=134.02MB mem-reservation=39.81MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=25, HASH(default.impala_tpcds_item.i_item_sk,default.impala_tpcds_warehouse.w_warehouse_sk,default.impala_tpcds_warehouse.w_warehouse_name)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=208.00KB mem-reservation=0B thread-reservation=0
   08:AGGREGATE [STREAMING]
   |  output: stddev_samp(default.impala_tpcds_inventory.inv_quantity_on_hand), sum(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand)), count(casttobigint(default.impala_tpcds_inventory.inv_quantity_on_hand))
   |  group by: default.impala_tpcds_item.i_item_sk, default.impala_tpcds_warehouse.w_warehouse_sk, default.impala_tpcds_warehouse.w_warehouse_name
@@ -293,9 +293,9 @@ Per-Host Resources: mem-estimate=133.86MB mem-reservation=39.81MB thread-reserva
      in pipelines: 01(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=48.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=22, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   02:SCAN HDFS [default.impala_tpcds_item, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_item.i_item_sk IS NOT NULL
@@ -309,9 +309,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 02(GETNEXT)
 
 F02:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=23, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=64.00KB mem-reservation=0B thread-reservation=0
   04:SCAN HDFS [default.impala_tpcds_date_dim, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_date_dim.d_date_sk IS NOT NULL, default.impala_tpcds_date_dim.d_moy = CAST(2 AS INT), default.impala_tpcds_date_dim.d_year = CAST(2000 AS INT)
@@ -326,9 +326,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 04(GETNEXT)
 
 F03:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=80.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=24, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   06:SCAN HDFS [default.impala_tpcds_warehouse, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_warehouse.w_warehouse_sk IS NOT NULL
@@ -342,9 +342,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 06(GETNEXT)
 
 F11:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.05MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.21MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=32, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=160.00KB mem-reservation=0B thread-reservation=0
   19:SELECT
   |  predicates: CASE WHEN divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand)))) = CAST(0 AS DOUBLE) THEN FALSE ELSE divide(stddev_samp(default.impala_tpcds_inventory_0.inv_quantity_on_hand), divide(casttodouble(sum(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))), casttodouble(count(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))))) > CAST(1 AS DOUBLE) END
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
@@ -369,9 +369,9 @@ Per-Host Resources: mem-estimate=128.05MB mem-reservation=34.00MB thread-reserva
      in pipelines: 11(GETNEXT)
 
 F06:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=133.86MB mem-reservation=39.81MB thread-reservation=1
+Per-Host Resources: mem-estimate=134.02MB mem-reservation=39.81MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F11, EXCHANGE=30, HASH(default.impala_tpcds_item_0.i_item_sk,default.impala_tpcds_warehouse_0.w_warehouse_sk,default.impala_tpcds_warehouse_0.w_warehouse_name)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=208.00KB mem-reservation=0B thread-reservation=0
   18:AGGREGATE [STREAMING]
   |  output: stddev_samp(default.impala_tpcds_inventory_0.inv_quantity_on_hand), sum(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand)), count(casttobigint(default.impala_tpcds_inventory_0.inv_quantity_on_hand))
   |  group by: default.impala_tpcds_item_0.i_item_sk, default.impala_tpcds_warehouse_0.w_warehouse_sk, default.impala_tpcds_warehouse_0.w_warehouse_name
@@ -428,9 +428,9 @@ Per-Host Resources: mem-estimate=133.86MB mem-reservation=39.81MB thread-reserva
      in pipelines: 11(GETNEXT)
 
 F07:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=48.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F06, EXCHANGE=27, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   12:SCAN HDFS [default.impala_tpcds_item, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_item_0.i_item_sk IS NOT NULL
@@ -444,9 +444,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 12(GETNEXT)
 
 F08:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F06, EXCHANGE=28, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=64.00KB mem-reservation=0B thread-reservation=0
   14:SCAN HDFS [default.impala_tpcds_date_dim, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_date_dim_0.d_date_sk IS NOT NULL, default.impala_tpcds_date_dim_0.d_year = CAST(2000 AS INT), default.impala_tpcds_date_dim_0.d_moy = casttoint(add(CAST(2 AS SMALLINT), CAST(1 AS SMALLINT)))
@@ -461,9 +461,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 14(GETNEXT)
 
 F09:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=80.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F06, EXCHANGE=29, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   16:SCAN HDFS [default.impala_tpcds_warehouse, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_warehouse_0.w_warehouse_sk IS NOT NULL

@@ -242,7 +242,7 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
 F03:PLAN FRAGMENT [HASH(i1.i_product_name)] hosts=1 instances=1
 Per-Host Resources: mem-estimate=128.02MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F04, EXCHANGE=11, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=64.00KB mem-reservation=0B thread-reservation=0
   05:TOP-N [LIMIT=100]
   |  order by: i1.i_product_name ASC NULLS LAST
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
@@ -261,9 +261,9 @@ Per-Host Resources: mem-estimate=128.02MB mem-reservation=34.00MB thread-reserva
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=129.96MB mem-reservation=35.94MB thread-reservation=1
+Per-Host Resources: mem-estimate=130.00MB mem-reservation=35.94MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F03, EXCHANGE=09, HASH(i1.i_product_name)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=64.00KB mem-reservation=0B thread-reservation=0
   04:AGGREGATE [STREAMING]
   |  group by: i1.i_product_name
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
@@ -295,9 +295,9 @@ Per-Host Resources: mem-estimate=129.96MB mem-reservation=35.94MB thread-reserva
      in pipelines: 00(GETNEXT)
 
 F02:PLAN FRAGMENT [HASH(default.impala_tpcds_item.i_manufact)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.02MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.09MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=08, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=96.00KB mem-reservation=0B thread-reservation=0
   07:AGGREGATE [FINALIZE]
   |  output: count:merge(*)
   |  group by: default.impala_tpcds_item.i_manufact
@@ -312,9 +312,9 @@ Per-Host Resources: mem-estimate=128.02MB mem-reservation=34.00MB thread-reserva
      in pipelines: 01(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.09MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=06, HASH(default.impala_tpcds_item.i_manufact)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=96.00KB mem-reservation=0B thread-reservation=0
   02:AGGREGATE [STREAMING]
   |  output: count(*)
   |  group by: default.impala_tpcds_item.i_manufact

@@ -216,7 +216,7 @@ Per-Host Resources: mem-estimate=92.00KB mem-reservation=0B thread-reservation=1
 F06:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=128.08MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F07, EXCHANGE=18, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=368.00KB mem-reservation=0B thread-reservation=0
   11:TOP-N [LIMIT=100]
   |  order by: substring(default.impala_tpcds_warehouse.w_warehouse_name, 1, 20) ASC NULLS LAST, default.impala_tpcds_ship_mode.sm_type ASC NULLS LAST, default.impala_tpcds_call_center.cc_name ASC NULLS LAST
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
@@ -241,9 +241,9 @@ Per-Host Resources: mem-estimate=128.08MB mem-reservation=34.00MB thread-reserva
      in pipelines: 01(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=135.82MB mem-reservation=41.75MB thread-reservation=1
+Per-Host Resources: mem-estimate=136.06MB mem-reservation=41.75MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F06, EXCHANGE=16, HASH(substring(default.impala_tpcds_warehouse.w_warehouse_name, 1, 20),default.impala_tpcds_ship_mode.sm_type,default.impala_tpcds_call_center.cc_name)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=320.00KB mem-reservation=0B thread-reservation=0
   10:AGGREGATE [STREAMING]
   |  output: sum(casttobigint(CASE WHEN subtract(casttobigint(default.impala_tpcds_catalog_sales.cs_ship_date_sk), casttobigint(default.impala_tpcds_catalog_sales.cs_sold_date_sk)) <= CAST(30 AS BIGINT) THEN CAST(1 AS TINYINT) ELSE CAST(0 AS TINYINT) END)), sum(casttobigint(CASE WHEN subtract(casttobigint(default.impala_tpcds_catalog_sales.cs_ship_date_sk), casttobigint(default.impala_tpcds_catalog_sales.cs_sold_date_sk)) > CAST(30 AS BIGINT) AND subtract(casttobigint(default.impala_tpcds_catalog_sales.cs_ship_date_sk), casttobigint(default.impala_tpcds_catalog_sales.cs_sold_date_sk)) <= CAST(60 AS BIGINT) THEN CAST(1 AS TINYINT) ELSE CAST(0 AS TINYINT) END)), sum(casttobigint(CASE WHEN subtract(casttobigint(default.impala_tpcds_catalog_sales.cs_ship_date_sk), casttobigint(default.impala_tpcds_catalog_sales.cs_sold_date_sk)) > CAST(60 AS BIGINT) AND subtract(casttobigint(default.impala_tpcds_catalog_sales.cs_ship_date_sk), casttobigint(default.impala_tpcds_catalog_sales.cs_sold_date_sk)) <= CAST(90 AS BIGINT) THEN CAST(1 AS TINYINT) ELSE CAST(0 AS TINYINT) END)), sum(casttobigint(CASE WHEN subtract(casttobigint(default.impala_tpcds_catalog_sales.cs_ship_date_sk), casttobigint(default.impala_tpcds_catalog_sales.cs_sold_date_sk)) > CAST(90 AS BIGINT) AND subtract(casttobigint(default.impala_tpcds_catalog_sales.cs_ship_date_sk), casttobigint(default.impala_tpcds_catalog_sales.cs_sold_date_sk)) <= CAST(120 AS BIGINT) THEN CAST(1 AS TINYINT) ELSE CAST(0 AS TINYINT) END)), sum(casttobigint(CASE WHEN subtract(casttobigint(default.impala_tpcds_catalog_sales.cs_ship_date_sk), casttobigint(default.impala_tpcds_catalog_sales.cs_sold_date_sk)) > CAST(120 AS BIGINT) THEN CAST(1 AS TINYINT) ELSE CAST(0 AS TINYINT) END))
   |  group by: substring(default.impala_tpcds_warehouse.w_warehouse_name, CAST(1 AS BIGINT), CAST(20 AS BIGINT)), default.impala_tpcds_ship_mode.sm_type, default.impala_tpcds_call_center.cc_name
@@ -312,9 +312,9 @@ Per-Host Resources: mem-estimate=135.82MB mem-reservation=41.75MB thread-reserva
      in pipelines: 01(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=48.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=12, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   02:SCAN HDFS [default.impala_tpcds_date_dim, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_date_dim.d_date_sk IS NOT NULL, default.impala_tpcds_date_dim.d_month_seq >= CAST(1178 AS INT) AND default.impala_tpcds_date_dim.d_month_seq <= add(CAST(1178 AS INT), CAST(11 AS INT))
@@ -328,9 +328,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 02(GETNEXT)
 
 F02:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=80.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=13, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   04:SCAN HDFS [default.impala_tpcds_warehouse, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_warehouse.w_warehouse_sk IS NOT NULL
@@ -344,9 +344,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 04(GETNEXT)
 
 F03:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=80.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=14, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   06:SCAN HDFS [default.impala_tpcds_ship_mode, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_ship_mode.sm_ship_mode_sk IS NOT NULL
@@ -360,9 +360,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 06(GETNEXT)
 
 F04:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=80.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=15, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   08:SCAN HDFS [default.impala_tpcds_call_center, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpcds_call_center.cc_call_center_sk IS NOT NULL

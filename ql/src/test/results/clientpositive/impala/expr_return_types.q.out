@@ -77,9 +77,9 @@ Per-Host Resources: mem-estimate=121.00KB mem-reservation=0B thread-reservation=
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=484.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=484.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.type_test, RANDOM]
      partitions=0/0 files=0 size=0B
      stored statistics:
@@ -127,9 +127,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=32.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.type_test, RANDOM]
      partitions=0/0 files=0 size=0B
      stored statistics:
@@ -177,9 +177,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=32.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.type_test, RANDOM]
      partitions=0/0 files=0 size=0B
      stored statistics:
@@ -227,9 +227,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=48.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.type_test, RANDOM]
      partitions=0/0 files=0 size=0B
      stored statistics:
@@ -277,9 +277,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=32.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.type_test, RANDOM]
      partitions=0/0 files=0 size=0B
      stored statistics:
@@ -327,9 +327,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=32.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.type_test, RANDOM]
      partitions=0/0 files=0 size=0B
      stored statistics:
@@ -414,9 +414,9 @@ Per-Host Resources: mem-estimate=20.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 01(GETNEXT)
 
 F01:PLAN FRAGMENT [HASH(default.type_test.tt_date)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=10.02MB mem-reservation=10.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=10.08MB mem-reservation=10.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=04, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   02:ANALYTIC
   |  functions: max(tt_int)
   |  partition by: default.type_test.tt_date
@@ -437,9 +437,9 @@ Per-Host Resources: mem-estimate=10.02MB mem-reservation=10.00MB thread-reservat
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=48.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=03, HASH(default.type_test.tt_date)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.type_test, RANDOM]
      partitions=0/0 files=0 size=0B
      stored statistics:
@@ -524,9 +524,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=32.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.type_test, RANDOM]
      partitions=0/0 files=0 size=0B
      stored statistics:
@@ -574,9 +574,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=32.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.type_test, RANDOM]
      partitions=0/0 files=0 size=0B
      stored statistics:

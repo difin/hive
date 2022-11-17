@@ -38,7 +38,7 @@ Per-Host Resources: mem-estimate=20.00KB mem-reservation=0B thread-reservation=1
 F01:PLAN FRAGMENT [HASH(default.impala_tpch_lineitem.l_orderkey)] hosts=1 instances=1
 Per-Host Resources: mem-estimate=134.00MB mem-reservation=40.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=05, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   02:SORT
   |  order by: default.impala_tpch_lineitem.l_orderkey ASC NULLS LAST
   |  mem-estimate=6.00MB mem-reservation=6.00MB spill-buffer=2.00MB thread-reservation=0
@@ -58,9 +58,9 @@ Per-Host Resources: mem-estimate=134.00MB mem-reservation=40.00MB thread-reserva
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.08MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=03, HASH(default.impala_tpch_lineitem.l_orderkey)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   01:AGGREGATE [STREAMING]
   |  output: count(*)
   |  group by: default.impala_tpch_lineitem.l_orderkey

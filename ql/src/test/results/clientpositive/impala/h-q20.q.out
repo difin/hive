@@ -232,7 +232,7 @@ Per-Host Resources: mem-estimate=28.00KB mem-reservation=0B thread-reservation=1
 F06:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
 Per-Host Resources: mem-estimate=15.95MB mem-reservation=15.88MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F07, EXCHANGE=18, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=112.00KB mem-reservation=0B thread-reservation=0
   11:SORT
   |  order by: default.impala_tpch_supplier.s_name ASC NULLS LAST
   |  mem-estimate=12.00MB mem-reservation=12.00MB spill-buffer=2.00MB thread-reservation=0
@@ -280,9 +280,9 @@ Per-Host Resources: mem-estimate=15.95MB mem-reservation=15.88MB thread-reservat
      in pipelines: 01(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=72.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F06, EXCHANGE=12, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=72.00KB mem-reservation=0B thread-reservation=0
   02:SCAN HDFS [default.impala_tpch_nation, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpch_nation.n_nationkey IS NOT NULL, default.impala_tpch_nation.n_name = 'CANADA'
@@ -297,9 +297,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 02(GETNEXT)
 
 F02:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=3.93MB mem-reservation=3.88MB thread-reservation=1
+Per-Host Resources: mem-estimate=4.11MB mem-reservation=3.88MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F06, EXCHANGE=17, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=240.00KB mem-reservation=0B thread-reservation=0
   09:HASH JOIN [INNER JOIN, BROADCAST]
   |  hash predicates: default.impala_tpch_partsupp.ps_partkey = default.impala_tpch_lineitem.l_partkey, default.impala_tpch_partsupp.ps_suppkey = default.impala_tpch_lineitem.l_suppkey
   |  fk/pk conjuncts: assumed fk/pk
@@ -337,9 +337,9 @@ Per-Host Resources: mem-estimate=3.93MB mem-reservation=3.88MB thread-reservatio
      in pipelines: 04(GETNEXT)
 
 F03:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=96.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=13, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=96.00KB mem-reservation=0B thread-reservation=0
   05:SCAN HDFS [default.impala_tpch_part, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.impala_tpch_part.p_partkey IS NOT NULL, like(default.impala_tpch_part.p_name, 'forest%')
@@ -353,9 +353,9 @@ Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
      in pipelines: 05(GETNEXT)
 
 F05:PLAN FRAGMENT [HASH(default.impala_tpch_lineitem.l_partkey,default.impala_tpch_lineitem.l_suppkey)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.04MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.14MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=16, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=144.00KB mem-reservation=0B thread-reservation=0
   15:AGGREGATE [FINALIZE]
   |  output: sum:merge(default.impala_tpch_lineitem.l_quantity)
   |  group by: default.impala_tpch_lineitem.l_partkey, default.impala_tpch_lineitem.l_suppkey
@@ -370,9 +370,9 @@ Per-Host Resources: mem-estimate=128.04MB mem-reservation=34.00MB thread-reserva
      in pipelines: 07(GETNEXT)
 
 F04:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.00MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.14MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F05, EXCHANGE=14, HASH(default.impala_tpch_lineitem.l_partkey,default.impala_tpch_lineitem.l_suppkey)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=144.00KB mem-reservation=0B thread-reservation=0
   08:AGGREGATE [STREAMING]
   |  output: sum(default.impala_tpch_lineitem.l_quantity)
   |  group by: default.impala_tpch_lineitem.l_partkey, default.impala_tpch_lineitem.l_suppkey

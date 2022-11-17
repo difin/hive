@@ -103,9 +103,9 @@ Per-Host Resources: mem-estimate=20.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=1.95MB mem-reservation=1.94MB thread-reservation=1
+Per-Host Resources: mem-estimate=2.02MB mem-reservation=1.94MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=04, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=80.00KB mem-reservation=0B thread-reservation=0
   02:HASH JOIN [INNER JOIN, BROADCAST]
   |  hash predicates: default.emps_hive.deptno = default.depts_hive.deptno
   |  fk/pk conjuncts: assumed fk/pk
@@ -132,9 +132,9 @@ Per-Host Resources: mem-estimate=1.95MB mem-reservation=1.94MB thread-reservatio
      in pipelines: 00(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=03, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=32.00KB mem-reservation=0B thread-reservation=0
   01:SCAN HDFS [default.depts_hive, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.depts_hive.deptno > casttoint(ltrim('10'))
@@ -486,9 +486,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 06(GETNEXT)
 
 F02:PLAN FRAGMENT [HASH(default.tab1_hive.empid,default.depts_hive.deptno)] hosts=1 instances=1
-Per-Host Resources: mem-estimate=128.02MB mem-reservation=34.00MB thread-reservation=1
+Per-Host Resources: mem-estimate=128.05MB mem-reservation=34.00MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F03, EXCHANGE=07, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   06:AGGREGATE [FINALIZE]
   |  group by: default.tab1_hive.empid, default.depts_hive.deptno
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
@@ -501,9 +501,9 @@ Per-Host Resources: mem-estimate=128.02MB mem-reservation=34.00MB thread-reserva
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=129.95MB mem-reservation=35.94MB thread-reservation=1
+Per-Host Resources: mem-estimate=129.98MB mem-reservation=35.94MB thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F02, EXCHANGE=05, HASH(default.tab1_hive.empid,default.depts_hive.deptno)]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   03:AGGREGATE [STREAMING]
   |  group by: default.tab1_hive.empid, default.depts_hive.deptno
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
@@ -536,9 +536,9 @@ Per-Host Resources: mem-estimate=129.95MB mem-reservation=35.94MB thread-reserva
      in pipelines: 00(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F00, EXCHANGE=04, BROADCAST]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=32.00KB mem-reservation=0B thread-reservation=0
   01:SCAN HDFS [default.depts_hive, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      predicates: default.depts_hive.deptno > casttoint(ltrim('10'))
@@ -1265,9 +1265,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=48.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.tab1_hive, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      stored statistics:
@@ -1547,9 +1547,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=48.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.tab1_hive, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      stored statistics:
@@ -1674,9 +1674,9 @@ Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
-Per-Host Resources: mem-estimate=0B mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=48.00KB mem-reservation=0B thread-reservation=1
   DATASTREAM SINK [FRAGMENT=F01, EXCHANGE=01, UNPARTITIONED]
-  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
   00:SCAN HDFS [default.tab1_hive, RANDOM]
      HDFS partitions=1/1 files=0 size=0B
      stored statistics:
