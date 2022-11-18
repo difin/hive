@@ -17,6 +17,10 @@
  */
 package org.apache.hadoop.hive.ql.exec.repl.util;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -74,6 +78,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -513,5 +518,17 @@ public class ReplUtils {
   public static boolean isErrorRecoverable(Throwable e) {
     int errorCode = ErrorMsg.getErrorMsg(e.getMessage()).getErrorCode();
     return errorCode > ErrorMsg.GENERIC_ERROR.getErrorCode();
+  }
+
+  // True if REPL DUMP should do transaction optimization
+  public static boolean filterTransactionOperations(HiveConf conf) {
+    return (conf.getBoolVar(HiveConf.ConfVars.REPL_FILTER_TRANSACTIONS));
+  }
+  public  static class TimeSerializer extends JsonSerializer<Long> {
+
+    @Override
+    public void serialize(Long epoch, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+      jsonGenerator.writeString(Instant.ofEpochSecond(epoch).toString());
+    }
   }
 }
