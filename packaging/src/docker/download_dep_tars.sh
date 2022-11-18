@@ -6,8 +6,8 @@
 # 5. Prints a recommended way to build hive image from hive repo root folder
 
 PLATFORM="${PLATFORM:-redhat7}"
-CDH_PREFIX="7.2.16.0"       #TODO: get last from https://release.infra.cloudera.com/hwre-api/releasedbuilds?stack=CDH&type=public
-CDWH_PREFIX="2022.0.11.0"
+CDH_PREFIX=${CDH_PREFIX:="7.2.16.0"}       #TODO: get last from https://release.infra.cloudera.com/hwre-api/releasedbuilds?stack=CDH&type=public
+CDWH_PREFIX=${CDWH_PREFIX:="2022.0.11.0"}
 
 function get_component_version(){
     COMPONENT=$1
@@ -45,7 +45,7 @@ if [ -z $CDWH_VERSION ]; then #CDWH_VERSION can be forced from ENV, like: export
 fi
 echo "CDWH_VERSION=${CDWH_VERSION}"
 
-export CDWH_REPO_DETAILS_URL="http://release.infra.cloudera.com/hwre-api/versioninfo?stack=CDWH&stack_version=${CDWH_PREFIX}&per_page=50"
+export CDWH_REPO_DETAILS_URL="http://release.infra.cloudera.com/hwre-api/versioninfo?stack=CDWH&stack_version=${CDWH_VERSION}&per_page=50"
 CDWH_REPO_URL=$(curl -s $CDWH_REPO_DETAILS_URL | jq '.["'${CDWH_VERSION}'"]'.platforms.${PLATFORM}.repo_url | tr -d '"')
 
 CDWH_GBN=$(curl -s $CDWH_REPO_DETAILS_URL | jq '.["'${CDWH_VERSION}'"]'.gbn | tr -d '"')
