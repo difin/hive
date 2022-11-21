@@ -160,7 +160,7 @@ public class LoadFileDesc extends LoadDesc implements Serializable {
       writeId = ctasCreateTableDesc.getInitialWriteId();
     }
     if (createViewDesc != null) {
-      writeId = createViewDesc.getInitialMmWriteId();
+      writeId = createViewDesc.getInitialWriteId();
     }
     return (writeId == null) ? -1 : writeId;
   }

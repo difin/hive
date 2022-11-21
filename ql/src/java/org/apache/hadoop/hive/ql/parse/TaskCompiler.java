@@ -93,7 +93,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -480,7 +479,7 @@ public abstract class TaskCompiler {
       loc = cmv.getLocation();
     }
     long writeId = lfd.getWriteId();
-    Path location = (loc == null) ? getDefaultCtasLocation(pCtx) : new Path(loc);
+    Path location = (loc == null) ? getDefaultCtasOrCMVLocation(pCtx) : new Path(loc);
     if (pCtx.getQueryProperties().isCTAS()) {
       CreateTableDesc ctd = pCtx.getCreateTable();
       if (HiveConf.getBoolVar(conf, HiveConf.ConfVars.CREATE_TABLE_AS_EXTERNAL)) {
@@ -515,7 +514,7 @@ public abstract class TaskCompiler {
     lfd.setTargetDir(location);
   }
 
-  private Path getDefaultCtasLocation(final ParseContext pCtx) throws SemanticException {
+  private Path getDefaultCtasOrCMVLocation(final ParseContext pCtx) throws SemanticException {
     try {
       String protoName = null, suffix = "";
       boolean isExternal = false;
@@ -526,11 +525,11 @@ public abstract class TaskCompiler {
         protoName = pCtx.getCreateTable().getDbTableName();
         isExternal = pCtx.getCreateTable().isExternal();
         createTableOrMVUseSuffix &= AcidUtils.isTransactionalTable(pCtx.getCreateTable());
-        suffix = getTableOrMVSuffix(pCtx, createTableOrMVUseSuffix);
+        suffix = Utilities.getTableOrMVSuffix(pCtx.getContext(), createTableOrMVUseSuffix);
       } else if (pCtx.getQueryProperties().isMaterializedView()) {
         protoName = pCtx.getCreateViewDesc().getViewName();
         createTableOrMVUseSuffix &= AcidUtils.isTransactionalView(pCtx.getCreateViewDesc());
-        suffix = getTableOrMVSuffix(pCtx, createTableOrMVUseSuffix);
+        suffix = Utilities.getTableOrMVSuffix(pCtx.getContext(), createTableOrMVUseSuffix);
       }
       String[] names = Utilities.getDbTableName(protoName);
       if (!db.databaseExists(names[0])) {
@@ -541,18 +540,6 @@ public abstract class TaskCompiler {
     } catch (HiveException | MetaException e) {
       throw new SemanticException(e);
     }
-  }
-
-  public String getTableOrMVSuffix(ParseContext pCtx, boolean createTableOrMVUseSuffix) {
-    String suffix = "";
-    if (createTableOrMVUseSuffix) {
-      long txnId = Optional.ofNullable(pCtx.getContext())
-              .map(ctx -> ctx.getHiveTxnManager().getCurrentTxnId()).orElse(0L);
-      if (txnId != 0) {
-        suffix = AcidUtils.getPathSuffix(txnId);
-      }
-    }
-    return suffix;
   }
 
   private void patchUpAfterCTASorMaterializedView(List<Task<?>> rootTasks,
