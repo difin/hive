@@ -44,7 +44,7 @@ RUN curl -o /etc/yum.repos.d/rhel8_mirrors.repo http://mirror.infra.cloudera.com
 # install debugging tools and other dependencies
 RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN yum -y update && \
-  yum install -y java-11-openjdk-headless java-11-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop procps && \
+  yum install -y java-11-openjdk-headless java-11-openjdk-devel.x86_64 strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop procps lsof net-tools && \
   yum clean all && \
   rm -rf /var/cache/yum
 
