@@ -56,6 +56,19 @@ class FireEventRequest
             'isRequired' => false,
             'type' => TType::STRING,
         ),
+        7 => array(
+            'var' => 'tblParams',
+            'isRequired' => false,
+            'type' => TType::MAP,
+            'ktype' => TType::STRING,
+            'vtype' => TType::STRING,
+            'key' => array(
+                'type' => TType::STRING,
+            ),
+            'val' => array(
+                'type' => TType::STRING,
+                ),
+        ),
     );
 
     /**
@@ -82,6 +95,10 @@ class FireEventRequest
      * @var string
      */
     public $catName = null;
+    /**
+     * @var array
+     */
+    public $tblParams = null;
 
     public function __construct($vals = null)
     {
@@ -103,6 +120,9 @@ class FireEventRequest
             }
             if (isset($vals['catName'])) {
                 $this->catName = $vals['catName'];
+            }
+            if (isset($vals['tblParams'])) {
+                $this->tblParams = $vals['tblParams'];
             }
         }
     }
@@ -178,6 +198,25 @@ class FireEventRequest
                         $xfer += $input->skip($ftype);
                     }
                     break;
+                case 7:
+                    if ($ftype == TType::MAP) {
+                        $this->tblParams = array();
+                        $_size839 = 0;
+                        $_ktype840 = 0;
+                        $_vtype841 = 0;
+                        $xfer += $input->readMapBegin($_ktype840, $_vtype841, $_size839);
+                        for ($_i843 = 0; $_i843 < $_size839; ++$_i843) {
+                            $key844 = '';
+                            $val845 = '';
+                            $xfer += $input->readString($key844);
+                            $xfer += $input->readString($val845);
+                            $this->tblParams[$key844] = $val845;
+                        }
+                        $xfer += $input->readMapEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
                 default:
                     $xfer += $input->skip($ftype);
                     break;
@@ -221,8 +260,8 @@ class FireEventRequest
             }
             $xfer += $output->writeFieldBegin('partitionVals', TType::LST, 5);
             $output->writeListBegin(TType::STRING, count($this->partitionVals));
-            foreach ($this->partitionVals as $iter839) {
-                $xfer += $output->writeString($iter839);
+            foreach ($this->partitionVals as $iter846) {
+                $xfer += $output->writeString($iter846);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -230,6 +269,19 @@ class FireEventRequest
         if ($this->catName !== null) {
             $xfer += $output->writeFieldBegin('catName', TType::STRING, 6);
             $xfer += $output->writeString($this->catName);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->tblParams !== null) {
+            if (!is_array($this->tblParams)) {
+                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+            }
+            $xfer += $output->writeFieldBegin('tblParams', TType::MAP, 7);
+            $output->writeMapBegin(TType::STRING, TType::STRING, count($this->tblParams));
+            foreach ($this->tblParams as $kiter847 => $viter848) {
+                $xfer += $output->writeString($kiter847);
+                $xfer += $output->writeString($viter848);
+            }
+            $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();
         }
         $xfer += $output->writeFieldStop();

@@ -48,6 +48,7 @@ import org.apache.hadoop.hive.metastore.messaging.UpdateTableColumnStatMessage;
 import org.apache.hadoop.hive.metastore.messaging.DeleteTableColumnStatMessage;
 import org.apache.hadoop.hive.metastore.messaging.UpdatePartitionColumnStatMessage;
 import org.apache.hadoop.hive.metastore.messaging.DeletePartitionColumnStatMessage;
+import org.apache.hadoop.hive.metastore.messaging.ReloadMessage;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -230,6 +231,14 @@ public class JSONMessageDeserializer extends MessageDeserializer {
       return mapper.readValue(messageBody, JSONDropConstraintMessage.class);
     } catch (Exception e) {
       throw new IllegalArgumentException("Could not construct DropConstraintMessage", e);
+    }
+  }
+
+  public ReloadMessage getReloadMessage(String messageBody) {
+    try {
+      return mapper.readValue(messageBody, JSONReloadMessage.class);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Could not construct ReloadMessage", e);
     }
   }
 

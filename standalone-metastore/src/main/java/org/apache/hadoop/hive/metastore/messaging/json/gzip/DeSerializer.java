@@ -42,6 +42,7 @@ import org.apache.hadoop.hive.metastore.messaging.DropPartitionMessage;
 import org.apache.hadoop.hive.metastore.messaging.DropTableMessage;
 import org.apache.hadoop.hive.metastore.messaging.InsertMessage;
 import org.apache.hadoop.hive.metastore.messaging.OpenTxnMessage;
+import org.apache.hadoop.hive.metastore.messaging.ReloadMessage;
 import org.apache.hadoop.hive.metastore.messaging.UpdateTableColumnStatMessage;
 import org.apache.hadoop.hive.metastore.messaging.UpdatePartitionColumnStatMessage;
 import org.apache.hadoop.hive.metastore.messaging.DeleteTableColumnStatMessage;
@@ -221,6 +222,9 @@ public class DeSerializer extends JSONMessageDeserializer {
     return super.getDeletePartitionColumnStatMessage(deCompress(messageBody));
   }
 
+  public ReloadMessage getReloadMessage(String messageBody) {
+    return super.getReloadMessage(deCompress(messageBody));
+  }
   public String deSerializeGenericString(String messageBody) {
     return deCompress(messageBody);
   }

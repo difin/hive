@@ -80,13 +80,13 @@ class ThriftHiveMetastore_partition_name_has_valid_characters_args
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->part_vals = array();
-                        $_size1643 = 0;
-                        $_etype1646 = 0;
-                        $xfer += $input->readListBegin($_etype1646, $_size1643);
-                        for ($_i1647 = 0; $_i1647 < $_size1643; ++$_i1647) {
-                            $elem1648 = null;
-                            $xfer += $input->readString($elem1648);
-                            $this->part_vals []= $elem1648;
+                        $_size1652 = 0;
+                        $_etype1655 = 0;
+                        $xfer += $input->readListBegin($_etype1655, $_size1652);
+                        for ($_i1656 = 0; $_i1656 < $_size1652; ++$_i1656) {
+                            $elem1657 = null;
+                            $xfer += $input->readString($elem1657);
+                            $this->part_vals []= $elem1657;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -120,8 +120,8 @@ class ThriftHiveMetastore_partition_name_has_valid_characters_args
             }
             $xfer += $output->writeFieldBegin('part_vals', TType::LST, 1);
             $output->writeListBegin(TType::STRING, count($this->part_vals));
-            foreach ($this->part_vals as $iter1649) {
-                $xfer += $output->writeString($iter1649);
+            foreach ($this->part_vals as $iter1658) {
+                $xfer += $output->writeString($iter1658);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

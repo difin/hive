@@ -1443,9 +1443,10 @@ struct InsertEventRequestData {
 }
 
 union FireEventRequestData {
-    1: InsertEventRequestData insertData
+    1: optional InsertEventRequestData insertData
     // used to fire insert events on multiple partitions
-    2: list<InsertEventRequestData> insertDatas
+    2: optional list<InsertEventRequestData> insertDatas,
+    3: optional bool refreshEvent
 }
 
 struct FireEventRequest {
@@ -1458,6 +1459,7 @@ struct FireEventRequest {
     // ignored if event request data contains multiple insert event datas
     5: optional list<string> partitionVals,
     6: optional string catName,
+    7: optional map<string, string> tblParams,
 }
 
 struct FireEventResponse {

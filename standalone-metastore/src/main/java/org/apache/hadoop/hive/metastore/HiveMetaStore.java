@@ -9756,57 +9756,86 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       switch (rqst.getData().getSetField()) {
         case INSERT_DATA:
         case INSERT_DATAS:
-        String catName =
-            rqst.isSetCatName() ? rqst.getCatName() : getDefaultCatalog(conf);
-        String dbName = rqst.getDbName();
-        String tblName = rqst.getTableName();
-        boolean isSuccessful = rqst.isSuccessful();
-        List<InsertEvent> events = new ArrayList<>();
-        if (rqst.getData().isSetInsertData()) {
-          events.add(new InsertEvent(catName, dbName, tblName,
-              rqst.getPartitionVals(),
-              rqst.getData().getInsertData(), isSuccessful, this));
-        } else {
-          // this is a bulk fire insert event operation
-          // we use the partition values field from the InsertEventRequestData object
-          // instead of the FireEventRequest object
-          for (InsertEventRequestData insertData : rqst.getData().getInsertDatas()) {
-            if (!insertData.isSetPartitionVal()) {
-              throw new MetaException(
-                  "Partition values must be set when firing multiple insert events");
-            }
+          String catName =
+              rqst.isSetCatName() ? rqst.getCatName() : getDefaultCatalog(conf);
+          String dbName = rqst.getDbName();
+          String tblName = rqst.getTableName();
+          boolean isSuccessful = rqst.isSuccessful();
+          List<InsertEvent> events = new ArrayList<>();
+          if (rqst.getData().isSetInsertData()) {
             events.add(new InsertEvent(catName, dbName, tblName,
-                insertData.getPartitionVal(),
-                insertData, isSuccessful, this));
-          }
-        }
-        FireEventResponse response = new FireEventResponse();
-        for (InsertEvent event : events) {
-          /*
-           * The transactional listener response will be set already on the event, so there is not need
-           * to pass the response to the non-transactional listener.
-           */
-          MetaStoreListenerNotifier
-              .notifyEvent(transactionalListeners, EventType.INSERT, event);
-          MetaStoreListenerNotifier.notifyEvent(listeners, EventType.INSERT, event);
-          if (event.getParameters() != null && event.getParameters()
-              .containsKey(
-                  MetaStoreEventListenerConstants.DB_NOTIFICATION_EVENT_ID_KEY_NAME)) {
-            response.addToEventIds(Long.valueOf(event.getParameters()
-                .get(MetaStoreEventListenerConstants.DB_NOTIFICATION_EVENT_ID_KEY_NAME)));
+                rqst.getPartitionVals(),
+                rqst.getData().getInsertData(), isSuccessful, this));
           } else {
-            String msg = "Insert event id not generated for ";
+            // this is a bulk fire insert event operation
+            // we use the partition values field from the InsertEventRequestData object
+            // instead of the FireEventRequest object
+            for (InsertEventRequestData insertData : rqst.getData().getInsertDatas()) {
+              if (!insertData.isSetPartitionVal()) {
+                throw new MetaException(
+                    "Partition values must be set when firing multiple insert events");
+              }
+              events.add(new InsertEvent(catName, dbName, tblName,
+                  insertData.getPartitionVal(),
+                  insertData, isSuccessful, this));
+            }
+          }
+          FireEventResponse response = new FireEventResponse();
+          for (InsertEvent event : events) {
+            /*
+             * The transactional listener response will be set already on the event, so there is not need
+             * to pass the response to the non-transactional listener.
+             */
+            MetaStoreListenerNotifier
+                .notifyEvent(transactionalListeners, EventType.INSERT, event);
+            MetaStoreListenerNotifier.notifyEvent(listeners, EventType.INSERT, event);
+            if (event.getParameters() != null && event.getParameters()
+                .containsKey(
+                    MetaStoreEventListenerConstants.DB_NOTIFICATION_EVENT_ID_KEY_NAME)) {
+              response.addToEventIds(Long.valueOf(event.getParameters()
+                  .get(MetaStoreEventListenerConstants.DB_NOTIFICATION_EVENT_ID_KEY_NAME)));
+            } else {
+              String msg = "Insert event id not generated for ";
+              if (event.getPartitionObj() != null) {
+                msg += "partition " + Arrays
+                    .toString(event.getPartitionObj().getValues().toArray()) + " of ";
+              }
+              msg +=
+                  " of table " + event.getTableObj().getDbName() + "." + event.getTableObj()
+                      .getTableName();
+              LOG.warn(msg);
+            }
+          }
+          return response;
+        case REFRESH_EVENT:
+          response = new FireEventResponse();
+          catName = rqst.isSetCatName() ? rqst.getCatName() : getDefaultCatalog(conf);
+          dbName = rqst.getDbName();
+          tblName = rqst.getTableName();
+          List<String> partitionVals = rqst.getPartitionVals();
+          Map<String, String> tableParams = rqst.getTblParams();
+          ReloadEvent event = new ReloadEvent(catName, dbName, tblName, partitionVals, rqst.isSuccessful(),
+                  rqst.getData().getRefreshEvent(), tableParams, this);
+          MetaStoreListenerNotifier
+                  .notifyEvent(transactionalListeners, EventType.RELOAD, event);
+          MetaStoreListenerNotifier.notifyEvent(listeners, EventType.RELOAD, event);
+          if (event.getParameters() != null && event.getParameters()
+                  .containsKey(
+                          MetaStoreEventListenerConstants.DB_NOTIFICATION_EVENT_ID_KEY_NAME)) {
+            response.addToEventIds(Long.valueOf(event.getParameters()
+                    .get(MetaStoreEventListenerConstants.DB_NOTIFICATION_EVENT_ID_KEY_NAME)));
+          } else {
+            String msg = "Reload event id not generated for ";
             if (event.getPartitionObj() != null) {
               msg += "partition " + Arrays
-                  .toString(event.getPartitionObj().getValues().toArray()) + " of ";
+                      .toString(event.getPartitionObj().getValues().toArray()) + " of ";
             }
             msg +=
-                " of table " + event.getTableObj().getDbName() + "." + event.getTableObj()
-                    .getTableName();
+                    " of table " + event.getTableObj().getDbName() + "." + event.getTableObj()
+                            .getTableName();
             LOG.warn(msg);
           }
-        }
-        return response;
+          return response;
         default:
         throw new TException("Event type " + rqst.getData().getSetField().toString()
             + " not currently supported.");

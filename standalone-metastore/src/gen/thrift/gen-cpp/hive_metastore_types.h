@@ -12027,9 +12027,10 @@ void swap(InsertEventRequestData &a, InsertEventRequestData &b);
 std::ostream& operator<<(std::ostream& out, const InsertEventRequestData& obj);
 
 typedef struct _FireEventRequestData__isset {
-  _FireEventRequestData__isset() : insertData(false), insertDatas(false) {}
+  _FireEventRequestData__isset() : insertData(false), insertDatas(false), refreshEvent(false) {}
   bool insertData :1;
   bool insertDatas :1;
+  bool refreshEvent :1;
 } _FireEventRequestData__isset;
 
 class FireEventRequestData : public virtual ::apache::thrift::TBase {
@@ -12037,18 +12038,22 @@ class FireEventRequestData : public virtual ::apache::thrift::TBase {
 
   FireEventRequestData(const FireEventRequestData&);
   FireEventRequestData& operator=(const FireEventRequestData&);
-  FireEventRequestData() noexcept {
+  FireEventRequestData() noexcept
+                       : refreshEvent(0) {
   }
 
   virtual ~FireEventRequestData() noexcept;
   InsertEventRequestData insertData;
   std::vector<InsertEventRequestData>  insertDatas;
+  bool refreshEvent;
 
   _FireEventRequestData__isset __isset;
 
   void __set_insertData(const InsertEventRequestData& val);
 
   void __set_insertDatas(const std::vector<InsertEventRequestData> & val);
+
+  void __set_refreshEvent(const bool val);
 
   bool operator == (const FireEventRequestData & rhs) const
   {
@@ -12059,6 +12064,10 @@ class FireEventRequestData : public virtual ::apache::thrift::TBase {
     if (__isset.insertDatas != rhs.__isset.insertDatas)
       return false;
     else if (__isset.insertDatas && !(insertDatas == rhs.insertDatas))
+      return false;
+    if (__isset.refreshEvent != rhs.__isset.refreshEvent)
+      return false;
+    else if (__isset.refreshEvent && !(refreshEvent == rhs.refreshEvent))
       return false;
     return true;
   }
@@ -12079,11 +12088,12 @@ void swap(FireEventRequestData &a, FireEventRequestData &b);
 std::ostream& operator<<(std::ostream& out, const FireEventRequestData& obj);
 
 typedef struct _FireEventRequest__isset {
-  _FireEventRequest__isset() : dbName(false), tableName(false), partitionVals(false), catName(false) {}
+  _FireEventRequest__isset() : dbName(false), tableName(false), partitionVals(false), catName(false), tblParams(false) {}
   bool dbName :1;
   bool tableName :1;
   bool partitionVals :1;
   bool catName :1;
+  bool tblParams :1;
 } _FireEventRequest__isset;
 
 class FireEventRequest : public virtual ::apache::thrift::TBase {
@@ -12105,6 +12115,7 @@ class FireEventRequest : public virtual ::apache::thrift::TBase {
   std::string tableName;
   std::vector<std::string>  partitionVals;
   std::string catName;
+  std::map<std::string, std::string>  tblParams;
 
   _FireEventRequest__isset __isset;
 
@@ -12119,6 +12130,8 @@ class FireEventRequest : public virtual ::apache::thrift::TBase {
   void __set_partitionVals(const std::vector<std::string> & val);
 
   void __set_catName(const std::string& val);
+
+  void __set_tblParams(const std::map<std::string, std::string> & val);
 
   bool operator == (const FireEventRequest & rhs) const
   {
@@ -12141,6 +12154,10 @@ class FireEventRequest : public virtual ::apache::thrift::TBase {
     if (__isset.catName != rhs.__isset.catName)
       return false;
     else if (__isset.catName && !(catName == rhs.catName))
+      return false;
+    if (__isset.tblParams != rhs.__isset.tblParams)
+      return false;
+    else if (__isset.tblParams && !(tblParams == rhs.tblParams))
       return false;
     return true;
   }

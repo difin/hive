@@ -82,6 +82,8 @@ public abstract class MessageDeserializer {
       return getUpdatePartitionColumnStatMessage(messageBody);
     case DELETE_PARTITION_COLUMN_STAT:
       return getDeletePartitionColumnStatMessage(messageBody);
+    case RELOAD:
+      return getReloadMessage(messageBody);
     default:
       throw new IllegalArgumentException("Unsupported event-type: " + eventTypeString);
     }
@@ -223,6 +225,10 @@ public abstract class MessageDeserializer {
    */
   public abstract DeletePartitionColumnStatMessage getDeletePartitionColumnStatMessage(String messageBody);
 
+  /**
+   * Method to de-serialize ReloadMessage instance.
+   */
+  public abstract ReloadMessage getReloadMessage(String messageBody);
   /**
    * Method to de-serialize any string passed. Need to be over-ridden by specific serialization subclasses.
    */

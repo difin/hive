@@ -89,6 +89,7 @@ import org.apache.hadoop.hive.metastore.events.UpdateTableColumnStatEvent;
 import org.apache.hadoop.hive.metastore.events.DeleteTableColumnStatEvent;
 import org.apache.hadoop.hive.metastore.events.UpdatePartitionColumnStatEvent;
 import org.apache.hadoop.hive.metastore.events.DeletePartitionColumnStatEvent;
+import org.apache.hadoop.hive.metastore.events.ReloadEvent;
 import org.apache.hadoop.hive.metastore.messaging.AbortTxnMessage;
 import org.apache.hadoop.hive.metastore.messaging.AcidWriteMessage;
 import org.apache.hadoop.hive.metastore.messaging.AddForeignKeyMessage;
@@ -122,6 +123,7 @@ import org.apache.hadoop.hive.metastore.messaging.UpdateTableColumnStatMessage;
 import org.apache.hadoop.hive.metastore.messaging.DeleteTableColumnStatMessage;
 import org.apache.hadoop.hive.metastore.messaging.UpdatePartitionColumnStatMessage;
 import org.apache.hadoop.hive.metastore.messaging.DeletePartitionColumnStatMessage;
+import org.apache.hadoop.hive.metastore.messaging.ReloadMessage;
 import org.apache.hadoop.hive.metastore.tools.SQLGenerator;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
@@ -894,6 +896,19 @@ public class DbNotificationListener extends TransactionalMetaStoreEventListener 
     event.setDbName(deletePartColStatEvent.getDBName());
     event.setTableName(deletePartColStatEvent.getTableName());
     process(event, deletePartColStatEvent);
+  }
+
+  public void onReload(ReloadEvent reloadEvent) throws MetaException {
+    Table tableObj = reloadEvent.getTableObj();
+    ReloadMessage msg = MessageBuilder.getInstance().buildReloadMessage(tableObj,
+            reloadEvent.getPartitionObj(), reloadEvent.isRefreshEvent());
+    NotificationEvent event =
+            new NotificationEvent(0, now(), EventType.RELOAD.toString(),
+                    msgEncoder.getSerializer().serialize(msg));
+    event.setCatName(tableObj.isSetCatName() ? tableObj.getCatName() : DEFAULT_CATALOG_NAME);
+    event.setDbName(tableObj.getDbName());
+    event.setTableName(tableObj.getTableName());
+    process(event, reloadEvent);
   }
 
   @Override
