@@ -475,7 +475,6 @@
     <dependency>
       <groupId>org.apache.calcite.avatica</groupId>
       <artifactId>avatica</artifactId>
-      <version>${avatica.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.apache.calcite.avatica</groupId>
