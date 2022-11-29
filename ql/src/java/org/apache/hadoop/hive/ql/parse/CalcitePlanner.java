@@ -93,6 +93,7 @@ import org.apache.calcite.rel.metadata.ChainedRelMetadataProvider;
 import org.apache.calcite.rel.metadata.JaninoRelMetadataProvider;
 import org.apache.calcite.rel.metadata.RelMetadataProvider;
 import org.apache.calcite.rel.metadata.RelMetadataQuery;
+import org.apache.calcite.rel.rules.FilterMergeRule;
 import org.apache.calcite.rel.rules.JoinToMultiJoinRule;
 import org.apache.calcite.rel.rules.LoptOptimizeJoinRule;
 import org.apache.calcite.rel.rules.ProjectMergeRule;
@@ -3231,7 +3232,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
         List<VirtualColumn> virtualCols = new ArrayList<>();
         if (tableType == TableType.NATIVE) {
           virtualCols = VirtualColumn.getRegistry(conf);
-          if (AcidUtils.isNonNativeAcidTable(tabMetaData)) {
+          if (AcidUtils.isNonNativeAcidTable(tabMetaData, false)) {
             virtualCols.addAll(tabMetaData.getStorageHandler().acidVirtualColumns());
           }
           for (VirtualColumn vc : virtualCols) {

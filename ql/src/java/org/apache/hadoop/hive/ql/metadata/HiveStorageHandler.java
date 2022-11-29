@@ -294,7 +294,8 @@ public interface HiveStorageHandler extends Configurable {
    *
    * @return the table's ACID support type
    */
-  default AcidSupportType supportsAcidOperations(org.apache.hadoop.hive.ql.metadata.Table table) {
+  default AcidSupportType supportsAcidOperations(org.apache.hadoop.hive.ql.metadata.Table table,
+      boolean isWriteOperation) {
     return AcidSupportType.NONE;
   }
 
@@ -303,7 +304,7 @@ public interface HiveStorageHandler extends Configurable {
    * for tables that support ACID operations.
    *
    * Should only return a non-empty list if
-   * {@link HiveStorageHandler#supportsAcidOperations(org.apache.hadoop.hive.ql.metadata.Table)} ()} returns something
+   * {@link HiveStorageHandler#supportsAcidOperations(org.apache.hadoop.hive.ql.metadata.Table, boolean)} ()} returns something
    * other NONE.
    *
    * @return the list of ACID virtual columns
@@ -323,7 +324,7 @@ public interface HiveStorageHandler extends Configurable {
    * This method specifies which columns should be injected into the <selectCols> part of the rewritten query.
    *
    * Should only return a non-empty list if
-   * {@link HiveStorageHandler#supportsAcidOperations(org.apache.hadoop.hive.ql.metadata.Table)} returns something
+   * {@link HiveStorageHandler#supportsAcidOperations(org.apache.hadoop.hive.ql.metadata.Table, boolean)} returns something
    * other NONE.
    *
    * @param table the table which is being deleted/updated/merged into
@@ -342,7 +343,7 @@ public interface HiveStorageHandler extends Configurable {
    * This method specifies which columns should be injected into the <sortCols> part of the rewritten query.
    *
    * Should only return a non-empty list if
-   * {@link HiveStorageHandler#supportsAcidOperations(org.apache.hadoop.hive.ql.metadata.Table)} returns something
+   * {@link HiveStorageHandler#supportsAcidOperations(org.apache.hadoop.hive.ql.metadata.Table, boolean)} returns something
    * other NONE.
    *
    * @param table the table which is being deleted/updated/merged into

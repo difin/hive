@@ -108,10 +108,11 @@ public class ImpalaHdfsScanRel extends ImpalaPlanRel {
     // Check if this is an Iceberg table (Hive classifies it as non-native Acid table)
     // Use fully qualified AcidUtils path otherwise it conflicts with the same
     // class name in Impala which is used later in this file
-    if (org.apache.hadoop.hive.ql.io.AcidUtils.isNonNativeAcidTable
-        (((RelOptHiveTable) scan.getTable()).getHiveTableMD())) {
-      throw new HiveException(String.format
-          ("Table %s is an Iceberg table format which is not currently supported.", tableName));
+    if (org.apache.hadoop.hive.ql.io.AcidUtils.isNonNativeAcidTable(
+        ((RelOptHiveTable) scan.getTable()).getHiveTableMD(), false)) {
+      throw new HiveException(String.format(
+          "Table %s is an Iceberg table format which is not currently supported.",
+          tableName));
     }
 
     List<FeFsPartition> feFsPartitions = Lists.newArrayList();
