@@ -372,28 +372,44 @@ public class ImpalaJoinRel extends ImpalaPlanRel {
    * e.g CAST($5, INT) + $4 = CAST($3, INT) + $1
    * This method will traverse the left and right sides of the
    * condition and identify the minimum RexInputRef index
-   * on each side. If the left's min index is greater than the
-   * right side's min, it will swap the two sides.
+   * on each side.
+   * If the left's min index is >= the number of expressions
+   * on the left side, it will swap the two sides. In the case
+   * that there is no input ref on the left side, it will check
+   * the right side index to see if the expression needs swapping.
    */
   private RexNode getCanonical(RexNode conjunct) {
     if (!conjunct.isA(SqlKind.EQUALS)) {
       return conjunct;
     }
 
+    boolean swapExprs = false;
     MinIndexVisitor visitor = new MinIndexVisitor();
     RexNode lhsRexCall = ((RexCall) conjunct).getOperands().get(0);
     RexNode rhsRexCall = ((RexCall) conjunct).getOperands().get(1);
     // visit the left and right child
     lhsRexCall.accept(visitor);
-    int lhsMinIndex = visitor.getMinIndex();
-    visitor.reset();
-    rhsRexCall.accept(visitor);
-    int rhsMinIndex = visitor.getMinIndex();
-    if (lhsMinIndex >  rhsMinIndex) {
+    int minIndex = visitor.getMinIndex();
+    int numExprsOnLeftSide = getImpalaRelInput(0).numOutputExprs();
+    if (minIndex != Integer.MAX_VALUE) {
+      if (minIndex >= numExprsOnLeftSide) {
+        swapExprs = true;
+      }
+    } else {
+      visitor.reset();
+      // didn't find an input ref on the left side, check the right side.
+      rhsRexCall.accept(visitor);
+      minIndex = visitor.getMinIndex();
+      Preconditions.checkState(minIndex != Integer.MAX_VALUE);
+      if (minIndex < numExprsOnLeftSide) {
+        swapExprs = true;
+      }
+    }
+
+    if (swapExprs) {
       // swap the left and right children
-      RexNode newConjunct = join.getCluster().getRexBuilder().
+      conjunct = join.getCluster().getRexBuilder().
           makeCall(SqlStdOperatorTable.EQUALS, rhsRexCall, lhsRexCall);
-      return newConjunct;
     }
     return conjunct;
   }
