@@ -39,6 +39,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static org.apache.hadoop.hive.conf.Constants.EXPLAIN_CTAS_LOCATION;
+
 /**
  * TableDesc.
  *
@@ -126,7 +128,7 @@ public class TableDesc implements Serializable, Cloneable {
 
   @Explain(displayName = "properties", explainLevels = { Level.EXTENDED })
   public Map getPropertiesExplain() {
-    return PlanUtils.getPropertiesExplain(getProperties());
+    return PlanUtils.getPropertiesForExplain(getProperties());
   }
 
   public void setProperties(final Properties properties) {
@@ -138,9 +140,13 @@ public class TableDesc implements Serializable, Cloneable {
     this.jobProperties = jobProperties;
   }
 
-  @Explain(displayName = "jobProperties", explainLevels = { Level.EXTENDED })
   public Map<String, String> getJobProperties() {
     return jobProperties;
+  }
+
+  @Explain(displayName = "jobProperties", explainLevels = { Level.EXTENDED })
+  public Map<String, String> getJobPropertiesExplain() {
+    return PlanUtils.getPropertiesForExplain(jobProperties, EXPLAIN_CTAS_LOCATION);
   }
 
   public void setJobSecrets(Map<String, String> jobSecrets) {
