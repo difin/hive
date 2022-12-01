@@ -159,7 +159,7 @@ Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
           destination: hdfs://### HDFS PATH ###
 
   Stage: Stage-2
-    Create View
+    Create Materialized View
       columns: empid int, deptno int
       table properties:
         materializedview.engine impala
@@ -244,7 +244,7 @@ Per-Host Resources: mem-estimate=12.00MB mem-reservation=12.00MB thread-reservat
 
 
   Stage: Stage-2
-    Create View
+    Create Materialized View
       partition columns: salary_alias float, commission int
       columns: empid int, deptno_alias int, name varchar(256)
       table properties:
@@ -346,7 +346,7 @@ Per-Host Resources: mem-estimate=12.00MB mem-reservation=12.00MB thread-reservat
 
 
   Stage: Stage-2
-    Create View
+    Create Materialized View
       partition columns: salary_alias float, deptno_alias int
       columns: empid int, name varchar(256), commission int
       table properties:

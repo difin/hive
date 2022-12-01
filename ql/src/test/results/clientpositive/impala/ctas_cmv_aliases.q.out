@@ -325,7 +325,7 @@ Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
           destination: hdfs://### HDFS PATH ###
 
   Stage: Stage-2
-    Create View
+    Create Materialized View
       columns: empid int, deptno0 int, cnt bigint
       table properties:
         materializedview.engine impala
@@ -358,7 +358,6 @@ PREHOOK: Input: default@depts_imp0
 PREHOOK: Input: default@emps_imp0
 PREHOOK: Output: database:default
 PREHOOK: Output: default@v_tab1_imp0
-PREHOOK: Output: streaming
 POSTHOOK: query: explain extended
 create view v_tab1_imp0 as
 select empid, depts_imp0.deptno deptno0, count(*) cnt from emps_imp0
@@ -383,14 +382,14 @@ STAGE DEPENDENCIES:
 STAGE PLANS:
   Stage: Stage-0
     Create View
-      columns: empid int, deptno0 int, cnt bigint
       expanded text: select `emps_imp0`.`empid`, `depts_imp0`.`deptno` `deptno0`, count(*) `cnt` from `default`.`emps_imp0`
 join `default`.`depts_imp0` using (`deptno`) where `depts_imp0`.`deptno` > cast(ltrim('10', 'a') as integer)
 group by `emps_imp0`.`empid`, `depts_imp0`.`deptno`
-      name: default.v_tab1_imp0
       original text: select empid, depts_imp0.deptno deptno0, count(*) cnt from emps_imp0
 join depts_imp0 using (deptno) where depts_imp0.deptno > cast(ltrim('10', 'a') as integer)
 group by empid, depts_imp0.deptno
+      columns: empid int, deptno0 int, cnt bigint
+      name: default.v_tab1_imp0
 
 HMS CALL get_table_req FOR emps_imp0
 PREHOOK: query: drop table emps_imp0

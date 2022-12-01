@@ -1377,7 +1377,7 @@ STAGE PLANS:
     Dependency Collection
 
   Stage: Stage-4
-    Create View
+    Create Materialized View
       columns: i int
       table properties:
         materializedview.engine tez

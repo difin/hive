@@ -100,7 +100,7 @@ STAGE PLANS:
     Dependency Collection
 
   Stage: Stage-4
-    Create View
+    Create Materialized View
       columns: key int
       table properties:
         materializedview.engine tez
@@ -805,7 +805,7 @@ STAGE PLANS:
     Dependency Collection
 
   Stage: Stage-4
-    Create View
+    Create Materialized View
       columns: key int
       table properties:
         materializedview.engine tez

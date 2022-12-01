@@ -429,13 +429,11 @@ POSTHOOK: Input: db1@table1
 POSTHOOK: Output: database:db1
 POSTHOOK: Output: db1@view1
 STAGE DEPENDENCIES:
-  Stage-1 is a root stage
+  Stage-0 is a root stage
 
 STAGE PLANS:
-  Stage: Stage-1
+  Stage: Stage-0
     Create View
-      if not exists: true
-      columns: level1 string, level1_desc string, level2 string, level2_desc string, level3 string, level3_desc string, level4 string, level4_desc string, level5 string, level5_desc string, level6 string, level6_desc string, level7 string, level7_desc string, level8 string, level8_desc string, level9 string, level9_desc string, level10 string, level10_desc string, level11 string, level11_desc string, level12 string, level12_desc string, level13 string, level13_desc string, level14 string, level14_desc string, pack string, aeoi string, aeoo string, data_date string, key string
       expanded text: SELECT
 `h`.`level1`,
 `h`.`level1_desc`,
@@ -602,7 +600,7 @@ WHEN `lc`.`leaf_level` = 12 THEN `h`.`level12`
 WHEN `lc`.`leaf_level` = 13 THEN `h`.`level13`
 END
 AND `h`.`level14` <> `lc`.`leaf_code`) `hh`) `hhh`
-      name: db1.view1
+      if not exists: true
       original text: SELECT
 h.level1,
 h.level1_desc,
@@ -769,4 +767,6 @@ WHEN lc.leaf_level = 12 THEN h.level12
 WHEN lc.leaf_level = 13 THEN h.level13
 END
 AND h.level14 <> lc.leaf_code) hh) hhh
+      columns: level1 string, level1_desc string, level2 string, level2_desc string, level3 string, level3_desc string, level4 string, level4_desc string, level5 string, level5_desc string, level6 string, level6_desc string, level7 string, level7_desc string, level8 string, level8_desc string, level9 string, level9_desc string, level10 string, level10_desc string, level11 string, level11_desc string, level12 string, level12_desc string, level13 string, level13_desc string, level14 string, level14_desc string, pack string, aeoi string, aeoo string, data_date string, key string
+      name: db1.view1
 

@@ -109,7 +109,7 @@ alterViewStatementSuffix
     | alterStatementSuffixRename[false]
     | alterStatementSuffixAddPartitions[false]
     | alterStatementSuffixDropPartitions[false]
-    | selectStatementWithCTE
+    | selectStatementWithCTE -> ^(TOK_ALTERVIEW_AS selectStatementWithCTE)
     ;
 
 alterMaterializedViewStatementSuffix[CommonTree tableNameTree]

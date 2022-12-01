@@ -19,7 +19,6 @@
 package org.apache.hadoop.hive.ql.parse;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -27,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.hadoop.hive.ql.ddl.view.create.CreateMaterializedViewDesc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.fs.Path;
@@ -67,7 +67,7 @@ public class QB {
   private Set<String> aliasInsideView;
 
   // If this is a materialized view, this stores the view descriptor
-  private CreateViewDesc viewDesc;
+  private CreateMaterializedViewDesc viewDesc;
 
   // used by PTFs
   /*
@@ -430,20 +430,16 @@ public class QB {
     return havingClauseSubQueryPredicate;
   }
 
-  public CreateViewDesc getViewDesc() {
+  public CreateMaterializedViewDesc getViewDesc() {
     return viewDesc;
   }
 
-  public void setViewDesc(CreateViewDesc viewDesc) {
+  public void setViewDesc(CreateMaterializedViewDesc viewDesc) {
     this.viewDesc = viewDesc;
   }
 
   public boolean isMaterializedView() {
-    return viewDesc != null && viewDesc.isMaterialized();
-  }
-
-  public boolean isView() {
-    return viewDesc != null && !viewDesc.isMaterialized();
+    return viewDesc != null;
   }
 
   public boolean isMultiDestQuery() {

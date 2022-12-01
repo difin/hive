@@ -125,7 +125,7 @@ STAGE PLANS:
     Dependency Collection
 
   Stage: Stage-4
-    Create View
+    Create Materialized View
       partition columns: key string
       columns: value string
       table properties:

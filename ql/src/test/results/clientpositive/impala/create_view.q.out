@@ -30,7 +30,6 @@ PREHOOK: type: CREATEVIEW
 PREHOOK: Input: default@impala_tpch_lineitem
 PREHOOK: Output: database:default
 PREHOOK: Output: default@impala_complex_view
-PREHOOK: Output: streaming
 HMS CALL get_table_req FOR impala_complex_view
 POSTHOOK: query: create view impala_complex_view AS
 select

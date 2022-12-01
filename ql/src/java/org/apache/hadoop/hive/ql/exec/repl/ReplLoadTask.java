@@ -506,13 +506,9 @@ public class ReplLoadTask extends Task<ReplLoadWork> implements Serializable {
     }
 
     CreateViewDesc desc = new CreateViewDesc(dbDotView, table.getCols(), null, table.getParameters(),
-            table.getPartColNames(), false, false, false, table.getSd().getInputFormat(),
-            table.getSd().getOutputFormat(),
-            table.getSd().getSerdeInfo().getSerializationLib());
+        table.getPartColNames(), false, false, viewOriginalText, viewExpandedText, table.getPartCols());
 
-    desc.setViewOriginalText(viewOriginalText);
-    desc.setViewExpandedText(viewExpandedText);
-    desc.setPartCols(table.getPartCols());desc.setReplicationSpec(metaData.getReplicationSpec());
+    desc.setReplicationSpec(metaData.getReplicationSpec());
     desc.setOwnerName(table.getOwner());
 
     return TaskFactory.get(new DDLWork(new HashSet<>(), new HashSet<>(), desc, true,
