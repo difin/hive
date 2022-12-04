@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.ql.session;
 import static org.apache.hadoop.hive.metastore.Warehouse.DEFAULT_DATABASE_NAME;
+import static org.apache.hadoop.hive.shims.HadoopShims.USER_ID;
 
 import java.io.Closeable;
 import java.io.File;
@@ -492,6 +493,7 @@ public class SessionState {
 
     ShimLoader.getHadoopShims().setHadoopSessionContext(getSessionId());
     this.cleanupService = cleanupService;
+    ShimLoader.getHadoopShims().setHadoopSessionContext(String.format(USER_ID, getSessionId(), userName));
     try {
       externalEngineHmsConverter = EngineCompileHelper.getInstance(conf).getHMSConverter();
     } catch (Exception e) {
