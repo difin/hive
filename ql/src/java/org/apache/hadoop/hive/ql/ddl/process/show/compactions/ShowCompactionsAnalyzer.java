@@ -18,7 +18,8 @@
 
 package org.apache.hadoop.hive.ql.ddl.process.show.compactions;
 
-import org.antlr.runtime.tree.Tree;
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.ddl.DDLWork;
 import org.apache.hadoop.hive.ql.ddl.DDLSemanticAnalyzerFactory.DDLType;
@@ -28,6 +29,11 @@ import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.BaseSemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.HiveParser;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.parse.PTFInvocationSpec;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Analyzer for show compactions commands.
@@ -40,21 +46,71 @@ public class ShowCompactionsAnalyzer extends BaseSemanticAnalyzer {
 
   @Override
   public void analyzeInternal(ASTNode root) throws SemanticException {
+    ctx.setResFile(ctx.getLocalTmpPath());
     String poolName = null;
-    Tree pool = root.getChild(0);
-    if (pool != null) {
-      if (pool.getType() != HiveParser.TOK_COMPACT_POOL) {
-        throw new SemanticException("Unknown token, 'POOL' expected.");
-      } else {
-        poolName = unescapeSQLString(pool.getChild(0).getText());
+    String orderBy = null;
+    if (root.getChildCount() > 6) {
+      throw new SemanticException(ErrorMsg.INVALID_AST_TREE.getMsg(root.toStringTree()));
+    }
+    for (int i = 0; i < root.getChildCount(); i++) {
+      ASTNode child = (ASTNode) root.getChild(i);
+      switch (child.getType()) {
+        case HiveParser.TOK_COMPACT_POOL:
+          poolName = unescapeSQLString(child.getChild(0).getText());
+          break;
+        case HiveParser.TOK_ORDERBY:
+          orderBy = processSortOrderSpec(child);
+          break;
       }
     }
-    ctx.setResFile(ctx.getLocalTmpPath());
-    ShowCompactionsDesc desc = new ShowCompactionsDesc(ctx.getResFile(), poolName);
+    ShowCompactionsDesc desc = new ShowCompactionsDesc(ctx.getResFile(), poolName, orderBy);
     Task<DDLWork> task = TaskFactory.get(new DDLWork(getInputs(), getOutputs(), desc));
     rootTasks.add(task);
 
     task.setFetchSource(true);
     setFetchTask(createFetchTask(ShowCompactionsDesc.SCHEMA));
+  }
+
+  private String processSortOrderSpec(ASTNode sortNode) {
+    List<PTFInvocationSpec.OrderExpression> orderExp = processOrderSpec(sortNode).getExpressions();
+    Map<String, String> orderByAttributes = orderExp.stream().
+      collect(Collectors.toMap(x -> getDbColumnName(x.getExpression()), x -> x.getOrder().toString()));
+    return orderByAttributes.entrySet().stream().map(e -> e.getKey() + "\t" + e.getValue()).collect(Collectors.joining(","));
+  }
+
+  private String getDbColumnName(ASTNode expression) {
+    String dbColumnPrefix = "CC_";
+    String dbColumnName = expression.getChild(0) == null ? expression.getText().replace("\'", "").toUpperCase() :
+      expression.getChild(0).getText().toUpperCase();
+    return EnumUtils.isValidEnum(CompactionColumn.class, dbColumnName) ? CompactionColumn.valueOf(dbColumnName).toString() :
+      "\"" + dbColumnPrefix + dbColumnName + "\"";
+  }
+
+  private enum CompactionColumn {
+    COMPACTIONID("\"CC_ID\""),
+    DBNAME("\"CC_DATABASE\""),
+    TABNAME("\"CC_TABLE\""),
+    PARTNAME("\"CC_PARTITION\""),
+    ENQUEUETIME("\"CC_ENQUEUE_TIME\""),
+    STARTTIME("\"CC_START\""),
+    POOLNAME("\"CC_POOL_NAME\""),
+    NEXTTXNID("\"CC_NEXT_TXN_ID\""),
+    HADOOPJOBID("\"CC_HADOOP_JOB_ID\""),
+    WORKERHOST("\"CC_WORKER_ID\""),
+    WORKERID("\"CC_WORKER_ID\""),
+    DURATION("\"CC_END\""),
+    TXNID("\"CC_TXN_ID\""),
+    COMMITTIME("CC_COMMIT_TIME"),
+    HIGHESTWRITEID("CC_HIGHEST_WRITE_ID");
+    private final String colVal;
+
+    CompactionColumn(String colVal) {
+      this.colVal = colVal;
+    }
+
+    @Override
+    public String toString() {
+      return colVal;
+    }
   }
 }

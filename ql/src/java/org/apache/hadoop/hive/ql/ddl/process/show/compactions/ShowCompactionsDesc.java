@@ -39,11 +39,13 @@ public class ShowCompactionsDesc implements DDLDesc, Serializable {
   private String resFile;
 
   private final String poolName;
+  private final String orderBy;
 
 
-  public ShowCompactionsDesc(Path resFile, String poolName) {
+  public ShowCompactionsDesc(Path resFile, String poolName, String orderBy) {
     this.resFile = resFile.toString();
     this.poolName = poolName;
+    this.orderBy = orderBy;
   }
 
   public String getResFile() {
@@ -55,4 +57,8 @@ public class ShowCompactionsDesc implements DDLDesc, Serializable {
     return poolName;
   }
 
+  @Explain(displayName = "orderBy", explainLevels = {Level.USER, Level.DEFAULT, Level.EXTENDED})
+  public String getOrderBy() {
+    return orderBy;
+  }
 }

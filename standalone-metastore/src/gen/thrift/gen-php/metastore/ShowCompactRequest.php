@@ -26,18 +26,30 @@ class ShowCompactRequest
             'isRequired' => false,
             'type' => TType::STRING,
         ),
+        2 => array(
+            'var' => 'order',
+            'isRequired' => false,
+            'type' => TType::STRING,
+        ),
     );
 
     /**
      * @var string
      */
     public $poolName = null;
+    /**
+     * @var string
+     */
+    public $order = null;
 
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
             if (isset($vals['poolName'])) {
                 $this->poolName = $vals['poolName'];
+            }
+            if (isset($vals['order'])) {
+                $this->order = $vals['order'];
             }
         }
     }
@@ -68,6 +80,13 @@ class ShowCompactRequest
                         $xfer += $input->skip($ftype);
                     }
                     break;
+                case 2:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->order);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
                 default:
                     $xfer += $input->skip($ftype);
                     break;
@@ -85,6 +104,11 @@ class ShowCompactRequest
         if ($this->poolName !== null) {
             $xfer += $output->writeFieldBegin('poolName', TType::STRING, 1);
             $xfer += $output->writeString($this->poolName);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->order !== null) {
+            $xfer += $output->writeFieldBegin('order', TType::STRING, 2);
+            $xfer += $output->writeString($this->order);
             $xfer += $output->writeFieldEnd();
         }
         $xfer += $output->writeFieldStop();

@@ -1333,7 +1333,7 @@ showStatement
       |
       (parttype=partTypeExpr)? (isExtended=KW_EXTENDED)? -> ^(TOK_SHOWLOCKS $parttype? $isExtended?)
       )
-    | KW_SHOW KW_COMPACTIONS compactPool? -> ^(TOK_SHOW_COMPACTIONS compactPool?)
+    | KW_SHOW KW_COMPACTIONS compactPool? orderByClause? -> ^(TOK_SHOW_COMPACTIONS compactPool? orderByClause?)
     | KW_SHOW KW_TRANSACTIONS -> ^(TOK_SHOW_TRANSACTIONS)
     | KW_SHOW KW_CONF StringLiteral -> ^(TOK_SHOWCONF StringLiteral)
     | KW_SHOW KW_RESOURCE

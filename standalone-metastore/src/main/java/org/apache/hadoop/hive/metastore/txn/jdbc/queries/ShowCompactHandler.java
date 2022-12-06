@@ -36,6 +36,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ShowCompactHandler implements QueryHandler<ShowCompactResponse> {
   
@@ -43,7 +44,7 @@ public class ShowCompactHandler implements QueryHandler<ShowCompactResponse> {
 
   //language=SQL
   private static final String SHOW_COMPACTION_QUERY =
-      "SELECT XX.* FROM ( SELECT " +
+      " XX.* FROM ( SELECT " +
           "  \"CQ_DATABASE\" AS \"CC_DATABASE\", \"CQ_TABLE\" AS \"CC_TABLE\", \"CQ_PARTITION\" AS \"CC_PARTITION\", " +
           "  \"CQ_STATE\" AS \"CC_STATE\", \"CQ_TYPE\" AS \"CC_TYPE\", \"CQ_WORKER_ID\" AS \"CC_WORKER_ID\", " +
           "  \"CQ_START\" AS \"CC_START\", -1 \"CC_END\", \"CQ_RUN_AS\" AS \"CC_RUN_AS\", " +
@@ -65,15 +66,18 @@ public class ShowCompactHandler implements QueryHandler<ShowCompactResponse> {
           "FROM " +
           "  \"COMPLETED_COMPACTIONS\" ) XX " +
           "WHERE " +
-          "  (\"CC_POOL_NAME\" = :poolName OR :poolName IS NULL) " + 
-          "ORDER BY CASE " +
-              "   WHEN \"CC_END\" > \"CC_START\" and \"CC_END\" > \"CC_COMMIT_TIME\" " +
-              "     THEN \"CC_END\" " +
-              "   WHEN \"CC_START\" > \"CC_COMMIT_TIME\" " +
-              "     THEN \"CC_START\" " +
-              "   ELSE \"CC_COMMIT_TIME\" " +
-              "END desc ," +
-              "\"CC_ENQUEUE_TIME\" asc";
+          "  (\"CC_POOL_NAME\" = :poolName OR :poolName IS NULL)";
+
+  //language=SQL
+  private static final String SHOW_COMPACTION_ORDERBY_CLAUSE =
+      "ORDER BY CASE " +
+          "   WHEN \"CC_END\" > \"CC_START\" and \"CC_END\" > \"CC_COMMIT_TIME\" " +
+          "     THEN \"CC_END\" " +
+          "   WHEN \"CC_START\" > \"CC_COMMIT_TIME\" " +
+          "     THEN \"CC_START\" " +
+          "   ELSE \"CC_COMMIT_TIME\" " +
+          "END desc ," +
+          "\"CC_ENQUEUE_TIME\" asc";
 
   private final ShowCompactRequest request;
 
@@ -84,7 +88,8 @@ public class ShowCompactHandler implements QueryHandler<ShowCompactResponse> {
 
   @Override
   public String getParameterizedQueryString(DatabaseProduct databaseProduct) throws MetaException {
-    return SHOW_COMPACTION_QUERY;
+    String noSelectQuery = SHOW_COMPACTION_QUERY + getShowCompactSortingOrderClause(request);
+    return "SELECT " + noSelectQuery;
   }
 
   @Override
@@ -144,6 +149,11 @@ public class ShowCompactHandler implements QueryHandler<ShowCompactResponse> {
       response.addToCompacts(e);      
     }
     return response;
+  }
+
+  private String getShowCompactSortingOrderClause(ShowCompactRequest request) {
+    String sortingOrder = request.getOrder();
+    return isNotBlank(sortingOrder) ? "  ORDER BY  " + sortingOrder : SHOW_COMPACTION_ORDERBY_CLAUSE;
   }
   
 }

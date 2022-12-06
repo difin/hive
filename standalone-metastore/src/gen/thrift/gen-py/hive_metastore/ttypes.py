@@ -16104,12 +16104,14 @@ class ShowCompactRequest(object):
     """
     Attributes:
      - poolName
+     - order
 
     """
 
 
-    def __init__(self, poolName=None,):
+    def __init__(self, poolName=None, order=None,):
         self.poolName = poolName
+        self.order = order
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -16125,6 +16127,11 @@ class ShowCompactRequest(object):
                     self.poolName = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.STRING:
+                    self.order = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -16138,6 +16145,10 @@ class ShowCompactRequest(object):
         if self.poolName is not None:
             oprot.writeFieldBegin('poolName', TType.STRING, 1)
             oprot.writeString(self.poolName.encode('utf-8') if sys.version_info[0] == 2 else self.poolName)
+            oprot.writeFieldEnd()
+        if self.order is not None:
+            oprot.writeFieldBegin('order', TType.STRING, 2)
+            oprot.writeString(self.order.encode('utf-8') if sys.version_info[0] == 2 else self.order)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -31554,6 +31565,7 @@ all_structs.append(ShowCompactRequest)
 ShowCompactRequest.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'poolName', 'UTF8', None, ),  # 1
+    (2, TType.STRING, 'order', 'UTF8', None, ),  # 2
 )
 all_structs.append(ShowCompactResponseElement)
 ShowCompactResponseElement.thrift_spec = (

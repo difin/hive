@@ -113,6 +113,7 @@ import org.apache.hadoop.hive.metastore.api.AbortTxnsRequest;
 import org.apache.hadoop.hive.metastore.api.CompactionRequest;
 import org.apache.hadoop.hive.metastore.api.CreateTableRequest;
 import org.apache.hadoop.hive.metastore.api.GetPartitionsByNamesRequest;
+import org.apache.hadoop.hive.metastore.api.ShowCompactRequest;
 import org.apache.hadoop.hive.metastore.api.SourceTable;
 import org.apache.hadoop.hive.metastore.api.UpdateTransactionalStatsRequest;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
@@ -6320,9 +6321,9 @@ private void constructOneLBLocationMap(FileStatus fSta,
     }
   }
 
-  public ShowCompactResponse showCompactions(String poolName) throws HiveException {
+  public ShowCompactResponse showCompactions(ShowCompactRequest request) throws HiveException {
     try {
-      return getMSC().showCompactions(poolName);
+      return getMSC().showCompactions(request);
     } catch (Exception e) {
       LOG.error("Failed showCompactions", e);
       throw new HiveException(e);

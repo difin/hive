@@ -3551,13 +3551,9 @@ public interface IMetaStoreClient {
   ShowCompactResponse showCompactions() throws TException;
 
   /**
-   * Get a list of all compactions for the given pool name.
-   * @return List of all current compactions for the given pool name.  This includes compactions waiting to happen,
-   * in progress, and finished but waiting to clean the existing files.
-   * @param poolName The name of the compaction pool for which the compactions must be returned.
-   * @throws TException
+   * Get a list of compactions for the given request object.
    */
-  ShowCompactResponse showCompactions(String poolName) throws TException;
+  ShowCompactResponse showCompactions(ShowCompactRequest request) throws TException;
 
   /**
    * Submit a request for performing cleanup of output directory. This is particularly

@@ -11205,8 +11205,9 @@ void swap(CompactionResponse &a, CompactionResponse &b);
 std::ostream& operator<<(std::ostream& out, const CompactionResponse& obj);
 
 typedef struct _ShowCompactRequest__isset {
-  _ShowCompactRequest__isset() : poolName(false) {}
+  _ShowCompactRequest__isset() : poolName(false), order(false) {}
   bool poolName :1;
+  bool order :1;
 } _ShowCompactRequest__isset;
 
 class ShowCompactRequest : public virtual ::apache::thrift::TBase {
@@ -11215,21 +11216,29 @@ class ShowCompactRequest : public virtual ::apache::thrift::TBase {
   ShowCompactRequest(const ShowCompactRequest&);
   ShowCompactRequest& operator=(const ShowCompactRequest&);
   ShowCompactRequest() noexcept
-                     : poolName() {
+                     : poolName(),
+                       order() {
   }
 
   virtual ~ShowCompactRequest() noexcept;
   std::string poolName;
+  std::string order;
 
   _ShowCompactRequest__isset __isset;
 
   void __set_poolName(const std::string& val);
+
+  void __set_order(const std::string& val);
 
   bool operator == (const ShowCompactRequest & rhs) const
   {
     if (__isset.poolName != rhs.__isset.poolName)
       return false;
     else if (__isset.poolName && !(poolName == rhs.poolName))
+      return false;
+    if (__isset.order != rhs.__isset.order)
+      return false;
+    else if (__isset.order && !(order == rhs.order))
       return false;
     return true;
   }

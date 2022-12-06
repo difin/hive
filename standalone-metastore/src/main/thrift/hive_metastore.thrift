@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.47"
+const string HMS_API = "1.2.48"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -1355,7 +1355,8 @@ struct CompactionResponse {
 }
 
 struct ShowCompactRequest {
-    1: optional string poolName
+    1: optional string poolName,
+    2: optional string order
 }
 
 struct ShowCompactResponseElement {

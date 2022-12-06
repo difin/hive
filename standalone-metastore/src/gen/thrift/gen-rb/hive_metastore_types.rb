@@ -4637,9 +4637,11 @@ end
 class ShowCompactRequest
   include ::Thrift::Struct, ::Thrift::Struct_Union
   POOLNAME = 1
+  ORDER = 2
 
   FIELDS = {
-    POOLNAME => {:type => ::Thrift::Types::STRING, :name => 'poolName', :optional => true}
+    POOLNAME => {:type => ::Thrift::Types::STRING, :name => 'poolName', :optional => true},
+    ORDER => {:type => ::Thrift::Types::STRING, :name => 'order', :optional => true}
   }
 
   def struct_fields; FIELDS; end

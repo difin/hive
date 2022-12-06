@@ -12,15 +12,18 @@ package org.apache.hadoop.hive.metastore.api;
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("ShowCompactRequest");
 
   private static final org.apache.thrift.protocol.TField POOL_NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("poolName", org.apache.thrift.protocol.TType.STRING, (short)1);
+  private static final org.apache.thrift.protocol.TField ORDER_FIELD_DESC = new org.apache.thrift.protocol.TField("order", org.apache.thrift.protocol.TType.STRING, (short)2);
 
   private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new ShowCompactRequestStandardSchemeFactory();
   private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new ShowCompactRequestTupleSchemeFactory();
 
   private @org.apache.thrift.annotation.Nullable java.lang.String poolName; // optional
+  private @org.apache.thrift.annotation.Nullable java.lang.String order; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    POOL_NAME((short)1, "poolName");
+    POOL_NAME((short)1, "poolName"),
+    ORDER((short)2, "order");
 
     private static final java.util.Map<java.lang.String, _Fields> byName = new java.util.HashMap<java.lang.String, _Fields>();
 
@@ -38,6 +41,8 @@ package org.apache.hadoop.hive.metastore.api;
       switch(fieldId) {
         case 1: // POOL_NAME
           return POOL_NAME;
+        case 2: // ORDER
+          return ORDER;
         default:
           return null;
       }
@@ -79,11 +84,13 @@ package org.apache.hadoop.hive.metastore.api;
   }
 
   // isset id assignments
-  private static final _Fields optionals[] = {_Fields.POOL_NAME};
+  private static final _Fields optionals[] = {_Fields.POOL_NAME,_Fields.ORDER};
   public static final java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new java.util.EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.POOL_NAME, new org.apache.thrift.meta_data.FieldMetaData("poolName", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.ORDER, new org.apache.thrift.meta_data.FieldMetaData("order", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = java.util.Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(ShowCompactRequest.class, metaDataMap);
@@ -99,6 +106,9 @@ package org.apache.hadoop.hive.metastore.api;
     if (other.isSetPoolName()) {
       this.poolName = other.poolName;
     }
+    if (other.isSetOrder()) {
+      this.order = other.order;
+    }
   }
 
   public ShowCompactRequest deepCopy() {
@@ -108,6 +118,7 @@ package org.apache.hadoop.hive.metastore.api;
   @Override
   public void clear() {
     this.poolName = null;
+    this.order = null;
   }
 
   @org.apache.thrift.annotation.Nullable
@@ -134,6 +145,30 @@ package org.apache.hadoop.hive.metastore.api;
     }
   }
 
+  @org.apache.thrift.annotation.Nullable
+  public java.lang.String getOrder() {
+    return this.order;
+  }
+
+  public void setOrder(@org.apache.thrift.annotation.Nullable java.lang.String order) {
+    this.order = order;
+  }
+
+  public void unsetOrder() {
+    this.order = null;
+  }
+
+  /** Returns true if field order is set (has been assigned a value) and false otherwise */
+  public boolean isSetOrder() {
+    return this.order != null;
+  }
+
+  public void setOrderIsSet(boolean value) {
+    if (!value) {
+      this.order = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, @org.apache.thrift.annotation.Nullable java.lang.Object value) {
     switch (field) {
     case POOL_NAME:
@@ -141,6 +176,14 @@ package org.apache.hadoop.hive.metastore.api;
         unsetPoolName();
       } else {
         setPoolName((java.lang.String)value);
+      }
+      break;
+
+    case ORDER:
+      if (value == null) {
+        unsetOrder();
+      } else {
+        setOrder((java.lang.String)value);
       }
       break;
 
@@ -152,6 +195,9 @@ package org.apache.hadoop.hive.metastore.api;
     switch (field) {
     case POOL_NAME:
       return getPoolName();
+
+    case ORDER:
+      return getOrder();
 
     }
     throw new java.lang.IllegalStateException();
@@ -166,6 +212,8 @@ package org.apache.hadoop.hive.metastore.api;
     switch (field) {
     case POOL_NAME:
       return isSetPoolName();
+    case ORDER:
+      return isSetOrder();
     }
     throw new java.lang.IllegalStateException();
   }
@@ -192,6 +240,15 @@ package org.apache.hadoop.hive.metastore.api;
         return false;
     }
 
+    boolean this_present_order = true && this.isSetOrder();
+    boolean that_present_order = true && that.isSetOrder();
+    if (this_present_order || that_present_order) {
+      if (!(this_present_order && that_present_order))
+        return false;
+      if (!this.order.equals(that.order))
+        return false;
+    }
+
     return true;
   }
 
@@ -202,6 +259,10 @@ package org.apache.hadoop.hive.metastore.api;
     hashCode = hashCode * 8191 + ((isSetPoolName()) ? 131071 : 524287);
     if (isSetPoolName())
       hashCode = hashCode * 8191 + poolName.hashCode();
+
+    hashCode = hashCode * 8191 + ((isSetOrder()) ? 131071 : 524287);
+    if (isSetOrder())
+      hashCode = hashCode * 8191 + order.hashCode();
 
     return hashCode;
   }
@@ -220,6 +281,16 @@ package org.apache.hadoop.hive.metastore.api;
     }
     if (isSetPoolName()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.poolName, other.poolName);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = java.lang.Boolean.compare(isSetOrder(), other.isSetOrder());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetOrder()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.order, other.order);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -251,6 +322,16 @@ package org.apache.hadoop.hive.metastore.api;
         sb.append("null");
       } else {
         sb.append(this.poolName);
+      }
+      first = false;
+    }
+    if (isSetOrder()) {
+      if (!first) sb.append(", ");
+      sb.append("order:");
+      if (this.order == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.order);
       }
       first = false;
     }
@@ -305,6 +386,14 @@ package org.apache.hadoop.hive.metastore.api;
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 2: // ORDER
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.order = iprot.readString();
+              struct.setOrderIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -322,6 +411,13 @@ package org.apache.hadoop.hive.metastore.api;
         if (struct.isSetPoolName()) {
           oprot.writeFieldBegin(POOL_NAME_FIELD_DESC);
           oprot.writeString(struct.poolName);
+          oprot.writeFieldEnd();
+        }
+      }
+      if (struct.order != null) {
+        if (struct.isSetOrder()) {
+          oprot.writeFieldBegin(ORDER_FIELD_DESC);
+          oprot.writeString(struct.order);
           oprot.writeFieldEnd();
         }
       }
@@ -346,19 +442,29 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetPoolName()) {
         optionals.set(0);
       }
-      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetOrder()) {
+        optionals.set(1);
+      }
+      oprot.writeBitSet(optionals, 2);
       if (struct.isSetPoolName()) {
         oprot.writeString(struct.poolName);
+      }
+      if (struct.isSetOrder()) {
+        oprot.writeString(struct.order);
       }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, ShowCompactRequest struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
-      java.util.BitSet incoming = iprot.readBitSet(1);
+      java.util.BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
         struct.poolName = iprot.readString();
         struct.setPoolNameIsSet(true);
+      }
+      if (incoming.get(1)) {
+        struct.order = iprot.readString();
+        struct.setOrderIsSet(true);
       }
     }
   }

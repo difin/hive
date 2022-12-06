@@ -22,6 +22,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.metastore.api.ShowCompactRequest;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponse;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponseElement;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
@@ -33,6 +34,10 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.NO_VAL;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getHostFromId;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getThreadIdFromId;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.session.SessionState;
 
 
@@ -48,7 +53,8 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
   public int execute() throws HiveException {
     SessionState sessionState = SessionState.get();
     // Call the metastore to get the status of all known compactions (completed get purged eventually)
-    ShowCompactResponse rsp = context.getDb().showCompactions(desc.getPoolName());
+    ShowCompactRequest request = getShowCompactioRequest(desc);
+    ShowCompactResponse rsp = context.getDb().showCompactions(request);
 
     // Write the results into the file
     try (DataOutputStream os = ShowUtils.getOutputStream(new Path(desc.getResFile()), context)) {
@@ -67,6 +73,17 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
       return 1;
     }
     return 0;
+  }
+
+  private ShowCompactRequest getShowCompactioRequest(ShowCompactionsDesc desc) throws SemanticException {
+    ShowCompactRequest request = new ShowCompactRequest();
+    if (isNotBlank(desc.getPoolName())) {
+      request.setPoolName(desc.getPoolName());
+    }
+    if (isNotBlank(desc.getOrderBy())) {
+      request.setOrder(desc.getOrderBy());
+    }
+    return request;
   }
 
   private void writeHeader(DataOutputStream os) throws IOException {

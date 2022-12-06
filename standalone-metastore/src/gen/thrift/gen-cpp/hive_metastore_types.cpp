@@ -28220,6 +28220,11 @@ void ShowCompactRequest::__set_poolName(const std::string& val) {
   this->poolName = val;
 __isset.poolName = true;
 }
+
+void ShowCompactRequest::__set_order(const std::string& val) {
+  this->order = val;
+__isset.order = true;
+}
 std::ostream& operator<<(std::ostream& out, const ShowCompactRequest& obj)
 {
   obj.printTo(out);
@@ -28256,6 +28261,14 @@ uint32_t ShowCompactRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
           xfer += iprot->skip(ftype);
         }
         break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->order);
+          this->__isset.order = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -28278,6 +28291,11 @@ uint32_t ShowCompactRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeString(this->poolName);
     xfer += oprot->writeFieldEnd();
   }
+  if (this->__isset.order) {
+    xfer += oprot->writeFieldBegin("order", ::apache::thrift::protocol::T_STRING, 2);
+    xfer += oprot->writeString(this->order);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -28286,15 +28304,18 @@ uint32_t ShowCompactRequest::write(::apache::thrift::protocol::TProtocol* oprot)
 void swap(ShowCompactRequest &a, ShowCompactRequest &b) {
   using ::std::swap;
   swap(a.poolName, b.poolName);
+  swap(a.order, b.order);
   swap(a.__isset, b.__isset);
 }
 
 ShowCompactRequest::ShowCompactRequest(const ShowCompactRequest& other995) {
   poolName = other995.poolName;
+  order = other995.order;
   __isset = other995.__isset;
 }
 ShowCompactRequest& ShowCompactRequest::operator=(const ShowCompactRequest& other996) {
   poolName = other996.poolName;
+  order = other996.order;
   __isset = other996.__isset;
   return *this;
 }
@@ -28302,6 +28323,7 @@ void ShowCompactRequest::printTo(std::ostream& out) const {
   using ::apache::thrift::to_string;
   out << "ShowCompactRequest(";
   out << "poolName="; (__isset.poolName ? (out << to_string(poolName)) : (out << "<null>"));
+  out << ", " << "order="; (__isset.order ? (out << to_string(order)) : (out << "<null>"));
   out << ")";
 }
 
