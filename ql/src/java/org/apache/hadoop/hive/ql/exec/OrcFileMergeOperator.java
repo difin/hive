@@ -109,6 +109,8 @@ public class OrcFileMergeOperator extends
 
       if (prevPath == null) {
         prevPath = k.getInputPath();
+      }
+      if (reader == null) {
         reader = OrcFile.createReader(fs, k.getInputPath());
         if (LOG.isInfoEnabled()) {
           LOG.info("ORC merge file input path: " + k.getInputPath());

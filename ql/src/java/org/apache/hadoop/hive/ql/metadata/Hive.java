@@ -2751,8 +2751,8 @@ public class Hive implements AutoCloseable {
            * See: HIVE-1707 and HIVE-2117 for background
            */
           FileSystem oldPartPathFS = oldPartPath.getFileSystem(getConf());
-          FileSystem loadPathFS = loadPath.getFileSystem(getConf());
-          if (FileUtils.isEqualFileSystemAndSameOzoneBucket(oldPartPathFS, loadPathFS, oldPartPath, loadPath)) {
+          FileSystem tblPathFS = tblDataLocationPath.getFileSystem(getConf());
+          if (FileUtils.isEqualFileSystemAndSameOzoneBucket(oldPartPathFS, tblPathFS, oldPartPath, loadPath)) {
             newPartPath = oldPartPath;
           }
         }
@@ -5760,6 +5760,9 @@ private void constructOneLBLocationMap(FileStatus fSta,
       PathFilter pathFilter, HiveConf conf, boolean purge, boolean isNeedRecycle) throws IOException, HiveException {
     if (isNeedRecycle && conf.getBoolVar(HiveConf.ConfVars.REPLCMENABLED)) {
       recycleDirToCmPath(path, purge);
+    }
+    if (!fs.exists(path)) {
+      return;
     }
     FileStatus[] statuses = fs.listStatus(path, pathFilter);
     if (statuses == null || statuses.length == 0) {

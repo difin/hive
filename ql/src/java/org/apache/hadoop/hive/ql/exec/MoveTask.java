@@ -441,6 +441,10 @@ public class MoveTask extends Task<MoveWork> implements Serializable {
             }
           }
           else {
+            FileSystem targetFs = targetPath.getFileSystem(conf);
+            if (!targetFs.exists(targetPath.getParent())){
+              targetFs.mkdirs(targetPath.getParent());
+            }
             moveFile(sourcePath, targetPath, lfd.getIsDfsDir());
           }
         }
