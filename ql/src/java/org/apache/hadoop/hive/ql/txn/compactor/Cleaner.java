@@ -96,7 +96,6 @@ public class Cleaner extends MetaStoreCompactorThread {
 
   static final private String CLASS_NAME = Cleaner.class.getName();
   static final private Logger LOG = LoggerFactory.getLogger(CLASS_NAME);
-  private long cleanerCheckInterval = 0;
   private boolean metricsEnabled = false;
 
   private ReplChangeManager replChangeManager;
@@ -106,7 +105,7 @@ public class Cleaner extends MetaStoreCompactorThread {
   public void init(AtomicBoolean stop) throws Exception {
     super.init(stop);
     replChangeManager = ReplChangeManager.getInstance(conf);
-    cleanerCheckInterval = conf.getTimeVar(
+    checkInterval = conf.getTimeVar(
             HiveConf.ConfVars.HIVE_COMPACTOR_CLEANER_RUN_INTERVAL, TimeUnit.MILLISECONDS);
     cleanerExecutor = CompactorUtil.createExecutorWithThreadFactory(
             conf.getIntVar(HiveConf.ConfVars.HIVE_COMPACTOR_CLEANER_THREADS_NUM),
@@ -184,9 +183,7 @@ public class Cleaner extends MetaStoreCompactorThread {
         }
         // Now, go back to bed until it's time to do this again
         long elapsedTime = System.currentTimeMillis() - startedAt;
-        if (elapsedTime < cleanerCheckInterval && !stop.get()) {
-          Thread.sleep(cleanerCheckInterval - elapsedTime);
-        }
+        doPostLoopActions(elapsedTime, CompactorThreadType.CLEANER);
       } while (!stop.get());
     } catch (InterruptedException ie) {
       LOG.error("Compactor cleaner thread interrupted, exiting " + StringUtils.stringifyException(ie));
@@ -399,7 +396,7 @@ public class Cleaner extends MetaStoreCompactorThread {
     final ValidReaderWriteIdList validWriteIdList = getValidCleanerWriteIdList(ci, validTxnList);
     if (LOG.isDebugEnabled()) {
       LOG.debug("Cleaning based on writeIdList: " + validWriteIdList);
-    }    
+    }
     return removeFiles(location, validWriteIdList, ci);
   }
   /**
