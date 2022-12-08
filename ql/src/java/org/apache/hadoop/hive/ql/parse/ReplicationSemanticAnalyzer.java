@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.List;
 import java.util.Collections;
+import java.util.Objects;
 
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVEQUERYID;
 import static org.apache.hadoop.hive.ql.exec.repl.ReplAck.LOAD_ACKNOWLEDGEMENT;
@@ -313,7 +314,8 @@ public class ReplicationSemanticAnalyzer extends BaseSemanticAnalyzer {
     // looking at each db, and then each table, and then setting up the appropriate
     // import job in its place.
     try {
-      assert(sourceDbNameOrPattern != null);
+      Objects.requireNonNull(sourceDbNameOrPattern , "REPL LOAD Source database name shouldn't be null");
+      Objects.requireNonNull(replScope.getDbName(), "REPL LOAD Target database name shouldn't be null");
       Path loadPath = getCurrentLoadPath();
       // Now, the dumped path can be one of three things:
       // a) It can be a db dump, in which case we expect a set of dirs, each with a
@@ -359,7 +361,7 @@ public class ReplicationSemanticAnalyzer extends BaseSemanticAnalyzer {
         rootTasks.add(TaskFactory.get(replLoadWork, conf));
       } else {
         ReplUtils.reportStatusInReplicationMetrics("REPL_LOAD", Status.SKIPPED, null, conf);
-        LOG.warn("Previous Dump Already Loaded");
+        LOG.warn("No dump to load or the previous dump already loaded");
       }
     } catch (Exception e) {
       // TODO : simple wrap & rethrow for now, clean up with error codes
