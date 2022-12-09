@@ -1373,9 +1373,9 @@ CREATE TABLE IF NOT EXISTS `DC_PRIVS` (
   CONSTRAINT `DC_PRIVS_FK1` FOREIGN KEY (`NAME`) REFERENCES `DATACONNECTORS` (`NAME`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO CDH_VERSION (VER_ID, SCHEMA_VERSION, VERSION_COMMENT) VALUES (1, '3.1.3000.7.2.16.0-Update3', 'Hive release version 3.1.3000 for CDH 7.2.16.0-Update3');
+INSERT INTO CDH_VERSION (VER_ID, SCHEMA_VERSION, VERSION_COMMENT) VALUES (1, '3.1.3000.7.2.16.0-Update4', 'Hive release version 3.1.3000 for CDH 7.2.16.0-Update4');
 
-SELECT 'Initialized metastore schema to 3.1.3000.7.2.16.0-Update3';
+SELECT 'Initialized metastore schema to 3.1.3000.7.2.16.0-Update4';
 
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
