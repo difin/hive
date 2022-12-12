@@ -60,7 +60,7 @@ public class FetchTask extends Task<FetchWork> implements Serializable {
   private int totalRows;
   private static final Logger LOG = LoggerFactory.getLogger(FetchTask.class);
   JobConf job = null;
-  private boolean cachingEnabled;
+  private boolean cachingEnabled = false;
 
   public FetchTask() {
     super();
@@ -74,8 +74,6 @@ public class FetchTask extends Task<FetchWork> implements Serializable {
   public void initialize(QueryState queryState, QueryPlan queryPlan, TaskQueue taskQueue, Context context) {
     super.initialize(queryState, queryPlan, taskQueue, context);
     work.initializeForFetch(context.getOpContext());
-
-    cachingEnabled = HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVEFETCHTASKCACHING);
     fetchedData = new ArrayList<>();
 
     try {
@@ -250,4 +248,11 @@ public class FetchTask extends Task<FetchWork> implements Serializable {
     ExecMapper.setDone(false);
   }
 
+  public void setCachingEnabled(boolean cachingEnabled) {
+    this.cachingEnabled = cachingEnabled;
+  }
+
+  public boolean isCachingEnabled() {
+    return cachingEnabled;
+  }
 }
