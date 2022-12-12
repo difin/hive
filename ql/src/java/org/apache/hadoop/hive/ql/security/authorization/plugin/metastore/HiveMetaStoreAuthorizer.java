@@ -53,6 +53,7 @@ import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthzSessionC
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveMetastoreClientFactoryImpl;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveOperationType;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.filtercontext.DataConnectorFilterContext;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.filtercontext.DatabaseFilterContext;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.filtercontext.TableFilterContext;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -252,7 +253,22 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
 
   @Override
   public List<String> filterDataConnectors(List<String> dcList) throws MetaException {
-    return dcList;
+    LOG.debug("HiveMetaStoreAuthorizer.filterDataConnector()");
+
+    if (dcList == null) {
+      return Collections.emptyList();
+    }
+
+    DataConnectorFilterContext dataConnectorFilterContext = new DataConnectorFilterContext(dcList);
+    HiveMetaStoreAuthzInfo hiveMetaStoreAuthzInfo = dataConnectorFilterContext.getAuthzContext();
+    List<String> filteredDataConnector = filterDataConnectorObjects(hiveMetaStoreAuthzInfo);
+    if (CollectionUtils.isEmpty(filteredDataConnector)) {
+      filteredDataConnector = Collections.emptyList();
+    }
+
+    LOG.debug("HiveMetaStoreAuthorizer.filterDataConnectors() :" + filteredDataConnector);
+
+    return filteredDataConnector;
   }
 
   private List<String> filterDatabaseObjects(HiveMetaStoreAuthzInfo hiveMetaStoreAuthzInfo) throws MetaException {
@@ -279,7 +295,42 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
     return ret;
   }
 
-  private List<Table> filterTableObjects(HiveMetaStoreAuthzInfo hiveMetaStoreAuthzInfo, List<Table> tableList) throws MetaException {
+  private List<String> filterDataConnectorObjects(HiveMetaStoreAuthzInfo hiveMetaStoreAuthzInfo) throws MetaException {
+    List<String> ret = null;
+
+    LOG.debug("==> HiveMetaStoreAuthorizer.filterDataConnectorObjects()");
+
+    try {
+      HiveAuthorizer hiveAuthorizer = createHiveMetaStoreAuthorizer();
+      List<HivePrivilegeObject> hivePrivilegeObjects = hiveMetaStoreAuthzInfo.getInputHObjs();
+      HiveAuthzContext hiveAuthzContext = hiveMetaStoreAuthzInfo.getHiveAuthzContext();
+      List<HivePrivilegeObject> filteredHivePrivilegeObjects =
+              hiveAuthorizer.filterListCmdObjects(hivePrivilegeObjects, hiveAuthzContext);
+      if (CollectionUtils.isNotEmpty(filteredHivePrivilegeObjects)) {
+        ret = getFilteredDataConnectorList(filteredHivePrivilegeObjects);
+      }
+      LOG.info(String.format("Filtered %d connectors out of %d", filteredHivePrivilegeObjects.size(),
+              hivePrivilegeObjects.size()));
+    } catch (Exception e) {
+      throw new MetaException("Error in HiveMetaStoreAuthorizer.filterDataConnector()" + e.getMessage());
+    }
+
+    LOG.debug("<== HiveMetaStoreAuthorizer.filterDataConnectorObjects() :" + ret );
+
+    return ret;
+  }
+
+  private List<String> getFilteredDataConnectorList(List<HivePrivilegeObject> hivePrivilegeObjects) {
+    List<String> ret = new ArrayList<>();
+    for(HivePrivilegeObject hivePrivilegeObject: hivePrivilegeObjects) {
+      String dcName = hivePrivilegeObject.getObjectName();
+      ret.add(dcName);
+    }
+    return ret;
+  }
+
+  private List<Table> filterTableObjects(HiveMetaStoreAuthzInfo hiveMetaStoreAuthzInfo, List<Table> tableList)
+      throws MetaException {
     List<Table> ret = null;
 
     try {

@@ -320,6 +320,7 @@ public class TestFilterHooks {
     testFilterForTables(true);
     testFilterForPartition(true);
     testFilterForCompaction();
+    testFilterForDataConnector();
   }
 
   /**
@@ -440,6 +441,10 @@ public class TestFilterHooks {
 
   protected void testFilterForDataConnector() throws Exception {
     assertNotNull(client.getDataConnector(DCNAME1));
-    assertEquals(2, client.getAllDataConnectorNames().size());
+    if (MetastoreConf.getBoolVar(conf, ConfVars.METASTORE_CLIENT_FILTER_ENABLED)) { // -- will be reverted after CDPD-26882
+      assertEquals(2, client.getAllDataConnectorNames().size());
+    } else {
+      assertEquals(0, client.getAllDataConnectorNames().size());
+    }
   }
 }
