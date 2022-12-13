@@ -3644,6 +3644,9 @@ public class HiveConf extends Configuration {
         "Authorization DDL task factory implementation"),
     HIVE_AUTHORIZATION_TABLES_ON_STORAGEHANDLERS("hive.security.authorization.tables.on.storagehandlers", false,
             "By default this config is false, if set to true, authorization on tables with storage handlers are enabled"),
+    HIVE_AUTHORIZATION_FUNCTIONS_IN_VIEW("hive.security.authorization.functions.in.view", true,
+            "Enable authorization on functions/udfs used within a TABLE/VIEW during a select query. Default " +
+         "setting is true When set to false, the udf used in the table/view will not be autiozed during the select query"),
 
     // if this is not set default value is set during config initialization
     // Default value can't be set in this constructor as it would refer names in other ConfVars
