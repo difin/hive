@@ -1137,9 +1137,17 @@
                 <filter>
                   <artifact>org.apache.calcite.avatica:avatica</artifact>
                   <excludes>
+                    <!-- Exclude Avatica bundled SLF4J, because Hive manages its own SLF4J version. -->
                     <exclude>org/slf4j/**</exclude>
                     <exclude>META-INF/maven/org.slf4j/**</exclude>
                     <exclude>META-INF/licenses/slf4j*/**</exclude>
+                  </excludes>
+                </filter>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <!-- Exclude dependency module descriptors, which would be incorrect in a Hive jar. -->
+                    <exclude>META-INF/versions/*/module-info.class</exclude>
                   </excludes>
                 </filter>
               </filters>
