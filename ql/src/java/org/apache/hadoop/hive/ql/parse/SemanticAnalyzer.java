@@ -13253,7 +13253,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           pCtx = t.transform(pCtx);
         }
       }
-      return;
     }
 
     // 5. Take care of view creation
