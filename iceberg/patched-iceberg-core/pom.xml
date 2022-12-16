@@ -81,6 +81,7 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/classes</outputDirectory>
                                     <excludes>
+                                        **/HadoopInputFile.class
                                     </excludes>
                                 </artifactItem>
                             </artifactItems>
