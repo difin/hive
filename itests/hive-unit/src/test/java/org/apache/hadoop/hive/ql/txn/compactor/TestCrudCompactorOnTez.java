@@ -94,7 +94,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("deprecation")
-@Ignore("CDPD-44432")
 public class TestCrudCompactorOnTez extends CompactorOnTezTest {
 
   @After
