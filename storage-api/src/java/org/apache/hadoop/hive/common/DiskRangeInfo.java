@@ -17,7 +17,11 @@
  */
 package org.apache.hadoop.hive.common;
 
+import org.apache.hadoop.hive.common.io.DiskRange;
 import org.apache.hadoop.hive.common.io.DiskRangeList;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -49,8 +53,11 @@ public class DiskRangeInfo {
     totalLength += diskRange.getLength();
   }
 
-  public DiskRangeList getDiskRanges() {
-    return head;
+  public List<DiskRange> getDiskRanges() {
+    if (head == null)
+      return null;
+    else
+      return Arrays.asList(head.listToArray());
   }
 
   public long getTotalLength() {
