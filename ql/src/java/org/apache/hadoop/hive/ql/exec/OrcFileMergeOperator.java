@@ -18,7 +18,6 @@
 package org.apache.hadoop.hive.ql.exec;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -180,9 +179,7 @@ public class OrcFileMergeOperator extends
 
       // add user metadata to footer in case of any
       if (v.isLastStripeInFile()) {
-        for (Map.Entry<String, ByteBuffer> entry: v.getUserMetadata().entrySet()) {
-          outWriters.get(bucketId).addUserMetadata(entry.getKey(), entry.getValue());
-        }
+        outWriters.get(bucketId).appendUserMetadata(v.getUserMetadata());
       }
     } catch (Throwable e) {
       exception = true;

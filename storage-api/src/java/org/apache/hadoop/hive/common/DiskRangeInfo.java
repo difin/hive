@@ -17,18 +17,20 @@
  */
 package org.apache.hadoop.hive.common;
 
-import org.apache.hadoop.hive.common.io.DiskRangeList;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.hadoop.hive.common.io.DiskRange;
 
 /**
  * Disk range information class containing disk ranges and total length.
  */
 public class DiskRangeInfo {
-
-  private DiskRangeList head, tail = null;
-  private long totalLength;
+  List<DiskRange> diskRanges; // TODO: use DiskRangeList instead
+  long totalLength;
 
   public DiskRangeInfo(int indexBaseOffset) {
+    this.diskRanges = new ArrayList<>();
     // Some data is missing from the stream for PPD uncompressed read (because index offset is
     // relative to the entire stream and we only read part of stream if RGs are filtered; unlike
     // with compressed data where PPD only filters CBs, so we always get full CB, and index offset
@@ -40,17 +42,13 @@ public class DiskRangeInfo {
     this.totalLength = indexBaseOffset;
   }
 
-  public void addDiskRange(DiskRangeList diskRange) {
-    if (tail == null) {
-      head = tail = diskRange;
-    } else {
-      tail = tail.insertAfter(diskRange);
-    }
+  public void addDiskRange(DiskRange diskRange) {
+    diskRanges.add(diskRange);
     totalLength += diskRange.getLength();
   }
 
-  public DiskRangeList getDiskRanges() {
-    return head;
+  public List<DiskRange> getDiskRanges() {
+    return diskRanges;
   }
 
   public long getTotalLength() {

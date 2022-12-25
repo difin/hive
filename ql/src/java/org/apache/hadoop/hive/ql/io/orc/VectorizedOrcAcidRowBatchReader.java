@@ -66,7 +66,6 @@ import org.apache.orc.IntegerColumnStatistics;
 import org.apache.orc.OrcConf;
 import org.apache.orc.OrcProto;
 import org.apache.orc.StripeInformation;
-import org.apache.orc.StripeStatistics;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.impl.ColumnStatisticsImpl;
 import org.apache.orc.impl.OrcTail;
@@ -465,8 +464,7 @@ public class VectorizedOrcAcidRowBatchReader
       return new OrcRawRecordMerger.KeyInterval(null, null);
     }
 
-    VectorizedOrcAcidRowBatchReader.ReaderData orcReaderData =
-        getOrcReaderData(orcSplit.getPath(), conf, cacheTag, orcSplit.getFileKey());
+    OrcTail orcTail = getOrcTail(orcSplit.getPath(), conf, cacheTag, orcSplit.getFileKey()).orcTail;
 
     if(orcSplit.isOriginal()) {
       /**
@@ -480,10 +478,10 @@ public class VectorizedOrcAcidRowBatchReader
        * Reader.Options, Configuration, OrcRawRecordMerger.Options)}*/
       LOG.debug("findMinMaxKeys(original split)");
 
-      return findOriginalMinMaxKeys(orcSplit, orcReaderData.orcTail, deleteEventReaderOptions);
+      return findOriginalMinMaxKeys(orcSplit, orcTail, deleteEventReaderOptions);
     }
 
-    List<StripeInformation> stripes = orcReaderData.orcTail.getStripes();
+    List<StripeInformation> stripes = orcTail.getStripes();
     final long splitStart = orcSplit.getStart();
     final long splitEnd = splitStart + orcSplit.getLength();
     int firstStripeIndex = -1;
@@ -539,7 +537,7 @@ public class VectorizedOrcAcidRowBatchReader
           lastStripeIndex + ")");
       return new OrcRawRecordMerger.KeyInterval(null, null);
     }
-    RecordIdentifier[] keyIndex = OrcRecordUpdater.parseKeyIndex(orcReaderData.orcTail);
+    RecordIdentifier[] keyIndex = OrcRecordUpdater.parseKeyIndex(orcTail);
 
     if(keyIndex == null) {
       LOG.warn("Could not find keyIndex (" + firstStripeIndex + "," +
@@ -559,12 +557,12 @@ public class VectorizedOrcAcidRowBatchReader
      * are actually computed.  Streaming ingest used to set it 0 and Minor
      * compaction so there are lots of legacy files with no (rather, bad)
      * column stats*/
-    boolean columnStatsPresent = orcReaderData.orcTail.getFooter().getRowIndexStride() > 0;
+    boolean columnStatsPresent = orcTail.getFooter().getRowIndexStride() > 0;
     if(!columnStatsPresent) {
       LOG.debug("findMinMaxKeys() No ORC column stats");
     }
 
-    List<StripeStatistics> stats = orcReaderData.reader.getVariantStripeStatistics(null);
+    List<OrcProto.StripeStatistics> stats = orcTail.getStripeStatisticsProto();
     assert stripes.size() == stats.size() : "str.s=" + stripes.size() +
         " sta.s=" + stats.size();
 
@@ -577,7 +575,7 @@ public class VectorizedOrcAcidRowBatchReader
     }
     else {
       if(columnStatsPresent) {
-        minKey = getKeyInterval(stats.get(firstStripeIndex).getColumnStatistics()).getMinKey();
+        minKey = getKeyInterval(stats.get(firstStripeIndex).getColStatsList()).getMinKey();
       }
     }
 
@@ -587,7 +585,7 @@ public class VectorizedOrcAcidRowBatchReader
       maxKey = keyIndex[lastStripeIndex];
     } else {
       if(columnStatsPresent) {
-        maxKey = getKeyInterval(stats.get(lastStripeIndex).getColumnStatistics()).getMaxKey();
+        maxKey = getKeyInterval(stats.get(lastStripeIndex).getColStatsList()).getMaxKey();
       }
     }
     OrcRawRecordMerger.KeyInterval keyInterval =
@@ -615,7 +613,7 @@ public class VectorizedOrcAcidRowBatchReader
        * writeId is the same in both cases
        */
       for(int i = firstStripeIndex; i <= lastStripeIndex; i++) {
-        OrcRawRecordMerger.KeyInterval key = getKeyInterval(stats.get(i).getColumnStatistics());
+        OrcRawRecordMerger.KeyInterval key = getKeyInterval(stats.get(i).getColStatsList());
         if(key.getMinKey().getBucketProperty() < minBucketProp) {
           minBucketProp = key.getMinKey().getBucketProperty();
         }
@@ -709,7 +707,7 @@ public class VectorizedOrcAcidRowBatchReader
 
   /**
    * Gets the OrcTail from cache if LLAP IO is enabled, otherwise creates the reader to get the tail.
-   * Always store the Reader along with the Tail as part of ReaderData so we can reuse it.
+   * If reader is created return that as well so we do not have recreate it if needed.
    * @param path The Orc file path we want to get the OrcTail for
    * @param conf The Configuration to access LLAP
    * @param cacheTag The cacheTag needed to get OrcTail from LLAP IO cache
@@ -719,12 +717,12 @@ public class VectorizedOrcAcidRowBatchReader
    * @return ReaderData object where the orcTail is not null. Reader can be null, but if we had to create
    * one we return that as well for further reuse.
    */
-  private static ReaderData getOrcReaderData(Path path, Configuration conf, CacheTag cacheTag, Object fileKey) throws IOException {
+  private static ReaderData getOrcTail(Path path, Configuration conf, CacheTag cacheTag, Object fileKey) throws IOException {
     ReaderData readerData = new ReaderData();
     if (shouldReadDeleteDeltasWithLlap(conf, true)) {
       try {
         readerData.orcTail = LlapProxy.getIo().getOrcTailFromCache(path, conf, cacheTag, fileKey);
-        readerData.reader = OrcFile.createReader(path, OrcFile.readerOptions(conf).orcTail(readerData.orcTail));
+        return readerData;
       } catch (IllegalCacheConfigurationException icce) {
         throw new IOException("LLAP cache is not configured properly while delete delta caching is turned on", icce);
       }
@@ -1943,7 +1941,7 @@ public class VectorizedOrcAcidRowBatchReader
               for (AcidInputFormat.DeltaFileMetaData fileMetaData : deltaMetaData.getDeltaFilesForStmtId(stmtId)) {
                 Path deleteDeltaFile = fileMetaData.getPath(deleteDeltaPath, bucket);
                 Object fileId = fileMetaData.getFileId(deleteDeltaFile, bucket, conf);
-                ReaderData readerData = getOrcReaderData(deleteDeltaFile, conf, cacheTag, fileId);
+                ReaderData readerData = getOrcTail(deleteDeltaFile, conf, cacheTag, fileId);
                 OrcTail orcTail = readerData.orcTail;
                 long numRows = orcTail.getFooter().getNumberOfRows();
                 if (numRows <= 0) {
@@ -2183,10 +2181,10 @@ public class VectorizedOrcAcidRowBatchReader
    * @param colStats The statistics array
    * @return The min record key
    */
-  private static OrcRawRecordMerger.KeyInterval getKeyInterval(ColumnStatistics[] colStats) {
-    IntegerColumnStatistics origWriteId = (IntegerColumnStatistics) colStats[OrcRecordUpdater.ORIGINAL_WRITEID + 1];
-    IntegerColumnStatistics bucketProperty = (IntegerColumnStatistics) colStats[OrcRecordUpdater.BUCKET + 1];
-    IntegerColumnStatistics rowId = (IntegerColumnStatistics) colStats[OrcRecordUpdater.ROW_ID + 1];
+  private static OrcRawRecordMerger.KeyInterval getKeyInterval(List<OrcProto.ColumnStatistics> colStats) {
+    IntegerColumnStatistics origWriteId = deserializeIntColumnStatistics(colStats, OrcRecordUpdater.ORIGINAL_WRITEID + 1);
+    IntegerColumnStatistics bucketProperty = deserializeIntColumnStatistics(colStats, OrcRecordUpdater.BUCKET + 1);
+    IntegerColumnStatistics rowId = deserializeIntColumnStatistics(colStats, OrcRecordUpdater.ROW_ID + 1);
 
     // We may want to change bucketProperty from int to long in the future(across the stack) this protects
     // the following cast to int
@@ -2197,17 +2195,6 @@ public class VectorizedOrcAcidRowBatchReader
     RecordIdentifier maxKey = new RecordIdentifier(origWriteId.getMaximum(), (int) bucketProperty.getMaximum(), rowId.getMaximum());
     RecordIdentifier minKey = new RecordIdentifier(origWriteId.getMinimum(), (int) bucketProperty.getMinimum(), rowId.getMinimum());
     return new OrcRawRecordMerger.KeyInterval(minKey, maxKey);
-  }
-
-  private static OrcRawRecordMerger.KeyInterval getKeyInterval(List<OrcProto.ColumnStatistics> colStats) {
-    ColumnStatistics[] columnStatsArray = new ColumnStatistics[colStats.size()];
-    columnStatsArray[OrcRecordUpdater.ORIGINAL_WRITEID + 1] =
-        deserializeIntColumnStatistics(colStats, OrcRecordUpdater.ORIGINAL_WRITEID + 1);
-    columnStatsArray[OrcRecordUpdater.BUCKET + 1]  =
-        deserializeIntColumnStatistics(colStats, OrcRecordUpdater.BUCKET + 1);
-    columnStatsArray[OrcRecordUpdater.ROW_ID + 1]  =
-        deserializeIntColumnStatistics(colStats, OrcRecordUpdater.ROW_ID + 1);
-    return getKeyInterval(columnStatsArray);
   }
 
   private static class RowIsDeletedColumnVector extends LongColumnVector {

@@ -20,8 +20,6 @@ package org.apache.hadoop.hive.ql.io.sarg;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -224,8 +222,9 @@ public class ConvertAstToSearchArg {
         }
         return ts;
       case DATE:
-        // TODO [ORC-661]: use ChronoLocalDate and day of epoch instead of java's sql Date
-        return Date.valueOf(LocalDate.parse(lit.toString()));
+        return new Date(
+            DateWritable.daysToMillis(
+                org.apache.hadoop.hive.common.type.Date.valueOf(lit.toString()).toEpochDay()));
       case DECIMAL:
         return new HiveDecimalWritable(lit.toString());
       case BOOLEAN:

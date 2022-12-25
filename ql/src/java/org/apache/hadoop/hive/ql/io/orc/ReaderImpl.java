@@ -43,12 +43,12 @@ public class ReaderImpl extends org.apache.orc.impl.ReaderImpl
   @Override
   public org.apache.hadoop.hive.ql.io.orc.CompressionKind getCompression() {
     for (CompressionKind value: org.apache.hadoop.hive.ql.io.orc.CompressionKind.values()) {
-      if (value.getUnderlying() == this.getCompressionKind()) {
+      if (value.getUnderlying() == compressionKind) {
         return value;
       }
     }
     throw new IllegalArgumentException("Unknown compression kind " +
-        this.getCompressionKind());
+        compressionKind);
   }
 
   /**
@@ -59,7 +59,7 @@ public class ReaderImpl extends org.apache.orc.impl.ReaderImpl
    */
   public ReaderImpl(Path path, OrcFile.ReaderOptions options) throws IOException {
     super(path, options);
-    this.inspector = OrcStruct.createObjectInspector(0, getTypes());
+    this.inspector = OrcStruct.createObjectInspector(0, types);
   }
 
   @Override
