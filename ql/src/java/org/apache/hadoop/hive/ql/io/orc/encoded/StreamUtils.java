@@ -19,10 +19,8 @@ package org.apache.hadoop.hive.ql.io.orc.encoded;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.List;
 
 import org.apache.hadoop.hive.common.DiskRangeInfo;
-import org.apache.hadoop.hive.common.io.DiskRange;
 import org.apache.hadoop.hive.common.io.DiskRangeList;
 import org.apache.hadoop.hive.common.io.encoded.EncodedColumnBatch.ColumnStreamData;
 import org.apache.hadoop.hive.common.io.encoded.MemoryBuffer;
@@ -49,9 +47,7 @@ public class StreamUtils {
 
     if (streamBuffer.getCacheBuffers() != null) {
       DiskRangeInfo diskRangeInfo = createDiskRangeInfo(streamBuffer);
-      List<DiskRange> diskRanges = diskRangeInfo.getDiskRanges();
-      DiskRangeList headDiskRange = diskRanges == null ? null : (DiskRangeList)diskRangeInfo.getDiskRanges().get(0);
-      return new SettableUncompressedStream(streamName, headDiskRange,
+      return new SettableUncompressedStream(streamName, diskRangeInfo.getDiskRanges(),
           diskRangeInfo.getTotalLength());
     } else {
       return new SettableUncompressedStream(streamName, new DiskRangeList(0,0), 0);

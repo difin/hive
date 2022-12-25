@@ -217,9 +217,9 @@ public class DiskRangeList extends DiskRange {
 
   // @VisibleForTesting
   public DiskRangeList[] listToArray() {
-    DiskRangeList[] result = new DiskRangeList[listSize()+1];
+    DiskRangeList[] result = new DiskRangeList[listSize()];
     int i = 0;
-    DiskRangeList current = this;
+    DiskRangeList current = this.next;
     while (current != null) {
       result[i] = current;
       ++i;

@@ -18,11 +18,8 @@
 package org.apache.hadoop.hive.ql.io.orc.encoded;
 
 import org.apache.hadoop.hive.common.DiskRangeInfo;
-import org.apache.hadoop.hive.common.io.DiskRange;
 import org.apache.hadoop.hive.common.io.DiskRangeList;
 import org.apache.orc.impl.InStream;
-
-import java.util.List;
 
 public class SettableUncompressedStream extends InStream.UncompressedStream {
 
@@ -31,11 +28,9 @@ public class SettableUncompressedStream extends InStream.UncompressedStream {
     setOffset(input);
   }
 
-  public void setBuffers(DiskRangeInfo diskRangeInfo) {
-    List<DiskRange> diskRanges = diskRangeInfo.getDiskRanges();
-    DiskRangeList headDiskRange = diskRanges == null ? null : (DiskRangeList)diskRangeInfo.getDiskRanges().get(0);
-    reset(headDiskRange);
-    setOffset(headDiskRange);
+  public void setBuffers(DiskRangeInfo diskRangeList) {
+    reset(diskRangeList.getDiskRanges());
+    setOffset(diskRangeList.getDiskRanges());
   }
 
   private void setOffset(DiskRangeList diskRangeList) {
