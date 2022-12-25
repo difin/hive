@@ -28,13 +28,13 @@ import org.antlr.runtime.Token;
  * to save memory. However, to support reuse (canonicalization) we need to
  * implement the proper hashCode() and equals() methods.
  */
-class ImmutableCommonToken extends CommonToken {
+public class ImmutableCommonToken extends CommonToken {
 
   private static final String SETTERS_DISABLED = "All setter methods are intentionally disabled";
 
   private final int hashCode;
 
-  ImmutableCommonToken(int type, String text) {
+  public ImmutableCommonToken(int type, String text) {
     super(type, text);
     hashCode = calculateHash();
   }

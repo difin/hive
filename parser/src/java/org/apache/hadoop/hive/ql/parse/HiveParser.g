@@ -483,7 +483,6 @@ TOK_SCHEDULE;
 TOK_EVERY;
 TOK_REMOTE;
 TOK_WITHIN_GROUP;
-TOK_REFRESH_TABLE;
 TOK_RESPECT_NULLS;
 TOK_IGNORE_NULLS;
 TOK_IDENTITY;
@@ -1079,7 +1078,6 @@ ddlStatement
     | abortTransactionStatement
     | killQueryStatement
     | resourcePlanDdlStatements
-    | refreshTableStatement
     | createDataConnectorStatement
     | dropDataConnectorStatement
     ;
@@ -2932,12 +2930,6 @@ killQueryStatement
   :
   KW_KILL KW_QUERY ( StringLiteral )+ -> ^(TOK_KILL_QUERY ( StringLiteral )+)
   ;
-
-refreshTableStatement
-@init { pushMsg("refresh table query statement", state); }
-@after {popMsg(state); }
-  : KW_REFRESH tablePartitionPrefix
-  -> ^(TOK_REFRESH_TABLE tablePartitionPrefix);
 
 compactPool
 @init { pushMsg("POOL clause", state); }

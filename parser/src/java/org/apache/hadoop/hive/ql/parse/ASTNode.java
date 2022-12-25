@@ -316,6 +316,10 @@ public class ASTNode extends CommonTree implements Node,Serializable {
     return toStringTree(rootNode);
   }
 
+  public boolean usingDefaultEngine() {
+    return true;
+  }
+
   private String toStringTree(ASTNode rootNode) {
     Deque<ASTNode> stack = new ArrayDeque<ASTNode>();
     stack.push(this);

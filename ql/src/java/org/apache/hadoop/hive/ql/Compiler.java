@@ -32,6 +32,7 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreUtils;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Schema;
 import org.apache.hadoop.hive.metastore.api.TxnType;
+import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
 import org.apache.hadoop.hive.ql.exec.ExplainTask;
 import org.apache.hadoop.hive.ql.exec.FetchTask;
 import org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils;
@@ -171,7 +172,9 @@ public class Compiler {
 
     boolean success = false;
     try {
-      tree = ParseUtils.parse(context.getCmd(), context);
+      EngineCompileHelper compileHelper =
+          EngineCompileHelper.getInstance(SessionState.get().getConf());
+      tree = compileHelper.parse(context.getCmd(), context);
       success = true;
     } finally {
       driverContext.getHookRunner().runAfterParseHook(context.getCmd(), !success);

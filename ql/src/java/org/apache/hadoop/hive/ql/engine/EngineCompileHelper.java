@@ -26,7 +26,12 @@ import org.apache.hadoop.hive.metastore.HMSConverter;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
+import org.apache.hadoop.hive.ql.parse.ASTNode;
+import org.apache.hadoop.hive.ql.parse.ParseException;
+import org.apache.hadoop.hive.ql.parse.ParseUtils;
+import org.apache.hadoop.hive.ql.parse.SemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.plan.HiveOperation;
 
 import java.util.List;
 import java.util.Set;
@@ -61,5 +66,18 @@ public interface EngineCompileHelper {
 
   default public HepProgram adjustPlanForEngine() {
     return null;
+  }
+
+  default ASTNode parse(String command, Context ctx) throws ParseException {
+    return ParseUtils.parse(command, ctx);
+  }
+
+  default SemanticAnalyzer getSemanticAnalyzer(QueryState queryState, ASTNode tree)
+      throws SemanticException {
+    throw new SemanticException("No semantic analyzer defined for " + tree.getType());
+  }
+
+  default HiveOperation getCommandType(ASTNode root) throws SemanticException {
+    throw new SemanticException("No Command type defined for " + root.getType());
   }
 }

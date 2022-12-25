@@ -55,6 +55,7 @@ import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.parse.TaskCompiler;
 import org.apache.hadoop.hive.ql.parse.BaseSemanticAnalyzer.AnalyzeRewriteContext;
 import org.apache.hadoop.hive.ql.plan.FetchWork;
+import org.apache.hadoop.hive.ql.plan.HiveOperation;
 import org.apache.hadoop.hive.ql.plan.LoadFileDesc;
 import org.apache.hadoop.hive.ql.plan.LoadMultiFilesDesc;
 import org.apache.hadoop.hive.ql.plan.LoadTableDesc;
@@ -94,25 +95,15 @@ public class ImpalaCompiler extends TaskCompiler {
         boolean computeStats = pCtx.getQueryProperties().isAnalyzeCommand() ||
             pCtx.getQueryProperties().isAnalyzeRewrite();
         boolean dropStats = pCtx.getQueryProperties().isDropStatsCommand();
-        boolean isRefreshCommand = pCtx.getQueryProperties().isRefreshCommand();
 
-        if (computeStats || dropStats || isRefreshCommand) {
-            // Compute, drop statistics and refresh statements are sent to the Impala engine
-            if (computeStats || dropStats) {
-                // We need to create a fetch operator since only Impala returns
-                // results for these statement
-                createFetchTask(pCtx);
-                String statsStatement = computeStats ? generateComputeStatsStatement(pCtx, inputs) :
-                        generateDropStatsStatement(pCtx, inputs);
-                work = ImpalaWork.createPlannedWork(statsStatement,
-                        pCtx.getFetchTask(), requestedFetchSize, generateInvalidateTableMetadataStatement(pCtx, inputs));
-            } else {
-                //Impala doesn't produce any output for these
-                // statements and so we don't define any fetch operator
-                // in Hive. Instead these statements are executed in sync mode.
-                work = ImpalaWork.createPlannedWork(generateRefreshStatement(inputs),
-                        null, -1, false);
-            }
+        if (computeStats || dropStats) {
+            // We need to create a fetch operator since only Impala returns
+            // results for these statement
+            createFetchTask(pCtx);
+            String statsStatement = computeStats ? generateComputeStatsStatement(pCtx, inputs) :
+                    generateDropStatsStatement(pCtx, inputs);
+            work = ImpalaWork.createPlannedWork(statsStatement,
+                    pCtx.getFetchTask(), requestedFetchSize, generateInvalidateTableMetadataStatement(pCtx, inputs));
         } else {
             MoveWork moveWork = moveTask == null ? null : moveTask.getWork();
             ImpalaCompiledPlan impalaCompiledPlan = getFinalizedCompiledPlan(pCtx, moveWork);
@@ -206,44 +197,6 @@ public class ImpalaCompiler extends TaskCompiler {
         return sb.toString();
     }
 
-    /*
-     * Generates refresh sql statement. If the partition column
-     * is of type String or Date, we wrap partition value with double quotes
-     * otherwise for partition column types like int, double etc we return
-     * the value as it.
-     * Few examples:
-     * - No partition spec:
-     *       REFRESH `tab`
-     * - Partition spec (partial spec not allowed)
-     *       REFRESH `tab` PARTITION (`part_col_str`="v1",`part_col_int`=v2..)
-     * - Partition spec of type char or varchar
-     *       REFRESH `tab` PARTITION (`part_col_char`=CAST("V1" AS CHAR(10)))
-     */
-
-    private String generateRefreshStatement(Set<ReadEntity> inputs) {
-        Table table = inputs.iterator().next().getTable();
-        StringBuilder sb = new StringBuilder();
-        sb.append("REFRESH ");
-        sb.append(unparseIdentifier(table.getDbName(), conf));
-        sb.append(".");
-        sb.append(unparseIdentifier(table.getTableName(), conf));
-
-        List<FieldSchema> partCols = table.getPartCols();
-        Map<String, String> partitionSpec = table.getTableSpec().partSpec;
-
-        // partSpec are partitions specified in sql
-        if(partitionSpec != null) {
-            sb.append(" PARTITION ");
-            sb.append("(");
-            sb.append(partCols.stream()
-                    .map(fs -> unparseIdentifier(fs.getName(), conf) + "=" +
-                            genPartValueString(fs, partitionSpec))
-                    .collect(Collectors.joining(", ")));
-            sb.append(")");
-        }
-        LOG.debug("Refresh statement passed to Impala for execution is: " + sb.toString());
-        return sb.toString();
-    }
 
     /*
      * The translation is as follows:

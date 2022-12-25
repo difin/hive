@@ -135,6 +135,7 @@ import org.apache.hadoop.hive.ql.ddl.table.misc.properties.AlterTableUnsetProper
 import org.apache.hadoop.hive.ql.ddl.table.storage.skewed.SkewedTableUtils;
 import org.apache.hadoop.hive.ql.ddl.view.create.CreateMaterializedViewDesc;
 import org.apache.hadoop.hive.ql.ddl.view.materialized.update.MaterializedViewUpdateDesc;
+import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
 import org.apache.hadoop.hive.ql.engine.EngineRuntimeHelper;
 import org.apache.hadoop.hive.ql.exec.AbstractMapJoinOperator;
 import org.apache.hadoop.hive.ql.exec.ArchiveUtils;
@@ -1679,7 +1680,14 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     QBParseInfo qbp = qb.getParseInfo();
     boolean skipRecursion = false;
 
-    if (ast.getToken() != null) {
+    // If ASTNode was created by a plugin, the token type will be unknown by this
+    // framework so all we can do is just set the command type.
+    if (!ast.usingDefaultEngine()) {
+      HiveOperation h = EngineCompileHelper.getInstance(conf).getCommandType(ast);
+      if (h != null) {
+        queryState.setCommandType(h);
+      }
+    } else if (ast.getToken() != null) {
       skipRecursion = true;
       switch (ast.getToken().getType()) {
       case HiveParser.TOK_SELECTDI:
@@ -1927,15 +1935,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         qb.addAlias(tblName);
         qb.getParseInfo().setDropStatsCommand(true);
         qb.getParseInfo().setIncrementalStats(AnalyzeCommandUtils.isIncrementalStats(ast));
-        break;
-
-      case HiveParser.TOK_REFRESH_TABLE:
-        // Case of Refresh command
-        String tbl_name = getUnescapedName((ASTNode) ast.getChild(0).getChild(0)).toLowerCase();
-        qb.setTabAlias(tbl_name, tbl_name);
-        qb.addAlias(tbl_name);
-        qb.getParseInfo().setIsRefreshCommand(true);
-        queryState.setCommandType(HiveOperation.REFRESH_TABLE);
         break;
 
       case HiveParser.TOK_UNIONALL:
@@ -2333,9 +2332,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         if (qb.getParseInfo().isAnalyzeCommand()) {
           throw new SemanticException(ErrorMsg.ANALYZE_VIEW.getMsg());
         }
-        if(qb.getParseInfo().isRefreshCommand()) {
-          throw new SemanticException(ErrorMsg.REFRESH_VIEW.getMsg());
-        }
         String fullViewName = tab.getFullyQualifiedName();
         // Prevent view cycles
         if (viewsExpanded.contains(fullViewName)) {
@@ -2387,8 +2383,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         qb.getParseInfo().addTableSpec(alias, ts);
       }
 
-      if (qb.getParseInfo().isDropStatsCommand() ||
-              qb.getParseInfo().isRefreshCommand()) {
+      if (qb.getParseInfo().isDropStatsCommand()) {
         // don't allow partial and dynamic partition specifications
         TableSpec ts = new TableSpec(db, conf, (ASTNode) ast.getChild(0), false, false);
         tab.setTableSpec(ts);
@@ -15873,7 +15868,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           !qb.getParseInfo().getDestToOrderBy().isEmpty());
       queryProperties.setOuterQueryLimit(qb.getParseInfo().getOuterQueryLimit());
       queryProperties.setMaterializedView(qb.isMaterializedView());
-      queryProperties.setRefreshCommand(qb.getParseInfo().isRefreshCommand());
     }
   }
   private void warn(String msg) {

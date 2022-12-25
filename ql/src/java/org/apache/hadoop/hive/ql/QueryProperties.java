@@ -326,14 +326,6 @@ public class QueryProperties {
     this.isMaterializedView = isMaterializedView;
   }
 
-  public boolean isRefreshCommand() {
-    return refreshCommand;
-  }
-
-  public void setRefreshCommand(boolean refreshCommand) {
-    this.refreshCommand = refreshCommand;
-  }
-
   public void clear() {
     query = false;
     analyzeCommand = false;
