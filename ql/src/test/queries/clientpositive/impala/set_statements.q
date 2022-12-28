@@ -46,3 +46,52 @@ explain select count(*) from impala_tpch_lineitem;
 -- verifies that unsupported Impala query options are removed after a query is executed
 set impala.dummy_option;
 set dummy_option;
+
+-- At the moment, ("impala.explain_level", "VERBOSE") is in 'properties' of HiveConf,
+-- which was loaded from data/conf/impala/hive-site.xml.
+-- 'lowercaseProperties' of HiveConf is empty.
+set explain_level=STANDARD;
+-- ("impala.explain_level", "VERBOSE") is in 'properties' of HiveConf.
+-- ("explain_level", "STANDARD") is in 'properties' of HiveConf.
+-- ("explain_level", "STANDARD") is in 'lowercaseProperties' of HiveConf.
+set EXPLAIN_LEVEL=MINIMAL;
+-- ("impala.explain_level", "VERBOSE") is in 'properties' of HiveConf.
+-- ("explain_level", "STANDARD") is in 'properties' field of HiveConf.
+-- ("explain_level", "MINIMAL") is in 'lowercaseProperties' of HiveConf.
+-- verifies that impala.explain_level is still "VERBOSE".
+set impala.explain_level;
+explain select 1;
+-- ("impala.explain_level", "MINIMAL") is in 'properties' of HiveConf.
+-- ("explain_level", "STANDARD") is in 'properties' of HiveConf.
+-- ("explain_level", "MINIMAL") is in 'lowercaseProperties' of HiveConf.
+set impala.explain_level;
+
+set explain_level=STANDARD;
+-- ("impala.explain_level", "MINIMAL") is in 'properties' of HiveConf.
+-- ("explain_level", "STANDARD") is in 'properties' of HiveConf.
+-- ("explain_level", "STANDARD") is in 'lowercaseProperties' of HiveConf.
+set impala.explain_level;
+explain select 2;
+-- ("impala.explain_level", "STANDARD") is in 'properties' of HiveConf.
+-- ("explain_level", "STANDARD") is in 'properties' of HiveConf.
+-- ("explain_level", "STANDARD") is in 'lowercaseProperties' of HiveConf.
+set impala.explain_level;
+
+set impala.explain_level=MINIMAL;
+set explain_level=MINIMAL;
+-- ("impala.explain_level", "MINIMAL") is in 'properties' of HiveConf.
+-- ("explain_level", "MINIMAL") is in 'properties' of HiveConf.
+-- ("explain_level", "MINIMAL") is in 'lowercaseProperties' of HiveConf.
+set explain_level=VERBOSE;
+-- ("impala.explain_level", "MINIMAL") is in 'properties' of HiveConf.
+-- ("explain_level", "VERBOSE") is in 'properties' of HiveConf.
+-- ("explain_level", "VERBOSE") is in 'lowercaseProperties' of HiveConf.
+set impala.explain_level=MINIMAL;
+-- ("impala.explain_level", "MINIMAL") is in 'properties' of HiveConf.
+-- ("explain_level", "MINIMAL") is in 'properties' of HiveConf.
+-- ("explain_level", "MINIMAL") is in 'lowercaseProperties' of HiveConf.
+explain select 3;
+-- ("impala.explain_level", "MINIMAL") is in 'properties' of HiveConf.
+-- ("explain_level", "MINIMAL") is in 'properties' of HiveConf.
+-- ("explain_level", "MINIMAL") is in 'lowercaseProperties' of HiveConf.
+set impala.explain_level;

@@ -103,6 +103,13 @@ public class HiveConf extends Configuration {
   private volatile boolean isImpalaConfigUpdated = false;
   private static final int LOG_PREFIX_LENGTH = 64;
 
+  private Map<String, String> lowercaseProperties =
+      Collections.synchronizedMap(new HashMap<>());
+
+  public Map<String, String> getLowercaseProperties() {
+    return lowercaseProperties;
+  }
+
   //XXX: CDPD-20696: need to get rid of Impala reference
   public boolean getImpalaConfigUpdated() {
     return isImpalaConfigUpdated;
@@ -5929,44 +5936,54 @@ public class HiveConf extends Configuration {
             + "It is not in list of params that are allowed to be modified at runtime");
       }
     }
+    // Make a reference to 'name' because local variables referenced from a lambda
+    // expression must be final or effectively final and 'name' is modified later in the
+    // method.
+    String nameReference = name;
     if (Iterables.any(restrictList,
-        restrictedVar -> name != null && name.startsWith(restrictedVar))) {
+        restrictedVar -> nameReference != null && nameReference.startsWith(restrictedVar))) {
       throw new IllegalArgumentException("Cannot modify " + name + " at runtime. It is in the list"
           + " of parameters that can't be modified at runtime or is prefixed by a restricted variable");
     }
-    String oldValue = name != null ? get(name) : null;
-    if (name == null || value == null || !value.equals(oldValue)) {
-      // When either name or value is null, the set method below will fail,
-      // and throw IllegalArgumentException.
-      // Note that for a key-value pair where the key does not start with
-      // Constants.IMPALA_PREFIX, conflicting key-value pairs could be added, which could
-      // not be prevented now because within this method, Impala's TQueryOptions is not
-      // available. Refer to CDPD-18048 for further details.
-      if (!isImpalaRelatedConfig(name)) {
-        set(name, value);
+
+    // When 'name' is null, isImpalaRelatedConfig() will throw a NullPointerException.
+    // When 'value' is null, value.equals() will throw a NullPointerException.
+    if (name != null && value != null) {
+      if (isImpalaRelatedConfig(name)) {
+        // Insert key with the impala namespace.
+        // We convert the portion of the key following Constants.IMPALA_PREFIX to
+        // lowercase letters to make sure there will not be conflicting key-value pairs
+        // for keys that start with Constants.IMPALA_PREFIX. For instance, we will not
+        // have both "impala.explain_level=VERBOSE" and "impala.EXPLAIN_LEVEL=MINIMAL"
+        // added to this HiveConf. Depending on the order of the SET statements, only
+        // one key-value pair could exist.
+        set(name.toLowerCase(), value);
+        setImpalaConfigUpdated(true);
+        // Now set the name to not have the impala namespace.
+        name = name.substring(Constants.IMPALA_PREFIX.length());
       }
       // After CDPD-13549, we allow a user to set up Impala's query options without
       // having to prepend Impala's namespace, and since the class of TQueryOptions is
       // not available here, we are not able to tell whether 'name' corresponds to an
-      // Impala query option here. Instead, we will determine this in
+      // Impala query option here. Instead, we will determine this later in
       // ImpalaHelper#updateImpalaQueryOptions() where the class of TQueryOptions is
       // available.
-      if (isImpalaRelatedConfig(name)) {
-        // If 'name' starts with "impala", we also add the corresponding query option
-        // without Impala's namespace when appropriate. We convert the portion of the
-        // key following Constants.IMPALA_PREFIX to lowercase letters to make sure there
-        // will not be conflicting key-value pairs for keys that start with
-        // Constants.IMPALA_PREFIX. For instance, we will not have both
-        // "impala.explain_level=VERBOSE" and "impala.EXPLAIN_LEVEL=MINIMAL" added to
-        // this HiveConf. Depending on the order of the SET statements, only one
-        // key-value pair could exist.
-        if (name.length() > Constants.IMPALA_PREFIX.length()) {
-          String impalaQueryOptionKey = name.substring(Constants.IMPALA_PREFIX.length());
-          set(Constants.IMPALA_PREFIX.concat(impalaQueryOptionKey.toLowerCase()), value);
-          set(impalaQueryOptionKey.toLowerCase(), value);
-        }
-        isImpalaConfigUpdated = true;
+      // Thus for a key-value pair where the key does not start with
+      // Constants.IMPALA_PREFIX, conflicting key-value pairs corresponding to Impala's
+      // query options, e.g., explain_level=VERBOSE and EXPLAIN_LEVEL=MINIMAL, could be
+      // added in the 'properties' field in the parent class Configuration, which is ok
+      // since in ImpalaQueryHelperImpl#updateImpalaQueryOptions() to prepare Impala's
+      // query options we rely on key-value pairs added to 'lowercaseProperties' and
+      // the key of each added pair in 'lowercaseProperties' is always converted to
+      // lowercase letters. That is, a query option added earlier to
+      // 'lowercaseProperties' will be overridden by the same query option added later.
+      String oldValue = get(name);
+      boolean shouldSet = !value.equals(oldValue);
+      if (shouldSet) {
+        set(name, value);
       }
+
+      lowercaseProperties.put(name.toLowerCase(), value);
     }
 
     // We also need to update the value associated with 'execution.engine' when
@@ -5978,7 +5995,7 @@ public class HiveConf extends Configuration {
     // invoked with 'name' equal to "hive.execution.engine". In this case, the body of
     // the if-statement above will not be executed, and thus set() will not be called to
     // update the value associated with 'execution.engine'.
-    if (name.equalsIgnoreCase(ConfVars.HIVE_EXECUTION_ENGINE.varname)) {
+    if (ConfVars.HIVE_EXECUTION_ENGINE.varname.equalsIgnoreCase(name)) {
       set(ConfVars.HIVE_EXECUTION_ENGINE.altName, value);
     }
   }
@@ -6397,6 +6414,7 @@ public class HiveConf extends Configuration {
     auxJars = other.auxJars;
     isImpalaConfigUpdated = other.isImpalaConfigUpdated;
     origProp = (Properties)other.origProp.clone();
+    lowercaseProperties.putAll(other.lowercaseProperties);
     restrictList.addAll(other.restrictList);
     hiddenSet.addAll(other.hiddenSet);
     modWhiteListPattern = other.modWhiteListPattern;

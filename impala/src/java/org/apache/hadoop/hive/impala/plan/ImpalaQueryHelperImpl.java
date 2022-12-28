@@ -310,8 +310,8 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     // update 'sessionConf' because 1) currently to prepare a TOpenSessionReq for the
     // Impala backend, we retrieve the query options in 'sessionConf', and 2) the query
     // option prefixed by Impala's namespace would be updated accordingly. Refer to
-    // ImpalaSession#open() for the first reason and SetProcessor#getVariable() for the
-    // second reason.
+    // ImpalaSessionImpl#openImpl() for the first reason and SetProcessor#getVariable()
+    // for the second reason.
     HiveConf sessionConf = SessionState.get().getConf();
     filterUnsupportedImpalaQueryOptions(sessionConf);
     updateImpalaQueryOptions(sessionConf);
@@ -425,34 +425,23 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
   }
 
   private void updateImpalaQueryOptions(HiveConf conf) {
-    Properties origProps = conf.getAllProperties();
+    Map<String, String> origProps = conf.getLowercaseProperties();
     Properties impalaProps = new Properties();
-    List<String> origImpalaProps = new ArrayList<>();
 
-    for (Map.Entry<Object, Object> e : origProps.entrySet()) {
+    for (Map.Entry<String, String> e : origProps.entrySet()) {
       String key = (String) e.getKey();
-      TQueryOptions._Fields field = TQueryOptions._Fields.findByName(
-              key.toLowerCase());
+      TQueryOptions._Fields field = TQueryOptions._Fields.findByName(key);
       if (field != null) {
-        // Convert the key to lower case so that in createDefaultQueryOptions() we could
-        // filter out the query option that could not be correctly parsed by
-        // FeSupport#ParseQueryOptions(). Recall that in createDefaultQueryOptions() to
-        // compute 'csvSessionOptions' we filter out each key-value pair in which the key
-        // equals "enabled_runtime_filter_types" and thus we will not be able to filter
-        // out a key-value pair like "ENABLED_RUNTIME_filter_types=BLOOM,MIN_MAX" if the
-        // key in such key-value pairs is not converted to lower case since some letters
-        // in the key are in upper case.
-        // We choose not to convert the key to upper case because in the unit tests
-        // the keys of Impala's query options are in lower case and thus a key-value pair
-        // like "impala.EXPLAIN_LEVEL=MINIMAL" could not override
-        // "impala.explain_level=VERBOSE" in 'impalaProps', which could cause some unit
-        // tests to fail. Refer to data/conf/impala/hive-site.xml for Impala's query
-        // options that we use in Hive's unit tests.
+        // We do not have to convert the key to lowercase letters because the keys in
+        // 'origProps' are already in lowercase. Recall that in
+        // createDefaultQueryOptions() to filter out the query option that could not be
+        // correctly parsed by FeSupport#ParseQueryOptions(), we filter out each
+        // key-value pair in which the key equals "enabled_runtime_filter_types" when
+        // computing 'csvSessionOptions' and thus we will not be able to filter out a
+        // key-value pair like "ENABLED_RUNTIME_filter_types=BLOOM,MIN_MAX" if the key in
+        // such key-value pairs is not in lowercase.
         impalaProps.put(
-            Constants.IMPALA_PREFIX.concat(((String) e.getKey()).toLowerCase()),
-            e.getValue());
-
-        origImpalaProps.add((String) e.getKey());
+            Constants.IMPALA_PREFIX.concat(key), e.getValue());
       }
     }
 
@@ -462,7 +451,6 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     // option is updated, the change will not be reflected in the TOpenSessionReq we send
     // to the Impala backend in the next query. Refer to
     // ImpalaSessionManager#getSession() for further details.
-
     for (Map.Entry<Object, Object> e : impalaProps.entrySet()) {
       String oldVal = conf.get((String) e.getKey());
       if (oldVal == null || oldVal != (String) e.getValue()) {
@@ -470,10 +458,6 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
         conf.setImpalaConfigUpdated(true);
       }
     }
-
-    // We do not call unset() for each query option 'name' in 'origImpalaProps' so that a
-    // user is able to get the value for the query option via "SET 'name'" instead of
-    // "SET impala.'name'";
   }
 
   /**
