@@ -189,7 +189,6 @@ public class Compiler {
     // that SemanticAnalyzer finds are in use
     SessionState.get().getCurrentFunctionsInUse().clear();
 
-    driverContext.setBackupContext(new Context(context));
     boolean executeHooks = driverContext.getHookRunner().hasPreAnalyzeHooks();
 
     HiveSemanticAnalyzerHookContext hookCtx = new HiveSemanticAnalyzerHookContextImpl();
