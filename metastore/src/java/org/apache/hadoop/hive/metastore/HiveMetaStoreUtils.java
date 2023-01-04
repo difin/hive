@@ -96,6 +96,25 @@ public class HiveMetaStoreUtils {
         SerDeUtils.initializeSerDe(deserializer, conf, properties, null);
       }
       return deserializer;
+    } catch (ClassNotFoundException cnfe){
+      // Best effort, try to load  class from the UDFClassLoader
+      Class<?> clazz = null;
+      try {
+        clazz = Class.forName(lib, true, conf.getClassLoader());
+        Deserializer deserializer = ReflectionUtil.newInstance(clazz.
+                asSubclass(Deserializer.class), conf);
+        if (skipConfError) {
+          SerDeUtils.initializeSerDeWithoutErrorCheck(deserializer, conf,
+                  MetaStoreUtils.getTableMetadata(table), null);
+        } else {
+          SerDeUtils.initializeSerDe(deserializer, conf, MetaStoreUtils.getTableMetadata(table), null);
+        }
+        return deserializer;
+      } catch (Throwable e) {
+        LOG.error("error in initSerDe: \" + e.getClass().getName() + \" \"\n" +
+                "          + e.getMessage(), ", e);
+        throw new MetaException(e.getClass().getName() + " " + e.getMessage());
+      }
     } catch (RuntimeException e) {
       throw e;
     } catch (Throwable e) {
