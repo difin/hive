@@ -266,14 +266,7 @@ public class Driver implements IDriver {
   private void prepareContext() throws CommandProcessorException {
     if (context != null && context.getExplainAnalyze() != AnalyzeState.RUNNING) {
       // close the existing ctx etc before compiling a new query, but does not destroy driver
-      if (!driverContext.isRetrial()) {
-        closeInProcess(false);
-      } else {
-        // On retrial we need to maintain information from the prior context. Such
-        // as the currently held locks.
-        context = new Context(context);
-        releaseResources();
-      }
+      closeInProcess(false);
     }
 
     try {
@@ -770,6 +763,10 @@ public class Driver implements IDriver {
               driverContext.getTxnManager().clearCaches();
             }
             driverContext.setRetrial(true);
+            driverContext.getBackupContext().addSubContext(context);
+            driverContext.getBackupContext().setHiveLocks(context.getHiveLocks());
+            context = driverContext.getBackupContext();
+
             driverContext.getConf().set(ValidTxnList.VALID_TXNS_KEY,
               driverContext.getTxnManager().getValidTxns().toString());
 
