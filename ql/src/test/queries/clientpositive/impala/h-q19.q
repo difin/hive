@@ -1,3 +1,4 @@
+--! qt:disabled:Found that the actual results in PTest and FENG's pre-commit tests are different CDPD-48219.
 set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
 
 --! qt:dataset:impala_dataset
