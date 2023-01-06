@@ -74,6 +74,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveAntiJoin;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSemiJoin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -674,8 +675,16 @@ public class RelFieldTrimmer implements ReflectiveVisitor {
     relBuilder.push(newInputs.get(0));
     relBuilder.push(newInputs.get(1));
 
+    boolean isSemiJoin = false;
     if (join instanceof HiveSemiJoin) {
       relBuilder.semiJoin(newConditionExpr);
+      isSemiJoin = true;
+    } else if (join instanceof HiveAntiJoin) {
+      relBuilder.antiJoin(newConditionExpr);
+      isSemiJoin = true;
+    }
+
+    if (isSemiJoin) {
       // For SemiJoins only map fields from the left-side
       Mapping inputMapping = inputMappings.get(0);
       mapping = Mappings.create(MappingType.INVERSE_SURJECTION,

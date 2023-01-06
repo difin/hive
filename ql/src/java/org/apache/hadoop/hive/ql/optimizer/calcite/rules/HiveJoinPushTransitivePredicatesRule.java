@@ -42,6 +42,9 @@ import org.apache.calcite.util.Util;
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveCalciteUtil;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveAntiJoin;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveJoin;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSemiJoin;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPNotNull;
 import org.apache.hive.common.util.AnnotationUtils;
 
@@ -67,6 +70,9 @@ public class HiveJoinPushTransitivePredicatesRule extends RelOptRule {
     super(operand(clazz, any()));
     this.allowDisjunctivePredicates = allowDisjunctivePredicates;
   }
+
+  public static final HiveJoinPushTransitivePredicatesRule INSTANCE_ANTIJOIN =
+          new HiveJoinPushTransitivePredicatesRule(HiveAntiJoin.class, false);
 
   @Override
   public void onMatch(RelOptRuleCall call) {
