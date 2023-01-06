@@ -105,6 +105,7 @@ public class TestReplicationScenariosExternalTables extends BaseReplicationAcros
     overrides.put(HiveConf.ConfVars.HIVE_DISTCP_DOAS_USER.varname,
         UserGroupInformation.getCurrentUser().getUserName());
     overrides.put(HiveConf.ConfVars.REPL_RUN_DATA_COPY_TASKS_ON_TARGET.varname, "false");
+    overrides.put(HiveConf.ConfVars.REPL_BATCH_INCREMENTAL_EVENTS.varname, String.valueOf(Boolean.FALSE));
 
     internalBeforeClassSetup(overrides, TestReplicationScenarios.class);
   }

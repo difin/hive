@@ -26,7 +26,8 @@ public enum ReplAck {
     LOAD_ACKNOWLEDGEMENT("_finished_load"),
     NON_RECOVERABLE_MARKER("_non_recoverable"),
     LOAD_METADATA("_load_metadata"),
-    FAILOVER_READY_MARKER("_failover_ready");
+    FAILOVER_READY_MARKER("_failover_ready"),
+    EVENTS_BATCHED("_events_batched");
     private String ack;
     ReplAck(String ack) {
         this.ack = ack;

@@ -68,7 +68,8 @@ public class TestTableLevelReplicationScenarios extends BaseReplicationScenarios
     overrides.put(HiveConf.ConfVars.REPL_INCLUDE_EXTERNAL_TABLES.varname, "true");
     overrides.put(HiveConf.ConfVars.HIVE_DISTCP_DOAS_USER.varname,
         UserGroupInformation.getCurrentUser().getUserName());
-
+    overrides.put(HiveConf.ConfVars.REPL_BATCH_INCREMENTAL_EVENTS.varname,
+            String.valueOf(Boolean.FALSE));
     internalBeforeClassSetup(overrides, TestTableLevelReplicationScenarios.class);
   }
 

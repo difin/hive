@@ -28,10 +28,18 @@ import org.apache.hadoop.hive.common.repl.ReplConst;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.metastore.ReplChangeManager;
+import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.AbortTxnRequest;
 import org.apache.hadoop.hive.metastore.api.AbortTxnsRequest;
+import org.apache.hadoop.hive.metastore.api.CompactionInfoStruct;
+import org.apache.hadoop.hive.metastore.api.CompactionRequest;
+import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.Partition;
+import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.Partition;
+import org.apache.hadoop.hive.metastore.api.SeedTxnIdRequest;
+import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.messaging.json.gzip.GzipJSONMessageEncoder;
 import org.apache.hadoop.hive.metastore.txn.entities.CompactionInfo;
@@ -41,15 +49,18 @@ import org.apache.hadoop.hive.metastore.InjectableBehaviourObjectStore;
 import org.apache.hadoop.hive.metastore.InjectableBehaviourObjectStore.CallerArguments;
 import org.apache.hadoop.hive.metastore.InjectableBehaviourObjectStore.BehaviourInjection;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
+import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.DriverFactory;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.IDriver;
 import org.apache.hadoop.hive.ql.exec.repl.ReplAck;
 import org.apache.hadoop.hive.ql.exec.repl.ReplDumpWork;
 import org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils;
+import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.parse.repl.DumpType;
 import org.apache.hadoop.hive.ql.parse.repl.load.DumpMetaData;
+import org.apache.hadoop.hive.ql.parse.repl.load.EventDumpDirComparator;
 import org.apache.hadoop.hive.ql.parse.repl.load.FailoverMetaData;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
@@ -61,9 +72,8 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import javax.annotation.Nullable;
 
@@ -72,21 +82,33 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import org.junit.Ignore;
 
 
 import static org.apache.hadoop.hive.metastore.ReplChangeManager.SOURCE_OF_REPLICATION;
+import static org.apache.hadoop.hive.ql.TxnCommandsBaseForTests.runCleaner;
+import static org.apache.hadoop.hive.ql.TxnCommandsBaseForTests.runWorker;
 import static org.apache.hadoop.hive.ql.exec.repl.ReplAck.DUMP_ACKNOWLEDGEMENT;
 import static org.apache.hadoop.hive.ql.exec.repl.ReplAck.LOAD_ACKNOWLEDGEMENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.fail;
 /**
  * TestReplicationScenariosAcidTables - test replication for ACID tables.
@@ -3397,4 +3419,324 @@ public class TestReplicationScenariosAcidTables extends BaseReplicationScenarios
       .verifyResults(new String[] { "bangalore", "paris", "sydney" })
       .verifyReplTargetProperty(replicatedDbName);
   }
+
+  @Test
+  public void testBatchingOfIncrementalEvents() throws Throwable {
+    final int REPL_MAX_LOAD_TASKS = 5;
+    List<String> incrementalBatchConfigs = Arrays.asList(
+            String.format("'%s'='%s'", HiveConf.ConfVars.REPL_BATCH_INCREMENTAL_EVENTS, "true"),
+            String.format("'%s'='%d'", HiveConf.ConfVars.REPL_APPROX_MAX_LOAD_TASKS, REPL_MAX_LOAD_TASKS)
+    );
+
+    //bootstrap run, config should have no effect
+    WarehouseInstance.Tuple bootstrapDump = primary.run("use " + primaryDbName)
+            .run("create table t1 (id int)")
+            .run("insert into table t1 values (1)")
+            .dump(primaryDbName, incrementalBatchConfigs);
+
+    FileSystem fs = new Path(bootstrapDump.dumpLocation).getFileSystem(conf);
+    Path eventsBatchAck = new Path(bootstrapDump.dumpLocation, ReplAck.EVENTS_BATCHED.toString());
+    assertFalse(fs.exists(eventsBatchAck));
+
+    replica.load(replicatedDbName, primaryDbName, incrementalBatchConfigs)
+            .run("use " + replicatedDbName)
+            .run("select * from t1")
+            .verifyResults(new String[]{"1"});
+
+    //incremental run
+    WarehouseInstance.Tuple incrementalDump = primary.run("use " + primaryDbName)
+            .run("insert into t1 values(2)")
+            .run("insert into t1 values(3)")
+            .run("insert into t1 values(4)")
+            .run("insert into t1 values(5)")
+            .dump(primaryDbName, incrementalBatchConfigs);
+
+    Path dumpPath = new Path(incrementalDump.dumpLocation, ReplUtils.REPL_HIVE_BASE_DIR);
+    eventsBatchAck = new Path(dumpPath, ReplAck.EVENTS_BATCHED.toString());
+    assertTrue(fs.exists(eventsBatchAck));
+
+    int eventsCountInAckFile = 0, expectedEventsCount = 0;
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(eventsBatchAck)))) {
+      eventsCountInAckFile = Integer.parseInt(br.readLine());
+    }
+    String eventsBatchDirPrefix = ReplUtils.INC_EVENTS_BATCH.replaceAll("%d", "");
+
+    List<FileStatus> batchFiles = Arrays.stream(fs.listStatus(dumpPath))
+            .filter(fileStatus -> fileStatus.getPath().getName()
+                    .startsWith(eventsBatchDirPrefix)).collect(Collectors.toList());
+
+
+    for (FileStatus fileStatus : batchFiles) {
+      int eventsPerBatch = fs.listStatus(fileStatus.getPath()).length;
+      assertTrue(eventsPerBatch <= REPL_MAX_LOAD_TASKS);
+      expectedEventsCount += eventsPerBatch;
+    }
+    assertEquals(eventsCountInAckFile, expectedEventsCount);
+
+    // Repl Load should be agnostic of batch size and REPL_BATCH_INCREMENTAL_EVENTS config.
+    // hence not passing incrementalBatchConfigs here.
+    replica.load(replicatedDbName, primaryDbName)
+            .run("use " + replicatedDbName)
+            .run("select * from t1")
+            .verifyResults(new String[]{"1", "2", "3", "4", "5"});
+
+    assertTrue(fs.exists(new Path(dumpPath, LOAD_ACKNOWLEDGEMENT.toString())));
+
+    ReplDumpWork.testDeletePreviousDumpMetaPath(true);
+    //second round of incremental dump.
+    incrementalDump = primary.run("use " + primaryDbName)
+            .run("insert into t1 values(6)")
+            .run("insert into t1 values(7)")
+            .run("insert into t1 values(8)")
+            .run("insert into t1 values(9)")
+            .dump(primaryDbName, incrementalBatchConfigs);
+
+    // simulate a failure in repl dump when batching was enabled.
+    dumpPath = new Path(incrementalDump.dumpLocation, ReplUtils.REPL_HIVE_BASE_DIR);
+    batchFiles = Arrays.stream(fs.listStatus(dumpPath))
+            .filter(fileStatus -> fileStatus.getPath().getName()
+                    .startsWith(eventsBatchDirPrefix))
+            .sorted(new EventDumpDirComparator()).collect(Collectors.toList());
+
+
+    FileStatus lastBatch = batchFiles.get(batchFiles.size() - 1);
+    Path lastBatchPath = lastBatch.getPath();
+
+    FileStatus[] eventsOfLastBatch = fs.listStatus(lastBatchPath);
+    Arrays.sort(eventsOfLastBatch, new EventDumpDirComparator());
+    Map<FileStatus, Long> modificationTimes = batchFiles.stream().filter(file -> !Objects.equals(lastBatch, file))
+            .collect(Collectors.toMap(Function.identity(), FileStatus::getModificationTime));
+
+    int lastReplId = Integer.parseInt(eventsOfLastBatch[0].getPath().getName()) - 1;
+
+    org.apache.hadoop.hive.ql.parse.repl.dump.Utils.writeOutput(String.valueOf(lastReplId),
+            new Path(dumpPath, ReplAck.EVENTS_DUMP.toString()),
+            primary.hiveConf);
+    fs.delete(new Path(dumpPath, DUMP_ACKNOWLEDGEMENT.toString()), false);
+    //delete all events of last batch except one.
+    for (int idx = 1; idx < eventsOfLastBatch.length; idx++)
+      fs.delete(eventsOfLastBatch[idx].getPath(), true);
+
+    // when we try to resume a failed dump which was batched without setting REPL_BATCH_INCREMENTAL_EVENTS = true
+    // in the next run dump should fail.
+    primary.dumpFailure(primaryDbName);
+    if (ReplUtils.failedWithNonRecoverableError(dumpPath, conf)) {
+      fs.delete(new Path(dumpPath, ReplAck.NON_RECOVERABLE_MARKER.toString()), false);
+    }
+
+    WarehouseInstance.Tuple dumpAfterFailure = primary.dump(primaryDbName, incrementalBatchConfigs);
+    //ensure dump did recover and dump location of new dump is same as the previous one.
+    assertEquals(dumpAfterFailure.dumpLocation, incrementalDump.dumpLocation);
+
+    List<FileStatus> filesAfterFailedDump = Arrays.stream(fs.listStatus(dumpPath))
+            .filter(fileStatus -> fileStatus.getPath().getName()
+                    .startsWith(eventsBatchDirPrefix))
+            .sorted(new EventDumpDirComparator()).collect(Collectors.toList());
+
+    //ensure all event files are dumped again.
+    assertEquals(batchFiles, filesAfterFailedDump);
+
+    //ensure last batch had events dumped and was indeed modified.
+    assertNotEquals(lastBatch.getModificationTime(),
+            filesAfterFailedDump.get(filesAfterFailedDump.size() - 1).getModificationTime());
+
+    assertArrayEquals(fs.listStatus(lastBatchPath),
+            fs.listStatus(filesAfterFailedDump.get(filesAfterFailedDump.size() - 1).getPath()));
+
+    //ensure remaining batches were not modified.
+    assertTrue(filesAfterFailedDump.stream()
+            .filter(file -> !Objects.equals(file, lastBatch))
+            .allMatch(file -> file.getModificationTime() == modificationTimes.get(file)));
+    //ensure successful repl load.
+    replica.load(replicatedDbName, primaryDbName)
+            .run("use " + replicatedDbName)
+            .run("select * from t1")
+            .verifyResults(new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9"});
+
+    ReplDumpWork.testDeletePreviousDumpMetaPath(false);
+  }
+
+
+  private void runCompaction(String dbName, String tblName, String partName, CompactionType compactionType)
+          throws Throwable {
+    HiveConf hiveConf = new HiveConf(primary.getConf());
+    TxnStore txnHandler = TxnUtils.getTxnStore(hiveConf);
+    markPreviousCompactionsAsComplete(txnHandler, hiveConf);
+    CompactionRequest rqst = new CompactionRequest(dbName, tblName, compactionType);
+    rqst.setPartitionname(partName);
+    txnHandler.compact(rqst);
+    hiveConf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, false);
+    runWorker(hiveConf);
+    runCleaner(hiveConf);
+  }
+
+  private void markPreviousCompactionsAsComplete(TxnStore txnHandler, HiveConf conf) throws Throwable {
+    Connection conn = TestTxnDbUtil.getConnection(conf);
+    Statement stmt = conn.createStatement();
+    ResultSet rs = stmt.executeQuery("select CQ_ID from COMPACTION_QUEUE");
+    List<Long> openCompactionIds = new ArrayList<>();
+    while (rs.next()) {
+      openCompactionIds.add(rs.getLong(1));
+    }
+    openCompactionIds.forEach(id->{
+      CompactionInfoStruct compactionInfoStruct = new CompactionInfoStruct();
+      compactionInfoStruct.setId(id);
+      CompactionInfo compactionInfo = CompactionInfo.compactionStructToInfo(compactionInfoStruct);
+      try {
+        txnHandler.markCompacted(compactionInfo);
+      } catch (MetaException e) {
+        throw new RuntimeException(e);
+      }
+    });
+  }
+
+  private FileStatus[] getDirsInTableLoc(WarehouseInstance wh, String db, String table) throws Throwable {
+    Path tblLoc = new Path(wh.getTable(db, table).getSd().getLocation());
+    FileSystem fs = tblLoc.getFileSystem(wh.getConf());
+    return fs.listStatus(tblLoc, EximUtil.getDirectoryFilter(fs));
+  }
+
+  private FileStatus[] getDirsInPartitionLoc(WarehouseInstance wh, Partition partition)
+          throws Throwable {
+    Path tblLoc = new Path(partition.getSd().getLocation());
+    FileSystem fs = tblLoc.getFileSystem(wh.getConf());
+    return fs.listStatus(tblLoc, EximUtil.getDirectoryFilter(fs));
+  }
+
+  private long getMinorCompactedTxnId(FileStatus[] fileStatuses) {
+    for (FileStatus fileStatus : fileStatuses) {
+      if (fileStatus.getPath().getName().startsWith(AcidUtils.DELTA_PREFIX)) {
+        AcidUtils.ParsedDeltaLight delta = AcidUtils.ParsedDelta.parse(fileStatus.getPath());
+        if (delta.getVisibilityTxnId() != 0) {
+          return delta.getVisibilityTxnId();
+        }
+      }
+    }
+    return -1;
+  }
+
+  private long getMajorCompactedWriteId(FileStatus[] fileStatuses, boolean replica) {
+    for (FileStatus fileStatus : fileStatuses) {
+      if (fileStatus.getPath().getName().startsWith(AcidUtils.BASE_PREFIX)) {
+        AcidUtils.ParsedBaseLight pbl = AcidUtils.ParsedBase.parseBase(fileStatus.getPath());
+        long writeId = pbl.getWriteId();
+        if (replica) {
+          assertEquals(0, pbl.getVisibilityTxnId());
+        }
+        return writeId;
+      }
+    }
+    return -1;
+  }
+
+  @Test
+  public void testAcidTablesBootstrapWithMajorCompaction() throws Throwable {
+    String tableName = testName.getMethodName();
+    String tableNamepart = testName.getMethodName() + "_part";
+    primary.run("use " + primaryDbName)
+            .run("create table " + tableName + " (id int) clustered by(id) into 3 buckets stored as orc " +
+                    "tblproperties (\"transactional\"=\"true\")")
+            .run("insert into " + tableName + " values(1)")
+            .run("insert into " + tableName + " values(2)")
+            .run("create table " + tableNamepart + " (id int) partitioned by (part int) clustered by(id) " +
+                    "into 3 buckets stored as orc " +
+                    "tblproperties (\"transactional\"=\"true\") ")
+            .run("insert into " + tableNamepart + " values(1, 2)")
+            .run("insert into " + tableNamepart + " values(2, 2)");
+    runCompaction(primaryDbName, tableName, null, CompactionType.MAJOR);
+
+    List<Partition> partList = primary.getAllPartitions(primaryDbName, tableNamepart);
+    for (Partition part : partList) {
+      Table tbl = primary.getTable(primaryDbName, tableNamepart);
+      String partName = Warehouse.makePartName(tbl.getPartitionKeys(), part.getValues());
+      runCompaction(primaryDbName, tableNamepart, partName, CompactionType.MAJOR);
+    }
+
+    List<String> withClause = Arrays.asList(
+            "'" + HiveConf.ConfVars.REPL_RUN_DATA_COPY_TASKS_ON_TARGET.varname + "'='true'");
+    WarehouseInstance.Tuple dump = primary.dump(primaryDbName, withClause);
+    replica.load(replicatedDbName, primaryDbName, withClause);
+    replica.run("use " + replicatedDbName)
+            .run("show tables")
+            .verifyResults(new String[]{tableName, tableNamepart})
+            .run("repl status " + replicatedDbName)
+            .verifyResult(dump.lastReplicationId)
+            .run("select id from " + tableName + " order by id")
+            .verifyResults(new String[]{"1", "2"})
+            .run("select id from " + tableNamepart + " order by id")
+            .verifyResults(new String[]{"1", "2"});
+
+    FileStatus[] fileStatuses = getDirsInTableLoc(primary, primaryDbName, tableName);
+    long writeId = getMajorCompactedWriteId(fileStatuses, false);
+    assertTrue(writeId != -1);
+
+    fileStatuses = getDirsInTableLoc(replica, replicatedDbName, tableName);
+    // replica write id should be same as source write id.
+    assertEquals(writeId, getMajorCompactedWriteId(fileStatuses, true));
+
+    // check for partitioned table.
+    for (Partition part : partList) {
+      fileStatuses = getDirsInPartitionLoc(primary, part);
+      writeId = getMajorCompactedWriteId(fileStatuses, false);
+      assertTrue(writeId != -1);
+      Partition partReplica = replica.getPartition(replicatedDbName, tableNamepart, part.getValues());
+      fileStatuses = getDirsInPartitionLoc(replica, partReplica);
+      assertEquals(writeId, getMajorCompactedWriteId(fileStatuses, true));
+    }
+  }
+
+  @Test
+  public void testAcidTablesBootstrapWithMinorCompaction() throws Throwable {
+    String tableName = testName.getMethodName();
+    String tableNamepart = testName.getMethodName() + "_part";
+    primary.run("use " + primaryDbName)
+            .run("create table " + tableName + " (id int) clustered by(id) into 3 buckets stored as orc " +
+                    "tblproperties (\"transactional\"=\"true\")")
+            .run("insert into " + tableName + " values(1)")
+            .run("insert into " + tableName + " values(2)")
+            .run("create table " + tableNamepart + " (id int) partitioned by (part int) clustered by(id) " +
+                    "into 3 buckets stored as orc " +
+                    "tblproperties (\"transactional\"=\"true\") ")
+            .run("insert into " + tableNamepart + " values(1, 2)")
+            .run("insert into " + tableNamepart + " values(2, 2)");
+
+    runCompaction(primaryDbName, tableName, null, CompactionType.MINOR);
+
+    List<Partition> partList = primary.getAllPartitions(primaryDbName, tableNamepart);
+    for (Partition part : partList) {
+      Table tbl = primary.getTable(primaryDbName, tableNamepart);
+      String partName = Warehouse.makePartName(tbl.getPartitionKeys(), part.getValues());
+      runCompaction(primaryDbName, tableNamepart, partName, CompactionType.MINOR);
+    }
+    List<String> withClause = Arrays.asList(
+            "'" + HiveConf.ConfVars.REPL_RUN_DATA_COPY_TASKS_ON_TARGET.varname + "'='true'");
+
+    WarehouseInstance.Tuple dump = primary.dump(primaryDbName, withClause);
+    replica.load(replicatedDbName, primaryDbName, withClause);
+    replica.run("use " + replicatedDbName)
+            .run("show tables")
+            .verifyResults(new String[]{tableName, tableNamepart})
+            .run("repl status " + replicatedDbName)
+            .verifyResult(dump.lastReplicationId)
+            .run("select id from " + tableName + " order by id")
+            .verifyResults(new String[]{"1", "2"})
+            .run("select id from " + tableNamepart + " order by id")
+            .verifyResults(new String[]{"1", "2"});
+
+    FileStatus[] fileStatuses = getDirsInTableLoc(primary, primaryDbName, tableName);
+    assertTrue(-1 != getMinorCompactedTxnId(fileStatuses));
+
+    fileStatuses = getDirsInTableLoc(replica, replicatedDbName, tableName);
+    Assert.assertEquals(-1, getMinorCompactedTxnId(fileStatuses));
+
+    // check for partitioned table.
+    for (Partition part : partList) {
+      fileStatuses = getDirsInPartitionLoc(primary, part);
+      assertTrue(-1 != getMinorCompactedTxnId(fileStatuses));
+      Partition partReplica = replica.getPartition(replicatedDbName, tableNamepart, part.getValues());
+      fileStatuses = getDirsInPartitionLoc(replica, partReplica);
+      assertTrue(-1 == getMinorCompactedTxnId(fileStatuses));
+    }
+  }
+
 }

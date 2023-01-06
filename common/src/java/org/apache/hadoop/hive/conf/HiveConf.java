@@ -590,6 +590,10 @@ public class HiveConf extends Configuration {
             + "task increment that would cross the specified limit."),
     REPL_PARTITIONS_DUMP_PARALLELISM("hive.repl.partitions.dump.parallelism",100,
         "Number of threads that will be used to dump partition data information during repl dump."),
+    REPL_BATCH_INCREMENTAL_EVENTS("hive.repl.batch.incremental.events", true,
+            "Dump events in batches during incremental phase of repl dump"),
+    REPL_TABLE_DUMP_PARALLELISM("hive.repl.table.dump.parallelism", 15,
+            "Number of threads that will be used to dump table data information during repl dump."),
     REPL_RUN_DATA_COPY_TASKS_ON_TARGET("hive.repl.run.data.copy.tasks.on.target", true,
             "Indicates whether replication should run data copy tasks during repl load operation."),
     REPL_DUMP_METADATA_ONLY("hive.repl.dump.metadata.only", false,
@@ -3788,6 +3792,11 @@ public class HiveConf extends Configuration {
         "org.apache.hive.hcatalog.api.repl.exim.EximReplicationTaskFactory",
         "Parameter that can be used to override which ReplicationTaskFactory will be\n" +
         "used to instantiate ReplicationTask events. Override for third party repl plugins"),
+
+    REPL_FILTER_TRANSACTIONS("hive.repl.filter.transactions", false,
+        "Enable transaction event filtering to save dump space.\n" +
+            "When true, transactions are implicitly opened during REPL DUMP.\n" +
+            "The default setting is false"),
     HIVE_MAPPER_CANNOT_SPAN_MULTIPLE_PARTITIONS("hive.mapper.cannot.span.multiple.partitions", false, ""),
     HIVE_REWORK_MAPREDWORK("hive.rework.mapredwork", false,
         "should rework the mapred work or not.\n" +
