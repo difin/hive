@@ -33,6 +33,8 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.NO_VAL;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getHostFromId;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getThreadIdFromId;
+import org.apache.hadoop.hive.ql.session.SessionState;
+
 
 /**
  * Operation process of showing compactions.
@@ -44,13 +46,16 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
 
   @Override
   public int execute() throws HiveException {
+    SessionState sessionState = SessionState.get();
     // Call the metastore to get the status of all known compactions (completed get purged eventually)
     ShowCompactResponse rsp = context.getDb().showCompactions(desc.getPoolName());
 
     // Write the results into the file
     try (DataOutputStream os = DDLUtils.getOutputStream(new Path(desc.getResFile()), context)) {
       // Write a header
-      writeHeader(os);
+      if(!sessionState.isHiveServerQuery()) {
+        writeHeader(os);
+      }
 
       if (rsp.getCompacts() != null) {
         for (ShowCompactResponseElement e : rsp.getCompacts()) {
