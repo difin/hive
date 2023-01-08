@@ -204,5 +204,7 @@ SELECT
     CQ_TBLPROPERTIES
 FROM COMPACTION_QUEUE;
 
+CREATE OR REPLACE VIEW SYS.CDH_VERSION AS SELECT 1 AS VER_ID, '3.1.3000.7.2.16.0-Update3' AS SCHEMA_VERSION,
+                                                 'Hive release version 3.1.3000 for CDH 7.2.16.0-Update3' AS VERSION_COMMENT;
 
 SELECT 'Finished upgrading MetaStore schema from 3.1.3000.7.2.16.0-Update2 to 3.1.3000.7.2.16.0-Update3';

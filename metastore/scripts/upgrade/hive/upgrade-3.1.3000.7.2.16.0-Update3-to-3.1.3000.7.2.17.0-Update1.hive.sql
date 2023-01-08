@@ -69,4 +69,7 @@ WHERE
     OR ((array_contains(current_groups(), P.`PRINCIPAL_NAME`) OR P.`PRINCIPAL_NAME` = 'public') AND P.`PRINCIPAL_TYPE`='GROUP'))
   AND P.`TBL_PRIV`='SELECT' AND P.`AUTHORIZER`=current_authorizer());
 
+CREATE OR REPLACE VIEW SYS.CDH_VERSION AS SELECT 1 AS VER_ID, '3.1.3000.7.2.17.0-Update1' AS SCHEMA_VERSION,
+                                                 'Hive release version 3.1.3000 for CDH 7.2.17.0-Update1' AS VERSION_COMMENT;
+
 SELECT 'Finished upgrading MetaStore schema from 3.1.3000.7.2.16.0-Update3 to 3.1.3000.7.2.17.0-Update1';
