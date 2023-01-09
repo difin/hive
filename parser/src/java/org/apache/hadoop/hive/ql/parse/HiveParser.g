@@ -1058,7 +1058,6 @@ ddlStatement
     | reloadFunctionsStatement
     | dropMacroStatement
     | analyzeStatement
-    | dropStatsStatement
     | lockStatement
     | unlockStatement
     | lockDatabase
@@ -1295,12 +1294,6 @@ analyzeStatement
       (KW_CACHE) => KW_CACHE KW_METADATA -> ^(TOK_CACHE_METADATA $parttype)
       )
     ;
-
-dropStatsStatement
-@init { pushMsg("drop statistics statement", state); }
-@after { popMsg(state); }
-    : KW_DROP KW_INCREMENTAL? KW_STATISTICS (tabPart=tableOrPartition)
-      -> ^(TOK_DROP_STATS $tabPart KW_INCREMENTAL?);
 
 showStatement
 @init { pushMsg("show statement", state); }

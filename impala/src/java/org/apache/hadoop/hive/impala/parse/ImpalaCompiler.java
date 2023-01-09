@@ -92,27 +92,13 @@ public class ImpalaCompiler extends TaskCompiler {
         ImpalaWork work;
         Preconditions.checkArgument(mvTask.size() <= 1, "ImpalaCompiler expects at most 1 MoveTask");
         MoveTask moveTask = mvTask.size() == 0 ? null : (MoveTask) mvTask.get(0);
-        boolean computeStats = pCtx.getQueryProperties().isAnalyzeCommand() ||
-            pCtx.getQueryProperties().isAnalyzeRewrite();
-        boolean dropStats = pCtx.getQueryProperties().isDropStatsCommand();
-
-        if (computeStats || dropStats) {
-            // We need to create a fetch operator since only Impala returns
-            // results for these statement
-            createFetchTask(pCtx);
-            String statsStatement = computeStats ? generateComputeStatsStatement(pCtx, inputs) :
-                    generateDropStatsStatement(pCtx, inputs);
-            work = ImpalaWork.createPlannedWork(statsStatement,
-                    pCtx.getFetchTask(), requestedFetchSize, generateInvalidateTableMetadataStatement(pCtx, inputs));
-        } else {
-            MoveWork moveWork = moveTask == null ? null : moveTask.getWork();
-            ImpalaCompiledPlan impalaCompiledPlan = getFinalizedCompiledPlan(pCtx, moveWork);
-            Preconditions.checkNotNull(impalaCompiledPlan, "Impala compiled plan cannot be null");
-            boolean submitExplainToBackend = !conf.getBoolVar(ConfVars.HIVE_IN_TEST) && impalaCompiledPlan.getIsExplain();
-            // This is the common path for a planned query
-            work = ImpalaWork.createPlannedWork(impalaCompiledPlan, pCtx.getQueryState(),
-                pCtx.getFetchTask(), requestedFetchSize, submitExplainToBackend, pCtx.getContext());
-        }
+        MoveWork moveWork = moveTask == null ? null : moveTask.getWork();
+        ImpalaCompiledPlan impalaCompiledPlan = getFinalizedCompiledPlan(pCtx, moveWork);
+        Preconditions.checkNotNull(impalaCompiledPlan, "Impala compiled plan cannot be null");
+        boolean submitExplainToBackend = !conf.getBoolVar(ConfVars.HIVE_IN_TEST) && impalaCompiledPlan.getIsExplain();
+        // This is the common path for a planned query
+        work = ImpalaWork.createPlannedWork(impalaCompiledPlan, pCtx.getQueryState(),
+            pCtx.getFetchTask(), requestedFetchSize, submitExplainToBackend, pCtx.getContext());
 
         Task<ImpalaWork> task = TaskFactory.get(work);
         if (moveTask != null) {
@@ -135,152 +121,6 @@ public class ImpalaCompiler extends TaskCompiler {
         fetch.setSink(pCtx.getFetchSink());
         FetchTask fetchTask = (FetchTask) TaskFactory.get(fetch);
         pCtx.setFetchTask(fetchTask);
-    }
-
-    /*
-     * The translation is as follows:
-     * - No column stats:
-     *     ANALYZE TABLE `tab` COMPUTE STATISTICS
-     *     -> COMPUTE STATS `tab` ()
-     * - All columns:
-     *     ANALYZE TABLE `tab` COMPUTE STATISTICS FOR COLUMNS
-     *     -> COMPUTE STATS `tab`
-     * - Subset of columns:
-     *    ANALYZE TABLE `tab` COMPUTE STATISTICS FOR COLUMNS `col1`, `col2`
-     *     -> COMPUTE STATS `tab` (`col1`, `col2`)
-     * - Incremental stats:
-     *     ANALYZE TABLE `tab` COMPUTE INCREMENTAL STATISTICS
-     *     -> COMPUTE INCREMENTAL STATS `tab`
-     * - Incremental stats with partition spec:
-     *     ANALYZE TABLE `tab` PARTITION(`part_col`='part_val') COMPUTE INCREMENTAL STATISTICS
-     *     -> COMPUTE INCREMENTAL STATS `tab` PARTITION (`ss_sold_date_sk`='part_val')
-     */
-    private String generateComputeStatsStatement(ParseContext pCtx, Set<ReadEntity> inputs) {
-        boolean incremental = pCtx.getQueryProperties().isIncrementalStats();
-        Table table = inputs.iterator().next().getTable();
-        StringBuilder sb = new StringBuilder();
-        sb.append("COMPUTE ");
-        if (incremental) {
-          sb.append("INCREMENTAL ");
-        }
-        sb.append("STATS ");
-        sb.append(unparseIdentifier(table.getDbName(), conf));
-        sb.append(".");
-        sb.append(unparseIdentifier(table.getTableName(), conf));
-        // Partition columns (if they have been specified)
-        if (table.getTableSpec() != null && table.getTableSpec().specType == SpecType.STATIC_PARTITION) {
-            List<FieldSchema> partCols = table.getPartCols();
-            Map<String, String> partitionSpec = table.getTableSpec().partSpec;
-            sb.append(" PARTITION (");
-            sb.append(partCols
-                .stream()
-                .map(fs -> unparseIdentifier(fs.getName(), conf) + "=" + genPartValueString(fs, partitionSpec))
-                .collect(Collectors.joining(", ")));
-            sb.append(")");
-        }
-        AnalyzeRewriteContext columnStatsCtx = pCtx.getAnalyzeRewrite();
-        if (columnStatsCtx != null && columnStatsCtx.getColName() != null) {
-            Set<String> colStats = new HashSet<>(columnStatsCtx.getColName());
-            boolean append = table.getCols().stream()
-                .anyMatch(col -> !colStats.contains(col.getName()));
-            if (append) {
-              sb.append(" (");
-              sb.append(columnStatsCtx.getColName()
-                  .stream()
-                  .map(colName -> unparseIdentifier(colName, conf))
-                  .collect(Collectors.joining(", ")));
-              sb.append(")");
-            }
-        } else if (!incremental) {
-            sb.append(" ()");
-        }
-        return sb.toString();
-    }
-
-
-    /*
-     * The translation is as follows:
-     * - All stats:
-     *     DROP STATISTICS `tab`
-     *     -> DROP STATS `tab`
-     * - Incremental stats:
-     *     DROP INCREMENTAL STATISTICS `tab`
-     *     -> DROP INCREMENTAL STATS `tab`
-     * - Incremental stats with partition spec:
-     *     DROP INCREMENTAL STATISTICS `tab` PARTITION(`part_col`='part_val')
-     *     -> DROP INCREMENTAL STATS `tab` PARTITION (`ss_sold_date_sk`='part_val')
-     */
-    private String generateDropStatsStatement(ParseContext pCtx, Set<ReadEntity> inputs) {
-        boolean incremental = pCtx.getQueryProperties().isIncrementalStats();
-        Table table = inputs.iterator().next().getTable();
-        StringBuilder sb = new StringBuilder();
-        sb.append("DROP ");
-        if (incremental) {
-          sb.append("INCREMENTAL ");
-        }
-        sb.append("STATS ");
-        sb.append(unparseIdentifier(table.getDbName(), conf));
-        sb.append(".");
-        sb.append(unparseIdentifier(table.getTableName(), conf));
-        // Partition columns (if they have been specified)
-        if (table.getTableSpec() != null && table.getTableSpec().specType == SpecType.STATIC_PARTITION) {
-            List<FieldSchema> partCols = table.getPartCols();
-            Map<String, String> partitionSpec = table.getTableSpec().partSpec;
-            sb.append(" PARTITION (");
-            sb.append(partCols
-                .stream()
-                .map(fs -> unparseIdentifier(fs.getName(), conf) + "=" + genPartValueString(fs, partitionSpec))
-                .collect(Collectors.joining(", ")));
-            sb.append(")");
-        }
-        return sb.toString();
-    }
-
-    private String generateInvalidateTableMetadataStatement(ParseContext pCtx, Set<ReadEntity> inputs) {
-        Table table = inputs.iterator().next().getTable();
-        StringBuilder sb = new StringBuilder();
-        sb.append("INVALIDATE METADATA ");
-        sb.append(unparseIdentifier(table.getDbName(), conf));
-        sb.append(".");
-        sb.append(unparseIdentifier(table.getTableName(), conf));
-        return sb.toString();
-    }
-
-    private String genPartValueString(FieldSchema fs, Map<String, String> partitionSpec) {
-        String partVal = partitionSpec.get(fs.getName());
-        String partType = fs.getType().toLowerCase();
-        StringBuilder sb = new StringBuilder();
-        PrimitiveTypeInfo pti = TypeInfoFactory.getPrimitiveTypeInfo(partType);
-        String ptName = pti.getTypeName();
-        if (ptName.equals(serdeConstants.BOOLEAN_TYPE_NAME) ||
-           ptName.equals(serdeConstants.INT_TYPE_NAME) ||
-           ptName.equals(serdeConstants.BIGINT_TYPE_NAME) ||
-           ptName.equals(serdeConstants.FLOAT_TYPE_NAME) ||
-           ptName.equals(serdeConstants.DOUBLE_TYPE_NAME) ||
-           ptName.equals(serdeConstants.TINYINT_TYPE_NAME) ||
-           ptName.equals(serdeConstants.SMALLINT_TYPE_NAME)) {
-            sb.append(partVal);
-        } else if (ptName.equals(serdeConstants.STRING_TYPE_NAME) ||
-                  ptName.equals(serdeConstants.DATE_TYPE_NAME)) {
-            sb.append("\"");
-            sb.append(BaseSemanticAnalyzer.escapeSQLString(partVal));
-            sb.append("\"");
-        } else if (ptName.startsWith(serdeConstants.CHAR_TYPE_NAME) ||
-                  ptName.startsWith(serdeConstants.VARCHAR_TYPE_NAME)) {
-            // Impala expects char and varchar values to be type casted
-            sb.append("CAST");
-            sb.append("(");
-            sb.append("\"");
-            sb.append(BaseSemanticAnalyzer.escapeSQLString(partVal));
-            sb.append("\"");
-            sb.append(" AS ");
-            sb.append(ptName);
-            sb.append(")");
-        } else {
-            throw new RuntimeException("Data type: " + pti.getTypeName()
-                    + " unknown to Impala for partition column: " + fs.getName());
-        }
-        return sb.toString();
     }
 
     @Override
@@ -355,22 +195,5 @@ public class ImpalaCompiler extends TaskCompiler {
         throw new SemanticException(e);
       }
       return plan;
-    }
-
-    @Override
-    protected void genColumnStats(List<Task<?>> rootTasks, ParseContext pCtx,
-            final Set<ReadEntity> inputs, final Set<WriteEntity> outputs) {
-        Preconditions.checkArgument(pCtx.getQueryProperties().isAnalyzeRewrite(),
-            "Only explicit column stats computation is supported for Impala");
-        // Add partitions to output write entities
-        Table table = inputs.iterator().next().getTable();
-        if (table.isPartitioned() && !pCtx.getOpToPartList().isEmpty()) {
-            PrunedPartitionList ppl =
-                pCtx.getOpToPartList().entrySet().iterator().next().getValue();
-            for (Partition partn : ppl.getPartitions()) {
-                LOG.trace("adding part: " + partn);
-                outputs.add(new WriteEntity(partn, WriteEntity.WriteType.DDL_NO_LOCK));
-            }
-        }
     }
 }

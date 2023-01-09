@@ -49,6 +49,7 @@ import org.apache.hadoop.hive.impala.funcmapper.ScalarFunctionDetails;
 import org.apache.hadoop.hive.impala.exec.ImpalaSessionImpl;
 import org.apache.hadoop.hive.impala.exec.ImpalaSessionManager;
 import org.apache.hadoop.hive.impala.parse.ImpalaCompiler;
+import org.apache.hadoop.hive.impala.parse.ImpalaFetchWork;
 import org.apache.hadoop.hive.impala.plan.ImpalaQueryDesc;
 import org.apache.hadoop.hive.impala.work.ImpalaWork;
 import org.apache.hadoop.mapred.JobConf;
@@ -91,7 +92,7 @@ public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
   public FetchOperator createFetchOperator(HiveConf conf, FetchWork work, JobConf job,
       Operator<?> operator, List<VirtualColumn> vcCols, Schema resultSchema,
       HiveOperation hiveOp) throws HiveException {
-    return hiveOp == HiveOperation.ANALYZE_TABLE ||
+    return (work instanceof ImpalaFetchWork) ||
         (hiveOp == HiveOperation.QUERY && conf.getResultMethod() == ResultMethod.STREAMING)
       ? new ImpalaStreamingFetchOperator(work, job, operator, vcCols, resultSchema)
       : new FetchOperator(work, job, operator, vcCols);

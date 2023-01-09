@@ -55,15 +55,12 @@ public class ImpalaWork extends EngineWork implements Serializable {
     private final Context context;
     /* Explain plan */
     private String explain;
-    /* Generated invalidate metadata query for some compiled queries, e.g., compute stats. */
-    private final String invalidateTableMetadataQuery;
 
     /* Execute in async mode */
     private final boolean runAsync;
 
     private ImpalaWork(WorkType type, ImpalaCompiledPlan plan, String query, FetchTask fetch, long fetchSize,
-        boolean submitExplainToBackend, QueryState queryState, Context context, String invalidateTableMetadataQuery,
-        boolean runAsync) {
+        boolean submitExplainToBackend, QueryState queryState, Context context, boolean runAsync) {
       this.type = type;
       this.plan = plan;
       this.query = query;
@@ -73,19 +70,18 @@ public class ImpalaWork extends EngineWork implements Serializable {
       this.queryState = queryState;
       this.context = context;
       this.explain = null;
-      this.invalidateTableMetadataQuery = invalidateTableMetadataQuery;
       this.runAsync = runAsync;
     }
 
     public static ImpalaWork createPlannedWork(ImpalaCompiledPlan plan, QueryState queryState, FetchTask fetch, long fetchSize,
         boolean submitExplainToBackend, Context context) {
       return new ImpalaWork(WorkType.COMPILED_PLAN, plan, queryState.getQueryString(), fetch, fetchSize,
-          submitExplainToBackend, queryState, context, null, true);
+          submitExplainToBackend, queryState, context, true);
     }
 
-    public static ImpalaWork createPlannedWork(String query, FetchTask fetch, long fetchSize, String invalidateTableMetadataQuery) {
-      return new ImpalaWork(WorkType.COMPILED_QUERY, null, query, fetch, fetchSize,
-          false, null, null, invalidateTableMetadataQuery, true);
+    public static ImpalaWork createPlannedWork(String query) {
+      return new ImpalaWork(WorkType.COMPILED_QUERY, null, query, null, 0,
+          false, null, null, true);
     }
 
     public static ImpalaWork createPlannedWork(String query, FetchTask fetch, long fetchSize) {
@@ -94,12 +90,12 @@ public class ImpalaWork extends EngineWork implements Serializable {
 
     public static ImpalaWork createPlannedWork(String query, FetchTask fetch, long fetchSize, boolean runAsync) {
         return new ImpalaWork(WorkType.COMPILED_QUERY, null, query, fetch, fetchSize,
-                false, null, null,null, runAsync);
+                false, null, null, runAsync);
     }
 
     public static ImpalaWork createQuery(String query, FetchTask fetch, long fetchSize) {
       return new ImpalaWork(WorkType.QUERY, null, query, fetch, fetchSize,
-          false, null, null, null, true);
+          false, null, null, true);
     }
 
     public WorkType getType() {
@@ -154,15 +150,6 @@ public class ImpalaWork extends EngineWork implements Serializable {
     @Explain(displayName = "Impala Query")
     public String getImpalaQuery() {
       return type == WorkType.COMPILED_QUERY || type == WorkType.QUERY ? query : null;
-    }
-
-    @Explain(displayName = "Invalidate Table Metadata")
-    public Boolean isInvalidateTableMetadata() {
-      return type == WorkType.COMPILED_QUERY ? invalidateTableMetadataQuery != null : null;
-    }
-
-    public String getInvalidateTableMetadataQuery() {
-      return invalidateTableMetadataQuery;
     }
 
     @Explain(displayName = "Run In Sync Mode", displayOnlyOnTrue = true)

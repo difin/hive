@@ -33,6 +33,7 @@ import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.ExplainSemanticAnalyzer;
+import org.apache.hadoop.hive.ql.parse.HiveParser;
 import org.apache.hadoop.hive.ql.parse.ParseException;
 import org.apache.hadoop.hive.ql.parse.ParseUtils;
 import org.apache.hadoop.hive.ql.parse.SemanticAnalyzer;
@@ -40,22 +41,38 @@ import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
 import org.apache.hadoop.hive.impala.calcite.ImpalaTypeSystemImpl;
 import org.apache.hadoop.hive.impala.calcite.rules.TezEngineScalarFixerRule;
+import org.apache.hadoop.hive.impala.parse.ComputeStatsSemanticAnalyzer;
+import org.apache.hadoop.hive.impala.parse.DropStatsSemanticAnalyzer;
 import org.apache.hadoop.hive.impala.parse.ImpalaParseException;
 import org.apache.hadoop.hive.impala.parse.ImpalaToken;
 import org.apache.hadoop.hive.impala.parse.ResetMetadataSemanticAnalyzer;
 import org.apache.hadoop.hive.impala.plan.ImpalaHMSConverter;
 import org.apache.hadoop.hive.impala.plan.ImpalaQueryHelperImpl;
+import org.apache.hadoop.hive.impala.calcite.ImpalaTypeSystemImpl;
+import org.apache.impala.analysis.ComputeStatsStmt;
+import org.apache.impala.analysis.DropStatsStmt;
 import org.apache.impala.analysis.Parser;
 import org.apache.impala.analysis.ResetMetadataStmt;
 import org.apache.impala.analysis.StatementBase;
 import org.apache.impala.common.AnalysisException;
 import org.apache.impala.thrift.TPrimitiveType;
 
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class ImpalaCompileHelper implements EngineCompileHelper {
 
   private static final Logger LOG = LoggerFactory.getLogger(ImpalaCompileHelper.class);
+
+  private static Pattern REFRESH_STMT =
+      Pattern.compile("\\s*refresh\\s+.*", Pattern.CASE_INSENSITIVE);
+  private static Pattern COMPUTE_STATS_STMT =
+      Pattern.compile("\\s*compute\\s+.*", Pattern.CASE_INSENSITIVE);
+  private static Pattern DROP_STATS_STMT =
+      Pattern.compile("\\s*drop\\s*stats\\s+.*", Pattern.CASE_INSENSITIVE);
+  private static Pattern DROP_INCR_STATS_STMT =
+      Pattern.compile("\\s*drop\\s*incremental\\s*stats\\s+.*", Pattern.CASE_INSENSITIVE);
 
   public HMSConverter getHMSConverter() {
     return new ImpalaHMSConverter();
@@ -98,8 +115,9 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
     } catch(ParseException e) {
       caughtException = e;
     }
+
     if (caughtException == null) {
-      return tree;
+      return convertTreeIfNecessary(tree, ctx);
     }
 
     // Now try through the Impala parser. Note: If the Impala parser works, it will
@@ -124,6 +142,10 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
     switch (tree.getType()) {
       case ImpalaToken.TOK_REFRESH_TABLE:
         return new ResetMetadataSemanticAnalyzer(queryState);
+      case ImpalaToken.TOK_DROP_STATS:
+        return new DropStatsSemanticAnalyzer(queryState);
+      case ImpalaToken.TOK_COMPUTE_STATS:
+        return new ComputeStatsSemanticAnalyzer(queryState);
       default:
         throw new SemanticException("Unknown token found: " + tree.getType());
     }
@@ -137,6 +159,10 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
     switch(root.getToken().getType()) {
       case ImpalaToken.TOK_REFRESH_TABLE:
         return HiveOperation.REFRESH_TABLE;
+      case ImpalaToken.TOK_DROP_STATS:
+        return HiveOperation.DROP_STATS;
+      case ImpalaToken.TOK_COMPUTE_STATS:
+        return HiveOperation.ANALYZE_TABLE;
       default:
         return null;
     }
@@ -149,15 +175,41 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
       return ResetMetadataSemanticAnalyzer.getASTNode((ResetMetadataStmt) impalaStmt,
           command, ctx);
     }
+    if (impalaStmt instanceof DropStatsStmt) {
+      return DropStatsSemanticAnalyzer.getASTNode((DropStatsStmt) impalaStmt, command, ctx);
+    }
+    if (impalaStmt instanceof ComputeStatsStmt) {
+      return ComputeStatsSemanticAnalyzer.getASTNode((ComputeStatsStmt) impalaStmt, command, ctx);
+    }
     throw new AnalysisException("This is a valid Impala statement but it is not supported " +
         "yet.");
   }
 
   private boolean isImpalaCommand(String command) {
-    String[] tokens = command.trim().split("\\s");
-    if (tokens[0].toLowerCase().equals("refresh")) {
+    if (REFRESH_STMT.matcher(command).matches()) {
+      return true;
+    }
+
+    if (COMPUTE_STATS_STMT.matcher(command).matches()) {
+      return true;
+    }
+
+    if (DROP_STATS_STMT.matcher(command).matches()) {
+      return true;
+    }
+
+    if (DROP_INCR_STATS_STMT.matcher(command).matches()) {
       return true;
     }
     return false;
+  }
+
+  private ASTNode convertTreeIfNecessary(ASTNode astNode, Context ctx) {
+    // Only analyze (compute stats) needs to change the tree.  The reason compute stats
+    // needs a different tree is because we need Impala to run the compute stats command.
+    if (astNode.getType() != HiveParser.TOK_ANALYZE) {
+      return astNode;
+    }
+    return ComputeStatsSemanticAnalyzer.rewriteTree(astNode, ctx);
   }
 }

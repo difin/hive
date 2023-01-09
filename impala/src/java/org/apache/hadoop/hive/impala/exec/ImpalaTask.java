@@ -32,6 +32,7 @@ import org.apache.hadoop.hive.ql.engine.EngineSession;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
 import org.apache.hadoop.hive.ql.plan.api.StageType;
+import org.apache.hadoop.hive.impala.parse.ImpalaFetchWork;
 import org.apache.hadoop.hive.impala.work.ImpalaWork;
 import org.apache.hive.service.rpc.thrift.TOperationHandle;
 
@@ -74,19 +75,8 @@ public class ImpalaTask extends Task<ImpalaWork> implements Serializable {
                 opHandle = sessionImpl.executePlan(work.getQuery(), work.getCompiledPlan());
                 break;
             case COMPILED_QUERY:
-                Preconditions.checkState(
-                        queryPlan.getOperation() == HiveOperation.ANALYZE_TABLE ||
-                        queryPlan.getOperation() == HiveOperation.DROP_STATS ||
-                        queryPlan.getOperation() == HiveOperation.REFRESH_TABLE);
-                if (work.getInvalidateTableMetadataQuery() != null) {
-                  TOperationHandle opHandleInvalidate = session.execute(work.getInvalidateTableMetadataQuery(), false);
-                  closeOperation(opHandleInvalidate);
-                }
-                //  isStreaming is true only for ANALYZE_TABLE || DROP_STATS hive operation
-                // For REFRESH_TABLE op, refresh query in Impala does not produce any output
-                // and so we execute the sql query in sync mode.
-                isStreaming = (queryPlan.getOperation() == HiveOperation.ANALYZE_TABLE ||
-                        queryPlan.getOperation() == HiveOperation.DROP_STATS);
+                isStreaming = (work.getFetch() != null &&
+                    (work.getFetch().getWork() instanceof ImpalaFetchWork));
                 opHandle = session.execute(work.getQuery(), !work.isRunInSyncMode());
                 break;
             case QUERY:

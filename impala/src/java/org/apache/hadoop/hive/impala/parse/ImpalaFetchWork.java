@@ -18,14 +18,17 @@
 
 package org.apache.hadoop.hive.impala.parse;
 
-public class ImpalaToken {
-  // 2000001 is an integer value that is out of range from anything that
-  // the Antlr parser will produce.
-  public static final int TOK_REFRESH_TABLE = 2000001;
-  public static final String REFRESH_TABLE_STRING = "refresh table";
-  public static final int TOK_DROP_STATS = 2000002;
-  public static final String DROP_STATS_STRING = "drop statistics";
-  public static final int TOK_COMPUTE_STATS = 2000003;
-  public static final String COMPUTE_STATS_STRING = "compute statistics";
-}
 
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.hadoop.hive.ql.plan.FetchWork;
+
+/**
+ * ImpalaFetchWork is a dummy class to ensure the ImpalaStreamingFetchOperator
+ * is created in the ImpalaRuntimeHelper.createFetchOperator method.
+ */
+public class ImpalaFetchWork extends FetchWork {
+  public ImpalaFetchWork() {
+    super(new ArrayList<>(), new ArrayList<>(), null);
+  }
+}
