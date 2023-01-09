@@ -134,13 +134,13 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
           LOG.info("Exception during executing compaction", e);
           err = true;
         } catch (InterruptedException ie) {
+          // do not ignore interruption requests
           Thread.currentThread().interrupt();
         } catch (Throwable t) {
           err = true;
         }
 
-        long elapsedTime = System.currentTimeMillis() - startedAt;
-        doPostLoopActions(elapsedTime, CompactorThreadType.WORKER);
+        doPostLoopActions(System.currentTimeMillis() - startedAt);
 
         // If we didn't try to launch a job it either means there was no work to do or we got
         // here as the result of an error like communication failure with the DB, schema failures etc.  Either way we want to wait
@@ -155,17 +155,20 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
         if (nextSleep > SLEEP_TIME_MAX) nextSleep = SLEEP_TIME_MAX;
       } while (!stop.get());
     } catch (InterruptedException e) {
+      // do not ignore interruption requests
       Thread.currentThread().interrupt();
     } catch (Throwable t) {
       LOG.error("Caught an exception in the main loop of compactor worker, exiting.", t);
     } finally {
-      if (executor != null) {
-        executor.shutdownNow();
+      if (Thread.currentThread().isInterrupted()) {
+        LOG.info("Interrupt received, Worker is shutting down.");
       }
+      executor.shutdownNow();
       if (msc != null) {
         msc.close();
       }
-    }  }
+    }
+  }
 
   @Override
   public void init(AtomicBoolean stop) throws Exception {
@@ -295,7 +298,7 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
           return false;
         }
       }
-      if ((runtimeVersion != null || ci.initiatorVersion != null) && !runtimeVersion.equals(ci.initiatorVersion)) {
+      if ((runtimeVersion == null && ci.initiatorVersion != null) || (runtimeVersion != null && !runtimeVersion.equals(ci.initiatorVersion))) {
         LOG.warn("Worker and Initiator versions do not match. Worker: v{}, Initiator: v{}", runtimeVersion, ci.initiatorVersion);
       }
 
@@ -609,12 +612,6 @@ public class Worker extends RemoteCompactorThread implements MetaStoreThread {
       msc.markFailed(CompactionInfo.compactionInfoToStruct(ci));
     } catch (Throwable t) {
       LOG.error("Caught an exception while trying to mark compaction {} as failed: {}", ci, t);
-    }
-  }
-
-  private void checkInterrupt() throws InterruptedException {
-    if (Thread.interrupted()) {
-      throw new InterruptedException("Compaction execution is interrupted");
     }
   }
 

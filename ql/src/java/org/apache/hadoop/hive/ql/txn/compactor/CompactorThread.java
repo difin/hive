@@ -48,8 +48,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCatalog;
-
 /**
  * Superclass for all threads in the compactor.
  */
@@ -70,8 +68,6 @@ public abstract class CompactorThread extends Thread implements Configurable {
   private static final Integer MAX_WARN_LOG_TIME = 1200000; //20 min
 
   protected long checkInterval = 0;
-
-  enum CompactorThreadType {INITIATOR, WORKER, CLEANER}
 
   public void setThreadId(int threadId) {
     this.threadId = threadId;
@@ -94,10 +90,16 @@ public abstract class CompactorThread extends Thread implements Configurable {
 
   public void init(AtomicBoolean stop) throws Exception {
     setPriority(MIN_PRIORITY);
-    setDaemon(true); // this means the process will exit without waiting for this thread
+    setDaemon(false);
     this.stop = stop;
     this.hostName = ServerUtils.hostname();
     this.runtimeVersion = getRuntimeVersion();
+  }
+
+  protected void checkInterrupt() throws InterruptedException {
+    if (Thread.interrupted()) {
+      throw new InterruptedException(getClass().getName() + " execution is interrupted.");
+    }
   }
 
   /**
@@ -238,8 +240,8 @@ public abstract class CompactorThread extends Thread implements Configurable {
     return requestBuilder.build();
   }
 
-  protected void doPostLoopActions(long elapsedTime, CompactorThreadType type) throws InterruptedException {
-    String threadTypeName = type.name();
+  protected void doPostLoopActions(long elapsedTime) throws InterruptedException {
+    String threadTypeName = getClass().getName();
     if (elapsedTime < checkInterval && !stop.get()) {
       Thread.sleep(checkInterval - elapsedTime);
     }
