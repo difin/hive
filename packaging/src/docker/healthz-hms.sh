@@ -11,4 +11,4 @@ DB_PORT=${DB_PORT:-5432}
 
 # This makes sure we can connect to database service and query HMS specific metrics exposed as for prometheus via JMX exporter.
 # If HMS is alive the metrics should exist and grep should return 0 exit code.
-nc -zv -w 2 $DB_ENDPOINT $DB_PORT && curl -s http://localhost:35000 | grep "^api_init"
+nmap -Pn -oG - -p $DB_PORT $DB_ENDPOINT | awk -F/ '{print $2}' | grep "open" && curl -s http://localhost:35000 | grep "^api_init"
