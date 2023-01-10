@@ -3939,6 +3939,11 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   }
 
   @Override
+  public void rollbackTxn(AbortTxnRequest abortTxnRequest) throws NoSuchTxnException, TException {
+    client.abort_txn(abortTxnRequest);
+  }
+
+  @Override
   public void replRollbackTxn(long srcTxnId, String replPolicy, TxnType txnType) throws NoSuchTxnException, TException {
     AbortTxnRequest rqst = new AbortTxnRequest(srcTxnId);
     rqst.setReplPolicy(replPolicy);
@@ -3980,6 +3985,11 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   @Override
   public void abortTxns(List<Long> txnids) throws NoSuchTxnException, TException {
     client.abort_txns(new AbortTxnsRequest(txnids));
+  }
+
+  @Override
+  public void abortTxns(AbortTxnsRequest abortTxnsRequest) throws NoSuchTxnException, TException {
+    client.abort_txns(abortTxnsRequest);
   }
 
   @Override

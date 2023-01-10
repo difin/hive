@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.ValidTxnList;
+import org.apache.hadoop.hive.metastore.api.AbortTxnRequest;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.CmRecycleResponse;
 import org.apache.hadoop.hive.metastore.api.CmRecycleRequest;
@@ -38,6 +39,7 @@ import org.apache.hadoop.hive.metastore.api.ShowLocksRequest;
 import org.apache.hadoop.hive.metastore.api.ShowLocksResponse;
 import org.apache.hadoop.hive.metastore.api.UnknownTableException;
 import org.apache.hadoop.hive.metastore.api.WriteNotificationLogRequest;
+import org.apache.hadoop.hive.metastore.txn.TxnErrorMsg;
 import org.apache.thrift.TException;
 
 
@@ -61,7 +63,9 @@ public final class SynchronizedMetaStoreClient {
   }
 
   public synchronized void rollbackTxn(long txnid) throws TException {
-    client.rollbackTxn(txnid);
+    AbortTxnRequest abortTxnRequest = new AbortTxnRequest(txnid);
+    abortTxnRequest.setErrorCode(TxnErrorMsg.ABORT_ROLLBACK.getErrorCode());
+    client.rollbackTxn(abortTxnRequest);
   }
 
   public synchronized void heartbeat(long txnid, long lockid) throws TException {

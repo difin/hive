@@ -46,6 +46,7 @@ import org.apache.hadoop.hive.metastore.messaging.event.filters.AndFilter;
 import org.apache.hadoop.hive.metastore.messaging.event.filters.CatalogFilter;
 import org.apache.hadoop.hive.metastore.messaging.event.filters.EventBoundaryFilter;
 import org.apache.hadoop.hive.metastore.messaging.event.filters.ReplEventFilter;
+import org.apache.hadoop.hive.metastore.txn.TxnErrorMsg;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.metastore.utils.SecurityUtils;
 import org.apache.hadoop.hive.metastore.utils.StringUtils;
@@ -644,7 +645,7 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
     List<Long> txnsForDb = getOpenTxns(getTxnMgr().getValidTxns(excludedTxns), work.dbNameOrPattern);
     if (!txnsForDb.isEmpty()) {
       LOG.debug("Going to abort transactions: {} for database: {}.", txnsForDb, work.dbNameOrPattern);
-      hiveDb.abortTransactions(txnsForDb);
+      hiveDb.abortTransactions(txnsForDb, TxnErrorMsg.ABORT_FETCH_FAILOVER_METADATA.getErrorCode());
     }
     fmd.setAbortedTxns(txnsForDb);
     fmd.setCursorPoint(currentNotificationId(hiveDb));
@@ -655,7 +656,7 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
     txnsForDb = getOpenTxns(allValidTxns, work.dbNameOrPattern);
     if (!txnsForDb.isEmpty()) {
       LOG.debug("Going to abort transactions: {} for database: {}.", txnsForDb, work.dbNameOrPattern);
-      hiveDb.abortTransactions(txnsForDb);
+      hiveDb.abortTransactions(txnsForDb, TxnErrorMsg.ABORT_FETCH_FAILOVER_METADATA.getErrorCode());
       fmd.addToAbortedTxns(txnsForDb);
     }
     fmd.setFailoverEventId(currentNotificationId(hiveDb));
@@ -1447,7 +1448,7 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
       List<Long> openTxns = getOpenTxns(validTxnList, work.dbNameOrPattern);
       if (!openTxns.isEmpty()) {
         //abort only write transactions for the db under replication if abort transactions is enabled.
-        hiveDb.abortTransactions(openTxns);
+        hiveDb.abortTransactions(openTxns, TxnErrorMsg.ABORT_WRITE_TXN_AFTER_TIMEOUT.getErrorCode());
         validTxnList = getTxnMgr().getValidTxns(excludedTxns);
         openTxns = getOpenTxns(validTxnList, work.dbNameOrPattern);
         if (!openTxns.isEmpty()) {

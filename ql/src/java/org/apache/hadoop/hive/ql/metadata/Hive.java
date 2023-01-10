@@ -102,6 +102,7 @@ import org.apache.hadoop.hive.common.log.InPlaceUpdate;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.metastore.api.AbortTxnsRequest;
 import org.apache.hadoop.hive.metastore.api.CompactionRequest;
 import org.apache.hadoop.hive.metastore.api.GetPartitionsByNamesRequest;
 import org.apache.hadoop.hive.metastore.api.GetTableRequest;
@@ -3096,7 +3097,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
         fSys, skewedColValueLocationMaps, newPartPath, skewedInfo);
     return skewedColValueLocationMaps;
   }
-  
+
   /**
    * Get the valid partitions from the path
    * @param numDP number of dynamic partitions
@@ -3107,7 +3108,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
   private Set<Path> getValidPartitionsInPath(int numDP, Path loadPath, Long writeId,
       boolean isMmTable, boolean isInsertOverwrite, boolean isDirectInsert, AcidUtils.Operation operation)
     throws HiveException {
-    
+
     Set<Path> validPartitions = new HashSet<>();
     try {
       FileSystem fs = loadPath.getFileSystem(conf);
@@ -3157,7 +3158,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
     }
     return validPartitions;
   }
-  
+
   /**
    * Given a source directory name of the load path, load all dynamically generated partitions
    * into the specified table and return a list of strings that represent the dynamic partition
@@ -3168,10 +3169,10 @@ private void constructOneLBLocationMap(FileStatus fSta,
   @Obsolete
   public Map<Map<String, String>, Partition> loadDynamicPartitions(
       Path loadPath, String tableName, Map<String, String> partSpec, LoadFileType loadFileType,
-      int numDP, int numLB, boolean isAcid, long writeId, int stmtId, boolean resetStatistics, 
-      AcidUtils.Operation operation, boolean isInsertOverwrite, boolean isDirectInsert) 
+      int numDP, int numLB, boolean isAcid, long writeId, int stmtId, boolean resetStatistics,
+      AcidUtils.Operation operation, boolean isInsertOverwrite, boolean isDirectInsert)
     throws HiveException {
-    
+
     Properties properties = new Properties();
     properties.setProperty(hive_metastoreConstants.META_TABLE_NAME, tableName);
     TableDesc tblDesc = new TableDesc();
@@ -3183,7 +3184,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
 
     // Get all valid partition paths and existing partitions for them (if any)
     Table tbl = getTable(tableName);
-    Set<Path> validPartitions = getValidPartitionsInPath(numDP, loadPath, writeId, 
+    Set<Path> validPartitions = getValidPartitionsInPath(numDP, loadPath, writeId,
       AcidUtils.isInsertOnlyTable(tbl.getParameters()), isInsertOverwrite, isDirectInsert, operation);
     Map<Path, PartitionDetails> partitionDetailsMap = Collections.synchronizedMap(new LinkedHashMap<>());
 
@@ -3203,8 +3204,8 @@ private void constructOneLBLocationMap(FileStatus fSta,
         partitionDetailsMap.put(partPath, details);
       }
     });
-    
-    return loadDynamicPartitions(tbd, numLB, isAcid, writeId, stmtId, resetStatistics, operation, 
+
+    return loadDynamicPartitions(tbd, numLB, isAcid, writeId, stmtId, resetStatistics, operation,
       partitionDetailsMap);
   }
 
@@ -6107,9 +6108,11 @@ private void constructOneLBLocationMap(FileStatus fSta,
     }
   }
 
-  public void abortTransactions(List<Long> txnids) throws HiveException {
+  public void abortTransactions(List<Long> txnids, long errorCode) throws HiveException {
+    AbortTxnsRequest abortTxnsRequest = new AbortTxnsRequest(txnids);
+    abortTxnsRequest.setErrorCode(errorCode);
     try {
-      getMSC().abortTxns(txnids);
+      getMSC().abortTxns(abortTxnsRequest);
     } catch (Exception e) {
       LOG.error(StringUtils.stringifyException(e));
       throw new HiveException(e);
