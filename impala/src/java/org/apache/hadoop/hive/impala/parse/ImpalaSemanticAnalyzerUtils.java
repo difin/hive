@@ -39,17 +39,22 @@ public class ImpalaSemanticAnalyzerUtils {
       return queryString;
     }
     String tableName = ((ASTNode)tableTokenNode.getChild(0)).getText();
-    String tableNameWithBackTicks  = "`" + tableName + "`";
+    return getQueryWithDatabase(tableName, queryString, currentDatabase);
+  }
+
+  public static String getQueryWithDatabase(String name, String queryString,
+      String currentDatabase) {
+    String nameWithBackTicks  = "`" + name + "`";
     String currentDbWithBackTicks = "`" + currentDatabase + "`";
 
     // First assume the tablename has backticks and try to add the db.
-    String newQueryString = queryString.replaceFirst(tableNameWithBackTicks,
-        currentDbWithBackTicks + "." + tableNameWithBackTicks);
+    String newQueryString = queryString.replaceFirst(nameWithBackTicks,
+        currentDbWithBackTicks + "." + nameWithBackTicks);
 
     // If the strings are different, a replacement was done, so we return the new string.
     if (!newQueryString.equals(queryString)) {
       return newQueryString;
     }
-    return queryString.replaceFirst(tableName, currentDbWithBackTicks + "." + tableName);
+    return queryString.replaceFirst(name, currentDbWithBackTicks + "." + name);
   }
 }

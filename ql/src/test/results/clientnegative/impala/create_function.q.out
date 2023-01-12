@@ -1,0 +1,8 @@
+FAILED: ImpalaParseException Syntax error in line 1:
+create function illegal syntax here
+                        ^
+Encountered: IDENTIFIER
+Expected: FROM, LOCATION, TO
+
+
+Note: this parsing error was produced by Impala. To see the parsing error message produced by Hive, set "hive.impala.show.impala.parsing.error" to false

@@ -4579,6 +4579,10 @@ public class HiveConf extends Configuration {
         "profile to capture statement timing after row fetch has completed."),
     HIVE_IMPALA_CONNECT_TIMEOUT("hive.impala.connect.timeout", 300000,
         "Timeout for Impala RPCs in milliseconds"),
+    HIVE_IMPALA_SHOW_IMPALA_PARSING_ERROR("hive.impala.show.impala.parsing.error", true,
+        "If the execution engine is Impala, when there is a parsing error and the type of command " +
+        "exists in both Hive and Impala, a 'true' setting will display the parsing error returned " +
+        "by the Impala engine."),
     HIVE_JAR_DIRECTORY("hive.jar.directory", null,
         "This is the location hive in tez mode will look for to find a site wide \n" +
         "installed hive instance."),

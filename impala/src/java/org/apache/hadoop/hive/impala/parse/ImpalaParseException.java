@@ -28,9 +28,9 @@ public class ImpalaParseException extends ParseException {
 
   private final String message;
 
-  public ImpalaParseException(Exception e) {
+  public ImpalaParseException(String msg) {
     super(null);
-    this.message = e.getMessage();
+    this.message = msg;
   }
 
   @Override

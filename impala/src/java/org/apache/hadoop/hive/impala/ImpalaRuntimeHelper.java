@@ -206,13 +206,10 @@ public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
     }
 
     ImpalaSessionImpl session = ImpalaSessionManager.getInstance().getSession(conf);
-    session.init(conf);
-    session.open();
     TBackendGflags config = session.getBackendConfig();
     if (config == null) {
       throw new HiveException("Backend Config could not be retrieved from Impala.");
     }
-    session.close();
     return config.getLocal_library_path();
   }
 }

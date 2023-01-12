@@ -27,9 +27,9 @@ import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
+import org.apache.hadoop.hive.ql.parse.BaseSemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.ParseException;
 import org.apache.hadoop.hive.ql.parse.ParseUtils;
-import org.apache.hadoop.hive.ql.parse.SemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
 
@@ -72,7 +72,7 @@ public interface EngineCompileHelper {
     return ParseUtils.parse(command, ctx);
   }
 
-  default SemanticAnalyzer getSemanticAnalyzer(QueryState queryState, ASTNode tree)
+  default BaseSemanticAnalyzer getSemanticAnalyzer(QueryState queryState, ASTNode tree)
       throws SemanticException {
     throw new SemanticException("No semantic analyzer defined for " + tree.getType());
   }

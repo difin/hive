@@ -18,10 +18,12 @@
 
 package org.apache.hadoop.hive.impala;
 
+import com.google.common.base.Preconditions;
 import org.apache.calcite.plan.hep.HepProgram;
 import org.apache.calcite.plan.hep.HepProgramBuilder;
 import org.apache.calcite.rel.type.RelDataTypeSystem;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.HMSConverter;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryState;
@@ -32,6 +34,7 @@ import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
+import org.apache.hadoop.hive.ql.parse.BaseSemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.ExplainSemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.HiveParser;
 import org.apache.hadoop.hive.ql.parse.ParseException;
@@ -39,9 +42,11 @@ import org.apache.hadoop.hive.ql.parse.ParseUtils;
 import org.apache.hadoop.hive.ql.parse.SemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
+import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.impala.calcite.ImpalaTypeSystemImpl;
 import org.apache.hadoop.hive.impala.calcite.rules.TezEngineScalarFixerRule;
 import org.apache.hadoop.hive.impala.parse.ComputeStatsSemanticAnalyzer;
+import org.apache.hadoop.hive.impala.parse.CreateFuncSemanticAnalyzer;
 import org.apache.hadoop.hive.impala.parse.DropStatsSemanticAnalyzer;
 import org.apache.hadoop.hive.impala.parse.ImpalaParseException;
 import org.apache.hadoop.hive.impala.parse.ImpalaToken;
@@ -50,6 +55,7 @@ import org.apache.hadoop.hive.impala.plan.ImpalaHMSConverter;
 import org.apache.hadoop.hive.impala.plan.ImpalaQueryHelperImpl;
 import org.apache.hadoop.hive.impala.calcite.ImpalaTypeSystemImpl;
 import org.apache.impala.analysis.ComputeStatsStmt;
+import org.apache.impala.analysis.CreateFunctionStmtBase;
 import org.apache.impala.analysis.DropStatsStmt;
 import org.apache.impala.analysis.Parser;
 import org.apache.impala.analysis.ResetMetadataStmt;
@@ -70,9 +76,19 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
   private static Pattern COMPUTE_STATS_STMT =
       Pattern.compile("\\s*compute\\s+.*", Pattern.CASE_INSENSITIVE);
   private static Pattern DROP_STATS_STMT =
-      Pattern.compile("\\s*drop\\s*stats\\s+.*", Pattern.CASE_INSENSITIVE);
+      Pattern.compile("\\s*drop\\s+stats\\s+.*", Pattern.CASE_INSENSITIVE);
   private static Pattern DROP_INCR_STATS_STMT =
-      Pattern.compile("\\s*drop\\s*incremental\\s*stats\\s+.*", Pattern.CASE_INSENSITIVE);
+      Pattern.compile("\\s*drop\\s+incremental\\s+stats\\s+.*", Pattern.CASE_INSENSITIVE);
+  private static Pattern CREATE_AGG_FUNC_STMT =
+      Pattern.compile("\\s*create\\s*aggregate\\s+function\\s+.*", Pattern.CASE_INSENSITIVE);
+  private static Pattern CREATE_FUNC_STMT =
+      Pattern.compile("\\s*create\\s+function\\s+.*", Pattern.CASE_INSENSITIVE);
+
+  private enum ParsingErrorEngine {
+    IMPALA,
+    HIVE,
+    AMBIGUOUS
+  }
 
   public HMSConverter getHMSConverter() {
     return new ImpalaHMSConverter();
@@ -127,13 +143,25 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
       return getASTForImpala(command, ctx);
     } catch (AnalysisException e) {
       LOG.info("Impala parsing exception: " + e);
-      // Need to determine which exception message to throw back.
-      throw isImpalaCommand(command) ? new ImpalaParseException(e) : caughtException;
+      switch (getParsingErrorType(command)) {
+        case IMPALA:
+          throw new ImpalaParseException(e.getMessage());
+        case HIVE:
+          throw caughtException;
+        case AMBIGUOUS:
+          boolean useImpalaExceptionMsg = SessionState.get().getConf().getBoolVar(
+              ConfVars.HIVE_IMPALA_SHOW_IMPALA_PARSING_ERROR);
+          Exception exceptionToUse = useImpalaExceptionMsg ? e : caughtException;
+          throw getExtendedParsingExceptionMessage(exceptionToUse, useImpalaExceptionMsg);
+        default:
+          Preconditions.checkState(false);
+          return null;
+      }
     }
   }
 
   @Override
-  public SemanticAnalyzer getSemanticAnalyzer(QueryState queryState, ASTNode tree)
+  public BaseSemanticAnalyzer getSemanticAnalyzer(QueryState queryState, ASTNode tree)
       throws SemanticException {
     if (tree.getToken() == null) {
       throw new RuntimeException("Empty Syntax Tree");
@@ -146,6 +174,8 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
         return new DropStatsSemanticAnalyzer(queryState);
       case ImpalaToken.TOK_COMPUTE_STATS:
         return new ComputeStatsSemanticAnalyzer(queryState);
+      case ImpalaToken.TOK_CREATE_FUNCTION:
+        return new CreateFuncSemanticAnalyzer(queryState);
       default:
         throw new SemanticException("Unknown token found: " + tree.getType());
     }
@@ -163,6 +193,8 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
         return HiveOperation.DROP_STATS;
       case ImpalaToken.TOK_COMPUTE_STATS:
         return HiveOperation.ANALYZE_TABLE;
+      case ImpalaToken.TOK_CREATE_FUNCTION:
+        return HiveOperation.CREATEFUNCTION;
       default:
         return null;
     }
@@ -181,27 +213,31 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
     if (impalaStmt instanceof ComputeStatsStmt) {
       return ComputeStatsSemanticAnalyzer.getASTNode((ComputeStatsStmt) impalaStmt, command, ctx);
     }
+    if (impalaStmt instanceof CreateFunctionStmtBase) {
+      return CreateFuncSemanticAnalyzer.getASTNode((CreateFunctionStmtBase) impalaStmt, command, ctx);
+    }
     throw new AnalysisException("This is a valid Impala statement but it is not supported " +
         "yet.");
   }
 
-  private boolean isImpalaCommand(String command) {
-    if (REFRESH_STMT.matcher(command).matches()) {
-      return true;
+  /**
+   * getParsingErrorType takes a command and decides whether the returned error
+   * should come from Hive, Impala, or potentially either one (ambiguous)
+   */
+  private ParsingErrorEngine getParsingErrorType(String command) {
+    if (REFRESH_STMT.matcher(command).matches() ||
+        COMPUTE_STATS_STMT.matcher(command).matches() ||
+        DROP_STATS_STMT.matcher(command).matches() ||
+        DROP_INCR_STATS_STMT.matcher(command).matches() ||
+        CREATE_AGG_FUNC_STMT.matcher(command).matches()) {
+      return ParsingErrorEngine.IMPALA;
     }
 
-    if (COMPUTE_STATS_STMT.matcher(command).matches()) {
-      return true;
+    if (CREATE_FUNC_STMT.matcher(command).matches()) {
+      return ParsingErrorEngine.AMBIGUOUS;
     }
 
-    if (DROP_STATS_STMT.matcher(command).matches()) {
-      return true;
-    }
-
-    if (DROP_INCR_STATS_STMT.matcher(command).matches()) {
-      return true;
-    }
-    return false;
+    return ParsingErrorEngine.HIVE;
   }
 
   private ASTNode convertTreeIfNecessary(ASTNode astNode, Context ctx) {
@@ -211,5 +247,15 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
       return astNode;
     }
     return ComputeStatsSemanticAnalyzer.rewriteTree(astNode, ctx);
+  }
+
+  private ParseException getExtendedParsingExceptionMessage(Exception e, boolean impalaEngine) {
+    String parsingMessage = e.getMessage() + "\n";
+    String parsingMessageEngine = impalaEngine ? "Impala" : "Hive";
+    String nonParsingMessageEngine = impalaEngine ? "Hive" : "Impala";
+    return new ImpalaParseException(parsingMessage + "Note: this parsing error was produced by " +
+        parsingMessageEngine + "." + " To see the parsing error message produced by " +
+        nonParsingMessageEngine + ", set \"" + ConfVars.HIVE_IMPALA_SHOW_IMPALA_PARSING_ERROR +
+        "\" to " + !impalaEngine);
   }
 }

@@ -1,0 +1,2 @@
+FAILED: ImpalaParseException line 3:27 cannot recognize input near 'illegal' 'syntax' 'here' in function identifier
+Note: this parsing error was produced by Hive. To see the parsing error message produced by Impala, set "hive.impala.show.impala.parsing.error" to true

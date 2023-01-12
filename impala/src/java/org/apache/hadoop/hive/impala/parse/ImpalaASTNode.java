@@ -23,9 +23,9 @@ import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.ImmutableCommonToken;
 
 /**
- * ImpalaASTNode functions like ASTNode but is used by the ImpalaParseDriver.
- * The usindDefaultEngine method allows the framework to fetch a SemanticAnalyzer
- * from this Impala plugged in module.
+ * ImpalaASTNode functions like ASTNode but is used when we need an Impala specific
+ * SemanticAnalyzer. The internal framework uses the "usingDefaultEngine" method
+ * to retrieve the SemanticAnalyzer from this plugin when the method returns false.
  */
 class ImpalaASTNode extends ASTNode {
   public ImpalaASTNode(Token payload) {
