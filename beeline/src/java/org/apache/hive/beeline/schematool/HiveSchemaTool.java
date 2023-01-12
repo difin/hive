@@ -77,14 +77,14 @@ public class HiveSchemaTool extends MetastoreSchemaTool {
     FileWriter fstream = new FileWriter(tmpFile.getPath());
     BufferedWriter out = new BufferedWriter(fstream);
     if (!dbType.equalsIgnoreCase(HiveSchemaHelper.DB_HIVE)) {
-      out.write("!autocommit off" + System.getProperty("line.separator"));
+      out.write("!autocommit off" + System.lineSeparator());
       out.write(sqlCommands);
-      out.write("!commit" + System.getProperty("line.separator"));
+      out.write("!commit" + System.lineSeparator());
     } else {
-      out.write("!autocommit on" + System.getProperty("line.separator"));
+      out.write("!autocommit on" + System.lineSeparator());
       out.write(sqlCommands);
     }
-    out.write("!closeall" + System.getProperty("line.separator"));
+    out.write("!closeall" + System.lineSeparator());
     out.close();
     execSql(tmpFile.getPath());
   }
