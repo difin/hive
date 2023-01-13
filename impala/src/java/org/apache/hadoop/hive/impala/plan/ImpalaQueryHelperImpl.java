@@ -339,9 +339,12 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     // since FeSupport#ParseQueryOptions() is not able to parse this query option when
     // the value contains commas. We use uppercase letters because in 'configurations'
     // the keys are in upper case.
+    // Skip adding the QUERY_EXECUTOR option that is defined and added in
+    // {@link org.apache.hive.service.cli.operation.HplSqlQueryExecutor}.
     String csvQueryOptions = configurations.entrySet().stream()
         .filter(e -> !e.getKey().equals("http_addr"))
         .filter(e -> !e.getKey().equals("ENABLED_RUNTIME_FILTER_TYPES"))
+        .filter(e -> !e.getKey().equals("QUERY_EXECUTOR"))
         .map(e -> e.getKey() + "=" + e.getValue())
         .collect(Collectors.joining(","));
 
