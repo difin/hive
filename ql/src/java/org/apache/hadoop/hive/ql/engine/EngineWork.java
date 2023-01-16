@@ -23,9 +23,7 @@ import org.apache.hadoop.classification.InterfaceStability;
 
 /**
  * EngineWork.  This class serves as a dummy base class for engine specific "Work"
- * objects. The core logic needs a specific class definition.
- * XXX: CDPD-20696: This logic will only work with one external class.  This will need
- * to be redesigned.
+ * objects.
  */
 @InterfaceStability.Unstable
 public abstract class EngineWork implements Serializable {

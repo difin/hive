@@ -122,11 +122,7 @@ public final class OperatorFactory {
     opvec.put(CommonMergeJoinDesc.class, CommonMergeJoinOperator.class);
     opvec.put(ListSinkDesc.class, ListSinkOperator.class);
     opvec.put(TopNKeyDesc.class, TopNKeyOperator.class);
-    EngineHelper helper = EngineLoader.getExternalInstance();
-    if (helper != null) {
-      EngineRuntimeHelper runtimeHelper = helper.getRuntimeHelper();
-      opvec.put(runtimeHelper.getQueryDescClass(), runtimeHelper.getQueryOperatorClass());
-    }
+    opvec.putAll(EngineLoader.getOperatorVecs());
   }
 
   static {

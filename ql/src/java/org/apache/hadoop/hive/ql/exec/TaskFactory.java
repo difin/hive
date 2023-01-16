@@ -45,9 +45,7 @@ import org.apache.hadoop.hive.ql.exec.repl.ReplStateLogTask;
 import org.apache.hadoop.hive.ql.exec.repl.ReplStateLogWork;
 import org.apache.hadoop.hive.ql.exec.schq.ScheduledQueryMaintenanceTask;
 import org.apache.hadoop.hive.ql.exec.tez.TezTask;
-import org.apache.hadoop.hive.ql.engine.EngineHelper;
 import org.apache.hadoop.hive.ql.engine.EngineLoader;
-import org.apache.hadoop.hive.ql.engine.EngineWork;
 import org.apache.hadoop.hive.ql.io.merge.MergeFileTask;
 import org.apache.hadoop.hive.ql.io.merge.MergeFileWork;
 import org.apache.hadoop.hive.ql.plan.ColumnStatsUpdateWork;
@@ -119,10 +117,7 @@ public final class TaskFactory {
     taskvec.add(new TaskTuple<DependencyCollectionWork>(DependencyCollectionWork.class,
         DependencyCollectionTask.class));
     taskvec.add(new TaskTuple<TezWork>(TezWork.class, TezTask.class));
-    EngineHelper helper = EngineLoader.getExternalInstance();
-    if (helper != null) {
-      taskvec.add(new TaskTuple<EngineWork>(EngineWork.class, helper.getRuntimeHelper().getTaskClass()));
-    }
+    taskvec.addAll(EngineLoader.getTaskTuples());
     taskvec.add(new TaskTuple<>(ReplDumpWork.class, ReplDumpTask.class));
     taskvec.add(new TaskTuple<>(ReplLoadWork.class, ReplLoadTask.class));
     taskvec.add(new TaskTuple<>(ReplStateLogWork.class, ReplStateLogTask.class));

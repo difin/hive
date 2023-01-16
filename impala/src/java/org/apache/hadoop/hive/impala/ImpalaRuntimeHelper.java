@@ -34,6 +34,7 @@ import org.apache.hadoop.hive.ql.engine.EngineRuntimeHelper;
 import org.apache.hadoop.hive.ql.exec.FetchOperator;
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.exec.Operator;
+import org.apache.hadoop.hive.ql.exec.TaskFactory.TaskTuple;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
@@ -41,6 +42,7 @@ import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.parse.TaskCompiler;
 import org.apache.hadoop.hive.ql.plan.FetchWork;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
+import org.apache.hadoop.hive.ql.plan.OperatorDesc;
 import org.apache.hadoop.hive.impala.funcmapper.AggFunctionDetails;
 import org.apache.hadoop.hive.impala.funcmapper.ImpalaFunctionSignature;
 import org.apache.hadoop.hive.impala.funcmapper.ScalarFunctionDetails;
@@ -48,6 +50,7 @@ import org.apache.hadoop.hive.impala.exec.ImpalaSessionImpl;
 import org.apache.hadoop.hive.impala.exec.ImpalaSessionManager;
 import org.apache.hadoop.hive.impala.parse.ImpalaCompiler;
 import org.apache.hadoop.hive.impala.plan.ImpalaQueryDesc;
+import org.apache.hadoop.hive.impala.work.ImpalaWork;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.impala.hive.executor.HiveJavaFunction;
 import org.apache.impala.hive.executor.HiveJavaFunctionFactory;
@@ -57,10 +60,14 @@ import org.apache.impala.util.FunctionUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,16 +75,17 @@ import org.slf4j.LoggerFactory;
 public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
   protected static final Logger LOG = LoggerFactory.getLogger(ImpalaRuntimeHelper.class);
 
-  public Class getTaskClass() {
-    return ImpalaTask.class;
+  public List<TaskTuple<? extends Serializable>> getTaskTuples() {
+    return Lists.newArrayList(new TaskTuple<ImpalaWork>(ImpalaWork.class, ImpalaTask.class));
   }
 
-  public Class getQueryDescClass() {
-    return ImpalaQueryDesc.class;
-  }
-
-  public Class getQueryOperatorClass() {
-    return ImpalaQueryOperator.class;
+  public IdentityHashMap<Class<? extends OperatorDesc>,
+      Class<? extends Operator<? extends OperatorDesc>>> getOperatorVecs() {
+    IdentityHashMap<Class<? extends OperatorDesc>,
+        Class<? extends Operator<? extends OperatorDesc>>> opVecs =
+            new IdentityHashMap<>();
+    opVecs.put(ImpalaQueryDesc.class, ImpalaQueryOperator.class);
+    return opVecs;
   }
 
   public FetchOperator createFetchOperator(HiveConf conf, FetchWork work, JobConf job,

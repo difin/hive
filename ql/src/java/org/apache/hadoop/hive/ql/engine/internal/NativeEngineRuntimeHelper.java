@@ -27,6 +27,7 @@ import org.apache.hadoop.hive.ql.ddl.function.show.ShowFunctionsOperation;
 import org.apache.hadoop.hive.ql.engine.EngineRuntimeHelper;
 import org.apache.hadoop.hive.ql.exec.FetchOperator;
 import org.apache.hadoop.hive.ql.exec.Operator;
+import org.apache.hadoop.hive.ql.exec.TaskFactory.TaskTuple;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.hive.ql.parse.MapReduceCompiler;
@@ -35,24 +36,25 @@ import org.apache.hadoop.hive.ql.parse.TaskCompiler;
 import org.apache.hadoop.hive.ql.parse.TezCompiler;
 import org.apache.hadoop.hive.ql.plan.FetchWork;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
+import org.apache.hadoop.hive.ql.plan.OperatorDesc;
 import org.apache.hadoop.mapred.JobConf;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 public class NativeEngineRuntimeHelper implements EngineRuntimeHelper {
 
-  public Class getTaskClass() {
-    throw new RuntimeException("not implemented");
+  public List<TaskTuple<? extends Serializable>> getTaskTuples() {
+    return new ArrayList<>();
   }
 
-  public Class getQueryDescClass() {
-    throw new RuntimeException("not implemented");
-  }
-
-  public Class getQueryOperatorClass() {
-    throw new RuntimeException("not implemented");
+  public IdentityHashMap<Class<? extends OperatorDesc>,
+      Class<? extends Operator<? extends OperatorDesc>>> getOperatorVecs() {
+    return new IdentityHashMap<>();
   }
 
   public FetchOperator createFetchOperator(HiveConf conf, FetchWork work, JobConf job,

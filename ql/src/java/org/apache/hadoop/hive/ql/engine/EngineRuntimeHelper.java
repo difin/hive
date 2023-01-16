@@ -26,16 +26,20 @@ import org.apache.hadoop.hive.metastore.api.Schema;
 import org.apache.hadoop.hive.ql.ddl.function.desc.DescFunctionOperation;
 import org.apache.hadoop.hive.ql.exec.FetchOperator;
 import org.apache.hadoop.hive.ql.exec.Operator;
+import org.apache.hadoop.hive.ql.exec.TaskFactory.TaskTuple;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.parse.TaskCompiler;
 import org.apache.hadoop.hive.ql.plan.FetchWork;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
+import org.apache.hadoop.hive.ql.plan.OperatorDesc;
 import org.apache.hadoop.mapred.JobConf;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 /**
@@ -45,11 +49,10 @@ import java.util.List;
 @InterfaceStability.Unstable
 public interface EngineRuntimeHelper {
 
-  public Class getTaskClass();
+  public List<TaskTuple<? extends Serializable>> getTaskTuples();
 
-  public Class getQueryDescClass();
-
-  public Class getQueryOperatorClass();
+  public IdentityHashMap<Class<? extends OperatorDesc>,
+      Class<? extends Operator<? extends OperatorDesc>>> getOperatorVecs();
 
   public FetchOperator createFetchOperator(HiveConf conf, FetchWork work, JobConf job,
       Operator<?> op, List<VirtualColumn> vcCols, Schema resultSchema,
