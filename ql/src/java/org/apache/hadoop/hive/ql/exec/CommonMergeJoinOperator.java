@@ -27,6 +27,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.hadoop.hive.ql.exec.tez.ReduceRecordSource;
+import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.FloatWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -685,6 +687,15 @@ public class CommonMergeJoinOperator extends AbstractMapJoinOperator<CommonMerge
       return -1;
     } else if (key_2 == null) {
       return 1;
+    }
+
+    // The IEEE 754 floating point spec specifies that signed -0.0 and 0.0 should be treated as equal.
+    // Double.compare() and Float.compare() treats -0.0 and 0.0 as different
+    if ((key_1 instanceof DoubleWritable && key_2 instanceof DoubleWritable &&
+        ((DoubleWritable) key_1).get() == 0.0d && ((DoubleWritable) key_2).get() == 0.0d) ||
+        (key_1 instanceof FloatWritable && key_2 instanceof FloatWritable &&
+            ((FloatWritable) key_1).get() == 0.0f && ((FloatWritable) key_2).get() == 0.0f)) {
+      return 0;
     }
 
     if (comparators[pos] == null) {
