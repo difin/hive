@@ -21,8 +21,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.util.Set;
-import java.util.LinkedHashSet;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.hive.ql.QTestArguments;
@@ -77,6 +75,7 @@ public class CoreCliDriver extends CliAdapter {
                 .withCleanupScript(cleanupScript)
                 .withLlapIo(true)
                 .withFsType(cliConfig.getFsType())
+                .withCustomConfigValueMap(cliConfig.getCustomConfigValueMap())
                 .build());
         }
       }.invoke("QtestUtil instance created", LOG, true);

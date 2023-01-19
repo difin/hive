@@ -1,0 +1,64 @@
+PREHOOK: query: drop table orc_table
+PREHOOK: type: DROPTABLE
+POSTHOOK: query: drop table orc_table
+POSTHOOK: type: DROPTABLE
+PREHOOK: query: create table orc_table (a int, b string) stored as orc TBLPROPERTIES('transactional'='true')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@orc_table
+POSTHOOK: query: create table orc_table (a int, b string) stored as orc TBLPROPERTIES('transactional'='true')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@orc_table
+PREHOOK: query: insert into orc_table values('1', 'text1')
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@orc_table
+POSTHOOK: query: insert into orc_table values('1', 'text1')
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@orc_table
+POSTHOOK: Lineage: orc_table.a SCRIPT []
+POSTHOOK: Lineage: orc_table.b SCRIPT []
+PREHOOK: query: insert into orc_table values('2', 'text2')
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@orc_table
+POSTHOOK: query: insert into orc_table values('2', 'text2')
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@orc_table
+POSTHOOK: Lineage: orc_table.a SCRIPT []
+POSTHOOK: Lineage: orc_table.b SCRIPT []
+PREHOOK: query: insert into orc_table values('3', 'text3')
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@orc_table
+POSTHOOK: query: insert into orc_table values('3', 'text3')
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@orc_table
+POSTHOOK: Lineage: orc_table.a SCRIPT []
+POSTHOOK: Lineage: orc_table.b SCRIPT []
+PREHOOK: query: alter table orc_table compact 'MAJOR' and wait
+PREHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: query: alter table orc_table compact 'MAJOR' and wait
+POSTHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: query: analyze table orc_table compute statistics
+PREHOOK: type: ANALYZE_TABLE
+PREHOOK: Input: default@orc_table
+PREHOOK: Output: default@orc_table
+POSTHOOK: query: analyze table orc_table compute statistics
+POSTHOOK: type: ANALYZE_TABLE
+POSTHOOK: Input: default@orc_table
+POSTHOOK: Output: default@orc_table
+PREHOOK: query: describe extended orc_table
+PREHOOK: type: DESCTABLE
+PREHOOK: Input: default@orc_table
+POSTHOOK: query: describe extended orc_table
+POSTHOOK: type: DESCTABLE
+POSTHOOK: Input: default@orc_table
+a                   	int                 	                    
+b                   	string              	                    
+	 	 
+#### A masked pattern was here ####

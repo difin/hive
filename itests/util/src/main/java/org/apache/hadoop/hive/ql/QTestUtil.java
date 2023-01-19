@@ -36,6 +36,8 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -218,6 +220,7 @@ public class QTestUtil {
     System.setProperty("hive.query.max.length", "100Mb");
 
     conf = new HiveConf(IDriver.class);
+    setCustomConfs(conf, testArgs.getCustomConfs());
     setMetaStoreProperties();
 
     qSkipSet = new HashSet<String>();
@@ -250,6 +253,10 @@ public class QTestUtil {
     this.cleanupScript = scriptsDir + File.separator + testArgs.getCleanupScript();
     
     savedConf = new HiveConf(conf);
+  }
+
+  private void setCustomConfs(HiveConf conf, Map<ConfVars,String> customConfigValueMap) {
+    customConfigValueMap.entrySet().forEach(item-> conf.set(item.getKey().varname, item.getValue()));
   }
 
   private void logClassPath() {
