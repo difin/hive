@@ -128,6 +128,7 @@ public abstract class CompactorTest {
   protected final void setup(HiveConf conf) throws Exception {
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON, true);
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.TXN_USE_MIN_HISTORY_WRITE_ID, useMinHistoryWriteId());
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_CLEANER_ON, true);
     this.conf = conf;
     fs = FileSystem.get(conf);
     TestTxnDbUtil.setConfValues(conf);

@@ -129,6 +129,7 @@ public abstract class TxnCommandsBaseForTests {
     hiveConf.setBoolean("hive.txn.write.acid.version.file", true);
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_ACID_DIRECT_UPDATE_AND_DELETE_ENABLED, true);
     MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON, true);
+    MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.COMPACTOR_CLEANER_ON, true);
     TestTxnDbUtil.setConfValues(hiveConf);
     TestTxnDbUtil.prepDb(hiveConf);
     txnHandler = TxnUtils.getTxnStore(hiveConf);
