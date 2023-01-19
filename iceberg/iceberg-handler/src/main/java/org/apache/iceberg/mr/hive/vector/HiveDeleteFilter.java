@@ -21,6 +21,7 @@ package org.apache.iceberg.mr.hive.vector;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.iceberg.FileScanTask;
@@ -28,6 +29,7 @@ import org.apache.iceberg.MetadataColumns;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.StructLike;
 import org.apache.iceberg.data.DeleteFilter;
+import org.apache.iceberg.deletes.PositionDeleteIndex;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.CloseableIterator;
 import org.apache.iceberg.io.FileIO;
@@ -72,7 +74,8 @@ public class HiveDeleteFilter extends DeleteFilter<HiveRow> {
    * @param batches iterable of HiveBatchContexts i.e. VRBs and their meta information
    * @return the adjusted iterable of HiveBatchContexts
    */
-  public CloseableIterable<HiveBatchContext> filterBatch(CloseableIterable<HiveBatchContext> batches) {
+  public CloseableIterable<HiveBatchContext> filterBatch(CloseableIterable<HiveBatchContext> batches,
+                                                         Map<String, PositionDeleteIndex> positionIndex) {
 
     // Delete filter pipeline setup logic:
     // A HiveRow iterable (deleteInputIterable) is provided as input iterable for the DeleteFilter.
@@ -81,7 +84,7 @@ public class HiveDeleteFilter extends DeleteFilter<HiveRow> {
     SwappableHiveRowIterable deleteInputIterable = new SwappableHiveRowIterable();
 
     // Output iterable of DeleteFilter, and its iterator
-    CloseableIterable<HiveRow> deleteOutputIterable = filter(deleteInputIterable);
+    CloseableIterable<HiveRow> deleteOutputIterable = filter(deleteInputIterable, positionIndex);
     CloseableIterator<HiveRow> deleteOutputIterator = deleteOutputIterable.iterator();
 
     return new CloseableIterable<HiveBatchContext>() {
