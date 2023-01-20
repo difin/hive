@@ -105,4 +105,7 @@ public interface LlapIo<T> {
    */
   RecordReader<NullWritable, VectorizedRowBatch> llapVectorizedOrcReaderForPath(Object fileKey, Path path, CacheTag tag,
       List<Integer> tableIncludedCols, JobConf conf, long offset, long length, Reporter reporter) throws IOException;
+
+  boolean usingLowLevelCache();
+
 }

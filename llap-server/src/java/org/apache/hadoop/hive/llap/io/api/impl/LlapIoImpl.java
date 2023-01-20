@@ -122,6 +122,7 @@ public class LlapIoImpl implements LlapIo<VectorizedRowBatch>, LlapIoDebugDump {
   private final ExecutorService encodeExecutor;
   private final LlapDaemonCacheMetrics cacheMetrics;
   private final LlapDaemonIOMetrics ioMetrics;
+  private final boolean useLowLevelCache;
   private ObjectName buddyAllocatorMXBean;
   private final Allocator allocator;
   private final FileMetadataCache fileMetadataCache;
@@ -136,7 +137,7 @@ public class LlapIoImpl implements LlapIo<VectorizedRowBatch>, LlapIoDebugDump {
   private LlapIoImpl(Configuration conf) throws IOException {
     this.daemonConf = conf;
     String ioMode = HiveConf.getVar(conf, HiveConf.ConfVars.LLAP_IO_MEMORY_MODE);
-    boolean useLowLevelCache = LlapIoImpl.MODE_CACHE.equalsIgnoreCase(ioMode);
+    useLowLevelCache = LlapIoImpl.MODE_CACHE.equalsIgnoreCase(ioMode);
     LOG.info("Initializing LLAP IO in {} mode", useLowLevelCache ? LlapIoImpl.MODE_CACHE : "none");
     String displayName = "LlapDaemonCacheMetrics-" + MetricsUtils.getHostName();
     String sessionId = conf.get("llap.daemon.metrics.sessionid");
@@ -502,5 +503,10 @@ public class LlapIoImpl implements LlapIo<VectorizedRowBatch>, LlapIoDebugDump {
         fileMetadataCache.decRefBuffer(footerData);
       }
     }
+  }
+
+  @Override
+  public boolean usingLowLevelCache() {
+    return useLowLevelCache;
   }
 }
