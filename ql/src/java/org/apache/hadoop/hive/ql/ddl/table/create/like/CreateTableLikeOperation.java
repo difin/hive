@@ -22,6 +22,7 @@ import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.META_
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,6 +39,7 @@ import org.apache.hadoop.hive.ql.ddl.DDLUtils;
 import org.apache.hadoop.hive.ql.ddl.table.create.CreateTableOperation;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.session.SessionState;
@@ -146,6 +148,7 @@ public class CreateTableLikeOperation extends DDLOperation<CreateTableLikeDesc> 
   }
 
   private void setTableParameters(Table tbl) throws HiveException {
+    Map<String, String> origParams = new HashMap<>(tbl.getParameters());
     Set<String> retainer = new HashSet<String>();
 
     Class<? extends Deserializer> serdeClass;
@@ -177,6 +180,10 @@ public class CreateTableLikeOperation extends DDLOperation<CreateTableLikeDesc> 
 
     if (desc.getTblProps() != null) {
       params.putAll(desc.getTblProps());
+    }
+    HiveStorageHandler storageHandler = tbl.getStorageHandler();
+    if (storageHandler != null) {
+      storageHandler.setTableParametersForCTLT(tbl, desc, origParams);
     }
   }
 
