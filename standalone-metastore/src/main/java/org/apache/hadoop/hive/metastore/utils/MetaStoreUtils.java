@@ -91,6 +91,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -193,6 +194,14 @@ public class MetaStoreUtils {
       return val;
     }
   };
+  public static final ThreadLocal<DateTimeFormatter> PARTITION_TIMESTAMP_FORMAT =
+      new ThreadLocal<DateTimeFormatter>() {
+        @Override
+        protected DateTimeFormatter initialValue() {
+          return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").
+              withZone(TimeZone.getTimeZone("UTC").toZoneId());
+        }
+      };
   // Indicates a type was derived from the deserializer rather than Hive's metadata.
   public static final String TYPE_FROM_DESERIALIZER = "<derived from deserializer>";
 
