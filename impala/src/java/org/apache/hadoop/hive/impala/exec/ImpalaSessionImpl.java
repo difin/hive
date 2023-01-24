@@ -271,9 +271,41 @@ public class ImpalaSessionImpl implements EngineSession {
         }
 
         fetchEOF = false;
+        waitForOperationStatus(resp);
+
+        return resp.getOperationHandle();
+    }
+
+    /* Executes a query string */
+    @Override
+    public TOperationHandle execute(String sql, boolean runAsync) throws HiveException {
+        Preconditions.checkNotNull(client);
+        Preconditions.checkNotNull(sessionHandle);
+
+        TExecuteStatementReq req = new TExecuteStatementReq();
+        req.setRunAsync(runAsync);
+        req.setStatement(sql);
+
+        PrepareForExecution();
+        // Don't retry the Execute itself in case the statement was DML or modified state
+        TExecuteStatementResp resp;
+        req.setSessionHandle(sessionHandle);
+        try {
+          resp = client.ExecuteStatement(req);
+          checkThriftStatus(resp.getStatus());
+        } catch (TException e) {
+          throw new HiveException(e);
+        }
+
+        waitForOperationStatus(resp);
+
+        fetchEOF = false;
+        return resp.getOperationHandle();
+    }
+
+    private void waitForOperationStatus(TExecuteStatementResp resp) throws HiveException {
         TOperationHandle opHandle = resp.getOperationHandle();
         TGetOperationStatusReq statusReq = new TGetOperationStatusReq(opHandle);
-
         while (true) {
           synchronized (pendingCancel) {
             if (pendingCancel) {
@@ -306,33 +338,6 @@ public class ImpalaSessionImpl implements EngineSession {
             }
           }
         }
-
-        return opHandle;
-    }
-
-    /* Executes a query string */
-    @Override
-    public TOperationHandle execute(String sql, boolean runAsync) throws HiveException {
-        Preconditions.checkNotNull(client);
-        Preconditions.checkNotNull(sessionHandle);
-
-        TExecuteStatementReq req = new TExecuteStatementReq();
-        req.setRunAsync(runAsync);
-        req.setStatement(sql);
-
-        PrepareForExecution();
-        // Don't retry the Execute itself in case the statement was DML or modified state
-        TExecuteStatementResp resp;
-        req.setSessionHandle(sessionHandle);
-        try {
-          resp = client.ExecuteStatement(req);
-          checkThriftStatus(resp.getStatus());
-        } catch (TException e) {
-          throw new HiveException(e);
-        }
-
-        fetchEOF = false;
-        return resp.getOperationHandle();
     }
 
     private void connectClient() throws HiveException {
