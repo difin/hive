@@ -489,6 +489,8 @@ public class SessionState {
     resourceDownloader = new ResourceDownloader(conf,
         HiveConf.getVar(conf, ConfVars.DOWNLOADED_RESOURCES_DIR), udfCacheMap, udfCacheDir);
     killQuery = new NullKillQuery();
+
+    ShimLoader.getHadoopShims().setHadoopSessionContext(getSessionId());
     this.cleanupService = cleanupService;
     try {
       externalEngineHmsConverter = EngineCompileHelper.getInstance(conf).getHMSConverter();

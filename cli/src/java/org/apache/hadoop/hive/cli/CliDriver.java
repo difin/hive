@@ -82,6 +82,7 @@ import org.apache.hadoop.hive.ql.processors.CommandProcessorFactory;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorResponse;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.session.SessionState.LogHelper;
+import org.apache.hadoop.hive.shims.ShimLoader;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hive.common.util.HiveStringUtils;
 import org.apache.hive.common.util.ShutdownHookManager;
@@ -253,9 +254,12 @@ public class CliDriver {
         }
 
         try {
+          // Set HDFS CallerContext to queryId and reset back to sessionId after the query is done
+          ShimLoader.getHadoopShims().setHadoopQueryContext(qp.getQueryState().getQueryId());
           response = qp.run(cmd);
         } catch (CommandProcessorException e) {
           qp.close();
+          ShimLoader.getHadoopShims().setHadoopSessionContext(ss.getSessionId());
           throw e;
         }
 
@@ -292,7 +296,7 @@ public class CliDriver {
           throw new CommandProcessorException(1);
         } finally {
           qp.close();
-
+          ShimLoader.getHadoopShims().setHadoopSessionContext(ss.getSessionId());
           if (out instanceof FetchConverter) {
             ((FetchConverter) out).fetchFinished();
           }

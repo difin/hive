@@ -172,7 +172,9 @@ public class TestCliDriverMethods extends TestCase {
     IDriver proc = mock(IDriver.class);
 
     CommandProcessorResponse cpr = mock(CommandProcessorResponse.class);
+    QueryState queryState = new QueryState.Builder().withGenerateNewQueryId(true).build();
     when(proc.run(anyString())).thenReturn(cpr);
+    when(proc.getQueryState()).thenReturn(queryState);
 
     // and then see what happens based on the provided schema
     when(proc.getSchema()).thenReturn(mockSchema);
