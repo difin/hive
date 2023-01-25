@@ -57,8 +57,9 @@ public class URLBasedJWKSProvider {
   private void loadJWKSets() throws IOException, ParseException {
     String jwksURL = MetastoreConf.getVar(conf, ConfVars.THRIFT_METASTORE_AUTHENTICATION_JWT_JWKS_URL);
     if (jwksURL == null || jwksURL.isEmpty()) {
-      throw new IOException("Invalid value of property: " +
+      LOG.warn("Invalid value of property: {}, JWT authentication will not work without configuring keyset",
           ConfVars.THRIFT_METASTORE_AUTHENTICATION_JWT_JWKS_URL.getHiveName());
+      return;
     }
     String[] jwksURLs = jwksURL.split(",");
     for (String urlString : jwksURLs) {

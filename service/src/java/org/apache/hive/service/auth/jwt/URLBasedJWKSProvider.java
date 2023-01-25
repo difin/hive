@@ -65,8 +65,9 @@ public class URLBasedJWKSProvider {
   private void loadJWKSets() throws IOException, ParseException, GeneralSecurityException {
     String jwksURL = HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_SERVER2_AUTHENTICATION_JWT_JWKS_URL);
     if (jwksURL == null || jwksURL.isEmpty()) {
-      throw new IOException("Invalid value of property: " + 
+      LOG.warn("Invalid value of property: {}, JWT authentication will not work without configuring keyset.",
           HiveConf.ConfVars.HIVE_SERVER2_AUTHENTICATION_JWT_JWKS_URL.varname);
+      return;
     }
     String[] jwksURLs = jwksURL.split(",");
     for (String urlString : jwksURLs) {
