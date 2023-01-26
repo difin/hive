@@ -6013,6 +6013,11 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         connectionProps.setProperty("user", username);
         connectionProps.setProperty("password", password);
         Connection conn = driver.connect(connString, connectionProps);
+        if (dbProduct == MYSQL) {
+          try (Statement stmt = conn.createStatement()) {
+            stmt.execute("SET @@session.sql_mode=ANSI_QUOTES");
+          }
+        }
         conn.setAutoCommit(false);
         return conn;
       } catch (SQLException e) {

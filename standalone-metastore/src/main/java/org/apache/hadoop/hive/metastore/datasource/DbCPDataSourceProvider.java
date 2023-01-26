@@ -121,6 +121,20 @@ public class DbCPDataSourceProvider implements DataSourceProvider {
     objectPool.setSoftMinEvictableIdleTimeMillis(softMinEvictableIdleTimeMillis);
     objectPool.setLifo(lifo);
 
+    // Enable TxnHandler#connPoolMutex to release the idle connection if possible,
+    // TxnHandler#connPoolMutex is mostly used for MutexAPI that is primarily designed to
+    // provide coarse-grained mutex support to maintenance tasks running inside the Metastore,
+    // this will make Metastore more scalable especially if there is a leader in the warehouse.
+    if ("mutex".equalsIgnoreCase(poolName)) {
+      if (timeBetweenEvictionRuns < 0) {
+        // When timeBetweenEvictionRunsMillis non-positive, no idle object evictor thread runs
+        objectPool.setTimeBetweenEvictionRunsMillis(30 * 1000);
+      }
+      if (softMinEvictableIdleTimeMillis < 0) {
+        objectPool.setSoftMinEvictableIdleTimeMillis(600 * 1000);
+      }
+    }
+
     if (dbProduct == MYSQL) {
       poolableConnFactory.setValidationQuery("SET @@session.sql_mode=ANSI_QUOTES");
     }
