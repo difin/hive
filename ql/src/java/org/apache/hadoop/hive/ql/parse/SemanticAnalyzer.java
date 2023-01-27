@@ -8123,6 +8123,11 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       throw new SemanticException("Unknown destination type: " + destType);
     }
 
+    if (!(destType == QBMetaData.DEST_DFS_FILE && qb.getIsQuery())
+        && destinationTable != null && destinationTable.getStorageHandler() != null) {
+      input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx, destinationTable);
+    }
+
     inputRR = opParseCtx.get(input).getRowResolver();
 
     List<ColumnInfo> vecCol = new ArrayList<ColumnInfo>();
@@ -8887,15 +8892,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
     // if target table is always unpartitioned, then the output object inspector will already contain the partition cols
     // too, therefore we shouldn't add the partition col num to the output col num
-    boolean alreadyContainsPartCols = Optional.ofNullable(tableDesc)
-        .map(CreateTableDesc::getStorageHandler)
-        .map(handler -> {
-          try {
-            return HiveUtils.getStorageHandler(conf, handler);
-          } catch (HiveException e) {
-            return null;
-          }
-        })
+    boolean alreadyContainsPartCols = Optional.ofNullable(table)
+        .map(Table::getStorageHandler)
         .map(HiveStorageHandler::alwaysUnpartitioned)
         .orElse(Boolean.FALSE);
 
