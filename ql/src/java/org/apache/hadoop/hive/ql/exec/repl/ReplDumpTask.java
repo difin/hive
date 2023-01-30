@@ -749,34 +749,6 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
         LOG.info("Event id {} to {} are already dumped, skipping {} events", work.eventFrom, resumeFrom, dumpedCount);
       }
       boolean isStagingDirCheckedForFailedEvents = false;
-
-      int batchNo = 0, eventCount = 0;
-      final int maxEventsPerBatch = conf.getIntVar(HiveConf.ConfVars.REPL_APPROX_MAX_LOAD_TASKS);
-      boolean shouldBatch = conf.getBoolVar(HiveConf.ConfVars.REPL_BATCH_INCREMENTAL_EVENTS);
-
-      if (shouldBatch && maxEventsPerBatch == 0) {
-        throw new SemanticException(String.format(
-                "batch size configured via %s cannot be set to zero since batching is enabled",
-                HiveConf.ConfVars.REPL_APPROX_MAX_LOAD_TASKS.varname));
-      }
-      Path eventRootDir = dumpRoot;
-      Path eventsBatchedAck = new Path(dumpRoot, ReplAck.EVENTS_BATCHED.toString());
-
-      if (shouldBatch && !Utils.fileExists(eventsBatchedAck, conf)) {
-        Utils.writeOutput(String.valueOf(estimatedNumEvents), eventsBatchedAck, conf);
-      } else if (!shouldBatch && Utils.fileExists(eventsBatchedAck, conf)) {
-        LOG.error("Failed to resume from previous dump. {} was set to true in previous dump but currently it's" +
-                        " set to false. Cannot dump events in sequential manner because they were batched in " +
-                        "the previous incomplete run",
-                HiveConf.ConfVars.REPL_BATCH_INCREMENTAL_EVENTS.varname);
-
-        throw new HiveException(
-                String.format("%s is set to false and previous incremental dump contains %s",
-                        HiveConf.ConfVars.REPL_BATCH_INCREMENTAL_EVENTS, ReplAck.EVENTS_BATCHED)
-        );
-      }
-
-
       while (evIter.hasNext()) {
         NotificationEvent ev = evIter.next();
         lastReplId = ev.getEventId();
@@ -789,7 +761,7 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
         }
         // Checking and removing remnant file from staging directory if previous incremental repl dump is failed
         if (!isStagingDirCheckedForFailedEvents) {
-          cleanFailedEventDirIfExists(eventRootDir, ev.getEventId());
+          cleanFailedEventDirIfExists(dumpRoot, ev.getEventId());
           isStagingDirCheckedForFailedEvents = true;
         }
 
@@ -980,16 +952,18 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
     return currentEventMaxLimit;
   }
 
-  private void cleanFailedEventDirIfExists(Path dumpDir, long resumeFrom) throws SemanticException {
-    Path nextEventRoot = new Path(dumpDir, String.valueOf(resumeFrom + 1));
+  private void cleanFailedEventDirIfExists(Path dumpDir, long eventId) throws SemanticException {
+    Path eventRoot = new Path(dumpDir, String.valueOf(eventId));
     Retryable retryable = Retryable.builder()
       .withHiveConf(conf)
       .withRetryOnException(IOException.class).build();
     try {
       retryable.executeCallable((Callable<Void>) () -> {
-        FileSystem fs = FileSystem.get(nextEventRoot.toUri(), conf);
         try {
-          fs.delete(nextEventRoot, true);
+          FileSystem fs = FileSystem.get(eventRoot.toUri(), conf);
+          if (fs.exists(eventRoot))  {
+            fs.delete(eventRoot, true);
+          }
         } catch (FileNotFoundException e) {
           // no worries
         }
