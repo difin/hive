@@ -64,7 +64,13 @@ public class CreateTableLikeOperation extends DDLOperation<CreateTableLikeDesc> 
     if (oldTable.getTableType() == TableType.VIRTUAL_VIEW || oldTable.getTableType() == TableType.MATERIALIZED_VIEW) {
       tbl = createViewLikeTable(oldTable);
     } else {
-      tbl = createTableLikeTable(oldTable);
+      Map<String, String> originalProperties = new HashMap<>();
+      // Get the storage handler without caching, since the storage handler can get changed when copying the
+      // properties of the target table and
+      if (oldTable.getStorageHandlerWithoutCaching() != null) {
+        originalProperties = new HashMap<>(oldTable.getStorageHandlerWithoutCaching().getNativeProperties(oldTable));
+      }
+      tbl = createTableLikeTable(oldTable, originalProperties);
     }
 
     // If location is specified - ensure that it is a full qualified name
@@ -113,7 +119,8 @@ public class CreateTableLikeOperation extends DDLOperation<CreateTableLikeDesc> 
     return table;
   }
 
-  private Table createTableLikeTable(Table table) throws SemanticException, HiveException {
+  private Table createTableLikeTable(Table table, Map<String, String> originalProperties)
+      throws SemanticException, HiveException {
     String[] names = Utilities.getDbTableName(desc.getTableName());
     table.setDbName(names[0]);
     table.setTableName(names[1]);
@@ -121,7 +128,7 @@ public class CreateTableLikeOperation extends DDLOperation<CreateTableLikeDesc> 
 
     setUserSpecifiedLocation(table);
 
-    setTableParameters(table);
+    setTableParameters(table, originalProperties);
 
     if (desc.isUserStorageFormat()) {
       setStorage(table);
@@ -147,8 +154,8 @@ public class CreateTableLikeOperation extends DDLOperation<CreateTableLikeDesc> 
     }
   }
 
-  private void setTableParameters(Table tbl) throws HiveException {
-    Map<String, String> origParams = new HashMap<>(tbl.getParameters());
+  private void setTableParameters(Table tbl,  Map<String, String> originalProperties) throws HiveException {
+    originalProperties.putAll(tbl.getParameters());
     Set<String> retainer = new HashSet<String>();
 
     Class<? extends Deserializer> serdeClass;
@@ -183,7 +190,7 @@ public class CreateTableLikeOperation extends DDLOperation<CreateTableLikeDesc> 
     }
     HiveStorageHandler storageHandler = tbl.getStorageHandler();
     if (storageHandler != null) {
-      storageHandler.setTableParametersForCTLT(tbl, desc, origParams);
+      storageHandler.setTableParametersForCTLT(tbl, desc, originalProperties);
     }
   }
 
