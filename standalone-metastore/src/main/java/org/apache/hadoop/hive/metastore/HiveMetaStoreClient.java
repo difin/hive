@@ -67,6 +67,7 @@ import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.metastore.api.*;
 import org.apache.hadoop.hive.metastore.api.Package;
 import org.apache.hadoop.hive.metastore.api.ThriftHiveMetastore.Client;
+import org.apache.hadoop.hive.metastore.auth.jwt.KrbToJWTExchanger;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.apache.hadoop.hive.metastore.hooks.URIResolverHook;
@@ -589,17 +590,27 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
         Locale.ROOT);
     String user = null;
     if (authType.equals("jwt")) {
-      // fetch JWT token from environment and set it in Auth Header in HTTP request
-      String jwtToken = System.getenv("HMS_JWT");
-      if (jwtToken == null || jwtToken.isEmpty()) {
-        LOG.debug("No jwt token set in environment variable: HMS_JWT");
-        throw new MetaException("For auth mode JWT, valid signed jwt token must be provided in the "
-            + "environment variable HMS_JWT");
-      }
+      final boolean isKrbToJWTEnabled = KrbToJWTExchanger.isKrbToJWTEnabled(conf);
       httpClientBuilder.addInterceptorFirst(new HttpRequestInterceptor() {
         @Override
         public void process(HttpRequest httpRequest, HttpContext httpContext)
             throws HttpException, IOException {
+          final String jwtToken;
+          if (isKrbToJWTEnabled) {
+            // fetch JWT token from Knox
+            try {
+              jwtToken = KrbToJWTExchanger.getTokenProvider(conf).getJwtToken();
+            } catch (Exception e) {
+              throw new IOException("Failed to exchange JWT by the Kerberos ticket", e);
+            }
+          } else {
+            // fetch JWT token from environment and set it in Auth Header in HTTP request
+            jwtToken = System.getenv("HMS_JWT");
+          }
+          if (jwtToken == null || jwtToken.isEmpty()) {
+            LOG.error("No valid jwt token provided, token: {}", jwtToken);
+            throw new IOException("For auth mode JWT, valid signed jwt token must be provided");
+          }
           httpRequest.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken);
         }
       });

@@ -26,12 +26,22 @@ import com.nimbusds.jose.jwk.JWKSet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
 import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
-import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +52,13 @@ import java.util.List;
 public class URLBasedJWKSProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(URLBasedJWKSProvider.class.getName());
+  // Same as hive.server2.authentication.jwt.jwks.skip.ssl.cert,
+  // this is meant to be used in a testing environment only
+  private static final String  SKIP_SSL_CERT = "metastore.authentication.jwt.jwks.skip.ssl.cert";
   private final Configuration conf;
   private List<JWKSet> jwkSets = new ArrayList<>();
 
-  public URLBasedJWKSProvider(Configuration conf) throws IOException, ParseException {
+  public URLBasedJWKSProvider(Configuration conf) throws IOException, ParseException, GeneralSecurityException {
     this.conf = conf;
     loadJWKSets();
   }
@@ -54,7 +67,7 @@ public class URLBasedJWKSProvider {
    * Fetches the JWKS and stores into memory. The JWKS are expected to be in the standard form as defined here -
    * https://datatracker.ietf.org/doc/html/rfc7517#appendix-A.
    */
-  private void loadJWKSets() throws IOException, ParseException {
+  private void loadJWKSets() throws IOException, ParseException, GeneralSecurityException {
     String jwksURL = MetastoreConf.getVar(conf, ConfVars.THRIFT_METASTORE_AUTHENTICATION_JWT_JWKS_URL);
     if (jwksURL == null || jwksURL.isEmpty()) {
       LOG.warn("Invalid value of property: {}, JWT authentication will not work without configuring keyset",
@@ -63,8 +76,34 @@ public class URLBasedJWKSProvider {
     }
     String[] jwksURLs = jwksURL.split(",");
     for (String urlString : jwksURLs) {
-      URL url = new URL(urlString);
-      jwkSets.add(JWKSet.load(url));
+      SSLContext context = null;
+      if ("true".equalsIgnoreCase(MetastoreConf.get(conf, SKIP_SSL_CERT))) {
+        context = SSLContext.getInstance("TLS");
+        X509TrustManager trustAllManager = new X509TrustManager() {
+          @Override
+          public void checkClientTrusted(X509Certificate[] chain, String authType)
+              throws CertificateException {
+          }
+          @Override
+          public void checkServerTrusted(X509Certificate[] chain, String authType)
+              throws CertificateException {
+          }
+          @Override
+          public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+          }
+        };
+        context.init(null, new X509TrustManager[]{trustAllManager}, new SecureRandom());
+      }
+      HttpGet get = new HttpGet(urlString);
+      try (CloseableHttpClient httpClient = (context == null) ?
+          HttpClients.createDefault() : HttpClients.custom().setSSLContext(context).build();
+           CloseableHttpResponse response = httpClient.execute(get)) {
+        HttpEntity entity = response.getEntity();
+        if (entity != null) {
+          jwkSets.add(JWKSet.load(entity.getContent()));
+        }
+      }
       LOG.info("Loaded JWKS from " + urlString);
     }
   }
