@@ -1245,6 +1245,12 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
+    public WriteNotificationLogBatchResponse add_write_notification_log_in_batch(
+            WriteNotificationLogBatchRequest batchRequest) throws TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public WriteNotificationLogResponse add_write_notification_log(WriteNotificationLogRequest rqst)
             throws TException {
         throw new UnsupportedOperationException("this method is not supported");

@@ -69,14 +69,14 @@ class WMGetTriggersForResourePlanResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->triggers = array();
-                        $_size1042 = 0;
-                        $_etype1045 = 0;
-                        $xfer += $input->readListBegin($_etype1045, $_size1042);
-                        for ($_i1046 = 0; $_i1046 < $_size1042; ++$_i1046) {
-                            $elem1047 = null;
-                            $elem1047 = new \metastore\WMTrigger();
-                            $xfer += $elem1047->read($input);
-                            $this->triggers []= $elem1047;
+                        $_size1049 = 0;
+                        $_etype1052 = 0;
+                        $xfer += $input->readListBegin($_etype1052, $_size1049);
+                        for ($_i1053 = 0; $_i1053 < $_size1049; ++$_i1053) {
+                            $elem1054 = null;
+                            $elem1054 = new \metastore\WMTrigger();
+                            $xfer += $elem1054->read($input);
+                            $this->triggers []= $elem1054;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +103,8 @@ class WMGetTriggersForResourePlanResponse
             }
             $xfer += $output->writeFieldBegin('triggers', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->triggers));
-            foreach ($this->triggers as $iter1048) {
-                $xfer += $iter1048->write($output);
+            foreach ($this->triggers as $iter1055) {
+                $xfer += $iter1055->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

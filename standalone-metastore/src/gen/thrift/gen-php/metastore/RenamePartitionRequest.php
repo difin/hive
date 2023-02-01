@@ -174,13 +174,13 @@ class RenamePartitionRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->partVals = array();
-                        $_size1128 = 0;
-                        $_etype1131 = 0;
-                        $xfer += $input->readListBegin($_etype1131, $_size1128);
-                        for ($_i1132 = 0; $_i1132 < $_size1128; ++$_i1132) {
-                            $elem1133 = null;
-                            $xfer += $input->readString($elem1133);
-                            $this->partVals []= $elem1133;
+                        $_size1135 = 0;
+                        $_etype1138 = 0;
+                        $xfer += $input->readListBegin($_etype1138, $_size1135);
+                        for ($_i1139 = 0; $_i1139 < $_size1135; ++$_i1139) {
+                            $elem1140 = null;
+                            $xfer += $input->readString($elem1140);
+                            $this->partVals []= $elem1140;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -251,8 +251,8 @@ class RenamePartitionRequest
             }
             $xfer += $output->writeFieldBegin('partVals', TType::LST, 4);
             $output->writeListBegin(TType::STRING, count($this->partVals));
-            foreach ($this->partVals as $iter1134) {
-                $xfer += $output->writeString($iter1134);
+            foreach ($this->partVals as $iter1141) {
+                $xfer += $output->writeString($iter1141);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

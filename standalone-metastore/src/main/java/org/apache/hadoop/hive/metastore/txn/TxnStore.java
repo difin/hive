@@ -71,6 +71,7 @@ import org.apache.hadoop.hive.metastore.api.TxnType;
 import org.apache.hadoop.hive.metastore.api.UnlockRequest;
 import org.apache.hadoop.hive.metastore.api.UpdateTransactionalStatsRequest;
 import org.apache.hadoop.hive.metastore.events.AcidWriteEvent;
+import org.apache.hadoop.hive.metastore.events.ListenerEvent;
 
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -675,7 +676,7 @@ public interface TxnStore extends Configurable {
    * @param acidWriteEvent
    */
   @RetrySemantics.Idempotent
-  void addWriteNotificationLog(AcidWriteEvent acidWriteEvent) throws MetaException;
+  void addWriteNotificationLog(ListenerEvent acidWriteEvent) throws MetaException;
 
   /**
    * Return the currently seen minimum open transaction ID.
