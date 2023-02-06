@@ -95,6 +95,9 @@ public class ImpalaSessionImpl implements EngineSession {
     private Boolean pendingCancel = new Boolean(false);
     /* Buffer size for socket stream */
     private int socketBufferSize;
+    /* Use HTTP for transport between hs2 and impala coordinator */
+    private boolean useHttp;
+    private String httpPath;
 
     public ImpalaSessionImpl(HiveConf conf) { init(conf); }
 
@@ -104,6 +107,11 @@ public class ImpalaSessionImpl implements EngineSession {
       this.connectionTimeout = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_CONNECT_TIMEOUT);
       this.impalaMaxTimerError = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_MAX_TIMER_ERROR);
       this.socketBufferSize = conf.getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_SOCKET_BUFFER_SIZE);
+      this.useHttp = conf.getBoolVar(HiveConf.ConfVars.HIVE_IMPALA_USE_HTTP);
+      this.httpPath = conf.getVar(HiveConf.ConfVars.HIVE_IMPALA_HTTP_PATH);
+      if (this.httpPath == null) {
+        this.httpPath = "";
+      }
     }
 
     /* Used to provide an interface for RPC calls consumed by retryRPC. */
@@ -340,14 +348,24 @@ public class ImpalaSessionImpl implements EngineSession {
         }
     }
 
-    private void connectClient() throws HiveException {
-        try {
-            connection = new ImpalaConnection(socketBufferSize, address, connectionTimeout);
-        } catch (TTransportException ex) {
-            throw new HiveException(ex);
+
+    private ImpalaConnection createConnection() throws HiveException {
+      try {
+        if (useHttp) {
+          return new ImpalaHttpConnection(address, httpPath, connectionTimeout);
+        } else {
+          return new ImpalaBinaryConnection(socketBufferSize, address, connectionTimeout);
         }
+      } catch (TTransportException ex) {
+        throw new HiveException(ex);
+      }
+    }
+
+    private void connectClient() throws HiveException {
+        connection = createConnection();
         client = connection.getClient();
     }
+
     /* Retrieve BackendConfig from impalad */
     public TBackendGflags getBackendConfig() throws HiveException {
         Preconditions.checkNotNull(client);

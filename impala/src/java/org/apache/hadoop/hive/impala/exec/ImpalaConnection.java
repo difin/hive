@@ -17,68 +17,24 @@
  */
 package org.apache.hadoop.hive.impala.exec;
 
-import com.google.common.base.Preconditions;
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.thrift.TCustomSocket;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.impala.thrift.ImpalaHiveServer2Service;
-import org.apache.thrift.transport.TTransportException;
-
-import java.net.InetSocketAddress;
 
 /**
  * Encapsulates a connection to an Impala coordinator.
  */
-class ImpalaConnection {
-    static private final TBinaryProtocol.Factory protocolFactory = new TBinaryProtocol.Factory();
-    private final InetSocketAddress socketAddress;
-    private final TCustomSocket socket;
-
-    /**
-     * @param address Address in the form of "host:port" to a Impala coordinator. Host may be a hostname or IP.
-     * @throws HiveException
-     */
-    ImpalaConnection(int socketBufferSize, String address, int timeout) throws HiveException, TTransportException {
-        String[] addr = address.split(":");
-
-        if (addr.length != 2) {
-            throw new HiveException("Address is malformed: '" + address + "' expected format host:port");
-        }
-
-        int port;
-        try {
-            port = Integer.parseInt(addr[1]);
-        } catch (Exception e) {
-            throw new HiveException("Address is malformed: '" + address + "' expected format host:port, " +
-                    "failed to parse port");
-        }
-        this.socketAddress = InetSocketAddress.createUnresolved(addr[0], port);
-        this.socket = new TCustomSocket(socketAddress.getHostString(),
-            socketAddress.getPort(), /*timeout*/ 0, /*timeout*/ 0, socketBufferSize);
-        this.socket.setSocketTimeout(timeout);
-    }
-
+interface ImpalaConnection {
     /**
      * Attempts to open the connection to Impala coordinator. Not idempotent.
      * @throws TException
      */
-    public void open() throws TException {
-        Preconditions.checkState(!socket.isOpen());
-        socket.open();
-    }
+    public void open() throws TException;
 
     /**
      * Closes a previously open connection.
      */
-    public void close() {
-        socket.close();
-    }
-
-    public String toString() {
-        return "ImpalaConnection{" + socketAddress + " isOpen: " + socket.isOpen() + "}";
-    }
+    public void close();
 
     /**
      * Returns an ImpalaHiveServer2Service.Client using this connection as a socket. Will open the connection if it is
@@ -87,14 +43,5 @@ class ImpalaConnection {
      * ImpalaConnection.
      * @throws HiveException
      */
-    ImpalaHiveServer2Service.Client getClient() throws HiveException {
-        try {
-            if (!socket.isOpen()) {
-                socket.open();
-            }
-        } catch (Exception e) {
-            throw new HiveException("Failed to connect to impala at address (" + socketAddress +")", e);
-        }
-        return new ImpalaHiveServer2Service.Client(protocolFactory.getProtocol(socket));
-    }
+    public ImpalaHiveServer2Service.Client getClient() throws HiveException;
 }

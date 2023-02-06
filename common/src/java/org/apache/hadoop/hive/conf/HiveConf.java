@@ -4563,6 +4563,9 @@ public class HiveConf extends Configuration {
         "Supported engines do not necessarily support all result methods." ),
 
     HIVE_IMPALA_ADDRESS("hive.impala.address", "localhost:21150", "Address for Impala execution engine."),
+    HIVE_IMPALA_HTTP_PATH("hive.impala.http.path", "uainternalcliservice", "Path component of impala URL endpoint when in HTTP mode."),
+    HIVE_IMPALA_USE_HTTP("hive.impala.use.http", false, "If set to true, use Thrift HTTP for transport otherwise " +
+        "use binary. Used in conjunction with hive.impala.address and hive.impala.http.path"),
     HIVE_IMPALA_REQUEST_POOL("hive.impala.request.pool", "default-pool",
              new StringSet(true, "default-pool", "root.default"), "Admission pool used for Impala queries"),
     HIVE_IMPALA_FETCH_SIZE("hive.impala.fetch.size", 1024L,
