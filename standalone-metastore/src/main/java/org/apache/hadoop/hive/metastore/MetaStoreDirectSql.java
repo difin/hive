@@ -85,6 +85,7 @@ import org.apache.hadoop.hive.metastore.model.MCreationMetadata;
 import org.apache.hadoop.hive.metastore.model.MDatabase;
 import org.apache.hadoop.hive.metastore.model.MNotificationLog;
 import org.apache.hadoop.hive.metastore.model.MNotificationNextId;
+import org.apache.hadoop.hive.metastore.model.MPartition;
 import org.apache.hadoop.hive.metastore.model.MPartitionColumnPrivilege;
 import org.apache.hadoop.hive.metastore.model.MPartitionColumnStatistics;
 import org.apache.hadoop.hive.metastore.model.MPartitionPrivilege;
@@ -146,6 +147,7 @@ class MetaStoreDirectSql {
   private final ImmutableMap<String, String> fieldnameToTableName;
   private AggregateStatsCache aggrStatsCache;
   private DirectSqlUpdateStat updateStat;
+  private DirectSqlInsertPart directSqlInsertPart;
 
   /**
    * This method returns a comma separated string consisting of String values of a given list.
@@ -190,6 +192,11 @@ class MetaStoreDirectSql {
     }
     this.batchSize = batchSize;
     this.updateStat = new DirectSqlUpdateStat(pm, conf, dbType, batchSize);
+
+    // TODO: Oracle supports to insert more than 1000 rows with a single insert query. Can use NO_BATCHING for oracle db
+    //  too during batch detection(DETECT_BATCHING) for insert queries as future improvement. Currently, used the same
+    //  limit as IN clause/operator limit(i.e., 1000) during batch detection.
+    this.directSqlInsertPart = new DirectSqlInsertPart(pm, conf, dbType, batchSize);
     ImmutableMap.Builder<String, String> fieldNameToTableNameBuilder =
         new ImmutableMap.Builder<>();
 
@@ -512,6 +519,18 @@ class MetaStoreDirectSql {
     Query<?> queryParams = pm.newQuery("javax.jdo.query.SQL", queryText);
     return MetastoreDirectSqlUtils.executeWithArray(
         queryParams, pms.toArray(), queryText);
+  }
+
+  /**
+   * Add partitions in batch using direct SQL
+   * @param parts list of partitions
+   * @param partPrivilegesList list of partition privileges
+   * @param partColPrivilegesList list of partition column privileges
+   * @throws MetaException
+   */
+  public void addPartitions(List<MPartition> parts, List<List<MPartitionPrivilege>> partPrivilegesList,
+      List<List<MPartitionColumnPrivilege>> partColPrivilegesList) throws MetaException {
+    directSqlInsertPart.addPartitions(parts, partPrivilegesList, partColPrivilegesList);
   }
 
   /**

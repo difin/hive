@@ -292,4 +292,45 @@ public final class SQLGenerator {
     return s;
   }
 
+  /**
+   * Gets the multiple row insert query for the given table with specified columns and row format
+   * @param tableName table name to be used in query
+   * @param columns comma separated column names string
+   * @param rowFormat values format string used in the insert query. Format is like (?,?...?) and the number of
+   *                  question marks in the format is equal to number of column names in the columns argument
+   * @param batchCount number of rows in the query
+   * @return database specific multiple row insert query
+   */
+  public String getBatchInsertQuery(String tableName, String columns, String rowFormat, int batchCount) {
+    StringBuilder sb = new StringBuilder();
+    String fixedPart = tableName + " " + columns + " values ";
+    String row;
+    if (dbProduct == DatabaseProduct.ORACLE) {
+      sb.append("insert all ");
+      row = "into " + fixedPart + rowFormat + " ";
+    } else {
+      sb.append("insert into " + fixedPart);
+      row = rowFormat + ',';
+    }
+    for (int i = 0; i < batchCount; i++) {
+      sb.append(row);
+    }
+    if (dbProduct == DatabaseProduct.ORACLE) {
+      sb.append("select * from dual ");
+    }
+    sb.setLength(sb.length() - 1);
+    return sb.toString();
+  }
+
+  /**
+   * Gets the boolean value specific to database for the given input
+   * @param val boolean value
+   * @return database specific value
+   */
+  public Object getBoolean(boolean val) {
+    if (dbProduct == DatabaseProduct.DERBY) {
+      return val ? "Y" : "N";
+    }
+    return val;
+  }
 }
