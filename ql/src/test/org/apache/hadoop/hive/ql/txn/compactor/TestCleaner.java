@@ -63,6 +63,8 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.times;
 
 /**
  * Tests for the compactor Cleaner thread
@@ -979,6 +981,37 @@ public class TestCleaner extends CompactorTest {
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
     Assert.assertEquals("Expected 1 compaction in queue, got: " + rsp.getCompacts(), 1, rsp.getCompactsSize());
     Assert.assertEquals(TxnStore.CLEANING_RESPONSE, rsp.getCompacts().get(0).getState());
+  }
+
+  @Test
+  public void testMetaCache() throws Exception {
+    conf.setBoolVar(HIVE_COMPACTOR_DELAYED_CLEANUP_ENABLED, false);
+
+    Table t = newTable("default", "retry_test", false);
+
+    addBaseFile(t, null, 20L, 20);
+    addDeltaFile(t, null, 21L, 22L, 2);
+    addDeltaFile(t, null, 23L, 24L, 2);
+    burnThroughTransactions("default", "retry_test", 25);
+
+    CompactionRequest rqst = new CompactionRequest("default", "retry_test", CompactionType.MAJOR);
+    long compactTxn = compactInTxn(rqst);
+    addBaseFile(t, null, 25L, 25, compactTxn);
+
+    //Prevent cleaner from marking the compaction as cleaned
+    TxnStore mockedHandler = spy(txnHandler);
+    doThrow(new RuntimeException()).when(mockedHandler).markCleaned(nullable(CompactionInfo.class));
+    Cleaner cleaner = Mockito.spy(new Cleaner());
+    cleaner.setConf(conf);
+    cleaner.init(new AtomicBoolean(true));
+    cleaner.run();
+    cleaner.run();
+
+    ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
+    List<ShowCompactResponseElement> compacts = rsp.getCompacts();
+    Assert.assertEquals(1, compacts.size());
+    Mockito.verify(cleaner, times(2)).computeIfAbsent(Mockito.any(),Mockito.any());
+    Mockito.verify(cleaner, times(1)).resolveTable(Mockito.any());
   }
 
 

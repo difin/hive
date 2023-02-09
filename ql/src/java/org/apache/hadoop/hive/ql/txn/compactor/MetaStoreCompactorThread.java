@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hive.ql.txn.compactor;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.hadoop.hive.metastore.MetaStoreThread;
 import org.apache.hadoop.hive.metastore.api.MetaException;
@@ -31,6 +33,11 @@ import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils;
 import org.apache.thrift.TException;
+import org.apache.thrift.TBase;
+
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Callable;
 
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +59,9 @@ public class MetaStoreCompactorThread extends CompactorThread implements MetaSto
   protected TxnStore txnHandler;
   protected int threadId;
   protected ScheduledExecutorService cycleUpdaterExecutorService;
+
+  private Optional<Cache<String, TBase>> metaCache = Optional.empty();
+
 
   @Override
   public void setThreadId(int threadId) {
@@ -139,5 +149,27 @@ public class MetaStoreCompactorThread extends CompactorThread implements MetaSto
       return elapsed;
     }
     return 0;
+  }
+
+  <T extends TBase<T,?>> T computeIfAbsent(String key, Callable<T> callable) throws Exception {
+    if (metaCache.isPresent()) {
+      try {
+        return (T) metaCache.get().get(key, callable);
+      } catch (ExecutionException e) {
+        throw (Exception) e.getCause();
+      }
+    }
+    return callable.call();
+  }
+
+  Optional<Cache<String, TBase>> initializeCache(boolean tableCacheOn) {
+    if (tableCacheOn) {
+      metaCache = Optional.of(CacheBuilder.newBuilder().softValues().build());
+    }
+    return metaCache;
+  }
+
+  void invalidateMetaCache(){
+    metaCache.ifPresent(Cache::invalidateAll);
   }
 }
