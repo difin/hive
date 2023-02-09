@@ -1,7 +1,7 @@
 CBO PLAN:
 HiveProject(i_category=[$0], i_brand=[$1], d_year=[CAST(2000):INTEGER], d_moy=[$2], avg_monthly_sales=[$3], sum_sales=[$4], psum=[$5], nsum=[$6])
   HiveSortLimit(sort0=[$7], dir0=[ASC], fetch=[100])
-    HiveProject(i_category=[$10], i_brand=[$11], d_moy=[$13], avg_monthly_sales=[$15], sum_sales=[$14], psum=[$8], nsum=[$3], (- (tok_table_or_col sum_sales) (tok_table_or_col avg_monthly_sales))=[-($14, $15)])
+    HiveProject(i_category=[$10], i_brand=[$11], d_moy=[$13], avg_monthly_sales=[$15], sum_sales=[$14], psum=[$8], nsum=[$3], (- (tok_table_or_col sum_sales) (tok_table_or_col avg_monthly_sales))1=[-($14, $15)])
       HiveJoin(condition=[AND(=($10, $0), =($11, $1), =($12, $2), =($16, $4))], joinType=[inner])
         HiveProject((tok_table_or_col i_category)=[$0], (tok_table_or_col i_brand)=[$1], (tok_table_or_col cc_name)=[$2], (tok_function sum (tok_table_or_col cs_sales_price))=[$3], EXPR$0=[-($4, 1)])
           HiveFilter(condition=[IS NOT NULL($4)])

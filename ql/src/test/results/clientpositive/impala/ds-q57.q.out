@@ -110,7 +110,7 @@ POSTHOOK: Input: default@impala_tpcds_item
 CBO PLAN:
 ImpalaProjectPassthroughRel(i_category=[$0], i_brand=[$1], d_year=[CAST(1999):INTEGER], d_moy=[$2], avg_monthly_sales=[$3], sum_sales=[$4], psum=[$5], nsum=[$6])
   ImpalaSortRel(sort0=[$7], sort1=[$3], dir0=[ASC], dir1=[ASC], fetch=[100])
-    ImpalaProjectRel(i_category=[$0], i_brand=[$1], d_moy=[$3], avg_monthly_sales=[$5], sum_sales=[$4], psum=[$10], nsum=[$15], (- (tok_table_or_col sum_sales) (tok_table_or_col avg_monthly_sales))=[-($4, $5)])
+    ImpalaProjectRel(i_category=[$0], i_brand=[$1], d_moy=[$3], avg_monthly_sales=[$5], sum_sales=[$4], psum=[$10], nsum=[$15], (- (tok_table_or_col sum_sales) (tok_table_or_col avg_monthly_sales))1=[-($4, $5)])
       ImpalaJoinRel(condition=[AND(=($0, $12), =($1, $13), =($2, $14), =($6, $16))], joinType=[inner])
         ImpalaJoinRel(condition=[AND(=($0, $7), =($1, $8), =($2, $9), =($6, $11))], joinType=[inner])
           ImpalaProjectPassthroughRel((tok_table_or_col i_category)=[$0], (tok_table_or_col i_brand)=[$1], (tok_table_or_col cc_name)=[$2], (tok_table_or_col d_moy)=[$4], (tok_function sum (tok_table_or_col cs_sales_price))=[$5], avg_window_0=[$6], rank_window_1=[$7])
