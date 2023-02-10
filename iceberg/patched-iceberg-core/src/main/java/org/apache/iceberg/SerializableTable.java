@@ -66,6 +66,7 @@ public class SerializableTable implements Table, Serializable {
   private transient volatile Schema lazySchema = null;
   private transient volatile Map<Integer, PartitionSpec> lazySpecs = null;
   private transient volatile SortOrder lazySortOrder = null;
+  private final Map<String, SnapshotRef> refs;
 
   protected SerializableTable(Table table) {
     this.name = table.name();
@@ -81,6 +82,7 @@ public class SerializableTable implements Table, Serializable {
     this.io = fileIO(table);
     this.encryption = table.encryption();
     this.locationProvider = table.locationProvider();
+    this.refs = SerializableMap.copyOf(table.refs());
   }
 
   /**
@@ -233,6 +235,16 @@ public class SerializableTable implements Table, Serializable {
   }
 
   @Override
+  public List<StatisticsFile> statisticsFiles() {
+    return lazyTable().statisticsFiles();
+  }
+
+  @Override
+  public Map<String, SnapshotRef> refs() {
+    return refs;
+  }
+
+  @Override
   public void refresh() {
     throw new UnsupportedOperationException(errorMsg("refresh"));
   }
@@ -330,11 +342,6 @@ public class SerializableTable implements Table, Serializable {
   @Override
   public ExpireSnapshots expireSnapshots() {
     throw new UnsupportedOperationException(errorMsg("expireSnapshots"));
-  }
-
-  @Override
-  public Rollback rollback() {
-    throw new UnsupportedOperationException(errorMsg("rollback"));
   }
 
   @Override
