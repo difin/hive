@@ -217,6 +217,11 @@
       <version>${commons-lang.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.github.luben</groupId>
+      <artifactId>zstd-jni</artifactId>
+      <version>${zstd-jni.version}</version>
+    </dependency>
+    <dependency>
       <groupId>javolution</groupId>
       <artifactId>javolution</artifactId>
     </dependency>
@@ -823,6 +828,10 @@
           <groupId>org.apache.shiro</groupId>
           <artifactId>shiro-crypto-cipher</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>com.github.luben</groupId>
+          <artifactId>zstd-jni</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -1097,6 +1106,7 @@
                   <include>joda-time:joda-time</include>
                   <include>com.google.re2j:re2j</include>
                   <include>io.netty:*</include>
+                  <include>com.github.luben:zstd-jni</include>
                    <!-- some netty-based classes are included in arrow jars with original
                   io.netty package name (e.g. io.netty.buffer.ArrowBuf in arrow-memory)
                   so we should include them in the shaded jars in order to make shade plugin
