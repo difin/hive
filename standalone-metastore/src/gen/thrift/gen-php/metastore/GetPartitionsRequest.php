@@ -229,13 +229,13 @@ class GetPartitionsRequest
                 case 6:
                     if ($ftype == TType::LST) {
                         $this->groupNames = array();
-                        $_size1163 = 0;
-                        $_etype1166 = 0;
-                        $xfer += $input->readListBegin($_etype1166, $_size1163);
-                        for ($_i1167 = 0; $_i1167 < $_size1163; ++$_i1167) {
-                            $elem1168 = null;
-                            $xfer += $input->readString($elem1168);
-                            $this->groupNames []= $elem1168;
+                        $_size1184 = 0;
+                        $_etype1187 = 0;
+                        $xfer += $input->readListBegin($_etype1187, $_size1184);
+                        for ($_i1188 = 0; $_i1188 < $_size1184; ++$_i1188) {
+                            $elem1189 = null;
+                            $xfer += $input->readString($elem1189);
+                            $this->groupNames []= $elem1189;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -261,13 +261,13 @@ class GetPartitionsRequest
                 case 9:
                     if ($ftype == TType::LST) {
                         $this->processorCapabilities = array();
-                        $_size1169 = 0;
-                        $_etype1172 = 0;
-                        $xfer += $input->readListBegin($_etype1172, $_size1169);
-                        for ($_i1173 = 0; $_i1173 < $_size1169; ++$_i1173) {
-                            $elem1174 = null;
-                            $xfer += $input->readString($elem1174);
-                            $this->processorCapabilities []= $elem1174;
+                        $_size1190 = 0;
+                        $_etype1193 = 0;
+                        $xfer += $input->readListBegin($_etype1193, $_size1190);
+                        for ($_i1194 = 0; $_i1194 < $_size1190; ++$_i1194) {
+                            $elem1195 = null;
+                            $xfer += $input->readString($elem1195);
+                            $this->processorCapabilities []= $elem1195;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -333,8 +333,8 @@ class GetPartitionsRequest
             }
             $xfer += $output->writeFieldBegin('groupNames', TType::LST, 6);
             $output->writeListBegin(TType::STRING, count($this->groupNames));
-            foreach ($this->groupNames as $iter1175) {
-                $xfer += $output->writeString($iter1175);
+            foreach ($this->groupNames as $iter1196) {
+                $xfer += $output->writeString($iter1196);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -361,8 +361,8 @@ class GetPartitionsRequest
             }
             $xfer += $output->writeFieldBegin('processorCapabilities', TType::LST, 9);
             $output->writeListBegin(TType::STRING, count($this->processorCapabilities));
-            foreach ($this->processorCapabilities as $iter1176) {
-                $xfer += $output->writeString($iter1176);
+            foreach ($this->processorCapabilities as $iter1197) {
+                $xfer += $output->writeString($iter1197);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

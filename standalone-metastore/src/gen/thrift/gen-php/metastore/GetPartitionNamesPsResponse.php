@@ -68,13 +68,13 @@ class GetPartitionNamesPsResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->names = array();
-                        $_size1212 = 0;
-                        $_etype1215 = 0;
-                        $xfer += $input->readListBegin($_etype1215, $_size1212);
-                        for ($_i1216 = 0; $_i1216 < $_size1212; ++$_i1216) {
-                            $elem1217 = null;
-                            $xfer += $input->readString($elem1217);
-                            $this->names []= $elem1217;
+                        $_size1233 = 0;
+                        $_etype1236 = 0;
+                        $xfer += $input->readListBegin($_etype1236, $_size1233);
+                        for ($_i1237 = 0; $_i1237 < $_size1233; ++$_i1237) {
+                            $elem1238 = null;
+                            $xfer += $input->readString($elem1238);
+                            $this->names []= $elem1238;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -101,8 +101,8 @@ class GetPartitionNamesPsResponse
             }
             $xfer += $output->writeFieldBegin('names', TType::LST, 1);
             $output->writeListBegin(TType::STRING, count($this->names));
-            foreach ($this->names as $iter1218) {
-                $xfer += $output->writeString($iter1218);
+            foreach ($this->names as $iter1239) {
+                $xfer += $output->writeString($iter1239);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

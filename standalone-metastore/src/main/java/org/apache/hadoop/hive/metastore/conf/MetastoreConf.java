@@ -1062,6 +1062,12 @@ public class MetastoreConf {
         "When used in conjunction with the org.apache.hadoop.hive.ql.parse.MetaDataExportListener pre event listener, \n" +
             "it is the location to which the metadata will be exported. The default is an empty string, which results in the \n" +
             "metadata being exported to the current user's home directory on HDFS."),
+    METASTORE_CLIENT_FIELD_SCHEMA_FOR_PARTITIONS("metastore.client.skip.columns.for.partitions",
+            "hive.metastore.client.skip.columns.for.partitions", false,
+            "Config to disable field schema for partitions. Currently all the partitions in a \n"
+                    + "table carries the field schema that is same as that of table schema. For a table with \n"
+                    + "wider partitions fetching duplicated field schema in every partition increases memory footprint\n"
+                    + "and thrift communication timeout errors. Set this config to 'true' to ignore column schema in partitions."),
     METASTORE_CLIENT_FILTER_ENABLED("metastore.client.filter.enabled", "hive.metastore.client.filter.enabled", true,
         "Enable filtering the metadata read results at HMS client. Default is true."),
     METASTORE_SERVER_FILTER_ENABLED("metastore.server.filter.enabled", "hive.metastore.server.filter.enabled", false,

@@ -4464,8 +4464,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     }
 
     private List<Partition> add_partitions_core(final RawStore ms, String catName,
-        String dbName, String tblName, List<Partition> parts, final boolean ifNotExists)
-        throws TException {
+        String dbName, String tblName, List<Partition> parts, final boolean ifNotExists,
+        boolean isSkipColSchemaForPartition) throws TException {
       logInfo("add_partitions");
       boolean success = false;
       // Ensures that the list doesn't have dups, and keeps track of directories we have created.
@@ -4500,6 +4500,9 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         List<Partition> partitionsToAdd = new ArrayList<>(parts.size());
         List<FieldSchema> partitionKeys = tbl.getPartitionKeys();
         for (final Partition part : parts) {
+          if(isSkipColSchemaForPartition) {
+            part.getSd().setCols(tbl.getSd().getCols());
+          }
           // Iterate through the partitions and validate them. If one of the partitions is
           // incorrect, an exception will be thrown before the threads which create the partition
           // folders are submitted. This way we can be sure that no partition and no partition
@@ -4754,6 +4757,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     @Override
     public AddPartitionsResult add_partitions_req(AddPartitionsRequest request)
         throws TException {
+      startFunction("add_partitions_req", ": db=" + request.getDbName() + " tab=" + request.getTblName());
       AddPartitionsResult result = new AddPartitionsResult();
       if (request.getParts().isEmpty()) {
         return result;
@@ -4762,6 +4766,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         if (!request.isSetCatName()) {
           request.setCatName(getDefaultCatalog(conf));
         }
+        boolean isColSkippedForPartitions = request.isSkipColumnSchemaForPartition();
         // Make sure all of the partitions have the catalog set as well
         request.getParts().forEach(p -> {
           if (!p.isSetCatName()) {
@@ -4769,14 +4774,23 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           }
         });
         List<Partition> parts = add_partitions_core(getMS(), request.getCatName(), request.getDbName(),
-            request.getTblName(), request.getParts(), request.isIfNotExists());
+            request.getTblName(), request.getParts(), request.isIfNotExists(), request.isSkipColumnSchemaForPartition());
         if (request.isNeedResult()) {
+          if (isColSkippedForPartitions) {
+            if (!parts.isEmpty()) {
+              StorageDescriptor sd = parts.get(0).getSd().deepCopy();
+              result.setPartitionColSchema(sd.getCols());
+            }
+            parts.stream().forEach(partition -> partition.getSd().getCols().clear());
+          }
           result.setPartitions(parts);
         }
       } catch (TException te) {
         throw te;
       } catch (Exception e) {
         throw newMetaException(e);
+      } finally {
+        endFunction("add_partitions_req", true, null, request.getTblName());
       }
       return result;
     }
@@ -4803,7 +4817,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           }
         }
         ret = add_partitions_core(getMS(), parts.get(0).getCatName(), parts.get(0).getDbName(),
-            parts.get(0).getTableName(), parts, false).size();
+            parts.get(0).getTableName(), parts, false, false).size();
         assert ret == parts.size();
       } catch (Exception e) {
         ex = e;
@@ -5536,8 +5550,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           for (DropPartitionsExpr expr : spec.getExprs()) {
             ++minCount; // At least one partition per expression, if not ifExists
             List<Partition> result = new ArrayList<>();
-            boolean hasUnknown = ms.getPartitionsByExpr(
-                catName, dbName, tblName, expr.getExpr(), null, (short)-1, result);
+            boolean hasUnknown = ms.getPartitionsByExpr(catName, dbName, tblName, expr.getExpr(), null,
+                    (short)-1, result, request.isSkipColumnSchemaForPartition());
             if (hasUnknown) {
               // Expr is built by DDLSA, it should only contain part cols and simple ops
               throw new MetaException("Unexpected unknown partitions to drop");
@@ -5558,7 +5572,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         } else if (spec.isSetNames()) {
           partNames = spec.getNames();
           minCount = partNames.size();
-          parts = ms.getPartitionsByNames(catName, dbName, tblName, partNames);
+          parts = ms.getPartitionsByNames(catName, dbName, tblName, partNames, request.isSkipColumnSchemaForPartition());
         } else {
           throw new MetaException("Partition spec is not set");
         }
@@ -5825,6 +5839,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     @Deprecated
     public List<Partition> get_partitions(final String db_name, final String tbl_name,
         final short max_parts) throws NoSuchObjectException, MetaException {
+      return get_partitions(db_name, tbl_name, max_parts, false);
+
+    }
+
+    private List<Partition> get_partitions(final String db_name, final String tbl_name,
+        final short max_parts, boolean skipColumnSchemaForPartition) throws NoSuchObjectException, MetaException {
       String[] parsedDbName = parseDbName(db_name, conf);
       startTableFunction("get_partitions", parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tbl_name);
       List<Partition> ret = null;
@@ -5836,7 +5856,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         fireReadTablePreEvent(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tbl_name);
 
         ret = getMS().getPartitions(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tbl_name,
-            max_parts);
+                max_parts, skipColumnSchemaForPartition);
         ret = FilterUtils.filterPartitionsIfEnabled(isServerFilterEnabled, filterHook, ret);
       } catch (Exception e) {
         ex = e;
@@ -5852,7 +5872,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public PartitionsResponse get_partitions_req(PartitionsRequest req)
         throws NoSuchObjectException, MetaException, TException {
       String dbName = MetaStoreUtils.prependCatalogToDbName(req.getCatName(), req.getDbName(), conf);
-      List<Partition> partitions = get_partitions(dbName, req.getTblName(), req.getMaxParts());
+      List<Partition> partitions = get_partitions(dbName, req.getTblName(), req.getMaxParts(),
+              req.isSkipColumnSchemaForPartition());
       PartitionsResponse res = new PartitionsResponse();
       res.setPartitions(partitions);
       return res;
@@ -5863,6 +5884,13 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public List<Partition> get_partitions_with_auth(final String dbName,
         final String tblName, final short maxParts, final String userName,
         final List<String> groupNames) throws TException {
+      return get_partitions_with_auth_optional_schema(dbName, tblName, maxParts, userName, groupNames , false);
+
+    }
+
+    private List<Partition> get_partitions_with_auth_optional_schema(final String dbName,
+             final String tblName, final short maxParts, final String userName,
+             final List<String> groupNames, boolean skipColSchemaForPartitions) throws TException {
       String[] parsedDbName = parseDbName(dbName, conf);
       startTableFunction("get_partitions_with_auth", parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tblName);
       List<Partition> ret = null;
@@ -5873,7 +5901,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             tblName, NO_FILTER_STRING, maxParts);
 
         ret = getMS().getPartitionsWithAuth(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tblName,
-            maxParts, userName, groupNames);
+                maxParts, userName, groupNames, skipColSchemaForPartitions);
         ret = FilterUtils.filterPartitionsIfEnabled(isServerFilterEnabled, filterHook, ret);
       } catch (InvalidObjectException e) {
         ex = e;
@@ -5885,7 +5913,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         endFunction("get_partitions_with_auth", ret != null, ex, tblName);
       }
       return ret;
-
     }
 
     private void checkLimitNumberOfPartitionsByFilter(String catName, String dbName,
@@ -6243,6 +6270,9 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           // Make sure the catalog name is set in the new partition
           if (!tmpPart.isSetCatName()) {
             tmpPart.setCatName(getDefaultCatalog(conf));
+          }
+          if (tmpPart.getSd() != null && tmpPart.getSd().getCols() != null && tmpPart.getSd().getCols().isEmpty()) {
+            tmpPart.getSd().setCols(table.getSd().getCols());
           }
           firePreEvent(new PreAlterPartitionEvent(db_name, tbl_name, table, null, tmpPart, this));
         }
@@ -7004,9 +7034,17 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         final String tbl_name, final List<String> part_vals,
         final short max_parts, final String userName,
         final List<String> groupNames) throws TException {
+
+      return get_partitions_ps_with_auth(db_name, tbl_name, part_vals, max_parts, userName, groupNames, false);
+    }
+
+    private List<Partition> get_partitions_ps_with_auth(final String db_name,
+        final String tbl_name, final List<String> part_vals,
+        final short max_parts, final String userName,
+        final List<String> groupNames, boolean skipColSchemaForPartitions) throws TException {
       String[] parsedDbName = parseDbName(db_name, conf);
       startPartitionFunction("get_partitions_ps_with_auth", parsedDbName[CAT_NAME],
-          parsedDbName[DB_NAME], tbl_name, part_vals);
+              parsedDbName[DB_NAME], tbl_name, part_vals);
       List<Partition> ret = null;
       Exception ex = null;
       try {
@@ -7014,7 +7052,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
                 tbl_name, part_vals, max_parts);
         fireReadTablePreEvent(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tbl_name);
         ret = getMS().listPartitionsPsWithAuth(parsedDbName[CAT_NAME], parsedDbName[DB_NAME],
-            tbl_name, part_vals, max_parts, userName, groupNames);
+                tbl_name, part_vals, max_parts, userName, groupNames, skipColSchemaForPartitions);
         ret = FilterUtils.filterPartitionsIfEnabled(isServerFilterEnabled, filterHook, ret);
       } catch (InvalidObjectException e) {
         ex = e;
@@ -7034,12 +7072,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       String dbName = MetaStoreUtils.prependCatalogToDbName(req.getCatName(), req.getDbName(), conf);
       List<Partition> partitions = null;
       if (req.getPartVals() == null) {
-        partitions = get_partitions_with_auth(dbName, req.getTblName(), req.getMaxParts(), req.getUserName(),
-            req.getGroupNames());
+        partitions = get_partitions_with_auth_optional_schema(dbName, req.getTblName(), req.getMaxParts(), req.getUserName(),
+            req.getGroupNames(), req.isSkipColumnSchemaForPartition());
       } else {
         partitions =
             get_partitions_ps_with_auth(dbName, req.getTblName(), req.getPartVals(), req.getMaxParts(),
-                req.getUserName(), req.getGroupNames());
+                req.getUserName(), req.getGroupNames(), req.isSkipColumnSchemaForPartition());
       }
       GetPartitionsPsWithAuthResponse res = new GetPartitionsPsWithAuthResponse();
       res.setPartitions(partitions);
@@ -7595,17 +7633,23 @@ public class HiveMetaStore extends ThriftHiveMetastore {
                                                     final String filter, final short maxParts)
         throws TException {
       String[] parsedDbName = parseDbName(dbName, conf);
-      startTableFunction("get_partitions_by_filter", parsedDbName[CAT_NAME], parsedDbName[DB_NAME],
-          tblName);
+      return get_partitions_by_filter_internal(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tblName, filter, maxParts, false);
+    }
+
+    private List<Partition> get_partitions_by_filter_internal(final String catName, final String dbName, final String tblName,
+                                                    final String filter, final short maxParts, boolean skipColSchemaForPartitions)
+            throws TException {
+      startTableFunction("get_partitions_by_filter", catName, dbName,
+              tblName);
       List<Partition> ret = null;
       Exception ex = null;
       try {
-        fireReadTablePreEvent(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tblName);
-        checkLimitNumberOfPartitionsByFilter(parsedDbName[CAT_NAME], parsedDbName[DB_NAME],
-            tblName, filter, maxParts);
+        fireReadTablePreEvent(catName, dbName, tblName);
+        checkLimitNumberOfPartitionsByFilter(catName, dbName,
+                tblName, filter, maxParts);
 
-        ret = getMS().getPartitionsByFilter(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tblName,
-            filter, maxParts);
+        ret = getMS().getPartitionsByFilter(catName, dbName, tblName,
+                filter, maxParts, skipColSchemaForPartitions);
         ret = FilterUtils.filterPartitionsIfEnabled(isServerFilterEnabled, filterHook, ret);
       } catch (Exception e) {
         ex = e;
@@ -7616,6 +7660,10 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       return ret;
     }
 
+    public List<Partition> get_partitions_by_filter_req(GetPartitionsByFilterRequest req) throws TException {
+      return get_partitions_by_filter_internal(req.getCatName(), req.getDbName(), req.getTblName(), req.getFilter(),
+              req.getMaxParts(), req.isSkipColumnSchemaForPartition());
+    }
     @Override
     @Deprecated
     public List<PartitionSpec> get_part_specs_by_filter(final String dbName, final String tblName,
@@ -7664,7 +7712,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         checkLimitNumberOfPartitionsByExpr(catName, dbName, tblName, req.getExpr(), UNLIMITED_MAX_PARTITIONS);
         List<Partition> partitions = new LinkedList<>();
         boolean hasUnknownPartitions = getMS().getPartitionsByExpr(catName, dbName, tblName,
-            req.getExpr(), req.getDefaultPartitionName(), req.getMaxParts(), partitions);
+            req.getExpr(), req.getDefaultPartitionName(), req.getMaxParts(), partitions, req.isSkipColumnSchemaForPartition());
         ret = new PartitionsByExprResult(partitions, hasUnknownPartitions);
       } catch (Exception e) {
         ex = e;
@@ -7755,7 +7803,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public List<Partition> get_partitions_by_names(final String dbName, final String tblName,
                                                    final List<String> partNames)
             throws TException {
-      return get_partitions_by_names(dbName, tblName, partNames, false, null, null);
+      return get_partitions_by_names(dbName, tblName, partNames, false, null, null, false);
     }
 
     @Override
@@ -7764,20 +7812,23 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       List<Partition> partitions = get_partitions_by_names(gpbnr.getDb_name(),
               gpbnr.getTbl_name(), gpbnr.getNames(),
               gpbnr.isSetGet_col_stats() && gpbnr.isGet_col_stats(), gpbnr.getEngine(),
-              gpbnr.getProcessorCapabilities(), gpbnr.getProcessorIdentifier());
-      return new GetPartitionsByNamesResult(partitions);
+              gpbnr.getProcessorCapabilities(), gpbnr.getProcessorIdentifier(), gpbnr.isSkipColumnSchemaForPartition());
+      GetPartitionsByNamesResult result = new GetPartitionsByNamesResult(partitions);
+      return result;
     }
 
+
     public List<Partition> get_partitions_by_names(final String dbName, final String tblName,
-           final List<String> partNames, boolean getColStats, String engine, String validWriteIdList)
-        throws TException {
+           final List<String> partNames, boolean getColStats, String engine, String validWriteIdList,
+           boolean skipColSchemaForPartitions) throws TException {
       return get_partitions_by_names(
-          dbName, tblName, partNames, getColStats, engine, null, null);
+          dbName, tblName, partNames, getColStats, engine, null, null, skipColSchemaForPartitions);
     }
 
     public List<Partition> get_partitions_by_names(final String dbName, final String tblName,
-           final List<String> partNames, boolean getColStats, String engine,
-           List<String> processorCapabilities, String processorId) throws TException {
+        final List<String> partNames, boolean getColStats, String engine,
+        List<String> processorCapabilities, String processorId,
+        boolean skipColSchemaForPartitions) throws TException {
 
       String[] dbNameParts = parseDbName(dbName, conf);
       String parsedCatName = dbNameParts[CAT_NAME];
@@ -7796,7 +7847,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
         getMS().openTransaction();
 
-        ret = getMS().getPartitionsByNames(parsedCatName, parsedDbName, tblName, partNames);
+        ret = getMS().getPartitionsByNames(parsedCatName, parsedDbName, tblName, partNames, skipColSchemaForPartitions);
         table = getTable(parsedCatName, parsedDbName, tblName);
 
         // If requested add column statistics in each of the partition objects

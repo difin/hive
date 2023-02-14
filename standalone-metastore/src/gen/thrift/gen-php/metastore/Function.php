@@ -216,14 +216,14 @@ class Function
                 case 8:
                     if ($ftype == TType::LST) {
                         $this->resourceUris = array();
-                        $_size612 = 0;
-                        $_etype615 = 0;
-                        $xfer += $input->readListBegin($_etype615, $_size612);
-                        for ($_i616 = 0; $_i616 < $_size612; ++$_i616) {
-                            $elem617 = null;
-                            $elem617 = new \metastore\ResourceUri();
-                            $xfer += $elem617->read($input);
-                            $this->resourceUris []= $elem617;
+                        $_size626 = 0;
+                        $_etype629 = 0;
+                        $xfer += $input->readListBegin($_etype629, $_size626);
+                        for ($_i630 = 0; $_i630 < $_size626; ++$_i630) {
+                            $elem631 = null;
+                            $elem631 = new \metastore\ResourceUri();
+                            $xfer += $elem631->read($input);
+                            $this->resourceUris []= $elem631;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -292,8 +292,8 @@ class Function
             }
             $xfer += $output->writeFieldBegin('resourceUris', TType::LST, 8);
             $output->writeListBegin(TType::STRUCT, count($this->resourceUris));
-            foreach ($this->resourceUris as $iter618) {
-                $xfer += $iter618->write($output);
+            foreach ($this->resourceUris as $iter632) {
+                $xfer += $iter632->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

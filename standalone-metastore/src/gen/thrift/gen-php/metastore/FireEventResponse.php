@@ -68,13 +68,13 @@ class FireEventResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->eventIds = array();
-                        $_size849 = 0;
-                        $_etype852 = 0;
-                        $xfer += $input->readListBegin($_etype852, $_size849);
-                        for ($_i853 = 0; $_i853 < $_size849; ++$_i853) {
-                            $elem854 = null;
-                            $xfer += $input->readI64($elem854);
-                            $this->eventIds []= $elem854;
+                        $_size863 = 0;
+                        $_etype866 = 0;
+                        $xfer += $input->readListBegin($_etype866, $_size863);
+                        for ($_i867 = 0; $_i867 < $_size863; ++$_i867) {
+                            $elem868 = null;
+                            $xfer += $input->readI64($elem868);
+                            $this->eventIds []= $elem868;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -101,8 +101,8 @@ class FireEventResponse
             }
             $xfer += $output->writeFieldBegin('eventIds', TType::LST, 1);
             $output->writeListBegin(TType::I64, count($this->eventIds));
-            foreach ($this->eventIds as $iter855) {
-                $xfer += $output->writeI64($iter855);
+            foreach ($this->eventIds as $iter869) {
+                $xfer += $output->writeI64($iter869);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

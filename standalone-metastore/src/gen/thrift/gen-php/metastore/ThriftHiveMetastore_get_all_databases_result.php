@@ -81,13 +81,13 @@ class ThriftHiveMetastore_get_all_databases_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
-                        $_size1295 = 0;
-                        $_etype1298 = 0;
-                        $xfer += $input->readListBegin($_etype1298, $_size1295);
-                        for ($_i1299 = 0; $_i1299 < $_size1295; ++$_i1299) {
-                            $elem1300 = null;
-                            $xfer += $input->readString($elem1300);
-                            $this->success []= $elem1300;
+                        $_size1316 = 0;
+                        $_etype1319 = 0;
+                        $xfer += $input->readListBegin($_etype1319, $_size1316);
+                        for ($_i1320 = 0; $_i1320 < $_size1316; ++$_i1320) {
+                            $elem1321 = null;
+                            $xfer += $input->readString($elem1321);
+                            $this->success []= $elem1321;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -122,8 +122,8 @@ class ThriftHiveMetastore_get_all_databases_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRING, count($this->success));
-            foreach ($this->success as $iter1301) {
-                $xfer += $output->writeString($iter1301);
+            foreach ($this->success as $iter1322) {
+                $xfer += $output->writeString($iter1322);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
