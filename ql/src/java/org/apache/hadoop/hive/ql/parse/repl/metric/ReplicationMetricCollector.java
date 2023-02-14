@@ -19,6 +19,7 @@ package org.apache.hadoop.hive.ql.parse.repl.metric;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.AtomicDouble;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.utils.StringUtils;
@@ -53,12 +54,14 @@ public abstract class ReplicationMetricCollector {
   private HiveConf conf;
 
   private static final Logger LOG = LoggerFactory.getLogger(ReplicationMetricCollector.class);
-  
+
   public void setMetricsMBean(ObjectName metricsMBean) {
     this.metricsMBean = metricsMBean;
   }
 
   private ObjectName metricsMBean;
+
+  private AtomicDouble sizeOfDataReplicatedInKB = new AtomicDouble(0);
 
   public ReplicationMetricCollector(String dbName, Metadata.ReplicationType replicationType,
                              String stagingDir, long dumpExecutionId, HiveConf conf) {
@@ -73,6 +76,10 @@ public abstract class ReplicationMetricCollector {
       Metadata metadata = new Metadata(dbName, replicationType, getStagingDir(stagingDir));
       replicationMetric = new ReplicationMetric(executionId, policy, dumpExecutionId, metadata);
     }
+  }
+
+  public void incrementSizeOfDataReplicated(long bytesCount) {
+    sizeOfDataReplicatedInKB.addAndGet((double)bytesCount/1024);
   }
 
   public void reportStageStart(String stageName, Map<String, Long> metricMap) throws SemanticException {
@@ -132,6 +139,7 @@ public abstract class ReplicationMetricCollector {
       replicationMetric.setProgress(progress);
       Metadata metadata = replicationMetric.getMetadata();
       metadata.setLastReplId(lastReplId);
+      metadata.setReplicatedDBSizeInKB(sizeOfDataReplicatedInKB.get());
       replicationMetric.setMetadata(metadata);
       metricCollector.addMetric(replicationMetric);
       if (Status.FAILED == status || Status.FAILED_ADMIN == status) {
@@ -176,6 +184,8 @@ public abstract class ReplicationMetricCollector {
       stage.setEndTime(getCurrentTimeInMillis());
       progress.addStage(stage);
       replicationMetric.setProgress(progress);
+      Metadata metadata = replicationMetric.getMetadata();
+      metadata.setReplicatedDBSizeInKB(sizeOfDataReplicatedInKB.get());
       metricCollector.addMetric(replicationMetric);
       if (Status.FAILED == status || Status.FAILED_ADMIN == status) {
         reportEnd(status);

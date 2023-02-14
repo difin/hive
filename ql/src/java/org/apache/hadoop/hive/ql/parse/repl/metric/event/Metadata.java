@@ -30,6 +30,7 @@ public class Metadata {
   }
   private String dbName;
   private ReplicationType replicationType;
+  private double replicatedDBSizeInKB;
   private String stagingDir;
   private long lastReplId;
   private String failoverMetadataLoc;
@@ -42,6 +43,7 @@ public class Metadata {
   public Metadata(Metadata metadata) {
     this.dbName = metadata.dbName;
     this.replicationType = metadata.replicationType;
+    this.replicatedDBSizeInKB = metadata.replicatedDBSizeInKB;
     this.stagingDir = metadata.stagingDir;
     this.lastReplId = metadata.lastReplId;
     this.failoverMetadataLoc = metadata.failoverMetadataLoc;
@@ -72,6 +74,14 @@ public class Metadata {
 
   public void setLastReplId(long lastReplId) {
     this.lastReplId = lastReplId;
+  }
+
+  public double getReplicatedDBSizeInKB() {
+    return replicatedDBSizeInKB;
+  }
+
+  public void setReplicatedDBSizeInKB(double size) {
+    this.replicatedDBSizeInKB = size;
   }
 
   public String getFailoverMetadataLoc() {

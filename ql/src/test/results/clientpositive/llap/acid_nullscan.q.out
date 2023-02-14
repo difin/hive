@@ -74,9 +74,9 @@ STAGE PLANS:
                         Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                         Reduce Output Operator
                           bucketingVersion: 2
-                          null sort order: 
+                          null sort order:
                           numBuckets: -1
-                          sort order: 
+                          sort order:
                           Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                           tag: -1
                           value expressions: _col0 (type: bigint)
@@ -86,7 +86,7 @@ STAGE PLANS:
             Path -> Alias:
               nullscan://null/_dummy_database._dummy_table/part_ [_dummy_table]
             Path -> Partition:
-              nullscan://null/_dummy_database._dummy_table/part_ 
+              nullscan://null/_dummy_database._dummy_table/part_
                 Partition
                   input format: org.apache.hadoop.hive.ql.io.OneNullRowInputFormat
                   output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
@@ -94,10 +94,11 @@ STAGE PLANS:
                     bucket_count -1
                     bucketing_version 2
                     column.name.delimiter ,
-                    columns 
-                    columns.types 
+                    columns
+                    columns.types
 #### A masked pattern was here ####
                     name _dummy_database._dummy_table
+                    serialization.ddl struct _dummy_table { }
                     serialization.format 1
                     serialization.lib org.apache.hadoop.hive.serde2.NullStructSerDe
                   serde: org.apache.hadoop.hive.serde2.NullStructSerDe
@@ -107,11 +108,12 @@ STAGE PLANS:
                     properties:
                       bucketing_version 2
                       column.name.delimiter ,
-                      columns 
+                      columns
                       columns.comments 
-                      columns.types 
+                      columns.types
 #### A masked pattern was here ####
                       name _dummy_database._dummy_table
+                      serialization.ddl struct _dummy_table { }
                       serialization.format 1
                       serialization.lib org.apache.hadoop.hive.serde2.NullStructSerDe
                     serde: org.apache.hadoop.hive.serde2.NullStructSerDe
