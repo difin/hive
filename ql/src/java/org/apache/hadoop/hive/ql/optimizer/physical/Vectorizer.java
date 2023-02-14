@@ -40,7 +40,8 @@ import java.util.Stack;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.ArrayUtils;
+import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedInputFormatInterface;
@@ -4392,6 +4393,7 @@ public class Vectorizer implements PhysicalPlanResolver {
     return false;
   }
 
+  @VisibleForTesting
   public static Operator<? extends OperatorDesc> vectorizeFilterOperator(
       Operator<? extends OperatorDesc> filterOp, VectorizationContext vContext,
       VectorFilterDesc vectorFilterDesc)
@@ -4412,9 +4414,10 @@ public class Vectorizer implements PhysicalPlanResolver {
         vContext, vectorFilterDesc);
   }
 
-  private static Operator<? extends OperatorDesc> vectorizeTopNKeyOperator(
-      Operator<? extends OperatorDesc> topNKeyOperator, VectorizationContext vContext,
-      VectorTopNKeyDesc vectorTopNKeyDesc) throws HiveException {
+  @VisibleForTesting
+  public static Operator<? extends OperatorDesc> vectorizeTopNKeyOperator(
+          Operator<? extends OperatorDesc> topNKeyOperator, VectorizationContext vContext,
+          VectorTopNKeyDesc vectorTopNKeyDesc) throws HiveException {
 
     TopNKeyDesc topNKeyDesc = (TopNKeyDesc) topNKeyOperator.getConf();
     VectorExpression[] keyExpressions = getVectorExpressions(vContext, topNKeyDesc.getKeyColumns());
