@@ -63,6 +63,7 @@ import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
 import org.apache.hadoop.hive.metastore.api.LockType;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
+import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.Context.Operation;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.QueryState;
@@ -1061,7 +1062,6 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   // TODO: remove the checks as copy-on-write mode implementation for these DML ops get added
   private static void checkDMLOperationMode(org.apache.hadoop.hive.ql.metadata.Table table) {
     Map<String, String> opTypes = ImmutableMap.of(
-        TableProperties.DELETE_MODE, TableProperties.DELETE_MODE_DEFAULT,
         TableProperties.MERGE_MODE, TableProperties.MERGE_MODE_DEFAULT,
         TableProperties.UPDATE_MODE, TableProperties.UPDATE_MODE_DEFAULT);
 
@@ -1567,9 +1567,9 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
     String formatVersion = origParams.get(TableProperties.FORMAT_VERSION);
     if ("2".equals(formatVersion)) {
       tbl.getParameters().put(TableProperties.FORMAT_VERSION, formatVersion);
-      tbl.getParameters().put(TableProperties.DELETE_MODE, "merge-on-read");
-      tbl.getParameters().put(TableProperties.UPDATE_MODE, "merge-on-read");
-      tbl.getParameters().put(TableProperties.MERGE_MODE, "merge-on-read");
+      tbl.getParameters().put(TableProperties.DELETE_MODE, MERGE_ON_READ);
+      tbl.getParameters().put(TableProperties.UPDATE_MODE, MERGE_ON_READ);
+      tbl.getParameters().put(TableProperties.MERGE_MODE, MERGE_ON_READ);
     }
 
     // check if the table is being created as managed table, in that case we translate it to external
@@ -1601,6 +1601,18 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
     props.put(InputFormatConfig.TABLE_SCHEMA, SchemaParser.toJson(origTable.schema()));
     props.put(InputFormatConfig.PARTITION_SPEC, PartitionSpecParser.toJson(origTable.spec()));
     return props;
+  }
+
+  @Override
+  public boolean shouldOverwrite(org.apache.hadoop.hive.ql.metadata.Table mTable, String operationName) {
+    String mode = null;
+    String formatVersion = mTable.getTTable().getParameters().get(TableProperties.FORMAT_VERSION);
+    // As of now only delete mode is supported, for all others return false
+    if ("2".equals(formatVersion) && operationName.equalsIgnoreCase(Context.Operation.DELETE.toString())) {
+      mode = mTable.getTTable().getParameters()
+          .getOrDefault(TableProperties.DELETE_MODE, TableProperties.DELETE_MODE_DEFAULT);
+    }
+    return COPY_ON_WRITE.equalsIgnoreCase(mode);
   }
 
   @Override

@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.tree.Tree;
 import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
@@ -38,6 +40,7 @@ import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.io.sarg.ConvertAstToSearchArg;
 import org.apache.hadoop.hive.ql.io.sarg.SearchArgument;
 import org.apache.hadoop.hive.ql.lib.Node;
+import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.parse.ParseUtils.ReparseResult;
@@ -131,16 +134,30 @@ public class UpdateDeleteSemanticAnalyzer extends RewriteSemanticAnalyzer {
     
     checkUpdateDeleteMergeSupported(operation, mTable);
 
+    boolean shouldOverwrite = false;
+    HiveStorageHandler storageHandler = mTable.getStorageHandler();
+    if (storageHandler != null) {
+      shouldOverwrite = storageHandler.shouldOverwrite(mTable, operation.name());
+    }
+
     StringBuilder rewrittenQueryStr = new StringBuilder();
-    rewrittenQueryStr.append("insert into table ");
+    if (shouldOverwrite) {
+      rewrittenQueryStr.append("insert overwrite table ");
+    } else {
+      rewrittenQueryStr.append("insert into table ");
+    }
     rewrittenQueryStr.append(getFullTableNameForSQL(tabNameNode));
     addPartitionColsToInsert(mTable.getPartCols(), rewrittenQueryStr);
 
     ColumnAppender columnAppender = getColumnAppender(null, DELETE_PREFIX);
     int columnOffset = columnAppender.getDeleteValues(operation).size();
-    rewrittenQueryStr.append(" select ");
-    columnAppender.appendAcidSelectColumns(rewrittenQueryStr, operation);
-    rewrittenQueryStr.setLength(rewrittenQueryStr.length() - 1);
+    if (!shouldOverwrite) {
+      rewrittenQueryStr.append(" select ");
+      columnAppender.appendAcidSelectColumns(rewrittenQueryStr, operation);
+      rewrittenQueryStr.setLength(rewrittenQueryStr.length() - 1);
+    } else {
+      rewrittenQueryStr.append(" select * ");
+    }
 
     Map<Integer, ASTNode> setColExprs = null;
     Map<String, ASTNode> setCols = null;
@@ -179,11 +196,35 @@ public class UpdateDeleteSemanticAnalyzer extends RewriteSemanticAnalyzer {
       where = (ASTNode)children.get(whereIndex);
       assert where.getToken().getType() == HiveParser.TOK_WHERE :
           "Expected where clause, but found " + where.getName();
+
+      if (shouldOverwrite) {
+        if (where.getChildCount() == 1) {
+
+          // Add isNull check for the where clause condition, since null is treated as false in where condition and
+          // not null also resolves to false, so we need to explicitly handle this case.
+          ASTNode isNullFuncNodeExpr = new ASTNode(new CommonToken(HiveParser.TOK_FUNCTION, "TOK_FUNCTION"));
+          isNullFuncNodeExpr.addChild(new ASTNode(new CommonToken(HiveParser.Identifier, "isNull")));
+          isNullFuncNodeExpr.addChild(where.getChild(0));
+
+          ASTNode orNodeExpr = new ASTNode(new CommonToken(HiveParser.KW_OR, "OR"));
+          orNodeExpr.addChild(isNullFuncNodeExpr);
+
+          // Add the inverted where clause condition, since we want to hold the records which doesn't satisfy this
+          // condition.
+          ASTNode notNodeExpr = new ASTNode(new CommonToken(HiveParser.KW_NOT, "!"));
+          notNodeExpr.addChild(where.getChild(0));
+          orNodeExpr.addChild(notNodeExpr);
+          where.setChild(0, orNodeExpr);
+        } else if (where.getChildCount() > 1) {
+          throw new SemanticException("Overwrite mode not supported with more than 1 children in where clause.");
+        }
+      }
     }
 
-    // Add a sort by clause so that the row ids come out in the correct order
-    appendSortBy(rewrittenQueryStr, columnAppender.getSortKeys());
-
+    if (!shouldOverwrite) {
+      // Add a sort by clause so that the row ids come out in the correct order
+      appendSortBy(rewrittenQueryStr, columnAppender.getSortKeys());
+    }
     ReparseResult rr = ParseUtils.parseRewrittenQuery(ctx, rewrittenQueryStr);
     Context rewrittenCtx = rr.rewrittenCtx;
     ASTNode rewrittenTree = rr.rewrittenTree;
@@ -196,8 +237,13 @@ public class UpdateDeleteSemanticAnalyzer extends RewriteSemanticAnalyzer {
       rewrittenCtx.setOperation(Context.Operation.UPDATE);
       rewrittenCtx.addDestNamePrefix(1, Context.DestClausePrefix.UPDATE);
     } else if (deleting()) {
-      rewrittenCtx.setOperation(Context.Operation.DELETE);
-      rewrittenCtx.addDestNamePrefix(1, Context.DestClausePrefix.DELETE);
+      if (shouldOverwrite) {
+        // We are now actually executing an Insert query, so set the modes accordingly.
+        rewrittenCtx.addDestNamePrefix(1, Context.DestClausePrefix.INSERT);
+      } else {
+        rewrittenCtx.setOperation(Context.Operation.DELETE);
+        rewrittenCtx.addDestNamePrefix(1, Context.DestClausePrefix.DELETE);
+      }
     }
 
     if (where != null) {

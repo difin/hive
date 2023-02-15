@@ -386,6 +386,16 @@ public interface HiveStorageHandler extends Configurable {
   }
 
   /**
+   * Returns whether the data should be overwritten for the specific operation.
+   * @param mTable the table.
+   * @param operationName operationName of the operation.
+   * @return if the data should be overwritten for the specified operation.
+   */
+  default boolean shouldOverwrite(org.apache.hadoop.hive.ql.metadata.Table mTable, String operationName) {
+    return false;
+  }
+
+  /**
    * Adds specific configurations to session for create table command.
    * @param tblProps table properties
    * @param hiveConf configuration
