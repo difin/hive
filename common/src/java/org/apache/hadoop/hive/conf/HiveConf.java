@@ -4027,6 +4027,9 @@ public class HiveConf extends Configuration {
       "true", new StringSet("true", "false", "ignore"),
       "Whether Tez session pool should allow submitting queries to custom queues. The options\n" +
       "are true, false (error out), ignore (accept the query but ignore the queue setting)."),
+    HIVE_MAPRED_JOB_FOLLOW_TEZ_QUEUE("hive.mapred.job.follow.tez.queue", false,
+      "Whether the MR jobs initiated by a query should be enforced to run in the queue denoted by "
+          + "'tez.queue.name', e.g. DistCp jobs."),
     HIVE_SERVER2_TEZ_USE_EXTERNAL_SESSIONS("hive.server2.use.external.sessions", false,
       "This flag is used in HiveServer2 to use externally started tez sessions"),
     HIVE_SERVER2_TEZ_EXTERNAL_SESSIONS_NAMESPACE("hive.server2.tez.external.sessions.namespace", "",
