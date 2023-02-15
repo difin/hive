@@ -51,6 +51,7 @@ import org.apache.impala.analysis.CastExpr;
 import org.apache.impala.analysis.CompoundPredicate;
 import org.apache.impala.analysis.Expr;
 import org.apache.impala.analysis.NumericLiteral;
+import org.apache.impala.analysis.StringLiteral;
 import org.apache.impala.catalog.Function;
 import org.apache.impala.catalog.Type;
 import org.apache.impala.common.AnalysisException;
@@ -83,14 +84,17 @@ public class ImpalaRexCall {
 
     String funcName = rexCall.getOperator().getName().toLowerCase();
     // Check for the function name to be "cast" rather than the "getKind()" to be
-    // CAST. There are some cases where the "getKind()" is OTHEr when the function
+    // CAST. There are some cases where the "getKind()" is OTHER when the function
     // name is "cast".
     if (funcName.equals("cast") && params.size() == 2) {
       return createCastFormatExpr(analyzer, rexCall, params);
     }
 
-    if (funcName.equals("cast") && rexCall.getType().getSqlTypeName() == SqlTypeName.BINARY) {
-      return createCastToBinary(params);
+    // Special logic for binary casting
+    if (funcName.equals("cast") &&
+        (rexCall.getType().getSqlTypeName() == SqlTypeName.BINARY ||
+        params.get(0).getType().isBinary())) {
+      return createCastWithBinary(params, rexCall.getType(), analyzer);
     }
 
     List<RexNode> operands = rexCall.getOperands();
@@ -376,17 +380,31 @@ public class ImpalaRexCall {
     return createCompoundExpr(analyzer, op, fnCompound, impalaExprList, retType);
   }
 
-  private static Expr createCastToBinary(List<Expr> params) throws HiveException {
+  private static Expr createCastWithBinary(List<Expr> params, RelDataType retType,
+      Analyzer analyzer) throws HiveException {
     if (params.size() != 1) {
       throw new HiveException("Number of parameters for casting to binary needs to be 1.");
     }
 
-    if (!params.get(0).getType().isStringType()) {
-      throw new HiveException("Can only cast a string type to binary.");
+    Type impalaRetType = ImpalaTypeConverter.createImpalaType(retType);
+
+    if ((!params.get(0).getType().isStringType() && !params.get(0).getType().isBinary()) ||
+        (!impalaRetType.isStringType() && !impalaRetType.isBinary())) {
+      throw new HiveException("Binary is only compatible with string.");
     }
 
-    // Do not need a casting function, just return the parameter.
-    return params.get(0);
+    // Do not need a casting function, just return the parameter as binary.
+    try {
+      if (params.get(0) instanceof StringLiteral) {
+        String s = ((StringLiteral) params.get(0)).getStringValue();
+        Expr e = new StringLiteral(s, impalaRetType, true);
+        e.analyze(analyzer);
+        return e;
+      }
+      return new CastExpr(impalaRetType, params.get(0));
+    } catch (AnalysisException e) {
+      throw new HiveException(e);
+    }
   }
 
   private static Expr createCastFormatExpr(Analyzer analyzer, RexCall rexCall, List<Expr> params
