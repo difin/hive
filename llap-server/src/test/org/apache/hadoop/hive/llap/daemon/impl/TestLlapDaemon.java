@@ -46,7 +46,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-@org.junit.Ignore("hive-test-kube keeps failing with Xmx stuff randomly")
 public class TestLlapDaemon {
 
   private static final String[] METRICS_SOURCES = new String[]{
