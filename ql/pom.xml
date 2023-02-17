@@ -27,7 +27,7 @@
   <properties>
     <hive.path.to.root>..</hive.path.to.root>
     <reflections.version>0.10.2</reflections.version>
-    <atlas.version>2.1.0.7.2.15.4-6</atlas.version>
+    <atlas.version>2.1.0.7.2.16.0-287</atlas.version>
     <commons-configuration.version>1.10</commons-configuration.version>
   </properties>
 
