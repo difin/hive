@@ -162,8 +162,8 @@ public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
     for (org.apache.hadoop.hive.metastore.api.Function hiveFunc : hiveFunctions) {
       String db = hiveFunc.getDbName();
       try {
-        HiveJavaFunctionFactory factory = new HiveJavaFunctionFactoryImpl();
-        HiveJavaFunction javaFunc = factory.create(localLibPath, hiveFunc);
+        HiveJavaFunctionFactory factory = new HiveJavaFunctionFactoryImpl(localLibPath);
+        HiveJavaFunction javaFunc = factory.create(hiveFunc);
         allFunctions.addAll(javaFunc.extract());
       } catch (Exception e) {
         LOG.info("Failed to add udf " + hiveFunc.getFunctionName() + ": " + e);

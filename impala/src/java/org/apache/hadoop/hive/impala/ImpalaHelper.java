@@ -18,10 +18,15 @@
 
 package org.apache.hadoop.hive.impala;
 
+import org.apache.hadoop.hive.impala.exec.ImpalaSessionManager;
 import org.apache.hadoop.hive.impala.funcmapper.AggFunctionDetails;
 import org.apache.hadoop.hive.impala.funcmapper.ScalarFunctionDetails;
 import org.apache.hadoop.hive.ql.engine.EngineHelper;
+import org.apache.hadoop.hive.ql.metadata.Hive;
+import org.apache.impala.service.BackendConfig;
 import org.apache.impala.service.FeSupport;
+import org.apache.impala.thrift.TBackendGflags;
+import org.apache.impala.thrift.TGeospatialLibrary;
 
 import java.util.List;
 
@@ -35,6 +40,13 @@ public class ImpalaHelper extends EngineHelper {
   static Throwable initializationError = null;
 
   static {
+    // CDPD-49726: Hack for IMPALA-11745: The BackendConfig.INSTANCE is required to be
+    // instantiated when loading the Builtins. However, the BackendConfig needs
+    // a HiveConf to be initialized, and it's not present at jar load time.
+    TBackendGflags cfg = new TBackendGflags();
+    cfg.geospatial_library = TGeospatialLibrary.NONE;
+    BackendConfig.create(cfg, false);
+
     try {
       // Need to setExternalFE before calling into any Impala function.
       FeSupport.setExternalFE();
@@ -59,6 +71,9 @@ public class ImpalaHelper extends EngineHelper {
       LOG.warn("Unable to load Impala functions: ", e);
       initializationError = e;
     }
+    // CDPD-49726: Hack for IMPALA-11745: Resetting BackendConfig to null so it can be instantiated
+    // properly.
+    BackendConfig.INSTANCE = null;
   }
 
   public ImpalaHelper() throws Throwable {
