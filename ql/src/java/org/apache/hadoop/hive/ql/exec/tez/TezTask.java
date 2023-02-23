@@ -18,10 +18,13 @@
 
 package org.apache.hadoop.hive.ql.exec.tez;
 
+import com.github.luben.zstd.RecyclingBufferPool;
 import org.apache.hadoop.hive.ql.session.SessionStateUtil;
 import org.apache.hive.common.util.Ref;
 import org.apache.hadoop.hive.ql.exec.tez.UserPoolMapping.MappingInput;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -621,6 +624,12 @@ public class TezTask extends Task<TezWork> {
     console.printInfo("Session re-established.");
     return newSession;
   }
+  
+  private void logURLs(String title, URL[] urls){
+    LOG.info(title);
+    for (int i=0; i<urls.length; i++)
+      LOG.info(urls[i].toString());
+  }
 
   DAGClient submit(DAG dag, Ref<TezSessionState> sessionStateRef) throws Exception {
     perfLogger.perfLogBegin(CLASS_NAME, PerfLogger.TEZ_SUBMIT_DAG);
@@ -628,6 +637,14 @@ public class TezTask extends Task<TezWork> {
     TezSessionState sessionState = sessionStateRef.value;
     try {
       try {
+
+        LOG.info("Before TezTask submit");
+        LOG.info(RecyclingBufferPool.INSTANCE.toString());
+
+        LOG.info("Before TezTask submit");
+        logURLs("Context classloader URLs:", ((URLClassLoader) (Thread.currentThread().getContextClassLoader())).getURLs());
+        logURLs("Current classloader URLs:", ((URLClassLoader) (getClass().getClassLoader())).getURLs());
+
         // ready to start execution on the cluster
         dagClient = sessionState.getSession().submitDAG(dag);
       } catch (SessionNotRunning nr) {

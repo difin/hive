@@ -864,6 +864,11 @@
       <version>${jersey.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.github.luben</groupId>
+      <artifactId>zstd-jni</artifactId>
+      <version>${zstd-jni.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>
       <version>${kafka.version}</version>
@@ -871,6 +876,10 @@
         <exclusion>
           <groupId>org.apache.shiro</groupId>
           <artifactId>shiro-crypto-cipher</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.github.luben</groupId>
+          <artifactId>zstd-jni</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

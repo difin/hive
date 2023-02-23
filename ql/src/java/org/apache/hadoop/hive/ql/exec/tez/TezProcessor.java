@@ -18,6 +18,8 @@
 package org.apache.hadoop.hive.ql.exec.tez;
 
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.text.NumberFormat;
@@ -342,12 +344,26 @@ public class TezProcessor extends AbstractLogicalIOProcessor {
             }
           }
         }
-        if (originalThrowable instanceof InterruptedException) {
-          throw (InterruptedException) originalThrowable;
-        } else {
-          throw new RuntimeException(originalThrowable);
-        }
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("In TezProcessor.initializeAndRunProcessor()");
+        sb.append(System.lineSeparator());
+        logURLs("Context classloader URLs:", ((URLClassLoader) (Thread.currentThread().getContextClassLoader())).getURLs(), sb);
+        logURLs("Current classloader URLs:", ((URLClassLoader) (getClass().getClassLoader())).getURLs(), sb);
+
+        throw new RuntimeException(originalThrowable.getMessage() + " " + sb.toString());
       }
+    }
+  }
+
+  private void logURLs(String title, URL[] urls, StringBuffer sb){
+    
+    sb.append(title);
+    sb.append(System.lineSeparator());
+    
+    for (int i=0; i<urls.length; i++){
+      sb.append(urls[i].toString());
+      sb.append(System.lineSeparator());
     }
   }
 
