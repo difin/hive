@@ -2,6 +2,12 @@
 --! qt:replace:/(\s+'uuid'=')\S+('\s*)/$1#Masked#$2/
 -- Mask random snapshot id
 --! qt:replace:/('current-snapshot-id'=')\d+/$1#SnapshotId#/
+-- Mask current-snapshot-timestamp-ms
+--! qt:replace:/('current-snapshot-timestamp-ms'=')\d+/$1#Masked#/
+-- Mask added file size
+--! qt:replace:/(\S\"added-files-size\":\")(\d+)(\")/$1#Masked#$3/
+-- Mask total file size
+--! qt:replace:/(\S\"total-files-size\":\")(\d+)(\")/$1#Masked#$3/
 
 DROP TABLE IF EXISTS ice_t;
 CREATE EXTERNAL TABLE ice_t (i int, s string, ts timestamp, d date) STORED BY ICEBERG;
