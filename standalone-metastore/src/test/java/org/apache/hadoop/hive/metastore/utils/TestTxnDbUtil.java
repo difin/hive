@@ -103,6 +103,11 @@ public final class TestTxnDbUtil {
           "  CTC_TIMESTAMP timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL," +
           "  CTC_WRITEID bigint," +
           "  CTC_UPDATE_DELETE char(1) NOT NULL)");
+      stmt.execute("CREATE TABLE MIN_HISTORY_WRITE_ID (" +
+          "  MH_TXNID bigint NOT NULL REFERENCES TXNS (TXN_ID)," +
+          "  MH_DATABASE varchar(128) NOT NULL," +
+          "  MH_TABLE varchar(256) NOT NULL," +
+          "  MH_WRITEID bigint NOT NULL)");
       stmt.execute("CREATE TABLE NEXT_TXN_ID (" + "  NTXN_NEXT bigint NOT NULL)");
       stmt.execute("INSERT INTO NEXT_TXN_ID VALUES(1)");
 
@@ -445,6 +450,7 @@ public final class TestTxnDbUtil {
 
         success &= dropTable(stmt, "TXN_COMPONENTS", retryCount);
         success &= dropTable(stmt, "COMPLETED_TXN_COMPONENTS", retryCount);
+        success &= dropTable(stmt, "MIN_HISTORY_WRITE_ID", retryCount);
         success &= dropTable(stmt, "TXNS", retryCount);
         success &= dropTable(stmt, "NEXT_TXN_ID", retryCount);
         success &= dropTable(stmt, "TXN_TO_WRITE_ID", retryCount);
