@@ -140,12 +140,13 @@ class ValidTxnManager {
   ValidTxnWriteIdList recordValidWriteIds() throws LockException {
     String txnString = driverContext.getConf().get(ValidTxnList.VALID_TXNS_KEY);
     if (StringUtils.isEmpty(txnString)) {
-      throw new IllegalStateException("calling recordValidWritsIdss() without initializing ValidTxnList " +
+      throw new IllegalStateException("calling recordValidWriteIds() without initializing ValidTxnList " +
           JavaUtils.txnIdToString(driverContext.getTxnManager().getCurrentTxnId()));
     }
 
     ValidTxnWriteIdList txnWriteIds = getTxnWriteIds(txnString);
     setValidWriteIds(txnWriteIds);
+    driverContext.getTxnManager().addWriteIdsToMinHistory(driverContext.getPlan(), txnWriteIds);
 
     LOG.debug("Encoding valid txn write ids info {} txnid: {}", txnWriteIds.toString(),
         driverContext.getTxnManager().getCurrentTxnId());

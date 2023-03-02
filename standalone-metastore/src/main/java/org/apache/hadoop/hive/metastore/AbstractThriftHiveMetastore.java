@@ -1072,7 +1072,11 @@ public class AbstractThriftHiveMetastore implements Iface {
             throws NoSuchTxnException, MetaException, TException {
         throw new UnsupportedOperationException("this method is not supported");
     }
-
+    
+    @Override
+    public void add_write_ids_to_min_history(long txnId, Map<String, Long> validWriteIds) throws TException {
+    }
+    
     @Override
     public AllocateTableWriteIdsResponse allocate_table_write_ids(AllocateTableWriteIdsRequest rqst)
             throws NoSuchTxnException, TxnAbortedException, MetaException, TException {

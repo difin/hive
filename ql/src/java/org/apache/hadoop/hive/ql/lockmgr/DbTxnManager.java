@@ -17,13 +17,14 @@
  */
 package org.apache.hadoop.hive.ql.lockmgr;
 
+import com.cronutils.utils.Predicates;
 import com.cronutils.utils.StringUtils;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.JavaUtils;
 import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
+import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
@@ -32,9 +33,9 @@ import org.apache.hadoop.hive.metastore.LockRequestBuilder;
 import org.apache.hadoop.hive.metastore.api.AbortTxnRequest;
 import org.apache.hadoop.hive.metastore.api.DataOperationType;
 import org.apache.hadoop.hive.metastore.api.LockComponent;
+import org.apache.hadoop.hive.metastore.api.LockRequest;
 import org.apache.hadoop.hive.metastore.api.LockResponse;
 import org.apache.hadoop.hive.metastore.api.LockState;
-import org.apache.hadoop.hive.metastore.api.LockType;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.NoSuchLockException;
 import org.apache.hadoop.hive.metastore.api.NoSuchTxnException;
@@ -43,10 +44,8 @@ import org.apache.hadoop.hive.metastore.api.TxnToWriteId;
 import org.apache.hadoop.hive.metastore.api.CommitTxnRequest;
 import org.apache.hadoop.hive.metastore.api.TxnType;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
-import org.apache.hadoop.hive.metastore.api.DataOperationType;
 import org.apache.hadoop.hive.metastore.api.GetOpenTxnsResponse;
 import org.apache.hadoop.hive.metastore.txn.TxnErrorMsg;
-import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.QueryPlan;
@@ -55,15 +54,12 @@ import org.apache.hadoop.hive.ql.ddl.database.unlock.UnlockDatabaseDesc;
 import org.apache.hadoop.hive.ql.ddl.table.lock.LockTableDesc;
 import org.apache.hadoop.hive.ql.ddl.table.lock.UnlockTableDesc;
 import org.apache.hadoop.hive.ql.hooks.Entity;
-import org.apache.hadoop.hive.ql.hooks.ReadEntity;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
-import org.apache.hadoop.hive.ql.session.*;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hive.common.util.ShutdownHookManager;
 import org.apache.thrift.TException;
@@ -76,8 +72,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -87,6 +85,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * An implementation of HiveTxnManager that stores the transactions in the metastore database.
@@ -120,6 +120,11 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
    */
   private Map<String, Long> tableWriteIds = new HashMap<>();
   private boolean shouldReallocateWriteIds = false;
+
+  /**
+   * The local cache of tables with registered minOpen write ID seen by the current transaction
+   */
+  private Set<String> minOpenTableWriteIds = new HashSet<>();
 
   /**
    * assigns a unique monotonically increasing ID to each statement
@@ -268,6 +273,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
       }
       stmtId = 0;
       numStatements = 0;
+      minOpenTableWriteIds.clear();
       tableWriteIds.clear();
       shouldReallocateWriteIds = false;
       isExplicitTransaction = false;
@@ -424,6 +430,35 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
       return false;
     }
   }
+
+  @Override
+  public void addWriteIdsToMinHistory(QueryPlan plan, ValidTxnWriteIdList txnWriteIds) {
+    if (plan.getInputs().isEmpty()) {
+      return;
+    }
+    Map<String, Long> writeIds = plan.getInputs().stream()
+      .filter(input -> !input.isDummy() && AcidUtils.isTransactionalTable(input.getTable()))
+      .map(input -> input.getTable().getFullyQualifiedName())
+      .filter(Predicates.not(minOpenTableWriteIds::contains))
+      .distinct()
+      .collect(Collectors.toMap(Function.identity(), table -> getMinOpenWriteId(txnWriteIds, table)));
+
+    if (!writeIds.isEmpty()) {
+      try {
+        getMS().addWriteIdsToMinHistory(txnId, writeIds);
+      } catch (TException | LockException e) {
+        throw new RuntimeException(ErrorMsg.METASTORE_COMMUNICATION_FAILED.getMsg(), e);
+      }
+      minOpenTableWriteIds.addAll(writeIds.keySet());
+    }
+  }
+
+  private Long getMinOpenWriteId(ValidTxnWriteIdList txnWriteIds, String table) {
+    ValidWriteIdList tableValidWriteIdList = txnWriteIds.getTableValidWriteIdList(table);
+    Long minOpenWriteId = tableValidWriteIdList.getMinOpenWriteId();
+    return minOpenWriteId != null ? minOpenWriteId : tableValidWriteIdList.getHighWatermark() + 1;
+  }
+
   /**
    * Normally client should call {@link #acquireLocks(org.apache.hadoop.hive.ql.QueryPlan, org.apache.hadoop.hive.ql.Context, String)}
    * @param isBlocking if false, the method will return immediately; thus the locks may be in LockState.WAITING
@@ -436,30 +471,22 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
     getLockManager();
     verifyState(plan);
     queryId = plan.getQueryId();
-    switch (plan.getOperation()) {
-      case SET_AUTOCOMMIT:
-        /**This is here for documentation purposes.  This TM doesn't support this - only has one
-        * mode of operation documented at {@link DbTxnManager#isExplicitTransaction}*/
-        return  null;
+    
+    if (plan.getOperation() == HiveOperation.SET_AUTOCOMMIT) {
+      /**This is here for documentation purposes.  This TM doesn't support this - only has one
+       * mode of operation documented at {@link DbTxnManager#isExplicitTransaction}*/
+      return null;
     }
-
-    LockRequestBuilder rqstBuilder = new LockRequestBuilder(queryId);
-    //link queryId to txnId
     LOG.info("Setting lock request transaction to " + JavaUtils.txnIdToString(txnId) + " for queryId=" + queryId);
-    rqstBuilder.setTransactionId(txnId)
-        .setUser(username);
 
-    rqstBuilder.setZeroWaitReadEnabled(!conf.getBoolVar(HiveConf.ConfVars.TXN_OVERWRITE_X_LOCK) ||
-        !conf.getBoolVar(HiveConf.ConfVars.TXN_WRITE_X_LOCK));
-
+    // Make sure we need locks. It's possible there's nothing to lock in this operation.
     if (plan.getInputs().isEmpty() && plan.getOutputs().isEmpty()) {
       LOG.debug("No locks needed for queryId=" + queryId);
       return null;
     }
-
-    List<LockComponent> lockComponents = AcidUtils.makeLockComponents(plan.getOutputs(), plan.getInputs(),
+    List<LockComponent> lockComponents = AcidUtils.makeLockComponents(
+        plan.getOutputs(), plan.getInputs(),
         ctx.getOperation(), conf);
-    rqstBuilder.setExclusiveCTAS(AcidUtils.isExclusiveCTAS(plan.getOutputs(), conf));
     lockComponents.addAll(getGlobalLocks(ctx.getConf()));
 
     //It's possible there's nothing to lock even if we have w/r entities.
@@ -467,10 +494,20 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
       LOG.debug("No locks needed for queryId=" + queryId);
       return null;
     }
-    rqstBuilder.addLockComponents(lockComponents);
 
-    List<HiveLock> locks = new ArrayList<HiveLock>(1);
-    LockState lockState = lockMgr.lock(rqstBuilder.build(), queryId, isBlocking, locks);
+    LockRequest lockRqst = new LockRequestBuilder(queryId)
+      .setTransactionId(txnId) //link queryId to txnId
+      .setUser(username)
+      .setExclusiveCTAS(AcidUtils.isExclusiveCTAS(plan.getOutputs(), conf))
+      .setZeroWaitReadEnabled(
+          !conf.getBoolVar(HiveConf.ConfVars.TXN_OVERWRITE_X_LOCK)
+            || !conf.getBoolVar(HiveConf.ConfVars.TXN_WRITE_X_LOCK))
+      .addLockComponents(lockComponents)
+      .build();
+
+    List<HiveLock> locks = new ArrayList<>(1);
+    LockState lockState = lockMgr.lock(lockRqst, queryId, isBlocking, locks);
+    
     ctx.setHiveLocks(locks);
     return lockState;
   }
@@ -497,7 +534,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
     }
     return globalLocks;
   }
-
+  
   /**
    * @param delay time to delay for first heartbeat
    */
@@ -524,6 +561,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
     txnId = 0;
     stmtId = -1;
     numStatements = 0;
+    minOpenTableWriteIds.clear();;
     tableWriteIds.clear();
     shouldReallocateWriteIds = false;
     queryId = null;

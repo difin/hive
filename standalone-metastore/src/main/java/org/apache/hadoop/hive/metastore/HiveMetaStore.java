@@ -9193,6 +9193,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     }
 
     @Override
+    public void add_write_ids_to_min_history(long txnId, Map<String, Long> validWriteIds) throws TException {
+      getTxnHandler().addWriteIdsToMinHistory(txnId, validWriteIds);
+    }
+    
+    @Override
     public void set_hadoop_jobid(String jobId, long cqId) {
       getTxnHandler().setHadoopJobId(jobId, cqId);
     }

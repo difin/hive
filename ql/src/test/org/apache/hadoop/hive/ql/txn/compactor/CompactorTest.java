@@ -52,6 +52,7 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.TxnAbortedException;
 import org.apache.hadoop.hive.metastore.api.TxnType;
+import org.apache.hadoop.hive.metastore.api.TxnToWriteId;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.metrics.AcidMetricService;
@@ -126,6 +127,7 @@ public abstract class CompactorTest {
 
   protected final void setup(HiveConf conf) throws Exception {
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON, true);
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.TXN_USE_MIN_HISTORY_WRITE_ID, useMinHistoryWriteId());
     this.conf = conf;
     fs = FileSystem.get(conf);
     TestTxnDbUtil.setConfValues(conf);
@@ -314,6 +316,14 @@ public abstract class CompactorTest {
     AllocateTableWriteIdsRequest awiRqst = new AllocateTableWriteIdsRequest(dbName, tblName);
     awiRqst.setTxnIds(rsp.getTxn_ids());
     AllocateTableWriteIdsResponse awiResp = txnHandler.allocateTableWriteIds(awiRqst);
+
+    long minOpenWriteId = Long.MAX_VALUE;
+    if (open != null && useMinHistoryWriteId()) {
+      long minOpenTxnId = open.stream().mapToLong(v -> v).min().orElse(-1);
+      minOpenWriteId = awiResp.getTxnToWriteIds().stream()
+        .filter(v -> v.getTxnId() == minOpenTxnId).map(TxnToWriteId::getWriteId)
+        .findFirst().orElse(minOpenWriteId);
+    }
     int i = 0;
     for (long tid : rsp.getTxn_ids()) {
       assert (awiResp.getTxnToWriteIds().get(i).getTxnId() == tid);
@@ -326,6 +336,9 @@ public abstract class CompactorTest {
         txnHandler.abortTxn(new AbortTxnRequest(tid));
       } else if (open == null || !open.contains(tid)) {
         txnHandler.commitTxn(new CommitTxnRequest(tid));
+      } else if (open.contains(tid) && useMinHistoryWriteId()){
+        txnHandler.addWriteIdsToMinHistory(tid, 
+          Collections.singletonMap(dbName + "." + tblName, minOpenWriteId));
       }
     }
   }
@@ -642,6 +655,10 @@ public abstract class CompactorTest {
    * are used since new (1.3) code has to be able to read old files.
    */
   abstract boolean useHive130DeltaDirName();
+  
+  protected boolean useMinHistoryWriteId() {
+    return false;
+  }
 
   String makeDeltaDirName(long minTxnId, long maxTxnId) {
     if(minTxnId != maxTxnId) {

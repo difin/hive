@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.26"
+const string HMS_API = "1.2.34"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -2926,6 +2926,7 @@ service ThriftHiveMetastore extends fb303.FacebookService
   void repl_tbl_writeid_state(1: ReplTblWriteIdStateRequest rqst)
   GetValidWriteIdsResponse get_valid_write_ids(1:GetValidWriteIdsRequest rqst)
       throws (1:NoSuchTxnException o1, 2:MetaException o2)
+  void add_write_ids_to_min_history(1:i64 txnId, 2: map<string, i64> writeIds) throws (1:MetaException o2)
   AllocateTableWriteIdsResponse allocate_table_write_ids(1:AllocateTableWriteIdsRequest rqst)
     throws (1:NoSuchTxnException o1, 2:TxnAbortedException o2, 3:MetaException o3)
   MaxAllocatedTableWriteIdResponse get_max_allocated_table_write_id(1:MaxAllocatedTableWriteIdRequest rqst)

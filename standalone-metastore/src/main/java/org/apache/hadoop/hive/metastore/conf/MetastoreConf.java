@@ -1507,7 +1507,10 @@ public class MetastoreConf {
     TXN_TIMEOUT("metastore.txn.timeout", "hive.txn.timeout", 300, TimeUnit.SECONDS,
         "time after which transactions are declared aborted if the client has not sent a heartbeat."),
     TXN_USE_MIN_HISTORY_LEVEL("metastore.txn.use.minhistorylevel", "hive.txn.use.minhistorylevel", true,
-        "Set this to false, for the TxnHandler and Cleaner to not use MinHistoryLevel table and take advantage of openTxn optimisation.\n"
+        "Set this to false, for the TxnHandler and Cleaner to not use MIN_HISTORY_LEVEL table and take advantage of openTxn optimisation.\n"
+            + "If the table is dropped HMS will switch this flag to false."),
+    TXN_USE_MIN_HISTORY_WRITE_ID("metastore.txn.use.minhistorywriteid", "hive.txn.use.minhistorywriteid", false,
+      "Set this to true, to avoid global minOpenTxn check in Cleaner.\n"
             + "If the table is dropped HMS will switch this flag to false."),
     LOCK_NUMRETRIES("metastore.lock.numretries", "hive.lock.numretries", 100,
         "The number of times you want to try to get all the locks"),
