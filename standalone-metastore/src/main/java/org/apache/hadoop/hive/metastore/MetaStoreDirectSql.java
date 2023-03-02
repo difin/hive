@@ -2611,13 +2611,13 @@ class MetaStoreDirectSql {
             + "WHERE " + SKEWED_VALUES + ".\"SD_ID_OID\" in  (" + sdIds + ")";
 
     Query query = pm.newQuery("javax.jdo.query.SQL", queryText);
-    List<Object[]> sqlResult = MetastoreDirectSqlUtils.ensureList(MetastoreDirectSqlUtils.executeWithArray(query, null, queryText));
+    List<Object> sqlResult = MetastoreDirectSqlUtils.executeWithArray(query, null, queryText);
 
     List<Object> skewedStringListIdList = new ArrayList<>(0);
 
     if (!sqlResult.isEmpty()) {
-      for (Object[] fields : sqlResult) {
-        skewedStringListIdList.add(MetastoreDirectSqlUtils.extractSqlLong(fields[0]));
+      for (Object stringListId : sqlResult) {
+        skewedStringListIdList.add(MetastoreDirectSqlUtils.extractSqlLong(stringListId));
       }
     }
     query.closeAll();
@@ -2724,13 +2724,13 @@ class MetaStoreDirectSql {
             + "WHERE " + SDS + ".\"CD_ID\" in (" + colIds + ") "
             + "GROUP BY " + SDS + ".\"CD_ID\"";
     Query query = pm.newQuery("javax.jdo.query.SQL", queryText);
-    List<Long> sqlResult = MetastoreDirectSqlUtils.executeWithArray(query, null, queryText);
+    List<Object> sqlResult = MetastoreDirectSqlUtils.executeWithArray(query, null, queryText);
 
     Set<Long> danglingColumnDescriptorIdSet = new HashSet<>(columnDescriptorIdList);
     if (!sqlResult.isEmpty()) {
-      for (Long cdId : sqlResult) {
+      for (Object cdId : sqlResult) {
         // the returned CD is not dangling, so remove it from the list
-        danglingColumnDescriptorIdSet.remove(cdId);
+        danglingColumnDescriptorIdSet.remove(MetastoreDirectSqlUtils.extractSqlLong(cdId));
       }
     }
     query.closeAll();
