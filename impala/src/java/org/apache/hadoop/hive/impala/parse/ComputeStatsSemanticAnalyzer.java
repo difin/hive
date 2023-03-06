@@ -117,8 +117,11 @@ public class ComputeStatsSemanticAnalyzer extends SemanticAnalyzer {
         regenerateQueryFromAST(root),
         SessionState.get().getCurrentDatabase());
     String invalidateStmt =
-        generateInvalidateMetadataStmt(SessionState.get().getCurrentDatabase(), table);
-    ImpalaWork invalidateWork = ImpalaWork.createPlannedWork(invalidateStmt);
+        generateInvalidateMetadataStmt((ASTNode) tableNode.getChild(0), table);
+    // second parameter forces invalidate metadata to run synchronously since we
+    // don't want to kick off the compute stats statement until after the invalidate
+    // metadata has been completed.
+    ImpalaWork invalidateWork = ImpalaWork.createPlannedWork(invalidateStmt, false);
     Task<ImpalaWork> invalidateTask = TaskFactory.get(invalidateWork);
     this.rootTasks.add(TaskFactory.get(invalidateWork));
     ImpalaWork work = ImpalaWork.createPlannedWork(statsStatement, fetchTask, 1);
@@ -127,7 +130,12 @@ public class ComputeStatsSemanticAnalyzer extends SemanticAnalyzer {
     invalidateTask.addDependentTask(computeStatsTask);
   }
 
-  private String generateInvalidateMetadataStmt(String db, Table table) {
+  private String generateInvalidateMetadataStmt(ASTNode tableTokenNode, Table table) {
+    // if the token has 2 children, it is of the form db.tbl and we grab the db name
+    // from the token. Otherwise, we have to use the current db in the session.
+    String db = tableTokenNode.getChildren().size() == 2
+        ? ((ASTNode)tableTokenNode.getChild(0)).getText()
+        : SessionState.get().getCurrentDatabase();
     return "invalidate metadata `" + db + "`.`" + table.getTableName() + "`";
   }
 

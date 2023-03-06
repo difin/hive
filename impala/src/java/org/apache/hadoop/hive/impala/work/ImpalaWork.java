@@ -84,6 +84,10 @@ public class ImpalaWork extends EngineWork implements Serializable {
           false, null, null, true);
     }
 
+    public static ImpalaWork createPlannedWork(String query, boolean runAsync) {
+      return new ImpalaWork(WorkType.COMPILED_QUERY, null, query, null, 0,
+          false, null, null, runAsync);
+    }
     public static ImpalaWork createPlannedWork(String query, FetchTask fetch, long fetchSize) {
       return createPlannedWork(query, fetch, fetchSize, true);
     }
