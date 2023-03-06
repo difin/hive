@@ -213,11 +213,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     if (2 != compacts.size()) {
       Assert.fail("Expecting 2 rows and found " + compacts.size() + " files " + compacts);
     }
-    Assert.assertEquals("did not initiate", compacts.get(0).getState());
-    Assert.assertTrue(compacts.get(0).getErrorMessage()
-            .startsWith("Caught exception while trying to determine if we should compact"));
-    Assert.assertEquals("refused", compacts.get(1).getState());
+    Assert.assertEquals("did not initiate", compacts.get(1).getState());
     Assert.assertTrue(compacts.get(1).getErrorMessage()
+            .startsWith("Caught exception while trying to determine if we should compact"));
+    Assert.assertEquals("refused", compacts.get(0).getState());
+    Assert.assertTrue(compacts.get(0).getErrorMessage()
             .startsWith("Query based Minor compaction is not possible for full acid tables having raw format (non-acid) data in them."));
   }
 
@@ -283,10 +283,10 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     if (2 != compacts.size()) {
       Assert.fail("Expecting 2 rows and found " + compacts.size() + " files " + compacts);
     }
-    Assert.assertEquals("did not initiate", compacts.get(0).getState());
-    Assert.assertTrue(compacts.get(0).getErrorMessage().startsWith("Caught exception while trying to determine if we should compact"));
-    Assert.assertEquals("refused", compacts.get(1).getState());
-    Assert.assertTrue(compacts.get(1).getErrorMessage().startsWith("Query based Minor compaction is not possible for full acid tables having raw format (non-acid) data in them."));
+    Assert.assertEquals("refused", compacts.get(0).getState());
+    Assert.assertTrue(compacts.get(0).getErrorMessage().startsWith("Query based Minor compaction is not possible for full acid tables having raw format (non-acid) data in them."));
+    Assert.assertEquals("did not initiate", compacts.get(1).getState());
+    Assert.assertTrue(compacts.get(1).getErrorMessage().startsWith("Caught exception while trying to determine if we should compact"));
   }
 
   /**

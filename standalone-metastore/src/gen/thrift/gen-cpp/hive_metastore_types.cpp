@@ -27919,6 +27919,26 @@ void ShowCompactResponseElement::__set_poolName(const std::string& val) {
   this->poolName = val;
 __isset.poolName = true;
 }
+
+void ShowCompactResponseElement::__set_nextTxnId(const int64_t val) {
+  this->nextTxnId = val;
+__isset.nextTxnId = true;
+}
+
+void ShowCompactResponseElement::__set_txnId(const int64_t val) {
+  this->txnId = val;
+__isset.txnId = true;
+}
+
+void ShowCompactResponseElement::__set_commitTime(const int64_t val) {
+  this->commitTime = val;
+__isset.commitTime = true;
+}
+
+void ShowCompactResponseElement::__set_hightestWriteId(const int64_t val) {
+  this->hightestWriteId = val;
+__isset.hightestWriteId = true;
+}
 std::ostream& operator<<(std::ostream& out, const ShowCompactResponseElement& obj)
 {
   obj.printTo(out);
@@ -28113,6 +28133,38 @@ uint32_t ShowCompactResponseElement::read(::apache::thrift::protocol::TProtocol*
           xfer += iprot->skip(ftype);
         }
         break;
+      case 21:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->nextTxnId);
+          this->__isset.nextTxnId = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 22:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->txnId);
+          this->__isset.txnId = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 23:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->commitTime);
+          this->__isset.commitTime = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 24:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->hightestWriteId);
+          this->__isset.hightestWriteId = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -28234,6 +28286,26 @@ uint32_t ShowCompactResponseElement::write(::apache::thrift::protocol::TProtocol
     xfer += oprot->writeString(this->poolName);
     xfer += oprot->writeFieldEnd();
   }
+  if (this->__isset.nextTxnId) {
+    xfer += oprot->writeFieldBegin("nextTxnId", ::apache::thrift::protocol::T_I64, 21);
+    xfer += oprot->writeI64(this->nextTxnId);
+    xfer += oprot->writeFieldEnd();
+  }
+  if (this->__isset.txnId) {
+    xfer += oprot->writeFieldBegin("txnId", ::apache::thrift::protocol::T_I64, 22);
+    xfer += oprot->writeI64(this->txnId);
+    xfer += oprot->writeFieldEnd();
+  }
+  if (this->__isset.commitTime) {
+    xfer += oprot->writeFieldBegin("commitTime", ::apache::thrift::protocol::T_I64, 23);
+    xfer += oprot->writeI64(this->commitTime);
+    xfer += oprot->writeFieldEnd();
+  }
+  if (this->__isset.hightestWriteId) {
+    xfer += oprot->writeFieldBegin("hightestWriteId", ::apache::thrift::protocol::T_I64, 24);
+    xfer += oprot->writeI64(this->hightestWriteId);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -28261,6 +28333,10 @@ void swap(ShowCompactResponseElement &a, ShowCompactResponseElement &b) {
   swap(a.initiatorVersion, b.initiatorVersion);
   swap(a.cleanerStart, b.cleanerStart);
   swap(a.poolName, b.poolName);
+  swap(a.nextTxnId, b.nextTxnId);
+  swap(a.txnId, b.txnId);
+  swap(a.commitTime, b.commitTime);
+  swap(a.hightestWriteId, b.hightestWriteId);
   swap(a.__isset, b.__isset);
 }
 
@@ -28285,6 +28361,10 @@ ShowCompactResponseElement::ShowCompactResponseElement(const ShowCompactResponse
   initiatorVersion = other986.initiatorVersion;
   cleanerStart = other986.cleanerStart;
   poolName = other986.poolName;
+  nextTxnId = other986.nextTxnId;
+  txnId = other986.txnId;
+  commitTime = other986.commitTime;
+  hightestWriteId = other986.hightestWriteId;
   __isset = other986.__isset;
 }
 ShowCompactResponseElement& ShowCompactResponseElement::operator=(const ShowCompactResponseElement& other987) {
@@ -28308,6 +28388,10 @@ ShowCompactResponseElement& ShowCompactResponseElement::operator=(const ShowComp
   initiatorVersion = other987.initiatorVersion;
   cleanerStart = other987.cleanerStart;
   poolName = other987.poolName;
+  nextTxnId = other987.nextTxnId;
+  txnId = other987.txnId;
+  commitTime = other987.commitTime;
+  hightestWriteId = other987.hightestWriteId;
   __isset = other987.__isset;
   return *this;
 }
@@ -28334,6 +28418,10 @@ void ShowCompactResponseElement::printTo(std::ostream& out) const {
   out << ", " << "initiatorVersion="; (__isset.initiatorVersion ? (out << to_string(initiatorVersion)) : (out << "<null>"));
   out << ", " << "cleanerStart="; (__isset.cleanerStart ? (out << to_string(cleanerStart)) : (out << "<null>"));
   out << ", " << "poolName="; (__isset.poolName ? (out << to_string(poolName)) : (out << "<null>"));
+  out << ", " << "nextTxnId="; (__isset.nextTxnId ? (out << to_string(nextTxnId)) : (out << "<null>"));
+  out << ", " << "txnId="; (__isset.txnId ? (out << to_string(txnId)) : (out << "<null>"));
+  out << ", " << "commitTime="; (__isset.commitTime ? (out << to_string(commitTime)) : (out << "<null>"));
+  out << ", " << "hightestWriteId="; (__isset.hightestWriteId ? (out << to_string(hightestWriteId)) : (out << "<null>"));
   out << ")";
 }
 

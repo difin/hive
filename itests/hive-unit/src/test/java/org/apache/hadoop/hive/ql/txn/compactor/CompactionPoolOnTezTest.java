@@ -59,9 +59,9 @@ public class CompactionPoolOnTezTest extends CompactorOnTezTest {
     List<ShowCompactResponseElement> compacts = rsp.getCompacts();
     Assert.assertEquals("Expecting 1 rows and found " + compacts.size(), 1, compacts.size());
     Assert.assertEquals("Expecting compaction state '" + state + "' and found:" + compacts.get(0).getState(),
-        state, compacts.get(0).getState());
+            state, compacts.get(0).getState());
     Assert.assertEquals("Expecting compaction pool '" + pool + "' and found:" + compacts.get(0).getPoolName(),
-        pool, compacts.get(0).getPoolName());
+            pool, compacts.get(0).getPoolName());
   }
 
   @Test
@@ -137,10 +137,10 @@ public class CompactionPoolOnTezTest extends CompactorOnTezTest {
     List results = new ArrayList();
     driver.getResults(results);
     Assert.assertEquals(3, results.size());
-    Assert.assertEquals("CompactionId\tDatabase\tTable\tPartition\tType\tState\tWorker host\tWorker\tEnqueue Time\tStart Time\tDuration(ms)\tHadoopJobId\tError message\tInitiator host\tInitiator\tPool name",
-        results.get(0));
-    Pattern p = Pattern.compile("(1|2)\tdefault\t(compaction_test|table2)\t --- \tMAJOR\tinitiated.*(pool1|default)");
-    for(int i = 1; i < results.size(); i++) {
+    Assert.assertEquals("CompactionId\tDatabase\tTable\tPartition\tType\tState\tWorker host\tWorker\tEnqueue Time\tStart Time\tDuration(ms)" +
+            "\tHadoopJobId\tError message\tInitiator host\tInitiator\tPool name\tTxnId\tNext TxnId\tCommit Time\tHighest WriteID", results.get(0));
+    Pattern p = Pattern.compile("(1|2)\tdefault\t(compaction_test|table2)\t --- \tMAJOR\tinitiated.*(pool1|default).*");
+    for (int i = 1; i < results.size(); i++) {
       Assert.assertTrue(p.matcher(results.get(i).toString()).matches());
     }
   }
@@ -162,10 +162,12 @@ public class CompactionPoolOnTezTest extends CompactorOnTezTest {
     List results = new ArrayList();
     driver.getResults(results);
     Assert.assertEquals(2, results.size());
-    Assert.assertEquals("CompactionId\tDatabase\tTable\tPartition\tType\tState\tWorker host\tWorker\tEnqueue Time\tStart Time\tDuration(ms)\tHadoopJobId\tError message\tInitiator host\tInitiator\tPool name",
-        results.get(0));
-    Pattern p = Pattern.compile("(1|2)\tdefault\tcompaction_test\t --- \tMAJOR\tinitiated.*pool1");
+    Assert.assertEquals("CompactionId\tDatabase\tTable\tPartition\tType\tState\tWorker host\tWorker\tEnqueue Time\tStart Time\tDuration(ms)" +
+                    "\tHadoopJobId\tError message\tInitiator host\tInitiator\tPool name\tTxnId\tNext TxnId\tCommit Time\tHighest WriteID",
+            results.get(0));
+    Pattern p = Pattern.compile("(1|2)\tdefault\t(compaction_test|table2)\t --- \tMAJOR\tinitiated.*(pool1).*");
     Assert.assertTrue(p.matcher(results.get(1).toString()).matches());
   }
+
 
 }

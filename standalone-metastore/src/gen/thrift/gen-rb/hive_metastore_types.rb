@@ -4621,6 +4621,10 @@ class ShowCompactResponseElement
   INITIATORVERSION = 18
   CLEANERSTART = 19
   POOLNAME = 20
+  NEXTTXNID = 21
+  TXNID = 22
+  COMMITTIME = 23
+  HIGHTESTWRITEID = 24
 
   FIELDS = {
     DBNAME => {:type => ::Thrift::Types::STRING, :name => 'dbname'},
@@ -4642,7 +4646,11 @@ class ShowCompactResponseElement
     INITIATORID => {:type => ::Thrift::Types::STRING, :name => 'initiatorId', :optional => true},
     INITIATORVERSION => {:type => ::Thrift::Types::STRING, :name => 'initiatorVersion', :optional => true},
     CLEANERSTART => {:type => ::Thrift::Types::I64, :name => 'cleanerStart', :optional => true},
-    POOLNAME => {:type => ::Thrift::Types::STRING, :name => 'poolName', :optional => true}
+    POOLNAME => {:type => ::Thrift::Types::STRING, :name => 'poolName', :optional => true},
+    NEXTTXNID => {:type => ::Thrift::Types::I64, :name => 'nextTxnId', :optional => true},
+    TXNID => {:type => ::Thrift::Types::I64, :name => 'txnId', :optional => true},
+    COMMITTIME => {:type => ::Thrift::Types::I64, :name => 'commitTime', :optional => true},
+    HIGHTESTWRITEID => {:type => ::Thrift::Types::I64, :name => 'hightestWriteId', :optional => true}
   }
 
   def struct_fields; FIELDS; end
