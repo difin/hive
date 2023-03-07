@@ -1,4 +1,5 @@
 set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
+set hive.auto.convert.anti.join=true;
 
 --! qt:dataset:impala_dataset
 

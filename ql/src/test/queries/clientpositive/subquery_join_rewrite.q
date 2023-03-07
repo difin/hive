@@ -1,5 +1,5 @@
 -- SORT_QUERY_RESULTS
-
+SET hive.auto.convert.anti.join=true;
 create table web_sales (ws_order_number int, ws_warehouse_sk int) stored as orc;
 
 insert into web_sales values

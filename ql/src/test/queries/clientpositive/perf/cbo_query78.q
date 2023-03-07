@@ -1,5 +1,6 @@
 set hive.mapred.mode=nonstrict;
 -- start query 1 in stream 0 using template query78.tpl and seed 1819994127
+set hive.auto.convert.anti.join=true;
 explain cbo
 with ws as
   (select d_year AS ws_sold_year, ws_item_sk,

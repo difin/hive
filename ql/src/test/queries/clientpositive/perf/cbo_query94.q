@@ -1,5 +1,6 @@
 set hive.mapred.mode=nonstrict;
 -- start query 1 in stream 0 using template query94.tpl and seed 2031708268
+set hive.auto.convert.anti.join=true;
 explain cbo
 select  
    count(distinct ws_order_number) as `order count`
