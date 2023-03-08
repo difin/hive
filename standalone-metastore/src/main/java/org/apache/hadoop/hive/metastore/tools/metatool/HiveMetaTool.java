@@ -43,6 +43,7 @@ public final class HiveMetaTool {
     ObjectStore objectStore = new ObjectStore();
     objectStore.setConf(MetastoreConf.newMetastoreConf());
 
+    int status = 0;
     MetaToolTask task = null;
     try {
       if (cl.isListFSRoot()) {
@@ -65,11 +66,11 @@ public final class HiveMetaTool {
       task.setCommandLine(cl);
       task.execute();
     } catch (Exception e) {
+      status = -1;
       LOGGER.error("Exception occured", e);
-      System.exit(1);
     } finally {
       objectStore.shutdown();
-      System.exit(0);
+      System.exit(status);
     }
   }
 }
