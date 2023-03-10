@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.DataConnector;
+import org.apache.hadoop.hive.metastore.api.Function;
 import org.apache.hadoop.hive.ql.metadata.DummyPartition;
 import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
@@ -72,6 +73,11 @@ public class Entity implements Serializable {
    * The partition.This is null if this object is not a partition.
    */
   private Partition p;
+
+  /**
+   * The metastore api function. This is null if this object is not a partition
+   */
+  private Function f;
 
   /**
    * The directory if this is a directory
@@ -316,6 +322,21 @@ public class Entity implements Serializable {
   }
 
   /**
+   * Constructor for a function.
+   *
+   * @param f
+   *          Function that is read or written to.
+   */
+  public Entity(Function f, boolean complete) {
+    d = null;
+    p = null;
+    this.f = f;
+    typ = Type.FUNCTION;
+    name = computeName();
+    this.complete = complete;
+  }
+
+  /**
    * Get the parameter map of the Entity.
    */
   public Map<String, String> getParameters() {
@@ -377,6 +398,13 @@ public class Entity implements Serializable {
     return t;
   }
 
+  /**
+   * Get the function associated with the entity.
+   */
+  public Function getFunction() {
+    return f;
+  }
+
   public boolean isDummy() {
     if (typ == Type.DATABASE) {
       return database.getName().equals(SemanticAnalyzer.DUMMY_DATABASE);
@@ -410,10 +438,10 @@ public class Entity implements Serializable {
     case DUMMYPARTITION:
       return p.getName();
     case FUNCTION:
-      if (database != null) {
-        return database.getName() + "." + stringObject;
+      if (f != null) {
+        return f.getDbName() + "." + f.getFunctionName();
       }
-      return stringObject;
+      return database != null ? database.getName() + "." + stringObject : stringObject;
     case STREAMING:
     case SERVICE_NAME:
       return stringObject;
