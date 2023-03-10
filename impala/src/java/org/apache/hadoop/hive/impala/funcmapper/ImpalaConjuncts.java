@@ -38,11 +38,14 @@ import org.apache.impala.analysis.Expr;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Class holding Impala and RexNode conjuncts organized by whether the
  * conjunct can be resolved by partition pruning.
  */
 public class ImpalaConjuncts {
+  private static final Logger LOG = LoggerFactory.getLogger(ImpalaConjuncts.class);
 
   private final List<Expr> impalaPartitionConjuncts;
   private final List<Expr> impalaNonPartitionConjuncts;
@@ -163,8 +166,8 @@ public class ImpalaConjuncts {
     }
     for (RexNode conjunct : existingPartitionConjuncts) {
       if (!allConjunctsSet.contains(conjunct)) {
-        throw new HiveException("Error: The following pruned partition conjunct"
-          + " did not exist in the final filter condition: " + conjunct);
+        LOG.warn("Warning: An expression used in partition pruning is still being added "
+            + "to the filtering clause: " + conjunct);
       }
     }
   }
