@@ -7486,6 +7486,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       // such an operation is being performed
       checkWriteIntoFullAcidTable(destTableIsFullAcid, dest, destinationTable);
 
+      checkInsertDestinationTableFormat(dest, destinationTable);
+
       partSpec = qbm.getPartSpecForAlias(dest);
       destinationPath = destinationTable.getPath();
 
@@ -8737,6 +8739,21 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
             op + " operation not " + "supported on full transactional (ACID) table " +
             destTable.getFullyQualifiedName() + " by Impala");
       }
+    }
+  }
+
+  protected void checkInsertDestinationTableFormat(String dest, Table destTable)
+      throws SemanticException {
+
+    if (!isImpalaPlan(conf) || !inserting(dest)) return;
+
+    String inputFormat = destTable.getSd().getInputFormat();
+
+    if (!(
+        inputFormat.equalsIgnoreCase("org.apache.hadoop.mapred.TextInputFormat") ||
+        inputFormat.equalsIgnoreCase("org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"))) {
+      throw new SemanticException("Insert operation against " + inputFormat +
+          " is not supported by Impala. Only the text or Parquet tables are supported.");
     }
   }
 

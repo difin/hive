@@ -1,0 +1,57 @@
+HMS CALL get_table_req FOR orc_tbl
+PREHOOK: query: create table if not exists orc_tbl (
+my_date timestamp,
+my_id bigint,
+my_id2 bigint,
+environment string,
+down_volume bigint,
+up_volume bigint
+)
+stored as orc tblproperties ('transactional'='true', 'transactional_properties'='insert_only')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@orc_tbl
+POSTHOOK: query: create table if not exists orc_tbl (
+my_date timestamp,
+my_id bigint,
+my_id2 bigint,
+environment string,
+down_volume bigint,
+up_volume bigint
+)
+stored as orc tblproperties ('transactional'='true', 'transactional_properties'='insert_only')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@orc_tbl
+HMS CALL get_table_req FOR avro_tbl
+PREHOOK: query: create table if not exists avro_tbl (
+my_date timestamp,
+my_id bigint,
+my_id2 bigint,
+environment string,
+down_volume bigint,
+up_volume bigint
+)
+stored as orc tblproperties ('transactional'='true', 'transactional_properties'='insert_only')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@avro_tbl
+POSTHOOK: query: create table if not exists avro_tbl (
+my_date timestamp,
+my_id bigint,
+my_id2 bigint,
+environment string,
+down_volume bigint,
+up_volume bigint
+)
+stored as orc tblproperties ('transactional'='true', 'transactional_properties'='insert_only')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@avro_tbl
+HMS CALL get_table_req FOR orc_tbl
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+HMS CALL get_table_req FOR _dummy_table
+FAILED: RuntimeException org.apache.hadoop.hive.ql.parse.SemanticException: Insert operation against org.apache.hadoop.hive.ql.io.orc.OrcInputFormat is not supported by Impala. Only the text or Parquet tables are supported.
