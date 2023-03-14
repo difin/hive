@@ -238,6 +238,10 @@ public class AlterMaterializedViewRebuildAnalyzer extends CalcitePlanner {
       // Optimize plan
       basePlan = executeProgram(basePlan, program.build(), mdProvider, executorProvider, singletonList(materialization));
 
+      program = new HepProgramBuilder();
+      generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST, HivePushdownSnapshotFilterRule.INSTANCE);
+      basePlan = executeProgram(basePlan, program.build(), mdProvider, executorProvider);
+
       perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.OPTIMIZER, "Calcite: View-based rewriting");
 
       List<Table> materializedViewsUsedOriginalPlan = getMaterializedViewsUsed(calcitePreMVRewritingPlan);

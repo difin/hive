@@ -571,6 +571,7 @@ public abstract class BaseSemanticAnalyzer {
     int ssampleIndex = -1;
     int asOfTimeIndex = -1;
     int asOfVersionIndex = -1;
+    int asOfVersionFromIndex = -1;
     for (int index = 1; index < tabref.getChildCount(); index++) {
       ASTNode ct = (ASTNode) tabref.getChild(index);
       if (ct.getToken().getType() == HiveParser.TOK_TABLEBUCKETSAMPLE) {
@@ -583,11 +584,14 @@ public abstract class BaseSemanticAnalyzer {
         asOfTimeIndex = index;
       } else if (ct.getToken().getType() == HiveParser.TOK_AS_OF_VERSION) {
         asOfVersionIndex = index;
+      } else if (ct.getToken().getType() == HiveParser.TOK_FROM_VERSION) {
+        asOfVersionFromIndex = index;
       } else {
         aliasIndex = index;
       }
     }
-    return new int[] {aliasIndex, propsIndex, tsampleIndex, ssampleIndex, asOfTimeIndex, asOfVersionIndex};
+    return new int[] {
+        aliasIndex, propsIndex, tsampleIndex, ssampleIndex, asOfTimeIndex, asOfVersionIndex, asOfVersionFromIndex};
   }
 
   /**

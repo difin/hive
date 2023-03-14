@@ -32,6 +32,7 @@ import org.apache.calcite.adapter.druid.DruidQuery;
 import org.apache.calcite.interpreter.BindableConvention;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptMaterialization;
+import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.plan.hep.HepPlanner;
 import org.apache.calcite.plan.hep.HepProgramBuilder;
@@ -55,9 +56,7 @@ import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.common.type.SnapshotContext;
-import org.apache.hadoop.hive.metastore.api.CreationMetadata;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
-import org.apache.hadoop.hive.metastore.api.SourceTable;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.lockmgr.LockException;
@@ -245,17 +244,26 @@ public class HiveMaterializedViewUtils {
       HiveRelOptMaterialization materialization, String validTxnsList,
       MaterializationSnapshot snapshot) throws LockException {
 
+    RelNode modifiedQueryRel;
     if (snapshot != null && snapshot.getTableSnapshots() != null && !snapshot.getTableSnapshots().isEmpty()) {
-      // Not supported yet for Iceberg tables
-      return materialization;
+      modifiedQueryRel = applyRule(
+              materialization.queryRel, HiveAugmentSnapshotMaterializationRule.with(snapshot.getTableSnapshots()));
+    } else {
+      String materializationTxnList = snapshot != null ? snapshot.getValidTxnList() : null;
+      modifiedQueryRel = augmentMaterializationWithTimeInformation(
+              materialization, validTxnsList, new ValidTxnWriteIdList(materializationTxnList));
     }
 
-    String materializationTxnList = snapshot != null ? snapshot.getValidTxnList() : null;
-    return augmentMaterializationWithTimeInformation(
-        materialization, validTxnsList, new ValidTxnWriteIdList(materializationTxnList));
+    return new HiveRelOptMaterialization(materialization.tableRel, modifiedQueryRel,
+            null, materialization.qualifiedTableName, materialization.getScope(), materialization.getRebuildMode(),
+            materialization.getAst());
   }
 
-  private static HiveRelOptMaterialization augmentMaterializationWithTimeInformation(
+  /**
+   * Method to enrich the materialization query contained in the input with
+   * its invalidation when materialization has native acid source tables.
+   */
+  private static RelNode augmentMaterializationWithTimeInformation(
       HiveRelOptMaterialization materialization, String validTxnsList,
       ValidTxnWriteIdList materializationTxnList) throws LockException {
     // Extract tables used by the query which will in turn be used to generate
@@ -275,15 +283,21 @@ public class HiveMaterializedViewUtils {
         SessionState.get().getTxnMgr().getValidWriteIds(tablesUsed, validTxnsList);
     // Augment
     final RexBuilder rexBuilder = materialization.queryRel.getCluster().getRexBuilder();
-    final HepProgramBuilder augmentMaterializationProgram = new HepProgramBuilder()
-        .addRuleInstance(new HiveAugmentMaterializationRule(rexBuilder, currentTxnList, materializationTxnList));
-    final HepPlanner augmentMaterializationPlanner = new HepPlanner(
-        augmentMaterializationProgram.build());
-    augmentMaterializationPlanner.setRoot(materialization.queryRel);
-    final RelNode modifiedQueryRel = augmentMaterializationPlanner.findBestExp();
-    return new HiveRelOptMaterialization(materialization.tableRel, modifiedQueryRel,
-        null, materialization.qualifiedTableName, materialization.getScope(), materialization.getRebuildMode(),
-            materialization.getAst());
+    return applyRule(
+            materialization.queryRel, new HiveAugmentMaterializationRule(rexBuilder, currentTxnList, materializationTxnList));
+  }
+
+  /**
+   * Method to apply a rule to a query plan.
+   */
+  private static RelNode applyRule(
+          RelNode basePlan, RelOptRule relOptRule) {
+    final HepProgramBuilder programBuilder = new HepProgramBuilder();
+    programBuilder.addRuleInstance(relOptRule);
+    final HepPlanner planner = new HepPlanner(
+        programBuilder.build());
+    planner.setRoot(basePlan);
+    return planner.findBestExp();
   }
 
   /**
