@@ -638,7 +638,7 @@
           </exclusion>
          <exclusion>
             <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
+            <artifactId>*</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
