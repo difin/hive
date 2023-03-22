@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.metastore.DatabaseProduct;
 import org.apache.hadoop.hive.metastore.TransactionalValidationListener;
+import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.GetOpenTxnsResponse;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
@@ -691,5 +692,31 @@ public class TxnUtils {
     LOG.error("Unable to stat file {} as either current user({}) or table owner({}), giving up", p,
         UserGroupInformation.getLoginUser(), t.getOwner());
     throw new IOException("Unable to stat file: " + p);
+  }
+
+  public static CompactionType dbCompactionType2ThriftType(char dbValue) throws MetaException {
+    switch (dbValue) {
+      case TxnHandler.MAJOR_TYPE:
+        return CompactionType.MAJOR;
+      case TxnHandler.MINOR_TYPE:
+        return CompactionType.MINOR;
+      case TxnHandler.REBALANCE_TYPE:
+        return CompactionType.REBALANCE;
+      default:
+        throw new MetaException("Unexpected compaction type " + dbValue);
+    }
+  }
+
+  public static Character thriftCompactionType2DbType(CompactionType ct) throws MetaException {
+    switch (ct) {
+      case MAJOR:
+        return TxnHandler.MAJOR_TYPE;
+      case MINOR:
+        return TxnHandler.MINOR_TYPE;
+      case REBALANCE:
+        return TxnHandler.REBALANCE_TYPE;
+      default:
+        throw new MetaException("Unexpected compaction type " + ct);
+    }
   }
 }

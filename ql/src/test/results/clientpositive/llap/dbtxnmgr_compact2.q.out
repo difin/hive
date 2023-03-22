@@ -35,6 +35,7 @@ STAGE PLANS:
   Stage: Stage-0
     Compact
       compaction type: minor
+      numberOfBuckets: 0
       partition spec:
         ds yesterday
       table name: default.T1_n105

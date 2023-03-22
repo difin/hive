@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.35"
+const string HMS_API = "1.2.37"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -202,6 +202,7 @@ enum LockType {
 enum CompactionType {
     MINOR = 1,
     MAJOR = 2,
+    REBALANCE = 3,
 }
 
 enum GrantRevokeType {
@@ -984,7 +985,8 @@ enum TxnType {
     READ_ONLY    = 2,
     COMPACTION   = 3,
     MATER_VIEW_REBUILD = 4,
-    SOFT_DELETE  = 5
+    SOFT_DELETE  = 5,
+    REBALANCE_COMPACTION = 6
 }
 
 // specifies which info to return with GetTablesExtRequest
@@ -1271,6 +1273,8 @@ struct CompactionRequest {
     7: optional string initiatorId
     8: optional string initiatorVersion
     9: optional string poolName
+    10: optional i32 numberOfBuckets
+    11: optional string orderByClause;
 }
 
 struct CompactionInfoStruct {
@@ -1291,6 +1295,8 @@ struct CompactionInfoStruct {
     15: optional i64 enqueueTime,
     16: optional i64 retryRetention,
     17: optional string poolname
+    18: optional i32 numberOfBuckets
+    19: optional string orderByClause;
 }
 
 struct OptionalCompactionInfoStruct {
@@ -2928,7 +2934,7 @@ service ThriftHiveMetastore extends fb303.FacebookService
   void repl_tbl_writeid_state(1: ReplTblWriteIdStateRequest rqst)
   GetValidWriteIdsResponse get_valid_write_ids(1:GetValidWriteIdsRequest rqst)
       throws (1:NoSuchTxnException o1, 2:MetaException o2)
-  void add_write_ids_to_min_history(1:i64 txnId, 2: map<string, i64> writeIds) throws (1:MetaException o2)
+  void add_write_ids_to_min_history(1:i64 txnId, 2: map<string, i64> writeIds) throws (1:MetaException o2)      
   AllocateTableWriteIdsResponse allocate_table_write_ids(1:AllocateTableWriteIdsRequest rqst)
     throws (1:NoSuchTxnException o1, 2:TxnAbortedException o2, 3:MetaException o3)
   MaxAllocatedTableWriteIdResponse get_max_allocated_table_write_id(1:MaxAllocatedTableWriteIdRequest rqst)

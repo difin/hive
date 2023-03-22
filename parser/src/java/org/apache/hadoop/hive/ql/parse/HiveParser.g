@@ -1897,6 +1897,14 @@ tableBuckets
     -> ^(TOK_ALTERTABLE_BUCKETS $bucketCols $sortCols? $num)
     ;
 
+tableImplBuckets
+@init { pushMsg("implicit table buckets specification", state); }
+@after { popMsg(state); }
+    :
+      KW_CLUSTERED KW_INTO num=Number KW_BUCKETS
+    -> ^(TOK_ALTERTABLE_BUCKETS $num)
+    ;
+
 tableSkewed
 @init { pushMsg("table skewed specification", state); }
 @after { popMsg(state); }

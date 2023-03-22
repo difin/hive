@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.collect.Lists;
@@ -52,19 +54,20 @@ import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.txn.CompactionInfo;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
+import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.DriverFactory;
 import org.apache.hadoop.hive.ql.TxnCommandsBaseForTests;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.ql.hooks.HiveProtoLoggingHook;
-import org.apache.hadoop.hive.ql.hooks.HiveProtoLoggingHook.ExecutionMode;
-import org.apache.hadoop.hive.ql.hooks.TestHiveProtoLoggingHook;
 import org.apache.hadoop.hive.ql.hooks.proto.HiveHookEvents;
 import org.apache.hadoop.hive.ql.io.AcidDirectory;
+import org.apache.hadoop.hive.ql.io.AcidOutputFormat;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
+import org.apache.hadoop.hive.ql.io.BucketCodec;
+import org.apache.hadoop.hive.ql.lockmgr.LockException;
 import org.apache.hadoop.hive.ql.metadata.Hive;
-import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
 import org.apache.hive.streaming.HiveStreamingConnection;
 import org.apache.hive.streaming.StreamingConnection;
@@ -77,7 +80,6 @@ import org.apache.orc.RecordReader;
 import org.apache.orc.StripeInformation;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.impl.RecordReaderImpl;
-import org.apache.tez.dag.history.logging.proto.ProtoMessageReader;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -105,6 +107,523 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
       driver.close();
     }
     conf = null;
+  }
+
+  @Test
+  public void testParquetRead() throws Exception {
+    conf.set("tez.grouping.min-size", "10000000");
+    conf.set("tez.grouping.max-size", "80000000");
+    conf.set("hive.vectorized.execution.enabled", "false");
+    driver = new Driver(conf);
+
+    String dbName = "default";
+    String tblName = "parq_test";
+    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    executeStatementOnDriver("create transactional table " + tblName + " (a int, b int) stored as PARQUET", driver);
+    executeStatementOnDriver("insert into " + tblName + " values(1,2),(1,3),(1,4),(2,2),(2,3),(2,4)", driver);
+    executeStatementOnDriver("insert into " + tblName + " values(3,2),(3,3),(3,4),(4,2),(4,3),(4,4)", driver);
+    executeStatementOnDriver("select * from " + tblName + " where b = 2", driver);
+  }
+
+  @Test
+  public void testRebalanceCompactionWithParallelDeleteAsSecondOptimisticLock() throws Exception {
+    testRebalanceCompactionWithParallelDeleteAsSecond(true);
+  }
+
+  @Test
+  public void testRebalanceCompactionWithParallelDeleteAsSecondPessimisticLock() throws Exception {
+    testRebalanceCompactionWithParallelDeleteAsSecond(false);
+  }
+
+  private void testRebalanceCompactionWithParallelDeleteAsSecond(boolean optimisticLock) throws Exception {
+    conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
+    conf.setBoolVar(HiveConf.ConfVars.HIVE_COMPACTOR_GATHER_STATS, false);
+    conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
+    conf.setBoolVar(HiveConf.ConfVars.TXN_WRITE_X_LOCK, optimisticLock);
+
+    //set grouping size to have 3 buckets, and re-create driver with the new config
+    conf.set("tez.grouping.min-size", "700");
+    conf.set("tez.grouping.max-size", "80000");
+    driver = new Driver(conf);
+
+    final String tableName = "rebalance_test";
+    TestDataProvider testDataProvider = prepareRebalanceTestData(tableName);
+
+    //Try to do a rebalancing compaction
+    executeStatementOnDriver("ALTER TABLE " + tableName + " COMPACT 'rebalance' ORDER BY b DESC", driver);
+
+    CountDownLatch startDelete = new CountDownLatch(1);
+    CountDownLatch endDelete = new CountDownLatch(1);
+    CompactorFactory factory = Mockito.spy(CompactorFactory.getInstance());
+    doAnswer(invocation -> {
+      Object result = invocation.callRealMethod();
+      startDelete.countDown();
+      Thread.sleep(1000);
+      return result;
+    }).when(factory).getCompactor(any(), any(), any(), any());
+
+    Worker worker = new Worker(factory);
+    worker.setConf(conf);
+    worker.init(new AtomicBoolean(true));
+    worker.start();
+
+    if (!startDelete.await(10, TimeUnit.SECONDS)) {
+      throw new RuntimeException("Waiting for the compaction to start timed out!");
+    }
+
+    boolean aborted = false;
+    try {
+      driver.run("DELETE FROM " + tableName + " WHERE b = 12");
+    } catch (CommandProcessorException e) {
+      if (optimisticLock) {
+        Assert.fail("In case of TXN_WRITE_X_LOCK = true, the transaction must be retried instead of being aborted.");
+      }
+      aborted = true;
+      Assert.assertEquals("FAILED: Hive Internal Error: org.apache.hadoop.hive.ql.lockmgr.LockException(" +
+          "Transaction manager has aborted the transaction txnid:21.  Reason: Aborting [txnid:21,24] due to a write " +
+          "conflict on default/rebalance_test committed by [txnid:20,24] d/u)", e.getErrorMessage());
+      // Delete the record, so the rest of the test can be the same in both cases
+      executeStatementOnDriver("DELETE FROM " + tableName + " WHERE b = 12", driver);
+    } finally {
+      if(!optimisticLock && !aborted) {
+        Assert.fail("In case of TXN_WRITE_X_LOCK = false, the transaction must be aborted instead of being retried.");
+      }
+    }
+    endDelete.countDown();
+
+    worker.join();
+
+    driver.close();
+    driver = new Driver(conf);
+
+    List<String> result = execSelectAndDumpData("select * from " + tableName + " WHERE b = 12", driver,
+        "Dumping data for " + tableName + " after load:");
+    Assert.assertEquals(0, result.size());
+
+    //Check if the compaction succeed
+    verifyCompaction(1, TxnStore.CLEANING_RESPONSE);
+
+    String[][] expectedBuckets = new String[][] {
+        {
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":0}\t17\t17",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":1}\t16\t16",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":2}\t15\t15",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":3}\t14\t14",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":4}\t13\t13",
+        },
+        {
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":6}\t3\t4",
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":7}\t4\t4",
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":8}\t2\t4",
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":9}\t5\t4",
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":10}\t6\t4",
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":11}\t4\t3",
+        },
+        {
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":12}\t2\t3",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":13}\t3\t3",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":14}\t6\t3",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":15}\t5\t3",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":16}\t6\t2",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":17}\t5\t2",
+        },
+    };
+    verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000020");
+  }
+
+  @Test
+  public void testRebalanceCompactionOfNotPartitionedImplicitlyBucketedTableWithOrder() throws Exception {
+    conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
+    conf.setBoolVar(HiveConf.ConfVars.HIVE_COMPACTOR_GATHER_STATS, false);
+    conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
+
+    //set grouping size to have 3 buckets, and re-create driver with the new config
+    conf.set("tez.grouping.min-size", "700");
+    conf.set("tez.grouping.max-size", "80000");
+    driver = new Driver(conf);
+
+    final String tableName = "rebalance_test";
+    TestDataProvider testDataProvider = prepareRebalanceTestData(tableName);
+
+    //Try to do a rebalancing compaction
+    executeStatementOnDriver("ALTER TABLE " + tableName + " COMPACT 'rebalance' ORDER BY b DESC", driver);
+    runWorker(conf);
+
+    driver.close();
+    driver = new Driver(conf);
+
+    //Check if the compaction succeed
+    verifyCompaction(1, TxnStore.CLEANING_RESPONSE);
+
+    String[][] expectedBuckets = new String[][] {
+        {
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":0}\t17\t17",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":1}\t16\t16",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":2}\t15\t15",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":3}\t14\t14",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":4}\t13\t13",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":5}\t12\t12",
+        },
+        {
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":6}\t3\t4",
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":7}\t4\t4",
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":8}\t2\t4",
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":9}\t5\t4",
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":10}\t6\t4",
+            "{\"writeid\":7,\"bucketid\":536936448,\"rowid\":11}\t4\t3",
+        },
+        {
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":12}\t2\t3",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":13}\t3\t3",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":14}\t6\t3",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":15}\t5\t3",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":16}\t6\t2",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":17}\t5\t2",
+        },
+    };
+    verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000020");
+  }
+
+  @Test
+  public void testRebalanceCompactionOfNotPartitionedImplicitlyBucketedTable() throws Exception {
+    conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
+    conf.setBoolVar(HiveConf.ConfVars.HIVE_COMPACTOR_GATHER_STATS, false);
+    conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
+
+    //set grouping size to have 3 buckets, and re-create driver with the new config
+    conf.set("tez.grouping.min-size", "700");
+    conf.set("tez.grouping.max-size", "80000");
+    driver = new Driver(conf);
+
+    final String tableName = "rebalance_test";
+    TestDataProvider testDataProvider = prepareRebalanceTestData(tableName);
+
+    //Try to do a rebalancing compaction
+    executeStatementOnDriver("ALTER TABLE " + tableName + " COMPACT 'rebalance'", driver);
+    runWorker(conf);
+
+    //Check if the compaction succeed
+    verifyCompaction(1, TxnStore.CLEANING_RESPONSE);
+
+    String[][] expectedBuckets = new String[][] {
+        {
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":0}\t5\t4",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t6\t2",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":2}\t6\t3",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":3}\t6\t4",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":4}\t5\t2",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":5}\t5\t3",
+        },
+        {
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":6}\t2\t4",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":7}\t3\t3",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":8}\t4\t4",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":9}\t4\t3",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":10}\t2\t3",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":11}\t3\t4",
+        },
+        {
+            "{\"writeid\":2,\"bucketid\":537001984,\"rowid\":12}\t12\t12",
+            "{\"writeid\":3,\"bucketid\":537001984,\"rowid\":13}\t13\t13",
+            "{\"writeid\":4,\"bucketid\":537001984,\"rowid\":14}\t14\t14",
+            "{\"writeid\":5,\"bucketid\":537001984,\"rowid\":15}\t15\t15",
+            "{\"writeid\":6,\"bucketid\":537001984,\"rowid\":16}\t16\t16",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":17}\t17\t17",
+        },
+    };
+    verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000020");
+  }
+
+  @Test
+  public void testRebalanceCompactionOfPartitionedImplicitlyBucketedTable() throws Exception {
+    conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
+    conf.setBoolVar(HiveConf.ConfVars.HIVE_COMPACTOR_GATHER_STATS, false);
+    conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
+
+    //set grouping size to have 3 buckets, and re-create driver with the new config
+    conf.set("tez.grouping.min-size", "1");
+    driver = new Driver(conf);
+
+    final String stageTableName = "stage_rebalance_test";
+    final String tableName = "rebalance_test";
+    AcidOutputFormat.Options options = new AcidOutputFormat.Options(conf);
+
+    TestDataProvider testDataProvider = new TestDataProvider();
+    testDataProvider.createFullAcidTable(stageTableName, true, false);
+    executeStatementOnDriver("insert into " + stageTableName +" values " +
+            "('1',1,'yesterday'), ('1',2,'yesterday'), ('1',3, 'yesterday'), ('1',4, 'yesterday'), " +
+            "('2',1,'today'), ('2',2,'today'), ('2',3,'today'), ('2',4, 'today'), " +
+            "('3',1,'tomorrow'), ('3',2,'tomorrow'), ('3',3,'tomorrow'), ('3',4,'tomorrow')",
+        driver);
+
+    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    executeStatementOnDriver("CREATE TABLE " + tableName + "(a string, b int) " +
+        "PARTITIONED BY (ds string) STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
+    executeStatementOnDriver("INSERT OVERWRITE TABLE " + tableName + " partition (ds='tomorrow') select a, b from " + stageTableName, driver);
+
+    //do some single inserts to have more data in the first bucket.
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('12',12,'tomorrow')", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('13',13,'tomorrow')", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('14',14,'tomorrow')", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('15',15,'tomorrow')", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('16',16,'tomorrow')", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('17',17,'tomorrow')", driver);
+
+    // Verify buckets and their content before rebalance in partition ds=tomorrow
+    Table table = msClient.getTable("default", tableName);
+    FileSystem fs = FileSystem.get(conf);
+    Assert.assertEquals("Test setup does not match the expected: different buckets",
+        Arrays.asList("bucket_00000_0", "bucket_00001_0", "bucket_00002_0"),
+        CompactorTestUtil.getBucketFileNames(fs, table, "ds=tomorrow", "base_0000001"));
+    String[][] expectedBuckets = new String[][] {
+        {
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":0}\t2\t1\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t2\t2\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":2}\t2\t3\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":3}\t2\t4\ttomorrow",
+            "{\"writeid\":2,\"bucketid\":536870912,\"rowid\":0}\t12\t12\ttomorrow",
+            "{\"writeid\":3,\"bucketid\":536870912,\"rowid\":0}\t13\t13\ttomorrow",
+            "{\"writeid\":4,\"bucketid\":536870912,\"rowid\":0}\t14\t14\ttomorrow",
+            "{\"writeid\":5,\"bucketid\":536870912,\"rowid\":0}\t15\t15\ttomorrow",
+            "{\"writeid\":6,\"bucketid\":536870912,\"rowid\":0}\t16\t16\ttomorrow",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":0}\t17\t17\ttomorrow",
+        },
+        {
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":0}\t3\t1\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":1}\t3\t2\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":2}\t3\t3\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":3}\t3\t4\ttomorrow",
+        },
+        {
+            "{\"writeid\":1,\"bucketid\":537001984,\"rowid\":0}\t1\t1\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":537001984,\"rowid\":1}\t1\t2\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":537001984,\"rowid\":2}\t1\t3\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":537001984,\"rowid\":3}\t1\t4\ttomorrow",
+        },
+    };
+    for(int i = 0; i < 3; i++) {
+      Assert.assertEquals("rebalanced bucket " + i, Arrays.asList(expectedBuckets[i]),
+          testDataProvider.getBucketData(tableName, BucketCodec.V1.encode(options.bucket(i)) + ""));
+    }
+
+    //Try to do a rebalancing compaction
+    executeStatementOnDriver("ALTER TABLE " + tableName + " PARTITION (ds='tomorrow') COMPACT 'rebalance'", driver);
+    runWorker(conf);
+
+    //Check if the compaction succeed
+    verifyCompaction(1, TxnStore.CLEANING_RESPONSE);
+
+    expectedBuckets = new String[][] {
+        {
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":0}\t2\t1\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t2\t2\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":2}\t2\t3\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":3}\t2\t4\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":4}\t3\t1\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":5}\t3\t2\ttomorrow",
+        },
+        {
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":6}\t3\t3\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":7}\t3\t4\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":8}\t1\t1\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":9}\t1\t2\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":10}\t1\t3\ttomorrow",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":11}\t1\t4\ttomorrow",
+        },
+        {
+            "{\"writeid\":2,\"bucketid\":537001984,\"rowid\":12}\t12\t12\ttomorrow",
+            "{\"writeid\":3,\"bucketid\":537001984,\"rowid\":13}\t13\t13\ttomorrow",
+            "{\"writeid\":4,\"bucketid\":537001984,\"rowid\":14}\t14\t14\ttomorrow",
+            "{\"writeid\":5,\"bucketid\":537001984,\"rowid\":15}\t15\t15\ttomorrow",
+            "{\"writeid\":6,\"bucketid\":537001984,\"rowid\":16}\t16\t16\ttomorrow",
+            "{\"writeid\":7,\"bucketid\":537001984,\"rowid\":17}\t17\t17\ttomorrow",
+        },
+    };
+    verifyRebalance(testDataProvider, tableName, "ds=tomorrow", expectedBuckets,
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000016");
+  }
+
+  @Test
+  public void testRebalanceCompactionOfNotPartitionedExplicitlyBucketedTable() throws Exception {
+    conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
+    conf.setBoolVar(HiveConf.ConfVars.HIVE_COMPACTOR_GATHER_STATS, false);
+    conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
+
+    final String tableName = "rebalance_test";
+    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    executeStatementOnDriver("CREATE TABLE " + tableName + "(a string, b int) " +
+        "CLUSTERED BY(a) INTO 4 BUCKETS STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('11',11),('22',22),('33',33),('44',44)", driver);
+
+    //Try to do a rebalancing compaction
+    executeStatementOnDriver("ALTER TABLE " + tableName + " COMPACT 'rebalance'", driver);
+    runWorker(conf);
+
+    //Check if the compaction is refused
+    List<ShowCompactResponseElement> compacts = verifyCompaction(1, TxnStore.REFUSED_RESPONSE);
+    Assert.assertEquals("Expecting error message 'Cannot execute rebalancing compaction on bucketed tables.' and found:" + compacts.get(0).getState(),
+        "Cannot execute rebalancing compaction on bucketed tables.", compacts.get(0).getErrorMessage());
+  }
+
+  @Test
+  public void testRebalanceCompactionNotPartitionedExplicitBucketNumbers() throws Exception {
+    conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
+    conf.setBoolVar(HiveConf.ConfVars.HIVE_COMPACTOR_GATHER_STATS, false);
+    conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
+
+    //set grouping size to have 3 buckets, and re-create driver with the new config
+    conf.set("tez.grouping.min-size", "700");
+    conf.set("tez.grouping.max-size", "80000");
+    driver = new Driver(conf);
+
+    final String tableName = "rebalance_test";
+    TestDataProvider testDataProvider = prepareRebalanceTestData(tableName);
+
+    //Try to do a rebalancing compaction
+    executeStatementOnDriver("ALTER TABLE " + tableName + " COMPACT 'rebalance' CLUSTERED INTO 4 BUCKETS", driver);
+    runWorker(conf);
+
+    verifyCompaction(1,  TxnStore.CLEANING_RESPONSE);
+
+    String[][] expectedBuckets = new String[][] {
+        {
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":0}\t5\t4",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t6\t2",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":2}\t6\t3",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":3}\t6\t4",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":4}\t5\t2",
+        },
+        {
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":5}\t5\t3",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":6}\t2\t4",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":7}\t3\t3",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":8}\t4\t4",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":9}\t4\t3",
+        },
+        {
+            "{\"writeid\":1,\"bucketid\":537001984,\"rowid\":10}\t2\t3",
+            "{\"writeid\":1,\"bucketid\":537001984,\"rowid\":11}\t3\t4",
+            "{\"writeid\":2,\"bucketid\":537001984,\"rowid\":12}\t12\t12",
+            "{\"writeid\":3,\"bucketid\":537001984,\"rowid\":13}\t13\t13",
+            "{\"writeid\":4,\"bucketid\":537001984,\"rowid\":14}\t14\t14",
+        },
+        {
+            "{\"writeid\":5,\"bucketid\":537067520,\"rowid\":15}\t15\t15",
+            "{\"writeid\":6,\"bucketid\":537067520,\"rowid\":16}\t16\t16",
+            "{\"writeid\":7,\"bucketid\":537067520,\"rowid\":17}\t17\t17",
+        },
+    };
+    verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002", "bucket_00003"}, "base_0000007_v0000020");
+  }
+
+  private TestDataProvider prepareRebalanceTestData(String tableName) throws Exception {
+    final String stageTableName = "stage_" + tableName;
+
+    TestDataProvider testDataProvider = new TestDataProvider();
+    testDataProvider.createFullAcidTable(stageTableName, true, false);
+    testDataProvider.insertTestDataPartitioned(stageTableName);
+
+    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    executeStatementOnDriver("CREATE TABLE " + tableName + "(a string, b int) " +
+        "STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
+    executeStatementOnDriver("INSERT OVERWRITE TABLE " + tableName + " select a, b from " + stageTableName, driver);
+
+    //do some single inserts to have more data in the first bucket.
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('12',12)", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('13',13)", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('14',14)", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('15',15)", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('16',16)", driver);
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('17',17)", driver);
+
+    // Verify buckets and their content before rebalance
+    Table table = msClient.getTable("default", tableName);
+    FileSystem fs = FileSystem.get(conf);
+    Assert.assertEquals("Test setup does not match the expected: different buckets",
+        Arrays.asList("bucket_00000_0", "bucket_00001_0", "bucket_00002_0"),
+        CompactorTestUtil.getBucketFileNames(fs, table, null, "base_0000001"));
+    String[][] expectedBuckets = new String[][] {
+        {
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":0}\t5\t4",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t6\t2",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":2}\t6\t3",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":3}\t6\t4",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":4}\t5\t2",
+            "{\"writeid\":1,\"bucketid\":536870912,\"rowid\":5}\t5\t3",
+            "{\"writeid\":2,\"bucketid\":536870912,\"rowid\":0}\t12\t12",
+            "{\"writeid\":3,\"bucketid\":536870912,\"rowid\":0}\t13\t13",
+            "{\"writeid\":4,\"bucketid\":536870912,\"rowid\":0}\t14\t14",
+            "{\"writeid\":5,\"bucketid\":536870912,\"rowid\":0}\t15\t15",
+            "{\"writeid\":6,\"bucketid\":536870912,\"rowid\":0}\t16\t16",
+            "{\"writeid\":7,\"bucketid\":536870912,\"rowid\":0}\t17\t17",
+        },
+        {
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":0}\t2\t4",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":1}\t3\t3",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":2}\t4\t4",
+            "{\"writeid\":1,\"bucketid\":536936448,\"rowid\":3}\t4\t3",
+        },
+        {
+            "{\"writeid\":1,\"bucketid\":537001984,\"rowid\":0}\t2\t3",
+            "{\"writeid\":1,\"bucketid\":537001984,\"rowid\":1}\t3\t4",
+        },
+    };
+    AcidOutputFormat.Options options = new AcidOutputFormat.Options(conf);
+    for(int i = 0; i < 3; i++) {
+      Assert.assertEquals("unbalanced bucket " + i, Arrays.asList(expectedBuckets[i]),
+          testDataProvider.getBucketData(tableName, BucketCodec.V1.encode(options.bucket(i)) + ""));
+    }
+    return testDataProvider;
+  }
+
+  private void verifyRebalance(TestDataProvider testDataProvider, String tableName, String partitionName,
+                               String[][] expectedBucketContent, String[] bucketNames, String folderName) throws Exception {
+    // Verify buckets and their content after rebalance
+    Table table = msClient.getTable("default", tableName);
+    FileSystem fs = FileSystem.get(conf);
+    Assert.assertEquals("Buckets does not match after compaction", Arrays.asList(bucketNames),
+        CompactorTestUtil.getBucketFileNames(fs, table, partitionName, folderName));
+    AcidOutputFormat.Options options = new AcidOutputFormat.Options(conf);
+    for(int i = 0; i < expectedBucketContent.length; i++) {
+      Assert.assertEquals("rebalanced bucket " + i, Arrays.asList(expectedBucketContent[i]),
+          testDataProvider.getBucketData(tableName, BucketCodec.V1.encode(options.bucket(i)) + ""));
+    }
+  }
+
+  @Test
+  public void testCompactionShouldNotFailOnPartitionsWithBooleanField() throws Exception {
+    conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
+
+    final String dbName = "default";
+    final String tableName = "compaction_test";
+    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    executeStatementOnDriver("CREATE TABLE " + tableName + "(id string, value string) PARTITIONED BY (bval boolean) CLUSTERED BY(id) " +
+            "INTO 10 BUCKETS STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
+
+    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('1','one',true),('2','two', true)," +
+            "('4','four', false),('5','five', true),('6','six', false),('7','seven', false),('8','eight', false)," +
+            "('11','eleven', true),('12','twelve', false),('13','thirteen', false),('14','fourteen', false)," +
+            "('17','seventeen', true),('18','eighteen', false),('19','nineteen', false),('20','twenty', true)", driver);
+
+    executeStatementOnDriver("insert into " + tableName + " values ('21', 'value21', false),('84', 'value84', false)", driver);
+    executeStatementOnDriver("insert into " + tableName + " values ('22', 'value22', false),('34', 'value34', true)", driver);
+    executeStatementOnDriver("insert into " + tableName + " values ('75', 'value75', true),('99', 'value99', true)", driver);
+
+    TxnStore txnHandler = TxnUtils.getTxnStore(conf);
+
+    //Try to do a major compaction directly
+    CompactionRequest rqst = new CompactionRequest(dbName, tableName, CompactionType.MAJOR);
+    rqst.setPartitionname("bval=true");
+    txnHandler.compact(rqst);
+
+    runWorker(conf);
+
+    //Check if the compaction succeed
+    verifyCompaction(1, TxnStore.CLEANING_RESPONSE);
   }
 
   @Test
@@ -341,42 +860,6 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     parameters = Hive.get().getTable(tblName).getParameters();
     Assert.assertEquals("The number of files is differing from the expected", "1", parameters.get("numFiles"));
     Assert.assertEquals("The number of rows is differing from the expected", "2", parameters.get("numRows"));
-  }
-
-  @Test
-  public void testCompactionShouldNotFailOnPartitionsWithBooleanField() throws Exception {
-    conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
-
-    final String dbName = "default";
-    final String tableName = "compaction_test";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
-    executeStatementOnDriver("CREATE TABLE " + tableName + "(id string, value string) PARTITIONED BY (bval boolean) CLUSTERED BY(id) " +
-            "INTO 10 BUCKETS STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
-
-    executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('1','one',true),('2','two', true)," +
-            "('4','four', false),('5','five', true),('6','six', false),('7','seven', false),('8','eight', false)," +
-            "('11','eleven', true),('12','twelve', false),('13','thirteen', false),('14','fourteen', false)," +
-            "('17','seventeen', true),('18','eighteen', false),('19','nineteen', false),('20','twenty', true)", driver);
-
-    executeStatementOnDriver("insert into " + tableName + " values ('21', 'value21', false),('84', 'value84', false)", driver);
-    executeStatementOnDriver("insert into " + tableName + " values ('22', 'value22', false),('34', 'value34', true)", driver);
-    executeStatementOnDriver("insert into " + tableName + " values ('75', 'value75', true),('99', 'value99', true)", driver);
-
-    TxnStore txnHandler = TxnUtils.getTxnStore(conf);
-
-    //Try to do a major compaction directly
-    CompactionRequest rqst = new CompactionRequest(dbName, tableName, CompactionType.MAJOR);
-    rqst.setPartitionname("bval=true");
-    txnHandler.compact(rqst);
-
-    runWorker(conf);
-
-    //Check if the compaction succeed
-    ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
-    List<ShowCompactResponseElement> compacts = rsp.getCompacts();
-    Assert.assertEquals("Expecting 1 rows and found " + compacts.size(), 1, compacts.size());
-    Assert.assertEquals("Expecting compaction state 'ready for cleaning' and found:" + compacts.get(0).getState(),
-            "ready for cleaning", compacts.get(0).getState());
   }
 
   @Test
@@ -2245,13 +2728,8 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     // Setup
     QueryCompactor qc = new QueryCompactor() {
       @Override
-      void runCompaction(HiveConf hiveConf, Table table, Partition partition, StorageDescriptor storageDescriptor,
-                         ValidWriteIdList writeIds, CompactionInfo compactionInfo, AcidDirectory dir) throws IOException {
-      }
-
-      @Override
-      protected void commitCompaction(String dest, String tmpTableName, HiveConf conf, ValidWriteIdList actualWriteIds,
-                                      long compactorTxnId) throws IOException, HiveException {
+      public void run(HiveConf hiveConf, Table table, Partition partition, StorageDescriptor storageDescriptor,
+               ValidWriteIdList writeIds, CompactionInfo compactionInfo, AcidDirectory dir) throws IOException {
       }
     };
     StorageDescriptor sdMock = mock(StorageDescriptor.class);

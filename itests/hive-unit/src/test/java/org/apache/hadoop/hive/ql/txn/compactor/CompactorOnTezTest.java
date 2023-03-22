@@ -19,6 +19,7 @@ package org.apache.hadoop.hive.ql.txn.compactor;
 
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.hive.cli.CliSessionState;
+import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
@@ -26,6 +27,7 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.ShowCompactRequest;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponseElement;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
+import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.DriverFactory;
@@ -154,18 +156,30 @@ public abstract class CompactorOnTezTest {
   }
 
   /**
-   * Verify that the expected number of transactions have run, and their state is "succeeded".
+   * Verify that the expected number of compactions have run, and their state matches the given state.
+   *
+   * @param expectedNumberOfCompactions number of compactions already run
+   * @param expectedState The expected state of all the compactions
+   * @throws MetaException
+   */
+  protected List<ShowCompactResponseElement> verifyCompaction(int expectedNumberOfCompactions, String expectedState) throws MetaException {
+    List<ShowCompactResponseElement> compacts =
+        TxnUtils.getTxnStore(conf).showCompact(new ShowCompactRequest()).getCompacts();
+    Assert.assertEquals("Compaction queue must contain " + expectedNumberOfCompactions + " element(s)",
+        expectedNumberOfCompactions, compacts.size());
+    compacts.forEach(
+        c -> Assert.assertEquals("Compaction state is not " + expectedState, expectedState, c.getState()));
+    return compacts;
+  }
+
+  /**
+   * Verify that the expected number of compactions have run, and their state is "succeeded".
    *
    * @param expectedSuccessfulCompactions number of compactions already run
    * @throws MetaException
    */
   protected void verifySuccessfulCompaction(int expectedSuccessfulCompactions) throws MetaException {
-    List<ShowCompactResponseElement> compacts =
-        TxnUtils.getTxnStore(conf).showCompact(new ShowCompactRequest()).getCompacts();
-    Assert.assertEquals("Completed compaction queue must contain " + expectedSuccessfulCompactions + " element(s)",
-        expectedSuccessfulCompactions, compacts.size());
-    compacts.forEach(
-        c -> Assert.assertEquals("Compaction state is not succeeded", "succeeded", c.getState()));
+    verifyCompaction(expectedSuccessfulCompactions, TxnStore.SUCCEEDED_RESPONSE);
   }
 
   protected HiveHookEvents.HiveHookEventProto getRelatedTezEvent(String dbTableName) throws Exception {
@@ -259,7 +273,7 @@ public abstract class CompactorOnTezTest {
 
     void createDb(String dbName, String poolName) throws Exception {
       executeStatementOnDriver("drop database if exists " + dbName + " cascade", driver);
-      executeStatementOnDriver("create database " + dbName + " WITH DBPROPERTIES('hive.compactor.worker.pool'='" + poolName + "')", driver);
+      executeStatementOnDriver("create database " + dbName + " WITH DBPROPERTIES('" + Constants.HIVE_COMPACTOR_WORKER_POOL + "'='" + poolName + "')", driver);
     }
 
     /**

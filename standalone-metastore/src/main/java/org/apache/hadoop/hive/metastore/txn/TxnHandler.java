@@ -249,6 +249,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   // Compactor types
   static final protected char MAJOR_TYPE = 'a';
   static final protected char MINOR_TYPE = 'i';
+  static final protected char REBALANCE_TYPE = 'r';
 
   private static final String DEFAULT_POOL_NAME = "default";
 
@@ -1353,7 +1354,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
            */
         }
 
-        if (txnType != TxnType.READ_ONLY && !isReplayedReplTxn) {
+        if (txnType != TxnType.READ_ONLY && !isReplayedReplTxn && !MetaStoreUtils.isCompactionTxn(txnType)) {
           moveTxnComponentsToCompleted(stmt, txnid, isUpdateDelete);
         } else if (isReplayedReplTxn) {
           if (rqst.isSetWriteEventInfos()) {
@@ -3543,6 +3544,12 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             String partName = rqst.getPartitionname();
             if (partName != null) buf.append("\"CQ_PARTITION\", ");
             buf.append("\"CQ_STATE\", \"CQ_TYPE\", \"CQ_ENQUEUE_TIME\", \"CQ_POOL_NAME\"");
+            if (rqst.isSetNumberOfBuckets()) {
+              buf.append(", \"CQ_NUMBER_OF_BUCKETS\"");
+            }
+            if (rqst.isSetOrderByClause()) {
+              buf.append(", \"CQ_ORDER_BY\"");
+            }
             if (rqst.getProperties() != null) {
               buf.append(", \"CQ_TBLPROPERTIES\"");
             }
@@ -3570,11 +3577,18 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             }
             buf.append(INITIATED_STATE);
             buf.append("', '");
-            buf.append(thriftCompactionType2DbType(rqst.getType()));
+            buf.append(TxnUtils.thriftCompactionType2DbType(rqst.getType()));
             buf.append("',");
             buf.append(getEpochFn(dbProduct));
             buf.append(", ?");
             params.add(rqst.getPoolName());
+            if (rqst.isSetNumberOfBuckets()) {
+              buf.append(", ").append(rqst.getNumberOfBuckets());
+            }
+            if (rqst.isSetOrderByClause()) {
+              buf.append(", ?");
+              params.add(rqst.getOrderByClause());
+            }
             if (rqst.getProperties() != null) {
               buf.append(", ?");
               params.add(new StringableMap(rqst.getProperties()).toString());
@@ -3649,7 +3663,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         }
         buf.append("\"CQ_STATE\", \"CQ_TYPE\"");
         params.add(String.valueOf(READY_FOR_CLEANING));
-        params.add(thriftCompactionType2DbType(rqst.getType()).toString());
+        params.add(TxnUtils.thriftCompactionType2DbType(rqst.getType()).toString());
 
         if (rqst.getProperties() != null) {
           buf.append(", \"CQ_TBLPROPERTIES\"");
@@ -3724,7 +3738,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
             e.setPartitionname(rs.getString(3));
             e.setState(compactorStateToResponse(rs.getString(4).charAt(0)));
             try {
-              e.setType(dbCompactionType2ThriftType(rs.getString(5).charAt(0)));
+              e.setType(TxnUtils.dbCompactionType2ThriftType(rs.getString(5).charAt(0)));
             } catch (MetaException ex) {
               //do nothing to handle RU/D if we add another status
             }
@@ -3859,7 +3873,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
           if (!rs.wasNull()) {
             lci.setPartitionname(partition);
           }
-          lci.setType(dbCompactionType2ThriftType(rs.getString(5).charAt(0)));
+          lci.setType(TxnUtils.dbCompactionType2ThriftType(rs.getString(5).charAt(0)));
           // Only put the latest record of each partition into response
           if (!partitionSet.contains(partition)) {
             response.addToCompactions(lci);
@@ -5854,27 +5868,6 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     return "'" + c + "'";
   }
 
-  static CompactionType dbCompactionType2ThriftType(char dbValue) throws MetaException {
-    switch (dbValue) {
-      case MAJOR_TYPE:
-        return CompactionType.MAJOR;
-      case MINOR_TYPE:
-        return CompactionType.MINOR;
-      default:
-        throw new MetaException("Unexpected compaction type " + dbValue);
-    }
-  }
-  static Character thriftCompactionType2DbType(CompactionType ct) throws MetaException {
-    switch (ct) {
-      case MAJOR:
-        return MAJOR_TYPE;
-      case MINOR:
-        return MINOR_TYPE;
-      default:
-        throw new MetaException("Unexpected compaction type " + ct);
-    }
-  }
-
   /**
    * {@link #lockInternal()} and {@link #unlockInternal()} are used to serialize those operations that require
    * Select ... For Update to sequence operations properly.  In practice that means when running
@@ -6062,7 +6055,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-      // Find the JDBC driver
+      // Find7 the JDBC driver
       if (driver == null) {
         String driverName = MetastoreConf.getVar(conf, ConfVars.CONNECTION_DRIVER);
         if (driverName == null || driverName.equals("")) {

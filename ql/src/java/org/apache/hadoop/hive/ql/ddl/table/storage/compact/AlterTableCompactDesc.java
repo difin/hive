@@ -36,17 +36,21 @@ public class AlterTableCompactDesc implements DDLDescWithWriteId {
   private final String compactionType;
   private final boolean isBlocking;
   private final String poolName;
+  private final int numberOfBuckets;
   private final Map<String, String> properties;
+  private final String orderByClause;
   private Long writeId;
 
   public AlterTableCompactDesc(TableName tableName, Map<String, String> partitionSpec, String compactionType,
-      boolean isBlocking, String poolName, Map<String, String> properties) {
+      boolean isBlocking, String poolName, int numberOfBuckets, Map<String, String> properties, String orderByClause) {
     this.tableName = tableName.getNotEmptyDbTable();
     this.partitionSpec = partitionSpec;
     this.compactionType = compactionType;
     this.isBlocking = isBlocking;
     this.poolName = poolName;
+    this.numberOfBuckets = numberOfBuckets;
     this.properties = properties;
+    this.orderByClause = orderByClause;
   }
 
   @Explain(displayName = "table name", explainLevels = { Level.USER, Level.DEFAULT, Level.EXTENDED })
@@ -75,9 +79,19 @@ public class AlterTableCompactDesc implements DDLDescWithWriteId {
     return poolName;
   }
 
+  @Explain(displayName = "numberOfBuckets", explainLevels = { Level.USER, Level.DEFAULT, Level.EXTENDED })
+  public int getNumberOfBuckets() {
+    return numberOfBuckets;
+  }
+
   @Explain(displayName = "properties", explainLevels = { Level.USER, Level.DEFAULT, Level.EXTENDED })
   public Map<String, String> getProperties() {
     return properties;
+  }
+
+  @Explain(displayName = "order by", explainLevels = { Level.USER, Level.DEFAULT, Level.EXTENDED })
+  public String getOrderByClause() {
+    return orderByClause;
   }
 
   @Override

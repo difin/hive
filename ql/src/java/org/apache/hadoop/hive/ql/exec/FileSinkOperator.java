@@ -50,6 +50,7 @@ import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.ql.CompilationOpContext;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.exec.Utilities.MissingBucketsContext;
+import org.apache.hadoop.hive.ql.io.AcidOutputFormat;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.io.BucketCodec;
 import org.apache.hadoop.hive.ql.io.HiveFileFormatUtils;
@@ -1062,9 +1063,16 @@ public class FileSinkOperator extends TerminalOperator<FileSinkDesc> implements
         if (valToPaths.get(lbDirName) == null) {
           createNewPaths(null, lbDirName);
         }
-      } else if (isCompactionTable) {
-        int bucketProperty = getBucketProperty(row);
-        bucketId = BucketCodec.determineVersion(bucketProperty).decodeWriterId(bucketProperty);
+      } else if (conf.isCompactionTable()) {
+        if (conf.isRebalanceRequested()) {
+          //For rebalancing compaction, the unencoded bucket id comes in the bucketproperty. It must be encoded before
+          //writing the data out
+          bucketId = getBucketProperty(row);
+          setBucketProperty(hconf, row, bucketId);
+        } else {
+          int bucketProperty = getBucketProperty(row);
+          bucketId = BucketCodec.determineVersion(bucketProperty).decodeWriterId(bucketProperty);
+        }
         if (!filesCreatedPerBucket.get(bucketId)) {
           createBucketFilesForCompaction(fsp);
         }
@@ -1831,6 +1839,20 @@ public class FileSinkOperator extends TerminalOperator<FileSinkDesc> implements
       return ((IntWritable) bucketProperty).get();
     } else {
       return (int) bucketProperty;
+    }
+  }
+
+  /**
+   * Required for rebalancing compaction. Encodes the raw bucket property set by the compactor
+   * @param row The acid row in which the bucket needs to be updated.
+   */
+  private void setBucketProperty(Configuration hiveConf, Object row, int bucketId) {
+    int encodedBucketValue = BucketCodec.V1.encode(new AcidOutputFormat.Options(hiveConf).bucket(bucketId));
+    Object bucketProperty = ((Object[]) row)[2];
+    if (bucketProperty instanceof Writable) {
+      ((IntWritable) bucketProperty).set(encodedBucketValue);
+    } else {
+      ((Object[]) row)[2] = encodedBucketValue;
     }
   }
 

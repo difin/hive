@@ -45,14 +45,14 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests for {@link CompactorMR#createBaseJobConf(HiveConf, String, Table, StorageDescriptor, ValidWriteIdList, CompactionInfo)}.
+ * Tests for {@link MRCompactor#createBaseJobConf(HiveConf, String, Table, StorageDescriptor, ValidWriteIdList, CompactionInfo)}.
  */
 @RunWith(Parameterized.class)
-public class TestCompactorMRJobQueueConfiguration {
+public class TestMRCompactorJobQueueConfiguration {
 
   private final ConfSetup input;
 
-  public TestCompactorMRJobQueueConfiguration(ConfSetup setup) {
+  public TestMRCompactorJobQueueConfiguration(ConfSetup setup) {
     this.input = setup;
   }
 
@@ -60,7 +60,7 @@ public class TestCompactorMRJobQueueConfiguration {
   public void testCreateBaseJobConfHasCorrectJobQueue() {
     Table tbl = createPersonTable();
     tbl.setParameters(input.tableProperties);
-    CompactorMR compactor = new CompactorMR();
+    MRCompactor compactor = new MRCompactor(null);
     CompactionInfo ci = new CompactionInfo(tbl.getDbName(), tbl.getTableName(), null, CompactionType.MAJOR);
     ci.properties = new StringableMap(input.compactionProperties).toString();
     HiveConf conf = new HiveConf();

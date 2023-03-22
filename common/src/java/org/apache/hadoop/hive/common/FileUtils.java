@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -34,7 +35,9 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Set;
 import java.util.Map;
@@ -529,7 +532,7 @@ public final class FileUtils {
       closeFs(proxyUser);
     }
     return isPermitted;
-  }  
+  }
 
   public static boolean isActionPermittedForFileHierarchy(FileSystem fs, FileStatus fileStatus,
       String userName, FsAction action, boolean recurse, FileSystem fsAsUser) throws Exception {
@@ -1199,6 +1202,37 @@ public final class FileUtils {
         throws IOException {
     return RemoteIterators.filteringRemoteIterator(fs.listFiles(path, recursive),
         status -> filter.accept(status.getPath()));
+  }
+
+  public static class AdaptingIterator<T> implements Iterator<T> {
+
+    private final RemoteIterator<T> iterator;
+
+    @Override
+    public boolean hasNext() {
+      try {
+        return iterator.hasNext();
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }
+
+    @Override
+    public T next() {
+      try {
+        if (iterator.hasNext()) {
+          return iterator.next();
+        } else {
+          throw new NoSuchElementException();
+        }
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }
+
+    public AdaptingIterator(RemoteIterator<T> iterator) {
+      this.iterator = iterator;
+    }
   }
 
   /**

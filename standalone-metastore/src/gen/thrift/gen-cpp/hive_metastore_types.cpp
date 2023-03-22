@@ -238,13 +238,15 @@ std::string to_string(const LockType::type& val) {
 
 int _kCompactionTypeValues[] = {
   CompactionType::MINOR,
-  CompactionType::MAJOR
+  CompactionType::MAJOR,
+  CompactionType::REBALANCE
 };
 const char* _kCompactionTypeNames[] = {
   "MINOR",
-  "MAJOR"
+  "MAJOR",
+  "REBALANCE"
 };
-const std::map<int, const char*> _CompactionType_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(2, _kCompactionTypeValues, _kCompactionTypeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
+const std::map<int, const char*> _CompactionType_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(3, _kCompactionTypeValues, _kCompactionTypeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
 
 std::ostream& operator<<(std::ostream& out, const CompactionType::type& val) {
   std::map<int, const char*>::const_iterator it = _CompactionType_VALUES_TO_NAMES.find(val);
@@ -616,7 +618,8 @@ int _kTxnTypeValues[] = {
   TxnType::READ_ONLY,
   TxnType::COMPACTION,
   TxnType::MATER_VIEW_REBUILD,
-  TxnType::SOFT_DELETE
+  TxnType::SOFT_DELETE,
+  TxnType::REBALANCE_COMPACTION
 };
 const char* _kTxnTypeNames[] = {
   "DEFAULT",
@@ -624,9 +627,10 @@ const char* _kTxnTypeNames[] = {
   "READ_ONLY",
   "COMPACTION",
   "MATER_VIEW_REBUILD",
-  "SOFT_DELETE"
+  "SOFT_DELETE",
+  "REBALANCE_COMPACTION"
 };
-const std::map<int, const char*> _TxnType_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(6, _kTxnTypeValues, _kTxnTypeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
+const std::map<int, const char*> _TxnType_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(7, _kTxnTypeValues, _kTxnTypeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
 
 std::ostream& operator<<(std::ostream& out, const TxnType::type& val) {
   std::map<int, const char*>::const_iterator it = _TxnType_VALUES_TO_NAMES.find(val);
@@ -26270,6 +26274,16 @@ void CompactionRequest::__set_poolName(const std::string& val) {
   this->poolName = val;
 __isset.poolName = true;
 }
+
+void CompactionRequest::__set_numberOfBuckets(const int32_t val) {
+  this->numberOfBuckets = val;
+__isset.numberOfBuckets = true;
+}
+
+void CompactionRequest::__set_orderByClause(const std::string& val) {
+  this->orderByClause = val;
+__isset.orderByClause = true;
+}
 std::ostream& operator<<(std::ostream& out, const CompactionRequest& obj)
 {
   obj.printTo(out);
@@ -26390,6 +26404,22 @@ uint32_t CompactionRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
+      case 10:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->numberOfBuckets);
+          this->__isset.numberOfBuckets = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 11:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->orderByClause);
+          this->__isset.orderByClause = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -26464,6 +26494,16 @@ uint32_t CompactionRequest::write(::apache::thrift::protocol::TProtocol* oprot) 
     xfer += oprot->writeString(this->poolName);
     xfer += oprot->writeFieldEnd();
   }
+  if (this->__isset.numberOfBuckets) {
+    xfer += oprot->writeFieldBegin("numberOfBuckets", ::apache::thrift::protocol::T_I32, 10);
+    xfer += oprot->writeI32(this->numberOfBuckets);
+    xfer += oprot->writeFieldEnd();
+  }
+  if (this->__isset.orderByClause) {
+    xfer += oprot->writeFieldBegin("orderByClause", ::apache::thrift::protocol::T_STRING, 11);
+    xfer += oprot->writeString(this->orderByClause);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -26480,6 +26520,8 @@ void swap(CompactionRequest &a, CompactionRequest &b) {
   swap(a.initiatorId, b.initiatorId);
   swap(a.initiatorVersion, b.initiatorVersion);
   swap(a.poolName, b.poolName);
+  swap(a.numberOfBuckets, b.numberOfBuckets);
+  swap(a.orderByClause, b.orderByClause);
   swap(a.__isset, b.__isset);
 }
 
@@ -26493,6 +26535,8 @@ CompactionRequest::CompactionRequest(const CompactionRequest& other966) {
   initiatorId = other966.initiatorId;
   initiatorVersion = other966.initiatorVersion;
   poolName = other966.poolName;
+  numberOfBuckets = other966.numberOfBuckets;
+  orderByClause = other966.orderByClause;
   __isset = other966.__isset;
 }
 CompactionRequest& CompactionRequest::operator=(const CompactionRequest& other967) {
@@ -26505,6 +26549,8 @@ CompactionRequest& CompactionRequest::operator=(const CompactionRequest& other96
   initiatorId = other967.initiatorId;
   initiatorVersion = other967.initiatorVersion;
   poolName = other967.poolName;
+  numberOfBuckets = other967.numberOfBuckets;
+  orderByClause = other967.orderByClause;
   __isset = other967.__isset;
   return *this;
 }
@@ -26520,6 +26566,8 @@ void CompactionRequest::printTo(std::ostream& out) const {
   out << ", " << "initiatorId="; (__isset.initiatorId ? (out << to_string(initiatorId)) : (out << "<null>"));
   out << ", " << "initiatorVersion="; (__isset.initiatorVersion ? (out << to_string(initiatorVersion)) : (out << "<null>"));
   out << ", " << "poolName="; (__isset.poolName ? (out << to_string(poolName)) : (out << "<null>"));
+  out << ", " << "numberOfBuckets="; (__isset.numberOfBuckets ? (out << to_string(numberOfBuckets)) : (out << "<null>"));
+  out << ", " << "orderByClause="; (__isset.orderByClause ? (out << to_string(orderByClause)) : (out << "<null>"));
   out << ")";
 }
 
@@ -26607,6 +26655,16 @@ __isset.retryRetention = true;
 void CompactionInfoStruct::__set_poolname(const std::string& val) {
   this->poolname = val;
 __isset.poolname = true;
+}
+
+void CompactionInfoStruct::__set_numberOfBuckets(const int32_t val) {
+  this->numberOfBuckets = val;
+__isset.numberOfBuckets = true;
+}
+
+void CompactionInfoStruct::__set_orderByClause(const std::string& val) {
+  this->orderByClause = val;
+__isset.orderByClause = true;
 }
 std::ostream& operator<<(std::ostream& out, const CompactionInfoStruct& obj)
 {
@@ -26778,6 +26836,22 @@ uint32_t CompactionInfoStruct::read(::apache::thrift::protocol::TProtocol* iprot
           xfer += iprot->skip(ftype);
         }
         break;
+      case 18:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->numberOfBuckets);
+          this->__isset.numberOfBuckets = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 19:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->orderByClause);
+          this->__isset.orderByClause = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -26884,6 +26958,16 @@ uint32_t CompactionInfoStruct::write(::apache::thrift::protocol::TProtocol* opro
     xfer += oprot->writeString(this->poolname);
     xfer += oprot->writeFieldEnd();
   }
+  if (this->__isset.numberOfBuckets) {
+    xfer += oprot->writeFieldBegin("numberOfBuckets", ::apache::thrift::protocol::T_I32, 18);
+    xfer += oprot->writeI32(this->numberOfBuckets);
+    xfer += oprot->writeFieldEnd();
+  }
+  if (this->__isset.orderByClause) {
+    xfer += oprot->writeFieldBegin("orderByClause", ::apache::thrift::protocol::T_STRING, 19);
+    xfer += oprot->writeString(this->orderByClause);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -26908,6 +26992,8 @@ void swap(CompactionInfoStruct &a, CompactionInfoStruct &b) {
   swap(a.enqueueTime, b.enqueueTime);
   swap(a.retryRetention, b.retryRetention);
   swap(a.poolname, b.poolname);
+  swap(a.numberOfBuckets, b.numberOfBuckets);
+  swap(a.orderByClause, b.orderByClause);
   swap(a.__isset, b.__isset);
 }
 
@@ -26929,6 +27015,8 @@ CompactionInfoStruct::CompactionInfoStruct(const CompactionInfoStruct& other969)
   enqueueTime = other969.enqueueTime;
   retryRetention = other969.retryRetention;
   poolname = other969.poolname;
+  numberOfBuckets = other969.numberOfBuckets;
+  orderByClause = other969.orderByClause;
   __isset = other969.__isset;
 }
 CompactionInfoStruct& CompactionInfoStruct::operator=(const CompactionInfoStruct& other970) {
@@ -26949,6 +27037,8 @@ CompactionInfoStruct& CompactionInfoStruct::operator=(const CompactionInfoStruct
   enqueueTime = other970.enqueueTime;
   retryRetention = other970.retryRetention;
   poolname = other970.poolname;
+  numberOfBuckets = other970.numberOfBuckets;
+  orderByClause = other970.orderByClause;
   __isset = other970.__isset;
   return *this;
 }
@@ -26972,6 +27062,8 @@ void CompactionInfoStruct::printTo(std::ostream& out) const {
   out << ", " << "enqueueTime="; (__isset.enqueueTime ? (out << to_string(enqueueTime)) : (out << "<null>"));
   out << ", " << "retryRetention="; (__isset.retryRetention ? (out << to_string(retryRetention)) : (out << "<null>"));
   out << ", " << "poolname="; (__isset.poolname ? (out << to_string(poolname)) : (out << "<null>"));
+  out << ", " << "numberOfBuckets="; (__isset.numberOfBuckets ? (out << to_string(numberOfBuckets)) : (out << "<null>"));
+  out << ", " << "orderByClause="; (__isset.orderByClause ? (out << to_string(orderByClause)) : (out << "<null>"));
   out << ")";
 }
 
