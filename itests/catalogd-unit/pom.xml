@@ -100,6 +100,14 @@
                 <artifactId>javax.json</artifactId>
               </exclusion>
               <exclusion>
+                <groupId>org.apache.iceberg</groupId>
+                <artifactId>iceberg-api</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>org.apache.iceberg</groupId>
+                <artifactId>iceberg-hive-runtime</artifactId>
+              </exclusion>
+              <exclusion>
                 <groupId>org.apache.impala</groupId>
                 <artifactId>impala-minimal-hive-exec</artifactId>
               </exclusion>
@@ -157,6 +165,14 @@
               <exclusion>
                 <groupId>org.glassfish</groupId>
                 <artifactId>javax.json</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>org.apache.iceberg</groupId>
+                <artifactId>iceberg-api</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>org.apache.iceberg</groupId>
+                <artifactId>iceberg-hive-runtime</artifactId>
               </exclusion>
               <exclusion>
                 <groupId>org.apache.impala</groupId>

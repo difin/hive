@@ -514,6 +514,10 @@
           <artifactId>*</artifactId>
         </exclusion>
         <exclusion>
+          <groupId>org.apache.iceberg</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>org.apache.kudu</groupId>
           <artifactId>*</artifactId>
         </exclusion>
