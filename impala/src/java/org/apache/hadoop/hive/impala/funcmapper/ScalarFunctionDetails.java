@@ -21,44 +21,28 @@ package org.apache.hadoop.hive.impala.funcmapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.reflect.ClassPath;
-import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
-import com.google.gson.reflect.TypeToken;
-import java.lang.annotation.Annotation;
-import java.io.IOException;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
-import org.apache.hadoop.hive.impala.exec.ImpalaSessionImpl;
-import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.ResourceUri;
-import org.apache.hadoop.hive.metastore.api.ResourceType;
-import org.apache.hadoop.hive.ql.exec.Description;
+import org.apache.hadoop.hive.ql.exec.FunctionInfo;
+import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
+import org.apache.hadoop.hive.ql.exec.Registry;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.impala.analysis.HdfsUri;
 import org.apache.impala.catalog.BuiltinsDb;
 import org.apache.impala.catalog.Function;
 import org.apache.impala.catalog.ScalarFunction;
-import org.apache.impala.catalog.ScalarType;
 import org.apache.impala.catalog.Type;
-import org.apache.impala.thrift.TBackendGflags;
 import org.apache.impala.thrift.TFunctionBinaryType;
-import org.apache.impala.thrift.TPrimitiveType;
-import org.apache.impala.util.FunctionUtils;
 
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -140,7 +124,7 @@ public class ScalarFunctionDetails implements FunctionDetails {
   private static volatile Map<ImpalaFunctionSignature, ScalarFunctionDetails>
       ALL_SCALARS_MAP = ImmutableMap.of();
 
-  private static volatile Map<String, Class<?>> HIVE_UDF_MAP = new HashMap<>();
+  private static volatile Map<String, List<String>> HIVE_UDF_MAP = new HashMap<>();
 
   /**
    * Fetch the functions from the Impala frontend and return them as a ScalarFunctionDetails list.
@@ -353,17 +337,11 @@ public class ScalarFunctionDetails implements FunctionDetails {
     // Because of this, the ScalarFunctionDetail structure is created on the fly and resolved
     // by the HiveFunctionResolver.
     if (HIVE_UDF_MAP.containsKey(name)) {
-      try {
-        sfd = new ScalarFunctionDetails(name,
-            ImpalaTypeConverter.getNormalizedImpalaTypes(operandTypes),
-            ImpalaTypeConverter.getNormalizedImpalaType(retType),
-            Hive.get().getConf().getVar(HiveConf.ConfVars.IMPALA_RUNTIME_HIVE_EXEC_JAR_LOCATION),
-            HIVE_UDF_MAP.get(name).getName());
-      } catch (HiveException e) {
-        // This catch is needed because retrieving the conf variable may fail. If this fails, we may as
-        // well throw a RuntimeException here, since something basic is wrong.
-        throw new RuntimeException("Exception trying to create ScalarFunctionDetails", e);
-      }
+      sfd = new ScalarFunctionDetails(name,
+          ImpalaTypeConverter.getNormalizedImpalaTypes(operandTypes),
+          ImpalaTypeConverter.getNormalizedImpalaType(retType),
+          HIVE_UDF_MAP.get(name).get(1),
+          HIVE_UDF_MAP.get(name).get(0));
     }
     return sfd;
   }
@@ -452,20 +430,45 @@ public class ScalarFunctionDetails implements FunctionDetails {
    * Add the builtin in hive UDFs to the map. The Hive UDFs should all be in the
    * ql.udf.generic package and must have an annotation defined.
    */
-  public static void addHiveUDFs() throws IOException, ClassNotFoundException {
-    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-    ClassPath cp = ClassPath.from(loader);
-    Set<ClassPath.ClassInfo> udfClasses =
-        cp.getTopLevelClasses("org.apache.hadoop.hive.ql.udf.generic");
-    for (ClassPath.ClassInfo udfClass : udfClasses) {
-      Class<?> c = Class.forName(udfClass.getName());
-      for (Annotation a : c.getAnnotations()) {
-        if (a instanceof Description) {
-          Description d = (Description) a;
-          HIVE_UDF_MAP.put(d.name(), c);
-        }
+  public static void addHiveUDFs() throws HiveException {
+    // load generic UDFs under org.apache.hadoop.hive.ql.udf.generic
+    Set<String> functionsFromFunctionRegistry = FunctionRegistry.getFunctionNames();
+    for (String funcName: functionsFromFunctionRegistry) {
+      Class<?> funcClass = FunctionRegistry.getFunctionInfo(funcName).getFunctionClass();
+      if (funcClass.getPackage().getName().contains("org.apache.hadoop.hive.ql.udf")) {
+        HIVE_UDF_MAP.put(funcName, Arrays.asList(funcClass.getName(), ""));
       }
     }
+
+    // load permanent functions created with CREATE FUNCTION and stored in HMS
+    List<org.apache.hadoop.hive.metastore.api.Function> permanentFunctions = Hive.get().getAllFunctions();
+    for (org.apache.hadoop.hive.metastore.api.Function func: permanentFunctions) {
+      List<ResourceUri> resources = func.getResourceUris();
+      if (resources.size() != 1) {
+        continue;
+      }
+      //getFunctionName doesn't return db. For db.func, it returns func
+      HIVE_UDF_MAP.put(func.getFunctionName(), Arrays.asList(func.getClassName(), resources.get(0).getUri()));
+    }
+
+    // load temporary functions from Session Registry
+    Registry sessionRegistry = SessionState.getRegistry();
+    if (sessionRegistry != null) {
+      Set<String> temporaryFunctions = sessionRegistry.getCurrentFunctionNames();
+      for (String funcName: temporaryFunctions) {
+        FunctionInfo funcInfo = sessionRegistry.getFunctionInfo(funcName);
+        FunctionInfo.FunctionResource[] resources = funcInfo.getResources();
+        if (resources.length != 1) {
+          continue;
+        }
+        // put only if it's not replacing a permanent function
+        HIVE_UDF_MAP.putIfAbsent(funcName, Arrays.asList(funcInfo.getFunctionClass().getName(),
+                resources[0].getResourceURI()));
+      }
+    }
+
+    // needed for hplsql
+    HIVE_UDF_MAP.put("hplsql", Arrays.asList("org.apache.hive.hplsql.udf.Udf", ""));
   }
 
   /**

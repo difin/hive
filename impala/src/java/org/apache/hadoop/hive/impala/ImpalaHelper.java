@@ -18,11 +18,10 @@
 
 package org.apache.hadoop.hive.impala;
 
-import org.apache.hadoop.hive.impala.exec.ImpalaSessionManager;
 import org.apache.hadoop.hive.impala.funcmapper.AggFunctionDetails;
 import org.apache.hadoop.hive.impala.funcmapper.ScalarFunctionDetails;
 import org.apache.hadoop.hive.ql.engine.EngineHelper;
-import org.apache.hadoop.hive.ql.metadata.Hive;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.impala.service.BackendConfig;
 import org.apache.impala.service.FeSupport;
 import org.apache.impala.thrift.TBackendGflags;
@@ -69,6 +68,10 @@ public class ImpalaHelper extends EngineHelper {
       }
 
       ScalarFunctionDetails.addHiveUDFs();
+    } catch (HiveException e) {
+      // This catch is needed because retrieving the conf variable may fail.
+      LOG.warn("Exception trying to create ScalarFunctionDetails", e);
+      initializationError = e;
     } catch (Exception e) {
       LOG.warn("Unable to load all Impala functions: ", e);
       initializationError = e;

@@ -100,12 +100,12 @@ public class HiveGenericUDFFunctionResolver implements ImpalaFunctionResolver {
 
     for (RexNode operand: operands) {
       RexNode value = operand;
-      if (isLiteralTypeSmallerThanInteger(operand)) {
+      if (isTypeSmallerThanInteger(operand)) {
         value = rexBuilder
-            .makeLiteral(
-                RexLiteral.intValue(operand),
+            .makeCast(
                 typeFactory.createSqlType(SqlTypeName.INTEGER),
-                false
+                value,
+                true
             );
       }
       result.add(value);
@@ -114,10 +114,7 @@ public class HiveGenericUDFFunctionResolver implements ImpalaFunctionResolver {
     return result;
   }
 
-  private boolean isLiteralTypeSmallerThanInteger(RexNode node) {
-    if (!(node instanceof RexLiteral)) {
-      return false;
-    }
+  private boolean isTypeSmallerThanInteger(RexNode node) {
     return node.getType().getSqlTypeName() == SqlTypeName.TINYINT ||
         node.getType().getSqlTypeName() == SqlTypeName.SMALLINT;
   }
