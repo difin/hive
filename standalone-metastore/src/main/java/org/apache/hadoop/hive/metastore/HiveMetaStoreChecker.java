@@ -29,6 +29,7 @@ import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getPartCols;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getPartitionListByFilterExp;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getPartitionName;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getPartitionSpec;
+import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getPartitionsByProjectSpec;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getPath;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.isPartitioned;
 
@@ -58,6 +59,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.GetPartitionsRequest;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.Partition;
@@ -266,12 +268,18 @@ public class HiveMetaStoreChecker {
                   MetastoreConf.getVar(conf, MetastoreConf.ConfVars.DEFAULTPARTITIONNAME), results);
           parts = new PartitionIterable(results);
         } else {
+        GetPartitionsRequest request = new GetPartitionsRequest(table.getDbName(), table.getTableName(),
+            null, null);
+        request.setProjectionSpec(new HiveMetaStoreClient.GetPartitionProjectionsSpecBuilder()
+            .addProjectField("sd.location")
+            .addProjectField("createTime").addProjectField("tableName")
+            .addProjectField("values").build());
+        request.setCatName(table.getCatName());
         int batchSize = MetastoreConf.getIntVar(conf, MetastoreConf.ConfVars.BATCH_RETRIEVE_MAX);
         if (batchSize > 0) {
-          parts = new PartitionIterable(getMsc(), table, batchSize);
+          parts = new PartitionIterable(getMsc(), table, batchSize).withProjectSpec(request);
         } else {
-          List<Partition> loadedPartitions = getAllPartitionsOf(getMsc(), table);
-          parts = new PartitionIterable(loadedPartitions);
+          parts = new PartitionIterable(getPartitionsByProjectSpec(msc, request));
         }
       }
     } else {
@@ -376,8 +384,8 @@ public class HiveMetaStoreChecker {
                   result.getExpiredPartitions().add(pr);
                 }
                 if (LOG.isDebugEnabled()) {
-                  LOG.debug("{}.{}.{}.{} expired. createdAt: {} current: {} age: {}s expiry: {}s", partition.getCatName(),
-                          partition.getDbName(), partition.getTableName(), pr.getPartitionName(), createdTime, currentEpochSecs,
+                  LOG.debug("{}.{}.{}.{} expired. createdAt: {} current: {} age: {}s expiry: {}s", table.getCatName(),
+                          table.getDbName(), partition.getTableName(), pr.getPartitionName(), createdTime, currentEpochSecs,
                           partitionAgeSeconds, partitionExpirySeconds);
                 }
               }

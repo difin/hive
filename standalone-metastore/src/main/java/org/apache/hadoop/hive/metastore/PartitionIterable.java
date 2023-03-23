@@ -23,8 +23,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.hadoop.hive.metastore.api.GetPartitionsFilterSpec;
+import org.apache.hadoop.hive.metastore.api.GetPartitionsRequest;
 import org.apache.hadoop.hive.metastore.api.Partition;
+import org.apache.hadoop.hive.metastore.api.PartitionFilterMode;
 import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.metastore.utils.MetastoreException;
 
 
@@ -99,8 +103,16 @@ public class PartitionIterable implements Iterable<Partition> {
           batch_counter++;
         }
         try {
-          batchIter =
-            msc.getPartitionsByNames(table.getCatName(), table.getDbName(), table.getTableName(), nameBatch).iterator();
+          if (request != null) {
+            GetPartitionsFilterSpec getPartitionsFilterSpec = new GetPartitionsFilterSpec();
+            getPartitionsFilterSpec.setFilterMode(PartitionFilterMode.BY_NAMES);
+            getPartitionsFilterSpec.setFilters(nameBatch);
+            request.setFilterSpec(getPartitionsFilterSpec);
+            batchIter = MetaStoreUtils.getPartitionsByProjectSpec(msc, request).iterator();
+          } else {
+            batchIter = msc.getPartitionsByNames(table.getCatName(), table.getDbName(), table.getTableName(), nameBatch)
+                .iterator();
+          }
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
@@ -128,6 +140,7 @@ public class PartitionIterable implements Iterable<Partition> {
   private IMetaStoreClient msc = null; // Assumes one instance of this + single-threaded compilation for each query.
   private Table table = null;
   private List<String> partitionNames = null;
+  private GetPartitionsRequest request = null;
   private int batch_size;
 
   /**
@@ -159,5 +172,10 @@ public class PartitionIterable implements Iterable<Partition> {
     } catch (Exception e) {
       throw new MetastoreException(e);
     }
+  }
+
+  public PartitionIterable withProjectSpec(GetPartitionsRequest request) {
+    this.request = request;
+    return this;
   }
 }

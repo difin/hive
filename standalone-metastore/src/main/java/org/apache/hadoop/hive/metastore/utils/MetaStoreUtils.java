@@ -20,6 +20,8 @@ package org.apache.hadoop.hive.metastore.utils;
 import java.beans.PropertyDescriptor;
 import org.apache.hadoop.hive.common.TableName;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.hadoop.hive.metastore.api.GetPartitionsRequest;
+import org.apache.hadoop.hive.metastore.api.GetPartitionsResponse;
 import org.apache.hadoop.hive.metastore.api.PartitionSpec;
 import org.apache.hadoop.hive.metastore.api.PartitionSpecWithSharedSD;
 import org.apache.hadoop.hive.metastore.api.PartitionWithoutSD;
@@ -2258,6 +2260,43 @@ public class MetaStoreUtils {
       return null;
     }
     return new Path(location);
+  }
+
+  public static List<Partition> getPartitionsByProjectSpec(IMetaStoreClient msc, GetPartitionsRequest request)
+      throws MetastoreException {
+    try {
+      GetPartitionsResponse response = msc.getPartitionsWithSpecs(request);
+      List<PartitionSpec> partitionSpecList = response.getPartitionSpec();
+      List<Partition> result = new ArrayList<>();
+      for (PartitionSpec spec : partitionSpecList) {
+        if (spec.getPartitionList() != null && spec.getPartitionList().getPartitions() != null) {
+          spec.getPartitionList().getPartitions().forEach(partition -> {
+            partition.setCatName(spec.getCatName());
+            partition.setDbName(spec.getDbName());
+            partition.setTableName(spec.getTableName());
+            result.add(partition);
+          });
+        }
+        PartitionSpecWithSharedSD pSpecWithSharedSD = spec.getSharedSDPartitionSpec();
+        if (pSpecWithSharedSD == null) {
+          continue;
+        }
+        List<PartitionWithoutSD> withoutSDList = pSpecWithSharedSD.getPartitions();
+        StorageDescriptor descriptor = pSpecWithSharedSD.getSd();
+        if (withoutSDList != null) {
+          for (PartitionWithoutSD psd : withoutSDList) {
+            StorageDescriptor newSD = new StorageDescriptor(descriptor);
+            Partition partition = new Partition(psd.getValues(), spec.getDbName(), spec.getTableName(),
+                psd.getCreateTime(), psd.getLastAccessTime(), newSD, psd.getParameters());
+            partition.getSd().setLocation(newSD.getLocation() + psd.getRelativePath());
+            result.add(partition);
+          }
+        }
+      }
+      return result;
+    } catch (Exception e) {
+      throw new MetastoreException(e);
+    }
   }
 
   public static void getPartitionListByFilterExp(IMetaStoreClient msc, Table table, byte[] filterExp,
