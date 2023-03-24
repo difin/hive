@@ -1206,7 +1206,7 @@ class MetaStoreDirectSql {
         return;
       }
 
-      String colTypeStr = partitionKeys.get(partColIndex).getType();
+      String colTypeStr = ColumnType.getTypeName(partitionKeys.get(partColIndex).getType());
       // We skipped 'like', other ops should all work as long as the types are right.
       FilterType colType = FilterType.fromType(colTypeStr);
       if (colType == FilterType.Invalid) {
