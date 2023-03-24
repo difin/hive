@@ -11910,7 +11910,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     if (msHost != null && !msHost.trim().isEmpty()) {
       return msHost.trim();
     } else {
-      return InetAddress.getLocalHost().getHostName();
+      return InetAddress.getLocalHost().getCanonicalHostName();
     }
   }
 
