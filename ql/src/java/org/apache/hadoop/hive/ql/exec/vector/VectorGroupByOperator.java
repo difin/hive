@@ -158,6 +158,7 @@ public class VectorGroupByOperator extends Operator<GroupByDesc>
 
   // tracks overall access count in map agg buffer any given time.
   private long totalAccessCount;
+  private boolean batchNeedsClone;
 
   /**
    * Interface for processing mode: global, hash, unsorted streaming, or group batch
@@ -1120,6 +1121,13 @@ public class VectorGroupByOperator extends Operator<GroupByDesc>
         objectInspectors.add(objInsp);
       }
 
+      for (VectorAggregateExpression aggregator : aggregators) {
+        if (aggregator.batchNeedsClone()) {
+          batchNeedsClone = true;
+          break;
+        }
+      }
+
       keyWrappersBatch = VectorHashKeyWrapperBatch.compileKeyWrapperBatch(keyExpressions);
       aggregationBatchInfo = new VectorAggregationBufferBatch();
       aggregationBatchInfo.compileAggregationBatchInfo(aggregators);
@@ -1364,5 +1372,9 @@ public class VectorGroupByOperator extends Operator<GroupByDesc>
 
   public long getMaxMemory() {
     return maxMemory;
+  }
+
+  public boolean batchNeedsClone() {
+    return batchNeedsClone;
   }
 }
