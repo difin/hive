@@ -1,4 +1,3 @@
---! qt:disabled:CDPD-1666
 --! qt:dataset:alltypesorc
 SET hive.vectorized.execution.enabled=false;
 set hive.compute.query.using.stats=false;
