@@ -66,9 +66,7 @@ public class ComputeStatsSemanticAnalyzer extends SemanticAnalyzer {
   @Override
   public void analyzeInternal(ASTNode root) throws SemanticException {
     LOG.debug("Compute statistics semantic analyzer");
-    int token = root.getType();
-    Preconditions.checkState(token == ImpalaToken.TOK_COMPUTE_STATS_WITH_IMPALA_SYNTAX ||
-        token == ImpalaToken.TOK_COMPUTE_STATS_WITH_HIVE_SYNTAX);
+    Preconditions.checkState(root.getType() == ImpalaToken.TOK_COMPUTE_STATS);
     ASTNode tableNode = (ASTNode) root.getChild(0);
     Map<String, String> partitionSpec = getPartSpec((ASTNode) tableNode.getChild(1));
     // PlanUtils.addInput adds the ReadEntity object into "inputs" which is
@@ -85,6 +83,7 @@ public class ComputeStatsSemanticAnalyzer extends SemanticAnalyzer {
     }
 
     PlanUtils.addInput(inputs, new ReadEntity(table, null, true));
+
 
     if (partitionSpec != null) {
       if (!AnalyzeCommandUtils.isIncrementalStats(root)) {
@@ -113,16 +112,9 @@ public class ComputeStatsSemanticAnalyzer extends SemanticAnalyzer {
     // results for these statement
     FetchWork fetch = new ImpalaFetchWork();
     fetchTask = (FetchTask) TaskFactory.get(fetch);
-
-    // If we are using Impala flavor, grab the original query. Otherwise, the
-    // query needs to be generated from the ASTNode.
-    String statsStmtBeforeAddingDb = (token == ImpalaToken.TOK_COMPUTE_STATS_WITH_IMPALA_SYNTAX)
-        ? queryState.getQueryString()
-        : regenerateQueryFromAST(root);
-
     String statsStatement = ImpalaSemanticAnalyzerUtils.getQueryWithDatabase(
         (ASTNode) tableNode.getChild(0),
-        statsStmtBeforeAddingDb,
+        regenerateQueryFromAST(root),
         SessionState.get().getCurrentDatabase());
     String invalidateStmt =
         generateInvalidateMetadataStmt((ASTNode) tableNode.getChild(0), table);
@@ -193,18 +185,11 @@ public class ComputeStatsSemanticAnalyzer extends SemanticAnalyzer {
     return partitionString;
   }
 
+  // Generate the AST with Impala syntax
   public static ASTNode getASTNode(ComputeStatsStmt stmt, String command, Context ctx)
         throws ParseException {
-    return getASTNode(stmt, command, ctx, ImpalaToken.TOK_COMPUTE_STATS_WITH_IMPALA_SYNTAX);
-  }
-
-  // Generate the AST with Impala syntax
-  // The token parameter differentiates whether the command used Impala syntax or
-  // Hive syntax
-  private static ASTNode getASTNode(ComputeStatsStmt stmt, String command, Context ctx,
-        int token) throws ParseException {
     Token computeStatsToken = new ImmutableCommonToken(
-        token, ImpalaToken.COMPUTE_STATS_STRING);
+        ImpalaToken.TOK_COMPUTE_STATS, ImpalaToken.COMPUTE_STATS_STRING);
     ImpalaASTNode computeStatsRoot = new ImpalaASTNode(computeStatsToken);
     String tableAndPartitionString = stmt.getTableName().toString();
     if (stmt.getPartitionSet() != null) {
@@ -228,8 +213,7 @@ public class ComputeStatsSemanticAnalyzer extends SemanticAnalyzer {
     try {
       impalaComputeStatsStmt = regenerateQueryFromAST(root);
       ComputeStatsStmt impalaStmt = (ComputeStatsStmt) Parser.parse(impalaComputeStatsStmt);
-      return getASTNode(impalaStmt, impalaComputeStatsStmt, ctx,
-          ImpalaToken.TOK_COMPUTE_STATS_WITH_HIVE_SYNTAX);
+      return getASTNode(impalaStmt, impalaComputeStatsStmt, ctx);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
