@@ -1,4 +1,4 @@
---! qt:disabled:hive-test-kube migration
+
 --! qt:dataset:src
 
 set hive.metastore.event.listeners=org.apache.hive.hcatalog.listener.DbNotificationListener;
