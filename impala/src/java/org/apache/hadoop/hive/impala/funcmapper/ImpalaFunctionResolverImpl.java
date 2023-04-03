@@ -559,6 +559,9 @@ public class ImpalaFunctionResolverImpl implements ImpalaFunctionResolver {
 
   private static ImpalaFunctionResolver createGenericFuncResolver(FunctionHelper helper,
       String func, List<RexNode> inputs) throws CalciteSemanticException {
+    if (func.toLowerCase().startsWith("floor_")) {
+      return new FloorIntervalFunctionResolver(helper, func, inputs);
+    }
     if (func.equals("internal_interval")) {
       return new InternalIntervalFunctionResolver(helper, inputs);
     }

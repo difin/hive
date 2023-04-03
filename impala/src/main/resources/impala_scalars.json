@@ -240,6 +240,38 @@
         "retType": "NULL_TYPE"
     },
     {
+        "fnName": "floor_year",
+        "retType": "INT"
+    },
+    {
+        "fnName": "floor_quarter",
+        "retType": "INT"
+    },
+    {
+        "fnName": "floor_month",
+        "retType": "INT"
+    },
+    {
+        "fnName": "floor_day",
+        "retType": "INT"
+    },
+    {
+        "fnName": "floor_week",
+        "retType": "INT"
+    },
+    {
+        "fnName": "floor_hour",
+        "retType": "INT"
+    },
+    {
+        "fnName": "floor_minute",
+        "retType": "INT"
+    },
+    {
+        "fnName": "floor_second",
+        "retType": "INT"
+    },
+    {
         "impalaFnName": "sq_count_check",
         "fnName": "sq_count_check",
         "retType": "BIGINT",
