@@ -367,7 +367,6 @@ public class TestSessionManagerMetrics {
         MetricsConstant.HS2_AVG_ACTIVE_SESSION_TIME, "NaN");
   }
 
-  @Ignore("CDPD-9053 Ignore TestSessionManagerMetrics.testAbandonedSessionMetrics as it is flaky")
   @Test
   public void testAbandonedSessionMetrics() throws Exception {
 
