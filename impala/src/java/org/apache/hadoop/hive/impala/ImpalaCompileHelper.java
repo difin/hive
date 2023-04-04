@@ -172,7 +172,8 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
         return new ResetMetadataSemanticAnalyzer(queryState);
       case ImpalaToken.TOK_DROP_STATS:
         return new DropStatsSemanticAnalyzer(queryState);
-      case ImpalaToken.TOK_COMPUTE_STATS:
+      case ImpalaToken.TOK_COMPUTE_STATS_WITH_HIVE_SYNTAX:
+      case ImpalaToken.TOK_COMPUTE_STATS_WITH_IMPALA_SYNTAX:
         return new ComputeStatsSemanticAnalyzer(queryState);
       case ImpalaToken.TOK_CREATE_FUNCTION:
         return new CreateFuncSemanticAnalyzer(queryState);
@@ -191,7 +192,8 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
         return HiveOperation.REFRESH_TABLE;
       case ImpalaToken.TOK_DROP_STATS:
         return HiveOperation.DROP_STATS;
-      case ImpalaToken.TOK_COMPUTE_STATS:
+      case ImpalaToken.TOK_COMPUTE_STATS_WITH_HIVE_SYNTAX:
+      case ImpalaToken.TOK_COMPUTE_STATS_WITH_IMPALA_SYNTAX:
         return HiveOperation.ANALYZE_TABLE;
       case ImpalaToken.TOK_CREATE_FUNCTION:
         return HiveOperation.CREATEFUNCTION;

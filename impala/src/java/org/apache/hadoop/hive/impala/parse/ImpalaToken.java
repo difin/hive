@@ -25,9 +25,10 @@ public class ImpalaToken {
   public static final String REFRESH_TABLE_STRING = "refresh table";
   public static final int TOK_DROP_STATS = 2000002;
   public static final String DROP_STATS_STRING = "drop statistics";
-  public static final int TOK_COMPUTE_STATS = 2000003;
+  public static final int TOK_COMPUTE_STATS_WITH_IMPALA_SYNTAX = 2000003;
   public static final String COMPUTE_STATS_STRING = "compute statistics";
   public static final int TOK_CREATE_FUNCTION = 2000004;
   public static final String CREATE_FUNCTION_STRING = "create function";
+  public static final int TOK_COMPUTE_STATS_WITH_HIVE_SYNTAX = 2000005;
 }
 
