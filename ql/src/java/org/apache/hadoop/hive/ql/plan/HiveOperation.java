@@ -219,9 +219,12 @@ public enum HiveOperation {
   CREATE_SCHEDULED_QUERY("CREATE SCHEDULED QUERY", HiveParser.TOK_CREATE_SCHEDULED_QUERY, null, null),
   ALTER_SCHEDULED_QUERY("ALTER SCHEDULED QUERY", HiveParser.TOK_ALTER_SCHEDULED_QUERY, null, null),
   DROP_SCHEDULED_QUERY("DROP SCHEDULED QUERY", HiveParser.TOK_DROP_SCHEDULED_QUERY, null, null),
-  // Refresh operation used for Impala engine, need to support a more generalized method to deal
+  // Operations used for Impala engine, need to support a more generalized method to deal
   // with operations that don't have tokens associated with it.
-  REFRESH_TABLE("REFRESH TABLE", -1, null, null)
+  REFRESH_TABLE("REFRESH TABLE", -1, null, null),
+  SHOW_TABLE_STATS("SHOW TABLE STATS", -1, null, null),
+  SHOW_COLUMN_STATS("SHOW COLUMN STATS", -1, null, null),
+  SHOW_FILES_IN("SHOW FILES IN", -1, null, null)
   ;
 
   private final String operationName;

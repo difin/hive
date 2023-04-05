@@ -15,20 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.hadoop.hive.impala.parse;
 
-public class ImpalaToken {
-  // 2000001 is an integer value that is out of range from anything that
-  // the Antlr parser will produce.
-  public static final int TOK_REFRESH_TABLE = 2000001;
-  public static final String REFRESH_TABLE_STRING = "refresh table";
-  public static final int TOK_DROP_STATS = 2000002;
-  public static final String DROP_STATS_STRING = "drop statistics";
-  public static final int TOK_COMPUTE_STATS_WITH_IMPALA_SYNTAX = 2000003;
-  public static final String COMPUTE_STATS_STRING = "compute statistics";
-  public static final int TOK_CREATE_FUNCTION = 2000004;
-  public static final String CREATE_FUNCTION_STRING = "create function";
-  public static final int TOK_COMPUTE_STATS_WITH_HIVE_SYNTAX = 2000005;
+import org.apache.hadoop.hive.ql.metadata.Table;
+import org.apache.hadoop.hive.ql.parse.ASTNode;
+import org.apache.hadoop.hive.ql.parse.SemanticException;
+
+import java.util.Map;
+
+/**
+ * Interface for validate methods for statement types.
+ */
+public interface SemanticAnalyzerValidator {
+  void validate(StatementType stmtType, ASTNode root, Table table,
+      Map<String, String> partitionSpec) throws SemanticException;
 }
 

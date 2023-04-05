@@ -77,7 +77,7 @@ public class CreateFuncSemanticAnalyzer extends AbstractFunctionAnalyzer {
   @Override
   public void analyzeInternal(ASTNode root) throws SemanticException {
     LOG.debug("Create function semantic analyzer");
-    assert root.getType() == ImpalaToken.TOK_CREATE_FUNCTION;
+    Preconditions.checkState(root.getType() == StmtTypeConstants.TOK_CREATE_FUNCTION);
     String functionName = root.getChild(0).getText().toLowerCase();
     boolean isTemporary = false;
     String className = unescapeSQLString(root.getChild(1).getText());
@@ -111,10 +111,10 @@ public class CreateFuncSemanticAnalyzer extends AbstractFunctionAnalyzer {
 
   }
 
-  public static ASTNode getASTNode(CreateFunctionStmtBase stmt, String command, Context ctx)
+  public static ASTNode getASTNode(CreateFunctionStmtBase stmt, String command)
         throws AnalysisException, ParseException {
     Token createFuncToken = new ImmutableCommonToken(
-        ImpalaToken.TOK_CREATE_FUNCTION, ImpalaToken.CREATE_FUNCTION_STRING);
+        StmtTypeConstants.TOK_CREATE_FUNCTION, StmtTypeConstants.CREATE_FUNCTION_STRING);
     ImpalaASTNode createFuncRoot = new ImpalaASTNode(createFuncToken);
 
     Token functionNameToken = new ImmutableCommonToken(

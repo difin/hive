@@ -162,6 +162,9 @@ public enum HiveOperationType {
   ALTER_SCHEDULED_QUERY,
   DROP_SCHEDULED_QUERY,
   REFRESH_TABLE,
+  SHOW_TABLE_STATS,
+  SHOW_COLUMN_STATS,
+  SHOW_FILES_IN,
 
   // ==== Hive command operation types starts here ==== //
   SET,
