@@ -857,6 +857,10 @@
       <artifactId>RoaringBitmap</artifactId>
       <version>0.9.22</version>
     </dependency>
+    <dependency>
+      <groupId>io.airlift</groupId>
+      <artifactId>aircompressor</artifactId>
+    </dependency>
   </dependencies>
   <profiles>
     <profile>

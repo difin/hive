@@ -70,6 +70,7 @@
     <!-- Library Dependency Versions -->
     <accumulo.version>1.7.0.7.2.11.0-233</accumulo.version>
     <activemq.version>5.16.3</activemq.version>
+    <aircompressor.version>0.21</aircompressor.version>
     <ant.version>1.10.12</ant.version>
     <antlr.version>3.5.2</antlr.version>
     <apache-directory-server.version>1.5.7</apache-directory-server.version>
@@ -387,6 +388,11 @@
         <version>${netty.version}</version>
       </dependency>
       <dependency>
+        <groupId>io.airlift</groupId>
+        <artifactId>aircompressor</artifactId>
+        <version>${aircompressor.version}</version>
+      </dependency>
+      <dependency>
         <groupId>jakarta.jms</groupId>
         <artifactId>jakarta.jms-api</artifactId>
         <version>${jms.version}</version>
@@ -564,6 +570,10 @@
           <exclusion>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-storage-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.airlift</groupId>
+            <artifactId>aircompressor</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
