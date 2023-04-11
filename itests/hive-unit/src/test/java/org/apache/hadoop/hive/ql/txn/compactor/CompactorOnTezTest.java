@@ -186,7 +186,7 @@ public abstract class CompactorOnTezTest {
   }
 
   protected HiveHookEvents.HiveHookEventProto getRelatedTezEvent(String dbTableName) throws Exception {
-    int retryCount = 3;
+    int retryCount = 10;
     while (retryCount-- > 0) {
       try {
         List<ProtoMessageReader<HiveHookEvents.HiveHookEventProto>> readers = TestHiveProtoLoggingHook.getTestReader(conf, tmpFolder);
@@ -211,7 +211,7 @@ public abstract class CompactorOnTezTest {
       } catch (EOFException e) {
         //Since Event writing is async it may happen that the event we are looking for is not yet written out.
         //Let's retry it after waiting a bit
-        Thread.sleep(2000);
+        Thread.sleep(3000);
       }
     }
     return null;
