@@ -102,5 +102,5 @@ POSTHOOK: Input: default@t1
 POSTHOOK: Input: default@t2
 #### A masked pattern was here ####
 t1.a	t1.b	s.c	s.d
-2	four	NULL	NULL
 1	four	NULL	NULL
+2	four	NULL	NULL

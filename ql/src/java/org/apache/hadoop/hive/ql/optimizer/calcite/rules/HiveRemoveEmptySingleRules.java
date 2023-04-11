@@ -19,23 +19,22 @@ package org.apache.hadoop.hive.ql.optimizer.calcite.rules;
 
 import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.plan.RelOptRuleCall;
-import org.apache.calcite.plan.RelOptUtil;
-import org.apache.calcite.plan.RelRule;
 import org.apache.calcite.plan.hep.HepRelVertex;
 import org.apache.calcite.plan.volcano.RelSubset;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.core.Aggregate;
 import org.apache.calcite.rel.core.Join;
-import org.apache.calcite.rel.core.JoinRelType;
+import org.apache.calcite.rel.core.Sort;
 import org.apache.calcite.rel.core.Union;
 import org.apache.calcite.rel.core.Values;
 import org.apache.calcite.rel.rules.PruneEmptyRules;
+import org.apache.calcite.rex.RexDynamicParam;
+import org.apache.calcite.rex.RexLiteral;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.tools.RelBuilder;
 import org.apache.hadoop.hive.ql.optimizer.calcite.Bug;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveAggregate;
-import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveAntiJoin;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveFilter;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveJoin;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveProject;
@@ -54,36 +53,34 @@ import static com.google.common.collect.Iterables.concat;
  */
 public class HiveRemoveEmptySingleRules extends PruneEmptyRules {
 
-  public static final RelOptRule PROJECT_INSTANCE =
-          RelRule.Config.EMPTY
-                  .withDescription("HivePruneEmptyProject")
-                  .as(PruneEmptyRules.RemoveEmptySingleRule.Config.class)
-                  .withOperandFor(HiveProject.class, project -> true)
-                  .withRelBuilderFactory(HiveRelFactories.HIVE_BUILDER)
-                  .toRule();
+  public static final RelOptRule PROJECT_INSTANCE = new PruneEmptyRules.RemoveEmptySingleRule(
+      HiveProject.class, project -> true, HiveRelFactories.HIVE_BUILDER, "HivePruneEmptyProject");
+  public static final RelOptRule FILTER_INSTANCE = new PruneEmptyRules.RemoveEmptySingleRule(
+      HiveFilter.class, hiveFilter -> true, HiveRelFactories.HIVE_BUILDER, "HivePruneEmptyFilter");
+  public static final RelOptRule SORT_INSTANCE = new PruneEmptyRules.RemoveEmptySingleRule(
+      HiveSortLimit.class, hiveSortLimit -> true, HiveRelFactories.HIVE_BUILDER, "HivePruneEmptySort");
+  public static final RelOptRule SORT_FETCH_ZERO_INSTANCE = new RemoveSortFetchZeroRule();
+  public static final RelOptRule AGGREGATE_INSTANCE = new PruneEmptyRules.RemoveEmptySingleRule(
+      HiveAggregate.class, Aggregate::isNotGrandTotal, HiveRelFactories.HIVE_BUILDER, "HivePruneEmptyAggregate");
 
-  public static final RelOptRule FILTER_INSTANCE =
-          RelRule.Config.EMPTY
-                  .withDescription("HivePruneEmptyFilter")
-                  .as(PruneEmptyRules.RemoveEmptySingleRule.Config.class)
-                  .withOperandFor(HiveFilter.class, singleRel -> true)
-                  .withRelBuilderFactory(HiveRelFactories.HIVE_BUILDER)
-                  .toRule();
+  public static final RelOptRule JOIN_LEFT_INSTANCE = new RemoveLeftEmptyJoinRule<>(HiveJoin.class);
+  public static final RelOptRule SEMI_JOIN_LEFT_INSTANCE = new RemoveLeftEmptyJoinRule<>(HiveSemiJoin.class);
+  public static final RelOptRule JOIN_RIGHT_INSTANCE = new RemoveRightEmptyJoinRule<>(HiveJoin.class);
+  public static final RelOptRule SEMI_JOIN_RIGHT_INSTANCE = new RemoveRightEmptyJoinRule<>(HiveSemiJoin.class);
+  public static final RelOptRule UNION_INSTANCE = new UnionEmptyPruneRule();
 
-  public static final RelOptRule JOIN_LEFT_INSTANCE = getJoinLeftInstance(HiveJoin.class);
-  public static final RelOptRule SEMI_JOIN_LEFT_INSTANCE = getJoinLeftInstance(HiveSemiJoin.class);
+  public static class RemoveSortFetchZeroRule extends RelOptRule {
 
-  private static <R extends RelNode> RelOptRule getJoinLeftInstance(Class<R> clazz) {
-    return RelRule.Config.EMPTY
-            .withOperandSupplier(b0 ->
-                    b0.operand(clazz).inputs(
-                            b1 -> b1.operand(Values.class)
-                                    .predicate(Values::isEmpty).noInputs(),
-                            b2 -> b2.operand(RelNode.class).anyInputs()))
-            .withDescription("HivePruneEmptyJoin(left)")
-            .as(JoinLeftEmptyRuleConfig.class)
-            .withRelBuilderFactory(HiveRelFactories.HIVE_BUILDER)
-            .toRule();
+    public RemoveSortFetchZeroRule() {
+      super(operand(HiveSortLimit.class, RelOptRule.any()), HiveRelFactories.HIVE_BUILDER, "PruneSortLimit0");
+    }
+
+    public void onMatch(RelOptRuleCall call) {
+      Sort sort = call.rel(0);
+      if (sort.fetch != null && !(sort.fetch instanceof RexDynamicParam) && RexLiteral.intValue(sort.fetch) == 0) {
+        call.transformTo(call.builder().push(sort).empty().build());
+      }
+    }
   }
 
   /**
@@ -95,54 +92,46 @@ public class HiveRemoveEmptySingleRules extends PruneEmptyRules {
    * to
    * select null as emp.col0 ... null as emp.coln, dept.* from dept
    */
-  public interface JoinLeftEmptyRuleConfig extends PruneEmptyRule.Config {
-    @Override default PruneEmptyRule toRule() {
-      return new PruneEmptyRule(this) {
-        @Override public void onMatch(RelOptRuleCall call) {
-          if (Bug.CALCITE_5294_FIXED) {
-            throw new IllegalStateException(
-                    "Class JoinLeftEmptyRuleConfig is redundant after fix is merged into Calcite");
-          }
+  public static class RemoveLeftEmptyJoinRule<R extends RelNode> extends RelOptRule {
 
-          final Join join = call.rel(0);
-          final Values empty = call.rel(1);
-          final RelNode right = call.rel(2);
-          final RelBuilder relBuilder = call.builder();
-          if (join.getJoinType().generatesNullsOnLeft()) {
-            // If "emp" is empty, "select * from emp right join dept" will have
-            // the same number of rows as "dept", and null values for the
-            // columns from "emp". The left side of the join can be removed.
-            final List<RexNode> nullLiterals =
-                    Collections.nCopies(empty.getRowType().getFieldCount(),
-                            relBuilder.literal(null));
-            call.transformTo(
-                    relBuilder.push(right)
-                            .project(concat(nullLiterals, relBuilder.fields()))
-                            .convert(join.getRowType(), true)
-                            .build());
-            return;
-          }
-          call.transformTo(relBuilder.push(join).empty().build());
-        }
-      };
+    public RemoveLeftEmptyJoinRule(Class<R> clazz) {
+      super(operand(clazz,
+          operand(Values.class, none()),
+          operand(RelNode.class, any())), HiveRelFactories.HIVE_BUILDER, "HivePruneEmptyJoin(left)");
+
+      if (Bug.CALCITE_5294_FIXED) {
+        throw new IllegalStateException(
+            "Class RemoveLeftEmptyJoinRule is redundant after fix is merged into Calcite");
+      }
     }
-  }
 
-  public static final RelOptRule JOIN_RIGHT_INSTANCE = getJoinRightInstance(HiveJoin.class);
-  public static final RelOptRule ANTI_JOIN_RIGHT_INSTANCE = getJoinRightInstance(HiveAntiJoin.class);
-  public static final RelOptRule SEMI_JOIN_RIGHT_INSTANCE = getJoinRightInstance(HiveSemiJoin.class);
+    @Override
+    public boolean matches(RelOptRuleCall call) {
+      Values values = call.rel(1);
+      return Values.isEmpty(values);
+    }
 
-  private static <R extends RelNode> RelOptRule getJoinRightInstance(Class<R> clazz) {
-    return RelRule.Config.EMPTY
-            .withOperandSupplier(b0 ->
-                    b0.operand(clazz).inputs(
-                            b1 -> b1.operand(RelNode.class).anyInputs(),
-                            b2 -> b2.operand(Values.class).predicate(Values::isEmpty)
-                                    .noInputs()))
-            .withDescription("HivePruneEmptyJoin(right)")
-            .as(JoinRightEmptyRuleConfig.class)
-            .withRelBuilderFactory(HiveRelFactories.HIVE_BUILDER)
-            .toRule();
+    public void onMatch(RelOptRuleCall call) {
+      final Join join = call.rel(0);
+      final Values empty = call.rel(1);
+      final RelNode right = call.rel(2);
+      final RelBuilder relBuilder = call.builder();
+      if (join.getJoinType().generatesNullsOnLeft()) {
+        // If "emp" is empty, "select * from emp right join dept" will have
+        // the same number of rows as "dept", and null values for the
+        // columns from "emp". The left side of the join can be removed.
+        final List<RexNode> nullLiterals =
+            Collections.nCopies(empty.getRowType().getFieldCount(),
+                relBuilder.literal(null));
+        call.transformTo(
+            relBuilder.push(right)
+                .project(concat(nullLiterals, relBuilder.fields()))
+                .convert(join.getRowType(), true)
+                .build());
+        return;
+      }
+      call.transformTo(relBuilder.push(join).empty().build());
+    }
   }
 
   /**
@@ -154,106 +143,77 @@ public class HiveRemoveEmptySingleRules extends PruneEmptyRules {
    * to
    * select emp.*, null as dept.col0 ... null as dept.coln from emp
    */
-  public interface JoinRightEmptyRuleConfig extends PruneEmptyRule.Config {
-    @Override default PruneEmptyRule toRule() {
-      return new PruneEmptyRule(this) {
-        @Override public void onMatch(RelOptRuleCall call) {
-          if (Bug.CALCITE_5294_FIXED) {
-            throw new IllegalStateException(
-                    "Class JoinRightEmptyRuleConfig is redundant after fix is merged into Calcite");
-          }
+  public static class RemoveRightEmptyJoinRule<R extends RelNode> extends RelOptRule {
 
-          final Join join = call.rel(0);
-          final RelNode left = call.rel(1);
-          final Values empty = call.rel(2);
-          final RelBuilder relBuilder = call.builder();
-          if (join.getJoinType().generatesNullsOnRight()) {
-            // If "dept" is empty, "select * from emp left join dept" will have
-            // the same number of rows as "emp", and null values for the
-            // columns from "dept". The right side of the join can be removed.
-            final List<RexNode> nullLiterals =
-                    Collections.nCopies(empty.getRowType().getFieldCount(),
-                            relBuilder.literal(null));
-            call.transformTo(
-                    relBuilder.push(left)
-                            .project(concat(relBuilder.fields(), nullLiterals))
-                            .convert(join.getRowType(), true)
-                            .build());
-            return;
-          }
-          if (join.getJoinType() == JoinRelType.ANTI) {
-            // In case of anti join: Join(X, Empty, ANTI) becomes X
-            call.transformTo(join.getLeft());
-            return;
-          }
-          call.transformTo(relBuilder.push(join).empty().build());
-        }
-      };
+    public RemoveRightEmptyJoinRule(Class<R> clazz) {
+      super(operand(clazz,
+          operand(RelNode.class, any()),
+          operand(Values.class, none())), HiveRelFactories.HIVE_BUILDER, "HivePruneEmptyJoin(right)");
+
+      if (Bug.CALCITE_5294_FIXED) {
+        throw new IllegalStateException(
+            "Class RemoveRightEmptyJoinRule is redundant after fix is merged into Calcite");
+      }
+    }
+
+    @Override
+    public boolean matches(RelOptRuleCall call) {
+      Values values = call.rel(2);
+      return Values.isEmpty(values);
+    }
+
+    public void onMatch(RelOptRuleCall call) {
+      final Join join = call.rel(0);
+      final RelNode left = call.rel(1);
+      final Values empty = call.rel(2);
+      final RelBuilder relBuilder = call.builder();
+      if (join.getJoinType().generatesNullsOnRight()) {
+        // If "dept" is empty, "select * from emp left join dept" will have
+        // the same number of rows as "emp", and null values for the
+        // columns from "dept". The right side of the join can be removed.
+        final List<RexNode> nullLiterals =
+            Collections.nCopies(empty.getRowType().getFieldCount(),
+                relBuilder.literal(null));
+        call.transformTo(
+            relBuilder.push(left)
+                .project(concat(relBuilder.fields(), nullLiterals))
+                .convert(join.getRowType(), true)
+                .build());
+        return;
+      }
+      call.transformTo(relBuilder.push(join).empty().build());
     }
   }
-
-  public static final RelOptRule SORT_INSTANCE =
-          RelRule.Config.EMPTY
-                  .withDescription("HivePruneEmptySort")
-                  .as(PruneEmptyRules.RemoveEmptySingleRule.Config.class)
-                  .withOperandFor(HiveSortLimit.class, singleRel -> true)
-                  .withRelBuilderFactory(HiveRelFactories.HIVE_BUILDER)
-                  .toRule();
-
-  public static final RelOptRule SORT_FETCH_ZERO_INSTANCE =
-          RelRule.Config.EMPTY
-                  .withOperandSupplier(b ->
-                          b.operand(HiveSortLimit.class).anyInputs())
-                  .withDescription("HivePruneSortLimit0")
-                  .as(PruneEmptyRules.SortFetchZeroRuleConfig.class)
-                  .withRelBuilderFactory(HiveRelFactories.HIVE_BUILDER)
-                  .toRule();
-
-  public static final RelOptRule AGGREGATE_INSTANCE =
-          RelRule.Config.EMPTY
-                  .withDescription("HivePruneEmptyAggregate")
-                  .as(PruneEmptyRules.RemoveEmptySingleRule.Config.class)
-                  .withOperandFor(HiveAggregate.class, Aggregate::isNotGrandTotal)
-                  .withRelBuilderFactory(HiveRelFactories.HIVE_BUILDER)
-                  .toRule();
-
-  public static final RelOptRule UNION_INSTANCE =
-          RelRule.Config.EMPTY
-                  .withOperandSupplier(b0 ->
-                          b0.operand(HiveUnion.class).unorderedInputs(b1 ->
-                                  b1.operand(Values.class)
-                                          .predicate(Values::isEmpty).noInputs()))
-                  .withDescription("HivePruneEmptyUnionBranch")
-                  .as(HiveUnionEmptyPruneRuleConfig.class)
-                  .withRelBuilderFactory(HiveRelFactories.HIVE_BUILDER)
-                  .toRule();
 
   /**
    * Copy of {@link PruneEmptyRules.UnionEmptyPruneRuleConfig} but this version expects {@link Union}.
    */
-  public interface HiveUnionEmptyPruneRuleConfig extends PruneEmptyRules.PruneEmptyRule.Config {
-    @Override default PruneEmptyRules.PruneEmptyRule toRule() {
-      return new PruneEmptyRules.PruneEmptyRule(this) {
-        @Override public void onMatch(RelOptRuleCall call) {
-          if (Bug.CALCITE_5293_FIXED) {
-            throw new IllegalStateException(
-                    "Class HiveUnionEmptyPruneRuleConfig is redundant after fix is merged into Calcite");
-          }
+  public static class UnionEmptyPruneRule extends RelOptRule {
 
-          final Union union = call.rel(0);
-          final List<RelNode> inputs = union.getInputs();
-          assert inputs != null;
-          final RelBuilder builder = call.builder();
-          int nonEmptyInputs = 0;
-          for (RelNode input : inputs) {
-            if (!isEmpty(input)) {
-              builder.push(input);
-              nonEmptyInputs++;
-            }
-          }
-          assert nonEmptyInputs < inputs.size()
-                  : "planner promised us at least one Empty child: "
-                  + RelOptUtil.toString(union);
+    public UnionEmptyPruneRule() {
+      super(operand(HiveUnion.class, any()), HiveRelFactories.HIVE_BUILDER, "UnionEmptyPruneRule");
+      if (Bug.CALCITE_5293_FIXED) {
+        throw new IllegalStateException(
+            "Class UnionEmptyPruneRule is redundant after fix is merged into Calcite");
+      }
+    }
+
+    @Override
+    public void onMatch(RelOptRuleCall call) {
+      final Union union = call.rel(0);
+      final List<RelNode> inputs = union.getInputs();
+      assert inputs != null;
+      final RelBuilder builder = call.builder();
+      int nonEmptyInputs = 0;
+      for (RelNode input : inputs) {
+        if (!isEmpty(input)) {
+          builder.push(input);
+          nonEmptyInputs++;
+        }
+      }
+      if (nonEmptyInputs == inputs.size()) {
+        return;
+      }
       if (nonEmptyInputs == 0) {
         builder.push(union).empty();
       } else {
@@ -262,16 +222,9 @@ public class HiveRemoveEmptySingleRules extends PruneEmptyRules {
       }
       call.transformTo(builder.build());
     }
-      };
-    }
   }
 
   private static boolean isEmpty(RelNode node) {
-    if (Bug.CALCITE_5293_FIXED) {
-      throw new IllegalStateException(
-              "Method HiveRemoveEmptySingleRules.isEmpty is redundant after fix is merged into Calcite");
-    }
-
     if (node instanceof Values) {
       return ((Values) node).getTuples().isEmpty();
     }

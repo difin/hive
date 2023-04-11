@@ -27,6 +27,7 @@ import org.apache.hadoop.hive.ql.exec.OperatorFactory;
 import org.apache.hadoop.hive.ql.exec.RowSchema;
 import org.apache.hadoop.hive.ql.exec.TableScanOperator;
 import org.apache.hadoop.hive.ql.metadata.Table;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveAggregate;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveValues;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.TypeConverter;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.opconventer.HiveOpConverter.OpAttr;
@@ -80,7 +81,7 @@ class HiveValuesVisitor extends HiveRelNodeVisitor<HiveValues> {
     TableScanDesc tsd = new TableScanDesc(SemanticAnalyzer.DUMMY_TABLE, Collections.emptyList(), metadata);
 
     return OperatorFactory.get(
-            hiveOpConverter.getSemanticAnalyzer().getOpContext(), tsd, new RowSchema(Collections.emptyList()));
+        hiveOpConverter.getSemanticAnalyzer().getOpContext(), tsd, new RowSchema(Collections.emptyList()));
   }
 
   private static Operator<?> createSelect(RelDataType relDataType, Operator<?> parentOp) {
@@ -93,7 +94,7 @@ class HiveValuesVisitor extends HiveRelNodeVisitor<HiveValues> {
       RelDataTypeField typeField = relDataType.getFieldList().get(i);
 
       ColumnInfo ci = new ColumnInfo(
-              typeField.getName(), TypeConverter.convert(typeField.getType()), SemanticAnalyzer.DUMMY_TABLE, false);
+          typeField.getName(), TypeConverter.convert(typeField.getType()), SemanticAnalyzer.DUMMY_TABLE, false);
       colInfoList.add(ci);
       columnNames.add(typeField.getName());
 

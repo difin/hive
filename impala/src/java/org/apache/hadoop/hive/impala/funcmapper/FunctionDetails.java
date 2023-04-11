@@ -18,27 +18,9 @@
 
 package org.apache.hadoop.hive.impala.funcmapper;
 
-import org.apache.hadoop.hive.conf.HiveConf;
-
 /**
  * FunctionDetails interface allowing multiple types of FunctionDetails (i.e. Scalar, Agg)
  */
-public interface SerDe {
-
-  /**
-   * Returns statistics collected when (de)serializing.
-   *
-   * @return {@link SerDeStats} object; or in case not supported: null
-   */
-  SerDeStats getSerDeStats();
-
-  /**
-   * Adds SerDe specific configurations to job conf.
-   * @param conf the job conf.
-   */
-  default void handleJobLevelConfiguration(HiveConf conf) {
-    // Do nothing
-  }
 public interface FunctionDetails {
   ImpalaFunctionSignature getSignature();
 }

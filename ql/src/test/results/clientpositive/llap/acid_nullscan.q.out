@@ -65,10 +65,10 @@ STAGE PLANS:
                     Number of rows: 0
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                     Select Operator
-                      Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
+                      Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
                       Group By Operator
                         aggregations: sum(null)
-                        minReductionHashAggr: 0.4
+                        minReductionHashAggr: 0.0
                         mode: hash
                         outputColumnNames: _col0
                         Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
@@ -86,7 +86,7 @@ STAGE PLANS:
             Path -> Alias:
               nullscan://null/_dummy_database._dummy_table/part_ [_dummy_table]
             Path -> Partition:
-              nullscan://null/_dummy_database._dummy_table/part_
+              nullscan://null/_dummy_database._dummy_table/part_ 
                 Partition
                   input format: org.apache.hadoop.hive.ql.io.OneNullRowInputFormat
                   output format: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
@@ -94,8 +94,8 @@ STAGE PLANS:
                     bucket_count -1
                     bucketing_version 2
                     column.name.delimiter ,
-                    columns
-                    columns.types
+                    columns 
+                    columns.types 
 #### A masked pattern was here ####
                     name _dummy_database._dummy_table
                     serialization.format 1
@@ -107,9 +107,9 @@ STAGE PLANS:
                     properties:
                       bucketing_version 2
                       column.name.delimiter ,
-                      columns
+                      columns 
                       columns.comments 
-                      columns.types
+                      columns.types 
 #### A masked pattern was here ####
                       name _dummy_database._dummy_table
                       serialization.format 1

@@ -18,9 +18,6 @@
 package org.apache.hadoop.hive.ql.parse.type;
 
 import com.google.common.collect.ImmutableList;
-
-import java.util.Collections;
-import java.util.List;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexExecutor;
@@ -131,8 +128,8 @@ public interface FunctionHelper {
    * Returns aggregation information based on given parameters.
    */
   AggregateInfo getAggregateFunctionInfo(boolean isDistinct, boolean isAllColumns,
-                                         String aggregateName, List<RexNode> aggregateParameters, List<FieldCollation> fieldCollations)
-      throws SemanticException;
+                                         String aggregateName, List<RexNode> aggregateParameters,
+                                         List<FieldCollation> fieldCollations) throws SemanticException;
 
   /**
    * Returns aggregation information for analytical function based on given parameters.
@@ -210,6 +207,11 @@ public interface FunctionHelper {
    * returns true if FunctionInfo is a stateful function.
    */
   boolean isStateful(FunctionInfo fi);
+
+  void validateFunction(String functionName, String dbName, boolean windowSpec)
+      throws SemanticException;
+
+  boolean isAggregateFunction(String functionName, String dbName);
 
   class FieldCollation {
     private final RexNode sortExpression;

@@ -1,3 +1,5 @@
+-- SORT_QUERY_RESULTS;
+
 set hive.cli.print.header=true;
 
 create table t1 (a1 int, b1 string);

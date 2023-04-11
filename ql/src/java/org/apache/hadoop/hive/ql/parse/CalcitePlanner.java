@@ -92,8 +92,6 @@ import org.apache.calcite.rel.metadata.ChainedRelMetadataProvider;
 import org.apache.calcite.rel.metadata.JaninoRelMetadataProvider;
 import org.apache.calcite.rel.metadata.RelMetadataProvider;
 import org.apache.calcite.rel.metadata.RelMetadataQuery;
-import org.apache.calcite.rel.rules.CoreRules;
-import org.apache.calcite.rel.rules.FilterMergeRule;
 import org.apache.calcite.rel.rules.FilterMergeRule;
 import org.apache.calcite.rel.rules.JoinToMultiJoinRule;
 import org.apache.calcite.rel.rules.LoptOptimizeJoinRule;
@@ -180,13 +178,6 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.HiveCalciteUtil;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveConfPlannerContext;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveDefaultRelMetadataProvider;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveMaterializedViewASTSubQueryRewriteShuttle;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveTezModelRelMetadataProvider;
-import org.apache.hadoop.hive.ql.optimizer.calcite.RuleEventLogger;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateSortLimitRule;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveJoinSwapConstraintsRule;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRemoveEmptySingleRules;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSemiJoinProjectTransposeRule;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializationRelMetadataProvider;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HivePlannerContext;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelDistribution;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
@@ -233,6 +224,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveExpandDistinctAggre
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFieldTrimmerRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterAggregateTransposeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterJoinRule;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterMergeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterProjectTSTransposeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterProjectTransposeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterSetOpTransposeRule;
@@ -327,8 +319,10 @@ import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFArray;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTFInline;
+import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hadoop.hive.ql.util.DirectionUtils;
 import org.apache.hadoop.hive.ql.util.NullOrdering;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
@@ -2020,10 +2014,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       rules.add(HiveFilterJoinRule.FILTER_ON_JOIN);
       rules.add(new HiveFilterAggregateTransposeRule(Filter.class, HiveRelFactories.HIVE_BUILDER,
           Aggregate.class));
-      rules.add(FilterMergeRule.Config.DEFAULT
-          .withOperandFor(HiveFilter.class)
-          .withRelBuilderFactory(HiveRelFactories.HIVE_BUILDER)
-          .toRule());
+      rules.add(HiveFilterMergeRule.INSTANCE);
       if (conf.getBoolVar(HiveConf.ConfVars.HIVE_OPTIMIZE_REDUCE_WITH_STATS)) {
         rules.add(HiveReduceExpressionsWithStatsRule.INSTANCE);
       }
@@ -2171,19 +2162,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
         generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
                 HiveAntiSemiJoinRule.INSTANCE);
       }
-
-      generatePartialProgram(program, true, HepMatchOrder.DEPTH_FIRST,
-              HiveRemoveEmptySingleRules.PROJECT_INSTANCE,
-              HiveRemoveEmptySingleRules.FILTER_INSTANCE,
-              HiveRemoveEmptySingleRules.JOIN_LEFT_INSTANCE,
-              HiveRemoveEmptySingleRules.SEMI_JOIN_LEFT_INSTANCE,
-              HiveRemoveEmptySingleRules.JOIN_RIGHT_INSTANCE,
-              HiveRemoveEmptySingleRules.SEMI_JOIN_RIGHT_INSTANCE,
-              HiveRemoveEmptySingleRules.ANTI_JOIN_RIGHT_INSTANCE,
-              HiveRemoveEmptySingleRules.SORT_INSTANCE,
-              HiveRemoveEmptySingleRules.SORT_FETCH_ZERO_INSTANCE,
-              HiveRemoveEmptySingleRules.AGGREGATE_INSTANCE,
-              HiveRemoveEmptySingleRules.UNION_INSTANCE);
 
       // Trigger program
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.OPTIMIZER);
