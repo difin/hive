@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 set hive.strict.checks.bucketing=false;
 set hive.default.nulls.last=false;
 

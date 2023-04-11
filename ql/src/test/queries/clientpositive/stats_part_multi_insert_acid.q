@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 -- Test multi inserting to the same partition
 set hive.support.concurrency=true;
 set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;

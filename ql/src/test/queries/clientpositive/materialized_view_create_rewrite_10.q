@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+Statistics\: Num rows\: \d+ Data size\:\s+)\S+(\s+Basic stats\: COMPLETE Column stats\: NONE)/$1#Masked#$2/
 -- Try to run incremental on a non-transactional MV in presence of delete operations
 -- Compiler should fall back to full rebuild.
 

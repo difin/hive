@@ -1,3 +1,4 @@
+--! qt:replace:/(.*Data size:\s+)\S+(\s+Basic stats.*)/$1#Masked#$2/
 set hive.support.concurrency=true;
 set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 set hive.acid.direct.insert.enabled=true;

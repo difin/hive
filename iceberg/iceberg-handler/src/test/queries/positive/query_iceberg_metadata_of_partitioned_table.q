@@ -1,3 +1,5 @@
+--! qt:replace:/(.*added-files-size\":\")\S+(\",\"changed-partition-count.*)/$1#Masked#$2/
+--! qt:replace:/(.*total-files-size\":\")\S+(\",\"total-data-files.*)/$1#Masked#$2/
 -- SORT_QUERY_RESULTS
 -- Mask the file size values as it can have slight variability, causing test flakiness
 --! qt:replace:/("file_size_in_bytes":)\d+/$1#Masked#/

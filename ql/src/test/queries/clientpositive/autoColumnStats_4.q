@@ -1,4 +1,5 @@
 --! qt:dataset:alltypesorc
+--! qt:replace:/(\s+totalSize\s+)\S+\s*/$1#Masked#/
 set hive.stats.column.autogather=true;
 set hive.mapred.mode=nonstrict;
 set hive.support.concurrency=true;

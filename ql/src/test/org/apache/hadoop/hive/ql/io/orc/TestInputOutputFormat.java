@@ -2604,14 +2604,14 @@ public class TestInputOutputFormat {
     assertEquals("mock:/combinationAcid/p=0/base_0000010/bucket_00000",
         split.getPath().toString());
     assertEquals(0, split.getStart());
-    assertEquals(702, split.getLength());
+    assertEquals(723, split.getLength());
     split = (HiveInputFormat.HiveInputSplit) splits[1];
     assertEquals("org.apache.hadoop.hive.ql.io.orc.OrcInputFormat",
         split.inputFormatClassName());
     assertEquals("mock:/combinationAcid/p=0/base_0000010/bucket_00001",
         split.getPath().toString());
     assertEquals(0, split.getStart());
-    assertEquals(726, split.getLength());
+    assertEquals(748, split.getLength());
     CombineHiveInputFormat.CombineHiveInputSplit combineSplit =
         (CombineHiveInputFormat.CombineHiveInputSplit) splits[2];
     assertEquals(BUCKETS, combineSplit.getNumPaths());
@@ -2619,7 +2619,7 @@ public class TestInputOutputFormat {
       assertEquals("mock:/combinationAcid/p=1/00000" + bucket + "_0",
           combineSplit.getPath(bucket).toString());
       assertEquals(0, combineSplit.getOffset(bucket));
-      assertEquals(253, combineSplit.getLength(bucket));
+      assertEquals(275, combineSplit.getLength(bucket));
     }
     String[] hosts = combineSplit.getLocations();
     assertEquals(2, hosts.length);
@@ -3262,7 +3262,7 @@ public class TestInputOutputFormat {
     }
     // call-1: open to read - split 1 => mock:/mocktable1/0_0
     // call-2: open to read - split 2 => mock:/mocktable1/0_1
-    assertEquals(4, readOpsDelta);
+    assertEquals(2, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
@@ -3405,7 +3405,7 @@ public class TestInputOutputFormat {
     }
     // call-1: open to read - split 1 => mock:/mocktable3/0_0
     // call-2: open to read - split 2 => mock:/mocktable3/0_1
-    assertEquals(4, readOpsDelta);
+    assertEquals(2, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
@@ -3548,7 +3548,7 @@ public class TestInputOutputFormat {
         readOpsDelta = statistics.getReadOps() - readOpsBefore;
       }
     }
-    assertEquals(8, readOpsDelta);
+    assertEquals(6, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");
@@ -3693,7 +3693,7 @@ public class TestInputOutputFormat {
         readOpsDelta = statistics.getReadOps() - readOpsBefore;
       }
     }
-    assertEquals(6, readOpsDelta);
+    assertEquals(4, readOpsDelta);
 
     // revert back to local fs
     conf.set("fs.defaultFS", "file:///");

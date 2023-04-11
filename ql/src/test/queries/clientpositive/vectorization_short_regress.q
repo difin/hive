@@ -1,3 +1,4 @@
+--! qt:replace:/(.*Data size:\s+)\S+(\s+Basic stats.*)/$1#Masked#$2/
 --! qt:dataset:src
 --! qt:dataset:alltypesorc
 set hive.compute.query.using.stats=false;

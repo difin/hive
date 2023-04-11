@@ -1,3 +1,4 @@
+--! qt:replace:/(\s*totalSize\s+)\S+\s*/$1#Masked#/
 set hive.vectorized.execution.enabled=false;
 create table cmv_basetable_n8 (a int, b varchar(256), c decimal(10,2));
 

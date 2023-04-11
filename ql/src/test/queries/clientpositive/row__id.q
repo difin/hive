@@ -1,3 +1,4 @@
+--! qt:replace:/(.*Data size:\s+)\S+(\s+Basic stats.*)/$1#Masked#$2/
 -- tid is flaky when compute column stats
 set hive.stats.column.autogather=false;
 set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;

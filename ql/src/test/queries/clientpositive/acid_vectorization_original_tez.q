@@ -1,3 +1,4 @@
+--! qt:replace:/(.*GROUP\s\S\S\S\s+)\S+(\s.*)/$1#Masked#$2/
 set hive.mapred.mode=nonstrict;
 set hive.support.concurrency=true;
 set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;

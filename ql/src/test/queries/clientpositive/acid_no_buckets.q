@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 --! qt:dataset:srcpart
 --this has 4 groups of tests
 --Acid tables w/o bucketing

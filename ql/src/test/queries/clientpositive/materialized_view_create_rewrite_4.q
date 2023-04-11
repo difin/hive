@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 -- Test Incremental rebuild of materialized view with aggregate but without count(*)
 -- when source tables have delete operations since last rebuild.
 

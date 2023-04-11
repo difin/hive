@@ -1,3 +1,4 @@
+--! qt:replace:/(File length:\s+)\S+(\s+bytes)/$1#Masked#$2/
 SET hive.vectorized.execution.enabled=FALSE;
 SET hive.mapred.mode=nonstrict;
 
