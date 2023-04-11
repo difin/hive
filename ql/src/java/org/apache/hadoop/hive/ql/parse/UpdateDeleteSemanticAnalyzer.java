@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.ErrorMsg;
@@ -97,14 +98,33 @@ public class UpdateDeleteSemanticAnalyzer extends RewriteSemanticAnalyzer {
   private void reparseAndSuperAnalyze(ASTNode tree, Table mTable, ASTNode tabNameNode) throws SemanticException {
     List<? extends Node> children = tree.getChildren();
 
-    checkUpdateDeleteMergeSupported(operation, mTable);
+    boolean shouldTruncate = HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_OPTIMIZE_REPLACE_DELETE_WITH_TRUNCATE) 
+      && children.size() == 1 && deleting();
+    if (shouldTruncate) {
+      StringBuilder rewrittenQueryStr = new StringBuilder("truncate table ").append(getFullTableNameForSQL(tabNameNode));
+      ReparseResult rr = parseRewrittenQuery(rewrittenQueryStr, ctx.getCmd());
+      Context rewrittenCtx = rr.rewrittenCtx;
+      ASTNode rewrittenTree = rr.rewrittenTree;
 
+      BaseSemanticAnalyzer truncate = SemanticAnalyzerFactory.get(queryState, rewrittenTree);
+      // Note: this will overwrite this.ctx with rewrittenCtx
+      rewrittenCtx.setEnableUnparse(false);
+      truncate.analyze(rewrittenTree, rewrittenCtx);
+
+      rootTasks = truncate.getRootTasks();
+      outputs = truncate.getOutputs();
+      updateOutputs(mTable);
+      return;
+    }
+    
+    checkUpdateDeleteMergeSupported(operation, mTable);
+    
     StringBuilder rewrittenQueryStr = new StringBuilder();
     rewrittenQueryStr.append("insert into table ");
     rewrittenQueryStr.append(getFullTableNameForSQL(tabNameNode));
     addPartitionColsToInsert(mTable.getPartCols(), rewrittenQueryStr);
 
-    ColumnAppender columnAppender = getColumnAppender(null);
+    ColumnAppender columnAppender = getColumnAppender(null, DELETE_PREFIX);
     int columnOffset = columnAppender.getDeleteValues(operation).size();
     rewrittenQueryStr.append(" select ");
     columnAppender.appendAcidSelectColumns(rewrittenQueryStr, operation);
