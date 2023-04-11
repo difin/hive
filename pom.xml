@@ -141,8 +141,7 @@
     <junit.jupiter.version>5.10.0</junit.jupiter.version>
     <junit.vintage.version>5.6.3</junit.vintage.version>
     <kafka.version>3.7.2</kafka.version>
-    <kryo.version>5.0.3</kryo.version>
-    <reflectasm.version>1.11.9</reflectasm.version>
+    <kryo.version>4.0.2</kryo.version>
     <kudu.version>1.17.0.7.3.1.200-90</kudu.version>
     <!-- Leaving libfb303 at 0.9.3 regardless of libthrift: As per THRIFT-4613 The Apache Thrift project does not publish items related to fb303 at this point -->
     <libfb303.version>0.9.3</libfb303.version>
@@ -238,13 +237,8 @@
       </dependency>
       <dependency>
         <groupId>com.esotericsoftware</groupId>
-        <artifactId>kryo</artifactId>
+        <artifactId>kryo-shaded</artifactId>
         <version>${kryo.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.esotericsoftware</groupId>
-        <artifactId>reflectasm</artifactId>
-        <version>${reflectasm.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>

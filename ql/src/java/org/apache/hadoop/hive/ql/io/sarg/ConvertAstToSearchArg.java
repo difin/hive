@@ -574,7 +574,7 @@ public class ConvertAstToSearchArg {
   }
 
   private final static ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
-    protected Kryo initialValue() { return SerializationUtilities.createNewKryo(); }
+    protected Kryo initialValue() { return new Kryo(); }
   };
 
   public static SearchArgument create(String kryo) {
@@ -601,10 +601,8 @@ public class ConvertAstToSearchArg {
 
   public static String sargToKryo(SearchArgument sarg) {
     Output out = new Output(KRYO_OUTPUT_BUFFER_SIZE, KRYO_OUTPUT_BUFFER_MAX_SIZE);
-    Kryo kryo = SerializationUtilities.borrowKryo();
-    kryo.writeObject(out, sarg);
+    kryo.get().writeObject(out, sarg);
     out.close();
-    SerializationUtilities.releaseKryo(kryo);
     return Base64.encodeBase64String(out.toBytes());
   }
 

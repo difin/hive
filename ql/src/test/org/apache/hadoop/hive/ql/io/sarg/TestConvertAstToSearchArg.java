@@ -32,16 +32,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.common.type.Timestamp;
 import org.apache.hadoop.hive.ql.exec.SerializationUtilities;
 import org.apache.hadoop.hive.ql.io.parquet.read.ParquetFilterPredicateConverter;
 import org.apache.hadoop.hive.ql.io.sarg.SearchArgument.TruthValue;
-import org.apache.hadoop.hive.ql.plan.ExprNodeColumnDesc;
-import org.apache.hadoop.hive.ql.plan.ExprNodeConstantDesc;
-import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeGenericFuncDesc;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPAnd;
-import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPEqual;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.parquet.filter2.predicate.FilterPredicate;
@@ -49,7 +43,6 @@ import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.MessageTypeParser;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -2763,15 +2756,23 @@ public class TestConvertAstToSearchArg {
     return vals;
   }
 
-  @Test
-  public void testTimestampSarg() throws Exception {
-    ExprNodeGenericFuncDesc node = getColumnEqualsConstantExpression(
-        TypeInfoFactory.timestampTypeInfo, "ts", Timestamp.ofEpochMilli(1426595696000L));
-    String serialAst = SerializationUtilities.serializeExpression(node);
+  // The following tests use serialized ASTs that I generated using Hive from
+  // branch-0.14.
 
-    ConvertAstToSearchArg convertAstToSearchArg = new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst));
-    assertFalse(convertAstToSearchArg.isPartial());
-    SearchArgument sarg = convertAstToSearchArg.buildSearchArgument();
+  @Test
+  public void TestTimestampSarg() throws Exception {
+    String serialAst =
+      "AQEAamF2YS51dGlsLkFycmF5TGlz9AECAQFvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnFsLn" +
+          "BsYW4uRXhwck5vZGVDb2x1bW5EZXPjAQF08wAAAWJpZ29y4wECb3JnLmFwYWNoZS5o" +
+          "YWRvb3AuaGl2ZS5zZXJkZTIudHlwZWluZm8uUHJpbWl0aXZlVHlwZUluZu8BAXRpbW" +
+          "VzdGFt8AEDb3JnLmFwYWNoZS5oYWRvb3AuaGl2ZS5xbC5wbGFuLkV4cHJOb2RlQ29u" +
+          "c3RhbnREZXPjAQECAQFzdHJpbucDATIwMTUtMDMtMTcgMTI6MzQ6NbYBBG9yZy5hcG" +
+          "FjaGUuaGFkb29wLmhpdmUucWwudWRmLmdlbmVyaWMuR2VuZXJpY1VERk9QRXF1YewB" +
+          "AAABgj0BRVFVQcwBBW9yZy5hcGFjaGUuaGFkb29wLmlvLkJvb2xlYW5Xcml0YWJs5Q" +
+          "EAAAECAQFib29sZWHu";
+    SearchArgument sarg =
+        new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst))
+            .buildSearchArgument();
     assertEquals("leaf-0", sarg.getExpression().toString());
     assertEquals(1, sarg.getLeaves().size());
     PredicateLeaf leaf = sarg.getLeaves().get(0);
@@ -2780,14 +2781,17 @@ public class TestConvertAstToSearchArg {
   }
 
   @Test
-  public void testDateSarg() throws Exception {
-    ExprNodeGenericFuncDesc node =
-        getColumnEqualsConstantExpression(TypeInfoFactory.dateTypeInfo, "dt", "2015-05-05");
-    String serialAst = SerializationUtilities.serializeExpression(node);
-
-    ConvertAstToSearchArg convertAstToSearchArg = new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst));
-    assertFalse(convertAstToSearchArg.isPartial());
-    SearchArgument sarg = convertAstToSearchArg.buildSearchArgument();
+  public void TestDateSarg() throws Exception {
+    String serialAst =
+        "AQEAamF2YS51dGlsLkFycmF5TGlz9AECAQFvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnFsLnBsYW4uRXh" +
+            "wck5vZGVDb2x1bW5EZXPjAQFk9AAAAWJpZ29y4wECb3JnLmFwYWNoZS5oYWRvb3AuaGl2ZS5zZXJkZT" +
+            "IudHlwZWluZm8uUHJpbWl0aXZlVHlwZUluZu8BAWRhdOUBA29yZy5hcGFjaGUuaGFkb29wLmhpdmUuc" +
+            "WwucGxhbi5FeHByTm9kZUNvbnN0YW50RGVz4wEBAgEBc3RyaW7nAwEyMDE1LTA1LTC1AQRvcmcuYXBh" +
+            "Y2hlLmhhZG9vcC5oaXZlLnFsLnVkZi5nZW5lcmljLkdlbmVyaWNVREZPUEVxdWHsAQAAAYI9AUVRVUH" +
+            "MAQVvcmcuYXBhY2hlLmhhZG9vcC5pby5Cb29sZWFuV3JpdGFibOUBAAABAgEBYm9vbGVh7g==";
+    SearchArgument sarg =
+        new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst))
+            .buildSearchArgument();
     assertEquals("leaf-0", sarg.getExpression().toString());
     assertEquals(1, sarg.getLeaves().size());
     PredicateLeaf leaf = sarg.getLeaves().get(0);
@@ -2796,14 +2800,18 @@ public class TestConvertAstToSearchArg {
   }
 
   @Test
-  public void testDecimalSarg() throws Exception {
-    ExprNodeGenericFuncDesc node =
-        getColumnEqualsConstantExpression(TypeInfoFactory.decimalTypeInfo, "dec", 123);
-    String serialAst = SerializationUtilities.serializeExpression(node);
-
-    ConvertAstToSearchArg convertAstToSearchArg = new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst));
-    assertFalse(convertAstToSearchArg.isPartial());
-    SearchArgument sarg = convertAstToSearchArg.buildSearchArgument();
+  public void TestDecimalSarg() throws Exception {
+    String serialAst =
+        "AQEAamF2YS51dGlsLkFycmF5TGlz9AECAQFvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnFsLnBsYW4uRXh" +
+            "wck5vZGVDb2x1bW5EZXPjAQFkZeMAAAFiaWdvcuMBAm9yZy5hcGFjaGUuaGFkb29wLmhpdmUuc2VyZG" +
+            "UyLnR5cGVpbmZvLkRlY2ltYWxUeXBlSW5m7wEUAAFkZWNpbWHsAQNvcmcuYXBhY2hlLmhhZG9vcC5oa" +
+            "XZlLnFsLnBsYW4uRXhwck5vZGVDb25zdGFudERlc+MBAQRvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnNl" +
+            "cmRlMi50eXBlaW5mby5QcmltaXRpdmVUeXBlSW5m7wEBaW70AvYBAQVvcmcuYXBhY2hlLmhhZG9vcC5" +
+            "oaXZlLnFsLnVkZi5nZW5lcmljLkdlbmVyaWNVREZPUEVxdWHsAQAAAYI9AUVRVUHMAQZvcmcuYXBhY2" +
+            "hlLmhhZG9vcC5pby5Cb29sZWFuV3JpdGFibOUBAAABBAEBYm9vbGVh7g==";
+    SearchArgument sarg =
+        new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst))
+            .buildSearchArgument();
     assertEquals("leaf-0", sarg.getExpression().toString());
     assertEquals(1, sarg.getLeaves().size());
     PredicateLeaf leaf = sarg.getLeaves().get(0);
@@ -2812,14 +2820,18 @@ public class TestConvertAstToSearchArg {
   }
 
   @Test
-  public void testCharSarg() throws Exception {
-    ExprNodeGenericFuncDesc node =
-        getColumnEqualsConstantExpression(TypeInfoFactory.charTypeInfo, "ch", "char      ");
-    String serialAst = SerializationUtilities.serializeExpression(node);
-
-    ConvertAstToSearchArg convertAstToSearchArg = new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst));
-    assertFalse(convertAstToSearchArg.isPartial());
-    SearchArgument sarg = convertAstToSearchArg.buildSearchArgument();
+  public void TestCharSarg() throws Exception {
+    String serialAst =
+        "AQEAamF2YS51dGlsLkFycmF5TGlz9AECAQFvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnFsLnBsYW4uRXh" +
+            "wck5vZGVDb2x1bW5EZXPjAQFj6AAAAWJpZ29y4wECb3JnLmFwYWNoZS5oYWRvb3AuaGl2ZS5zZXJkZT" +
+            "IudHlwZWluZm8uQ2hhclR5cGVJbmbvARQBY2hh8gEDb3JnLmFwYWNoZS5oYWRvb3AuaGl2ZS5xbC5wb" +
+            "GFuLkV4cHJOb2RlQ29uc3RhbnREZXPjAQEEb3JnLmFwYWNoZS5oYWRvb3AuaGl2ZS5zZXJkZTIudHlw" +
+            "ZWluZm8uUHJpbWl0aXZlVHlwZUluZu8BAXN0cmlu5wMBY2hhciAgICAgoAEFb3JnLmFwYWNoZS5oYWR" +
+            "vb3AuaGl2ZS5xbC51ZGYuZ2VuZXJpYy5HZW5lcmljVURGT1BFcXVh7AEAAAGCPQFFUVVBzAEGb3JnLm" +
+            "FwYWNoZS5oYWRvb3AuaW8uQm9vbGVhbldyaXRhYmzlAQAAAQQBAWJvb2xlYe4=";
+    SearchArgument sarg =
+        new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst))
+            .buildSearchArgument();
     assertEquals("leaf-0", sarg.getExpression().toString());
     assertEquals(1, sarg.getLeaves().size());
     PredicateLeaf leaf = sarg.getLeaves().get(0);
@@ -2828,14 +2840,18 @@ public class TestConvertAstToSearchArg {
   }
 
   @Test
-  public void testVarcharSarg() throws Exception {
-    ExprNodeGenericFuncDesc node =
-        getColumnEqualsConstantExpression(TypeInfoFactory.varcharTypeInfo, "vc", "variable");
-    String serialAst = SerializationUtilities.serializeExpression(node);
-
-    ConvertAstToSearchArg convertAstToSearchArg = new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst));
-    assertFalse(convertAstToSearchArg.isPartial());
-    SearchArgument sarg = convertAstToSearchArg.buildSearchArgument();;
+  public void TestVarcharSarg() throws Exception {
+    String serialAst =
+        "AQEAamF2YS51dGlsLkFycmF5TGlz9AECAQFvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnFsLnBsYW4uRXh" +
+            "wck5vZGVDb2x1bW5EZXPjAQF24wAAAWJpZ29y4wECb3JnLmFwYWNoZS5oYWRvb3AuaGl2ZS5zZXJkZT" +
+            "IudHlwZWluZm8uVmFyY2hhclR5cGVJbmbvAcgBAXZhcmNoYfIBA29yZy5hcGFjaGUuaGFkb29wLmhpd" +
+            "mUucWwucGxhbi5FeHByTm9kZUNvbnN0YW50RGVz4wEBBG9yZy5hcGFjaGUuaGFkb29wLmhpdmUuc2Vy" +
+            "ZGUyLnR5cGVpbmZvLlByaW1pdGl2ZVR5cGVJbmbvAQFzdHJpbucDAXZhcmlhYmzlAQVvcmcuYXBhY2h" +
+            "lLmhhZG9vcC5oaXZlLnFsLnVkZi5nZW5lcmljLkdlbmVyaWNVREZPUEVxdWHsAQAAAYI9AUVRVUHMAQ" +
+            "ZvcmcuYXBhY2hlLmhhZG9vcC5pby5Cb29sZWFuV3JpdGFibOUBAAABBAEBYm9vbGVh7g==";
+    SearchArgument sarg =
+        new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst))
+            .buildSearchArgument();
     assertEquals("leaf-0", sarg.getExpression().toString());
     assertEquals(1, sarg.getLeaves().size());
     PredicateLeaf leaf = sarg.getLeaves().get(0);
@@ -2844,14 +2860,17 @@ public class TestConvertAstToSearchArg {
   }
 
   @Test
-  public void testBigintSarg() throws Exception {
-    ExprNodeGenericFuncDesc node =
-        getColumnEqualsConstantExpression(TypeInfoFactory.intTypeInfo, "bi", 12345);
-    String serialAst = SerializationUtilities.serializeExpression(node);
-
-    ConvertAstToSearchArg convertAstToSearchArg = new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst));
-    assertFalse(convertAstToSearchArg.isPartial());
-    SearchArgument sarg = convertAstToSearchArg.buildSearchArgument();
+  public void TestBigintSarg() throws Exception {
+    String serialAst =
+        "AQEAamF2YS51dGlsLkFycmF5TGlz9AECAQFvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnFsLnBsYW4uRXh" +
+            "wck5vZGVDb2x1bW5EZXPjAQFi6QAAAWJpZ29y4wECb3JnLmFwYWNoZS5oYWRvb3AuaGl2ZS5zZXJkZT" +
+            "IudHlwZWluZm8uUHJpbWl0aXZlVHlwZUluZu8BAWJpZ2lu9AEDb3JnLmFwYWNoZS5oYWRvb3AuaGl2Z" +
+            "S5xbC5wbGFuLkV4cHJOb2RlQ29uc3RhbnREZXPjAQECBwnywAEBBG9yZy5hcGFjaGUuaGFkb29wLmhp" +
+            "dmUucWwudWRmLmdlbmVyaWMuR2VuZXJpY1VERk9QRXF1YewBAAABgj0BRVFVQcwBBW9yZy5hcGFjaGU" +
+            "uaGFkb29wLmlvLkJvb2xlYW5Xcml0YWJs5QEAAAECAQFib29sZWHu";
+    SearchArgument sarg =
+        new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst))
+            .buildSearchArgument();
     assertEquals("leaf-0", sarg.getExpression().toString());
     assertEquals(1, sarg.getLeaves().size());
     PredicateLeaf leaf = sarg.getLeaves().get(0);
@@ -2860,29 +2879,19 @@ public class TestConvertAstToSearchArg {
   }
 
   @Test
-  public void testBooleanSarg() throws Exception {
-    ExprNodeDesc column1 =
-        new ExprNodeColumnDesc(TypeInfoFactory.booleanTypeInfo, "b1", null, false);
-    ExprNodeDesc column2 =
-        new ExprNodeColumnDesc(TypeInfoFactory.booleanTypeInfo, "b2", null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(TypeInfoFactory.booleanTypeInfo, true);
-
-    ExprNodeGenericFuncDesc function1 = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
-        new GenericUDFOPEqual(), Lists.newArrayList(column1, constant));
-    ExprNodeGenericFuncDesc function2 = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
-        new GenericUDFOPEqual(), Lists.newArrayList(column2, constant));
-
-    List<ExprNodeDesc> children = Lists.newArrayList();
-
-    children.add(function1);
-    children.add(function2);
-    ExprNodeGenericFuncDesc node = new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo,
-        new GenericUDFOPAnd(), children);
-    String serialAst = SerializationUtilities.serializeExpression(node);
-
-    ConvertAstToSearchArg convertAstToSearchArg = new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst));
-    assertFalse(convertAstToSearchArg.isPartial());
-    SearchArgument sarg = convertAstToSearchArg.buildSearchArgument();
+  public void TestBooleanSarg() throws Exception {
+    String serialAst =
+        "AQEAamF2YS51dGlsLkFycmF5TGlz9AECAQFvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnFsLnBsYW4uRXh" +
+            "wck5vZGVHZW5lcmljRnVuY0Rlc+MBAQABAgECb3JnLmFwYWNoZS5oYWRvb3AuaGl2ZS5xbC5wbGFuLk" +
+            "V4cHJOb2RlQ29sdW1uRGVz4wEBYrEAAAFib29sb3LjAQNvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnNlc" +
+            "mRlMi50eXBlaW5mby5QcmltaXRpdmVUeXBlSW5m7wEBYm9vbGVh7gEEb3JnLmFwYWNoZS5oYWRvb3Au" +
+            "aGl2ZS5xbC5wbGFuLkV4cHJOb2RlQ29uc3RhbnREZXPjAQEDCQUBAQVvcmcuYXBhY2hlLmhhZG9vcC5" +
+            "oaXZlLnFsLnVkZi5nZW5lcmljLkdlbmVyaWNVREZPUEVxdWHsAQAAAYI9AUVRVUHMAQZvcmcuYXBhY2" +
+            "hlLmhhZG9vcC5pby5Cb29sZWFuV3JpdGFibOUBAAABAwkBAgEBYrIAAAgBAwkBB29yZy5hcGFjaGUua" +
+            "GFkb29wLmhpdmUucWwudWRmLmdlbmVyaWMuR2VuZXJpY1VERk9QQW7kAQEGAQAAAQMJ";
+    SearchArgument sarg =
+        new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst))
+            .buildSearchArgument();
     assertEquals("(and leaf-0 leaf-1)", sarg.getExpression().toString());
     assertEquals(2, sarg.getLeaves().size());
     PredicateLeaf leaf = sarg.getLeaves().get(0);
@@ -2894,14 +2903,17 @@ public class TestConvertAstToSearchArg {
   }
 
   @Test
-  public void testFloatSarg() throws Exception {
-    ExprNodeGenericFuncDesc node =
-        getColumnEqualsConstantExpression(TypeInfoFactory.floatTypeInfo, "flt", 1.1f);
-    String serialAst = SerializationUtilities.serializeExpression(node);
-
-    ConvertAstToSearchArg convertAstToSearchArg = new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst));
-    assertFalse(convertAstToSearchArg.isPartial());
-    SearchArgument sarg = convertAstToSearchArg.buildSearchArgument();
+  public void TestFloatSarg() throws Exception {
+    String serialAst =
+        "AQEAamF2YS51dGlsLkFycmF5TGlz9AECAQFvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnFsLnBsYW4uRXh" +
+            "wck5vZGVDb2x1bW5EZXPjAQFmbPQAAAFiaWdvcuMBAm9yZy5hcGFjaGUuaGFkb29wLmhpdmUuc2VyZG" +
+            "UyLnR5cGVpbmZvLlByaW1pdGl2ZVR5cGVJbmbvAQFmbG9h9AEDb3JnLmFwYWNoZS5oYWRvb3AuaGl2Z" +
+            "S5xbC5wbGFuLkV4cHJOb2RlQ29uc3RhbnREZXPjAQECBwQ/jMzNAQRvcmcuYXBhY2hlLmhhZG9vcC5o" +
+            "aXZlLnFsLnVkZi5nZW5lcmljLkdlbmVyaWNVREZPUEVxdWHsAQAAAYI9AUVRVUHMAQVvcmcuYXBhY2h" +
+            "lLmhhZG9vcC5pby5Cb29sZWFuV3JpdGFibOUBAAABAgEBYm9vbGVh7g==";
+    SearchArgument sarg =
+        new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst))
+            .buildSearchArgument();
     assertEquals("leaf-0", sarg.getExpression().toString());
     assertEquals(1, sarg.getLeaves().size());
     PredicateLeaf leaf = sarg.getLeaves().get(0);
@@ -2910,30 +2922,21 @@ public class TestConvertAstToSearchArg {
   }
 
   @Test
-  public void testDoubleSarg() throws Exception {
-    ExprNodeGenericFuncDesc node =
-        getColumnEqualsConstantExpression(TypeInfoFactory.doubleTypeInfo, "dbl", 2.2);
-    String serialAst = SerializationUtilities.serializeExpression(node);
-
-    ConvertAstToSearchArg convertAstToSearchArg = new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst));
-    assertFalse(convertAstToSearchArg.isPartial());
-    SearchArgument sarg = convertAstToSearchArg.buildSearchArgument();
+  public void TestDoubleSarg() throws Exception {
+    String serialAst =
+        "AQEAamF2YS51dGlsLkFycmF5TGlz9AECAQFvcmcuYXBhY2hlLmhhZG9vcC5oaXZlLnFsLnBsYW4uRXh" +
+            "wck5vZGVDb2x1bW5EZXPjAQFkYuwAAAFiaWdvcuMBAm9yZy5hcGFjaGUuaGFkb29wLmhpdmUuc2VyZG" +
+            "UyLnR5cGVpbmZvLlByaW1pdGl2ZVR5cGVJbmbvAQFkb3VibOUBA29yZy5hcGFjaGUuaGFkb29wLmhpd" +
+            "mUucWwucGxhbi5FeHByTm9kZUNvbnN0YW50RGVz4wEBAgcKQAGZmZmZmZoBBG9yZy5hcGFjaGUuaGFk" +
+            "b29wLmhpdmUucWwudWRmLmdlbmVyaWMuR2VuZXJpY1VERk9QRXF1YewBAAABgj0BRVFVQcwBBW9yZy5" +
+            "hcGFjaGUuaGFkb29wLmlvLkJvb2xlYW5Xcml0YWJs5QEAAAECAQFib29sZWHu";
+    SearchArgument sarg =
+        new ConvertAstToSearchArg(conf, SerializationUtilities.deserializeExpression(serialAst))
+            .buildSearchArgument();
     assertEquals("leaf-0", sarg.getExpression().toString());
     assertEquals(1, sarg.getLeaves().size());
     PredicateLeaf leaf = sarg.getLeaves().get(0);
     assertEquals(PredicateLeaf.Type.FLOAT, leaf.getType());
     assertEquals("(EQUALS dbl 2.2)", leaf.toString());
-  }
-
-  private ExprNodeGenericFuncDesc getColumnEqualsConstantExpression(TypeInfo typeInfo,
-      String columnName, Object value) {
-    ExprNodeDesc column = new ExprNodeColumnDesc(typeInfo, columnName, null, false);
-    ExprNodeDesc constant = new ExprNodeConstantDesc(typeInfo, value);
-    List<ExprNodeDesc> children = Lists.newArrayList();
-    children.add(column);
-    children.add(constant);
-    ExprNodeGenericFuncDesc node =
-        new ExprNodeGenericFuncDesc(typeInfo, new GenericUDFOPEqual(), children);
-    return node;
   }
 }

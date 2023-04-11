@@ -174,7 +174,7 @@ public class ObjectContainer<ROW> {
             SerializationUtilities.releaseKryo(kryo);
           }
 
-          if (input.end()) {
+          if (input.eof()) {
             input.close();
             input = null;
           }
