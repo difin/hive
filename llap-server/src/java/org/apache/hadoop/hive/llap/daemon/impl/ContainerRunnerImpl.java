@@ -17,7 +17,6 @@ package org.apache.hadoop.hive.llap.daemon.impl;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +41,6 @@ import org.apache.hadoop.hive.llap.DaemonId;
 import org.apache.hadoop.hive.llap.LlapNodeId;
 import org.apache.hadoop.hive.llap.LlapUtil;
 import org.apache.hadoop.hive.llap.NotTezEventHelper;
-import org.apache.hadoop.hive.llap.counters.FragmentCountersMap;
-import org.apache.hadoop.hive.llap.counters.LlapWmCounters;
 import org.apache.hadoop.hive.llap.counters.WmFragmentCounters;
 import org.apache.hadoop.hive.llap.daemon.ContainerRunner;
 import org.apache.hadoop.hive.llap.daemon.FragmentCompletionHandler;
@@ -78,15 +75,13 @@ import org.apache.hadoop.hive.llap.metrics.LlapDaemonExecutorMetrics;
 import org.apache.hadoop.hive.llap.security.LlapSignerImpl;
 import org.apache.hadoop.hive.llap.tez.Converters;
 import org.apache.hadoop.hive.llap.tezplugins.LlapTezUtils;
-import org.apache.hadoop.hive.ql.exec.tez.WorkloadManager;
 import org.apache.hadoop.security.Credentials;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.service.CompositeService;
 import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.apache.hadoop.yarn.util.AuxiliaryServiceHelper;
-import org.apache.log4j.NDC;
-import org.apache.tez.common.counters.TezCounters;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.tez.common.security.JobTokenIdentifier;
 import org.apache.tez.common.security.TokenCache;
 import org.apache.tez.dag.api.TezConfiguration;
@@ -257,9 +252,9 @@ public class ContainerRunnerImpl extends CompositeService implements ContainerRu
     // thread pool. For now, we will push both dagId and queryId into NDC and the custom thread
     // pool that we use for task execution and llap io (StatsRecordingThreadPool) will pop them
     // using reflection and update the MDC.
-    NDC.push(dagId);
-    NDC.push(queryId);
-    NDC.push(fragmentId);
+    ThreadContext.push(dagId);
+    ThreadContext.push(queryId);
+    ThreadContext.push(fragmentId);
     Scheduler.SubmissionState submissionState;
     SubmitWorkResponseProto.Builder responseBuilder = SubmitWorkResponseProto.newBuilder();
     try {
@@ -331,7 +326,7 @@ public class ContainerRunnerImpl extends CompositeService implements ContainerRu
       }
     } finally {
       MDC.clear();
-      NDC.clear();
+      ThreadContext.clearStack();
     }
 
     return responseBuilder.setUniqueNodeId(daemonId.getUniqueNodeIdInCluster())
