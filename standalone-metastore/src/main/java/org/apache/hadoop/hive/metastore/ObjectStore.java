@@ -9634,16 +9634,27 @@ public class ObjectStore implements RawStore, Configurable {
         sizeNumFiles = BigInteger.valueOf(rs.getLong("NUM_FILES"));
 
         // for iceberg tables, overwrite the metadata by the metadata fetched in HMSSummaryIcebergHandler
+        // when some error happended to the icebergHandler, we use the data from the hms
         if (fileType != null && fileType.equals("iceberg") && icebergHandler.isEnabled() && icebergTableSummaryMap != null) {
           // if the new metadata is not null or 0, overwrite the old metadata
           MetadataTableSummary icebergTableSummary = icebergTableSummaryMap.get(tblName);
-          ctlgName = icebergTableSummary.getCtlgName() != null ? icebergTableSummary.getCtlgName() : ctlgName;
-          dbName = icebergTableSummary.getDbName() != null ? icebergTableSummary.getDbName() : dbName;
-          colCount = icebergTableSummary.getColCount() != 0 ? icebergTableSummary.getColCount() : colCount;
-          partitionColumnCount = icebergTableSummary.getPartitionColumnCount() != 0 ? icebergTableSummary.getPartitionColumnCount() : partitionColumnCount;
-          totalSize = icebergTableSummary.getTotalSize() != null ? icebergTableSummary.getTotalSize() : totalSize;
-          sizeNumRows = icebergTableSummary.getSizeNumRows() != null ? icebergTableSummary.getSizeNumRows(): sizeNumRows;
-          sizeNumFiles = icebergTableSummary.getSizeNumFiles() != null ? icebergTableSummary.getSizeNumFiles(): sizeNumFiles;
+          try {
+            if (icebergTableSummary != null) {
+              ctlgName = icebergTableSummary.getCtlgName() != null ? icebergTableSummary.getCtlgName() : ctlgName;
+              dbName = icebergTableSummary.getDbName() != null ? icebergTableSummary.getDbName() : dbName;
+              colCount = icebergTableSummary.getColCount() != 0 ? icebergTableSummary.getColCount() : colCount;
+              partitionColumnCount = icebergTableSummary.getPartitionColumnCount() != 0 ? icebergTableSummary.getPartitionColumnCount() : partitionColumnCount;
+              totalSize = icebergTableSummary.getTotalSize() != null ? icebergTableSummary.getTotalSize() : totalSize;
+              sizeNumRows = icebergTableSummary.getSizeNumRows() != null ? icebergTableSummary.getSizeNumRows() : sizeNumRows;
+              sizeNumFiles = icebergTableSummary.getSizeNumFiles() != null ? icebergTableSummary.getSizeNumFiles() : sizeNumFiles;
+            } else {
+              LOG.info("Iceberg Table {}.{}.{} icebergTableSummary is null", ctlgName, dbName, tblName);
+            }
+          } catch (Exception icebergException){
+            String msg = "Runtime iceberg related exception";
+            LOG.error(msg, icebergException);
+            throw icebergException;
+          }
         }
 
         MetadataTableSummary summary = new MetadataTableSummary(ctlgName, dbName, tblName, colCount,

@@ -22,7 +22,6 @@ import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class IcebergTableMetadataHandler {
   private final Configuration conf;
   private boolean isEnabled = false;
 
-  private static final IcebergReflector IR;
+  public static final IcebergReflector IR;
   static {
     IcebergReflector ir = null;
     try {
@@ -98,9 +97,13 @@ public class IcebergTableMetadataHandler {
         }
       }
 
-    } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+    } catch (Exception e) {
+      Throwable cause = e.getCause();
       isEnabled = false;
-      LOG.warn("Could not find or instantiate class " + CATALOG_CLASS + ", cannot retrieve stats for iceberg tables.");
+      LOG.warn("Could not find or instantiate class " + CATALOG_CLASS + ", cannot retrieve stats for iceberg tables.", e);
+      if (cause instanceof InterruptedException) {
+        Thread.currentThread().interrupt();
+      }
     }
     return metadataSummaryMap;
   }

@@ -18,18 +18,31 @@
 package org.apache.hadoop.hive.metastore.tools.metatool;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 import java.util.Map;
+
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.KERBEROS_KEYTAB_FILE;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.KERBEROS_PRINCIPAL;
+import static org.apache.hadoop.security.UserGroupInformation.loginUserFromKeytabAndReturnUGI;
 
 /**
  * Collects Iceberg table metadata statistics using reflection to avoid cyclic dependency.
  */
 public class IcebergReflector {
+  /** Lets log. */
+  private static final Logger LOGGER = LoggerFactory.getLogger(IcebergReflector.class);
+  /** The Iceberg catalog class name. */
   private static final String CATALOG_CLASS = "org.apache.iceberg.hive.HiveCatalog";
   /** The catalog class. */
   private final Class<?> catalogClass;
@@ -55,7 +68,8 @@ public class IcebergReflector {
   private volatile Method fieldsMethod;
   private volatile Method currentSnapshotMethod;
   /** The Snapshot.summary() .*/
-  private volatile Method summaryMethod;
+  public volatile Method summaryMethod;
+  private UserGroupInformation ugi;
 
   /**
    * Creates the catalog reflector.
@@ -64,16 +78,29 @@ public class IcebergReflector {
    * @throws InstantiationException
    * @throws IllegalAccessException
    */
-  IcebergReflector() throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+  public IcebergReflector() throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException {
     catalogClass = Class.forName(CATALOG_CLASS);
     // constructor
     this.constructor = catalogClass.getConstructor();
     this.setConf = catalogClass.getMethod("setConf", org.apache.hadoop.conf.Configuration.class);
-    this.initialize =  catalogClass.getMethod("initialize", String.class, Map.class);
+    this.initialize = catalogClass.getMethod("initialize", String.class, Map.class);
     this.listNamespaces = catalogClass.getMethod("listNamespaces");
+
+    Configuration cfg = MetastoreConf.newMetastoreConf();
+    String principal = MetastoreConf.getAsString(cfg, KERBEROS_PRINCIPAL);
+    String keytabFile = MetastoreConf.getAsString(cfg, KERBEROS_KEYTAB_FILE);
+    if (principal != null && keytabFile != null) {
+      try {
+        cfg.set("hadoop.security.authentication", "kerberos");
+        UserGroupInformation.setConfiguration(cfg);
+        ugi = loginUserFromKeytabAndReturnUGI(principal, keytabFile);
+      } catch (Exception x) {
+        LOGGER.error("unable to create proxy user", x);
+      }
+    }
   }
 
-  CatalogHandle newCatalog() {
+  public CatalogHandle newCatalog() {
     try {
       Object catalog = constructor.newInstance();
       return new CatalogHandle(catalog);
@@ -86,10 +113,10 @@ public class IcebergReflector {
   /**
    * A catalog instance.
    */
-  class CatalogHandle {
-    private final Object catalog;
+  public class CatalogHandle {
+    public final Object catalog;
 
-    CatalogHandle(Object catalog) {
+    public CatalogHandle(Object catalog) {
       this.catalog = catalog;
     }
 
@@ -110,7 +137,7 @@ public class IcebergReflector {
         Class<?> namespaceClazz = namespace.getClass();
         listTablesMethod = catalogClass.getMethod("listTables", namespaceClazz);
       }
-      return (Collection<?>) listTablesMethod.invoke(namespace);
+      return (Collection<?>) listTablesMethod.invoke(catalog, namespace);
     }
 
     Object loadTable(Object tableIdentifier) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
@@ -118,8 +145,23 @@ public class IcebergReflector {
         Class<?> identifierClazz = tableIdentifier.getClass();
         loadTableMethod = catalogClass.getMethod("loadTable", identifierClazz);
       }
-      return loadTableMethod.invoke(tableIdentifier);
+      if (ugi == null) {
+        return loadTableMethod.invoke(catalog, tableIdentifier);
+      }
+      try {
+        return ugi.doAs(new PrivilegedExceptionAction<Object>() {
+          @Override
+          public Object run() throws Exception {
+            return loadTableMethod.invoke(catalog, tableIdentifier);
+          }
+        });
+      } catch (IOException e) {
+        throw new InvocationTargetException(e);
+      } catch (InterruptedException e) {
+        throw new InvocationTargetException(e);
+      }
     }
+
 
     /**
      * Creates the metadata summary for a given Iceberg table.
@@ -129,7 +171,7 @@ public class IcebergReflector {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    MetadataTableSummary collectMetadata(Object table) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public MetadataTableSummary collectMetadata(Object table) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
       Method nameMethod = table.getClass().getMethod("name");
       String tableFullName = (String) nameMethod.invoke(table);
       String[] paths = tableFullName.split("\\.");
@@ -171,7 +213,8 @@ public class IcebergReflector {
       // sometimes current snapshot could be null
       if (snapshot != null) {
         if (summaryMethod == null) {
-          summaryMethod = snapshot.getClass().getDeclaredMethod("summary");
+          summaryMethod = snapshot.getClass().getMethod("summary");
+          summaryMethod.setAccessible(true);
         }
         Map<String, String> summaryMap = (Map<String,String>) summaryMethod.invoke(snapshot);
         BigInteger totalSizeBytes = new BigInteger(summaryMap.get("total-files-size"));
