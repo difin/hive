@@ -37,7 +37,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-@org.junit.Ignore("unstable test")
+
 public class TestRemoteHiveMetaStoreKerberos extends TestRemoteHiveMetaStore {
   private static MiniHiveKdc miniKDC;
 
