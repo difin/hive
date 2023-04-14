@@ -105,7 +105,9 @@ public class TestASTConverter {
       "               farray\n" +
       "               TOK_FUNCTION\n" +
       "                  array\n" +
-      "                  TOK_NULL\n" +
+      "                  TOK_FUNCTION\n" +
+      "                     TOK_INT\n" +
+      "                     TOK_NULL\n" +
       "               fmap\n" +
       "               TOK_FUNCTION\n" +
       "                  map\n" +
