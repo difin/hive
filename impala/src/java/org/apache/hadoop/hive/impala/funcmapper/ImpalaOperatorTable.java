@@ -105,6 +105,7 @@ public class ImpalaOperatorTable {
     map.put("IN_ITERATE", InIterateOperator.IN_ITERATE);
     map.put("<=>", SqlStdOperatorTable.IS_NOT_DISTINCT_FROM);
     map.put("NULLIF", SqlStdOperatorTable.CASE);
+    map.put("!", SqlStdOperatorTable.NOT);
 
     IMPALA_OPERATOR_MAP = Collections.unmodifiableMap(map);
   }
