@@ -236,7 +236,7 @@ STAGE PLANS:
                 vectorized: true
             Reduce Operator Tree:
               Group By Operator
-                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, expectedEntries=57)
+                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, 1, expectedEntries=57)
                 Group By Vectorization:
                     aggregators: VectorUDAFMinLong(col 0:int) -> int, VectorUDAFMaxLong(col 1:int) -> int, VectorUDAFBloomFilterMerge(col 2:binary) -> binary
                     className: VectorGroupByOperator
@@ -486,7 +486,7 @@ STAGE PLANS:
                 vectorized: true
             Reduce Operator Tree:
               Group By Operator
-                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, expectedEntries=57)
+                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, 1, expectedEntries=57)
                 Group By Vectorization:
                     aggregators: VectorUDAFMinString(col 0:string) -> string, VectorUDAFMaxString(col 1:string) -> string, VectorUDAFBloomFilterMerge(col 2:binary) -> binary
                     className: VectorGroupByOperator
@@ -736,7 +736,7 @@ STAGE PLANS:
                 vectorized: true
             Reduce Operator Tree:
               Group By Operator
-                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, expectedEntries=57)
+                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, 1, expectedEntries=57)
                 Group By Vectorization:
                     aggregators: VectorUDAFMinString(col 0:string) -> string, VectorUDAFMaxString(col 1:string) -> string, VectorUDAFBloomFilterMerge(col 2:binary) -> binary
                     className: VectorGroupByOperator
@@ -1017,7 +1017,7 @@ STAGE PLANS:
                 vectorized: true
             Reduce Operator Tree:
               Group By Operator
-                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, expectedEntries=57)
+                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, 1, expectedEntries=57)
                 Group By Vectorization:
                     aggregators: VectorUDAFMinLong(col 0:int) -> int, VectorUDAFMaxLong(col 1:int) -> int, VectorUDAFBloomFilterMerge(col 2:binary) -> binary
                     className: VectorGroupByOperator
@@ -1267,7 +1267,7 @@ STAGE PLANS:
                 vectorized: true
             Reduce Operator Tree:
               Group By Operator
-                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, expectedEntries=57)
+                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, 1, expectedEntries=57)
                 Group By Vectorization:
                     aggregators: VectorUDAFMinString(col 0:string) -> string, VectorUDAFMaxString(col 1:string) -> string, VectorUDAFBloomFilterMerge(col 2:binary) -> binary
                     className: VectorGroupByOperator
@@ -1517,7 +1517,7 @@ STAGE PLANS:
                 vectorized: true
             Reduce Operator Tree:
               Group By Operator
-                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, expectedEntries=2)
+                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, 1, expectedEntries=2)
                 Group By Vectorization:
                     aggregators: VectorUDAFMinLong(col 0:int) -> int, VectorUDAFMaxLong(col 1:int) -> int, VectorUDAFBloomFilterMerge(col 2:binary) -> binary
                     className: VectorGroupByOperator
@@ -1695,7 +1695,7 @@ STAGE PLANS:
             Execution mode: vectorized, llap
             Reduce Operator Tree:
               Group By Operator
-                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, expectedEntries=57)
+                aggregations: min(VALUE._col0), max(VALUE._col1), bloom_filter(VALUE._col2, 1, expectedEntries=57)
                 mode: final
                 outputColumnNames: _col0, _col1, _col2
                 Statistics: Num rows: 1 Data size: 12 Basic stats: COMPLETE Column stats: COMPLETE
