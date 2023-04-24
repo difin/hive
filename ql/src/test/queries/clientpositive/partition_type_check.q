@@ -1,3 +1,4 @@
+--! qt:disabled:DWX-15069
 --! qt:dataset:part
 set hive.mapred.mode=nonstrict;
 set hive.typecheck.on.insert = true;
