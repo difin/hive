@@ -18,36 +18,24 @@
 
 package org.apache.hadoop.hive.ql.optimizer.calcite.rules;
 
-import org.apache.calcite.jdbc.JavaTypeFactoryImpl;
-import org.apache.calcite.plan.RelOptCluster;
+import org.apache.calcite.plan.AbstractRelOptPlanner;
 import org.apache.calcite.plan.RelOptSchema;
-import org.apache.calcite.plan.hep.HepPlanner;
-import org.apache.calcite.plan.hep.HepProgramBuilder;
 import org.apache.calcite.rel.RelNode;
-import org.apache.calcite.rel.logical.LogicalTableScan;
-import org.apache.calcite.rel.type.RelDataType;
-import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.rex.RexNode;
-import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.tools.RelBuilder;
 import org.apache.hadoop.hive.ql.metadata.Table;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HivePlannerContext;
-import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
 import org.apache.hadoop.hive.ql.optimizer.calcite.RelOptHiveTable;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveFilter;
-import org.apache.hadoop.hive.ql.parse.type.HiveFunctionHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.*;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.lenient;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestHivePointLookupOptimizerRule {
@@ -59,8 +47,8 @@ public class TestHivePointLookupOptimizerRule {
   @Mock
   Table hiveTableMDMock;
 
-  private HepPlanner planner;
-  private RelBuilder builder;
+  private AbstractRelOptPlanner planner;
+  private RelBuilder relBuilder;
 
   @SuppressWarnings("unused")
   private static class MyRecord {
@@ -72,55 +60,26 @@ public class TestHivePointLookupOptimizerRule {
 
   @Before
   public void before() {
-    JavaTypeFactoryImpl typeFactory = new JavaTypeFactoryImpl();
-    RexBuilder rexBuilder = new RexBuilder(typeFactory);
-
-    HepProgramBuilder programBuilder = new HepProgramBuilder();
-    programBuilder.addRuleInstance(new HivePointLookupOptimizerRule.FilterCondition(2, true));
-
-    planner = new HepPlanner(programBuilder.build(),
-        new HivePlannerContext(null, null, null, null, null, new HiveFunctionHelper(rexBuilder), null));
-
-    final RelOptCluster optCluster = RelOptCluster.create(planner, rexBuilder);
-    RelDataType rowTypeMock = typeFactory.createStructType(MyRecord.class);
-    Mockito.doReturn(rowTypeMock).when(tableMock).getRowType();
-    LogicalTableScan tableScan = LogicalTableScan.create(optCluster, tableMock, Collections.emptyList());
-    Mockito.doReturn(tableScan).when(tableMock).toRel(Matchers.any());
-    Mockito.doReturn(tableMock).when(schemaMock).getTableForMember(Matchers.any());
-    lenient().doReturn(hiveTableMDMock).when(tableMock).getHiveTableMD();
-
-    builder = HiveRelFactories.HIVE_BUILDER.create(optCluster, schemaMock);
-
-  }
-
-  public RexNode or(RexNode... args) {
-    return builder.call(SqlStdOperatorTable.OR, args);
-  }
-
-  public RexNode and(RexNode... args) {
-    return builder.call(SqlStdOperatorTable.AND, args);
-  }
-
-  public RexNode eq(String field, Number value) {
-    return builder.call(SqlStdOperatorTable.EQUALS,
-        builder.field(field), builder.literal(value));
+    planner = buildPlanner(
+        Collections.singletonList(new HivePointLookupOptimizerRule.FilterCondition(2, true)));
+    relBuilder = buildRelBuilder(planner, schemaMock, tableMock, hiveTableMDMock, MyRecord.class);
   }
 
   @Test
   public void testSimpleCase() {
 
     // @formatter:off
-    final RelNode basePlan = builder
+    final RelNode basePlan = relBuilder
           .scan("t")
           .filter(
-              and(
-                or(
-                    eq("f1",1),
-                    eq("f1",2)
+              and(relBuilder,
+                or(relBuilder,
+                    eq(relBuilder, "f1",1),
+                    eq(relBuilder, "f1",2)
                     ),
-                or(
-                    eq("f2",3),
-                    eq("f2",4)
+                or(relBuilder,
+                    eq(relBuilder, "f2",3),
+                    eq(relBuilder, "f2",4)
                     )
                 )
               )
@@ -139,17 +98,17 @@ public class TestHivePointLookupOptimizerRule {
   public void testInExprsMergedSingleOverlap() {
 
     // @formatter:off
-    final RelNode basePlan = builder
+    final RelNode basePlan = relBuilder
         .scan("t")
         .filter(
-            and(
-                or(
-                    eq("f1",1),
-                    eq("f1",2)
+            and(relBuilder,
+                or(relBuilder,
+                    eq(relBuilder,"f1",1),
+                    eq(relBuilder,"f1",2)
                 ),
-                or(
-                    eq("f1",1),
-                    eq("f1",3)
+                or(relBuilder,
+                    eq(relBuilder,"f1",1),
+                    eq(relBuilder,"f1",3)
                 )
             )
         )
@@ -168,19 +127,19 @@ public class TestHivePointLookupOptimizerRule {
   public void testInExprsAndEqualsMerged() {
 
     // @formatter:off
-    final RelNode basePlan = builder
+    final RelNode basePlan = relBuilder
         .scan("t")
         .filter(
-            and(
-                or(
-                    eq("f1",1),
-                    eq("f1",2)
+            and(relBuilder,
+                or(relBuilder,
+                    eq(relBuilder,"f1",1),
+                    eq(relBuilder,"f1",2)
                 ),
-                or(
-                    eq("f1",1),
-                    eq("f1",3)
+                or(relBuilder,
+                    eq(relBuilder,"f1",1),
+                    eq(relBuilder,"f1",3)
                 ),
-                eq("f1",1)
+                eq(relBuilder,"f1",1)
             )
         )
         .build();
@@ -198,21 +157,21 @@ public class TestHivePointLookupOptimizerRule {
   public void testInExprsMergedMultipleOverlap() {
 
     // @formatter:off
-    final RelNode basePlan = builder
+    final RelNode basePlan = relBuilder
         .scan("t")
         .filter(
-            and(
-                or(
-                    eq("f1",1),
-                    eq("f1",2),
-                    eq("f1",4),
-                    eq("f1",3)
+            and(relBuilder,
+                or(relBuilder,
+                    eq(relBuilder,"f1",1),
+                    eq(relBuilder,"f1",2),
+                    eq(relBuilder,"f1",4),
+                    eq(relBuilder,"f1",3)
                 ),
-                or(
-                    eq("f1",5),
-                    eq("f1",1),
-                    eq("f1",2),
-                    eq("f1",3)
+                or(relBuilder,
+                    eq(relBuilder,"f1",5),
+                    eq(relBuilder,"f1",1),
+                    eq(relBuilder,"f1",2),
+                    eq(relBuilder,"f1",3)
                 )
             )
         )
@@ -231,18 +190,18 @@ public class TestHivePointLookupOptimizerRule {
   public void testCaseWithConstantsOfDifferentType() {
 
     // @formatter:off
-    final RelNode basePlan = builder
+    final RelNode basePlan = relBuilder
         .scan("t")
         .filter(
-            and(
-                or(
-                    eq("f1",1),
-                    eq("f1",2)
+            and(relBuilder,
+                or(relBuilder,
+                    eq(relBuilder,"f1",1),
+                    eq(relBuilder,"f1",2)
                 ),
-                eq("f1", 1.0),
-                or(
-                    eq("f4",3.0),
-                    eq("f4",4.1)
+                eq(relBuilder,"f1", 1.0),
+                or(relBuilder,
+                    eq(relBuilder,"f4",3.0),
+                    eq(relBuilder,"f4",4.1)
                 )
             )
         )
@@ -264,20 +223,20 @@ public class TestHivePointLookupOptimizerRule {
   public void testCaseInAndEqualsWithConstantsOfDifferentType() {
 
     // @formatter:off
-    final RelNode basePlan = builder
+    final RelNode basePlan = relBuilder
         .scan("t")
         .filter(
-            and(
-                or(
-                    eq("f1",1),
-                    eq("f1",2)
+            and(relBuilder,
+                or(relBuilder,
+                    eq(relBuilder,"f1",1),
+                    eq(relBuilder,"f1",2)
                 ),
-                eq("f1",1),
-                or(
-                    eq("f4",3.0),
-                    eq("f4",4.1)
+                eq(relBuilder,"f1",1),
+                or(relBuilder,
+                    eq(relBuilder,"f4",3.0),
+                    eq(relBuilder,"f4",4.1)
                 ),
-                eq("f4",4.1)
+                eq(relBuilder,"f4",4.1)
             )
         )
         .build();
@@ -295,12 +254,14 @@ public class TestHivePointLookupOptimizerRule {
   public void testSimpleStructCase() {
 
     // @formatter:off
-    final RelNode basePlan = builder
+    final RelNode basePlan = relBuilder
           .scan("t")
           .filter(
-              or(
-                  and( eq("f1",1),eq("f2",1)),
-                  and( eq("f1",2),eq("f2",2))
+              or(relBuilder,
+                  and(relBuilder,
+                      eq(relBuilder,"f1",1), eq(relBuilder,"f2",1)),
+                  and(relBuilder,
+                      eq(relBuilder,"f1",2), eq(relBuilder,"f2",2))
                   )
               )
           .build();
@@ -319,13 +280,13 @@ public class TestHivePointLookupOptimizerRule {
   public void testObscuredSimple() {
 
     // @formatter:off
-    final RelNode basePlan = builder
+    final RelNode basePlan = relBuilder
           .scan("t")
           .filter(
-              or(
-                  eq("f2",99),
-                  eq("f1",1),
-                  eq("f1",2)
+              or(relBuilder,
+                  eq(relBuilder,"f2",99),
+                  eq(relBuilder,"f1",1),
+                  eq(relBuilder,"f1",2)
                   )
               )
           .build();
@@ -345,23 +306,27 @@ public class TestHivePointLookupOptimizerRule {
   public void testRecursionIsNotObstructed() {
 
     // @formatter:off
-    final RelNode basePlan = builder
+    final RelNode basePlan = relBuilder
           .scan("t")
           .filter(
-              and(
-                or(
-                    eq("f1",1),
-                    eq("f1",2)
+              and(relBuilder,
+                or(relBuilder,
+                    eq(relBuilder,"f1",1),
+                    eq(relBuilder,"f1",2)
                     )
                 ,
-                or(
-                    and(
-                        or(eq("f2",1),eq("f2",2)),
-                        or(eq("f3",1),eq("f3",2))
+                or(relBuilder,
+                    and(relBuilder,
+                        or(relBuilder,
+                            eq(relBuilder,"f2",1), eq(relBuilder,"f2",2)),
+                        or(relBuilder,
+                            eq(relBuilder,"f3",1), eq(relBuilder,"f3",2))
                         ),
-                    and(
-                        or(eq("f2",3),eq("f2",4)),
-                        or(eq("f3",3),eq("f3",4))
+                    and(relBuilder,
+                        or(relBuilder,
+                            eq(relBuilder,"f2",3),eq(relBuilder,"f2",4)),
+                        or(relBuilder,
+                            eq(relBuilder,"f3",3),eq(relBuilder,"f3",4))
                         )
                 )
               ))
