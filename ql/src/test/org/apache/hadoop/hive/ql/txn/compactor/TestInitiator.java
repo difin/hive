@@ -121,6 +121,7 @@ public class TestInitiator extends CompactorTest {
 
   @Test
   public void majorCompactOnTableTooManyAborts() throws Exception {
+    boolean useCleanerForAbortCleanup = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_CLEAN_ABORTS_USING_CLEANER);
     Table t = newTable("default", "mcottma", false);
 
     HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_COMPACTOR_ABORTEDTXN_THRESHOLD, 10);
@@ -142,14 +143,19 @@ public class TestInitiator extends CompactorTest {
 
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
     List<ShowCompactResponseElement> compacts = rsp.getCompacts();
-    Assert.assertEquals(1, compacts.size());
-    Assert.assertEquals("initiated", compacts.get(0).getState());
-    Assert.assertEquals("mcottma", compacts.get(0).getTablename());
-    Assert.assertEquals(CompactionType.MAJOR, compacts.get(0).getType());
+    if (useCleanerForAbortCleanup) {
+      Assert.assertEquals(0, compacts.size());
+    } else {
+      Assert.assertEquals(1, compacts.size());
+      Assert.assertEquals("initiated", compacts.get(0).getState());
+      Assert.assertEquals("mcottma", compacts.get(0).getTablename());
+      Assert.assertEquals(CompactionType.MAJOR, compacts.get(0).getType());
+    }
   }
 
   @Test
   public void majorCompactOnPartitionTooManyAborts() throws Exception {
+    boolean useCleanerForAbortCleanup = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_CLEAN_ABORTS_USING_CLEANER);
     Table t = newTable("default", "mcoptma", true);
     Partition p = newPartition(t, "today");
 
@@ -173,11 +179,15 @@ public class TestInitiator extends CompactorTest {
 
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
     List<ShowCompactResponseElement> compacts = rsp.getCompacts();
-    Assert.assertEquals(1, compacts.size());
-    Assert.assertEquals("initiated", compacts.get(0).getState());
-    Assert.assertEquals("mcoptma", compacts.get(0).getTablename());
-    Assert.assertEquals("ds=today", compacts.get(0).getPartitionname());
-    Assert.assertEquals(CompactionType.MAJOR, compacts.get(0).getType());
+    if (useCleanerForAbortCleanup) {
+      Assert.assertEquals(0, compacts.size());
+    } else {
+      Assert.assertEquals(1, compacts.size());
+      Assert.assertEquals("initiated", compacts.get(0).getState());
+      Assert.assertEquals("mcoptma", compacts.get(0).getTablename());
+      Assert.assertEquals("ds=today", compacts.get(0).getPartitionname());
+      Assert.assertEquals(CompactionType.MAJOR, compacts.get(0).getType());
+    }
   }
 
   @Test
@@ -216,6 +226,7 @@ public class TestInitiator extends CompactorTest {
    */
   @Test
   public void compactExpiredAbortedTxns() throws Exception {
+    boolean useCleanerForAbortCleanup = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_CLEAN_ABORTS_USING_CLEANER);
     Table t = newTable("default", "expiredAbortedTxns", false);
     // abort a txn
     long txnid = openTxn();
@@ -241,8 +252,12 @@ public class TestInitiator extends CompactorTest {
     // set to 1 ms, wait 1 ms, and check that minor compaction is queued
     conf.setTimeVar(HiveConf.ConfVars.HIVE_COMPACTOR_ABORTEDTXN_TIME_THRESHOLD, 1, TimeUnit.MILLISECONDS);
     Thread.sleep(1L);
-    ShowCompactResponse rsp = initiateAndVerifyCompactionQueueLength(1);
-    Assert.assertEquals(CompactionType.MINOR, rsp.getCompacts().get(0).getType());
+    if (useCleanerForAbortCleanup) {
+      initiateAndVerifyCompactionQueueLength(0);
+    } else {
+      ShowCompactResponse rsp = initiateAndVerifyCompactionQueueLength(1);
+      Assert.assertEquals(CompactionType.MINOR, rsp.getCompacts().get(0).getType());
+    }
   }
 
   private ShowCompactResponse initiateAndVerifyCompactionQueueLength(int expectedLength)
@@ -989,6 +1004,7 @@ public class TestInitiator extends CompactorTest {
 
   @Test
   public void testInitiatorHostAndVersion() throws Exception {
+    boolean useCleanerForAbortCleanup = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_CLEAN_ABORTS_USING_CLEANER);
     String tableName = "my_table";
     Table t = newTable("default", tableName, false);
 
@@ -1020,14 +1036,18 @@ public class TestInitiator extends CompactorTest {
     // verify status of table compaction
     ShowCompactResponse rsp = txnHandler.showCompact(new ShowCompactRequest());
     List<ShowCompactResponseElement> compacts = rsp.getCompacts();
-    Assert.assertEquals(1, compacts.size());
-    Assert.assertEquals("initiated", compacts.get(0).getState());
-    Assert.assertEquals(tableName, compacts.get(0).getTablename());
-    Assert.assertEquals(runtimeVersion, compacts.get(0).getInitiatorVersion());
-    // split the threadid
-    String[] parts = compacts.get(0).getInitiatorId().split("-");
-    Assert.assertTrue(parts.length > 1);
-    Assert.assertEquals(ServerUtils.hostname(), String.join("-", Arrays.copyOfRange(parts, 0, parts.length - 1)));
+    if (useCleanerForAbortCleanup) {
+      Assert.assertEquals(0, compacts.size());
+    } else {
+      Assert.assertEquals(1, compacts.size());
+      Assert.assertEquals("initiated", compacts.get(0).getState());
+      Assert.assertEquals(tableName, compacts.get(0).getTablename());
+      Assert.assertEquals(runtimeVersion, compacts.get(0).getInitiatorVersion());
+      // split the threadid
+      String[] parts = compacts.get(0).getInitiatorId().split("-");
+      Assert.assertTrue(parts.length > 1);
+      Assert.assertEquals(ServerUtils.hostname(), String.join("-", Arrays.copyOfRange(parts, 0, parts.length - 1)));
+    }
   }
 
   @Test
