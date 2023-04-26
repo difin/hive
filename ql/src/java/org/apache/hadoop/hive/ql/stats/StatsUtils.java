@@ -294,7 +294,7 @@ public class StatsUtils {
         colStats = getTableColumnStats(table, schema, neededColumns, colStatsCache, fetchColStats);
         estimateStatsForMissingCols(neededColumns, colStats, table, conf, nr, schema);
         // we should have stats for all columns (estimated or actual)
-        assert (neededColumns.size() == colStats.size());
+        assert (neededColumns.size() <= colStats.size());
         long betterDS = getDataSizeFromColumnStats(nr, colStats);
         ds = (betterDS < 1 || colStats.isEmpty()) ? ds : betterDS;
       }
@@ -1066,8 +1066,12 @@ public class StatsUtils {
     }
     if (fetchColStats && !colStatsToRetrieve.isEmpty()) {
       try {
-        List<ColumnStatisticsObj> colStat = Hive.get().getTableColumnStatistics(
-            dbName, tabName, colStatsToRetrieve, false);
+        List<ColumnStatisticsObj> colStat;
+        if (table.isNonNative() && table.getStorageHandler().canProvideColStatistics(table)) {
+          colStat = table.getStorageHandler().getColStatistics(table);
+        } else {
+          colStat = Hive.get().getTableColumnStatistics(dbName, tabName, colStatsToRetrieve, false);
+        }
         stats = convertColStats(colStat, tabName);
       } catch (HiveException e) {
         LOG.error("Failed to retrieve table statistics: ", e);
