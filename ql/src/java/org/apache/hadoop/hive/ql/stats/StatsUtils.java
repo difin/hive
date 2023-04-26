@@ -1066,12 +1066,8 @@ public class StatsUtils {
     }
     if (fetchColStats && !colStatsToRetrieve.isEmpty()) {
       try {
-        List<ColumnStatisticsObj> colStat;
-        if (table.isNonNative() && table.getStorageHandler().canProvideColStatistics(table)) {
-          colStat = table.getStorageHandler().getColStatistics(table);
-        } else {
-          colStat = Hive.get().getTableColumnStatistics(dbName, tabName, colStatsToRetrieve, false);
-        }
+        List<ColumnStatisticsObj> colStat = Hive.get().getTableColumnStatistics(
+            dbName, tabName, colStatsToRetrieve, false);
         stats = convertColStats(colStat, tabName);
       } catch (HiveException e) {
         LOG.error("Failed to retrieve table statistics: ", e);
