@@ -3983,8 +3983,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       Exception ex = null;
       try {
         t = getMS().getTableMeta(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tblNames, tblTypes);
-        t = FilterUtils.filterTableMetasIfEnabled(isServerFilterEnabled, filterHook,
-            parsedDbName[CAT_NAME], parsedDbName[DB_NAME], t);
+        t = FilterUtils.filterTableMetasIfEnabled(isServerFilterEnabled, filterHook, t);
       } catch (Exception e) {
         ex = e;
         throw newMetaException(e);

@@ -218,7 +218,15 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
   }
 
   @Override
-  public final List<TableMeta> filterTableMetas(String catName,String dbName,List<TableMeta> tableMetas) throws MetaException {
+  @Deprecated
+  public List<TableMeta> filterTableMetas(String catName, String dbName,List<TableMeta> tableMetas)
+      throws MetaException {
+    return filterTableMetas(tableMetas);
+  }
+
+  @Override
+  public final List<TableMeta> filterTableMetas(List<TableMeta> tableMetas)
+      throws MetaException {
     return tableMetas;
   }
 

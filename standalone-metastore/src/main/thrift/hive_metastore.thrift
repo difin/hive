@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.34"
+const string HMS_API = "1.2.35"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -1704,6 +1704,8 @@ struct TableMeta {
   3: required string tableType;
   4: optional string comments;
   5: optional string catName;
+  6: optional string ownerName;
+  7: optional PrincipalType ownerType;
 }
 
 struct Materialization {

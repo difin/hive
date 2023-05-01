@@ -13819,9 +13819,11 @@ void swap(CmRecycleResponse &a, CmRecycleResponse &b);
 std::ostream& operator<<(std::ostream& out, const CmRecycleResponse& obj);
 
 typedef struct _TableMeta__isset {
-  _TableMeta__isset() : comments(false), catName(false) {}
+  _TableMeta__isset() : comments(false), catName(false), ownerName(false), ownerType(false) {}
   bool comments :1;
   bool catName :1;
+  bool ownerName :1;
+  bool ownerType :1;
 } _TableMeta__isset;
 
 class TableMeta : public virtual ::apache::thrift::TBase {
@@ -13834,7 +13836,9 @@ class TableMeta : public virtual ::apache::thrift::TBase {
               tableName(),
               tableType(),
               comments(),
-              catName() {
+              catName(),
+              ownerName(),
+              ownerType(static_cast<PrincipalType::type>(0)) {
   }
 
   virtual ~TableMeta() noexcept;
@@ -13843,6 +13847,12 @@ class TableMeta : public virtual ::apache::thrift::TBase {
   std::string tableType;
   std::string comments;
   std::string catName;
+  std::string ownerName;
+  /**
+   * 
+   * @see PrincipalType
+   */
+  PrincipalType::type ownerType;
 
   _TableMeta__isset __isset;
 
@@ -13855,6 +13865,10 @@ class TableMeta : public virtual ::apache::thrift::TBase {
   void __set_comments(const std::string& val);
 
   void __set_catName(const std::string& val);
+
+  void __set_ownerName(const std::string& val);
+
+  void __set_ownerType(const PrincipalType::type val);
 
   bool operator == (const TableMeta & rhs) const
   {
@@ -13871,6 +13885,14 @@ class TableMeta : public virtual ::apache::thrift::TBase {
     if (__isset.catName != rhs.__isset.catName)
       return false;
     else if (__isset.catName && !(catName == rhs.catName))
+      return false;
+    if (__isset.ownerName != rhs.__isset.ownerName)
+      return false;
+    else if (__isset.ownerName && !(ownerName == rhs.ownerName))
+      return false;
+    if (__isset.ownerType != rhs.__isset.ownerType)
+      return false;
+    else if (__isset.ownerType && !(ownerType == rhs.ownerType))
       return false;
     return true;
   }
