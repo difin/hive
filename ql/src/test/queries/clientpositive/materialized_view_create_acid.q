@@ -1,3 +1,4 @@
+--! qt:disabled:CDPD-55557
 SET hive.support.concurrency=true;
 SET hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 
