@@ -44,6 +44,20 @@ if [ "${GET_TEZ_TOKEN}" == "true" ] ; then
         printf 'HDFS fetch token failed\n'
         exit 1
     fi
+    if [[ -n "$TEZ_FETCH_TOKENS_FOR_FS" ]] ; then
+        IFS=';' read -ra fs_array <<< "$TEZ_FETCH_TOKENS_FOR_FS"
+        for fs in "${fs_array[@]}"
+        do
+            if hdfs fetchdt -fs ${fs} /tmp/fs_token && hadoop dtutil append /tmp/fs_token ${TOKEN_FILE_PATH} && rm /tmp/fs_token; then
+                printf "Delegation token fetch for ${fs} succeeded\n"
+            else
+                printf "Delegation token fetch for ${fs} failed\n"
+                exit 1
+            fi
+        done
+    else
+        printf "No additional delegation tokens fetched\n"
+    fi
     if hive --service jar ${AUTOSCALING_JAR} com.github.cloudera.llap.FetchLlapDT -principal ${SERVICE_PRINCIPAL} -keytab ${SERVICE_KEYTAB} ${TOKEN_FILE_PATH}; then
         printf 'LLAP token succeeded\n'
     else
