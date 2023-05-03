@@ -316,9 +316,10 @@ public class TaskRunnerCallable extends CallableWithNdc<TaskRunner2Result> {
   }
 
   private void setMDCFromNDC() {
-    final String fragId = ThreadContext.pop();
-    final String queryId = ThreadContext.pop();
-    final String dagId = ThreadContext.pop();
+    ThreadContext.ContextStack stack = ThreadContext.cloneStack();
+    final String fragId = stack.pop();
+    final String queryId = stack.pop();
+    final String dagId = stack.pop();
     MDC.put("dagId", dagId);
     MDC.put("queryId", queryId);
     MDC.put("fragmentId", fragId);
