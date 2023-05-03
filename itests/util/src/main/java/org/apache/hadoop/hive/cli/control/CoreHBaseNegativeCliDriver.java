@@ -122,14 +122,13 @@ public class CoreHBaseNegativeCliDriver extends CliAdapter {
       } catch (CommandProcessorException e) {
         // this is the expected result
       }
-
       QTestProcessExecResult result = qt.checkCliDriverResults(fname);
       if (result.getReturnCode() != 0) {
         qt.failedDiff(result.getReturnCode(), fname, result.getCapturedOutput());
       }
 
     } catch (Exception e) {
-      qt.failed(e, fname, null);
+      qt.failedWithException(e, fname, null);
     }
 
     long elapsedTime = System.currentTimeMillis() - startTime;

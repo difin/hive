@@ -178,7 +178,7 @@ public class CoreCliDriver extends CliAdapter {
         qt.executeClient(fname);
       } catch (CommandProcessorException e) {
         failed = true;
-        qt.failed(e.getResponseCode(), fname, QTestUtil.DEBUG_HINT);
+        qt.failedQuery(e.getCause(), e.getResponseCode(), fname, QTestUtil.DEBUG_HINT);
       }
 
       QTestProcessExecResult result = qt.checkCliDriverResults(fname);
@@ -193,7 +193,7 @@ public class CoreCliDriver extends CliAdapter {
       throw e;
     } catch (Exception e) {
       failed = true;
-      qt.failed(e, fname, QTestUtil.DEBUG_HINT);
+      qt.failedWithException(e, fname, QTestUtil.DEBUG_HINT);
     } finally {
       String message = "Done query " + fname + ". succeeded=" + !failed + ", skipped=" + skipped +
           ". ElapsedTime(ms)=" + sw.stop().elapsed(TimeUnit.MILLISECONDS);

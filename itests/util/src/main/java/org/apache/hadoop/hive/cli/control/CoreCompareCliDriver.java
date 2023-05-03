@@ -152,7 +152,7 @@ public class CoreCompareCliDriver extends CliAdapter{
         try {
           qt.executeClient(versionFile, fname);
         } catch (CommandProcessorException e) {
-          qt.failed(e.getResponseCode(), fname, QTestUtil.DEBUG_HINT);
+          qt.failedQuery(e.getException(), e.getResponseCode(), fname, QTestUtil.DEBUG_HINT);
         }
       }
 
@@ -163,7 +163,7 @@ public class CoreCompareCliDriver extends CliAdapter{
         qt.failedDiff(result.getReturnCode(), fname, message);
       }
     } catch (Exception e) {
-      qt.failed(e, fname, QTestUtil.DEBUG_HINT);
+      qt.failedWithException(e, fname, QTestUtil.DEBUG_HINT);
     }
 
     long elapsedTime = System.currentTimeMillis() - startTime;

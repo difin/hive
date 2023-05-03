@@ -118,7 +118,7 @@ public class CoreKuduCliDriver extends CliAdapter {
       try {
         qt.executeClient(fname);
       } catch (CommandProcessorException e) {
-        qt.failed(e.getResponseCode(), fname, null);
+        qt.failedQuery(e.getCause(), e.getResponseCode(), fname, QTestUtil.DEBUG_HINT);
       }
 
       QTestProcessExecResult result = qt.checkCliDriverResults(fname);
@@ -127,7 +127,7 @@ public class CoreKuduCliDriver extends CliAdapter {
       }
 
     } catch (Exception e) {
-      qt.failed(e, fname, null);
+      qt.failedWithException(e, fname, null);
     }
 
     long elapsedTime = System.currentTimeMillis() - startTime;

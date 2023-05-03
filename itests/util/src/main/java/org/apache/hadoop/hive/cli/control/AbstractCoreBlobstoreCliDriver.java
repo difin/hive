@@ -159,11 +159,11 @@ public abstract class AbstractCoreBlobstoreCliDriver extends CliAdapter {
       try {
         qt.executeClient(fname);
         if (!expectSuccess) {
-          qt.failed(0, fname, debugHint);
+          qt.failedQuery(null, 0, fname, debugHint);
         }
       } catch (CommandProcessorException e) {
         if (expectSuccess) {
-          qt.failed(e.getResponseCode(), fname, debugHint);
+          qt.failedQuery(e.getCause(), e.getResponseCode(), fname, debugHint);
         }
       }
 
@@ -175,7 +175,7 @@ public abstract class AbstractCoreBlobstoreCliDriver extends CliAdapter {
       }
     }
     catch (Exception e) {
-      qt.failed(e, fname, debugHint);
+      qt.failedWithException(e, fname, debugHint);
     }
 
     long elapsedTime = System.currentTimeMillis() - startTime;

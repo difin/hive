@@ -121,7 +121,7 @@ public class CoreHBaseCliDriver extends CliAdapter {
       try {
         qt.executeClient(fname);
       } catch (CommandProcessorException e) {
-        qt.failed(e.getResponseCode(), fname, null);
+        qt.failedQuery(e.getException(), e.getResponseCode(), fname, null);
       }
 
       QTestProcessExecResult result = qt.checkCliDriverResults(fname);
@@ -130,7 +130,7 @@ public class CoreHBaseCliDriver extends CliAdapter {
       }
 
     } catch (Exception e) {
-      qt.failed(e, fname, null);
+      qt.failedWithException(e, fname, null);
     }
 
     long elapsedTime = System.currentTimeMillis() - startTime;

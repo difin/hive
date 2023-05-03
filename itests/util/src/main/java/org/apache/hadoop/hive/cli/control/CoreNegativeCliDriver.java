@@ -152,7 +152,7 @@ public class CoreNegativeCliDriver extends CliAdapter{
         qt.failedDiff(qTestProcessExecResult.getReturnCode(), fname, message);
       }
     } catch (Exception e) {
-      qt.failed(e, fname, QTestUtil.DEBUG_HINT);
+      qt.failedWithException(e, fname, QTestUtil.DEBUG_HINT);
     }
 
     long elapsedTime = System.currentTimeMillis() - startTime;

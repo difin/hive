@@ -126,7 +126,7 @@ public class CoreKuduNegativeCliDriver extends CliAdapter {
       }
 
     } catch (Exception e) {
-      qt.failed(e, fname, null);
+      qt.failedWithException(e, fname, null);
     }
 
     long elapsedTime = System.currentTimeMillis() - startTime;

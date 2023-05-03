@@ -107,7 +107,7 @@ public class CorePerfCliDriver extends CliAdapter {
       try {
         qt.executeClient(fname);
       } catch (CommandProcessorException e) {
-        qt.failed(e.getResponseCode(), fname, QTestUtil.DEBUG_HINT);
+        qt.failedQuery(e.getException(), e.getResponseCode(), fname, QTestUtil.DEBUG_HINT);
       }
 
       QTestProcessExecResult result = qt.checkCliDriverResults(fname);
@@ -119,7 +119,7 @@ public class CorePerfCliDriver extends CliAdapter {
     } catch (AssumptionViolatedException e) {
       throw e;
     } catch (Exception e) {
-      qt.failed(e, fname, QTestUtil.DEBUG_HINT);
+      qt.failedWithException(e, fname, QTestUtil.DEBUG_HINT);
     }
 
     long elapsedTime = System.currentTimeMillis() - startTime;

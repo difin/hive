@@ -1156,21 +1156,6 @@ public class QTestUtil {
     return sem.getRootTasks();
   }
 
-  public void failed(int ecode, String fname, String debugHint) {
-    String command = SessionState.get() != null ? SessionState.get().getLastCommand() : null;
-    String
-        message =
-        "Client execution failed with error code = "
-            + ecode
-            + (command != null ? " running \"" + command : "")
-            + "\" fname="
-            + fname
-            + " "
-            + (debugHint != null ? debugHint : "");
-    LOG.error(message);
-    Assert.fail(message);
-  }
-
   // for negative tests, which is succeeded.. no need to print the query string
   public void failed(String fname, String debugHint) {
     Assert.fail("Client Execution was expected to fail, but succeeded with error code 0 for fname=" + fname + (debugHint
@@ -1190,7 +1175,18 @@ public class QTestUtil {
     Assert.fail(message);
   }
 
-  public void failed(Exception e, String fname, String debugHint) {
+  public void failedQuery(Throwable e, int ecode, String fname, String debugHint) {
+    String command = SessionState.get() != null ? SessionState.get().getLastCommand() : null;
+
+    String message = String.format(
+        "Client execution failed with error code = %d %nrunning %s %nfname=%s%n%s%n %s", ecode,
+        command != null ? command : "", fname, debugHint != null ? debugHint : "",
+        e == null ? "" : org.apache.hadoop.util.StringUtils.stringifyException(e));
+    LOG.error(message);
+    Assert.fail(message);
+  }
+
+  public void failedWithException(Exception e, String fname, String debugHint) {
     String command = SessionState.get() != null ? SessionState.get().getLastCommand() : null;
     System.err.println("Failed query: " + fname);
     System.err.flush();
