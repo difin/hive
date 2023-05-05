@@ -25,10 +25,13 @@ import org.apache.hadoop.hive.metastore.TestHiveMetaStore;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
+import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransportException;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -114,5 +117,11 @@ public class TestRemoteHiveMetaStoreKerberos extends TestRemoteHiveMetaStore {
     // relevant here. In a real cluster, the service principal will be supported by the
     // underlying file system. The actual test scenario is covered by the test in
     // TestHiveMetaStore, hence overriding this test here.
+  }
+
+  @Override
+  public void testHMSAPIVersion() throws TException, IOException {
+    testHMSAPIVersion(
+        Paths.get(System.getProperty("build.dir"), "..", "..", "..", "standalone-metastore", "versionmap.txt"));
   }
 }

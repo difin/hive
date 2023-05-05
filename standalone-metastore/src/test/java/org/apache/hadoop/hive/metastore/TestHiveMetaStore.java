@@ -21,7 +21,8 @@ package org.apache.hadoop.hive.metastore;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -31,11 +32,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -47,7 +46,6 @@ import com.google.common.collect.Sets;
 import org.apache.hadoop.hive.metastore.api.DataConnector;
 import org.apache.hadoop.hive.metastore.api.DatabaseType;
 import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.hive.metastore.api.CreationMetadata;
 import org.apache.hadoop.hive.metastore.api.SourceTable;
 import org.apache.hadoop.hive.metastore.client.builder.DatabaseBuilder;
 import org.apache.hadoop.hive.metastore.client.builder.TableBuilder;
@@ -3495,7 +3493,13 @@ public abstract class TestHiveMetaStore {
   }
 
   @Test
-  public void testHMSAPIVersion() throws TException {
-    assertEquals("1.2.37", client.getHMSAPIVersion());
+  public void testHMSAPIVersion() throws TException, IOException {
+    testHMSAPIVersion(Paths.get(System.getProperty("build.dir"), "..", "versionmap.txt"));
+  }
+
+  protected void testHMSAPIVersion(java.nio.file.Path versionMapTxtPath) throws TException, IOException {
+    List<String> versions = Files.readAllLines(versionMapTxtPath);
+    String version = versions.get(versions.size() - 1).split(",")[1].trim();
+    assertEquals("API version mismatch. Please make sure that the version specified in hive_metastore.thrift/HMS_API and in the last line of versionmap.txt are the same.", version, client.getHMSAPIVersion());
   }
 }

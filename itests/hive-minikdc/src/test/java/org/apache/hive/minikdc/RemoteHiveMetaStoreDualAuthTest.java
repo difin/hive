@@ -22,7 +22,11 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.TestRemoteHiveMetaStore;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
+import org.apache.thrift.TException;
 import org.junit.Before;
+
+import java.io.IOException;
+import java.nio.file.Paths;
 
 @org.junit.Ignore("hive-test-kube migration flaky")
 public class RemoteHiveMetaStoreDualAuthTest extends TestRemoteHiveMetaStore {
@@ -75,5 +79,11 @@ public class RemoteHiveMetaStoreDualAuthTest extends TestRemoteHiveMetaStore {
     // relevant here. In a real cluster, the service principal will be supported by the
     // underlying file system. The actual test scenario is covered by the test in
     // TestHiveMetaStore, hence overriding this test here.
+  }
+
+  @Override
+  public void testHMSAPIVersion() throws TException, IOException {
+    testHMSAPIVersion(
+        Paths.get(System.getProperty("build.dir"), "..", "..", "..", "standalone-metastore", "versionmap.txt"));
   }
 }
