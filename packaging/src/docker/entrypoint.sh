@@ -13,7 +13,7 @@ if [ "${USE_KERBEROS}" == "true" ]; then
   SERVICE_KEYTAB=${SERVICE_KEYTAB:?SERVICE_KEYTAB is required for kinit}
   SERVICE_PRINCIPAL=${SERVICE_PRINCIPAL:?SERVICE_PRINCIPAL is required for kinit}
   kinit -V -k -t ${SERVICE_KEYTAB} ${SERVICE_PRINCIPAL}
-  klist
+  klist -ef
 fi
 
 # For graceful shutdown of processes, the JVM process should run as PID 1 to receive SIGTERM from k8s.
