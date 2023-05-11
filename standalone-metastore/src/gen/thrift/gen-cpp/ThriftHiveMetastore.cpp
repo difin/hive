@@ -26153,6 +26153,14 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_result::read(::apache::thri
           xfer += iprot->skip(ftype);
         }
         break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->o3.read(iprot);
+          this->__isset.o3 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -26190,6 +26198,10 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_result::write(::apache::thr
   } else if (this->__isset.o2) {
     xfer += oprot->writeFieldBegin("o2", ::apache::thrift::protocol::T_STRUCT, 2);
     xfer += this->o2.write(oprot);
+    xfer += oprot->writeFieldEnd();
+  } else if (this->__isset.o3) {
+    xfer += oprot->writeFieldBegin("o3", ::apache::thrift::protocol::T_STRUCT, 3);
+    xfer += this->o3.write(oprot);
     xfer += oprot->writeFieldEnd();
   }
   xfer += oprot->writeFieldStop();
@@ -26255,6 +26267,14 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_presult::read(::apache::thr
         if (ftype == ::apache::thrift::protocol::T_STRUCT) {
           xfer += this->o2.read(iprot);
           this->__isset.o2 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->o3.read(iprot);
+          this->__isset.o3 = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -26400,6 +26420,14 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_req_result::read(::apache::
           xfer += iprot->skip(ftype);
         }
         break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->o3.read(iprot);
+          this->__isset.o3 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -26429,6 +26457,10 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_req_result::write(::apache:
   } else if (this->__isset.o2) {
     xfer += oprot->writeFieldBegin("o2", ::apache::thrift::protocol::T_STRUCT, 2);
     xfer += this->o2.write(oprot);
+    xfer += oprot->writeFieldEnd();
+  } else if (this->__isset.o3) {
+    xfer += oprot->writeFieldBegin("o3", ::apache::thrift::protocol::T_STRUCT, 3);
+    xfer += this->o3.write(oprot);
     xfer += oprot->writeFieldEnd();
   }
   xfer += oprot->writeFieldStop();
@@ -26482,6 +26514,14 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_req_presult::read(::apache:
         if (ftype == ::apache::thrift::protocol::T_STRUCT) {
           xfer += this->o2.read(iprot);
           this->__isset.o2 = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->o3.read(iprot);
+          this->__isset.o3 = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -70505,6 +70545,9 @@ void ThriftHiveMetastoreClient::recv_get_partitions_by_names(std::vector<Partiti
   if (result.__isset.o2) {
     throw result.o2;
   }
+  if (result.__isset.o3) {
+    throw result.o3;
+  }
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "get_partitions_by_names failed: unknown result");
 }
 
@@ -70568,6 +70611,9 @@ void ThriftHiveMetastoreClient::recv_get_partitions_by_names_req(GetPartitionsBy
   }
   if (result.__isset.o2) {
     throw result.o2;
+  }
+  if (result.__isset.o3) {
+    throw result.o3;
   }
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "get_partitions_by_names_req failed: unknown result");
 }
@@ -87068,6 +87114,9 @@ void ThriftHiveMetastoreProcessor::process_get_partitions_by_names(int32_t seqid
   } catch (NoSuchObjectException &o2) {
     result.o2 = std::move(o2);
     result.__isset.o2 = true;
+  } catch (InvalidObjectException &o3) {
+    result.o3 = std::move(o3);
+    result.__isset.o3 = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != nullptr) {
       this->eventHandler_->handlerError(ctx, "ThriftHiveMetastore.get_partitions_by_names");
@@ -87128,6 +87177,9 @@ void ThriftHiveMetastoreProcessor::process_get_partitions_by_names_req(int32_t s
   } catch (NoSuchObjectException &o2) {
     result.o2 = std::move(o2);
     result.__isset.o2 = true;
+  } catch (InvalidObjectException &o3) {
+    result.o3 = std::move(o3);
+    result.__isset.o3 = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != nullptr) {
       this->eventHandler_->handlerError(ctx, "ThriftHiveMetastore.get_partitions_by_names_req");
@@ -106349,6 +106401,10 @@ void ThriftHiveMetastoreConcurrentClient::recv_get_partitions_by_names(std::vect
         sentry.commit();
         throw result.o2;
       }
+      if (result.__isset.o3) {
+        sentry.commit();
+        throw result.o3;
+      }
       // in a bad state, don't commit
       throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "get_partitions_by_names failed: unknown result");
     }
@@ -106440,6 +106496,10 @@ void ThriftHiveMetastoreConcurrentClient::recv_get_partitions_by_names_req(GetPa
       if (result.__isset.o2) {
         sentry.commit();
         throw result.o2;
+      }
+      if (result.__isset.o3) {
+        sentry.commit();
+        throw result.o3;
       }
       // in a bad state, don't commit
       throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "get_partitions_by_names_req failed: unknown result");

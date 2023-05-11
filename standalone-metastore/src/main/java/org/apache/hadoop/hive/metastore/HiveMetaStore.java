@@ -7830,6 +7830,9 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           }
         }
         success = getMS().commitTransaction();
+      } catch (NoSuchObjectException|InvalidObjectException|MetaException e) {
+        ex = e;
+        throw e;
       } catch (Exception e) {
         ex = e;
         rethrowException(e);

@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.37"
+const string HMS_API = "1.2.38"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -2690,9 +2690,9 @@ service ThriftHiveMetastore extends fb303.FacebookService
 
   // get partitions give a list of partition names
   list<Partition> get_partitions_by_names(1:string db_name 2:string tbl_name 3:list<string> names)
-                       throws(1:MetaException o1, 2:NoSuchObjectException o2)
+      throws(1:MetaException o1, 2:NoSuchObjectException o2, 3:InvalidObjectException o3)
   GetPartitionsByNamesResult get_partitions_by_names_req(1:GetPartitionsByNamesRequest req)
-                        throws(1:MetaException o1, 2:NoSuchObjectException o2)
+      throws(1:MetaException o1, 2:NoSuchObjectException o2, 3:InvalidObjectException o3)
 
   // changes the partition to the new partition object. partition is identified from the part values
   // in the new_part

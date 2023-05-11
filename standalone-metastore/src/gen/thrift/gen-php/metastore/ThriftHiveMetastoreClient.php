@@ -6683,6 +6683,9 @@ class ThriftHiveMetastoreClient extends \FacebookServiceClient implements \metas
         if ($result->o2 !== null) {
             throw $result->o2;
         }
+        if ($result->o3 !== null) {
+            throw $result->o3;
+        }
         throw new \Exception("get_partitions_by_names failed: unknown result");
     }
 
@@ -6747,6 +6750,9 @@ class ThriftHiveMetastoreClient extends \FacebookServiceClient implements \metas
         }
         if ($result->o2 !== null) {
             throw $result->o2;
+        }
+        if ($result->o3 !== null) {
+            throw $result->o3;
         }
         throw new \Exception("get_partitions_by_names_req failed: unknown result");
     }
