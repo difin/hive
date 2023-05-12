@@ -1,3 +1,4 @@
+--! qt:replace:/(File length:\s+)\S+(\s+bytes)/$1#Masked#$2/
 set hive.vectorized.execution.enabled=false;
 
 DROP TABLE orcfile_merge1_n2;

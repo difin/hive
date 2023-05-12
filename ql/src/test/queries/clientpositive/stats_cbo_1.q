@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+Statistics\: Num rows\: \d+ Data size\:\s+)\S+(\s+Basic stats\: \S+ Column stats\: \S+)/$1#Masked#$2/
 CREATE TABLE repro(i STRING) STORED AS ORC;
 INSERT INTO repro VALUES (NULL), (NULL), (NULL);
 

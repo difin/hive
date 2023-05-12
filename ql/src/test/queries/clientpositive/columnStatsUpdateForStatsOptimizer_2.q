@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 set hive.stats.column.autogather=false;
 set hive.stats.fetch.column.stats=true;
 set hive.compute.query.using.stats=true; 

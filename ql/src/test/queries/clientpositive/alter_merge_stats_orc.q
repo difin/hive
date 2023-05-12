@@ -1,3 +1,5 @@
+--! qt:replace:/(\S+FileSize:)\S+/$1#Masked#/
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 --! qt:dataset:src
 set hive.exec.submitviachild=false;
 set hive.exec.submit.local.task.via.child=false;

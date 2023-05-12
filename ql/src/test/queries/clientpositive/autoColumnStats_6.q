@@ -1,3 +1,4 @@
+--! qt:replace:/(.*GROUP\s\S\S\S\s+)\S+(\s.*)/$1#Masked#$2/
 --! qt:dataset:src
 set hive.stats.column.autogather=true;
 set hive.mapred.mode=nonstrict;

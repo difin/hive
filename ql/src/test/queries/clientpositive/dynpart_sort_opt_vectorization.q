@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 --! qt:dataset:alltypesorc
 set hive.compute.query.using.stats=false;
 set hive.mapred.mode=nonstrict;

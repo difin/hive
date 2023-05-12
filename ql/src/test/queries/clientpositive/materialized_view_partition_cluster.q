@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 --! qt:dataset:src
 
 -- SORT_QUERY_RESULTS

@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 --! qt:dataset:srcpart
 --! qt:dataset:src
 set hive.support.concurrency=true;

@@ -1,3 +1,4 @@
+--! qt:replace:/(\S+FileSize:)\S+/$1#Masked#/
 --! qt:dataset:src
 set hive.compute.query.using.stats=false;
 set hive.mapred.mode=nonstrict;

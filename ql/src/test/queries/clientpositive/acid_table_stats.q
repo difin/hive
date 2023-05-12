@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 --! qt:dataset:srcpart
 set hive.mapred.mode=nonstrict;
 set hive.support.concurrency=true;

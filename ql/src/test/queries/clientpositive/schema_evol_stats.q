@@ -1,3 +1,4 @@
+--! qt:replace:/(\s+totalSize\s+)\S+\s+/$1#Masked#/
 --! qt:dataset:part
 set hive.mapred.mode=nonstrict;
 SET hive.exec.schema.evolution=true;
