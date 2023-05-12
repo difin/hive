@@ -17,7 +17,7 @@ STAGE PLANS:
                 TableScan
                   alias: store_sales
                   filterExpr: (ss_store_sk is not null and ss_hdemo_sk is not null and ss_sold_time_sk is not null) (type: boolean)
-                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_77_container, bigKeyColName:ss_hdemo_sk, smallTablePos:1, keyRatio:2.0336772282173666E-4
+                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_77_container, bigKeyColName:ss_hdemo_sk, smallTablePos:1, keyRatio:2.9979791175219683E-4
                   Statistics: Num rows: 86404891377 Data size: 1980339026496 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: (ss_store_sk is not null and ss_hdemo_sk is not null and ss_sold_time_sk is not null) (type: boolean)
@@ -35,7 +35,7 @@ STAGE PLANS:
                         outputColumnNames: _col1, _col2
                         input vertices:
                           1 Map 4
-                        Statistics: Num rows: 1929513924 Data size: 16 Basic stats: COMPLETE Column stats: COMPLETE
+                        Statistics: Num rows: 2844424992 Data size: 16 Basic stats: COMPLETE Column stats: COMPLETE
                         Map Join Operator
                           condition map:
                                Inner Join 0 to 1
@@ -45,7 +45,7 @@ STAGE PLANS:
                           outputColumnNames: _col1
                           input vertices:
                             1 Map 5
-                          Statistics: Num rows: 175719656 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
+                          Statistics: Num rows: 259040049 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
                           Map Join Operator
                             condition map:
                                  Inner Join 0 to 1
@@ -54,7 +54,7 @@ STAGE PLANS:
                               1 _col0 (type: bigint)
                             input vertices:
                               1 Map 6
-                            Statistics: Num rows: 17571966 Data size: 140575728 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 25904006 Data size: 207232048 Basic stats: COMPLETE Column stats: COMPLETE
                             Group By Operator
                               aggregations: count()
                               minReductionHashAggr: 0.99
@@ -76,17 +76,17 @@ STAGE PLANS:
                   Statistics: Num rows: 86400 Data size: 1382400 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: ((t_hour = 8) and (t_minute >= 30)) (type: boolean)
-                    Statistics: Num rows: 1200 Data size: 19200 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 1769 Data size: 28304 Basic stats: COMPLETE Column stats: COMPLETE
                     Select Operator
                       expressions: t_time_sk (type: bigint)
                       outputColumnNames: _col0
-                      Statistics: Num rows: 1200 Data size: 9600 Basic stats: COMPLETE Column stats: COMPLETE
+                      Statistics: Num rows: 1769 Data size: 14152 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: bigint)
                         null sort order: a
                         sort order: +
                         Map-reduce partition columns: _col0 (type: bigint)
-                        Statistics: Num rows: 1200 Data size: 9600 Basic stats: COMPLETE Column stats: COMPLETE
+                        Statistics: Num rows: 1769 Data size: 14152 Basic stats: COMPLETE Column stats: COMPLETE
             Execution mode: vectorized, llap
             LLAP IO: may be used (ACID table)
         Map 5 

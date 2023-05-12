@@ -37,7 +37,7 @@ STAGE PLANS:
                         native: true
                         predicateExpression: FilterLongColGreaterLongScalar(col 0:tinyint, val 0)
                     predicate: (ctinyint > 0Y) (type: boolean)
-                    Statistics: Num rows: 4096 Data size: 312018 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 6046 Data size: 460522 Basic stats: COMPLETE Column stats: COMPLETE
                     Limit
                       Number of rows: 10
                       Limit Vectorization:

@@ -46,7 +46,7 @@ STAGE PLANS:
                           outputColumnNames: _col0
                           input vertices:
                             1 Map 6
-                          Statistics: Num rows: 239664235 Data size: 1874156184 Basic stats: COMPLETE Column stats: COMPLETE
+                          Statistics: Num rows: 551087033 Data size: 4365538568 Basic stats: COMPLETE Column stats: COMPLETE
                           Map Join Operator
                             condition map:
                                  Inner Join 0 to 1
@@ -55,7 +55,7 @@ STAGE PLANS:
                               1 _col0 (type: bigint)
                             input vertices:
                               1 Map 7
-                            Statistics: Num rows: 19972021 Data size: 159776168 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 45923921 Data size: 367391368 Basic stats: COMPLETE Column stats: COMPLETE
                             Group By Operator
                               aggregations: count()
                               minReductionHashAggr: 0.99
@@ -75,7 +75,7 @@ STAGE PLANS:
                               1 _col0 (type: bigint)
                             input vertices:
                               1 Map 8
-                            Statistics: Num rows: 19972021 Data size: 159776168 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 45923921 Data size: 367391368 Basic stats: COMPLETE Column stats: COMPLETE
                             Group By Operator
                               aggregations: count()
                               minReductionHashAggr: 0.99
@@ -118,17 +118,17 @@ STAGE PLANS:
                   Statistics: Num rows: 4602 Data size: 54968 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: wp_char_count BETWEEN 5000 AND 5200 (type: boolean)
-                    Statistics: Num rows: 511 Data size: 6108 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 1175 Data size: 14036 Basic stats: COMPLETE Column stats: COMPLETE
                     Select Operator
                       expressions: wp_web_page_sk (type: bigint)
                       outputColumnNames: _col0
-                      Statistics: Num rows: 511 Data size: 4088 Basic stats: COMPLETE Column stats: COMPLETE
+                      Statistics: Num rows: 1175 Data size: 9400 Basic stats: COMPLETE Column stats: COMPLETE
                       Reduce Output Operator
                         key expressions: _col0 (type: bigint)
                         null sort order: a
                         sort order: +
                         Map-reduce partition columns: _col0 (type: bigint)
-                        Statistics: Num rows: 511 Data size: 4088 Basic stats: COMPLETE Column stats: COMPLETE
+                        Statistics: Num rows: 1175 Data size: 9400 Basic stats: COMPLETE Column stats: COMPLETE
             Execution mode: vectorized, llap
             LLAP IO: may be used (ACID table)
         Map 7 

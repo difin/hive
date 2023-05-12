@@ -64,12 +64,12 @@ STAGE PLANS:
                   Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: (col0 < 10) (type: boolean)
-                    Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
                     Select Operator
-                      Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
+                      Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
                       Group By Operator
                         aggregations: count()
-                        minReductionHashAggr: 0.5
+                        minReductionHashAggr: 0.0
                         mode: hash
                         outputColumnNames: _col0
                         Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
@@ -312,12 +312,12 @@ STAGE PLANS:
                       value expressions: _col0 (type: int)
                   Filter Operator
                     predicate: (col0 < 10) (type: boolean)
-                    Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
                     Select Operator
-                      Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
+                      Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
                       Group By Operator
                         aggregations: count()
-                        minReductionHashAggr: 0.5
+                        minReductionHashAggr: 0.0
                         mode: hash
                         outputColumnNames: _col0
                         Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
@@ -446,12 +446,12 @@ STAGE PLANS:
                   Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: (col0 < 10) (type: boolean)
-                    Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
                     Select Operator
-                      Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
+                      Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
                       Group By Operator
                         aggregations: count()
-                        minReductionHashAggr: 0.5
+                        minReductionHashAggr: 0.0
                         mode: hash
                         outputColumnNames: _col0
                         Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
@@ -701,12 +701,12 @@ STAGE PLANS:
                   Statistics: Num rows: 7 Data size: 28 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: (col0 < 10) (type: boolean)
-                    Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
+                    Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
                     Select Operator
-                      Statistics: Num rows: 2 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
+                      Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: COMPLETE
                       Group By Operator
                         aggregations: count()
-                        minReductionHashAggr: 0.5
+                        minReductionHashAggr: 0.0
                         mode: hash
                         outputColumnNames: _col0
                         Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE

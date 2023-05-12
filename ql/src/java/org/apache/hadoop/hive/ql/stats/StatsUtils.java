@@ -135,6 +135,10 @@ public class StatsUtils {
 
   private static final Logger LOG = LoggerFactory.getLogger(StatsUtils.class.getName());
 
+  // Range lower limit for date type when not defined (days, heuristic): '1999-01-01'
+  private static final int DATE_RANGE_LOWER_LIMIT = 10593;
+  // Range upper limit for date type when not defined (days, heuristic): '2024-12-31'
+  private static final int DATE_RANGE_UPPER_LIMIT = 20089;
 
   private static final ForkJoinPool statsForkJoinPool = new ForkJoinPool(
           Runtime.getRuntime().availableProcessors(),
@@ -1007,7 +1011,7 @@ public class StatsUtils {
     } else if (colTypeLowerCase.equals(serdeConstants.DATE_TYPE_NAME)) {
       cs.setAvgColLen(JavaDataModel.get().lengthOfDate());
       // epoch, days since epoch
-      cs.setRange(0, 25201);
+      cs.setRange(DATE_RANGE_LOWER_LIMIT, DATE_RANGE_UPPER_LIMIT);
     } else {
       cs.setAvgColLen(getSizeOfComplexTypes(conf, cinfo.getObjectInspector()));
     }
