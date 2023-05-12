@@ -2579,10 +2579,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             madeDir = true;
           }
         }
-        if (MetastoreConf.getBoolVar(conf, ConfVars.STATS_AUTO_GATHER) &&
-            !MetaStoreUtils.isView(tbl)) {
-          MetaStoreUtils.updateTableStatsSlow(db, tbl, wh, madeDir, false, envContext);
-        }
+
+        MetaStoreUtils.updateTableStatsForCreateTable(wh, db, tbl, envContext, conf, tblPath, madeDir);
 
         // set create time
         long time = System.currentTimeMillis() / 1000;
