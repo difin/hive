@@ -123,6 +123,11 @@ public class ImpalaWork extends EngineWork implements Serializable {
       return fetchSize;
     }
 
+    @Explain(displayName = "Results Cache eligible", displayOnlyOnTrue = true)
+    public boolean getCanCacheResults() {
+      return fetch != null && fetch.canBeCached();
+    }
+
     @Explain(displayName = "Impala Plan")
     public String getImpalaExplain() {
       if (type == WorkType.COMPILED_PLAN) {

@@ -13410,6 +13410,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         // Specify that the results of this query can be cached.
         setCacheUsage(new CacheUsage(
             CacheUsage.CacheStatus.CAN_CACHE_QUERY_RESULTS, queryInfo));
+        fetchTask.setCanBeCached(true);
       }
     }
   }
@@ -16051,10 +16052,20 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       return false;
     }
 
-    // At least one mr/tez job or an impala plan that is not streaming
-    if (Utilities.getNumClusterJobs(getRootTasks()) == 0 &&
-        (!isImpalaPlan(conf) || conf.getResultMethod() == ResultMethod.STREAMING)) {
-      LOG.info("Not eligible for results caching - no mr/tez/impala jobs");
+    if (isImpalaPlan(conf)) {
+      if (conf.getResultMethod() != ResultMethod.FILE) {
+        LOG.info("Not eligible for results caching - " + ConfVars.HIVE_RESULT_METHOD.varname + " is not 'file'");
+        return false;
+      }
+
+      if (qb.isSimpleSelectQuery()) {
+        LOG.info("Not eligible for results caching - query is not complex enough");
+        return false;
+      }
+    // 0 cluster jobs for hive plans typically means hive.fetch.task.conversion has kicked in. This is not
+    // applicable to Impala plans since they always have 0 cluster jobs.
+    } else if (Utilities.getNumClusterJobs(getRootTasks()) == 0) {
+      LOG.info("Not eligible for results caching - no mr or tez jobs");
       return false;
     }
 

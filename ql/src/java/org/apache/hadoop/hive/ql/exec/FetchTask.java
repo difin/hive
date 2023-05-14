@@ -62,6 +62,19 @@ public class FetchTask extends Task<FetchWork> implements Serializable {
   JobConf job = null;
   private boolean cachingEnabled = false;
 
+  // Marker on if Semantic Analyzer thinks the query type is eligible for caching.
+  // It may not actually be cached depending on if the runtime results meet various
+  // requirements (result size, etc).
+  private boolean canBeCached = false;
+
+  public boolean canBeCached() {
+    return canBeCached;
+  }
+
+  public void setCanBeCached(boolean canBeCached) {
+    this.canBeCached = canBeCached;
+  }
+
   public FetchTask() {
     super();
   }
