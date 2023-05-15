@@ -391,7 +391,10 @@ KW_TRAILING: 'TRAILING';
 KW_TRIM: 'TRIM';
 KW_EXPIRE_SNAPSHOTS: 'EXPIRE_SNAPSHOTS';
 KW_SET_CURRENT_SNAPSHOT: 'SET_CURRENT_SNAPSHOT';
-
+KW_BRANCH: 'BRANCH';
+KW_SNAPSHOTS: 'SNAPSHOTS';
+KW_RETAIN: 'RETAIN';
+KW_RETENTION: 'RETENTION';
 
 // Operators
 // NOTE: if you add a new function/operator, add it to sysFuncNames so that describe function _FUNC_ will work.
