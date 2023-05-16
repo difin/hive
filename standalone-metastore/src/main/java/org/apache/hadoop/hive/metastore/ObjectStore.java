@@ -10121,11 +10121,12 @@ public class ObjectStore implements RawStore, Configurable {
       String catName, String dbName, String tableName, final List<String> colNames, String engine,
       boolean allowSql, boolean allowJdo) throws MetaException, NoSuchObjectException {
     final boolean enableBitVector = MetastoreConf.getBoolVar(getConf(), ConfVars.STATS_FETCH_BITVECTOR);
+    final boolean enableKll = MetastoreConf.getBoolVar(getConf(), ConfVars.STATS_FETCH_KLL);
     return new GetStatHelper(normalizeIdentifier(catName), normalizeIdentifier(dbName),
         normalizeIdentifier(tableName), allowSql, allowJdo, null) {
       @Override
       protected ColumnStatistics getSqlResult(GetHelper<ColumnStatistics> ctx) throws MetaException {
-        return directSql.getTableStats(catName, dbName, tblName, colNames, engine, enableBitVector);
+        return directSql.getTableStats(catName, dbName, tblName, colNames, engine, enableBitVector, enableKll);
       }
       @Override
       protected ColumnStatistics getJdoResult(GetHelper<ColumnStatistics> ctx) throws MetaException {
@@ -10143,7 +10144,7 @@ public class ObjectStore implements RawStore, Configurable {
           if (desc.getLastAnalyzed() > mStat.getLastAnalyzed()) {
             desc.setLastAnalyzed(mStat.getLastAnalyzed());
           }
-          statObjs.add(StatObjectConverter.getTableColumnStatisticsObj(mStat, enableBitVector));
+          statObjs.add(StatObjectConverter.getTableColumnStatisticsObj(mStat, enableBitVector, enableKll));
           Deadline.checkTimeout();
         }
         ColumnStatistics colStat = new ColumnStatistics(desc, statObjs);
@@ -10242,11 +10243,13 @@ public class ObjectStore implements RawStore, Configurable {
       String catName, String dbName, String tableName, final List<String> partNames, final List<String> colNames,
       String engine, boolean allowSql, boolean allowJdo) throws MetaException, NoSuchObjectException {
     final boolean enableBitVector = MetastoreConf.getBoolVar(getConf(), ConfVars.STATS_FETCH_BITVECTOR);
+    final boolean enableKll = MetastoreConf.getBoolVar(getConf(), ConfVars.STATS_FETCH_KLL);
     return new GetListHelper<ColumnStatistics>(catName, dbName, tableName, allowSql, allowJdo) {
       @Override
       protected List<ColumnStatistics> getSqlResult(
           GetHelper<List<ColumnStatistics>> ctx) throws MetaException {
-        return directSql.getPartitionStats(catName, dbName, tblName, partNames, colNames, engine, enableBitVector);
+        return directSql.getPartitionStats(
+            catName, dbName, tblName, partNames, colNames, engine, enableBitVector, enableKll);
       }
       @Override
       protected List<ColumnStatistics> getJdoResult(GetHelper<List<ColumnStatistics>> ctx)
@@ -10273,7 +10276,7 @@ public class ObjectStore implements RawStore, Configurable {
             csd = StatObjectConverter.getPartitionColumnStatisticsDesc(mStatsObj);
             curList = new ArrayList<>(colNames.size());
           }
-          curList.add(StatObjectConverter.getPartitionColumnStatisticsObj(mStatsObj, enableBitVector));
+          curList.add(StatObjectConverter.getPartitionColumnStatisticsObj(mStatsObj, enableBitVector, enableKll));
           lastPartName = partName;
           Deadline.checkTimeout();
         }
@@ -10323,12 +10326,13 @@ public class ObjectStore implements RawStore, Configurable {
         ConfVars.STATS_NDV_DENSITY_FUNCTION);
     final double ndvTuner = MetastoreConf.getDoubleVar(getConf(), ConfVars.STATS_NDV_TUNER);
     final boolean enableBitVector = MetastoreConf.getBoolVar(getConf(), ConfVars.STATS_FETCH_BITVECTOR);
+    final boolean enableKll = MetastoreConf.getBoolVar(getConf(), ConfVars.STATS_FETCH_KLL);
     return new GetHelper<AggrStats>(catName, dbName, tblName, true, false) {
       @Override
       protected AggrStats getSqlResult(GetHelper<AggrStats> ctx)
           throws MetaException {
         return directSql.aggrColStatsForPartitions(catName, dbName, tblName, partNames,
-            colNames, engine, useDensityFunctionForNDVEstimation, ndvTuner, enableBitVector);
+            colNames, engine, useDensityFunctionForNDVEstimation, ndvTuner, enableBitVector, enableKll);
       }
       @Override
       protected AggrStats getJdoResult(GetHelper<AggrStats> ctx)
@@ -10348,14 +10352,14 @@ public class ObjectStore implements RawStore, Configurable {
   @Override
   public List<MetaStoreUtils.ColStatsObjWithSourceInfo> getPartitionColStatsForDatabase(String catName, String dbName)
       throws MetaException, NoSuchObjectException {
-    final boolean enableBitVector =
-        MetastoreConf.getBoolVar(getConf(), ConfVars.STATS_FETCH_BITVECTOR);
+    final boolean enableBitVector = MetastoreConf.getBoolVar(getConf(), ConfVars.STATS_FETCH_BITVECTOR);
+    final boolean enableKll = MetastoreConf.getBoolVar(getConf(), ConfVars.STATS_FETCH_KLL);
     return new GetHelper<List<MetaStoreUtils.ColStatsObjWithSourceInfo>>(
         catName, dbName, null, true, false) {
       @Override
       protected List<MetaStoreUtils.ColStatsObjWithSourceInfo> getSqlResult(
           GetHelper<List<MetaStoreUtils.ColStatsObjWithSourceInfo>> ctx) throws MetaException {
-        return directSql.getColStatsForAllTablePartitions(catName, dbName, enableBitVector);
+        return directSql.getColStatsForAllTablePartitions(catName, dbName, enableBitVector, enableKll);
       }
 
       @Override

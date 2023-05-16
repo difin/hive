@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.hadoop.hive.common.HiveStatsUtils;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -35,7 +37,6 @@ import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.SetPartitionsStatsRequest;
-import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.ql.CompilationOpContext;
 import org.apache.hadoop.hive.ql.exec.FetchOperator;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
@@ -120,6 +121,7 @@ public class ColStatsProcessor implements IStatsProcessor {
         String columnType = colType.get(i);
         PrimitiveTypeInfo typeInfo = (PrimitiveTypeInfo) TypeInfoUtils.getTypeInfoFromTypeString(columnType);
         List<ColumnStatsField> columnStatsFields = ColumnStatsType.getColumnStats(typeInfo);
+        columnStatsFields = ColumnStatsType.removeDisabledStatistics(conf, columnStatsFields);
         try {
           ColumnStatisticsObj statObj = ColumnStatisticsObjTranslator.readHiveColumnStatistics(
               columnName, columnType, columnStatsFields, pos, fields, values);
@@ -247,6 +249,7 @@ public class ColStatsProcessor implements IStatsProcessor {
     MAX("max"),
     NDV("numdistinctvalues"),
     BITVECTOR("ndvbitvector"),
+    KLL_SKETCH("kllsketch"),
     MAX_LENGTH("maxlength"),
     AVG_LENGTH("avglength");
 
@@ -281,7 +284,8 @@ public class ColStatsProcessor implements IStatsProcessor {
             ColumnStatsField.MAX,
             ColumnStatsField.COUNT_NULLS,
             ColumnStatsField.NDV,
-            ColumnStatsField.BITVECTOR)),
+            ColumnStatsField.BITVECTOR,
+            ColumnStatsField.KLL_SKETCH)),
     DOUBLE(
         ImmutableList.of(
             ColumnStatsField.COLUMN_STATS_TYPE,
@@ -289,7 +293,8 @@ public class ColStatsProcessor implements IStatsProcessor {
             ColumnStatsField.MAX,
             ColumnStatsField.COUNT_NULLS,
             ColumnStatsField.NDV,
-            ColumnStatsField.BITVECTOR)),
+            ColumnStatsField.BITVECTOR,
+            ColumnStatsField.KLL_SKETCH)),
     STRING(
         ImmutableList.of(
             ColumnStatsField.COLUMN_STATS_TYPE,
@@ -311,7 +316,8 @@ public class ColStatsProcessor implements IStatsProcessor {
             ColumnStatsField.MAX,
             ColumnStatsField.COUNT_NULLS,
             ColumnStatsField.NDV,
-            ColumnStatsField.BITVECTOR)),
+            ColumnStatsField.BITVECTOR,
+            ColumnStatsField.KLL_SKETCH)),
     DATE(
         ImmutableList.of(
             ColumnStatsField.COLUMN_STATS_TYPE,
@@ -319,7 +325,8 @@ public class ColStatsProcessor implements IStatsProcessor {
             ColumnStatsField.MAX,
             ColumnStatsField.COUNT_NULLS,
             ColumnStatsField.NDV,
-            ColumnStatsField.BITVECTOR)),
+            ColumnStatsField.BITVECTOR,
+            ColumnStatsField.KLL_SKETCH)),
     TIMESTAMP(
         ImmutableList.of(
             ColumnStatsField.COLUMN_STATS_TYPE,
@@ -327,7 +334,8 @@ public class ColStatsProcessor implements IStatsProcessor {
             ColumnStatsField.MAX,
             ColumnStatsField.COUNT_NULLS,
             ColumnStatsField.NDV,
-            ColumnStatsField.BITVECTOR));
+            ColumnStatsField.BITVECTOR,
+            ColumnStatsField.KLL_SKETCH));
 
 
     private final List<ColumnStatsField> columnStats;
@@ -376,5 +384,13 @@ public class ColStatsProcessor implements IStatsProcessor {
       return getColumnStatsType(typeInfo).getColumnStats();
     }
 
+    public static List<ColumnStatsField> removeDisabledStatistics(HiveConf conf, List<ColumnStatsField> columnStatsFields) {
+      if (!HiveStatsUtils.computeHistograms(conf)) {
+        return columnStatsFields.stream()
+            .filter(f -> f != ColumnStatsField.KLL_SKETCH)
+            .collect(Collectors.toList());
+      }
+      return columnStatsFields;
+    }
   }
 }

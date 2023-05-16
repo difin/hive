@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.38"
+const string HMS_API = "1.2.39"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -484,7 +484,8 @@ struct DoubleColumnStatsData {
 2: optional double highValue,
 3: required i64 numNulls,
 4: required i64 numDVs,
-5: optional binary bitVectors
+5: optional binary bitVectors,
+6: optional binary histogram
 }
 
 struct LongColumnStatsData {
@@ -492,7 +493,8 @@ struct LongColumnStatsData {
 2: optional i64 highValue,
 3: required i64 numNulls,
 4: required i64 numDVs,
-5: optional binary bitVectors
+5: optional binary bitVectors,
+6: optional binary histogram
 }
 
 struct StringColumnStatsData {
@@ -500,7 +502,8 @@ struct StringColumnStatsData {
 2: required double avgColLen,
 3: required i64 numNulls,
 4: required i64 numDVs,
-5: optional binary bitVectors
+5: optional binary bitVectors,
+6: optional binary histogram
 }
 
 struct BinaryColumnStatsData {
@@ -521,7 +524,8 @@ struct DecimalColumnStatsData {
 2: optional Decimal highValue,
 3: required i64 numNulls,
 4: required i64 numDVs,
-5: optional binary bitVectors
+5: optional binary bitVectors,
+6: optional binary histogram
 }
 
 struct Date {
@@ -533,7 +537,8 @@ struct DateColumnStatsData {
 2: optional Date highValue,
 3: required i64 numNulls,
 4: required i64 numDVs,
-5: optional binary bitVectors
+5: optional binary bitVectors,
+6: optional binary histogram
 }
 
 union ColumnStatisticsData {

@@ -19,6 +19,7 @@ package org.apache.hadoop.hive.metastore.cache;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -553,7 +554,7 @@ public class TestCachedStore {
     Map<String, String> newParams1 = new HashMap<>();
     newParams1.put("key", "value");
     newSd1.setCols(newCols1);
-    newSd1.setParameters(params1);
+    newSd1.setParameters(newParams1);
     newSd1.setLocation("loc1");
     newTbl1.setSd(newSd1);
     newTbl1.setPartitionKeys(new ArrayList<>());
@@ -612,7 +613,7 @@ public class TestCachedStore {
     sd1.setParameters(params1);
     sd1.setLocation("loc1");
     part1.setSd(sd1);
-    part1.setValues(Arrays.asList("201701"));
+    part1.setValues(Collections.singletonList("201701"));
 
     Partition part2 = new Partition();
     StorageDescriptor sd2 = new StorageDescriptor();
@@ -624,7 +625,7 @@ public class TestCachedStore {
     sd2.setParameters(params2);
     sd2.setLocation("loc2");
     part2.setSd(sd2);
-    part2.setValues(Arrays.asList("201702"));
+    part2.setValues(Collections.singletonList("201702"));
 
     Partition part3 = new Partition();
     StorageDescriptor sd3 = new StorageDescriptor();
@@ -636,7 +637,7 @@ public class TestCachedStore {
     sd3.setParameters(params3);
     sd3.setLocation("loc3");
     part3.setSd(sd3);
-    part3.setValues(Arrays.asList("201703"));
+    part3.setValues(Collections.singletonList("201703"));
 
     Partition newPart1 = new Partition();
     newPart1.setDbName(dbName);

@@ -4888,16 +4888,18 @@ class DoubleColumnStatsData(object):
      - numNulls
      - numDVs
      - bitVectors
+     - histogram
 
     """
 
 
-    def __init__(self, lowValue=None, highValue=None, numNulls=None, numDVs=None, bitVectors=None,):
+    def __init__(self, lowValue=None, highValue=None, numNulls=None, numDVs=None, bitVectors=None, histogram=None,):
         self.lowValue = lowValue
         self.highValue = highValue
         self.numNulls = numNulls
         self.numDVs = numDVs
         self.bitVectors = bitVectors
+        self.histogram = histogram
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -4933,6 +4935,11 @@ class DoubleColumnStatsData(object):
                     self.bitVectors = iprot.readBinary()
                 else:
                     iprot.skip(ftype)
+            elif fid == 6:
+                if ftype == TType.STRING:
+                    self.histogram = iprot.readBinary()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -4962,6 +4969,10 @@ class DoubleColumnStatsData(object):
         if self.bitVectors is not None:
             oprot.writeFieldBegin('bitVectors', TType.STRING, 5)
             oprot.writeBinary(self.bitVectors)
+            oprot.writeFieldEnd()
+        if self.histogram is not None:
+            oprot.writeFieldBegin('histogram', TType.STRING, 6)
+            oprot.writeBinary(self.histogram)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -4993,16 +5004,18 @@ class LongColumnStatsData(object):
      - numNulls
      - numDVs
      - bitVectors
+     - histogram
 
     """
 
 
-    def __init__(self, lowValue=None, highValue=None, numNulls=None, numDVs=None, bitVectors=None,):
+    def __init__(self, lowValue=None, highValue=None, numNulls=None, numDVs=None, bitVectors=None, histogram=None,):
         self.lowValue = lowValue
         self.highValue = highValue
         self.numNulls = numNulls
         self.numDVs = numDVs
         self.bitVectors = bitVectors
+        self.histogram = histogram
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -5038,6 +5051,11 @@ class LongColumnStatsData(object):
                     self.bitVectors = iprot.readBinary()
                 else:
                     iprot.skip(ftype)
+            elif fid == 6:
+                if ftype == TType.STRING:
+                    self.histogram = iprot.readBinary()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -5067,6 +5085,10 @@ class LongColumnStatsData(object):
         if self.bitVectors is not None:
             oprot.writeFieldBegin('bitVectors', TType.STRING, 5)
             oprot.writeBinary(self.bitVectors)
+            oprot.writeFieldEnd()
+        if self.histogram is not None:
+            oprot.writeFieldBegin('histogram', TType.STRING, 6)
+            oprot.writeBinary(self.histogram)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -5098,16 +5120,18 @@ class StringColumnStatsData(object):
      - numNulls
      - numDVs
      - bitVectors
+     - histogram
 
     """
 
 
-    def __init__(self, maxColLen=None, avgColLen=None, numNulls=None, numDVs=None, bitVectors=None,):
+    def __init__(self, maxColLen=None, avgColLen=None, numNulls=None, numDVs=None, bitVectors=None, histogram=None,):
         self.maxColLen = maxColLen
         self.avgColLen = avgColLen
         self.numNulls = numNulls
         self.numDVs = numDVs
         self.bitVectors = bitVectors
+        self.histogram = histogram
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -5143,6 +5167,11 @@ class StringColumnStatsData(object):
                     self.bitVectors = iprot.readBinary()
                 else:
                     iprot.skip(ftype)
+            elif fid == 6:
+                if ftype == TType.STRING:
+                    self.histogram = iprot.readBinary()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -5172,6 +5201,10 @@ class StringColumnStatsData(object):
         if self.bitVectors is not None:
             oprot.writeFieldBegin('bitVectors', TType.STRING, 5)
             oprot.writeBinary(self.bitVectors)
+            oprot.writeFieldEnd()
+        if self.histogram is not None:
+            oprot.writeFieldBegin('histogram', TType.STRING, 6)
+            oprot.writeBinary(self.histogram)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -5375,16 +5408,18 @@ class DecimalColumnStatsData(object):
      - numNulls
      - numDVs
      - bitVectors
+     - histogram
 
     """
 
 
-    def __init__(self, lowValue=None, highValue=None, numNulls=None, numDVs=None, bitVectors=None,):
+    def __init__(self, lowValue=None, highValue=None, numNulls=None, numDVs=None, bitVectors=None, histogram=None,):
         self.lowValue = lowValue
         self.highValue = highValue
         self.numNulls = numNulls
         self.numDVs = numDVs
         self.bitVectors = bitVectors
+        self.histogram = histogram
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -5422,6 +5457,11 @@ class DecimalColumnStatsData(object):
                     self.bitVectors = iprot.readBinary()
                 else:
                     iprot.skip(ftype)
+            elif fid == 6:
+                if ftype == TType.STRING:
+                    self.histogram = iprot.readBinary()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -5451,6 +5491,10 @@ class DecimalColumnStatsData(object):
         if self.bitVectors is not None:
             oprot.writeFieldBegin('bitVectors', TType.STRING, 5)
             oprot.writeBinary(self.bitVectors)
+            oprot.writeFieldEnd()
+        if self.histogram is not None:
+            oprot.writeFieldBegin('histogram', TType.STRING, 6)
+            oprot.writeBinary(self.histogram)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -5541,16 +5585,18 @@ class DateColumnStatsData(object):
      - numNulls
      - numDVs
      - bitVectors
+     - histogram
 
     """
 
 
-    def __init__(self, lowValue=None, highValue=None, numNulls=None, numDVs=None, bitVectors=None,):
+    def __init__(self, lowValue=None, highValue=None, numNulls=None, numDVs=None, bitVectors=None, histogram=None,):
         self.lowValue = lowValue
         self.highValue = highValue
         self.numNulls = numNulls
         self.numDVs = numDVs
         self.bitVectors = bitVectors
+        self.histogram = histogram
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -5588,6 +5634,11 @@ class DateColumnStatsData(object):
                     self.bitVectors = iprot.readBinary()
                 else:
                     iprot.skip(ftype)
+            elif fid == 6:
+                if ftype == TType.STRING:
+                    self.histogram = iprot.readBinary()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -5617,6 +5668,10 @@ class DateColumnStatsData(object):
         if self.bitVectors is not None:
             oprot.writeFieldBegin('bitVectors', TType.STRING, 5)
             oprot.writeBinary(self.bitVectors)
+            oprot.writeFieldEnd()
+        if self.histogram is not None:
+            oprot.writeFieldBegin('histogram', TType.STRING, 6)
+            oprot.writeBinary(self.histogram)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -29884,6 +29939,7 @@ DoubleColumnStatsData.thrift_spec = (
     (3, TType.I64, 'numNulls', None, None, ),  # 3
     (4, TType.I64, 'numDVs', None, None, ),  # 4
     (5, TType.STRING, 'bitVectors', 'BINARY', None, ),  # 5
+    (6, TType.STRING, 'histogram', 'BINARY', None, ),  # 6
 )
 all_structs.append(LongColumnStatsData)
 LongColumnStatsData.thrift_spec = (
@@ -29893,6 +29949,7 @@ LongColumnStatsData.thrift_spec = (
     (3, TType.I64, 'numNulls', None, None, ),  # 3
     (4, TType.I64, 'numDVs', None, None, ),  # 4
     (5, TType.STRING, 'bitVectors', 'BINARY', None, ),  # 5
+    (6, TType.STRING, 'histogram', 'BINARY', None, ),  # 6
 )
 all_structs.append(StringColumnStatsData)
 StringColumnStatsData.thrift_spec = (
@@ -29902,6 +29959,7 @@ StringColumnStatsData.thrift_spec = (
     (3, TType.I64, 'numNulls', None, None, ),  # 3
     (4, TType.I64, 'numDVs', None, None, ),  # 4
     (5, TType.STRING, 'bitVectors', 'BINARY', None, ),  # 5
+    (6, TType.STRING, 'histogram', 'BINARY', None, ),  # 6
 )
 all_structs.append(BinaryColumnStatsData)
 BinaryColumnStatsData.thrift_spec = (
@@ -29926,6 +29984,7 @@ DecimalColumnStatsData.thrift_spec = (
     (3, TType.I64, 'numNulls', None, None, ),  # 3
     (4, TType.I64, 'numDVs', None, None, ),  # 4
     (5, TType.STRING, 'bitVectors', 'BINARY', None, ),  # 5
+    (6, TType.STRING, 'histogram', 'BINARY', None, ),  # 6
 )
 all_structs.append(Date)
 Date.thrift_spec = (
@@ -29940,6 +29999,7 @@ DateColumnStatsData.thrift_spec = (
     (3, TType.I64, 'numNulls', None, None, ),  # 3
     (4, TType.I64, 'numDVs', None, None, ),  # 4
     (5, TType.STRING, 'bitVectors', 'BINARY', None, ),  # 5
+    (6, TType.STRING, 'histogram', 'BINARY', None, ),  # 6
 )
 all_structs.append(ColumnStatisticsData)
 ColumnStatisticsData.thrift_spec = (
