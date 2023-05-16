@@ -55,6 +55,7 @@ import org.apache.iceberg.deletes.PositionDeleteIndex;
 import org.apache.iceberg.expressions.Expression;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.CloseableIterator;
+import org.apache.iceberg.mr.InputFormatConfig;
 import org.apache.iceberg.mr.hive.HiveIcebergInputFormat;
 import org.apache.iceberg.mr.mapred.MapredIcebergInputFormat;
 import org.apache.iceberg.orc.VectorizedReadUtils;
@@ -197,7 +198,7 @@ public class HiveVectorizedReader {
     // If LLAP enabled, try to retrieve an LLAP record reader - this might yield to null in some special cases
     // TODO: add support for reading files with positional deletes with LLAP (LLAP would need to provide file row num)
     if (HiveConf.getBoolVar(job, HiveConf.ConfVars.LLAP_IO_ENABLED, LlapProxy.isDaemon()) &&
-        LlapProxy.getIo() != null && task.deletes().isEmpty()) {
+        LlapProxy.getIo() != null && task.deletes().isEmpty() && !InputFormatConfig.fetchVirtualColumns(job)) {
       boolean isDisableVectorization =
           job.getBoolean(HiveIcebergInputFormat.getVectorizationConfName(tableName), false);
       if (isDisableVectorization) {
