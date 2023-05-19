@@ -27,9 +27,10 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.client.builder.DatabaseBuilder;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
-import org.apache.hadoop.util.StringUtils;
-import org.junit.AfterClass;
+import org.apache.thrift.TException;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -44,38 +45,35 @@ public class TestHiveMetaStoreTimeout {
   protected static Configuration conf;
   protected static Warehouse warehouse;
 
+  private final String dbName = "db";
+  
   @BeforeClass
-  public static void setUp() throws Exception {
-    HiveMetaStore.TEST_TIMEOUT_ENABLED = true;
+  public static void startMetaStoreServer() throws Exception {
     conf = MetastoreConf.newMetastoreConf();
     MetastoreConf.setClass(conf, ConfVars.EXPRESSION_PROXY_CLASS,
         MockPartitionExpressionForMetastore.class, PartitionExpressionProxy.class);
-    MetastoreConf.setTimeVar(conf, ConfVars.CLIENT_SOCKET_TIMEOUT, 1000,
+    MetastoreConf.setTimeVar(conf, ConfVars.CLIENT_SOCKET_TIMEOUT, 2000,
         TimeUnit.MILLISECONDS);
     MetaStoreTestUtils.setConfForStandloneMode(conf);
     warehouse = new Warehouse(conf);
     client = new HiveMetaStoreClient(conf);
   }
 
-  @AfterClass
-  public static void tearDown() throws Exception {
+  @Before
+  public void setup() throws MetaException {
     HiveMetaStore.TEST_TIMEOUT_ENABLED = false;
-    try {
-      client.close();
-    } catch (Throwable e) {
-      System.err.println("Unable to close metastore");
-      System.err.println(StringUtils.stringifyException(e));
-      throw e;
-    }
+    HiveMetaStore.TEST_TIMEOUT_VALUE = -1;
+    client = new HiveMetaStoreClient(conf);
+  }
+
+  @After
+  public void cleanup() throws TException {
+    client.close();
+    client = null;    
   }
 
   @Test
   public void testNoTimeout() throws Exception {
-    HiveMetaStore.TEST_TIMEOUT_VALUE = 250;
-
-    String dbName = "db";
-    client.dropDatabase(dbName, true, true);
-
     new DatabaseBuilder()
         .setName(dbName)
         .create(client, conf);
@@ -85,10 +83,8 @@ public class TestHiveMetaStoreTimeout {
 
   @Test
   public void testTimeout() throws Exception {
-    HiveMetaStore.TEST_TIMEOUT_VALUE = 2 * 1000;
-
-    String dbName = "db";
-    client.dropDatabase(dbName, true, true);
+    HiveMetaStore.TEST_TIMEOUT_ENABLED = true;
+    HiveMetaStore.TEST_TIMEOUT_VALUE = 4000;
 
     Database db = new DatabaseBuilder()
         .setName(dbName)
@@ -100,18 +96,10 @@ public class TestHiveMetaStoreTimeout {
       Assert.assertTrue("unexpected MetaException", e.getMessage().contains("Timeout when " +
           "executing method: create_database"));
     }
-
-    // restore
-    HiveMetaStore.TEST_TIMEOUT_VALUE = 1;
   }
 
   @Test
   public void testResetTimeout() throws Exception {
-    HiveMetaStore.TEST_TIMEOUT_VALUE = 250;
-    String dbName = "db";
-
-    // no timeout before reset
-    client.dropDatabase(dbName, true, true);
     Database db = new DatabaseBuilder()
         .setName(dbName)
         .build(conf);
@@ -123,8 +111,8 @@ public class TestHiveMetaStoreTimeout {
     client.dropDatabase(dbName, true, true);
 
     // reset
-    HiveMetaStore.TEST_TIMEOUT_VALUE = 2000;
-    client.setMetaConf(ConfVars.CLIENT_SOCKET_TIMEOUT.getVarname(), "1s");
+    HiveMetaStore.TEST_TIMEOUT_ENABLED = true;
+    HiveMetaStore.TEST_TIMEOUT_VALUE = 4000;
 
     // timeout after reset
     try {
