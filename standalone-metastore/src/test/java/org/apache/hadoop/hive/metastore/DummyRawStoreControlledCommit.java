@@ -113,6 +113,7 @@ import org.apache.hadoop.hive.metastore.api.WMTrigger;
 import org.apache.hadoop.hive.metastore.api.WMValidateResourcePlanResponse;
 import org.apache.hadoop.hive.metastore.api.WriteEventInfo;
 
+import org.apache.hadoop.hive.metastore.model.MTable;
 import org.apache.hadoop.hive.metastore.partition.spec.PartitionSpecProxy;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.ColStatsObjWithSourceInfo;
 import org.apache.thrift.TException;
@@ -805,6 +806,14 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
       throws NoSuchObjectException, MetaException, InvalidObjectException,
       InvalidInputException {
     return objectStore.updateTableColumnStatistics(statsObj, validWriteIds, writeId);
+  }
+
+  @Override
+  public Map<String, String> updatePartitionColumnStatistics(Table table, MTable mTable, ColumnStatistics statsObj,
+                                                             List<String> partVals, String validWriteIds, long writeId)
+      throws NoSuchObjectException, MetaException, InvalidObjectException,
+      InvalidInputException {
+    return objectStore.updatePartitionColumnStatistics(table, mTable, statsObj, partVals, validWriteIds, writeId);
   }
 
   @Override
@@ -1512,6 +1521,11 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
     objectStore.dropPackage(request);
   }
 
+  @Override
+  public MTable ensureGetMTable(String catName, String dbName, String tblName) throws NoSuchObjectException {
+      return objectStore.ensureGetMTable(catName, dbName, catName);
+  }
+    
   @Override
   public Map<String, Map<String, String>> updatePartitionColumnStatisticsInBatch(
         Map<String, ColumnStatistics> partColStatsMap,

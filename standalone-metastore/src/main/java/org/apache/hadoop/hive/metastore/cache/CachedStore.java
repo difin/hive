@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.Executors;
@@ -59,6 +60,7 @@ import org.apache.hadoop.hive.metastore.api.AllTableConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.Catalog;
 import org.apache.hadoop.hive.metastore.api.CheckConstraintsRequest;
+import org.apache.hadoop.hive.metastore.api.ColumnStatisticsDesc;
 import org.apache.hadoop.hive.metastore.api.DatabaseType;
 import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
@@ -158,6 +160,7 @@ import org.apache.hadoop.hive.metastore.messaging.DeletePartitionColumnStatMessa
 import org.apache.hadoop.hive.metastore.messaging.MessageBuilder;
 import org.apache.hadoop.hive.metastore.messaging.MessageDeserializer;
 import org.apache.hadoop.hive.metastore.messaging.MessageFactory;
+import org.apache.hadoop.hive.metastore.model.MTable;
 import org.apache.hadoop.hive.metastore.partition.spec.PartitionSpecProxy;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.metastore.utils.FileUtils;
@@ -1299,9 +1302,9 @@ public class CachedStore implements RawStore, Configurable {
     return getTable(catName, dbName, tblName, null);
   }
 
-  @Override
-  public Table getTable(String catName, String dbName, String tblName, String validWriteIds) throws MetaException {
-    catName = normalizeIdentifier(catName);
+  @Override public Table getTable(String catName, String dbName, String tblName, String validWriteIds)
+      throws MetaException {
+    catName = normalizeIdentifier(Optional.ofNullable(catName).orElse(getDefaultCatalog(conf)));
     dbName = StringUtils.normalizeIdentifier(dbName);
     tblName = StringUtils.normalizeIdentifier(tblName);
     if (!shouldCacheTable(catName, dbName, tblName) || (canUseEvents && rawStore.isActiveTransaction())) {
@@ -2345,12 +2348,27 @@ public class CachedStore implements RawStore, Configurable {
     return succ;
   }
 
-  @Override
-  public Map<String, String> updatePartitionColumnStatistics(ColumnStatistics colStats,
-      List<String> partVals, String validWriteIds, long writeId)
+  @Override public Map<String, String> updatePartitionColumnStatistics(ColumnStatistics colStats, List<String> partVals,
+                                                                       String validWriteIds, long writeId)
+          throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
+    return updatePartitionColumnStatisticsInternal(null, null, colStats, partVals, validWriteIds, writeId);
+  }
+
+  @Override public Map<String, String> updatePartitionColumnStatistics(Table table, MTable mTable,
+                                                                       ColumnStatistics colStats, List<String> partVals,
+                                                                       String validWriteIds, long writeId)
+          throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
+    return updatePartitionColumnStatisticsInternal(table, mTable, colStats, partVals, validWriteIds, writeId);
+  }
+  
+  private Map<String, String> updatePartitionColumnStatisticsInternal(Table table, MTable mTable, 
+                                                                          ColumnStatistics colStats, List<String> partVals, String validWriteIds, long writeId)
       throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
+    ColumnStatisticsDesc statsDesc = colStats.getStatsDesc();
+    table = Optional.ofNullable(table).orElse(getTable(statsDesc.getCatName(), statsDesc.getDbName(), statsDesc.getTableName()));
+    mTable = Optional.ofNullable(mTable).orElse(ensureGetMTable(statsDesc.getCatName(), statsDesc.getDbName(), statsDesc.getTableName()));
     Map<String, String> newParams = rawStore.updatePartitionColumnStatistics(
-        colStats, partVals, validWriteIds, writeId);
+        table, mTable, colStats, partVals, validWriteIds, writeId);
     if (newParams != null && !canUseEvents) {
       String catName = colStats.getStatsDesc().isSetCatName() ?
           normalizeIdentifier(colStats.getStatsDesc().getCatName()) : DEFAULT_CATALOG_NAME;
@@ -3424,4 +3442,8 @@ public class CachedStore implements RawStore, Configurable {
     rawStore.deleteAllPartitionColumnStatistics(tn, w);
   }
 
+  @Override
+  public MTable ensureGetMTable(String catName, String dbName, String tblName) throws NoSuchObjectException {
+    return rawStore.ensureGetMTable(catName, dbName, tblName);
+  }
 }

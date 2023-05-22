@@ -75,6 +75,7 @@ import org.apache.hadoop.hive.metastore.metrics.Metrics;
 import org.apache.hadoop.hive.metastore.metrics.MetricsConstants;
 import org.apache.hadoop.hive.metastore.model.MNotificationLog;
 import org.apache.hadoop.hive.metastore.model.MNotificationNextId;
+import org.apache.hadoop.hive.metastore.model.MTable;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -668,7 +669,7 @@ public class TestObjectStore {
             .addCol("test_sort_col", "int", "test sort col comment")
             .build(conf);
     objectStore.createTable(tbl1);
-
+    MTable mTable1 = objectStore.ensureGetMTable(tbl1.getCatName(), tbl1.getDbName(), tbl1.getTableName());
     PrivilegeBag privilegeBag = new PrivilegeBag();
     // Create partitions for the partitioned table
     for(int i=0; i < 3; i++) {
@@ -730,7 +731,7 @@ public class TestObjectStore {
         ColumnStatisticsObj partStats = new ColumnStatisticsObj("test_part_col", "int", data);
         statsObjList.add(partStats);
 
-        objectStore.updatePartitionColumnStatistics(stats, part.getValues(), null, -1);
+        objectStore.updatePartitionColumnStatistics(tbl1, mTable1, stats, part.getValues(), null, -1);
       }
     }
     if (withPrivileges) {
