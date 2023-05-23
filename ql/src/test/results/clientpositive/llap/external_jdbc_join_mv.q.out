@@ -161,14 +161,14 @@ HiveProject(id1=[$0], name0=[$1], jid=[$2], cid=[$3], jid0=[$2], title=[$5], cid
   HiveJoin(condition=[=($3, $6)], joinType=[inner])
     HiveJoin(condition=[=($2, $4)], joinType=[inner])
       HiveProject(id=[$0], name=[$1], jid=[$2], cid=[$3])
-        HiveJdbcConverter
+        HiveJdbcConverter(convention=[JDBC.DERBY])
           JdbcFilter(condition=[AND(IS NOT NULL($3), IS NOT NULL($2))])
             JdbcHiveTableScan(table=[[default, person]], table:alias=[person])
       HiveProject(id=[$0], title=[$1])
         HiveFilter(condition=[IS NOT NULL($0)])
           HiveTableScan(table=[[default, mv1]], table:alias=[default.mv1])
     HiveProject(id=[$0], name=[$1])
-      HiveJdbcConverter
+      HiveJdbcConverter(convention=[JDBC.DERBY])
         JdbcFilter(condition=[IS NOT NULL($0)])
           JdbcHiveTableScan(table=[[default, country]], table:alias=[country])
 

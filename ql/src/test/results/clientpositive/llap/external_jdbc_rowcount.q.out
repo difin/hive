@@ -265,7 +265,7 @@ POSTHOOK: Input: default@ext_simple_derby_table3
 POSTHOOK: Input: default@ext_simple_derby_table4
 #### A masked pattern was here ####
 CBO PLAN:
-HiveJdbcConverter
+HiveJdbcConverter(convention=[JDBC.DERBY])
   JdbcProject(fkey=[$0], ikey=[$2], _o__c2=[$3])
     JdbcAggregate(group=[{0, 2, 4}], agg#0=[sum($1)])
       JdbcFilter(condition=[IS NULL($3)])

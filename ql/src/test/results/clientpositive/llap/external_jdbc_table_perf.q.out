@@ -1483,36 +1483,36 @@ STAGE PLANS:
             hive.sql.query SELECT "t23"."w_warehouse_sk", "t23"."i_item_sk", CAST(1 AS INTEGER) AS "d_moy", "t23"."mean", "t23"."cov", "t23"."w_warehouse_sk0" AS "w_warehouse_sk1", "t23"."i_item_sk0" AS "i_item_sk1", CAST(2 AS INTEGER) AS "d_moy1", "t23"."mean0" AS "mean1", "t23"."cov0" AS "cov1"
 FROM (SELECT "t10"."w_warehouse_sk", "t10"."i_item_sk", "t10"."mean", "t10"."cov", "t22"."w_warehouse_sk" AS "w_warehouse_sk0", "t22"."i_item_sk" AS "i_item_sk0", "t22"."mean" AS "mean0", "t22"."cov" AS "cov0"
 FROM (SELECT "$f1" AS "w_warehouse_sk", "$f2" AS "i_item_sk", CAST("$f4" AS DOUBLE) / "$f5" AS "mean", CASE WHEN CAST("$f4" AS DOUBLE) / "$f5" = 0 THEN NULL ELSE CAST("$f4" AS DOUBLE) / (CAST("$f4" AS DOUBLE) / "$f5") END AS "cov"
-FROM (SELECT "t6"."w_warehouse_sk" AS "$f1", "t4"."i_item_sk" AS "$f2", SUM("t0"."inv_quantity_on_hand") AS "$f4", COUNT("t0"."inv_quantity_on_hand") AS "$f5"
+FROM (SELECT "t6"."w_warehouse_sk" AS "$f1", "t2"."i_item_sk" AS "$f2", SUM("t0"."inv_quantity_on_hand") AS "$f4", COUNT("t0"."inv_quantity_on_hand") AS "$f5"
 FROM (SELECT "inv_date_sk", "inv_item_sk", "inv_warehouse_sk", "inv_quantity_on_hand"
 FROM "INVENTORY"
-WHERE "inv_date_sk" IS NOT NULL AND "inv_warehouse_sk" IS NOT NULL AND "inv_item_sk" IS NOT NULL) AS "t0"
-INNER JOIN (SELECT "d_date_sk"
-FROM "DATE_DIM"
-WHERE "d_year" = 2001 AND "d_moy" = 1 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."inv_date_sk" = "t2"."d_date_sk"
+WHERE "inv_date_sk" IS NOT NULL AND ("inv_warehouse_sk" IS NOT NULL AND "inv_item_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "i_item_sk"
 FROM "ITEM"
-WHERE "i_item_sk" IS NOT NULL) AS "t4" ON "t0"."inv_item_sk" = "t4"."i_item_sk"
+WHERE "i_item_sk" IS NOT NULL) AS "t2" ON "t0"."inv_item_sk" = "t2"."i_item_sk"
+INNER JOIN (SELECT "d_date_sk"
+FROM "DATE_DIM"
+WHERE "d_year" = 2001 AND ("d_moy" = 1 AND "d_date_sk" IS NOT NULL)) AS "t4" ON "t0"."inv_date_sk" = "t4"."d_date_sk"
 INNER JOIN (SELECT "w_warehouse_sk", "w_warehouse_name"
 FROM "WAREHOUSE"
 WHERE "w_warehouse_sk" IS NOT NULL) AS "t6" ON "t0"."inv_warehouse_sk" = "t6"."w_warehouse_sk"
-GROUP BY "t4"."i_item_sk", "t6"."w_warehouse_sk", "t6"."w_warehouse_name") AS "t8"
+GROUP BY "t2"."i_item_sk", "t6"."w_warehouse_sk", "t6"."w_warehouse_name") AS "t8"
 WHERE CASE WHEN CAST("t8"."$f4" AS DOUBLE) / "t8"."$f5" = 0 THEN FALSE ELSE CAST("t8"."$f4" AS DOUBLE) / (CAST("t8"."$f4" AS DOUBLE) / "t8"."$f5") > 1 END) AS "t10"
 INNER JOIN (SELECT "$f1" AS "w_warehouse_sk", "$f2" AS "i_item_sk", CAST("$f4" AS DOUBLE) / "$f5" AS "mean", CASE WHEN CAST("$f4" AS DOUBLE) / "$f5" = 0 THEN NULL ELSE CAST("$f4" AS DOUBLE) / (CAST("$f4" AS DOUBLE) / "$f5") END AS "cov"
-FROM (SELECT "t18"."w_warehouse_sk" AS "$f1", "t16"."i_item_sk" AS "$f2", SUM("t12"."inv_quantity_on_hand") AS "$f4", COUNT("t12"."inv_quantity_on_hand") AS "$f5"
+FROM (SELECT "t18"."w_warehouse_sk" AS "$f1", "t14"."i_item_sk" AS "$f2", SUM("t12"."inv_quantity_on_hand") AS "$f4", COUNT("t12"."inv_quantity_on_hand") AS "$f5"
 FROM (SELECT "inv_date_sk", "inv_item_sk", "inv_warehouse_sk", "inv_quantity_on_hand"
 FROM "INVENTORY"
-WHERE "inv_item_sk" IS NOT NULL AND "inv_warehouse_sk" IS NOT NULL AND "inv_date_sk" IS NOT NULL) AS "t12"
-INNER JOIN (SELECT "d_date_sk"
-FROM "DATE_DIM"
-WHERE "d_year" = 2001 AND "d_moy" = 2 AND "d_date_sk" IS NOT NULL) AS "t14" ON "t12"."inv_date_sk" = "t14"."d_date_sk"
+WHERE "inv_item_sk" IS NOT NULL AND ("inv_warehouse_sk" IS NOT NULL AND "inv_date_sk" IS NOT NULL)) AS "t12"
 INNER JOIN (SELECT "i_item_sk"
 FROM "ITEM"
-WHERE "i_item_sk" IS NOT NULL) AS "t16" ON "t12"."inv_item_sk" = "t16"."i_item_sk"
+WHERE "i_item_sk" IS NOT NULL) AS "t14" ON "t12"."inv_item_sk" = "t14"."i_item_sk"
+INNER JOIN (SELECT "d_date_sk"
+FROM "DATE_DIM"
+WHERE "d_year" = 2001 AND ("d_moy" = 2 AND "d_date_sk" IS NOT NULL)) AS "t16" ON "t12"."inv_date_sk" = "t16"."d_date_sk"
 INNER JOIN (SELECT "w_warehouse_sk", "w_warehouse_name"
 FROM "WAREHOUSE"
 WHERE "w_warehouse_sk" IS NOT NULL) AS "t18" ON "t12"."inv_warehouse_sk" = "t18"."w_warehouse_sk"
-GROUP BY "t16"."i_item_sk", "t18"."w_warehouse_sk", "t18"."w_warehouse_name") AS "t20"
+GROUP BY "t14"."i_item_sk", "t18"."w_warehouse_sk", "t18"."w_warehouse_name") AS "t20"
 WHERE CASE WHEN CAST("t20"."$f4" AS DOUBLE) / "t20"."$f5" = 0 THEN FALSE ELSE CAST("t20"."$f4" AS DOUBLE) / (CAST("t20"."$f4" AS DOUBLE) / "t20"."$f5") > 1 END) AS "t22" ON "t10"."i_item_sk" = "t22"."i_item_sk" AND "t10"."w_warehouse_sk" = "t22"."w_warehouse_sk"
 ORDER BY "t10"."w_warehouse_sk", "t10"."i_item_sk", "t10"."mean", "t10"."cov", "t22"."mean", "t22"."cov") AS "t23"
             hive.sql.query.fieldNames w_warehouse_sk,i_item_sk,d_moy,mean,cov,w_warehouse_sk1,i_item_sk1,d_moy1,mean1,cov1
@@ -1659,7 +1659,7 @@ STAGE PLANS:
                     hive.sql.query SELECT "t0"."c_customer_sk", "t0"."c_customer_id", "t0"."c_current_cdemo_sk", "t0"."c_current_hdemo_sk", "t0"."c_current_addr_sk", "t0"."c_first_shipto_date_sk", "t0"."c_first_sales_date_sk", "t0"."c_salutation", "t0"."c_first_name", "t0"."c_last_name", "t0"."c_preferred_cust_flag", "t0"."c_birth_day", "t0"."c_birth_month", "t0"."c_birth_year", "t0"."c_birth_country", "t0"."c_login", "t0"."c_email_address", "t0"."c_last_review_date", "t4"."ca_address_sk", "t4"."ca_address_id", "t4"."ca_street_number", "t4"."ca_street_name", "t4"."ca_street_type", "t4"."ca_suite_number", "t4"."ca_city", "t4"."ca_county", "t4"."ca_state", "t4"."ca_zip", "t4"."ca_country", "t4"."ca_gmt_offset", "t4"."ca_location_type", "t2"."cd_demo_sk", "t2"."cd_gender", "t2"."cd_marital_status", "t2"."cd_education_status", "t2"."cd_purchase_estimate", "t2"."cd_credit_rating", "t2"."cd_dep_count", "t2"."cd_dep_employed_count", "t2"."cd_dep_college_count"
 FROM (SELECT "c_customer_sk", "c_customer_id", "c_current_cdemo_sk", "c_current_hdemo_sk", "c_current_addr_sk", "c_first_shipto_date_sk", "c_first_sales_date_sk", "c_salutation", "c_first_name", "c_last_name", "c_preferred_cust_flag", "c_birth_day", "c_birth_month", "c_birth_year", "c_birth_country", "c_login", "c_email_address", "c_last_review_date"
 FROM "CUSTOMER"
-WHERE "c_customer_sk" IS NOT NULL AND "c_current_cdemo_sk" IS NOT NULL AND "c_current_addr_sk" IS NOT NULL) AS "t0"
+WHERE "c_customer_sk" IS NOT NULL AND ("c_current_cdemo_sk" IS NOT NULL AND "c_current_addr_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "cd_demo_sk", "cd_gender", "cd_marital_status", "cd_education_status", "cd_purchase_estimate", "cd_credit_rating", "cd_dep_count", "cd_dep_employed_count", "cd_dep_college_count"
 FROM "CUSTOMER_DEMOGRAPHICS"
 WHERE "cd_demo_sk" IS NOT NULL) AS "t2" ON "t0"."c_current_cdemo_sk" = "t2"."cd_demo_sk"
@@ -1688,19 +1688,19 @@ WHERE "ca_state" IN ('CO', 'IL', 'MN') AND "ca_address_sk" IS NOT NULL) AS "t4" 
                 TableScan
                   alias: store_sales
                   properties:
-                    hive.sql.query SELECT "t0"."ss_customer_sk" AS "ss_customer_sk0"
+                    hive.sql.query SELECT "t0"."ss_customer_sk"
 FROM (SELECT "ss_sold_date_sk", "ss_customer_sk"
 FROM "STORE_SALES"
 WHERE "ss_customer_sk" IS NOT NULL AND "ss_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."ss_sold_date_sk" = "t2"."d_date_sk"
-                    hive.sql.query.fieldNames ss_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_sold_date_sk" = "t2"."d_date_sk"
+                    hive.sql.query.fieldNames ss_customer_sk
                     hive.sql.query.fieldTypes int
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: ss_customer_sk0 (type: int)
+                    expressions: ss_customer_sk (type: int)
                     outputColumnNames: _col0
                     Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                     Group By Operator
@@ -1722,24 +1722,19 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                 TableScan
                   alias: web_sales
                   properties:
-                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."ws_bill_customer_sk" AS "ws_bill_customer_sk0"
+                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."ws_bill_customer_sk"
 FROM (SELECT "ws_sold_date_sk", "ws_bill_customer_sk"
 FROM "WEB_SALES"
 WHERE "ws_bill_customer_sk" IS NOT NULL AND "ws_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-<<<<<<< HEAD
-WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."ws_sold_date_sk" = "t2"."d_date_sk"
-GROUP BY "t0"."ws_bill_customer_sk"
-=======
-WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."ws_sold_date_sk" = "t2"."d_date_sk"
->>>>>>> 14c653a5fe... HIVE-23716: Support Anti Join in Hive (Mahesh Kumar Behera, reviewed by Vineet Garg, Ramesh Kumar Thangarajan, Panagiotis Garefalakis, Jesus Camacho Rodriguez)
-                    hive.sql.query.fieldNames literalTrue,ws_bill_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."ws_sold_date_sk" = "t2"."d_date_sk"
+                    hive.sql.query.fieldNames literalTrue,ws_bill_customer_sk
                     hive.sql.query.fieldTypes boolean,int
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: literaltrue (type: boolean), ws_bill_customer_sk0 (type: int)
+                    expressions: literaltrue (type: boolean), ws_bill_customer_sk (type: int)
                     outputColumnNames: _col0, _col1
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
@@ -1756,36 +1751,19 @@ WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) A
                 TableScan
                   alias: catalog_sales
                   properties:
-                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."cs_ship_customer_sk" AS "cs_ship_customer_sk0"
+                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."cs_ship_customer_sk"
 FROM (SELECT "cs_sold_date_sk", "cs_ship_customer_sk"
 FROM "CATALOG_SALES"
 WHERE "cs_ship_customer_sk" IS NOT NULL AND "cs_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-<<<<<<< HEAD
-WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."cs_sold_date_sk" = "t2"."d_date_sk"
-GROUP BY "t0"."cs_ship_customer_sk"
-=======
-WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."cs_sold_date_sk" = "t2"."d_date_sk"
->>>>>>> 14c653a5fe... HIVE-23716: Support Anti Join in Hive (Mahesh Kumar Behera, reviewed by Vineet Garg, Ramesh Kumar Thangarajan, Panagiotis Garefalakis, Jesus Camacho Rodriguez)
-                    hive.sql.query.fieldNames literalTrue,cs_ship_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."cs_sold_date_sk" = "t2"."d_date_sk"
+                    hive.sql.query.fieldNames literalTrue,cs_ship_customer_sk
                     hive.sql.query.fieldTypes boolean,int
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-<<<<<<< HEAD
-                    expressions: literaltrue (type: boolean), cs_ship_customer_sk0 (type: int)
-                    outputColumnNames: _col0, _col1
-                    Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
-                    Reduce Output Operator
-                      key expressions: _col1 (type: int)
-                      null sort order: a
-                      sort order: +
-                      Map-reduce partition columns: _col1 (type: int)
-                      Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
-                      value expressions: _col0 (type: boolean)
-=======
-                    expressions: cs_ship_customer_sk0 (type: int)
+                    expressions: cs_ship_customer_sk (type: int)
                     outputColumnNames: _col0
                     Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                     Group By Operator
@@ -1796,11 +1774,10 @@ WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) A
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: z
+                        null sort order: a
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
->>>>>>> 14c653a5fe... HIVE-23716: Support Anti Join in Hive (Mahesh Kumar Behera, reviewed by Vineet Garg, Ramesh Kumar Thangarajan, Panagiotis Garefalakis, Jesus Camacho Rodriguez)
             Execution mode: vectorized, llap
             LLAP IO: no inputs
         Reducer 2 
@@ -1876,25 +1853,7 @@ WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) A
                       sort order: +++++
                       Map-reduce partition columns: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
                       Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-<<<<<<< HEAD
-                      Group By Operator
-                        aggregations: count()
-                        keys: _col32 (type: char(1)), _col33 (type: char(1)), _col34 (type: char(20)), _col35 (type: int), _col36 (type: char(10))
-                        minReductionHashAggr: 0.99
-                        mode: hash
-                        outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5
-                        Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                        Reduce Output Operator
-                          key expressions: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
-                          null sort order: zzzzz
-                          sort order: +++++
-                          Map-reduce partition columns: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
-                          Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                          TopN Hash Memory Usage: 0.1
-                          value expressions: _col5 (type: bigint)
-=======
                       value expressions: _col5 (type: bigint)
->>>>>>> 14c653a5fe... HIVE-23716: Support Anti Join in Hive (Mahesh Kumar Behera, reviewed by Vineet Garg, Ramesh Kumar Thangarajan, Panagiotis Garefalakis, Jesus Camacho Rodriguez)
         Reducer 5 
             Execution mode: vectorized, llap
             Reduce Operator Tree:
@@ -1913,7 +1872,6 @@ WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) A
                     null sort order: zzzzz
                     sort order: +++++
                     Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                    TopN Hash Memory Usage: 0.1
                     value expressions: _col3 (type: bigint)
         Reducer 6 
             Execution mode: vectorized, llap
@@ -2185,7 +2143,7 @@ STAGE PLANS:
                     hive.sql.query SELECT "t0"."c_customer_sk", "t0"."c_customer_id", "t0"."c_current_cdemo_sk", "t0"."c_current_hdemo_sk", "t0"."c_current_addr_sk", "t0"."c_first_shipto_date_sk", "t0"."c_first_sales_date_sk", "t0"."c_salutation", "t0"."c_first_name", "t0"."c_last_name", "t0"."c_preferred_cust_flag", "t0"."c_birth_day", "t0"."c_birth_month", "t0"."c_birth_year", "t0"."c_birth_country", "t0"."c_login", "t0"."c_email_address", "t0"."c_last_review_date", "t4"."ca_address_sk", "t4"."ca_address_id", "t4"."ca_street_number", "t4"."ca_street_name", "t4"."ca_street_type", "t4"."ca_suite_number", "t4"."ca_city", "t4"."ca_county", "t4"."ca_state", "t4"."ca_zip", "t4"."ca_country", "t4"."ca_gmt_offset", "t4"."ca_location_type", "t2"."cd_demo_sk", "t2"."cd_gender", "t2"."cd_marital_status", "t2"."cd_education_status", "t2"."cd_purchase_estimate", "t2"."cd_credit_rating", "t2"."cd_dep_count", "t2"."cd_dep_employed_count", "t2"."cd_dep_college_count"
 FROM (SELECT "c_customer_sk", "c_customer_id", "c_current_cdemo_sk", "c_current_hdemo_sk", "c_current_addr_sk", "c_first_shipto_date_sk", "c_first_sales_date_sk", "c_salutation", "c_first_name", "c_last_name", "c_preferred_cust_flag", "c_birth_day", "c_birth_month", "c_birth_year", "c_birth_country", "c_login", "c_email_address", "c_last_review_date"
 FROM "CUSTOMER"
-WHERE "c_customer_sk" IS NOT NULL AND "c_current_cdemo_sk" IS NOT NULL AND "c_current_addr_sk" IS NOT NULL) AS "t0"
+WHERE "c_customer_sk" IS NOT NULL AND ("c_current_cdemo_sk" IS NOT NULL AND "c_current_addr_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "cd_demo_sk", "cd_gender", "cd_marital_status", "cd_education_status", "cd_purchase_estimate", "cd_credit_rating", "cd_dep_count", "cd_dep_employed_count", "cd_dep_college_count"
 FROM "CUSTOMER_DEMOGRAPHICS"
 WHERE "cd_demo_sk" IS NOT NULL) AS "t2" ON "t0"."c_current_cdemo_sk" = "t2"."cd_demo_sk"
@@ -2214,19 +2172,19 @@ WHERE "ca_state" IN ('CO', 'IL', 'MN') AND "ca_address_sk" IS NOT NULL) AS "t4" 
                 TableScan
                   alias: store_sales
                   properties:
-                    hive.sql.query SELECT "t0"."ss_customer_sk" AS "ss_customer_sk0"
+                    hive.sql.query SELECT "t0"."ss_customer_sk"
 FROM (SELECT "ss_sold_date_sk", "ss_customer_sk"
 FROM "STORE_SALES"
 WHERE "ss_customer_sk" IS NOT NULL AND "ss_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."ss_sold_date_sk" = "t2"."d_date_sk"
-                    hive.sql.query.fieldNames ss_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_sold_date_sk" = "t2"."d_date_sk"
+                    hive.sql.query.fieldNames ss_customer_sk
                     hive.sql.query.fieldTypes int
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: ss_customer_sk0 (type: int)
+                    expressions: ss_customer_sk (type: int)
                     outputColumnNames: _col0
                     Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                     Group By Operator
@@ -2248,19 +2206,19 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                 TableScan
                   alias: web_sales
                   properties:
-                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."ws_bill_customer_sk" AS "ws_bill_customer_sk0"
+                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."ws_bill_customer_sk"
 FROM (SELECT "ws_sold_date_sk", "ws_bill_customer_sk"
 FROM "WEB_SALES"
 WHERE "ws_bill_customer_sk" IS NOT NULL AND "ws_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."ws_sold_date_sk" = "t2"."d_date_sk"
-                    hive.sql.query.fieldNames literalTrue,ws_bill_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."ws_sold_date_sk" = "t2"."d_date_sk"
+                    hive.sql.query.fieldNames literalTrue,ws_bill_customer_sk
                     hive.sql.query.fieldTypes boolean,int
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: literaltrue (type: boolean), ws_bill_customer_sk0 (type: int)
+                    expressions: literaltrue (type: boolean), ws_bill_customer_sk (type: int)
                     outputColumnNames: _col0, _col1
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
@@ -2277,31 +2235,19 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                 TableScan
                   alias: catalog_sales
                   properties:
-                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."cs_ship_customer_sk" AS "cs_ship_customer_sk0"
+                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."cs_ship_customer_sk"
 FROM (SELECT "cs_sold_date_sk", "cs_ship_customer_sk"
 FROM "CATALOG_SALES"
 WHERE "cs_ship_customer_sk" IS NOT NULL AND "cs_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."cs_sold_date_sk" = "t2"."d_date_sk"
-                    hive.sql.query.fieldNames literalTrue,cs_ship_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."cs_sold_date_sk" = "t2"."d_date_sk"
+                    hive.sql.query.fieldNames literalTrue,cs_ship_customer_sk
                     hive.sql.query.fieldTypes boolean,int
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-<<<<<<< HEAD
-                    expressions: literaltrue (type: boolean), cs_ship_customer_sk0 (type: int)
-                    outputColumnNames: _col0, _col1
-                    Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
-                    Reduce Output Operator
-                      key expressions: _col1 (type: int)
-                      null sort order: a
-                      sort order: +
-                      Map-reduce partition columns: _col1 (type: int)
-                      Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
-                      value expressions: _col0 (type: boolean)
-=======
-                    expressions: cs_ship_customer_sk0 (type: int)
+                    expressions: cs_ship_customer_sk (type: int)
                     outputColumnNames: _col0
                     Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                     Group By Operator
@@ -2312,11 +2258,10 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: z
+                        null sort order: a
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
->>>>>>> 14c653a5fe... HIVE-23716: Support Anti Join in Hive (Mahesh Kumar Behera, reviewed by Vineet Garg, Ramesh Kumar Thangarajan, Panagiotis Garefalakis, Jesus Camacho Rodriguez)
             Execution mode: vectorized, llap
             LLAP IO: no inputs
         Reducer 2 
@@ -2392,25 +2337,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                       sort order: +++++
                       Map-reduce partition columns: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
                       Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-<<<<<<< HEAD
-                      Group By Operator
-                        aggregations: count()
-                        keys: _col32 (type: char(1)), _col33 (type: char(1)), _col34 (type: char(20)), _col35 (type: int), _col36 (type: char(10))
-                        minReductionHashAggr: 0.99
-                        mode: hash
-                        outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5
-                        Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                        Reduce Output Operator
-                          key expressions: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
-                          null sort order: zzzzz
-                          sort order: +++++
-                          Map-reduce partition columns: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
-                          Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                          TopN Hash Memory Usage: 0.1
-                          value expressions: _col5 (type: bigint)
-=======
                       value expressions: _col5 (type: bigint)
->>>>>>> 14c653a5fe... HIVE-23716: Support Anti Join in Hive (Mahesh Kumar Behera, reviewed by Vineet Garg, Ramesh Kumar Thangarajan, Panagiotis Garefalakis, Jesus Camacho Rodriguez)
         Reducer 5 
             Execution mode: vectorized, llap
             Reduce Operator Tree:
@@ -2429,7 +2356,6 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                     null sort order: zzzzz
                     sort order: +++++
                     Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                    TopN Hash Memory Usage: 0.1
                     value expressions: _col3 (type: bigint)
         Reducer 6 
             Execution mode: vectorized, llap
@@ -3067,7 +2993,7 @@ STAGE PLANS:
                     hive.sql.query SELECT "t0"."ss_sold_date_sk", "t0"."ss_sold_time_sk", "t0"."ss_item_sk", "t0"."ss_customer_sk", "t0"."ss_cdemo_sk", "t0"."ss_hdemo_sk", "t0"."ss_addr_sk", "t0"."ss_store_sk", "t0"."ss_promo_sk", "t0"."ss_ticket_number", "t0"."ss_quantity", "t0"."ss_wholesale_cost", "t0"."ss_list_price", "t0"."ss_sales_price", "t0"."ss_ext_discount_amt", "t0"."ss_ext_sales_price", "t0"."ss_ext_wholesale_cost", "t0"."ss_ext_list_price", "t0"."ss_ext_tax", "t0"."ss_coupon_amt", "t0"."ss_net_paid", "t0"."ss_net_paid_inc_tax", "t0"."ss_net_profit", "t6"."d_date_sk", "t6"."d_date_id", "t6"."d_date", "t6"."d_month_seq", "t6"."d_week_seq", "t6"."d_quarter_seq", "t6"."d_year", "t6"."d_dow", "t6"."d_moy", "t6"."d_dom", "t6"."d_qoy", "t6"."d_fy_year", "t6"."d_fy_quarter_seq", "t6"."d_fy_week_seq", "t6"."d_day_name", "t6"."d_quarter_name", "t6"."d_holiday", "t6"."d_weekend", "t6"."d_following_holiday", "t6"."d_first_dom", "t6"."d_last_dom", "t6"."d_same_day_ly", "t6"."d_same_day_lq", "t6"."d_current_day", "t6"."d_current_week", "t6"."d_current_month", "t6"."d_current_quarter", "t6"."d_current_year", "t2"."ca_address_sk", "t2"."ca_address_id", "t2"."ca_street_number", "t2"."ca_street_name", "t2"."ca_street_type", "t2"."ca_suite_number", "t2"."ca_city", "t2"."ca_county", "t2"."ca_state", "t2"."ca_zip", "t2"."ca_country", "t2"."ca_gmt_offset", "t2"."ca_location_type", "t4"."i_item_sk", "t4"."i_item_id", "t4"."i_rec_start_date", "t4"."i_rec_end_date", "t4"."i_item_desc", "t4"."i_current_price", "t4"."i_wholesale_cost", "t4"."i_brand_id", "t4"."i_brand", "t4"."i_class_id", "t4"."i_class", "t4"."i_category_id", "t4"."i_category", "t4"."i_manufact_id", "t4"."i_manufact", "t4"."i_size", "t4"."i_formulation", "t4"."i_color", "t4"."i_units", "t4"."i_container", "t4"."i_manager_id", "t4"."i_product_name"
 FROM (SELECT "ss_sold_date_sk", "ss_sold_time_sk", "ss_item_sk", "ss_customer_sk", "ss_cdemo_sk", "ss_hdemo_sk", "ss_addr_sk", "ss_store_sk", "ss_promo_sk", "ss_ticket_number", "ss_quantity", "ss_wholesale_cost", "ss_list_price", "ss_sales_price", "ss_ext_discount_amt", "ss_ext_sales_price", "ss_ext_wholesale_cost", "ss_ext_list_price", "ss_ext_tax", "ss_coupon_amt", "ss_net_paid", "ss_net_paid_inc_tax", "ss_net_profit"
 FROM "STORE_SALES"
-WHERE "ss_item_sk" IS NOT NULL AND "ss_addr_sk" IS NOT NULL AND "ss_sold_date_sk" IS NOT NULL) AS "t0"
+WHERE "ss_item_sk" IS NOT NULL AND ("ss_addr_sk" IS NOT NULL AND "ss_sold_date_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "ca_address_sk", "ca_address_id", "ca_street_number", "ca_street_name", "ca_street_type", "ca_suite_number", "ca_city", "ca_county", "ca_state", "ca_zip", "ca_country", "ca_gmt_offset", "ca_location_type"
 FROM "CUSTOMER_ADDRESS"
 WHERE "ca_gmt_offset" = -8 AND "ca_address_sk" IS NOT NULL) AS "t2" ON "t0"."ss_addr_sk" = "t2"."ca_address_sk"
@@ -3076,7 +3002,7 @@ FROM "ITEM"
 WHERE "i_item_id" IS NOT NULL AND "i_item_sk" IS NOT NULL) AS "t4" ON "t0"."ss_item_sk" = "t4"."i_item_sk"
 INNER JOIN (SELECT "d_date_sk", "d_date_id", "d_date", "d_month_seq", "d_week_seq", "d_quarter_seq", "d_year", "d_dow", "d_moy", "d_dom", "d_qoy", "d_fy_year", "d_fy_quarter_seq", "d_fy_week_seq", "d_day_name", "d_quarter_name", "d_holiday", "d_weekend", "d_following_holiday", "d_first_dom", "d_last_dom", "d_same_day_ly", "d_same_day_lq", "d_current_day", "d_current_week", "d_current_month", "d_current_quarter", "d_current_year"
 FROM "DATE_DIM"
-WHERE "d_year" = 2000 AND "d_moy" = 1 AND "d_date_sk" IS NOT NULL) AS "t6" ON "t0"."ss_sold_date_sk" = "t6"."d_date_sk"
+WHERE "d_year" = 2000 AND ("d_moy" = 1 AND "d_date_sk" IS NOT NULL)) AS "t6" ON "t0"."ss_sold_date_sk" = "t6"."d_date_sk"
                     hive.sql.query.fieldNames ss_sold_date_sk,ss_sold_time_sk,ss_item_sk,ss_customer_sk,ss_cdemo_sk,ss_hdemo_sk,ss_addr_sk,ss_store_sk,ss_promo_sk,ss_ticket_number,ss_quantity,ss_wholesale_cost,ss_list_price,ss_sales_price,ss_ext_discount_amt,ss_ext_sales_price,ss_ext_wholesale_cost,ss_ext_list_price,ss_ext_tax,ss_coupon_amt,ss_net_paid,ss_net_paid_inc_tax,ss_net_profit,d_date_sk,d_date_id,d_date,d_month_seq,d_week_seq,d_quarter_seq,d_year,d_dow,d_moy,d_dom,d_qoy,d_fy_year,d_fy_quarter_seq,d_fy_week_seq,d_day_name,d_quarter_name,d_holiday,d_weekend,d_following_holiday,d_first_dom,d_last_dom,d_same_day_ly,d_same_day_lq,d_current_day,d_current_week,d_current_month,d_current_quarter,d_current_year,ca_address_sk,ca_address_id,ca_street_number,ca_street_name,ca_street_type,ca_suite_number,ca_city,ca_county,ca_state,ca_zip,ca_country,ca_gmt_offset,ca_location_type,i_item_sk,i_item_id,i_rec_start_date,i_rec_end_date,i_item_desc,i_current_price,i_wholesale_cost,i_brand_id,i_brand,i_class_id,i_class,i_category_id,i_category,i_manufact_id,i_manufact,i_size,i_formulation,i_color,i_units,i_container,i_manager_id,i_product_name
                     hive.sql.query.fieldTypes int,int,int,int,int,int,int,int,int,int,int,decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),int,char(16),date,int,int,int,int,int,int,int,int,int,int,int,char(9),char(6),char(1),char(1),char(1),int,int,int,int,char(1),char(1),char(1),char(1),char(1),int,char(16),char(10),varchar(60),char(15),char(10),varchar(60),varchar(30),char(2),char(10),varchar(20),decimal(5,2),char(20),int,char(16),date,date,varchar(200),decimal(7,2),decimal(7,2),int,char(50),int,char(50),int,char(50),int,char(50),char(20),char(20),char(20),char(10),char(10),int,char(50)
                     hive.sql.query.split false
@@ -3102,7 +3028,7 @@ WHERE "d_year" = 2000 AND "d_moy" = 1 AND "d_date_sk" IS NOT NULL) AS "t6" ON "t
                     hive.sql.query SELECT "t0"."cs_sold_date_sk", "t0"."cs_sold_time_sk", "t0"."cs_ship_date_sk", "t0"."cs_bill_customer_sk", "t0"."cs_bill_cdemo_sk", "t0"."cs_bill_hdemo_sk", "t0"."cs_bill_addr_sk", "t0"."cs_ship_customer_sk", "t0"."cs_ship_cdemo_sk", "t0"."cs_ship_hdemo_sk", "t0"."cs_ship_addr_sk", "t0"."cs_call_center_sk", "t0"."cs_catalog_page_sk", "t0"."cs_ship_mode_sk", "t0"."cs_warehouse_sk", "t0"."cs_item_sk", "t0"."cs_promo_sk", "t0"."cs_order_number", "t0"."cs_quantity", "t0"."cs_wholesale_cost", "t0"."cs_list_price", "t0"."cs_sales_price", "t0"."cs_ext_discount_amt", "t0"."cs_ext_sales_price", "t0"."cs_ext_wholesale_cost", "t0"."cs_ext_list_price", "t0"."cs_ext_tax", "t0"."cs_coupon_amt", "t0"."cs_ext_ship_cost", "t0"."cs_net_paid", "t0"."cs_net_paid_inc_tax", "t0"."cs_net_paid_inc_ship", "t0"."cs_net_paid_inc_ship_tax", "t0"."cs_net_profit", "t6"."d_date_sk", "t6"."d_date_id", "t6"."d_date", "t6"."d_month_seq", "t6"."d_week_seq", "t6"."d_quarter_seq", "t6"."d_year", "t6"."d_dow", "t6"."d_moy", "t6"."d_dom", "t6"."d_qoy", "t6"."d_fy_year", "t6"."d_fy_quarter_seq", "t6"."d_fy_week_seq", "t6"."d_day_name", "t6"."d_quarter_name", "t6"."d_holiday", "t6"."d_weekend", "t6"."d_following_holiday", "t6"."d_first_dom", "t6"."d_last_dom", "t6"."d_same_day_ly", "t6"."d_same_day_lq", "t6"."d_current_day", "t6"."d_current_week", "t6"."d_current_month", "t6"."d_current_quarter", "t6"."d_current_year", "t2"."ca_address_sk", "t2"."ca_address_id", "t2"."ca_street_number", "t2"."ca_street_name", "t2"."ca_street_type", "t2"."ca_suite_number", "t2"."ca_city", "t2"."ca_county", "t2"."ca_state", "t2"."ca_zip", "t2"."ca_country", "t2"."ca_gmt_offset", "t2"."ca_location_type", "t4"."i_item_sk", "t4"."i_item_id", "t4"."i_rec_start_date", "t4"."i_rec_end_date", "t4"."i_item_desc", "t4"."i_current_price", "t4"."i_wholesale_cost", "t4"."i_brand_id", "t4"."i_brand", "t4"."i_class_id", "t4"."i_class", "t4"."i_category_id", "t4"."i_category", "t4"."i_manufact_id", "t4"."i_manufact", "t4"."i_size", "t4"."i_formulation", "t4"."i_color", "t4"."i_units", "t4"."i_container", "t4"."i_manager_id", "t4"."i_product_name"
 FROM (SELECT "cs_sold_date_sk", "cs_sold_time_sk", "cs_ship_date_sk", "cs_bill_customer_sk", "cs_bill_cdemo_sk", "cs_bill_hdemo_sk", "cs_bill_addr_sk", "cs_ship_customer_sk", "cs_ship_cdemo_sk", "cs_ship_hdemo_sk", "cs_ship_addr_sk", "cs_call_center_sk", "cs_catalog_page_sk", "cs_ship_mode_sk", "cs_warehouse_sk", "cs_item_sk", "cs_promo_sk", "cs_order_number", "cs_quantity", "cs_wholesale_cost", "cs_list_price", "cs_sales_price", "cs_ext_discount_amt", "cs_ext_sales_price", "cs_ext_wholesale_cost", "cs_ext_list_price", "cs_ext_tax", "cs_coupon_amt", "cs_ext_ship_cost", "cs_net_paid", "cs_net_paid_inc_tax", "cs_net_paid_inc_ship", "cs_net_paid_inc_ship_tax", "cs_net_profit"
 FROM "CATALOG_SALES"
-WHERE "cs_item_sk" IS NOT NULL AND "cs_bill_addr_sk" IS NOT NULL AND "cs_sold_date_sk" IS NOT NULL) AS "t0"
+WHERE "cs_item_sk" IS NOT NULL AND ("cs_bill_addr_sk" IS NOT NULL AND "cs_sold_date_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "ca_address_sk", "ca_address_id", "ca_street_number", "ca_street_name", "ca_street_type", "ca_suite_number", "ca_city", "ca_county", "ca_state", "ca_zip", "ca_country", "ca_gmt_offset", "ca_location_type"
 FROM "CUSTOMER_ADDRESS"
 WHERE "ca_gmt_offset" = -8 AND "ca_address_sk" IS NOT NULL) AS "t2" ON "t0"."cs_bill_addr_sk" = "t2"."ca_address_sk"
@@ -3111,7 +3037,7 @@ FROM "ITEM"
 WHERE "i_item_id" IS NOT NULL AND "i_item_sk" IS NOT NULL) AS "t4" ON "t0"."cs_item_sk" = "t4"."i_item_sk"
 INNER JOIN (SELECT "d_date_sk", "d_date_id", "d_date", "d_month_seq", "d_week_seq", "d_quarter_seq", "d_year", "d_dow", "d_moy", "d_dom", "d_qoy", "d_fy_year", "d_fy_quarter_seq", "d_fy_week_seq", "d_day_name", "d_quarter_name", "d_holiday", "d_weekend", "d_following_holiday", "d_first_dom", "d_last_dom", "d_same_day_ly", "d_same_day_lq", "d_current_day", "d_current_week", "d_current_month", "d_current_quarter", "d_current_year"
 FROM "DATE_DIM"
-WHERE "d_year" = 2000 AND "d_moy" = 1 AND "d_date_sk" IS NOT NULL) AS "t6" ON "t0"."cs_sold_date_sk" = "t6"."d_date_sk"
+WHERE "d_year" = 2000 AND ("d_moy" = 1 AND "d_date_sk" IS NOT NULL)) AS "t6" ON "t0"."cs_sold_date_sk" = "t6"."d_date_sk"
                     hive.sql.query.fieldNames cs_sold_date_sk,cs_sold_time_sk,cs_ship_date_sk,cs_bill_customer_sk,cs_bill_cdemo_sk,cs_bill_hdemo_sk,cs_bill_addr_sk,cs_ship_customer_sk,cs_ship_cdemo_sk,cs_ship_hdemo_sk,cs_ship_addr_sk,cs_call_center_sk,cs_catalog_page_sk,cs_ship_mode_sk,cs_warehouse_sk,cs_item_sk,cs_promo_sk,cs_order_number,cs_quantity,cs_wholesale_cost,cs_list_price,cs_sales_price,cs_ext_discount_amt,cs_ext_sales_price,cs_ext_wholesale_cost,cs_ext_list_price,cs_ext_tax,cs_coupon_amt,cs_ext_ship_cost,cs_net_paid,cs_net_paid_inc_tax,cs_net_paid_inc_ship,cs_net_paid_inc_ship_tax,cs_net_profit,d_date_sk,d_date_id,d_date,d_month_seq,d_week_seq,d_quarter_seq,d_year,d_dow,d_moy,d_dom,d_qoy,d_fy_year,d_fy_quarter_seq,d_fy_week_seq,d_day_name,d_quarter_name,d_holiday,d_weekend,d_following_holiday,d_first_dom,d_last_dom,d_same_day_ly,d_same_day_lq,d_current_day,d_current_week,d_current_month,d_current_quarter,d_current_year,ca_address_sk,ca_address_id,ca_street_number,ca_street_name,ca_street_type,ca_suite_number,ca_city,ca_county,ca_state,ca_zip,ca_country,ca_gmt_offset,ca_location_type,i_item_sk,i_item_id,i_rec_start_date,i_rec_end_date,i_item_desc,i_current_price,i_wholesale_cost,i_brand_id,i_brand,i_class_id,i_class,i_category_id,i_category,i_manufact_id,i_manufact,i_size,i_formulation,i_color,i_units,i_container,i_manager_id,i_product_name
                     hive.sql.query.fieldTypes int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),int,char(16),date,int,int,int,int,int,int,int,int,int,int,int,char(9),char(6),char(1),char(1),char(1),int,int,int,int,char(1),char(1),char(1),char(1),char(1),int,char(16),char(10),varchar(60),char(15),char(10),varchar(60),varchar(30),char(2),char(10),varchar(20),decimal(5,2),char(20),int,char(16),date,date,varchar(200),decimal(7,2),decimal(7,2),int,char(50),int,char(50),int,char(50),int,char(50),char(20),char(20),char(20),char(10),char(10),int,char(50)
                     hive.sql.query.split false
@@ -3137,7 +3063,7 @@ WHERE "d_year" = 2000 AND "d_moy" = 1 AND "d_date_sk" IS NOT NULL) AS "t6" ON "t
                     hive.sql.query SELECT "t0"."ws_sold_date_sk", "t0"."ws_sold_time_sk", "t0"."ws_ship_date_sk", "t0"."ws_item_sk", "t0"."ws_bill_customer_sk", "t0"."ws_bill_cdemo_sk", "t0"."ws_bill_hdemo_sk", "t0"."ws_bill_addr_sk", "t0"."ws_ship_customer_sk", "t0"."ws_ship_cdemo_sk", "t0"."ws_ship_hdemo_sk", "t0"."ws_ship_addr_sk", "t0"."ws_web_page_sk", "t0"."ws_web_site_sk", "t0"."ws_ship_mode_sk", "t0"."ws_warehouse_sk", "t0"."ws_promo_sk", "t0"."ws_order_number", "t0"."ws_quantity", "t0"."ws_wholesale_cost", "t0"."ws_list_price", "t0"."ws_sales_price", "t0"."ws_ext_discount_amt", "t0"."ws_ext_sales_price", "t0"."ws_ext_wholesale_cost", "t0"."ws_ext_list_price", "t0"."ws_ext_tax", "t0"."ws_coupon_amt", "t0"."ws_ext_ship_cost", "t0"."ws_net_paid", "t0"."ws_net_paid_inc_tax", "t0"."ws_net_paid_inc_ship", "t0"."ws_net_paid_inc_ship_tax", "t0"."ws_net_profit", "t6"."d_date_sk", "t6"."d_date_id", "t6"."d_date", "t6"."d_month_seq", "t6"."d_week_seq", "t6"."d_quarter_seq", "t6"."d_year", "t6"."d_dow", "t6"."d_moy", "t6"."d_dom", "t6"."d_qoy", "t6"."d_fy_year", "t6"."d_fy_quarter_seq", "t6"."d_fy_week_seq", "t6"."d_day_name", "t6"."d_quarter_name", "t6"."d_holiday", "t6"."d_weekend", "t6"."d_following_holiday", "t6"."d_first_dom", "t6"."d_last_dom", "t6"."d_same_day_ly", "t6"."d_same_day_lq", "t6"."d_current_day", "t6"."d_current_week", "t6"."d_current_month", "t6"."d_current_quarter", "t6"."d_current_year", "t2"."ca_address_sk", "t2"."ca_address_id", "t2"."ca_street_number", "t2"."ca_street_name", "t2"."ca_street_type", "t2"."ca_suite_number", "t2"."ca_city", "t2"."ca_county", "t2"."ca_state", "t2"."ca_zip", "t2"."ca_country", "t2"."ca_gmt_offset", "t2"."ca_location_type", "t4"."i_item_sk", "t4"."i_item_id", "t4"."i_rec_start_date", "t4"."i_rec_end_date", "t4"."i_item_desc", "t4"."i_current_price", "t4"."i_wholesale_cost", "t4"."i_brand_id", "t4"."i_brand", "t4"."i_class_id", "t4"."i_class", "t4"."i_category_id", "t4"."i_category", "t4"."i_manufact_id", "t4"."i_manufact", "t4"."i_size", "t4"."i_formulation", "t4"."i_color", "t4"."i_units", "t4"."i_container", "t4"."i_manager_id", "t4"."i_product_name"
 FROM (SELECT "ws_sold_date_sk", "ws_sold_time_sk", "ws_ship_date_sk", "ws_item_sk", "ws_bill_customer_sk", "ws_bill_cdemo_sk", "ws_bill_hdemo_sk", "ws_bill_addr_sk", "ws_ship_customer_sk", "ws_ship_cdemo_sk", "ws_ship_hdemo_sk", "ws_ship_addr_sk", "ws_web_page_sk", "ws_web_site_sk", "ws_ship_mode_sk", "ws_warehouse_sk", "ws_promo_sk", "ws_order_number", "ws_quantity", "ws_wholesale_cost", "ws_list_price", "ws_sales_price", "ws_ext_discount_amt", "ws_ext_sales_price", "ws_ext_wholesale_cost", "ws_ext_list_price", "ws_ext_tax", "ws_coupon_amt", "ws_ext_ship_cost", "ws_net_paid", "ws_net_paid_inc_tax", "ws_net_paid_inc_ship", "ws_net_paid_inc_ship_tax", "ws_net_profit"
 FROM "WEB_SALES"
-WHERE "ws_item_sk" IS NOT NULL AND "ws_bill_addr_sk" IS NOT NULL AND "ws_sold_date_sk" IS NOT NULL) AS "t0"
+WHERE "ws_item_sk" IS NOT NULL AND ("ws_bill_addr_sk" IS NOT NULL AND "ws_sold_date_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "ca_address_sk", "ca_address_id", "ca_street_number", "ca_street_name", "ca_street_type", "ca_suite_number", "ca_city", "ca_county", "ca_state", "ca_zip", "ca_country", "ca_gmt_offset", "ca_location_type"
 FROM "CUSTOMER_ADDRESS"
 WHERE "ca_gmt_offset" = -8 AND "ca_address_sk" IS NOT NULL) AS "t2" ON "t0"."ws_bill_addr_sk" = "t2"."ca_address_sk"
@@ -3146,7 +3072,7 @@ FROM "ITEM"
 WHERE "i_item_id" IS NOT NULL AND "i_item_sk" IS NOT NULL) AS "t4" ON "t0"."ws_item_sk" = "t4"."i_item_sk"
 INNER JOIN (SELECT "d_date_sk", "d_date_id", "d_date", "d_month_seq", "d_week_seq", "d_quarter_seq", "d_year", "d_dow", "d_moy", "d_dom", "d_qoy", "d_fy_year", "d_fy_quarter_seq", "d_fy_week_seq", "d_day_name", "d_quarter_name", "d_holiday", "d_weekend", "d_following_holiday", "d_first_dom", "d_last_dom", "d_same_day_ly", "d_same_day_lq", "d_current_day", "d_current_week", "d_current_month", "d_current_quarter", "d_current_year"
 FROM "DATE_DIM"
-WHERE "d_year" = 2000 AND "d_moy" = 1 AND "d_date_sk" IS NOT NULL) AS "t6" ON "t0"."ws_sold_date_sk" = "t6"."d_date_sk"
+WHERE "d_year" = 2000 AND ("d_moy" = 1 AND "d_date_sk" IS NOT NULL)) AS "t6" ON "t0"."ws_sold_date_sk" = "t6"."d_date_sk"
                     hive.sql.query.fieldNames ws_sold_date_sk,ws_sold_time_sk,ws_ship_date_sk,ws_item_sk,ws_bill_customer_sk,ws_bill_cdemo_sk,ws_bill_hdemo_sk,ws_bill_addr_sk,ws_ship_customer_sk,ws_ship_cdemo_sk,ws_ship_hdemo_sk,ws_ship_addr_sk,ws_web_page_sk,ws_web_site_sk,ws_ship_mode_sk,ws_warehouse_sk,ws_promo_sk,ws_order_number,ws_quantity,ws_wholesale_cost,ws_list_price,ws_sales_price,ws_ext_discount_amt,ws_ext_sales_price,ws_ext_wholesale_cost,ws_ext_list_price,ws_ext_tax,ws_coupon_amt,ws_ext_ship_cost,ws_net_paid,ws_net_paid_inc_tax,ws_net_paid_inc_ship,ws_net_paid_inc_ship_tax,ws_net_profit,d_date_sk,d_date_id,d_date,d_month_seq,d_week_seq,d_quarter_seq,d_year,d_dow,d_moy,d_dom,d_qoy,d_fy_year,d_fy_quarter_seq,d_fy_week_seq,d_day_name,d_quarter_name,d_holiday,d_weekend,d_following_holiday,d_first_dom,d_last_dom,d_same_day_ly,d_same_day_lq,d_current_day,d_current_week,d_current_month,d_current_quarter,d_current_year,ca_address_sk,ca_address_id,ca_street_number,ca_street_name,ca_street_type,ca_suite_number,ca_city,ca_county,ca_state,ca_zip,ca_country,ca_gmt_offset,ca_location_type,i_item_sk,i_item_id,i_rec_start_date,i_rec_end_date,i_item_desc,i_current_price,i_wholesale_cost,i_brand_id,i_brand,i_class_id,i_class,i_category_id,i_category,i_manufact_id,i_manufact,i_size,i_formulation,i_color,i_units,i_container,i_manager_id,i_product_name
                     hive.sql.query.fieldTypes int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),int,char(16),date,int,int,int,int,int,int,int,int,int,int,int,char(9),char(6),char(1),char(1),char(1),int,int,int,int,char(1),char(1),char(1),char(1),char(1),int,char(16),char(10),varchar(60),char(15),char(10),varchar(60),varchar(30),char(2),char(10),varchar(20),decimal(5,2),char(20),int,char(16),date,date,varchar(200),decimal(7,2),decimal(7,2),int,char(50),int,char(50),int,char(50),int,char(50),char(20),char(20),char(20),char(10),char(10),int,char(50)
                     hive.sql.query.split false
@@ -3322,7 +3248,6 @@ WHERE "i_color" IN ('orchid              ', 'chiffon             ', 'lace       
                     null sort order: z
                     sort order: +
                     Statistics: Num rows: 1 Data size: 233 Basic stats: COMPLETE Column stats: NONE
-                    TopN Hash Memory Usage: 0.1
                     value expressions: _col0 (type: char(16))
         Reducer 6 
             Execution mode: vectorized, llap
@@ -3793,33 +3718,33 @@ WHERE "d_date" IS NOT NULL AND "d_date_sk" IS NOT NULL) AS "t4" ON "t2"."sr_retu
         Map 15 
             Map Operator Tree:
                 TableScan
-                  alias: web_returns
+                  alias: catalog_returns
                   properties:
-                    hive.sql.query SELECT "t0"."wr_returned_date_sk", "t0"."wr_returned_time_sk", "t0"."wr_item_sk", "t0"."wr_refunded_customer_sk", "t0"."wr_refunded_cdemo_sk", "t0"."wr_refunded_hdemo_sk", "t0"."wr_refunded_addr_sk", "t0"."wr_returning_customer_sk", "t0"."wr_returning_cdemo_sk", "t0"."wr_returning_hdemo_sk", "t0"."wr_returning_addr_sk", "t0"."wr_web_page_sk", "t0"."wr_reason_sk", "t0"."wr_order_number", "t0"."wr_return_quantity", "t0"."wr_return_amt", "t0"."wr_return_tax", "t0"."wr_return_amt_inc_tax", "t0"."wr_fee", "t0"."wr_return_ship_cost", "t0"."wr_refunded_cash", "t0"."wr_reversed_charge", "t0"."wr_account_credit", "t0"."wr_net_loss", "t2"."i_item_sk", "t2"."i_item_id", "t2"."i_rec_start_date", "t2"."i_rec_end_date", "t2"."i_item_desc", "t2"."i_current_price", "t2"."i_wholesale_cost", "t2"."i_brand_id", "t2"."i_brand", "t2"."i_class_id", "t2"."i_class", "t2"."i_category_id", "t2"."i_category", "t2"."i_manufact_id", "t2"."i_manufact", "t2"."i_size", "t2"."i_formulation", "t2"."i_color", "t2"."i_units", "t2"."i_container", "t2"."i_manager_id", "t2"."i_product_name", "t4"."d_date_sk", "t4"."d_date_id", "t4"."d_date", "t4"."d_month_seq", "t4"."d_week_seq", "t4"."d_quarter_seq", "t4"."d_year", "t4"."d_dow", "t4"."d_moy", "t4"."d_dom", "t4"."d_qoy", "t4"."d_fy_year", "t4"."d_fy_quarter_seq", "t4"."d_fy_week_seq", "t4"."d_day_name", "t4"."d_quarter_name", "t4"."d_holiday", "t4"."d_weekend", "t4"."d_following_holiday", "t4"."d_first_dom", "t4"."d_last_dom", "t4"."d_same_day_ly", "t4"."d_same_day_lq", "t4"."d_current_day", "t4"."d_current_week", "t4"."d_current_month", "t4"."d_current_quarter", "t4"."d_current_year"
-FROM (SELECT "wr_returned_date_sk", "wr_returned_time_sk", "wr_item_sk", "wr_refunded_customer_sk", "wr_refunded_cdemo_sk", "wr_refunded_hdemo_sk", "wr_refunded_addr_sk", "wr_returning_customer_sk", "wr_returning_cdemo_sk", "wr_returning_hdemo_sk", "wr_returning_addr_sk", "wr_web_page_sk", "wr_reason_sk", "wr_order_number", "wr_return_quantity", "wr_return_amt", "wr_return_tax", "wr_return_amt_inc_tax", "wr_fee", "wr_return_ship_cost", "wr_refunded_cash", "wr_reversed_charge", "wr_account_credit", "wr_net_loss"
-FROM "WEB_RETURNS"
-WHERE "wr_returned_date_sk" IS NOT NULL AND "wr_item_sk" IS NOT NULL) AS "t0"
+                    hive.sql.query SELECT "t0"."cr_returned_date_sk", "t0"."cr_returned_time_sk", "t0"."cr_item_sk", "t0"."cr_refunded_customer_sk", "t0"."cr_refunded_cdemo_sk", "t0"."cr_refunded_hdemo_sk", "t0"."cr_refunded_addr_sk", "t0"."cr_returning_customer_sk", "t0"."cr_returning_cdemo_sk", "t0"."cr_returning_hdemo_sk", "t0"."cr_returning_addr_sk", "t0"."cr_call_center_sk", "t0"."cr_catalog_page_sk", "t0"."cr_ship_mode_sk", "t0"."cr_warehouse_sk", "t0"."cr_reason_sk", "t0"."cr_order_number", "t0"."cr_return_quantity", "t0"."cr_return_amount", "t0"."cr_return_tax", "t0"."cr_return_amt_inc_tax", "t0"."cr_fee", "t0"."cr_return_ship_cost", "t0"."cr_refunded_cash", "t0"."cr_reversed_charge", "t0"."cr_store_credit", "t0"."cr_net_loss", "t2"."i_item_sk", "t2"."i_item_id", "t2"."i_rec_start_date", "t2"."i_rec_end_date", "t2"."i_item_desc", "t2"."i_current_price", "t2"."i_wholesale_cost", "t2"."i_brand_id", "t2"."i_brand", "t2"."i_class_id", "t2"."i_class", "t2"."i_category_id", "t2"."i_category", "t2"."i_manufact_id", "t2"."i_manufact", "t2"."i_size", "t2"."i_formulation", "t2"."i_color", "t2"."i_units", "t2"."i_container", "t2"."i_manager_id", "t2"."i_product_name", "t4"."d_date_sk", "t4"."d_date_id", "t4"."d_date", "t4"."d_month_seq", "t4"."d_week_seq", "t4"."d_quarter_seq", "t4"."d_year", "t4"."d_dow", "t4"."d_moy", "t4"."d_dom", "t4"."d_qoy", "t4"."d_fy_year", "t4"."d_fy_quarter_seq", "t4"."d_fy_week_seq", "t4"."d_day_name", "t4"."d_quarter_name", "t4"."d_holiday", "t4"."d_weekend", "t4"."d_following_holiday", "t4"."d_first_dom", "t4"."d_last_dom", "t4"."d_same_day_ly", "t4"."d_same_day_lq", "t4"."d_current_day", "t4"."d_current_week", "t4"."d_current_month", "t4"."d_current_quarter", "t4"."d_current_year"
+FROM (SELECT "cr_returned_date_sk", "cr_returned_time_sk", "cr_item_sk", "cr_refunded_customer_sk", "cr_refunded_cdemo_sk", "cr_refunded_hdemo_sk", "cr_refunded_addr_sk", "cr_returning_customer_sk", "cr_returning_cdemo_sk", "cr_returning_hdemo_sk", "cr_returning_addr_sk", "cr_call_center_sk", "cr_catalog_page_sk", "cr_ship_mode_sk", "cr_warehouse_sk", "cr_reason_sk", "cr_order_number", "cr_return_quantity", "cr_return_amount", "cr_return_tax", "cr_return_amt_inc_tax", "cr_fee", "cr_return_ship_cost", "cr_refunded_cash", "cr_reversed_charge", "cr_store_credit", "cr_net_loss"
+FROM "CATALOG_RETURNS"
+WHERE "cr_returned_date_sk" IS NOT NULL AND "cr_item_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "i_item_sk", "i_item_id", "i_rec_start_date", "i_rec_end_date", "i_item_desc", "i_current_price", "i_wholesale_cost", "i_brand_id", "i_brand", "i_class_id", "i_class", "i_category_id", "i_category", "i_manufact_id", "i_manufact", "i_size", "i_formulation", "i_color", "i_units", "i_container", "i_manager_id", "i_product_name"
 FROM "ITEM"
-WHERE "i_item_id" IS NOT NULL AND "i_item_sk" IS NOT NULL) AS "t2" ON "t0"."wr_item_sk" = "t2"."i_item_sk"
+WHERE "i_item_id" IS NOT NULL AND "i_item_sk" IS NOT NULL) AS "t2" ON "t0"."cr_item_sk" = "t2"."i_item_sk"
 INNER JOIN (SELECT "d_date_sk", "d_date_id", "d_date", "d_month_seq", "d_week_seq", "d_quarter_seq", "d_year", "d_dow", "d_moy", "d_dom", "d_qoy", "d_fy_year", "d_fy_quarter_seq", "d_fy_week_seq", "d_day_name", "d_quarter_name", "d_holiday", "d_weekend", "d_following_holiday", "d_first_dom", "d_last_dom", "d_same_day_ly", "d_same_day_lq", "d_current_day", "d_current_week", "d_current_month", "d_current_quarter", "d_current_year"
 FROM "DATE_DIM"
-WHERE "d_date" IS NOT NULL AND "d_date_sk" IS NOT NULL) AS "t4" ON "t0"."wr_returned_date_sk" = "t4"."d_date_sk"
-                    hive.sql.query.fieldNames wr_returned_date_sk,wr_returned_time_sk,wr_item_sk,wr_refunded_customer_sk,wr_refunded_cdemo_sk,wr_refunded_hdemo_sk,wr_refunded_addr_sk,wr_returning_customer_sk,wr_returning_cdemo_sk,wr_returning_hdemo_sk,wr_returning_addr_sk,wr_web_page_sk,wr_reason_sk,wr_order_number,wr_return_quantity,wr_return_amt,wr_return_tax,wr_return_amt_inc_tax,wr_fee,wr_return_ship_cost,wr_refunded_cash,wr_reversed_charge,wr_account_credit,wr_net_loss,i_item_sk,i_item_id,i_rec_start_date,i_rec_end_date,i_item_desc,i_current_price,i_wholesale_cost,i_brand_id,i_brand,i_class_id,i_class,i_category_id,i_category,i_manufact_id,i_manufact,i_size,i_formulation,i_color,i_units,i_container,i_manager_id,i_product_name,d_date_sk,d_date_id,d_date,d_month_seq,d_week_seq,d_quarter_seq,d_year,d_dow,d_moy,d_dom,d_qoy,d_fy_year,d_fy_quarter_seq,d_fy_week_seq,d_day_name,d_quarter_name,d_holiday,d_weekend,d_following_holiday,d_first_dom,d_last_dom,d_same_day_ly,d_same_day_lq,d_current_day,d_current_week,d_current_month,d_current_quarter,d_current_year
-                    hive.sql.query.fieldTypes int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),int,char(16),date,date,varchar(200),decimal(7,2),decimal(7,2),int,char(50),int,char(50),int,char(50),int,char(50),char(20),char(20),char(20),char(10),char(10),int,char(50),int,char(16),date,int,int,int,int,int,int,int,int,int,int,int,char(9),char(6),char(1),char(1),char(1),int,int,int,int,char(1),char(1),char(1),char(1),char(1)
+WHERE "d_date" IS NOT NULL AND "d_date_sk" IS NOT NULL) AS "t4" ON "t0"."cr_returned_date_sk" = "t4"."d_date_sk"
+                    hive.sql.query.fieldNames cr_returned_date_sk,cr_returned_time_sk,cr_item_sk,cr_refunded_customer_sk,cr_refunded_cdemo_sk,cr_refunded_hdemo_sk,cr_refunded_addr_sk,cr_returning_customer_sk,cr_returning_cdemo_sk,cr_returning_hdemo_sk,cr_returning_addr_sk,cr_call_center_sk,cr_catalog_page_sk,cr_ship_mode_sk,cr_warehouse_sk,cr_reason_sk,cr_order_number,cr_return_quantity,cr_return_amount,cr_return_tax,cr_return_amt_inc_tax,cr_fee,cr_return_ship_cost,cr_refunded_cash,cr_reversed_charge,cr_store_credit,cr_net_loss,i_item_sk,i_item_id,i_rec_start_date,i_rec_end_date,i_item_desc,i_current_price,i_wholesale_cost,i_brand_id,i_brand,i_class_id,i_class,i_category_id,i_category,i_manufact_id,i_manufact,i_size,i_formulation,i_color,i_units,i_container,i_manager_id,i_product_name,d_date_sk,d_date_id,d_date,d_month_seq,d_week_seq,d_quarter_seq,d_year,d_dow,d_moy,d_dom,d_qoy,d_fy_year,d_fy_quarter_seq,d_fy_week_seq,d_day_name,d_quarter_name,d_holiday,d_weekend,d_following_holiday,d_first_dom,d_last_dom,d_same_day_ly,d_same_day_lq,d_current_day,d_current_week,d_current_month,d_current_quarter,d_current_year
+                    hive.sql.query.fieldTypes int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),int,char(16),date,date,varchar(200),decimal(7,2),decimal(7,2),int,char(50),int,char(50),int,char(50),int,char(50),char(20),char(20),char(20),char(10),char(10),int,char(50),int,char(16),date,int,int,int,int,int,int,int,int,int,int,int,char(9),char(6),char(1),char(1),char(1),int,int,int,int,char(1),char(1),char(1),char(1),char(1)
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: wr_return_quantity (type: int), i_item_id (type: char(16)), d_date (type: date)
-                    outputColumnNames: _col14, _col25, _col48
+                    expressions: cr_return_quantity (type: int), i_item_id (type: char(16)), d_date (type: date)
+                    outputColumnNames: _col17, _col28, _col51
                     Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
-                      key expressions: _col48 (type: date)
+                      key expressions: _col51 (type: date)
                       null sort order: a
                       sort order: +
-                      Map-reduce partition columns: _col48 (type: date)
+                      Map-reduce partition columns: _col51 (type: date)
                       Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
-                      value expressions: _col14 (type: int), _col25 (type: char(16))
+                      value expressions: _col17 (type: int), _col28 (type: char(16))
             Execution mode: vectorized, llap
             LLAP IO: no inputs
         Map 16 
@@ -3850,33 +3775,33 @@ WHERE "d_week_seq" IS NOT NULL AND "d_date" IS NOT NULL
         Map 17 
             Map Operator Tree:
                 TableScan
-                  alias: catalog_returns
+                  alias: web_returns
                   properties:
-                    hive.sql.query SELECT "t0"."cr_returned_date_sk", "t0"."cr_returned_time_sk", "t0"."cr_item_sk", "t0"."cr_refunded_customer_sk", "t0"."cr_refunded_cdemo_sk", "t0"."cr_refunded_hdemo_sk", "t0"."cr_refunded_addr_sk", "t0"."cr_returning_customer_sk", "t0"."cr_returning_cdemo_sk", "t0"."cr_returning_hdemo_sk", "t0"."cr_returning_addr_sk", "t0"."cr_call_center_sk", "t0"."cr_catalog_page_sk", "t0"."cr_ship_mode_sk", "t0"."cr_warehouse_sk", "t0"."cr_reason_sk", "t0"."cr_order_number", "t0"."cr_return_quantity", "t0"."cr_return_amount", "t0"."cr_return_tax", "t0"."cr_return_amt_inc_tax", "t0"."cr_fee", "t0"."cr_return_ship_cost", "t0"."cr_refunded_cash", "t0"."cr_reversed_charge", "t0"."cr_store_credit", "t0"."cr_net_loss", "t2"."i_item_sk", "t2"."i_item_id", "t2"."i_rec_start_date", "t2"."i_rec_end_date", "t2"."i_item_desc", "t2"."i_current_price", "t2"."i_wholesale_cost", "t2"."i_brand_id", "t2"."i_brand", "t2"."i_class_id", "t2"."i_class", "t2"."i_category_id", "t2"."i_category", "t2"."i_manufact_id", "t2"."i_manufact", "t2"."i_size", "t2"."i_formulation", "t2"."i_color", "t2"."i_units", "t2"."i_container", "t2"."i_manager_id", "t2"."i_product_name", "t4"."d_date_sk", "t4"."d_date_id", "t4"."d_date", "t4"."d_month_seq", "t4"."d_week_seq", "t4"."d_quarter_seq", "t4"."d_year", "t4"."d_dow", "t4"."d_moy", "t4"."d_dom", "t4"."d_qoy", "t4"."d_fy_year", "t4"."d_fy_quarter_seq", "t4"."d_fy_week_seq", "t4"."d_day_name", "t4"."d_quarter_name", "t4"."d_holiday", "t4"."d_weekend", "t4"."d_following_holiday", "t4"."d_first_dom", "t4"."d_last_dom", "t4"."d_same_day_ly", "t4"."d_same_day_lq", "t4"."d_current_day", "t4"."d_current_week", "t4"."d_current_month", "t4"."d_current_quarter", "t4"."d_current_year"
-FROM (SELECT "cr_returned_date_sk", "cr_returned_time_sk", "cr_item_sk", "cr_refunded_customer_sk", "cr_refunded_cdemo_sk", "cr_refunded_hdemo_sk", "cr_refunded_addr_sk", "cr_returning_customer_sk", "cr_returning_cdemo_sk", "cr_returning_hdemo_sk", "cr_returning_addr_sk", "cr_call_center_sk", "cr_catalog_page_sk", "cr_ship_mode_sk", "cr_warehouse_sk", "cr_reason_sk", "cr_order_number", "cr_return_quantity", "cr_return_amount", "cr_return_tax", "cr_return_amt_inc_tax", "cr_fee", "cr_return_ship_cost", "cr_refunded_cash", "cr_reversed_charge", "cr_store_credit", "cr_net_loss"
-FROM "CATALOG_RETURNS"
-WHERE "cr_returned_date_sk" IS NOT NULL AND "cr_item_sk" IS NOT NULL) AS "t0"
+                    hive.sql.query SELECT "t0"."wr_returned_date_sk", "t0"."wr_returned_time_sk", "t0"."wr_item_sk", "t0"."wr_refunded_customer_sk", "t0"."wr_refunded_cdemo_sk", "t0"."wr_refunded_hdemo_sk", "t0"."wr_refunded_addr_sk", "t0"."wr_returning_customer_sk", "t0"."wr_returning_cdemo_sk", "t0"."wr_returning_hdemo_sk", "t0"."wr_returning_addr_sk", "t0"."wr_web_page_sk", "t0"."wr_reason_sk", "t0"."wr_order_number", "t0"."wr_return_quantity", "t0"."wr_return_amt", "t0"."wr_return_tax", "t0"."wr_return_amt_inc_tax", "t0"."wr_fee", "t0"."wr_return_ship_cost", "t0"."wr_refunded_cash", "t0"."wr_reversed_charge", "t0"."wr_account_credit", "t0"."wr_net_loss", "t2"."i_item_sk", "t2"."i_item_id", "t2"."i_rec_start_date", "t2"."i_rec_end_date", "t2"."i_item_desc", "t2"."i_current_price", "t2"."i_wholesale_cost", "t2"."i_brand_id", "t2"."i_brand", "t2"."i_class_id", "t2"."i_class", "t2"."i_category_id", "t2"."i_category", "t2"."i_manufact_id", "t2"."i_manufact", "t2"."i_size", "t2"."i_formulation", "t2"."i_color", "t2"."i_units", "t2"."i_container", "t2"."i_manager_id", "t2"."i_product_name", "t4"."d_date_sk", "t4"."d_date_id", "t4"."d_date", "t4"."d_month_seq", "t4"."d_week_seq", "t4"."d_quarter_seq", "t4"."d_year", "t4"."d_dow", "t4"."d_moy", "t4"."d_dom", "t4"."d_qoy", "t4"."d_fy_year", "t4"."d_fy_quarter_seq", "t4"."d_fy_week_seq", "t4"."d_day_name", "t4"."d_quarter_name", "t4"."d_holiday", "t4"."d_weekend", "t4"."d_following_holiday", "t4"."d_first_dom", "t4"."d_last_dom", "t4"."d_same_day_ly", "t4"."d_same_day_lq", "t4"."d_current_day", "t4"."d_current_week", "t4"."d_current_month", "t4"."d_current_quarter", "t4"."d_current_year"
+FROM (SELECT "wr_returned_date_sk", "wr_returned_time_sk", "wr_item_sk", "wr_refunded_customer_sk", "wr_refunded_cdemo_sk", "wr_refunded_hdemo_sk", "wr_refunded_addr_sk", "wr_returning_customer_sk", "wr_returning_cdemo_sk", "wr_returning_hdemo_sk", "wr_returning_addr_sk", "wr_web_page_sk", "wr_reason_sk", "wr_order_number", "wr_return_quantity", "wr_return_amt", "wr_return_tax", "wr_return_amt_inc_tax", "wr_fee", "wr_return_ship_cost", "wr_refunded_cash", "wr_reversed_charge", "wr_account_credit", "wr_net_loss"
+FROM "WEB_RETURNS"
+WHERE "wr_returned_date_sk" IS NOT NULL AND "wr_item_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "i_item_sk", "i_item_id", "i_rec_start_date", "i_rec_end_date", "i_item_desc", "i_current_price", "i_wholesale_cost", "i_brand_id", "i_brand", "i_class_id", "i_class", "i_category_id", "i_category", "i_manufact_id", "i_manufact", "i_size", "i_formulation", "i_color", "i_units", "i_container", "i_manager_id", "i_product_name"
 FROM "ITEM"
-WHERE "i_item_id" IS NOT NULL AND "i_item_sk" IS NOT NULL) AS "t2" ON "t0"."cr_item_sk" = "t2"."i_item_sk"
+WHERE "i_item_id" IS NOT NULL AND "i_item_sk" IS NOT NULL) AS "t2" ON "t0"."wr_item_sk" = "t2"."i_item_sk"
 INNER JOIN (SELECT "d_date_sk", "d_date_id", "d_date", "d_month_seq", "d_week_seq", "d_quarter_seq", "d_year", "d_dow", "d_moy", "d_dom", "d_qoy", "d_fy_year", "d_fy_quarter_seq", "d_fy_week_seq", "d_day_name", "d_quarter_name", "d_holiday", "d_weekend", "d_following_holiday", "d_first_dom", "d_last_dom", "d_same_day_ly", "d_same_day_lq", "d_current_day", "d_current_week", "d_current_month", "d_current_quarter", "d_current_year"
 FROM "DATE_DIM"
-WHERE "d_date" IS NOT NULL AND "d_date_sk" IS NOT NULL) AS "t4" ON "t0"."cr_returned_date_sk" = "t4"."d_date_sk"
-                    hive.sql.query.fieldNames cr_returned_date_sk,cr_returned_time_sk,cr_item_sk,cr_refunded_customer_sk,cr_refunded_cdemo_sk,cr_refunded_hdemo_sk,cr_refunded_addr_sk,cr_returning_customer_sk,cr_returning_cdemo_sk,cr_returning_hdemo_sk,cr_returning_addr_sk,cr_call_center_sk,cr_catalog_page_sk,cr_ship_mode_sk,cr_warehouse_sk,cr_reason_sk,cr_order_number,cr_return_quantity,cr_return_amount,cr_return_tax,cr_return_amt_inc_tax,cr_fee,cr_return_ship_cost,cr_refunded_cash,cr_reversed_charge,cr_store_credit,cr_net_loss,i_item_sk,i_item_id,i_rec_start_date,i_rec_end_date,i_item_desc,i_current_price,i_wholesale_cost,i_brand_id,i_brand,i_class_id,i_class,i_category_id,i_category,i_manufact_id,i_manufact,i_size,i_formulation,i_color,i_units,i_container,i_manager_id,i_product_name,d_date_sk,d_date_id,d_date,d_month_seq,d_week_seq,d_quarter_seq,d_year,d_dow,d_moy,d_dom,d_qoy,d_fy_year,d_fy_quarter_seq,d_fy_week_seq,d_day_name,d_quarter_name,d_holiday,d_weekend,d_following_holiday,d_first_dom,d_last_dom,d_same_day_ly,d_same_day_lq,d_current_day,d_current_week,d_current_month,d_current_quarter,d_current_year
-                    hive.sql.query.fieldTypes int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),int,char(16),date,date,varchar(200),decimal(7,2),decimal(7,2),int,char(50),int,char(50),int,char(50),int,char(50),char(20),char(20),char(20),char(10),char(10),int,char(50),int,char(16),date,int,int,int,int,int,int,int,int,int,int,int,char(9),char(6),char(1),char(1),char(1),int,int,int,int,char(1),char(1),char(1),char(1),char(1)
+WHERE "d_date" IS NOT NULL AND "d_date_sk" IS NOT NULL) AS "t4" ON "t0"."wr_returned_date_sk" = "t4"."d_date_sk"
+                    hive.sql.query.fieldNames wr_returned_date_sk,wr_returned_time_sk,wr_item_sk,wr_refunded_customer_sk,wr_refunded_cdemo_sk,wr_refunded_hdemo_sk,wr_refunded_addr_sk,wr_returning_customer_sk,wr_returning_cdemo_sk,wr_returning_hdemo_sk,wr_returning_addr_sk,wr_web_page_sk,wr_reason_sk,wr_order_number,wr_return_quantity,wr_return_amt,wr_return_tax,wr_return_amt_inc_tax,wr_fee,wr_return_ship_cost,wr_refunded_cash,wr_reversed_charge,wr_account_credit,wr_net_loss,i_item_sk,i_item_id,i_rec_start_date,i_rec_end_date,i_item_desc,i_current_price,i_wholesale_cost,i_brand_id,i_brand,i_class_id,i_class,i_category_id,i_category,i_manufact_id,i_manufact,i_size,i_formulation,i_color,i_units,i_container,i_manager_id,i_product_name,d_date_sk,d_date_id,d_date,d_month_seq,d_week_seq,d_quarter_seq,d_year,d_dow,d_moy,d_dom,d_qoy,d_fy_year,d_fy_quarter_seq,d_fy_week_seq,d_day_name,d_quarter_name,d_holiday,d_weekend,d_following_holiday,d_first_dom,d_last_dom,d_same_day_ly,d_same_day_lq,d_current_day,d_current_week,d_current_month,d_current_quarter,d_current_year
+                    hive.sql.query.fieldTypes int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),int,char(16),date,date,varchar(200),decimal(7,2),decimal(7,2),int,char(50),int,char(50),int,char(50),int,char(50),char(20),char(20),char(20),char(10),char(10),int,char(50),int,char(16),date,int,int,int,int,int,int,int,int,int,int,int,char(9),char(6),char(1),char(1),char(1),int,int,int,int,char(1),char(1),char(1),char(1),char(1)
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: cr_return_quantity (type: int), i_item_id (type: char(16)), d_date (type: date)
-                    outputColumnNames: _col17, _col28, _col51
+                    expressions: wr_return_quantity (type: int), i_item_id (type: char(16)), d_date (type: date)
+                    outputColumnNames: _col14, _col25, _col48
                     Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
-                      key expressions: _col51 (type: date)
+                      key expressions: _col48 (type: date)
                       null sort order: a
                       sort order: +
-                      Map-reduce partition columns: _col51 (type: date)
+                      Map-reduce partition columns: _col48 (type: date)
                       Statistics: Num rows: 1 Data size: 160 Basic stats: COMPLETE Column stats: NONE
-                      value expressions: _col17 (type: int), _col28 (type: char(16))
+                      value expressions: _col14 (type: int), _col25 (type: char(16))
             Execution mode: vectorized, llap
             LLAP IO: no inputs
         Map 7 
@@ -3980,13 +3905,13 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                 condition map:
                      Left Semi Join 0 to 1
                 keys:
-                  0 _col48 (type: date)
+                  0 _col51 (type: date)
                   1 _col0 (type: date)
-                outputColumnNames: _col14, _col25
+                outputColumnNames: _col17, _col28
                 Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
                 Group By Operator
-                  aggregations: sum(_col14)
-                  keys: _col25 (type: char(16))
+                  aggregations: sum(_col17)
+                  keys: _col28 (type: char(16))
                   minReductionHashAggr: 0.99
                   mode: hash
                   outputColumnNames: _col0, _col1
@@ -4025,13 +3950,13 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                 condition map:
                      Left Semi Join 0 to 1
                 keys:
-                  0 _col51 (type: date)
+                  0 _col48 (type: date)
                   1 _col0 (type: date)
-                outputColumnNames: _col17, _col28
+                outputColumnNames: _col14, _col25
                 Statistics: Num rows: 1 Data size: 176 Basic stats: COMPLETE Column stats: NONE
                 Group By Operator
-                  aggregations: sum(_col17)
-                  keys: _col28 (type: char(16))
+                  aggregations: sum(_col14)
+                  keys: _col25 (type: char(16))
                   minReductionHashAggr: 0.99
                   mode: hash
                   outputColumnNames: _col0, _col1
@@ -4144,7 +4069,7 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                   Statistics: Num rows: 1 Data size: 212 Basic stats: COMPLETE Column stats: NONE
                   top n: 100
                   Select Operator
-                    expressions: _col0 (type: char(16)), _col1 (type: bigint), (((_col2 / UDFToDouble(((_col1 + _col7) + _col4))) / 3.0D) * 100.0D) (type: double), _col7 (type: bigint), (((_col8 / UDFToDouble(((_col1 + _col7) + _col4))) / 3.0D) * 100.0D) (type: double), _col4 (type: bigint), (((_col5 / UDFToDouble(((_col1 + _col7) + _col4))) / 3.0D) * 100.0D) (type: double), (CAST( ((_col1 + _col7) + _col4) AS decimal(19,0)) / 3) (type: decimal(25,6))
+                    expressions: _col0 (type: char(16)), _col1 (type: bigint), (((_col2 / UDFToDouble(((_col1 + _col4) + _col7))) / 3.0D) * 100.0D) (type: double), _col4 (type: bigint), (((_col5 / UDFToDouble(((_col1 + _col4) + _col7))) / 3.0D) * 100.0D) (type: double), _col7 (type: bigint), (((_col8 / UDFToDouble(((_col1 + _col4) + _col7))) / 3.0D) * 100.0D) (type: double), (CAST( ((_col1 + _col4) + _col7) AS decimal(19,0)) / 3) (type: decimal(25,6))
                     outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5, _col6, _col7
                     Statistics: Num rows: 1 Data size: 212 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
@@ -4152,7 +4077,6 @@ WHERE "d_date" IN (DATE '1998-01-02', DATE '1998-10-15', DATE '1998-11-10') AND 
                       null sort order: zz
                       sort order: ++
                       Statistics: Num rows: 1 Data size: 212 Basic stats: COMPLETE Column stats: NONE
-                      TopN Hash Memory Usage: 0.1
                       value expressions: _col2 (type: double), _col3 (type: bigint), _col4 (type: double), _col5 (type: bigint), _col6 (type: double), _col7 (type: decimal(25,6))
         Reducer 6 
             Execution mode: vectorized, llap
@@ -4394,7 +4318,7 @@ STAGE PLANS:
                     hive.sql.query SELECT "t0"."ss_sold_date_sk", "t0"."ss_sold_time_sk", "t0"."ss_item_sk", "t0"."ss_customer_sk", "t0"."ss_cdemo_sk", "t0"."ss_hdemo_sk", "t0"."ss_addr_sk", "t0"."ss_store_sk", "t0"."ss_promo_sk", "t0"."ss_ticket_number", "t0"."ss_quantity", "t0"."ss_wholesale_cost", "t0"."ss_list_price", "t0"."ss_sales_price", "t0"."ss_ext_discount_amt", "t0"."ss_ext_sales_price", "t0"."ss_ext_wholesale_cost", "t0"."ss_ext_list_price", "t0"."ss_ext_tax", "t0"."ss_coupon_amt", "t0"."ss_net_paid", "t0"."ss_net_paid_inc_tax", "t0"."ss_net_profit", "t6"."d_date_sk", "t6"."d_date_id", "t6"."d_date", "t6"."d_month_seq", "t6"."d_week_seq", "t6"."d_quarter_seq", "t6"."d_year", "t6"."d_dow", "t6"."d_moy", "t6"."d_dom", "t6"."d_qoy", "t6"."d_fy_year", "t6"."d_fy_quarter_seq", "t6"."d_fy_week_seq", "t6"."d_day_name", "t6"."d_quarter_name", "t6"."d_holiday", "t6"."d_weekend", "t6"."d_following_holiday", "t6"."d_first_dom", "t6"."d_last_dom", "t6"."d_same_day_ly", "t6"."d_same_day_lq", "t6"."d_current_day", "t6"."d_current_week", "t6"."d_current_month", "t6"."d_current_quarter", "t6"."d_current_year", "t2"."ca_address_sk", "t2"."ca_address_id", "t2"."ca_street_number", "t2"."ca_street_name", "t2"."ca_street_type", "t2"."ca_suite_number", "t2"."ca_city", "t2"."ca_county", "t2"."ca_state", "t2"."ca_zip", "t2"."ca_country", "t2"."ca_gmt_offset", "t2"."ca_location_type", "t4"."i_item_sk", "t4"."i_item_id", "t4"."i_rec_start_date", "t4"."i_rec_end_date", "t4"."i_item_desc", "t4"."i_current_price", "t4"."i_wholesale_cost", "t4"."i_brand_id", "t4"."i_brand", "t4"."i_class_id", "t4"."i_class", "t4"."i_category_id", "t4"."i_category", "t4"."i_manufact_id", "t4"."i_manufact", "t4"."i_size", "t4"."i_formulation", "t4"."i_color", "t4"."i_units", "t4"."i_container", "t4"."i_manager_id", "t4"."i_product_name"
 FROM (SELECT "ss_sold_date_sk", "ss_sold_time_sk", "ss_item_sk", "ss_customer_sk", "ss_cdemo_sk", "ss_hdemo_sk", "ss_addr_sk", "ss_store_sk", "ss_promo_sk", "ss_ticket_number", "ss_quantity", "ss_wholesale_cost", "ss_list_price", "ss_sales_price", "ss_ext_discount_amt", "ss_ext_sales_price", "ss_ext_wholesale_cost", "ss_ext_list_price", "ss_ext_tax", "ss_coupon_amt", "ss_net_paid", "ss_net_paid_inc_tax", "ss_net_profit"
 FROM "STORE_SALES"
-WHERE "ss_item_sk" IS NOT NULL AND "ss_addr_sk" IS NOT NULL AND "ss_sold_date_sk" IS NOT NULL) AS "t0"
+WHERE "ss_item_sk" IS NOT NULL AND ("ss_addr_sk" IS NOT NULL AND "ss_sold_date_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "ca_address_sk", "ca_address_id", "ca_street_number", "ca_street_name", "ca_street_type", "ca_suite_number", "ca_city", "ca_county", "ca_state", "ca_zip", "ca_country", "ca_gmt_offset", "ca_location_type"
 FROM "CUSTOMER_ADDRESS"
 WHERE "ca_gmt_offset" = -6 AND "ca_address_sk" IS NOT NULL) AS "t2" ON "t0"."ss_addr_sk" = "t2"."ca_address_sk"
@@ -4403,7 +4327,7 @@ FROM "ITEM"
 WHERE "i_manufact_id" IS NOT NULL AND "i_item_sk" IS NOT NULL) AS "t4" ON "t0"."ss_item_sk" = "t4"."i_item_sk"
 INNER JOIN (SELECT "d_date_sk", "d_date_id", "d_date", "d_month_seq", "d_week_seq", "d_quarter_seq", "d_year", "d_dow", "d_moy", "d_dom", "d_qoy", "d_fy_year", "d_fy_quarter_seq", "d_fy_week_seq", "d_day_name", "d_quarter_name", "d_holiday", "d_weekend", "d_following_holiday", "d_first_dom", "d_last_dom", "d_same_day_ly", "d_same_day_lq", "d_current_day", "d_current_week", "d_current_month", "d_current_quarter", "d_current_year"
 FROM "DATE_DIM"
-WHERE "d_year" = 1999 AND "d_moy" = 3 AND "d_date_sk" IS NOT NULL) AS "t6" ON "t0"."ss_sold_date_sk" = "t6"."d_date_sk"
+WHERE "d_year" = 1999 AND ("d_moy" = 3 AND "d_date_sk" IS NOT NULL)) AS "t6" ON "t0"."ss_sold_date_sk" = "t6"."d_date_sk"
                     hive.sql.query.fieldNames ss_sold_date_sk,ss_sold_time_sk,ss_item_sk,ss_customer_sk,ss_cdemo_sk,ss_hdemo_sk,ss_addr_sk,ss_store_sk,ss_promo_sk,ss_ticket_number,ss_quantity,ss_wholesale_cost,ss_list_price,ss_sales_price,ss_ext_discount_amt,ss_ext_sales_price,ss_ext_wholesale_cost,ss_ext_list_price,ss_ext_tax,ss_coupon_amt,ss_net_paid,ss_net_paid_inc_tax,ss_net_profit,d_date_sk,d_date_id,d_date,d_month_seq,d_week_seq,d_quarter_seq,d_year,d_dow,d_moy,d_dom,d_qoy,d_fy_year,d_fy_quarter_seq,d_fy_week_seq,d_day_name,d_quarter_name,d_holiday,d_weekend,d_following_holiday,d_first_dom,d_last_dom,d_same_day_ly,d_same_day_lq,d_current_day,d_current_week,d_current_month,d_current_quarter,d_current_year,ca_address_sk,ca_address_id,ca_street_number,ca_street_name,ca_street_type,ca_suite_number,ca_city,ca_county,ca_state,ca_zip,ca_country,ca_gmt_offset,ca_location_type,i_item_sk,i_item_id,i_rec_start_date,i_rec_end_date,i_item_desc,i_current_price,i_wholesale_cost,i_brand_id,i_brand,i_class_id,i_class,i_category_id,i_category,i_manufact_id,i_manufact,i_size,i_formulation,i_color,i_units,i_container,i_manager_id,i_product_name
                     hive.sql.query.fieldTypes int,int,int,int,int,int,int,int,int,int,int,decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),int,char(16),date,int,int,int,int,int,int,int,int,int,int,int,char(9),char(6),char(1),char(1),char(1),int,int,int,int,char(1),char(1),char(1),char(1),char(1),int,char(16),char(10),varchar(60),char(15),char(10),varchar(60),varchar(30),char(2),char(10),varchar(20),decimal(5,2),char(20),int,char(16),date,date,varchar(200),decimal(7,2),decimal(7,2),int,char(50),int,char(50),int,char(50),int,char(50),char(20),char(20),char(20),char(10),char(10),int,char(50)
                     hive.sql.query.split false
@@ -4429,7 +4353,7 @@ WHERE "d_year" = 1999 AND "d_moy" = 3 AND "d_date_sk" IS NOT NULL) AS "t6" ON "t
                     hive.sql.query SELECT "t0"."cs_sold_date_sk", "t0"."cs_sold_time_sk", "t0"."cs_ship_date_sk", "t0"."cs_bill_customer_sk", "t0"."cs_bill_cdemo_sk", "t0"."cs_bill_hdemo_sk", "t0"."cs_bill_addr_sk", "t0"."cs_ship_customer_sk", "t0"."cs_ship_cdemo_sk", "t0"."cs_ship_hdemo_sk", "t0"."cs_ship_addr_sk", "t0"."cs_call_center_sk", "t0"."cs_catalog_page_sk", "t0"."cs_ship_mode_sk", "t0"."cs_warehouse_sk", "t0"."cs_item_sk", "t0"."cs_promo_sk", "t0"."cs_order_number", "t0"."cs_quantity", "t0"."cs_wholesale_cost", "t0"."cs_list_price", "t0"."cs_sales_price", "t0"."cs_ext_discount_amt", "t0"."cs_ext_sales_price", "t0"."cs_ext_wholesale_cost", "t0"."cs_ext_list_price", "t0"."cs_ext_tax", "t0"."cs_coupon_amt", "t0"."cs_ext_ship_cost", "t0"."cs_net_paid", "t0"."cs_net_paid_inc_tax", "t0"."cs_net_paid_inc_ship", "t0"."cs_net_paid_inc_ship_tax", "t0"."cs_net_profit", "t6"."d_date_sk", "t6"."d_date_id", "t6"."d_date", "t6"."d_month_seq", "t6"."d_week_seq", "t6"."d_quarter_seq", "t6"."d_year", "t6"."d_dow", "t6"."d_moy", "t6"."d_dom", "t6"."d_qoy", "t6"."d_fy_year", "t6"."d_fy_quarter_seq", "t6"."d_fy_week_seq", "t6"."d_day_name", "t6"."d_quarter_name", "t6"."d_holiday", "t6"."d_weekend", "t6"."d_following_holiday", "t6"."d_first_dom", "t6"."d_last_dom", "t6"."d_same_day_ly", "t6"."d_same_day_lq", "t6"."d_current_day", "t6"."d_current_week", "t6"."d_current_month", "t6"."d_current_quarter", "t6"."d_current_year", "t2"."ca_address_sk", "t2"."ca_address_id", "t2"."ca_street_number", "t2"."ca_street_name", "t2"."ca_street_type", "t2"."ca_suite_number", "t2"."ca_city", "t2"."ca_county", "t2"."ca_state", "t2"."ca_zip", "t2"."ca_country", "t2"."ca_gmt_offset", "t2"."ca_location_type", "t4"."i_item_sk", "t4"."i_item_id", "t4"."i_rec_start_date", "t4"."i_rec_end_date", "t4"."i_item_desc", "t4"."i_current_price", "t4"."i_wholesale_cost", "t4"."i_brand_id", "t4"."i_brand", "t4"."i_class_id", "t4"."i_class", "t4"."i_category_id", "t4"."i_category", "t4"."i_manufact_id", "t4"."i_manufact", "t4"."i_size", "t4"."i_formulation", "t4"."i_color", "t4"."i_units", "t4"."i_container", "t4"."i_manager_id", "t4"."i_product_name"
 FROM (SELECT "cs_sold_date_sk", "cs_sold_time_sk", "cs_ship_date_sk", "cs_bill_customer_sk", "cs_bill_cdemo_sk", "cs_bill_hdemo_sk", "cs_bill_addr_sk", "cs_ship_customer_sk", "cs_ship_cdemo_sk", "cs_ship_hdemo_sk", "cs_ship_addr_sk", "cs_call_center_sk", "cs_catalog_page_sk", "cs_ship_mode_sk", "cs_warehouse_sk", "cs_item_sk", "cs_promo_sk", "cs_order_number", "cs_quantity", "cs_wholesale_cost", "cs_list_price", "cs_sales_price", "cs_ext_discount_amt", "cs_ext_sales_price", "cs_ext_wholesale_cost", "cs_ext_list_price", "cs_ext_tax", "cs_coupon_amt", "cs_ext_ship_cost", "cs_net_paid", "cs_net_paid_inc_tax", "cs_net_paid_inc_ship", "cs_net_paid_inc_ship_tax", "cs_net_profit"
 FROM "CATALOG_SALES"
-WHERE "cs_item_sk" IS NOT NULL AND "cs_bill_addr_sk" IS NOT NULL AND "cs_sold_date_sk" IS NOT NULL) AS "t0"
+WHERE "cs_item_sk" IS NOT NULL AND ("cs_bill_addr_sk" IS NOT NULL AND "cs_sold_date_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "ca_address_sk", "ca_address_id", "ca_street_number", "ca_street_name", "ca_street_type", "ca_suite_number", "ca_city", "ca_county", "ca_state", "ca_zip", "ca_country", "ca_gmt_offset", "ca_location_type"
 FROM "CUSTOMER_ADDRESS"
 WHERE "ca_gmt_offset" = -6 AND "ca_address_sk" IS NOT NULL) AS "t2" ON "t0"."cs_bill_addr_sk" = "t2"."ca_address_sk"
@@ -4438,7 +4362,7 @@ FROM "ITEM"
 WHERE "i_manufact_id" IS NOT NULL AND "i_item_sk" IS NOT NULL) AS "t4" ON "t0"."cs_item_sk" = "t4"."i_item_sk"
 INNER JOIN (SELECT "d_date_sk", "d_date_id", "d_date", "d_month_seq", "d_week_seq", "d_quarter_seq", "d_year", "d_dow", "d_moy", "d_dom", "d_qoy", "d_fy_year", "d_fy_quarter_seq", "d_fy_week_seq", "d_day_name", "d_quarter_name", "d_holiday", "d_weekend", "d_following_holiday", "d_first_dom", "d_last_dom", "d_same_day_ly", "d_same_day_lq", "d_current_day", "d_current_week", "d_current_month", "d_current_quarter", "d_current_year"
 FROM "DATE_DIM"
-WHERE "d_year" = 1999 AND "d_moy" = 3 AND "d_date_sk" IS NOT NULL) AS "t6" ON "t0"."cs_sold_date_sk" = "t6"."d_date_sk"
+WHERE "d_year" = 1999 AND ("d_moy" = 3 AND "d_date_sk" IS NOT NULL)) AS "t6" ON "t0"."cs_sold_date_sk" = "t6"."d_date_sk"
                     hive.sql.query.fieldNames cs_sold_date_sk,cs_sold_time_sk,cs_ship_date_sk,cs_bill_customer_sk,cs_bill_cdemo_sk,cs_bill_hdemo_sk,cs_bill_addr_sk,cs_ship_customer_sk,cs_ship_cdemo_sk,cs_ship_hdemo_sk,cs_ship_addr_sk,cs_call_center_sk,cs_catalog_page_sk,cs_ship_mode_sk,cs_warehouse_sk,cs_item_sk,cs_promo_sk,cs_order_number,cs_quantity,cs_wholesale_cost,cs_list_price,cs_sales_price,cs_ext_discount_amt,cs_ext_sales_price,cs_ext_wholesale_cost,cs_ext_list_price,cs_ext_tax,cs_coupon_amt,cs_ext_ship_cost,cs_net_paid,cs_net_paid_inc_tax,cs_net_paid_inc_ship,cs_net_paid_inc_ship_tax,cs_net_profit,d_date_sk,d_date_id,d_date,d_month_seq,d_week_seq,d_quarter_seq,d_year,d_dow,d_moy,d_dom,d_qoy,d_fy_year,d_fy_quarter_seq,d_fy_week_seq,d_day_name,d_quarter_name,d_holiday,d_weekend,d_following_holiday,d_first_dom,d_last_dom,d_same_day_ly,d_same_day_lq,d_current_day,d_current_week,d_current_month,d_current_quarter,d_current_year,ca_address_sk,ca_address_id,ca_street_number,ca_street_name,ca_street_type,ca_suite_number,ca_city,ca_county,ca_state,ca_zip,ca_country,ca_gmt_offset,ca_location_type,i_item_sk,i_item_id,i_rec_start_date,i_rec_end_date,i_item_desc,i_current_price,i_wholesale_cost,i_brand_id,i_brand,i_class_id,i_class,i_category_id,i_category,i_manufact_id,i_manufact,i_size,i_formulation,i_color,i_units,i_container,i_manager_id,i_product_name
                     hive.sql.query.fieldTypes int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),int,char(16),date,int,int,int,int,int,int,int,int,int,int,int,char(9),char(6),char(1),char(1),char(1),int,int,int,int,char(1),char(1),char(1),char(1),char(1),int,char(16),char(10),varchar(60),char(15),char(10),varchar(60),varchar(30),char(2),char(10),varchar(20),decimal(5,2),char(20),int,char(16),date,date,varchar(200),decimal(7,2),decimal(7,2),int,char(50),int,char(50),int,char(50),int,char(50),char(20),char(20),char(20),char(10),char(10),int,char(50)
                     hive.sql.query.split false
@@ -4464,7 +4388,7 @@ WHERE "d_year" = 1999 AND "d_moy" = 3 AND "d_date_sk" IS NOT NULL) AS "t6" ON "t
                     hive.sql.query SELECT "t0"."ws_sold_date_sk", "t0"."ws_sold_time_sk", "t0"."ws_ship_date_sk", "t0"."ws_item_sk", "t0"."ws_bill_customer_sk", "t0"."ws_bill_cdemo_sk", "t0"."ws_bill_hdemo_sk", "t0"."ws_bill_addr_sk", "t0"."ws_ship_customer_sk", "t0"."ws_ship_cdemo_sk", "t0"."ws_ship_hdemo_sk", "t0"."ws_ship_addr_sk", "t0"."ws_web_page_sk", "t0"."ws_web_site_sk", "t0"."ws_ship_mode_sk", "t0"."ws_warehouse_sk", "t0"."ws_promo_sk", "t0"."ws_order_number", "t0"."ws_quantity", "t0"."ws_wholesale_cost", "t0"."ws_list_price", "t0"."ws_sales_price", "t0"."ws_ext_discount_amt", "t0"."ws_ext_sales_price", "t0"."ws_ext_wholesale_cost", "t0"."ws_ext_list_price", "t0"."ws_ext_tax", "t0"."ws_coupon_amt", "t0"."ws_ext_ship_cost", "t0"."ws_net_paid", "t0"."ws_net_paid_inc_tax", "t0"."ws_net_paid_inc_ship", "t0"."ws_net_paid_inc_ship_tax", "t0"."ws_net_profit", "t6"."d_date_sk", "t6"."d_date_id", "t6"."d_date", "t6"."d_month_seq", "t6"."d_week_seq", "t6"."d_quarter_seq", "t6"."d_year", "t6"."d_dow", "t6"."d_moy", "t6"."d_dom", "t6"."d_qoy", "t6"."d_fy_year", "t6"."d_fy_quarter_seq", "t6"."d_fy_week_seq", "t6"."d_day_name", "t6"."d_quarter_name", "t6"."d_holiday", "t6"."d_weekend", "t6"."d_following_holiday", "t6"."d_first_dom", "t6"."d_last_dom", "t6"."d_same_day_ly", "t6"."d_same_day_lq", "t6"."d_current_day", "t6"."d_current_week", "t6"."d_current_month", "t6"."d_current_quarter", "t6"."d_current_year", "t2"."ca_address_sk", "t2"."ca_address_id", "t2"."ca_street_number", "t2"."ca_street_name", "t2"."ca_street_type", "t2"."ca_suite_number", "t2"."ca_city", "t2"."ca_county", "t2"."ca_state", "t2"."ca_zip", "t2"."ca_country", "t2"."ca_gmt_offset", "t2"."ca_location_type", "t4"."i_item_sk", "t4"."i_item_id", "t4"."i_rec_start_date", "t4"."i_rec_end_date", "t4"."i_item_desc", "t4"."i_current_price", "t4"."i_wholesale_cost", "t4"."i_brand_id", "t4"."i_brand", "t4"."i_class_id", "t4"."i_class", "t4"."i_category_id", "t4"."i_category", "t4"."i_manufact_id", "t4"."i_manufact", "t4"."i_size", "t4"."i_formulation", "t4"."i_color", "t4"."i_units", "t4"."i_container", "t4"."i_manager_id", "t4"."i_product_name"
 FROM (SELECT "ws_sold_date_sk", "ws_sold_time_sk", "ws_ship_date_sk", "ws_item_sk", "ws_bill_customer_sk", "ws_bill_cdemo_sk", "ws_bill_hdemo_sk", "ws_bill_addr_sk", "ws_ship_customer_sk", "ws_ship_cdemo_sk", "ws_ship_hdemo_sk", "ws_ship_addr_sk", "ws_web_page_sk", "ws_web_site_sk", "ws_ship_mode_sk", "ws_warehouse_sk", "ws_promo_sk", "ws_order_number", "ws_quantity", "ws_wholesale_cost", "ws_list_price", "ws_sales_price", "ws_ext_discount_amt", "ws_ext_sales_price", "ws_ext_wholesale_cost", "ws_ext_list_price", "ws_ext_tax", "ws_coupon_amt", "ws_ext_ship_cost", "ws_net_paid", "ws_net_paid_inc_tax", "ws_net_paid_inc_ship", "ws_net_paid_inc_ship_tax", "ws_net_profit"
 FROM "WEB_SALES"
-WHERE "ws_item_sk" IS NOT NULL AND "ws_bill_addr_sk" IS NOT NULL AND "ws_sold_date_sk" IS NOT NULL) AS "t0"
+WHERE "ws_item_sk" IS NOT NULL AND ("ws_bill_addr_sk" IS NOT NULL AND "ws_sold_date_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "ca_address_sk", "ca_address_id", "ca_street_number", "ca_street_name", "ca_street_type", "ca_suite_number", "ca_city", "ca_county", "ca_state", "ca_zip", "ca_country", "ca_gmt_offset", "ca_location_type"
 FROM "CUSTOMER_ADDRESS"
 WHERE "ca_gmt_offset" = -6 AND "ca_address_sk" IS NOT NULL) AS "t2" ON "t0"."ws_bill_addr_sk" = "t2"."ca_address_sk"
@@ -4473,7 +4397,7 @@ FROM "ITEM"
 WHERE "i_manufact_id" IS NOT NULL AND "i_item_sk" IS NOT NULL) AS "t4" ON "t0"."ws_item_sk" = "t4"."i_item_sk"
 INNER JOIN (SELECT "d_date_sk", "d_date_id", "d_date", "d_month_seq", "d_week_seq", "d_quarter_seq", "d_year", "d_dow", "d_moy", "d_dom", "d_qoy", "d_fy_year", "d_fy_quarter_seq", "d_fy_week_seq", "d_day_name", "d_quarter_name", "d_holiday", "d_weekend", "d_following_holiday", "d_first_dom", "d_last_dom", "d_same_day_ly", "d_same_day_lq", "d_current_day", "d_current_week", "d_current_month", "d_current_quarter", "d_current_year"
 FROM "DATE_DIM"
-WHERE "d_year" = 1999 AND "d_moy" = 3 AND "d_date_sk" IS NOT NULL) AS "t6" ON "t0"."ws_sold_date_sk" = "t6"."d_date_sk"
+WHERE "d_year" = 1999 AND ("d_moy" = 3 AND "d_date_sk" IS NOT NULL)) AS "t6" ON "t0"."ws_sold_date_sk" = "t6"."d_date_sk"
                     hive.sql.query.fieldNames ws_sold_date_sk,ws_sold_time_sk,ws_ship_date_sk,ws_item_sk,ws_bill_customer_sk,ws_bill_cdemo_sk,ws_bill_hdemo_sk,ws_bill_addr_sk,ws_ship_customer_sk,ws_ship_cdemo_sk,ws_ship_hdemo_sk,ws_ship_addr_sk,ws_web_page_sk,ws_web_site_sk,ws_ship_mode_sk,ws_warehouse_sk,ws_promo_sk,ws_order_number,ws_quantity,ws_wholesale_cost,ws_list_price,ws_sales_price,ws_ext_discount_amt,ws_ext_sales_price,ws_ext_wholesale_cost,ws_ext_list_price,ws_ext_tax,ws_coupon_amt,ws_ext_ship_cost,ws_net_paid,ws_net_paid_inc_tax,ws_net_paid_inc_ship,ws_net_paid_inc_ship_tax,ws_net_profit,d_date_sk,d_date_id,d_date,d_month_seq,d_week_seq,d_quarter_seq,d_year,d_dow,d_moy,d_dom,d_qoy,d_fy_year,d_fy_quarter_seq,d_fy_week_seq,d_day_name,d_quarter_name,d_holiday,d_weekend,d_following_holiday,d_first_dom,d_last_dom,d_same_day_ly,d_same_day_lq,d_current_day,d_current_week,d_current_month,d_current_quarter,d_current_year,ca_address_sk,ca_address_id,ca_street_number,ca_street_name,ca_street_type,ca_suite_number,ca_city,ca_county,ca_state,ca_zip,ca_country,ca_gmt_offset,ca_location_type,i_item_sk,i_item_id,i_rec_start_date,i_rec_end_date,i_item_desc,i_current_price,i_wholesale_cost,i_brand_id,i_brand,i_class_id,i_class,i_category_id,i_category,i_manufact_id,i_manufact,i_size,i_formulation,i_color,i_units,i_container,i_manager_id,i_product_name
                     hive.sql.query.fieldTypes int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),decimal(7,2),int,char(16),date,int,int,int,int,int,int,int,int,int,int,int,char(9),char(6),char(1),char(1),char(1),int,int,int,int,char(1),char(1),char(1),char(1),char(1),int,char(16),char(10),varchar(60),char(15),char(10),varchar(60),varchar(30),char(2),char(10),varchar(20),decimal(5,2),char(20),int,char(16),date,date,varchar(200),decimal(7,2),decimal(7,2),int,char(50),int,char(50),int,char(50),int,char(50),char(20),char(20),char(20),char(10),char(10),int,char(50)
                     hive.sql.query.split false
@@ -4649,7 +4573,6 @@ WHERE "i_category" = 'Books                                             ' AND "i
                     null sort order: z
                     sort order: +
                     Statistics: Num rows: 1 Data size: 127 Basic stats: COMPLETE Column stats: NONE
-                    TopN Hash Memory Usage: 0.1
                     value expressions: _col0 (type: int)
         Reducer 6 
             Execution mode: vectorized, llap
@@ -5206,16 +5129,16 @@ STAGE PLANS:
                     hive.sql.query SELECT COUNT(*) AS "$f0"
 FROM (SELECT "ss_sold_time_sk", "ss_hdemo_sk", "ss_store_sk"
 FROM "STORE_SALES"
-WHERE "ss_store_sk" IS NOT NULL AND "ss_sold_time_sk" IS NOT NULL AND "ss_hdemo_sk" IS NOT NULL) AS "t0"
-INNER JOIN (SELECT "s_store_sk"
-FROM "STORE"
-WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t2" ON "t0"."ss_store_sk" = "t2"."s_store_sk"
-INNER JOIN (SELECT "t_time_sk"
-FROM "TIME_DIM"
-WHERE "t_minute" >= 30 AND "t_hour" = 8 AND "t_time_sk" IS NOT NULL) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+WHERE "ss_store_sk" IS NOT NULL AND ("ss_sold_time_sk" IS NOT NULL AND "ss_hdemo_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "hd_demo_sk"
 FROM "HOUSEHOLD_DEMOGRAPHICS"
-WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR "hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3) AND "hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL) AS "t6" ON "t0"."ss_hdemo_sk" = "t6"."hd_demo_sk"
+WHERE ("hd_vehicle_count" <= 5 OR ("hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3)) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR ("hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3)) AND ("hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_hdemo_sk" = "t2"."hd_demo_sk"
+INNER JOIN (SELECT "t_time_sk"
+FROM "TIME_DIM"
+WHERE "t_minute" >= 30 AND ("t_hour" = 8 AND "t_time_sk" IS NOT NULL)) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+INNER JOIN (SELECT "s_store_sk"
+FROM "STORE"
+WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t6" ON "t0"."ss_store_sk" = "t6"."s_store_sk"
                     hive.sql.query.fieldNames $f0
                     hive.sql.query.fieldTypes bigint
                     hive.sql.query.split false
@@ -5239,16 +5162,16 @@ WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" 
                     hive.sql.query SELECT COUNT(*) AS "$f0"
 FROM (SELECT "ss_sold_time_sk", "ss_hdemo_sk", "ss_store_sk"
 FROM "STORE_SALES"
-WHERE "ss_hdemo_sk" IS NOT NULL AND "ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL) AS "t0"
-INNER JOIN (SELECT "s_store_sk"
-FROM "STORE"
-WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t2" ON "t0"."ss_store_sk" = "t2"."s_store_sk"
-INNER JOIN (SELECT "t_time_sk"
-FROM "TIME_DIM"
-WHERE "t_minute" >= 30 AND "t_hour" = 11 AND "t_time_sk" IS NOT NULL) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+WHERE "ss_hdemo_sk" IS NOT NULL AND ("ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "hd_demo_sk"
 FROM "HOUSEHOLD_DEMOGRAPHICS"
-WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR "hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3) AND "hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL) AS "t6" ON "t0"."ss_hdemo_sk" = "t6"."hd_demo_sk"
+WHERE ("hd_vehicle_count" <= 5 OR ("hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3)) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR ("hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3)) AND ("hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_hdemo_sk" = "t2"."hd_demo_sk"
+INNER JOIN (SELECT "t_time_sk"
+FROM "TIME_DIM"
+WHERE "t_minute" >= 30 AND ("t_hour" = 11 AND "t_time_sk" IS NOT NULL)) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+INNER JOIN (SELECT "s_store_sk"
+FROM "STORE"
+WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t6" ON "t0"."ss_store_sk" = "t6"."s_store_sk"
                     hive.sql.query.fieldNames $f0
                     hive.sql.query.fieldTypes bigint
                     hive.sql.query.split false
@@ -5272,16 +5195,16 @@ WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" 
                     hive.sql.query SELECT COUNT(*) AS "$f0"
 FROM (SELECT "ss_sold_time_sk", "ss_hdemo_sk", "ss_store_sk"
 FROM "STORE_SALES"
-WHERE "ss_hdemo_sk" IS NOT NULL AND "ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL) AS "t0"
-INNER JOIN (SELECT "s_store_sk"
-FROM "STORE"
-WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t2" ON "t0"."ss_store_sk" = "t2"."s_store_sk"
-INNER JOIN (SELECT "t_time_sk"
-FROM "TIME_DIM"
-WHERE "t_minute" < 30 AND "t_hour" = 11 AND "t_time_sk" IS NOT NULL) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+WHERE "ss_hdemo_sk" IS NOT NULL AND ("ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "hd_demo_sk"
 FROM "HOUSEHOLD_DEMOGRAPHICS"
-WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR "hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3) AND "hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL) AS "t6" ON "t0"."ss_hdemo_sk" = "t6"."hd_demo_sk"
+WHERE ("hd_vehicle_count" <= 5 OR ("hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3)) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR ("hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3)) AND ("hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_hdemo_sk" = "t2"."hd_demo_sk"
+INNER JOIN (SELECT "t_time_sk"
+FROM "TIME_DIM"
+WHERE "t_minute" < 30 AND ("t_hour" = 11 AND "t_time_sk" IS NOT NULL)) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+INNER JOIN (SELECT "s_store_sk"
+FROM "STORE"
+WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t6" ON "t0"."ss_store_sk" = "t6"."s_store_sk"
                     hive.sql.query.fieldNames $f0
                     hive.sql.query.fieldTypes bigint
                     hive.sql.query.split false
@@ -5305,16 +5228,16 @@ WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" 
                     hive.sql.query SELECT COUNT(*) AS "$f0"
 FROM (SELECT "ss_sold_time_sk", "ss_hdemo_sk", "ss_store_sk"
 FROM "STORE_SALES"
-WHERE "ss_hdemo_sk" IS NOT NULL AND "ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL) AS "t0"
-INNER JOIN (SELECT "s_store_sk"
-FROM "STORE"
-WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t2" ON "t0"."ss_store_sk" = "t2"."s_store_sk"
-INNER JOIN (SELECT "t_time_sk"
-FROM "TIME_DIM"
-WHERE "t_minute" >= 30 AND "t_hour" = 10 AND "t_time_sk" IS NOT NULL) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+WHERE "ss_hdemo_sk" IS NOT NULL AND ("ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "hd_demo_sk"
 FROM "HOUSEHOLD_DEMOGRAPHICS"
-WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR "hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3) AND "hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL) AS "t6" ON "t0"."ss_hdemo_sk" = "t6"."hd_demo_sk"
+WHERE ("hd_vehicle_count" <= 5 OR ("hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3)) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR ("hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3)) AND ("hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_hdemo_sk" = "t2"."hd_demo_sk"
+INNER JOIN (SELECT "t_time_sk"
+FROM "TIME_DIM"
+WHERE "t_minute" >= 30 AND ("t_hour" = 10 AND "t_time_sk" IS NOT NULL)) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+INNER JOIN (SELECT "s_store_sk"
+FROM "STORE"
+WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t6" ON "t0"."ss_store_sk" = "t6"."s_store_sk"
                     hive.sql.query.fieldNames $f0
                     hive.sql.query.fieldTypes bigint
                     hive.sql.query.split false
@@ -5338,16 +5261,16 @@ WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" 
                     hive.sql.query SELECT COUNT(*) AS "$f0"
 FROM (SELECT "ss_sold_time_sk", "ss_hdemo_sk", "ss_store_sk"
 FROM "STORE_SALES"
-WHERE "ss_hdemo_sk" IS NOT NULL AND "ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL) AS "t0"
-INNER JOIN (SELECT "s_store_sk"
-FROM "STORE"
-WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t2" ON "t0"."ss_store_sk" = "t2"."s_store_sk"
-INNER JOIN (SELECT "t_time_sk"
-FROM "TIME_DIM"
-WHERE "t_minute" < 30 AND "t_hour" = 10 AND "t_time_sk" IS NOT NULL) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+WHERE "ss_hdemo_sk" IS NOT NULL AND ("ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "hd_demo_sk"
 FROM "HOUSEHOLD_DEMOGRAPHICS"
-WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR "hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3) AND "hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL) AS "t6" ON "t0"."ss_hdemo_sk" = "t6"."hd_demo_sk"
+WHERE ("hd_vehicle_count" <= 5 OR ("hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3)) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR ("hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3)) AND ("hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_hdemo_sk" = "t2"."hd_demo_sk"
+INNER JOIN (SELECT "t_time_sk"
+FROM "TIME_DIM"
+WHERE "t_minute" < 30 AND ("t_hour" = 10 AND "t_time_sk" IS NOT NULL)) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+INNER JOIN (SELECT "s_store_sk"
+FROM "STORE"
+WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t6" ON "t0"."ss_store_sk" = "t6"."s_store_sk"
                     hive.sql.query.fieldNames $f0
                     hive.sql.query.fieldTypes bigint
                     hive.sql.query.split false
@@ -5371,16 +5294,16 @@ WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" 
                     hive.sql.query SELECT COUNT(*) AS "$f0"
 FROM (SELECT "ss_sold_time_sk", "ss_hdemo_sk", "ss_store_sk"
 FROM "STORE_SALES"
-WHERE "ss_hdemo_sk" IS NOT NULL AND "ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL) AS "t0"
-INNER JOIN (SELECT "s_store_sk"
-FROM "STORE"
-WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t2" ON "t0"."ss_store_sk" = "t2"."s_store_sk"
-INNER JOIN (SELECT "t_time_sk"
-FROM "TIME_DIM"
-WHERE "t_minute" >= 30 AND "t_hour" = 9 AND "t_time_sk" IS NOT NULL) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+WHERE "ss_hdemo_sk" IS NOT NULL AND ("ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "hd_demo_sk"
 FROM "HOUSEHOLD_DEMOGRAPHICS"
-WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR "hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3) AND "hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL) AS "t6" ON "t0"."ss_hdemo_sk" = "t6"."hd_demo_sk"
+WHERE ("hd_vehicle_count" <= 5 OR ("hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3)) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR ("hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3)) AND ("hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_hdemo_sk" = "t2"."hd_demo_sk"
+INNER JOIN (SELECT "t_time_sk"
+FROM "TIME_DIM"
+WHERE "t_minute" >= 30 AND ("t_hour" = 9 AND "t_time_sk" IS NOT NULL)) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+INNER JOIN (SELECT "s_store_sk"
+FROM "STORE"
+WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t6" ON "t0"."ss_store_sk" = "t6"."s_store_sk"
                     hive.sql.query.fieldNames $f0
                     hive.sql.query.fieldTypes bigint
                     hive.sql.query.split false
@@ -5404,16 +5327,16 @@ WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" 
                     hive.sql.query SELECT COUNT(*) AS "$f0"
 FROM (SELECT "ss_sold_time_sk", "ss_hdemo_sk", "ss_store_sk"
 FROM "STORE_SALES"
-WHERE "ss_hdemo_sk" IS NOT NULL AND "ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL) AS "t0"
-INNER JOIN (SELECT "s_store_sk"
-FROM "STORE"
-WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t2" ON "t0"."ss_store_sk" = "t2"."s_store_sk"
-INNER JOIN (SELECT "t_time_sk"
-FROM "TIME_DIM"
-WHERE "t_minute" < 30 AND "t_hour" = 9 AND "t_time_sk" IS NOT NULL) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+WHERE "ss_hdemo_sk" IS NOT NULL AND ("ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "hd_demo_sk"
 FROM "HOUSEHOLD_DEMOGRAPHICS"
-WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR "hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3) AND "hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL) AS "t6" ON "t0"."ss_hdemo_sk" = "t6"."hd_demo_sk"
+WHERE ("hd_vehicle_count" <= 5 OR ("hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3)) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR ("hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3)) AND ("hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_hdemo_sk" = "t2"."hd_demo_sk"
+INNER JOIN (SELECT "t_time_sk"
+FROM "TIME_DIM"
+WHERE "t_minute" < 30 AND ("t_hour" = 9 AND "t_time_sk" IS NOT NULL)) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+INNER JOIN (SELECT "s_store_sk"
+FROM "STORE"
+WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t6" ON "t0"."ss_store_sk" = "t6"."s_store_sk"
                     hive.sql.query.fieldNames $f0
                     hive.sql.query.fieldTypes bigint
                     hive.sql.query.split false
@@ -5437,16 +5360,16 @@ WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" 
                     hive.sql.query SELECT COUNT(*) AS "$f0"
 FROM (SELECT "ss_sold_time_sk", "ss_hdemo_sk", "ss_store_sk"
 FROM "STORE_SALES"
-WHERE "ss_hdemo_sk" IS NOT NULL AND "ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL) AS "t0"
-INNER JOIN (SELECT "s_store_sk"
-FROM "STORE"
-WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t2" ON "t0"."ss_store_sk" = "t2"."s_store_sk"
-INNER JOIN (SELECT "t_time_sk"
-FROM "TIME_DIM"
-WHERE "t_minute" < 30 AND "t_hour" = 12 AND "t_time_sk" IS NOT NULL) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+WHERE "ss_hdemo_sk" IS NOT NULL AND ("ss_sold_time_sk" IS NOT NULL AND "ss_store_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "hd_demo_sk"
 FROM "HOUSEHOLD_DEMOGRAPHICS"
-WHERE ("hd_vehicle_count" <= 5 OR "hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR "hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3) AND "hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL) AS "t6" ON "t0"."ss_hdemo_sk" = "t6"."hd_demo_sk"
+WHERE ("hd_vehicle_count" <= 5 OR ("hd_vehicle_count" <= 2 OR "hd_vehicle_count" <= 3)) AND ("hd_dep_count" = 4 AND "hd_vehicle_count" <= 5 OR ("hd_dep_count" = 2 AND "hd_vehicle_count" <= 2 OR "hd_dep_count" = 0 AND "hd_vehicle_count" <= 3)) AND ("hd_dep_count" IN (4, 2, 0) AND "hd_demo_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_hdemo_sk" = "t2"."hd_demo_sk"
+INNER JOIN (SELECT "t_time_sk"
+FROM "TIME_DIM"
+WHERE "t_minute" < 30 AND ("t_hour" = 12 AND "t_time_sk" IS NOT NULL)) AS "t4" ON "t0"."ss_sold_time_sk" = "t4"."t_time_sk"
+INNER JOIN (SELECT "s_store_sk"
+FROM "STORE"
+WHERE "s_store_name" = 'ese' AND "s_store_sk" IS NOT NULL) AS "t6" ON "t0"."ss_store_sk" = "t6"."s_store_sk"
                     hive.sql.query.fieldNames $f0
                     hive.sql.query.fieldTypes bigint
                     hive.sql.query.split false
@@ -6016,30 +5939,29 @@ STAGE PLANS:
                 TableScan
                   alias: web_returns
                   properties:
-                    hive.sql.query SELECT "t2"."r_reason_desc", SUM("t9"."ws_quantity") AS "$f1", COUNT("t9"."ws_quantity") AS "$f2", SUM("t0"."wr_refunded_cash") AS "$f3", COUNT("t0"."wr_refunded_cash") AS "$f4", SUM("t0"."wr_fee") AS "$f5", COUNT("t0"."wr_fee") AS "$f6"
+                    hive.sql.query SELECT "t2"."r_reason_desc", SUM("t13"."ws_quantity") AS "$f1", COUNT("t13"."ws_quantity") AS "$f2", SUM("t0"."wr_refunded_cash") AS "$f3", COUNT("t0"."wr_refunded_cash") AS "$f4", SUM("t0"."wr_fee") AS "$f5", COUNT("t0"."wr_fee") AS "$f6"
 FROM (SELECT "wr_item_sk", "wr_refunded_cdemo_sk", "wr_refunded_addr_sk", "wr_returning_cdemo_sk", "wr_reason_sk", "wr_order_number", "wr_fee", "wr_refunded_cash"
 FROM "WEB_RETURNS"
-WHERE "wr_reason_sk" IS NOT NULL AND "wr_refunded_addr_sk" IS NOT NULL AND "wr_returning_cdemo_sk" IS NOT NULL AND "wr_refunded_cdemo_sk" IS NOT NULL AND "wr_item_sk" IS NOT NULL AND "wr_order_number" IS NOT NULL) AS "t0"
+WHERE "wr_reason_sk" IS NOT NULL AND ("wr_refunded_addr_sk" IS NOT NULL AND "wr_returning_cdemo_sk" IS NOT NULL) AND ("wr_refunded_cdemo_sk" IS NOT NULL AND ("wr_item_sk" IS NOT NULL AND "wr_order_number" IS NOT NULL))) AS "t0"
 INNER JOIN (SELECT "r_reason_sk", "r_reason_desc"
 FROM "REASON"
 WHERE "r_reason_sk" IS NOT NULL) AS "t2" ON "t0"."wr_reason_sk" = "t2"."r_reason_sk"
 INNER JOIN (SELECT "ca_address_sk", "ca_state" IN ('IN', 'OH', 'NJ') AS "EXPR$0", "ca_state" IN ('WI', 'CT', 'KY') AS "EXPR$1", "ca_state" IN ('LA', 'IA', 'AR') AS "EXPR$2"
 FROM "CUSTOMER_ADDRESS"
-WHERE "ca_state" IN ('IN', 'OH', 'NJ', 'WI', 'CT', 'KY', 'LA', 'IA', 'AR') AND "ca_country" = 'United States' AND "ca_address_sk" IS NOT NULL) AS "t4" ON "t0"."wr_refunded_addr_sk" = "t4"."ca_address_sk"
-INNER JOIN (SELECT "t6"."ws_sold_date_sk", "t6"."ws_item_sk", "t6"."ws_order_number", "t6"."ws_quantity", "t6"."EXPR$0", "t6"."EXPR$1", "t6"."EXPR$2", "t6"."EXPR$3", "t6"."EXPR$4", "t6"."EXPR$5", "t8"."d_date_sk"
-FROM (SELECT "ws_sold_date_sk", "ws_item_sk", "ws_order_number", "ws_quantity", "ws_net_profit" BETWEEN 100 AND 200 AS "EXPR$0", "ws_net_profit" BETWEEN 150 AND 300 AS "EXPR$1", "ws_net_profit" BETWEEN 50 AND 250 AS "EXPR$2", "ws_sales_price" BETWEEN 100 AND 150 AS "EXPR$3", "ws_sales_price" BETWEEN 50 AND 100 AS "EXPR$4", "ws_sales_price" BETWEEN 150 AND 200 AS "EXPR$5"
-FROM "WEB_SALES"
-WHERE (100 <= "ws_sales_price" OR "ws_sales_price" <= 150 OR 50 <= "ws_sales_price" OR "ws_sales_price" <= 100 OR 150 <= "ws_sales_price" OR "ws_sales_price" <= 200) AND (100 <= "ws_net_profit" OR "ws_net_profit" <= 200 OR 150 <= "ws_net_profit" OR "ws_net_profit" <= 300 OR 50 <= "ws_net_profit" OR "ws_net_profit" <= 250) AND "ws_sold_date_sk" IS NOT NULL AND "ws_item_sk" IS NOT NULL AND "ws_order_number" IS NOT NULL) AS "t6"
-INNER JOIN (SELECT "d_date_sk"
-FROM "DATE_DIM"
-WHERE "d_year" = 2000 AND "d_date_sk" IS NOT NULL) AS "t8" ON "t6"."ws_sold_date_sk" = "t8"."d_date_sk") AS "t9" ON ("t4"."EXPR$0" AND "t9"."EXPR$0" OR "t4"."EXPR$1" AND "t9"."EXPR$1" OR "t4"."EXPR$2" AND "t9"."EXPR$2") AND "t0"."wr_item_sk" = "t9"."ws_item_sk" AND "t0"."wr_order_number" = "t9"."ws_order_number"
-INNER JOIN (SELECT "t11"."cd_demo_sk", "t11"."cd_marital_status", "t11"."cd_education_status", "t11"."EXPR$0", "t11"."EXPR$1", "t11"."EXPR$2", "t11"."EXPR$3", "t11"."EXPR$4", "t11"."EXPR$5", "t13"."cd_demo_sk" AS "cd_demo_sk0", "t13"."cd_marital_status" AS "cd_marital_status0", "t13"."cd_education_status" AS "cd_education_status0"
-FROM (SELECT "cd_demo_sk", "cd_marital_status", "cd_education_status", "cd_marital_status" = 'M' AS "EXPR$0", "cd_education_status" = 'Advanced Degree     ' AS "EXPR$1", "cd_marital_status" = 'S' AS "EXPR$2", "cd_education_status" = 'College             ' AS "EXPR$3", "cd_marital_status" = 'W' AS "EXPR$4", "cd_education_status" = '2 yr Degree         ' AS "EXPR$5"
+WHERE "ca_state" IN ('IN', 'OH', 'NJ', 'WI', 'CT', 'KY', 'LA', 'IA', 'AR') AND ("ca_country" = 'United States' AND "ca_address_sk" IS NOT NULL)) AS "t4" ON "t0"."wr_refunded_addr_sk" = "t4"."ca_address_sk"
+INNER JOIN (SELECT "cd_demo_sk", "cd_marital_status", "cd_education_status", "cd_marital_status" = 'M' AS "EXPR$0", "cd_education_status" = 'Advanced Degree     ' AS "EXPR$1", "cd_marital_status" = 'S' AS "EXPR$2", "cd_education_status" = 'College             ' AS "EXPR$3", "cd_marital_status" = 'W' AS "EXPR$4", "cd_education_status" = '2 yr Degree         ' AS "EXPR$5"
 FROM "CUSTOMER_DEMOGRAPHICS"
-WHERE "cd_marital_status" IN ('M', 'S', 'W') AND "cd_education_status" IN ('Advanced Degree     ', 'College             ', '2 yr Degree         ') AND "cd_demo_sk" IS NOT NULL) AS "t11"
+WHERE "cd_marital_status" IN ('M', 'S', 'W') AND ("cd_education_status" IN ('Advanced Degree     ', 'College             ', '2 yr Degree         ') AND "cd_demo_sk" IS NOT NULL)) AS "t6" ON "t0"."wr_refunded_cdemo_sk" = "t6"."cd_demo_sk"
 INNER JOIN (SELECT "cd_demo_sk", "cd_marital_status", "cd_education_status"
 FROM "CUSTOMER_DEMOGRAPHICS"
-WHERE "cd_marital_status" IN ('M', 'S', 'W') AND "cd_education_status" IN ('Advanced Degree     ', 'College             ', '2 yr Degree         ') AND "cd_demo_sk" IS NOT NULL) AS "t13" ON "t11"."cd_marital_status" = "t13"."cd_marital_status" AND "t11"."cd_education_status" = "t13"."cd_education_status") AS "t14" ON "t0"."wr_returning_cdemo_sk" = "t14"."cd_demo_sk0" AND "t0"."wr_refunded_cdemo_sk" = "t14"."cd_demo_sk" AND ("t14"."EXPR$0" AND "t14"."EXPR$1" AND "t9"."EXPR$3" OR "t14"."EXPR$2" AND "t14"."EXPR$3" AND "t9"."EXPR$4" OR "t14"."EXPR$4" AND "t14"."EXPR$5" AND "t9"."EXPR$5")
+WHERE "cd_marital_status" IN ('M', 'S', 'W') AND ("cd_education_status" IN ('Advanced Degree     ', 'College             ', '2 yr Degree         ') AND "cd_demo_sk" IS NOT NULL)) AS "t8" ON "t0"."wr_returning_cdemo_sk" = "t8"."cd_demo_sk" AND "t6"."cd_marital_status" = "t8"."cd_marital_status" AND "t6"."cd_education_status" = "t8"."cd_education_status"
+INNER JOIN (SELECT "t10"."ws_sold_date_sk", "t10"."ws_item_sk", "t10"."ws_order_number", "t10"."ws_quantity", "t10"."EXPR$0", "t10"."EXPR$1", "t10"."EXPR$2", "t10"."EXPR$3", "t10"."EXPR$4", "t10"."EXPR$5", "t12"."d_date_sk"
+FROM (SELECT "ws_sold_date_sk", "ws_item_sk", "ws_order_number", "ws_quantity", "ws_net_profit" BETWEEN 100 AND 200 AS "EXPR$0", "ws_net_profit" BETWEEN 150 AND 300 AS "EXPR$1", "ws_net_profit" BETWEEN 50 AND 250 AS "EXPR$2", "ws_sales_price" BETWEEN 100 AND 150 AS "EXPR$3", "ws_sales_price" BETWEEN 50 AND 100 AS "EXPR$4", "ws_sales_price" BETWEEN 150 AND 200 AS "EXPR$5"
+FROM "WEB_SALES"
+WHERE (100 <= "ws_sales_price" OR ("ws_sales_price" <= 150 OR 50 <= "ws_sales_price") OR ("ws_sales_price" <= 100 OR (150 <= "ws_sales_price" OR "ws_sales_price" <= 200))) AND (100 <= "ws_net_profit" OR ("ws_net_profit" <= 200 OR 150 <= "ws_net_profit") OR ("ws_net_profit" <= 300 OR (50 <= "ws_net_profit" OR "ws_net_profit" <= 250))) AND ("ws_sold_date_sk" IS NOT NULL AND ("ws_item_sk" IS NOT NULL AND "ws_order_number" IS NOT NULL))) AS "t10"
+INNER JOIN (SELECT "d_date_sk"
+FROM "DATE_DIM"
+WHERE "d_year" = 2000 AND "d_date_sk" IS NOT NULL) AS "t12" ON "t10"."ws_sold_date_sk" = "t12"."d_date_sk") AS "t13" ON "t0"."wr_item_sk" = "t13"."ws_item_sk" AND "t0"."wr_order_number" = "t13"."ws_order_number" AND ("t6"."EXPR$0" AND "t6"."EXPR$1" AND "t13"."EXPR$3" OR "t6"."EXPR$2" AND "t6"."EXPR$3" AND "t13"."EXPR$4" OR "t6"."EXPR$4" AND "t6"."EXPR$5" AND "t13"."EXPR$5") AND ("t4"."EXPR$0" AND "t13"."EXPR$0" OR "t4"."EXPR$1" AND "t13"."EXPR$1" OR "t4"."EXPR$2" AND "t13"."EXPR$2")
 GROUP BY "t2"."r_reason_desc"
                     hive.sql.query.fieldNames r_reason_desc,$f1,$f2,$f3,$f4,$f5,$f6
                     hive.sql.query.fieldTypes char(100),bigint,bigint,decimal(17,2),bigint,decimal(17,2),bigint
@@ -6060,7 +5982,6 @@ GROUP BY "t2"."r_reason_desc"
                         null sort order: zzzz
                         sort order: ++++
                         Statistics: Num rows: 1 Data size: 440 Basic stats: COMPLETE Column stats: NONE
-                        TopN Hash Memory Usage: 0.1
             Execution mode: vectorized, llap
             LLAP IO: no inputs
         Reducer 2 
@@ -6204,7 +6125,6 @@ POSTHOOK: Input: default@web_returns
 POSTHOOK: Input: default@web_sales
 #### A masked pattern was here ####
 PREHOOK: query: explain
-<<<<<<< HEAD
 SELECT ranking
 FROM
     (SELECT rank() OVER (PARTITION BY ss_store_sk
@@ -6225,7 +6145,120 @@ FROM
 WHERE ranking <= 5
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@store_sales
-=======
+#### A masked pattern was here ####
+STAGE DEPENDENCIES:
+  Stage-1 is a root stage
+  Stage-0 depends on stages: Stage-1
+
+STAGE PLANS:
+  Stage: Stage-1
+    Tez
+#### A masked pattern was here ####
+      Edges:
+        Reducer 2 <- Map 1 (SIMPLE_EDGE)
+#### A masked pattern was here ####
+      Vertices:
+        Map 1 
+            Map Operator Tree:
+                TableScan
+                  alias: store_sales
+                  properties:
+                    hive.sql.query SELECT "ss_store_sk", SUM("ss_net_profit") AS "$f1"
+FROM "STORE_SALES"
+GROUP BY "ss_store_sk"
+                    hive.sql.query.fieldNames ss_store_sk,$f1
+                    hive.sql.query.fieldTypes int,decimal(17,2)
+                    hive.sql.query.split false
+                  Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
+                  Top N Key Operator
+                    sort order: ++
+                    keys: ss_store_sk (type: int), $f1 (type: decimal(17,2))
+                    null sort order: az
+                    Map-reduce partition columns: ss_store_sk (type: int)
+                    Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
+                    top n: 6
+                    Select Operator
+                      expressions: ss_store_sk (type: int), $f1 (type: decimal(17,2))
+                      outputColumnNames: _col0, _col1
+                      Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
+                      Reduce Output Operator
+                        key expressions: _col0 (type: int), _col1 (type: decimal(17,2))
+                        null sort order: az
+                        sort order: ++
+                        Map-reduce partition columns: _col0 (type: int)
+                        Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
+            Execution mode: vectorized, llap
+            LLAP IO: no inputs
+        Reducer 2 
+            Execution mode: vectorized, llap
+            Reduce Operator Tree:
+              Select Operator
+                expressions: KEY.reducesinkkey0 (type: int), KEY.reducesinkkey1 (type: decimal(17,2))
+                outputColumnNames: _col0, _col1
+                Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
+                PTF Operator
+                  Function definitions:
+                      Input definition
+                        input alias: ptf_0
+                        output shape: _col0: int, _col1: decimal(17,2)
+                        type: WINDOWING
+                      Windowing table definition
+                        input alias: ptf_1
+                        name: windowingtablefunction
+                        order by: _col1 ASC NULLS LAST
+                        partition by: _col0
+                        raw input shape:
+                        window functions:
+                            window function definition
+                              alias: rank_window_0
+                              arguments: _col1
+                              name: rank
+                              window function: GenericUDAFRankEvaluator
+                              window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
+                              isPivotResult: true
+                  Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
+                  Filter Operator
+                    predicate: (rank_window_0 <= 5) (type: boolean)
+                    Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
+                    Select Operator
+                      expressions: rank_window_0 (type: int)
+                      outputColumnNames: _col0
+                      Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
+                      File Output Operator
+                        compressed: false
+                        Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
+                        table:
+                            input format: org.apache.hadoop.mapred.SequenceFileInputFormat
+                            output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
+                            serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+
+  Stage: Stage-0
+    Fetch Operator
+      limit: -1
+      Processor Tree:
+        ListSink
+
+PREHOOK: query: SELECT ranking
+FROM
+    (SELECT rank() OVER (PARTITION BY ss_store_sk
+        ORDER BY sum(ss_net_profit)) AS ranking
+     FROM store_sales
+     GROUP BY ss_store_sk) tmp1
+WHERE ranking <= 5
+PREHOOK: type: QUERY
+PREHOOK: Input: default@store_sales
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT ranking
+FROM
+    (SELECT rank() OVER (PARTITION BY ss_store_sk
+        ORDER BY sum(ss_net_profit)) AS ranking
+     FROM store_sales
+     GROUP BY ss_store_sk) tmp1
+WHERE ranking <= 5
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@store_sales
+#### A masked pattern was here ####
+PREHOOK: query: explain
 SELECT cd_gender,
        cd_marital_status,
        cd_education_status,
@@ -6336,7 +6369,6 @@ POSTHOOK: Input: default@customer_demographics
 POSTHOOK: Input: default@date_dim
 POSTHOOK: Input: default@store_sales
 POSTHOOK: Input: default@web_sales
->>>>>>> 14c653a5fe... HIVE-23716: Support Anti Join in Hive (Mahesh Kumar Behera, reviewed by Vineet Garg, Ramesh Kumar Thangarajan, Panagiotis Garefalakis, Jesus Camacho Rodriguez)
 #### A masked pattern was here ####
 STAGE DEPENDENCIES:
   Stage-1 is a root stage
@@ -6347,125 +6379,22 @@ STAGE PLANS:
     Tez
 #### A masked pattern was here ####
       Edges:
-<<<<<<< HEAD
-        Reducer 2 <- Map 1 (SIMPLE_EDGE)
-=======
         Reducer 2 <- Map 1 (SIMPLE_EDGE), Map 7 (SIMPLE_EDGE)
         Reducer 3 <- Map 8 (SIMPLE_EDGE), Reducer 2 (SIMPLE_EDGE)
         Reducer 4 <- Map 9 (SIMPLE_EDGE), Reducer 3 (SIMPLE_EDGE)
         Reducer 5 <- Reducer 4 (SIMPLE_EDGE)
         Reducer 6 <- Reducer 5 (SIMPLE_EDGE)
->>>>>>> 14c653a5fe... HIVE-23716: Support Anti Join in Hive (Mahesh Kumar Behera, reviewed by Vineet Garg, Ramesh Kumar Thangarajan, Panagiotis Garefalakis, Jesus Camacho Rodriguez)
 #### A masked pattern was here ####
       Vertices:
         Map 1 
             Map Operator Tree:
                 TableScan
-<<<<<<< HEAD
-                  alias: store_sales
-                  properties:
-                    hive.sql.query SELECT "ss_store_sk", SUM("ss_net_profit") AS "$f1"
-FROM "STORE_SALES"
-GROUP BY "ss_store_sk"
-                    hive.sql.query.fieldNames ss_store_sk,$f1
-                    hive.sql.query.fieldTypes int,decimal(17,2)
-                    hive.sql.query.split false
-                  Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
-                  Top N Key Operator
-                    sort order: ++
-                    keys: ss_store_sk (type: int), $f1 (type: decimal(17,2))
-                    null sort order: az
-                    Map-reduce partition columns: ss_store_sk (type: int)
-                    Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
-                    top n: 6
-                    Select Operator
-                      expressions: ss_store_sk (type: int), $f1 (type: decimal(17,2))
-                      outputColumnNames: _col0, _col1
-                      Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
-                      Reduce Output Operator
-                        key expressions: _col0 (type: int), _col1 (type: decimal(17,2))
-                        null sort order: az
-                        sort order: ++
-                        Map-reduce partition columns: _col0 (type: int)
-                        Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
-                        TopN Hash Memory Usage: 0.1
-            Execution mode: vectorized, llap
-            LLAP IO: no inputs
-        Reducer 2 
-            Execution mode: vectorized, llap
-            Reduce Operator Tree:
-              Select Operator
-                expressions: KEY.reducesinkkey0 (type: int), KEY.reducesinkkey1 (type: decimal(17,2))
-                outputColumnNames: _col0, _col1
-                Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
-                PTF Operator
-                  Function definitions:
-                      Input definition
-                        input alias: ptf_0
-                        output shape: _col0: int, _col1: decimal(17,2)
-                        type: WINDOWING
-                      Windowing table definition
-                        input alias: ptf_1
-                        name: windowingtablefunction
-                        order by: _col1 ASC NULLS LAST
-                        partition by: _col0
-                        raw input shape:
-                        window functions:
-                            window function definition
-                              alias: rank_window_0
-                              arguments: _col1
-                              name: rank
-                              window function: GenericUDAFRankEvaluator
-                              window frame: ROWS PRECEDING(MAX)~FOLLOWING(MAX)
-                              isPivotResult: true
-                  Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
-                  Filter Operator
-                    predicate: (rank_window_0 <= 5) (type: boolean)
-                    Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
-                    Select Operator
-                      expressions: rank_window_0 (type: int)
-                      outputColumnNames: _col0
-                      Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
-                      File Output Operator
-                        compressed: false
-                        Statistics: Num rows: 1 Data size: 116 Basic stats: COMPLETE Column stats: NONE
-                        table:
-                            input format: org.apache.hadoop.mapred.SequenceFileInputFormat
-                            output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
-                            serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
-
-  Stage: Stage-0
-    Fetch Operator
-      limit: -1
-      Processor Tree:
-        ListSink
-
-PREHOOK: query: SELECT ranking
-FROM
-    (SELECT rank() OVER (PARTITION BY ss_store_sk
-        ORDER BY sum(ss_net_profit)) AS ranking
-     FROM store_sales
-     GROUP BY ss_store_sk) tmp1
-WHERE ranking <= 5
-PREHOOK: type: QUERY
-PREHOOK: Input: default@store_sales
-#### A masked pattern was here ####
-POSTHOOK: query: SELECT ranking
-FROM
-    (SELECT rank() OVER (PARTITION BY ss_store_sk
-        ORDER BY sum(ss_net_profit)) AS ranking
-     FROM store_sales
-     GROUP BY ss_store_sk) tmp1
-WHERE ranking <= 5
-POSTHOOK: type: QUERY
-POSTHOOK: Input: default@store_sales
-=======
                   alias: c
                   properties:
                     hive.sql.query SELECT "t0"."c_customer_sk", "t0"."c_customer_id", "t0"."c_current_cdemo_sk", "t0"."c_current_hdemo_sk", "t0"."c_current_addr_sk", "t0"."c_first_shipto_date_sk", "t0"."c_first_sales_date_sk", "t0"."c_salutation", "t0"."c_first_name", "t0"."c_last_name", "t0"."c_preferred_cust_flag", "t0"."c_birth_day", "t0"."c_birth_month", "t0"."c_birth_year", "t0"."c_birth_country", "t0"."c_login", "t0"."c_email_address", "t0"."c_last_review_date", "t4"."ca_address_sk", "t4"."ca_address_id", "t4"."ca_street_number", "t4"."ca_street_name", "t4"."ca_street_type", "t4"."ca_suite_number", "t4"."ca_city", "t4"."ca_county", "t4"."ca_state", "t4"."ca_zip", "t4"."ca_country", "t4"."ca_gmt_offset", "t4"."ca_location_type", "t2"."cd_demo_sk", "t2"."cd_gender", "t2"."cd_marital_status", "t2"."cd_education_status", "t2"."cd_purchase_estimate", "t2"."cd_credit_rating", "t2"."cd_dep_count", "t2"."cd_dep_employed_count", "t2"."cd_dep_college_count"
 FROM (SELECT "c_customer_sk", "c_customer_id", "c_current_cdemo_sk", "c_current_hdemo_sk", "c_current_addr_sk", "c_first_shipto_date_sk", "c_first_sales_date_sk", "c_salutation", "c_first_name", "c_last_name", "c_preferred_cust_flag", "c_birth_day", "c_birth_month", "c_birth_year", "c_birth_country", "c_login", "c_email_address", "c_last_review_date"
 FROM "CUSTOMER"
-WHERE "c_current_addr_sk" IS NOT NULL AND "c_current_cdemo_sk" IS NOT NULL AND "c_customer_sk" IS NOT NULL) AS "t0"
+WHERE "c_customer_sk" IS NOT NULL AND ("c_current_cdemo_sk" IS NOT NULL AND "c_current_addr_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "cd_demo_sk", "cd_gender", "cd_marital_status", "cd_education_status", "cd_purchase_estimate", "cd_credit_rating", "cd_dep_count", "cd_dep_employed_count", "cd_dep_college_count"
 FROM "CUSTOMER_DEMOGRAPHICS"
 WHERE "cd_demo_sk" IS NOT NULL) AS "t2" ON "t0"."c_current_cdemo_sk" = "t2"."cd_demo_sk"
@@ -6482,7 +6411,7 @@ WHERE "ca_state" IN ('CO', 'IL', 'MN') AND "ca_address_sk" IS NOT NULL) AS "t4" 
                     Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: z
+                      null sort order: a
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
@@ -6494,19 +6423,19 @@ WHERE "ca_state" IN ('CO', 'IL', 'MN') AND "ca_address_sk" IS NOT NULL) AS "t4" 
                 TableScan
                   alias: store_sales
                   properties:
-                    hive.sql.query SELECT "t0"."ss_customer_sk" AS "ss_customer_sk0"
-FROM (SELECT "ss_sold_date_sk", "ss_sold_time_sk", "ss_item_sk", "ss_customer_sk", "ss_cdemo_sk", "ss_hdemo_sk", "ss_addr_sk", "ss_store_sk", "ss_promo_sk", "ss_ticket_number", "ss_quantity", "ss_wholesale_cost", "ss_list_price", "ss_sales_price", "ss_ext_discount_amt", "ss_ext_sales_price", "ss_ext_wholesale_cost", "ss_ext_list_price", "ss_ext_tax", "ss_coupon_amt", "ss_net_paid", "ss_net_paid_inc_tax", "ss_net_profit"
+                    hive.sql.query SELECT "t0"."ss_customer_sk"
+FROM (SELECT "ss_sold_date_sk", "ss_customer_sk"
 FROM "STORE_SALES"
 WHERE "ss_customer_sk" IS NOT NULL AND "ss_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."ss_sold_date_sk" = "t2"."d_date_sk"
-                    hive.sql.query.fieldNames ss_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_sold_date_sk" = "t2"."d_date_sk"
+                    hive.sql.query.fieldNames ss_customer_sk
                     hive.sql.query.fieldTypes int
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: ss_customer_sk0 (type: int)
+                    expressions: ss_customer_sk (type: int)
                     outputColumnNames: _col0
                     Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                     Group By Operator
@@ -6517,7 +6446,7 @@ WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) A
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: z
+                        null sort order: a
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
@@ -6528,24 +6457,25 @@ WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) A
                 TableScan
                   alias: web_sales
                   properties:
-                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."ws_bill_customer_sk" AS "ws_bill_customer_sk0"
-FROM (SELECT "ws_sold_date_sk", "ws_sold_time_sk", "ws_ship_date_sk", "ws_item_sk", "ws_bill_customer_sk", "ws_bill_cdemo_sk", "ws_bill_hdemo_sk", "ws_bill_addr_sk", "ws_ship_customer_sk", "ws_ship_cdemo_sk", "ws_ship_hdemo_sk", "ws_ship_addr_sk", "ws_web_page_sk", "ws_web_site_sk", "ws_ship_mode_sk", "ws_warehouse_sk", "ws_promo_sk", "ws_order_number", "ws_quantity", "ws_wholesale_cost", "ws_list_price", "ws_sales_price", "ws_ext_discount_amt", "ws_ext_sales_price", "ws_ext_wholesale_cost", "ws_ext_list_price", "ws_ext_tax", "ws_coupon_amt", "ws_ext_ship_cost", "ws_net_paid", "ws_net_paid_inc_tax", "ws_net_paid_inc_ship", "ws_net_paid_inc_ship_tax", "ws_net_profit"
+                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."ws_bill_customer_sk"
+FROM (SELECT "ws_sold_date_sk", "ws_bill_customer_sk"
 FROM "WEB_SALES"
 WHERE "ws_bill_customer_sk" IS NOT NULL AND "ws_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."ws_sold_date_sk" = "t2"."d_date_sk"
-                    hive.sql.query.fieldNames literalTrue,ws_bill_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."ws_sold_date_sk" = "t2"."d_date_sk"
+GROUP BY "t0"."ws_bill_customer_sk"
+                    hive.sql.query.fieldNames literalTrue,ws_bill_customer_sk
                     hive.sql.query.fieldTypes boolean,int
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: literaltrue (type: boolean), ws_bill_customer_sk0 (type: int)
+                    expressions: literaltrue (type: boolean), ws_bill_customer_sk (type: int)
                     outputColumnNames: _col0, _col1
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: z
+                      null sort order: a
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
@@ -6557,33 +6487,29 @@ WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) A
                 TableScan
                   alias: catalog_sales
                   properties:
-                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."cs_ship_customer_sk" AS "cs_ship_customer_sk0"
-FROM (SELECT "cs_sold_date_sk", "cs_sold_time_sk", "cs_ship_date_sk", "cs_bill_customer_sk", "cs_bill_cdemo_sk", "cs_bill_hdemo_sk", "cs_bill_addr_sk", "cs_ship_customer_sk", "cs_ship_cdemo_sk", "cs_ship_hdemo_sk", "cs_ship_addr_sk", "cs_call_center_sk", "cs_catalog_page_sk", "cs_ship_mode_sk", "cs_warehouse_sk", "cs_item_sk", "cs_promo_sk", "cs_order_number", "cs_quantity", "cs_wholesale_cost", "cs_list_price", "cs_sales_price", "cs_ext_discount_amt", "cs_ext_sales_price", "cs_ext_wholesale_cost", "cs_ext_list_price", "cs_ext_tax", "cs_coupon_amt", "cs_ext_ship_cost", "cs_net_paid", "cs_net_paid_inc_tax", "cs_net_paid_inc_ship", "cs_net_paid_inc_ship_tax", "cs_net_profit"
+                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."cs_ship_customer_sk"
+FROM (SELECT "cs_sold_date_sk", "cs_ship_customer_sk"
 FROM "CATALOG_SALES"
 WHERE "cs_ship_customer_sk" IS NOT NULL AND "cs_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."cs_sold_date_sk" = "t2"."d_date_sk"
-                    hive.sql.query.fieldNames literalTrue,cs_ship_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."cs_sold_date_sk" = "t2"."d_date_sk"
+GROUP BY "t0"."cs_ship_customer_sk"
+                    hive.sql.query.fieldNames literalTrue,cs_ship_customer_sk
                     hive.sql.query.fieldTypes boolean,int
                     hive.sql.query.split false
-                  Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
+                  Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: cs_ship_customer_sk0 (type: int)
-                    outputColumnNames: _col0
-                    Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
-                    Group By Operator
-                      keys: _col0 (type: int)
-                      minReductionHashAggr: 0.99
-                      mode: hash
-                      outputColumnNames: _col0
-                      Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
-                      Reduce Output Operator
-                        key expressions: _col0 (type: int)
-                        null sort order: z
-                        sort order: +
-                        Map-reduce partition columns: _col0 (type: int)
-                        Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
+                    expressions: literaltrue (type: boolean), cs_ship_customer_sk (type: int)
+                    outputColumnNames: _col0, _col1
+                    Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
+                    Reduce Output Operator
+                      key expressions: _col1 (type: int)
+                      null sort order: a
+                      sort order: +
+                      Map-reduce partition columns: _col1 (type: int)
+                      Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
+                      value expressions: _col0 (type: boolean)
             Execution mode: vectorized, llap
             LLAP IO: no inputs
         Reducer 2 
@@ -6599,7 +6525,7 @@ WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) A
                 Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
                 Reduce Output Operator
                   key expressions: _col0 (type: int)
-                  null sort order: z
+                  null sort order: a
                   sort order: +
                   Map-reduce partition columns: _col0 (type: int)
                   Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
@@ -6624,7 +6550,7 @@ WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) A
                     Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: z
+                      null sort order: a
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
@@ -6634,32 +6560,39 @@ WHERE "d_year" = 1999 AND "d_moy" BETWEEN 1 AND 3 AND "d_date_sk" IS NOT NULL) A
             Reduce Operator Tree:
               Merge Join Operator
                 condition map:
-                     Anti Join 0 to 1
+                     Left Outer Join 0 to 1
                 keys:
                   0 _col0 (type: int)
-                  1 _col0 (type: int)
-                outputColumnNames: _col32, _col33, _col34, _col35, _col36
+                  1 _col1 (type: int)
+                outputColumnNames: _col32, _col33, _col34, _col35, _col36, _col42
                 Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                Top N Key Operator
-                  sort order: +++++
-                  keys: _col32 (type: char(1)), _col33 (type: char(1)), _col34 (type: char(20)), _col35 (type: int), _col36 (type: char(10))
-                  null sort order: zzzzz
+                Filter Operator
+                  predicate: _col42 is null (type: boolean)
                   Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                  top n: 100
-                  Group By Operator
-                    aggregations: count()
+                  Top N Key Operator
+                    sort order: +++++
                     keys: _col32 (type: char(1)), _col33 (type: char(1)), _col34 (type: char(20)), _col35 (type: int), _col36 (type: char(10))
-                    minReductionHashAggr: 0.99
-                    mode: hash
-                    outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5
+                    null sort order: zzzzz
                     Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                    Reduce Output Operator
-                      key expressions: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
-                      null sort order: zzzzz
-                      sort order: +++++
-                      Map-reduce partition columns: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
+                    top n: 100
+                    Select Operator
+                      expressions: _col32 (type: char(1)), _col33 (type: char(1)), _col34 (type: char(20)), _col35 (type: int), _col36 (type: char(10))
+                      outputColumnNames: _col32, _col33, _col34, _col35, _col36
                       Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                      value expressions: _col5 (type: bigint)
+                      Group By Operator
+                        aggregations: count()
+                        keys: _col32 (type: char(1)), _col33 (type: char(1)), _col34 (type: char(20)), _col35 (type: int), _col36 (type: char(10))
+                        minReductionHashAggr: 0.99
+                        mode: hash
+                        outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5
+                        Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
+                        Reduce Output Operator
+                          key expressions: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
+                          null sort order: zzzzz
+                          sort order: +++++
+                          Map-reduce partition columns: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
+                          Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
+                          value expressions: _col5 (type: bigint)
         Reducer 5 
             Execution mode: vectorized, llap
             Reduce Operator Tree:
@@ -6949,7 +6882,7 @@ STAGE PLANS:
                     hive.sql.query SELECT "t0"."c_customer_sk", "t0"."c_customer_id", "t0"."c_current_cdemo_sk", "t0"."c_current_hdemo_sk", "t0"."c_current_addr_sk", "t0"."c_first_shipto_date_sk", "t0"."c_first_sales_date_sk", "t0"."c_salutation", "t0"."c_first_name", "t0"."c_last_name", "t0"."c_preferred_cust_flag", "t0"."c_birth_day", "t0"."c_birth_month", "t0"."c_birth_year", "t0"."c_birth_country", "t0"."c_login", "t0"."c_email_address", "t0"."c_last_review_date", "t4"."ca_address_sk", "t4"."ca_address_id", "t4"."ca_street_number", "t4"."ca_street_name", "t4"."ca_street_type", "t4"."ca_suite_number", "t4"."ca_city", "t4"."ca_county", "t4"."ca_state", "t4"."ca_zip", "t4"."ca_country", "t4"."ca_gmt_offset", "t4"."ca_location_type", "t2"."cd_demo_sk", "t2"."cd_gender", "t2"."cd_marital_status", "t2"."cd_education_status", "t2"."cd_purchase_estimate", "t2"."cd_credit_rating", "t2"."cd_dep_count", "t2"."cd_dep_employed_count", "t2"."cd_dep_college_count"
 FROM (SELECT "c_customer_sk", "c_customer_id", "c_current_cdemo_sk", "c_current_hdemo_sk", "c_current_addr_sk", "c_first_shipto_date_sk", "c_first_sales_date_sk", "c_salutation", "c_first_name", "c_last_name", "c_preferred_cust_flag", "c_birth_day", "c_birth_month", "c_birth_year", "c_birth_country", "c_login", "c_email_address", "c_last_review_date"
 FROM "CUSTOMER"
-WHERE "c_current_addr_sk" IS NOT NULL AND "c_current_cdemo_sk" IS NOT NULL AND "c_customer_sk" IS NOT NULL) AS "t0"
+WHERE "c_customer_sk" IS NOT NULL AND ("c_current_cdemo_sk" IS NOT NULL AND "c_current_addr_sk" IS NOT NULL)) AS "t0"
 INNER JOIN (SELECT "cd_demo_sk", "cd_gender", "cd_marital_status", "cd_education_status", "cd_purchase_estimate", "cd_credit_rating", "cd_dep_count", "cd_dep_employed_count", "cd_dep_college_count"
 FROM "CUSTOMER_DEMOGRAPHICS"
 WHERE "cd_demo_sk" IS NOT NULL) AS "t2" ON "t0"."c_current_cdemo_sk" = "t2"."cd_demo_sk"
@@ -6966,7 +6899,7 @@ WHERE "ca_state" IN ('CO', 'IL', 'MN') AND "ca_address_sk" IS NOT NULL) AS "t4" 
                     Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: z
+                      null sort order: a
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 376 Basic stats: COMPLETE Column stats: NONE
@@ -6978,19 +6911,19 @@ WHERE "ca_state" IN ('CO', 'IL', 'MN') AND "ca_address_sk" IS NOT NULL) AS "t4" 
                 TableScan
                   alias: store_sales
                   properties:
-                    hive.sql.query SELECT "t0"."ss_customer_sk" AS "ss_customer_sk0"
-FROM (SELECT "ss_sold_date_sk", "ss_sold_time_sk", "ss_item_sk", "ss_customer_sk", "ss_cdemo_sk", "ss_hdemo_sk", "ss_addr_sk", "ss_store_sk", "ss_promo_sk", "ss_ticket_number", "ss_quantity", "ss_wholesale_cost", "ss_list_price", "ss_sales_price", "ss_ext_discount_amt", "ss_ext_sales_price", "ss_ext_wholesale_cost", "ss_ext_list_price", "ss_ext_tax", "ss_coupon_amt", "ss_net_paid", "ss_net_paid_inc_tax", "ss_net_profit"
+                    hive.sql.query SELECT "t0"."ss_customer_sk"
+FROM (SELECT "ss_sold_date_sk", "ss_customer_sk"
 FROM "STORE_SALES"
 WHERE "ss_customer_sk" IS NOT NULL AND "ss_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."ss_sold_date_sk" = "t2"."d_date_sk"
-                    hive.sql.query.fieldNames ss_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."ss_sold_date_sk" = "t2"."d_date_sk"
+                    hive.sql.query.fieldNames ss_customer_sk
                     hive.sql.query.fieldTypes int
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: ss_customer_sk0 (type: int)
+                    expressions: ss_customer_sk (type: int)
                     outputColumnNames: _col0
                     Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                     Group By Operator
@@ -7001,7 +6934,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                       Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
                       Reduce Output Operator
                         key expressions: _col0 (type: int)
-                        null sort order: z
+                        null sort order: a
                         sort order: +
                         Map-reduce partition columns: _col0 (type: int)
                         Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
@@ -7012,24 +6945,25 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                 TableScan
                   alias: web_sales
                   properties:
-                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."ws_bill_customer_sk" AS "ws_bill_customer_sk0"
-FROM (SELECT "ws_sold_date_sk", "ws_sold_time_sk", "ws_ship_date_sk", "ws_item_sk", "ws_bill_customer_sk", "ws_bill_cdemo_sk", "ws_bill_hdemo_sk", "ws_bill_addr_sk", "ws_ship_customer_sk", "ws_ship_cdemo_sk", "ws_ship_hdemo_sk", "ws_ship_addr_sk", "ws_web_page_sk", "ws_web_site_sk", "ws_ship_mode_sk", "ws_warehouse_sk", "ws_promo_sk", "ws_order_number", "ws_quantity", "ws_wholesale_cost", "ws_list_price", "ws_sales_price", "ws_ext_discount_amt", "ws_ext_sales_price", "ws_ext_wholesale_cost", "ws_ext_list_price", "ws_ext_tax", "ws_coupon_amt", "ws_ext_ship_cost", "ws_net_paid", "ws_net_paid_inc_tax", "ws_net_paid_inc_ship", "ws_net_paid_inc_ship_tax", "ws_net_profit"
+                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."ws_bill_customer_sk"
+FROM (SELECT "ws_sold_date_sk", "ws_bill_customer_sk"
 FROM "WEB_SALES"
 WHERE "ws_bill_customer_sk" IS NOT NULL AND "ws_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."ws_sold_date_sk" = "t2"."d_date_sk"
-                    hive.sql.query.fieldNames literalTrue,ws_bill_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."ws_sold_date_sk" = "t2"."d_date_sk"
+GROUP BY "t0"."ws_bill_customer_sk"
+                    hive.sql.query.fieldNames literalTrue,ws_bill_customer_sk
                     hive.sql.query.fieldTypes boolean,int
                     hive.sql.query.split false
                   Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: literaltrue (type: boolean), ws_bill_customer_sk0 (type: int)
+                    expressions: literaltrue (type: boolean), ws_bill_customer_sk (type: int)
                     outputColumnNames: _col0, _col1
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col1 (type: int)
-                      null sort order: z
+                      null sort order: a
                       sort order: +
                       Map-reduce partition columns: _col1 (type: int)
                       Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
@@ -7041,33 +6975,29 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                 TableScan
                   alias: catalog_sales
                   properties:
-                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."cs_ship_customer_sk" AS "cs_ship_customer_sk0"
-FROM (SELECT "cs_sold_date_sk", "cs_sold_time_sk", "cs_ship_date_sk", "cs_bill_customer_sk", "cs_bill_cdemo_sk", "cs_bill_hdemo_sk", "cs_bill_addr_sk", "cs_ship_customer_sk", "cs_ship_cdemo_sk", "cs_ship_hdemo_sk", "cs_ship_addr_sk", "cs_call_center_sk", "cs_catalog_page_sk", "cs_ship_mode_sk", "cs_warehouse_sk", "cs_item_sk", "cs_promo_sk", "cs_order_number", "cs_quantity", "cs_wholesale_cost", "cs_list_price", "cs_sales_price", "cs_ext_discount_amt", "cs_ext_sales_price", "cs_ext_wholesale_cost", "cs_ext_list_price", "cs_ext_tax", "cs_coupon_amt", "cs_ext_ship_cost", "cs_net_paid", "cs_net_paid_inc_tax", "cs_net_paid_inc_ship", "cs_net_paid_inc_ship_tax", "cs_net_profit"
+                    hive.sql.query SELECT TRUE AS "literalTrue", "t0"."cs_ship_customer_sk"
+FROM (SELECT "cs_sold_date_sk", "cs_ship_customer_sk"
 FROM "CATALOG_SALES"
 WHERE "cs_ship_customer_sk" IS NOT NULL AND "cs_sold_date_sk" IS NOT NULL) AS "t0"
 INNER JOIN (SELECT "d_date_sk"
 FROM "DATE_DIM"
-WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) AS "t2" ON "t0"."cs_sold_date_sk" = "t2"."d_date_sk"
-                    hive.sql.query.fieldNames literalTrue,cs_ship_customer_sk0
+WHERE "d_moy" BETWEEN 1 AND 3 AND ("d_year" = 1999 AND "d_date_sk" IS NOT NULL)) AS "t2" ON "t0"."cs_sold_date_sk" = "t2"."d_date_sk"
+GROUP BY "t0"."cs_ship_customer_sk"
+                    hive.sql.query.fieldNames literalTrue,cs_ship_customer_sk
                     hive.sql.query.fieldTypes boolean,int
                     hive.sql.query.split false
-                  Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
+                  Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
-                    expressions: cs_ship_customer_sk0 (type: int)
-                    outputColumnNames: _col0
-                    Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
-                    Group By Operator
-                      keys: _col0 (type: int)
-                      minReductionHashAggr: 0.99
-                      mode: hash
-                      outputColumnNames: _col0
-                      Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
-                      Reduce Output Operator
-                        key expressions: _col0 (type: int)
-                        null sort order: z
-                        sort order: +
-                        Map-reduce partition columns: _col0 (type: int)
-                        Statistics: Num rows: 1 Data size: 4 Basic stats: COMPLETE Column stats: NONE
+                    expressions: literaltrue (type: boolean), cs_ship_customer_sk (type: int)
+                    outputColumnNames: _col0, _col1
+                    Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
+                    Reduce Output Operator
+                      key expressions: _col1 (type: int)
+                      null sort order: a
+                      sort order: +
+                      Map-reduce partition columns: _col1 (type: int)
+                      Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: NONE
+                      value expressions: _col0 (type: boolean)
             Execution mode: vectorized, llap
             LLAP IO: no inputs
         Reducer 2 
@@ -7083,7 +7013,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                 Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
                 Reduce Output Operator
                   key expressions: _col0 (type: int)
-                  null sort order: z
+                  null sort order: a
                   sort order: +
                   Map-reduce partition columns: _col0 (type: int)
                   Statistics: Num rows: 1 Data size: 413 Basic stats: COMPLETE Column stats: NONE
@@ -7108,7 +7038,7 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
                     Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: _col0 (type: int)
-                      null sort order: z
+                      null sort order: a
                       sort order: +
                       Map-reduce partition columns: _col0 (type: int)
                       Statistics: Num rows: 1 Data size: 454 Basic stats: COMPLETE Column stats: NONE
@@ -7118,32 +7048,39 @@ WHERE "d_moy" BETWEEN 1 AND 3 AND "d_year" = 1999 AND "d_date_sk" IS NOT NULL) A
             Reduce Operator Tree:
               Merge Join Operator
                 condition map:
-                     Anti Join 0 to 1
+                     Left Outer Join 0 to 1
                 keys:
                   0 _col0 (type: int)
-                  1 _col0 (type: int)
-                outputColumnNames: _col32, _col33, _col34, _col35, _col36
+                  1 _col1 (type: int)
+                outputColumnNames: _col32, _col33, _col34, _col35, _col36, _col42
                 Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                Top N Key Operator
-                  sort order: +++++
-                  keys: _col32 (type: char(1)), _col33 (type: char(1)), _col34 (type: char(20)), _col35 (type: int), _col36 (type: char(10))
-                  null sort order: zzzzz
+                Filter Operator
+                  predicate: _col42 is null (type: boolean)
                   Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                  top n: 100
-                  Group By Operator
-                    aggregations: count()
+                  Top N Key Operator
+                    sort order: +++++
                     keys: _col32 (type: char(1)), _col33 (type: char(1)), _col34 (type: char(20)), _col35 (type: int), _col36 (type: char(10))
-                    minReductionHashAggr: 0.99
-                    mode: hash
-                    outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5
+                    null sort order: zzzzz
                     Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                    Reduce Output Operator
-                      key expressions: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
-                      null sort order: zzzzz
-                      sort order: +++++
-                      Map-reduce partition columns: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
+                    top n: 100
+                    Select Operator
+                      expressions: _col32 (type: char(1)), _col33 (type: char(1)), _col34 (type: char(20)), _col35 (type: int), _col36 (type: char(10))
+                      outputColumnNames: _col32, _col33, _col34, _col35, _col36
                       Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
-                      value expressions: _col5 (type: bigint)
+                      Group By Operator
+                        aggregations: count()
+                        keys: _col32 (type: char(1)), _col33 (type: char(1)), _col34 (type: char(20)), _col35 (type: int), _col36 (type: char(10))
+                        minReductionHashAggr: 0.99
+                        mode: hash
+                        outputColumnNames: _col0, _col1, _col2, _col3, _col4, _col5
+                        Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
+                        Reduce Output Operator
+                          key expressions: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
+                          null sort order: zzzzz
+                          sort order: +++++
+                          Map-reduce partition columns: _col0 (type: char(1)), _col1 (type: char(1)), _col2 (type: char(20)), _col3 (type: int), _col4 (type: char(10))
+                          Statistics: Num rows: 1 Data size: 499 Basic stats: COMPLETE Column stats: NONE
+                          value expressions: _col5 (type: bigint)
         Reducer 5 
             Execution mode: vectorized, llap
             Reduce Operator Tree:
@@ -7296,7 +7233,6 @@ POSTHOOK: Input: default@customer_demographics
 POSTHOOK: Input: default@date_dim
 POSTHOOK: Input: default@store_sales
 POSTHOOK: Input: default@web_sales
->>>>>>> 14c653a5fe... HIVE-23716: Support Anti Join in Hive (Mahesh Kumar Behera, reviewed by Vineet Garg, Ramesh Kumar Thangarajan, Panagiotis Garefalakis, Jesus Camacho Rodriguez)
 #### A masked pattern was here ####
 PREHOOK: query: DROP TABLE catalog_sales
 PREHOOK: type: DROPTABLE

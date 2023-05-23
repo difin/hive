@@ -27,7 +27,6 @@ import org.apache.hive.service.rpc.thrift.TSetClientInfoResp;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -339,16 +338,14 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
     TOpenSessionResp resp = new TOpenSessionResp();
     try {
       SessionHandle sessionHandle = getSessionHandle(req, resp);
+      final int fetchSize = hiveConf.getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE);
+
+      Map<String, String> map = new HashMap<>();
+      map.put(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE.varname, Integer.toString(fetchSize));
+      map.put(HiveConf.ConfVars.HIVE_DEFAULT_NULLS_LAST.varname,
+          String.valueOf(hiveConf.getBoolVar(ConfVars.HIVE_DEFAULT_NULLS_LAST)));
       resp.setSessionHandle(sessionHandle.toTSessionHandle());
-      Map<String, String> configurationMap = new HashMap<String, String>();
-      // Set the updated fetch size from the server into the configuration map for the client
-      HiveConf sessionConf = cliService.getSessionConf(sessionHandle);
-      configurationMap.put(
-        HiveConf.ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE.varname,
-        Integer.toString(sessionConf != null ?
-          sessionConf.getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE) :
-          hiveConf.getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE)));
-      resp.setConfiguration(configurationMap);
+      resp.setConfiguration(map);
       resp.setStatus(OK_STATUS);
       ThriftCLIServerContext context =
         (ThriftCLIServerContext)currentServerContext.get();
@@ -807,13 +804,15 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
   @Override
   public TFetchResultsResp FetchResults(TFetchResultsReq req) throws TException {
     TFetchResultsResp resp = new TFetchResultsResp();
+
+    final int maxFetchSize = hiveConf.getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_MAX_FETCH_SIZE);
+    if (req.getMaxRows() > maxFetchSize) {
+      LOG.warn("Fetch Size greater than maximum allowed. Capping fetch size. [req={}, max={}]", req.getMaxRows(),
+          maxFetchSize);
+      req.setMaxRows(maxFetchSize);
+    }
+
     try {
-      // Set fetch size
-      int maxFetchSize =
-        hiveConf.getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_MAX_FETCH_SIZE);
-      if (req.getMaxRows() > maxFetchSize) {
-        req.setMaxRows(maxFetchSize);
-      }
       RowSet rowSet = cliService.fetchResults(
           new OperationHandle(req.getOperationHandle()),
           FetchOrientation.getFetchOrientation(req.getOrientation()),

@@ -1,4 +1,3 @@
---! qt:disabled:hive-test-kube-migration
 --! qt:dataset:src
 
 -- SORT_QUERY_RESULTS

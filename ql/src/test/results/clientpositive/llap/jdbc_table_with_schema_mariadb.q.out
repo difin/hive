@@ -31,7 +31,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@country_0
 #### A masked pattern was here ####
 CBO PLAN:
-HiveJdbcConverter
+HiveJdbcConverter(convention=[JDBC.MYSQL])
   JdbcAggregate(group=[{}], agg#0=[count()])
     JdbcHiveTableScan(table=[[default, country_0]], table:alias=[country_0])
 
@@ -79,7 +79,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@country_1
 #### A masked pattern was here ####
 CBO PLAN:
-HiveJdbcConverter
+HiveJdbcConverter(convention=[JDBC.MYSQL])
   JdbcAggregate(group=[{}], agg#0=[count()])
     JdbcHiveTableScan(table=[[default, country_1]], table:alias=[country_1])
 
@@ -125,7 +125,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@country_2
 #### A masked pattern was here ####
 CBO PLAN:
-HiveJdbcConverter
+HiveJdbcConverter(convention=[JDBC.MYSQL])
   JdbcAggregate(group=[{}], agg#0=[count()])
     JdbcHiveTableScan(table=[[default, country_2]], table:alias=[country_2])
 
@@ -173,7 +173,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@country_3
 #### A masked pattern was here ####
 CBO PLAN:
-HiveJdbcConverter
+HiveJdbcConverter(convention=[JDBC.MYSQL])
   JdbcAggregate(group=[{}], agg#0=[count()])
     JdbcHiveTableScan(table=[[default, country_3]], table:alias=[country_3])
 

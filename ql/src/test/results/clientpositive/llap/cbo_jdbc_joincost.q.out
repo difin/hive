@@ -81,7 +81,7 @@ POSTHOOK: Input: default@author
 POSTHOOK: Input: default@book
 #### A masked pattern was here ####
 CBO PLAN:
-HiveJdbcConverter: rowcount = ###Masked###, cumulative cost = ###Masked###, id = ###Masked###
+HiveJdbcConverter(convention=[JDBC.MYSQL]): rowcount = ###Masked###, cumulative cost = ###Masked###, id = ###Masked###
   JdbcProject(lname=[$1], title=[$2]): rowcount = ###Masked###, cumulative cost = ###Masked###, id = ###Masked###
     JdbcJoin(condition=[=($0, $3)], joinType=[inner]): rowcount = ###Masked###, cumulative cost = ###Masked###, id = ###Masked###
       JdbcProject(id=[$0], lname=[$2]): rowcount = ###Masked###, cumulative cost = ###Masked###, id = ###Masked###

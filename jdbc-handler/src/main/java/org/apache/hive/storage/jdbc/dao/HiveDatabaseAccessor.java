@@ -17,14 +17,26 @@
  */
 package org.apache.hive.storage.jdbc.dao;
 
-/**
- * Oracle specific data accessor. This is needed because Oracle JDBC drivers do not support generic LIMIT and OFFSET
- * escape functions
- */
-public class OracleDatabaseAccessor extends GenericJdbcDatabaseAccessor {
+import java.sql.ResultSet;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hive.storage.jdbc.exception.HiveJdbcDatabaseAccessException;
 
-  // Random column name to reduce the chance of conflict
-  static final String ROW_NUM_COLUMN_NAME = "dummy_rownum_col_rn1938392";
+/**
+ * Hive specific data accessor.
+ */
+public class HiveDatabaseAccessor extends GenericJdbcDatabaseAccessor {
+
+  @Override
+  public List<String> getColumnNames(Configuration conf) throws HiveJdbcDatabaseAccessException {
+    List<String> columnNames = super.getColumnNames(conf);
+    return columnNames.stream()
+        .map(c -> {
+          int lastIndex = c.lastIndexOf(".");
+          return lastIndex == -1 ? c : c.substring(lastIndex + 1); })
+        .collect(Collectors.toList());
+  }
 
   @Override
   protected String addLimitAndOffsetToQuery(String sql, int limit, int offset) {
@@ -34,38 +46,30 @@ public class OracleDatabaseAccessor extends GenericJdbcDatabaseAccessor {
       if (limit == -1) {
         return sql;
       }
-      // A simple ROWNUM > offset and ROWNUM <= (offset + limit) won't work, it will return nothing
-      return "SELECT * FROM (SELECT t.*, ROWNUM AS " + ROW_NUM_COLUMN_NAME + " FROM (" + sql + ") t) WHERE "
-          +  ROW_NUM_COLUMN_NAME + " >" + offset + " AND " + ROW_NUM_COLUMN_NAME + " <=" + (offset + limit);
+      return sql + " LIMIT " + limit + " OFFSET " + offset;
     }
   }
-
 
   @Override
   protected String addLimitToQuery(String sql, int limit) {
     if (limit == -1) {
       return sql;
     }
-    return "SELECT * FROM (" + sql + ") WHERE ROWNUM <= " + limit;
+    return sql + " LIMIT " + limit;
   }
 
   @Override
-  protected String constructQuery(String table, String[] columnNames) {
-    if(columnNames == null) {
-      throw new IllegalArgumentException("Column names may not be null");
-    }
-
-    StringBuilder query = new StringBuilder();
-    query.append("INSERT INTO ").append(table).append(" VALUES (");
-
-    for (int i = 0; i < columnNames.length; i++) {
-      query.append("?");
-      if(i != columnNames.length - 1) {
-        query.append(",");
-      }
-    }
-    query.append(")");
-    return query.toString();
+  protected List<String> getColNamesFromRS(ResultSet rs) throws Exception {
+    List<String> columnNames = super.getColNamesFromRS(rs);
+    return columnNames.stream()
+        .map(c -> {
+          int lastIndex = c.lastIndexOf(".");
+          return lastIndex == -1 ? c : c.substring(lastIndex + 1); })
+        .collect(Collectors.toList());
   }
 
+  @Override
+  protected String getMetaDataQuery(String sql) {
+    return addLimitToQuery(sql, 0);
+  }
 }

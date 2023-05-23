@@ -17,13 +17,15 @@ package org.apache.hive.storage.jdbc.dao;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
 
-import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
+import org.apache.hadoop.mapreduce.RecordWriter;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hive.storage.jdbc.exception.HiveJdbcDatabaseAccessException;
 
+import java.io.IOException;
 import java.util.List;
 
-public interface DatabaseAccessor {
+public interface DatabaseAccessor extends AutoCloseable {
 
   List<String> getColumnNames(Configuration conf) throws HiveJdbcDatabaseAccessException;
 
@@ -51,6 +53,9 @@ public interface DatabaseAccessor {
     getRecordIterator(Configuration conf, String partitionColumn, String lowerBound, String upperBound, int limit, int
           offset) throws
           HiveJdbcDatabaseAccessException;
+
+  RecordWriter getRecordWriter(TaskAttemptContext context)
+      throws IOException;
 
   Pair<String, String> getBounds(Configuration conf, String partitionColumn, boolean lower, boolean upper) throws
           HiveJdbcDatabaseAccessException;
