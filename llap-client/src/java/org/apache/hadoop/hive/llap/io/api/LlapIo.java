@@ -108,4 +108,14 @@ public interface LlapIo<T> {
 
   boolean usingLowLevelCache();
 
+  /**
+   * Extract and return the cache content metadata.
+   */
+  LlapDaemonProtocolProtos.CacheEntryList fetchCachedContentInfo();
+
+  /**
+   * Load the actual data into the cache based on the provided metadata.
+   */
+  void loadDataIntoCache(LlapDaemonProtocolProtos.CacheEntryList metadata);
+
 }

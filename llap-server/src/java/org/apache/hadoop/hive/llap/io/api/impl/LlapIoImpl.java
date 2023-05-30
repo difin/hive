@@ -134,6 +134,8 @@ public class LlapIoImpl implements LlapIo<VectorizedRowBatch>, LlapIoDebugDump {
   private final Configuration daemonConf;
   private final LowLevelCacheMemoryManager memoryManager;
   private PathCache pathCache;
+  private final FixedSizedObjectPool<IoTrace> tracePool;
+  private LowLevelCachePolicy realCachePolicy;
 
   private List<LlapIoDebugDump> debugDumpComponents = new ArrayList<>();
 
@@ -175,8 +177,7 @@ public class LlapIoImpl implements LlapIo<VectorizedRowBatch>, LlapIoDebugDump {
       boolean useLrfu = HiveConf.getBoolVar(conf, HiveConf.ConfVars.LLAP_USE_LRFU);
       long totalMemorySize = HiveConf.getSizeVar(conf, ConfVars.LLAP_IO_MEMORY_MAX_SIZE);
       int minAllocSize = (int) HiveConf.getSizeVar(conf, ConfVars.LLAP_ALLOCATOR_MIN_ALLOC);
-      LowLevelCachePolicy
-          realCachePolicy =
+      realCachePolicy =
           useLrfu ? new LowLevelLrfuCachePolicy(minAllocSize, totalMemorySize, conf) : new LowLevelFifoCachePolicy();
       if (!(realCachePolicy instanceof ProactiveEvictingCachePolicy.Impl)) {
         HiveConf.setBoolVar(this.daemonConf, ConfVars.LLAP_IO_PROACTIVE_EVICTION_ENABLED, false);
@@ -252,7 +253,7 @@ public class LlapIoImpl implements LlapIo<VectorizedRowBatch>, LlapIoDebugDump {
         new LinkedBlockingQueue<Runnable>(),
         new ThreadFactoryBuilder().setNameFormat("IO-Elevator-Thread-%d").setDaemon(true)
             .setThreadFactory(r -> new LlapPooledIOThread(r)).build());
-    FixedSizedObjectPool<IoTrace> tracePool = IoTrace.createTracePool(conf);
+    tracePool = IoTrace.createTracePool(conf);
     if (isEncodeEnabled) {
       int encodePoolMultiplier = HiveConf.getIntVar(conf, ConfVars.LLAP_IO_ENCODE_THREADPOOL_MULTIPLIER);
       int encodeThreads = numThreads * encodePoolMultiplier;
@@ -512,5 +513,30 @@ public class LlapIoImpl implements LlapIo<VectorizedRowBatch>, LlapIoDebugDump {
   @Override
   public boolean usingLowLevelCache() {
     return useLowLevelCache;
+  }
+
+  @Override
+  public LlapDaemonProtocolProtos.CacheEntryList fetchCachedContentInfo() {
+    if (useLowLevelCache) {
+      GenericDataCache cache = new GenericDataCache(dataCache, bufferManager);
+      LlapCacheMetadataSerializer serializer = new LlapCacheMetadataSerializer(fileMetadataCache, cache, daemonConf,
+          pathCache, tracePool, realCachePolicy);
+      return serializer.fetchCachedContentInfo();
+    } else {
+      LOG.warn("Low level cache is disabled.");
+      return LlapDaemonProtocolProtos.CacheEntryList.getDefaultInstance();
+    }
+  }
+
+  @Override
+  public void loadDataIntoCache(LlapDaemonProtocolProtos.CacheEntryList metadata) {
+    if (useLowLevelCache) {
+      GenericDataCache cache = new GenericDataCache(dataCache, bufferManager);
+      LlapCacheMetadataSerializer serializer = new LlapCacheMetadataSerializer(fileMetadataCache, cache, daemonConf,
+          pathCache, tracePool, realCachePolicy);
+      serializer.loadData(metadata);
+    } else {
+      LOG.warn("Cannot load data into the cache. Low level cache is disabled.");
+    }
   }
 }
