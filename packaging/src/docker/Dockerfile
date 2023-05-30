@@ -123,15 +123,6 @@ RUN ln -s /usr/lib/hadoop/bin/hdfs /usr/bin/hdfs
 RUN ln -s /usr/lib/hadoop/share/hadoop/tools/lib/* /usr/lib/hadoop/share/hadoop/common
 RUN ln -s /usr/lib/hadoop/share/hadoop/tools/lib/hadoop-aws-${HADOOP_VERSION}.jar /usr/lib/hadoop/hadoop-aws-${HADOOP_VERSION}.jar
 
-# A temporary workaround for DWX-13395, should be removed when old JDK8-compatible
-# opts (HADOOP_CLIENT_OPTS) are fully removed in DWX-15343. This below is just a way
-# to prepend the needed env var definitions to the most often used hadoop executables by devs
-# ...yeah, prepending something is this complicated.
-RUN echo -e 'export HADOOP_CLIENT_OPTS="${HADOOP_CLIENT_OPTS_JDK11:-$HADOOP_CLIENT_OPTS}"\n' | cat - /usr/lib/hadoop/bin/hadoop > temp && \
-    mv temp /usr/lib/hadoop/bin/hadoop && chown 1001:users /usr/lib/hadoop/bin/hadoop && chmod 755 /usr/lib/hadoop/bin/hadoop
-RUN echo -e 'export HADOOP_CLIENT_OPTS="${HADOOP_CLIENT_OPTS_JDK11:-$HADOOP_CLIENT_OPTS}"\n' | cat - /usr/lib/hadoop/bin/hdfs > temp && \
-    mv temp /usr/lib/hadoop/bin/hdfs && chown 1001:users /usr/lib/hadoop/bin/hdfs && chmod 755 /usr/lib/hadoop/bin/hdfs
-
 COPY --from=ranger-base /usr/lib/ranger-${RANGER_VERSION}-hive-plugin /usr/lib/ranger-hive-plugin
 RUN mkdir -p /usr/lib/hive/lib/
 RUN ln -s /usr/lib/ranger-hive-plugin/lib/* /usr/lib/hive/lib/
