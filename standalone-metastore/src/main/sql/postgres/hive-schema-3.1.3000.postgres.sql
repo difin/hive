@@ -559,7 +559,8 @@ CREATE TABLE "TAB_COL_STATS" (
  "NUM_TRUES" bigint,
  "NUM_FALSES" bigint,
  "LAST_ANALYZED" bigint NOT NULL,
- "ENGINE" character varying(128) NOT NULL
+ "ENGINE" character varying(128) NOT NULL,
+ "HISTOGRAM" bytea
 );
 
 --
@@ -598,7 +599,8 @@ CREATE TABLE "PART_COL_STATS" (
  "NUM_TRUES" bigint,
  "NUM_FALSES" bigint,
  "LAST_ANALYZED" bigint NOT NULL,
- "ENGINE" character varying(128) NOT NULL
+ "ENGINE" character varying(128) NOT NULL,
+ "HISTOGRAM" bytea
 );
 
 --
@@ -2228,5 +2230,5 @@ ADD CONSTRAINT "DCPRIVILEGEINDEX" UNIQUE ("AUTHORIZER", "NAME", "PRINCIPAL_NAME"
 
 CREATE INDEX "DC_PRIVS_N49" ON "DC_PRIVS" USING btree ("NAME");
 
-INSERT INTO "CDH_VERSION" ("VER_ID", "SCHEMA_VERSION", "VERSION_COMMENT") VALUES (1, '3.1.3000.7.2.17.0-Update2', 'Hive release version 3.1.3000 for CDH 7.2.17.0-Update2');
-SELECT 'Initialized MetaStore schema for 3.1.3000.7.2.17.0-Update2';
+INSERT INTO "CDH_VERSION" ("VER_ID", "SCHEMA_VERSION", "VERSION_COMMENT") VALUES (1, '3.1.3000.7.2.17.0-Update3', 'Hive release version 3.1.3000 for CDH 7.2.17.0-Update3');
+SELECT 'Initialized MetaStore schema for 3.1.3000.7.2.17.0-Update3';
