@@ -160,6 +160,7 @@ public class TimeIntervalOpFunctionResolver extends ImpalaFunctionResolverImpl {
   }
 
   public static boolean isTimeIntervalOp(SqlTypeName type) {
-    return SqlTypeName.INTERVAL_TYPES.contains(type) || SqlTypeName.DATETIME_TYPES.contains(type);
+    return SqlTypeName.INTERVAL_TYPES.contains(type) || SqlTypeName.DATETIME_TYPES.contains(type)
+        || SqlTypeName.STRING_TYPES.contains(type);
   }
 }
