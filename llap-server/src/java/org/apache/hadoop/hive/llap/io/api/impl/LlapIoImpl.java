@@ -36,6 +36,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.io.CacheTag;
 import org.apache.hadoop.hive.common.io.encoded.MemoryBufferOrBuffers;
 import org.apache.hadoop.hive.llap.ProactiveEviction;
+import org.apache.hadoop.hive.llap.cache.LlapCacheHydration;
 import org.apache.hadoop.hive.llap.cache.MemoryLimitedPathCache;
 import org.apache.hadoop.hive.llap.cache.PathCache;
 import org.apache.hadoop.hive.llap.cache.ProactiveEvictingCachePolicy;
@@ -273,6 +274,7 @@ public class LlapIoImpl implements LlapIo<VectorizedRowBatch>, LlapIoDebugDump {
     LOG.info("LLAP IO initialized");
 
     registerMXBeans();
+    LlapCacheHydration.setupAndStartIfEnabled(daemonConf);
   }
 
   private void registerMXBeans() {
