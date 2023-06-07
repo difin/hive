@@ -823,27 +823,6 @@ FROM
   \"PART_COL_STATS\""
 );
 
-CREATE OR REPLACE VIEW `VERSION` AS SELECT 1 AS `VER_ID`, '3.1.3000' AS `SCHEMA_VERSION`,
-  'Hive release version 3.1.3000' AS `VERSION_COMMENT`;
-
-CREATE EXTERNAL TABLE IF NOT EXISTS `DB_VERSION` (
-  `VER_ID` BIGINT,
-  `SCHEMA_VERSION` string,
-  `VERSION_COMMENT` string,
-  CONSTRAINT `SYS_PK_DB_VERSION` PRIMARY KEY (`VER_ID`) DISABLE
-)
-STORED BY 'org.apache.hive.storage.jdbc.JdbcStorageHandler'
-TBLPROPERTIES (
-"hive.sql.database.type" = "METASTORE",
-"hive.sql.query" =
-"SELECT
-  \"VER_ID\",
-  \"SCHEMA_VERSION\",
-  \"VERSION_COMMENT\"
-FROM
-  \"VERSION\""
-);
-
 CREATE EXTERNAL TABLE IF NOT EXISTS `FUNCS` (
   `FUNC_ID` bigint,
   `CLASS_NAME` string,
@@ -2009,6 +1988,27 @@ WHERE
 SELECT 'Upgrading MetaStore schema from 3.1.3000 to 3.1.3000.7.2.17.0-Update2';
 
 USE SYS;
+
+CREATE OR REPLACE VIEW `VERSION` AS SELECT 1 AS `VER_ID`, '3.1.3000' AS `SCHEMA_VERSION`,
+    'Hive release version 3.1.3000' AS `VERSION_COMMENT`;
+
+CREATE EXTERNAL TABLE IF NOT EXISTS `DB_VERSION` (
+  `VER_ID` BIGINT,
+  `SCHEMA_VERSION` string,
+  `VERSION_COMMENT` string,
+  CONSTRAINT `SYS_PK_DB_VERSION` PRIMARY KEY (`VER_ID`) DISABLE
+)
+STORED BY 'org.apache.hive.storage.jdbc.JdbcStorageHandler'
+TBLPROPERTIES (
+"hive.sql.database.type" = "METASTORE",
+"hive.sql.query" =
+"SELECT
+  \"VER_ID\",
+  \"SCHEMA_VERSION\",
+  \"VERSION_COMMENT\"
+FROM
+  \"VERSION\""
+);
 
 CREATE OR REPLACE VIEW `CDH_VERSION` AS SELECT 1 AS `VER_ID`, '3.1.3000.7.2.17.0-Update2' AS `SCHEMA_VERSION`,
   'Hive release version 3.1.3000 for CDH 7.2.17.0-Update2' AS `VERSION_COMMENT`;
