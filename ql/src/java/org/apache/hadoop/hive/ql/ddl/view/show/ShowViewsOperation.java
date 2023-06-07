@@ -19,6 +19,7 @@
 package org.apache.hadoop.hive.ql.ddl.view.show;
 
 import java.io.DataOutputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -28,7 +29,8 @@ import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
-import org.apache.hadoop.hive.ql.ddl.DDLUtils;
+import org.apache.hadoop.hive.ql.ddl.ShowUtils;
+import org.apache.hadoop.hive.ql.ddl.table.info.show.tables.ShowTablesFormatter;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 
 /**
@@ -50,11 +52,12 @@ public class ShowViewsOperation extends DDLOperation<ShowViewsDesc> {
     }
 
     List<String> tableNames = context.getDb().getTablesByType(dbName, pattern, TableType.VIRTUAL_VIEW);
+    Collections.sort(tableNames);
     LOG.debug("Found {} view(s) matching the SHOW VIEWS statement.", tableNames.size());
 
-    try (DataOutputStream os = DDLUtils.getOutputStream(new Path(resultsFile), context)) {
-      SortedSet<String> sortedSet = new TreeSet<String>(tableNames);
-      context.getFormatter().showTables(os, sortedSet);
+    try (DataOutputStream os = ShowUtils.getOutputStream(new Path(resultsFile), context)) {
+      ShowTablesFormatter formatter = ShowTablesFormatter.getFormatter(context.getConf());
+      formatter.showTables(os, tableNames);
     } catch (Exception e) {
       throw new HiveException(e, ErrorMsg.GENERIC_ERROR, "in database" + dbName);
     }

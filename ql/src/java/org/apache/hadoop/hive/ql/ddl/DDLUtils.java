@@ -77,15 +77,6 @@ public final class DDLUtils {
     throw new UnsupportedOperationException("DDLUtils should not be instantiated");
   }
 
-  public static DataOutputStream getOutputStream(Path outputFile, DDLOperationContext context) throws HiveException {
-    try {
-      FileSystem fs = outputFile.getFileSystem(context.getConf());
-      return fs.create(outputFile);
-    } catch (Exception e) {
-      throw new HiveException(e);
-    }
-  }
-
   /**
    * There are many places where "duplicate" Read/WriteEnity objects are added.  The way this was
    * initially implemented, the duplicate just replaced the previous object.
@@ -174,51 +165,6 @@ public final class DDLUtils {
     // The table is missing either due to drop/rename which follows the operation.
     // Or the existing table is newer than our update. So, don't allow the update.
     return false;
-  }
-
-  public static String propertiesToString(Map<String, String> props, Set<String> exclude) {
-    if (props.isEmpty()) {
-      return "";
-    }
-
-    SortedMap<String, String> sortedProperties = new TreeMap<String, String>(props);
-    List<String> realProps = new ArrayList<String>();
-    for (Map.Entry<String, String> e : sortedProperties.entrySet()) {
-      if (e.getValue() != null && (exclude == null || !exclude.contains(e.getKey()))) {
-        realProps.add("  '" + e.getKey() + "'='" + HiveStringUtils.escapeHiveCommand(e.getValue()) + "'");
-      }
-    }
-    return StringUtils.join(realProps, ", \n");
-  }
-
-  public static void writeToFile(String data, String file, DDLOperationContext context) throws IOException {
-    if (StringUtils.isEmpty(data)) {
-      return;
-    }
-
-    Path resFile = new Path(file);
-    FileSystem fs = resFile.getFileSystem(context.getConf());
-    try (FSDataOutputStream out = fs.create(resFile);
-         OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8")) {
-      writer.write(data);
-      writer.write((char) Utilities.newLineCode);
-      writer.flush();
-    }
-  }
-
-  public static void appendNonNull(StringBuilder builder, Object value) {
-    appendNonNull(builder, value, false);
-  }
-
-  public static void appendNonNull(StringBuilder builder, Object value, boolean firstColumn) {
-    if (!firstColumn) {
-      builder.append((char)Utilities.tabCode);
-    } else if (builder.length() > 0) {
-      builder.append((char)Utilities.newLineCode);
-    }
-    if (value != null) {
-      builder.append(value);
-    }
   }
 
   /**

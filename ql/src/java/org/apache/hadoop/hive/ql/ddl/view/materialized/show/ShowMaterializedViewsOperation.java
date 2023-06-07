@@ -28,7 +28,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
-import org.apache.hadoop.hive.ql.ddl.DDLUtils;
+import org.apache.hadoop.hive.ql.ddl.ShowUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Table;
 
@@ -54,9 +54,10 @@ public class ShowMaterializedViewsOperation extends DDLOperation<ShowMaterialize
     List<Table> tableObjects = new ArrayList<>(context.getDb().getMaterializedViewObjectsByPattern(dbName, pattern));
     LOG.debug("Found {} materialized view(s) matching the SHOW MATERIALIZED VIEWS statement.", tableObjects.size());
 
-    try (DataOutputStream os = DDLUtils.getOutputStream(new Path(resultsFile), context)) {
+    try (DataOutputStream os = ShowUtils.getOutputStream(new Path(resultsFile), context)) {
       Collections.sort(tableObjects, Comparator.comparing(Table::getTableName));
-      context.getFormatter().showMaterializedViews(os, tableObjects);
+      ShowMaterializedViewsFormatter formatter = ShowMaterializedViewsFormatter.getFormatter(context.getConf());
+      formatter.showMaterializedViews(os, tableObjects);
     } catch (Exception e) {
       throw new HiveException(e, ErrorMsg.GENERIC_ERROR, "in database" + dbName);
     }

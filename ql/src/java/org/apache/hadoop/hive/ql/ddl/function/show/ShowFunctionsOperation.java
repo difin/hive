@@ -19,7 +19,7 @@
 package org.apache.hadoop.hive.ql.ddl.function.show;
 
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
-import org.apache.hadoop.hive.ql.ddl.DDLUtils;
+import org.apache.hadoop.hive.ql.ddl.ShowUtils;
 import org.apache.hadoop.hive.ql.engine.EngineRuntimeHelper;
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.exec.Utilities;
@@ -46,7 +46,7 @@ public class ShowFunctionsOperation extends DDLOperation<ShowFunctionsDesc> {
 
   @Override
   public int execute() throws HiveException {
-    try (DataOutputStream outStream = DDLUtils.getOutputStream(new Path(desc.getResFile()), context)) {
+    try (DataOutputStream outStream = ShowUtils.getOutputStream(new Path(desc.getResFile()), context)) {
       EngineRuntimeHelper helper = EngineRuntimeHelper.getInstance(SessionState.get().getConf());
       return helper.fetchFunctions(outStream, desc.getPattern());
     } catch (IOException e) {

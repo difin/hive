@@ -29,7 +29,7 @@ import org.apache.hadoop.hive.metastore.api.DatabaseType;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
-import org.apache.hadoop.hive.ql.ddl.DDLUtils;
+import org.apache.hadoop.hive.ql.ddl.ShowUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 
 import static org.apache.hadoop.hive.metastore.api.DatabaseType.NATIVE;
@@ -44,7 +44,7 @@ public class DescDatabaseOperation extends DDLOperation<DescDatabaseDesc> {
 
   @Override
   public int execute() throws HiveException {
-    try (DataOutputStream outStream = DDLUtils.getOutputStream(new Path(desc.getResFile()), context)) {
+    try (DataOutputStream outStream = ShowUtils.getOutputStream(new Path(desc.getResFile()), context)) {
       Database database = context.getDb().getDatabase(desc.getDatabaseName());
       if (database == null) {
         throw new HiveException(ErrorMsg.DATABASE_NOT_EXISTS, desc.getDatabaseName());

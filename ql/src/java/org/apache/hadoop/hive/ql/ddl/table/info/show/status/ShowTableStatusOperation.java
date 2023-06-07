@@ -19,7 +19,8 @@
 package org.apache.hadoop.hive.ql.ddl.table.info.show.status;
 
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
-import org.apache.hadoop.hive.ql.ddl.DDLUtils;
+import org.apache.hadoop.hive.ql.ddl.ShowUtils;
+import org.apache.hadoop.hive.ql.ddl.table.info.show.status.formatter.ShowTableStatusFormatter;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
@@ -73,9 +74,10 @@ public class ShowTableStatusOperation extends DDLOperation<ShowTableStatusDesc> 
     }
 
     // write the results in the file
-    DataOutputStream outStream = DDLUtils.getOutputStream(new Path(desc.getResFile()), context);
+    DataOutputStream outStream = ShowUtils.getOutputStream(new Path(desc.getResFile()), context);
     try {
-      context.getFormatter().showTableStatus(outStream, context.getDb(), context.getConf(), tbls, part, par);
+      ShowTableStatusFormatter formatter = ShowTableStatusFormatter.getFormatter(context.getConf());
+      formatter.showTableStatus(outStream, context.getDb(), context.getConf(), tbls, par);
     } catch (Exception e) {
       throw new HiveException(e, ErrorMsg.GENERIC_ERROR, "show table status");
     } finally {

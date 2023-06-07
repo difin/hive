@@ -19,15 +19,13 @@
 package org.apache.hadoop.hive.ql.ddl.table.info.show.tables;
 
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
-import org.apache.hadoop.hive.ql.ddl.DDLUtils;
+import org.apache.hadoop.hive.ql.ddl.ShowUtils;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.TableType;
@@ -61,23 +59,20 @@ public class ShowTablesOperation extends DDLOperation<ShowTablesDesc> {
     if (isExtended) {
       tableObjects = new ArrayList<>();
       tableObjects.addAll(context.getDb().getTableObjectsByType(dbName, pattern, typeFilter));
+      Collections.sort(tableObjects, Comparator.comparing(Table::getTableName));
       LOG.debug("Found {} table(s) matching the SHOW EXTENDED TABLES statement.", tableObjects.size());
     } else {
       tableNames = context.getDb().getTablesByType(dbName, pattern, typeFilter);
+      Collections.sort(tableNames);
       LOG.debug("Found {} table(s) matching the SHOW TABLES statement.", tableNames.size());
     }
 
-    try (DataOutputStream os = DDLUtils.getOutputStream(new Path(resultsFile), context)) {
+    ShowTablesFormatter formatter = ShowTablesFormatter.getFormatter(context.getConf());
+    try (DataOutputStream os = ShowUtils.getOutputStream(new Path(resultsFile), context)) {
       if (tableNames != null) {
-        SortedSet<String> sortedSet = new TreeSet<String>(tableNames);
-        context.getFormatter().showTables(os, sortedSet);
+        formatter.showTables(os, tableNames);
       } else {
-        Collections.sort(tableObjects, Comparator.comparing(Table::getTableName));
-        if (isExtended) {
-          context.getFormatter().showTablesExtended(os, tableObjects);
-        } else {
-          context.getFormatter().showMaterializedViews(os, tableObjects);
-        }
+        formatter.showTablesExtended(os, tableObjects);
       }
     } catch (Exception e) {
       throw new HiveException(e, ErrorMsg.GENERIC_ERROR, "in database" + dbName);
