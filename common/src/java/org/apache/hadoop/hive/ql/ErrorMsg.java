@@ -485,7 +485,7 @@ public enum ErrorMsg {
       "Materialized view engine: {0}", true),
   REFRESH_VIEW(10501, "REFRESH is not supported for views"),
   INVALID_METADATA_TABLE_NAME(10502, "Invalid metadata table name {0}.", true),
-  METADATA_TABLE_NOT_SUPPORTED(10503, "Metadata tables are not supported for table {0}.", true),
+  TABLE_META_REF_NOT_SUPPORTED(10431, "Table Meta Ref extension is not supported for table {0}.", true),
   COMPACTION_REFUSED(10432, "Compaction request for {0}.{1}{2} is refused, details: {3}.", true),
   NON_NATIVE_ACID_UPDATE(10435, "Update and Merge into non-native ACID table is only supported when " +
       HiveConf.ConfVars.SPLIT_UPDATE.varname + " is true."),
