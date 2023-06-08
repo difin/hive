@@ -4482,7 +4482,7 @@ public class ObjectStore implements RawStore, Configurable {
   public int getNumPartitionsByFilter(String catName, String dbName, String tblName,
                                       String filter) throws MetaException, NoSuchObjectException {
     final ExpressionTree exprTree = org.apache.commons.lang.StringUtils.isNotEmpty(filter)
-        ? PartFilterExprUtil.getFilterParser(filter).tree : ExpressionTree.EMPTY_TREE;
+        ? PartFilterExprUtil.parseFilterTree(filter) : ExpressionTree.EMPTY_TREE;
 
     catName = normalizeIdentifier(catName);
     dbName = normalizeIdentifier(dbName);
@@ -4582,7 +4582,7 @@ public class ObjectStore implements RawStore, Configurable {
     List<FieldSchema> partitionKeys = convertToFieldSchemas(mTable.getPartitionKeys());
     boolean isAcidTable = TxnUtils.isAcidTable(mTable.getParameters());
     final ExpressionTree tree = (filter != null && !filter.isEmpty())
-        ? PartFilterExprUtil.getFilterParser(filter).tree : ExpressionTree.EMPTY_TREE;
+        ? PartFilterExprUtil.parseFilterTree(filter) : ExpressionTree.EMPTY_TREE;
     return new GetListHelper<Partition>(catName, dbName, tblName, allowSql, allowJdo) {
       private final SqlFilterForPushdown filter = new SqlFilterForPushdown();
 
@@ -4661,7 +4661,7 @@ public class ObjectStore implements RawStore, Configurable {
           }
         }
         String filterStr = filterBuilder.toString();
-        tree = PartFilterExprUtil.getFilterParser(filterStr).tree;
+        tree = PartFilterExprUtil.parseFilterTree(filterStr);
       }
 
       @Override
@@ -4759,7 +4759,7 @@ public class ObjectStore implements RawStore, Configurable {
   private String makeQueryFilterString(String catName, String dbName, MTable mtable, String filter,
       Map<String, Object> params) throws MetaException {
     ExpressionTree tree = (filter != null && !filter.isEmpty())
-        ? PartFilterExprUtil.getFilterParser(filter).tree : ExpressionTree.EMPTY_TREE;
+        ? PartFilterExprUtil.parseFilterTree(filter) : ExpressionTree.EMPTY_TREE;
     return makeQueryFilterString(catName, dbName, convertToTable(mtable), tree, params, true);
   }
 

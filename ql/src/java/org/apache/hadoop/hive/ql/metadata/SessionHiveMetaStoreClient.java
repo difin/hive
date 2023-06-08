@@ -1610,7 +1610,7 @@ public class SessionHiveMetaStoreClient extends HiveMetaStoreClientWithLocalCach
   private String generateJDOFilter(org.apache.hadoop.hive.metastore.api.Table table, String filter)
       throws MetaException {
     ExpressionTree exprTree = org.apache.commons.lang.StringUtils.isNotEmpty(filter)
-        ? PartFilterExprUtil.getFilterParser(filter).tree : ExpressionTree.EMPTY_TREE;
+        ? PartFilterExprUtil.parseFilterTree(filter) : ExpressionTree.EMPTY_TREE;
     return generateJDOFilter(table, exprTree);
   }
 
