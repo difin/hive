@@ -250,6 +250,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   static final protected char MAJOR_TYPE = 'a';
   static final protected char MINOR_TYPE = 'i';
   static final protected char REBALANCE_TYPE = 'r';
+  static final protected char ABORT_TXN_CLEANUP_TYPE = 'c';
 
   private static final String DEFAULT_POOL_NAME = "default";
 
@@ -1385,7 +1386,7 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         removeWriteIdsFromMinHistory(dbConn, ImmutableList.of(txnid));
         updateCommitIdAndCleanUpMetadata(stmt, txnid, txnType, commitId, tempCommitId);
         removeTxnsFromMinHistoryLevel(dbConn, ImmutableList.of(txnid));
-        
+
         if (rqst.isSetKeyValue()) {
           updateKeyValueAssociatedWithTxn(rqst, stmt);
         }
@@ -5877,12 +5878,12 @@ abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
    * Select ... For Update to sequence operations properly.  In practice that means when running
    * with Derby database.  See more notes at class level.
    */
-  private void lockInternal() {
+  protected void lockInternal() {
     if(dbProduct == DatabaseProduct.DERBY) {
       derbyLock.lock();
     }
   }
-  private void unlockInternal() {
+  protected void unlockInternal() {
     if(dbProduct == DatabaseProduct.DERBY) {
       derbyLock.unlock();
     }

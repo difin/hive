@@ -9222,7 +9222,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
     @Override
     public void mark_cleaned(CompactionInfoStruct cr) throws MetaException {
-      getTxnHandler().markCleaned(CompactionInfo.compactionStructToInfo(cr), false);
+      getTxnHandler().markCleaned(CompactionInfo.compactionStructToInfo(cr));
     }
 
     @Override

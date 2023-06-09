@@ -40,6 +40,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -91,6 +92,55 @@ class CompactionTxnHandler extends TxnHandler {
   private static final String DELETE_FAILED_TXNS_SQL =
       "DELETE FROM \"TXNS\" WHERE \"TXN_ID\" NOT IN (SELECT \"TC_TXNID\" FROM \"TXN_COMPONENTS\") " +
           "AND \"TXN_STATE\" = " + TxnStatus.ABORTED;
+
+  // Three inner sub-queries which are under left-join to fetch the required data for aborted txns.
+  private static final String SELECT_ABORTS_WITH_MIN_OPEN_WRITETXN_QUERY =
+      "SELECT " +
+          " \"res1\".\"TC_DATABASE\" AS \"DB\", \"res1\".\"TC_TABLE\" AS \"TBL\", \"res1\".\"TC_PARTITION\" AS \"PART\", " +
+          " \"res1\".\"MIN_TXN_START_TIME\" AS \"MIN_TXN_START_TIME\", \"res1\".\"ABORTED_TXN_COUNT\" AS \"ABORTED_TXN_COUNT\", " +
+          " \"res2\".\"MIN_OPEN_WRITE_TXNID\" AS \"MIN_OPEN_WRITE_TXNID\", \"res3\".\"RETRY_RETENTION\" AS \"RETRY_RETENTION\", " +
+          " \"res3\".\"ID\" AS \"RETRY_CQ_ID\" " +
+      " FROM " +
+          // First sub-query - Gets the aborted txns with min txn start time, number of aborted txns
+          // for corresponding db, table, partition.
+          " ( SELECT \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\", MIN(\"TXN_STARTED\") AS \"MIN_TXN_START_TIME\", " +
+          " COUNT(*) AS \"ABORTED_TXN_COUNT\" FROM \"TXNS\", \"TXN_COMPONENTS\" " +
+          " WHERE \"TXN_ID\" = \"TC_TXNID\" AND \"TXN_STATE\" = " + TxnStatus.ABORTED +
+          " GROUP BY \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\" %s ) \"res1\" " +
+      " LEFT JOIN" +
+          // Second sub-query - Gets the min open txn id for corresponding db, table, partition.
+          "( SELECT \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\", MIN(\"TC_TXNID\") AS \"MIN_OPEN_WRITE_TXNID\" " +
+          " FROM \"TXNS\", \"TXN_COMPONENTS\" " +
+          " WHERE \"TXN_ID\" = \"TC_TXNID\" AND \"TXN_STATE\" = " + TxnStatus.OPEN +
+          " GROUP BY \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\" ) \"res2\"" +
+      " ON \"res1\".\"TC_DATABASE\" = \"res2\".\"TC_DATABASE\"" +
+      " AND \"res1\".\"TC_TABLE\" = \"res2\".\"TC_TABLE\"" +
+      " AND (\"res1\".\"TC_PARTITION\" = \"res2\".\"TC_PARTITION\" " +
+              " OR (\"res1\".\"TC_PARTITION\" IS NULL AND \"res2\".\"TC_PARTITION\" IS NULL)) " +
+      " LEFT JOIN " +
+          // Third sub-query - Gets the retry entries for corresponding db, table, partition.
+          "( SELECT \"CQ_DATABASE\", \"CQ_TABLE\", \"CQ_PARTITION\", MAX(\"CQ_ID\") AS \"ID\", " +
+          " MAX(\"CQ_RETRY_RETENTION\") AS \"RETRY_RETENTION\", " +
+          " MIN(\"CQ_COMMIT_TIME\") - %s + MAX(\"CQ_RETRY_RETENTION\") AS \"RETRY_RECORD_CHECK\" FROM \"COMPACTION_QUEUE\" " +
+          " WHERE \"CQ_TYPE\" = " + quoteChar(TxnHandler.ABORT_TXN_CLEANUP_TYPE) +
+          " GROUP BY \"CQ_DATABASE\", \"CQ_TABLE\", \"CQ_PARTITION\") \"res3\" " +
+      " ON \"res1\".\"TC_DATABASE\" = \"res3\".\"CQ_DATABASE\" " +
+      " AND \"res1\".\"TC_TABLE\" = \"res3\".\"CQ_TABLE\" " +
+      " AND (\"res1\".\"TC_PARTITION\" = \"res3\".\"CQ_PARTITION\" " +
+              " OR (\"res1\".\"TC_PARTITION\" IS NULL AND \"res3\".\"CQ_PARTITION\" IS NULL))" +
+      " WHERE \"res3\".\"RETRY_RECORD_CHECK\" <= 0 OR \"res3\".\"RETRY_RECORD_CHECK\" IS NULL";
+
+  private static final String DELETE_ABORT_RETRY_ENTRIES_FROM_COMPACTION_QUEUE =
+          "DELETE FROM \"COMPACTION_QUEUE\" WHERE \"CQ_DATABASE\" = ? " +
+                  " AND \"CQ_TABLE\" = ? AND (\"CQ_PARTITION\" = ? OR \"CQ_PARTITION\" IS NULL) AND \"CQ_TYPE\" = " +
+                  quoteChar(TxnHandler.ABORT_TXN_CLEANUP_TYPE);
+
+  private static final String INSERT_ABORT_RETRY_ENTRY_INTO_COMPACTION_QUEUE =
+      "INSERT INTO \"COMPACTION_QUEUE\" (\"CQ_ID\", \"CQ_DATABASE\", \"CQ_TABLE\", \"CQ_PARTITION\", " +
+      " \"CQ_TYPE\", \"CQ_STATE\", \"CQ_RETRY_RETENTION\", \"CQ_ERROR_MESSAGE\", \"CQ_COMMIT_TIME\") " +
+      " VALUES (?, ?, ?, ?, ?, ?, ?, ?, %s)";
+
+
   public CompactionTxnHandler() {
   }
 
@@ -254,7 +304,7 @@ class CompactionTxnHandler extends TxnHandler {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT \"CQ_ID\", \"CQ_DATABASE\", \"CQ_TABLE\", \"CQ_PARTITION\", " +
           "\"CQ_TYPE\", \"CQ_POOL_NAME\", \"CQ_NUMBER_OF_BUCKETS\", \"CQ_ORDER_BY\", " +
-            "\"CQ_TBLPROPERTIES\" FROM \"COMPACTION_QUEUE\" WHERE \"CQ_STATE\" = '" + INITIATED_STATE + "' AND ");
+          "\"CQ_TBLPROPERTIES\" FROM \"COMPACTION_QUEUE\" WHERE \"CQ_STATE\" = " + quoteChar(INITIATED_STATE) + " AND ");
         boolean hasPoolName = StringUtils.isNotBlank(rqst.getPoolName());
         if(hasPoolName) {
           sb.append("\"CQ_POOL_NAME\"=?");
@@ -398,7 +448,8 @@ class CompactionTxnHandler extends TxnHandler {
          * By filtering on minOpenTxnWaterMark, we will only cleanup after every transaction is committed, that could see
          * the uncompacted deltas. This way the cleaner can clean up everything that was made obsolete by this compaction.
          */
-        String whereClause = " WHERE \"CQ_STATE\" = " + quoteChar(READY_FOR_CLEANING) + 
+        String whereClause = " WHERE \"CQ_STATE\" = " + quoteChar(READY_FOR_CLEANING) +
+          " AND \"CQ_TYPE\" != " + quoteChar(TxnHandler.ABORT_TXN_CLEANUP_TYPE) +
           " AND (\"CQ_COMMIT_TIME\" < (" + getEpochFn(dbProduct) + " - \"CQ_RETRY_RETENTION\" - " + retentionTime + ") OR \"CQ_COMMIT_TIME\" IS NULL)";
         
         String queryStr = 
@@ -477,17 +528,8 @@ class CompactionTxnHandler extends TxnHandler {
       try (Connection dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED, connPoolCompaction);
            Statement stmt = dbConn.createStatement()) {
         boolean checkAbortedTimeThreshold = abortedTimeThreshold >= 0;
-        String sCheckAborted = "SELECT \"tc\".\"TC_DATABASE\", \"tc\".\"TC_TABLE\", \"tc\".\"TC_PARTITION\", " +
-            " \"tc\".\"MIN_TXN_START_TIME\", \"tc\".\"ABORTED_TXN_COUNT\", \"minOpenWriteTxnId\".\"MIN_OPEN_WRITE_TXNID\" FROM " +
-            " ( SELECT \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\", " +
-            " MIN(\"TXN_STARTED\") AS \"MIN_TXN_START_TIME\", COUNT(*) AS \"ABORTED_TXN_COUNT\" FROM \"TXNS\", \"TXN_COMPONENTS\" " +
-            " WHERE \"TXN_ID\" = \"TC_TXNID\" AND \"TXN_STATE\" = " + TxnStatus.ABORTED +
-            " GROUP BY \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\" " +
-            (checkAbortedTimeThreshold ? "" : " HAVING COUNT(*) > " + abortedThreshold) + " ) \"tc\" " +
-            " LEFT JOIN ( SELECT MIN(\"TC_TXNID\") AS \"MIN_OPEN_WRITE_TXNID\", \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\" FROM \"TXNS\", \"TXN_COMPONENTS\" " +
-            " WHERE \"TXN_ID\" = \"TC_TXNID\" AND \"TXN_STATE\"=" + TxnStatus.OPEN + " GROUP BY \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\" ) \"minOpenWriteTxnId\" " +
-            " ON \"tc\".\"TC_DATABASE\" = \"minOpenWriteTxnId\".\"TC_DATABASE\" AND \"tc\".\"TC_TABLE\" = \"minOpenWriteTxnId\".\"TC_TABLE\"" +
-            " AND (\"tc\".\"TC_PARTITION\" = \"minOpenWriteTxnId\".\"TC_PARTITION\" OR (\"tc\".\"TC_PARTITION\" IS NULL AND \"minOpenWriteTxnId\".\"TC_PARTITION\" IS NULL))";
+        String sCheckAborted = String.format(SELECT_ABORTS_WITH_MIN_OPEN_WRITETXN_QUERY,
+                checkAbortedTimeThreshold ? "" : " HAVING COUNT(*) > " + abortedThreshold, getEpochFn(dbProduct));
 
         LOG.debug("Going to execute query <{}>", sCheckAborted);
         try (ResultSet rs = stmt.executeQuery(sCheckAborted)) {
@@ -502,7 +544,12 @@ class CompactionTxnHandler extends TxnHandler {
               info.tableName = rs.getString(2);
               info.partName = rs.getString(3);
               // In this case, this field contains min open write txn ID.
-              info.txnId = rs.getLong(6);
+              info.minOpenWriteTxnId = rs.getLong(6) > 0 ? rs.getLong(6) : Long.MAX_VALUE;
+              // The specific type, state assigned to abort cleanup.
+              info.type = CompactionType.ABORT_TXN_CLEANUP;
+              info.state = READY_FOR_CLEANING;
+              info.retryRetention = rs.getLong(7);
+              info.id = rs.getLong(8);
               readyToCleanAborts.add(info);
             }
           }
@@ -510,9 +557,8 @@ class CompactionTxnHandler extends TxnHandler {
         return readyToCleanAborts;
       } catch (SQLException e) {
         LOG.error("Unable to select next element for cleaning, " + e.getMessage());
-        checkRetryable(e, "findReadyToCleanForAborts");
-        throw new MetaException("Unable to connect to transaction database " +
-                e.getMessage());
+        checkRetryable(e, "findReadyToCleanAborts");
+        throw new MetaException(DB_FAILED_TO_CONNECT + e.getMessage());
       }
     } catch (RetryException e) {
       return findReadyToCleanAborts(abortedTimeThreshold, abortedThreshold);
@@ -617,7 +663,7 @@ class CompactionTxnHandler extends TxnHandler {
    */
   @Override
   @RetrySemantics.CannotRetry
-  public void markCleaned(CompactionInfo info, boolean isAbortOnly) throws MetaException {
+  public void markCleaned(CompactionInfo info) throws MetaException {
     LOG.debug("Running markCleaned with CompactionInfo: {}", info);
     try {
       Connection dbConn = null;
@@ -625,7 +671,7 @@ class CompactionTxnHandler extends TxnHandler {
       ResultSet rs = null;
       try {
         dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED, connPoolCompaction);
-        if (!isAbortOnly) {
+        if (!info.isAbortedTxnCleanup()) {
           String s = "INSERT INTO \"COMPLETED_COMPACTIONS\"(\"CC_ID\", \"CC_DATABASE\", "
               + "\"CC_TABLE\", \"CC_PARTITION\", \"CC_STATE\", \"CC_TYPE\", \"CC_TBLPROPERTIES\", \"CC_WORKER_ID\", "
               + "\"CC_START\", \"CC_END\", \"CC_RUN_AS\", \"CC_HIGHEST_WRITE_ID\", \"CC_META_INFO\", "
@@ -692,14 +738,13 @@ class CompactionTxnHandler extends TxnHandler {
         LOG.error("Unable to delete from compaction queue " + e.getMessage());
         LOG.debug("Going to rollback");
         rollbackDBConn(dbConn);
-        checkRetryable(e, "markCleaned(" + info + "," + isAbortOnly + ")");
-        throw new MetaException("Unable to connect to transaction database " +
-          e.getMessage());
+        checkRetryable(e, "markCleaned(" + info + ")");
+        throw new MetaException(DB_FAILED_TO_CONNECT + e.getMessage());
       } finally {
         close(rs, pStmt, dbConn);
       }
     } catch (RetryException e) {
-      markCleaned(info, isAbortOnly);
+      markCleaned(info);
     }
   }
 
@@ -707,6 +752,14 @@ class CompactionTxnHandler extends TxnHandler {
     PreparedStatement pStmt = null;
     ResultSet rs = null;
     try {
+      /*
+       * Remove all abort retry associated metadata of table/partition in the COMPACTION_QUEUE both when compaction
+       * or abort cleanup is successful. We don't want a situation wherein we have a abort retry entry for a table
+       * but no corresponding entry in TXN_COMPONENTS table. Successful compaction will delete
+       * the retry metadata, so that abort cleanup is retried again (an optimistic retry approach).
+       */
+      removeAbortRetryEntries(dbConn, info);
+
       /*
        * compaction may remove data from aborted txns above tc_writeid bit it only guarantees to
        * remove it up to (inclusive) tc_writeid, so it's critical to not remove metadata about
@@ -930,7 +983,7 @@ class CompactionTxnHandler extends TxnHandler {
   /**
    * Clean up aborted transactions from txns that have no components in txn_components. The reason such
    * txns exist can be that now work was done in this txn (e.g. Streaming opened TransactionBatch and
-   * abandoned it w/o doing any work) or due to {@link #markCleaned(CompactionInfo, boolean)} being called.
+   * abandoned it w/o doing any work) or due to {@link #markCleaned(CompactionInfo)} being called.
    */
   @Override
   @RetrySemantics.SafeToRetry
@@ -1222,6 +1275,77 @@ class CompactionTxnHandler extends TxnHandler {
   private static boolean timedOut(CompactionInfo ci, RetentionCounters rc, long pastTimeout) {
     return ci.start < pastTimeout
             && (rc.hasSucceededMajorCompaction || (rc.hasSucceededMinorCompaction && ci.type == CompactionType.MINOR));
+  }
+
+  private void removeAbortRetryEntries(Connection dbConn, CompactionInfo info) throws MetaException, RetryException {
+    LOG.debug("Going to execute update <{}>", DELETE_ABORT_RETRY_ENTRIES_FROM_COMPACTION_QUEUE);
+    try (PreparedStatement pStmt = dbConn.prepareStatement(DELETE_ABORT_RETRY_ENTRIES_FROM_COMPACTION_QUEUE)) {
+      pStmt.setString(1, info.dbname);
+      pStmt.setString(2, info.tableName);
+      if (info.partName != null) {
+        pStmt.setString(3, info.partName);
+      } else {
+        // Since the type of 'CQ_PARTITION' column is varchar.
+        // Hence, setting null for VARCHAR type.
+        pStmt.setNull(3, Types.VARCHAR);
+      }
+      int rc = pStmt.executeUpdate();
+      LOG.debug("Removed {} records in COMPACTION_QUEUE", rc);
+    } catch (SQLException e) {
+      LOG.error("Unable to delete abort retry entries from COMPACTION_QUEUE due to {}", e.getMessage());
+      LOG.debug("Going to rollback");
+      rollbackDBConn(dbConn);
+      checkRetryable(e, "removeAbortRetryEntries(" + info + ")");
+      throw new MetaException(DB_FAILED_TO_CONNECT + e.getMessage());
+    }
+  }
+
+  private void insertAbortRetryRetentionTimeOnError(Connection dbConn, CompactionInfo info) throws MetaException, SQLException {
+    String query = String.format(INSERT_ABORT_RETRY_ENTRY_INTO_COMPACTION_QUEUE, getEpochFn(dbProduct));
+    TxnStore.MutexAPI.LockHandle handle = null;
+    try (PreparedStatement pStmt = dbConn.prepareStatement(query);
+         Statement stmt = dbConn.createStatement()) {
+      lockInternal();
+      /**
+       * MUTEX_KEY.CompactionScheduler lock ensures that there is only 1 entry in
+       * Initiated/Working state for any resource.  This ensures that we don't run concurrent
+       * compactions for any resource.
+       */
+      handle = getMutexAPI().acquireLock(MUTEX_KEY.CompactionScheduler.name());
+      long id = generateCompactionQueueId(stmt);
+      pStmt.setLong(1, id);
+      pStmt.setString(2, info.dbname);
+      pStmt.setString(3, info.tableName);
+      if (info.partName != null) {
+        pStmt.setString(4, info.partName);
+      } else {
+        // Since the type of 'CQ_PARTITION' column is varchar.
+        // Hence, setting null for VARCHAR type.
+        pStmt.setNull(4, Types.VARCHAR);
+      }
+      pStmt.setString(5, Character.toString(TxnUtils.thriftCompactionType2DbType(info.type)));
+      pStmt.setString(6, Character.toString(info.state));
+      pStmt.setLong(7, info.retryRetention);
+      pStmt.setString(8, info.errorMessage);
+      int updCnt = pStmt.executeUpdate();
+      if (updCnt == 0) {
+        LOG.error("Unable to update/insert compaction queue record: {}. updCnt={}", info, updCnt);
+        dbConn.rollback();
+        throw new MetaException("Unable to insert abort retry entry into COMPACTION QUEUE: " +
+                " CQ_DATABASE=" + info.dbname + ", CQ_TABLE=" + info.tableName + ", CQ_PARTITION" + info.partName);
+      }
+      LOG.debug("Going to commit");
+      dbConn.commit();
+    } catch (SQLException e) {
+      LOG.error("Unable to update compaction queue: {}", e.getMessage());
+      rollbackDBConn(dbConn);
+      throw e;
+    } finally {
+      if (handle != null) {
+        handle.releaseLocks();
+      }
+      unlockInternal();
+    }
   }
 
   /**
@@ -1543,29 +1667,33 @@ class CompactionTxnHandler extends TxnHandler {
   public void setCleanerRetryRetentionTimeOnError(CompactionInfo info) throws MetaException {
     try {
       try (Connection dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED, connPoolCompaction)) {
-        try (PreparedStatement stmt = dbConn.prepareStatement("UPDATE \"COMPACTION_QUEUE\" " +
-                "SET \"CQ_RETRY_RETENTION\" = ?, \"CQ_ERROR_MESSAGE\"= ? WHERE \"CQ_ID\" = ?")) {
-          stmt.setLong(1, info.retryRetention);
-          stmt.setString(2, info.errorMessage);
-          stmt.setLong(3, info.id);
-          int updCnt = stmt.executeUpdate();
-          if (updCnt != 1) {
-            LOG.error("Unable to update compaction queue record: {}. updCnt={}", info, updCnt);
-            dbConn.rollback();
-            throw new MetaException("No record with CQ_ID=" + info.id + " found in COMPACTION_QUEUE");
+        if (info.isAbortedTxnCleanup() && info.id == 0) {
+          insertAbortRetryRetentionTimeOnError(dbConn, info);
+        } else {
+          try (PreparedStatement stmt = dbConn.prepareStatement("UPDATE \"COMPACTION_QUEUE\" " +
+                  "SET \"CQ_RETRY_RETENTION\" = ?, \"CQ_ERROR_MESSAGE\"= ? WHERE \"CQ_ID\" = ?")) {
+            stmt.setLong(1, info.retryRetention);
+            stmt.setString(2, info.errorMessage);
+            stmt.setLong(3, info.id);
+            int updCnt = stmt.executeUpdate();
+            if (updCnt != 1) {
+              LOG.error("Unable to update compaction queue record: {}. updCnt={}", info, updCnt);
+              dbConn.rollback();
+              throw new MetaException("No record with CQ_ID=" + info.id + " found in COMPACTION_QUEUE");
+            }
+            LOG.debug("Going to commit");
+            dbConn.commit();
+          } catch (SQLException e) {
+            LOG.error("Unable to update compaction queue: " + e.getMessage());
+            rollbackDBConn(dbConn);
+            checkRetryable(e, "insertOrSetCleanerRetryRetentionTimeOnError(" + info + ")");
+            throw new MetaException("Unable to update compaction queue: " +
+                    e.getMessage());
           }
-          LOG.debug("Going to commit");
-          dbConn.commit();
-        } catch (SQLException e) {
-          LOG.error("Unable to update compaction queue: " + e.getMessage());
-          rollbackDBConn(dbConn);
-          checkRetryable(e, "setCleanerRetryRetentionTimeOnError(" + info + ")");
-          throw new MetaException("Unable to update compaction queue: " +
-                  e.getMessage());
         }
       } catch (SQLException e) {
         LOG.error(DB_FAILED_TO_CONNECT + e.getMessage());
-        checkRetryable(e, "setCleanerRetryRetentionTimeOnError(" + info  + ")");
+        checkRetryable(e, "insertOrSetCleanerRetryRetentionTimeOnError(" + info  + ")");
         throw new MetaException(DB_FAILED_TO_CONNECT + e.getMessage());
       }
     } catch (RetryException e) {

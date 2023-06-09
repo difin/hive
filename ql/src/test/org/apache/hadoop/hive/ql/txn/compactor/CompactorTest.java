@@ -83,6 +83,7 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.util.Progressable;
 import org.apache.thrift.TException;
 import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +127,7 @@ public abstract class CompactorTest {
   FileSystem fs;
 
   @Before
+  @BeforeEach
   public void setup() throws Exception {
     setup(new HiveConf());
   }

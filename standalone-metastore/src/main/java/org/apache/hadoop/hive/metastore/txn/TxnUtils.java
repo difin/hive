@@ -717,6 +717,8 @@ public class TxnUtils {
         return CompactionType.MINOR;
       case TxnHandler.REBALANCE_TYPE:
         return CompactionType.REBALANCE;
+      case TxnHandler.ABORT_TXN_CLEANUP_TYPE:
+        return CompactionType.ABORT_TXN_CLEANUP;
       default:
         throw new MetaException("Unexpected compaction type " + dbValue);
     }
@@ -730,6 +732,8 @@ public class TxnUtils {
         return TxnHandler.MINOR_TYPE;
       case REBALANCE:
         return TxnHandler.REBALANCE_TYPE;
+      case ABORT_TXN_CLEANUP:
+        return TxnHandler.ABORT_TXN_CLEANUP_TYPE;
       default:
         throw new MetaException("Unexpected compaction type " + ct);
     }

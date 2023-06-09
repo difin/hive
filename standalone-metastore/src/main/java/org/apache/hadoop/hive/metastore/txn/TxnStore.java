@@ -518,10 +518,9 @@ public interface TxnStore extends Configurable {
    * it has been compacted.
    *
    * @param info info on the compaction entry to remove
-   * @param isAbortOnly whether to cleanup only abort related cleanup information
    */
   @RetrySemantics.CannotRetry
-  void markCleaned(CompactionInfo info, boolean isAbortOnly) throws MetaException;
+  void markCleaned(CompactionInfo info) throws MetaException;
 
   /**
    * Mark a compaction entry as failed.  This will move it to the compaction history queue with a
@@ -543,7 +542,7 @@ public interface TxnStore extends Configurable {
 
   /**
    * Stores the value of {@link CompactionInfo#retryRetention} and {@link CompactionInfo#errorMessage} fields
-   * of the CompactionInfo in the HMS database.
+   * of the CompactionInfo either by inserting or updating the fields in the HMS database.
    * @param info The {@link CompactionInfo} object holding the values.
    * @throws MetaException
    */
