@@ -1651,7 +1651,7 @@ public class TestReplicationScenariosAcidTables extends BaseReplicationScenarios
             primary.dump(primaryDbName);
 
     long lastReplId = Long.parseLong(bootStrapDump.lastReplicationId);
-    primary.testEventCounts(primaryDbName, lastReplId, null, null, 12);
+    primary.testEventCounts(primaryDbName, lastReplId, null, null, 13);
 
     // Test load
     replica.load(replicatedDbName, primaryDbName)

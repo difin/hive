@@ -38,6 +38,7 @@ import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.CAT_NAME;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.DB_NAME;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.prependCatalogToDbName;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.prependNotNullCatToDbName;
+import static org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdentifier;
 
 import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -2485,6 +2486,9 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         throw new MetaException("Create table in REMOTE database " + db.getName() + " is not allowed");
       }
 
+      tbl.setDbName(normalizeIdentifier(tbl.getDbName()));
+      tbl.setTableName(normalizeIdentifier(tbl.getTableName()));
+
       if (transformer != null) {
         tbl = transformer.transformCreateTable(tbl, processorCapabilities, processorId);
       }
@@ -4153,7 +4157,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           if (distinctTableNames.size() > tableBatchSize) {
             List<String> lowercaseTableNames = new ArrayList<>();
             for (String tableName : tableNames) {
-              lowercaseTableNames.add(org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdentifier(tableName));
+              lowercaseTableNames.add(normalizeIdentifier(tableName));
             }
             distinctTableNames = new ArrayList<>(new HashSet<>(lowercaseTableNames));
           }
