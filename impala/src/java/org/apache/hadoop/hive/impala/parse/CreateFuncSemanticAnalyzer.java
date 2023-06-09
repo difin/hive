@@ -72,6 +72,7 @@ public class CreateFuncSemanticAnalyzer extends AbstractFunctionAnalyzer {
 
   public CreateFuncSemanticAnalyzer(QueryState queryState) throws SemanticException {
     super(queryState);
+    queryState.setCommandType(HiveOperation.CREATEFUNCTION);
   }
 
   @Override
@@ -99,7 +100,6 @@ public class CreateFuncSemanticAnalyzer extends AbstractFunctionAnalyzer {
     ImpalaWork work = ImpalaWork.createPlannedWork(createFuncStmt, fetchTask, 1);
     Task<ImpalaWork> impalaTask = TaskFactory.get(work);
     this.rootTasks.add(impalaTask);
-    queryState.setCommandType(HiveOperation.CREATEFUNCTION);
 
     Task<DDLWork> reloadTask =
         TaskFactory.get(new DDLWork(getInputs(), getOutputs(), new ReloadFunctionsDesc()));
