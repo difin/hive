@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-final class ThreadPoolExecutorWithOomHook extends ThreadPoolExecutor {
+class ThreadPoolExecutorWithOomHook extends ThreadPoolExecutor {
 
   public static final Logger LOG = LoggerFactory.getLogger(ThreadPoolExecutorWithOomHook.class.getName());
 

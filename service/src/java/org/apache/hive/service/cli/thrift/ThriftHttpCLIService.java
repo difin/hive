@@ -20,8 +20,8 @@ package org.apache.hive.service.cli.thrift;
 
 import java.security.KeyStore;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.Set;
@@ -96,11 +96,18 @@ public class ThriftHttpCLIService extends ThriftCLIService {
       // Start with minWorkerThreads, expand till maxWorkerThreads and reject
       // subsequent requests
       String threadPoolName = "HiveServer2-HttpHandler-Pool";
-      ExecutorService executorService = new ThreadPoolExecutorWithOomHook(minWorkerThreads,
+      ThreadPoolExecutor executorService = new ThreadPoolExecutorWithOomHook(minWorkerThreads,
           maxWorkerThreads,workerKeepAliveTime, TimeUnit.SECONDS,
-          new SynchronousQueue<Runnable>(), new ThreadFactoryWithGarbageCleanup(threadPoolName), oomHook);
+          new SynchronousQueue<Runnable>(), new ThreadFactoryWithGarbageCleanup(threadPoolName), oomHook) {
+        @Override
+        public void setThreadFactory(ThreadFactory threadFactory) {
+          // ExecutorThreadPool will override the ThreadFactoryWithGarbageCleanup with his own ThreadFactory,
+          // Override this method to ignore the action.
+          LOG.warn("Ignore setting the thread factory as the pool has already provided his own: {}", getThreadFactory());
+        }
+      };
 
-      ExecutorThreadPool threadPool = new ExecutorThreadPool((ThreadPoolExecutor) executorService);
+      ExecutorThreadPool threadPool = new ExecutorThreadPool(executorService);
 
       // HTTP Server
       server = new Server(threadPool);
