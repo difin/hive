@@ -40,7 +40,7 @@ public class AlterDatabaseSetPropertiesDesc extends AbstractAlterDatabaseDesc {
     this.dbProperties = dbProperties;
   }
 
-  @Explain(displayName="properties")
+  @Explain(displayName= "properties")
   public Map<String, String> getDatabaseProperties() {
     return dbProperties;
   }

@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.40"
+const string HMS_API = "1.2.41"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -2342,6 +2342,22 @@ struct GetAllWriteEventInfoRequest {
   3: optional string tableName
 }
 
+struct PropertySetRequest {
+    1: required string nameSpace;
+    2: map<string, string> propertyMap;
+}
+
+struct PropertyGetRequest {
+    1: required string nameSpace;
+    2: string mapPrefix;
+    3: optional string mapPredicate;
+    4: optional list<string> mapSelection;
+}
+
+struct PropertyGetResponse {
+    1: map<string, map<string , string>> properties;
+}
+
 // Exceptions.
 
 exception MetaException {
@@ -3105,6 +3121,12 @@ service ThriftHiveMetastore extends fb303.FacebookService
   list<string> get_all_packages(1: ListPackageRequest request) throws (1:MetaException o1)
   void drop_package(1: DropPackageRequest request) throws (1:MetaException o1)
   list<WriteEventInfo> get_all_write_event_info(1: GetAllWriteEventInfoRequest request) throws (1:MetaException o1)
+
+  // retrieve properties
+  PropertyGetResponse get_properties(1:PropertyGetRequest req) throws(1:MetaException e1, 2:NoSuchObjectException e2);
+  // set properties
+  bool set_properties(1:PropertySetRequest req) throws(1:MetaException e1, 2:NoSuchObjectException e2);
+
   }
 
 // * Note about the DDL_TIME: When creating or altering a table or a partition,

@@ -297,6 +297,8 @@ class ThriftHiveMetastoreIf : virtual public  ::facebook::fb303::FacebookService
   virtual void get_all_packages(std::vector<std::string> & _return, const ListPackageRequest& request) = 0;
   virtual void drop_package(const DropPackageRequest& request) = 0;
   virtual void get_all_write_event_info(std::vector<WriteEventInfo> & _return, const GetAllWriteEventInfoRequest& request) = 0;
+  virtual void get_properties(PropertyGetResponse& _return, const PropertyGetRequest& req) = 0;
+  virtual bool set_properties(const PropertySetRequest& req) = 0;
 };
 
 class ThriftHiveMetastoreIfFactory : virtual public  ::facebook::fb303::FacebookServiceIfFactory {
@@ -1169,6 +1171,13 @@ class ThriftHiveMetastoreNull : virtual public ThriftHiveMetastoreIf , virtual p
   }
   void get_all_write_event_info(std::vector<WriteEventInfo> & /* _return */, const GetAllWriteEventInfoRequest& /* request */) override {
     return;
+  }
+  void get_properties(PropertyGetResponse& /* _return */, const PropertyGetRequest& /* req */) override {
+    return;
+  }
+  bool set_properties(const PropertySetRequest& /* req */) override {
+    bool _return = false;
+    return _return;
   }
 };
 
@@ -34084,6 +34093,247 @@ class ThriftHiveMetastore_get_all_write_event_info_presult {
 
 };
 
+typedef struct _ThriftHiveMetastore_get_properties_args__isset {
+  _ThriftHiveMetastore_get_properties_args__isset() : req(false) {}
+  bool req :1;
+} _ThriftHiveMetastore_get_properties_args__isset;
+
+class ThriftHiveMetastore_get_properties_args {
+ public:
+
+  ThriftHiveMetastore_get_properties_args(const ThriftHiveMetastore_get_properties_args&);
+  ThriftHiveMetastore_get_properties_args& operator=(const ThriftHiveMetastore_get_properties_args&);
+  ThriftHiveMetastore_get_properties_args() noexcept {
+  }
+
+  virtual ~ThriftHiveMetastore_get_properties_args() noexcept;
+  PropertyGetRequest req;
+
+  _ThriftHiveMetastore_get_properties_args__isset __isset;
+
+  void __set_req(const PropertyGetRequest& val);
+
+  bool operator == (const ThriftHiveMetastore_get_properties_args & rhs) const
+  {
+    if (!(req == rhs.req))
+      return false;
+    return true;
+  }
+  bool operator != (const ThriftHiveMetastore_get_properties_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const ThriftHiveMetastore_get_properties_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class ThriftHiveMetastore_get_properties_pargs {
+ public:
+
+
+  virtual ~ThriftHiveMetastore_get_properties_pargs() noexcept;
+  const PropertyGetRequest* req;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _ThriftHiveMetastore_get_properties_result__isset {
+  _ThriftHiveMetastore_get_properties_result__isset() : success(false), e1(false), e2(false) {}
+  bool success :1;
+  bool e1 :1;
+  bool e2 :1;
+} _ThriftHiveMetastore_get_properties_result__isset;
+
+class ThriftHiveMetastore_get_properties_result {
+ public:
+
+  ThriftHiveMetastore_get_properties_result(const ThriftHiveMetastore_get_properties_result&);
+  ThriftHiveMetastore_get_properties_result& operator=(const ThriftHiveMetastore_get_properties_result&);
+  ThriftHiveMetastore_get_properties_result() noexcept {
+  }
+
+  virtual ~ThriftHiveMetastore_get_properties_result() noexcept;
+  PropertyGetResponse success;
+  MetaException e1;
+  NoSuchObjectException e2;
+
+  _ThriftHiveMetastore_get_properties_result__isset __isset;
+
+  void __set_success(const PropertyGetResponse& val);
+
+  void __set_e1(const MetaException& val);
+
+  void __set_e2(const NoSuchObjectException& val);
+
+  bool operator == (const ThriftHiveMetastore_get_properties_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    if (!(e1 == rhs.e1))
+      return false;
+    if (!(e2 == rhs.e2))
+      return false;
+    return true;
+  }
+  bool operator != (const ThriftHiveMetastore_get_properties_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const ThriftHiveMetastore_get_properties_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _ThriftHiveMetastore_get_properties_presult__isset {
+  _ThriftHiveMetastore_get_properties_presult__isset() : success(false), e1(false), e2(false) {}
+  bool success :1;
+  bool e1 :1;
+  bool e2 :1;
+} _ThriftHiveMetastore_get_properties_presult__isset;
+
+class ThriftHiveMetastore_get_properties_presult {
+ public:
+
+
+  virtual ~ThriftHiveMetastore_get_properties_presult() noexcept;
+  PropertyGetResponse* success;
+  MetaException e1;
+  NoSuchObjectException e2;
+
+  _ThriftHiveMetastore_get_properties_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+typedef struct _ThriftHiveMetastore_set_properties_args__isset {
+  _ThriftHiveMetastore_set_properties_args__isset() : req(false) {}
+  bool req :1;
+} _ThriftHiveMetastore_set_properties_args__isset;
+
+class ThriftHiveMetastore_set_properties_args {
+ public:
+
+  ThriftHiveMetastore_set_properties_args(const ThriftHiveMetastore_set_properties_args&);
+  ThriftHiveMetastore_set_properties_args& operator=(const ThriftHiveMetastore_set_properties_args&);
+  ThriftHiveMetastore_set_properties_args() noexcept {
+  }
+
+  virtual ~ThriftHiveMetastore_set_properties_args() noexcept;
+  PropertySetRequest req;
+
+  _ThriftHiveMetastore_set_properties_args__isset __isset;
+
+  void __set_req(const PropertySetRequest& val);
+
+  bool operator == (const ThriftHiveMetastore_set_properties_args & rhs) const
+  {
+    if (!(req == rhs.req))
+      return false;
+    return true;
+  }
+  bool operator != (const ThriftHiveMetastore_set_properties_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const ThriftHiveMetastore_set_properties_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class ThriftHiveMetastore_set_properties_pargs {
+ public:
+
+
+  virtual ~ThriftHiveMetastore_set_properties_pargs() noexcept;
+  const PropertySetRequest* req;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _ThriftHiveMetastore_set_properties_result__isset {
+  _ThriftHiveMetastore_set_properties_result__isset() : success(false), e1(false), e2(false) {}
+  bool success :1;
+  bool e1 :1;
+  bool e2 :1;
+} _ThriftHiveMetastore_set_properties_result__isset;
+
+class ThriftHiveMetastore_set_properties_result {
+ public:
+
+  ThriftHiveMetastore_set_properties_result(const ThriftHiveMetastore_set_properties_result&);
+  ThriftHiveMetastore_set_properties_result& operator=(const ThriftHiveMetastore_set_properties_result&);
+  ThriftHiveMetastore_set_properties_result() noexcept
+                                            : success(0) {
+  }
+
+  virtual ~ThriftHiveMetastore_set_properties_result() noexcept;
+  bool success;
+  MetaException e1;
+  NoSuchObjectException e2;
+
+  _ThriftHiveMetastore_set_properties_result__isset __isset;
+
+  void __set_success(const bool val);
+
+  void __set_e1(const MetaException& val);
+
+  void __set_e2(const NoSuchObjectException& val);
+
+  bool operator == (const ThriftHiveMetastore_set_properties_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    if (!(e1 == rhs.e1))
+      return false;
+    if (!(e2 == rhs.e2))
+      return false;
+    return true;
+  }
+  bool operator != (const ThriftHiveMetastore_set_properties_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const ThriftHiveMetastore_set_properties_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _ThriftHiveMetastore_set_properties_presult__isset {
+  _ThriftHiveMetastore_set_properties_presult__isset() : success(false), e1(false), e2(false) {}
+  bool success :1;
+  bool e1 :1;
+  bool e2 :1;
+} _ThriftHiveMetastore_set_properties_presult__isset;
+
+class ThriftHiveMetastore_set_properties_presult {
+ public:
+
+
+  virtual ~ThriftHiveMetastore_set_properties_presult() noexcept;
+  bool* success;
+  MetaException e1;
+  NoSuchObjectException e2;
+
+  _ThriftHiveMetastore_set_properties_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
 class ThriftHiveMetastoreClient : virtual public ThriftHiveMetastoreIf, public  ::facebook::fb303::FacebookServiceClient {
  public:
   ThriftHiveMetastoreClient(std::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) :
@@ -34908,6 +35158,12 @@ class ThriftHiveMetastoreClient : virtual public ThriftHiveMetastoreIf, public  
   void get_all_write_event_info(std::vector<WriteEventInfo> & _return, const GetAllWriteEventInfoRequest& request) override;
   void send_get_all_write_event_info(const GetAllWriteEventInfoRequest& request);
   void recv_get_all_write_event_info(std::vector<WriteEventInfo> & _return);
+  void get_properties(PropertyGetResponse& _return, const PropertyGetRequest& req) override;
+  void send_get_properties(const PropertyGetRequest& req);
+  void recv_get_properties(PropertyGetResponse& _return);
+  bool set_properties(const PropertySetRequest& req) override;
+  void send_set_properties(const PropertySetRequest& req);
+  bool recv_set_properties();
 };
 
 class ThriftHiveMetastoreProcessor : public  ::facebook::fb303::FacebookServiceProcessor {
@@ -35189,6 +35445,8 @@ class ThriftHiveMetastoreProcessor : public  ::facebook::fb303::FacebookServiceP
   void process_get_all_packages(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_drop_package(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_get_all_write_event_info(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_get_properties(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_set_properties(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
   ThriftHiveMetastoreProcessor(::std::shared_ptr<ThriftHiveMetastoreIf> iface) :
      ::facebook::fb303::FacebookServiceProcessor(iface),
@@ -35464,6 +35722,8 @@ class ThriftHiveMetastoreProcessor : public  ::facebook::fb303::FacebookServiceP
     processMap_["get_all_packages"] = &ThriftHiveMetastoreProcessor::process_get_all_packages;
     processMap_["drop_package"] = &ThriftHiveMetastoreProcessor::process_drop_package;
     processMap_["get_all_write_event_info"] = &ThriftHiveMetastoreProcessor::process_get_all_write_event_info;
+    processMap_["get_properties"] = &ThriftHiveMetastoreProcessor::process_get_properties;
+    processMap_["set_properties"] = &ThriftHiveMetastoreProcessor::process_set_properties;
   }
 
   virtual ~ThriftHiveMetastoreProcessor() {}
@@ -38100,6 +38360,25 @@ class ThriftHiveMetastoreMultiface : virtual public ThriftHiveMetastoreIf, publi
     return;
   }
 
+  void get_properties(PropertyGetResponse& _return, const PropertyGetRequest& req) override {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->get_properties(_return, req);
+    }
+    ifaces_[i]->get_properties(_return, req);
+    return;
+  }
+
+  bool set_properties(const PropertySetRequest& req) override {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->set_properties(req);
+    }
+    return ifaces_[i]->set_properties(req);
+  }
+
 };
 
 // The 'concurrent' client is a thread safe client that correctly handles
@@ -38929,6 +39208,12 @@ class ThriftHiveMetastoreConcurrentClient : virtual public ThriftHiveMetastoreIf
   void get_all_write_event_info(std::vector<WriteEventInfo> & _return, const GetAllWriteEventInfoRequest& request) override;
   int32_t send_get_all_write_event_info(const GetAllWriteEventInfoRequest& request);
   void recv_get_all_write_event_info(std::vector<WriteEventInfo> & _return, const int32_t seqid);
+  void get_properties(PropertyGetResponse& _return, const PropertyGetRequest& req) override;
+  int32_t send_get_properties(const PropertyGetRequest& req);
+  void recv_get_properties(PropertyGetResponse& _return, const int32_t seqid);
+  bool set_properties(const PropertySetRequest& req) override;
+  int32_t send_set_properties(const PropertySetRequest& req);
+  bool recv_set_properties(const int32_t seqid);
 };
 
 #ifdef _MSC_VER

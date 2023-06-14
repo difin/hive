@@ -5242,4 +5242,25 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
       throws TException {
     return client.get_partitions_with_specs(request);
   }
+
+  @Override
+  public boolean setProperties(String nameSpace, Map<String, String> properties) throws TException {
+    PropertySetRequest psr = new PropertySetRequest();
+    psr.setNameSpace(nameSpace);
+    psr.setPropertyMap(properties);
+    return client.set_properties(psr);
+  }
+
+  @Override
+  public Map<String, Map<String, String>> getProperties(String nameSpace, String mapPrefix, String mapPredicate, String... selection) throws TException {
+    PropertyGetRequest request = new PropertyGetRequest();
+    request.setNameSpace(nameSpace);
+    request.setMapPrefix(mapPrefix);
+    request.setMapPredicate(mapPredicate);
+    if (selection != null && selection.length > 0) {
+      request.setMapSelection(Arrays.asList(selection));
+    }
+    PropertyGetResponse response = client.get_properties(request);
+    return response.getProperties();
+  }
 }

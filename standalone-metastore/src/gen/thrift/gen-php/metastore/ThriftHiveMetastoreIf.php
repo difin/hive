@@ -1964,4 +1964,18 @@ interface ThriftHiveMetastoreIf extends \FacebookServiceIf
      * @throws \metastore\MetaException
      */
     public function get_all_write_event_info(\metastore\GetAllWriteEventInfoRequest $request);
+    /**
+     * @param \metastore\PropertyGetRequest $req
+     * @return \metastore\PropertyGetResponse
+     * @throws \metastore\MetaException
+     * @throws \metastore\NoSuchObjectException
+     */
+    public function get_properties(\metastore\PropertyGetRequest $req);
+    /**
+     * @param \metastore\PropertySetRequest $req
+     * @return bool
+     * @throws \metastore\MetaException
+     * @throws \metastore\NoSuchObjectException
+     */
+    public function set_properties(\metastore\PropertySetRequest $req);
 }

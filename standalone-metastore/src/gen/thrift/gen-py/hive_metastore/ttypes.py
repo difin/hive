@@ -28487,6 +28487,263 @@ class GetAllWriteEventInfoRequest(object):
         return not (self == other)
 
 
+class PropertySetRequest(object):
+    """
+    Attributes:
+     - nameSpace
+     - propertyMap
+
+    """
+
+
+    def __init__(self, nameSpace=None, propertyMap=None,):
+        self.nameSpace = nameSpace
+        self.propertyMap = propertyMap
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRING:
+                    self.nameSpace = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.MAP:
+                    self.propertyMap = {}
+                    (_ktype1252, _vtype1253, _size1251) = iprot.readMapBegin()
+                    for _i1255 in range(_size1251):
+                        _key1256 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        _val1257 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        self.propertyMap[_key1256] = _val1257
+                    iprot.readMapEnd()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('PropertySetRequest')
+        if self.nameSpace is not None:
+            oprot.writeFieldBegin('nameSpace', TType.STRING, 1)
+            oprot.writeString(self.nameSpace.encode('utf-8') if sys.version_info[0] == 2 else self.nameSpace)
+            oprot.writeFieldEnd()
+        if self.propertyMap is not None:
+            oprot.writeFieldBegin('propertyMap', TType.MAP, 2)
+            oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.propertyMap))
+            for kiter1258, viter1259 in self.propertyMap.items():
+                oprot.writeString(kiter1258.encode('utf-8') if sys.version_info[0] == 2 else kiter1258)
+                oprot.writeString(viter1259.encode('utf-8') if sys.version_info[0] == 2 else viter1259)
+            oprot.writeMapEnd()
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        if self.nameSpace is None:
+            raise TProtocolException(message='Required field nameSpace is unset!')
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
+class PropertyGetRequest(object):
+    """
+    Attributes:
+     - nameSpace
+     - mapPrefix
+     - mapPredicate
+     - mapSelection
+
+    """
+
+
+    def __init__(self, nameSpace=None, mapPrefix=None, mapPredicate=None, mapSelection=None,):
+        self.nameSpace = nameSpace
+        self.mapPrefix = mapPrefix
+        self.mapPredicate = mapPredicate
+        self.mapSelection = mapSelection
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRING:
+                    self.nameSpace = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.STRING:
+                    self.mapPrefix = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.STRING:
+                    self.mapPredicate = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 4:
+                if ftype == TType.LIST:
+                    self.mapSelection = []
+                    (_etype1263, _size1260) = iprot.readListBegin()
+                    for _i1264 in range(_size1260):
+                        _elem1265 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        self.mapSelection.append(_elem1265)
+                    iprot.readListEnd()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('PropertyGetRequest')
+        if self.nameSpace is not None:
+            oprot.writeFieldBegin('nameSpace', TType.STRING, 1)
+            oprot.writeString(self.nameSpace.encode('utf-8') if sys.version_info[0] == 2 else self.nameSpace)
+            oprot.writeFieldEnd()
+        if self.mapPrefix is not None:
+            oprot.writeFieldBegin('mapPrefix', TType.STRING, 2)
+            oprot.writeString(self.mapPrefix.encode('utf-8') if sys.version_info[0] == 2 else self.mapPrefix)
+            oprot.writeFieldEnd()
+        if self.mapPredicate is not None:
+            oprot.writeFieldBegin('mapPredicate', TType.STRING, 3)
+            oprot.writeString(self.mapPredicate.encode('utf-8') if sys.version_info[0] == 2 else self.mapPredicate)
+            oprot.writeFieldEnd()
+        if self.mapSelection is not None:
+            oprot.writeFieldBegin('mapSelection', TType.LIST, 4)
+            oprot.writeListBegin(TType.STRING, len(self.mapSelection))
+            for iter1266 in self.mapSelection:
+                oprot.writeString(iter1266.encode('utf-8') if sys.version_info[0] == 2 else iter1266)
+            oprot.writeListEnd()
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        if self.nameSpace is None:
+            raise TProtocolException(message='Required field nameSpace is unset!')
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
+class PropertyGetResponse(object):
+    """
+    Attributes:
+     - properties
+
+    """
+
+
+    def __init__(self, properties=None,):
+        self.properties = properties
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.MAP:
+                    self.properties = {}
+                    (_ktype1268, _vtype1269, _size1267) = iprot.readMapBegin()
+                    for _i1271 in range(_size1267):
+                        _key1272 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        _val1273 = {}
+                        (_ktype1275, _vtype1276, _size1274) = iprot.readMapBegin()
+                        for _i1278 in range(_size1274):
+                            _key1279 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                            _val1280 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                            _val1273[_key1279] = _val1280
+                        iprot.readMapEnd()
+                        self.properties[_key1272] = _val1273
+                    iprot.readMapEnd()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('PropertyGetResponse')
+        if self.properties is not None:
+            oprot.writeFieldBegin('properties', TType.MAP, 1)
+            oprot.writeMapBegin(TType.STRING, TType.MAP, len(self.properties))
+            for kiter1281, viter1282 in self.properties.items():
+                oprot.writeString(kiter1281.encode('utf-8') if sys.version_info[0] == 2 else kiter1281)
+                oprot.writeMapBegin(TType.STRING, TType.STRING, len(viter1282))
+                for kiter1283, viter1284 in viter1282.items():
+                    oprot.writeString(kiter1283.encode('utf-8') if sys.version_info[0] == 2 else kiter1283)
+                    oprot.writeString(viter1284.encode('utf-8') if sys.version_info[0] == 2 else viter1284)
+                oprot.writeMapEnd()
+            oprot.writeMapEnd()
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
 class MetaException(TException):
     """
     Attributes:
@@ -31857,6 +32114,25 @@ GetAllWriteEventInfoRequest.thrift_spec = (
     (1, TType.I64, 'txnId', None, None, ),  # 1
     (2, TType.STRING, 'dbName', 'UTF8', None, ),  # 2
     (3, TType.STRING, 'tableName', 'UTF8', None, ),  # 3
+)
+all_structs.append(PropertySetRequest)
+PropertySetRequest.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'nameSpace', 'UTF8', None, ),  # 1
+    (2, TType.MAP, 'propertyMap', (TType.STRING, 'UTF8', TType.STRING, 'UTF8', False), None, ),  # 2
+)
+all_structs.append(PropertyGetRequest)
+PropertyGetRequest.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'nameSpace', 'UTF8', None, ),  # 1
+    (2, TType.STRING, 'mapPrefix', 'UTF8', None, ),  # 2
+    (3, TType.STRING, 'mapPredicate', 'UTF8', None, ),  # 3
+    (4, TType.LIST, 'mapSelection', (TType.STRING, 'UTF8', False), None, ),  # 4
+)
+all_structs.append(PropertyGetResponse)
+PropertyGetResponse.thrift_spec = (
+    None,  # 0
+    (1, TType.MAP, 'properties', (TType.STRING, 'UTF8', TType.MAP, (TType.STRING, 'UTF8', TType.STRING, 'UTF8', False), False), None, ),  # 1
 )
 all_structs.append(MetaException)
 MetaException.thrift_spec = (

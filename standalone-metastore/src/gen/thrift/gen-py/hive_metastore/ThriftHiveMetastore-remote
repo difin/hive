@@ -295,6 +295,8 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('   get_all_packages(ListPackageRequest request)')
     print('  void drop_package(DropPackageRequest request)')
     print('   get_all_write_event_info(GetAllWriteEventInfoRequest request)')
+    print('  PropertyGetResponse get_properties(PropertyGetRequest req)')
+    print('  bool set_properties(PropertySetRequest req)')
     print('  string getName()')
     print('  string getVersion()')
     print('  fb_status getStatus()')
@@ -2012,6 +2014,18 @@ elif cmd == 'get_all_write_event_info':
         print('get_all_write_event_info requires 1 args')
         sys.exit(1)
     pp.pprint(client.get_all_write_event_info(eval(args[0]),))
+
+elif cmd == 'get_properties':
+    if len(args) != 1:
+        print('get_properties requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.get_properties(eval(args[0]),))
+
+elif cmd == 'set_properties':
+    if len(args) != 1:
+        print('set_properties requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.set_properties(eval(args[0]),))
 
 elif cmd == 'getName':
     if len(args) != 0:

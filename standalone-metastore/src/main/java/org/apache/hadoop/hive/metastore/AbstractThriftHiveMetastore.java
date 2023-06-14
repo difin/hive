@@ -1663,4 +1663,12 @@ public class AbstractThriftHiveMetastore implements Iface {
             throws MetaException, org.apache.thrift.TException {
         throw new UnsupportedOperationException("this method is not supported");
     }
+
+    public PropertyGetResponse get_properties(PropertyGetRequest req) throws MetaException, NoSuchObjectException, org.apache.thrift.TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    public boolean set_properties(PropertySetRequest req) throws MetaException, NoSuchObjectException, org.apache.thrift.TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
 }

@@ -81,6 +81,7 @@
     <jackson.version>2.12.7</jackson.version>
     <javolution.version>5.5.1</javolution.version>
     <jetty.version>9.4.31.v20200723</jetty.version>
+    <jexl.version>3.3</jexl.version>
     <junit.version>4.13.2</junit.version>
     <junit.jupiter.version>5.6.2</junit.jupiter.version>
     <junit.vintage.version>5.6.3</junit.vintage.version>
@@ -221,6 +222,11 @@
       <groupId>javolution</groupId>
       <artifactId>javolution</artifactId>
       <version>${javolution.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-jexl3</artifactId>
+      <version>${jexl.version}</version>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>

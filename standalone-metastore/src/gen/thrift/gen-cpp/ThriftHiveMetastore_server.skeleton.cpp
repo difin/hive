@@ -1375,6 +1375,16 @@ class ThriftHiveMetastoreHandler : virtual public ThriftHiveMetastoreIf {
     printf("get_all_write_event_info\n");
   }
 
+  void get_properties(PropertyGetResponse& _return, const PropertyGetRequest& req) {
+    // Your implementation goes here
+    printf("get_properties\n");
+  }
+
+  bool set_properties(const PropertySetRequest& req) {
+    // Your implementation goes here
+    printf("set_properties\n");
+  }
+
 };
 
 int main(int argc, char **argv) {

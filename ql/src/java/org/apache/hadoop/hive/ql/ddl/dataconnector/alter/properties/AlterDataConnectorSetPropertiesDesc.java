@@ -38,7 +38,7 @@ public class AlterDataConnectorSetPropertiesDesc extends AbstractAlterDataConnec
     this.dcProperties = dcProperties;
   }
 
-  @Explain(displayName="properties")
+  @Explain(displayName= "properties")
   public Map<String, String> getConnectorProperties() {
     return dcProperties;
   }

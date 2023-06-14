@@ -4494,6 +4494,40 @@ module ThriftHiveMetastore
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_all_write_event_info failed: unknown result')
     end
 
+    def get_properties(req)
+      send_get_properties(req)
+      return recv_get_properties()
+    end
+
+    def send_get_properties(req)
+      send_message('get_properties', Get_properties_args, :req => req)
+    end
+
+    def recv_get_properties()
+      result = receive_message(Get_properties_result)
+      return result.success unless result.success.nil?
+      raise result.e1 unless result.e1.nil?
+      raise result.e2 unless result.e2.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_properties failed: unknown result')
+    end
+
+    def set_properties(req)
+      send_set_properties(req)
+      return recv_set_properties()
+    end
+
+    def send_set_properties(req)
+      send_message('set_properties', Set_properties_args, :req => req)
+    end
+
+    def recv_set_properties()
+      result = receive_message(Set_properties_result)
+      return result.success unless result.success.nil?
+      raise result.e1 unless result.e1.nil?
+      raise result.e2 unless result.e2.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'set_properties failed: unknown result')
+    end
+
   end
 
   class Processor < ::FacebookService::Processor 
@@ -7852,6 +7886,32 @@ module ThriftHiveMetastore
         result.o1 = o1
       end
       write_result(result, oprot, 'get_all_write_event_info', seqid)
+    end
+
+    def process_get_properties(seqid, iprot, oprot)
+      args = read_args(iprot, Get_properties_args)
+      result = Get_properties_result.new()
+      begin
+        result.success = @handler.get_properties(args.req)
+      rescue ::MetaException => e1
+        result.e1 = e1
+      rescue ::NoSuchObjectException => e2
+        result.e2 = e2
+      end
+      write_result(result, oprot, 'get_properties', seqid)
+    end
+
+    def process_set_properties(seqid, iprot, oprot)
+      args = read_args(iprot, Set_properties_args)
+      result = Set_properties_result.new()
+      begin
+        result.success = @handler.set_properties(args.req)
+      rescue ::MetaException => e1
+        result.e1 = e1
+      rescue ::NoSuchObjectException => e2
+        result.e2 = e2
+      end
+      write_result(result, oprot, 'set_properties', seqid)
     end
 
   end
@@ -17736,6 +17796,78 @@ module ThriftHiveMetastore
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::STRUCT, :class => ::WriteEventInfo}},
       O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => ::MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_properties_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    REQ = 1
+
+    FIELDS = {
+      REQ => {:type => ::Thrift::Types::STRUCT, :name => 'req', :class => ::PropertyGetRequest}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_properties_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    E1 = 1
+    E2 = 2
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => ::PropertyGetResponse},
+      E1 => {:type => ::Thrift::Types::STRUCT, :name => 'e1', :class => ::MetaException},
+      E2 => {:type => ::Thrift::Types::STRUCT, :name => 'e2', :class => ::NoSuchObjectException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Set_properties_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    REQ = 1
+
+    FIELDS = {
+      REQ => {:type => ::Thrift::Types::STRUCT, :name => 'req', :class => ::PropertySetRequest}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Set_properties_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+    E1 = 1
+    E2 = 2
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::BOOL, :name => 'success'},
+      E1 => {:type => ::Thrift::Types::STRUCT, :name => 'e1', :class => ::MetaException},
+      E2 => {:type => ::Thrift::Types::STRUCT, :name => 'e2', :class => ::NoSuchObjectException}
     }
 
     def struct_fields; FIELDS; end

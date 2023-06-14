@@ -106,13 +106,13 @@ class ThriftHiveMetastore_truncate_table_args
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->partNames = array();
-                        $_size1354 = 0;
-                        $_etype1357 = 0;
-                        $xfer += $input->readListBegin($_etype1357, $_size1354);
-                        for ($_i1358 = 0; $_i1358 < $_size1354; ++$_i1358) {
-                            $elem1359 = null;
-                            $xfer += $input->readString($elem1359);
-                            $this->partNames []= $elem1359;
+                        $_size1388 = 0;
+                        $_etype1391 = 0;
+                        $xfer += $input->readListBegin($_etype1391, $_size1388);
+                        for ($_i1392 = 0; $_i1392 < $_size1388; ++$_i1392) {
+                            $elem1393 = null;
+                            $xfer += $input->readString($elem1393);
+                            $this->partNames []= $elem1393;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -149,8 +149,8 @@ class ThriftHiveMetastore_truncate_table_args
             }
             $xfer += $output->writeFieldBegin('partNames', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->partNames));
-            foreach ($this->partNames as $iter1360) {
-                $xfer += $output->writeString($iter1360);
+            foreach ($this->partNames as $iter1394) {
+                $xfer += $output->writeString($iter1394);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
