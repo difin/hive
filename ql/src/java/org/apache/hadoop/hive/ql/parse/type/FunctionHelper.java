@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql.parse.type;
 import com.google.common.collect.ImmutableList;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexBuilder;
+import org.apache.calcite.rex.RexCall;
 import org.apache.calcite.rex.RexExecutor;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.sql.SqlAggFunction;
@@ -158,6 +159,12 @@ public interface FunctionHelper {
    * Returns the helper needed to do partition pruning.
    */
   PartitionPruneRuleHelper getPartitionPruneRuleHelper();
+
+  /**
+   * Returns RexCall for UDTF from the appropriate function registry based on given parameters
+   */
+  RexCall getUDTFFunction(String functionName, List<RexNode> operands)
+      throws SemanticException;
 
   /**
    * Folds expression according to function semantics.

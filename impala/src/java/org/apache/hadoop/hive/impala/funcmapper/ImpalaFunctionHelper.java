@@ -24,6 +24,7 @@ import java.nio.charset.Charset;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.rex.RexBuilder;
+import org.apache.calcite.rex.RexCall;
 import org.apache.calcite.rex.RexExecutor;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.sql.SqlAggFunction;
@@ -477,6 +478,12 @@ public class ImpalaFunctionHelper implements FunctionHelper {
     } catch (HiveException e) {
       throw new SemanticException(e);
     }
+  }
+
+  @Override
+  public RexCall getUDTFFunction(String functionName, List<RexNode> operands)
+      throws SemanticException {
+    throw new RuntimeException("not impelemnted yet.");
   }
 
   /**
