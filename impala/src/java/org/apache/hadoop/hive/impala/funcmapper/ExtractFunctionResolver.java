@@ -58,7 +58,7 @@ public class ExtractFunctionResolver extends ImpalaFunctionResolverImpl {
 
   @Override
   public List<RexNode> getConvertedInputs(ImpalaFunctionSignature candidate) {
-    return rewriteExtractDateChildren(op, inputNodes, rexBuilder);
+    return rewriteExtractDateChildren(op, candidate, inputNodes, rexBuilder);
   }
 
   @Override
@@ -78,7 +78,7 @@ public class ExtractFunctionResolver extends ImpalaFunctionResolverImpl {
    * timestamp always whereas the code in RexNodeConverter sometimes turns it into a date.
    */
   private static List<RexNode> rewriteExtractDateChildren(SqlOperator op,
-      List<RexNode> childRexNodeLst, RexBuilder rexBuilder) {
+      ImpalaFunctionSignature candidate, List<RexNode> childRexNodeLst, RexBuilder rexBuilder) {
     List<RexNode> newChildRexNodeLst = new ArrayList<>(2);
     if (op == HiveExtractDate.YEAR) {
       newChildRexNodeLst.add(rexBuilder.makeFlag(TimeUnitRange.YEAR));
@@ -99,11 +99,15 @@ public class ExtractFunctionResolver extends ImpalaFunctionResolverImpl {
     }
 
     final RexNode child = Iterables.getOnlyElement(childRexNodeLst);
-    if (SqlTypeUtil.isDatetime(child.getType()) || SqlTypeUtil.isInterval(child.getType())) {
+
+    RelDataType candidateType = candidate.getArgTypes().get(0);
+
+    if (SqlTypeUtil.isInterval(child.getType()) ||
+        candidateType.getSqlTypeName().equals(child.getType().getSqlTypeName())) {
       newChildRexNodeLst.add(child);
     } else {
-      RelDataType sqlType = rexBuilder.getTypeFactory().createSqlType(SqlTypeName.TIMESTAMP);
-      RelDataType nullableType = rexBuilder.getTypeFactory().createTypeWithNullability(sqlType, true);
+      RelDataType nullableType =
+          rexBuilder.getTypeFactory().createTypeWithNullability(candidateType, true);
       RexNode castType = rexBuilder.makeCast(nullableType, child);
       newChildRexNodeLst.add(castType);
     }
