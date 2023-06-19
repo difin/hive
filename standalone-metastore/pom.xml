@@ -56,8 +56,7 @@
 
     <!-- Dependency versions -->
     <aircompressor.version>0.21</aircompressor.version>
-    <antlr.version>3.5.2</antlr.version>
-    <antlr4.version>4.9.3</antlr4.version>
+    <antlr.version>4.9.3</antlr.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
     <apache-directory-server.version>1.5.7</apache-directory-server.version>
     <caffeine.version>2.8.4</caffeine.version>
@@ -211,14 +210,9 @@
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
-      <artifactId>antlr-runtime</artifactId>
+      <artifactId>antlr4-runtime</artifactId>
       <version>${antlr.version}</version>
     </dependency>
-      <dependency>
-        <groupId>org.antlr</groupId>
-        <artifactId>antlr4-runtime</artifactId>
-        <version>${antlr4.version}</version>
-      </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>ST4</artifactId>
@@ -1043,24 +1037,8 @@
       </plugin>
       <plugin>
         <groupId>org.antlr</groupId>
-        <artifactId>antlr3-maven-plugin</artifactId>
-        <version>${antlr.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>antlr</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-          <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>${antlr4.version}</version>
+        <version>${antlr.version}</version>
         <executions>
           <execution>
             <goals>
