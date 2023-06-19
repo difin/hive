@@ -58,7 +58,7 @@
     <dependency>
        <groupId>org.antlr</groupId>
        <artifactId>antlr4-runtime</artifactId>
-       <version>4.5</version>
+       <version>${antlr4.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
@@ -92,7 +92,7 @@
      <plugin>
         <groupId>org.antlr</groupId>
           <artifactId>antlr4-maven-plugin</artifactId>
-          <version>4.5</version>
+          <version>${antlr4.version}</version>
           <configuration>
             <visitor>true</visitor>
           </configuration>
