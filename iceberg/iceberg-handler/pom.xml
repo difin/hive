@@ -122,6 +122,11 @@
             <artifactId>RoaringBitmap</artifactId>
             <version>0.9.22</version>
         </dependency>
+        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
