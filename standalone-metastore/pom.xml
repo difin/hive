@@ -145,6 +145,7 @@
     <dependency>
       <groupId>org.apache.datasketches</groupId>
       <artifactId>datasketches-hive</artifactId>
+      <version>${datasketches.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
