@@ -108,6 +108,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -972,9 +974,19 @@ public class MetaStoreUtils {
       }
     }
 
-    if (MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.STATS_AUTO_GATHER)) {
+    if (MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.STATS_AUTO_GATHER) && 
+            !isDoNotUpdateStats(envContext)) {
+      LOG.debug("Calling updateTableStatsSlow for table {}.{}.{}", tbl.getCatName(), tbl.getDbName(), tbl.getTableName());
       updateTableStatsSlow(db, tbl, wh, newDir, false, envContext);
     }
+  }
+
+  private static boolean isDoNotUpdateStats(EnvironmentContext envContext) {
+    return Optional.ofNullable(envContext)
+            .map(EnvironmentContext::getProperties)
+            .map(props -> props.getOrDefault(StatsSetupConst.DO_NOT_UPDATE_STATS, StatsSetupConst.FALSE))
+            .map(Boolean::parseBoolean)
+            .orElse(false);
   }
 
   public static boolean areSameColumns(List<FieldSchema> oldCols, List<FieldSchema> newCols) {

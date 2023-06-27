@@ -54,6 +54,7 @@ import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.PartitionTransform;
 import org.apache.hadoop.hive.ql.parse.ReplicationSpec;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.parse.StorageFormat.StorageHandlerTypes;
 import org.apache.hadoop.hive.ql.parse.TransformSpec;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.session.SessionStateUtil;
@@ -64,6 +65,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_ICEBERG_STATS_SOURCE;
 
 /**
  * Utilities used by some DDLOperations.
@@ -304,5 +306,15 @@ public final class DDLUtils {
       throw new SemanticException(String.format("Not an iceberg table: %s (type=%s)",
           table.getFullTableName(), tableType));
     }
+  }
+
+  public static boolean isIcebergTable(Table table) {
+    return table.isNonNative() && 
+            table.getStorageHandler().getType() == StorageHandlerTypes.ICEBERG;
+  }
+
+  public static boolean isIcebergStatsSource(HiveConf conf) {
+    return conf.get(HIVE_ICEBERG_STATS_SOURCE.varname, HiveMetaHook.ICEBERG)
+            .equalsIgnoreCase(HiveMetaHook.ICEBERG);
   }
 }
