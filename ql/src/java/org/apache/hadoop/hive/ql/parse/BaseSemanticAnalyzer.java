@@ -128,6 +128,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_LOAD_DATA_USE_NATIVE_API;
+
 /**
  * BaseSemanticAnalyzer.
  *
@@ -1220,6 +1222,9 @@ public abstract class BaseSemanticAnalyzer {
             ast.getChild(childIndex), e.getMessage()), e);
       }
 
+      boolean isUseNativeLoadApi = checkUseNativeApi(conf, ast);
+      allowDynamicPartitionsSpec &= !isUseNativeLoadApi;
+
       // get partition metadata if partition specified
       if (ast.getChildCount() == 2 && ast.getToken().getType() != HiveParser.TOK_CREATETABLE &&
           ast.getToken().getType() != HiveParser.TOK_CREATE_MATERIALIZED_VIEW &&
@@ -1244,6 +1249,12 @@ public abstract class BaseSemanticAnalyzer {
             val = stripQuotes(partspec_val.getChild(1).getText());
           }
           tmpPartSpec.put(colName, val);
+        }
+
+        // Return here in case of native load api, as for now the iceberg tables are considered unpartitioned in HMS
+        if (isUseNativeLoadApi) {
+          partSpec = tmpPartSpec;
+          return;
         }
 
         // check if the columns, as well as value types in the partition() clause are valid
@@ -1324,6 +1335,11 @@ public abstract class BaseSemanticAnalyzer {
       } else {
         specType = SpecType.TABLE_ONLY;
       }
+    }
+
+    private boolean checkUseNativeApi(HiveConf conf, ASTNode ast) {
+      boolean isLoad = ast.getParent() != null && ast.getParent().getType() == HiveParser.TOK_LOAD;
+      return isLoad && tableHandle.isNonNative() && conf.getBoolVar(HIVE_LOAD_DATA_USE_NATIVE_API);
     }
 
     public TableName getTableName() {

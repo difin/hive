@@ -956,7 +956,7 @@ public class MoveTask extends Task<MoveWork> implements Serializable {
       if (loadTableWork.isUseAppendForLoad()) {
         loadTableWork.getMdTable().getStorageHandler()
             .appendFiles(loadTableWork.getMdTable().getTTable(), loadTableWork.getSourcePath().toUri(),
-                loadTableWork.getLoadFileType() == LoadFileType.REPLACE_ALL);
+                loadTableWork.getLoadFileType() == LoadFileType.REPLACE_ALL, loadTableWork.getPartitionSpec());
         return true;
       }
       // Get the info from the table data
