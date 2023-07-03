@@ -35,9 +35,9 @@ import org.apache.impala.thrift.TGetPartitionStatsResponse;
 import org.apache.impala.thrift.TPartitionKeyValue;
 import org.apache.impala.thrift.TUniqueId;
 import org.apache.impala.util.PatternMatcher;
-
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 public class DummyCatalog implements FeCatalog {
 
@@ -112,7 +112,8 @@ public class DummyCatalog implements FeCatalog {
   }
 
   @Override
-  public void prioritizeLoad(Set<TableName> tableNames) throws InternalException {
+  public void prioritizeLoad(Set<TableName> tableNames, @Nullable TUniqueId queryId)
+      throws InternalException {
     throw new RuntimeException("not implemented");
   }
 
