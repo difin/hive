@@ -87,7 +87,10 @@ public class TargetHelper {
   // the end.
   private final List<Integer> dynPartitionColPositions;
 
+  private final ImpalaPlannerContext ctx;
   public TargetHelper(ImpalaPlannerContext ctx, QB qb) throws SemanticException {
+    this.ctx = ctx;
+
     // Validate that the select output and target table schema are compatible
     impalaTable = ctx.getTargetTable();
     Preconditions.checkNotNull(impalaTable);
@@ -371,7 +374,7 @@ public class TargetHelper {
       String selectListColName = selectListColNames.get(i);
       // The checkTypeCompatibility call will return the correctly cast type.
       expr = StatementBase.checkTypeCompatibility(targetTable.getCompleteName(),
-          impalaTable.getColumn(selectListColName), expr, true, null);
+          impalaTable.getColumn(selectListColName), expr, ctx.getRootAnalyzer(), null);
       exprsMap.put(selectListColName, expr);
     }
 
@@ -441,7 +444,7 @@ public class TargetHelper {
     }
     // The checkTypeCompatibility call will return the correctly cast type.
     return StatementBase.checkTypeCompatibility(targetTable.getCompleteName(),
-        impalaTable.getColumn(colName), expr, true, null);
+        impalaTable.getColumn(colName), expr, ctx.getRootAnalyzer(), null);
   }
 }
 

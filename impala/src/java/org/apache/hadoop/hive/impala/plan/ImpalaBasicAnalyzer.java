@@ -33,6 +33,7 @@ import org.apache.impala.authorization.Privilege;
 import org.apache.impala.catalog.BuiltinsDb;
 import org.apache.impala.catalog.FeDb;
 import org.apache.impala.catalog.FeTable;
+import org.apache.impala.catalog.TypeCompatibility;
 import org.apache.impala.common.AnalysisException;
 import org.apache.impala.thrift.TNetworkAddress;
 import org.apache.impala.thrift.TQueryCtx;
@@ -187,5 +188,17 @@ public class ImpalaBasicAnalyzer extends Analyzer {
     SlotDescriptor result = super.addSlotDescriptor(tupleDesc);
     result.setIsMaterialized(true);
     return result;
+  }
+
+  @Override
+  /**
+   * IMPALA-10173 changed the way the analyzer handles the type compatibility level.
+   * Before, checkTypeCompatibility passed in "strict_decimal" as true. The new way
+   * is to handle it through the analyzer. Since UA only calls this from one place and
+   * since UA always uses STRICT_DECIMAL compatibility, it is ok to hardcode this value
+   * here.
+   */
+  public TypeCompatibility getRegularCompatibilityLevel() {
+    return TypeCompatibility.STRICT_DECIMAL;
   }
 }
