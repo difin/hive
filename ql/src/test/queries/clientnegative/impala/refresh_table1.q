@@ -1,4 +1,3 @@
---! qt:disabled:Re-enable this q test once IMPALA-11619 is merged.
 --! qt:dataset:impala_dataset
 		
 		
