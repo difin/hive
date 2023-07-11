@@ -150,6 +150,7 @@ public class CompactorTasks implements LeaderElection.LeadershipStateListener {
         if (thread instanceof Thread) {
           ((Thread)thread).interrupt();
         }
+        HiveMetaStore.LOG.info("Stopped the Compaction task: {}.", thread.getClass().getName());
       });
       metastoreThreadsMap = null;
     }

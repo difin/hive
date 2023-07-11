@@ -12098,18 +12098,15 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
           LeaderElectionContext context = new LeaderElectionContext.ContextBuilder(conf)
               .setHMSHandler(thriftServer.getHandler()).servHost(getServerHostName())
-              // always tasks
-              .setTType(LeaderElectionContext.TTYPE.ALWAYS_TASKS)
+              .setTType(LeaderElectionContext.TTYPE.ALWAYS_TASKS) // always tasks
               .addListener(new HouseKeepingTasks(conf, false))
-              // housekeeping tasks
-              .setTType(LeaderElectionContext.TTYPE.HOUSEKEEPING)
+              .setTType(LeaderElectionContext.TTYPE.HOUSEKEEPING) // housekeeping tasks
               .addListener(new CMClearer(conf))
               .addListener(new StatsUpdaterTask(conf))
               .addListener(new CompactorTasks(conf, false))
               .addListener(new CompactorPMF())
               .addListener(new HouseKeepingTasks(conf, true))
-              // compactor worker
-              .setTType(LeaderElectionContext.TTYPE.WORKER)
+              .setTType(LeaderElectionContext.TTYPE.WORKER) // compactor worker
               .addListener(new CompactorTasks(conf, true), MetastoreConf.getVar(conf,
                   MetastoreConf.ConfVars.HIVE_METASTORE_RUNWORKER_IN).equals("metastore"))
               .build();
@@ -12118,8 +12115,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           }
           context.start();
         } catch (Throwable e) {
-          LOG.error("Failure when starting the leader tasks, compactions or housekeeping tasks may not happen, " +
-              StringUtils.stringifyException(e));
+          LOG.error("Failure when starting the leader tasks, Compaction or Housekeeping tasks may not happen", e);
         } finally {
           startLock.unlock();
         }
