@@ -164,6 +164,9 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
 
   @Override
   public void preCreateTable(org.apache.hadoop.hive.metastore.api.Table hmsTable) {
+    if (hmsTable.isTemporary()) {
+      throw new UnsupportedOperationException("Creation of temporary iceberg tables is not supported.");
+    }
     this.catalogProperties = getCatalogProperties(hmsTable);
 
     // Set the table type even for non HiveCatalog based tables
@@ -172,7 +175,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
 
     if (!Catalogs.hiveCatalog(conf, catalogProperties)) {
       if (Boolean.parseBoolean(this.catalogProperties.getProperty(hive_metastoreConstants.TABLE_IS_CTLT))) {
-        throw new RuntimeException("CTLT target table must be a HiveCatalog table.");
+        throw new UnsupportedOperationException("CTLT target table must be a HiveCatalog table.");
       }
       // For non-HiveCatalog tables too, we should set the input and output format
       // so that the table can be read by other engines like Impala
