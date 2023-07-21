@@ -80,7 +80,7 @@
     <arrow.version>0.11.1.2023.0.15.0-SNAPSHOT</arrow.version>
     <avatica.version>1.17.0.7.2.16.0-287</avatica.version>
     <avro.version>1.8.2.2023.0.15.0-SNAPSHOT</avro.version>
-    <bcprov-jdk15on.version>1.64</bcprov-jdk15on.version>
+    <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
     <calcite.version>1.25.0.2023.0.15.0-SNAPSHOT</calcite.version>
     <datanucleus-api-jdo.version>5.2.8</datanucleus-api-jdo.version>
