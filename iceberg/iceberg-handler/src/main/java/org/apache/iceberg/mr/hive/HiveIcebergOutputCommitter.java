@@ -412,7 +412,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
     for (JobContext jobContext : outputTable.jobContexts) {
       JobConf conf = jobContext.getJobConf();
       table = Optional.ofNullable(table).orElse(Catalogs.loadTable(conf, catalogProperties));
-      branchName = conf.get(InputFormatConfig.OUTPUT_TABLE_BRANCH);
+      branchName = conf.get(InputFormatConfig.OUTPUT_TABLE_SNAPSHOT_REF);
 
       LOG.info("Committing job has started for table: {}, using location: {}",
           table, generateJobLocation(outputTable.table.location(), conf, jobContext.getJobID()));
@@ -454,7 +454,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
   private Long getSnapshotId(Table table, String branchName) {
     Optional<Long> snapshotId = Optional.ofNullable(table.currentSnapshot()).map(Snapshot::snapshotId);
     if (StringUtils.isNotEmpty(branchName)) {
-      String ref = HiveUtils.getTableBranch(branchName);
+      String ref = HiveUtils.getTableSnapshotRef(branchName);
       snapshotId = Optional.ofNullable(table.refs().get(ref)).map(SnapshotRef::snapshotId);
     }
     return snapshotId.orElse(null);
@@ -474,7 +474,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
       AppendFiles write = table.newAppend();
       results.dataFiles().forEach(write::appendFile);
       if (StringUtils.isNotEmpty(branchName)) {
-        write.toBranch(HiveUtils.getTableBranch(branchName));
+        write.toBranch(HiveUtils.getTableSnapshotRef(branchName));
       }
       write.commit();
 
@@ -483,7 +483,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
       results.dataFiles().forEach(write::addRows);
       results.deleteFiles().forEach(write::addDeletes);
       if (StringUtils.isNotEmpty(branchName)) {
-        write.toBranch(HiveUtils.getTableBranch(branchName));
+        write.toBranch(HiveUtils.getTableSnapshotRef(branchName));
       }
       if (snapshotId != null) {
         write.validateFromSnapshot(snapshotId);
@@ -517,7 +517,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
       ReplacePartitions overwrite = table.newReplacePartitions();
       results.dataFiles().forEach(overwrite::addFile);
       if (StringUtils.isNotEmpty(branchName)) {
-        overwrite.toBranch(HiveUtils.getTableBranch(branchName));
+        overwrite.toBranch(HiveUtils.getTableSnapshotRef(branchName));
       }
       overwrite.commit();
       LOG.info("Overwrite commit took {} ms for table: {} with {} file(s)", System.currentTimeMillis() - startTime,
@@ -526,7 +526,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
       DeleteFiles deleteFiles = table.newDelete();
       deleteFiles.deleteFromRowFilter(Expressions.alwaysTrue());
       if (StringUtils.isNotEmpty(branchName)) {
-        deleteFiles.toBranch(HiveUtils.getTableBranch(branchName));
+        deleteFiles.toBranch(HiveUtils.getTableSnapshotRef(branchName));
       }
       deleteFiles.commit();
       LOG.info("Cleared table contents as part of empty overwrite for unpartitioned table. " +

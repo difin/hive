@@ -138,7 +138,7 @@ public class Table implements Serializable {
    */
   private String asOfTimestamp = null;
 
-  private String branchName;
+  private String snapshotRef;
 
   /**
    * Used only for serialization.
@@ -182,7 +182,7 @@ public class Table implements Serializable {
     newTab.setVersionIntervalFrom(this.versionIntervalFrom);
 
     newTab.setMetaTable(this.getMetaTable());
-    newTab.setBranchName(this.getBranchName());
+    newTab.setSnapshotRef(this.getSnapshotRef());
     return newTab;
   }
 
@@ -1358,12 +1358,12 @@ public class Table implements Serializable {
     this.metaTable = metaTable;
   }
 
-  public String getBranchName() {
-    return branchName;
+  public String getSnapshotRef() {
+    return snapshotRef;
   }
 
-  public void setBranchName(String branchName) {
-    this.branchName = branchName;
+  public void setSnapshotRef(String snapshotRef) {
+    this.snapshotRef = snapshotRef;
   }
 
   public SourceTable createSourceTable() {
