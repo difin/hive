@@ -22,7 +22,7 @@
 
   <groupId>org.apache.hive</groupId>
   <artifactId>hive-standalone-metastore</artifactId>
-  <version>3.1.3000.2023.0.15.0-SNAPSHOT</version>
+  <version>3.1.3000.2023.0.16.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Hive Standalone Metastore</name>
 
@@ -91,11 +91,11 @@
     <libthrift.version>0.16.0</libthrift.version>
     <log4j2.version>2.17.1</log4j2.version>
     <mockito-core.version>3.4.4</mockito-core.version>
-    <orc.version>1.8.3.2023.0.15.0-SNAPSHOT</orc.version>
+    <orc.version>1.8.3.2023.0.16.0-SNAPSHOT</orc.version>
     <protobuf.version>2.5.0</protobuf.version>
     <sqlline.version>1.9.0</sqlline.version>
     <jline.version>2.14.6</jline.version>
-    <storage-api.version>3.1.3000.2023.0.15.0-SNAPSHOT</storage-api.version>
+    <storage-api.version>3.1.3000.2023.0.16.0-SNAPSHOT</storage-api.version>
     <ST4.version>4.0.4</ST4.version>
     <zookeeper.version>3.5.5.7.2.17.0-334</zookeeper.version>
     <curator.version>4.3.0.7.2.17.0-334</curator.version>
