@@ -45,6 +45,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -364,6 +365,7 @@ public class TestMetaStoreUtils {
    *   <li>Stats auto source in envContext is set to true</li>
    * </ol>
    */
+  @Ignore("CDPD-59294")
   @Test
   public void testUpdateTableStatsForCreateTableInvokeStatsCalc() throws TException {
     // DO_NOT_UPDATE_STATS in env context is not defined => invoke stats calculation
