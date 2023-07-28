@@ -87,6 +87,59 @@ SELECT
     CQ_TBLPROPERTIES
 FROM COMPACTION_QUEUE;
 
+CREATE EXTERNAL TABLE IF NOT EXISTS `TXNS` (
+    `TXN_ID` bigint,
+    `TXN_STATE` string,
+    `TXN_STARTED` bigint,
+    `TXN_LAST_HEARTBEAT` bigint,
+    `TXN_USER` string,
+    `TXN_HOST` string,
+    `TXN_AGENT_INFO` string,
+    `TXN_META_INFO` string,
+    `TXN_HEARTBEAT_COUNT` int,
+    `TXN_TYPE` int
+)
+STORED BY 'org.apache.hive.storage.jdbc.JdbcStorageHandler'
+TBLPROPERTIES (
+"hive.sql.database.type" = "METASTORE",
+"hive.sql.query" =
+"SELECT
+    \"TXN_ID\",
+    \"TXN_STATE\",
+    \"TXN_STARTED\",
+    \"TXN_LAST_HEARTBEAT\",
+    \"TXN_USER\",
+    \"TXN_HOST\",
+    \"TXN_AGENT_INFO\",
+    \"TXN_META_INFO\",
+    \"TXN_HEARTBEAT_COUNT\",
+    \"TXN_TYPE\"
+FROM \"TXNS\""
+);
+
+
+CREATE EXTERNAL TABLE IF NOT EXISTS `TXN_COMPONENTS` (
+    `TC_TXNID` bigint,
+    `TC_DATABASE` string,
+    `TC_TABLE` string,
+    `TC_PARTITION` string,
+    `TC_OPERATION_TYPE` string,
+    `TC_WRITEID` bigint
+)
+STORED BY 'org.apache.hive.storage.jdbc.JdbcStorageHandler'
+TBLPROPERTIES (
+"hive.sql.database.type" = "METASTORE",
+"hive.sql.query" =
+"SELECT
+    \"TC_TXNID\",
+    \"TC_DATABASE\",
+    \"TC_TABLE\",
+    \"TC_PARTITION\",
+    \"TC_OPERATION_TYPE\",
+    \"TC_WRITEID\"
+FROM \"TXN_COMPONENTS\""
+);
+
 CREATE OR REPLACE VIEW `TRANSACTIONS` (
                                        `TXN_ID`,
                                        `STATE`,
