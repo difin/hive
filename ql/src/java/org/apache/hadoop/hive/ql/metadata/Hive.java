@@ -5981,15 +5981,16 @@ private void constructOneLBLocationMap(FileStatus fSta,
     perfLogger.PerfLogBegin(CLASS_NAME, PerfLogger.HIVE_GET_TABLE_COLUMN_STATS);
     List<ColumnStatisticsObj> retv = null;
     try {
+      LOG.debug("Using stats engine: " + conf.getStatsField());
       if (checkTransactional) {
         Table tbl = getTable(dbName, tableName);
         AcidUtils.TableSnapshot tableSnapshot = AcidUtils.getTableSnapshot(conf, tbl);
         retv = getMSC().getTableColumnStatistics(dbName, tableName, colNames,
-            conf.getEngine().getStatsField(),
+            conf.getStatsField(),
             tableSnapshot != null ? tableSnapshot.getValidWriteIdList() : null);
       } else {
         retv = getMSC().getTableColumnStatistics(dbName, tableName, colNames,
-            conf.getEngine().getStatsField());
+            conf.getStatsField());
       }
       return retv;
     } catch (Exception e) {
@@ -6014,7 +6015,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
 
       return getMSC().getPartitionColumnStatistics(
           dbName, tableName, partNames, colNames,
-          conf.getEngine().getStatsField(),
+          conf.getStatsField(),
           writeIdList);
     } catch (Exception e) {
       LOG.debug(StringUtils.stringifyException(e));
@@ -6040,7 +6041,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
         AcidUtils.TableSnapshot tableSnapshot = AcidUtils.getTableSnapshot(conf, tbl);
         writeIdList = tableSnapshot != null ? tableSnapshot.getValidWriteIdList() : null;
         return getMSC().getAggrColStatsFor(dbName, tblName, colNames, partNames,
-            conf.getEngine().getStatsField(), writeIdList);
+            conf.getStatsField(), writeIdList);
       }
       //XXX: CDPD-20696 Remove reference to Impala
       if (conf.getEngine() == Engine.IMPALA) {
@@ -6049,7 +6050,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
         //       and using stats for different engines is completely transparent
         //       for FENG
         List<ColumnStatisticsObj> colStats = getMSC().getTableColumnStatistics(
-            dbName, tblName, colNames, conf.getEngine().getStatsField());
+            dbName, tblName, colNames, conf.getStatsField());
         // Adjust the stats based on supplied row counts if pruning actually reduced
         // the row count:
         double selectivity = originalRowCount == -1 ? 1.0 :
@@ -6064,7 +6065,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
         return new AggrStats(colStats, partNames.size());
       }
       return getMSC().getAggrColStatsFor(dbName, tblName, colNames, partNames,
-          conf.getEngine().getStatsField(), null);
+          conf.getStatsField(), null);
     } catch (Exception e) {
       LOG.debug(StringUtils.stringifyException(e));
       return new AggrStats(new ArrayList<>(),0);

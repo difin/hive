@@ -143,16 +143,6 @@ public class HiveConf extends Configuration {
       }
     };
 
-    public String getStatsField() {
-      switch (this) {
-      case HIVE:
-        return Constants.HIVE_ENGINE;
-      case IMPALA:
-        return Constants.IMPALA_ENGINE;
-      }
-      throw new RuntimeException("Cannot store statistics for " + toString());
-    }
-
     public boolean ordinalNotationGroupBy() {
       switch (this) {
       case HIVE:
@@ -4585,6 +4575,12 @@ public class HiveConf extends Configuration {
         "Modify this parameter to set a different execution engine for only etl queries. The same engine " +
             "is used for all the queries if empty."),
 
+    HIVE_FETCH_STATS_ENGINE("hive.fetch.stats.engine", "default",
+            new StringSet(false,  "default", Engine.HIVE.toString(), Engine.IMPALA.toString()),
+        "Chooses engine used to fetch stats. If set to 'default', the stats will be fetched from " +
+        "the value set in 'hive.execution.engine' or 'tez' if set to MR. This is only meant for test " +
+        "purposes since the stats engine should match the runtime engine."),
+
     HIVE_FUNCTION_RESOLVER_ENGINE("hive.function.resolver.engine", "default",
         new StringSet("default", Runtime.TEZ.toString(), Runtime.IMPALA.toString()),
         "Modify this parameter to set a different execution engine for function resolving. If " +
@@ -6716,6 +6712,21 @@ public class HiveConf extends Configuration {
     } catch (Exception e) {
       return Runtime.INVALID_RUNTIME;
     }
+  }
+
+  public String getStatsField() {
+    String fetchStatsEngine = this.getVar(ConfVars.HIVE_FETCH_STATS_ENGINE).toUpperCase();
+    if (fetchStatsEngine.equalsIgnoreCase("DEFAULT")) {
+      switch (getEngine()) {
+        case IMPALA:
+          return Constants.IMPALA_ENGINE;
+        default:
+          return Constants.HIVE_ENGINE;
+      }
+    } else if (fetchStatsEngine.equalsIgnoreCase(Runtime.IMPALA.toString())) {
+        return Constants.IMPALA_ENGINE;
+    }
+    return Constants.HIVE_ENGINE;
   }
 
   /**
