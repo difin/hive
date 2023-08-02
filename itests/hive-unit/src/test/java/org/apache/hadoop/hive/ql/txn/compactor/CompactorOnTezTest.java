@@ -44,17 +44,21 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.EOFException;
 import java.io.File;
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeStatementOnDriver;
 import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeStatementOnDriverAndReturnResults;
@@ -63,6 +67,9 @@ import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeS
  * Superclass for Test[Crud|Mm]CompactorOnTez, for setup and helper classes.
  */
 public abstract class CompactorOnTezTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(CompactorOnTezTest.class);
+
   private static final AtomicInteger RANDOM_INT = new AtomicInteger(new Random().nextInt());
   private static final String TEST_DATA_DIR = new File(
       System.getProperty("java.io.tmpdir") + File.separator + TestCrudCompactorOnTez.class
@@ -209,12 +216,30 @@ public abstract class CompactorOnTezTest {
           }
         }
       } catch (EOFException e) {
+        LOG.info("Event not found, waiting, and logging thread dump");
+        LOG.info(getThreadDump(th -> th.getName().contains("main") || th.getName().contains("Hive Hook Proto Log Writer")));
         //Since Event writing is async it may happen that the event we are looking for is not yet written out.
         //Let's retry it after waiting a bit
         Thread.sleep(3000);
       }
     }
     return null;
+  }
+
+  public String getThreadDump(Predicate<Thread> threadFilter) {
+    Map<Thread, StackTraceElement[]> dump = Thread.getAllStackTraces();
+    StringBuilder sb = new StringBuilder();
+    for(Thread th : dump.keySet().stream().filter(threadFilter).collect(Collectors.toList())) {
+      sb.append("----------\n")
+          .append("Thread Name:").append(th.getName()).append("\n")
+          .append("State:").append(th.getState().name()).append("\n")
+          .append("Thread group:").append(th.getThreadGroup().getName()).append("\n")
+          .append("Daemon:").append(th.isDaemon()).append("\n")
+          .append("Stack trace:\n");
+      Arrays.asList(dump.get(th)).forEach(ste -> sb.append("\t").append(ste.toString()).append("\n"));
+      sb.append("\n");
+    }
+    return sb.toString();
   }
 
   protected class TestDataProvider {

@@ -226,6 +226,7 @@ public class HiveProtoLoggingHook implements ExecuteWithHookContext {
     }
 
     void shutdown() {
+      LOG.debug("Shutting down proto logging hook");
       if (logWriter != null) {
         logWriter.shutdown();
         try {
@@ -235,6 +236,7 @@ public class HiveProtoLoggingHook implements ExecuteWithHookContext {
         }
       }
       IOUtils.closeQuietly(writer);
+      LOG.debug("Proto logging hook successfully shut down.");
     }
 
     void handle(HookContext hookContext) {
@@ -304,6 +306,7 @@ public class HiveProtoLoggingHook implements ExecuteWithHookContext {
         // increment log file count, if creating a new writer.
         writer = logger.getWriter(logFileName + "_" + ++logFileCount);
         writerDate = logger.getDateFromDir(writer.getPath().getParent().getName());
+        LOG.debug("New writer created for path: {}", writer.getPath());
         return true;
       }
       return false;
@@ -325,6 +328,8 @@ public class HiveProtoLoggingHook implements ExecuteWithHookContext {
             maybeRolloverWriterForDay();
             writer.writeProto(event);
             writer.hflush();
+            LOG.info("Event for query {} successfully written. Remaining queue size: {}", 
+                event.getHiveQueryId(), logWriter.getQueue().size());
           }
           return;
         } catch (IOException e) {
