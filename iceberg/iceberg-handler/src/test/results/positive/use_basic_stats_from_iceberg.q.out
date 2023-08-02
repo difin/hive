@@ -144,9 +144,10 @@ Database:           	default
 #### A masked pattern was here ####
 Retention:          	0                   	 
 #### A masked pattern was here ####
-Table Type:         	MANAGED_TABLE       	 
+Table Type:         	EXTERNAL_TABLE      	 
 Table Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"a\":\"true\"}}
+	EXTERNAL            	TRUE                
 	bucketing_version   	2                   
 	current-schema      	{\"type\":\"struct\",\"schema-id\":0,\"fields\":[{\"id\":1,\"name\":\"a\",\"required\":false,\"type\":\"int\"}]}
 	format-version      	2                   
@@ -186,9 +187,10 @@ Database:           	default
 #### A masked pattern was here ####
 Retention:          	0                   	 
 #### A masked pattern was here ####
-Table Type:         	MANAGED_TABLE       	 
+Table Type:         	EXTERNAL_TABLE      	 
 Table Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"b\":\"true\"}}
+	EXTERNAL            	TRUE                
 	bucketing_version   	2                   
 	current-schema      	{\"type\":\"struct\",\"schema-id\":0,\"fields\":[{\"id\":1,\"name\":\"b\",\"required\":false,\"type\":\"int\"}]}
 	format-version      	2                   
@@ -235,23 +237,23 @@ Stage-0
     Stage-1
       Reducer 2
       File Output Operator [FS_10]
-        Merge Join Operator [MERGEJOIN_25] (rows=1 width=4)
-          Conds:RS_28._col0=RS_31._col0(Inner),Output:["_col0","_col1"]
+        Merge Join Operator [MERGEJOIN_15] (rows=1 width=4)
+          Conds:RS_18._col0=RS_21._col0(Inner),Output:["_col0","_col1"]
         <-Map 1 [SIMPLE_EDGE] vectorized
-          SHUFFLE [RS_28]
+          SHUFFLE [RS_18]
             PartitionCols:_col0
-            Select Operator [SEL_27] (rows=1 width=4)
+            Select Operator [SEL_17] (rows=1 width=4)
               Output:["_col0"]
-              Filter Operator [FIL_26] (rows=1 width=4)
+              Filter Operator [FIL_16] (rows=1 width=4)
                 predicate:a is not null
                 TableScan [TS_0] (rows=1 width=4)
                   default@t1,t1,Tbl:COMPLETE,Col:NONE,Output:["a"]
         <-Map 3 [SIMPLE_EDGE] vectorized
-          SHUFFLE [RS_31]
+          SHUFFLE [RS_21]
             PartitionCols:_col0
-            Select Operator [SEL_30] (rows=1 width=4)
+            Select Operator [SEL_20] (rows=1 width=4)
               Output:["_col0"]
-              Filter Operator [FIL_29] (rows=1 width=4)
+              Filter Operator [FIL_19] (rows=1 width=4)
                 predicate:b is not null
                 TableScan [TS_3] (rows=1 width=4)
                   default@t2,t2,Tbl:COMPLETE,Col:NONE,Output:["b"]

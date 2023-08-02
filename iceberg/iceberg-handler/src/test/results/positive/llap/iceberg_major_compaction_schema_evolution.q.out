@@ -220,9 +220,10 @@ Database:           	default
 #### A masked pattern was here ####
 Retention:          	0                   	 
 #### A masked pattern was here ####
-Table Type:         	MANAGED_TABLE       	 
+Table Type:         	EXTERNAL_TABLE      	 
 Table Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
+	EXTERNAL            	TRUE                
 	bucketing_version   	2                   
 	current-schema      	{\"type\":\"struct\",\"schema-id\":2,\"fields\":[{\"id\":1,\"name\":\"fname\",\"required\":false,\"type\":\"string\"},{\"id\":2,\"name\":\"last_name\",\"required\":false,\"type\":\"string\"},{\"id\":3,\"name\":\"dept_id\",\"required\":false,\"type\":\"long\"},{\"id\":4,\"name\":\"address\",\"required\":false,\"type\":\"string\"}]}
 	current-snapshot-id 	#Masked#
@@ -307,9 +308,10 @@ Database:           	default
 #### A masked pattern was here ####
 Retention:          	0                   	 
 #### A masked pattern was here ####
-Table Type:         	MANAGED_TABLE       	 
+Table Type:         	EXTERNAL_TABLE      	 
 Table Parameters:	 	 
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"address\":\"true\",\"dept_id\":\"true\",\"fname\":\"true\",\"last_name\":\"true\"}}
+	EXTERNAL            	TRUE                
 	bucketing_version   	2                   
 	current-schema      	{\"type\":\"struct\",\"schema-id\":2,\"fields\":[{\"id\":1,\"name\":\"fname\",\"required\":false,\"type\":\"string\"},{\"id\":2,\"name\":\"last_name\",\"required\":false,\"type\":\"string\"},{\"id\":3,\"name\":\"dept_id\",\"required\":false,\"type\":\"long\"},{\"id\":4,\"name\":\"address\",\"required\":false,\"type\":\"string\"}]}
 	current-snapshot-id 	#Masked#

@@ -1988,18 +1988,18 @@ POSTHOOK: query: insert into tbl_ice_with_nulls values
 POSTHOOK: type: QUERY
 POSTHOOK: Input: _dummy_database@_dummy_table
 POSTHOOK: Output: default@tbl_ice_with_nulls
-Warning: Shuffle Join MERGEJOIN[57][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
-Warning: Shuffle Join MERGEJOIN[59][tables = [$hdt$_0, $hdt$_1, $hdt$_2, $hdt$_3]] in Stage 'Reducer 4' is a cross product
-Warning: Shuffle Join MERGEJOIN[60][tables = [$hdt$_0, $hdt$_1, $hdt$_2, $hdt$_3, $hdt$_4]] in Stage 'Reducer 5' is a cross product
-Warning: Shuffle Join MERGEJOIN[211][tables = [$hdt$_0, $hdt$_1, $hdt$_2]] in Stage 'Reducer 3' is a cross product
-Warning: Shuffle Join MERGEJOIN[213][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 4' is a cross product
-Warning: Shuffle Join MERGEJOIN[214][tables = [$hdt$_0, $hdt$_1, $hdt$_2]] in Stage 'Reducer 5' is a cross product
-Warning: Shuffle Join MERGEJOIN[209][tables = [$hdt$_1, $hdt$_2]] in Stage 'Reducer 11' is a cross product
-Warning: Shuffle Join MERGEJOIN[215][tables = [$hdt$_1, $hdt$_2, $hdt$_3, $hdt$_4]] in Stage 'Reducer 13' is a cross product
-Warning: Shuffle Join MERGEJOIN[216][tables = [$hdt$_1, $hdt$_2, $hdt$_3, $hdt$_4, $hdt$_5]] in Stage 'Reducer 14' is a cross product
-Warning: Shuffle Join MERGEJOIN[207][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 18' is a cross product
-Warning: Shuffle Join MERGEJOIN[217][tables = [$hdt$_0, $hdt$_1, $hdt$_2, $hdt$_3]] in Stage 'Reducer 20' is a cross product
-Warning: Shuffle Join MERGEJOIN[218][tables = [$hdt$_0, $hdt$_1, $hdt$_2, $hdt$_3, $hdt$_4]] in Stage 'Reducer 21' is a cross product
+Warning: Shuffle Join MERGEJOIN[52][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 2' is a cross product
+Warning: Shuffle Join MERGEJOIN[54][tables = [$hdt$_0, $hdt$_1, $hdt$_2, $hdt$_3]] in Stage 'Reducer 4' is a cross product
+Warning: Shuffle Join MERGEJOIN[55][tables = [$hdt$_0, $hdt$_1, $hdt$_2, $hdt$_3, $hdt$_4]] in Stage 'Reducer 5' is a cross product
+Warning: Shuffle Join MERGEJOIN[196][tables = [$hdt$_0, $hdt$_1, $hdt$_2]] in Stage 'Reducer 3' is a cross product
+Warning: Shuffle Join MERGEJOIN[198][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 4' is a cross product
+Warning: Shuffle Join MERGEJOIN[199][tables = [$hdt$_0, $hdt$_1, $hdt$_2]] in Stage 'Reducer 5' is a cross product
+Warning: Shuffle Join MERGEJOIN[194][tables = [$hdt$_1, $hdt$_2]] in Stage 'Reducer 11' is a cross product
+Warning: Shuffle Join MERGEJOIN[200][tables = [$hdt$_1, $hdt$_2, $hdt$_3, $hdt$_4]] in Stage 'Reducer 13' is a cross product
+Warning: Shuffle Join MERGEJOIN[201][tables = [$hdt$_1, $hdt$_2, $hdt$_3, $hdt$_4, $hdt$_5]] in Stage 'Reducer 14' is a cross product
+Warning: Shuffle Join MERGEJOIN[192][tables = [$hdt$_0, $hdt$_1]] in Stage 'Reducer 18' is a cross product
+Warning: Shuffle Join MERGEJOIN[202][tables = [$hdt$_0, $hdt$_1, $hdt$_2, $hdt$_3]] in Stage 'Reducer 20' is a cross product
+Warning: Shuffle Join MERGEJOIN[203][tables = [$hdt$_0, $hdt$_1, $hdt$_2, $hdt$_3, $hdt$_4]] in Stage 'Reducer 21' is a cross product
 PREHOOK: query: delete from tbl_ice_with_nulls where id in (select id from tbl_ice_with_nulls where id > 9) or name in (select name from tbl_ice_with_nulls where name = 'sdf')
 PREHOOK: type: QUERY
 PREHOOK: Input: default@tbl_ice_with_nulls
