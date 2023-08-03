@@ -22,6 +22,10 @@ import org.apache.hadoop.hive.common.type.Timestamp;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 /**
  * Test suite for parsing timestamps.
  */
@@ -62,6 +66,11 @@ public class TestTimestampParser {
         tsp.parseTimestamp("2018-10-19 10:35:00+01:00"));
   }
 
+  @Test public void testParseTimestampWithInvalidTimeDelimiterRetainsDatePart() {
+    final TimestampParser tsp = new TimestampParser();
+    Assert.assertEquals(new Timestamp(LocalDateTime.of(LocalDate.of(1945, 12, 31), LocalTime.MIDNIGHT)),
+        tsp.parseTimestamp("1945-12-31-23:59:59"));
+  }
   @Test
   public void testDefaultInvalid() {
     final TimestampParser tsp = new TimestampParser();
@@ -119,7 +128,7 @@ public class TestTimestampParser {
         "yyyy-MM-dd'T'HH:mm:ss.SSS", "yyyy-MM-dd'T'HH:mm:ss.SSSS"};
 
     final TimestampParser tsp = new TimestampParser(patterns);
-    Assert.assertNull(tsp.parseTimestamp("1945-12-31-23:59:59"));
+    Assert.assertNull(tsp.parseTimestamp("1945/12/31 23:59:59"));
   }
 
   @Test()
@@ -163,7 +172,7 @@ public class TestTimestampParser {
     // Also try other patterns
     final String[] patterns = { "millis", "yyyy-MM-dd'T'HH:mm:ss" };
     final TimestampParser tsp = new TimestampParser(patterns);
-    Assert.assertNull(tsp.parseTimestamp("1945-12-31-23:59:59"));
+    Assert.assertNull(tsp.parseTimestamp("1945/12/31 23:59:59"));
   }
 
   /**
