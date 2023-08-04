@@ -2944,7 +2944,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       RexNode calciteJoinCond = null;
       List<String> namedColumns = null;
       if (joinCond != null) {
-        JoinTypeCheckCtx jCtx = new JoinTypeCheckCtx(leftRR, rightRR, hiveJoinType);
+        JoinTypeCheckCtx jCtx = new JoinTypeCheckCtx(leftRR, rightRR, cluster.getRexBuilder(), hiveJoinType);
         RowResolver input = RowResolver.getCombinedRR(leftRR, rightRR);
         // named columns join
         // TODO: we can also do the same for semi join but it seems that other
@@ -3006,7 +3006,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
           }
           joinCond = count > 1 ? and : equal;
         } else if (unparseTranslator != null && unparseTranslator.isEnabled()) {
-          genAllExprNodeDesc(joinCond, input, jCtx);
+          jCtx.setUnparseTranslator(unparseTranslator);
+          genAllRexNode(joinCond, input, jCtx, conf, queryHelper);
         }
         Map<ASTNode, RexNode> exprNodes = RexNodeTypeCheck.genExprNodeJoinCond(
             joinCond, jCtx, queryHelper.createFunctionHelper(cluster.getRexBuilder()));
