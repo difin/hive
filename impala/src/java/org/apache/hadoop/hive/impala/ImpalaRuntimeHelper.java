@@ -116,11 +116,16 @@ public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
 
   @Override
   public synchronized void reloadFunctions(List<Function> functions, HiveConf conf, IMetaStoreClient msc) {
-    List<org.apache.impala.catalog.Function> impalaFunctions =
-        getHiveUDFs(functions, conf);
-    impalaFunctions.addAll(getNativeUDFs(msc));
-    ScalarFunctionDetails.addUDFs(impalaFunctions);
-    AggFunctionDetails.addUDFs(impalaFunctions);
+    try {
+      List<org.apache.impala.catalog.Function> impalaFunctions =
+          getHiveUDFs(functions, conf);
+      impalaFunctions.addAll(getNativeUDFs(msc));
+      ScalarFunctionDetails.addUDFs(impalaFunctions);
+      AggFunctionDetails.addUDFs(impalaFunctions);
+      ScalarFunctionDetails.addHiveUDFs();
+    } catch (HiveException e) {
+      LOG.warn("Reload functions failed for UnifiedAnalytics, some UDFs may not be visible.");
+    }
   }
 
   @Override

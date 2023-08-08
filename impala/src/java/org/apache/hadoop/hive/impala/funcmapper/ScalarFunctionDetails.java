@@ -431,12 +431,13 @@ public class ScalarFunctionDetails implements FunctionDetails {
    * ql.udf.generic package and must have an annotation defined.
    */
   public static void addHiveUDFs() throws HiveException {
+    Map<String, List<String>> tmpHiveUdfMap = new HashMap<>();
     // load generic UDFs under org.apache.hadoop.hive.ql.udf.generic
     Set<String> functionsFromFunctionRegistry = FunctionRegistry.getFunctionNames();
     for (String funcName: functionsFromFunctionRegistry) {
       Class<?> funcClass = FunctionRegistry.getFunctionInfo(funcName).getFunctionClass();
       if (funcClass.getPackage().getName().contains("org.apache.hadoop.hive.ql.udf")) {
-        HIVE_UDF_MAP.put(funcName, Arrays.asList(funcClass.getName(), ""));
+        tmpHiveUdfMap.put(funcName, Arrays.asList(funcClass.getName(), ""));
       }
     }
 
@@ -448,7 +449,7 @@ public class ScalarFunctionDetails implements FunctionDetails {
         continue;
       }
       //getFunctionName doesn't return db. For db.func, it returns func
-      HIVE_UDF_MAP.put(func.getFunctionName(), Arrays.asList(func.getClassName(), resources.get(0).getUri()));
+      tmpHiveUdfMap.put(func.getFunctionName(), Arrays.asList(func.getClassName(), resources.get(0).getUri()));
     }
 
     // load temporary functions from Session Registry
@@ -462,13 +463,14 @@ public class ScalarFunctionDetails implements FunctionDetails {
           continue;
         }
         // put only if it's not replacing a permanent function
-        HIVE_UDF_MAP.putIfAbsent(funcName, Arrays.asList(funcInfo.getFunctionClass().getName(),
+        tmpHiveUdfMap.putIfAbsent(funcName, Arrays.asList(funcInfo.getFunctionClass().getName(),
                 resources[0].getResourceURI()));
       }
     }
 
     // needed for hplsql
-    HIVE_UDF_MAP.put("hplsql", Arrays.asList("org.apache.hive.hplsql.udf.Udf", ""));
+    tmpHiveUdfMap.put("hplsql", Arrays.asList("org.apache.hive.hplsql.udf.Udf", ""));
+    HIVE_UDF_MAP = tmpHiveUdfMap;
   }
 
   /**

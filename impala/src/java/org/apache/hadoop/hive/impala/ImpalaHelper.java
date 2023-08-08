@@ -66,12 +66,6 @@ public class ImpalaHelper extends EngineHelper {
             AggFunctionDetails.createAggFunctionDetailsFromImpala();
         AggFunctionDetails.addFunctionsFromImpala(afdList);
       }
-
-      ScalarFunctionDetails.addHiveUDFs();
-    } catch (HiveException e) {
-      // This catch is needed because retrieving the conf variable may fail.
-      LOG.warn("Exception trying to create ScalarFunctionDetails", e);
-      initializationError = e;
     } catch (Exception e) {
       LOG.warn("Unable to load all Impala functions: ", e);
       initializationError = e;
