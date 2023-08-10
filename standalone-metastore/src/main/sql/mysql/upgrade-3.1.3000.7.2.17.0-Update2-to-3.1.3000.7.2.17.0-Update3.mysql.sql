@@ -2,7 +2,7 @@ SELECT 'Upgrading MetaStore schema from 3.1.3000.7.2.17.0-Update2 to 3.1.3000.7.
 
 -- HIVE-27457
 UPDATE SDS
-    SET INPUT_FORMAT = 'org.apache.hadoop.hive.kudu.KuduInputFormat', "OUTPUT_FORMAT" = 'org.apache.hadoop.hive.kudu.KuduOutputFormat'
+    SET INPUT_FORMAT = 'org.apache.hadoop.hive.kudu.KuduInputFormat', OUTPUT_FORMAT = 'org.apache.hadoop.hive.kudu.KuduOutputFormat'
     WHERE SD_ID IN (
         SELECT TBLS.SD_ID FROM TBLS
             INNER JOIN TABLE_PARAMS ON TBLS.TBL_ID = TABLE_PARAMS.TBL_ID
