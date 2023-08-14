@@ -7128,7 +7128,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     boolean enforceBucketing = false;
     List<ExprNodeDesc> partnCols = new ArrayList<>();
     List<ExprNodeDesc> sortCols = new ArrayList<>();
-    List<Integer> sortOrders = new ArrayList<>();
     boolean multiFileSpray = false;
     int numFiles = 1;
     int totalFiles = 1;
@@ -7152,6 +7151,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       // Non-native acid tables should handle their own bucketing for updates/deletes
       if ((updating(dest) || deleting(dest)) && !AcidUtils.isNonNativeAcidTable(dest_tab, true)) {
         partnCols = getPartitionColsFromBucketColsForUpdateDelete(input, true);
+        sortCols = getPartitionColsFromBucketColsForUpdateDelete(input, false);
+        createSortOrderForUpdateDelete(sortCols, order, nullOrder);
         enforceBucketing = true;
       }
     }
