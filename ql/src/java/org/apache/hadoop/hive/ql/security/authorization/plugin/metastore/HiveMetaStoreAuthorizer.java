@@ -31,7 +31,6 @@ import org.apache.hadoop.hive.metastore.api.InvalidOperationException;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.events.PreAlterTableEvent;
 import org.apache.hadoop.hive.metastore.events.PreCreateTableEvent;
 import org.apache.hadoop.hive.metastore.events.PreDropTableEvent;
@@ -45,6 +44,7 @@ import org.apache.hadoop.hive.metastore.api.TableMeta;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
 import org.apache.hadoop.hive.ql.security.HiveMetastoreAuthenticationProvider;
+import static org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObjectUtils.TablePrivilegeLookup;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.events.*;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthorizer;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthorizerFactory;
@@ -357,26 +357,11 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
   }
 
   private List<Table> getFilteredTableList(List<HivePrivilegeObject> hivePrivilegeObjects, List<Table> tableList) {
-    List<Table> ret = new ArrayList<>();
-    for(HivePrivilegeObject hivePrivilegeObject:hivePrivilegeObjects) {
-      String dbName  = hivePrivilegeObject.getDbname();
-      String tblName = hivePrivilegeObject.getObjectName();
-      Table  table   = getFilteredTable(dbName,tblName,tableList);
-      if (table != null) {
+    final List<Table> ret = new ArrayList<>();
+    final TablePrivilegeLookup index = new TablePrivilegeLookup(hivePrivilegeObjects);
+    for(Table table : tableList) {
+      if (index.lookup(table.getDbName(), table.getTableName()) != null) {
         ret.add(table);
-      }
-    }
-    return ret;
-  }
-
-  private Table getFilteredTable(String dbName, String tblName, List<Table> tableList) {
-    Table ret = null;
-    for (Table table: tableList) {
-      String databaseName = table.getDbName();
-      String tableName = table.getTableName();
-      if (dbName.equals(databaseName) && tblName.equals(tableName)) {
-        ret = table;
-        break;
       }
     }
     return ret;
@@ -401,23 +386,10 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
 
   private List<String> getFilteredTableNames(List<HivePrivilegeObject> hivePrivilegeObjects, String databaseName, List<String> tableNames) {
     List<String> ret = new ArrayList<>();
-    for(HivePrivilegeObject hivePrivilegeObject:hivePrivilegeObjects) {
-      String dbName  = hivePrivilegeObject.getDbname();
-      String tblName = hivePrivilegeObject.getObjectName();
-      String table   = getFilteredTableNames(dbName, tblName, databaseName, tableNames);
-      if (table != null) {
-        ret.add(table);
-      }
-    }
-    return ret;
-  }
-
-  private String getFilteredTableNames(String dbName, String tblName, String databaseName, List<String> tableNames) {
-    String ret = null;
-    for (String tableName: tableNames) {
-      if (dbName.equals(databaseName) && tblName.equals(tableName)) {
-        ret = tableName;
-        break;
+    final TablePrivilegeLookup index = new TablePrivilegeLookup(hivePrivilegeObjects);
+    for(String tableName : tableNames) {
+      if (index.lookup(databaseName, tableName) != null) {
+        ret.add(tableName);
       }
     }
     return ret;

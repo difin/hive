@@ -19,8 +19,6 @@ package org.apache.hadoop.hive.ql.security.authorization.plugin;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.hadoop.conf.Configuration;
@@ -32,7 +30,7 @@ import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.TableMeta;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject.HivePrivilegeObjectType;
 import org.apache.hadoop.hive.ql.session.SessionState;
-
+import static org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObjectUtils.TablePrivilegeLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,26 +61,11 @@ public class AuthorizationMetaStoreFilterHook extends DefaultMetaStoreFilterHook
   }
 
   private List<Table> getFilteredTableList(List<HivePrivilegeObject> hivePrivilegeObjects, List<Table> tableList) {
-    List<Table> ret = new ArrayList<>();
-    for(HivePrivilegeObject hivePrivilegeObject:hivePrivilegeObjects) {
-      String dbName  = hivePrivilegeObject.getDbname();
-      String tblName = hivePrivilegeObject.getObjectName();
-      Table  table   = getFilteredTable(dbName,tblName,tableList);
-      if (table != null) {
+    final List<Table> ret = new ArrayList<>();
+    final TablePrivilegeLookup index = new TablePrivilegeLookup(hivePrivilegeObjects);
+    for(Table table : tableList) {
+      if (index.lookup(table.getDbName(), table.getTableName()) != null) {
         ret.add(table);
-      }
-    }
-    return ret;
-  }
-
-  private Table getFilteredTable(String dbName, String tblName, List<Table> tableList) {
-    Table ret = null;
-    for (Table table: tableList) {
-      String databaseName = table.getDbName();
-      String tableName = table.getTableName();
-      if (dbName.equals(databaseName) && tblName.equals(tableName)) {
-        ret = table;
-        break;
       }
     }
     return ret;
@@ -170,12 +153,14 @@ public class AuthorizationMetaStoreFilterHook extends DefaultMetaStoreFilterHook
   public List<TableMeta> filterTableMetas(List<TableMeta> tableMetas) throws MetaException {
     List<HivePrivilegeObject> listObjs = tableMetasToPrivilegeObjs(tableMetas);
     List<HivePrivilegeObject> filteredList = getFilteredObjects(listObjs);
-    Set<ImmutablePair<String, String>> filteredNames = filteredList.stream()
-        .map(e -> tableMetaKey(e.getDbname(), e.getObjectName()))
-        .collect(Collectors.toSet());
-    return tableMetas.stream()
-        .filter(e -> filteredNames.contains(tableMetaKey(e.getDbName(), e.getTableName())))
-        .collect(Collectors.toList());
+    final List<TableMeta> ret = new ArrayList<>();
+    final TablePrivilegeLookup index = new TablePrivilegeLookup(filteredList);
+    for(TableMeta table : tableMetas) {
+      if (index.lookup(table.getDbName(), table.getTableName()) != null) {
+        ret.add(table);
+      }
+    }
+    return ret;
   }
 
   @Override
