@@ -353,7 +353,7 @@ public abstract class TaskCompiler {
       crtTblDesc.validate(conf);
       Task<?> crtTblTask = TaskFactory.get(new DDLWork(inputs, outputs, crtTblDesc));
       // kudu requires createTask to be before moveTask
-      boolean createTaskAfterMoveTask = !crtTblDesc.getSerName().equals(KUDU_SERDE) &&
+      boolean createTaskAfterMoveTask = crtTblDesc.getSerName() != null && !crtTblDesc.getSerName().equals(KUDU_SERDE) &&
               CollectionUtils.isEmpty(crtTblDesc.getPartColNames());
       patchUpAfterCTASorMaterializedView(rootTasks, inputs, outputs, crtTblTask,
           createTaskAfterMoveTask);

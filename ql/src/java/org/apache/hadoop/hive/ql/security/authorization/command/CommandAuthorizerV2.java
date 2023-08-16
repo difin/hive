@@ -199,13 +199,13 @@ final class CommandAuthorizerV2 {
           tableName2Cols.get(Table.getCompleteName(table.getDbName(), table.getTableName()));
       hivePrivObject = new HivePrivilegeObject(privObjType, table.getDbName(), table.getTableName(),
           null, columns, actionType, null, null, table.getOwner(), table.getOwnerType());
-      if (HiveConf.getBoolVar(SessionState.getSessionConf(), HiveConf.ConfVars.HIVE_AUTHORIZATION_TABLES_ON_STORAGEHANDLERS, false)) {
-        if (table.getStorageHandler() != null) {
+      if (table.getStorageHandler() != null && HiveConf.getBoolVar(SessionState.getSessionConf(),
+              HiveConf.ConfVars.HIVE_AUTHORIZATION_TABLES_ON_STORAGEHANDLERS, false)) {
           //TODO: add hive privilege object for storage based handlers for create and alter table commands.
-          if (hiveOpType == HiveOperationType.CREATETABLE ||
+          if (privObject instanceof WriteEntity && (hiveOpType == HiveOperationType.CREATETABLE ||
                   hiveOpType == HiveOperationType.ALTERTABLE_PROPERTIES ||
                   hiveOpType == HiveOperationType.CREATETABLE_AS_SELECT ||
-                  hiveOpType == HiveOperationType.DROPTABLE) {
+                  hiveOpType == HiveOperationType.DROPTABLE)) {
             try {
               String storageUri = table.getStorageHandler().getURIForAuth(table.getTTable()).toString();
               hivePrivObjs.add(new HivePrivilegeObject(HivePrivilegeObjectType.STORAGEHANDLER_URI, null, storageUri, null, null,
@@ -215,7 +215,6 @@ final class CommandAuthorizerV2 {
               throw new HiveException("Exception occurred while getting the URI from storage handler: " + ex.getMessage());
             }
           }
-        }
       }
       break;
     case DFS_DIR:
