@@ -1775,9 +1775,9 @@
                         <fileset dir="." includes="if/*.thrift,if/test/*.thrift,src/main/thrift/*.thrift" />
                       </path>
                       <sequential>
-                        <echo message="Generating Thrift code for @{thrift.file}"/>
-                        <exec executable="${thrift.home}/bin/thrift" failonerror="true" dir=".">
-                          <arg line="${thrift.args} -strict -I ${basedir}/include -I ${basedir}/.. -o ${thrift.gen.dir} @{thrift.file} "/>
+                        <echo message="Generating Thrift code for @{thrift.file}" />
+                        <exec dir="." executable="${thrift.home}/bin/thrift" failonerror="true">
+                          <arg line="${thrift.args} -strict -I ${basedir}/include -I ${basedir}/.. -o ${thrift.gen.dir} @{thrift.file} " />
                         </exec>
                       </sequential>
                     </for>
