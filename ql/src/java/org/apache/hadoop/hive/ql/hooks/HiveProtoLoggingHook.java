@@ -300,13 +300,14 @@ public class HiveProtoLoggingHook implements ExecuteWithHookContext {
         if (writer != null) {
           // Day change over case, reset the logFileCount.
           logFileCount = 0;
+          LOG.info("Closing event file due to rollover: {}", writer.getPath());
           IOUtils.closeQuietly(writer);
           writer = null;
         }
         // increment log file count, if creating a new writer.
         writer = logger.getWriter(logFileName + "_" + ++logFileCount);
         writerDate = logger.getDateFromDir(writer.getPath().getParent().getName());
-        LOG.debug("New writer created for path: {}", writer.getPath());
+        LOG.info("New writer created for path: {}", writer.getPath());
         return true;
       }
       return false;
@@ -328,8 +329,8 @@ public class HiveProtoLoggingHook implements ExecuteWithHookContext {
             maybeRolloverWriterForDay();
             writer.writeProto(event);
             writer.hflush();
-            LOG.info("Event for query {} successfully written. Remaining queue size: {}", 
-                event.getHiveQueryId(), logWriter.getQueue().size());
+            LOG.info("Event for query {} successfully written to file {}. Remaining queue size: {}", 
+                event.getHiveQueryId(), writer.getPath(), logWriter.getQueue().size());
           }
           return;
         } catch (IOException e) {

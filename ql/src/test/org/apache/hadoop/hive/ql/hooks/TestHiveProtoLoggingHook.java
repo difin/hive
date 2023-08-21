@@ -60,9 +60,13 @@ import org.junit.rules.TemporaryFolder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class TestHiveProtoLoggingHook {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TestHiveProtoLoggingHook.class);
 
   @Rule
   public TemporaryFolder folder = new TemporaryFolder();
@@ -307,7 +311,9 @@ public class TestHiveProtoLoggingHook {
     for (FileStatus folderStatus : folderStatuses) {
       FileStatus[] status = fs.listStatus(folderStatus.getPath());
       Assert.assertEquals(1, status.length);
-      readers.add(logger.getReader(status[0].getPath()));
+      Path filePath = status[0].getPath(); 
+      LOG.info("Found event file for processing, adding to readers list: {}", filePath);
+      readers.add(logger.getReader(filePath));
     }
     return readers;
   }

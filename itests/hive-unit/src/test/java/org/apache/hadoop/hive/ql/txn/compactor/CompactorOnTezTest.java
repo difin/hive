@@ -32,6 +32,7 @@ import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.DriverFactory;
 import org.apache.hadoop.hive.ql.IDriver;
+import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.hooks.HiveProtoLoggingHook.ExecutionMode;
 import org.apache.hadoop.hive.ql.hooks.TestHiveProtoLoggingHook;
 import org.apache.hadoop.hive.ql.hooks.proto.HiveHookEvents;
@@ -43,7 +44,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +88,9 @@ public abstract class CompactorOnTezTest {
 
   @ClassRule
   public static TemporaryFolder folder = new TemporaryFolder();
+  
+  @Rule
+  public TestName testName = new TestName();
 
   public static String tmpFolder;
 
@@ -92,7 +98,7 @@ public abstract class CompactorOnTezTest {
   // Note: we create a new conf and driver object before every test
   public void setup() throws Exception {
     HiveConf hiveConf = new HiveConf(this.getClass());
-    setupWithConf(hiveConf);
+    setupWithConf(hiveConf);    
   }
 
   @BeforeClass
@@ -114,6 +120,7 @@ public abstract class CompactorOnTezTest {
     hiveConf.setVar(HiveConf.ConfVars.HIVEINPUTFORMAT, HiveInputFormat.class.getName());
     hiveConf.setVar(HiveConf.ConfVars.HIVEFETCHTASKCONVERSION, "none");
     hiveConf.setVar(HiveConf.ConfVars.DYNAMICPARTITIONINGMODE, "nonstrict");
+    hiveConf.setVar(HiveConf.ConfVars.HIVEQUERYID, "test_query_id_" + testName.getMethodName());
     MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON, true);
     MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.COMPACTOR_CLEANER_ON, true);
     TestTxnDbUtil.setConfValues(hiveConf);
@@ -123,7 +130,7 @@ public abstract class CompactorOnTezTest {
     // Use tez as execution engine for this test class
     setupTez(conf);
     msClient = new HiveMetaStoreClient(conf);
-    driver = DriverFactory.newDriver(conf);
+    driver = DriverFactory.newDriver(new QueryState.Builder().withHiveConf(conf).build(), null, null);
     SessionState.start(new CliSessionState(conf));
   }
 
@@ -217,7 +224,7 @@ public abstract class CompactorOnTezTest {
         }
       } catch (EOFException e) {
         LOG.info("Event not found, waiting, and logging thread dump");
-        LOG.info(getThreadDump(th -> th.getName().contains("main") || th.getName().contains("Hive Hook Proto Log Writer")));
+        LOG.info(getThreadDump(th -> true));
         //Since Event writing is async it may happen that the event we are looking for is not yet written out.
         //Let's retry it after waiting a bit
         Thread.sleep(3000);
