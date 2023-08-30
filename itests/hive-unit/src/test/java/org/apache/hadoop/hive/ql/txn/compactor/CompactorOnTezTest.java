@@ -44,24 +44,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.EOFException;
 import java.io.File;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeStatementOnDriver;
 import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeStatementOnDriverAndReturnResults;
@@ -70,9 +63,6 @@ import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeS
  * Superclass for Test[Crud|Mm]CompactorOnTez, for setup and helper classes.
  */
 public abstract class CompactorOnTezTest {
-
-  private static final Logger LOG = LoggerFactory.getLogger(CompactorOnTezTest.class);
-
   private static final AtomicInteger RANDOM_INT = new AtomicInteger(new Random().nextInt());
   private static final String TEST_DATA_DIR = new File(
       System.getProperty("java.io.tmpdir") + File.separator + TestCrudCompactorOnTez.class
@@ -88,9 +78,6 @@ public abstract class CompactorOnTezTest {
 
   @ClassRule
   public static TemporaryFolder folder = new TemporaryFolder();
-  
-  @Rule
-  public TestName testName = new TestName();
 
   public static String tmpFolder;
 
@@ -98,7 +85,7 @@ public abstract class CompactorOnTezTest {
   // Note: we create a new conf and driver object before every test
   public void setup() throws Exception {
     HiveConf hiveConf = new HiveConf(this.getClass());
-    setupWithConf(hiveConf);    
+    setupWithConf(hiveConf);
   }
 
   @BeforeClass
@@ -120,7 +107,6 @@ public abstract class CompactorOnTezTest {
     hiveConf.setVar(HiveConf.ConfVars.HIVEINPUTFORMAT, HiveInputFormat.class.getName());
     hiveConf.setVar(HiveConf.ConfVars.HIVEFETCHTASKCONVERSION, "none");
     hiveConf.setVar(HiveConf.ConfVars.DYNAMICPARTITIONINGMODE, "nonstrict");
-    hiveConf.setVar(HiveConf.ConfVars.HIVEQUERYID, "test_query_id_" + testName.getMethodName());
     MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON, true);
     MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.COMPACTOR_CLEANER_ON, true);
     TestTxnDbUtil.setConfValues(hiveConf);
@@ -200,53 +186,32 @@ public abstract class CompactorOnTezTest {
   }
 
   protected HiveHookEvents.HiveHookEventProto getRelatedTezEvent(String dbTableName) throws Exception {
-    int retryCount = 10;
+    int retryCount = 3;
     while (retryCount-- > 0) {
-      try {
-        List<ProtoMessageReader<HiveHookEvents.HiveHookEventProto>> readers = TestHiveProtoLoggingHook.getTestReader(conf, tmpFolder);
-        for (ProtoMessageReader<HiveHookEvents.HiveHookEventProto> reader : readers) {
-          HiveHookEvents.HiveHookEventProto event = reader.readEvent();
-          boolean getRelatedEvent = false;
-          while (!getRelatedEvent) {
-            while (event != null && ExecutionMode.TEZ != ExecutionMode.valueOf(event.getExecutionMode())) {
-              event = reader.readEvent();
+      List<ProtoMessageReader<HiveHookEvents.HiveHookEventProto>> readers = TestHiveProtoLoggingHook.getTestReader(conf, tmpFolder);
+      for (ProtoMessageReader<HiveHookEvents.HiveHookEventProto> reader : readers) {
+        do {
+          HiveHookEvents.HiveHookEventProto event;
+          try {
+            if ((event = reader.readEvent()) == null) {
+              break;
             }
-            // Tables read is the table picked for compaction.
-            if (event != null && event.getTablesReadCount() > 0 && dbTableName.equalsIgnoreCase(event.getTablesRead(0))) {
-              getRelatedEvent = true;
-            } else {
-              event = reader.readEvent();
-            }
+          } catch (IOException e) {
+            //IO error, or reached end of current event file. Advancing to next.
+            break;
           }
-          if (getRelatedEvent) {
+          if (ExecutionMode.TEZ.equals(ExecutionMode.valueOf(event.getExecutionMode())) &&
+              event.getTablesReadCount() > 0 &&
+              dbTableName.equalsIgnoreCase(event.getTablesRead(0))) {
             return event;
           }
-        }
-      } catch (EOFException e) {
-        LOG.info("Event not found, waiting, and logging thread dump");
-        LOG.info(getThreadDump(th -> true));
-        //Since Event writing is async it may happen that the event we are looking for is not yet written out.
-        //Let's retry it after waiting a bit
-        Thread.sleep(3000);
+        } while (true);
       }
+      //Since Event writing is async it may happen that the event we are looking for is not yet written out.
+      //Let's retry it after waiting a bit
+      Thread.sleep(3000);
     }
     return null;
-  }
-
-  public String getThreadDump(Predicate<Thread> threadFilter) {
-    Map<Thread, StackTraceElement[]> dump = Thread.getAllStackTraces();
-    StringBuilder sb = new StringBuilder();
-    for(Thread th : dump.keySet().stream().filter(threadFilter).collect(Collectors.toList())) {
-      sb.append("----------\n")
-          .append("Thread Name:").append(th.getName()).append("\n")
-          .append("State:").append(th.getState().name()).append("\n")
-          .append("Thread group:").append(th.getThreadGroup().getName()).append("\n")
-          .append("Daemon:").append(th.isDaemon()).append("\n")
-          .append("Stack trace:\n");
-      Arrays.asList(dump.get(th)).forEach(ste -> sb.append("\t").append(ste.toString()).append("\n"));
-      sb.append("\n");
-    }
-    return sb.toString();
   }
 
   protected class TestDataProvider {
