@@ -35,6 +35,7 @@ import org.apache.zookeeper.data.ACL;
 import org.junit.AfterClass;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -51,6 +52,7 @@ public abstract class ZooKeeperTokenStoreTestBase {
   private static final String LOCALHOST_KEY_STORE_NAME = "keystore.jks";
   private static final String TRUST_STORE_NAME = "truststore.jks";
   private static final String KEY_STORE_TRUST_STORE_PASSWORD = "HiveJdbc";
+  private static final String KEY_STORE_TRUST_STORE_TYPE = "JKS";
   private static MiniZooKeeperCluster zkCluster = null;
   private static int zkPort = -1;
   private static ZooKeeperTokenStore ts;
@@ -91,16 +93,21 @@ public abstract class ZooKeeperTokenStoreTestBase {
           dataFileDir + File.separator + LOCALHOST_KEY_STORE_NAME);
       conf.set(MetastoreDelegationTokenManager.DELEGATION_TOKEN_STORE_ZK_KEYSTORE_PASSWORD,
           KEY_STORE_TRUST_STORE_PASSWORD);
+      conf.set(MetastoreDelegationTokenManager.DELEGATION_TOKEN_STORE_ZK_KEYSTORE_TYPE,
+          KEY_STORE_TRUST_STORE_TYPE);
       conf.set(MetastoreDelegationTokenManager.DELEGATION_TOKEN_STORE_ZK_TRUSTSTORE_LOCATION,
           dataFileDir + File.separator + TRUST_STORE_NAME);
       conf.set(MetastoreDelegationTokenManager.DELEGATION_TOKEN_STORE_ZK_TRUSTSTORE_PASSWORD,
           KEY_STORE_TRUST_STORE_PASSWORD);
+      conf.set(MetastoreDelegationTokenManager.DELEGATION_TOKEN_STORE_ZK_TRUSTSTORE_TYPE,
+          KEY_STORE_TRUST_STORE_TYPE);
       conf.set(MetastoreDelegationTokenManager.DELEGATION_TOKEN_STORE_ZK_SSL_ENABLE, "true");
 
     }
     return conf;
   }
 
+  @Test
   public void testTokenStorage() throws Exception {
     String ZK_PATH = "/zktokenstore-testTokenStorage";
     ts = new ZooKeeperTokenStore();
@@ -152,6 +159,7 @@ public abstract class ZooKeeperTokenStoreTestBase {
     assertNull(ts.getToken(tokenId));
   }
 
+  @Test
   public void testAclNoAuth() throws Exception {
     String ZK_PATH = "/zktokenstore-testAclNoAuth";
     Configuration conf = createConf(ZK_PATH);
@@ -169,6 +177,7 @@ public abstract class ZooKeeperTokenStoreTestBase {
     }
   }
 
+  @Test
   public void testAclInvalid() throws Exception {
     String ZK_PATH = "/zktokenstore-testAclInvalid";
     String aclString = "sasl:hive/host@TEST.DOMAIN:cdrwa, fail-parse-ignored";
@@ -190,6 +199,7 @@ public abstract class ZooKeeperTokenStoreTestBase {
     }
   }
 
+  @Test
   public void testAclPositive() throws Exception {
     String ZK_PATH = "/zktokenstore-testAcl";
     Configuration conf = createConf(ZK_PATH);
