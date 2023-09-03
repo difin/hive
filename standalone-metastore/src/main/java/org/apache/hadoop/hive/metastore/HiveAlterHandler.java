@@ -226,7 +226,8 @@ public class HiveAlterHandler implements AlterHandler {
 
       boolean renamedTranslatedToExternalTable = rename && MetaStoreUtils.isTranslatedToExternalTable(oldt)
           && MetaStoreUtils.isTranslatedToExternalTable(newt);
-
+      boolean renamedExternalTable = rename && MetaStoreUtils.isExternalTable(oldt)
+          && !MetaStoreUtils.isPropertyTrue(oldt.getParameters(), "TRANSLATED_TO_EXTERNAL");
       boolean isRenameIcebergTable =
           rename && HiveMetaHook.ICEBERG.equalsIgnoreCase(newt.getParameters().get(HiveMetaHook.TABLE_TYPE));
 
@@ -234,7 +235,8 @@ public class HiveAlterHandler implements AlterHandler {
       columnStatistics = deleteTableColumnStats(msdb, oldt, newt, columnStatistics);
 
       if (!isRenameIcebergTable &&
-          (replDataLocationChanged || renamedManagedTable || renamedTranslatedToExternalTable)) {
+          (replDataLocationChanged || renamedManagedTable || renamedTranslatedToExternalTable ||
+              renamedExternalTable)) {
         srcPath = new Path(oldt.getSd().getLocation());
 
         if (replDataLocationChanged) {
@@ -245,7 +247,7 @@ public class HiveAlterHandler implements AlterHandler {
           // separately.
           destPath = new Path(newt.getSd().getLocation());
           dataWasMoved = true;
-        } else {
+        } else if (!renamedExternalTable) {
           // Rename flow.
           // If a table was created in a user specified location using the DDL like
           // create table tbl ... location ...., it should be treated like an external table
