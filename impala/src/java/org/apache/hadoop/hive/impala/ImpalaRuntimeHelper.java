@@ -71,6 +71,7 @@ import org.apache.impala.thrift.TBackendGflags;
 import org.apache.impala.thrift.TColumn;
 import org.apache.impala.thrift.TCreateTableParams;
 import org.apache.impala.thrift.TTableName;
+import org.apache.impala.util.EventSequence;
 import org.apache.impala.util.FunctionUtils;
 
 import java.io.DataOutputStream;
@@ -226,7 +227,8 @@ public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
       // Return if we are in Hive's q test. This allows us to exercise the corresponding
       // code path up to this point in the q test.
       if (context.getConf().getBoolVar(HiveConf.ConfVars.HIVE_IN_TEST)) return;
-      KuduCatalogOpExecutor.createSynchronizedTable(msTbl, createTableParams);
+      EventSequence catalogTimeline = new EventSequence("Catalog Server Operation");
+      KuduCatalogOpExecutor.createSynchronizedTable(catalogTimeline, msTbl, createTableParams);
     } catch (Exception e) {
       throw new HiveException(e);
     }
