@@ -69,34 +69,28 @@ public class ImpalaAnalyticExpr extends AnalyticExpr {
   // other expr classes (since they have been through analysis in Calcite),
   // for this expr class, there are a few steps that are needed to get the
   // desired functionality.
-  // TODO: CDPD-21517: Explore if window function standardization can be done
-  // in Hive
   @Override
   protected void analyzeImpl(Analyzer analyzer) throws AnalysisException {
     // Analytic functions need to be standardized into canonical forms that are
     // supported by Impala. For example, LAG(c1) is standardized to
     // LAG(c1, 1, NULL).
-    // NOTE: at present we are calling this for a subset of functions to
-    // avoid potential side effects for all analytic functions.
     FunctionCallExpr origFuncExpr = getFnCall();
     String fname = origFuncExpr.getFnName().getFunction().toLowerCase();
-    if (isStandardizationNeeded(fname)) {
-      this.standardize(analyzer);
-      // If the function expr has changed, make relevant adjustments
-      if (getFnCall() != origFuncExpr) {
-        setChildren();
-        Preconditions.checkArgument(getFnCall() instanceof ImpalaFunctionCallExpr);
-        if (!isResetNeeded(getFnCall().getFnName().
-            getFunction().toLowerCase())) {
-          return;
-        }
-        // Since standardization may change the function signature, we need to find
-        // the new matching function in the function registry
-        try {
-          ((ImpalaFunctionCallExpr) getFnCall()).resetFunction();
-        } catch (HiveException e) {
-          throw new AnalysisException("Encountered exception: ", e);
-        }
+    this.standardize(analyzer);
+    // If the function expr has changed, make relevant adjustments
+    if (getFnCall() != origFuncExpr) {
+      setChildren();
+      Preconditions.checkArgument(getFnCall() instanceof ImpalaFunctionCallExpr);
+      if (!isResetNeeded(getFnCall().getFnName().
+          getFunction().toLowerCase())) {
+        return;
+      }
+      // Since standardization may change the function signature, we need to find
+      // the new matching function in the function registry
+      try {
+        ((ImpalaFunctionCallExpr) getFnCall()).resetFunction();
+      } catch (HiveException e) {
+        throw new AnalysisException("Encountered exception: ", e);
       }
     }
   }
@@ -144,12 +138,6 @@ public class ImpalaAnalyticExpr extends AnalyticExpr {
       throw new IllegalStateException(
           "Encountered exception creating rewritten analytic expr: ", e);
     }
-  }
-
-  private boolean isStandardizationNeeded(String fname) {
-    return fname.equals("lag") || fname.equals("lead") ||
-        fname.equals("first_value") || fname.equals("last_value") ||
-        fname.equals("row_number");
   }
 
   private boolean isResetNeeded(String fname) {
