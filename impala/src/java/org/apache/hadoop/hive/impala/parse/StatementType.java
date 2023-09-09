@@ -69,6 +69,9 @@ import org.apache.impala.analysis.AlterTableStmt;
 import org.apache.impala.analysis.AlterTableUnSetTblProperties;
 import org.apache.impala.analysis.ComputeStatsStmt;
 import org.apache.impala.analysis.CreateFunctionStmtBase;
+import org.apache.impala.analysis.CreateTableAsSelectStmt;
+import org.apache.impala.analysis.CreateTableLikeStmt;
+import org.apache.impala.analysis.CreateTableStmt;
 import org.apache.impala.analysis.DropStatsStmt;
 import org.apache.impala.analysis.ResetMetadataStmt;
 import org.apache.impala.analysis.ShowFilesStmt;
@@ -290,7 +293,22 @@ public enum StatementType {
       StmtTypeConstants.WriteLock.NO_LOCK,
       StmtTypeConstants.ParsingErrorEngine.IMPALA,
       StmtTypeConstants.REFRESH_VALIDATOR,
-      ImmutableSet.of(ResetMetadataStmt.class));
+      ImmutableSet.of(ResetMetadataStmt.class)),
+
+  CREATE_TABLE(StmtTypeConstants.TOK_CREATE_TABLE,
+      ImmutableList.of("create", "table"),
+      HiveOperation.CREATETABLE,
+      StmtTypeConstants.NO_COLS,
+      StmtTypeConstants.NO_TYPES,
+      StmtTypeConstants.NO_INVALIDATE_CMD,
+      StmtTypeConstants.NO_PARTITION_COLS,
+      StmtTypeConstants.NO_FETCH_TASK,
+      TableAfterCommand.REQUIRED,
+      StmtTypeConstants.WriteLock.NO_LOCK,
+      StmtTypeConstants.ParsingErrorEngine.IMPALA,
+      StmtTypeConstants.NO_VALIDATOR_DEFINED,
+      ImmutableSet.of(CreateTableStmt.class, CreateTableAsSelectStmt.class,
+          CreateTableLikeStmt.class));
 
   // Static map containg token key to its statement type
   private final static Map<Integer, StatementType> STATEMENT_TYPE_MAP;

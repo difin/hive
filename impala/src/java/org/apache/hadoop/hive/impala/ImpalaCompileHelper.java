@@ -44,11 +44,12 @@ import org.apache.hadoop.hive.impala.calcite.ImpalaTypeSystemImpl;
 import org.apache.hadoop.hive.impala.calcite.rules.TezEngineScalarFixerRule;
 import org.apache.hadoop.hive.impala.parse.ComputeStatsWithHiveSyntaxSemanticAnalyzer;
 import org.apache.hadoop.hive.impala.parse.CreateFuncSemanticAnalyzer;
+import org.apache.hadoop.hive.impala.parse.CreateTableSemanticAnalyzer;
 import org.apache.hadoop.hive.impala.parse.ImpalaParseException;
+import org.apache.hadoop.hive.impala.parse.ImpalaSyntaxSemanticAnalyzer;
 import org.apache.hadoop.hive.impala.parse.ShowColumnStatsSemanticAnalyzer;
 import org.apache.hadoop.hive.impala.parse.StatementType;
 import org.apache.hadoop.hive.impala.parse.StmtTypeConstants;
-import org.apache.hadoop.hive.impala.parse.ImpalaSyntaxSemanticAnalyzer;
 import org.apache.hadoop.hive.impala.plan.ImpalaHMSConverter;
 import org.apache.hadoop.hive.impala.plan.ImpalaQueryHelperImpl;
 import org.apache.impala.analysis.AlterTableDropColStmt;
@@ -154,10 +155,14 @@ public class ImpalaCompileHelper implements EngineCompileHelper {
     // ImpalaSyntaxSemanticAnalyzer.
     StatementType stmtType = StatementType.getStatementType(tree.getType());
     if (stmtType != null) {
-      if (stmtType == StatementType.SHOW_COLUMN_STATS) {
-        return new ShowColumnStatsSemanticAnalyzer(queryState, SessionState.get().getConf());
+      switch (stmtType) {
+        case SHOW_COLUMN_STATS:
+          return new ShowColumnStatsSemanticAnalyzer(queryState, SessionState.get().getConf());
+        case CREATE_TABLE:
+          return new CreateTableSemanticAnalyzer(queryState, stmtType);
+        default:
+          return new ImpalaSyntaxSemanticAnalyzer(queryState, stmtType);
       }
-      return new ImpalaSyntaxSemanticAnalyzer(queryState, stmtType);
     }
 
     // Two exceptions for special SemanticAnalyzers

@@ -64,8 +64,15 @@ public class StmtTypeConstants {
 
   public static boolean NEEDS_INVALIDATE_CMD = true;
   public static boolean NO_INVALIDATE_CMD = false;
+
+  // The PREPEND_PARTITION_COLS constant should be used on very special Impala statement cases.
+  // For example, the "show table stats" command returns a variable number of columns. If there
+  // are <n> partition columns, the first <n> columns returned will be the partition names, and
+  // the stats will exist in the columns after the partition columns. For most Impala statements,
+  // it is correct to use NO_PARTITION_COLS
   public static boolean PREPEND_PARTITION_COLS = true;
   public static boolean NO_PARTITION_COLS = false;
+
   public static boolean CREATE_FETCH_TASK = true;
   public static boolean NO_FETCH_TASK = false;
   public static boolean WRITE_ENTITY_NEEDED = true;
@@ -117,5 +124,6 @@ public class StmtTypeConstants {
   public static final int TOK_INVALIDATE_METADATA = BASE_TOKEN_ID + 14;
   public static final int TOK_DROP_INCR_STATS = BASE_TOKEN_ID + 15;
   public static final int TOK_COMPUTE_INCR_STATS = BASE_TOKEN_ID + 16;
+  public static final int TOK_CREATE_TABLE = BASE_TOKEN_ID + 17;
   public static final String CREATE_FUNCTION_STRING = "create function";
 }
