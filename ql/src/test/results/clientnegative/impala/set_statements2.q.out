@@ -1,0 +1,1 @@
+FAILED: RuntimeException org.apache.hadoop.hive.ql.parse.SemanticException: org.apache.hadoop.hive.ql.metadata.HiveException: org.apache.impala.common.InternalException: Invalid enabled_runtime_filter_types: 3. Valid values are BLOOM(0),MIN_MAX(1),IN_LIST(2).

@@ -95,3 +95,24 @@ explain select 3;
 -- ("explain_level", "MINIMAL") is in 'properties' of HiveConf.
 -- ("explain_level", "MINIMAL") is in 'lowercaseProperties' of HiveConf.
 set impala.explain_level;
+
+set enabled_runtime_filter_types=BLOOM,MIN_MAX,IN_LIST;
+-- executes a query
+explain select count(*) from impala_tpch_lineitem;
+-- verifies that the value of the prefixed option is updated after a query is executed.
+set impala.enabled_runtime_filter_types;
+
+set enabled_runtime_filter_types=1,2;
+-- executes a query
+explain select count(*) from impala_tpch_lineitem;
+-- verifies that the value of the prefixed option is updated after a query is executed
+-- and that the value of each runtime filter type could be numerical.
+set impala.enabled_runtime_filter_types;
+
+set enabled_runtime_filter_types=BLOOM,2;
+-- executes a query
+explain select count(*) from impala_tpch_lineitem;
+-- verifies that the value of the prefixed option is updated after a query is executed
+-- and that the value of each runtime filter type on the right-hand side of the
+-- assignment could either be represented by an integer or a string.
+set impala.enabled_runtime_filter_types;

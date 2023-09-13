@@ -39,6 +39,7 @@ import org.apache.hadoop.hive.impala.prune.ImpalaBasicHdfsTable;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.Warehouse;
+import org.apache.hadoop.hive.metastore.utils.StringUtils;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.engine.EngineEventSequence;
@@ -73,7 +74,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -278,7 +281,7 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     return options;
   }
 
-  private TQueryOptions createTestQueryOptions(HiveConf conf) {
+  private TQueryOptions createTestQueryOptions(HiveConf conf) throws HiveException {
     // Note: Currently in the non-testing environment, i.e.,
     // conf.getBoolVar(ConfVars.HIVE_IN_TEST) evaluates to false, we use 'conf' to
     // initialize those fields in an ImpalaSession that can be set up via Hive-related
@@ -298,10 +301,52 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     // SessionState.get().getConf().
     HiveConf sessionConf = SessionState.get().getConf();
     filterUnsupportedImpalaQueryOptions(sessionConf);
-    updateImpalaQueryOptions(sessionConf);
-    Map<String, String> queryOptions = sessionConf.subtree("impala").entrySet().stream()
+    Map<String, String> impalaProps = updateImpalaQueryOptions(sessionConf);
+
+    // In the testing environment, we do not have a running Impala server, so we do not
+    // create an EngineSession with the Impala server as done in
+    // createDefaultQueryOptions(). Instead, we update 'options' based on
+    // SessionState.get().getConf().subtree("impala") which we use to configure Impala's
+    // query options when establishing an EngineSession with the Impala server.
+    Map<String, String> sessionOptions = sessionConf.subtree("impala").entrySet().stream()
         .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
-    return parseQueryOptions(queryOptions);
+
+    // We will use parseQueryOptions() to process 'csvSessionOptions'. Similar to
+    // FeSupport#ParseQueryOptions(), parseQueryOptions() is not able to process the
+    // value of 'enabled_runtime_filter_types' either, and therefore we filter out the
+    // value of 'enabled_runtime_filter_types' as done in createDefaultQueryOptions().
+    String csvSessionOptions = sessionOptions.entrySet().stream()
+        .filter(e -> !e.getKey().equals("enabled_runtime_filter_types"))
+        .map(e -> e.getKey() + "=" + e.getValue())
+        .collect(Collectors.joining(","));
+
+    String csvImpalaProps = impalaProps.entrySet().stream()
+        .filter(e -> !e.getKey().equals("enabled_runtime_filter_types"))
+        .map(e -> e.getKey() + "=" + e.getValue())
+        .collect(Collectors.joining(","));
+
+    TQueryOptions options;
+    try {
+      // FeSupport#ParseQueryOptions() is not available in the testing environment. Thus,
+      // in the following we use parseQueryOptions() to mimic what is done in
+      // FeSupport#ParseQueryOptions().
+      options = parseQueryOptions(csvSessionOptions, new TQueryOptions());
+
+      // Check the validity of query options other than 'enabled_runtime_filter_types'.
+      parseQueryOptions(csvImpalaProps, new TQueryOptions());
+
+      // Check the validity of 'enabled_runtime_filter_types'.
+      String key = "enabled_runtime_filter_types";
+      String rawFilterTypes = impalaProps.get(key);
+      Set<TRuntimeFilterType> types;
+      if (rawFilterTypes != null) {
+        types = getEnabledRuntimeFilterTypes(rawFilterTypes, key);
+        updateEnabledRuntimeFilterTypes(options, rawFilterTypes, types);
+      }
+    } catch (InternalException e) {
+      throw new HiveException(e);
+    }
+    return options;
   }
 
   private TQueryOptions createDefaultQueryOptions(HiveConf conf) throws HiveException {
@@ -314,7 +359,7 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     // for the second reason.
     HiveConf sessionConf = SessionState.get().getConf();
     filterUnsupportedImpalaQueryOptions(sessionConf);
-    updateImpalaQueryOptions(sessionConf);
+    Map<String, String> impalaProps = updateImpalaQueryOptions(sessionConf);
 
     ImpalaSessionManager mgr = ImpalaSessionManager.getInstance();
     EngineSession session = mgr.getSession(conf);
@@ -346,19 +391,7 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
         .map(e -> e.getKey() + "=" + e.getValue())
         .collect(Collectors.joining(","));
 
-    Map<String, String> sessionOptions =
-      SessionState.get().getConf().subtree("impala").entrySet().stream()
-          .filter(e -> !e.getKey().equals("core-site.overridden"))
-          .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
-
-    // We filter out the key-value pair associated with 'enabled_runtime_filter_types'
-    // since FeSupport#ParseQueryOptions() is not able to parse this query option when
-    // the value contains commas. We use lowercase letters because the keys of Impala's
-    // query options are converted to lower case letters in updateImpalaQueryOptions().
-    // If a user explicitly set up an Impala's query option, we will see the
-    // corresponding key-value pair in 'sessionOptions' and the key would be in lower
-    // case due to updateImpalaQueryOptions().
-    String csvSessionOptions = sessionOptions.entrySet().stream()
+    String csvImpalaProps = impalaProps.entrySet().stream()
         .filter(e -> !e.getKey().equals("enabled_runtime_filter_types"))
         .map(e -> e.getKey() + "=" + e.getValue())
         .collect(Collectors.joining(","));
@@ -366,37 +399,84 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     // Overlay defaults from Impala backend option settings
     TQueryOptions options;
     try {
-      options = FeSupport.ParseQueryOptions(csvQueryOptions,
-          new TQueryOptions());
-      updateEnabledRuntimeFilterTypes(options, configurations,
-          "ENABLED_RUNTIME_FILTER_TYPES");
+      options = FeSupport.ParseQueryOptions(csvQueryOptions, new TQueryOptions());
 
-      options = FeSupport.ParseQueryOptions(csvSessionOptions, options);
-      updateEnabledRuntimeFilterTypes(options, sessionOptions,
-          "enabled_runtime_filter_types");
+      // In the following we will check the validity of Impala's query options using
+      // FeSupport#ParseQueryOptions() and getEnabledRuntimeFilterTypes() and will
+      // catch the InternalException thrown if there is an invalid value of a query
+      // option in 'csvImpalaProps' or 'impalaProps'. Recall that in
+      // updateImpalaQueryOptions() we used the query options in 'impalaProps' to set up
+      // the HiveConf that will be used to establish the session with the Impala server.
+      // We would like to perform this check because the value of an Impala's
+      // query option returned by the Impala server in 'csvQueryOptions' could be
+      // different from that in 'csvImpalaProps' constructed from 'impalaProps'. This is
+      // possible because the session with the Impala server could still be established
+      // even though the value of a query option is not valid. In such a case, the value
+      // of this query option returned from the Impala server would be the default value.
+      // To avoid the inconsistency, we will throw a HiveException once we have found any
+      // invalid query option used to establish the session with the Impala server.
+
+      // Check the validity of query options other than 'enabled_runtime_filter_types'.
+      FeSupport.ParseQueryOptions(csvImpalaProps, new TQueryOptions());
+
+      // Check the validity of 'enabled_runtime_filter_types'.
+      String key = "enabled_runtime_filter_types";
+      String rawFilterTypes = impalaProps.get(key);
+      Set<TRuntimeFilterType> types;
+      // If the value of 'enabled_runtime_filter_types' is an empty string, we do not
+      // update 'options' so that the value of 'enabled_runtime_filter_types' would
+      // remain the default one. This matches the current behavior of the Impala server
+      // to avoid different representation of the same value, i.e., the empty string.
+      if (!StringUtils.isEmpty(rawFilterTypes)) {
+        types = getEnabledRuntimeFilterTypes(rawFilterTypes, key);
+        updateEnabledRuntimeFilterTypes(options, rawFilterTypes, types);
+      }
     } catch (InternalException e) {
       throw new HiveException(e);
     }
     return options;
   }
 
+  private Set<TRuntimeFilterType>  getEnabledRuntimeFilterTypes(
+      String rawValue, String key) throws InternalException {
+    Set<TRuntimeFilterType> types = new HashSet<>();
+    TRuntimeFilterType[] filterTypes = TRuntimeFilterType.values();
+
+    if (rawValue.equalsIgnoreCase("all")) {
+      types.addAll(Arrays.asList(filterTypes));
+      return types;
+    }
+
+    for (String rawType : rawValue.split(",")) {
+      boolean found = false;
+      for (TRuntimeFilterType filterType : filterTypes) {
+        if ((rawType.matches("\\d+") &&
+            new Integer(rawType) == filterType.getValue()) ||
+            rawType.equalsIgnoreCase(filterType.name())) {
+          types.add(filterType);
+          found = true;
+        }
+      }
+      if (!found) {
+        throw new InternalException("Invalid " + key + ": " + rawType + ". " +
+            "Valid values are " +
+            Arrays.stream(filterTypes)
+                .map(e -> e.name() + "(" + e.getValue() + ")")
+                .collect(Collectors.joining(",")) + ".");
+      }
+    }
+    return types;
+  }
+
   /**
    * As a workaround, this method updates the query option of
-   * 'ENABLED_RUNTIME_FILTER_TYPES' based on the corresponding configuration in
-   * 'impalaOptions'.
+   * 'ENABLED_RUNTIME_FILTER_TYPES' based on the given in 'types'.
    */
   private void updateEnabledRuntimeFilterTypes(TQueryOptions updatedOptions,
-      Map<String, String> impalaOptions, String key) {
-    if (impalaOptions.containsKey(key)) {
-      String rawValue = impalaOptions.get(key);
-      String rawTypes[] = rawValue.split(",");
-      Set<TRuntimeFilterType> types = new HashSet<>();
-      for (String rawType : rawTypes) {
-        TRuntimeFilterType type = TRuntimeFilterType.valueOf(rawType);
-        types.add(type);
-      }
-      updatedOptions.setEnabled_runtime_filter_types(types);
-    }
+      String rawFilterTypes, Set<TRuntimeFilterType> types) {
+    Preconditions.checkArgument(!rawFilterTypes.equals(""),
+        "rawFilterTypes should not be empty.");
+    updatedOptions.setEnabled_runtime_filter_types(types);
   }
 
   private void filterUnsupportedImpalaQueryOptions(HiveConf conf) {
@@ -424,9 +504,9 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     }
   }
 
-  private void updateImpalaQueryOptions(HiveConf conf) {
+  private Map<String, String> updateImpalaQueryOptions(HiveConf conf) {
     Map<String, String> origProps = conf.getLowercaseProperties();
-    Properties impalaProps = new Properties();
+    Map<String, String> impalaProps = new HashMap<>();
 
     for (Map.Entry<String, String> e : origProps.entrySet()) {
       String key = (String) e.getKey();
@@ -440,8 +520,7 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
         // computing 'csvSessionOptions' and thus we will not be able to filter out a
         // key-value pair like "ENABLED_RUNTIME_filter_types=BLOOM,MIN_MAX" if the key in
         // such key-value pairs is not in lowercase.
-        impalaProps.put(
-            Constants.IMPALA_PREFIX.concat(key), e.getValue());
+        impalaProps.put(key, e.getValue());
       }
     }
 
@@ -451,20 +530,37 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
     // option is updated, the change will not be reflected in the TOpenSessionReq we send
     // to the Impala backend in the next query. Refer to
     // ImpalaSessionManager#getSession() for further details.
-    for (Map.Entry<Object, Object> e : impalaProps.entrySet()) {
-      String oldVal = conf.get((String) e.getKey());
+    for (Map.Entry e : impalaProps.entrySet()) {
+      String oldVal = conf.get(Constants.IMPALA_PREFIX.concat((String) e.getKey()));
       if (oldVal == null || oldVal != (String) e.getValue()) {
-        conf.set((String) e.getKey(), (String) e.getValue());
+        conf.set(
+            Constants.IMPALA_PREFIX.concat((String) e.getKey()), (String) e.getValue());
         conf.setImpalaConfigUpdated(true);
       }
     }
+
+    return impalaProps;
   }
 
   /**
    * This method is only used for test purposes.
    */
-  private TQueryOptions parseQueryOptions(Map<String, String> options) {
-    final TQueryOptions queryOptions = new TQueryOptions();
+  private TQueryOptions parseQueryOptions(String csvQueryOptions, TQueryOptions queryOptions)
+      throws InternalException {
+    Preconditions.checkNotNull(csvQueryOptions);
+    Preconditions.checkNotNull(queryOptions);
+
+    if (csvQueryOptions.equals("")) {
+      return queryOptions;
+    }
+
+    Map<String, String> options = new HashMap<>();
+    String[] kvs = csvQueryOptions.split(",");
+    for (String kv : kvs) {
+      String[] tokens = kv.split("=");
+      options.put(tokens[0], tokens[1]);
+    }
+
     if (options.size() == 0) {
       return queryOptions;
     }
@@ -478,29 +574,29 @@ public class ImpalaQueryHelperImpl implements EngineQueryHelper {
         continue;
       }
       switch (field) {
-      case NUM_NODES:
-        queryOptions.setNum_nodes(
-            Integer.parseInt(kv.getValue()));
-        break;
-      case PARQUET_DICTIONARY_FILTERING:
-        queryOptions.setParquet_dictionary_filtering(
-            Boolean.parseBoolean(kv.getValue()));
-        break;
-      case RUNTIME_FILTER_MODE:
-        queryOptions.setRuntime_filter_mode(
-            TRuntimeFilterMode.valueOf(kv.getValue().toUpperCase()));
-        break;
-      case EXPLAIN_LEVEL:
-        queryOptions.setExplain_level(
-            TExplainLevel.valueOf(kv.getValue().toUpperCase()));
-        break;
-      case SCRATCH_LIMIT:
-        queryOptions.setScratch_limit(
-            Long.parseLong(kv.getValue()));
-        break;
-      default:
-        throw new RuntimeException("Query option '" + field + "' not supported for yet. "
-            + "Please add handling to parse options");
+        case NUM_NODES:
+          queryOptions.setNum_nodes(
+              Integer.parseInt(kv.getValue()));
+          break;
+        case PARQUET_DICTIONARY_FILTERING:
+          queryOptions.setParquet_dictionary_filtering(
+              Boolean.parseBoolean(kv.getValue()));
+          break;
+        case RUNTIME_FILTER_MODE:
+          queryOptions.setRuntime_filter_mode(
+              TRuntimeFilterMode.valueOf(kv.getValue().toUpperCase()));
+          break;
+        case EXPLAIN_LEVEL:
+          queryOptions.setExplain_level(
+              TExplainLevel.valueOf(kv.getValue().toUpperCase()));
+          break;
+        case SCRATCH_LIMIT:
+          queryOptions.setScratch_limit(
+              Long.parseLong(kv.getValue()));
+          break;
+        default:
+          throw new InternalException("Query option '" + field + "' not supported for yet. "
+              + "Please add handling to parse options");
       }
     }
     return queryOptions;
