@@ -1,0 +1,33 @@
+PREHOOK: query: create table aa1 ( stf_id string)
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@aa1
+POSTHOOK: query: create table aa1 ( stf_id string)
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@aa1
+PREHOOK: query: create table bb1 ( stf_id string)
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@bb1
+POSTHOOK: query: create table bb1 ( stf_id string)
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@bb1
+PREHOOK: query: create table cc1 ( stf_id string)
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@cc1
+POSTHOOK: query: create table cc1 ( stf_id string)
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@cc1
+PREHOOK: query: create table ff1 ( x string)
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@ff1
+POSTHOOK: query: create table ff1 ( x string)
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@ff1
+FAILED: SemanticException Line 0:-1 Expression not in GROUP BY key 'col1'
