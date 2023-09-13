@@ -25,7 +25,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteViewSemanticException;
 /**
  * A strategy defining when CBO fallbacks to the legacy optimizer.
  */
-public enum CBOFallbackStrategy {
+enum CBOFallbackStrategy {
   /**
    * Never use the legacy optimizer, all CBO errors are fatal.
    */
@@ -33,11 +33,6 @@ public enum CBOFallbackStrategy {
     @Override
     boolean isFatal(Exception e) {
       return true;
-    }
-
-    @Override
-    public boolean allowsRetry() {
-      return false;
     }
   },
   /**
@@ -50,11 +45,6 @@ public enum CBOFallbackStrategy {
       return e instanceof CalciteSubquerySemanticException || e instanceof CalciteViewSemanticException
           || e instanceof CalciteSubqueryRuntimeException;
     }
-
-    @Override
-    public boolean allowsRetry() {
-      return true;
-    }
   },
   /**
    * Always use the legacy optimizer, CBO errors are not fatal.
@@ -63,11 +53,6 @@ public enum CBOFallbackStrategy {
     @Override
     boolean isFatal(Exception e) {
       return false;
-    }
-
-    @Override
-    public boolean allowsRetry() {
-      return true;
     }
   },
   /**
@@ -82,17 +67,10 @@ public enum CBOFallbackStrategy {
       }
       return !(e instanceof CalciteSemanticException);
     }
-
-    @Override
-    public boolean allowsRetry() {
-      return true;
-    }
   };
 
   /**
    * Returns true if the specified exception is fatal (must not fallback to legacy optimizer), and false otherwise.
    */
   abstract boolean isFatal(Exception e);
-
-  public abstract boolean allowsRetry();
 }

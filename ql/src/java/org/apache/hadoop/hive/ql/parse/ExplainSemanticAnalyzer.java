@@ -18,7 +18,6 @@
 
 package org.apache.hadoop.hive.ql.parse;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ import org.apache.hadoop.hive.ql.parse.ExplainConfiguration.AnalyzeState;
 import org.apache.hadoop.hive.ql.parse.ExplainConfiguration.VectorizationDetailLevel;
 import org.apache.hadoop.hive.ql.plan.ExplainWork;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
-import org.apache.hadoop.hive.ql.reexec.ReCompileException;
+import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.stats.StatsAggregator;
 import org.apache.hadoop.hive.ql.stats.StatsCollectionContext;
 import org.apache.hadoop.hive.ql.stats.fs.FSStatsAggregator;
@@ -161,11 +160,7 @@ public class ExplainSemanticAnalyzer extends BaseSemanticAnalyzer {
           while (driver.getResults(new ArrayList<String>())) {
           }
         } catch (CommandProcessorException e) {
-          if (e.getException() instanceof ReCompileException) {
-            throw (ReCompileException) e.getException();
-          } else {
-            throw new SemanticException(e.getMessage(), e);
-          }
+          throw new SemanticException(e.getErrorMessage(), e);
         }
         config.setOpIdToRuntimeNumRows(aggregateStats(config.getExplainRootPath()));
       } catch (IOException e1) {

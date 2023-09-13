@@ -317,9 +317,6 @@ import org.apache.hadoop.hive.ql.plan.TableScanDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
 import org.apache.hadoop.hive.ql.plan.SelectDesc;
-import org.apache.hadoop.hive.ql.plan.mapper.EmptyStatsSource;
-import org.apache.hadoop.hive.ql.plan.mapper.StatsSource;
-import org.apache.hadoop.hive.ql.reexec.ReCompileException;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFArray;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;
@@ -558,10 +555,11 @@ public class CalcitePlanner extends SemanticAnalyzer {
   @Override
   @SuppressWarnings("rawtypes")
   Operator genOPTree(ASTNode ast, PlannerContext plannerCtx) throws SemanticException {
-    final Operator sinkOp;
+    Operator sinkOp = null;
+    boolean skipCalcitePlan = false;
 
     if (!runCBO) {
-      sinkOp = super.genOPTree(ast, plannerCtx);
+      skipCalcitePlan = true;
     } else {
       PreCboCtx cboCtx = (PreCboCtx) plannerCtx;
       List<ASTNode> oldHints = new ArrayList<>();
@@ -588,6 +586,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
         profilesCBO = obtainCBOProfiles(queryProperties);
 
         disableJoinMerge = true;
+        boolean reAnalyzeAST = false;
         boolean isImpalaPlan = isImpalaPlan(conf);
         final boolean materializedView = getQB().isMaterializedView();
 
@@ -712,7 +711,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
             throw e;
           }
 
-          // Determine if we should re-throw the exception OR if we try to mark the query to retry as non-CBO.
           if (fallbackStrategy.isFatal(e)) {
             if (e instanceof RuntimeException || e instanceof SemanticException) {
               // These types of exceptions do not need wrapped
@@ -721,12 +719,21 @@ public class CalcitePlanner extends SemanticAnalyzer {
             // Wrap all other errors (Should only hit in tests)
             throw new SemanticException(e);
           } else {
-            throw new ReCompileException(this.ctx.getCboInfo());
+            reAnalyzeAST = true;
           }
         } finally {
           runCBO = false;
           disableJoinMerge = defaultJoinMerge;
           disableSemJoinReordering = false;
+          if (reAnalyzeAST) {
+            Preconditions.checkState(!isImpalaPlan, "Impala planning requires CBO plan");
+            init(true);
+            prunedPartitions.clear();
+            // Assumption: At this point Parse Tree gen & resolution will always
+            // be true (since we started out that way).
+            super.genResolvedParseTree(ast, new PlannerContext());
+            skipCalcitePlan = true;
+          }
         }
       } else {
         String msg;
@@ -736,10 +743,15 @@ public class CalcitePlanner extends SemanticAnalyzer {
           msg = "Plan not optimized by CBO.";
         }
         this.ctx.setCboInfo(msg);
-        sinkOp = super.genOPTree(ast, plannerCtx);
+        skipCalcitePlan = true;
       }
     }
+
     markEvent("Planning finished");
+
+    if (skipCalcitePlan) {
+      sinkOp = super.genOPTree(ast, plannerCtx);
+    }
 
     return sinkOp;
   }

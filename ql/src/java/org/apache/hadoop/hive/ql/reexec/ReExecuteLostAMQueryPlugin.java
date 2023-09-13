@@ -65,12 +65,24 @@ public class ReExecuteLostAMQueryPlugin implements IReExecutionPlugin {
   }
 
   @Override
+  public void beforeExecute(int executionIndex, boolean explainReOptimization) {
+  }
+
+  @Override
   public boolean shouldReExecute(int executionNum) {
     return retryPossible;
   }
 
   @Override
-  public boolean shouldReExecuteAfterCompile(int executionNum, PlanMapper oldPlanMapper, PlanMapper newPlanMapper) {
+  public void prepareToReExecute() {
+  }
+
+  @Override
+  public boolean shouldReExecute(int executionNum, PlanMapper oldPlanMapper, PlanMapper newPlanMapper) {
     return retryPossible;
+  }
+
+  @Override
+  public void afterExecute(PlanMapper planMapper, boolean successfull) {
   }
 }

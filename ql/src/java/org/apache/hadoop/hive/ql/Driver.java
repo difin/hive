@@ -181,7 +181,6 @@ public class Driver implements IDriver {
    * @param resetTaskIds Resets taskID counter if true.
    * @return 0 for ok
    */
-  @VisibleForTesting
   public int compile(String command, boolean resetTaskIds) {
     try {
       compile(command, resetTaskIds, false);
@@ -265,7 +264,6 @@ public class Driver implements IDriver {
   }
 
   private void prepareContext() throws CommandProcessorException {
-    String originalCboInfo = context != null ? context.cboInfo : null;
     if (context != null && context.getExplainAnalyze() != AnalyzeState.RUNNING) {
       // close the existing ctx etc before compiling a new query, but does not destroy driver
       if (!driverContext.isRetrial()) {
@@ -281,7 +279,6 @@ public class Driver implements IDriver {
     try {
       if (context == null) {
         context = new Context(driverContext.getConf());
-        context.setCboInfo(originalCboInfo);
       }
     } catch (IOException e) {
       throw new CommandProcessorException(e);

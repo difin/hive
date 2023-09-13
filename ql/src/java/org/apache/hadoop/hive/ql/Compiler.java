@@ -56,7 +56,6 @@ import org.apache.hadoop.hive.ql.plan.HiveOperation;
 import org.apache.hadoop.hive.ql.plan.PlanUtils;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
-import org.apache.hadoop.hive.ql.reexec.ReCompileException;
 import org.apache.hadoop.hive.ql.security.authorization.command.CommandAuthorizer;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.session.SessionState.LogHelper;
@@ -97,7 +96,7 @@ public class Compiler {
   public QueryPlan compile(String rawCommand, boolean deferClose) throws CommandProcessorException {
     initialize(rawCommand);
 
-    Throwable compileException = null;
+    boolean compileError = false;
     boolean parsed = false;
     QueryPlan plan = null;
     try {
@@ -116,15 +115,15 @@ public class Compiler {
       authorize(sem);
       explainOutput(sem, plan);
     } catch (CommandProcessorException cpe) {
-      compileException = cpe.getCause();
+      compileError = true;
       throw cpe;
     } catch (Exception e) {
-      compileException = e;
+      compileError = true;
       DriverUtils.checkInterrupted(driverState, driverContext, "during query compilation: " + e.getMessage(), null,
           null);
       handleException(e);
     } finally {
-      cleanUp(compileException, parsed, deferClose);
+      cleanUp(compileError, parsed, deferClose);
     }
 
     return plan;
@@ -466,19 +465,17 @@ public class Compiler {
       errorMessage += ". Failed command: " + driverContext.getQueryString();
     }
 
-    if (!(e instanceof ReCompileException)) {
-      CONSOLE.printError(errorMessage, "\n" + StringUtils.stringifyException(e));
-    }
+    CONSOLE.printError(errorMessage, "\n" + StringUtils.stringifyException(e));
     throw DriverUtils.createProcessorException(driverContext, error.getErrorCode(), errorMessage, error.getSQLState(),
         e);
   }
 
-  private void cleanUp(Throwable compileException, boolean parsed, boolean deferClose) {
+  private void cleanUp(boolean compileError, boolean parsed, boolean deferClose) {
     // Trigger post compilation hook. Note that if the compilation fails here then
     // before/after execution hook will never be executed.
     if (parsed) {
       try {
-        driverContext.getHookRunner().runAfterCompilationHook(driverContext, context, compileException);
+        driverContext.getHookRunner().runAfterCompilationHook(context.getCmd(), compileError);
       } catch (Exception e) {
         LOG.warn("Failed when invoking query after-compilation hook.", e);
       }
@@ -493,7 +490,7 @@ public class Compiler {
       LOG.info("Compiling command(queryId={}) has been interrupted after {} seconds", driverContext.getQueryId(),
           duration);
     } else {
-      driverState.compilationFinishedWithLocking(compileException != null);
+      driverState.compilationFinishedWithLocking(compileError);
       LOG.info("Completed compiling command(queryId={}); Time taken: {} seconds", driverContext.getQueryId(),
           duration);
     }

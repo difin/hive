@@ -60,13 +60,25 @@ public class ReExecutionDagSubmitPlugin implements IReExecutionPlugin {
   private boolean retryPossible;
 
   @Override
-  public boolean shouldReExecuteAfterCompile(int executionNum, PlanMapper pm1, PlanMapper pm2) {
+  public void prepareToReExecute() {
+  }
+
+  @Override
+  public boolean shouldReExecute(int executionNum, PlanMapper pm1, PlanMapper pm2) {
     return retryPossible;
+  }
+
+  @Override
+  public void beforeExecute(int executionIndex, boolean explainReOptimization) {
   }
 
   @Override
   public boolean shouldReExecute(int executionNum) {
     return retryPossible;
+  }
+
+  @Override
+  public void afterExecute(PlanMapper planMapper, boolean success) {
   }
 
 }

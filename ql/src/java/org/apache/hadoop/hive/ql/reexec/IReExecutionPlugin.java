@@ -42,72 +42,24 @@ public interface IReExecutionPlugin {
   /**
    * Called before executing the query.
    */
-  default void beforeExecute(int executionIndex, boolean explainReOptimization) {
-    // default noop
-  }
+  void beforeExecute(int executionIndex, boolean explainReOptimization);
 
   /**
    * The query have failed, does this plugin advises to re-execute it again?
    */
-  default boolean shouldReExecute(int executionNum) {
-    // default no
-    return false;
-  }
+  boolean shouldReExecute(int executionNum);
 
   /**
-   * The plugin should prepare for the re-compilation of the query.
+   * The plugin should prepare for the re-compilaton of the query.
    */
-  default void prepareToReExecute() {
-    // default noop
-  }
+  void prepareToReExecute();
 
   /**
-   * The query has failed; and have been recompiled - does this plugin advises to re-execute it again?
+   * The query have failed; and have been recompiled - does this plugin advises to re-execute it again?
    */
-  default boolean shouldReExecuteAfterCompile(int executionNum, PlanMapper oldPlanMapper, PlanMapper newPlanMapper) {
-    // default no
-    return false;
-  }
+  boolean shouldReExecute(int executionNum, PlanMapper oldPlanMapper, PlanMapper newPlanMapper);
 
-  /**
-   * Called after the driver executed the query - delivers the status and the plan data.
-   * @param planMapper
-   * @param successful
-   */
-  default void afterExecute(PlanMapper planMapper, boolean successful) {
-    // default noop
-  }
+  void afterExecute(PlanMapper planMapper, boolean successfull);
 
-  /**
-   * Called before the compilation happen.
-   * @param compilationNum Number of the previous compilations
-   */
-  default void beforeCompile(int compilationNum) {
-    // default noop
-  }
 
-  /**
-   * The query has failed. Should we try recompilation?
-   * @param compilationNum Number of the previous compilations
-   * @return
-   */
-  default boolean shouldReCompile(int compilationNum) {
-    // default no
-    return false;
-  }
-
-  /**
-   * The plugin should prepare for the recompilation of the query
-   */
-  default void prepareToReCompile() {
-    // default noop
-  }
-
-  /**
-   * Called after the compilation - delivers the result of the new compilation.
-   * @param successful
-   */
-  default void afterCompile(boolean successful) {
-    // default noop
-  }
 }
