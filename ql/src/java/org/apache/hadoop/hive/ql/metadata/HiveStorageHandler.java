@@ -383,6 +383,14 @@ public interface HiveStorageHandler extends Configurable {
     return new HashMap<>();
   }
 
+  /**
+   * Adds specific configurations to session for create table command.
+   * @param tblProps table properties
+   * @param hiveConf configuration
+   */
+  default void addResourcesForCreateTable(Map<String, String> tblProps, HiveConf hiveConf) {
+  }
+
   enum AcidSupportType {
     NONE,
     WITH_TRANSACTIONS,

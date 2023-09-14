@@ -926,20 +926,28 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   public URI getURIForAuth(org.apache.hadoop.hive.metastore.api.Table hmsTable) throws URISyntaxException {
     String dbName = hmsTable.getDbName();
     String tableName = hmsTable.getTableName();
-    StringBuilder authURI = new StringBuilder(ICEBERG_URI_PREFIX).append(encodeString(dbName)).append("/")
-            .append(encodeString(tableName)).append("?snapshot=");
-    Optional<String> locationProperty = SessionStateUtil.getProperty(conf, hive_metastoreConstants.META_TABLE_LOCATION);
-    if (locationProperty.isPresent()) {
-      Preconditions.checkArgument(locationProperty.get() != null,
-          "Table location is not set in SessionState. Authorization URI cannot be supplied.");
-      // this property is set during the create operation before the hive table was created
-      // we are returning a dummy iceberg metadata file
-      authURI.append(encodeString(URI.create(locationProperty.get()).getPath()))
-              .append(encodeString("/metadata/dummy.metadata.json"));
+    StringBuilder authURI =
+        new StringBuilder(ICEBERG_URI_PREFIX).append(encodeString(dbName)).append("/").append(encodeString(tableName))
+            .append("?snapshot=");
+    // If metadata location is provided we should use that location for auth, since during create if the
+    // metadata_location is explicitly provided we register a table using that path.
+    Optional<String> metadataLocation =
+        SessionStateUtil.getProperty(conf, BaseMetastoreTableOperations.METADATA_LOCATION_PROP);
+    if (metadataLocation.isPresent()) {
+      authURI.append(encodeString(metadataLocation.get()));
     } else {
-      Table table = IcebergTableUtil.getTable(conf, hmsTable);
-      authURI.append(encodeString(URI.create(((BaseTable) table)
-              .operations().current().metadataFileLocation()).getPath()));
+      Optional<String> locationProperty =
+          SessionStateUtil.getProperty(conf, hive_metastoreConstants.META_TABLE_LOCATION);
+      if (locationProperty.isPresent()) {
+        // this property is set during the create operation before the hive table was created
+        // we are returning a dummy iceberg metadata file
+        authURI.append(encodeString(URI.create(locationProperty.get()).getPath()))
+            .append(encodeString("/metadata/dummy.metadata.json"));
+      } else {
+        Table table = IcebergTableUtil.getTable(conf, hmsTable);
+        authURI.append(
+            encodeString(URI.create(((BaseTable) table).operations().current().metadataFileLocation()).getPath()));
+      }
     }
     LOG.debug("Iceberg storage handler authorization URI {}", authURI);
     return new URI(authURI.toString());
@@ -1534,6 +1542,14 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   }
 
   @Override
+  public void addResourcesForCreateTable(Map<String, String> tblProps, HiveConf hiveConf) {
+    String metadataLocation = tblProps.get(BaseMetastoreTableOperations.METADATA_LOCATION_PROP);
+    if (StringUtils.isNotEmpty(metadataLocation)) {
+      SessionStateUtil.addResourceOrThrow(hiveConf, BaseMetastoreTableOperations.METADATA_LOCATION_PROP,
+          metadataLocation);
+    }
+  }
+
   public Boolean hasAppendsOnly(org.apache.hadoop.hive.ql.metadata.Table hmsTable, SnapshotContext since) {
     TableDesc tableDesc = Utilities.getTableDesc(hmsTable);
     Table table = IcebergTableUtil.getTable(conf, tableDesc.getProperties());
