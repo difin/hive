@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.common.classification.InterfaceAudience.LimitedPrivate;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hive.jdbc.logs.InPlaceUpdateStream;
+import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
 import org.apache.hive.service.cli.RowSet;
 import org.apache.hive.service.cli.RowSetFactory;
 import org.apache.hive.service.rpc.thrift.TCLIService;
@@ -67,12 +68,16 @@ public class HiveStatement implements java.sql.Statement {
   private static final int DEFAULT_FETCH_SIZE =
       HiveConf.ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE.defaultIntVal;
 
+// TODO: Should there be a hiveconf default?
+  private static final int DEFAULT_FETCH_THREADS = 1;
+
   private final HiveConnection connection;
   private TCLIService.Iface client;
   private TOperationHandle stmtHandle = null;
   private final TSessionHandle sessHandle;
   Map<String,String> sessConf = new HashMap<String,String>();
   private int fetchSize;
+  private int fetchThreads;
   private final int defaultFetchSize;
   private boolean isScrollableResultset = false;
   private boolean isOperationComplete = false;
@@ -130,11 +135,22 @@ public class HiveStatement implements java.sql.Statement {
 
   public HiveStatement(HiveConnection connection, TCLIService.Iface client,
       TSessionHandle sessHandle) {
-    this(connection, client, sessHandle, false, 0, DEFAULT_FETCH_SIZE);
+    this(connection, client, sessHandle, false, 0, DEFAULT_FETCH_SIZE, DEFAULT_FETCH_THREADS);
+  }
+
+  public HiveStatement(HiveConnection connection, TCLIService.Iface client,
+      TSessionHandle sessHandle, int fetchSize, int fetchThreads) {
+    this(connection, client, sessHandle, false, fetchSize, DEFAULT_FETCH_SIZE, fetchThreads);
   }
 
   public HiveStatement(HiveConnection connection, TCLIService.Iface client, TSessionHandle sessHandle,
       boolean isScrollableResultset, int initFetchSize, int defaultFetchSize) {
+    this(connection, client, sessHandle, isScrollableResultset, initFetchSize, defaultFetchSize, DEFAULT_FETCH_THREADS);
+  }
+
+
+  public HiveStatement(HiveConnection connection, TCLIService.Iface client, TSessionHandle sessHandle,
+      boolean isScrollableResultset, int initFetchSize, int defaultFetchSize, int fetchThreads) {
     this.connection = Objects.requireNonNull(connection);
     this.client = Objects.requireNonNull(client);
     this.sessHandle = Objects.requireNonNull(sessHandle);
@@ -146,6 +162,7 @@ public class HiveStatement implements java.sql.Statement {
     this.isScrollableResultset = isScrollableResultset;
     this.defaultFetchSize = defaultFetchSize;
     this.fetchSize = (initFetchSize == 0) ? defaultFetchSize : initFetchSize;
+    this.fetchThreads = fetchThreads;
   }
 
   /*
@@ -321,6 +338,7 @@ public class HiveStatement implements java.sql.Statement {
       return false;
     }
     resultSet =  new HiveQueryResultSet.Builder(this).setClient(client).setSessionHandle(sessHandle)
+        .setConnection(connection).setFetchThreads(fetchThreads)
         .setStmtHandle(stmtHandle).setMaxRows(maxRows).setFetchSize(fetchSize)
         .setScrollable(isScrollableResultset)
         .build();
@@ -350,6 +368,7 @@ public class HiveStatement implements java.sql.Statement {
     }
     resultSet =
         new HiveQueryResultSet.Builder(this).setClient(client).setSessionHandle(sessHandle)
+            .setConnection(connection).setFetchThreads(fetchThreads)
             .setStmtHandle(stmtHandle).setMaxRows(maxRows).setFetchSize(fetchSize)
             .setScrollable(isScrollableResultset).build();
     return true;
@@ -395,6 +414,7 @@ public class HiveStatement implements java.sql.Statement {
     TGetOperationStatusReq statusReq = new TGetOperationStatusReq(stmtHandle);
     TGetOperationStatusResp statusResp = null;
 
+// TODO: Impala doesn't set this
     while(statusResp == null || !statusResp.isSetHasResultSet()) {
       try {
         statusResp = client.GetOperationStatus(statusReq);

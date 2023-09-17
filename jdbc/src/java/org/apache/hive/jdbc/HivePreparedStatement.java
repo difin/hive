@@ -67,6 +67,12 @@ public class HivePreparedStatement extends HiveStatement implements PreparedStat
     this.sql = sql;
   }
 
+  public HivePreparedStatement(HiveConnection connection, TCLIService.Iface client,
+      TSessionHandle sessHandle, String sql, int fetchSize, int fetchThreads) {
+    super(connection, client, sessHandle, fetchSize, fetchThreads);
+    this.sql = sql;
+  }
+
   /*
    * (non-Javadoc)
    *
