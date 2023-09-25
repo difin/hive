@@ -375,3 +375,38 @@ PLAN-ROOT SINK
         ListSink
 
 impala.enabled_runtime_filter_types=BLOOM,2
+impala.num_nodes=3
+num_nodes="3"
+impala.num_nodes=3
+HMS CALL get_table_req FOR impala_tpch_lineitem
+HMS CALL get_foreign_keys FOR impala_tpch_lineitem
+PREHOOK: query: explain select count(*) from impala_tpch_lineitem
+PREHOOK: type: QUERY
+PREHOOK: Input: default@impala_tpch_lineitem
+PREHOOK: Output: streaming
+POSTHOOK: query: explain select count(*) from impala_tpch_lineitem
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@impala_tpch_lineitem
+STAGE DEPENDENCIES:
+  Stage-1 is a root stage
+  Stage-0 is a root stage
+
+STAGE PLANS:
+  Stage: Stage-1
+    Impala
+      Impala Plan: 
+PLAN-ROOT SINK
+03:AGGREGATE [FINALIZE]
+02:EXCHANGE [UNPARTITIONED]
+01:AGGREGATE
+00:SCAN HDFS [default.impala_tpch_lineitem]
+
+
+  Stage: Stage-0
+    Fetch Operator
+      limit: -1
+      Processor Tree:
+        ListSink
+
+impala.num_nodes=4
+num_nodes="4"

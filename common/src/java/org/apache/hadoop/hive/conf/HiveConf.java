@@ -108,7 +108,10 @@ public class HiveConf extends Configuration {
       Collections.synchronizedMap(new HashMap<>());
 
   public Map<String, String> getLowercaseProperties() {
-    return lowercaseProperties;
+    // As a long term goal, we should work to isolate the Impala properties but before
+    // this is done, we would like to make sure that 'lowercaseProperties' can only be
+    // retrieved in the Unified Analytics mode.
+    return getEngine() == Engine.IMPALA ? lowercaseProperties : null;
   }
 
   //XXX: CDPD-20696: need to get rid of Impala reference
@@ -6080,7 +6083,13 @@ public class HiveConf extends Configuration {
         // have both "impala.explain_level=VERBOSE" and "impala.EXPLAIN_LEVEL=MINIMAL"
         // added to this HiveConf. Depending on the order of the SET statements, only
         // one key-value pair could exist.
-        set(name.toLowerCase(), value);
+        // Moreover, we remove the double quotation marks surrounding the value so that
+        // we won't send such values to the Impala server when establishing the session.
+        // This also aligns HiveServer2 with the classic Impala in that the classic
+        // Impala is able to parse a value surrounded by the double quotation marks if
+        // the SET statement is sent as a query to the Impala server (v.s. configuration
+        // overlay).
+        set(name.toLowerCase(), value.replaceAll("^\"|\"$", ""));
         setImpalaConfigUpdated(true);
         // Now set the name to not have the impala namespace.
         name = name.substring(Constants.IMPALA_PREFIX.length());
@@ -6105,8 +6114,11 @@ public class HiveConf extends Configuration {
       if (shouldSet) {
         set(name, value);
       }
-
-      lowercaseProperties.put(name.toLowerCase(), value);
+      // Remove the double quotation marks surrounding the value. This won't interfere
+      // with the values of non-Impala properties because 'lowercaseProperties' is
+      // only used in ImpalaQueryHelperImpl#updateImpalaQueryOptions() to update the
+      // values of Impala's query options prefixed with Impala's namespace.
+      lowercaseProperties.put(name.toLowerCase(), value.replaceAll("^\"|\"$", ""));
     }
 
     // We also need to update the value associated with 'execution.engine' when

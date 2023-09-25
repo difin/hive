@@ -116,3 +116,19 @@ explain select count(*) from impala_tpch_lineitem;
 -- and that the value of each runtime filter type on the right-hand side of the
 -- assignment could either be represented by an integer or a string.
 set impala.enabled_runtime_filter_types;
+
+set impala.num_nodes="3";
+-- verifies the double quotation marks are removed in the prefixed option.
+set impala.num_nodes;
+-- verifies the double quotation marks are not removed for the non-prefixed option.
+set num_nodes;
+
+set num_nodes="4";
+-- verifies the value of 'impala.num_nodes' is still 3 before the execution of the next query.
+set impala.num_nodes;
+-- executes a query
+explain select count(*) from impala_tpch_lineitem;
+-- verifies the double quotation marks are removed in the prefixed option.
+set impala.num_nodes;
+-- verifies the double quotation marks are not removed for the non-prefixed option.
+set num_nodes;
