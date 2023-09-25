@@ -21,6 +21,7 @@ package org.apache.iceberg.mr.hive;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.stream.StreamSupport;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -71,7 +72,7 @@ public class TestHiveIcebergCRUD extends HiveIcebergStorageHandlerWithEngineBase
     // delete one of the rows
     List<Record> toDelete = TestHelper.RecordsBuilder
         .newInstance(HiveIcebergStorageHandlerTestUtils.CUSTOMER_SCHEMA).add(1L, "Bob", null).build();
-    DeleteFile deleteFile = HiveIcebergTestUtils.createEqualityDeleteFile(tbl, "dummyPath",
+    DeleteFile deleteFile = HiveIcebergTestUtils.createEqualityDeleteFile(tbl, getDummyPath(),
         ImmutableList.of("customer_id", "first_name"), fileFormat, toDelete);
     tbl.newRowDelta().addDeletes(deleteFile).commit();
 
@@ -99,7 +100,7 @@ public class TestHiveIcebergCRUD extends HiveIcebergStorageHandlerWithEngineBase
     // delete all rows with id=1 and first_name=Bob
     List<Record> toDelete = TestHelper.RecordsBuilder
         .newInstance(HiveIcebergStorageHandlerTestUtils.CUSTOMER_SCHEMA).add(1L, "Bob", null).build();
-    DeleteFile deleteFile = HiveIcebergTestUtils.createEqualityDeleteFile(tbl, "dummyPath",
+    DeleteFile deleteFile = HiveIcebergTestUtils.createEqualityDeleteFile(tbl, getDummyPath(),
         ImmutableList.of("customer_id", "first_name"), fileFormat, toDelete);
     tbl.newRowDelta().addDeletes(deleteFile).commit();
 
@@ -127,7 +128,7 @@ public class TestHiveIcebergCRUD extends HiveIcebergStorageHandlerWithEngineBase
     Schema shorterSchema = new Schema(
         optional(1, "id", Types.LongType.get()), optional(2, "name", Types.StringType.get()));
     List<Record> toDelete = TestHelper.RecordsBuilder.newInstance(shorterSchema).add(1L, "Bob").build();
-    DeleteFile deleteFile = HiveIcebergTestUtils.createEqualityDeleteFile(tbl, "dummyPath",
+    DeleteFile deleteFile = HiveIcebergTestUtils.createEqualityDeleteFile(tbl, getDummyPath(),
         ImmutableList.of("customer_id", "first_name"), fileFormat, toDelete);
     tbl.newRowDelta().addDeletes(deleteFile).commit();
 
@@ -152,7 +153,7 @@ public class TestHiveIcebergCRUD extends HiveIcebergStorageHandlerWithEngineBase
     List<PositionDelete<Record>> deletes = ImmutableList.of(positionDelete(
         dataFile.path(), 2L, HiveIcebergStorageHandlerTestUtils.CUSTOMER_RECORDS.get(2))
     );
-    DeleteFile deleteFile = HiveIcebergTestUtils.createPositionalDeleteFile(tbl, "dummyPath",
+    DeleteFile deleteFile = HiveIcebergTestUtils.createPositionalDeleteFile(tbl, getDummyPath(),
         fileFormat, null, deletes);
     tbl.newRowDelta().addDeletes(deleteFile).commit();
 
@@ -188,7 +189,7 @@ public class TestHiveIcebergCRUD extends HiveIcebergStorageHandlerWithEngineBase
         positionDelete(dataFile.path(), 0L, null),
         positionDelete(dataFile.path(), 2L, null)
     );
-    DeleteFile deleteFile = HiveIcebergTestUtils.createPositionalDeleteFile(tbl, "dummyPath",
+    DeleteFile deleteFile = HiveIcebergTestUtils.createPositionalDeleteFile(tbl, getDummyPath(),
         fileFormat, ImmutableMap.of("customer_id", 0L), deletes);
     tbl.newRowDelta().addDeletes(deleteFile).commit();
 
@@ -227,7 +228,7 @@ public class TestHiveIcebergCRUD extends HiveIcebergStorageHandlerWithEngineBase
         positionDelete(dataFile.path(), 0L, rowsToDel.get(0)),
         positionDelete(dataFile.path(), 2L, rowsToDel.get(1))
     );
-    DeleteFile deleteFile = HiveIcebergTestUtils.createPositionalDeleteFile(tbl, "dummyPath",
+    DeleteFile deleteFile = HiveIcebergTestUtils.createPositionalDeleteFile(tbl, getDummyPath(),
         fileFormat, ImmutableMap.of("customer_id", 0L), deletes);
     tbl.newRowDelta().addDeletes(deleteFile).commit();
 
@@ -737,5 +738,9 @@ public class TestHiveIcebergCRUD extends HiveIcebergStorageHandlerWithEngineBase
   private static <T> PositionDelete<T> positionDelete(CharSequence path, long pos, T row) {
     PositionDelete<T> positionDelete = PositionDelete.create();
     return positionDelete.set(path, pos, row);
+  }
+
+  private static String getDummyPath() {
+    return "dummyPath-" + UUID.randomUUID();
   }
 }

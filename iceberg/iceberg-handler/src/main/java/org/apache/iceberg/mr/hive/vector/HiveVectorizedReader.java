@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.io.encoded.MemoryBufferOrBuffers;
@@ -51,6 +52,8 @@ import org.apache.iceberg.PartitionField;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.Table;
+import org.apache.iceberg.data.DeleteFilter;
+import org.apache.iceberg.deletes.PositionDeleteIndex;
 import org.apache.iceberg.expressions.Expression;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.CloseableIterator;
@@ -82,7 +85,8 @@ public class HiveVectorizedReader {
   }
 
   public static CloseableIterable<HiveBatchContext> reader(Table table, Path path, FileScanTask task,
-      Map<Integer, ?> idToConstant, TaskAttemptContext context, Expression residual, Schema readSchema) {
+      Map<Integer, ?> idToConstant, TaskAttemptContext context, Expression residual, Schema readSchema,
+      Function<DeleteFilter<HiveRow>, Map<String, PositionDeleteIndex>> positionIndex) {
 
     HiveDeleteFilter deleteFilter = null;
     Schema requiredSchema = readSchema;
@@ -169,7 +173,9 @@ public class HiveVectorizedReader {
       CloseableIterable<HiveBatchContext> vrbIterable =
           createVectorizedRowBatchIterable(recordReader, job, partitionColIndices, partitionValues, idToConstant);
 
-      return deleteFilter != null ? deleteFilter.filterBatch(vrbIterable) : vrbIterable;
+      return (deleteFilter != null) ?
+        deleteFilter.filterBatch(vrbIterable, positionIndex.apply(deleteFilter)) :
+        vrbIterable;
 
     } catch (IOException ioe) {
       throw new RuntimeException("Error creating vectorized record reader for " + path, ioe);

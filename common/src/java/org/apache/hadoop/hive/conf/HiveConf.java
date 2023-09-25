@@ -29,7 +29,6 @@ import org.apache.hadoop.hive.common.ZooKeeperHiveHelper;
 import org.apache.hadoop.hive.common.classification.InterfaceAudience;
 import org.apache.hadoop.hive.common.classification.InterfaceAudience.LimitedPrivate;
 import org.apache.hadoop.hive.common.type.TimestampTZUtil;
-import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.Validator.PatternSet;
 import org.apache.hadoop.hive.conf.Validator.RangeValidator;
 import org.apache.hadoop.hive.conf.Validator.RatioValidator;
@@ -2291,6 +2290,16 @@ public class HiveConf extends Configuration {
     HIVE_ICEBERG_ALLOW_DATAFILES_IN_TABLE_LOCATION_ONLY("hive.iceberg.allow.datafiles.in.table.location.only", false,
         "If this is set to true, then all the data files being read should be withing the table location"),
 
+    HIVE_ICEBERG_DELETE_FILTER_THRESHOLD("hive.iceberg.delete.filter.threshold", 2_000_000L,
+        "Threshold for number of delete records to keep in memory as a set; If number of deletes is greater\n" +
+            "than the threshold, delete file will be read from disk"),
+
+    HIVE_ICEBERG_DELETE_INDEX_MAX_SIZE("hive.iceberg.delete.index.max.size;", 1_000L,
+        "Max number of delete files whose entries will be stored in the deletes bit map index"),
+
+    HIVE_ICEBERG_DELETE_INDEX_EXPIRY_TIME("hive.iceberg.delete.index.expiry.time", "600s",
+        new TimeValidator(TimeUnit.SECONDS), "Number of minutes to keep deletes index entries before eviction"),
+    
     HIVEUSEEXPLICITRCFILEHEADER("hive.exec.rcfile.use.explicit.header", true,
         "If this is set the header for RCFiles will simply be RCF.  If this is not\n" +
         "set the header will be that borrowed from sequence files, e.g. SEQ- followed\n" +
