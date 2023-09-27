@@ -27,12 +27,12 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.nodes.PersistentEphemeralNode;
@@ -50,8 +50,9 @@ import org.apache.hadoop.registry.client.types.ServiceRecord;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.util.reflection.Fields;
-import org.mockito.internal.util.reflection.InstanceField;
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 @org.junit.Ignore("disable during hive-test-kube upgrade - flaky; this issue is most likely fixed upstream; but it's not obvious")
 public class TestLlapZookeeperRegistryImpl {
@@ -84,8 +85,8 @@ public class TestLlapZookeeperRegistryImpl {
             build();
     curatorFramework.start();
 
-    trySetMock(registry, CuratorFramework.class, curatorFramework);
-    trySetMock(compute1, CuratorFramework.class, curatorFramework);
+    trySetMock(registry, "zooKeeperClient", curatorFramework);
+    trySetMock(compute1, "zooKeeperClient", curatorFramework);
   }
 
   @After
@@ -151,10 +152,10 @@ public class TestLlapZookeeperRegistryImpl {
     PersistentEphemeralNode znode2 = createZnodeForComputeGroup(COMPUTE_2, "id2");
 
     assertEventually(() -> instances.getAllForComputeGroup(s -> COMPUTE_1.equals(s)).size() == 1,
-        "should see 1 instance in compute group 1");
+            "should see 1 instance in compute group 1");
 
     assertEventually(() -> instances.getAllForComputeGroup(Pattern.compile(".*").asPredicate()).size() == 2,
-        "should see all the two instances from all compute groups");
+            "should see all the two instances from all compute groups");
 
     assertEventually(() -> instances.getAll().size() == 1, "should have size 1 after adding 1 to its compute group");
     CloseableUtils.closeQuietly(znode2);
@@ -185,10 +186,10 @@ public class TestLlapZookeeperRegistryImpl {
     record.set(ZkRegistryBase.UNIQUE_IDENTIFIER, id);
     record.set(COMPUTE_NAME_PROPERTY_KEY, computeGroup);
     PersistentEphemeralNode znode = new PersistentEphemeralNode(
-      curatorFramework,
-      PersistentEphemeralNode.Mode.EPHEMERAL_SEQUENTIAL,
-      compute1.getWorkersPath().replace(compute1.getComputeGroup(), computeGroup) + "/worker-",
-      new RegistryUtils.ServiceRecordMarshal().toBytes(record));
+            curatorFramework,
+            PersistentEphemeralNode.Mode.EPHEMERAL_SEQUENTIAL,
+            compute1.getWorkersPath().replace(compute1.getComputeGroup(), computeGroup) + "/worker-",
+            new RegistryUtils.ServiceRecordMarshal().toBytes(record));
     znode.start();
     if (!znode.waitForInitialCreate(10, TimeUnit.SECONDS)) {
       fail("Max znode creation wait time exhausted");
@@ -196,15 +197,18 @@ public class TestLlapZookeeperRegistryImpl {
     return znode;
   }
 
-  static <T> void trySetMock(Object o, Class<T> clazz, T mock) {
-    List<InstanceField> instanceFields = Fields
-        .allDeclaredFieldsOf(o)
-        .filter(instanceField -> !clazz.isAssignableFrom(instanceField.jdkField().getType()))
-        .instanceFields();
-    if (instanceFields.size() != 1) {
+  static <T> void trySetMock(Object o, String field, T value) {
+    try {
+      Field fieldToChange = Arrays.stream(FieldUtils.getAllFields(o.getClass()))
+              .filter(f -> f.getName().equals(field))
+              .findFirst()
+              .orElseThrow(NoSuchFieldException::new);
+
+      fieldToChange.setAccessible(true);
+
+      fieldToChange.set(o, value);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
       throw new RuntimeException("Mocking is only supported, if only one field is assignable from the given class.");
     }
-    InstanceField instanceField = instanceFields.get(0);
-    instanceField.set(mock);
   }
 }
