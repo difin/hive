@@ -27,6 +27,8 @@ import org.apache.hadoop.hive.metastore.utils.MetastoreVersionInfo;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import static org.apache.hadoop.hive.metastore.tools.schematool.MetastoreSchemaTool.quote;
+
 /**
  * This class defines the Cloudera specific implementation of IMetaStoreSchemaInfo It overrides the
  * default implementation MetaStoreSchemaInfo which is available upstream such that it exposes the
@@ -314,32 +316,27 @@ public class CDHMetaStoreSchemaInfo extends MetaStoreSchemaInfo {
   @Override
   public String getMetaStoreSchemaVersion(MetaStoreConnectionInfo connectionInfo)
           throws HiveMetaException {
-    boolean needsQuotedIdentifier = HiveSchemaHelper.getDbCommandParser(connectionInfo.getDbType(),
-            connectionInfo.getMetaDbType(), false).needsQuotedIdentifier();
     Connection metastoreDbConnection = null;
 
     try {
       String schema = ( HiveSchemaHelper.DB_HIVE.equals(connectionInfo.getDbType()) ? "SYS" : null );
       metastoreDbConnection = HiveSchemaHelper.getConnectionToMetastore(connectionInfo, schema);
-      return getSchemaVersionInternal(metastoreDbConnection, "CDH_VERSION", needsQuotedIdentifier);
+      return getSchemaVersionInternal(metastoreDbConnection, "CDH_VERSION", connectionInfo);
     } catch (SQLException ex) {
       try {
-        return getSchemaVersionInternal(metastoreDbConnection, "VERSION", needsQuotedIdentifier);
+        return getSchemaVersionInternal(metastoreDbConnection, "VERSION", connectionInfo);
       } catch (SQLException e) {
         throw new HiveMetaException("Failed to get schema version, Cause:" + e.getMessage());
       }
     }
   }
 
-  private String getSchemaVersionInternal(Connection metastoreDbConnection, String table, boolean quoted)
+  private String getSchemaVersionInternal(Connection metastoreDbConnection, String table, MetaStoreConnectionInfo info)
           throws SQLException, HiveMetaException {
-    String versionQuery;
-    if (quoted) {
-      versionQuery = "select * from \"" + table + "\" t";
-    } else {
-      versionQuery = "select * from " + table + " t";
-    }
-
+    HiveSchemaHelper.NestedScriptParser db =
+        HiveSchemaHelper.getDbCommandParser(info.getDbType(), info.getMetaDbType(), false);
+    String versionQuery =
+        quote("select * from <q>" + table + "<q> t", db.needsQuotedIdentifier(), db.getQuoteCharacter());
     try {
       Statement stmt = metastoreDbConnection.createStatement();
       ResultSet res = stmt.executeQuery(versionQuery);

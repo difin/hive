@@ -457,6 +457,11 @@ public class HiveSchemaHelper {
     }
 
     @Override
+    public boolean needsQuotedIdentifier() {
+      return true;
+    }
+
+    @Override
     public boolean isNonExecCommand(String dbCommand) {
       return super.isNonExecCommand(dbCommand) ||
           (dbCommand.startsWith("/*") && dbCommand.endsWith("*/")) ||
