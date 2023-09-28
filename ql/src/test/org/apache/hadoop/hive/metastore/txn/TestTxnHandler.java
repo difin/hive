@@ -1806,7 +1806,7 @@ public class TestTxnHandler {
     String dbName = "abc";
     String tableName = "def";
     int numTxns = 2;
-    try (Connection dbConn = ((TxnHandler) txnHandler).getDbConn(Connection.TRANSACTION_READ_COMMITTED);
+    try (Connection dbConn = TestTxnDbUtil.getConnection(conf);
          Statement stmt = dbConn.createStatement()) {
       // run this multiple times to get write-write conflicts with relatively high chance
       for (int i = 0; i < 20; ++i) {

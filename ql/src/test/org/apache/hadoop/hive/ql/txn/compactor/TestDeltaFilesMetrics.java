@@ -83,6 +83,7 @@ public class TestDeltaFilesMetrics extends CompactorTest  {
   @After
   public void tearDown() throws Exception {
     MetricsFactory.close();
+    compactorTestCleanup();
   }
 
 

@@ -100,7 +100,7 @@
     <curator.version>5.4.0.7.2.18.0-641</curator.version>
     <cron-utils.version>9.1.6</cron-utils.version>
     <httpcomponents.core.version>4.4.13</httpcomponents.core.version>
-    <!-- Thrift properties -->
+    <spring.version>5.2.24.RELEASE</spring.version>    <!-- Thrift properties -->
     <thrift.home>you-must-set-this-to-run-thrift</thrift.home>
     <thrift.gen.dir>${basedir}/src/gen/thrift</thrift.gen.dir>
     <thrift.args>-I ${thrift.home} -strict --gen java:beans,generated_annotations=undated --gen cpp --gen php --gen py --gen rb
@@ -525,6 +525,16 @@
       <groupId>com.cloudera</groupId>
       <artifactId>jwtprovider-api</artifactId>
       <version>${jwt.provider.api.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring.version}</version>
     </dependency>
     <!-- JDBC drivers -->
     <dependency>

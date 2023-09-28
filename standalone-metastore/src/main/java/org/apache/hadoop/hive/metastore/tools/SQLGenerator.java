@@ -383,4 +383,29 @@ public final class SQLGenerator {
     }
     return val;
   }
+
+  public String isWithinCheckInterval(String expr, long interval) throws MetaException {
+    String condition;
+    switch (dbProduct) {
+      case DERBY:
+        condition = " {fn TIMESTAMPDIFF(sql_tsi_second, " + expr + ", current_timestamp)} <= " + interval;
+        break;
+      case MYSQL:
+      case POSTGRES:
+        condition = expr + " >= current_timestamp - interval '" + interval + "' second";
+        break;
+      case SQLSERVER:
+        condition = "DATEDIFF(second, " + expr + ", current_timestamp) <= " + interval;
+        break;
+      case ORACLE:
+        condition = expr + " >= current_timestamp - numtodsinterval(" + interval + " , 'second')";
+        break;
+      default:
+        String msg = "Unknown database product: " + dbProduct.toString();
+        LOG.error(msg);
+        throw new MetaException(msg);
+    }
+    return condition;
+  }
+
 }
