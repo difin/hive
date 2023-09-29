@@ -21,7 +21,6 @@ package org.apache.hadoop.hive.ql.parse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1810,9 +1809,9 @@ public abstract class BaseSemanticAnalyzer {
       throw new SemanticException("Unexpected date type " + colValue.getClass());
     }
     try {
-      return MetaStoreUtils.PARTITION_DATE_FORMAT.get().format(
-          MetaStoreUtils.PARTITION_DATE_FORMAT.get().parse(value.toString()));
-    } catch (ParseException e) {
+      return MetaStoreUtils.convertDateToString(
+          MetaStoreUtils.convertStringToDate(value.toString()));
+    } catch (Exception e) {
       throw new SemanticException(e);
     }
   }
