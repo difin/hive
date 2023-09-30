@@ -347,8 +347,10 @@ public class ImpalaPlanner {
                   }
                 }
               }
+              // CDPD-62070: Hardcode 'isPrimaryKeyUnique' to true until we figure out
+              // how to create a Kudu table with a non-unique primary key.
               impalaTable = KuduTable.createCtasTarget(new org.apache.impala.catalog.Db(msTbl.getDbName(), msDb),
-                      msTbl, columnDefs, primaryKeyColumnDefs, partitionParams);
+                      msTbl, columnDefs, /*isPrimaryKeyUnique*/ true, primaryKeyColumnDefs, partitionParams);
             } else {
               impalaTable = HdfsTable.createCtasTarget(new org.apache.impala.catalog.Db(msTbl.getDbName(), msDb),
                       msTbl);

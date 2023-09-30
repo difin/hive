@@ -218,6 +218,9 @@ public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
       columns.add(new TColumn(column.getName(), Type.parseColumnType(column.getType()).toThrift()));
     }
     createTableParams.setColumns(columns);
+    // CDPD-62070: Hardcode this field to true until we figure out how to create a Kudu
+    // table with a non-unique primary key.
+    createTableParams.setIs_primary_key_unique(true);
 
     try {
       // Return if we are in Hive's q test. This allows us to exercise the corresponding
