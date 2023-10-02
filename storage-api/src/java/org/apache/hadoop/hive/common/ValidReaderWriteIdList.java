@@ -257,8 +257,8 @@ public class ValidReaderWriteIdList implements ValidWriteIdList {
     }
   }
 
-  public ValidReaderWriteIdList updateHighWatermark(long value) {
-    return new ValidReaderWriteIdList(tableName, exceptions, abortedBits, value, minOpenWriteId);
+  public void setHighWatermark(long value) {
+    this.highWatermark = value;
   }
 }
 
