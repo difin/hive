@@ -48,7 +48,7 @@ import javax.annotation.Nullable;
 public abstract class AbstractSerDe implements Deserializer, Serializer {
 
   protected String configErrors;
-  protected Logger log = LoggerFactory.getLogger(getClass());
+  protected static final Logger log = LoggerFactory.getLogger(AbstractSerDe.class);
 
   protected Optional<Configuration> configuration;
   protected Properties properties;
@@ -114,7 +114,7 @@ public abstract class AbstractSerDe implements Deserializer, Serializer {
     Preconditions.checkArgument(this.columnNames.size() == this.columnTypes.size(),
         "Column names must match count of column types");
 
-    log.debug("SerDe initialized: [{}][{}]", this.configuration, this.properties);
+    log.debug("{} initialized: [{}][{}]", getClass().getName(), this.configuration, this.properties);
   }
 
   protected List<String> parseColumnNames() {
