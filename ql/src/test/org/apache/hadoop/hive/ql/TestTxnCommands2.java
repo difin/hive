@@ -98,7 +98,9 @@ import static org.mockito.Mockito.any;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 

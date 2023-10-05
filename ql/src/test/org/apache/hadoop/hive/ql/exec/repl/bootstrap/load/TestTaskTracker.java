@@ -22,14 +22,14 @@ import org.apache.hadoop.hive.ql.exec.repl.util.TaskTracker;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.Serializable;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(PowerMockRunner.class)
+@RunWith(MockitoJUnitRunner.class)
   public class TestTaskTracker {
   @Mock
   private Task<? extends Serializable> task;

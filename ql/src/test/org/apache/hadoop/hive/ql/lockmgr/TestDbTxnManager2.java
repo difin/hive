@@ -42,6 +42,7 @@ import org.apache.hadoop.hive.metastore.txn.AcidHouseKeeperService;
 import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
+import org.apache.hive.common.util.ReflectionUtil;
 import org.junit.Assert;
 import org.apache.hadoop.hive.common.FileUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -54,8 +55,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.AccessibilityChanger;
-import org.mockito.internal.util.reflection.FieldSetter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -2453,14 +2452,12 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   // This was added when back porting HIVE-26875 since Apache Hive is different in this area (it has been
   // refactored in such a way that these tests do not need to change the visibility of anything).
   private Driver driverSpy(Driver driver) throws Exception {
-    AccessibilityChanger changer = new AccessibilityChanger();
     Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     Object obj = validTxnManager.get(driver);
 
     driver = Mockito.spy(driver);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver);
     return driver;
   }
 
@@ -3612,25 +3609,22 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   private void testDropPartition(boolean blocking) throws Exception {
     dropTable(new String[] {"tab_acid"});
     FileSystem fs = FileSystem.get(conf);
-    AccessibilityChanger changer = new AccessibilityChanger();
 
     Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     Object obj = validTxnManager.get(driver);
 
     HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
     driver = Mockito.spy(driver);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver);
 
     validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     obj = validTxnManager.get(driver2);
 
     HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_DROP_PARTITION_USE_BASE, !blocking);
     driver2 = Mockito.spy(driver2);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver2);
 
     driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
@@ -3664,7 +3658,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       driver.getFetchTask().fetch(res);
       swapTxnManager(txnMgr2);
 
-      FieldSetter.setField(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements"), 0);
+      ReflectionUtil.setField(txnMgr2, "numStatements", 0);
       txnMgr2.getMS().unlock(checkLock.getLockid());
     }
     driver2.lockAndRespond();
@@ -3718,27 +3712,24 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   private void testDropTable(boolean blocking) throws Exception {
     dropTable(new String[] {"tab_acid"});
     FileSystem fs = FileSystem.get(conf);
-    AccessibilityChanger changer = new AccessibilityChanger();
-    
+
     Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     Object obj = validTxnManager.get(driver);
 
     HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
     HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
-    
+
     driver = Mockito.spy(driver);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
-    changer.safelyDisableAccess(validTxnManager);
-    
+    ReflectionUtil.setField(obj, "driver", driver);
+
     validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     obj = validTxnManager.get(driver2);
 
     HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_CREATE_TABLE_USE_SUFFIX, !blocking);
     driver2 = Mockito.spy(driver2);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver2);
 
     driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
@@ -3774,7 +3765,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       driver.getFetchTask().fetch(res);
       swapTxnManager(txnMgr2);
 
-      FieldSetter.setField(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements"), 0);
+      ReflectionUtil.setField(txnMgr2, "numStatements", 0);
       txnMgr2.getMS().unlock(checkLock.getLockid());
     }
     driver2.lockAndRespond();
@@ -3865,26 +3856,23 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   private void testRenameTable(boolean blocking) throws Exception {
     dropTable(new String[] {"tab_acid", "tab_acid_v2"});
     FileSystem fs = FileSystem.get(conf);
-    AccessibilityChanger changer = new AccessibilityChanger();
 
     Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     Object obj = validTxnManager.get(driver);
 
     HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
     HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
     driver = Mockito.spy(driver);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver);
 
     validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     obj = validTxnManager.get(driver2);
 
     HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
     driver2 = Mockito.spy(driver2);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver2);
 
     driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
@@ -3920,7 +3908,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       driver.getFetchTask().fetch(res);
       swapTxnManager(txnMgr2);
 
-      FieldSetter.setField(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements"), 0);
+      ReflectionUtil.setField(txnMgr2, "numStatements", 0);
       txnMgr2.getMS().unlock(checkLock.getLockid());
     }
     driver2.lockAndRespond();
@@ -4014,26 +4002,23 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     driver.run("drop materialized view if exists mv_tab_acid");
     dropTable(new String[] {"tab_acid"});
     FileSystem fs = FileSystem.get(conf);
-    AccessibilityChanger changer = new AccessibilityChanger();
 
     Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     Object obj = validTxnManager.get(driver);
 
     HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
     HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
     driver = Mockito.spy(driver);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver);
 
     validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     obj = validTxnManager.get(driver2);
 
     HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_CREATE_TABLE_USE_SUFFIX, !blocking);
     driver2 = Mockito.spy(driver2);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver2);
 
     driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
@@ -4074,7 +4059,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       driver.getFetchTask().fetch(res);
       swapTxnManager(txnMgr2);
 
-      FieldSetter.setField(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements"), 0);
+      ReflectionUtil.setField(txnMgr2, "numStatements", 0);
       txnMgr2.getMS().unlock(checkLock.getLockid());
     }
     driver2.lockAndRespond();
@@ -4131,25 +4116,22 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   private void testRenamePartition(boolean blocking) throws Exception {
     dropTable(new String[] {"tab_acid"});
     FileSystem fs = FileSystem.get(conf);
-    AccessibilityChanger changer = new AccessibilityChanger();
 
     Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     Object obj = validTxnManager.get(driver);
 
     HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
     driver = Mockito.spy(driver);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver);
 
     validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     obj = validTxnManager.get(driver2);
 
     HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_RENAME_PARTITION_MAKE_COPY, !blocking);
     driver2 = Mockito.spy(driver2);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver2);
 
     driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
@@ -4183,7 +4165,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       driver.getFetchTask().fetch(res);
       swapTxnManager(txnMgr2);
 
-      FieldSetter.setField(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements"), 0);
+      ReflectionUtil.setField(txnMgr2, "numStatements", 0);
       txnMgr2.getMS().unlock(checkLock.getLockid());
     }
     driver2.lockAndRespond();
@@ -4229,7 +4211,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     driver.getFetchTask().fetch(res);
     Assert.assertEquals("Expecting 1 rows and found " + res.size(), 1, res.size());
   }
-  
+
   @Test
   public void testDropDatabaseNonBlocking() throws Exception {
     dropDatabaseNonBlocking(false, false);
@@ -4329,25 +4311,22 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   @Test
   public void testAddPartitionIfNotExists() throws Exception {
     dropTable(new String[] {"T", "Tstage"});
-    AccessibilityChanger changer = new AccessibilityChanger();
 
     Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     Object obj = validTxnManager.get(driver);
-    
+
     HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVE_LOCKS_PARTITION_THRESHOLD, 1);
     driver = Mockito.spy(driver);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver);
 
     validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     obj = validTxnManager.get(driver2);
-    
+
     driver2 = Mockito.spy(driver2);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
-    changer.safelyDisableAccess(validTxnManager);
-    
+    ReflectionUtil.setField(obj, "driver", driver2);
+
     driver.run("create table if not exists T (a int, b int) partitioned by (p string) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
     //bucketed just so that we get 2 files
@@ -4406,25 +4385,22 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
 
   private void testAddColumns(boolean blocking) throws Exception {
     dropTable(new String[] {"tab_acid"});
-    AccessibilityChanger changer = new AccessibilityChanger();
 
     Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     Object obj = validTxnManager.get(driver);
 
     HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
     driver = Mockito.spy(driver);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver);
 
     validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     obj = validTxnManager.get(driver2);
 
     HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
     driver2 = Mockito.spy(driver2);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver2);
 
     driver.run("create table if not exists tab_acid (a int, b int) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
@@ -4460,7 +4436,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       driver.getFetchTask().fetch(res);
       swapTxnManager(txnMgr2);
 
-      FieldSetter.setField(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements"), 0);
+      ReflectionUtil.setField(txnMgr2, "numStatements", 0);
       txnMgr2.getMS().unlock(checkLock.getLockid());
     }
     driver2.lockAndRespond();
@@ -4516,25 +4492,22 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   
   private void testReplaceRenameColumns(boolean blocking, String alterSubQuery) throws Exception {
     dropTable(new String[] {"tab_acid"});
-    AccessibilityChanger changer = new AccessibilityChanger();
 
     Field validTxnManager = driver.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     Object obj = validTxnManager.get(driver);
 
     HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
     driver = Mockito.spy(driver);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver);
 
     validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     obj = validTxnManager.get(driver2);
 
     HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, !blocking);
     driver2 = Mockito.spy(driver2);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver2);
 
     driver.run("create table if not exists tab_acid (a int, b int) " +
       "stored as orc TBLPROPERTIES ('transactional'='true')");
@@ -4570,7 +4543,7 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
       driver.getFetchTask().fetch(res);
       swapTxnManager(txnMgr2);
 
-      FieldSetter.setField(txnMgr2, txnMgr2.getClass().getDeclaredField("numStatements"), 0);
+      ReflectionUtil.setField(txnMgr2, "numStatements", 0);
       txnMgr2.getMS().unlock(checkLock.getLockid());
     }
     driver2.lockAndRespond();
@@ -4695,7 +4668,6 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
   @Test
   public void testSetSerdeAndFileFormatNonBlocking() throws Exception {
     dropTable(new String[] {"tab_acid"});
-    AccessibilityChanger changer = new AccessibilityChanger();
 
     driver.run("create table if not exists tab_acid (a int, b int) partitioned by (p string) " +
       "TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')");
@@ -4704,13 +4676,12 @@ public class TestDbTxnManager2 extends DbTxnManagerEndToEndTestBase {
     driver.compileAndRespond("select * from tab_acid");
 
     Field validTxnManager = driver2.getClass().getDeclaredField("validTxnManager");
-    changer.enableAccess(validTxnManager);
+    validTxnManager.setAccessible(true);
     Object obj = validTxnManager.get(driver2);
 
     HiveConf.setBoolVar(driver2.getConf(), HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED, true);
     driver2 = Mockito.spy(driver2);
-    FieldSetter.setField(obj, obj.getClass().getDeclaredField("driver"), driver2);
-    changer.safelyDisableAccess(validTxnManager);
+    ReflectionUtil.setField(obj, "driver", driver2);
 
     DbTxnManager txnMgr2 = (DbTxnManager) TxnManagerFactory.getTxnManagerFactory().getTxnManager(conf);
     swapTxnManager(txnMgr2);

@@ -30,9 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.slf4j.LoggerFactory;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,8 +42,7 @@ import java.util.concurrent.TimeUnit;
  * Tests the File List implementation.
  */
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({FSDataOutputStream.class})
+@RunWith(MockitoJUnitRunner.class)
 public class TestFileList {
 
   HiveConf conf = new HiveConf();

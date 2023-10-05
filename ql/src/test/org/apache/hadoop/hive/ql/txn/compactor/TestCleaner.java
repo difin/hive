@@ -42,10 +42,10 @@ import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.ql.txn.compactor.handler.TaskHandler;
 import org.apache.hadoop.hive.ql.txn.compactor.handler.TaskHandlerFactory;
+import org.apache.hive.common.util.ReflectionUtil;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.util.reflection.FieldSetter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -128,7 +128,8 @@ public class TestCleaner extends CompactorTest {
       cleaner.setConf(conf);
       cleaner.init(new AtomicBoolean(true));
       cleaner.setCleanupHandlers(taskHandlers);
-      FieldSetter.setField(cleaner, MetaStoreCompactorThread.class.getDeclaredField("txnHandler"), mockedHandler);
+
+      ReflectionUtil.setInAllFields(cleaner, "txnHandler", mockedHandler);
 
       cleaner.run();
 
@@ -160,7 +161,7 @@ public class TestCleaner extends CompactorTest {
     cleaner.setConf(conf);
     cleaner.init(new AtomicBoolean(true));
     cleaner.setCleanupHandlers(taskHandlers);
-    FieldSetter.setField(cleaner, MetaStoreCompactorThread.class.getDeclaredField("txnHandler"), mockedHandler);
+    ReflectionUtil.setInAllFields(cleaner, "txnHandler", mockedHandler);
 
     cleaner.run();
 
@@ -202,7 +203,7 @@ public class TestCleaner extends CompactorTest {
     cleaner.setConf(conf);
     cleaner.init(new AtomicBoolean(true));
     cleaner.setCleanupHandlers(taskHandlers);
-    FieldSetter.setField(cleaner, MetaStoreCompactorThread.class.getDeclaredField("txnHandler"), mockedHandler);
+    ReflectionUtil.setInAllFields(cleaner, "txnHandler", mockedHandler);
 
     cleaner.run();
 
@@ -218,7 +219,7 @@ public class TestCleaner extends CompactorTest {
     cleaner.setConf(conf);
     cleaner.init(new AtomicBoolean(true));
     cleaner.setCleanupHandlers(taskHandlers);
-    FieldSetter.setField(cleaner, MetaStoreCompactorThread.class.getDeclaredField("txnHandler"), mockedHandler);
+    ReflectionUtil.setInAllFields(cleaner, "txnHandler", mockedHandler);
 
     cleaner.run();
 
