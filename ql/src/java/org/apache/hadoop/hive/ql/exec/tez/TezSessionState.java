@@ -44,6 +44,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
+import org.apache.hadoop.hive.common.FileUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConfUtil;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
@@ -92,6 +93,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -939,7 +941,8 @@ public class TezSessionState implements TezSession {
    * @throws LoginException when we are unable to determine the user.
    * @throws URISyntaxException when current jar location cannot be determined.
    */
-  protected final LocalResource createJarLocalResource(String localJarPath)
+  @VisibleForTesting
+  final LocalResource createJarLocalResource(String localJarPath)
       throws IOException, LoginException, IllegalArgumentException {
     // TODO Reduce the number of lookups that happen here. This shouldn't go to HDFS for each call.
     // The hiveJarDir can be determined once per client.
@@ -947,7 +950,7 @@ public class TezSessionState implements TezSession {
     assert destDirStatus != null;
     Path destDirPath = destDirStatus.getPath();
 
-    Path localFile = new Path(localJarPath);
+    Path localFile = FileUtils.resolveSymlinks(new Path(localJarPath), conf);
     String sha = getSha(localFile);
 
     String destFileName = localFile.getName();
