@@ -154,7 +154,7 @@
     <opencsv.version>2.3</opencsv.version>
     <orc.version>1.8.3.2023.0.17.0-SNAPSHOT</orc.version>
     <mockito-core.version>3.4.4</mockito-core.version>
-    <powermock.version>2.0.2</powermock.version>
+    <mockito-inline.version>4.11.0</mockito-inline.version>
     <mina.version>2.0.0-M5</mina.version>
     <netty.version>4.1.86.Final</netty.version>
     <netty.hadoop.version>4.0.52.Final</netty.hadoop.version>
