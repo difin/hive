@@ -22,23 +22,6 @@ public class DerbySQLConnectorProvider extends AbstractJDBCConnectorProvider {
     super(dbName, connector, DRIVER_CLASS);
   }
 
-  /**
-   * Returns a list of all table names from the remote database.
-   * @return List A collection of all the table names, null if there are no tables.
-   * @throws IOException To indicate any failures with executing this API
-   */
-  @Override
-  protected ResultSet fetchTableNames() throws MetaException {
-    ResultSet rs = null;
-    try {
-      rs = getConnection().getMetaData().getTables(scoped_db, null, null, new String[] { "TABLE" });
-    } catch (SQLException sqle) {
-      LOG.warn("Could not retrieve table names from remote datasource, cause:" + sqle.getMessage());
-      throw new MetaException("Could not retrieve table names from remote datasource, cause:" + sqle);
-    }
-    return rs;
-  }
-
   @Override protected String getCatalogName() {
     return scoped_db;
   }

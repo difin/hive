@@ -124,4 +124,7 @@ public abstract class AbstractDataConnectorProvider implements IDataConnectorPro
   abstract protected String getOutputClass();
 
   abstract protected String getTableLocation(String tblName);
+
+  abstract protected String getDatasourceType();
+
 }

@@ -2,6 +2,7 @@ package org.apache.hadoop.hive.metastore.dataconnector;
 
 import org.apache.hadoop.hive.metastore.api.DataConnector;
 import org.apache.hadoop.hive.metastore.dataconnector.jdbc.DerbySQLConnectorProvider;
+import org.apache.hadoop.hive.metastore.dataconnector.jdbc.HiveJDBCConnectorProvider;
 import org.apache.hadoop.hive.metastore.dataconnector.jdbc.MSSQLConnectorProvider;
 import org.apache.hadoop.hive.metastore.dataconnector.jdbc.MySQLConnectorProvider;
 import org.apache.hadoop.hive.metastore.dataconnector.jdbc.OracleConnectorProvider;
@@ -31,6 +32,10 @@ public class JDBCConnectorProviderFactory {
 
     case MSSQL_TYPE:
       provider = new MSSQLConnectorProvider(dbName, connector);
+      break;
+
+    case HIVE_JDBC_TYPE:
+      provider = new HiveJDBCConnectorProvider(dbName, connector);
       break;
 
     default:
