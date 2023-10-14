@@ -134,7 +134,7 @@ public class AlterTableExecuteAnalyzer extends AbstractAlterTableAnalyzer {
       ASTNode childNode) throws SemanticException {
     AlterTableExecuteSpec<AlterTableExecuteSpec.SetCurrentSnapshotSpec> spec =
         new AlterTableExecuteSpec(SET_CURRENT_SNAPSHOT,
-            new AlterTableExecuteSpec.SetCurrentSnapshotSpec(Long.valueOf(childNode.getText())));
+            new AlterTableExecuteSpec.SetCurrentSnapshotSpec(childNode.getText()));
     return new AlterTableExecuteDesc(tableName, partitionSpec, spec);
   }
 

@@ -21,6 +21,7 @@ package org.apache.iceberg.mr.hive;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -33,6 +34,7 @@ import org.apache.hadoop.hive.ql.io.sarg.SearchArgument;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
 import org.apache.hadoop.hive.ql.parse.AlterTableExecuteSpec;
 import org.apache.hadoop.hive.ql.parse.TransformSpec;
+import org.apache.hadoop.hive.ql.plan.PlanUtils;
 import org.apache.hadoop.hive.ql.session.SessionStateUtil;
 import org.apache.iceberg.DeleteFiles;
 import org.apache.iceberg.ManageSnapshots;
@@ -40,6 +42,7 @@ import org.apache.iceberg.PartitionData;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.RowLevelOperationMode;
 import org.apache.iceberg.Schema;
+import org.apache.iceberg.SnapshotRef;
 import org.apache.iceberg.StructLike;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.TableProperties;
@@ -246,13 +249,23 @@ public class IcebergTableUtil {
   /**
    * Set the current snapshot for the iceberg table
    * @param table the iceberg table
-   * @param value parameter of the rollback, that can be a timestamp in millis or a snapshot id
+   * @param value parameter of the rollback, that can be a snapshot id or a SnapshotRef name
    */
-  public static void setCurrentSnapshot(Table table, Long value) {
+  public static void setCurrentSnapshot(Table table, String value) {
     ManageSnapshots manageSnapshots = table.manageSnapshots();
-    LOG.debug("Rolling the iceberg table {} from snapshot id {} to snapshot ID {}", table.name(),
-        table.currentSnapshot().snapshotId(), value);
-    manageSnapshots.setCurrentSnapshot(value);
+    long snapshotId;
+    try {
+      snapshotId = Long.parseLong(value);
+      LOG.debug("Rolling the iceberg table {} from snapshot id {} to snapshot ID {}", table.name(),
+          table.currentSnapshot().snapshotId(), snapshotId);
+    } catch (NumberFormatException e) {
+      String refName = PlanUtils.stripQuotes(value);
+      snapshotId = Optional.ofNullable(table.refs().get(refName)).map(SnapshotRef::snapshotId).orElseThrow(() ->
+          new IllegalArgumentException(String.format("SnapshotRef %s does not exist", refName)));
+      LOG.debug("Rolling the iceberg table {} from snapshot id {} to the snapshot ID {} of SnapshotRef {}",
+          table.name(), table.currentSnapshot().snapshotId(), snapshotId, refName);
+    }
+    manageSnapshots.setCurrentSnapshot(snapshotId);
     manageSnapshots.commit();
   }
 
