@@ -364,6 +364,20 @@ public class JdbcColumn {
     }
   }
 
+  static boolean columnSigned(Type hiveType)
+      throws SQLException {
+    int columnType = hiveTypeToSqlType(hiveType);
+    switch(columnType) {
+    case Types.TINYINT:
+    case Types.SMALLINT:
+    case Types.INTEGER:
+    case Types.BIGINT:
+      return true;
+    default:
+      return false;
+    }
+  }
+
   public Integer getNumPrecRadix() {
     if (type.equalsIgnoreCase("tinyint")) {
       return 10;
