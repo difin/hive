@@ -23,7 +23,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.metastore.api.Database;
-import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.events.PreCreateTableEvent;
 import org.apache.hadoop.hive.metastore.events.PreEventContext;
@@ -84,7 +83,7 @@ public class CreateTableEvent extends HiveMetaStoreAuthorizableEvent {
     ret.add(getHivePrivilegeObject(database));
     ret.add(getHivePrivilegeObject(table));
 
-    if (StringUtils.isNotEmpty(uri) && table.getTableType() != TableType.EXTERNAL_TABLE.toString()) {
+    if (StringUtils.isNotEmpty(uri)) {
       ret.add(new HivePrivilegeObject(HivePrivilegeObjectType.DFS_URI, null, uri));
     }
 
