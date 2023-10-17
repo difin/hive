@@ -9834,7 +9834,7 @@ public class ObjectStore implements RawStore, Configurable {
 
     final String query = sqlGenerator.getSelectQueryForMetastoreSummary();
     try {
-      String tblName, dbName, ctlgName, tblType, fileType, compressionType, partitionColumn;
+      String tblName, dbName, ctlgName, tblType, fileType, compressionType, partitionColumn, writeFormatDefault, transactionalProperties;
       int colCount, arrayColCount, structColCount, mapColCount;
       Integer partitionCnt;
       BigInteger totalSize, sizeNumRows, sizeNumFiles;
@@ -9862,6 +9862,11 @@ public class ObjectStore implements RawStore, Configurable {
         sizeNumRows = BigInteger.valueOf(rs.getLong("NUM_ROWS"));
         sizeNumFiles = BigInteger.valueOf(rs.getLong("NUM_FILES"));
 
+        writeFormatDefault = rs.getString("WRITE_FORMAT_DEFAULT");
+        if (writeFormatDefault == null) writeFormatDefault = "null";
+        transactionalProperties = rs.getString("TRANSACTIONAL_PROPERTIES");
+        if (transactionalProperties == null) transactionalProperties = "null";
+
         // for iceberg tables, overwrite the metadata by the metadata fetched in HMSSummaryIcebergHandler
         // when some error happended to the icebergHandler, we use the data from the hms
         if (fileType != null && fileType.equals("iceberg") && icebergHandler.isEnabled() && icebergTableSummaryMap != null) {
@@ -9876,6 +9881,13 @@ public class ObjectStore implements RawStore, Configurable {
               totalSize = icebergTableSummary.getTotalSize() != null ? icebergTableSummary.getTotalSize() : totalSize;
               sizeNumRows = icebergTableSummary.getSizeNumRows() != null ? icebergTableSummary.getSizeNumRows() : sizeNumRows;
               sizeNumFiles = icebergTableSummary.getSizeNumFiles() != null ? icebergTableSummary.getSizeNumFiles() : sizeNumFiles;
+              if (writeFormatDefault.equals("null")){
+                fileType = "parquet";
+              }
+              else {
+                fileType = writeFormatDefault;
+              }
+              tblType = "ICEBERG";
             } else {
               LOG.info("Iceberg Table {}.{}.{} icebergTableSummary is null", ctlgName, dbName, tblName);
             }
@@ -9883,6 +9895,32 @@ public class ObjectStore implements RawStore, Configurable {
             String msg = "Runtime iceberg related exception";
             LOG.error(msg, icebergException);
             throw icebergException;
+          }
+        }
+
+        if (tblType.equals("EXTERNAL_TABLE")){
+          if (fileType.equals("parquet")){
+            tblType = "HIVE_EXTERNAL";
+          }
+          else if (fileType.equals("jdbc")){
+            tblType = "JDBC";
+          }
+          else if (fileType.equals("kudu")){
+            tblType = "KUDU";
+          }
+          else if (fileType.equals("hbase")){
+            tblType = "HBASE";
+          } else {
+            tblType = "HIVE_EXTERNAL";
+          }
+        }
+
+        if (tblType.equals("MANAGED_TABLE")){
+          if (transactionalProperties == "insert_only"){
+            tblType = "HIVE_ACID_INSERT_ONLY";
+          }
+          else {
+            tblType = "HIVE_ACID_FULL";
           }
         }
 
