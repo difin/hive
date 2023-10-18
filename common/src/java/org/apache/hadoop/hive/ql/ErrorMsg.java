@@ -486,6 +486,8 @@ public enum ErrorMsg {
   COMPACTION_REFUSED(10432, "Compaction request for {0}.{1}{2} is refused, details: {3}.", true),
   NON_NATIVE_ACID_UPDATE(10435, "Update and Merge into non-native ACID table is only supported when " +
       HiveConf.ConfVars.SPLIT_UPDATE.varname + " is true."),
+  NON_NATIVE_ACID_COW_UPDATE(10437, "Update and Merge into non-native ACID table in copy-on-write mode is only supported when " +
+      HiveConf.ConfVars.SPLIT_UPDATE.varname + " is false."),
 
   //========================== 20000 range starts here ========================//
 
