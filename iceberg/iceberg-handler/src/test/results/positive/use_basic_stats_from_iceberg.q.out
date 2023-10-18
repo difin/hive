@@ -149,7 +149,6 @@ Table Parameters:
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"a\":\"true\"}}
 	bucketing_version   	2                   
 	current-schema      	{\"type\":\"struct\",\"schema-id\":0,\"fields\":[{\"id\":1,\"name\":\"a\",\"required\":false,\"type\":\"int\"}]}
-	engine.hive.enabled 	true                
 	format-version      	2                   
 	iceberg.orc.files.only	false               
 	metadata_location   	hdfs://### HDFS PATH ###
@@ -192,7 +191,6 @@ Table Parameters:
 	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"b\":\"true\"}}
 	bucketing_version   	2                   
 	current-schema      	{\"type\":\"struct\",\"schema-id\":0,\"fields\":[{\"id\":1,\"name\":\"b\",\"required\":false,\"type\":\"int\"}]}
-	engine.hive.enabled 	true                
 	format-version      	2                   
 	iceberg.orc.files.only	false               
 	metadata_location   	hdfs://### HDFS PATH ###
