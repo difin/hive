@@ -23,12 +23,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.ql.QueryState;
+import org.apache.hadoop.hive.ql.io.sarg.SearchArgument;
+import org.apache.hadoop.hive.ql.metadata.HiveUtils;
 import org.apache.hadoop.hive.ql.parse.AlterTableExecuteSpec;
 import org.apache.hadoop.hive.ql.parse.TransformSpec;
 import org.apache.hadoop.hive.ql.session.SessionStateUtil;
+import org.apache.iceberg.DeleteFiles;
 import org.apache.iceberg.ManageSnapshots;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Schema;
@@ -36,6 +40,7 @@ import org.apache.iceberg.Table;
 import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.UpdatePartitionSpec;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.expressions.Expression;
 import org.apache.iceberg.expressions.Expressions;
 import org.apache.iceberg.mr.Catalogs;
 import org.apache.iceberg.mr.InputFormatConfig;
@@ -264,5 +269,14 @@ public class IcebergTableUtil {
   public static boolean isV2Table(Map<String, String> props) {
     return props != null &&
         "2".equals(props.get(TableProperties.FORMAT_VERSION));
+  }
+
+  public static void performMetadataDelete(Table icebergTable, String branchName, SearchArgument sarg) {
+    Expression exp = HiveIcebergFilterFactory.generateFilterExpression(sarg);
+    DeleteFiles deleteFiles = icebergTable.newDelete();
+    if (StringUtils.isNotEmpty(branchName)) {
+      deleteFiles = deleteFiles.toBranch(HiveUtils.getTableSnapshotRef(branchName));
+    }
+    deleteFiles.deleteFromRowFilter(exp).commit();
   }
 }
