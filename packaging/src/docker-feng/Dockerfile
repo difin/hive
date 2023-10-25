@@ -12,5 +12,9 @@ RUN yum -y update && \
   yum install -y compat-openssl10 && \
   yum clean all && \
   rm -rf /var/cache/yum
+
+# add notice file
+ADD /NOTICE.txt /NOTICE.txt
+
 USER hive
 ENV LD_LIBRARY_PATH /lib/x86_64-linux-gnu:/usr/lib/hadoop/lib/native:/usr/lib/impala/impala-fesupport-${IMPALA_VERSION}

@@ -48,8 +48,8 @@ RUN yum -y update && \
   yum clean all && \
   rm -rf /var/cache/yum
 
-# add NOTICES directory
-ADD /notices-files /NOTICES
+# add notice file
+ADD /NOTICE.txt /NOTICE.txt
 
 ENV JAVA_HOME /etc/alternatives/jre
 
