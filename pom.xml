@@ -122,7 +122,7 @@
     <httpcomponents.core.version>4.4.13</httpcomponents.core.version>
     <impala.version>4.0.0.2024.0.17.0-SNAPSHOT</impala.version>
     <jackson.version>2.12.7.20221012</jackson.version>
-    <ivy.version>2.5.1</ivy.version>
+    <ivy.version>2.5.2</ivy.version>
     <jamon.plugin.version>2.3.4</jamon.plugin.version>
     <jamon-runtime.version>2.3.1</jamon-runtime.version>
     <javax-servlet.version>3.1.0</javax-servlet.version>
