@@ -78,7 +78,7 @@
     <guava.version>28.2-jre</guava.version>
     <hadoop.version>3.1.1.7.2.17.0-334</hadoop.version>
     <hikaricp.version>2.6.1</hikaricp.version>
-    <jackson.version>2.12.7</jackson.version>
+    <jackson.version>2.12.7.20221012</jackson.version>
     <javolution.version>5.5.1</javolution.version>
     <jetty.version>9.4.31.v20200723</jetty.version>
     <jexl.version>3.3</jexl.version>
