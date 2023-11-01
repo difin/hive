@@ -145,12 +145,12 @@ RUN mkdir -p /usr/lib/hive/lib/
 
 # install mysql JDBC connector for mysql and mariadb, and Oracle JDBC driver, then move them where the schematool can find them
 RUN yum -y clean all && \
-    yum -y install postgresql postgresql-jdbc && \
+    yum -y install postgresql && \
     rm -rf /var/cache/yum && \
     wget --no-verbose https://s3.amazonaws.com/dev.hortonworks.com/ARTIFACTS/jdbc/1911/ojdbc8.jar -O /usr/lib/hive/lib/oracle-connector-java.jar && \
     wget --no-verbose https://mirror.infra.cloudera.com/mysql/mysql-connector-java-8.0.28.jar -O /usr/lib/hive/lib/mysql-connector-java-8.0.28.jar && \
+    wget --no-verbose --no-check-certificate https://jdbc.postgresql.org/download/postgresql-42.5.4.jar -O /usr/lib/hive/lib/postgresql-jdbc.jar && \
     /remove-unwanted.sh
-RUN ln -sF /usr/share/java/postgresql-jdbc.jar /usr/lib/hive/lib/postgresql-jdbc.jar
 
 # postgres-jdbc fetches java-8 as a dependency, let's make java11 as default, pointed by /etc/alternatives/java
 RUN alternatives --set java java-11-openjdk.x86_64
