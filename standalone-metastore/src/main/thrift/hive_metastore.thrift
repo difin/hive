@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.42"
+const string HMS_API = "1.2.43"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -1424,6 +1424,9 @@ struct NotificationEventRequest {
     1: required i64 lastEvent,
     2: optional i32 maxEvents,
     3: optional list<string> eventTypeSkipList,
+    4: optional string catName,
+    5: optional string dbName,
+    6: optional list<string> tableNames
 }
 
 struct NotificationEvent {
@@ -1450,7 +1453,8 @@ struct NotificationEventsCountRequest {
     2: required string dbName,
     3: optional string catName,
     4: optional i64 toEventId,
-    5: optional i64 limit
+    5: optional i64 limit,
+    6: optional list<string> tableNames
 }
 
 struct NotificationEventsCountResponse {

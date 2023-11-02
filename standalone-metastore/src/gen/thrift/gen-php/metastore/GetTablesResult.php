@@ -69,14 +69,14 @@ class GetTablesResult
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->tables = array();
-                        $_size979 = 0;
-                        $_etype982 = 0;
-                        $xfer += $input->readListBegin($_etype982, $_size979);
-                        for ($_i983 = 0; $_i983 < $_size979; ++$_i983) {
-                            $elem984 = null;
-                            $elem984 = new \metastore\Table();
-                            $xfer += $elem984->read($input);
-                            $this->tables []= $elem984;
+                        $_size993 = 0;
+                        $_etype996 = 0;
+                        $xfer += $input->readListBegin($_etype996, $_size993);
+                        for ($_i997 = 0; $_i997 < $_size993; ++$_i997) {
+                            $elem998 = null;
+                            $elem998 = new \metastore\Table();
+                            $xfer += $elem998->read($input);
+                            $this->tables []= $elem998;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +103,8 @@ class GetTablesResult
             }
             $xfer += $output->writeFieldBegin('tables', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->tables));
-            foreach ($this->tables as $iter985) {
-                $xfer += $iter985->write($output);
+            foreach ($this->tables as $iter999) {
+                $xfer += $iter999->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

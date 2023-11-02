@@ -170,14 +170,14 @@ package org.apache.hadoop.hive.metastore.api;
           if (field.type == INSERT_DATAS_FIELD_DESC.type) {
             java.util.List<InsertEventRequestData> insertDatas;
             {
-              org.apache.thrift.protocol.TList _list952 = iprot.readListBegin();
-              insertDatas = new java.util.ArrayList<InsertEventRequestData>(_list952.size);
-              @org.apache.thrift.annotation.Nullable InsertEventRequestData _elem953;
-              for (int _i954 = 0; _i954 < _list952.size; ++_i954)
+              org.apache.thrift.protocol.TList _list968 = iprot.readListBegin();
+              insertDatas = new java.util.ArrayList<InsertEventRequestData>(_list968.size);
+              @org.apache.thrift.annotation.Nullable InsertEventRequestData _elem969;
+              for (int _i970 = 0; _i970 < _list968.size; ++_i970)
               {
-                _elem953 = new InsertEventRequestData();
-                _elem953.read(iprot);
-                insertDatas.add(_elem953);
+                _elem969 = new InsertEventRequestData();
+                _elem969.read(iprot);
+                insertDatas.add(_elem969);
               }
               iprot.readListEnd();
             }
@@ -215,9 +215,9 @@ package org.apache.hadoop.hive.metastore.api;
         java.util.List<InsertEventRequestData> insertDatas = (java.util.List<InsertEventRequestData>)value_;
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, insertDatas.size()));
-          for (InsertEventRequestData _iter955 : insertDatas)
+          for (InsertEventRequestData _iter971 : insertDatas)
           {
-            _iter955.write(oprot);
+            _iter971.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -244,14 +244,14 @@ package org.apache.hadoop.hive.metastore.api;
         case INSERT_DATAS:
           java.util.List<InsertEventRequestData> insertDatas;
           {
-            org.apache.thrift.protocol.TList _list956 = iprot.readListBegin();
-            insertDatas = new java.util.ArrayList<InsertEventRequestData>(_list956.size);
-            @org.apache.thrift.annotation.Nullable InsertEventRequestData _elem957;
-            for (int _i958 = 0; _i958 < _list956.size; ++_i958)
+            org.apache.thrift.protocol.TList _list972 = iprot.readListBegin();
+            insertDatas = new java.util.ArrayList<InsertEventRequestData>(_list972.size);
+            @org.apache.thrift.annotation.Nullable InsertEventRequestData _elem973;
+            for (int _i974 = 0; _i974 < _list972.size; ++_i974)
             {
-              _elem957 = new InsertEventRequestData();
-              _elem957.read(iprot);
-              insertDatas.add(_elem957);
+              _elem973 = new InsertEventRequestData();
+              _elem973.read(iprot);
+              insertDatas.add(_elem973);
             }
             iprot.readListEnd();
           }
@@ -279,9 +279,9 @@ package org.apache.hadoop.hive.metastore.api;
         java.util.List<InsertEventRequestData> insertDatas = (java.util.List<InsertEventRequestData>)value_;
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, insertDatas.size()));
-          for (InsertEventRequestData _iter959 : insertDatas)
+          for (InsertEventRequestData _iter975 : insertDatas)
           {
-            _iter959.write(oprot);
+            _iter975.write(oprot);
           }
           oprot.writeListEnd();
         }
