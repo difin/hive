@@ -21,6 +21,7 @@ import java.beans.PropertyDescriptor;
 
 import org.apache.hadoop.hive.common.TableName;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.hadoop.hive.metastore.api.GetPartitionsByNamesRequest;
 import org.apache.hadoop.hive.metastore.api.GetPartitionsRequest;
 import org.apache.hadoop.hive.metastore.api.GetPartitionsResponse;
 import org.apache.hadoop.hive.metastore.api.PartitionSpec;
@@ -2670,6 +2671,31 @@ public class MetaStoreUtils {
       return NO_VAL;
     }
     return id.substring(id.lastIndexOf('-') + 1);
+  }
+
+  public static GetPartitionsByNamesRequest convertToGetPartitionsByNamesRequest(String dbName, String tblName,
+      List<String> partNames) {
+    GetPartitionsByNamesRequest result = new GetPartitionsByNamesRequest(dbName, tblName);
+    result.setNames(partNames);
+    result.setGet_col_stats(false);
+    return result;
+  }
+
+  public static <T> T createThriftPartitionsReq(Class<T> clazz, Configuration conf, T... deepCopy) {
+    final T req;
+    if (deepCopy != null && deepCopy.length == 1) {
+      assert clazz.isAssignableFrom(deepCopy[0].getClass());
+      req = JavaUtils.newInstance(clazz, new Class[]{clazz}, deepCopy);
+    } else {
+      req = JavaUtils.newInstance(clazz);
+    }
+    JavaUtils.setField(req, "setSkipColumnSchemaForPartition", new Class[]{boolean.class},
+        MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.METASTORE_CLIENT_FIELD_SCHEMA_FOR_PARTITIONS));
+    JavaUtils.setField(req, "setIncludeParamKeyPattern", new Class[]{String.class},
+        MetastoreConf.getAsString(conf, MetastoreConf.ConfVars.METASTORE_PARTITIONS_PARAMETERS_INCLUDE_PATTERN));
+    JavaUtils.setField(req, "setExcludeParamKeyPattern", new Class[]{String.class},
+        MetastoreConf.getAsString(conf, MetastoreConf.ConfVars.METASTORE_PARTITIONS_PARAMETERS_EXCLUDE_PATTERN));
+    return req;
   }
 
   /**

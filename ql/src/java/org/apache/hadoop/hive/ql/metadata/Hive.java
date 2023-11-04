@@ -4336,6 +4336,8 @@ private void constructOneLBLocationMap(FileStatus fSta,
           GetPartitionsPsWithAuthResponse res = getMSC().listPartitionsWithAuthInfoRequest(req);
           tParts = res.getPartitions();
 
+        } catch (NoSuchObjectException nsoe) {
+          return Lists.newArrayList();
         } catch (Exception e) {
           LOG.error(StringUtils.stringifyException(e));
           throw new HiveException(e);
