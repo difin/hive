@@ -4594,14 +4594,19 @@ private void constructOneLBLocationMap(FileStatus fSta,
     perfLogger.PerfLogBegin(CLASS_NAME, PerfLogger.HIVE_GET_PARTITIONS_BY_EXPR);
     try {
       assert result != null;
-      byte[] exprBytes = SerializationUtilities.serializeObjectWithTypeInformation(expr);
-      String defaultPartitionName = HiveConf.getVar(conf, ConfVars.DEFAULTPARTITIONNAME);
-      List<org.apache.hadoop.hive.metastore.api.Partition> msParts =
-          new ArrayList<org.apache.hadoop.hive.metastore.api.Partition>();
-      boolean hasUnknownParts = getMSC().listPartitionsByExpr(tbl.getDbName(),
+      if (tbl.getStorageHandler() != null && tbl.getStorageHandler().alwaysUnpartitioned()) {
+        result.addAll(tbl.getStorageHandler().getPartitionsByExpr(tbl, expr));
+        return false;
+      } else {
+        byte[] exprBytes = SerializationUtilities.serializeObjectWithTypeInformation(expr);
+        String defaultPartitionName = HiveConf.getVar(conf, ConfVars.DEFAULTPARTITIONNAME);
+        List<org.apache.hadoop.hive.metastore.api.Partition> msParts =
+            new ArrayList<org.apache.hadoop.hive.metastore.api.Partition>();
+        boolean hasUnknownParts = getMSC().listPartitionsByExpr(tbl.getDbName(),
           tbl.getTableName(), exprBytes, defaultPartitionName, (short) -1, msParts);
-      result.addAll(convertFromMetastore(tbl, msParts));
-      return hasUnknownParts;
+        result.addAll(convertFromMetastore(tbl, msParts));
+        return hasUnknownParts;
+      }
     } finally {
       perfLogger.PerfLogEnd(CLASS_NAME, PerfLogger.HIVE_GET_PARTITIONS_BY_EXPR, "HS2-cache");
     }

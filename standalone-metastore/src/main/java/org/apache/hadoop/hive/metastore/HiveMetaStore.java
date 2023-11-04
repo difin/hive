@@ -5450,7 +5450,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       //  3. Either
       //    3.1. User has specified PURGE from the commandline, and if not,
       //    3.2. User has set the table to auto-purge.
-      return ((envContext != null) && Boolean.parseBoolean(envContext.getProperties().get("ifPurge")))
+      return (envContext != null && envContext.getProperties() != null
+        && Boolean.parseBoolean(envContext.getProperties().get("ifPurge")))
         || (tbl.isSetParameters() && "true".equalsIgnoreCase(tbl.getParameters().get("auto.purge")));
 
     }

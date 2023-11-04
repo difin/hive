@@ -34,8 +34,10 @@ import org.apache.hadoop.hive.ql.parse.TransformSpec;
 import org.apache.hadoop.hive.ql.session.SessionStateUtil;
 import org.apache.iceberg.DeleteFiles;
 import org.apache.iceberg.ManageSnapshots;
+import org.apache.iceberg.PartitionData;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Schema;
+import org.apache.iceberg.StructLike;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.UpdatePartitionSpec;
@@ -44,6 +46,7 @@ import org.apache.iceberg.expressions.Expression;
 import org.apache.iceberg.expressions.Expressions;
 import org.apache.iceberg.mr.Catalogs;
 import org.apache.iceberg.mr.InputFormatConfig;
+import org.apache.iceberg.types.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -278,5 +281,16 @@ public class IcebergTableUtil {
       deleteFiles = deleteFiles.toBranch(HiveUtils.getTableSnapshotRef(branchName));
     }
     deleteFiles.deleteFromRowFilter(exp).commit();
+  }
+
+  public static PartitionData toPartitionData(StructLike key, Types.StructType keyType) {
+    PartitionData data = new PartitionData(keyType);
+    for (int i = 0; i < keyType.fields().size(); i++) {
+      Object val = key.get(i, keyType.fields().get(i).type().typeId().javaClass());
+      if (val != null) {
+        data.set(i, val);
+      }
+    }
+    return data;
   }
 }
