@@ -3,12 +3,12 @@ PREHOOK: type: DROPTABLE
 POSTHOOK: query: drop table if exists tbl_ice_parquet
 POSTHOOK: type: DROPTABLE
 PREHOOK: query: create external table tbl_ice_parquet(a int, b string) stored by iceberg stored as parquet
-TBLPROPERTIES ('iceberg.decimal64.vectorization'='true')
+TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@tbl_ice_parquet
 POSTHOOK: query: create external table tbl_ice_parquet(a int, b string) stored by iceberg stored as parquet
-TBLPROPERTIES ('iceberg.decimal64.vectorization'='true')
+TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tbl_ice_parquet
@@ -123,7 +123,7 @@ PREHOOK: query: create external table tbl_ice_parquet_all_types (
     t_date DATE,
     t_decimal DECIMAL(4,2)
     ) stored by iceberg stored as parquet
-    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true')
+    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@tbl_ice_parquet_all_types
@@ -139,7 +139,7 @@ POSTHOOK: query: create external table tbl_ice_parquet_all_types (
     t_date DATE,
     t_decimal DECIMAL(4,2)
     ) stored by iceberg stored as parquet
-    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true')
+    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tbl_ice_parquet_all_types
@@ -241,7 +241,7 @@ PREHOOK: query: create external table tbl_ice_parquet_parted (
     b string
     ) partitioned by (p1 string, p2 string)
 #### A masked pattern was here ####
-    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true')
+    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1')
 PREHOOK: type: CREATETABLE
 #### A masked pattern was here ####
 PREHOOK: Output: database:default
@@ -251,7 +251,7 @@ POSTHOOK: query: create external table tbl_ice_parquet_parted (
     b string
     ) partitioned by (p1 string, p2 string)
 #### A masked pattern was here ####
-    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true')
+    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1')
 POSTHOOK: type: CREATETABLE
 #### A masked pattern was here ####
 POSTHOOK: Output: database:default
@@ -367,7 +367,7 @@ PREHOOK: query: create external table tbl_ice_parquet_complex (
     structofarrays struct<names:array<string>, birthdays:array<string>>,
     structofmaps struct<map1:map<string, string>, map2:map<string, string>>
     ) stored by iceberg stored as parquet
-    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true')
+    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
 PREHOOK: Output: default@tbl_ice_parquet_complex
@@ -385,7 +385,7 @@ POSTHOOK: query: create external table tbl_ice_parquet_complex (
     structofarrays struct<names:array<string>, birthdays:array<string>>,
     structofmaps struct<map1:map<string, string>, map2:map<string, string>>
     ) stored by iceberg stored as parquet
-    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true')
+    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1')
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tbl_ice_parquet_complex

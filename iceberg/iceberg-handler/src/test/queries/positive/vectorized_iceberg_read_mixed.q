@@ -2,7 +2,7 @@ set hive.vectorized.execution.enabled=true;
 
 drop table if exists tbl_ice_mixed;
 create external table tbl_ice_mixed(a int, b string) stored by iceberg stored as orc
-TBLPROPERTIES ('iceberg.decimal64.vectorization'='true');
+TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1');
 insert into table tbl_ice_mixed values (1, 'one'), (2, 'two'), (3, 'three'), (4, 'four'), (5, 'five'), (111, 'one'), (22, 'two'), (11, 'one'), (44444, 'four'), (44, 'four');
 alter table tbl_ice_mixed set tblproperties ('write.format.default'='parquet');
 insert into table tbl_ice_mixed values (10, 'ten'), (20, 'twenty'), (30, 'thirty'), (40, 'fourty'), (50, 'fifty'), (1110, 'ten'), (220, 'twenty'),  (44445, 'four'),  (10, 'one');
@@ -24,7 +24,7 @@ create external table tbl_ice_mixed_all_types (
     t_date DATE,
     t_decimal DECIMAL(4,2)
     ) stored by iceberg stored as orc
-    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true');
+    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1');
 
 insert into tbl_ice_mixed_all_types values (1.1, 1.2, false, 4, 567890123456789, '6', "col7", cast('2012-10-03 19:58:08' as timestamp), date('1234-09-09'), cast('10.01' as decimal(4,2)));
 alter table tbl_ice_mixed_all_types set tblproperties ('write.format.default'='parquet');
@@ -48,7 +48,7 @@ create external table tbl_ice_mixed_parted (
     b string
     ) partitioned by (p1 string, p2 string)
     stored by iceberg stored as orc location 'file:/tmp/tbl_ice_mixed_parted'
-    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true');
+    TBLPROPERTIES ('iceberg.decimal64.vectorization'='true',"format-version"='1');
 
 insert into tbl_ice_mixed_parted values
                                       (1, 'aa', 'Europe', 'Hungary'),
