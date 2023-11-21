@@ -491,8 +491,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   @Override
   public boolean canSetColStatistics(org.apache.hadoop.hive.ql.metadata.Table hmsTable) {
     Table table = IcebergTableUtil.getTable(conf, hmsTable.getTTable());
-    // need to disable only column stats and not basic stats until HIVE-27448 is addressed
-    return false;
+    return table.currentSnapshot() != null && getStatsSource().equals(Constants.ICEBERG);
   }
 
   @Override

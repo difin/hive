@@ -108,7 +108,7 @@ avg_col_len
 max_col_len         	                    
 num_trues           	                    
 num_falses          	                    
-bit_vector          	HL                  
+bit_vector          	                    
 comment             	                    
 COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"a\":\"true\",\"b\":\"true\",\"c\":\"true\"}}
 PREHOOK: query: desc formatted tbl_ice_puffin c
@@ -127,7 +127,7 @@ avg_col_len
 max_col_len         	                    
 num_trues           	                    
 num_falses          	                    
-bit_vector          	HL                  
+bit_vector          	                    
 comment             	                    
 COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"a\":\"true\",\"b\":\"true\",\"c\":\"true\"}}
 PREHOOK: query: explain select * from tbl_ice_puffin order by a, b, c
@@ -205,12 +205,12 @@ data_type           	int
 min                 	1                   
 max                 	5000                
 num_nulls           	0                   
-distinct_count      	10                  
+distinct_count      	9                   
 avg_col_len         	                    
 max_col_len         	                    
 num_trues           	                    
 num_falses          	                    
-bit_vector          	HL                  
+bit_vector          	                    
 comment             	                    
 COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"a\":\"true\",\"b\":\"true\",\"c\":\"true\"}}
 PREHOOK: query: desc formatted tbl_ice_puffin c
@@ -224,11 +224,11 @@ data_type           	int
 min                 	50                  
 max                 	510000              
 num_nulls           	0                   
-distinct_count      	11                  
+distinct_count      	9                   
 avg_col_len         	                    
 max_col_len         	                    
 num_trues           	                    
 num_falses          	                    
-bit_vector          	HL                  
+bit_vector          	                    
 comment             	                    
 COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"a\":\"true\",\"b\":\"true\",\"c\":\"true\"}}
