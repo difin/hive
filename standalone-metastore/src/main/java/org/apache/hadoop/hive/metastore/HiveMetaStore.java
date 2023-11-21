@@ -11732,10 +11732,14 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     return new ThriftServer() {
       @Override
       public void start() throws Throwable {
-        HMSHandler.LOG.info("Starting HTTPServer for HMS");
+        HMSHandler.LOG.debug("Starting HTTPServer for HMS");
         server.setStopAtShutdown(true);
         server.start();
-        HMSHandler.LOG.info("Started HTTPServer for HMS");
+        HMSHandler.LOG.info("Started the new HTTPServer for metastore on port [{}]...", port);
+        HMSHandler.LOG.info("Options.minWorkerThreads = {}", minWorkerThreads);
+        HMSHandler.LOG.info("Options.maxWorkerThreads = {}", maxWorkerThreads);
+        HMSHandler.LOG.info("Enable SSL = {}", useSsl);
+        server.join();
       }
 
       @Override
@@ -11877,15 +11881,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     return new ThriftServer() {
       @Override
       public void start() throws Throwable {
+        HMSHandler.LOG.info("Started the new metaserver on port [{}]...", port);
+        HMSHandler.LOG.info("Options.minWorkerThreads = {}", minWorkerThreads);
+        HMSHandler.LOG.info("Options.maxWorkerThreads = {}", maxWorkerThreads);
+        HMSHandler.LOG.info("TCP keepalive = {}", tcpKeepAlive);
+        HMSHandler.LOG.info("Enable SSL = {}", useSSL);
         tServer.serve();
-        HMSHandler.LOG.info("Started the new metaserver on port [" + port
-            + "]...");
-        HMSHandler.LOG.info("Options.minWorkerThreads = "
-            + minWorkerThreads);
-        HMSHandler.LOG.info("Options.maxWorkerThreads = "
-            + maxWorkerThreads);
-        HMSHandler.LOG.info("TCP keepalive = " + tcpKeepAlive);
-        HMSHandler.LOG.info("Enable SSL = " + useSSL);
       }
 
       @Override
