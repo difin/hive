@@ -14629,15 +14629,14 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           tblProps, isExt, storageFormat, dbDotTab, sortCols, isMaterialization, isTemporary,
           isTransactional, isManaged, new String[]{qualifiedTabName.getDb(), qualifiedTabName.getTable()}, isDefaultTableTypeChanged);
 
-      isExt = isIcebergTable(tblProps) ||
-          isExternalTableChanged(tblProps, isTransactional, isExt, isDefaultTableTypeChanged);
+      isExt = isExternalTableChanged(tblProps, isTransactional, isExt, isDefaultTableTypeChanged);
       tblProps.put(hive_metastoreConstants.TABLE_IS_CTLT, "true");
       addDbAndTabToOutputs(new String[] {qualifiedTabName.getDb(), qualifiedTabName.getTable()},
           TableType.MANAGED_TABLE, isTemporary, tblProps, storageFormat);
 
       Table likeTable = getTable(likeTableName, false);
       if (likeTable != null) {
-        if (isTemporary || isExt) {
+        if (isTemporary || isExt || isIcebergTable(tblProps)) {
           updateDefaultTblProps(likeTable.getParameters(), tblProps,
               new ArrayList<>(Arrays.asList(hive_metastoreConstants.TABLE_IS_TRANSACTIONAL,
                   hive_metastoreConstants.TABLE_TRANSACTIONAL_PROPERTIES)));
