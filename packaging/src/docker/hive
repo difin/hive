@@ -116,7 +116,7 @@ then
   fi
 fi
 
-CONF_DIRS="${TEZ_CONF_DIR:-/etc/tez/conf}:${HIVE_CONF_DIR}"
+CONF_DIRS="${CONF_DIRS}:${TEZ_CONF_DIR:-/etc/tez/conf}:${HIVE_CONF_DIR}"
 CLASSPATH="${CONF_DIRS}"
 
 HIVE_LIB=${HIVE_HOME}/lib
