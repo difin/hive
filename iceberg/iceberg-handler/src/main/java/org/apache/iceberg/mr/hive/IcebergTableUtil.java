@@ -22,10 +22,12 @@ package org.apache.iceberg.mr.hive;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
+import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.io.sarg.SearchArgument;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
@@ -36,6 +38,7 @@ import org.apache.iceberg.DeleteFiles;
 import org.apache.iceberg.ManageSnapshots;
 import org.apache.iceberg.PartitionData;
 import org.apache.iceberg.PartitionSpec;
+import org.apache.iceberg.RowLevelOperationMode;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.StructLike;
 import org.apache.iceberg.Table;
@@ -272,6 +275,25 @@ public class IcebergTableUtil {
   public static boolean isV2Table(Map<String, String> props) {
     return props != null &&
         "2".equals(props.get(TableProperties.FORMAT_VERSION));
+  }
+
+  public static boolean isCopyOnWriteMode(Context.Operation operation, BinaryOperator<String> props) {
+    String mode = null;
+    switch (operation) {
+      case DELETE:
+        mode = props.apply(TableProperties.DELETE_MODE,
+            TableProperties.DELETE_MODE_DEFAULT);
+        break;
+      case UPDATE:
+        mode = props.apply(TableProperties.UPDATE_MODE,
+            TableProperties.UPDATE_MODE_DEFAULT);
+        break;
+      case MERGE:
+        mode = props.apply(TableProperties.MERGE_MODE,
+            TableProperties.MERGE_MODE_DEFAULT);
+        break;
+    }
+    return RowLevelOperationMode.COPY_ON_WRITE.modeName().equalsIgnoreCase(mode);
   }
 
   public static void performMetadataDelete(Table icebergTable, String branchName, SearchArgument sarg) {

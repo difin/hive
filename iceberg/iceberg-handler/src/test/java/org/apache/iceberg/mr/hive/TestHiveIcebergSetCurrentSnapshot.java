@@ -21,15 +21,23 @@ package org.apache.iceberg.mr.hive;
 
 import java.io.IOException;
 import java.util.List;
+import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 /**
  * Tests setting current snapshot feature
  */
 public class TestHiveIcebergSetCurrentSnapshot extends HiveIcebergStorageHandlerWithEngineBase {
+
+  @Override
+  protected void validateTestParams() {
+    Assume.assumeTrue(fileFormat == FileFormat.PARQUET && isVectorized &&
+        testTableType == TestTables.TestTableType.HIVE_CATALOG && formatVersion == 2);
+  }
 
   @Test
   public void testSetCurrentSnapshot() throws IOException, InterruptedException {

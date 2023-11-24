@@ -484,10 +484,8 @@ public enum ErrorMsg {
   INVALID_METADATA_TABLE_NAME(10502, "Invalid metadata table name {0}.", true),
   TABLE_META_REF_NOT_SUPPORTED(10431, "Table Meta Ref extension is not supported for table {0}.", true),
   COMPACTION_REFUSED(10432, "Compaction request for {0}.{1}{2} is refused, details: {3}.", true),
-  NON_NATIVE_ACID_UPDATE(10435, "Update and Merge into non-native ACID table is only supported when " +
-      HiveConf.ConfVars.SPLIT_UPDATE.varname + " is true."),
-  NON_NATIVE_ACID_COW_UPDATE(10437, "Update and Merge into non-native ACID table in copy-on-write mode is only supported when " +
-      HiveConf.ConfVars.SPLIT_UPDATE.varname + " is false."),
+  NON_NATIVE_ACID_UPDATE(10435, "Update and Merge to a non-native ACID table in \"merge-on-read\" mode is only supported when \"" +
+      HiveConf.ConfVars.SPLIT_UPDATE.varname + "\"=\"true\""),
 
   //========================== 20000 range starts here ========================//
 

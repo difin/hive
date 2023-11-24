@@ -27,10 +27,12 @@ import org.apache.commons.collections4.IterableUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.functional.RemoteIterators;
+import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.data.Record;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import static org.apache.iceberg.TableProperties.MAX_SNAPSHOT_AGE_MS;
@@ -39,6 +41,12 @@ import static org.apache.iceberg.TableProperties.MAX_SNAPSHOT_AGE_MS;
  * Tests covering the rollback feature
  */
 public class TestHiveIcebergExpireSnapshots extends HiveIcebergStorageHandlerWithEngineBase {
+
+  @Override
+  protected void validateTestParams() {
+    Assume.assumeTrue(fileFormat == FileFormat.PARQUET && isVectorized &&
+        testTableType == TestTables.TestTableType.HIVE_CATALOG && formatVersion == 2);
+  }
 
   @Test
   public void testExpireSnapshotsWithTimestamp() throws IOException, InterruptedException {

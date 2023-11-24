@@ -127,6 +127,8 @@ public class MergeSemanticAnalyzer extends RewriteSemanticAnalyzer<MergeStatemen
 
     MergeStatement.MergeStatementBuilder mergeStatementBuilder = MergeStatement
         .withTarget(targetTable, getFullTableNameForSQL(targetNameNode), targetAlias)
+        .sourceName(sourceName)
+        .sourceAlias(getSourceAlias(source, sourceName))
         .onClauseAsText(onClauseAsText);
 
     int whenClauseBegins = 3;
@@ -138,8 +140,6 @@ public class MergeSemanticAnalyzer extends RewriteSemanticAnalyzer<MergeStatemen
       whenClauseBegins++;
     }
     List<ASTNode> whenClauses = findWhenClauses(tree, whenClauseBegins);
-
-    mergeStatementBuilder.sourceAlias(getSourceAlias(source, sourceName));
 
     // Add the hint if any
     if (hasHint) {
@@ -160,8 +160,14 @@ public class MergeSemanticAnalyzer extends RewriteSemanticAnalyzer<MergeStatemen
       switch (getWhenClauseOperation(whenClause).getType()) {
       case HiveParser.TOK_INSERT:
         numInsertClauses++;
+
+        OnClauseAnalyzer oca = new OnClauseAnalyzer(onClause, targetTable, targetAlias,
+          conf, onClauseAsText);
+        oca.analyze();
+        
         mergeStatementBuilder.addWhenClause(
-            handleInsert(whenClause, onClause, targetTable, targetAlias, onClauseAsText));
+            handleInsert(whenClause, oca.getPredicate(), targetTable))
+          .onClausePredicate(oca.getPredicate());
         break;
       case HiveParser.TOK_UPDATE:
         numWhenMatchedUpdateClauses++;
@@ -326,12 +332,11 @@ public class MergeSemanticAnalyzer extends RewriteSemanticAnalyzer<MergeStatemen
 
   /**
    * Generates the Insert leg of the multi-insert SQL to represent WHEN NOT MATCHED THEN INSERT clause.
-   * @param targetTableNameInSourceQuery - simple name/alias
    * @throws SemanticException
    */
-  private MergeStatement.InsertClause handleInsert(ASTNode whenNotMatchedClause, ASTNode onClause,
-                                                   Table targetTable, String targetTableNameInSourceQuery,
-                                                   String onClauseAsString) throws SemanticException {
+  private MergeStatement.InsertClause handleInsert(ASTNode whenNotMatchedClause, String onClausePredicate,
+                                                   Table targetTable) throws SemanticException {
+    
     ASTNode whenClauseOperation = getWhenClauseOperation(whenNotMatchedClause);
     assert whenNotMatchedClause.getType() == HiveParser.TOK_NOT_MATCHED;
     assert whenClauseOperation.getType() == HiveParser.TOK_INSERT;
@@ -350,11 +355,6 @@ public class MergeSemanticAnalyzer extends RewriteSemanticAnalyzer<MergeStatemen
       throw new SemanticException(String.format("Column schema must have the same length as values (%d vs %d)",
           columnListNode.getChildCount(), valuesNode.getChildCount() - 1));
     }
-
-    OnClauseAnalyzer oca = new OnClauseAnalyzer(onClause, targetTable, targetTableNameInSourceQuery,
-        conf, onClauseAsString);
-    oca.analyze();
-
     UnparseTranslator defaultValuesTranslator = new UnparseTranslator(conf);
     defaultValuesTranslator.enable();
     List<String> targetSchema = processTableColumnNames(columnListNode, targetTable.getFullyQualifiedName());
@@ -365,7 +365,7 @@ public class MergeSemanticAnalyzer extends RewriteSemanticAnalyzer<MergeStatemen
 
     String extraPredicate = getWhenClausePredicate(whenNotMatchedClause);
     return new MergeStatement.InsertClause(
-        getMatchedText(columnListNode), valuesClause, oca.getPredicate(), extraPredicate);
+        getMatchedText(columnListNode), valuesClause, onClausePredicate, extraPredicate);
   }
 
   private void collectDefaultValues(
