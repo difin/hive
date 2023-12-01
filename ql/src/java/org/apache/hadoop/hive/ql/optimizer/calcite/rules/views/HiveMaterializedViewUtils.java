@@ -16,6 +16,7 @@
  */
 package org.apache.hadoop.hive.ql.optimizer.calcite.rules.views;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
@@ -290,7 +291,8 @@ public class HiveMaterializedViewUtils {
   /**
    * Method to apply a rule to a query plan.
    */
-  private static RelNode applyRule(
+  @VisibleForTesting
+  static RelNode applyRule(
           RelNode basePlan, RelOptRule relOptRule) {
     final HepProgramBuilder programBuilder = new HepProgramBuilder();
     programBuilder.addRuleInstance(relOptRule);
