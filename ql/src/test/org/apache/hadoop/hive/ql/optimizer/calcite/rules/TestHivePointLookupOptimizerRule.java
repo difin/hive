@@ -42,7 +42,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.nio.charset.Charset;
 import java.util.Collections;
 
-import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.*;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.and;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.buildPlanner;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.buildRelBuilder;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.eq;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.or;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)

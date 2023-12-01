@@ -31,7 +31,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Collections;
 
-import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.*;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.assertPlans;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.buildPlanner;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.buildRelBuilder;
+import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.TestRuleHelper.eq;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class TestHiveUnionPullUpConstantsRule {
@@ -43,18 +47,6 @@ public class TestHiveUnionPullUpConstantsRule {
   @Mock
   private Table hiveTableMDMock;
 
-  private static class MyRecordWithNullableField {
-    public Integer f1;
-    public int f2;
-    public double f3;
-  }
-
-  private static class MyRecord {
-    public int f1;
-    public int f2;
-    public double f3;
-  }
-
   private AbstractRelOptPlanner planner;
   private RelBuilder relBuilder;
 
@@ -65,7 +57,7 @@ public class TestHiveUnionPullUpConstantsRule {
 
   @Test
   public void testNonNullableFields() {
-    before(MyRecord.class);
+    before(TestRuleHelper.MyRecord.class);
 
     final RelNode plan = relBuilder
         .scan("t")
@@ -101,7 +93,7 @@ public class TestHiveUnionPullUpConstantsRule {
 
   @Test
   public void testNullableFields() {
-    before(MyRecordWithNullableField.class);
+    before(TestRuleHelper.MyRecordWithNullableField.class);
 
     final RelNode plan = relBuilder
         .scan("t")
