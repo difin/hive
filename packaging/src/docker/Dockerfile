@@ -84,7 +84,7 @@ RUN mkdir /async-profiler && \
 
 # jmx-exporter for prometheus metrics
 RUN mkdir /jmx-exporter && \
-   wget https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.20.0/jmx_prometheus_javaagent-0.20.0.jar -O /jmx-exporter/jmx_prometheus_javaagent-0.20.0.jar
+   wget https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.20.0/jmx_prometheus_javaagent-0.20.0.jar -O /jmx-exporter/jmx_prometheus_javaagent.jar
 
 # llap work directory and logs directory, Ranger cache and audit directories
 RUN mkdir -p /apps/llap/work && \
