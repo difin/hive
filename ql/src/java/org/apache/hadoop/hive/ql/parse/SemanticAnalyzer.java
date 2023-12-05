@@ -14166,6 +14166,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         retValue.put("storage_handler", KuduStorageFormatDescriptor.KUDU_STORAGE_HANDLER);
       }
     }
+    if (isIcebergTable(retValue)) {
+      SessionStateUtil.addResourceOrThrow(conf, SessionStateUtil.DEFAULT_TABLE_LOCATION,
+          getDefaultLocation(qualifiedTabName[0], qualifiedTabName[1], true));
+    }
     return retValue;
   }
 
@@ -14577,13 +14581,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       if (location != null) {
         tblLocation = location;
       } else {
-        try {
-          Warehouse wh = new Warehouse(conf);
-          tblLocation = wh.getDefaultTablePath(db.getDatabase(qualifiedTabName.getDb()), qualifiedTabName.getTable(),
-                  isExt).toUri().getPath();
-        } catch (MetaException | HiveException e) {
-          throw new SemanticException(e);
-        }
+        tblLocation = getDefaultLocation(qualifiedTabName.getDb(), qualifiedTabName.getTable(), isExt);
       }
       try {
         HiveStorageHandler storageHandler = HiveUtils.getStorageHandler(conf, storageFormat.getStorageHandler());
@@ -14743,6 +14741,17 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       throw new SemanticException("Unrecognized command.");
     }
     return null;
+  }
+
+  private String getDefaultLocation(String dbName, String tableName, boolean isExt) throws SemanticException {
+    String tblLocation;
+    try {
+      Warehouse wh = new Warehouse(conf);
+      tblLocation = wh.getDefaultTablePath(db.getDatabase(dbName), tableName, isExt).toUri().getPath();
+    } catch (MetaException | HiveException e) {
+      throw new SemanticException(e);
+    }
+    return tblLocation;
   }
 
   private static boolean isIcebergTable(Map<String, String> tblProps) {
