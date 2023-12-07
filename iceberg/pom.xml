@@ -26,7 +26,7 @@
     <properties>
         <hive.path.to.root>..</hive.path.to.root>
         <path.to.iceberg.root>.</path.to.iceberg.root>
-        <iceberg.version>1.3.0.2023.0.17.0-SNAPSHOT</iceberg.version>
+        <iceberg.version>1.3.0.2024.0.17.0-SNAPSHOT</iceberg.version>
         <kryo.version>5.0.3</kryo.version>
         <iceberg.mockito-core.version>3.4.4</iceberg.mockito-core.version>
         <iceberg.avro.version>1.11.1</iceberg.avro.version>
