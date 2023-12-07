@@ -1338,7 +1338,8 @@ public class MapJoinProcessor extends Transform {
         List<ExprNodeDesc> keyExprList =
             ExprNodeDescUtils.resolveJoinKeysAsRSColumns(mapEntry.getValue(), rsParent);
         if (keyExprList == null) {
-          throw new SemanticException("Error resolving join keys");
+          LOG.warn("Error resolving join keys {} in {} {}", mapEntry.getValue(), rsParent, rsParent.getColumnExprMap());
+          return null;
         }
         newKeyExprMap.put(pos, keyExprList);
       }
