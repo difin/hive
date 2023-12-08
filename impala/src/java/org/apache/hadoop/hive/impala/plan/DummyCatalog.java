@@ -34,6 +34,7 @@ import org.apache.impala.thrift.TCatalogObject;
 import org.apache.impala.thrift.TGetPartitionStatsResponse;
 import org.apache.impala.thrift.TPartitionKeyValue;
 import org.apache.impala.thrift.TUniqueId;
+import org.apache.impala.thrift.TImpalaTableType;
 import org.apache.impala.util.PatternMatcher;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +50,11 @@ public class DummyCatalog implements FeCatalog {
   @Override
   public List<String> getTableNames(String dbName, PatternMatcher matcher)
       throws DatabaseNotFoundException {
+    throw new RuntimeException("not implemented");
+  }
+
+  public List<String> getTableNames(String dbName, PatternMatcher matcher,
+      Set<TImpalaTableType> tableTypes) throws DatabaseNotFoundException {
     throw new RuntimeException("not implemented");
   }
 
