@@ -85,19 +85,19 @@ public class TestListPartitionsWithXIncludeParams
     partParams.put("key1", "value1");
     partParams.put("akey1", "avalue1");
     partParams.put("akey10", "avalue10");
-    partParams.put("excludekey1", "value1");
-    partParams.put("excludekey2", "value1");
+    partParams.put("impala_intermediate_stats_chunk_abcdef", "value1");
+    partParams.put("impalaeintermediatedstats_chunk_abc", "value1");
+    partParams.put("impala_intermediate_stats_chunk", "value1");
     includeKeys.add("key1");
     includeKeys.add("akey1");
-    excludeKeys.add("excludekey1");
-    excludeKeys.add("excludekey2");
+    excludeKeys.add("impala_intermediate_stats_chunk_abcdef");
+    excludeKeys.add("impalaeintermediatedstats_chunk_abc");
+    excludeKeys.add("impala_intermediate_stats_chunk");
     hiveConf = metaStore.getConf();
     MetastoreConf.setVar(hiveConf, MetastoreConf.ConfVars.EXPRESSION_PROXY_CLASS,
         PartitionExpressionForMetastoreTest.class.getName());
     MetastoreConf.setVar(hiveConf,
         MetastoreConf.ConfVars.METASTORE_PARTITIONS_PARAMETERS_INCLUDE_PATTERN, "%k_y_");
-    MetastoreConf.setVar(hiveConf,
-        MetastoreConf.ConfVars.METASTORE_PARTITIONS_PARAMETERS_EXCLUDE_PATTERN, "%exclu%");
   }
 
   @Override

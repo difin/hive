@@ -1087,7 +1087,7 @@ public class MetastoreConf {
                     + "wider partitions fetching duplicated field schema in every partition increases memory footprint\n"
                     + "and thrift communication timeout errors. Set this config to 'true' to ignore column schema in partitions."),
     METASTORE_PARTITIONS_PARAMETERS_EXCLUDE_PATTERN("metastore.partitions.parameters.exclude.pattern",
-        "hive.metastore.partitions.parameters.exclude.pattern", "",
+        "hive.metastore.partitions.parameters.exclude.pattern", "impala_intermediate_stats_chunk%",
         "SQL pattern used to exclude the matched parameters for get-partitions APIs.\n"
             + "Any key-value pair from parameters whose key matches with the pattern will be excluded from the partitions.\n"
             + "This property doesn't work for the temporary table."),
