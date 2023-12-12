@@ -86,7 +86,6 @@
     <junit.jupiter.version>5.6.2</junit.jupiter.version>
     <junit.vintage.version>5.6.3</junit.vintage.version>
     <jwt.provider.api.version>0.10.0.0.1.0-b8</jwt.provider.api.version>
-    <jwt.provider.knox.version>0.10.0.0.1.0-b8</jwt.provider.knox.version>
     <libfb303.version>0.9.3</libfb303.version>
     <libthrift.version>0.16.0</libthrift.version>
     <log4j2.version>2.17.1</log4j2.version>
@@ -526,12 +525,6 @@
       <groupId>com.cloudera</groupId>
       <artifactId>jwtprovider-api</artifactId>
       <version>${jwt.provider.api.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.cloudera</groupId>
-      <artifactId>jwtprovider-knox</artifactId>
-      <version>${jwt.provider.knox.version}</version>
-      <classifier>shaded</classifier>
     </dependency>
     <!-- JDBC drivers -->
     <dependency>
