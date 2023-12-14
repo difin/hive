@@ -18,7 +18,6 @@
 
 package org.apache.hive.jdbc.miniHS2;
 
-import org.apache.hadoop.hive.UtilsForTest;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
@@ -48,7 +47,7 @@ public class TestHiveServer2Acid {
 
   @BeforeClass
   public static void beforeTest() throws Exception {
-    HiveConf conf = UtilsForTest.getHiveOnTezConfFromDir("../../data/conf/tez/");
+    HiveConf conf = new HiveConf();
     TestTxnDbUtil.setConfValues(conf);
     TestTxnDbUtil.prepDb(conf);
     miniHS2 = new MiniHS2(conf, MiniHS2.MiniClusterType.TEZ);

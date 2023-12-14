@@ -18,8 +18,6 @@
 
 package org.apache.hadoop.hive;
 
-import java.io.File;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -57,15 +55,6 @@ public class UtilsForTest {
       String key = iter.next().getKey();
       hiveConf.set(key, hiveConf.get(key));
     }
-  }
-
-  public static HiveConf getHiveOnTezConfFromDir(String confDir) throws Exception {
-    HiveConf.setHiveSiteLocation(
-        new URL("file://" + new File(confDir).toURI().getPath() + "/hive-site.xml"));
-    HiveConf hiveConf = new HiveConf();
-    hiveConf
-        .addResource(new URL("file://" + new File(confDir).toURI().getPath() + "/tez-site.xml"));
-    return hiveConf;
   }
 
 }
