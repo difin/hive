@@ -28,9 +28,9 @@ import org.apache.hadoop.hive.metastore.txn.CompactionInfo;
 import org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils;
 import org.apache.thrift.TException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCatalog;
 
 /**
@@ -58,12 +58,7 @@ public class RemoteCompactorThread extends CompactorThread {
   }
 
   @Override Table resolveTable(CompactionInfo ci) throws MetaException {
-    try {
-      return msc.getTable(getDefaultCatalog(conf), ci.dbname, ci.tableName);
-    } catch (TException e) {
-      LOG.error("Unable to find table " + ci.getFullTableName(), e);
-      throw new MetaException(e.toString());
-    }
+    return RemoteCompactorUtil.resolveTable(conf, msc, ci);
   }
 
   @Override boolean replIsCompactionDisabledForDatabase(String dbName) throws TException {
@@ -78,12 +73,11 @@ public class RemoteCompactorThread extends CompactorThread {
   }
 
   @Override List<Partition> getPartitionsByNames(CompactionInfo ci) throws MetaException {
-    try {
-      return msc.getPartitionsByNames(getDefaultCatalog(conf), ci.dbname, ci.tableName,
-          Collections.singletonList(ci.partName));
-    } catch (TException e) {
-      LOG.error("Unable to get partitions by name for CompactionInfo=" + ci);
-      throw new MetaException(e.toString());
-    }
+    return RemoteCompactorUtil.getPartitionsByNames(conf, msc, ci.dbname, ci.tableName, ci.tableName);
+  }
+
+  protected Partition resolvePartition(CompactionInfo ci) throws MetaException {
+    return CompactorUtil.resolvePartition(conf, msc, ci.dbname, ci.tableName, ci.partName, 
+        CompactorUtil.METADATA_FETCH_MODE.REMOTE);
   }
 }

@@ -59,7 +59,6 @@ import org.apache.hadoop.hive.ql.io.AcidUtils.ParsedDirectory;
 import org.apache.hadoop.hive.shims.HadoopShims.HdfsFileStatusWithId;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hive.common.util.Ref;
-import org.apache.thrift.TBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,10 +72,7 @@ import java.util.List;
 import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -148,7 +144,7 @@ public class Initiator extends MetaStoreCompactorThread {
 
           final ShowCompactResponse currentCompactions = txnHandler.showCompact(new ShowCompactRequest());
 
-          checkInterrupt();
+          CompactorUtil.checkInterrupt(CLASS_NAME);
 
           // Currently we invalidate all entries after each cycle, because the bootstrap replication is marked via
           // table property hive.repl.first.inc.pending which would be cached.
@@ -163,7 +159,7 @@ public class Initiator extends MetaStoreCompactorThread {
               .collect(Collectors.toSet())).get();
           LOG.debug("Found {} potential compactions, checking to see if we should compact any of them", potentials.size());
 
-          checkInterrupt();
+          CompactorUtil.checkInterrupt(CLASS_NAME);
 
           Map<String, String> tblNameOwners = new HashMap<>();
           List<CompletableFuture<Void>> compactionList = new ArrayList<>();
@@ -257,11 +253,11 @@ public class Initiator extends MetaStoreCompactorThread {
   private void scheduleCompactionIfRequired(CompactionInfo ci, Table t, Partition p, String poolName,
                                             String runAs)
       throws MetaException {
-    StorageDescriptor sd = resolveStorageDescriptor(t, p);
+    StorageDescriptor sd = CompactorUtil.resolveStorageDescriptor(t, p);
     try {
       ValidWriteIdList validWriteIds = resolveValidWriteIds(t);
 
-      checkInterrupt();
+      CompactorUtil.checkInterrupt(CLASS_NAME);
 
       CompactionType type = checkForCompaction(ci, validWriteIds, sd, t.getParameters(), runAs);
       if (type != null) {
@@ -314,7 +310,7 @@ public class Initiator extends MetaStoreCompactorThread {
       throws IOException, InterruptedException {
     //Figure out who we should run the file operations as
     String fullTableName = TxnUtils.getFullTableName(t.getDbName(), t.getTableName());
-    StorageDescriptor sd = resolveStorageDescriptor(t, p);
+    StorageDescriptor sd = CompactorUtil.resolveStorageDescriptor(t, p);
 
     String user = cache.get(fullTableName);
     if (user == null) {
@@ -432,7 +428,7 @@ public class Initiator extends MetaStoreCompactorThread {
     AcidMetricService.updateMetricsFromInitiator(ci.dbname, ci.tableName, ci.partName, conf, txnHandler,
         baseSize, deltaSizes, acidDirectory.getObsolete());
 
-    if (runJobAsSelf(runAs)) {
+    if (CompactorUtil.runJobAsSelf(runAs)) {
       return determineCompactionType(ci, acidDirectory, tblproperties, baseSize, deltaSize);
     } else {
       LOG.info("Going to initiate as user " + runAs + " for " + ci.getFullPartitionName());
@@ -518,7 +514,7 @@ public class Initiator extends MetaStoreCompactorThread {
     LOG.debug("Found " + deltas.size() + " delta files, and " + (noBase ? "no" : "has") + " base," +
         "requesting " + (noBase ? "major" : "minor") + " compaction");
 
-    return noBase || !isMinorCompactionSupported(tblproperties, dir) ?
+    return noBase || !CompactorUtil.isMinorCompactionSupported(conf, tblproperties, dir) ?
             CompactionType.MAJOR : CompactionType.MINOR;
   }
 
