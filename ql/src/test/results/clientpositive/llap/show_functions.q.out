@@ -433,6 +433,9 @@ to_date
 to_epoch_milli
 to_unix_timestamp
 to_utc_timestamp
+toarray
+tomap
+tostruct
 translate
 trim
 trunc
@@ -1032,6 +1035,9 @@ to_date
 to_epoch_milli
 to_unix_timestamp
 to_utc_timestamp
+toarray
+tomap
+tostruct
 translate
 trim
 trunc
