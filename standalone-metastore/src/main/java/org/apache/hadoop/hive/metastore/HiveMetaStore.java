@@ -117,7 +117,7 @@ import org.apache.hadoop.hive.metastore.properties.PropertyStore;
 import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
 import org.apache.hadoop.hive.metastore.security.MetastoreDelegationTokenManager;
 import org.apache.hadoop.hive.metastore.thrift.TCustomServerSocket;
-import org.apache.hadoop.hive.metastore.txn.CompactionInfo;
+import org.apache.hadoop.hive.metastore.txn.entities.CompactionInfo;
 import org.apache.hadoop.hive.metastore.txn.CompactionMetricsDataConverter;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
@@ -9270,7 +9270,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     }
     
     @Override
-    public void set_hadoop_jobid(String jobId, long cqId) {
+    public void set_hadoop_jobid(String jobId, long cqId) throws MetaException {
       getTxnHandler().setHadoopJobId(jobId, cqId);
     }
 

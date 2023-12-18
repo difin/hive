@@ -18,6 +18,8 @@
 
 package org.apache.hadoop.hive.metastore;
 
+import org.apache.hadoop.hive.metastore.txn.TxnUtils;
+
 import java.sql.SQLException;
 import java.sql.SQLTransactionRollbackException;
 
@@ -60,11 +62,12 @@ public enum DatabaseProduct {
   }
   /**
    * Is the given exception a table not found exception
-   * @param e Exception
+   * @param t Exception
    * @return
    */
-  public static boolean isTableNotExistsError(DatabaseProduct dbProduct, SQLException e) {
-    return (dbProduct == POSTGRES && "42P01".equalsIgnoreCase(e.getSQLState()))
+  public static boolean isTableNotExistsError(DatabaseProduct dbProduct, Throwable t) {
+      SQLException e = TxnUtils.getSqlException(t);
+      return (dbProduct == POSTGRES && "42P01".equalsIgnoreCase(e.getSQLState()))
         || (dbProduct == MYSQL && "42S02".equalsIgnoreCase(e.getSQLState()))
         || (dbProduct == ORACLE && "42000".equalsIgnoreCase(e.getSQLState()) && e.getMessage().contains("ORA-00942"))
         || (dbProduct == SQLSERVER && "S0002".equalsIgnoreCase(e.getSQLState()) && e.getMessage().contains("Invalid object"))
@@ -89,7 +92,8 @@ public enum DatabaseProduct {
     return dbType == DERBY;
   }
 
-  public static boolean isDuplicateKeyError(DatabaseProduct dbType, SQLException ex) {
+  public static boolean isDuplicateKeyError(DatabaseProduct dbType, Throwable th) {
+    SQLException ex = TxnUtils.getSqlException(th);
     switch (dbType) {
       case DERBY:
         if("23505".equals(ex.getSQLState())) {

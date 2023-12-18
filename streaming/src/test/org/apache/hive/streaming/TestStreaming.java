@@ -1297,12 +1297,18 @@ public class TestStreaming {
       .withHiveConf(conf)
       .connect();
 
+    HiveConf houseKeeperConf = new HiveConf(conf);
+    
     connection.beginTransaction();
     conf.setTimeVar(HiveConf.ConfVars.HIVE_TIMEDOUT_TXN_REAPER_START, 0, TimeUnit.SECONDS);
+    
     //ensure txn timesout
-    conf.setTimeVar(HiveConf.ConfVars.HIVE_TXN_TIMEOUT, 2, TimeUnit.MILLISECONDS);
+    houseKeeperConf.setTimeVar(HiveConf.ConfVars.HIVE_TXN_TIMEOUT, 100, TimeUnit.MILLISECONDS);
     AcidHouseKeeperService houseKeeperService = new AcidHouseKeeperService();
-    houseKeeperService.setConf(conf);
+    houseKeeperService.setConf(houseKeeperConf);
+
+    connection.beginTransaction();
+    Thread.sleep(150);
     houseKeeperService.run();
     try {
       //should fail because the TransactionBatch timed out
@@ -1321,6 +1327,7 @@ public class TestStreaming {
     connection.beginTransaction();
     connection.commitTransaction();
     connection.beginTransaction();
+    Thread.sleep(150);
     houseKeeperService.run();
     try {
       //should fail because the TransactionBatch timed out
