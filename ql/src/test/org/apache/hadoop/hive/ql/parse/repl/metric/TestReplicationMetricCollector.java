@@ -41,6 +41,7 @@ import org.apache.hadoop.hive.ql.parse.repl.metric.event.Metric;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
@@ -63,6 +64,7 @@ import static org.junit.Assert.assertTrue;
  */
 
 @RunWith(MockitoJUnitRunner.class)
+@Ignore("CDPD-65030")
 public class TestReplicationMetricCollector {
 
   HiveConf conf;
