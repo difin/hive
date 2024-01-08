@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -669,7 +670,9 @@ public class DagUtils {
     int cpus = HiveConf.getIntVar(conf, HiveConf.ConfVars.HIVETEZCPUVCORES) > 0 ?
       HiveConf.getIntVar(conf, HiveConf.ConfVars.HIVETEZCPUVCORES) :
       conf.getInt(MRJobConfig.MAP_CPU_VCORES, MRJobConfig.DEFAULT_MAP_CPU_VCORES);
-    return Resource.newInstance(memory, cpus);
+    Resource resource = Resource.newInstance(memory, cpus);
+    LOG.debug("Tez container resource: {}", resource);
+    return resource;
   }
 
   /*
@@ -699,19 +702,18 @@ public class DagUtils {
     }
     logLevel = sb.toString();
 
+    String finalOpts = null;
     if (HiveConf.getIntVar(conf, HiveConf.ConfVars.HIVETEZCONTAINERSIZE) > 0) {
-      if (javaOpts != null) {
-        return javaOpts + " " + logLevel;
-      } else  {
-        return logLevel;
-      }
+      finalOpts = Strings.nullToEmpty(javaOpts) + " " + logLevel;
     } else {
       if (javaOpts != null && !javaOpts.isEmpty()) {
         LOG.warn(HiveConf.ConfVars.HIVETEZJAVAOPTS + " will be ignored because "
                  + HiveConf.ConfVars.HIVETEZCONTAINERSIZE + " is not set!");
       }
-      return logLevel + " " + MRHelpers.getJavaOptsForMRMapper(conf);
+      finalOpts = logLevel + " " + MRHelpers.getJavaOptsForMRMapper(conf);
     }
+    LOG.debug("Tez container final opts: {}", finalOpts);
+    return finalOpts;
   }
 
   private Vertex createVertexFromMergeWork(HiveConf hiveConf, JobConf conf, MergeJoinWork mergeJoinWork,
