@@ -49,6 +49,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -65,6 +66,7 @@ import static org.apache.iceberg.TableProperties.CURRENT_SNAPSHOT_TIMESTAMP;
 import static org.apache.iceberg.TableProperties.DEFAULT_PARTITION_SPEC;
 import static org.apache.iceberg.TableProperties.DEFAULT_SORT_ORDER;
 import static org.apache.iceberg.expressions.Expressions.bucket;
+import static org.apache.iceberg.rest.HMSCatalog.hmsCatalogMetricCount;
 import static org.apache.iceberg.types.Types.NestedField.required;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -195,18 +197,34 @@ public class TestHMSCatalog extends HMSTestBase {
     Object response = clientCall(jwt, url, "POST", false, "{ \"namespace\" : [ \""+ns+"\" ], "+
         "\"properties\":{ \"owner\": \"apache\", \"group\" : \"iceberg\" }"
         +"}");
-    //Assert.assertNotNull(response);
+    Assert.assertNotNull(response);
     Database database1 = metastoreClient.getDatabase(ns);
     Assert.assertTrue(database1.getParameters().get("owner").equals("apache"));
     Assert.assertTrue(database1.getParameters().get("group").equals("iceberg"));
 
+    List<TableIdentifier> tis = catalog.listTables(Namespace.of(ns));
+    Assert.assertTrue(tis.isEmpty());
+
+    // list tables in hivedb
+    url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath+"/v1/namespaces/" + ns + "/tables");
+    //String jwt = generateJWT();
+    // succeed
+    response = clientCall(jwt, url, "GET", null);
+    Assert.assertNotNull(response);
+
+    // quick check on metrics
+    Map<String, Long> counters = reportMetricCounters("list_namespaces", "list_tables");
+    counters.entrySet().forEach(m->{
+      Assert.assertTrue(m.getKey(), m.getValue() > 0);
+    });
   }
 
   @Test
   public void testCreateTableTxnBuilder() throws Exception {
     Schema schema = getTestSchema();
-    TableIdentifier tableIdent = TableIdentifier.of(DB_NAME, "tbl");
-    String location = temp.newFolder("tbl").toString();
+    String tblName = "tbl" + Integer.toHexString(RND.nextInt(65536));
+    TableIdentifier tableIdent = TableIdentifier.of(DB_NAME, tblName);
+    String location = temp.newFolder(tblName).toString();
 
     try {
       Transaction txn = catalog.buildTable(tableIdent, schema)
@@ -231,16 +249,21 @@ public class TestHMSCatalog extends HMSTestBase {
 
       // list tables in hivedb
       url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath+"/v1/namespaces/" + DB_NAME + "/tables");
-      //String jwt = generateJWT();
       // succeed
       response = clientCall(jwt, url, "GET", null);
       Assert.assertNotNull(response);
 
       // load table
-      url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath+"/v1/namespaces/" + DB_NAME + "/tables/" + "tbl");
+      url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath+"/v1/namespaces/" + DB_NAME + "/tables/" + tblName);
       // succeed
       response = clientCall(jwt, url, "GET", null);
       Assert.assertNotNull(response);
+
+      // quick check on metrics
+      Map<String, Long> counters = reportMetricCounters("list_namespaces", "list_tables", "load_table");
+      counters.entrySet().forEach(m->{
+        Assert.assertTrue(m.getKey(), m.getValue() > 0);
+      });
     } finally {
       catalog.dropTable(tableIdent);
     }

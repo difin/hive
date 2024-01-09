@@ -18,9 +18,7 @@
  */
 
 package org.apache.iceberg.rest;
-
-import org.apache.hadoop.hive.common.metrics.common.Metrics;
-import org.apache.hadoop.hive.common.metrics.common.MetricsFactory;
+import org.apache.hadoop.hive.metastore.metrics.Metrics;
 import org.apache.iceberg.BaseMetadataTable;
 import org.apache.iceberg.BaseTable;
 import org.apache.iceberg.Table;
@@ -40,11 +38,8 @@ import org.apache.iceberg.exceptions.NotAuthorizedException;
 import org.apache.iceberg.exceptions.RESTException;
 import org.apache.iceberg.exceptions.UnprocessableEntityException;
 import org.apache.iceberg.exceptions.ValidationException;
-import org.apache.iceberg.io.InputFile;
-import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
 import org.apache.iceberg.relocated.com.google.common.base.Splitter;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.rest.requests.CreateNamespaceRequest;
 import org.apache.iceberg.rest.requests.CreateTableRequest;
 import org.apache.iceberg.rest.requests.RenameTableRequest;
@@ -62,11 +57,15 @@ import org.apache.iceberg.rest.responses.OAuthTokenResponse;
 import org.apache.iceberg.rest.responses.UpdateNamespacePropertiesResponse;
 import org.apache.iceberg.util.Pair;
 import org.apache.iceberg.util.PropertyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import com.codahale.metrics.Counter;
 
 /**
  * Original @ https://github.com/apache/iceberg/blob/main/core/src/test/java/org/apache/iceberg/rest/RESTCatalogAdapter.java
@@ -74,6 +73,7 @@ import java.util.function.Consumer;
 
 /** Adaptor class to translate REST requests into {@link Catalog} API calls. */
 public class HMSCatalogAdapter implements RESTClient {
+  private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogAdapter.class);
   private static final Splitter SLASH = Splitter.on('/');
 
   private static final Map<Class<? extends Exception>, Integer> EXCEPTION_ERROR_CODES =
@@ -164,6 +164,19 @@ public class HMSCatalogAdapter implements RESTClient {
     private final Class<? extends RESTRequest> requestClass;
     private final Class<? extends RESTResponse> responseClass;
 
+    /**
+     * An exception safe way of getting a route by name.
+     * @param name the route name
+     * @return the route instance or null if it could not be found
+     */
+    static Route byName(String name) {
+      try {
+        return valueOf(name.toUpperCase());
+      } catch(IllegalArgumentException xill) {
+        return null;
+      }
+    }
+
     Route(HTTPMethod method, String pattern) {
       this(method, pattern, null, null);
     }
@@ -194,12 +207,6 @@ public class HMSCatalogAdapter implements RESTClient {
       this.requiredLength = parts.size();
       this.requirements = requirementsBuilder.build();
       this.variables = variablesBuilder.build();
-
-      Metrics metrics = MetricsFactory.getInstance();
-      if(metrics != null){
-        metrics.incrementCounter("list");
-        metrics.markMeter("requests");
-      }
     }
 
     private boolean matches(HTTPMethod requestMethod, List<String> requestPath) {
@@ -242,6 +249,12 @@ public class HMSCatalogAdapter implements RESTClient {
   @SuppressWarnings("MethodLength")
   public <T extends RESTResponse> T handleRequest(
       Route route, Map<String, String> vars, Object body, Class<T> responseType) {
+    // update HMS catalog route counter metric
+    final String metricName = HMSCatalog.hmsCatalogMetricCount(route.name());
+    Counter counter = Metrics.getOrCreateCounter(metricName);
+    if (counter != null) {
+      counter.inc();
+    }
     switch (route) {
       case TOKENS: {
         @SuppressWarnings("unchecked")

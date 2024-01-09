@@ -63,8 +63,12 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -97,6 +101,38 @@ public class HMSCatalog extends BaseMetastoreCatalog implements SupportsNamespac
     } else {
       this.configuration = configuration;
     }
+  }
+
+  /** The metric names prefix. */
+  static final String HMS_METRIC_PREFIX = "hmscatalog.";
+
+  /**
+   * @param route a route/api-call name
+   * @return the metric counter name for the api-call
+   */
+  static String hmsCatalogMetricCount(String route) {
+    return HMS_METRIC_PREFIX + route.toLowerCase() + ".count";
+  }
+
+  /**
+   * @param apis an optional list of known api call names
+   * @return the list of metric names for the HMSCatalog class
+   */
+  public static List<String> getMetricNames(String...apis) {
+    final List<HMSCatalogAdapter.Route> routes;
+    if (apis != null && apis.length > 0) {
+      routes = Arrays.asList(apis).stream()
+          .map(api -> HMSCatalogAdapter.Route.byName(api))
+          .filter(Objects::nonNull)
+          .collect(Collectors.toList());
+    } else {
+      routes = Arrays.asList(HMSCatalogAdapter.Route.values());
+    }
+    final List<String> metricNames = new ArrayList<>(routes.size());
+    for(HMSCatalogAdapter.Route route : routes) {
+      metricNames.add(hmsCatalogMetricCount(route.name()));
+    }
+    return metricNames;
   }
 
   public static  IHMSHandler getHandler(Configuration configuration) throws MetaException {
@@ -161,10 +197,11 @@ public class HMSCatalog extends BaseMetastoreCatalog implements SupportsNamespac
 
     try {
       final RawStore store = getMS();
-      List<String> tableNames = store.getAllTables(catalog, database);
-      List<TableIdentifier> tableIdentifiers;
-
-      if (listAllTables) {
+      final List<String> tableNames = store.getAllTables(catalog, database);
+      final List<TableIdentifier> tableIdentifiers;
+      if (tableNames.isEmpty()) {
+        tableIdentifiers = Collections.emptyList();
+      } else if (listAllTables) {
         tableIdentifiers =
             tableNames.stream()
                 .map(t -> TableIdentifier.of(namespace, t))
