@@ -1693,7 +1693,6 @@
         <module>testutils</module>
         <module>upgrade-acid</module>
         <module>kafka-handler</module>
-        <module>hms-catalog</module>
         <module>packaging</module>
       </modules>
     </profile>

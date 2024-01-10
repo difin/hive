@@ -41,7 +41,6 @@ import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.prependNotNu
 import static org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdentifier;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -211,7 +210,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
   private static String msHost = null;
   private static ThriftServer thriftServer;
   private static Server propertyServer = null;
-  private static Server icebergServer = null;
 
   public static Server getPropertyServer() {
     return propertyServer;
@@ -11349,7 +11347,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     return newRetryingHMSHandler(baseHandler, conf, false);
   }
 
-  public static IHMSHandler newRetryingHMSHandler(IHMSHandler baseHandler, Configuration conf,
+  private static IHMSHandler newRetryingHMSHandler(IHMSHandler baseHandler, Configuration conf,
       boolean local) throws MetaException {
     return RetryingHMSHandler.getProxy(conf, baseHandler, local);
   }
@@ -11980,8 +11978,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
       // optionally create and start the property server and servlet
       propertyServer = PropertyServlet.startServer(conf);
-      // optionally create and start the Iceberg REST server and servlet
-      icebergServer = startIcebergCatalog(conf);
 
       thriftServer.start();
     } catch (Throwable x) {
@@ -11989,29 +11985,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       HMSHandler.LOG.error(StringUtils.stringifyException(x));
       throw x;
     }
-  }
-
-  static Server startIcebergCatalog(Configuration source) {
-    Configuration configuration = new Configuration(source);
-    String curi = configuration.get(MetastoreConf.ConfVars.THRIFT_URIS.getVarname());
-    String cwarehouse = configuration.get(MetastoreConf.ConfVars.WAREHOUSE.getVarname());
-    String cextwarehouse = configuration.get(MetastoreConf.ConfVars.WAREHOUSE_EXTERNAL.getVarname());
-    try {
-      Class<?> iceClazz = Class.forName("org.apache.iceberg.rest.HMSCatalogServer");
-      Method iceStart = iceClazz.getMethod("startServer", Configuration.class);
-      return (Server) iceStart.invoke(null, configuration);
-    } catch (ClassNotFoundException xnf) {
-      LOG.warn("Class org.apache.iceberg.rest.HMSCatalogServer not found in classpath, " +
-              "REST service not started. Ensure hms catalog jar is in $HIVE_HOME/lib");
-      return null;
-    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-      LOG.error("error starting Iceberg REST server {}", e);
-      return null;
-    }
-  }
-
-  public static Server getIcebergServer() {
-    return icebergServer;
   }
 
   /**
