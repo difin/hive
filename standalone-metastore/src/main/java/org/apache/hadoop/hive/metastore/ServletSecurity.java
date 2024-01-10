@@ -43,7 +43,7 @@ import java.util.Optional;
 /**
  * Secures servlet processing.
  */
-public class ServletSecurity {
+public class ServletSecurity implements SecureServletCaller {
   private static final Logger LOG = LoggerFactory.getLogger(ServletSecurity.class);
   static final String X_USER = MetaStoreUtils.USER_NAME_HTTP_HEADER;
   private final boolean isSecurityEnabled;
@@ -51,7 +51,7 @@ public class ServletSecurity {
   private JWTValidator jwtValidator = null;
   private final Configuration conf;
 
-  ServletSecurity(Configuration conf, boolean jwt) {
+  public ServletSecurity(Configuration conf, boolean jwt) {
     this.conf = conf;
     this.isSecurityEnabled = UserGroupInformation.isSecurityEnabled();
     this.jwtAuthEnabled = jwt;
@@ -73,14 +73,6 @@ public class ServletSecurity {
   }
 
   /**
-   * Any http method executor.
-   */
-  @FunctionalInterface
-  interface MethodExecutor {
-    void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
-  }
-
-  /**
    * The method to call to secure the execution of a (http) method.
    * @param request the request
    * @param response the response
@@ -89,7 +81,7 @@ public class ServletSecurity {
    * @throws IOException if the Json in/out fail
    */
   public void execute(HttpServletRequest request, HttpServletResponse response, MethodExecutor executor)
-      throws ServletException, IOException {
+      throws IOException {
     if (LOG.isDebugEnabled()) {
       LOG.debug("Logging headers in "+request.getMethod()+" request");
       Enumeration<String> headerNames = request.getHeaderNames();
@@ -123,7 +115,7 @@ public class ServletSecurity {
       } catch (RuntimeException e) {
         LOG.error("Exception when executing http request as user: " + clientUgi.getUserName(),
             e);
-        throw new ServletException(e);
+        throw new IOException(e);
       }
     } catch (HttpAuthenticationException e) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
