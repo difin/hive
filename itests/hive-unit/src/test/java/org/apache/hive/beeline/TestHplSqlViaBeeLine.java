@@ -187,8 +187,8 @@ public class TestHplSqlViaBeeLine {
             "BEGIN\n" +
             "   RETURN 'This is ' || b;\n" +
             "END;\n" +
-            "SELECT check(col_b) FROM result ORDER BY col_b DESC;\n";
-    testScriptFile(SCRIPT_TEXT, args(), "This is true.*This is false");
+            "SELECT check(col_b) FROM result ORDER BY col_b ASC;\n";
+    testScriptFile(SCRIPT_TEXT, args(), "This is false.*This is true");
   }
 
   @Test
@@ -283,7 +283,7 @@ public class TestHplSqlViaBeeLine {
             "BEGIN\n" +
             "   RETURN 'Hello ' || s || '!';\n" +
             "END;\n" +
-            "SELECT hello(col_s) FROM result;\n";
+            "SELECT hello(col_s) FROM result ORDER BY col_s ASC;\n";
     testScriptFile(SCRIPT_TEXT, args(), "Hello Alice!.*Hello Smith!");
   }
 
@@ -363,8 +363,8 @@ public class TestHplSqlViaBeeLine {
             "BEGIN\n" +
             "   RETURN 'Hello ' || c || '!';\n" +
             "END;\n" +
-            "SELECT hello(col_c) FROM result ORDER BY col_c DESC;\n";
-    testScriptFile(SCRIPT_TEXT, args(), "Hello Daya!.*Hello Alice!");
+            "SELECT hello(col_c) FROM result ORDER BY col_c ASC;\n";
+    testScriptFile(SCRIPT_TEXT, args(), "Hello Alice!.*Hello Daya!");
   }
 
   @Test
