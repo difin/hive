@@ -48,13 +48,14 @@ import org.apache.hadoop.registry.client.binding.RegistryTypeUtils;
 import org.apache.hadoop.registry.client.binding.RegistryUtils;
 import org.apache.hadoop.registry.client.types.ServiceRecord;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-@org.junit.Ignore("disable during hive-test-kube upgrade - flaky; this issue is most likely fixed upstream; but it's not obvious")
+
 public class TestLlapZookeeperRegistryImpl {
 
   public static final String COMPUTE_1 = "compute1";
@@ -67,6 +68,7 @@ public class TestLlapZookeeperRegistryImpl {
 
   private CuratorFramework curatorFramework;
   private TestingServer server;
+  private final static String NAMESPACE_PREFIX = "llap-";
 
   @Before
   public void setUp() throws Exception {
@@ -162,6 +164,16 @@ public class TestLlapZookeeperRegistryImpl {
     assertEventually(() -> instances.getAll().size() == 1, "should have size 1 after removing from different compute group");
     CloseableUtils.closeQuietly(znode1);
     assertEventually(() -> instances.getAll().size() == 0, "should have size 0 after removing from same compute group");
+  }
+
+  @Test
+  public void testPersistentNodePath() {
+    String llapRootNameSpace = "/" + LlapZookeeperRegistryImpl.getRootNamespace(hiveConf,
+        HiveConf.getVar(hiveConf, HiveConf.ConfVars.LLAP_ZK_REGISTRY_NAMESPACE), NAMESPACE_PREFIX);
+    String persistentNodeName = "/pnode0";
+
+    Assert.assertEquals(llapRootNameSpace + "/user-" + System.getProperty("user.name") + persistentNodeName,
+        registry.getPersistentNodePath());
   }
 
   static <T> void assertEventually(Callable<Boolean> matcher, String message) throws Exception {
