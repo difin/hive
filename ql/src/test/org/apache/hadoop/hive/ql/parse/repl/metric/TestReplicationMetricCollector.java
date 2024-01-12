@@ -41,13 +41,10 @@ import org.apache.hadoop.hive.ql.parse.repl.metric.event.Metric;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Map;
@@ -64,21 +61,21 @@ import static org.junit.Assert.assertTrue;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-@Ignore("CDPD-65030")
 public class TestReplicationMetricCollector {
 
   HiveConf conf;
 
-  @Mock
   private FailoverMetaData fmd;
 
-  @Mock
   private MetricSink metricSinkInstance;
 
-  static MockedStatic<MetricSink> metricSinkMockedStatic;
+  MockedStatic<MetricSink> metricSinkMockedStatic;
 
   @Before
   public void setup() throws Exception {
+    fmd = Mockito.mock(FailoverMetaData.class);
+    metricSinkInstance = Mockito.mock(MetricSink.class);
+
     conf = new HiveConf();
     conf.set(Constants.SCHEDULED_QUERY_SCHEDULENAME, "repl");
     conf.set(Constants.SCHEDULED_QUERY_EXECUTIONID, "1");
