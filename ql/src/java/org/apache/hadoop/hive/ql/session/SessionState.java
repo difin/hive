@@ -774,7 +774,9 @@ public class SessionState {
     }
 
     String engine = HiveConf.getVar(startSs.getConf(), HiveConf.ConfVars.HIVE_EXECUTION_ENGINE);
-    if (!engine.equals("tez") || startSs.isHiveServerQuery) {
+
+    if (!engine.equals("tez") || startSs.isHiveServerQuery
+            || !HiveConf.getBoolVar(startSs.getConf(), ConfVars.HIVE_CLI_TEZ_INITIALIZE_SESSION)) {
       return;
     }
 
