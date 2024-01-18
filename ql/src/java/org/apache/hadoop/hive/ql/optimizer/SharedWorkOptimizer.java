@@ -611,23 +611,17 @@ public class SharedWorkOptimizer extends Transform {
         throws SemanticException {
       // First we check if the two table scan operators can actually be merged
       // If schemas do not match, we currently do not merge
-      List<String> prevTsOpNeededColumns = tsOp1.getNeededColumns();
-      List<String> tsOpNeededColumns = tsOp2.getNeededColumns();
-      if (prevTsOpNeededColumns.size() != tsOpNeededColumns.size()) {
-        return false;
-      }
-      boolean notEqual = false;
-      for (int i = 0; i < prevTsOpNeededColumns.size(); i++) {
-        if (!prevTsOpNeededColumns.get(i).equals(tsOpNeededColumns.get(i))) {
-          notEqual = true;
-          break;
-        }
-      }
-      if (notEqual) {
+      if (!compatibleSchema(tsOp1, tsOp2)) {
         return false;
       }
 
       return super.areMergeable(pctx, tsOp1, tsOp2);
+    }
+
+    private boolean compatibleSchema(TableScanOperator tsOp1, TableScanOperator tsOp2) {
+      return Objects.equals(tsOp1.getNeededColumns(), tsOp2.getNeededColumns())
+          && Objects.equals(tsOp1.getNeededColumnIDs(), tsOp2.getNeededColumnIDs())
+          && Objects.equals(tsOp1.getConf().getVirtualCols(), tsOp2.getConf().getVirtualCols());
     }
 
     @Override
