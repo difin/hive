@@ -214,9 +214,16 @@ public class Utils {
     private String currentHostZnodePath;
     private final List<String> rejectedHostZnodePaths = new ArrayList<String>();
 
+    private static String getNullsLastVarname() {
+      try {
+        return HiveConf.ConfVars.HIVE_DEFAULT_NULLS_LAST.varname;
+      } catch(java.lang.NoSuchFieldError e) {
+        return "hive.default.nulls.last";
+      }
+    }
     // HiveConf parameters
     public static final String HIVE_DEFAULT_NULLS_LAST_KEY =
-        HIVE_CONF_PREFIX + HiveConf.ConfVars.HIVE_DEFAULT_NULLS_LAST.varname;
+        HIVE_CONF_PREFIX + getNullsLastVarname();
 
     public JdbcConnectionParams() {
     }

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hive.jdbc.Utils.JdbcConnectionParams;
 import org.apache.hive.service.cli.TableSchema;
@@ -1247,11 +1248,13 @@ public class HiveDatabaseMetaData implements DatabaseMetaData {
    * @return
    */
   public static boolean getHiveDefaultNullsLast(Map<String, String> hiveConfs) throws SQLException {
-    if (hiveConfs == null) {
-      throw new SQLException("hiveConfs is not available");
-    }
-    if (hiveConfs.get(JdbcConnectionParams.HIVE_DEFAULT_NULLS_LAST_KEY) == null) {
-      throw new SQLException("HIVE_DEFAULT_NULLS_LAST is not available");
+    if (hiveConfs == null ||
+        hiveConfs.get(JdbcConnectionParams.HIVE_DEFAULT_NULLS_LAST_KEY) == null) {
+      try {
+        return Boolean.parseBoolean(ConfVars.HIVE_DEFAULT_NULLS_LAST.getDefaultValue());
+      } catch(java.lang.NoSuchFieldError e) {
+        return true;
+      }
     }
     return Boolean.parseBoolean(hiveConfs.get(JdbcConnectionParams.HIVE_DEFAULT_NULLS_LAST_KEY));
   }
