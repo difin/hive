@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.apache.hive</groupId>
     <artifactId>hive</artifactId>
-    <version>3.1.3000.2024.0.17.0-SNAPSHOT</version>
+    <version>3.1.3000.2024.0.18.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -28,7 +28,7 @@
     <docker.ubi7.minimal.version>7.8-328</docker.ubi7.minimal.version>
     <hive.path.to.root>..</hive.path.to.root>
     <hive.jdbc.driver.jar>apache-hive-${project.version}-jdbc.jar</hive.jdbc.driver.jar>
-    <atlas.version>2.1.0.7.2.17.0-334</atlas.version>
+    <atlas.version>2.1.0.7.2.17.200-29</atlas.version>
     <oozie.version>5.1.0.7.2.17.0-334</oozie.version>
     <ranger.version>2.3.0.7.2.17.0-334</ranger.version>
     <solr.version>8.4.1.7.2.17.0-334</solr.version>
