@@ -29,9 +29,9 @@
     <hive.path.to.root>..</hive.path.to.root>
     <hive.jdbc.driver.jar>apache-hive-${project.version}-jdbc.jar</hive.jdbc.driver.jar>
     <atlas.version>2.1.0.7.2.17.200-29</atlas.version>
-    <oozie.version>5.1.0.7.2.17.0-334</oozie.version>
-    <ranger.version>2.3.0.7.2.17.0-334</ranger.version>
-    <solr.version>8.4.1.7.2.17.0-334</solr.version>
+    <oozie.version>5.1.0.7.2.17.200-29</oozie.version>
+    <ranger.version>2.3.0.7.2.17.200-29</ranger.version>
+    <solr.version>8.4.1.7.2.17.200-29</solr.version>
   </properties>
 
   <profiles>
