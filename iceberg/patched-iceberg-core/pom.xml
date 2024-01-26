@@ -89,7 +89,6 @@
                                     <excludes>
                                         **/HadoopInputFile.class
                                         **/SerializableTable.class
-                                        **/PartitionsTable.class
                                     </excludes>
                                 </artifactItem>
                             </artifactItems>
