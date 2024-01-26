@@ -308,9 +308,9 @@ public class Hadoop23Shims extends HadoopShimsSecure {
       jConf.setInt(MRJobConfig.MAP_MEMORY_MB, 512);
       jConf.setInt(MRJobConfig.REDUCE_MEMORY_MB, 512);
       jConf.setInt(MRJobConfig.MR_AM_VMEM_MB, 128);
-      jConf.setInt(YarnConfiguration.YARN_MINICLUSTER_NM_PMEM_MB, 512);
+      jConf.setInt(YarnConfiguration.YARN_MINICLUSTER_NM_PMEM_MB, 2048);
       jConf.setInt(YarnConfiguration.RM_SCHEDULER_MINIMUM_ALLOCATION_MB, 128);
-      jConf.setInt(YarnConfiguration.RM_SCHEDULER_MAXIMUM_ALLOCATION_MB, 512);
+      jConf.setInt(YarnConfiguration.RM_SCHEDULER_MAXIMUM_ALLOCATION_MB, 2048);
 
       mr = new MiniMRCluster(numberOfTaskTrackers, nameNode, numDir, null, null, jConf);
     }
@@ -410,9 +410,9 @@ public class Hadoop23Shims extends HadoopShimsSecure {
     public MiniTezShim(Configuration conf, int numberOfTaskTrackers, String nameNode,
                        boolean usingLlap) throws IOException {
       mr = new MiniTezCluster("hive", numberOfTaskTrackers);
-      conf.setInt(YarnConfiguration.YARN_MINICLUSTER_NM_PMEM_MB, 4096);
+      conf.setInt(YarnConfiguration.YARN_MINICLUSTER_NM_PMEM_MB, 2048);
       conf.setInt(YarnConfiguration.RM_SCHEDULER_MINIMUM_ALLOCATION_MB, 128);
-      conf.setInt(YarnConfiguration.RM_SCHEDULER_MAXIMUM_ALLOCATION_MB, 4096);
+      conf.setInt(YarnConfiguration.RM_SCHEDULER_MAXIMUM_ALLOCATION_MB, 2048);
 
       conf.set("fs.defaultFS", nameNode);
       conf.set("tez.am.log.level", "DEBUG");
