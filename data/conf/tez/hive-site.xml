@@ -79,11 +79,6 @@
 </property>
 
 <property>
-  <name>javax.jdo.option.ConnectionURL</name>
-  <value>jdbc:derby:memory:${test.tmp.dir}/junit_metastore_db;create=true</value>
-</property>
-
-<property>
   <name>hive.metastore.schema.verification</name>
   <value>false</value>
 </property>
@@ -101,13 +96,6 @@
 <property>
   <name>javax.jdo.option.ConnectionPassword</name>
   <value>mine</value>
-</property>
-
-<property>
-  <!--  this should eventually be deprecated since the metastore should supply this -->
-  <name>hive.metastore.warehouse.dir</name>
-  <value>${test.warehouse.dir}</value>
-  <description></description>
 </property>
 
 <property>
@@ -163,13 +151,7 @@
   <value>org.apache.hadoop.hive.ql.hooks.PostExecutePrinter</value>
   <description>Post Execute Hook for Tests</description>
 </property>
-
-<property>
-  <name>hive.support.concurrency</name>
-  <value>false</value>
-  <description>Whether hive supports concurrency or not. A zookeeper instance must be up and running for the default hive lock manager to support read-write locks.</description>
-</property>
-
+  
 <property>
   <name>hive.lock.sleep.between.retries</name>
   <value>2</value>
@@ -315,4 +297,66 @@
   <value>false</value>
 </property>
 
+  <!-- ACID Properties - Dima -->
+
+  <property>
+    <name>hive.txn.manager</name>
+    <value>org.apache.hadoop.hive.ql.lockmgr.DbTxnManager</value>
+  </property>
+
+  <property>
+    <name>hive.compactor.initiator.on</name>
+    <value>false</value>
+  </property>
+
+  <property>
+    <name>hive.compactor.worker.threads</name>
+    <value>4</value>
+  </property>
+
+  <property>
+    <name>metastore.compactor.worker.threads</name>
+    <value>4</value>
+  </property>
+
+  <property>
+    <name>hive.support.concurrency</name>
+    <value>true</value>
+  </property>
+
+  <property>
+    <name>hive.exec.dynamic.partition.mode</name>
+    <value>nonstrict</value>
+  </property>
+
+  <property>
+    <name>hive.lock.manager</name>
+    <value>org.apache.hadoop.hive.ql.lockmgr.DbLockManager</value>
+  </property>
+
+  <property>
+    <name>hive.compactor.crud.query.based</name>
+    <value>true</value>
+  </property>
+
+  <property>
+    <name>hive.metastore.runworker.in</name>
+    <value>hs2</value>
+  </property>
+
+  <!-- External megastore - Dima -->
+
+  <property>
+    <name>hive.metastore.local</name>
+    <value>false</value>
+  </property>
+  <property>
+    <name>hive.metastore.uris</name>
+    <value>thrift://localhost:9083</value>
+  </property>
+  <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>/Users/dfingerman/apps/hive/warehouse/hive_upstream</value>
+  </property>
+  
 </configuration>

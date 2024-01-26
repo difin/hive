@@ -26,6 +26,12 @@
   </property>
 
 <property>
+  <name>hive.metastore.client.cache.recordStats</name>
+  <value>true</value>
+  <description>This property enables recording metastore client cache stats in DEBUG logs</description>
+</property>
+
+<property>
   <name>hive.in.test</name>
   <value>true</value>
   <description>Internal marker for test. Used for masking env-dependent values</description>
@@ -118,10 +124,11 @@
 </property>
 
 <property>
-  <!--  this should eventually be deprecated since the metastore should supply this -->
-  <name>hive.metastore.warehouse.dir</name>
-  <value>${test.warehouse.dir}</value>
-  <description></description>
+  <name>hive.metastore.metadb.dir</name>
+  <value>file://${test.tmp.dir}/metadb/</value>
+  <description>
+  Required by metastore server or if the uris argument below is not supplied
+  </description>
 </property>
 
 <property>
@@ -179,12 +186,6 @@
 </property>
 
 <property>
-  <name>hive.support.concurrency</name>
-  <value>false</value>
-  <description>Whether hive supports concurrency or not. A zookeeper instance must be up and running for the default hive lock manager to support read-write locks.</description>
-</property>
-
-<property>
   <name>fs.pfile.impl</name>
   <value>org.apache.hadoop.fs.ProxyLocalFileSystem</value>
   <description>A proxy for local file system used for cross file system testing</description>
@@ -232,6 +233,12 @@
   <name>hive.stats.dbclass</name>
   <value>fs</value>
   <description>The default storatge that stores temporary hive statistics. Currently, fs type is supported</description>
+</property>
+
+<property>
+  <name>hive.execution.engine</name>
+  <value>tez</value>
+  <description>Whether to use MR or Tez</description>
 </property>
 
 <property>
@@ -397,6 +404,68 @@
 <property>
   <name>hive.txn.xlock.ctas</name>
   <value>false</value>
+</property>
+
+<!-- ACID Properties - Dima -->
+
+<property>
+  <name>hive.txn.manager</name>
+  <value>org.apache.hadoop.hive.ql.lockmgr.DbTxnManager</value>
+</property>
+
+<property>
+  <name>hive.compactor.initiator.on</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>hive.compactor.worker.threads</name>
+  <value>4</value>
+</property>
+
+<property>
+  <name>metastore.compactor.worker.threads</name>
+  <value>4</value>
+</property>
+
+<property>
+  <name>hive.support.concurrency</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>hive.exec.dynamic.partition.mode</name>
+  <value>nonstrict</value>
+</property>
+
+<property>
+  <name>hive.lock.manager</name>
+  <value>org.apache.hadoop.hive.ql.lockmgr.DbLockManager</value>
+</property>
+
+<property>
+  <name>hive.compactor.crud.query.based</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>hive.metastore.runworker.in</name>
+  <value>hs2</value>
+</property>
+
+<!-- Using Your Own Metastore -->
+
+<property>
+  <name>hive.metastore.local</name>
+  <value>false</value>
+</property>
+<property>
+  <name>hive.metastore.uris</name>
+  <value>thrift://localhost:9083</value>
+</property>
+<property>
+  <name>hive.metastore.warehouse.dir</name>
+  <value>/Users/dfingerman/apps/hive/warehouse/hive_upstream</value>
 </property>
 
 <property>

@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+
+    <!-- UPSTREAM -->
+
+    <property>
+        <name>hive.server2.logging.operation.level</name>
+        <value>NONE</value>
+    </property>
+    
+    <property>
+        <name>hive.log4j.file</name>
+        <value>hive-log4j.properties</value>
+    </property>
+    
+    <property>
+        <name>metastore.log4j.file</name>
+        <value>metastore-log4j.properties</value>
+    </property>
+    
+    <!-- Intellij -->
+    <property>
+        <name>hive.jar.path</name>
+        <value>/Users/dfingerman/workspace/hive-upstream-difin/ql/target/hive-exec-4.2.0-SNAPSHOT.jar</value>
+        <description>The location of hive_cli.jar that is used when submitting jobs in a separate jvm.</description>
+    </property>
+    
+    <property>
+        <name>hive.hadoop.classpath</name>
+        <value>/Users/dfingerman/workspace/hive-upstream-difin/ql/target/hive-exec-4.2.0-SNAPSHOT.jar</value>
+    </property>
+    
+    <property>
+        <name>hive.metastore.local</name>
+        <value>false</value>
+    </property>
+    
+    <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://localhost:9083</value>
+    </property>
+    
+    <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>/Users/dfingerman/apps/hive/warehouse/hive_upstream</value>
+    </property>
+    
+    <property>
+        <name>hive.server2.metrics.enabled</name>
+        <value>true</value>
+    </property>
+    
+    <property>
+        <name>spark.eventLog.enabled</name>
+        <value>true</value>
+    </property>
+    
+    <property>
+        <name>spark.eventLog.dir</name>
+        <value>/tmp/hive</value>
+    </property>
+    
+    <property>
+        <name>metastore.metastore.event.db.notification.api.auth</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>hive.metastore.schema.verification</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>datanucleus.autoCreateTables</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.exec.scratchdir</name>
+        <value>/tmp/hive-${user.name}</value>
+    </property>
+
+    <property>
+        <name>iceberg.engine.hive.enabled</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.vectorized.execution.enabled</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:postgresql://localhost:5432/metastore_upstream</value>
+        <description>JDBC connect string for a JDBC metastore</description>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <value>org.postgresql.Driver</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>hive</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value>hive</value>
+    </property>
+
+    <property>
+        <name>datanucleus.schema.autoCreateAll</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.server2.enable.doAs</name>
+        <value>false</value>
+        <description></description>
+    </property>
+
+    <property>
+        <name>hive.server2.enable.impersonation</name>
+        <value>false</value>
+        <description></description>
+    </property>
+
+    <property>
+        <name>dfs.namenode.acls.enabled</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>hive.server2.webui.explain.output</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.server2.webui.show.graph</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.server2.webui.show.stats</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.server2.webui.max.graph.size</name>
+        <value>40</value>
+    </property>
+
+    <!-- ACID -->
+    <property>
+        <name>hive.txn.manager</name>
+        <value>org.apache.hadoop.hive.ql.lockmgr.DbTxnManager</value>
+    </property>
+
+    <property>
+        <name>hive.compactor.initiator.on</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.compactor.worker.threads</name>
+        <value>4</value>
+    </property>
+
+    <property>
+        <name>metastore.compactor.worker.threads</name>
+        <value>4</value>
+    </property>
+
+    <property>
+        <name>hive.enforce.bucketing</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.support.concurrency</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.exec.dynamic.partition.mode</name>
+        <value>nonstrict</value>
+    </property>
+
+    <property>
+        <name>hive.lock.manager</name>
+        <value>org.apache.hadoop.hive.ql.lockmgr.DbLockManager</value>
+    </property>
+
+    <property>
+        <name>hive.compactor.crud.query.based</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.metastore.runworker.in</name>
+        <value>hs2</value>
+    </property>
+
+    <!-- Tez -->
+    
+    <property>
+        <name>hive.metastore.client.cache.enabled</name>
+        <value>true</value>
+        <description>This property enables a Caffeiene Cache for Metastore client</description>
+    </property>
+    
+    <property>
+        <name>hive.tez.container.size</name>
+        <value>1024</value>
+    </property>
+    
+</configuration>
