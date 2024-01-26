@@ -62,7 +62,7 @@ public class StartMiniHS2Cluster {
       break;
     }
     HiveConf conf = new HiveConf();
-    conf.setBoolVar(ConfVars.HIVE_SUPPORT_CONCURRENCY, false);
+    conf.setBoolVar(ConfVars.HIVE_SUPPORT_CONCURRENCY, true);
     conf.setBoolVar(HiveConf.ConfVars.HIVE_RPC_QUERY_PLAN, true);
 
     for (; idx < confFiles.length; ++idx) {

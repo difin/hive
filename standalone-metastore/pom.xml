@@ -396,7 +396,6 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${postgres.version}</version>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>

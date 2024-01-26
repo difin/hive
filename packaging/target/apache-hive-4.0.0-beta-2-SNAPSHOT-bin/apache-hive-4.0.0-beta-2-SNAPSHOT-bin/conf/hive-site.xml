@@ -1,0 +1,439 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+
+    <!-- UPSTREAM -->
+
+    <property>
+        <name>hive.server2.logging.operation.level</name>
+        <value>NONE</value>
+    </property>
+    <property>
+        <name>hive.log4j.file</name>
+        <value>hive-log4j.properties</value>
+    </property>
+    <property>
+        <name>metastore.log4j.file</name>
+        <value>metastore-log4j.properties</value>
+    </property>
+    <!-- Intellij -->
+    <property>
+        <name>hive.jar.path</name>
+        <value>/Users/dfingerman/workspace/hive-up-difin/ql/target/hive-exec-4.0.0-SNAPSHOT.jar</value>
+        <description>The location of hive_cli.jar that is used when submitting jobs in a separate jvm.</description>
+    </property>
+    <property>
+        <name>hive.hadoop.classpath</name>
+        <value>/Users/dfingerman/workspace/hive-up-difin/ql/target/hive-exec-4.0.0-SNAPSHOT.jar</value>
+    </property>
+    <property>
+        <name>hive.metastore.local</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://localhost:9083</value>
+    </property>
+    <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>/Users/dfingerman/apps/hive/warehouse/hive_upstream</value>
+    </property>
+    <property>
+        <name>hive.server2.metrics.enabled</name>
+        <value>true</value>
+    </property>
+    <!--property>
+        <name>spark.master</name>
+        <value>spark://asinkovits-MBP15.local:7077</value>
+    </property-->
+    <!--property>
+        <name>hive.spark.client.server.connect.timeout</name>
+        <value>10000</value>
+    </property-->
+    <!--property>
+        <name>spark.yarn.jars</name>
+        <value>hdfs://asinkovits-MBP15.local:9000/spark-jars/*</value>
+    </property-->
+    <!-- <property>
+        <name>spark.home</name> -->
+    <!--value>/Users/antalsinkovits/dev/spark/spark-2.3.2-SNAPSHOT-bin-hadoop2-without-hive</value-->
+    <!--value>/Users/antalsinkovits/dev/spark/spark-2.3.1-bin-hadoop2.7</value-->
+    <!-- <value>/Users/antalsinkovits/dev/spark/spark-2.4.0-SNAPSHOT-bin-hadoop3-without-hive</value>
+</property> -->
+    <property>
+        <name>spark.eventLog.enabled</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>spark.eventLog.dir</name>
+        <value>/tmp/hive</value>
+    </property>
+
+    <!--
+    <property>
+      <name>hive.service.metrics.class</name>
+      <value>org.apache.hadoop.hive.common.metrics.LegacyMetrics</value>
+    </property>
+    -->
+    <!--
+    <property>
+      <name>hive.txn.manager</name>
+      <value>org.apache.hadoop.hive.ql.lockmgr.DbTxnManager</value>
+    </property>
+    <property>
+      <name>hive.compactor.initiator.on</name>
+      <value>true</value>
+    </property>
+    <property>
+      <name>hive.support.concurrency</name>
+      <value>true</value>
+    </property>
+    -->
+    <!-- Intellij -->
+
+    <!--
+    <property>
+      <name>hive.server2.use.SSL</name>
+      <value>true</value>
+    </property>
+    <property>
+      <name>hive.server2.keystore.path</name>
+      <value>/home/sergio/Development/tools/hive-ssl-keystore.jks</value>
+    </property>
+    <property>
+      <name>hive.server2.keystore.password</name>
+      <value>hive123</value>
+    </property>
+    -->
+    <!--
+    <property>
+        <name>spark.home</name>
+        <value>/Users/szita/shadow/CDH/spark/</value>
+    </property>
+    -->
+    <!--
+    <property>
+      <name>hive.server2.authentication</name>
+      <value>KERBEROS</value>
+    </property>
+    <property>
+      <name>hive.server2.authentication.kerberos.principal</name>
+      <value>sergio/localhost@VICTORY.COM</value>
+    </property>
+    <property>
+      <name>hive.server2.authentication.kerberos.keytab</name>
+      <value>/etc/hadoop/sergio.keytab</value>
+    </property>
+    <property>
+      <name>hive.metastore.sasl.enabled</name>
+      <value>true</value>
+      <description>If true, the metastore thrift interface will be secured with SASL. Clients must authenticate with Kerberos.</description>
+    </property>
+    <property>
+      <name>hive.metastore.kerberos.keytab.file</name>
+      <value>/etc/hadoop/sergio.keytab</value>
+      <description>The path to the Kerberos Keytab file containing the metastore thrift server's service principal.</description>
+    </property>
+    <property>
+      <name>hive.metastore.kerberos.principal</name>
+      <value>sergio/localhost@VICTORY.COM</value>
+      <description>The service principal for the metastore thrift server. The special string _HOST will be replaced automatically with the correct host name.</description>
+    </property>
+    -->
+    <property>
+        <name>metastore.metastore.event.db.notification.api.auth</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>hive.metastore.schema.verification</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>datanucleus.autoCreateTables</name>
+        <value>true</value>
+    </property>
+    <!-- 
+        <property>
+            <name>metastore.log4j.file</name>
+            <value>/Users/karencoppage/up/hive/conf/metastore-log4j.properties</value>
+        </property>
+    
+        <property>
+            <name>hive.log4j.file</name>
+            <value>/Users/karencoppage/up/hive/conf/hive-log4j.properties</value>
+        </property> -->
+
+    <!--
+    <property>
+      <name>hive.exec.pre.hooks</name>
+      <value>org.apache.hadoop.hive.ql.hooks.PreExecutePrinter</value>
+      <description>Pre Execute Hook for Tests</description>
+    </property>
+
+    <property>
+      <name>hive.exec.post.hooks</name>
+      <value>org.apache.hadoop.hive.ql.hooks.PostExecutePrinter</value>
+      <description>Post Execute Hook for Tests</description>
+    </property>
+    -->
+
+    <!--
+    <property>
+      <name>hive.server2.authentication</name>
+      <value>LDAP</value>
+    </property>
+    <property>
+      <name>hive.server2.authentication.ldap.url</name>
+      <value>ldap://w2k8-1.ad.sec.cloudera.com</value>
+    </property>
+    <property>
+      <name>hive.server2.authentication.ldap.Domain</name>
+      <value>AD.SEC.CLOUDERA.COM</value>
+    </property>
+    -->
+
+    <property>
+        <name>hive.exec.scratchdir</name>
+        <value>/tmp/hive-${user.name}</value>
+    </property>
+
+    <property>
+        <name>iceberg.engine.hive.enabled</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.vectorized.execution.enabled</name>
+        <value>false</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <!-- <value>jdbc:derby:;databaseName=/Users/laszlopinter/Documents/Work/Data/upstream/hive/metastore_db;create=true</value> -->
+        <!-- <value>jdbc:mysql://localhost:3306/upstream_hive</value> -->
+        <value>jdbc:postgresql://localhost:5432/metastore_upstream</value>
+        <description>JDBC connect string for a JDBC metastore</description>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <!-- <value>org.apache.derby.jdbc.EmbeddedDriver</value> -->
+        <!-- <value>com.mysql.jdbc.Driver</value> -->
+        <value>org.postgresql.Driver</value>
+    </property>
+
+    <!-- built-in derby (works!) -->
+    <!--     <property>
+            <name>javax.jdo.option.ConnectionURL</name>
+            <value>jdbc:derby:;databaseName=/Users/karencoppage/data/upstream/metastore_db;create=true</value>
+            <description>JDBC connect string for a JDBC metastore</description>
+        </property>
+    
+      <property>
+            <name>javax.jdo.option.ConnectionDriverName</name>
+            <value>org.apache.derby.jdbc.EmbeddedDriver</value>
+        </property> -->
+
+
+    <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>hive</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value>hive</value>
+    </property>
+
+    <property>
+        <name>datanucleus.schema.autoCreateAll</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.server2.enable.doAs</name>
+        <value>false</value>
+        <description></description>
+    </property>
+
+    <property>
+        <name>hive.server2.enable.impersonation</name>
+        <value>false</value>
+        <description></description>
+    </property>
+
+    <property>
+        <name>dfs.namenode.acls.enabled</name>
+        <value>false</value>
+    </property>
+
+    <!-- FAIR SCHEDULER -->
+
+    <!--
+    <property>
+      <name>mapred.jobtracker.taskScheduler</name>
+      <value>org.apache.hadoop.mapred.FairScheduler</value>
+    </property>
+
+    <property>
+      <name>mapred.fairscheduler.allocation.file</name>
+      <value>/mnt/samsung/dev-tools/conf/allocations.xml</value>
+    </property>
+
+    <property>
+      <name>mapred.fairscheduler.poolnameproperty</name>
+      <value>pool.name</value>
+    </property>
+
+    <property>
+      <name>pool.name</name>
+      <value>${user.name}</value>
+    </property>
+    -->
+
+    <!-- These following lines are needed to use ACID features -->
+    <!-- BEGIN -->
+
+    <!--
+    <property>
+      <name>hive.enforce.bucketing</name>
+      <value>true</value>
+    </property>
+    <property>
+      <name>hive.support.concurrency</name>
+      <value>true</value>
+    </property>
+    <property>
+      <name>hive.exec.dynamic.partition.mode</name>
+      <value>nonstrict</value>
+    </property>
+    <property>
+      <name>hive.txn.manager</name>
+      <value>org.apache.hadoop.hive.ql.lockmgr.DbTxnManager</value>
+    </property>
+    <property>
+      <name>hive.lock.manager</name>
+      <value>org.apache.hadoop.hive.ql.lockmgr.DbLockManager</value>
+    </property>
+    <property>
+      <name>hive.compactor.initiator.on</name>
+      <value>true</value>
+    </property>
+    <property>
+      <name>hive.compactor.worker.threads</name>
+      <value>2</value>
+    </property>
+    -->
+    <!-- END -->
+
+
+
+    <property>
+        <name>hive.server2.webui.explain.output</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.server2.webui.show.graph</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.server2.webui.show.stats</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.server2.webui.max.graph.size</name>
+        <value>40</value>
+    </property>
+
+    <!-- ACID -->
+    <property>
+        <name>hive.txn.manager</name>
+        <value>org.apache.hadoop.hive.ql.lockmgr.DbTxnManager</value>
+    </property>
+
+    <property>
+        <name>hive.compactor.initiator.on</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.compactor.worker.threads</name>
+        <value>4</value>
+    </property>
+
+    <property>
+        <name>metastore.compactor.worker.threads</name>
+        <value>4</value>
+    </property>
+
+    <property>
+        <name>hive.enforce.bucketing</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.support.concurrency</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.exec.dynamic.partition.mode</name>
+        <value>nonstrict</value>
+    </property>
+
+    <property>
+        <name>hive.lock.manager</name>
+        <value>org.apache.hadoop.hive.ql.lockmgr.DbLockManager</value>
+    </property>
+
+    <property>
+        <name>hive.compactor.crud.query.based</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>hive.metastore.runworker.in</name>
+        <value>hs2</value>
+    </property>
+
+
+
+
+
+    <!-- Random -->
+
+    <!--     <property>
+            <name>hive.users.in.admin.role</name>
+            <value>karencoppage</value>
+        </property> -->
+
+
+
+    <!--Timestamp-->
+
+    <!--     <property>
+            <name>hive.parquet.write.int64.timestamp</name>
+            <value>true</value>
+        </property>
+     -->
+    <!--for WebUI explain plan-->
+
+    <!--     <property>
+            <name>hive.server2.webui.max.historic.queries</name>
+            <value>40</value>
+        </property> -->
+
+
+
+
+    <!--     <property>
+            <name></name>
+            <value></value>
+        </property>
+     -->
+</configuration>

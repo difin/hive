@@ -29,6 +29,10 @@
     <htmlunit.version>2.70.0</htmlunit.version>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.apache.hive</groupId>
+      <artifactId>hive-iceberg-handler</artifactId>
+    </dependency>
     <!-- intra-project -->
     <dependency>
       <groupId>org.apache.hive</groupId>
@@ -492,7 +496,6 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>net.sf.supercsv</groupId>

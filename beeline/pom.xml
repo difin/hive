@@ -194,7 +194,6 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <optional>true</optional>
     </dependency>
   </dependencies>
   <profiles>
