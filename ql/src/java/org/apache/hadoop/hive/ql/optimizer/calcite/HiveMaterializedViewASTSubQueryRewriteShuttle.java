@@ -26,6 +26,7 @@ import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization;
+import org.apache.hadoop.hive.ql.metadata.RewriteAlgorithm;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveFilter;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveProject;
@@ -37,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,7 @@ import java.util.function.Predicate;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
-import static org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization.RewriteAlgorithm.NON_CALCITE;
+import static org.apache.hadoop.hive.ql.metadata.RewriteAlgorithm.NON_CALCITE;
 import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializedViewUtils.extractTable;
 
 /**
@@ -150,7 +150,7 @@ public class HiveMaterializedViewASTSubQueryRewriteShuttle extends HiveRelShuttl
   public static RelNode getMaterializedViewByAST(
           ASTNode expandedAST,
           RelOptCluster optCluster,
-          Predicate<EnumSet<HiveRelOptMaterialization.RewriteAlgorithm>> filter,
+          Predicate<Set<RewriteAlgorithm>> filter,
           Hive db,
           Set<TableName> tablesUsedByOriginalPlan,
           HiveTxnManager txnManager,

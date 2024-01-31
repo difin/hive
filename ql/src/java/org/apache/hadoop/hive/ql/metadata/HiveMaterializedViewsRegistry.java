@@ -86,9 +86,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.collect.ImmutableList;
 
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization.RewriteAlgorithm.ALL;
-import static org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization.RewriteAlgorithm.TEXT;
+import static org.apache.hadoop.hive.ql.metadata.RewriteAlgorithm.ALL;
 
 /**
  * Registry for materialized views. The goal of this cache is to avoid parsing and creating
@@ -263,9 +261,7 @@ public final class HiveMaterializedViewsRegistry {
     }
 
     return new HiveRelOptMaterialization(viewScan, plan.getPlan(),
-            null, viewScan.getTable().getQualifiedName(),
-            isBlank(plan.getInvalidAutomaticRewritingMaterializationReason()) ?
-            EnumSet.allOf(HiveRelOptMaterialization.RewriteAlgorithm.class) : EnumSet.of(TEXT),
+        null, viewScan.getTable().getQualifiedName(), plan.getSupportedRewriteAlgorithms(),
             determineIncrementalRebuildMode(plan.getPlan()), plan.getAst());
   }
 
@@ -301,7 +297,7 @@ public final class HiveMaterializedViewsRegistry {
     }
 
     HiveRelOptMaterialization materialization = createMaterialization(conf, db, materializedViewTable);
-    if (materialization == null) {
+    if (materialization == null || materialization.getScope().isEmpty()) {
       return;
     }
 
@@ -376,7 +372,7 @@ public final class HiveMaterializedViewsRegistry {
    */
   List<HiveRelOptMaterialization> getRewritingMaterializedViews() {
     return materializedViewsCache.values().stream()
-            .filter(materialization -> materialization.getScope().contains(HiveRelOptMaterialization.RewriteAlgorithm.CALCITE))
+            .filter(materialization -> materialization.getScope().contains(RewriteAlgorithm.CALCITE))
             .collect(toList());
   }
 
@@ -386,7 +382,7 @@ public final class HiveMaterializedViewsRegistry {
    * @return the collection of materialized views, or the empty collection if none
    */
   public HiveRelOptMaterialization getRewritingMaterializedView(String dbName, String viewName,
-                                                         EnumSet<HiveRelOptMaterialization.RewriteAlgorithm> scope) {
+                                                         EnumSet<RewriteAlgorithm> scope) {
     HiveRelOptMaterialization materialization = materializedViewsCache.get(dbName, viewName);
     if (materialization == null) {
       return null;

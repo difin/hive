@@ -367,7 +367,7 @@ import java.util.stream.IntStream;
 import javax.sql.DataSource;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.hadoop.hive.ql.metadata.HiveRelOptMaterialization.RewriteAlgorithm.ANY;
+import static org.apache.hadoop.hive.ql.metadata.RewriteAlgorithm.ANY;
 import static org.apache.hadoop.hive.ql.optimizer.calcite.HiveMaterializedViewASTSubQueryRewriteShuttle.getMaterializedViewByAST;
 import static org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.HiveMaterializedViewUtils.checkPrivilegeForMaterializedViews;
 import static org.apache.hadoop.hive.ql.plan.HiveOperation.CREATEVIEW;
@@ -1843,8 +1843,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
       HiveRelOptMaterializationValidator materializationValidator = new HiveRelOptMaterializationValidator();
       materializationValidator.validate(calciteGenPlan);
       setInvalidResultCacheReason(materializationValidator.getResultCacheInvalidReason());
-      setInvalidAutomaticRewritingMaterializationReason(
-          materializationValidator.getAutomaticRewritingInvalidReason());
+      setMaterializationValidationResult(
+          materializationValidator.getAutomaticRewritingValidationResult());
 
       // 2. Apply pre-join order optimizations
       calcitePreCboPlan = applyPreJoinOrderingTransforms(calciteGenPlan,
