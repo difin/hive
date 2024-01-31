@@ -72,6 +72,7 @@ import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.ddl.table.AbstractAlterTableDesc;
 import org.apache.hadoop.hive.ql.ddl.table.AlterTableType;
+import org.apache.hadoop.hive.ql.ddl.table.create.CreateTableDesc;
 import org.apache.hadoop.hive.ql.ddl.table.create.like.CreateTableLikeDesc;
 import org.apache.hadoop.hive.ql.ddl.table.misc.properties.AlterTableSetPropertiesDesc;
 import org.apache.hadoop.hive.ql.exec.ColumnInfo;
@@ -1642,6 +1643,11 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
       tbl.getSd().getCols().addAll(tbl.getPartitionKeys());
       tbl.getTTable().setPartitionKeysIsSet(false);
     }
+  }
+
+  @Override
+  public void setTableLocationForCTAS(CreateTableDesc desc, String location) {
+    desc.setLocation(location);
   }
 
   @Override
