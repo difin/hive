@@ -253,9 +253,9 @@ public class CommitTxnFunction implements TransactionalFunction<TxnType> {
       }
       jdbcResource.execute(new DeleteReplTxnMapEntryCommand(sourceTxnId, rqst.getReplPolicy()));
     }
+    jdbcResource.execute(new RemoveWriteIdsFromMinHistoryCommand(ImmutableList.of(txnid)));
     updateWSCommitIdAndCleanUpMetadata(jdbcResource, txnid, txnType, commitId, tempCommitId);
     jdbcResource.execute(new RemoveTxnsFromMinHistoryLevelCommand(ImmutableList.of(txnid)));
-    jdbcResource.execute(new RemoveWriteIdsFromMinHistoryCommand(ImmutableList.of(txnid)));
     if (rqst.isSetKeyValue()) {
       updateKeyValueAssociatedWithTxn(jdbcResource, rqst);
     }
@@ -546,7 +546,7 @@ public class CommitTxnFunction implements TransactionalFunction<TxnType> {
    */
   private void updateWSCommitIdAndCleanUpMetadata(MultiDataSourceJdbcResource jdbcResource, long txnid, TxnType txnType,
                                                     Long commitId, long tempId) throws MetaException {
-    List<String> queryBatch = new ArrayList<>(5);
+    List<String> queryBatch = new ArrayList<>(6);
     // update write_set with real commitId
     if (commitId != null) {
       queryBatch.add("UPDATE \"WRITE_SET\" SET \"WS_COMMIT_ID\" = " + commitId +
