@@ -3433,8 +3433,7 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   public Map<String, List<ColumnStatisticsObj>> getPartitionColumnStatistics(
       String catName, String dbName, String tableName, List<String> partNames,
       List<String> colNames, String engine) throws TException {
-    PartitionsStatsRequest rqst = new PartitionsStatsRequest(dbName, tableName, colNames,
-        partNames);
+    PartitionsStatsRequest rqst = new PartitionsStatsRequest(dbName, tableName, colNames, partNames);
     rqst.setEngine(engine);
     rqst.setCatName(catName);
     rqst.setValidWriteIdList(getValidWriteIdList(dbName, tableName));

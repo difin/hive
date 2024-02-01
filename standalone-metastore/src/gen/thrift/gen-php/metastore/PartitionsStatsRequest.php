@@ -93,7 +93,7 @@ class PartitionsStatsRequest
     /**
      * @var string
      */
-    public $engine = null;
+    public $engine = "hive";
 
     public function __construct($vals = null)
     {

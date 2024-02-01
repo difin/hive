@@ -2221,7 +2221,7 @@ class ColumnStatistics
     STATSDESC => {:type => ::Thrift::Types::STRUCT, :name => 'statsDesc', :class => ::ColumnStatisticsDesc},
     STATSOBJ => {:type => ::Thrift::Types::LIST, :name => 'statsObj', :element => {:type => ::Thrift::Types::STRUCT, :class => ::ColumnStatisticsObj}},
     ISSTATSCOMPLIANT => {:type => ::Thrift::Types::BOOL, :name => 'isStatsCompliant', :optional => true},
-    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :optional => true}
+    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :default => %q"hive", :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -2535,7 +2535,7 @@ class SetPartitionsStatsRequest
     NEEDMERGE => {:type => ::Thrift::Types::BOOL, :name => 'needMerge', :optional => true},
     WRITEID => {:type => ::Thrift::Types::I64, :name => 'writeId', :default => -1, :optional => true},
     VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
-    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :optional => true}
+    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :default => %q"hive", :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -3132,7 +3132,7 @@ class TableStatsRequest
     COLNAMES => {:type => ::Thrift::Types::LIST, :name => 'colNames', :element => {:type => ::Thrift::Types::STRING}},
     CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName', :optional => true},
     VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
-    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :optional => true},
+    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :default => %q"hive", :optional => true},
     ID => {:type => ::Thrift::Types::I64, :name => 'id', :default => -1, :optional => true}
   }
 
@@ -3164,7 +3164,7 @@ class PartitionsStatsRequest
     PARTNAMES => {:type => ::Thrift::Types::LIST, :name => 'partNames', :element => {:type => ::Thrift::Types::STRING}},
     CATNAME => {:type => ::Thrift::Types::STRING, :name => 'catName', :optional => true},
     VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
-    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :optional => true}
+    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :default => %q"hive", :optional => true}
   }
 
   def struct_fields; FIELDS; end
@@ -3430,7 +3430,7 @@ class GetPartitionsByNamesRequest
     GET_COL_STATS => {:type => ::Thrift::Types::BOOL, :name => 'get_col_stats', :optional => true},
     PROCESSORCAPABILITIES => {:type => ::Thrift::Types::LIST, :name => 'processorCapabilities', :element => {:type => ::Thrift::Types::STRING}, :optional => true},
     PROCESSORIDENTIFIER => {:type => ::Thrift::Types::STRING, :name => 'processorIdentifier', :optional => true},
-    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :optional => true},
+    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :default => %q"hive", :optional => true},
     VALIDWRITEIDLIST => {:type => ::Thrift::Types::STRING, :name => 'validWriteIdList', :optional => true},
     GETFILEMETADATA => {:type => ::Thrift::Types::BOOL, :name => 'getFileMetadata', :optional => true},
     ID => {:type => ::Thrift::Types::I64, :name => 'id', :default => -1, :optional => true},
@@ -5482,7 +5482,7 @@ class GetTableRequest
     GETCOLUMNSTATS => {:type => ::Thrift::Types::BOOL, :name => 'getColumnStats', :optional => true},
     PROCESSORCAPABILITIES => {:type => ::Thrift::Types::LIST, :name => 'processorCapabilities', :element => {:type => ::Thrift::Types::STRING}, :optional => true},
     PROCESSORIDENTIFIER => {:type => ::Thrift::Types::STRING, :name => 'processorIdentifier', :optional => true},
-    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :optional => true},
+    ENGINE => {:type => ::Thrift::Types::STRING, :name => 'engine', :default => %q"hive", :optional => true},
     ID => {:type => ::Thrift::Types::I64, :name => 'id', :default => -1, :optional => true},
     GETFILEMETADATA => {:type => ::Thrift::Types::BOOL, :name => 'getFileMetadata', :optional => true}
   }

@@ -134,6 +134,8 @@ package org.apache.hadoop.hive.metastore.api;
   }
 
   public PartitionsStatsRequest() {
+    this.engine = "hive";
+
   }
 
   public PartitionsStatsRequest(
@@ -190,7 +192,8 @@ package org.apache.hadoop.hive.metastore.api;
     this.partNames = null;
     this.catName = null;
     this.validWriteIdList = null;
-    this.engine = null;
+    this.engine = "hive";
+
   }
 
   @org.apache.thrift.annotation.Nullable

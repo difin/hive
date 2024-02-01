@@ -294,7 +294,6 @@ public class ColumnStatsUpdateTask extends Task<ColumnStatsUpdateWork> {
     ColumnStatistics colStats = constructColumnStatsFromInput();
     SetPartitionsStatsRequest request =
             new SetPartitionsStatsRequest(Collections.singletonList(colStats));
-    request.setEngine(Constants.HIVE_ENGINE);
 
     // Set writeId and validWriteId list for replicated statistics. getColStats() will return
     // non-null value only during replication.

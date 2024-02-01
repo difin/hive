@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.46"
+const string HMS_API = "1.2.47"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -573,7 +573,7 @@ struct ColumnStatistics {
 2: required list<ColumnStatisticsObj> statsObj,
 3: optional bool isStatsCompliant, // Are the stats isolation-level-compliant with the
                                                       // the calling query?
-4: optional string engine
+4: optional string engine = "hive"
 }
 
 // FileMetadata represents the table-level (in case of unpartitioned) or partition-level
@@ -698,7 +698,7 @@ struct SetPartitionsStatsRequest {
 2: optional bool needMerge, //stats need to be merged with the existing stats
 3: optional i64 writeId=-1,         // writeId for the current query that updates the stats
 4: optional string validWriteIdList, // valid write id list for the table for which this struct is being sent
-5: optional string engine //engine creating the current request
+5: optional string engine = "hive" //engine creating the current request
 }
 
 struct SetPartitionsStatsResponse {
@@ -867,7 +867,7 @@ struct TableStatsRequest {
  3: required list<string> colNames
  4: optional string catName,
  5: optional string validWriteIdList,  // valid write id list for the table for which this struct is being sent
- 6: optional string engine, //engine creating the current request
+ 6: optional string engine = "hive", //engine creating the current request
  7: optional i64 id=-1 // table id
 }
 
@@ -878,7 +878,7 @@ struct PartitionsStatsRequest {
  4: required list<string> partNames,
  5: optional string catName,
  6: optional string validWriteIdList, // valid write id list for the table for which this struct is being sent
- 7: optional string engine //engine creating the current request
+ 7: optional string engine = "hive" //engine creating the current request
 }
 
 // Return type for add_partitions_req
@@ -959,7 +959,7 @@ struct GetPartitionsByNamesRequest {
   4: optional bool get_col_stats,
   5: optional list<string> processorCapabilities,
   6: optional string processorIdentifier,
-  7: optional string engine,
+  7: optional string engine = "hive",
   8: optional string validWriteIdList,
   // when this flag is set to true, HMS will return back the file-metadata
   // for the requested partition names along with the Partition objects
@@ -1652,7 +1652,7 @@ struct GetTableRequest {
   7: optional bool getColumnStats,
   8: optional list<string> processorCapabilities,
   9: optional string processorIdentifier,
-  10: optional string engine,
+  10: optional string engine = "hive",
   11: optional i64 id=-1, // table id
   // when this flag is set to true, HMS will return the file-metadata
   // for table. Default is false

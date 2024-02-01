@@ -124,6 +124,8 @@ package org.apache.hadoop.hive.metastore.api;
   public SetPartitionsStatsRequest() {
     this.writeId = -1L;
 
+    this.engine = "hive";
+
   }
 
   public SetPartitionsStatsRequest(
@@ -167,7 +169,8 @@ package org.apache.hadoop.hive.metastore.api;
     this.writeId = -1L;
 
     this.validWriteIdList = null;
-    this.engine = null;
+    this.engine = "hive";
+
   }
 
   public int getColStatsSize() {

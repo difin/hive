@@ -214,7 +214,6 @@ public class ColStatsProcessor implements IStatsProcessor {
       }
 
       SetPartitionsStatsRequest request = new SetPartitionsStatsRequest(colStats);
-      request.setEngine(Constants.HIVE_ENGINE);
       request.setNeedMerge(colStatDesc.isNeedMerge());
 
       if (txnMgr != null) {
