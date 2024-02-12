@@ -25,9 +25,10 @@ import org.apache.hadoop.hive.metastore.PartitionManagementTask;
 import org.apache.hadoop.hive.metastore.RuntimeStatsCleanerTask;
 import org.apache.hadoop.hive.metastore.events.EventCleanerTask;
 import org.apache.hadoop.hive.metastore.security.MetastoreDelegationTokenManager;
-import org.apache.hadoop.hive.metastore.txn.AcidHouseKeeperService;
-import org.apache.hadoop.hive.metastore.txn.AcidOpenTxnsCounterService;
-import org.apache.hadoop.hive.metastore.txn.AcidTxnCleanerService;
+import org.apache.hadoop.hive.metastore.txn.service.AcidHouseKeeperService;
+import org.apache.hadoop.hive.metastore.txn.service.AcidOpenTxnsCounterService;
+import org.apache.hadoop.hive.metastore.txn.service.AcidTxnCleanerService;
+import org.apache.hadoop.hive.metastore.txn.service.CompactionHouseKeeperService;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -262,6 +263,9 @@ public class MetastoreConf {
     ACID_HOUSEKEEPER_SERVICE_START("metastore.acid.housekeeper.start",
         "hive.metastore.acid.housekeeper.start", 60, TimeUnit.SECONDS,
         "Time delay of 1st acid housekeeper run after metastore has started."),
+    COMPACTION_HOUSEKEEPER_SERVICE_INTERVAL("metastore.compaction.housekeeper.interval",
+        "hive.metastore.compaction.housekeeper.interval", 300, TimeUnit.SECONDS,
+        "Time interval describing how often the acid compaction housekeeper runs."),
     ACID_TXN_CLEANER_INTERVAL("metastore.acid.txn.cleaner.interval",
         "hive.metastore.acid.txn.cleaner.interval", 10, TimeUnit.SECONDS,
         "Time interval describing how often aborted and committed txns are cleaned."),
@@ -1450,6 +1454,7 @@ public class MetastoreConf {
             "or in server mode.  They must implement " + MetastoreTaskThread.class.getName()),
     TASK_THREADS_REMOTE_ONLY("metastore.task.threads.remote", "metastore.task.threads.remote",
         AcidHouseKeeperService.class.getName() + "," +
+                CompactionHouseKeeperService.class.getName() + "," +
             AcidTxnCleanerService.class.getName() + "," +
             AcidOpenTxnsCounterService.class.getName() + "," +
             MaterializationsRebuildLockCleanerTask.class.getName() + "," +
