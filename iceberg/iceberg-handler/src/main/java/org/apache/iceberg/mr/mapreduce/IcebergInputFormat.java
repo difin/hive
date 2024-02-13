@@ -19,8 +19,6 @@
 
 package org.apache.iceberg.mr.mapreduce;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Arrays;
@@ -29,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -40,8 +37,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.FileUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.llap.LlapHiveUtils;
+import org.apache.hadoop.hive.ql.exec.ObjectCache;
+import org.apache.hadoop.hive.ql.exec.ObjectCacheFactory;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.metadata.AuthorizationException;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
 import org.apache.hadoop.hive.ql.plan.MapWork;
 import org.apache.hadoop.mapred.JobConf;
@@ -289,7 +289,7 @@ public class IcebergInputFormat<T> extends InputFormat<Void, T> {
     private static final String HIVE_VECTORIZED_READER_CLASS = "org.apache.iceberg.mr.hive.vector.HiveVectorizedReader";
     private static final DynMethods.StaticMethod HIVE_VECTORIZED_READER_BUILDER;
 
-    private static Cache<CharSequence, Map<String, PositionDeleteIndex>> deletePosIndexCache;
+    private ObjectCache deletePosIndexCache;
 
     static {
       if (HiveVersion.min(HiveVersion.HIVE_3)) {
@@ -341,29 +341,21 @@ public class IcebergInputFormat<T> extends InputFormat<Void, T> {
       this.fetchVirtualColumns = InputFormatConfig.fetchVirtualColumns(conf);
       this.currentIterator = nextTask();
 
-      if (deletePosIndexCache == null) {
-        synchronized (IcebergRecordReader.class) {
-          if (deletePosIndexCache == null) {
-            deletePosIndexCache =
-                Caffeine.newBuilder()
-                    .expireAfterAccess(
-                        HiveConf.getTimeVar(conf, HiveConf.ConfVars.HIVE_ICEBERG_DELETE_INDEX_EXPIRY_TIME,
-                            TimeUnit.MINUTES),
-                        TimeUnit.MINUTES)
-                    .softValues()
-                    .maximumSize(conf.getLong(HiveConf.ConfVars.HIVE_ICEBERG_DELETE_INDEX_MAX_SIZE.varname,
-                        HiveConf.ConfVars.HIVE_ICEBERG_DELETE_INDEX_MAX_SIZE.defaultLongVal))
-                    .build();
-          }
-        }
-      }
+      String queryId = HiveConf.getVar(conf, HiveConf.ConfVars.HIVEQUERYID);
+      this.deletePosIndexCache = ObjectCacheFactory.getCache(conf, queryId, false);
     }
 
     private CloseableIterator<T> nextTask() {
       Function<DeleteFilter<T>, Map<String, PositionDeleteIndex>> positionIndex =
-          filter -> filter.createPosIndexMap(deletePosIndexCache,
-              tasks, conf.getLong(HiveConf.ConfVars.HIVE_ICEBERG_DELETE_FILTER_THRESHOLD.varname,
-                  HiveConf.ConfVars.HIVE_ICEBERG_DELETE_FILTER_THRESHOLD.defaultLongVal));
+          filter -> filter.createPosIndexMap((path, callable) -> {
+            try {
+              return deletePosIndexCache.retrieve(path, callable);
+            } catch (HiveException e) {
+              throw new RuntimeException(e);
+            }
+          }, tasks,
+          HiveConf.getLongVar(conf, HiveConf.ConfVars.HIVE_ICEBERG_DELETE_FILTER_THRESHOLD)
+        );
       CloseableIterator<T> closeableIterator = CloseableIterable.concat(
           Iterables.transform(tasks, task -> open(task, expectedSchema, positionIndex))).iterator();
       if (!fetchVirtualColumns || Utilities.getIsVectorized(conf)) {

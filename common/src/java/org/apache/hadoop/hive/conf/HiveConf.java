@@ -2293,12 +2293,6 @@ public class HiveConf extends Configuration {
     HIVE_ICEBERG_DELETE_FILTER_THRESHOLD("hive.iceberg.delete.filter.threshold", 2_000_000L,
         "Threshold for number of delete records to keep in memory as a set; If number of deletes is greater\n" +
             "than the threshold, delete file will be read from disk"),
-
-    HIVE_ICEBERG_DELETE_INDEX_MAX_SIZE("hive.iceberg.delete.index.max.size;", 1_000L,
-        "Max number of delete files whose entries will be stored in the deletes bit map index"),
-
-    HIVE_ICEBERG_DELETE_INDEX_EXPIRY_TIME("hive.iceberg.delete.index.expiry.time", "600s",
-        new TimeValidator(TimeUnit.SECONDS), "Number of minutes to keep deletes index entries before eviction"),
     
     HIVEUSEEXPLICITRCFILEHEADER("hive.exec.rcfile.use.explicit.header", true,
         "If this is set the header for RCFiles will simply be RCF.  If this is not\n" +
@@ -3186,7 +3180,7 @@ public class HiveConf extends Configuration {
         "Enables lockless reads"),
 
     HIVE_ACID_CREATE_TABLE_USE_SUFFIX("hive.acid.createtable.softdelete", false,
-        "Enables non-blocking DROP TABLE operation.\n" +
+        "Enables c DROP TABLE operation.\n" +
         "If enabled, every table directory would be suffixed with the corresponding table creation txnId."),
 
     HIVE_ACID_TRUNCATE_USE_BASE("hive.acid.truncate.usebase", true,
