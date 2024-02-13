@@ -963,6 +963,7 @@ nonReserved
     | KW_BRANCH | KW_SNAPSHOTS | KW_RETAIN | KW_RETENTION
     | KW_TAG
     | KW_FAST_FORWARD
+    | KW_OPTIMIZE
 ;
 
 //The following SQL2011 reserved keywords are used as function name only, but not as identifiers.
