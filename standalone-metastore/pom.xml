@@ -98,7 +98,7 @@
     <sqlline.version>1.9.0</sqlline.version>
     <jline.version>2.14.6</jline.version>
     <storage-api.version>3.1.3000.2025.0.20.0-SNAPSHOT</storage-api.version>
-    <ST4.version>4.0.4</ST4.version>
+    <ST4.version>4.0.8</ST4.version>
     <zookeeper.version>3.8.1.7.3.1.200-90</zookeeper.version>
     <curator.version>5.4.0.7.3.1.200-90</curator.version>
     <cron-utils.version>9.2.1</cron-utils.version>
