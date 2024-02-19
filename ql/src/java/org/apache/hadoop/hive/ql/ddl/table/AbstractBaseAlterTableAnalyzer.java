@@ -35,6 +35,8 @@ import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.parse.BaseSemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.Context;
+import org.apache.hadoop.hive.ql.session.SessionState;
 
 /**
  * Abstract ancestor of all Alter Table analyzer.
@@ -98,6 +100,7 @@ public abstract class AbstractBaseAlterTableAnalyzer extends BaseSemanticAnalyze
 
       if (AlterTableUtils.isFullPartitionSpec(table, partitionSpec)) {
         // Fully specified partition spec
+        SessionState.getSessionConf().set(Context.operationNameConf, op.getName());
         Partition part = PartitionUtils.getPartition(db, table, partitionSpec, true);
         outputs.add(new WriteEntity(part, writeType));
       } else {

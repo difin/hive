@@ -58,6 +58,8 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreServerUtils;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
+import org.apache.hadoop.hive.ql.Context;
+import org.apache.hadoop.hive.ql.ddl.table.AlterTableType;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.io.HiveFileFormatUtils;
 import org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat;
@@ -460,7 +462,7 @@ public class Table implements Serializable {
 
   final public void validatePartColumnNames(
       Map<String, String> spec, boolean shouldBeFull) throws SemanticException {
-    List<FieldSchema> partCols = tTable.getPartitionKeys();
+    List<FieldSchema> partCols = getPartitionKeys();
     final String tableName = Warehouse.getQualifiedName(tTable);
     if (partCols == null || (partCols.size() == 0)) {
       if (spec != null) {
@@ -484,7 +486,7 @@ public class Table implements Serializable {
         break;
       }
     }
-    if (columnsFound < spec.size()) {
+    if (columnsFound < spec.size() && !(getStorageHandler() != null && getStorageHandler().alwaysUnpartitioned())) {
       throw new ValidationFailureSemanticException(tableName + ": Partition spec " + spec +
           " contains non-partition columns");
     }
@@ -609,7 +611,7 @@ public class Table implements Serializable {
 
 
   public List<FieldSchema> getPartCols() {
-    List<FieldSchema> partKeys = tTable.getPartitionKeys();
+    List<FieldSchema> partKeys = getPartitionKeys();
     if (partKeys == null) {
       partKeys = new ArrayList<FieldSchema>();
       tTable.setPartitionKeys(partKeys);
@@ -932,7 +934,9 @@ public class Table implements Serializable {
   }
 
   public List<FieldSchema> getPartitionKeys() {
-    return tTable.getPartitionKeys();
+    return getStorageHandler() != null && getStorageHandler().alwaysUnpartitioned() &&
+        SessionState.getSessionConf().get(Context.operationNameConf, StringUtils.EMPTY).equals(AlterTableType.COMPACT.getName()) ?
+        getStorageHandler().getPartitionKeys(this) : tTable.getPartitionKeys();
   }
 
   /**

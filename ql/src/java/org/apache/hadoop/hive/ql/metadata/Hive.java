@@ -3688,6 +3688,11 @@ private void constructOneLBLocationMap(FileStatus fSta,
         pvals.add(val);
       }
     }
+
+    if (tbl.getStorageHandler() != null && tbl.getStorageHandler().alwaysUnpartitioned()) {
+      return new Partition(tbl, partSpec, tbl.getDataLocation());
+    }
+    
     org.apache.hadoop.hive.metastore.api.Partition tpart = null;
     try {
       String userName = getUserName();
