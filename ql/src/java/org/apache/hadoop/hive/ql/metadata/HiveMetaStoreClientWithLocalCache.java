@@ -79,8 +79,8 @@ public class HiveMetaStoreClientWithLocalCache extends HiveMetaStoreClient imple
     // init cache only once
     if (!INITIALIZED.get()) {
       LOG.info("Initializing local cache in HiveMetaStoreClient...");
-      maxSize = MetastoreConf.getSizeVar(conf, MetastoreConf.ConfVars.MSC_CACHE_MAX_SIZE);
-      recordStats = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.MSC_CACHE_RECORD_STATS);
+      maxSize = HiveConf.getSizeVar(conf, HiveConf.ConfVars.MSC_CACHE_MAX_SIZE);
+      recordStats = HiveConf.getBoolVar(conf, HiveConf.ConfVars.MSC_CACHE_RECORD_STATS);
       initSizeEstimator();
       initCache();
       LOG.info("Local cache initialized in HiveMetaStoreClient: {}", mscLocalCache);
