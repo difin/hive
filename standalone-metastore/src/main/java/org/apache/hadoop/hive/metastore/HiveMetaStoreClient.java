@@ -1427,7 +1427,7 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
 
     HiveMetaHook hook = getHook(tbl);
     if (hook != null) {
-      hook.preCreateTable(tbl);
+      hook.preCreateTable(request);
     }
     boolean success = false;
     try {
