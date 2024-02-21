@@ -13,7 +13,7 @@ const hive_metastoreConstants g_hive_metastore_constants;
 hive_metastoreConstants::hive_metastoreConstants() {
   DDL_TIME = "transient_lastDdlTime";
 
-  HMS_API = "1.2.44";
+  HMS_API = "1.2.45";
 
   ACCESSTYPE_NONE = 1;
 
@@ -94,6 +94,10 @@ hive_metastoreConstants::hive_metastoreConstants() {
   TXN_ID = "txnId";
 
   WRITE_ID = "writeId";
+
+  EXPECTED_PARAMETER_KEY = "expected_parameter_key";
+
+  EXPECTED_PARAMETER_VALUE = "expected_parameter_value";
 
 }
 

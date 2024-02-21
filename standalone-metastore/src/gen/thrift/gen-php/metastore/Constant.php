@@ -60,6 +60,8 @@ final class Constant extends \Thrift\Type\TConstant
     static protected $TABLE_IS_CTLT;
     static protected $TXN_ID;
     static protected $WRITE_ID;
+    static protected $EXPECTED_PARAMETER_KEY;
+    static protected $EXPECTED_PARAMETER_VALUE;
 
     protected static function init_DDL_TIME()
     {
@@ -68,7 +70,7 @@ final class Constant extends \Thrift\Type\TConstant
 
     protected static function init_HMS_API()
     {
-        return "1.2.44";
+        return "1.2.45";
     }
 
     protected static function init_ACCESSTYPE_NONE()
@@ -269,5 +271,15 @@ final class Constant extends \Thrift\Type\TConstant
     protected static function init_WRITE_ID()
     {
         return "writeId";
+    }
+
+    protected static function init_EXPECTED_PARAMETER_KEY()
+    {
+        return "expected_parameter_key";
+    }
+
+    protected static function init_EXPECTED_PARAMETER_VALUE()
+    {
+        return "expected_parameter_value";
     }
 }

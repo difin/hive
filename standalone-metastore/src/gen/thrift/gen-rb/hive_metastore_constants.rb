@@ -9,7 +9,7 @@ require 'hive_metastore_types'
 
 DDL_TIME = %q"transient_lastDdlTime"
 
-HMS_API = %q"1.2.44"
+HMS_API = %q"1.2.45"
 
 ACCESSTYPE_NONE = 1
 
@@ -90,4 +90,8 @@ TABLE_IS_CTLT = %q"created_with_ctlt"
 TXN_ID = %q"txnId"
 
 WRITE_ID = %q"writeId"
+
+EXPECTED_PARAMETER_KEY = %q"expected_parameter_key"
+
+EXPECTED_PARAMETER_VALUE = %q"expected_parameter_value"
 

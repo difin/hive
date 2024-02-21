@@ -11,7 +11,7 @@ package org.apache.hadoop.hive.metastore.api;
 
   public static final java.lang.String DDL_TIME = "transient_lastDdlTime";
 
-  public static final java.lang.String HMS_API = "1.2.44";
+  public static final java.lang.String HMS_API = "1.2.45";
 
   public static final byte ACCESSTYPE_NONE = (byte)1;
 
@@ -92,4 +92,9 @@ package org.apache.hadoop.hive.metastore.api;
   public static final java.lang.String TXN_ID = "txnId";
 
   public static final java.lang.String WRITE_ID = "writeId";
+
+  public static final java.lang.String EXPECTED_PARAMETER_KEY = "expected_parameter_key";
+
+  public static final java.lang.String EXPECTED_PARAMETER_VALUE = "expected_parameter_value";
+
 }

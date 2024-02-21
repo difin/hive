@@ -13,7 +13,7 @@ from thrift.TRecursive import fix_spec
 import sys
 from .ttypes import *
 DDL_TIME = "transient_lastDdlTime"
-HMS_API = "1.2.44"
+HMS_API = "1.2.45"
 ACCESSTYPE_NONE = 1
 ACCESSTYPE_READONLY = 2
 ACCESSTYPE_WRITEONLY = 4
@@ -54,3 +54,5 @@ DEFAULT_TABLE_TYPE = "defaultTableType"
 TABLE_IS_CTLT = "created_with_ctlt"
 TXN_ID = "txnId"
 WRITE_ID = "writeId"
+EXPECTED_PARAMETER_KEY = "expected_parameter_key"
+EXPECTED_PARAMETER_VALUE = "expected_parameter_value"
