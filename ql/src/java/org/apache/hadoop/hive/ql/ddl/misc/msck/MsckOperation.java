@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.ql.ddl.misc.msck;
 import static org.apache.hadoop.hive.metastore.Msck.getProxyClass;
 
 import org.apache.hadoop.hive.common.TableName;
+import org.apache.hadoop.hive.metastore.utils.MetastoreException;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ import org.apache.hadoop.hive.metastore.MsckInfo;
 import org.apache.hadoop.hive.metastore.PartitionManagementTask;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.utils.MetastoreException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
@@ -51,7 +53,7 @@ public class MsckOperation extends DDLOperation<MsckDesc> {
   }
 
   @Override
-  public int execute() throws HiveException, IOException, TException {
+  public int execute() throws HiveException, IOException, TException, MetastoreException {
     try {
       Msck msck = new Msck(false, false);
       msck.init(Msck.getMsckConf(context.getDb().getConf()));
@@ -75,9 +77,9 @@ public class MsckOperation extends DDLOperation<MsckDesc> {
       MsckInfo msckInfo = new MsckInfo("hive", tableName.getDb(), tableName.getTable(), desc.getFilterExp(), desc.getResFile(),
           desc.isRepairPartitions(), desc.isAddPartitions(), desc.isDropPartitions(), partitionExpirySeconds);
       return msck.repair(msckInfo);
-    } catch (MetaException e) {
+    } catch (MetaException | MetastoreException e) {
       LOG.error("Unable to create msck instance.", e);
-      return 1;
+      throw e;
     } catch (SemanticException e) {
       LOG.error("Msck failed.", e);
       return 1;
