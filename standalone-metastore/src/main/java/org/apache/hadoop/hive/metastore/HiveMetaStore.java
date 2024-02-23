@@ -233,11 +233,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     private final Configuration conf; // stores datastore (jpox) properties,
                                      // right now they come from jpox.properties
 
-    // Flag to control that always threads are initialized only once
-    // instead of multiple times
-    private final static AtomicBoolean alwaysThreadsInitialized =
-        new AtomicBoolean(false);
-
     private static String currentUrl;
     private FileMetadataManager fileMetadataManager;
     private PartitionExpressionProxy expressionProxy;
@@ -563,12 +558,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         partitionValidationPattern = null;
       }
 
-      // We only initialize once the tasks that need to be run periodically. For remote metastore
-      // these threads are started along with the other housekeeping threads only in the leader
-      // HMS.
-      if (!isMetaStoreRemote()) {
-        startAlwaysTaskThreads(conf, this);
-      }
       expressionProxy = PartFilterExprUtil.createExpressionProxy(conf);
       fileMetadataManager = new FileMetadataManager(this.getMS(), conf);
 
@@ -596,20 +585,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
       }
       dataconnectorFactory = DataConnectorProviderFactory.getInstance(this);
-    }
-
-    private static void startAlwaysTaskThreads(Configuration conf, IHMSHandler handler) throws MetaException {
-      if (alwaysThreadsInitialized.compareAndSet(false, true)) {
-        try {
-          LeaderElectionContext context = new LeaderElectionContext.ContextBuilder(conf)
-              .setTType(LeaderElectionContext.TTYPE.ALWAYS_TASKS)
-              .addListener(new HouseKeepingTasks(conf, false))
-              .setHMSHandler(handler).build();
-          context.start();
-        } catch (Exception e) {
-          throw newMetaException(e);
-        }
-      }
     }
 
     /**
