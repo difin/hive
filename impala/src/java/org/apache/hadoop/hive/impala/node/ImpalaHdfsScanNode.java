@@ -83,6 +83,10 @@ public class ImpalaHdfsScanNode extends HdfsScanNode {
       // Supply our own countStarExpr instead of letting Impala create one. This
       // allows equality checks of the count expr to succeed within Impala.
       countStarSlot_ = applyCountStarOptimization(analyzer, countStarExpr);
+      // Recompute scan ranges and stats since this scan node might only need to schedule
+      // fewer scan ranges, which is the footer ranges only.
+      computeScanRangeLocations(analyzer);
+      computeStats(analyzer);
       AggregateInfo scanAggInfo = multiAggInfo.getMaterializedAggClass(0);
       scanAggInfo.substitute(getOptimizedAggSmap(), analyzer);
       scanAggInfo.getMergeAggInfo().substitute(getOptimizedAggSmap(), analyzer);
