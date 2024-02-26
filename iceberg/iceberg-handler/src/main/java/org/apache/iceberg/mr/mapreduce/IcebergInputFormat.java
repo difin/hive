@@ -41,7 +41,6 @@ import org.apache.hadoop.hive.ql.exec.ObjectCache;
 import org.apache.hadoop.hive.ql.exec.ObjectCacheFactory;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.metadata.AuthorizationException;
-import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
 import org.apache.hadoop.hive.ql.plan.MapWork;
 import org.apache.hadoop.mapred.JobConf;
@@ -349,8 +348,12 @@ public class IcebergInputFormat<T> extends InputFormat<Void, T> {
       Function<DeleteFilter<T>, Map<String, PositionDeleteIndex>> positionIndex =
           filter -> filter.createPosIndexMap((path, callable) -> {
             try {
-              return deletePosIndexCache.retrieve(path, callable);
-            } catch (HiveException e) {
+              if (deletePosIndexCache != null) {
+                return deletePosIndexCache.retrieve(path, callable);
+              } else {
+                return callable.call();
+              }
+            } catch (Exception e) {
               throw new RuntimeException(e);
             }
           }, tasks,
