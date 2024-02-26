@@ -38,7 +38,8 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveHepExtractRelNodeRu
  * This rule will perform a rewriting to prepare the plan for incremental
  * view maintenance in case there exist aggregation operator, so we can
  * avoid the INSERT OVERWRITE and use a MERGE statement instead.
- *
+ * <br>
+ * <pre>
  * In particular, the INSERT OVERWRITE maintenance will look like this
  * (in SQL):
  * INSERT OVERWRITE mv
@@ -52,8 +53,9 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveHepExtractRelNodeRu
  *   WHERE TAB_A.ROW_ID &gt; 5
  *   GROUP BY a, b) inner_subq
  * GROUP BY a, b;
- *
+ * </pre>
  * We need to transform that into:
+ * <pre>
  * MERGE INTO mv
  * USING (
  *   SELECT a, b, SUM(x) AS s, COUNT(*) AS c --NEW DATA
@@ -91,7 +93,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveHepExtractRelNodeRu
  *   WHERE mv.flag AND countStar = 0
  *   SORT BY mv.ROW__ID;
  *
- * {@see CalcitePlanner#fixUpASTAggregateInsertDeleteIncrementalRebuild}
+ * {@see AlterMaterializedViewRebuildAnalyzer}
  */
 public class HiveAggregateInsertDeleteIncrementalRewritingRule extends HiveAggregateIncrementalRewritingRuleBase<
         HiveAggregateInsertDeleteIncrementalRewritingRule.IncrementalComputePlanWithDeletedRows> {
@@ -116,7 +118,10 @@ public class HiveAggregateInsertDeleteIncrementalRewritingRule extends HiveAggre
     aggInput = HiveHepExtractRelNodeRule.execute(aggInput);
     aggInput = new HiveRowIsDeletedPropagator(relBuilder).propagate(aggInput);
 
-    int rowIsDeletedIdx = aggInput.getRowType().getFieldCount() - 1;
+    // The row schema has two additional columns after propagation:
+    // rowIsDeleted is the last but one
+    // col0 ... coln, _any_deleted, _any_inserted
+    int rowIsDeletedIdx = aggInput.getRowType().getFieldCount() - 2;
     RexNode rowIsDeletedNode = rexBuilder.makeInputRef(
             aggInput.getRowType().getFieldList().get(rowIsDeletedIdx).getType(), rowIsDeletedIdx);
 
@@ -130,7 +135,7 @@ public class HiveAggregateInsertDeleteIncrementalRewritingRule extends HiveAggre
     List<RelBuilder.AggCall> newAggregateCalls = new ArrayList<>(aggregate.getAggCallList().size());
     for (int i = 0; i < aggregate.getAggCallList().size(); ++i) {
       AggregateCall aggregateCall = aggregate.getAggCallList().get(i);
-      if (aggregateCall.getAggregation().getKind() == SqlKind.COUNT && aggregateCall.getArgList().size() == 0) {
+      if (aggregateCall.getAggregation().getKind() == SqlKind.COUNT && aggregateCall.getArgList().isEmpty()) {
         countIdx = i + aggregate.getGroupCount();
       }
 
