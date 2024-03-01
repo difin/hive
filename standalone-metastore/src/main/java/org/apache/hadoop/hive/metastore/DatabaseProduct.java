@@ -126,4 +126,23 @@ public enum DatabaseProduct {
     }
     return false;
   }
+
+  protected static String toDate(String tableValue, DatabaseProduct dbType) {
+    if (ORACLE == dbType) {
+      return "TO_DATE(" + tableValue + ", 'YYYY-MM-DD')";
+    } else {
+      return "cast(" + tableValue + " as date)";
+    }
+  }
+
+  protected static String toTimestamp(String tableValue, DatabaseProduct dbType) {
+    if (ORACLE == dbType) {
+      return "TO_TIMESTAMP(" + tableValue + ", 'YYYY-MM-DD HH24:mi:ss')";
+    } else if (SQLSERVER == dbType) {
+      return "CONVERT(DATETIME, " + tableValue + ")";
+    } else {
+      return "cast(" + tableValue + " as TIMESTAMP)";
+    }
+  }
+
 }
