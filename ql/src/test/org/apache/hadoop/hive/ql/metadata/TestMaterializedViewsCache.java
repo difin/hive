@@ -37,6 +37,7 @@ import org.apache.calcite.rex.RexShuttle;
 import org.apache.calcite.util.Litmus;
 import org.apache.calcite.util.Pair;
 import org.apache.hadoop.hive.ql.optimizer.calcite.RelOptHiveTable;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.IncrementalRebuildMode;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.HiveParser;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
@@ -47,7 +48,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -155,7 +155,7 @@ public class TestMaterializedViewsCache {
     return new HiveRelOptMaterialization(
             new DummyRel(table), new DummyRel(table), null, asList(table.getDbName(), table.getTableName()),
             RewriteAlgorithm.ALL,
-            HiveRelOptMaterialization.IncrementalRebuildMode.AVAILABLE, ParseUtils.parse(table.getViewExpandedText(), null));
+            IncrementalRebuildMode.AVAILABLE, ParseUtils.parse(table.getViewExpandedText(), null));
   }
 
   @Test

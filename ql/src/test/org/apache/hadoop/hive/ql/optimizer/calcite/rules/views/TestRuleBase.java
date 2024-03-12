@@ -25,11 +25,13 @@ import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.rex.RexBuilder;
 import org.apache.calcite.sql.type.SqlTypeName;
+import org.apache.calcite.tools.RelBuilder;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteSemanticException;
+import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveTypeSystemImpl;
 import org.apache.hadoop.hive.ql.optimizer.calcite.RelOptHiveTable;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveRelNode;
@@ -43,6 +45,7 @@ import org.mockito.Mock;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +55,7 @@ import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.lenient;
 
 public class TestRuleBase {
+  protected static RelBuilder REL_BUILDER;
   protected static final RexBuilder REX_BUILDER = new RexBuilder(new JavaTypeFactoryImpl(new HiveTypeSystemImpl()));
   protected static final RelDataTypeFactory TYPE_FACTORY = REX_BUILDER.getTypeFactory();
 
@@ -78,11 +82,19 @@ public class TestRuleBase {
 
 
   @Mock
-  protected RelOptHiveTable table2Mock;
-  protected static RelDataType table2Type;
-  protected static Table table2;
+  protected RelOptHiveTable tNonNativeTableMock;
+  protected static RelDataType tNonNativeType;
+  protected static Table tNonNative;
+
   @Mock
-  protected static HiveStorageHandler table2storageHandler;
+  protected RelOptHiveTable tNNSnapshotsTableMock;
+  protected static RelDataType tNNSnapshotsType;
+  protected static Table tNNSnapshots;
+
+  @Mock
+  protected static HiveStorageHandler tNonNativeStorageHandler;
+  @Mock
+  protected static HiveStorageHandler tNNSnapshotsStorageHandler;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -108,12 +120,21 @@ public class TestRuleBase {
       put("i", SqlTypeName.INTEGER);
     }}, asList(VirtualColumn.ROWID, VirtualColumn.ROWISDELETED));
 
-    table2 = createTable("t2_iceberg");
-    table2Type = createTableType(new HashMap<String, SqlTypeName>() {{
+    tNonNative = createTable("t_non_native");
+    tNonNativeType = createTableType(new HashMap<String, SqlTypeName>() {{
+      put("d", SqlTypeName.INTEGER);
+      put("e", SqlTypeName.VARCHAR);
+      put("f", SqlTypeName.INTEGER);
+    }}, Collections.emptyList());
+
+    tNNSnapshots = createTable("t_supports_snapshots");
+    tNNSnapshotsType = createTableType(new HashMap<String, SqlTypeName>() {{
       put("d", SqlTypeName.INTEGER);
       put("e", SqlTypeName.VARCHAR);
       put("f", SqlTypeName.INTEGER);
     }}, singletonList(VirtualColumn.SNAPSHOT_ID));
+
+    REL_BUILDER = HiveRelFactories.HIVE_BUILDER.create(relOptCluster, null);
   }
 
   private static Table createTable(String name) {
@@ -150,13 +171,25 @@ public class TestRuleBase {
     lenient().doReturn(t3NativeType).when(t3NativeMock).getRowType();
     lenient().doReturn(t3Native).when(t3NativeMock).getHiveTableMD();
 
-    lenient().doReturn(table2Type).when(table2Mock).getRowType();
-    lenient().doReturn(table2).when(table2Mock).getHiveTableMD();
-    table2.setStorageHandler(table2storageHandler);
+    lenient().doReturn(tNonNativeType).when(tNonNativeTableMock).getRowType();
+    lenient().doReturn(tNonNative).when(tNonNativeTableMock).getHiveTableMD();
+    tNonNative.setStorageHandler(tNonNativeStorageHandler);
+
+    lenient().doReturn(tNNSnapshotsType).when(tNNSnapshotsTableMock).getRowType();
+    lenient().doReturn(tNNSnapshots).when(tNNSnapshotsTableMock).getHiveTableMD();
+    tNNSnapshots.setStorageHandler(tNNSnapshotsStorageHandler);
   }
 
-  protected RelNode createT2IcebergTS() {
-    return createTS(table2Mock, "t2");
+  protected RelNode createNonNativeTS() {
+    HiveTableScan ts = createTS(tNonNativeTableMock, "t_non_native");
+    lenient().doReturn(false).when(tNNSnapshotsStorageHandler).areSnapshotsSupported();
+    return ts;
+  }
+
+  protected RelNode createNonNativeTSSupportingSnapshots() {
+    HiveTableScan ts = createTS(tNNSnapshotsTableMock, "t_supports_snapshots");
+    lenient().doReturn(true).when(tNNSnapshotsStorageHandler).areSnapshotsSupported();
+    return ts;
   }
 
   protected HiveTableScan createTS(RelOptHiveTable table, String alias) {
