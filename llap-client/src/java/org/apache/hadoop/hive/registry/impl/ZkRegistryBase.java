@@ -401,7 +401,7 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
 
   @VisibleForTesting
   public String getPersistentNodePath() {
-    return "/" + PATH_JOINER.join(namespace, StringUtils.substringBetween(workersPath, "/", "/"), "pnode0");
+    return "/" + StringUtils.substringBetween(workersPath, "/", "/") + "/pnode0";
   }
 
   protected void ensurePersistentNodePath(ServiceRecord srv) throws IOException {

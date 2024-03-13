@@ -168,11 +168,9 @@ public class TestLlapZookeeperRegistryImpl {
 
   @Test
   public void testPersistentNodePath() {
-    String llapRootNameSpace = "/" + LlapZookeeperRegistryImpl.getRootNamespace(hiveConf,
-        HiveConf.getVar(hiveConf, HiveConf.ConfVars.LLAP_ZK_REGISTRY_NAMESPACE), NAMESPACE_PREFIX);
     String persistentNodeName = "/pnode0";
 
-    Assert.assertEquals(llapRootNameSpace + "/user-" + System.getProperty("user.name") + persistentNodeName,
+    Assert.assertEquals("/user-" + System.getProperty("user.name") + persistentNodeName,
         registry.getPersistentNodePath());
   }
 
