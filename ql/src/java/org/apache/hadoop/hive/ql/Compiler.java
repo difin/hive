@@ -474,6 +474,7 @@ public class Compiler {
   }
 
   private void cleanUp(Throwable compileException, boolean parsed, boolean deferClose) {
+    double duration = perfLogger.PerfLogEnd(CLASS_NAME, PerfLogger.COMPILE) / 1000.00;
     // Trigger post compilation hook. Note that if the compilation fails here then
     // before/after execution hook will never be executed.
     if (parsed) {
@@ -484,7 +485,6 @@ public class Compiler {
       }
     }
 
-    double duration = perfLogger.PerfLogEnd(CLASS_NAME, PerfLogger.COMPILE) / 1000.00;
     ImmutableMap<String, Long> compileHMSTimings = Hive.dumpMetaCallTimingWithoutEx("compilation");
     driverContext.getQueryDisplay().setHmsTimings(QueryDisplay.Phase.COMPILATION, compileHMSTimings);
 
