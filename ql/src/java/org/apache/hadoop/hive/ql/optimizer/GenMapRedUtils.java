@@ -1745,6 +1745,7 @@ public final class GenMapRedUtils {
       if (createTableDesc != null) {
         storageHandlerClass = createTableDesc.getStorageHandler();
         mergeTaskProperties = new Properties();
+        mergeTaskProperties.putAll(createTableDesc.getSerdeProps());
         mergeTaskProperties.put(hive_metastoreConstants.META_TABLE_NAME, createTableDesc.getDbTableName());
         location = createTableDesc.getLocation();
       } else {
@@ -1752,6 +1753,7 @@ public final class GenMapRedUtils {
         if (createViewDesc != null) {
           storageHandlerClass = createViewDesc.getStorageHandler();
           mergeTaskProperties = new Properties();
+          mergeTaskProperties.putAll(createViewDesc.getSerdeProps());
           mergeTaskProperties.put(hive_metastoreConstants.META_TABLE_NAME, createViewDesc.getViewName());
           location = createViewDesc.getLocation();
         }
