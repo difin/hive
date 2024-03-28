@@ -116,7 +116,7 @@ Table Parameters:
 	metadata_location   	hdfs://### HDFS PATH ###
 	numFiles            	1                   
 	numRows             	5                   
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 	previous_metadata_location	hdfs://### HDFS PATH ###
 	rawDataSize         	#Masked#                 
 	schema.name-mapping.default	[ {                 
@@ -132,7 +132,10 @@ Table Parameters:
 	totalSize           	#Masked#                 
 #### A masked pattern was here ####
 	uuid                	#Masked#
+	write.delete.mode   	merge-on-read       
 	write.format.default	orc                 
+	write.merge.mode    	merge-on-read       
+	write.update.mode   	merge-on-read       
 	 	 
 # Storage Information	 	 
 SerDe Library:      	org.apache.iceberg.mr.hive.HiveIcebergSerDe	 
@@ -279,7 +282,7 @@ Table Parameters:
 	metadata_location   	hdfs://### HDFS PATH ###
 	numFiles            	1                   
 	numRows             	5                   
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 	previous_metadata_location	hdfs://### HDFS PATH ###
 	rawDataSize         	#Masked#                  
 	schema.name-mapping.default	[ {                 
@@ -295,7 +298,10 @@ Table Parameters:
 	totalSize           	#Masked#                 
 #### A masked pattern was here ####
 	uuid                	#Masked#
+	write.delete.mode   	merge-on-read       
 	write.format.default	parquet             
+	write.merge.mode    	merge-on-read       
+	write.update.mode   	merge-on-read       
 	 	 
 # Storage Information	 	 
 SerDe Library:      	org.apache.iceberg.mr.hive.HiveIcebergSerDe	 
@@ -442,7 +448,7 @@ Table Parameters:
 	metadata_location   	hdfs://### HDFS PATH ###
 	numFiles            	1                   
 	numRows             	5                   
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 	previous_metadata_location	hdfs://### HDFS PATH ###
 	rawDataSize         	#Masked#                   
 	schema.name-mapping.default	[ {                 
@@ -458,7 +464,10 @@ Table Parameters:
 	totalSize           	#Masked#                 
 #### A masked pattern was here ####
 	uuid                	#Masked#
+	write.delete.mode   	merge-on-read       
 	write.format.default	avro                
+	write.merge.mode    	merge-on-read       
+	write.update.mode   	merge-on-read       
 	 	 
 # Storage Information	 	 
 SerDe Library:      	org.apache.iceberg.mr.hive.HiveIcebergSerDe	 

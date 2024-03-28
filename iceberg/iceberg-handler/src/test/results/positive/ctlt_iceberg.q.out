@@ -45,7 +45,7 @@ TBLPROPERTIES (
   'format-version'='2', 
   'iceberg.orc.files.only'='false', 
   'metadata_location'='hdfs://### HDFS PATH ###', 
-  'parquet.compression'='zstd', 
+  'parquet.compression'='snappy', 
   'snapshot-count'='0', 
   'table_type'='ICEBERG', 
 #### A masked pattern was here ####
@@ -130,12 +130,15 @@ TBLPROPERTIES (
   'format-version'='2', 
   'iceberg.orc.files.only'='false', 
   'metadata_location'='hdfs://### HDFS PATH ###', 
-  'parquet.compression'='zstd', 
+  'parquet.compression'='snappy', 
   'serialization.format'='1', 
   'snapshot-count'='0', 
   'table_type'='ICEBERG', 
 #### A masked pattern was here ####
-  'uuid'='#Masked#')
+  'uuid'='#Masked#', 
+  'write.delete.mode'='merge-on-read', 
+  'write.merge.mode'='merge-on-read', 
+  'write.update.mode'='merge-on-read')
 PREHOOK: query: create table emp_like1 like emp_iceberg stored by iceberg
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
@@ -171,7 +174,7 @@ TBLPROPERTIES (
   'format-version'='2', 
   'iceberg.orc.files.only'='false', 
   'metadata_location'='hdfs://### HDFS PATH ###', 
-  'parquet.compression'='zstd', 
+  'parquet.compression'='snappy', 
   'snapshot-count'='0', 
   'table_type'='ICEBERG', 
 #### A masked pattern was here ####
@@ -243,11 +246,14 @@ TBLPROPERTIES (
   'format-version'='2', 
   'iceberg.orc.files.only'='false', 
   'metadata_location'='hdfs://### HDFS PATH ###', 
-  'parquet.compression'='zstd', 
+  'parquet.compression'='snappy', 
   'snapshot-count'='0', 
   'table_type'='ICEBERG', 
 #### A masked pattern was here ####
-  'uuid'='#Masked#')
+  'uuid'='#Masked#', 
+  'write.delete.mode'='merge-on-read', 
+  'write.merge.mode'='merge-on-read', 
+  'write.update.mode'='merge-on-read')
 PREHOOK: query: create managed table man_table (id int) Stored as orc TBLPROPERTIES ('transactional'='true')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default

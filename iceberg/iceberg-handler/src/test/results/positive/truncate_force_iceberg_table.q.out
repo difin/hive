@@ -99,7 +99,7 @@ Table Parameters:
 	metadata_location   	hdfs://### HDFS PATH ###
 	numFiles            	3                   
 	numRows             	10                  
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 	previous_metadata_location	hdfs://### HDFS PATH ###
 	rawDataSize         	0                   
 	serialization.format	1                   
@@ -109,7 +109,10 @@ Table Parameters:
 	totalSize           	#Masked#                
 #### A masked pattern was here ####
 	uuid                	#Masked#
+	write.delete.mode   	merge-on-read       
 	write.format.default	parquet             
+	write.merge.mode    	merge-on-read       
+	write.update.mode   	merge-on-read       
 	 	 
 # Storage Information	 	 
 SerDe Library:      	org.apache.iceberg.mr.hive.HiveIcebergSerDe	 
@@ -171,7 +174,7 @@ Table Parameters:
 	metadata_location   	hdfs://### HDFS PATH ###
 	numFiles            	0                   
 	numRows             	0                   
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 	previous_metadata_location	hdfs://### HDFS PATH ###
 	rawDataSize         	0                   
 	serialization.format	1                   
@@ -181,7 +184,10 @@ Table Parameters:
 	totalSize           	#Masked#                   
 #### A masked pattern was here ####
 	uuid                	#Masked#
+	write.delete.mode   	merge-on-read       
 	write.format.default	parquet             
+	write.merge.mode    	merge-on-read       
+	write.update.mode   	merge-on-read       
 	 	 
 # Storage Information	 	 
 SerDe Library:      	org.apache.iceberg.mr.hive.HiveIcebergSerDe	 

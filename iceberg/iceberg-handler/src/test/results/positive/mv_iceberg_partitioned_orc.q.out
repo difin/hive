@@ -72,7 +72,7 @@ Table Parameters:
 	metadata_location   	hdfs://### HDFS PATH ###
 	numFiles            	2                   
 	numRows             	2                   
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 	previous_metadata_location	hdfs://### HDFS PATH ###
 	snapshot-count      	1                   
 	storage_handler     	org.apache.iceberg.mr.hive.HiveIcebergStorageHandler
@@ -158,7 +158,7 @@ Table Parameters:
 	metadata_location   	hdfs://### HDFS PATH ###
 	numFiles            	2                   
 	numRows             	2                   
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 	previous_metadata_location	hdfs://### HDFS PATH ###
 	snapshot-count      	1                   
 	storage_handler     	org.apache.iceberg.mr.hive.HiveIcebergStorageHandler

@@ -235,6 +235,7 @@ Table Parameters:
 #### A masked pattern was here ####
 	numFiles            	10                  
 	numRows             	10                  
+	parquet.compression 	snappy              
 #### A masked pattern was here ####
 	rawDataSize         	0                   
 	serialization.format	1                   
@@ -323,6 +324,7 @@ Table Parameters:
 #### A masked pattern was here ####
 	numFiles            	2                   
 	numRows             	5                   
+	parquet.compression 	snappy              
 #### A masked pattern was here ####
 	rawDataSize         	0                   
 	serialization.format	1                   

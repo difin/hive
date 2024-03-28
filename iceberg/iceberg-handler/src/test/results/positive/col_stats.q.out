@@ -510,7 +510,7 @@ Table Parameters:
 	metadata_location   	hdfs://### HDFS PATH ###
 	numFiles            	0                   
 	numRows             	0                   
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 	rawDataSize         	0                   
 	serialization.format	1                   
 	snapshot-count      	0                   
@@ -554,7 +554,7 @@ Table Parameters:
 	metadata_location   	hdfs://### HDFS PATH ###
 	numFiles            	0                   
 	numRows             	0                   
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 	rawDataSize         	0                   
 	serialization.format	1                   
 	snapshot-count      	0                   
