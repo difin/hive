@@ -714,7 +714,6 @@ public class QTestUtil {
     sem = new SemanticAnalyzer(new QueryState.Builder().withHiveConf(conf).build());
 
     testWarehouse = conf.getVar(HiveConf.ConfVars.METASTOREWAREHOUSE);
-    TestTxnDbUtil.prepDb(conf);
 
     db = Hive.get(conf);
     drv = DriverFactory.newDriver(conf);

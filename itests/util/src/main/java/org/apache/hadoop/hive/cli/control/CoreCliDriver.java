@@ -136,6 +136,7 @@ public class CoreCliDriver extends CliAdapter {
         @Override
         public Void invokeInternal() throws Exception {
           qt.shutdown();
+          metaStoreHandler.getRule().after();
           return null;
         }
       }.invoke("Teardown done.", LOG, false);

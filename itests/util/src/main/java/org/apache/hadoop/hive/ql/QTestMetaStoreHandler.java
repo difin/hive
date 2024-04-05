@@ -66,6 +66,7 @@ public class QTestMetaStoreHandler {
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CONNECTION_DRIVER, rule.getJdbcDriver());
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CONNECTION_USER_NAME, rule.getHiveUser());
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.PWD, rule.getHivePassword());
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.AUTO_CREATE_ALL, false);
 
     LOG.info(String.format("set metastore connection to url: %s",
         MetastoreConf.getVar(conf, MetastoreConf.ConfVars.CONNECT_URL_KEY)));
@@ -96,14 +97,12 @@ public class QTestMetaStoreHandler {
   }
 
   public void beforeTest() throws Exception {
-    getRule().before();
-    if (!isDerby()) {// derby is handled with old QTestUtil logic (TxnDbUtil stuff)
-      getRule().install();
+    if (isDerby()) {
+      getRule().before();
     }
   }
 
   public void afterTest(QTestUtil qt) throws Exception {
-    getRule().after();
 
     // special qtest logic, which doesn't fit quite well into Derby.after()
     if (isDerby()) {
@@ -116,5 +115,6 @@ public class QTestMetaStoreHandler {
     System.setProperty(MetastoreConf.ConfVars.CONNECTION_DRIVER.getVarname(), rule.getJdbcDriver());
     System.setProperty(MetastoreConf.ConfVars.CONNECTION_USER_NAME.getVarname(), rule.getHiveUser());
     System.setProperty(MetastoreConf.ConfVars.PWD.getVarname(), rule.getHivePassword());
+    System.setProperty(MetastoreConf.ConfVars.AUTO_CREATE_ALL.getVarname(), "false");
   }
 }

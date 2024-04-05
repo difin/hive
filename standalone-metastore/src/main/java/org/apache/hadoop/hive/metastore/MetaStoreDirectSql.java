@@ -2632,6 +2632,9 @@ class MetaStoreDirectSql {
    * MetaException
    */
   private void dropStorageDescriptors(List<Object> storageDescriptorIdList) throws MetaException {
+    if (storageDescriptorIdList.isEmpty()) {
+      return;
+    }
     String queryText;
     String sdIds = getIdListForIn(storageDescriptorIdList);
 
@@ -2719,6 +2722,9 @@ class MetaStoreDirectSql {
    */
   private void dropSerdes(List<Object> serdeIdList) throws MetaException {
     String queryText;
+    if (serdeIdList.isEmpty()) {
+      return;
+    }
     String serdeIds = getIdListForIn(serdeIdList);
 
     try {
@@ -2745,6 +2751,9 @@ class MetaStoreDirectSql {
    */
   private void dropDanglingColumnDescriptors(List<Long> columnDescriptorIdList)
       throws MetaException {
+    if (columnDescriptorIdList.isEmpty()) {
+      return;
+    }
     String queryText;
     String colIds = getIdListForIn(columnDescriptorIdList);
 
