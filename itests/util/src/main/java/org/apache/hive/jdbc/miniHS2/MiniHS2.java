@@ -300,7 +300,7 @@ public class MiniHS2 extends AbstractHiveService {
       }
       // store the config in system properties
       mr.setupConfiguration(getHiveConf());
-      baseFsDir = new Path(new Path(fs.getUri()), "/base");
+      baseFsDir = new Path(new Path(fs.getUri()), HiveConf.ConfVars.SCRATCHDIR.getDefaultValue());
     } else {
       // This is FS only mode, just initialize the dfs root directory.
       fs = FileSystem.getLocal(hiveConf);
