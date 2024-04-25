@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.ql.io.AcidUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponse;
@@ -53,6 +54,13 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
     Table table = context.getDb().getTable(desc.getTableName());
     if (!AcidUtils.isTransactionalTable(table) && !AcidUtils.isNonNativeAcidTable(table)) {
       throw new HiveException(ErrorMsg.NONACID_COMPACTION_NOT_SUPPORTED, table.getDbName(), table.getTableName());
+    }
+    
+    if (table.getStorageHandler() != null) {
+      Optional<ErrorMsg> error = table.getStorageHandler().isEligibleForCompaction(table, desc.getPartitionSpec());
+      if (error.isPresent()) {
+        throw new HiveException(error.get(), table.getDbName(), table.getTableName());
+      }
     }
 
     String partitionName = getPartitionName(table);

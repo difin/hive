@@ -956,6 +956,10 @@ class MetaStoreDirectSql {
     query.closeAll();
     MetastoreDirectSqlUtils.timingTrace(doTrace, queryText, start, queryTime);
 
+    if (partIds.isEmpty()) {
+      return orderedResult;
+    }
+
     // Now get all the one-to-many things. Start with partitions.
     MetastoreDirectSqlUtils
         .setPartitionParametersWithFilter(PARTITION_PARAMS, convertMapNullsToEmptyStrings, pm,

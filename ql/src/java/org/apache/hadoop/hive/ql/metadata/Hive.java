@@ -3901,6 +3901,14 @@ private void constructOneLBLocationMap(FileStatus fSta,
     return part;
   }
 
+  public Partition getPartition(Table tbl, Map<String, String> partSpec) throws HiveException {
+    if (tbl.getStorageHandler() != null && tbl.getStorageHandler().alwaysUnpartitioned()) {
+      return tbl.getStorageHandler().getPartition(tbl, partSpec);
+    } else {
+      return getPartition(tbl, partSpec, false);
+    }
+  }
+  
   public Partition getPartition(Table tbl, Map<String, String> partSpec,
       boolean forceCreate) throws HiveException {
     return getPartition(tbl, partSpec, forceCreate, null, true);
@@ -4332,36 +4340,40 @@ private void constructOneLBLocationMap(FileStatus fSta,
     perfLogger.PerfLogBegin(CLASS_NAME, PerfLogger.HIVE_GET_PARTITIONS);
 
     try {
-      if (tbl.isPartitioned()) {
-        List<org.apache.hadoop.hive.metastore.api.Partition> tParts;
-        try {
-          GetPartitionsPsWithAuthRequest req = new GetPartitionsPsWithAuthRequest();
-          req.setTblName(tbl.getTableName());
-          req.setDbName(tbl.getDbName());
-          req.setUserName(getUserName());
-          req.setMaxParts((short) -1);
-          req.setGroupNames(getGroupNames());
-          if (AcidUtils.isTransactionalTable(tbl)) {
-            ValidWriteIdList validWriteIdList = getValidWriteIdList(tbl.getDbName(), tbl.getTableName());
-            req.setValidWriteIdList(validWriteIdList != null ? validWriteIdList.toString() : null);
-            req.setId(tbl.getTTable().getId());
-          }
-          GetPartitionsPsWithAuthResponse res = getMSC().listPartitionsWithAuthInfoRequest(req);
-          tParts = res.getPartitions();
-
-        } catch (NoSuchObjectException nsoe) {
-          return Lists.newArrayList();
-        } catch (Exception e) {
-          LOG.error(StringUtils.stringifyException(e));
-          throw new HiveException(e);
-        }
-        List<Partition> parts = new ArrayList<>(tParts.size());
-        for (org.apache.hadoop.hive.metastore.api.Partition tpart : tParts) {
-          parts.add(new Partition(tbl, tpart));
-        }
-        return parts;
+      if (tbl.getStorageHandler() != null && tbl.getStorageHandler().alwaysUnpartitioned()) {
+        return tbl.getStorageHandler().getPartitions(tbl, Collections.EMPTY_MAP);
       } else {
-        return Collections.singletonList(new Partition(tbl));
+        if (tbl.isPartitioned()) {
+          List<org.apache.hadoop.hive.metastore.api.Partition> tParts;
+          try {
+            GetPartitionsPsWithAuthRequest req = new GetPartitionsPsWithAuthRequest();
+            req.setTblName(tbl.getTableName());
+            req.setDbName(tbl.getDbName());
+            req.setUserName(getUserName());
+            req.setMaxParts((short) -1);
+            req.setGroupNames(getGroupNames());
+            if (AcidUtils.isTransactionalTable(tbl)) {
+              ValidWriteIdList validWriteIdList = getValidWriteIdList(tbl.getDbName(), tbl.getTableName());
+              req.setValidWriteIdList(validWriteIdList != null ? validWriteIdList.toString() : null);
+              req.setId(tbl.getTTable().getId());
+            }
+            GetPartitionsPsWithAuthResponse res = getMSC().listPartitionsWithAuthInfoRequest(req);
+            tParts = res.getPartitions();
+
+          } catch (NoSuchObjectException nsoe) {
+            return Lists.newArrayList();
+          } catch (Exception e) {
+            LOG.error(StringUtils.stringifyException(e));
+            throw new HiveException(e);
+          }
+          List<Partition> parts = new ArrayList<>(tParts.size());
+          for (org.apache.hadoop.hive.metastore.api.Partition tpart : tParts) {
+            parts.add(new Partition(tbl, tpart));
+          }
+          return parts;
+        } else {
+          return Collections.singletonList(new Partition(tbl));
+        }
       }
     } finally {
       perfLogger.PerfLogEnd(CLASS_NAME, PerfLogger.HIVE_GET_PARTITIONS, "HS2-cache");
@@ -4446,7 +4458,11 @@ private void constructOneLBLocationMap(FileStatus fSta,
    */
   public List<Partition> getPartitions(Table tbl, Map<String, String> partialPartSpec)
   throws HiveException {
-    return getPartitions(tbl, partialPartSpec, (short)-1);
+    if (tbl.getStorageHandler() != null && tbl.getStorageHandler().alwaysUnpartitioned()) {
+      return tbl.getStorageHandler().getPartitions(tbl, partialPartSpec);
+    } else {
+      return getPartitions(tbl, partialPartSpec, (short)-1); 
+    }
   }
 
   /**
