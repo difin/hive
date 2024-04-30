@@ -60,7 +60,7 @@ Table Parameters:
 	bucketing_version   	2                   
 	materializedview.engine	tez                 
 	numFiles            	0                   
-	totalSize           	0                   
+	totalSize           	#Masked#
 #### A masked pattern was here ####
 	 	 
 # Storage Information	 	 
@@ -102,7 +102,7 @@ Table Parameters:
 	bucketing_version   	2                   
 	materializedview.engine	tez                 
 	numFiles            	0                   
-	totalSize           	0                   
+	totalSize           	#Masked#
 #### A masked pattern was here ####
 	 	 
 # Storage Information	 	 

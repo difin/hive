@@ -51,7 +51,7 @@ public class QOutProcessor {
   public static final String HDFS_DATE_MASK = "### HDFS DATE ###";
   public static final String HDFS_USER_MASK = "### USER ###";
   public static final String HDFS_GROUP_MASK = "### GROUP ###";
-  
+
   public static final String MASK_PATTERN = "#### A masked pattern was here ####";
   public static final String PARTIAL_MASK_PATTERN = "#### A PARTIAL masked pattern was here ####";
   private static final PatternReplacementPair MASK_STATS = new PatternReplacementPair(
@@ -73,7 +73,7 @@ public class QOutProcessor {
   public static class LineProcessingResult {
     private String line;
     private boolean partialMaskWasMatched = false;
-    
+
     public LineProcessingResult(String line) {
       this.line = line;
     }
@@ -82,7 +82,7 @@ public class QOutProcessor {
       return line;
     }
   }
-  
+
   private final Pattern[] planMask = toPattern(new String[] {
       ".*[.][.][.] [0-9]* more.*",
       "pk_-?[0-9]*_[0-9]*_[0-9]*",
@@ -215,7 +215,7 @@ public class QOutProcessor {
 
   LineProcessingResult processLine(String line) {
     LineProcessingResult result = new LineProcessingResult(line);
-    
+
     Matcher matcher = null;
 
     if (fsType == FsType.ENCRYPTED_HDFS) {
@@ -251,37 +251,10 @@ public class QOutProcessor {
         }
       }
 
-      if (!result.partialMaskWasMatched && queryMasks.contains(Mask.STATS)) {
-        matcher = MASK_STATS.pattern.matcher(result.line);
-        if (matcher.find()) {
-          result.line = result.line.replaceAll(MASK_STATS.pattern.pattern(), MASK_STATS.replacement);
-          result.partialMaskWasMatched = true;
-        }
-      }
-
-      if (!result.partialMaskWasMatched && queryMasks.contains(Mask.DATASIZE)) {
-        matcher = MASK_DATA_SIZE.pattern.matcher(result.line);
-        if (matcher.find()) {
-          result.line = result.line.replaceAll(MASK_DATA_SIZE.pattern.pattern(), MASK_DATA_SIZE.replacement);
-          result.partialMaskWasMatched = true;
-        }
-      }
-
-      if (!result.partialMaskWasMatched && queryMasks.contains(Mask.LINEAGE)) {
-        matcher = MASK_LINEAGE.pattern.matcher(result.line);
-        if (matcher.find()) {
-          result.line = result.line.replaceAll(MASK_LINEAGE.pattern.pattern(), MASK_LINEAGE.replacement);
-          result.partialMaskWasMatched = true;
-        }
-      }
-
-      if (!result.partialMaskWasMatched && queryMasks.contains(Mask.TIMESTAMP)) {
-        matcher = MASK_TIMESTAMP.pattern.matcher(result.line);
-        if (matcher.find()) {
-          result.line = result.line.replaceAll(MASK_TIMESTAMP.pattern.pattern(), MASK_TIMESTAMP.replacement);
-          result.partialMaskWasMatched = true;
-        }
-      }
+      maskPattern(result, Mask.STATS, MASK_STATS);
+      maskPattern(result, Mask.DATASIZE, MASK_DATA_SIZE);
+      maskPattern(result, Mask.LINEAGE,  MASK_LINEAGE);
+      maskPattern(result, Mask.TIMESTAMP, MASK_TIMESTAMP);
 
       for (String prefix : maskIfStartsWith) {
         if (result.line.startsWith(prefix)) {
@@ -322,6 +295,15 @@ public class QOutProcessor {
     return result;
   }
 
+  private void maskPattern(LineProcessingResult result, Mask mask, PatternReplacementPair patternReplacementPair) {
+    if (!result.partialMaskWasMatched && queryMasks.contains(mask)) {
+      if (patternReplacementPair.pattern.matcher(result.line).find()) {
+        result.line = result.line.replaceAll(patternReplacementPair.pattern.pattern(), patternReplacementPair.replacement);
+        result.partialMaskWasMatched = true;
+      }
+    }
+  }
+
   private final Pattern[] partialReservedPlanMask = toPattern(new String[] {
       "data/warehouse/(.*?/)+\\.hive-staging"  // the directory might be db/table/partition
       //TODO: add more expected test result here
@@ -344,7 +326,7 @@ public class QOutProcessor {
     ArrayList<PatternReplacementPair> ppm = new ArrayList<>();
     ppm.add(new PatternReplacementPair(Pattern.compile("\\{\"writeid\":[1-9][0-9]*,\"bucketid\":"),
         "{\"writeid\":### Masked writeid ###,\"bucketid\":"));
-    
+
     ppm.add(new PatternReplacementPair(Pattern.compile("attempt_[0-9_]+"), "attempt_#ID#"));
     ppm.add(new PatternReplacementPair(Pattern.compile("vertex_[0-9_]+"), "vertex_#ID#"));
     ppm.add(new PatternReplacementPair(Pattern.compile("task_[0-9_]+"), "task_#ID#"));
@@ -374,6 +356,7 @@ public class QOutProcessor {
           add(toPatternPair(PATH_HDFS_WITH_DATE_USER_GROUP_REGEX, String.format("%s %s$3$4 %s $6%s",
               HDFS_USER_MASK, HDFS_GROUP_MASK, HDFS_DATE_MASK, HDFS_MASK)));
           add(toPatternPair(PATH_HDFS_REGEX, String.format("$1%s", HDFS_MASK)));
+        add(toPatternPair("(.*totalSize\\s*=*\\s*)\\d+\\s*(.*)", "$1#Masked#$2"));
         }
       };
 

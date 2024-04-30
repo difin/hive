@@ -494,7 +494,7 @@ ekoifman:apache-hive-3.0.0-SNAPSHOT-bin ekoifman$ tree /Users/ekoifman/dev/hiver
     };
     checkExpected(rs, expected4,"after major compact");
   }
-  
+
   @Test
   public void testInsertFromUnion() throws Exception {
     int[][] values = {{1,2},{2,4},{5,6},{6,8},{9,10}};
@@ -792,8 +792,6 @@ ekoifman:apache-hive-3.0.0-SNAPSHOT-bin ekoifman$ tree /Users/ekoifman/dev/hiver
             .getParameters();
     Assert.assertEquals("The number of files is differing from the expected", "1", parameters.get("numFiles"));
     Assert.assertEquals("The number of rows is differing from the expected", "2", parameters.get("numRows"));
-    //Masking Total Size
-    //Assert.assertEquals("The total table size is differing from the expected", "704", parameters.get("totalSize"));
 
     int[][] targetVals2 = {{5, 1, 1}, {5, 2, 2}, {5, 3, 1}, {5, 4, 2}};
     runStatementOnDriver("insert into T partition(p=1,q) " + makeValuesClause(targetVals2));
@@ -847,8 +845,6 @@ ekoifman:apache-hive-3.0.0-SNAPSHOT-bin ekoifman$ tree /Users/ekoifman/dev/hiver
             .getParameters();
     Assert.assertEquals("The number of files is differing from the expected", "1", parameters.get("numFiles"));
     Assert.assertEquals("The number of rows is differing from the expected", "4", parameters.get("numRows"));
-    // Masking Total Size
-    // Assert.assertEquals("The total table size is differing from the expected", "698", parameters.get("totalSize"));
   }
 
   @Test
