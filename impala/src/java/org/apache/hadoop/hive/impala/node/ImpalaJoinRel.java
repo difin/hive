@@ -526,6 +526,17 @@ public class ImpalaJoinRel extends ImpalaPlanRel {
   public List<Expr> getJoinConjunctToRegister(Expr joinConjunct) {
     Preconditions.checkState(joinConjunct.getChildren().size() > 0);
     List<SlotRef> leftSideSlotRefs = new ArrayList<>();
+
+    // DWX-17033: The joinConjunct can be wrapped by a "not" function.
+    // This is not a BinaryPredicate so it should be handled separately.
+    if (!(joinConjunct instanceof BinaryPredicate)) {
+      joinConjunct.collect(SlotRef.class, leftSideSlotRefs);
+      if (leftSideSlotRefs.size() == 0) {
+        return Lists.newArrayList();
+      }
+      return Lists.newArrayList(joinConjunct);
+    }
+
     List<SlotRef> rightSideSlotRefs = new ArrayList<>();
     joinConjunct.getChild(0).collect(SlotRef.class, leftSideSlotRefs);
     joinConjunct.getChild(1).collect(SlotRef.class, rightSideSlotRefs);
