@@ -1269,12 +1269,13 @@ public class HiveConnection implements java.sql.Connection {
       protocol = openResp.getServerProtocolVersion();
       sessHandle = openResp.getSessionHandle();
 
+      // Update fetchSize if modified by server
       ConfVars confVars = ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE;
       final String serverFetchSizeString =
-          openResp.getConfiguration().getOrDefault(confVars.varname, confVars.getDefaultValue());
+              openResp.getConfiguration().getOrDefault(confVars.varname, confVars.getDefaultValue());
       if (serverFetchSizeString == null) {
         throw new IllegalStateException("Server returned a null default fetch size. Check that "
-            + ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE.varname + " is configured correctly.");
+                + ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_DEFAULT_FETCH_SIZE.varname + " is configured correctly.");
       }
 
       this.defaultFetchSize = Integer.parseInt(serverFetchSizeString);
