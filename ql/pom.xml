@@ -964,10 +964,10 @@
               <target>
                 <mkdir dir="${test.tmp.dir}/scripts/metastore" />
                 <copy todir="${test.tmp.dir}/scripts/metastore">
-                  <fileset dir="${basedir}/${hive.path.to.root}/metastore/scripts/"/>
+                  <fileset dir="${basedir}/${hive.path.to.root}/metastore/scripts/" />
                 </copy>
-                <copy todir="${test.tmp.dir}/scripts/metastore/upgrade" overwrite="true">
-                  <fileset dir="${basedir}/${hive.path.to.root}/standalone-metastore/src/main/sql/"/>
+                <copy overwrite="true" todir="${test.tmp.dir}/scripts/metastore/upgrade">
+                  <fileset dir="${basedir}/${hive.path.to.root}/standalone-metastore/src/main/sql/" />
                 </copy>
               </target>
             </configuration>

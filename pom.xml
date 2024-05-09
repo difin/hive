@@ -42,7 +42,7 @@
     <checkstyle.conf.dir>${basedir}/${hive.path.to.root}/checkstyle</checkstyle.conf.dir>
 
     <!-- Test Properties -->
-    <test.extra.path></test.extra.path>
+    <test.extra.path />
     <itest.jdbc.jars>set-this-to-colon-separated-full-path-list-of-jars-to-run-integration-tests
     </itest.jdbc.jars>
     <!--suppress UnresolvedMavenProperty -->
