@@ -342,7 +342,8 @@ public class HiveTableScan extends TableScan implements HiveRelNode {
     if (hiveTable.getTableType() == TableType.NATIVE) {
       PrunedPartitionList ppList = hiveTable.getPrunedPartitionList();
       // Dummy tables will not have a partition list. (Such as INSERT INTO  ... VALUES ())
-      if (ppList == null  && !hiveTable.isDummyTable()) {
+      // Materialized tables (CTEs) will not have partition list.
+      if (ppList == null && !hiveTable.isDummyTable() && !hiveTable.getHiveTableMD().isMaterializedTable()) {
         // This is so plans that have not had ran HivePartitionPruneRule to be
         // considered very expensive.
         return planner.getCostFactory().makeInfiniteCost();

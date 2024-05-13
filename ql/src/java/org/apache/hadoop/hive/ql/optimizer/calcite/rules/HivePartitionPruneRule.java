@@ -55,6 +55,9 @@ public abstract class HivePartitionPruneRule extends RelOptRule {
         SemanticAnalyzer.DUMMY_DATABASE + "." + SemanticAnalyzer.DUMMY_TABLE)) {
       return;
     }
+    if (hiveTable.getHiveTableMD().isMaterializedTable()) {
+      return;
+    }
 
     FunctionHelper functionHelper = call.getPlanner().getContext().unwrap(FunctionHelper.class);
     PartitionPruneRuleHelper ruleHelper =

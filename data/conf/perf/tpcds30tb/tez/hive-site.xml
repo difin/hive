@@ -69,6 +69,22 @@
         <name>hive.mapjoin.bucket.cache.size</name>
         <value>10000</value>
     </property>
+    <!--    The hive.optimize.cte.* properties are set in a way-->
+    <!--    to test the CommonTableExpressionIdentitySuggester and keep-->
+    <!--    the suggestions similar to those in apache/master.-->
+
+    <!--    Setting the threshold to a high value allows most of the-->
+    <!--    CTE code path to be exercised while in the end the-->
+    <!--    suggestions will not be incorporated in the plan-->
+    <!--    leaving logical and physical plans unaffected.-->
+    <property>
+        <name>hive.optimize.cte.materialize.threshold</name>
+        <value>100</value>
+    </property>
+    <property>
+        <name>hive.optimize.cte.materialize.full.aggregate.only</name>
+        <value>true</value>
+    </property>
     <property>
         <name>hive.optimize.metadataonly</name>
         <value>true</value>

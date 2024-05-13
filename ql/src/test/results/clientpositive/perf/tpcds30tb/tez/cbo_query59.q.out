@@ -1,3 +1,8 @@
+CTE Suggestion:
+HiveProject(d_date_sk=[$0], d_week_seq=[$4], EXPR$0=[=($14, _UTF-16LE'Sunday   ')], EXPR$1=[=($14, _UTF-16LE'Monday   ')], EXPR$2=[=($14, _UTF-16LE'Tuesday  ')], EXPR$3=[=($14, _UTF-16LE'Wednesday')], EXPR$4=[=($14, _UTF-16LE'Thursday ')], EXPR$5=[=($14, _UTF-16LE'Friday   ')], EXPR$6=[=($14, _UTF-16LE'Saturday ')])
+  HiveFilter(condition=[IS NOT NULL($4)])
+    HiveTableScan(table=[[default, date_dim]], table:alias=[date_dim])
+
 CBO PLAN:
 HiveSortLimit(sort0=[$0], sort1=[$1], sort2=[$2], dir0=[ASC], dir1=[ASC], dir2=[ASC], fetch=[100])
   HiveProject(s_store_name1=[$12], s_store_id1=[$11], d_week_seq1=[$0], _o__c3=[/($2, $17)], _o__c4=[/($3, $18)], _o__c5=[/($4, $4)], _o__c6=[/($5, $19)], _o__c7=[/($6, $20)], _o__c8=[/($7, $21)], _o__c9=[/($8, $22)])
