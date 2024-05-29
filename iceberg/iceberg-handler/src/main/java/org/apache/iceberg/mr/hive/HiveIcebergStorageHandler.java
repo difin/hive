@@ -991,9 +991,6 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
       AlterTableSnapshotRefSpec alterTableSnapshotRefSpec) {
     TableDesc tableDesc = Utilities.getTableDesc(hmsTable);
     Table icebergTable = IcebergTableUtil.getTable(conf, tableDesc.getProperties());
-    Optional.ofNullable(icebergTable.currentSnapshot()).orElseThrow(() ->
-        new UnsupportedOperationException(String.format("Cannot alter %s on iceberg table %s.%s which has no snapshot",
-            alterTableSnapshotRefSpec.getOperationType().getName(), hmsTable.getDbName(), hmsTable.getTableName())));
 
     switch (alterTableSnapshotRefSpec.getOperationType()) {
       case CREATE_BRANCH:
@@ -1002,6 +999,10 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
         IcebergSnapshotRefExec.createBranch(icebergTable, createBranchSpec);
         break;
       case CREATE_TAG:
+        Optional.ofNullable(icebergTable.currentSnapshot()).orElseThrow(() -> new UnsupportedOperationException(
+            String.format("Cannot alter %s on iceberg table %s.%s which has no snapshot",
+                alterTableSnapshotRefSpec.getOperationType().getName(), hmsTable.getDbName(),
+                hmsTable.getTableName())));
         AlterTableSnapshotRefSpec.CreateSnapshotRefSpec createTagSpec =
             (AlterTableSnapshotRefSpec.CreateSnapshotRefSpec) alterTableSnapshotRefSpec.getOperationParams();
         IcebergSnapshotRefExec.createTag(icebergTable, createTagSpec);
