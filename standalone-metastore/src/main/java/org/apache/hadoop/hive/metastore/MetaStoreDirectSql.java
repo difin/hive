@@ -56,6 +56,7 @@ import javax.jdo.Query;
 import javax.jdo.Transaction;
 import javax.jdo.datastore.JDOConnection;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -109,6 +110,7 @@ import org.apache.hadoop.hive.metastore.parser.ExpressionTree.LogicalOperator;
 import org.apache.hadoop.hive.metastore.parser.ExpressionTree.Operator;
 import org.apache.hadoop.hive.metastore.parser.ExpressionTree.TreeNode;
 import org.apache.hadoop.hive.metastore.parser.ExpressionTree.TreeVisitor;
+import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.ColStatsObjWithSourceInfo;
 import org.apache.hive.common.util.BloomFilter;
@@ -2938,5 +2940,14 @@ class MetaStoreDirectSql {
     } catch (SQLException e) {
       throw new MetaException("Error removing column stat states:" + e.getMessage());
     }
+  }
+
+  long updateTableParam(Table table, String key, String expectedValue, String newValue) {
+    String statement = TxnUtils.createUpdatePreparedStmt(
+      "\"TABLE_PARAMS\"",
+      ImmutableList.of("\"PARAM_VALUE\""),
+      ImmutableList.of("\"TBL_ID\"", "\"PARAM_KEY\"", "\"PARAM_VALUE\""));
+    Query query = pm.newQuery("javax.jdo.query.SQL", statement);
+    return (long) query.executeWithArray(newValue, table.getId(), key, expectedValue);
   }
 }

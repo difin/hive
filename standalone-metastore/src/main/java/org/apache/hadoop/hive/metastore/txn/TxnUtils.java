@@ -29,7 +29,6 @@ import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.metastore.DatabaseProduct;
-import org.apache.hadoop.hive.metastore.TransactionalValidationListener;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.GetOpenTxnsResponse;
 import org.apache.hadoop.hive.metastore.api.MetaException;
@@ -60,7 +59,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -811,5 +809,12 @@ public class TxnUtils {
     }
     return (SQLException)ex;
   }
-
+  
+  public static String createUpdatePreparedStmt(String tableName, List<String> columnNames, List<String> conditionKeys) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("update " + tableName + " set ");
+    sb.append(columnNames.stream().map(col -> col + "=?").collect(Collectors.joining(",")));
+    sb.append(" where " + conditionKeys.stream().map(cond -> cond + "=?").collect(Collectors.joining(" and ")));
+    return sb.toString();
+  }
 }
