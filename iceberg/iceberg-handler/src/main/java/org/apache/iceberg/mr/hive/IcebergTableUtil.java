@@ -42,7 +42,6 @@ import org.apache.iceberg.DeleteFiles;
 import org.apache.iceberg.ManageSnapshots;
 import org.apache.iceberg.PartitionData;
 import org.apache.iceberg.PartitionSpec;
-import org.apache.iceberg.RowLevelOperationMode;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.SnapshotRef;
 import org.apache.iceberg.StructLike;
@@ -57,6 +56,9 @@ import org.apache.iceberg.mr.InputFormatConfig;
 import org.apache.iceberg.types.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.iceberg.RowLevelOperationMode.COPY_ON_WRITE;
+import static org.apache.iceberg.RowLevelOperationMode.MERGE_ON_READ;
 
 public class IcebergTableUtil {
 
@@ -302,8 +304,16 @@ public class IcebergTableUtil {
   }
 
   public static boolean isV2Table(Map<String, String> props) {
-    return props != null &&
-        "2".equals(props.get(TableProperties.FORMAT_VERSION));
+    return props != null && isV2Table(props::getOrDefault);
+  }
+
+  public static boolean isV2Table(BinaryOperator<String> props) {
+    String version = props.apply(TableProperties.FORMAT_VERSION, null);
+    return "2".equals(version);
+  }
+
+  private static String getWriteModeDefault(BinaryOperator<String> props) {
+    return (isV2Table(props) ? MERGE_ON_READ : COPY_ON_WRITE).modeName();
   }
 
   public static boolean isCopyOnWriteMode(Context.Operation operation, BinaryOperator<String> props) {
@@ -311,18 +321,18 @@ public class IcebergTableUtil {
     switch (operation) {
       case DELETE:
         mode = props.apply(TableProperties.DELETE_MODE,
-            TableProperties.DELETE_MODE_DEFAULT);
+            getWriteModeDefault(props));
         break;
       case UPDATE:
         mode = props.apply(TableProperties.UPDATE_MODE,
-            TableProperties.UPDATE_MODE_DEFAULT);
+            getWriteModeDefault(props));
         break;
       case MERGE:
         mode = props.apply(TableProperties.MERGE_MODE,
-            TableProperties.MERGE_MODE_DEFAULT);
+            getWriteModeDefault(props));
         break;
     }
-    return RowLevelOperationMode.COPY_ON_WRITE.modeName().equalsIgnoreCase(mode);
+    return COPY_ON_WRITE.modeName().equalsIgnoreCase(mode);
   }
 
   public static void performMetadataDelete(Table icebergTable, String branchName, SearchArgument sarg) {

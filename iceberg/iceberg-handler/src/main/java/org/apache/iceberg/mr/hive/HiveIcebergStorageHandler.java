@@ -209,6 +209,11 @@ import org.apache.iceberg.util.StructProjection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.iceberg.TableProperties.DELETE_MODE;
+import static org.apache.iceberg.TableProperties.FORMAT_VERSION;
+import static org.apache.iceberg.TableProperties.MERGE_MODE;
+import static org.apache.iceberg.TableProperties.UPDATE_MODE;
+
 public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, HiveStorageHandler {
   private static final Logger LOG = LoggerFactory.getLogger(HiveIcebergStorageHandler.class);
 
@@ -1385,6 +1390,13 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
 
       // serialize table object into config
       Table serializableTable = SerializableTable.copyOf(table);
+
+      // set table format-version and write-mode information from tableDesc
+      List<String> writeConfigList = ImmutableList.of(
+          FORMAT_VERSION, DELETE_MODE, UPDATE_MODE, MERGE_MODE);
+      if (IcebergTableUtil.isV2Table(props::getProperty)) {
+        writeConfigList.forEach(cfg -> serializableTable.properties().computeIfAbsent(cfg, props::getProperty));
+      }
       checkAndSkipIoConfigSerialization(configuration, serializableTable);
       map.put(InputFormatConfig.SERIALIZED_TABLE_PREFIX + tableDesc.getTableName(),
           SerializationUtil.serializeToBase64(serializableTable));
