@@ -18,7 +18,6 @@
 
 package org.apache.hadoop.hive.ql.plan;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -116,7 +115,6 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   private transient Partition partition;
   private Path destPath;
   private boolean isHiveServerQuery;
-  private Long mmWriteId;
   private boolean isMerge;
   private boolean isMmCtas;
 
@@ -154,7 +152,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
       final boolean compressed, final int destTableId, final boolean multiFileSpray,
       final boolean canBeMerged, final int numFiles, final int totalFiles,
       final List<ExprNodeDesc> partitionCols, final DynamicPartitionCtx dpCtx, Path destPath,
-      Long mmWriteId, boolean isMmCtas, boolean isInsertOverwrite, boolean isQuery, boolean isCTASorCM, boolean isDirectInsert,
+      boolean isMmCtas, boolean isInsertOverwrite, boolean isQuery, boolean isCTASorCM, boolean isDirectInsert,
       AcidUtils.Operation acidOperation, boolean deleteOfSplitUpdate) {
     this.dirName = dirName;
     setTableInfo(tableInfo);
@@ -169,7 +167,6 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
     this.dpCtx = dpCtx;
     this.dpSortState = DPSortState.NONE;
     this.destPath = destPath;
-    this.mmWriteId = mmWriteId;
     this.isMmCtas = isMmCtas;
     this.isInsertOverwrite = isInsertOverwrite;
     this.isQuery = isQuery;
@@ -197,7 +194,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   public FileSinkDesc(FileSinkDesc other) {
     this(other.dirName, other.tableInfo, other.partition, other.compressed, other.destTableId, other.multiFileSpray,
         other.canBeMerged, other.numFiles, other.totalFiles, other.partitionCols, other.dpCtx,
-        other.destPath, other.mmWriteId, other.isMmCtas, other.isInsertOverwrite, other.isQuery,
+        other.destPath, other.isMmCtas, other.isInsertOverwrite, other.isQuery,
         other.isCTASorCM, other.isDirectInsert, other.acidOperation, other.deleteOfSplitUpdate);
   }
 
@@ -205,7 +202,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   public Object clone() throws CloneNotSupportedException {
     FileSinkDesc ret = new FileSinkDesc(dirName, tableInfo, partition, compressed,
         destTableId, multiFileSpray, canBeMerged, numFiles, totalFiles,
-        partitionCols, dpCtx, destPath, mmWriteId, isMmCtas, isInsertOverwrite, isQuery,
+        partitionCols, dpCtx, destPath, isMmCtas, isInsertOverwrite, isQuery,
         isCTASorCM, isDirectInsert, acidOperation, deleteOfSplitUpdate);
     ret.setCompressCodec(compressCodec);
     ret.setCompressType(compressType);
@@ -396,7 +393,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   public boolean isIcebergTable() {
     if (getTable() != null) {
       return DDLUtils.isIcebergTable(table);
-    } else { 
+    } else {
       return MetaStoreUtils.isIcebergTable(
           Maps.fromProperties(getTableInfo().getProperties()));
     }
@@ -695,10 +692,6 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
 
   public void setStatsTmpDir(String statsCollectionTempDir) {
     this.statsTmpDir = statsCollectionTempDir;
-  }
-
-  public void setMmWriteId(Long mmWriteId) {
-    this.mmWriteId = mmWriteId;
   }
 
   public void setIsMerge(boolean b) {

@@ -18,7 +18,6 @@
 
 package org.apache.hadoop.hive.ql;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +35,6 @@ import org.apache.hadoop.hive.ql.cache.results.CacheUsage;
 import org.apache.hadoop.hive.ql.cache.results.QueryResultsCache;
 import org.apache.hadoop.hive.ql.cache.results.QueryResultsCache.CacheEntry;
 import org.apache.hadoop.hive.ql.exec.ConditionalTask;
-import org.apache.hadoop.hive.ql.exec.DagUtils;
 import org.apache.hadoop.hive.ql.exec.FetchTask;
 import org.apache.hadoop.hive.ql.exec.Task;
 import org.apache.hadoop.hive.ql.exec.TaskFactory;
@@ -221,7 +219,7 @@ public class Executor {
     if (driverContext.getCacheUsage().getStatus() == CacheUsage.CacheStatus.CAN_CACHE_QUERY_RESULTS &&
         driverContext.getPlan().getFetchTask() != null) {
       ValidTxnWriteIdList txnWriteIdList = null;
-      if (driverContext.getPlan().hasAcidResourcesInQuery()) {
+      if (driverContext.getPlan().hasAcidReadWrite()) {
         txnWriteIdList = AcidUtils.getValidTxnWriteIdList(driverContext.getConf());
       }
       // The results of this query execution might be cacheable.

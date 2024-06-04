@@ -36,6 +36,8 @@ import org.apache.hadoop.hive.ql.parse.CalcitePlanner;
 import org.apache.hadoop.hive.ql.parse.QB;
 
 import java.util.List;
+import java.util.function.Supplier;
+
 /**
  * EngineQueryHelper.  This interface defines objects created and used while compiling
  * query database engine specific code.
@@ -47,16 +49,15 @@ public interface EngineQueryHelper {
     throw new RuntimeException("Method not supported.");
   }
 
-  default public FileSinkDesc compilePlan(Hive db, RelNode rootRelNode,
+  default FileSinkDesc compilePlan(Hive db, RelNode rootRelNode,
       FileSinkDesc fileSinkDesc, boolean isExplain, QB qb, CalcitePlanner.PreCboCtx.Type stmtType,
-      String txnString, HiveTxnManager txnManager, List<FieldSchema> resultSchema) throws HiveException {
+      Supplier<String> validTxnsList, HiveTxnManager txnManager, List<FieldSchema> resultSchema) throws HiveException {
     throw new RuntimeException("Method not supported.");
   }
 
-  public boolean supportsMarkEvent();
+  boolean supportsMarkEvent();
 
-  public boolean supportsValidateFunction();
+  boolean supportsValidateFunction();
 
-  public FunctionHelper createFunctionHelper(RexBuilder rexBuilder);
-
+  FunctionHelper createFunctionHelper(RexBuilder rexBuilder);
 }

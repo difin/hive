@@ -89,6 +89,7 @@ import static org.apache.hadoop.hive.ql.TxnCommandsBaseForTests.runWorker;
 import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeStatementOnDriver;
 import static org.apache.hadoop.hive.ql.txn.compactor.CompactorTestUtil.executeStatementOnDriverAndReturnResults;
 import static org.apache.hadoop.hive.ql.txn.compactor.TestCompactor.execSelectAndDumpData;
+import static org.apache.hadoop.hive.ql.txn.compactor.TestCompactorBase.dropTables;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -180,8 +181,8 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
       }
       aborted = true;
       Assert.assertEquals("FAILED: Hive Internal Error: org.apache.hadoop.hive.ql.lockmgr.LockException(" +
-          "Transaction manager has aborted the transaction txnid:21.  Reason: Aborting [txnid:21,24] due to a write " +
-          "conflict on default/rebalance_test committed by [txnid:20,24] d/u)", e.getErrorMessage());
+          "Transaction manager has aborted the transaction txnid:20.  Reason: Aborting [txnid:20,20] due to a write " +
+          "conflict on default/rebalance_test committed by [txnid:19,20] d/u)", e.getErrorMessage());
       // Delete the record, so the rest of the test can be the same in both cases
       executeStatementOnDriver("DELETE FROM " + tableName + " WHERE b = 12", driver);
     } finally {
@@ -231,7 +232,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         },
     };
     verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
-        new String[] {"bucket_00000", "bucket_00001", "bucket_00002", "bucket_00003"}, "base_0000007_v0000020");
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002", "bucket_00003"}, "base_0000007_v0000019");
   }
 
   @Test
@@ -287,7 +288,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         },
     };
     verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
-        new String[] {"bucket_00000", "bucket_00001", "bucket_00002","bucket_00003"}, "base_0000007_v0000020");
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002","bucket_00003"}, "base_0000007_v0000019");
   }
 
   @Test
@@ -341,7 +342,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         },
     };
     verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
-        new String[] {"bucket_00000", "bucket_00001", "bucket_00002","bucket_00003"}, "base_0000007_v0000020");
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002","bucket_00003"}, "base_0000007_v0000019");
   }
 
   @Test
@@ -366,7 +367,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
             "('3',1,'tomorrow'), ('3',2,'tomorrow'), ('3',3,'tomorrow'), ('3',4,'tomorrow')",
         driver);
 
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(a string, b int) " +
         "PARTITIONED BY (ds string) STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
     executeStatementOnDriver("INSERT OVERWRITE TABLE " + tableName + " partition (ds='tomorrow') select a, b from " + stageTableName, driver);
@@ -450,7 +451,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         },
     };
     verifyRebalance(testDataProvider, tableName, "ds=tomorrow", expectedBuckets,
-        new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000016");
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000015");
   }
 
   @Test
@@ -460,7 +461,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
 
     final String tableName = "rebalance_test";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(a string, b int) " +
         "CLUSTERED BY(a) INTO 4 BUCKETS STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
     executeStatementOnDriver("INSERT INTO TABLE " + tableName + " values ('11',11),('22',22),('33',33),('44',44)", driver);
@@ -524,7 +525,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         },
     };
     verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
-        new String[] {"bucket_00000", "bucket_00001", "bucket_00002", "bucket_00003"}, "base_0000007_v0000020");
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002", "bucket_00003"}, "base_0000007_v0000019");
   }
 
   private TestDataProvider prepareRebalanceTestData(String tableName) throws Exception {
@@ -534,7 +535,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testDataProvider.createFullAcidTable(stageTableName, true, false);
     testDataProvider.insertTestData(stageTableName, true);
 
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(a string, b int) " +
         "STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
     executeStatementOnDriver("INSERT OVERWRITE TABLE " + tableName + " select a, b from " + stageTableName, driver);
@@ -609,7 +610,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
 
     final String dbName = "default";
     final String tableName = "compaction_test";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(id string, value string) PARTITIONED BY (bval boolean) CLUSTERED BY(id) " +
             "INTO 10 BUCKETS STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
 
@@ -641,7 +642,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
 
     final String dbName = "default";
     final String tableName = "compaction_test";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(id string, value string) CLUSTERED BY(id) " +
         "INTO 10 BUCKETS STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
 
@@ -691,7 +692,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
 
     final String dbName = "default";
     final String tableName = "compaction_test";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(id string, value string) CLUSTERED BY(id) " +
             "INTO 10 BUCKETS STORED AS ORC TBLPROPERTIES('transactional'='false')", driver);
 
@@ -762,8 +763,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     final String dbName = "default";
     final String origTableName = "compaction_test";
     final String testTableName = "imported";
-    executeStatementOnDriver("drop table if exists " + origTableName, driver);
-    executeStatementOnDriver("drop table if exists " + testTableName, driver);
+    dropTables(driver, origTableName, testTableName);
     executeStatementOnDriver("CREATE TABLE " + origTableName + "(id string, value string) CLUSTERED BY(id) " +
             "INTO 10 BUCKETS STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
 
@@ -831,7 +831,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     String dbName = "default";
     String tblName = "compaction_test";
     IMetaStoreClient msClient = new HiveMetaStoreClient(conf);
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("CREATE TABLE " + tblName + "(a INT, b STRING) " +
             " CLUSTERED BY(a) INTO 4 BUCKETS" + //currently ACID requires table to be bucketed
             " STORED AS ORC  TBLPROPERTIES ('transactional'='true')", driver);
@@ -924,7 +924,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     CompactorTestUtil.runCleaner(conf);
     verifySuccessfulCompaction(1);
     // Should contain only one base directory now
-    String expectedBase = "base_0000005_v0000009";
+    String expectedBase = "base_0000005_v0000008";
     Assert.assertEquals("Base directory does not match after major compaction",
         Collections.singletonList(expectedBase),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, null));
@@ -980,7 +980,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     CompactorTestUtil.runCleaner(conf);
     verifySuccessfulCompaction(1);
     // Should contain only one base directory now
-    String expectedBase = "base_0000005_v0000008";
+    String expectedBase = "base_0000005_v0000007";
     Assert.assertEquals("Base directory does not match after major compaction",
         Collections.singletonList(expectedBase),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, null));
@@ -1006,7 +1006,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
 
     String dbName = "default";
     String tblName = "testMajorCompaction";
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("create transactional table " + tblName + " (a int, b int) clustered"
         + " by (a) into 4 buckets"
         + " stored as ORC TBLPROPERTIES('bucketing_version'='2', 'transactional'='true',"
@@ -1054,7 +1054,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     CompactorTestUtil.runCleaner(conf);
     verifySuccessfulCompaction(1);
     // Should contain only one base directory now
-    String expectedBase = "base_0000003_v0000009";
+    String expectedBase = "base_0000003_v0000008";
     Assert.assertEquals("Base directory does not match after major compaction",
         Collections.singletonList(expectedBase),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, null));
@@ -1062,7 +1062,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> expectedBucketFiles = Arrays.asList("bucket_00000", "bucket_00001", "bucket_00002");
     Assert.assertEquals("Bucket names are not matching after compaction", expectedBucketFiles,
         CompactorTestUtil
-            .getBucketFileNames(fs, table, null, "base_0000003_v0000009"));
+            .getBucketFileNames(fs, table, null, "base_0000003_v0000008"));
     // Check buckets contents
     Assert.assertEquals("post-compaction bucket 0", expectedRsBucket0, testDataProvider.getBucketData(tblName,
       "536870912"));
@@ -1132,32 +1132,32 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     verifySuccessfulCompaction( 3);
     // Should contain only one base directory now
     Assert.assertEquals("Base directory does not match after major compaction",
-        Collections.singletonList("base_0000005_v0000009"),
+        Collections.singletonList("base_0000005_v0000008"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, partitionToday));
     Assert.assertEquals("Base directory does not match after major compaction",
-        Collections.singletonList("base_0000005_v0000014"),
+        Collections.singletonList("base_0000005_v0000010"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, partitionTomorrow));
     Assert.assertEquals("Base directory does not match after major compaction",
-        Collections.singletonList("base_0000005_v0000019"),
+        Collections.singletonList("base_0000005_v0000012"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, partitionYesterday));
     // Check base dir contents
     List<String> expectedBucketFiles = Arrays.asList("bucket_00000");
     Assert.assertEquals("Bucket names are not matching after compaction", expectedBucketFiles,
         CompactorTestUtil
-            .getBucketFileNames(fs, table, partitionToday, "base_0000005_v0000009"));
+            .getBucketFileNames(fs, table, partitionToday, "base_0000005_v0000008"));
     Assert.assertEquals("Bucket names are not matching after compaction", expectedBucketFiles,
         CompactorTestUtil
-            .getBucketFileNames(fs, table, partitionTomorrow, "base_0000005_v0000014"));
+            .getBucketFileNames(fs, table, partitionTomorrow, "base_0000005_v0000010"));
     Assert.assertEquals("Bucket names are not matching after compaction", expectedBucketFiles,
         CompactorTestUtil
-            .getBucketFileNames(fs, table, partitionYesterday, "base_0000005_v0000019"));
+            .getBucketFileNames(fs, table, partitionYesterday, "base_0000005_v0000012"));
     // Check buckets contents
     Assert.assertEquals("post-compaction bucket 0", expectedRsBucket0,
         testDataProvider.getBucketData(tblName, "536870912"));
     // Check bucket file contents
-    checkBucketIdAndRowIdInAcidFile(fs, new Path(todayPath, "base_0000005_v0000009"), 0);
-    checkBucketIdAndRowIdInAcidFile(fs, new Path(tomorrowPath, "base_0000005_v0000014"), 0);
-    checkBucketIdAndRowIdInAcidFile(fs, new Path(yesterdayPath, "base_0000005_v0000019"), 0);
+    checkBucketIdAndRowIdInAcidFile(fs, new Path(todayPath, "base_0000005_v0000008"), 0);
+    checkBucketIdAndRowIdInAcidFile(fs, new Path(tomorrowPath, "base_0000005_v0000010"), 0);
+    checkBucketIdAndRowIdInAcidFile(fs, new Path(yesterdayPath, "base_0000005_v0000012"), 0);
 
     CompactorTestUtilities.checkAcidVersion(fs.listFiles(new Path(table.getSd().getLocation()), true), fs,
         conf.getBoolVar(HiveConf.ConfVars.HIVE_WRITE_ACID_VERSION_FILE), new String[] { AcidUtils.BASE_PREFIX});
@@ -1220,9 +1220,9 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     // 3 compactions should be in the response queue with succeeded state
     verifySuccessfulCompaction( 3);
     // Verify base directories after compaction in each partition
-    String expectedBaseToday = "base_0000005_v0000011";
-    String expectedBaseTomorrow = "base_0000005_v0000016";
-    String expectedBaseYesterday = "base_0000005_v0000021";
+    String expectedBaseToday = "base_0000005_v0000010";
+    String expectedBaseTomorrow = "base_0000005_v0000012";
+    String expectedBaseYesterday = "base_0000005_v0000014";
     List<String> baseDeltasInToday =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, partitionToday);
     Assert.assertEquals("Delta directories does not match after compaction",
@@ -1300,11 +1300,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> actualDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, null);
     Assert.assertEquals("Delta directories does not match after compaction",
-        Collections.singletonList("delta_0000001_0000005_v0000009"), actualDeltasAfterComp);
+        Collections.singletonList("delta_0000001_0000005_v0000008"), actualDeltasAfterComp);
     List<String> actualDeleteDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deleteEventDeltaDirFilter, table, null);
     Assert.assertEquals("Delete delta directories does not match after compaction",
-        Collections.singletonList("delete_delta_0000001_0000005_v0000009"), actualDeleteDeltasAfterComp);
+        Collections.singletonList("delete_delta_0000001_0000005_v0000008"), actualDeleteDeltasAfterComp);
     // Verify bucket files in delta dirs
     List<String> expectedBucketFiles = Collections.singletonList("bucket_00000");
     Assert.assertEquals("Bucket names are not matching after compaction", expectedBucketFiles,
@@ -1359,7 +1359,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     expectedDeleteDeltas.add("delete_delta_0000005_0000005_0000");
 
     testMinorCompactionWithoutBucketsCommon(dbName, tableName, tempTableName, false, expectedDeltas,
-        expectedDeleteDeltas, "delta_0000001_0000008_v0000025", CompactionType.MINOR);
+        expectedDeleteDeltas, "delta_0000001_0000008_v0000012", CompactionType.MINOR);
   }
 
   @Test
@@ -1380,7 +1380,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     expectedDeleteDeltas.add("delete_delta_0000005_0000005_0000");
 
     testMinorCompactionWithoutBucketsCommon(dbName, tableName, tempTableName, true, expectedDeltas,
-        expectedDeleteDeltas, "delta_0000002_0000008_v0000025", CompactionType.MINOR);
+        expectedDeleteDeltas, "delta_0000002_0000008_v0000012", CompactionType.MINOR);
   }
 
   @Test
@@ -1401,7 +1401,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     expectedDeleteDeltas.add("delete_delta_0000005_0000005_0000");
 
     testMinorCompactionWithoutBucketsCommon(dbName, tableName, tempTableName, true, expectedDeltas,
-        expectedDeleteDeltas, "base_0000008_v0000025", CompactionType.MAJOR);
+        expectedDeleteDeltas, "base_0000008_v0000012", CompactionType.MAJOR);
   }
 
   private void testMinorCompactionWithoutBucketsCommon(String dbName, String tableName, String tempTableName,
@@ -1523,11 +1523,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> actualDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, null);
     Assert.assertEquals("Delta directories does not match after compaction",
-        Collections.singletonList("delta_0000001_0000008_v0000024"), actualDeltasAfterComp);
+        Collections.singletonList("delta_0000001_0000008_v0000011"), actualDeltasAfterComp);
     List<String> actualDeleteDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deleteEventDeltaDirFilter, table, null);
     Assert.assertEquals("Delete delta directories does not match after compaction",
-        Collections.singletonList("delete_delta_0000001_0000008_v0000024"), actualDeleteDeltasAfterComp);
+        Collections.singletonList("delete_delta_0000001_0000008_v0000011"), actualDeleteDeltasAfterComp);
     // Verify bucket files in delta dirs
     List<String> actualData = dataProvider.getAllData(tableName);
 
@@ -1553,7 +1553,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> actualBasesAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, null);
     Assert.assertEquals("Base directory does not match after compaction",
-        Collections.singletonList("base_0000008_v0000039"), actualBasesAfterComp);
+        Collections.singletonList("base_0000008_v0000014"), actualBasesAfterComp);
     // Verify bucket files in delta dirs
     Assert.assertEquals("Bucket names are not matching after compaction", expectedBucketFiles,
         CompactorTestUtil.getBucketFileNames(fs, table, null, actualBasesAfterComp.get(0)));
@@ -1596,11 +1596,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> actualDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, null);
     Assert.assertEquals("Delta directories does not match after compaction",
-        Collections.singletonList("delta_0000001_0000005_v0000009"), actualDeltasAfterComp);
+        Collections.singletonList("delta_0000001_0000005_v0000008"), actualDeltasAfterComp);
     List<String> actualDeleteDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deleteEventDeltaDirFilter, table, null);
     Assert.assertEquals("Delete delta directories does not match after compaction",
-        Collections.singletonList("delete_delta_0000001_0000005_v0000009"), actualDeleteDeltasAfterComp);
+        Collections.singletonList("delete_delta_0000001_0000005_v0000008"), actualDeleteDeltasAfterComp);
     // Verify bucket files in delta dirs
     List<String> expectedBucketFiles = Arrays.asList("bucket_00000", "bucket_00001");
     Assert.assertEquals("Bucket names are not matching after compaction", expectedBucketFiles,
@@ -1679,12 +1679,12 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> actualDeltasAfterCompPartToday =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, partitionToday);
     Assert.assertEquals("Delta directories does not match after compaction",
-        Collections.singletonList("delta_0000001_0000005_v0000009"), actualDeltasAfterCompPartToday);
+        Collections.singletonList("delta_0000001_0000005_v0000008"), actualDeltasAfterCompPartToday);
     List<String> actualDeleteDeltasAfterCompPartToday =
         CompactorTestUtil
             .getBaseOrDeltaNames(fs, AcidUtils.deleteEventDeltaDirFilter, table, partitionToday);
     Assert.assertEquals("Delete delta directories does not match after compaction",
-        Collections.singletonList("delete_delta_0000001_0000005_v0000009"), actualDeleteDeltasAfterCompPartToday);
+        Collections.singletonList("delete_delta_0000001_0000005_v0000008"), actualDeleteDeltasAfterCompPartToday);
     // Verify bucket files in delta dirs
     List<String> expectedBucketFiles = Collections.singletonList("bucket_00000");
     Assert.assertEquals("Bucket names are not matching after compaction", expectedBucketFiles,
@@ -1763,12 +1763,12 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> actualDeltasAfterCompPartToday =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, partitionToday);
     Assert.assertEquals("Delta directories does not match after compaction",
-        Collections.singletonList("delta_0000001_0000005_v0000009"), actualDeltasAfterCompPartToday);
+        Collections.singletonList("delta_0000001_0000005_v0000008"), actualDeltasAfterCompPartToday);
     List<String> actualDeleteDeltasAfterCompPartToday =
         CompactorTestUtil
             .getBaseOrDeltaNames(fs, AcidUtils.deleteEventDeltaDirFilter, table, partitionToday);
     Assert.assertEquals("Delete delta directories does not match after compaction",
-        Collections.singletonList("delete_delta_0000001_0000005_v0000009"), actualDeleteDeltasAfterCompPartToday);
+        Collections.singletonList("delete_delta_0000001_0000005_v0000008"), actualDeleteDeltasAfterCompPartToday);
     // Verify bucket files in delta dirs
     List<String> expectedBucketFiles = Arrays.asList("bucket_00000", "bucket_00001");
     Assert.assertEquals("Bucket names are not matching after compaction", expectedBucketFiles,
@@ -1840,11 +1840,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     // Verify delta directories after compaction
     List<String> actualDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, null);
-    Assert.assertEquals(Collections.singletonList("delta_0000001_0000015_v0000019"), actualDeltasAfterComp);
+    Assert.assertEquals(Collections.singletonList("delta_0000001_0000015_v0000018"), actualDeltasAfterComp);
     List<String> actualDeleteDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deleteEventDeltaDirFilter, table, null);
     Assert
-        .assertEquals(Collections.singletonList("delete_delta_0000001_0000015_v0000019"), actualDeleteDeltasAfterComp);
+        .assertEquals(Collections.singletonList("delete_delta_0000001_0000015_v0000018"), actualDeleteDeltasAfterComp);
     // Verify bucket file in delta dir
     List<String> expectedBucketFile = Collections.singletonList("bucket_00000");
     Assert.assertEquals("Bucket names are not matching after compaction", expectedBucketFile,
@@ -1905,11 +1905,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> actualDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, null);
     Assert.assertEquals("Delta directories does not match after compaction",
-        Collections.singletonList("delta_0000001_0000015_v0000046"), actualDeltasAfterComp);
+        Collections.singletonList("delta_0000001_0000015_v0000021"), actualDeltasAfterComp);
     List<String> actualDeleteDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deleteEventDeltaDirFilter, table, null);
     Assert.assertEquals("Delete delta directories does not match after compaction",
-        Collections.singletonList("delete_delta_0000001_0000015_v0000046"), actualDeleteDeltasAfterComp);
+        Collections.singletonList("delete_delta_0000001_0000015_v0000021"), actualDeleteDeltasAfterComp);
 
     CompactorTestUtilities.checkAcidVersion(fs.listFiles(new Path(table.getSd().getLocation()), true), fs,
         conf.getBoolVar(HiveConf.ConfVars.HIVE_WRITE_ACID_VERSION_FILE),
@@ -1921,7 +1921,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
   public void testMinorCompactionWhileStreaming() throws Exception {
     String dbName = "default";
     String tableName = "testMinorCompaction";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(a INT, b STRING) " + " CLUSTERED BY(a) INTO 1 BUCKETS"
         + " STORED AS ORC  TBLPROPERTIES ('transactional'='true')", driver);
     StreamingConnection connection = null;
@@ -1942,10 +1942,10 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
       Table table = metaStoreClient.getTable(dbName, tableName);
       FileSystem fs = FileSystem.get(conf);
       Assert.assertEquals("Delta names does not match", Arrays
-          .asList("delta_0000001_0000002", "delta_0000001_0000005_v0000009", "delta_0000003_0000004",
+          .asList("delta_0000001_0000002", "delta_0000001_0000005_v0000008", "delta_0000003_0000004",
               "delta_0000005_0000006"), CompactorTestUtil.getBaseOrDeltaNames(fs, null, table, null));
       CompactorTestUtil.checkExpectedTxnsPresent(null,
-          new Path[] {new Path(table.getSd().getLocation(), "delta_0000001_0000005_v0000009")}, "a,b", "int:string",
+          new Path[] {new Path(table.getSd().getLocation(), "delta_0000001_0000005_v0000008")}, "a,b", "int:string",
           0, 1L, 4L, null, 1);
     } finally {
       if (connection != null) {
@@ -1958,7 +1958,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
   public void testMinorCompactionWhileStreamingAfterAbort() throws Exception {
     String dbName = "default";
     String tableName = "testMinorCompaction";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(a INT, b STRING) " + " CLUSTERED BY(a) INTO 1 BUCKETS"
         + " STORED AS ORC  TBLPROPERTIES ('transactional'='true')", driver);
     CompactorTestUtil.runStreamingAPI(conf, dbName, tableName, Lists
@@ -1972,10 +1972,10 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     Table table = metaStoreClient.getTable(dbName, tableName);
     FileSystem fs = FileSystem.get(conf);
     Assert.assertEquals("Delta names does not match",
-        Arrays.asList("delta_0000001_0000002", "delta_0000001_0000006_v0000009", "delta_0000003_0000004"),
+        Arrays.asList("delta_0000001_0000002", "delta_0000001_0000006_v0000008", "delta_0000003_0000004"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, null, table, null));
     CompactorTestUtil.checkExpectedTxnsPresent(null,
-        new Path[] {new Path(table.getSd().getLocation(), "delta_0000001_0000006_v0000009")}, "a,b", "int:string", 0,
+        new Path[] {new Path(table.getSd().getLocation(), "delta_0000001_0000006_v0000008")}, "a,b", "int:string", 0,
         1L, 4L, Lists.newArrayList(5, 6), 1);
 
     CompactorTestUtilities.checkAcidVersion(fs.listFiles(new Path(table.getSd().getLocation()), true), fs,
@@ -1987,7 +1987,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
   public void testMinorCompactionWhileStreamingWithAbort() throws Exception {
     String dbName = "default";
     String tableName = "testMinorCompaction";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver(
             "CREATE TABLE " + tableName + "(a INT, b STRING, c int, d int, e int, f int, j int, i int) " +
                     " STORED AS ORC  TBLPROPERTIES ('transactional'='true')", driver);
@@ -2002,10 +2002,10 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     Table table = metaStoreClient.getTable(dbName, tableName);
     FileSystem fs = FileSystem.get(conf);
     Assert.assertEquals("Delta names does not match",
-        Arrays.asList("delta_0000001_0000002", "delta_0000001_0000006_v0000009", "delta_0000005_0000006"),
+        Arrays.asList("delta_0000001_0000002", "delta_0000001_0000006_v0000008", "delta_0000005_0000006"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, null, table, null));
     CompactorTestUtil.checkExpectedTxnsPresent(null,
-        new Path[] {new Path(table.getSd().getLocation(), "delta_0000001_0000006_v0000009")}, "a,b", "int:string", 0,
+        new Path[] {new Path(table.getSd().getLocation(), "delta_0000001_0000006_v0000008")}, "a,b", "int:string", 0,
         1L, 6L, Lists.newArrayList(3, 4), 1);
   }
 
@@ -2013,7 +2013,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
   public void testMinorCompactionWhileStreamingWithAbortInMiddle() throws Exception {
     String dbName = "default";
     String tableName = "testMinorCompaction";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver(
         "CREATE TABLE " + tableName + "(a INT, b STRING) " + " STORED AS ORC  TBLPROPERTIES ('transactional'='true')",
         driver);
@@ -2039,10 +2039,10 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     IMetaStoreClient metaStoreClient = new HiveMetaStoreClient(conf);
     Table table = metaStoreClient.getTable(dbName, tableName);
     FileSystem fs = FileSystem.get(conf);
-    Assert.assertEquals("Delta names does not match", Collections.singletonList("delta_0000001_0000003_v0000006"),
+    Assert.assertEquals("Delta names does not match", Collections.singletonList("delta_0000001_0000003_v0000005"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, null, table, null));
     CompactorTestUtil.checkExpectedTxnsPresent(null,
-        new Path[] {new Path(table.getSd().getLocation(), "delta_0000001_0000003_v0000006")}, "a,b", "int:string", 0,
+        new Path[] {new Path(table.getSd().getLocation(), "delta_0000001_0000003_v0000005")}, "a,b", "int:string", 0,
         1L, 3L, Lists.newArrayList(2), 1);
   }
 
@@ -2070,10 +2070,10 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     verifySuccessfulCompaction(1);
     // Verify delta directories after compaction
     Assert.assertEquals("Delta directories does not match after minor compaction",
-        Collections.singletonList("delta_0000001_0000005_v0000009"),
+        Collections.singletonList("delta_0000001_0000005_v0000008"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, null));
     Assert.assertEquals("Delete delta directories does not match after minor compaction",
-        Collections.singletonList("delete_delta_0000001_0000005_v0000009"),
+        Collections.singletonList("delete_delta_0000001_0000005_v0000008"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deleteEventDeltaDirFilter, table, null));
     // Verify all contents
     List<String> actualData = dataProvider.getAllData(tableName);
@@ -2090,7 +2090,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     verifySuccessfulCompaction(2);
     // Verify base directory after compaction
     Assert.assertEquals("Base directory does not match after major compaction",
-        Collections.singletonList("base_0000010_v0000030"),
+        Collections.singletonList("base_0000010_v0000017"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, null));
     // Verify all contents
     actualData = dataProvider.getAllData(tableName);
@@ -2121,7 +2121,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     verifySuccessfulCompaction(1);
     // Verify base directory after compaction
     Assert.assertEquals("Base directory does not match after major compaction",
-        Collections.singletonList("base_0000005_v0000009"),
+        Collections.singletonList("base_0000005_v0000008"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, null));
     // Verify all contents
     List<String> actualData = dataProvider.getAllData(tableName);
@@ -2138,13 +2138,13 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     verifySuccessfulCompaction(2);
     // Verify base directory after compaction
     Assert.assertEquals("Base directory does not match after major compaction",
-        Collections.singletonList("base_0000005_v0000009"),
+        Collections.singletonList("base_0000005_v0000008"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, null));
     Assert.assertEquals("Delta directories do not match after major compaction",
-        Collections.singletonList("delta_0000006_0000010_v0000021"),
+        Collections.singletonList("delta_0000006_0000010_v0000017"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, null));
     Assert.assertEquals("Delete delta directories does not match after minor compaction",
-        Collections.singletonList("delete_delta_0000006_0000010_v0000021"),
+        Collections.singletonList("delete_delta_0000006_0000010_v0000017"),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deleteEventDeltaDirFilter, table, null));
     // Verify all contents
     actualData = dataProvider.getAllData(tableName);
@@ -2155,7 +2155,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
   public void testMinorCompactionWhileStreamingWithSplitUpdate() throws Exception {
     String dbName = "default";
     String tableName = "testMinorCompaction";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(a INT, b STRING) " + " CLUSTERED BY(a) INTO 1 BUCKETS"
         + " STORED AS ORC  TBLPROPERTIES ('transactional'='true'," + "'transactional_properties'='default')", driver);
     StreamingConnection connection = null;
@@ -2173,10 +2173,10 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
       Table table = metaStoreClient.getTable(dbName, tableName);
       FileSystem fs = FileSystem.get(conf);
       Assert.assertEquals("Delta names does not match", Arrays
-          .asList("delta_0000001_0000002", "delta_0000001_0000005_v0000009", "delta_0000003_0000004",
+          .asList("delta_0000001_0000002", "delta_0000001_0000005_v0000008", "delta_0000003_0000004",
               "delta_0000005_0000006"), CompactorTestUtil.getBaseOrDeltaNames(fs, null, table, null));
       CompactorTestUtil.checkExpectedTxnsPresent(null,
-          new Path[] {new Path(table.getSd().getLocation(), "delta_0000001_0000005_v0000009")}, "a,b", "int:string",
+          new Path[] {new Path(table.getSd().getLocation(), "delta_0000001_0000005_v0000008")}, "a,b", "int:string",
           0, 1L, 4L, null, 1);
       //Assert that we have no delete deltas if there are no input delete events.
       Assert.assertEquals(0,
@@ -2193,7 +2193,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
   public void testCompactionWithSchemaEvolutionAndBuckets() throws Exception {
     String dbName = "default";
     String tblName = "testCompactionWithSchemaEvolutionAndBuckets";
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("create transactional table " + tblName
         + " (a int, b int) partitioned by(ds string) clustered by (a) into 2 buckets"
         + " stored as ORC TBLPROPERTIES('bucketing_version'='2', 'transactional'='true',"
@@ -2240,7 +2240,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         + tblName + " where ROW__ID.bucketid = 536936448 and ds='today' order by a,b", driver);
     Assert.assertEquals("compacted read", expectedRsBucket1PtnToday, rsCompactBucket1PtnToday);
     // Clean up
-    executeStatementOnDriver("drop table " + tblName, driver);
+    dropTables(driver, tblName);
   }
 
   @Test
@@ -2252,7 +2252,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     driver = DriverFactory.newDriver(hiveConf);
     String dbName = "default";
     String tblName = "testCompactionWithSchemaEvolutionNoBucketsMultipleReducers";
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("create transactional table " + tblName + " (a int, b int) partitioned by(ds string)"
         + " stored as ORC TBLPROPERTIES('transactional'='true'," + " 'transactional_properties'='default')", driver);
     // Insert some data
@@ -2289,15 +2289,15 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         + " where ds='yesterday'", driver);
     Assert.assertEquals("compacted read", expectedRsPtnYesterday, rsCompactPtnYesterday);
     // Clean up
-    executeStatementOnDriver("drop table " + tblName, driver);
+    dropTables(driver, tblName);
   }
 
   @Test public void testMajorCompactionDb() throws Exception {
-    testCompactionDb(CompactionType.MAJOR, "base_0000005_v0000011");
+    testCompactionDb(CompactionType.MAJOR, "base_0000005_v0000009");
   }
 
   @Test public void testMinorCompactionDb() throws Exception {
-    testCompactionDb(CompactionType.MINOR, "delta_0000001_0000005_v0000011");
+    testCompactionDb(CompactionType.MINOR, "delta_0000001_0000005_v0000009");
   }
 
   /**
@@ -2441,7 +2441,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     // 2 compactions should be in the response queue with succeeded state
     verifySuccessfulCompaction(2);
     // Should contain only one base directory now
-    String expectedBase = "base_0000006_v0000024";
+    String expectedBase = "base_0000006_v0000012";
     Assert.assertEquals("Base directory does not match after major compaction",
         Collections.singletonList(expectedBase),
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, null));
@@ -2495,7 +2495,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> actualDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.baseFileFilter, table, null);
     Assert.assertEquals("Base directory does not match after compaction",
-        Collections.singletonList("base_0000003_v0000014"), actualDeltasAfterComp);
+        Collections.singletonList("base_0000003_v0000006"), actualDeltasAfterComp);
 
     // Verify bucket files in delta dirs
     List<String> expectedBucketFiles = Collections.singletonList("bucket_00000");
@@ -2566,12 +2566,12 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> actualDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, null);
     Assert.assertEquals("Delta directory does not match after compaction",
-        Collections.singletonList("delta_0000001_0000004_v0000033"), actualDeltasAfterComp);
+        Collections.singletonList("delta_0000001_0000004_v0000009"), actualDeltasAfterComp);
 
     List<String> actualDeleteDeltasAfterComp =
         CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deleteEventDeltaDirFilter, table, null);
     Assert.assertEquals("Delete delta directory does not match after compaction",
-        Collections.singletonList("delete_delta_0000001_0000004_v0000033"), actualDeleteDeltasAfterComp);
+        Collections.singletonList("delete_delta_0000001_0000004_v0000009"), actualDeleteDeltasAfterComp);
 
     // Verify bucket files in delta dirs
     List<String> expectedBucketFiles = Collections.singletonList("bucket_00000");
@@ -2609,7 +2609,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
   }
 
   private void runMergeStatement(String tableName, List<String> values) throws Exception {
-    executeStatementOnDriver("DROP TABLE IF EXISTS merge_source", driver);
+    dropTables(driver, "merge_source");
     executeStatementOnDriver("CREATE TABLE merge_source(id int,value string) STORED AS ORC", driver);
     StringBuilder sb = new StringBuilder();
     for (String value : values) {
@@ -2621,7 +2621,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     executeStatementOnDriver("MERGE INTO " + tableName
         + " AS T USING merge_source AS S ON T.ID = S.ID WHEN MATCHED AND (T.value != S.value AND S.value IS NOT NULL) THEN UPDATE SET value = S.value WHEN NOT MATCHED THEN INSERT VALUES (S.ID, S.value)",
         driver);
-    executeStatementOnDriver("DROP TABLE merge_source", driver);
+    dropTables(driver, "merge_source");
   }
 
   /**
@@ -2752,12 +2752,12 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     hiveConf.set(ValidTxnList.VALID_TXNS_KEY, "8:9223372036854775807::");
 
     // Check for default case.
-    qc.runCompactionQueries(hiveConf, null, sdMock, null, ciMock, null, emptyQueries, emptyQueries, emptyQueries, null);
+    qc.runCompactionQueries(hiveConf, null, ciMock, null, emptyQueries, emptyQueries, emptyQueries, null);
     Assert.assertEquals("all", hiveConf.getVar(HiveConf.ConfVars.LLAP_IO_ETL_SKIP_FORMAT));
 
     // Check for case where  hive.llap.io.etl.skip.format is explicitly set to none - as to always use cache.
     hiveConf.setVar(HiveConf.ConfVars.LLAP_IO_ETL_SKIP_FORMAT, "none");
-    qc.runCompactionQueries(hiveConf, null, sdMock, null, ciMock, null, emptyQueries, emptyQueries, emptyQueries, null);
+    qc.runCompactionQueries(hiveConf, null, ciMock, null, emptyQueries, emptyQueries, emptyQueries, null);
     Assert.assertEquals("none", hiveConf.getVar(HiveConf.ConfVars.LLAP_IO_ETL_SKIP_FORMAT));
 
   }
@@ -2768,7 +2768,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     String tblName = "empty_table";
 
     // Setup of LOAD INPATH scenario.
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("create table " + tblName + " (a string) stored as orc " +
             "TBLPROPERTIES ('transactional'='true')", driver);
     executeStatementOnDriver("insert into " + tblName + " values ('a')", driver);
@@ -2802,14 +2802,14 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
 
     // Helper table for the union all insert
     String helperTblName = "helper_table";
-    executeStatementOnDriver("drop table if exists " + helperTblName, driver);
+    dropTables(driver, helperTblName);
     executeStatementOnDriver("create table " + helperTblName + " (a int, b int) stored as orc " +
             "TBLPROPERTIES ('transactional'='false')", driver);
     executeStatementOnDriver("insert into " + helperTblName + " values (1, 1), (2, 2)", driver);
 
     // Non acid nested table with union subdirs
     String tblName = "non_acid_nested";
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("create table " + tblName +
             "(a int, b int) partitioned by (p string, q string) stored as orc TBLPROPERTIES ('transactional'='false')", driver);
 
@@ -2852,7 +2852,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     fileStatuses = fs.listStatus(new Path(table.getSd().getLocation() + "/" + partitionName1 + "/" + partitionName2));
     Assert.assertEquals(1, fileStatuses.length);
     String baseName = fileStatuses[0].getPath().getName();
-    Assert.assertEquals("base_10000000_v0000009", baseName);
+    Assert.assertEquals("base_10000000_v0000002", baseName);
   }
 
   @Test
@@ -2865,7 +2865,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     TestDataProvider testDP = new TestDataProvider();
 
     // Create test table
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("CREATE TABLE " + tblName + "(col1 array<struct<arr_col1:int, `timestamp`:string>>)" +
             "STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
 
@@ -2933,7 +2933,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     TestDataProvider testDP = new TestDataProvider();
 
     // Create test table
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("CREATE TABLE " + tblName + "(col1 array<struct<arr_col1:int, `timestamp`:string>>)" +
             "STORED AS ORC TBLPROPERTIES('transactional'='true', 'compactor.tez.task.resource.memory.mb'='8000')", driver);
 
@@ -3000,7 +3000,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     TestDataProvider testDP = new TestDataProvider();
 
     // Create test table
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("CREATE TABLE " + tblName + "(col1 array<struct<arr_col1:int, `timestamp`:string>>)" +
             "STORED AS ORC TBLPROPERTIES('transactional'='true', 'compactor.tez.task.resource.memory.mb'='8000')", driver);
 
@@ -3063,7 +3063,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     TestDataProvider testDP = new TestDataProvider();
 
     // Create test table
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("CREATE TABLE " + tblName + "(`sessionid` string,`row` int,`timeofoccurrence` bigint)" +
             "STORED AS ORC TBLPROPERTIES('transactional'='true')", driver);
 
@@ -3137,7 +3137,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     String dbName = "default";
     String tblName = "minor_compaction_test";
     IMetaStoreClient msClient = new HiveMetaStoreClient(conf);
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
     executeStatementOnDriver("CREATE TABLE " + tblName + "(a INT, b STRING) " +
             " PARTITIONED BY(bkt INT)" +
             " STORED AS ORC TBLPROPERTIES ('transactional'='true')", driver);
@@ -3200,63 +3200,63 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
       Assert.assertEquals("The number of files is differing from the expected", "1", parameters.get("numFiles"));
     }
     Assert.assertEquals("The number of rows is differing from the expected", "2", parameters.get("numRows"));
-    executeStatementOnDriver("drop table if exists " + tblName, driver);
+    dropTables(driver, tblName);
   }
 
   @Test
   public void testMajorCompactionWithMergeNotPartitionedWithoutBuckets() throws Exception {
     testCompactionWithMerge(CompactionType.MAJOR, false, false, null, Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, true, false);
+            Collections.singletonList("base_0000003_v0000006"), true, true, false);
   }
 
   @Test
   public void testMajorCompactionWithFallbackNotPartitionedWithoutBuckets() throws Exception {
     testCompactionWithMerge(CompactionType.MAJOR, false, false, null, Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, true, true);
+            Collections.singletonList("base_0000003_v0000006"), true, true, true);
   }
 
   @Test
   public void testMajorCompactionWithMergePartitionedWithoutBuckets() throws Exception {
     testCompactionWithMerge(CompactionType.MAJOR, true, false, "ds=today", Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, true, false);
+            Collections.singletonList("base_0000003_v0000006"), true, true, false);
   }
 
   @Test
   public void testMajorCompactionWithFallbackPartitionedWithoutBuckets() throws Exception {
     testCompactionWithMerge(CompactionType.MAJOR, true, false, "ds=today", Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, true, true);
+            Collections.singletonList("base_0000003_v0000006"), true, true, true);
   }
 
   @Test
   public void testMajorCompactionWithMergeNotPartitionedWithBuckets() throws Exception {
     testCompactionWithMerge(CompactionType.MAJOR, false, true, null, Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, true, false);
+            Collections.singletonList("base_0000003_v0000006"), true, true, false);
   }
 
   @Test
   public void testMajorCompactionWithFallbackNotPartitionedWithBuckets() throws Exception {
     testCompactionWithMerge(CompactionType.MAJOR, false, true, null, Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, true, true);
+            Collections.singletonList("base_0000003_v0000006"), true, true, true);
   }
 
   @Test
   public void testMajorCompactionWithMergePartitionedWithBuckets() throws Exception {
     testCompactionWithMerge(CompactionType.MAJOR, true, true, "ds=today", Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, true, false);
+            Collections.singletonList("base_0000003_v0000006"), true, true, false);
   }
 
   @Test
   public void testMajorCompactionWithFallbackPartitionedWithBuckets() throws Exception {
     testCompactionWithMerge(CompactionType.MAJOR, true, true, "ds=today", Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, true, true);
+            Collections.singletonList("base_0000003_v0000006"), true, true, true);
   }
 
   @Test
@@ -3264,7 +3264,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, false, false, null,
             Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"), true, true, false);
+            Collections.singletonList("delta_0000001_0000003_v0000006"), true, true, false);
   }
 
   @Test
@@ -3272,7 +3272,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, false, false, null,
             Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"), true, true, true);
+            Collections.singletonList("delta_0000001_0000003_v0000006"), true, true, true);
   }
 
   @Test
@@ -3280,7 +3280,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, true, false, "ds=today",
             Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"), true, true, false);
+            Collections.singletonList("delta_0000001_0000003_v0000006"), true, true, false);
   }
 
   @Test
@@ -3288,7 +3288,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, true, false, "ds=today",
             Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"), true, true, true);
+            Collections.singletonList("delta_0000001_0000003_v0000006"), true, true, true);
   }
 
   @Test
@@ -3296,7 +3296,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, false, true, null,
             Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"), true, true, false);
+            Collections.singletonList("delta_0000001_0000003_v0000006"), true, true, false);
   }
 
   @Test
@@ -3304,7 +3304,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, false, true, null,
             Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"), true, true, true);
+            Collections.singletonList("delta_0000001_0000003_v0000006"), true, true, true);
   }
 
   @Test
@@ -3312,7 +3312,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, true, true, "ds=today",
             Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"), true, true, false);
+            Collections.singletonList("delta_0000001_0000003_v0000006"), true, true, false);
   }
 
   @Test
@@ -3320,7 +3320,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, true, true, "ds=today",
             Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"), true, true, true);
+            Collections.singletonList("delta_0000001_0000003_v0000006"), true, true, true);
   }
 
   @Test
@@ -3328,11 +3328,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, true, true, "ds=today",
             Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"),true, false, false);
+            Collections.singletonList("delta_0000001_0000003_v0000006"),true, false, false);
     testCompactionWithMerge(CompactionType.MAJOR, true, true, "ds=today",
             Arrays.asList("bucket_00000", "bucket_00001"),
-            Arrays.asList("delta_0000001_0000003_v0000007", "delta_0000004_0000004_0000", "delta_0000005_0000005_0000",
-                    "delta_0000006_0000006_0000"), Collections.singletonList("base_0000006_v0000014"), false, true, false);
+            Arrays.asList("delta_0000001_0000003_v0000006", "delta_0000004_0000004_0000", "delta_0000005_0000005_0000",
+                    "delta_0000006_0000006_0000"), Collections.singletonList("base_0000006_v0000013"), false, true, false);
   }
 
   @Test
@@ -3340,11 +3340,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, true, true, "ds=today",
             Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"),true, false, true);
+            Collections.singletonList("delta_0000001_0000003_v0000006"),true, false, true);
     testCompactionWithMerge(CompactionType.MAJOR, true, true, "ds=today",
             Arrays.asList("bucket_00000", "bucket_00001"),
-            Arrays.asList("delta_0000001_0000003_v0000007", "delta_0000004_0000004_0000", "delta_0000005_0000005_0000",
-                    "delta_0000006_0000006_0000"), Collections.singletonList("base_0000006_v0000025"), false, true, true);
+            Arrays.asList("delta_0000001_0000003_v0000006", "delta_0000004_0000004_0000", "delta_0000005_0000005_0000",
+                    "delta_0000006_0000006_0000"), Collections.singletonList("base_0000006_v0000013"), false, true, true);
   }
 
   @Test
@@ -3352,11 +3352,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MAJOR, false, false, null,
             Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, false, false);
+            Collections.singletonList("base_0000003_v0000006"), true, false, false);
     testCompactionWithMerge(CompactionType.MINOR, false, false, null,
             Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000004_0000004_0000", "delta_0000005_0000005_0000", "delta_0000006_0000006_0000"),
-            Collections.singletonList("delta_0000004_0000006_v0000014"), false, true, false);
+            Collections.singletonList("delta_0000004_0000006_v0000013"), false, true, false);
   }
 
   @Test
@@ -3364,11 +3364,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MAJOR, false, false, null,
             Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, false, true);
+            Collections.singletonList("base_0000003_v0000006"), true, false, true);
     testCompactionWithMerge(CompactionType.MINOR, false, false, null,
             Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000004_0000004_0000", "delta_0000005_0000005_0000", "delta_0000006_0000006_0000"),
-            Collections.singletonList("delta_0000004_0000006_v0000017"), false, true, true);
+            Collections.singletonList("delta_0000004_0000006_v0000013"), false, true, true);
   }
 
   @Test
@@ -3376,11 +3376,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MAJOR, true, true, "ds=today",
             Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, false, false);
+            Collections.singletonList("base_0000003_v0000006"), true, false, false);
     testCompactionWithMerge(CompactionType.MAJOR, true, true, "ds=today",
             Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000004_0000004_0000", "delta_0000005_0000005_0000", "delta_0000006_0000006_0000"),
-            Collections.singletonList("base_0000006_v0000014"), false, true, false);
+            Collections.singletonList("base_0000006_v0000013"), false, true, false);
   }
 
   @Test
@@ -3388,11 +3388,11 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MAJOR, true, true, "ds=today",
             Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("base_0000003_v0000007"), true, false, true);
+            Collections.singletonList("base_0000003_v0000006"), true, false, true);
     testCompactionWithMerge(CompactionType.MAJOR, true, true, "ds=today",
             Arrays.asList("bucket_00000", "bucket_00001"),
             Arrays.asList("delta_0000004_0000004_0000", "delta_0000005_0000005_0000", "delta_0000006_0000006_0000"),
-            Collections.singletonList("base_0000006_v0000017"), false, true, true);
+            Collections.singletonList("base_0000006_v0000013"), false, true, true);
   }
 
   @Test
@@ -3400,12 +3400,12 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, false, false, null,
             Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"), true, false, false);
+            Collections.singletonList("delta_0000001_0000003_v0000006"), true, false, false);
     testCompactionWithMerge(CompactionType.MINOR, false, false, null,
             Collections.singletonList("bucket_00000"),
-            Arrays.asList("delta_0000001_0000003_v0000007", "delta_0000004_0000004_0000", "delta_0000005_0000005_0000",
+            Arrays.asList("delta_0000001_0000003_v0000006", "delta_0000004_0000004_0000", "delta_0000005_0000005_0000",
                     "delta_0000006_0000006_0000"),
-            Collections.singletonList("delta_0000001_0000006_v0000014"), false, true, false);
+            Collections.singletonList("delta_0000001_0000006_v0000013"), false, true, false);
   }
 
   @Test
@@ -3413,12 +3413,12 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     testCompactionWithMerge(CompactionType.MINOR, false, false, null,
             Collections.singletonList("bucket_00000"),
             Arrays.asList("delta_0000001_0000001_0000", "delta_0000002_0000002_0000", "delta_0000003_0000003_0000"),
-            Collections.singletonList("delta_0000001_0000003_v0000007"), true, false, true);
+            Collections.singletonList("delta_0000001_0000003_v0000006"), true, false, true);
     testCompactionWithMerge(CompactionType.MINOR, false, false, null,
             Collections.singletonList("bucket_00000"),
-            Arrays.asList("delta_0000001_0000003_v0000007", "delta_0000004_0000004_0000", "delta_0000005_0000005_0000",
+            Arrays.asList("delta_0000001_0000003_v0000006", "delta_0000004_0000004_0000", "delta_0000005_0000005_0000",
                     "delta_0000006_0000006_0000"),
-            Collections.singletonList("delta_0000001_0000006_v0000025"), false, true, true);
+            Collections.singletonList("delta_0000001_0000006_v0000013"), false, true, true);
   }
 
   private void testCompactionWithMerge(CompactionType compactionType, boolean isPartitioned, boolean isBucketed,
@@ -3538,7 +3538,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     String dbName = "default";
     String tableName = "testParquetFallback";
     String partitionName = "bkt=1";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(a INT, b STRING) " + " PARTITIONED BY(bkt INT)" +
             " STORED AS PARQUET TBLPROPERTIES ('transactional'='true', 'transactional_properties'='insert_only')", driver);
 
@@ -3602,7 +3602,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     String dbName = "default";
     String tableName = "testOrcFallback";
     String partitionName = "bkt=1";
-    executeStatementOnDriver("drop table if exists " + tableName, driver);
+    dropTables(driver, tableName);
     executeStatementOnDriver("CREATE TABLE " + tableName + "(a INT, b STRING) " + " PARTITIONED BY(bkt INT)" +
             " STORED AS ORC TBLPROPERTIES ('transactional'='true')", driver);
 
@@ -3737,7 +3737,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> deltas = CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, null);
     Assert.assertEquals(2, deltas.size());
     Assert.assertEquals("Delta directory names are not matching after compaction",
-        Arrays.asList("delta_0000002_0000004_v0000008", "delta_0000005_0000005"), deltas);
+        Arrays.asList("delta_0000002_0000004_v0000007", "delta_0000005_0000005"), deltas);
     for (String delta: deltas) {
       // Check if none of the delta directories are empty
       List<String> files = CompactorTestUtil.getBucketFileNames(fs, table, null, delta);
@@ -3781,7 +3781,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     List<String> deltas = CompactorTestUtil.getBaseOrDeltaNames(fs, AcidUtils.deltaFileFilter, table, null);
     Assert.assertEquals(2, deltas.size());
     Assert.assertEquals("Delta directory names are not matching after compaction",
-        Arrays.asList("delta_0000001_0000003_v0000007", "delta_0000004_0000004"), deltas);
+        Arrays.asList("delta_0000001_0000003_v0000006", "delta_0000004_0000004"), deltas);
     for (String delta: deltas) {
       // Check if none of the delta directories are empty
       List<String> files = CompactorTestUtil.getBucketFileNames(fs, table, null, delta);

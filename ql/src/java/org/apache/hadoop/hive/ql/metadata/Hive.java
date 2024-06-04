@@ -76,6 +76,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -2013,8 +2014,8 @@ public class Hive implements AutoCloseable {
    * @return the list of materialized views available for rewriting from the registry
    * @throws HiveException
    */
-  public List<HiveRelOptMaterialization> getPreprocessedMaterializedViewsFromRegistry(
-      Set<TableName> tablesUsed, HiveTxnManager txnMgr) throws HiveException {
+  public List<HiveRelOptMaterialization> getPreprocessedMaterializedViewsFromRegistry (
+      Set<TableName> tablesUsed, Supplier<String> validTxnsList, HiveTxnManager txnMgr) throws HiveException {
     // From cache
     List<HiveRelOptMaterialization> materializedViews =
         HiveMaterializedViewsRegistry.get().getRewritingMaterializedViews();
@@ -2023,12 +2024,12 @@ public class Hive implements AutoCloseable {
       return new ArrayList<>();
     }
     // Add to final result
-    return filterAugmentMaterializedViews(materializedViews, tablesUsed, txnMgr);
+    return filterAugmentMaterializedViews(materializedViews, tablesUsed, validTxnsList, txnMgr);
   }
 
-  private List<HiveRelOptMaterialization> filterAugmentMaterializedViews(List<HiveRelOptMaterialization> materializedViews,
-        Set<TableName> tablesUsed, HiveTxnManager txnMgr) throws HiveException {
-    final String validTxnsList = conf.get(ValidTxnList.VALID_TXNS_KEY);
+  private List<HiveRelOptMaterialization> filterAugmentMaterializedViews (
+      List<HiveRelOptMaterialization> materializedViews, Set<TableName> tablesUsed,
+      Supplier<String> validTxnsList, HiveTxnManager txnMgr) throws HiveException {
     final boolean tryIncrementalRewriting =
         HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_MATERIALIZED_VIEW_REWRITING_INCREMENTAL);
     try {
@@ -2037,7 +2038,7 @@ public class Hive implements AutoCloseable {
       for (HiveRelOptMaterialization materialization : materializedViews) {
         final Table materializedViewTable = extractTable(materialization);
         final Boolean outdated = isOutdatedMaterializedView(
-            materializedViewTable, tablesUsed, false, txnMgr);
+            materializedViewTable, tablesUsed, false, validTxnsList, txnMgr);
         if (outdated == null) {
           continue;
         }
@@ -2056,7 +2057,8 @@ public class Hive implements AutoCloseable {
           // if rewriting with outdated materialized views is enabled (currently
           // disabled by default).
           materialization = HiveMaterializedViewUtils.augmentMaterializationWithTimeInformation(
-              materialization, validTxnsList, materializedViewTable.getMVMetadata().getSnapshot());
+              materialization, validTxnsList,
+              materializedViewTable.getMVMetadata().getSnapshot());
         }
         result.addAll(HiveMaterializedViewUtils.deriveGroupingSetsMaterializedViews(materialization));
       }
@@ -2073,15 +2075,10 @@ public class Hive implements AutoCloseable {
    * This method checks invalidation time window defined in materialization.
    */
   public Boolean isOutdatedMaterializedView(
-          Table materializedViewTable, Set<TableName> tablesUsed,
-          boolean forceMVContentsUpToDate, HiveTxnManager txnMgr) throws HiveException {
-
-    String validTxnsList = conf.get(ValidTxnList.VALID_TXNS_KEY);
-    if (validTxnsList == null) {
-      return null;
-    }
+      Table materializedViewTable, Set<TableName> tablesUsed, boolean forceMVContentsUpToDate,
+      Supplier<String> validTxnsList, HiveTxnManager txnMgr) throws HiveException {
     long defaultTimeWindow = HiveConf.getTimeVar(conf,
-            HiveConf.ConfVars.HIVE_MATERIALIZED_VIEW_REWRITING_TIME_WINDOW, TimeUnit.MILLISECONDS);
+        HiveConf.ConfVars.HIVE_MATERIALIZED_VIEW_REWRITING_TIME_WINDOW, TimeUnit.MILLISECONDS);
 
     // Check if materialization defined its own invalidation time window
     String timeWindowString = materializedViewTable.getProperty(MATERIALIZED_VIEW_REWRITING_TIME_WINDOW);
@@ -2100,7 +2097,7 @@ public class Hive implements AutoCloseable {
       if (forceMVContentsUpToDate || timeWindow == 0L ||
               mvMetadata.getMaterializationTime() < System.currentTimeMillis() - timeWindow) {
         return HiveMaterializedViewUtils.isOutdatedMaterializedView(
-                validTxnsList, txnMgr, this, tablesUsed, materializedViewTable);
+            validTxnsList, txnMgr, this, tablesUsed, materializedViewTable);
       }
     }
     return outdated;
@@ -2111,15 +2108,11 @@ public class Hive implements AutoCloseable {
    * (false), or it cannot be determined (null). The latest case may happen e.g. when the
    * materialized view definition uses external tables.
    */
-  public Boolean isOutdatedMaterializedView(HiveTxnManager txnManager, Table table) throws HiveException {
-
-    String validTxnsList = conf.get(ValidTxnList.VALID_TXNS_KEY);
-    if (validTxnsList == null) {
-      return null;
-    }
-
+  public Boolean isOutdatedMaterializedView(
+      Supplier<String> validTxnsList, HiveTxnManager txnManager, Table table) throws HiveException {
     return HiveMaterializedViewUtils.isOutdatedMaterializedView(
-        validTxnsList, txnManager, this, table.getMVMetadata().getSourceTableNames(), table);
+        validTxnsList, txnManager, this,
+        table.getMVMetadata().getSourceTableNames(), table);
   }
 
   /**
@@ -2129,8 +2122,9 @@ public class Hive implements AutoCloseable {
    * @return true if they are up-to-date, otherwise false
    * @throws HiveException
    */
-  public boolean validateMaterializedViewsFromRegistry(List<Table> cachedMaterializedViewTables,
-      Set<TableName> tablesUsed, HiveTxnManager txnMgr) throws HiveException {
+  public boolean validateMaterializedViewsFromRegistry(
+      List<Table> cachedMaterializedViewTables, Set<TableName> tablesUsed,
+      Supplier<String> validTxnsList, HiveTxnManager txnMgr) throws HiveException {
     try {
       // Final result
       boolean result = true;
@@ -2144,7 +2138,8 @@ public class Hive implements AutoCloseable {
           HiveMaterializedViewsRegistry.get().dropMaterializedView(cachedMaterializedViewTable);
           result = false;
         } else {
-          final Boolean outdated = isOutdatedMaterializedView(cachedMaterializedViewTable, tablesUsed, false, txnMgr);
+          final Boolean outdated = isOutdatedMaterializedView(cachedMaterializedViewTable, tablesUsed,
+              false, validTxnsList, txnMgr);
           if (outdated == null) {
             result = false;
             continue;
@@ -2252,8 +2247,7 @@ public class Hive implements AutoCloseable {
    * @throws HiveException
    */
   public List<HiveRelOptMaterialization> getPreprocessedMaterializedViews(
-      Set<TableName> tablesUsed, HiveTxnManager txnMgr)
-      throws HiveException {
+      Set<TableName> tablesUsed, Supplier<String> validTxnsList, HiveTxnManager txnMgr) throws HiveException {
     // From metastore
     List<Table> materializedViewTables =
         getAllMaterializedViewObjectsForRewriting();
@@ -2262,7 +2256,8 @@ public class Hive implements AutoCloseable {
       return new ArrayList<>();
     }
     // Return final result
-    return getValidMaterializedViews(materializedViewTables, tablesUsed, false, true, txnMgr, EnumSet.of(CALCITE));
+    return getValidMaterializedViews(materializedViewTables, tablesUsed, false, true,
+        validTxnsList, txnMgr, EnumSet.of(CALCITE));
   }
 
   /**
@@ -2273,10 +2268,12 @@ public class Hive implements AutoCloseable {
    * @return the materialized view for rebuild
    * @throws HiveException
    */
-  public HiveRelOptMaterialization getMaterializedViewForRebuild(String dbName, String materializedViewName,
-      Set<TableName> tablesUsed, HiveTxnManager txnMgr) throws HiveException {
+  public HiveRelOptMaterialization getMaterializedViewForRebuild(
+      String dbName, String materializedViewName, Set<TableName> tablesUsed,
+      Supplier<String> validTxnsList, HiveTxnManager txnMgr) throws HiveException {
     List<HiveRelOptMaterialization> validMaterializedViews = getValidMaterializedViews(
-            ImmutableList.of(getTable(dbName, materializedViewName)), tablesUsed, true, false, txnMgr, ALL);
+        ImmutableList.of(getTable(dbName, materializedViewName)), tablesUsed, true, false,
+        validTxnsList, txnMgr, ALL);
     if (validMaterializedViews.isEmpty()) {
       return null;
     }
@@ -2285,11 +2282,11 @@ public class Hive implements AutoCloseable {
     return validMaterializedViews.get(0);
   }
 
-  private List<HiveRelOptMaterialization> getValidMaterializedViews(List<Table> materializedViewTables,
+  private List<HiveRelOptMaterialization> getValidMaterializedViews(
+      List<Table> materializedViewTables,
       Set<TableName> tablesUsed, boolean forceMVContentsUpToDate, boolean expandGroupingSets,
-      HiveTxnManager txnMgr, EnumSet<RewriteAlgorithm> scope)
-      throws HiveException {
-    final String validTxnsList = conf.get(ValidTxnList.VALID_TXNS_KEY);
+      Supplier<String> validTxnsList, HiveTxnManager txnMgr,
+      EnumSet<RewriteAlgorithm> scope) throws HiveException {
     final boolean tryIncrementalRewriting =
         HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_MATERIALIZED_VIEW_REWRITING_INCREMENTAL);
     final boolean tryIncrementalRebuild =
@@ -2299,7 +2296,7 @@ public class Hive implements AutoCloseable {
       List<HiveRelOptMaterialization> result = new ArrayList<>();
       for (Table materializedViewTable : materializedViewTables) {
         final Boolean outdated = isOutdatedMaterializedView(
-                materializedViewTable, tablesUsed, forceMVContentsUpToDate, txnMgr);
+            materializedViewTable, tablesUsed, forceMVContentsUpToDate, validTxnsList, txnMgr);
         if (outdated == null) {
           continue;
         }
@@ -2344,7 +2341,8 @@ public class Hive implements AutoCloseable {
               // We will rewrite it to include the filters on transaction list
               // so we can produce partial rewritings
               relOptMaterialization = HiveMaterializedViewUtils.augmentMaterializationWithTimeInformation(
-                  relOptMaterialization, validTxnsList, metadata.getSnapshot());
+                  relOptMaterialization, validTxnsList,
+                  metadata.getSnapshot());
             }
             addToMaterializationList(expandGroupingSets, invalidationInfo, relOptMaterialization, result);
             continue;
@@ -2366,7 +2364,8 @@ public class Hive implements AutoCloseable {
             // We will rewrite it to include the filters on transaction list
             // so we can produce partial rewritings
             relOptMaterialization = HiveMaterializedViewUtils.augmentMaterializationWithTimeInformation(
-                    hiveRelOptMaterialization, validTxnsList, metadata.getSnapshot());
+                hiveRelOptMaterialization, validTxnsList,
+                metadata.getSnapshot());
           }
           addToMaterializationList(expandGroupingSets, invalidationInfo, relOptMaterialization, result);
         }
@@ -2418,7 +2417,7 @@ public class Hive implements AutoCloseable {
    * @throws HiveException - an exception is thrown during validation or unable to pull transaction ids
    */
   public List<HiveRelOptMaterialization> getMaterializedViewsByAST(
-      ASTNode astNode, Set<TableName> tablesUsed, HiveTxnManager txnMgr) throws HiveException {
+          ASTNode astNode, Set<TableName> tablesUsed,  Supplier<String> validTxnsList, HiveTxnManager txnMgr) throws HiveException {
 
     Collection<HiveRelOptMaterialization> materializedViews =
             HiveMaterializedViewsRegistry.get().getRewritingMaterializedViews(astNode);
@@ -2431,7 +2430,8 @@ public class Hive implements AutoCloseable {
       List<HiveRelOptMaterialization> result = new ArrayList<>();
       for (HiveRelOptMaterialization materialization : materializedViews) {
         Table materializedViewTable = extractTable(materialization);
-        final Boolean outdated = isOutdatedMaterializedView(materializedViewTable, tablesUsed, false, txnMgr);
+        final Boolean outdated = isOutdatedMaterializedView(materializedViewTable, tablesUsed,
+            false, validTxnsList, txnMgr);
         if (outdated == null) {
           LOG.debug("Unable to determine if Materialized view " + materializedViewTable.getFullyQualifiedName() +
                   " contents are outdated. It may uses external tables?");

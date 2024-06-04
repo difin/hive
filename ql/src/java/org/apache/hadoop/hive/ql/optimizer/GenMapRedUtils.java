@@ -1302,7 +1302,6 @@ public final class GenMapRedUtils {
       if (isCustomDelete) {
         fsOutputDesc.setWriteOperation(Context.Operation.DELETE);
       }
-      fsOutputDesc.setMmWriteId(srcMmWriteId);
       fsOutputDesc.setIsMerge(true);
       // Create and attach the filesink for the merge.
       OperatorFactory.getAndMakeChild(fsOutputDesc, inputRS, tsMerge);

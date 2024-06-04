@@ -135,7 +135,6 @@ import org.apache.calcite.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.TableName;
-import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
@@ -147,7 +146,6 @@ import org.apache.hadoop.hive.ql.QueryProperties;
 import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.ddl.table.create.CreateTableAnalyzer;
 import org.apache.hadoop.hive.ql.exec.ColumnInfo;
-import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.DummyScanOperator;
 import org.apache.hadoop.hive.ql.exec.FileSinkOperator;
 import org.apache.hadoop.hive.ql.exec.FunctionInfo;
@@ -160,6 +158,7 @@ import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.engine.EngineEventSequence;
 import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
 import org.apache.hadoop.hive.ql.engine.EngineQueryHelper;
+import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.lib.Node;
 import org.apache.hadoop.hive.ql.log.PerfLogger;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -206,13 +205,11 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTableScan;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveUnion;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.jdbc.HiveJdbcConverter;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.jdbc.JdbcHiveTableScan;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.CteRuleConfig;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateJoinTransposeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateProjectMergeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregatePullUpConstantsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateReduceFunctionsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateReduceRule;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateSortLimitRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAggregateSplitRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveCardinalityPreservingJoinRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveDruidRules;
@@ -237,7 +234,6 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveJoinCommuteRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveJoinConstraintsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveJoinProjectTransposeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveJoinPushTransitivePredicatesRule;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveJoinSwapConstraintsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveJoinToMultiJoinRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveAntiSemiJoinRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveOptimizeInlineArrayTableFunctionRule;
@@ -254,12 +250,10 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveReduceExpressionsRu
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveReduceExpressionsWithStatsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRelDecorrelator;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRelFieldTrimmer;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRemoveEmptySingleRules;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRemoveGBYSemiJoinRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRemoveSqCountCheck;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRewriteToDataSketchesRules;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveRulesRegistry;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSemiJoinProjectTransposeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSemiJoinRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSortJoinReduceRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSortMergeRule;
@@ -273,12 +267,10 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveUnionMergeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveUnionPullUpConstantsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveWindowingFixRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.MarkEventRule;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.RemoveInfrequentCteRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.RuleStatisticsListener;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveWindowingLastValueRewrite;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.TableScanToSpoolRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.jdbc.JDBCAbstractSplitFilterRule;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.jdbc.JDBCAggregateProjectMergeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.jdbc.JDBCAggregationPushDownRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.jdbc.JDBCExpandExpressionsRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.jdbc.JDBCExtractJoinFilterRule;
@@ -1495,7 +1487,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       FileSinkOperator fso = (FileSinkOperator) genFileSinkPlan(dest, getQB(), tableScanOp);
       FileSinkDesc impalaQueryDesc = this.queryHelper.compilePlan(
           getDb(), impalaRel, fso.getConf(), ctx.isExplainPlan(), getQB(), cboCtx.type,
-          conf.get(ValidTxnList.VALID_TXNS_KEY), getTxnMgr(), resultSchema);
+          queryState::getValidTxnList, getTxnMgr(), resultSchema);
       markEvent("Impala plan generated");
       return OperatorFactory.getAndMakeChild(impalaQueryDesc, fso);
     } catch (HiveException e) {
@@ -1877,8 +1869,8 @@ public class CalcitePlanner extends SemanticAnalyzer {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Plan after post-join transformations:\n" + RelOptUtil.toString(calcitePlan));
       }
-      
-      // Perform the CTE rewriting near the end of CBO transformations to avoid interference of the new HiveTableSpool 
+
+      // Perform the CTE rewriting near the end of CBO transformations to avoid interference of the new HiveTableSpool
       // operator with other rules (especially those related to constant folding and branch pruning).
       if (!forViewCreation) {
         calcitePlan = applyCteRewriting(planner, calcitePlan, mdProvider.getMetadataProvider(), executorProvider);
@@ -1886,7 +1878,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
           LOG.debug("Plan after CTE rewriting:\n{}", RelOptUtil.toString(calcitePlan));
         }
       }
-      calcitePlan = 
+      calcitePlan =
           applySearchExpandTransforms(calcitePlan, mdProvider.getMetadataProvider(), executorProvider);
 
       perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.HIVE_SORT_PREDICATES);
@@ -2207,13 +2199,12 @@ public class CalcitePlanner extends SemanticAnalyzer {
       final boolean useMaterializedViewsRegistry =
           !conf.get(HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname).equals("DUMMY");
       final RelNode calcitePreMVRewritingPlan = basePlan;
-      final Set<TableName> tablesUsedQuery = getTablesUsed(basePlan);
 
+      final Set<TableName> tablesUsedQuery = getTablesUsed(basePlan);
       if (tablesUsedQuery.isEmpty()) {
         // There are no tables used in the plan (DUMMY_TABLEs such as INSERT INTO VALUES())
-        return calcitePreMVRewritingPlan;
+        return basePlan;
       }
-
       // Add views to planner
       List<HiveRelOptMaterialization> materializations = new ArrayList<>();
       try {
@@ -2222,9 +2213,11 @@ public class CalcitePlanner extends SemanticAnalyzer {
         // as this is not a rebuild, and we apply the user parameters
         // (HIVE_MATERIALIZED_VIEW_REWRITING_TIME_WINDOW) instead.
         if (useMaterializedViewsRegistry) {
-          materializations.addAll(db.getPreprocessedMaterializedViewsFromRegistry(tablesUsedQuery, getTxnMgr()));
+          materializations.addAll(db.getPreprocessedMaterializedViewsFromRegistry(tablesUsedQuery,
+              queryState::getValidTxnList, getTxnMgr()));
         } else {
-          materializations.addAll(db.getPreprocessedMaterializedViews(tablesUsedQuery, getTxnMgr()));
+          materializations.addAll(db.getPreprocessedMaterializedViews(tablesUsedQuery,
+              queryState::getValidTxnList, getTxnMgr()));
         }
         final boolean strict = conf.getBoolVar(ConfVars.HIVE_MATERIALIZED_VIEW_REWRITING_ENGINE_STRICT);
         final String engine = conf.getVar(ConfVars.HIVE_EXECUTION_ENGINE);
@@ -2275,7 +2268,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
         // Before proceeding we need to check whether materialized views used are up-to-date
         // wrt information in metastore
         try {
-          if (!db.validateMaterializedViewsFromRegistry(materializedViewsUsedAfterRewrite, tablesUsedQuery, getTxnMgr())) {
+          if (!db.validateMaterializedViewsFromRegistry(materializedViewsUsedAfterRewrite, tablesUsedQuery, queryState::getValidTxnList, getTxnMgr())) {
             return calcitePreMVRewritingPlan;
           }
         } catch (HiveException e) {
@@ -2434,9 +2427,14 @@ public class CalcitePlanner extends SemanticAnalyzer {
                 queryToRewriteAST.getTokenStopIndex());
 
         ASTNode expandedAST = ParseUtils.parse(expandedQueryText, new Context(conf));
+
         Set<TableName> tablesUsedByOriginalPlan = getTablesUsed(removeSubqueries(originalPlan, metadataProvider));
+        if (tablesUsedByOriginalPlan.isEmpty()) {
+          return originalPlan;
+        }
+
         RelNode mvScan = getMaterializedViewByAST(
-            expandedAST, optCluster, ANY, db, tablesUsedByOriginalPlan, getTxnMgr(), functionHelper);
+            expandedAST, optCluster, ANY, db, tablesUsedByOriginalPlan, queryState::getValidTxnList, getTxnMgr(), functionHelper);
         if (mvScan != null) {
           return mvScan;
         }
@@ -2445,8 +2443,9 @@ public class CalcitePlanner extends SemanticAnalyzer {
           return originalPlan;
         }
         return new HiveMaterializedViewASTSubQueryRewriteShuttle(subQueryMap, queryToRewriteAST, expandedAST,
-                HiveRelFactories.HIVE_BUILDER.create(optCluster, null),
-                db, tablesUsedByOriginalPlan, getTxnMgr(), functionHelper).rewrite(originalPlan);
+              HiveRelFactories.HIVE_BUILDER.create(optCluster, null),
+              db, tablesUsedByOriginalPlan, queryState::getValidTxnList, getTxnMgr(), functionHelper)
+          .rewrite(originalPlan);
       } catch (Exception e) {
         LOG.warn("Automatic materialized view query rewrite failed. expanded query text: {} AST string {} ",
                 expandedQueryText, queryToRewriteAST.toStringTree(), e);
@@ -2740,10 +2739,10 @@ public class CalcitePlanner extends SemanticAnalyzer {
         public void visit(RelNode node, int ordinal, RelNode parent) {
           if (node instanceof TableScan) {
             TableScan ts = (TableScan) node;
-            RelOptHiveTable table = (RelOptHiveTable) ts.getTable();
-            if (!table.isDummyTable()) {
-            Table hiveTableMD = ((RelOptHiveTable) ts.getTable()).getHiveTableMD();
-            tablesUsed.add(hiveTableMD.getFullTableName());
+            Table table = ((RelOptHiveTable) ts.getTable()).getHiveTableMD();
+            if (AcidUtils.isTransactionalTable(table) ||
+                  table.isNonNative() && table.getStorageHandler().areSnapshotsSupported()) {
+              tablesUsed.add(table.getFullTableName());
             }
           }
           super.visit(node, ordinal, parent);
@@ -5434,7 +5433,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       fullyQualName += "." + tableMetaRef;
     }
     if (!tabNameToTabObject.containsKey(fullyQualName)) {
-      Table table = db.getTable(dbName, tableName, tableMetaRef, throwException, true);
+      Table table = db.getTable(dbName, tableName, tableMetaRef, throwException, false, false);
       if (table != null) {
         tabNameToTabObject.put(fullyQualName, table);
       }

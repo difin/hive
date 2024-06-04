@@ -310,9 +310,8 @@ target/tmp/org.apache.hadoop.hive.ql.TestTxnCommands-1521148657811/
    * If Import is creating a table it will be exactly like exported one except for the name.
    */
   private void testImport(boolean existingTarget) throws Exception {
-    runStatementOnDriver("drop table if exists T");
-    runStatementOnDriver("drop table if exists Tstage");
-    if(existingTarget) {
+    dropTables("T", "Tstage");
+    if (existingTarget) {
       runStatementOnDriver("create table T (a int, b int) stored as orc");
     }
     //Tstage is just a simple way to generate test data
@@ -350,11 +349,11 @@ target/tmp/org.apache.hadoop.hive.ql.TestTxnCommands-1521148657811/
     TestTxnCommands2.runWorker(hiveConf);
     String[][] expected3 = new String[][] {
         {"{\"writeid\":1,\"bucketid\":536870912,\"rowid\":0}\t1\t2",
-            ".*t/delta_0000001_0000002_v000002[6-7]/bucket_00000"},
+            ".*t/delta_0000001_0000002_v000001[5-6]/bucket_00000"},
         {"{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t3\t4",
-            ".*t/delta_0000001_0000002_v000002[6-7]/bucket_00000"},
+            ".*t/delta_0000001_0000002_v000001[5-6]/bucket_00000"},
         {"{\"writeid\":2,\"bucketid\":536870913,\"rowid\":0}\t0\t6",
-            ".*t/delta_0000001_0000002_v000002[6-7]/bucket_00000"}};
+            ".*t/delta_0000001_0000002_v000001[5-6]/bucket_00000"}};
     checkResultAndVectorization(expected3, testQuery, "minor compact imported table", LOG);
   }
 

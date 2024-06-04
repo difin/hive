@@ -160,7 +160,7 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
   private void testDeleteEventPruning() throws Exception {
     HiveConf.setBoolVar(hiveConf,
         HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED, true);
-    dropTable(new String[]{"T"});
+    dropTables("T");
     runStatementOnDriver(
         "create transactional table T(a int, b int) stored as orc");
     runStatementOnDriver("insert into T values(1,2),(4,5)");
@@ -190,9 +190,9 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
 
     String[][] expected2 = new String[][]{
         {"{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t4\t5",
-            "warehouse/t/base_0000003_v0000023/bucket_00000"},
+            "warehouse/t/base_0000003_v0000012/bucket_00000"},
         {"{\"writeid\":2,\"bucketid\":536870912,\"rowid\":0}\t4\t6",
-            "warehouse/t/base_0000003_v0000023/bucket_00000"}};
+            "warehouse/t/base_0000003_v0000012/bucket_00000"}};
     checkResultAndVectorization(expected2, testQuery, "after compaction", LOG);
   }
   /**
@@ -300,7 +300,7 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
   @Test
   public void testCleaner2() throws Exception {
     MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.CREATE_TABLES_AS_ACID, true);
-    dropTable(new String[] {"T"});
+    dropTables("T");
     //note: transaction names T1, T2, etc below, are logical, the actual txnid will be different
     runStatementOnDriver("create table T (a int, b int) stored as orc");
     runStatementOnDriver("insert into T values(0,2)");//makes delta_1_1 in T1
@@ -338,7 +338,7 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
      ├── delta_0000001_0000001_0000
      │   ├── _orc_acid_version
      │   └── bucket_00000
-     ├── delta_0000001_0000002_v0000020
+     ├── delta_0000001_0000002_v0000010
      │   ├── _orc_acid_version
      │   └── bucket_00000
      └── delta_0000002_0000002_0000
@@ -350,7 +350,7 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
         FileUtils.HIDDEN_FILES_PATH_FILTER);
 
     String[] expectedList = new String[] {
-        "/t/delta_0000001_0000002_v0000020",
+        "/t/delta_0000001_0000002_v0000010",
         "/t/delta_0000001_0000001_0000",
         "/t/delta_0000002_0000002_0000",
     };
@@ -358,7 +358,7 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
 
 
     /*
-    T3 is still running and cannot see anything compactor produces with v0000019 suffix
+    T3 is still running and cannot see anything compactor produces with v0000009 suffix
     so it may be reading delta_1_1 & delta_2_2 and so cleaner cannot delete any files
      at this point*/
     runCleaner(hiveConf);
@@ -377,14 +377,14 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
     runStatementOnDriver("alter table T compact 'minor'");
     runWorker(hiveConf);
     /*
-    at this point delta_0000001_0000003_v0000023 is visible to everyone
+    at this point delta_0000001_0000003_v0000012 is visible to everyone
     so cleaner removes all files shadowed by it (which is everything in this case)
     */
     runCleaner(hiveConf);
     runCleaner(hiveConf);
 
     expectedList = new String[] {
-        "/t/delta_0000001_0000003_v0000023"
+        "/t/delta_0000001_0000003_v0000014"
     };
     actualList = fs.listStatus(new Path(warehousePath + "/t"),
         FileUtils.HIDDEN_FILES_PATH_FILTER);
@@ -407,7 +407,7 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
   @Test
   public void testCompactionAbort() throws Exception {
     MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.CREATE_TABLES_AS_ACID, true);
-    dropTable(new String[] {"T"});
+    dropTables("T");
     //note: transaction names T1, T2, etc below, are logical, the actual txnid will be different
     runStatementOnDriver("create table T (a int, b int) stored as orc");
     runStatementOnDriver("insert into T values(0,2)");//makes delta_1_1 in T1
@@ -466,7 +466,7 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
   public void testMajorCompactionAbortLeftoverFiles() throws Exception {
     MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.CREATE_TABLES_AS_ACID, true);
 
-    dropTable(new String[] {"T"});
+    dropTables("T");
     //note: transaction names T1, T2, etc below, are logical, the actual txnid will be different
     runStatementOnDriver("create table T (a int, b int) stored as orc");
     runStatementOnDriver("insert into T values(0,2)"); //makes delta_1_1 in T1
@@ -522,7 +522,7 @@ public class TestTxnCommands3 extends TxnCommandsBaseForTests {
   public void testMinorCompactionAbortLeftoverFiles() throws Exception {
     MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.CREATE_TABLES_AS_ACID, true);
 
-    dropTable(new String[] {"T"});
+    dropTables("T");
     //note: transaction names T1, T2, etc below, are logical, the actual txnid will be different
     runStatementOnDriver("create table T (a int, b int) stored as orc");
     runStatementOnDriver("insert into T values(0,2)"); //makes delta_1_1 in T1

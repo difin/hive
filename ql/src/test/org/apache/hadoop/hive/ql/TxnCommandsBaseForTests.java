@@ -375,7 +375,7 @@ public abstract class TxnCommandsBaseForTests {
     //verify data and layout
     for(int i = 0; i < expected.length; i++) {
       Assert.assertTrue("Actual line (data) " + i + " data: " + rs.get(i) + "; expected " + expected[i][0], rs.get(i).startsWith(expected[i][0]));
-      if (expected.length == 2) {
+      if (expected[i].length == 2) {
         Assert.assertTrue("Actual line(file) " + i + " file: " + rs.get(i),
                 rs.get(i).endsWith(expected[i][1]) || rs.get(i).matches(expected[i][1]));
       }
@@ -404,10 +404,13 @@ public abstract class TxnCommandsBaseForTests {
     List<String> rs = runStatementOnDriver(query);
     checkExpected(rs, expectedResult, msg + (shouldVectorized() ? " vect" : ""), LOG);
   }
-  void dropTable(String[] tabs) throws Exception {
-    for(String tab : tabs) {
-      d.run("drop table if exists " + tab);
+  void dropTables(String... tables) throws Exception {
+    HiveConf queryConf = d.getQueryState().getConf();
+    queryConf.setBoolVar(HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY, false);
+    for (String table : tables) {
+      d.run("drop table if exists " + table);
     }
+    queryConf.setBoolVar(HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY, true);
   }
   Driver swapDrivers(Driver otherDriver) {
     Driver tmp = d;

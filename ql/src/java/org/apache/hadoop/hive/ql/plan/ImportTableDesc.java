@@ -111,7 +111,7 @@ public class ImportTableDesc {
   }
 
   public String getTableName() throws SemanticException {
-    return createTblDesc.getTableName().getTable();
+    return createTblDesc.getFullTableName().getTable();
   }
 
   public List<FieldSchema> getPartCols() {

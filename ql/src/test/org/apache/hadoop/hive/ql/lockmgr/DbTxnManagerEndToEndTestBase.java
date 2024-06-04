@@ -19,6 +19,7 @@ package org.apache.hadoop.hive.ql.lockmgr;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
@@ -102,6 +103,8 @@ public abstract class DbTxnManagerEndToEndTestBase {
   @After
   public void tearDown() throws Exception {
     driver.close();
+    conf.unset(ValidTxnList.VALID_TXNS_KEY);
+    
     driver2.close();
     if (txnMgr != null) {
       txnMgr.closeTxnManager();

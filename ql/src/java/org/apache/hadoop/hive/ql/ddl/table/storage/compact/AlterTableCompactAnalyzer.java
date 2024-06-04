@@ -21,7 +21,6 @@ package org.apache.hadoop.hive.ql.ddl.table.storage.compact;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.antlr.runtime.TokenRewriteStream;
 import org.antlr.runtime.tree.Tree;
 import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
@@ -29,6 +28,7 @@ import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.QueryProperties;
 import org.apache.hadoop.hive.ql.QueryState;
+import org.apache.hadoop.hive.ql.ddl.DDLDesc.DDLDescWithWriteId;
 import org.apache.hadoop.hive.ql.ddl.DDLWork;
 import org.apache.hadoop.hive.ql.ddl.DDLSemanticAnalyzerFactory.DDLType;
 import org.apache.hadoop.hive.ql.ddl.table.AbstractAlterTableAnalyzer;
@@ -125,6 +125,11 @@ public class AlterTableCompactAnalyzer extends AbstractAlterTableAnalyzer {
         numberOfBuckets, mapProp, orderBy, filterExpr);
     addInputsOutputsAlterTable(tableName, partitionSpec, desc, desc.getType(), false);
     rootTasks.add(TaskFactory.get(new DDLWork(getInputs(), getOutputs(), desc)));
+  }
+
+  @Override
+  protected void setAcidDdlDesc(DDLDescWithWriteId desc) {
+    // doesn't need an open txn
   }
 
   @Override

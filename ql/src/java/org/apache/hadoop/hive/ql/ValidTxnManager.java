@@ -32,12 +32,9 @@ import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.common.ValidTxnWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
-import org.apache.hadoop.hive.metastore.api.GetOpenTxnsResponse;
 import org.apache.hadoop.hive.metastore.api.LockComponent;
 import org.apache.hadoop.hive.metastore.api.LockType;
 import org.apache.hadoop.hive.metastore.api.TxnType;
-import org.apache.hadoop.hive.metastore.txn.TxnUtils;
-import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.metastore.utils.StringUtils;
 import org.apache.hadoop.hive.ql.exec.Operator;
 import org.apache.hadoop.hive.ql.exec.TableScanOperator;
@@ -48,7 +45,7 @@ import org.apache.hadoop.hive.ql.lockmgr.HiveLock;
 import org.apache.hadoop.hive.ql.lockmgr.HiveLockMode;
 import org.apache.hadoop.hive.ql.lockmgr.LockException;
 import org.apache.hadoop.hive.ql.metadata.Table;
-import org.apache.hive.common.util.TxnIdUtils;
+import org.apache.hadoop.hive.ql.session.SessionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,39 +134,41 @@ class ValidTxnManager {
    *  Write the current set of valid write ids for the operated acid tables into the configuration so
    *  that it can be read by the input format.
    */
-  ValidTxnWriteIdList recordValidWriteIds() throws LockException {
+  void recordValidWriteIds() throws LockException {
     String txnString = driverContext.getConf().get(ValidTxnList.VALID_TXNS_KEY);
     if (StringUtils.isEmpty(txnString)) {
       throw new IllegalStateException("calling recordValidWriteIds() without initializing ValidTxnList " +
           JavaUtils.txnIdToString(driverContext.getTxnManager().getCurrentTxnId()));
     }
-
     ValidTxnWriteIdList txnWriteIds = getTxnWriteIds(txnString);
     setValidWriteIds(txnWriteIds);
-    driverContext.getTxnManager().addWriteIdsToMinHistory(driverContext.getPlan(), txnWriteIds);
 
-    LOG.debug("Encoding valid txn write ids info {} txnid: {}", txnWriteIds.toString(),
+    if ((!driverContext.isRetrial() || driverContext.isOutdatedTxn())
+        && !SessionState.get().isCompaction()) {
+      driverContext.getTxnManager().addWriteIdsToMinHistory(driverContext.getPlan(), txnWriteIds);
+    }
+
+    LOG.debug("Encoding valid txn write ids info {}, txnid: {}", txnWriteIds,
         driverContext.getTxnManager().getCurrentTxnId());
-    return txnWriteIds;
   }
 
   private ValidTxnWriteIdList getTxnWriteIds(String txnString) throws LockException {
-    List<String> txnTables = getTransactionalTables(getTables(true, true));
-    ValidTxnWriteIdList txnWriteIds = null;
-    if (driverContext.getCompactionWriteIds() != null) {
-      // This is kludgy: here we need to read with Compactor's snapshot/txn rather than the snapshot of the current
+    List<String> txnTables = getTransactionalTables();
+    final ValidTxnWriteIdList txnWriteIds;
+
+    if (SessionState.get().isCompaction()) {
+      // Here we are reading with Compactor's snapshot/txn rather than the snapshot of the current
       // {@code txnMgr}, in effect simulating a "flashback query" but can't actually share compactor's txn since it
-      // would run multiple statements.  See more comments in {@link org.apache.hadoop.hive.ql.txn.compactor.Worker}
-      // where it start the compactor txn*/
+      // would run multiple statements. See more comments in {@link org.apache.hadoop.hive.ql.txn.compactor.Worker}
+      // where it starts the compactor txn*/
       if (txnTables.size() != 1) {
         throw new LockException("Unexpected tables in compaction: " + txnTables);
       }
-      txnWriteIds = new ValidTxnWriteIdList(driverContext.getCompactorTxnId());
-      txnWriteIds.addTableValidWriteIdList(driverContext.getCompactionWriteIds());
+      txnWriteIds = AcidUtils.getValidTxnWriteIdList(driverContext.getConf());
     } else {
       txnWriteIds = driverContext.getTxnManager().getValidWriteIds(txnTables, txnString);
     }
-    if (driverContext.getTxnType() == TxnType.READ_ONLY && !getTables(false, true).isEmpty()) {
+    if (driverContext.getTxnType() == TxnType.READ_ONLY && !getTables(false).isEmpty()) {
       throw new IllegalStateException(String.format(
           "Inferred transaction type '%s' doesn't conform to the actual query string '%s'",
           driverContext.getTxnType(), driverContext.getQueryState().getQueryString()));
@@ -200,14 +199,12 @@ class ValidTxnManager {
     }
   }
 
-  private Map<String, Table> getTables(boolean inputNeeded, boolean outputNeeded) {
+  private Map<String, Table> getTables(boolean inputNeeded) {
     Map<String, Table> tables = new HashMap<>();
     if (inputNeeded) {
       driverContext.getPlan().getInputs().forEach(input -> addTableFromEntity(input, tables));
     }
-    if (outputNeeded) {
-      driverContext.getPlan().getOutputs().forEach(output -> addTableFromEntity(output, tables));
-    }
+    driverContext.getPlan().getOutputs().forEach(output -> addTableFromEntity(output, tables));
     return tables;
   }
 
@@ -228,8 +225,8 @@ class ValidTxnManager {
     tables.put(fullTableName, table);
   }
 
-  private List<String> getTransactionalTables(Map<String, Table> tables) {
-    return tables.entrySet().stream()
+  private List<String> getTransactionalTables() {
+    return getTables(true).entrySet().stream()
       .filter(entry -> AcidUtils.isTransactionalTable(entry.getValue()))
       .map(Map.Entry::getKey)
       .collect(Collectors.toList());

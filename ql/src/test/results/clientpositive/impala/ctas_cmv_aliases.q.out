@@ -326,6 +326,7 @@ Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
 
   Stage: Stage-2
     Create Materialized View
+      location: hdfs://### HDFS PATH ###
       columns: empid int, deptno0 int, cnt bigint
       table properties:
         materializedview.engine impala

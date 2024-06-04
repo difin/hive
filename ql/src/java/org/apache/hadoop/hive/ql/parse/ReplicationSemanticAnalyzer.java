@@ -56,7 +56,6 @@ import java.util.Objects;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVEQUERYID;
 import static org.apache.hadoop.hive.ql.exec.repl.ReplAck.LOAD_ACKNOWLEDGEMENT;
 import static org.apache.hadoop.hive.ql.parse.HiveParser.TOK_DBNAME;
-import static org.apache.hadoop.hive.ql.parse.HiveParser.TOK_REPLACE;
 import static org.apache.hadoop.hive.ql.parse.HiveParser.TOK_REPL_CONFIG;
 import static org.apache.hadoop.hive.ql.parse.HiveParser.TOK_REPL_DUMP;
 import static org.apache.hadoop.hive.ql.parse.HiveParser.TOK_REPL_LOAD;
@@ -129,7 +128,7 @@ public class ReplicationSemanticAnalyzer extends BaseSemanticAnalyzer {
   }
 
   private void setTxnConfigs() {
-    String validTxnList = queryState.getConf().get(ValidTxnList.VALID_TXNS_KEY);
+    String validTxnList = queryState.getValidTxnList();
     if (validTxnList != null) {
       conf.set(ValidTxnList.VALID_TXNS_KEY, validTxnList);
     }
@@ -144,7 +143,7 @@ public class ReplicationSemanticAnalyzer extends BaseSemanticAnalyzer {
     String replScopeType = (replScope == this.replScope) ? "Current" : "Old";
     for (int listIdx = 0; listIdx < childCount; listIdx++) {
       String tableList = unescapeSQLString(replTablesNode.getChild(listIdx).getText());
-      if (tableList == null || tableList.isEmpty()) {
+      if (tableList.isEmpty()) {
         throw new SemanticException(ErrorMsg.REPL_INVALID_DB_OR_TABLE_PATTERN);
       }
       if (listIdx == 0) {
@@ -171,10 +170,8 @@ public class ReplicationSemanticAnalyzer extends BaseSemanticAnalyzer {
       switch (currNode.getType()) {
       case TOK_REPL_CONFIG:
         Map<String, String> replConfigs = getProps((ASTNode) currNode.getChild(0));
-        if (null != replConfigs) {
-          for (Map.Entry<String, String> config : replConfigs.entrySet()) {
-            conf.set(config.getKey(), config.getValue());
-          }
+        for (Map.Entry<String, String> config : replConfigs.entrySet()) {
+          conf.set(config.getKey(), config.getValue());
         }
         break;
       case TOK_REPL_TABLES:
@@ -425,7 +422,7 @@ public class ReplicationSemanticAnalyzer extends BaseSemanticAnalyzer {
     return collector;
   }
 
-  private Path getCurrentLoadPath() throws IOException, SemanticException {
+  private Path getCurrentLoadPath() throws IOException {
     Path loadPathBase = ReplUtils.getEncodedDumpRootPath(conf, sourceDbNameOrPattern.toLowerCase());
     final FileSystem fs = loadPathBase.getFileSystem(conf);
     // Make fully qualified path for further use.
@@ -453,27 +450,25 @@ public class ReplicationSemanticAnalyzer extends BaseSemanticAnalyzer {
 
   private void setConfigs(ASTNode node) throws SemanticException {
     Map<String, String> replConfigs = getProps(node);
-    if (null != replConfigs) {
-      for (Map.Entry<String, String> config : replConfigs.entrySet()) {
-        String key = config.getKey();
-        // don't set the query id in the config
-        if (key.equalsIgnoreCase(HIVEQUERYID.varname)) {
-          String queryTag = config.getValue();
-          if (!StringUtils.isEmpty(queryTag)) {
-            QueryState.setApplicationTag(conf, queryTag);
-          }
-          queryState.setQueryTag(queryTag);
-        } else {
-          conf.set(key, config.getValue());
+    for (Map.Entry<String, String> config : replConfigs.entrySet()) {
+      String key = config.getKey();
+      // don't set the query id in the config
+      if (key.equalsIgnoreCase(HIVEQUERYID.varname)) {
+        String queryTag = config.getValue();
+        if (!StringUtils.isEmpty(queryTag)) {
+          QueryState.setApplicationTag(conf, queryTag);
         }
+        queryState.setQueryTag(queryTag);
+      } else {
+        conf.set(key, config.getValue());
       }
+    }
 
-      // As hive conf is changed, need to get the Hive DB again with it.
-      try {
-        db = Hive.get(conf);
-      } catch (HiveException e) {
-        throw new SemanticException(e);
-      }
+    // As hive conf is changed, need to get the Hive DB again with it.
+    try {
+      db = Hive.get(conf);
+    } catch (HiveException e) {
+      throw new SemanticException(e);
     }
   }
 

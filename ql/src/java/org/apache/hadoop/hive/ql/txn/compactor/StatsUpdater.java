@@ -55,7 +55,7 @@ public final class StatsUpdater {
      * field so need to figure out the msg format and how to surface it in SHOW COMPACTIONS, etc
      *
      * @param ci Information about the compaction being run
-     * @param conf The hive configuration object
+     * @param hiveConf The hive configuration object
      * @param userName The user to run the statistic collection with
      * @param compactionQueueName The name of the compaction queue
      */
@@ -107,7 +107,7 @@ public final class StatsUpdater {
 
             LOG.info("{}: running '{}'", ci, sb);
             SessionState sessionState = DriverUtils.setUpSessionState(conf, userName, true);
-            DriverUtils.runOnDriver(conf, userName, sessionState, sb.toString(), ci.highestWriteId);
+            DriverUtils.runOnDriver(conf, userName, sessionState, sb.toString());
         } catch (Throwable t) {
           LOG.error("{}: gatherStats({},{},{}) failed due to: {}",
                   ci, ci.dbname, ci.tableName, ci.partName, t.getMessage(), t);

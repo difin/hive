@@ -52,6 +52,7 @@ import org.apache.hadoop.hive.ql.exec.TaskFactory;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
 import org.apache.hadoop.hive.ql.engine.EngineEventSequence;
+import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.lock.CompileLock;
 import org.apache.hadoop.hive.ql.lock.CompileLockFactory;
 import org.apache.hadoop.hive.ql.lockmgr.HiveLock;
@@ -156,17 +157,6 @@ public class Driver implements IDriver {
 
   public Driver(QueryState queryState, String userName, QueryInfo queryInfo) {
     this(queryState, userName, queryInfo, null);
-  }
-
-  public Driver(QueryState queryState, String userName, ValidWriteIdList compactionWriteIds, long compactorTxnId) {
-    this(queryState, userName);
-    driverContext.setCompactionWriteIds(compactionWriteIds);
-    driverContext.setCompactorTxnId(compactorTxnId);
-  }
-
-  public Driver(QueryState queryState, String userName, long analyzeTableWriteId) {
-    this(queryState, userName);
-    driverContext.setAnalyzeTableWriteId(analyzeTableWriteId);
   }
 
   public Driver(QueryState queryState, String userName, QueryInfo queryInfo, HiveTxnManager txnManager) {
@@ -348,7 +338,7 @@ public class Driver implements IDriver {
         }
       }
       if (isDirectInsertOn) {
-        acidSinks.sort((FileSinkDesc fsd1, FileSinkDesc fsd2) -> fsd1.getMoveTaskId().compareTo(fsd2.getMoveTaskId()));
+        acidSinks.sort(Comparator.comparing(FileSinkDesc::getMoveTaskId));
       }
 
       for (FileSinkDesc desc : acidSinks) {
@@ -393,7 +383,8 @@ public class Driver implements IDriver {
     PerfLogger perfLogger = SessionState.getPerfLogger();
     perfLogger.PerfLogBegin(CLASS_NAME, PerfLogger.ACQUIRE_READ_WRITE_LOCKS);
 
-    if(!driverContext.getTxnManager().isTxnOpen() && driverContext.getTxnManager().supportsAcid()) {
+    if (!driverContext.getTxnManager().isTxnOpen() && driverContext.getTxnManager().supportsAcid()
+        && !SessionState.get().isCompaction()) {
       /*non acid txn managers don't support txns but fwd lock requests to lock managers
         acid txn manager requires all locks to be associated with a txn so if we
         end up here w/o an open txn it's because we are processing something like "use <database>
@@ -415,19 +406,21 @@ public class Driver implements IDriver {
         acidDdlDesc.setWriteId(writeId);
       }
 
+      if (!SessionState.get().isCompaction()) {
       /*It's imperative that {@code acquireLocks()} is called for all commands so that
       HiveTxnManager can transition its state machine correctly*/
-      driverContext.getTxnManager().acquireLocks(driverContext.getPlan(), context, userFromUGI, driverState);
-      // This check is for controlling the correctness of the current state
-      if (driverContext.getTxnManager().recordSnapshot(driverContext.getPlan()) &&
-          !driverContext.isValidTxnListsGenerated()) {
-        throw new IllegalStateException(
-            "Need to record valid WriteID list but there is no valid TxnID list (" +
-                JavaUtils.txnIdToString(driverContext.getTxnManager().getCurrentTxnId()) +
-                ", queryId:" + driverContext.getPlan().getQueryId() + ")");
+        driverContext.getTxnManager().acquireLocks(driverContext.getPlan(), context, userFromUGI, driverState);
+        // This check is for controlling the correctness of the current state
+        if (driverContext.getTxnManager().recordSnapshot(driverContext.getPlan()) &&
+            !driverContext.isValidTxnListsGenerated()) {
+          throw new IllegalStateException(
+              "Need to record valid WriteID list but there is no valid TxnID list (" +
+                  JavaUtils.txnIdToString(driverContext.getTxnManager().getCurrentTxnId()) +
+                  ", queryId:" + driverContext.getPlan().getQueryId() + ")");
+        }
       }
 
-      if (driverContext.getPlan().hasAcidResourcesInQuery() || hasAcidDdl) {
+      if (driverContext.getPlan().hasAcidReadWrite() || hasAcidDdl) {
         validTxnManager.recordValidWriteIds();
       }
 
@@ -452,8 +445,10 @@ public class Driver implements IDriver {
   private void allocateWriteIdForAcidAnalyzeTable() throws LockException {
     if (driverContext.getPlan().getAcidAnalyzeTable() != null) {
       Table table = driverContext.getPlan().getAcidAnalyzeTable().getTable();
-      driverContext.getTxnManager().setTableWriteId(
-          table.getDbName(), table.getTableName(), driverContext.getAnalyzeTableWriteId());
+      ValidWriteIdList writeIdList = AcidUtils.getTableValidWriteIdList(driverContext.getConf(),
+          TableName.getDbTable(table.getDbName(), table.getTableName()));
+      long writeId = (writeIdList != null) ? writeIdList.getHighWatermark() : -1;
+      driverContext.getTxnManager().setTableWriteId(table.getDbName(), table.getTableName(), writeId);
     }
   }
 
@@ -763,11 +758,10 @@ public class Driver implements IDriver {
               // data add ends up being > than the data delete.
               driverContext.getTxnManager().clearCaches();
             }
+            driverContext.getConf().unset(ValidTxnList.VALID_TXNS_KEY);
             driverContext.setRetrial(true);
-            driverContext.getConf().set(ValidTxnList.VALID_TXNS_KEY,
-              driverContext.getTxnManager().getValidTxns().toString());
 
-            if (driverContext.getPlan().hasAcidResourcesInQuery()) {
+            if (driverContext.getPlan().hasAcidReadWrite()) {
               compileInternal(context.getCmd(), true);
               validTxnManager.recordValidWriteIds();
               setWriteIdForAcidFileSinks();
