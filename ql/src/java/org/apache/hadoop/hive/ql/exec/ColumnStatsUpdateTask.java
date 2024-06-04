@@ -53,6 +53,7 @@ import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.plan.ColumnStatsUpdateWork;
 import org.apache.hadoop.hive.ql.plan.api.StageType;
 import org.apache.hadoop.hive.serde2.io.DateWritableV2;
+import org.apache.hadoop.hive.serde.serdeConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,9 +98,11 @@ public class ColumnStatsUpdateTask extends Task<ColumnStatsUpdateWork> {
 
     ColumnStatisticsData statsData = new ColumnStatisticsData();
 
-    if (columnType.equalsIgnoreCase("long") || columnType.equalsIgnoreCase("tinyint")
-        || columnType.equalsIgnoreCase("smallint") || columnType.equalsIgnoreCase("int")
-        || columnType.equalsIgnoreCase("bigint") || columnType.equalsIgnoreCase("timestamp")) {
+    if (columnType.equalsIgnoreCase(serdeConstants.TINYINT_TYPE_NAME)
+        || columnType.equalsIgnoreCase(serdeConstants.SMALLINT_TYPE_NAME)
+        || columnType.equalsIgnoreCase(serdeConstants.INT_TYPE_NAME)
+        || columnType.equalsIgnoreCase(serdeConstants.BIGINT_TYPE_NAME)
+        || columnType.equalsIgnoreCase(serdeConstants.TIMESTAMP_TYPE_NAME)){
       LongColumnStatsDataInspector longStats = new LongColumnStatsDataInspector();
       longStats.setNumNullsIsSet(false);
       longStats.setNumDVsIsSet(false);
