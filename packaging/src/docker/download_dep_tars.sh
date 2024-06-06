@@ -5,8 +5,8 @@
 # 4. Downloads artifacts to scripts's folder
 # 5. Prints a recommended way to build hive image from hive repo root folder
 
-PLATFORM="${PLATFORM:-redhat7}"
-CDH_PREFIX=${CDH_PREFIX:="7.2.17.0"}       #TODO: get last from https://release.infra.cloudera.com/hwre-api/releasedbuilds?stack=CDH&type=public
+PLATFORM="${PLATFORM:-redhat8}"
+CDH_PREFIX=${CDH_PREFIX:="7.2.18.0"}       #TODO: get last from https://release.infra.cloudera.com/hwre-api/releasedbuilds?stack=CDH&type=public
 CDWH_PREFIX=${CDWH_PREFIX:=$(curl -s "https://release.infra.cloudera.com/hwre-api/stackinfo?stack=CDWH&build_type=dev" | jq '.[] | select(.branch=="cdw-master")' | jq ."stack_version" | tr -d '"')}
 
 function get_component_version(){
@@ -36,20 +36,20 @@ fi
 echo "CDH_VERSION=${CDH_VERSION}"
 
 CDH_GBN=$(curl -s $BUILD_INFO_URL | jq '.gbn' | tr -d '"')
-CDH_TARS_URL=http://cloudera-build-us-west-1.vpc.cloudera.com/s3/build/${CDH_GBN}/cdh/7.x/$PLATFORM/yum/tars/
+CDH_TARS_URL=https://cloudera-build-us-west-1.vpc.cloudera.com/s3/build/${CDH_GBN}/cdh/7.x/$PLATFORM/yum/tars/
 echo "CDH_TARS_URL=${CDH_TARS_URL}"
 
-CDWH_BUILD_URL="http://release.infra.cloudera.com/hwre-api/stackinfo?stack=CDWH&build_type=dev"
+CDWH_BUILD_URL="https://release.infra.cloudera.com/hwre-api/stackinfo?stack=CDWH&build_type=dev"
 if [ -z $CDWH_VERSION ]; then #CDWH_VERSION can be forced from ENV, like: export CDWH_VERSION=2022.0.9.0-14
     CDWH_VERSION=$(curl -s ${CDWH_BUILD_URL} | jq '.["'${CDWH_PREFIX}'"].last_sucessful_build' | tr -d '"')
 fi
 echo "CDWH_VERSION=${CDWH_VERSION}"
 
-export CDWH_REPO_DETAILS_URL="http://release.infra.cloudera.com/hwre-api/versioninfo?stack=CDWH&stack_version=${CDWH_VERSION}&per_page=50"
+export CDWH_REPO_DETAILS_URL="https://release.infra.cloudera.com/hwre-api/versioninfo?stack=CDWH&stack_version=${CDWH_VERSION}&per_page=50"
 CDWH_REPO_URL=$(curl -s $CDWH_REPO_DETAILS_URL | jq '.["'${CDWH_VERSION}'"]'.platforms.${PLATFORM}.repo_url | tr -d '"')
 
 CDWH_GBN=$(curl -s $CDWH_REPO_DETAILS_URL | jq '.["'${CDWH_VERSION}'"]'.gbn | tr -d '"')
-CDWH_TARS_URL=http://cloudera-build-us-west-1.vpc.cloudera.com/s3/build/${CDWH_GBN}/cdwh/${CDWH_YEAR}.x/$PLATFORM/yum/tars/
+CDWH_TARS_URL=https://cloudera-build-us-west-1.vpc.cloudera.com/s3/build/${CDWH_GBN}/cdwh/${CDWH_YEAR}.x/$PLATFORM/yum/tars/
 echo "CDWH_TARS_URL=${CDWH_TARS_URL}"
 
 TEZ_VERSION=$(get_component_version "tez" $CDWH_VERSION, "CDWH")
