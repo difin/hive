@@ -2630,7 +2630,7 @@ public class HiveConf extends Configuration {
         "and the original filter is removed. If this config is false, the original filter \n" +
         "is also left in the operator tree at the original place."),
     HIVE_JOIN_DISJ_TRANSITIVE_PREDICATES_PUSHDOWN("hive.optimize.join.disjunctive.transitive.predicates.pushdown",
-        true, "Whether to transitively infer disjunctive predicates across joins. \n"
+        false, "Whether to transitively infer disjunctive predicates across joins. \n"
         + "Disjunctive predicates are hard to simplify and pushing them down might lead to infinite rule matching "
         + "causing stackoverflow and OOM errors"),
     HIVEPOINTLOOKUPOPTIMIZER("hive.optimize.point.lookup", true,
