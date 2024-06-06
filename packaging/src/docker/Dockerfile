@@ -79,8 +79,8 @@ RUN useradd -ms /bin/bash hive
 # async-profiler for perf profiling
 RUN mkdir /async-profiler && \
    wget https://github.com/jvm-profiling-tools/async-profiler/releases/download/v2.9/async-profiler-2.9-linux-x64.tar.gz && \
-   tar -xvf async-profiler-2.9-linux-x64.tar.gz -C /async-profiler && \
-   rm async-profiler-2.9-linux-x64.tar.gz
+   tar -xvf async-profiler-2.9-linux-x64.tar.gz -C /async-profiler && mv /async-profiler/async-profiler-2.9-linux-x64/* /async-profiler && \
+   rm async-profiler-2.9-linux-x64.tar.gz && rm -rf /async-profiler/async-profiler-2.9-linux-x64
 
 # jmx-exporter for prometheus metrics
 RUN mkdir /jmx-exporter && \
