@@ -101,7 +101,8 @@ public class Driver implements IDriver {
   private int maxRows = 100;
   private ByteStream.Output bos = new ByteStream.Output();
 
-  private final DriverContext driverContext;
+  @VisibleForTesting
+  final DriverContext driverContext;
   private final DriverState driverState = new DriverState();
   private final List<HiveLock> hiveLocks = new ArrayList<HiveLock>();
   private final ValidTxnManager validTxnManager;
@@ -548,11 +549,11 @@ public class Driver implements IDriver {
     } catch (CommandProcessorException cpe) {
       SessionState ss = SessionState.get();
       if (ss == null) {
-        throw cpe;
+        saveErrorMessageAndRethrow(cpe);
       }
       MetaDataFormatter mdf = MetaDataFormatUtils.getFormatter(ss.getConf());
       if (!(mdf instanceof JsonMetaDataFormatter)) {
-        throw cpe;
+        saveErrorMessageAndRethrow(cpe);
       }
       /*Here we want to encode the error in machine readable way (e.g. JSON)
        * Ideally, errorCode would always be set to a canonical error defined in ErrorMsg.
@@ -563,7 +564,7 @@ public class Driver implements IDriver {
       try {
         if (cpe.getException() == null) {
           mdf.error(ss.out, cpe.getErrorMessage(), cpe.getResponseCode(), cpe.getSqlState());
-          throw cpe;
+          saveErrorMessageAndRethrow(cpe);
         }
         ErrorMsg canonicalErr = ErrorMsg.getErrorMsg(cpe.getResponseCode());
         if (canonicalErr != null && canonicalErr != ErrorMsg.GENERIC_ERROR) {
@@ -573,7 +574,7 @@ public class Driver implements IDriver {
             return its code as error code. In this case we want to
             preserve it for downstream code to interpret*/
           mdf.error(ss.out, cpe.getErrorMessage(), cpe.getResponseCode(), cpe.getSqlState(), null);
-          throw cpe;
+          saveErrorMessageAndRethrow(cpe);
         }
         if (cpe.getException() instanceof HiveException) {
           HiveException rc = (HiveException)cpe.getException();
@@ -587,8 +588,9 @@ public class Driver implements IDriver {
       } catch (HiveException ex) {
         CONSOLE.printError("Unable to JSON-encode the error", StringUtils.stringifyException(ex));
       }
-      throw cpe;
+      saveErrorMessageAndRethrow(cpe);
     }
+    return null;
   }
 
   @Override
@@ -602,7 +604,8 @@ public class Driver implements IDriver {
       compileInternal(command, false);
       return new CommandProcessorResponse(getSchema(), null);
     } catch (CommandProcessorException cpe) {
-      throw cpe;
+      saveErrorMessageAndRethrow(cpe);
+      return null;
     } finally {
       if (cleanupTxnList) {
         // Valid txn list might be generated for a query compiled using this
@@ -624,7 +627,7 @@ public class Driver implements IDriver {
         acquireLocks();
       } catch (CommandProcessorException cpe) {
         rollback(cpe);
-        throw cpe;
+        saveErrorMessageAndRethrow(cpe);
       }
     }
   }
@@ -660,7 +663,7 @@ public class Driver implements IDriver {
         } catch (LockException e) {
           LOG.warn("Exception in releasing locks. " + StringUtils.stringifyException(e));
         }
-        throw cpe;
+        saveErrorMessageAndRethrow(cpe);
       }
     }
 
@@ -821,7 +824,7 @@ public class Driver implements IDriver {
         }
       } catch (CommandProcessorException cpe) {
         rollback(cpe);
-        throw cpe;
+        saveErrorMessageAndRethrow(cpe);
       }
 
       //if needRequireLock is false, the release here will do nothing because there is no lock
@@ -1266,5 +1269,10 @@ public class Driver implements IDriver {
 
     return driverContext.getPlan().getFetchTask() != null && driverContext.getPlan().getResultSchema() != null &&
         driverContext.getPlan().getResultSchema().isSetFieldSchemas();
+  }
+
+  private void saveErrorMessageAndRethrow(CommandProcessorException cpe) throws CommandProcessorException {
+    driverContext.setQueryErrorMessage(cpe.getErrorMessage());
+    throw cpe;
   }
 }
