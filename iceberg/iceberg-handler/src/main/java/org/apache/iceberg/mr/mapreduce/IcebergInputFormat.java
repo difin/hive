@@ -21,7 +21,6 @@ package org.apache.iceberg.mr.mapreduce;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -49,7 +48,7 @@ import org.apache.iceberg.IncrementalAppendScan;
 import org.apache.iceberg.Partitioning;
 import org.apache.iceberg.Scan;
 import org.apache.iceberg.ScanTaskGroup;
-import org.apache.iceberg.SchemaParser;
+import org.apache.iceberg.Schema;
 import org.apache.iceberg.SnapshotRef;
 import org.apache.iceberg.SystemConfigs;
 import org.apache.iceberg.Table;
@@ -144,14 +143,19 @@ public class IcebergInputFormat<T> extends InputFormat<Void, T> {
       Long openFileCost = splitSize > 0 ? splitSize : TableProperties.SPLIT_SIZE_DEFAULT;
       scan = scan.option(TableProperties.SPLIT_OPEN_FILE_COST, String.valueOf(openFileCost));
     }
-    String schemaStr = conf.get(InputFormatConfig.READ_SCHEMA);
-    if (schemaStr != null) {
-      scan.project(SchemaParser.fromJson(schemaStr));
-    }
-
-    String[] selectedColumns = conf.getStrings(InputFormatConfig.SELECTED_COLUMNS);
-    if (selectedColumns != null) {
-      scan.select(Arrays.asList(selectedColumns));
+    //  TODO: Currently, this projection optimization stored on scan is not being used effectively on Hive side, as
+    //   Hive actually uses conf to propagate the projected columns to let the final reader to read the only
+    //   projected columns data. See IcebergInputFormat::readSchema(Configuration conf, Table table, boolean
+    //   caseSensitive). But we can consider using this projection optimization stored on scan in the future when
+    //   needed.
+    Schema readSchema = InputFormatConfig.readSchema(conf);
+    if (readSchema != null) {
+      scan = scan.project(readSchema);
+    } else {
+      String[] selectedColumns = InputFormatConfig.selectedColumns(conf);
+      if (selectedColumns != null) {
+        scan = scan.select(selectedColumns);
+      }
     }
 
     // TODO add a filter parser to get rid of Serialization
