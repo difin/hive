@@ -1129,9 +1129,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
     LOG.info(cteName + " will be materialized into " + location);
     cte.source = analyzer;
 
-    ctx.addMaterializedTable(cteName, table);
-    // For CalcitePlanner, store qualified name too
-    ctx.addMaterializedTable(table.getFullyQualifiedName(), table);
+    ctx.addMaterializedTable(cteName, table, getMaterializedTableStats(analyzer.getSinkOp(), table));
 
     return table;
   }

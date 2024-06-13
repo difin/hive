@@ -240,6 +240,7 @@ import org.apache.hadoop.hive.ql.parse.type.ExprNodeTypeCheck;
 import org.apache.hadoop.hive.ql.parse.type.TypeCheckCtx;
 import org.apache.hadoop.hive.ql.parse.type.TypeCheckProcFactory;
 import org.apache.hadoop.hive.ql.plan.AggregationDesc;
+import org.apache.hadoop.hive.ql.plan.ColStatistics;
 import org.apache.hadoop.hive.ql.plan.DynamicPartitionCtx;
 import org.apache.hadoop.hive.ql.plan.ExprNodeColumnDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeColumnListDesc;
@@ -270,6 +271,7 @@ import org.apache.hadoop.hive.ql.plan.PlanUtils;
 import org.apache.hadoop.hive.ql.plan.ReduceSinkDesc;
 import org.apache.hadoop.hive.ql.plan.ScriptDesc;
 import org.apache.hadoop.hive.ql.plan.SelectDesc;
+import org.apache.hadoop.hive.ql.plan.Statistics;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.hadoop.hive.ql.plan.TableScanDesc;
 import org.apache.hadoop.hive.ql.plan.UDTFDesc;
@@ -1602,11 +1604,30 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     LOG.info(cteName + " will be materialized into " + location);
     cte.source = analyzer;
 
-    ctx.addMaterializedTable(cteName, table);
+    ctx.addMaterializedTable(cteName, table, getMaterializedTableStats(analyzer.getSinkOp(), table));
 
     return table;
   }
 
+  protected Statistics getMaterializedTableStats(Operator<?> sinkOp, Table table) {
+    final Statistics tableStats = sinkOp.getStatistics().clone();
+    final List<ColStatistics> sourceColStatsList = tableStats.getColumnStats();
+    final List<String> colNames = table.getCols().stream().map(FieldSchema::getName).collect(Collectors.toList());
+    if (sourceColStatsList.size() != colNames.size()) {
+      throw new IllegalStateException(String.format(
+          "The size of col stats must be equal to that of schema. Stats = %s, Schema = %s",
+          sourceColStatsList, colNames));
+    }
+    final List<ColStatistics> colStatsList = new ArrayList<>(sourceColStatsList.size());
+    for (int i = 0; i < sourceColStatsList.size(); i++) {
+      final ColStatistics colStats = sourceColStatsList.get(i);
+      // FileSinkOperator stores column stats with internal names such as "_col1"
+      colStats.setColumnName(colNames.get(i));
+      colStatsList.add(colStats);
+    }
+    tableStats.setColumnStats(colStatsList);
+    return tableStats;
+  }
 
   static boolean isJoinToken(ASTNode node) {
     if ((node.getToken().getType() == HiveParser.TOK_JOIN)
@@ -12450,6 +12471,11 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     }
 
     Operator output = putOpInsertMap(op, rwsch);
+
+    if (tab.isMaterializedTable()) {
+      // Clone Statistics just in case because multiple TableScanOperator can access the same CTE
+      top.setStatistics(ctx.getMaterializedTableStats(tab.getFullTableName()).clone());
+    }
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("Created Table Plan for " + alias + " " + op.toString());
