@@ -546,4 +546,18 @@ public class ReplUtils {
       throw new IllegalStateException(message, e);
     }
   }
+
+  public static void reportStatusInReplicationMetrics(String stageName, Status status, String errorLogPath,
+                                                      HiveConf conf)
+          throws SemanticException {
+    ReplicationMetricCollector metricCollector =
+            new ReplicationMetricCollector(null, null, null, 0, conf) {};
+    metricCollector.reportStageStart(stageName, new HashMap<>());
+    metricCollector.reportStageEnd(stageName, status, errorLogPath);
+  }
+
+  public static boolean isErrorRecoverable(Throwable e) {
+    int errorCode = ErrorMsg.getErrorMsg(e.getMessage()).getErrorCode();
+    return errorCode > ErrorMsg.GENERIC_ERROR.getErrorCode();
+  }
 }

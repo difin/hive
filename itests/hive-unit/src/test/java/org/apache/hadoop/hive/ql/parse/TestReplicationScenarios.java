@@ -28,9 +28,7 @@ import org.apache.hadoop.hive.cli.CliSessionState;
 import org.apache.hadoop.hive.common.repl.ReplConst;
 import org.apache.hadoop.hive.common.repl.ReplScope;
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.*;
 import org.apache.hadoop.hive.ql.exec.repl.ReplAck;
-import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.StringAppender;
 import org.apache.hadoop.hive.ql.parse.repl.metric.MetricCollector;
 import org.apache.hadoop.hive.ql.parse.repl.metric.event.Metadata;
@@ -4638,12 +4636,12 @@ public class TestReplicationScenarios {
       verifyFail("REPL DUMP " + primaryDbName, driver);
 
       metric = collector.getMetrics().getLast();
-      assertEquals(metric.getProgress().getStatus(), Status.FAILED_ADMIN);
+      assertEquals(metric.getProgress().getStatus(), Status.SKIPPED);
       assertEquals(metric.getProgress().getStages().get(0).getErrorLogPath(), nonRecoverableFile.toString());
 
       verifyFail("REPL DUMP " + primaryDbName, driver);
       metric = collector.getMetrics().getLast();
-      assertEquals(metric.getProgress().getStatus(), Status.FAILED_ADMIN);
+      assertEquals(metric.getProgress().getStatus(), Status.SKIPPED);
       assertEquals(metric.getProgress().getStages().get(0).getErrorLogPath(), nonRecoverableFile.toString());
 
       fs.delete(nonRecoverableFile, true);
@@ -4666,7 +4664,7 @@ public class TestReplicationScenarios {
       verifyFail("REPL LOAD " + primaryDbName + " INTO " + replicaDbName, driverMirror);
 
       metric = collector.getMetrics().getLast();
-      assertEquals(metric.getProgress().getStatus(), Status.FAILED_ADMIN);
+      assertEquals(metric.getProgress().getStatus(), Status.SKIPPED);
       assertEquals(metric.getProgress().getStages().get(0).getErrorLogPath(), nonRecoverableFile.toString());
     } finally {
       isMetricsEnabledForTests(false);
