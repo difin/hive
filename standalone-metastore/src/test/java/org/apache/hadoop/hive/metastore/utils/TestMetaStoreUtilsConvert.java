@@ -106,7 +106,7 @@ public class TestMetaStoreUtilsConvert {
 
   @Test
   public void testTimestampToString() {
-    assertEquals(timestampString, convertTimestampToString(timestamp));
+    assertEquals(timestampString, MetaStoreUtils.convertTimestampToString(timestamp));
   }
 
   @Test
@@ -116,7 +116,7 @@ public class TestMetaStoreUtilsConvert {
 
   @Test
   public void testStringToTimestamp() {
-    assertEquals(timestamp, convertStringToTimestamp(timestampString));
+    assertEquals(timestamp, MetaStoreUtils.convertStringToTimestamp(timestampString));
   }
 
   @AfterClass
