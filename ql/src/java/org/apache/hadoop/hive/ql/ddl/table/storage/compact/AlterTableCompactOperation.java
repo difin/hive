@@ -41,6 +41,8 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
 
+import java.util.stream.Collectors;
+
 /**
  * Operation process of compacting a table.
  */
@@ -91,10 +93,15 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
     } else {
       Map<String, String> partitionSpec = desc.getPartitionSpec();
       List<Partition> partitions = context.getDb().getPartitions(table, partitionSpec);
-      if (partitions.size() > 1) {
-        throw new HiveException(ErrorMsg.TOO_MANY_COMPACTION_PARTITIONS);
-      } else if (partitions.size() == 0) {
+      partitions = context.getDb().getPartitions(table, partitionSpec);
+      if (partitions.isEmpty()) {
         throw new HiveException(ErrorMsg.INVALID_PARTITION_SPEC);
+      }
+      // This validates that the partition spec given in the compaction command matches exactly one partition 
+      // in the table, not a partial partition spec.
+      partitions = partitions.stream().filter(part -> part.getSpec().size() == partitionSpec.size()).collect(Collectors.toList());
+      if (partitions.size() != 1) {
+        throw new HiveException(ErrorMsg.TOO_MANY_COMPACTION_PARTITIONS);
       }
       partitionName = partitions.get(0).getName();
     }
