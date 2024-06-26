@@ -165,6 +165,7 @@ public class TestJdbcWithServiceDiscovery {
     conf.setTimeVar(HiveConf.ConfVars.HIVE_ZOOKEEPER_CONNECTION_BASESLEEPTIME, 100, TimeUnit.MILLISECONDS);
     conf.setIntVar(HiveConf.ConfVars.HIVE_ZOOKEEPER_CONNECTION_MAX_RETRIES, 1);
     conf.setBoolVar(HiveConf.ConfVars.HIVE_ZOOKEEPER_KILLQUERY_ENABLE, true);
+    conf.setBoolVar(HiveConf.ConfVars.HIVE_SERVER2_PARALLEL_OPS_IN_SESSION, true);
   }
 
   private static Map<String, String> getConfOverlay(final String instanceId) {

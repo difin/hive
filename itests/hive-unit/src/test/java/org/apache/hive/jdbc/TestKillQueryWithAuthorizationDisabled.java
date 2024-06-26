@@ -96,6 +96,7 @@ public class TestKillQueryWithAuthorizationDisabled {
     defaultConf.setBoolVar(HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY, false);
     defaultConf.setBoolVar(HiveConf.ConfVars.HIVE_SERVER2_ENABLE_DOAS, false);
     defaultConf.setBoolVar(HiveConf.ConfVars.HIVE_QUERY_RESULTS_CACHE_ENABLED, false);
+    defaultConf.setBoolVar(HiveConf.ConfVars.HIVE_SERVER2_PARALLEL_OPS_IN_SESSION, true);
     defaultConf.addResource(new URL("file://" + new File(confDir).toURI().getPath() + "/tez-site.xml"));
     return defaultConf;
   }
