@@ -2290,10 +2290,6 @@ public class HiveConf extends Configuration {
     HIVE_ICEBERG_ALLOW_DATAFILES_IN_TABLE_LOCATION_ONLY("hive.iceberg.allow.datafiles.in.table.location.only", false,
         "If this is set to true, then all the data files being read should be withing the table location"),
 
-    HIVE_ICEBERG_DELETE_FILTER_THRESHOLD("hive.iceberg.delete.filter.threshold", 2_000_000L,
-        "Threshold for number of delete records to keep in memory as a set; If number of deletes is greater\n" +
-            "than the threshold, delete file will be read from disk"),
-    
     HIVEUSEEXPLICITRCFILEHEADER("hive.exec.rcfile.use.explicit.header", true,
         "If this is set the header for RCFiles will simply be RCF.  If this is not\n" +
         "set the header will be that borrowed from sequence files, e.g. SEQ- followed\n" +
@@ -3185,7 +3181,7 @@ public class HiveConf extends Configuration {
         "Enables lockless reads"),
 
     HIVE_ACID_CREATE_TABLE_USE_SUFFIX("hive.acid.createtable.softdelete", false,
-        "Enables c DROP TABLE operation.\n" +
+        "Enables non-blocking DROP TABLE operation.\n" +
         "If enabled, every table directory would be suffixed with the corresponding table creation txnId."),
 
     HIVE_ACID_TRUNCATE_USE_BASE("hive.acid.truncate.usebase", true,
