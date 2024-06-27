@@ -21,6 +21,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.shims.Utils;
 import org.junit.After;
@@ -53,7 +54,9 @@ public class BaseReplicationAcrossInstances {
 
   static void internalBeforeClassSetup(Map<String, String> overrides, Class clazz)
       throws Exception {
-    conf = new HiveConf(clazz);
+    conf = new HiveConfForTest(BaseReplicationAcrossInstances.class);
+    //TODO: HIVE-28044: Replication tests to run on Tez
+    conf.set(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "mr");
     conf.set("dfs.client.use.datanode.hostname", "true");
     conf.set("hadoop.proxyuser." + Utils.getUGI().getShortUserName() + ".hosts", "*");
     conf.set("hive.repl.cmrootdir", "/tmp/");
@@ -84,7 +87,9 @@ public class BaseReplicationAcrossInstances {
           throws Exception {
     // Setup replica HDFS.
     String replicaBaseDir = Files.createTempDirectory("replica").toFile().getAbsolutePath();
-    replicaConf = new HiveConf(clazz);
+    replicaConf = new HiveConfForTest(clazz);
+    //TODO: HIVE-28044: Replication tests to run on Tez
+    replicaConf.set(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "mr");
     replicaConf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, replicaBaseDir);
     replicaConf.set("dfs.client.use.datanode.hostname", "true");
     replicaConf.set("hadoop.proxyuser." + Utils.getUGI().getShortUserName() + ".hosts", "*");
@@ -93,7 +98,9 @@ public class BaseReplicationAcrossInstances {
 
     // Setup primary HDFS.
     String primaryBaseDir = Files.createTempDirectory("base").toFile().getAbsolutePath();
-    conf = new HiveConf(clazz);
+    conf = new HiveConfForTest(clazz);
+    //TODO: HIVE-28044: Replication tests to run on Tez
+    conf.set(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "mr");
     conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, primaryBaseDir);
     conf.set("dfs.client.use.datanode.hostname", "true");
     conf.set("hadoop.proxyuser." + Utils.getUGI().getShortUserName() + ".hosts", "*");

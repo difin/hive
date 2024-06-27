@@ -110,6 +110,8 @@ public class TestHCatStorerMulti {
 
     if (driver == null) {
       HiveConf hiveConf = new HiveConf(this.getClass());
+      //TODO: HIVE-27998: hcatalog tests on Tez
+      hiveConf.setVar(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE, "mr");
       hiveConf.set(HiveConf.ConfVars.PREEXECHOOKS.varname, "");
       hiveConf.set(HiveConf.ConfVars.POSTEXECHOOKS.varname, "");
       hiveConf.set(HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY.varname, "false");

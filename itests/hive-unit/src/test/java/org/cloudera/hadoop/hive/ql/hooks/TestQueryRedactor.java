@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.junit.Before;
@@ -32,14 +33,14 @@ public class TestQueryRedactor {
 
   @BeforeClass
   public static void onetimeSetup() throws Exception {
-    HiveConf conf = new HiveConf(TestQueryRedactor.class);
+    HiveConf conf = new HiveConfForTest(TestQueryRedactor.class);
     Driver driver = createDriver(conf);
     driver.run("create table t1(i int)");
   }
 
   @AfterClass
   public static void onetimeTeardown() throws Exception {
-    HiveConf conf = new HiveConf(TestQueryRedactor.class);
+    HiveConf conf = new HiveConfForTest(TestQueryRedactor.class);
     Driver driver = createDriver(conf);
     driver.run("drop table t1");
   }
@@ -50,7 +51,7 @@ public class TestQueryRedactor {
 
   @Test
   public void testQueryRedactor() throws Exception {
-    HiveConf conf = new HiveConf(TestQueryRedactor.class);
+    HiveConf conf = new HiveConfForTest(TestQueryRedactor.class);
     HiveConf.setVar(conf, HiveConf.ConfVars.QUERYREDACTORHOOKS,
       QueryRedactor.class.getName());
     String hiveRoot = System.getProperty("hive.root");

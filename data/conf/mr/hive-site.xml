@@ -19,23 +19,11 @@
 
 <configuration>
 
-<property>
-  <name>hive.metastore.client.cache.maxSize</name>
-  <value>10Mb</value>
-  <description>Max size for hive metastore client local cache</description>
-</property>
-
-<property>
-  <name>hive.metastore.client.cache.enabled</name>
-  <value>true</value>
-  <description>This property enables a Caffeiene Cache for Metastore client</description>
-</property>
-
-<property>
-  <name>hive.metastore.client.cache.recordStats</name>
-  <value>true</value>
-  <description>This property enables recording metastore client cache stats in DEBUG logs</description>
-</property>
+  <property>
+    <name>hive.metastore.client.cache.enabled</name>
+    <value>true</value>
+    <description>This property enables a Caffeiene Cache for Metastore client</description>
+  </property>
 
 <property>
   <name>hive.in.test</name>
@@ -49,12 +37,6 @@
   <value>${test.tmp.dir}/cli/mapred/staging</value>
 </property>
 
-<!-- Hive Configuration can either be stored in this file or in the hadoop configuration files  -->
-<!-- that are implied by Hadoop setup variables.                                                -->
-<!-- Aside from Hadoop setup variables - this file is provided as a convenience so that Hive    -->
-<!-- users do not have to edit hadoop configuration files (that may be managed as a centralized -->
-<!-- resource).                                                                                 -->
-
 <!-- Hive Execution Parameters -->
 <property>
   <name>hadoop.tmp.dir</name>
@@ -62,13 +44,10 @@
   <description>A base for other temporary directories.</description>
 </property>
 
-<!--
 <property>
-  <name>hive.exec.reducers.max</name>
-  <value>1</value>
-  <description>maximum number of reducers</description>
+  <name>hive.execution.engine</name>
+  <value>mr</value>
 </property>
--->
 
 <property>
   <name>hive.exec.scratchdir</name>
@@ -122,14 +101,6 @@
   <name>hive.metastore.warehouse.dir</name>
   <value>${test.warehouse.dir}</value>
   <description></description>
-</property>
-
-<property>
-  <name>hive.metastore.metadb.dir</name>
-  <value>file://${test.tmp.dir}/metadb/</value>
-  <description>
-  Required by metastore server or if the uris argument below is not supplied
-  </description>
 </property>
 
 <property>
@@ -239,11 +210,6 @@
 </property>
 
 <property>
-  <name>hive.stats.key.prefix.reserve.length</name>
-  <value>0</value>
-</property>
-
-<property>
   <name>hive.conf.restricted.list</name>
   <value>dummy.config.value</value>
   <description>Using dummy config value above because you cannot override config with empty value</description>
@@ -301,27 +267,6 @@
 </property>
 
 <property>
-  <name>hive.llap.io.cache.orc.size</name>
-  <value>8388608</value>
-</property>
-
-<property>
-  <name>hive.llap.io.cache.orc.arena.size</name>
-  <value>8388608</value>
-</property>
-
-<property>
-  <name>hive.llap.io.cache.orc.alloc.max</name>
-  <value>2097152</value>
-</property>
-
-
-<property>
-  <name>hive.llap.io.cache.orc.alloc.min</name>
-  <value>32768</value>
-</property>
-
-<property>
   <name>hive.llap.cache.allow.synthetic.fileid</name>
   <value>true</value>
 </property>
@@ -363,17 +308,6 @@
 </property>
 
 <property>
-  <name>hbase.unsafe.stream.capability.enforce</name>
-  <value>false</value>
-</property>
-
-<property>
-  <name>hbase.procedure.store.wal.use.hsync</name>
-  <value>false</value>
-</property>
-
-
-<property>
   <name>hive.query.reexecution.stats.persist.scope</name>
   <value>query</value>
 </property>
@@ -384,8 +318,13 @@
 </property>
 
 <property>
-  <name>hive.security.authorization.scheduled.queries.supported</name>
+  <name>hive.strict.timestamp.conversion</name>
   <value>false</value>
+</property>
+
+<property>
+  <name>hive.cbo.fallback.strategy</name>
+  <value>TEST</value>
 </property>
 
 <property>
@@ -406,13 +345,19 @@
   <value>false</value>
 </property>
 
-<property>
-  <name>hive.cbo.fallback.strategy</name>
-  <value>TEST</value>
-</property>
+  <property>
+    <!-- Set large for tests. This acts as an artifical LIMIT. See HIVE-24484 for details -->
+    <name>hive.server2.thrift.resultset.max.fetch.size</name>
+    <value>1000000</value>
+  </property>
 
-<property>
-  <name>hive.tez.exec.print.summary</name>
-  <value>true</value>
-</property>
+  <property>
+    <name>hive.server2.webui.max.threads</name>
+    <value>4</value>
+  </property>
+
+  <property>
+    <name>hive.async.cleanup.service.thread.count</name>
+    <value>4</value>
+  </property>
 </configuration>

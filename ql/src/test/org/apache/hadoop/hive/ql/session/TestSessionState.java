@@ -18,6 +18,7 @@
 package org.apache.hadoop.hive.ql.session;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -47,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hive.common.util.HiveTestUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -63,6 +65,7 @@ import com.google.common.io.Files;
  */
 @RunWith(value = Parameterized.class)
 public class TestSessionState {
+
   private final boolean prewarm;
   private final static String clazzDistFileName = "RefreshedJarClass.jar.V1";
   private final static String clazzV2FileName = "RefreshedJarClass.jar.V2";
@@ -86,7 +89,7 @@ public class TestSessionState {
 
   @Before
   public void setUp() {
-    HiveConf conf = new HiveConf();
+    HiveConf conf = new HiveConfForTest(getClass());
     String tmp = System.getProperty("java.io.tmpdir");
     File tmpDir = new File(tmp);
     if (!tmpDir.exists()) {
@@ -134,7 +137,7 @@ public class TestSessionState {
         SessionState.get().getCurrentDatabase());
 
     //verify that a new sessionstate has default db
-    SessionState.start(new HiveConf());
+    SessionState.start(getNewHiveConf());
     assertEquals(Warehouse.DEFAULT_DATABASE_NAME,
         SessionState.get().getCurrentDatabase());
 
@@ -167,7 +170,7 @@ public class TestSessionState {
 
   @Test
   public void testClassLoaderEquality() throws Exception {
-    HiveConf conf = new HiveConf();
+    HiveConf conf = getNewHiveConf();
     final SessionState ss1 = new SessionState(conf);
     RegisterJarRunnable otherThread = new RegisterJarRunnable("./build/contrib/test/test-udfs.jar", ss1);
     Thread th1 = new Thread(otherThread);
@@ -204,7 +207,7 @@ public class TestSessionState {
 
   @Test
   public void testReloadAuxJars2() {
-    HiveConf conf = new HiveConf();
+    HiveConf conf = getNewHiveConf();
     HiveConf.setVar(conf, ConfVars.HIVERELOADABLEJARS, hiveReloadPath);
     SessionState ss = new SessionState(conf);
     SessionState.start(ss);
@@ -274,7 +277,7 @@ public class TestSessionState {
 
   @Test
   public void testReloadExistingAuxJars2() {
-    HiveConf conf = new HiveConf();
+    HiveConf conf = getNewHiveConf();
     HiveConf.setVar(conf, ConfVars.HIVERELOADABLEJARS, hiveReloadPath);
 
     SessionState ss = new SessionState(conf);
@@ -320,7 +323,7 @@ public class TestSessionState {
    */
   @Test
   public void testCreatePath() throws Exception {
-    HiveConf conf = new HiveConf();
+    HiveConf conf = getNewHiveConf();
     LocalFileSystem localFileSystem = FileSystem.getLocal(conf);
 
     Path repeatedCreate = new Path("repeatedCreate");
@@ -360,5 +363,9 @@ public class TestSessionState {
     } catch (IOException e) {
       assertTrue(e.getMessage().contains("Failed to create directory noPermissions/child"));
     }
+  }
+
+  private HiveConf getNewHiveConf() {
+    return new HiveConfForTest(getClass());
   }
 }

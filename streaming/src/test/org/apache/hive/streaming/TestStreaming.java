@@ -208,6 +208,8 @@ public class TestStreaming {
 
 
     conf = new HiveConf(this.getClass());
+    //TODO: HIVE-28351: TestStreaming to run on Tez
+    conf.setVar(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE, "mr");
     conf.set("fs.raw.impl", RawFileSystem.class.getName());
     conf.setVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
       "org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory");

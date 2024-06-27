@@ -50,6 +50,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.io.SessionStream;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Schema;
 import org.apache.hadoop.hive.ql.IDriver;
@@ -120,7 +121,8 @@ public class TestCliDriverMethods extends TestCase {
     SessionStream err = new SessionStream(dataErr);
     System.setErr(err);
 
-    CliSessionState ss = new CliSessionState(new HiveConf());
+    HiveConf hiveConf = getHiveConf();
+    CliSessionState ss = new CliSessionState(hiveConf);
     ss.out = out;
     ss.err = err;
 
@@ -215,7 +217,7 @@ public class TestCliDriverMethods extends TestCase {
       File historyFile = new File(historyDirectory + File.separator + ".hivehistory");
       historyFile.delete();
     }
-    HiveConf configuration = new HiveConf();
+    HiveConf configuration = getHiveConf();
     configuration.setBoolVar(ConfVars.HIVE_SESSION_HISTORY_ENABLED, true);
     PrintStream oldOut = System.out;
     ByteArrayOutputStream dataOut = new ByteArrayOutputStream();
@@ -228,7 +230,7 @@ public class TestCliDriverMethods extends TestCase {
     String[] args = {};
 
     try {
-      new FakeCliDriver().run(args);
+      new FakeCliDriver(configuration).run(args);
       assertTrue(dataOut.toString(), dataOut.toString().contains("test message"));
       assertTrue(dataErr.toString(), dataErr.toString().contains("Hive history file="));
       assertTrue(dataErr.toString(), dataErr.toString().contains("File: fakeFile is not a file."));
@@ -248,7 +250,7 @@ public class TestCliDriverMethods extends TestCase {
    */
   public void testQuit() throws Exception {
 
-    CliSessionState ss = new CliSessionState(new HiveConf());
+    CliSessionState ss = new CliSessionState(getHiveConf());
     ss.err = new SessionStream(System.err);
     ss.out = new SessionStream(System.out);
 
@@ -277,15 +279,15 @@ public class TestCliDriverMethods extends TestCase {
   }
 
   public void testProcessSelectDatabase() throws Exception {
-    CliSessionState sessinState = new CliSessionState(new HiveConf());
-    CliSessionState.start(sessinState);
+    CliSessionState sessionState = new CliSessionState(getHiveConf());
+    CliSessionState.start(sessionState);
     ByteArrayOutputStream data = new ByteArrayOutputStream();
-    sessinState.err = new SessionStream(data);
-    sessinState.database = "database";
+    sessionState.err = new SessionStream(data);
+    sessionState.database = "database";
     CliDriver driver = new CliDriver();
 
     try {
-      driver.processSelectDatabase(sessinState);
+      driver.processSelectDatabase(sessionState);
       fail("shuld be exit");
     } catch (ExitException e) {
       e.printStackTrace();
@@ -311,7 +313,7 @@ public class TestCliDriverMethods extends TestCase {
     FileUtils.write(homeFile, "-- init hive file for test ");
     setEnv("HIVE_HOME", homeFile.getParentFile().getParentFile().getAbsolutePath());
     setEnv("HIVE_CONF_DIR", homeFile.getParentFile().getAbsolutePath());
-    CliSessionState sessionState = new CliSessionState(new HiveConf());
+    CliSessionState sessionState = new CliSessionState(getHiveConf());
 
     ByteArrayOutputStream data = new ByteArrayOutputStream();
 
@@ -405,11 +407,20 @@ public class TestCliDriverMethods extends TestCase {
 
   private static class FakeCliDriver extends CliDriver {
 
+    private HiveConf conf;
+
+    public FakeCliDriver(HiveConf configuration) {
+      this.conf = configuration;
+    }
+
     @Override
     protected void setupConsoleReader() throws IOException {
       reader = new FakeConsoleReader();
     }
 
+    protected HiveConf getConf() {
+      return conf;
+    }
   }
 
   private static class FakeConsoleReader extends ConsoleReader {
@@ -500,5 +511,9 @@ public class TestCliDriverMethods extends TestCase {
     public int getStatus() {
       return status;
     }
+  }
+
+  private HiveConf getHiveConf() {
+    return new HiveConfForTest(this.getClass());
   }
 }

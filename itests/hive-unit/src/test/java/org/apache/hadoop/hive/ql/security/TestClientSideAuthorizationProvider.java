@@ -25,17 +25,21 @@ import junit.framework.TestCase;
 
 import org.apache.hadoop.hive.cli.CliSessionState;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.ql.DriverFactory;
 import org.apache.hadoop.hive.ql.IDriver;
+import org.apache.hadoop.hive.ql.exec.tez.ObjectCache;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
 import org.apache.hadoop.hive.ql.security.authorization.DefaultHiveAuthorizationProvider;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.shims.Utils;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.tez.runtime.common.objectregistry.ObjectRegistryImpl;
+
 
 /**
  * TestClientSideAuthorizationProvider : Simple base test for client side
@@ -55,7 +59,6 @@ public class TestClientSideAuthorizationProvider extends TestCase {
 
   @Override
   protected void setUp() throws Exception {
-
     super.setUp();
 
     // Turn off metastore-side authorization
@@ -64,7 +67,7 @@ public class TestClientSideAuthorizationProvider extends TestCase {
 
     int port = MetaStoreTestUtils.startMetaStoreWithRetry();
 
-    clientHiveConf = new HiveConf(this.getClass());
+    clientHiveConf = new HiveConfForTest(this.getClass());
 
     // Turn on client-side authorization
     clientHiveConf.setBoolVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_ENABLED,true);
@@ -86,6 +89,9 @@ public class TestClientSideAuthorizationProvider extends TestCase {
     SessionState.start(new CliSessionState(clientHiveConf));
     msc = new HiveMetaStoreClient(clientHiveConf);
     driver = DriverFactory.newDriver(clientHiveConf);
+
+    // this test involves limit operator which needs an object cache
+    ObjectCache.setupObjectRegistry(new ObjectRegistryImpl());
   }
 
   @Override

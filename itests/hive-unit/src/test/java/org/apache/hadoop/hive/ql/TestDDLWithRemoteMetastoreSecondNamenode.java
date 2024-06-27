@@ -27,9 +27,9 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
 import org.apache.hadoop.hive.metastore.api.Database;
-import org.apache.hadoop.hive.ql.exec.mr.ExecDriver;
 import org.apache.hadoop.hive.ql.metadata.*;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorResponse;
@@ -72,7 +72,7 @@ public class TestDDLWithRemoteMetastoreSecondNamenode extends TestCase {
     }
     tests = new JUnit4TestAdapter(this.getClass()).countTestCases();
     try {
-      conf = new HiveConf(ExecDriver.class);
+      conf = new HiveConfForTest(getClass());
       SessionState.start(conf);
 
       // Test with remote metastore service

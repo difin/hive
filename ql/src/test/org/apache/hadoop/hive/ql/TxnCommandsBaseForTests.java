@@ -102,6 +102,8 @@ public abstract class TxnCommandsBaseForTests {
   }
   protected void initHiveConf() {
     hiveConf = new HiveConf(this.getClass());
+    //TODO: HIVE-28029: Make unit tests based on TxnCommandsBaseForTests run on Tez
+    hiveConf.setVar(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE, "mr");
   }
   void setUpInternal() throws Exception {
     initHiveConf();

@@ -4627,11 +4627,11 @@ public class HiveConf extends Configuration {
         "Whether to show the unquoted partition names in query results."),
 
     HIVE_EXECUTION_ENGINE("hive.execution.engine", Runtime.TEZ.toString(),
-            new StringSet(true,  Runtime.MR.toString(), Runtime.TEZ.toString(),
+            new StringSet(true,  Runtime.TEZ.toString(), Runtime.MR.toString(),
                 Runtime.IMPALA.toString()),
-        "Chooses execution engine. Options are: mr (Map reduce, default), tez, and impala. While MR\n" +
-        "remains the default engine for historical reasons, it is itself a historical engine\n" +
-        "and is deprecated in Hive 2 line. It may be removed without further warning.", "execution.engine"),
+        "Chooses execution engine. Options are: 'tez' (Tez, default), 'mr' (MapReduce, deprecated). "+
+        "MR is a historical engine and is deprecated in Hive 2 line. It may be removed without further warning.",
+        "execution.engine"),
 
     HIVE_ETL_EXECUTION_ENGINE("hive.etl.execution.engine", "", new StringSet("", Runtime.TEZ.toString()),
         "Modify this parameter to set a different execution engine for only etl queries. The same engine " +

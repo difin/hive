@@ -128,7 +128,7 @@ public class TestLocationQueries extends BaseTestQueries {
     QTestUtil[] qt = new QTestUtil[qfiles.length];
 
     for (int i = 0; i < qfiles.length; i++) {
-      qt[i] = new CheckResults(resDir, logDir, MiniClusterType.NONE, "parta");
+      qt[i] = new CheckResults(resDir, logDir, MiniClusterType.TEZ_LOCAL, "parta");
       qt[i].postInit();
       qt[i].newSession();
       qt[i].addFile(qfiles[i], false);

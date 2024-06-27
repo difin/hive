@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.apache.hadoop.hive.cli.CliSessionState;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
 import org.apache.hadoop.hive.metastore.api.Database;
@@ -64,7 +65,7 @@ public class TestAuthorizationPreEventListener extends TestCase {
 
     int port = MetaStoreTestUtils.startMetaStoreWithRetry();
 
-    clientHiveConf = new HiveConf(this.getClass());
+    clientHiveConf = new HiveConfForTest(this.getClass());
 
     clientHiveConf.setVar(HiveConf.ConfVars.METASTOREURIS, "thrift://localhost:" + port);
     clientHiveConf.setIntVar(HiveConf.ConfVars.METASTORETHRIFTCONNECTIONRETRIES, 3);

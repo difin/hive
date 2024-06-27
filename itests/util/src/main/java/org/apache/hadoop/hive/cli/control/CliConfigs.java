@@ -57,7 +57,7 @@ public class CliConfigs {
         setInitScript("q_test_init.sql");
         setCleanupScript("q_test_cleanup.sql");
 
-        setHiveConfDir("");
+        setHiveConfDir("data/conf/mr");
         setClusterType(MiniClusterType.NONE);
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
@@ -77,7 +77,8 @@ public class CliConfigs {
         setInitScript("q_test_init_parse.sql");
         setCleanupScript("q_test_cleanup.sql");
 
-        setHiveConfDir("data/conf/perf-reg/");
+        // TODO: HIVE-28031: Adapt some cli driver tests to Tez where it's applicable
+        setHiveConfDir("data/conf/mr");
         setClusterType(MiniClusterType.NONE);
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
@@ -99,7 +100,7 @@ public class CliConfigs {
         setInitScript("q_test_init_for_minimr.sql");
         setCleanupScript("q_test_cleanup.sql");
 
-        setHiveConfDir("");
+        setHiveConfDir("data/conf/mr");
         setClusterType(MiniClusterType.MR);
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
@@ -251,11 +252,8 @@ public class CliConfigs {
 
         setClusterType(MiniClusterType.MR);
         setFsType(QTestMiniClusters.FsType.ENCRYPTED_HDFS);
-        if (getClusterType() == MiniClusterType.TEZ) {
-          setHiveConfDir("data/conf/tez");
-        } else {
-          setHiveConfDir("data/conf");
-        }
+        // TODO: HIVE-28031: Adapt some cli driver tests to Tez where it's applicable
+        setHiveConfDir("data/conf/mr");
 
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
@@ -275,7 +273,8 @@ public class CliConfigs {
         setInitScript("q_test_init_contrib.sql");
         setCleanupScript("q_test_cleanup_contrib.sql");
 
-        setHiveConfDir("");
+        // TODO: HIVE-28031: Adapt some cli driver tests to Tez where it's applicable
+        setHiveConfDir("data/conf/mr");
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
       }
@@ -350,7 +349,7 @@ public class CliConfigs {
         setInitScript("q_test_init_compare.sql");
         setCleanupScript("q_test_cleanup_compare.sql");
 
-        setHiveConfDir("");
+        setHiveConfDir("data/conf/mr");
         setClusterType(MiniClusterType.NONE);
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
@@ -372,7 +371,7 @@ public class CliConfigs {
         setInitScript("q_test_init.sql");
         setCleanupScript("q_test_cleanup.sql");
 
-        setHiveConfDir("");
+        setHiveConfDir("data/conf/mr");
         setClusterType(MiniClusterType.NONE);
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
@@ -414,7 +413,8 @@ public class CliConfigs {
         setInitScript("q_test_init_src_with_stats.sql");
         setCleanupScript("q_test_cleanup_src.sql");
 
-        setHiveConfDir("");
+        // TODO: HIVE-28031: Adapt some cli driver tests to Tez where it's applicable
+        setHiveConfDir("data/conf/mr");
         setClusterType(MiniClusterType.NONE);
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
@@ -454,7 +454,8 @@ public class CliConfigs {
         setInitScript("q_test_init_src.sql");
         setCleanupScript("q_test_cleanup_src.sql");
 
-        setHiveConfDir("");
+        // TODO: HIVE-28031: Adapt some cli driver tests to Tez where it's applicable
+        setHiveConfDir("data/conf/mr");
         setClusterType(MiniClusterType.NONE);
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
@@ -474,7 +475,8 @@ public class CliConfigs {
         setInitScript("q_test_init.sql");
         setCleanupScript("q_test_cleanup.sql");
 
-        setHiveConfDir("");
+        // TODO: HIVE-28031: Adapt some cli driver tests to Tez where it's applicable
+        setHiveConfDir("data/conf/mr");
         setClusterType(MiniClusterType.NONE);
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
@@ -497,7 +499,8 @@ public class CliConfigs {
         setInitScript("q_test_init_src.sql");
         setCleanupScript("q_test_cleanup_src.sql");
 
-        setHiveConfDir("");
+        // TODO: HIVE-28031: Adapt some cli driver tests to Tez where it's applicable
+        setHiveConfDir("data/conf/mr");
         setClusterType(MiniClusterType.NONE);
       } catch (Exception e) {
         throw new RuntimeException("can't construct cliconfig", e);
@@ -579,7 +582,8 @@ public class CliConfigs {
         setHiveConfDir("data/conf/tez");
         break;
       default:
-        setHiveConfDir("data/conf");
+        // TODO: HIVE-28031: Adapt some cli driver tests to Tez where it's applicable
+        setHiveConfDir("data/conf/mr");
         break;
       }
     }

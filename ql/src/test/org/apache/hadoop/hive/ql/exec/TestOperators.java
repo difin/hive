@@ -29,6 +29,7 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.ql.CompilationOpContext;
 import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.exec.vector.VectorSelectOperator;
@@ -409,7 +410,7 @@ public class TestOperators extends TestCase {
 
   @Test
   public void testFetchOperatorContext() throws Exception {
-    HiveConf conf = new HiveConf();
+    HiveConf conf = new HiveConfForTest(getClass());
     conf.set("hive.support.concurrency", "false");
     conf.setVar(HiveConf.ConfVars.HIVEMAPREDMODE, "nonstrict");
     conf.setVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,

@@ -84,7 +84,7 @@ public class TestHive extends TestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    hiveConf = new HiveConf(this.getClass());
+    hiveConf = getNewConf(null);
     hiveConf
     .setVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
         "org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory");
@@ -105,6 +105,13 @@ public class TestHive extends TestCase {
           + hiveConf);
       throw e;
     }
+  }
+
+  private static HiveConf getNewConf(HiveConf oldConf) {
+    HiveConf conf = oldConf == null ? new HiveConf(TestHive.class) : new HiveConf(oldConf, TestHive.class);
+    //TODO: HIVE-28289: TestHive/TestHiveRemote to run on Tez
+    conf.setVar(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE, "mr");
+    return conf;
   }
 
   @Override
@@ -562,8 +569,8 @@ public class TestHive extends TestCase {
                                                  .put("ds", "20141216")
                                                  .put("hr", "12")
                                                  .build();
-
-      int trashSizeBeforeDrop = getTrashContents().length;
+      FileStatus[] trashContentsBeforeDrop = getTrashContents();
+      int trashSizeBeforeDrop = trashContentsBeforeDrop.length;
 
       Table table = createPartitionedTable(dbName, tableName);
       hm.createPartition(table, partitionSpec);
@@ -596,11 +603,12 @@ public class TestHive extends TestCase {
                                            .purgeData(false)
                       );
 
-      int trashSizeWithoutPurge = getTrashContents().length;
+      FileStatus[] trashContentsWithoutPurge = getTrashContents();
+      int trashSizeWithoutPurge = trashContentsWithoutPurge.length;
 
-      assertEquals("After dropPartitions(noPurge), data should've gone to trash!",
-                  trashSizeBeforeDrop, trashSizeWithoutPurge);
-
+      assertEquals("After dropPartitions(noPurge), data should've gone to trash, contents before drop: "
+          + Arrays.asList(trashContentsBeforeDrop) + ", contents without purge: " + Arrays.asList(trashContentsWithoutPurge)
+          + "!", trashSizeBeforeDrop, trashSizeWithoutPurge);
     }
     catch (Exception e) {
       fail("Unexpected exception: " + StringUtils.stringifyException(e));
@@ -777,7 +785,7 @@ public class TestHive extends TestCase {
     Hive newHiveObj;
 
     //if HiveConf has not changed, same object should be returned
-    HiveConf newHconf = new HiveConf(hiveConf);
+    HiveConf newHconf = getNewConf(hiveConf);
     newHiveObj = Hive.get(newHconf);
     assertTrue(prevHiveObj == newHiveObj);
 
@@ -789,7 +797,7 @@ public class TestHive extends TestCase {
     prevHiveObj = Hive.get();
     prevHiveObj.getDatabaseCurrent();
     //change value of a metavar config param in new hive conf
-    newHconf = new HiveConf(hiveConf);
+    newHconf = getNewConf(hiveConf);
     newHconf.setIntVar(ConfVars.METASTORETHRIFTCONNECTIONRETRIES,
         newHconf.getIntVar(ConfVars.METASTORETHRIFTCONNECTIONRETRIES) + 1);
     newHiveObj = Hive.get(newHconf);

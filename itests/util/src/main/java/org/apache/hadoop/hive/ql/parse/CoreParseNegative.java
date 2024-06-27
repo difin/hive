@@ -49,6 +49,7 @@ public class CoreParseNegative extends CliAdapter{
   @BeforeClass
   public void beforeClass() {
     MiniClusterType miniMR = cliConfig.getClusterType();
+    String hiveConfDir = cliConfig.getHiveConfDir();
     String initScript = cliConfig.getInitScript();
     String cleanupScript = cliConfig.getCleanupScript();
 
@@ -58,7 +59,7 @@ public class CoreParseNegative extends CliAdapter{
             .withOutDir(cliConfig.getResultsDir())
             .withLogDir(cliConfig.getLogDir())
             .withClusterType(miniMR)
-            .withConfDir(null)
+            .withConfDir(hiveConfDir)
             .withInitScript(initScript)
             .withCleanupScript(cleanupScript)
             .withLlapIo(false)

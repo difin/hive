@@ -751,7 +751,7 @@ public class CliDriver {
       logInitDetailMessage = e.getMessage();
     }
 
-    CliSessionState ss = new CliSessionState(new HiveConf(SessionState.class));
+    CliSessionState ss = new CliSessionState(getConf());
     ss.in = System.in;
     try {
       ss.out = new SessionStream(System.out, true, "UTF-8");
@@ -822,6 +822,10 @@ public class CliDriver {
       ss.resetThreadName();
       ss.close();
     }
+  }
+
+  protected HiveConf getConf() {
+    return new HiveConf(SessionState.class);
   }
 
   /**

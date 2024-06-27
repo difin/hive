@@ -65,6 +65,8 @@ public class TestMsgBusConnection {
     System.setProperty("java.naming.provider.url", "tcp://localhost:61616");
     connectClient();
     HiveConf hiveConf = new HiveConf(this.getClass());
+    //TODO: HIVE-27998: Make hcatalog tests run on Tez if needed
+    hiveConf.setVar(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE, "mr");
     hiveConf.set(ConfVars.METASTORE_EVENT_LISTENERS.varname, NotificationListener.class.getName());
     hiveConf.set(HiveConf.ConfVars.PREEXECHOOKS.varname, "");
     hiveConf.set(HiveConf.ConfVars.POSTEXECHOOKS.varname, "");

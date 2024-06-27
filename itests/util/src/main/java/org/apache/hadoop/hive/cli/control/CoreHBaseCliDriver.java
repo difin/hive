@@ -45,12 +45,13 @@ public class CoreHBaseCliDriver extends CliAdapter {
   @BeforeClass
   public void beforeClass() {
     MiniClusterType miniMR = cliConfig.getClusterType();
+    String hiveConfDir = cliConfig.getHiveConfDir();
     String initScript = cliConfig.getInitScript();
     String cleanupScript = cliConfig.getCleanupScript();
 
     try {
       qt = new HBaseQTestUtil(cliConfig.getResultsDir(), cliConfig.getLogDir(), miniMR,
-          new HBaseTestSetup(), initScript, cleanupScript);
+          new HBaseTestSetup(), hiveConfDir, initScript, cleanupScript);
     } catch (Exception e) {
       System.err.println("Exception: " + e.getMessage());
       e.printStackTrace();

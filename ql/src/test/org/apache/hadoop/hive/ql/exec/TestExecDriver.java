@@ -86,6 +86,8 @@ public class TestExecDriver extends TestCase {
     try {
       queryState = new QueryState.Builder().withHiveConf(new HiveConf(ExecDriver.class)).build();
       conf = queryState.getConf();
+      // this test is mr specific
+      conf.set(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "mr");
       conf.setBoolVar(HiveConf.ConfVars.SUBMITVIACHILD, true);
       conf.setBoolVar(HiveConf.ConfVars.SUBMITLOCALTASKVIACHILD, true);
       conf.setVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,

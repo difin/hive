@@ -33,6 +33,7 @@ import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.common.repl.ReplConst;
 import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
@@ -60,21 +61,18 @@ import com.google.common.collect.Lists;
 public class TestStatsUpdaterThread {
   @SuppressWarnings("unused")
   static final private Logger LOG = LoggerFactory.getLogger(TestStatsUpdaterThread.class);
-  private static final String TEST_DATA_DIR = new File(System.getProperty("java.io.tmpdir") +
-    File.separator + TestStatsUpdaterThread.class.getCanonicalName()
-    + "-" + System.currentTimeMillis()
-  ).getPath().replaceAll("\\\\", "/");
-  private HiveConf hiveConf;
+
+  private HiveConfForTest hiveConf;
   private SessionState ss;
 
   String getTestDataDir() {
-    return TEST_DATA_DIR;
+    return hiveConf.getTestDataDir();
   }
 
   @SuppressWarnings("deprecation")
   @Before
   public void setUp() throws Exception {
-    this.hiveConf = new HiveConf(TestStatsUpdaterThread.class);
+    hiveConf = new HiveConfForTest(getClass());
     hiveConf.set(HiveConf.ConfVars.PREEXECHOOKS.varname, "");
     hiveConf.set(HiveConf.ConfVars.POSTEXECHOOKS.varname, "");
     hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, getTestDataDir());

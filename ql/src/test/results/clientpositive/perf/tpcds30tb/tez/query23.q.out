@@ -454,16 +454,16 @@ STAGE PLANS:
                         Statistics: Num rows: 26175322 Data size: 199975264 Basic stats: COMPLETE Column stats: COMPLETE
                         Group By Operator
                           keys: _col0 (type: bigint)
-                          minReductionHashAggr: 0.0
+                          minReductionHashAggr: 0.49999994
                           mode: hash
                           outputColumnNames: _col0
-                          Statistics: Num rows: 26175322 Data size: 199975264 Basic stats: COMPLETE Column stats: COMPLETE
+                          Statistics: Num rows: 13087661 Data size: 99987632 Basic stats: COMPLETE Column stats: COMPLETE
                           Reduce Output Operator
                             key expressions: _col0 (type: bigint)
                             null sort order: z
                             sort order: +
                             Map-reduce partition columns: _col0 (type: bigint)
-                            Statistics: Num rows: 26175322 Data size: 199975264 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 13087661 Data size: 99987632 Basic stats: COMPLETE Column stats: COMPLETE
         Reducer 11 
             Execution mode: vectorized, llap
             Reduce Operator Tree:
@@ -495,16 +495,16 @@ STAGE PLANS:
                         Statistics: Num rows: 26175322 Data size: 199975264 Basic stats: COMPLETE Column stats: COMPLETE
                         Group By Operator
                           keys: _col0 (type: bigint)
-                          minReductionHashAggr: 0.0
+                          minReductionHashAggr: 0.49999994
                           mode: hash
                           outputColumnNames: _col0
-                          Statistics: Num rows: 26175322 Data size: 199975264 Basic stats: COMPLETE Column stats: COMPLETE
+                          Statistics: Num rows: 13087661 Data size: 99987632 Basic stats: COMPLETE Column stats: COMPLETE
                           Reduce Output Operator
                             key expressions: _col0 (type: bigint)
                             null sort order: z
                             sort order: +
                             Map-reduce partition columns: _col0 (type: bigint)
-                            Statistics: Num rows: 26175322 Data size: 199975264 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 13087661 Data size: 99987632 Basic stats: COMPLETE Column stats: COMPLETE
         Reducer 13 
             Execution mode: vectorized, llap
             Reduce Operator Tree:
