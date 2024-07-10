@@ -19,8 +19,6 @@
 package org.apache.hadoop.hive.ql.security.authorization.plugin.metastore;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.MetaStoreFilterHook;
@@ -57,19 +55,25 @@ import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.filterc
 import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.filtercontext.DatabaseFilterContext;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.filtercontext.TableFilterContext;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * HiveMetaStoreAuthorizer :  Do authorization checks on MetaStore Events in MetaStorePreEventListener
  */
 
 public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implements MetaStoreFilterHook {
-  private static final Log    LOG              = LogFactory.getLog(HiveMetaStoreAuthorizer.class);
+  private static final Logger    LOG              = LoggerFactory.getLogger(HiveMetaStoreAuthorizer.class);
 
   private static final ThreadLocal<Configuration> tConfig = new ThreadLocal<Configuration>() {
 
@@ -220,15 +224,54 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
 
   @Override
   @Deprecated
-  public List<TableMeta> filterTableMetas(String catName, String dbName,List<TableMeta> tableMetas)
+  public List<TableMeta> filterTableMetas(String catName, String dbName, List<TableMeta> tableMetas)
       throws MetaException {
-    return filterTableMetas(tableMetas);
+    LOG.debug("==> HiveMetaStoreAuthorizer.filterTableMetas()");
+    if (!CollectionUtils.isEmpty(tableMetas)) {
+      List<String> tableNames = new ArrayList<>();
+      tableMetas.forEach(tableMeta -> {
+        if (!tableMeta.getCatName().equalsIgnoreCase(catName) ||
+            !tableMeta.getDbName().equalsIgnoreCase(dbName)) {
+          throw new IllegalArgumentException(String.format("Table: %s doesn't belong to the catalog: %s, database: %s",
+              tableMeta.getCatName() + "." + tableMeta.getDbName() + "." + tableMeta.getTableName(), catName, dbName));
+        }
+        tableNames.add(tableMeta.getTableName());
+      });
+      TableFilterContext     tableFilterContext     = new TableFilterContext(dbName, tableNames);
+      HiveMetaStoreAuthzInfo hiveMetaStoreAuthzInfo = tableFilterContext.getAuthzContext();
+      final List<String>  filteredTableNames = filterTableNames(hiveMetaStoreAuthzInfo, dbName, tableNames);
+      if (!CollectionUtils.isEmpty(filteredTableNames)) {
+        Set<String> filteredTabs = new HashSet<>(filteredTableNames);
+        LOG.debug("<== HiveMetaStoreAuthorizer.filterTableMetas() : {}", filteredTabs);
+        return tableMetas.stream().filter(tblMeta -> filteredTabs.contains(tblMeta.getTableName()))
+            .collect(Collectors.toList());
+      }
+    }
+    LOG.info("<== HiveMetaStoreAuthorizer.filterTableMetas() : returning empty set");
+    return Collections.emptyList();
   }
 
   @Override
   public final List<TableMeta> filterTableMetas(List<TableMeta> tableMetas)
       throws MetaException {
-    return tableMetas;
+    LOG.debug("==> HiveMetaStoreAuthorizer.filterTableMetas()");
+    if (!CollectionUtils.isEmpty(tableMetas)) {
+      Map<String, List<TableMeta>> metaGroupByCatDb = new HashMap<>();
+      tableMetas.forEach(tableMeta -> {
+        String key = MetaStoreUtils.prependCatalogToDbName(tableMeta.getCatName(),
+            tableMeta.getDbName(), getConf()).toLowerCase();
+        metaGroupByCatDb.computeIfAbsent(key, s -> new ArrayList<>()).add(tableMeta);
+      });
+      List<TableMeta> filteredTabs = new ArrayList<>();
+      for (Map.Entry<String, List<TableMeta>> entry : metaGroupByCatDb.entrySet()) {
+        TableMeta firstTabMeta = entry.getValue().get(0);
+        filteredTabs.addAll(filterTableMetas(firstTabMeta.getCatName(),
+            firstTabMeta.getDbName(), entry.getValue()));
+      }
+      return filteredTabs;
+    }
+    LOG.info("<== HiveMetaStoreAuthorizer.filterTableMetas() : returning empty set");
+    return Collections.emptyList();
   }
 
   @Override
