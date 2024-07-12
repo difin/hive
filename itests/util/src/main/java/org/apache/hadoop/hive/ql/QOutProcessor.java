@@ -65,6 +65,10 @@ public class QOutProcessor {
   private static final PatternReplacementPair MASK_DATA_SIZE = new PatternReplacementPair(
       Pattern.compile(" Data size: [1-9][0-9]*"),
       " Data size: ###Masked###");
+    private static final PatternReplacementPair MASK_TIMESTAMP = new PatternReplacementPair(
+      Pattern.compile(
+          "[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9].[0-9]{1,3} [a-zA-Z/]*"),
+        "  ###MaskedTimeStamp### ");
   private static final PatternReplacementPair MASK_LINEAGE = new PatternReplacementPair(
       Pattern.compile("POSTHOOK: Lineage: .*"),
       "POSTHOOK: Lineage: ###Masked###");
@@ -72,6 +76,7 @@ public class QOutProcessor {
   private static final Pattern PATTERN_MASK_STATS = Pattern.compile("-- MASK_STATS");
   private static final Pattern PATTERN_MASK_DATA_SIZE = Pattern.compile("-- MASK_DATA_SIZE");
   private static final Pattern PATTERN_MASK_LINEAGE = Pattern.compile("-- MASK_LINEAGE");
+  private static final Pattern PATTERN_MASK_TIMESTAMP = Pattern.compile("-- MASK_TIMESTAMP");
 
   private FsType fsType = FsType.LOCAL;
 
@@ -266,6 +271,14 @@ public class QOutProcessor {
         }
       }
 
+      if (!result.partialMaskWasMatched && qMaskLineageQuerySet.contains(tname)) {
+        matcher = MASK_TIMESTAMP.pattern.matcher(result.line);
+        if (matcher.find()) {
+          result.line = result.line.replaceAll(MASK_TIMESTAMP.pattern.pattern(), MASK_TIMESTAMP.replacement);
+          result.partialMaskWasMatched = true;
+        }
+      }
+
       for (String prefix : maskIfStartsWith) {
         if (result.line.startsWith(prefix)) {
           result.line = MASK_PATTERN;
@@ -366,6 +379,9 @@ public class QOutProcessor {
       qMaskDataSizeQuerySet.add(qf.getName());
     }
     if (matches(PATTERN_MASK_LINEAGE, query)) {
+      qMaskLineageQuerySet.add(qf.getName());
+    }
+    if (matches(PATTERN_MASK_TIMESTAMP, query)) {
       qMaskLineageQuerySet.add(qf.getName());
     }
   }
