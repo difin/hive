@@ -38,6 +38,7 @@
         <validate.skip>false</validate.skip>
         <assertj.version>3.24.2</assertj.version>
         <junit.jupiter.version>5.10.0</junit.jupiter.version>
+    <awaitility.version>4.2.1</awaitility.version>
         <immutables.value.version>2.10.0</immutables.value.version>
     </properties>
 
@@ -236,6 +237,11 @@
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
                 <version>${junit.jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.esotericsoftware.kryo</groupId>
