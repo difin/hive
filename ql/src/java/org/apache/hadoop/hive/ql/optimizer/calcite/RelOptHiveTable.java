@@ -48,16 +48,12 @@ import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.mapping.IntPair;
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.IMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
-import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Order;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.ql.exec.ColumnInfo;
 import org.apache.hadoop.hive.ql.metadata.ForeignKeyInfo;
 import org.apache.hadoop.hive.ql.metadata.ForeignKeyInfo.ForeignKeyCol;
-import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.PartitionIterable;
 import org.apache.hadoop.hive.ql.metadata.PrimaryKeyInfo;
@@ -109,8 +105,6 @@ public class RelOptHiveTable implements RelOptTable {
   private List<RelReferentialConstraint>          referentialConstraints;
   private boolean                                 fetchedReferentialConstraints;
   private final HiveConf                          hiveConf;
-
-  private final Hive                              db;
   private final ParsedQueryTables                 tablesCache;
   private final Map<String, PrunedPartitionList>  partitionCache;
   private final Map<String, ColumnStatsList>      colStatsCache;
@@ -127,7 +121,7 @@ public class RelOptHiveTable implements RelOptTable {
 
   public RelOptHiveTable(RelOptSchema calciteSchema, RelDataTypeFactory typeFactory, List<String> qualifiedTblName,
       RelDataType rowType, Table hiveTblMetadata, List<ColumnInfo> hiveNonPartitionCols, List<ColumnInfo> hivePartitionCols,
-      List<VirtualColumn> hiveVirtualCols, HiveConf hconf, Hive db, ParsedQueryTables tabNameToTabObject,
+      List<VirtualColumn> hiveVirtualCols, HiveConf hconf, ParsedQueryTables tabNameToTabObject,
       Map<String, PrunedPartitionList> partitionCache, Map<String, ColumnStatsList> colStatsCache,
       AtomicInteger noColsMissingStats, TableType tableType, PartitionPruneRuleHelper pruneRuleHelper) {
     this.schema = calciteSchema;
@@ -144,7 +138,6 @@ public class RelOptHiveTable implements RelOptTable {
     this.noOfNonVirtualCols = hiveNonPartitionCols.size() + hivePartitionCols.size();
     this.hiveVirtualCols = ImmutableList.copyOf(hiveVirtualCols);
     this.hiveConf = hconf;
-    this.db = db;
     this.tablesCache = tabNameToTabObject;
     this.partitionCache = partitionCache;
     this.colStatsCache = colStatsCache;
@@ -239,7 +232,7 @@ public class RelOptHiveTable implements RelOptTable {
     // 3. Build new Table
     return new RelOptHiveTable(this.schema, this.typeFactory, this.qualifiedTblName, newRowType,
         this.hiveTblMetadata, newHiveNonPartitionCols, newHivePartitionCols, newHiveVirtualCols,
-        this.hiveConf, this.db, this.tablesCache, ppCache, this.colStatsCache,
+        this.hiveConf, this.tablesCache, ppCache, this.colStatsCache,
         this.noColsMissingStats, this.tableType, ruleHelper);
   }
 
@@ -802,14 +795,6 @@ public class RelOptHiveTable implements RelOptTable {
 
   public PrunedPartitionList getPrunedPartitionList() {
     return partitionList;
-  }
-
-  public IMetaStoreClient getMSC() throws MetaException {
-    return db.getMSC();
-  }
-
-  public Database getDatabase() throws HiveException {
-    return db.getDatabase(getHiveTableMD().getDbName());
   }
 
   public TableType getTableType() {

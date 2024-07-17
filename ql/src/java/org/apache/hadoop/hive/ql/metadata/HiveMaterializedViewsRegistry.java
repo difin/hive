@@ -509,7 +509,7 @@ public final class HiveMaterializedViewsRegistry {
       // have any "engine" mentioned in this code.
       RelOptHiveTable optTable = new RelOptHiveTable(null, cluster.getTypeFactory(), fullyQualifiedTabName,
           rowType, viewTable, nonPartitionColumns, partitionColumns, new ArrayList<>(),
-          conf, db, new QueryTables(true), new HashMap<>(), new HashMap<>(), new AtomicInteger(),
+          conf, new QueryTables(true), new HashMap<>(), new HashMap<>(), new AtomicInteger(),
           tableType, new HivePartitionPruneRuleHelper());
       DruidTable druidTable = new DruidTable(new DruidSchema(address, address, false),
           dataSource, RelDataTypeImpl.proto(rowType), metrics, DruidTable.DEFAULT_TIMESTAMP_COLUMN,
@@ -527,7 +527,7 @@ public final class HiveMaterializedViewsRegistry {
       // HivePartitionPruneRuleHelper.
       RelOptHiveTable optTable = new RelOptHiveTable(null, cluster.getTypeFactory(), fullyQualifiedTabName,
           rowType, viewTable, nonPartitionColumns, partitionColumns, new ArrayList<>(),
-          conf, db, new QueryTables(true), new HashMap<>(), new HashMap<>(), new AtomicInteger(),
+          conf, new QueryTables(true), new HashMap<>(), new HashMap<>(), new AtomicInteger(),
           tableType, new HivePartitionPruneRuleHelper());
       tableRel = new HiveTableScan(cluster, cluster.traitSetOf(HiveRelNode.CONVENTION), optTable,
           viewTable.getTableName(), null, false, false);
