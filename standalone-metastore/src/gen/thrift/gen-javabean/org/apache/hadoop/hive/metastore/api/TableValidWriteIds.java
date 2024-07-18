@@ -682,13 +682,13 @@ package org.apache.hadoop.hive.metastore.api;
           case 3: // INVALID_WRITE_IDS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list798 = iprot.readListBegin();
-                struct.invalidWriteIds = new java.util.ArrayList<java.lang.Long>(_list798.size);
-                long _elem799;
-                for (int _i800 = 0; _i800 < _list798.size; ++_i800)
+                org.apache.thrift.protocol.TList _list806 = iprot.readListBegin();
+                struct.invalidWriteIds = new java.util.ArrayList<java.lang.Long>(_list806.size);
+                long _elem807;
+                for (int _i808 = 0; _i808 < _list806.size; ++_i808)
                 {
-                  _elem799 = iprot.readI64();
-                  struct.invalidWriteIds.add(_elem799);
+                  _elem807 = iprot.readI64();
+                  struct.invalidWriteIds.add(_elem807);
                 }
                 iprot.readListEnd();
               }
@@ -738,9 +738,9 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(INVALID_WRITE_IDS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I64, struct.invalidWriteIds.size()));
-          for (long _iter801 : struct.invalidWriteIds)
+          for (long _iter809 : struct.invalidWriteIds)
           {
-            oprot.writeI64(_iter801);
+            oprot.writeI64(_iter809);
           }
           oprot.writeListEnd();
         }
@@ -777,9 +777,9 @@ package org.apache.hadoop.hive.metastore.api;
       oprot.writeI64(struct.writeIdHighWaterMark);
       {
         oprot.writeI32(struct.invalidWriteIds.size());
-        for (long _iter802 : struct.invalidWriteIds)
+        for (long _iter810 : struct.invalidWriteIds)
         {
-          oprot.writeI64(_iter802);
+          oprot.writeI64(_iter810);
         }
       }
       oprot.writeBinary(struct.abortedBits);
@@ -801,13 +801,13 @@ package org.apache.hadoop.hive.metastore.api;
       struct.writeIdHighWaterMark = iprot.readI64();
       struct.setWriteIdHighWaterMarkIsSet(true);
       {
-        org.apache.thrift.protocol.TList _list803 = iprot.readListBegin(org.apache.thrift.protocol.TType.I64);
-        struct.invalidWriteIds = new java.util.ArrayList<java.lang.Long>(_list803.size);
-        long _elem804;
-        for (int _i805 = 0; _i805 < _list803.size; ++_i805)
+        org.apache.thrift.protocol.TList _list811 = iprot.readListBegin(org.apache.thrift.protocol.TType.I64);
+        struct.invalidWriteIds = new java.util.ArrayList<java.lang.Long>(_list811.size);
+        long _elem812;
+        for (int _i813 = 0; _i813 < _list811.size; ++_i813)
         {
-          _elem804 = iprot.readI64();
-          struct.invalidWriteIds.add(_elem804);
+          _elem812 = iprot.readI64();
+          struct.invalidWriteIds.add(_elem812);
         }
       }
       struct.setInvalidWriteIdsIsSet(true);

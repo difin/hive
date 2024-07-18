@@ -318,15 +318,15 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // REPL_TXN_MAP_ENTRY
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
-                org.apache.thrift.protocol.TMap _map1566 = iprot.readMapBegin();
-                struct.replTxnMapEntry = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1566.size);
-                @org.apache.thrift.annotation.Nullable java.lang.String _key1567;
-                @org.apache.thrift.annotation.Nullable java.lang.String _val1568;
-                for (int _i1569 = 0; _i1569 < _map1566.size; ++_i1569)
+                org.apache.thrift.protocol.TMap _map1582 = iprot.readMapBegin();
+                struct.replTxnMapEntry = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1582.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _key1583;
+                @org.apache.thrift.annotation.Nullable java.lang.String _val1584;
+                for (int _i1585 = 0; _i1585 < _map1582.size; ++_i1585)
                 {
-                  _key1567 = iprot.readString();
-                  _val1568 = iprot.readString();
-                  struct.replTxnMapEntry.put(_key1567, _val1568);
+                  _key1583 = iprot.readString();
+                  _val1584 = iprot.readString();
+                  struct.replTxnMapEntry.put(_key1583, _val1584);
                 }
                 iprot.readMapEnd();
               }
@@ -352,10 +352,10 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(REPL_TXN_MAP_ENTRY_FIELD_DESC);
         {
           oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, struct.replTxnMapEntry.size()));
-          for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1570 : struct.replTxnMapEntry.entrySet())
+          for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1586 : struct.replTxnMapEntry.entrySet())
           {
-            oprot.writeString(_iter1570.getKey());
-            oprot.writeString(_iter1570.getValue());
+            oprot.writeString(_iter1586.getKey());
+            oprot.writeString(_iter1586.getValue());
           }
           oprot.writeMapEnd();
         }
@@ -386,10 +386,10 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetReplTxnMapEntry()) {
         {
           oprot.writeI32(struct.replTxnMapEntry.size());
-          for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1571 : struct.replTxnMapEntry.entrySet())
+          for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1587 : struct.replTxnMapEntry.entrySet())
           {
-            oprot.writeString(_iter1571.getKey());
-            oprot.writeString(_iter1571.getValue());
+            oprot.writeString(_iter1587.getKey());
+            oprot.writeString(_iter1587.getValue());
           }
         }
       }
@@ -401,15 +401,15 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TMap _map1572 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING); 
-          struct.replTxnMapEntry = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1572.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _key1573;
-          @org.apache.thrift.annotation.Nullable java.lang.String _val1574;
-          for (int _i1575 = 0; _i1575 < _map1572.size; ++_i1575)
+          org.apache.thrift.protocol.TMap _map1588 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING); 
+          struct.replTxnMapEntry = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1588.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _key1589;
+          @org.apache.thrift.annotation.Nullable java.lang.String _val1590;
+          for (int _i1591 = 0; _i1591 < _map1588.size; ++_i1591)
           {
-            _key1573 = iprot.readString();
-            _val1574 = iprot.readString();
-            struct.replTxnMapEntry.put(_key1573, _val1574);
+            _key1589 = iprot.readString();
+            _val1590 = iprot.readString();
+            struct.replTxnMapEntry.put(_key1589, _val1590);
           }
         }
         struct.setReplTxnMapEntryIsSet(true);

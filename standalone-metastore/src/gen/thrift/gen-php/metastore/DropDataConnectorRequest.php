@@ -16,51 +16,59 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class ThriftHiveMetastore_get_table_objects_by_name_args
+class DropDataConnectorRequest
 {
     static public $isValidate = false;
 
     static public $_TSPEC = array(
         1 => array(
-            'var' => 'dbname',
-            'isRequired' => false,
+            'var' => 'connectorName',
+            'isRequired' => true,
             'type' => TType::STRING,
         ),
         2 => array(
-            'var' => 'tbl_names',
+            'var' => 'ifNotExists',
             'isRequired' => false,
-            'type' => TType::LST,
-            'etype' => TType::STRING,
-            'elem' => array(
-                'type' => TType::STRING,
-                ),
+            'type' => TType::BOOL,
+        ),
+        3 => array(
+            'var' => 'checkReferences',
+            'isRequired' => false,
+            'type' => TType::BOOL,
         ),
     );
 
     /**
      * @var string
      */
-    public $dbname = null;
+    public $connectorName = null;
     /**
-     * @var string[]
+     * @var bool
      */
-    public $tbl_names = null;
+    public $ifNotExists = null;
+    /**
+     * @var bool
+     */
+    public $checkReferences = null;
 
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            if (isset($vals['dbname'])) {
-                $this->dbname = $vals['dbname'];
+            if (isset($vals['connectorName'])) {
+                $this->connectorName = $vals['connectorName'];
             }
-            if (isset($vals['tbl_names'])) {
-                $this->tbl_names = $vals['tbl_names'];
+            if (isset($vals['ifNotExists'])) {
+                $this->ifNotExists = $vals['ifNotExists'];
+            }
+            if (isset($vals['checkReferences'])) {
+                $this->checkReferences = $vals['checkReferences'];
             }
         }
     }
 
     public function getName()
     {
-        return 'ThriftHiveMetastore_get_table_objects_by_name_args';
+        return 'DropDataConnectorRequest';
     }
 
 
@@ -79,23 +87,21 @@ class ThriftHiveMetastore_get_table_objects_by_name_args
             switch ($fid) {
                 case 1:
                     if ($ftype == TType::STRING) {
-                        $xfer += $input->readString($this->dbname);
+                        $xfer += $input->readString($this->connectorName);
                     } else {
                         $xfer += $input->skip($ftype);
                     }
                     break;
                 case 2:
-                    if ($ftype == TType::LST) {
-                        $this->tbl_names = array();
-                        $_size1544 = 0;
-                        $_etype1547 = 0;
-                        $xfer += $input->readListBegin($_etype1547, $_size1544);
-                        for ($_i1548 = 0; $_i1548 < $_size1544; ++$_i1548) {
-                            $elem1549 = null;
-                            $xfer += $input->readString($elem1549);
-                            $this->tbl_names []= $elem1549;
-                        }
-                        $xfer += $input->readListEnd();
+                    if ($ftype == TType::BOOL) {
+                        $xfer += $input->readBool($this->ifNotExists);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 3:
+                    if ($ftype == TType::BOOL) {
+                        $xfer += $input->readBool($this->checkReferences);
                     } else {
                         $xfer += $input->skip($ftype);
                     }
@@ -113,22 +119,20 @@ class ThriftHiveMetastore_get_table_objects_by_name_args
     public function write($output)
     {
         $xfer = 0;
-        $xfer += $output->writeStructBegin('ThriftHiveMetastore_get_table_objects_by_name_args');
-        if ($this->dbname !== null) {
-            $xfer += $output->writeFieldBegin('dbname', TType::STRING, 1);
-            $xfer += $output->writeString($this->dbname);
+        $xfer += $output->writeStructBegin('DropDataConnectorRequest');
+        if ($this->connectorName !== null) {
+            $xfer += $output->writeFieldBegin('connectorName', TType::STRING, 1);
+            $xfer += $output->writeString($this->connectorName);
             $xfer += $output->writeFieldEnd();
         }
-        if ($this->tbl_names !== null) {
-            if (!is_array($this->tbl_names)) {
-                throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
-            }
-            $xfer += $output->writeFieldBegin('tbl_names', TType::LST, 2);
-            $output->writeListBegin(TType::STRING, count($this->tbl_names));
-            foreach ($this->tbl_names as $iter1550) {
-                $xfer += $output->writeString($iter1550);
-            }
-            $output->writeListEnd();
+        if ($this->ifNotExists !== null) {
+            $xfer += $output->writeFieldBegin('ifNotExists', TType::BOOL, 2);
+            $xfer += $output->writeBool($this->ifNotExists);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->checkReferences !== null) {
+            $xfer += $output->writeFieldBegin('checkReferences', TType::BOOL, 3);
+            $xfer += $output->writeBool($this->checkReferences);
             $xfer += $output->writeFieldEnd();
         }
         $xfer += $output->writeFieldStop();

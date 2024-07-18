@@ -224,14 +224,14 @@ class CreateTableRequest
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->primaryKeys = array();
-                        $_size1140 = 0;
-                        $_etype1143 = 0;
-                        $xfer += $input->readListBegin($_etype1143, $_size1140);
-                        for ($_i1144 = 0; $_i1144 < $_size1140; ++$_i1144) {
-                            $elem1145 = null;
-                            $elem1145 = new \metastore\SQLPrimaryKey();
-                            $xfer += $elem1145->read($input);
-                            $this->primaryKeys []= $elem1145;
+                        $_size1147 = 0;
+                        $_etype1150 = 0;
+                        $xfer += $input->readListBegin($_etype1150, $_size1147);
+                        for ($_i1151 = 0; $_i1151 < $_size1147; ++$_i1151) {
+                            $elem1152 = null;
+                            $elem1152 = new \metastore\SQLPrimaryKey();
+                            $xfer += $elem1152->read($input);
+                            $this->primaryKeys []= $elem1152;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -241,14 +241,14 @@ class CreateTableRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->foreignKeys = array();
-                        $_size1146 = 0;
-                        $_etype1149 = 0;
-                        $xfer += $input->readListBegin($_etype1149, $_size1146);
-                        for ($_i1150 = 0; $_i1150 < $_size1146; ++$_i1150) {
-                            $elem1151 = null;
-                            $elem1151 = new \metastore\SQLForeignKey();
-                            $xfer += $elem1151->read($input);
-                            $this->foreignKeys []= $elem1151;
+                        $_size1153 = 0;
+                        $_etype1156 = 0;
+                        $xfer += $input->readListBegin($_etype1156, $_size1153);
+                        for ($_i1157 = 0; $_i1157 < $_size1153; ++$_i1157) {
+                            $elem1158 = null;
+                            $elem1158 = new \metastore\SQLForeignKey();
+                            $xfer += $elem1158->read($input);
+                            $this->foreignKeys []= $elem1158;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -258,14 +258,14 @@ class CreateTableRequest
                 case 5:
                     if ($ftype == TType::LST) {
                         $this->uniqueConstraints = array();
-                        $_size1152 = 0;
-                        $_etype1155 = 0;
-                        $xfer += $input->readListBegin($_etype1155, $_size1152);
-                        for ($_i1156 = 0; $_i1156 < $_size1152; ++$_i1156) {
-                            $elem1157 = null;
-                            $elem1157 = new \metastore\SQLUniqueConstraint();
-                            $xfer += $elem1157->read($input);
-                            $this->uniqueConstraints []= $elem1157;
+                        $_size1159 = 0;
+                        $_etype1162 = 0;
+                        $xfer += $input->readListBegin($_etype1162, $_size1159);
+                        for ($_i1163 = 0; $_i1163 < $_size1159; ++$_i1163) {
+                            $elem1164 = null;
+                            $elem1164 = new \metastore\SQLUniqueConstraint();
+                            $xfer += $elem1164->read($input);
+                            $this->uniqueConstraints []= $elem1164;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -275,14 +275,14 @@ class CreateTableRequest
                 case 6:
                     if ($ftype == TType::LST) {
                         $this->notNullConstraints = array();
-                        $_size1158 = 0;
-                        $_etype1161 = 0;
-                        $xfer += $input->readListBegin($_etype1161, $_size1158);
-                        for ($_i1162 = 0; $_i1162 < $_size1158; ++$_i1162) {
-                            $elem1163 = null;
-                            $elem1163 = new \metastore\SQLNotNullConstraint();
-                            $xfer += $elem1163->read($input);
-                            $this->notNullConstraints []= $elem1163;
+                        $_size1165 = 0;
+                        $_etype1168 = 0;
+                        $xfer += $input->readListBegin($_etype1168, $_size1165);
+                        for ($_i1169 = 0; $_i1169 < $_size1165; ++$_i1169) {
+                            $elem1170 = null;
+                            $elem1170 = new \metastore\SQLNotNullConstraint();
+                            $xfer += $elem1170->read($input);
+                            $this->notNullConstraints []= $elem1170;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -292,14 +292,14 @@ class CreateTableRequest
                 case 7:
                     if ($ftype == TType::LST) {
                         $this->defaultConstraints = array();
-                        $_size1164 = 0;
-                        $_etype1167 = 0;
-                        $xfer += $input->readListBegin($_etype1167, $_size1164);
-                        for ($_i1168 = 0; $_i1168 < $_size1164; ++$_i1168) {
-                            $elem1169 = null;
-                            $elem1169 = new \metastore\SQLDefaultConstraint();
-                            $xfer += $elem1169->read($input);
-                            $this->defaultConstraints []= $elem1169;
+                        $_size1171 = 0;
+                        $_etype1174 = 0;
+                        $xfer += $input->readListBegin($_etype1174, $_size1171);
+                        for ($_i1175 = 0; $_i1175 < $_size1171; ++$_i1175) {
+                            $elem1176 = null;
+                            $elem1176 = new \metastore\SQLDefaultConstraint();
+                            $xfer += $elem1176->read($input);
+                            $this->defaultConstraints []= $elem1176;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -309,14 +309,14 @@ class CreateTableRequest
                 case 8:
                     if ($ftype == TType::LST) {
                         $this->checkConstraints = array();
-                        $_size1170 = 0;
-                        $_etype1173 = 0;
-                        $xfer += $input->readListBegin($_etype1173, $_size1170);
-                        for ($_i1174 = 0; $_i1174 < $_size1170; ++$_i1174) {
-                            $elem1175 = null;
-                            $elem1175 = new \metastore\SQLCheckConstraint();
-                            $xfer += $elem1175->read($input);
-                            $this->checkConstraints []= $elem1175;
+                        $_size1177 = 0;
+                        $_etype1180 = 0;
+                        $xfer += $input->readListBegin($_etype1180, $_size1177);
+                        for ($_i1181 = 0; $_i1181 < $_size1177; ++$_i1181) {
+                            $elem1182 = null;
+                            $elem1182 = new \metastore\SQLCheckConstraint();
+                            $xfer += $elem1182->read($input);
+                            $this->checkConstraints []= $elem1182;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -326,13 +326,13 @@ class CreateTableRequest
                 case 9:
                     if ($ftype == TType::LST) {
                         $this->processorCapabilities = array();
-                        $_size1176 = 0;
-                        $_etype1179 = 0;
-                        $xfer += $input->readListBegin($_etype1179, $_size1176);
-                        for ($_i1180 = 0; $_i1180 < $_size1176; ++$_i1180) {
-                            $elem1181 = null;
-                            $xfer += $input->readString($elem1181);
-                            $this->processorCapabilities []= $elem1181;
+                        $_size1183 = 0;
+                        $_etype1186 = 0;
+                        $xfer += $input->readListBegin($_etype1186, $_size1183);
+                        for ($_i1187 = 0; $_i1187 < $_size1183; ++$_i1187) {
+                            $elem1188 = null;
+                            $xfer += $input->readString($elem1188);
+                            $this->processorCapabilities []= $elem1188;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -382,8 +382,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('primaryKeys', TType::LST, 3);
             $output->writeListBegin(TType::STRUCT, count($this->primaryKeys));
-            foreach ($this->primaryKeys as $iter1182) {
-                $xfer += $iter1182->write($output);
+            foreach ($this->primaryKeys as $iter1189) {
+                $xfer += $iter1189->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -394,8 +394,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('foreignKeys', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->foreignKeys));
-            foreach ($this->foreignKeys as $iter1183) {
-                $xfer += $iter1183->write($output);
+            foreach ($this->foreignKeys as $iter1190) {
+                $xfer += $iter1190->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -406,8 +406,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('uniqueConstraints', TType::LST, 5);
             $output->writeListBegin(TType::STRUCT, count($this->uniqueConstraints));
-            foreach ($this->uniqueConstraints as $iter1184) {
-                $xfer += $iter1184->write($output);
+            foreach ($this->uniqueConstraints as $iter1191) {
+                $xfer += $iter1191->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -418,8 +418,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('notNullConstraints', TType::LST, 6);
             $output->writeListBegin(TType::STRUCT, count($this->notNullConstraints));
-            foreach ($this->notNullConstraints as $iter1185) {
-                $xfer += $iter1185->write($output);
+            foreach ($this->notNullConstraints as $iter1192) {
+                $xfer += $iter1192->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -430,8 +430,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('defaultConstraints', TType::LST, 7);
             $output->writeListBegin(TType::STRUCT, count($this->defaultConstraints));
-            foreach ($this->defaultConstraints as $iter1186) {
-                $xfer += $iter1186->write($output);
+            foreach ($this->defaultConstraints as $iter1193) {
+                $xfer += $iter1193->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -442,8 +442,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('checkConstraints', TType::LST, 8);
             $output->writeListBegin(TType::STRUCT, count($this->checkConstraints));
-            foreach ($this->checkConstraints as $iter1187) {
-                $xfer += $iter1187->write($output);
+            foreach ($this->checkConstraints as $iter1194) {
+                $xfer += $iter1194->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -454,8 +454,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('processorCapabilities', TType::LST, 9);
             $output->writeListBegin(TType::STRING, count($this->processorCapabilities));
-            foreach ($this->processorCapabilities as $iter1188) {
-                $xfer += $output->writeString($iter1188);
+            foreach ($this->processorCapabilities as $iter1195) {
+                $xfer += $output->writeString($iter1195);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

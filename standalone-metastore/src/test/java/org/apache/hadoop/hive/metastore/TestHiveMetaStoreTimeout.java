@@ -52,7 +52,7 @@ public class TestHiveMetaStoreTimeout {
     conf = MetastoreConf.newMetastoreConf();
     MetastoreConf.setClass(conf, ConfVars.EXPRESSION_PROXY_CLASS,
         MockPartitionExpressionForMetastore.class, PartitionExpressionProxy.class);
-    MetastoreConf.setTimeVar(conf, ConfVars.CLIENT_SOCKET_TIMEOUT, 2000,
+    MetastoreConf.setTimeVar(conf, ConfVars.CLIENT_SOCKET_TIMEOUT, 10000,
         TimeUnit.MILLISECONDS);
     MetaStoreTestUtils.setConfForStandloneMode(conf);
     warehouse = new Warehouse(conf);

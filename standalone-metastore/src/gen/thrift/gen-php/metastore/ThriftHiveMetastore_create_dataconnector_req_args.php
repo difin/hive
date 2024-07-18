@@ -16,40 +16,36 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class ThriftHiveMetastore_get_table_objects_by_name_result
+class ThriftHiveMetastore_create_dataconnector_req_args
 {
     static public $isValidate = false;
 
     static public $_TSPEC = array(
-        0 => array(
-            'var' => 'success',
+        1 => array(
+            'var' => 'connectorReq',
             'isRequired' => false,
-            'type' => TType::LST,
-            'etype' => TType::STRUCT,
-            'elem' => array(
-                'type' => TType::STRUCT,
-                'class' => '\metastore\Table',
-                ),
+            'type' => TType::STRUCT,
+            'class' => '\metastore\CreateDataConnectorRequest',
         ),
     );
 
     /**
-     * @var \metastore\Table[]
+     * @var \metastore\CreateDataConnectorRequest
      */
-    public $success = null;
+    public $connectorReq = null;
 
     public function __construct($vals = null)
     {
         if (is_array($vals)) {
-            if (isset($vals['success'])) {
-                $this->success = $vals['success'];
+            if (isset($vals['connectorReq'])) {
+                $this->connectorReq = $vals['connectorReq'];
             }
         }
     }
 
     public function getName()
     {
-        return 'ThriftHiveMetastore_get_table_objects_by_name_result';
+        return 'ThriftHiveMetastore_create_dataconnector_req_args';
     }
 
 
@@ -66,19 +62,10 @@ class ThriftHiveMetastore_get_table_objects_by_name_result
                 break;
             }
             switch ($fid) {
-                case 0:
-                    if ($ftype == TType::LST) {
-                        $this->success = array();
-                        $_size1551 = 0;
-                        $_etype1554 = 0;
-                        $xfer += $input->readListBegin($_etype1554, $_size1551);
-                        for ($_i1555 = 0; $_i1555 < $_size1551; ++$_i1555) {
-                            $elem1556 = null;
-                            $elem1556 = new \metastore\Table();
-                            $xfer += $elem1556->read($input);
-                            $this->success []= $elem1556;
-                        }
-                        $xfer += $input->readListEnd();
+                case 1:
+                    if ($ftype == TType::STRUCT) {
+                        $this->connectorReq = new \metastore\CreateDataConnectorRequest();
+                        $xfer += $this->connectorReq->read($input);
                     } else {
                         $xfer += $input->skip($ftype);
                     }
@@ -96,17 +83,13 @@ class ThriftHiveMetastore_get_table_objects_by_name_result
     public function write($output)
     {
         $xfer = 0;
-        $xfer += $output->writeStructBegin('ThriftHiveMetastore_get_table_objects_by_name_result');
-        if ($this->success !== null) {
-            if (!is_array($this->success)) {
+        $xfer += $output->writeStructBegin('ThriftHiveMetastore_create_dataconnector_req_args');
+        if ($this->connectorReq !== null) {
+            if (!is_object($this->connectorReq)) {
                 throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
             }
-            $xfer += $output->writeFieldBegin('success', TType::LST, 0);
-            $output->writeListBegin(TType::STRUCT, count($this->success));
-            foreach ($this->success as $iter1557) {
-                $xfer += $iter1557->write($output);
-            }
-            $output->writeListEnd();
+            $xfer += $output->writeFieldBegin('connectorReq', TType::STRUCT, 1);
+            $xfer += $this->connectorReq->write($output);
             $xfer += $output->writeFieldEnd();
         }
         $xfer += $output->writeFieldStop();

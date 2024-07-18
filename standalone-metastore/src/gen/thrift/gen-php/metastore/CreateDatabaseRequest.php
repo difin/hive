@@ -84,10 +84,16 @@ class CreateDatabaseRequest
         11 => array(
             'var' => 'type',
             'isRequired' => false,
-            'type' => TType::STRING,
+            'type' => TType::I32,
+            'class' => '\metastore\DatabaseType',
         ),
         12 => array(
             'var' => 'dataConnectorName',
+            'isRequired' => false,
+            'type' => TType::STRING,
+        ),
+        13 => array(
+            'var' => 'remote_dbname',
             'isRequired' => false,
             'type' => TType::STRING,
         ),
@@ -134,13 +140,17 @@ class CreateDatabaseRequest
      */
     public $managedLocationUri = null;
     /**
-     * @var string
+     * @var int
      */
     public $type = null;
     /**
      * @var string
      */
     public $dataConnectorName = null;
+    /**
+     * @var string
+     */
+    public $remote_dbname = null;
 
     public function __construct($vals = null)
     {
@@ -180,6 +190,9 @@ class CreateDatabaseRequest
             }
             if (isset($vals['dataConnectorName'])) {
                 $this->dataConnectorName = $vals['dataConnectorName'];
+            }
+            if (isset($vals['remote_dbname'])) {
+                $this->remote_dbname = $vals['remote_dbname'];
             }
         }
     }
@@ -227,16 +240,16 @@ class CreateDatabaseRequest
                 case 4:
                     if ($ftype == TType::MAP) {
                         $this->parameters = array();
-                        $_size1189 = 0;
-                        $_ktype1190 = 0;
-                        $_vtype1191 = 0;
-                        $xfer += $input->readMapBegin($_ktype1190, $_vtype1191, $_size1189);
-                        for ($_i1193 = 0; $_i1193 < $_size1189; ++$_i1193) {
-                            $key1194 = '';
-                            $val1195 = '';
-                            $xfer += $input->readString($key1194);
-                            $xfer += $input->readString($val1195);
-                            $this->parameters[$key1194] = $val1195;
+                        $_size1196 = 0;
+                        $_ktype1197 = 0;
+                        $_vtype1198 = 0;
+                        $xfer += $input->readMapBegin($_ktype1197, $_vtype1198, $_size1196);
+                        for ($_i1200 = 0; $_i1200 < $_size1196; ++$_i1200) {
+                            $key1201 = '';
+                            $val1202 = '';
+                            $xfer += $input->readString($key1201);
+                            $xfer += $input->readString($val1202);
+                            $this->parameters[$key1201] = $val1202;
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -287,8 +300,8 @@ class CreateDatabaseRequest
                     }
                     break;
                 case 11:
-                    if ($ftype == TType::STRING) {
-                        $xfer += $input->readString($this->type);
+                    if ($ftype == TType::I32) {
+                        $xfer += $input->readI32($this->type);
                     } else {
                         $xfer += $input->skip($ftype);
                     }
@@ -296,6 +309,13 @@ class CreateDatabaseRequest
                 case 12:
                     if ($ftype == TType::STRING) {
                         $xfer += $input->readString($this->dataConnectorName);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 13:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->remote_dbname);
                     } else {
                         $xfer += $input->skip($ftype);
                     }
@@ -335,9 +355,9 @@ class CreateDatabaseRequest
             }
             $xfer += $output->writeFieldBegin('parameters', TType::MAP, 4);
             $output->writeMapBegin(TType::STRING, TType::STRING, count($this->parameters));
-            foreach ($this->parameters as $kiter1196 => $viter1197) {
-                $xfer += $output->writeString($kiter1196);
-                $xfer += $output->writeString($viter1197);
+            foreach ($this->parameters as $kiter1203 => $viter1204) {
+                $xfer += $output->writeString($kiter1203);
+                $xfer += $output->writeString($viter1204);
             }
             $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();
@@ -376,13 +396,18 @@ class CreateDatabaseRequest
             $xfer += $output->writeFieldEnd();
         }
         if ($this->type !== null) {
-            $xfer += $output->writeFieldBegin('type', TType::STRING, 11);
-            $xfer += $output->writeString($this->type);
+            $xfer += $output->writeFieldBegin('type', TType::I32, 11);
+            $xfer += $output->writeI32($this->type);
             $xfer += $output->writeFieldEnd();
         }
         if ($this->dataConnectorName !== null) {
             $xfer += $output->writeFieldBegin('dataConnectorName', TType::STRING, 12);
             $xfer += $output->writeString($this->dataConnectorName);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->remote_dbname !== null) {
+            $xfer += $output->writeFieldBegin('remote_dbname', TType::STRING, 13);
+            $xfer += $output->writeString($this->remote_dbname);
             $xfer += $output->writeFieldEnd();
         }
         $xfer += $output->writeFieldStop();

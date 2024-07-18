@@ -773,13 +773,13 @@ package org.apache.hadoop.hive.metastore.api;
           case 3: // TXN_IDS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list814 = iprot.readListBegin();
-                struct.txnIds = new java.util.ArrayList<java.lang.Long>(_list814.size);
-                long _elem815;
-                for (int _i816 = 0; _i816 < _list814.size; ++_i816)
+                org.apache.thrift.protocol.TList _list822 = iprot.readListBegin();
+                struct.txnIds = new java.util.ArrayList<java.lang.Long>(_list822.size);
+                long _elem823;
+                for (int _i824 = 0; _i824 < _list822.size; ++_i824)
                 {
-                  _elem815 = iprot.readI64();
-                  struct.txnIds.add(_elem815);
+                  _elem823 = iprot.readI64();
+                  struct.txnIds.add(_elem823);
                 }
                 iprot.readListEnd();
               }
@@ -799,14 +799,14 @@ package org.apache.hadoop.hive.metastore.api;
           case 5: // SRC_TXN_TO_WRITE_ID_LIST
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list817 = iprot.readListBegin();
-                struct.srcTxnToWriteIdList = new java.util.ArrayList<TxnToWriteId>(_list817.size);
-                @org.apache.thrift.annotation.Nullable TxnToWriteId _elem818;
-                for (int _i819 = 0; _i819 < _list817.size; ++_i819)
+                org.apache.thrift.protocol.TList _list825 = iprot.readListBegin();
+                struct.srcTxnToWriteIdList = new java.util.ArrayList<TxnToWriteId>(_list825.size);
+                @org.apache.thrift.annotation.Nullable TxnToWriteId _elem826;
+                for (int _i827 = 0; _i827 < _list825.size; ++_i827)
                 {
-                  _elem818 = new TxnToWriteId();
-                  _elem818.read(iprot);
-                  struct.srcTxnToWriteIdList.add(_elem818);
+                  _elem826 = new TxnToWriteId();
+                  _elem826.read(iprot);
+                  struct.srcTxnToWriteIdList.add(_elem826);
                 }
                 iprot.readListEnd();
               }
@@ -851,9 +851,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(TXN_IDS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I64, struct.txnIds.size()));
-            for (long _iter820 : struct.txnIds)
+            for (long _iter828 : struct.txnIds)
             {
-              oprot.writeI64(_iter820);
+              oprot.writeI64(_iter828);
             }
             oprot.writeListEnd();
           }
@@ -872,9 +872,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(SRC_TXN_TO_WRITE_ID_LIST_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.srcTxnToWriteIdList.size()));
-            for (TxnToWriteId _iter821 : struct.srcTxnToWriteIdList)
+            for (TxnToWriteId _iter829 : struct.srcTxnToWriteIdList)
             {
-              _iter821.write(oprot);
+              _iter829.write(oprot);
             }
             oprot.writeListEnd();
           }
@@ -922,9 +922,9 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetTxnIds()) {
         {
           oprot.writeI32(struct.txnIds.size());
-          for (long _iter822 : struct.txnIds)
+          for (long _iter830 : struct.txnIds)
           {
-            oprot.writeI64(_iter822);
+            oprot.writeI64(_iter830);
           }
         }
       }
@@ -934,9 +934,9 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetSrcTxnToWriteIdList()) {
         {
           oprot.writeI32(struct.srcTxnToWriteIdList.size());
-          for (TxnToWriteId _iter823 : struct.srcTxnToWriteIdList)
+          for (TxnToWriteId _iter831 : struct.srcTxnToWriteIdList)
           {
-            _iter823.write(oprot);
+            _iter831.write(oprot);
           }
         }
       }
@@ -955,13 +955,13 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.BitSet incoming = iprot.readBitSet(4);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list824 = iprot.readListBegin(org.apache.thrift.protocol.TType.I64);
-          struct.txnIds = new java.util.ArrayList<java.lang.Long>(_list824.size);
-          long _elem825;
-          for (int _i826 = 0; _i826 < _list824.size; ++_i826)
+          org.apache.thrift.protocol.TList _list832 = iprot.readListBegin(org.apache.thrift.protocol.TType.I64);
+          struct.txnIds = new java.util.ArrayList<java.lang.Long>(_list832.size);
+          long _elem833;
+          for (int _i834 = 0; _i834 < _list832.size; ++_i834)
           {
-            _elem825 = iprot.readI64();
-            struct.txnIds.add(_elem825);
+            _elem833 = iprot.readI64();
+            struct.txnIds.add(_elem833);
           }
         }
         struct.setTxnIdsIsSet(true);
@@ -972,14 +972,14 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(2)) {
         {
-          org.apache.thrift.protocol.TList _list827 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-          struct.srcTxnToWriteIdList = new java.util.ArrayList<TxnToWriteId>(_list827.size);
-          @org.apache.thrift.annotation.Nullable TxnToWriteId _elem828;
-          for (int _i829 = 0; _i829 < _list827.size; ++_i829)
+          org.apache.thrift.protocol.TList _list835 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.srcTxnToWriteIdList = new java.util.ArrayList<TxnToWriteId>(_list835.size);
+          @org.apache.thrift.annotation.Nullable TxnToWriteId _elem836;
+          for (int _i837 = 0; _i837 < _list835.size; ++_i837)
           {
-            _elem828 = new TxnToWriteId();
-            _elem828.read(iprot);
-            struct.srcTxnToWriteIdList.add(_elem828);
+            _elem836 = new TxnToWriteId();
+            _elem836.read(iprot);
+            struct.srcTxnToWriteIdList.add(_elem836);
           }
         }
         struct.setSrcTxnToWriteIdListIsSet(true);
