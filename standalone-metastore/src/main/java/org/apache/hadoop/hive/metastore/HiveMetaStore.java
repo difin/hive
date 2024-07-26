@@ -4467,10 +4467,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
         db = ms.getDatabase(catName, dbName);
 
-        if (!parts.isEmpty()) {
-          firePreEvent(new PreAddPartitionEvent(tbl, parts, this));
-        }
-
         Set<PartValEqWrapperLite> partsToAdd = new HashSet<>(parts.size());
         List<Partition> partitionsToAdd = new ArrayList<>(parts.size());
         List<FieldSchema> partitionKeys = tbl.getPartitionKeys();
@@ -4488,6 +4484,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           } else {
             existingParts.add(part);
           }
+        }
+
+        // Only authorize on newly created partitions
+        if (!partitionsToAdd.isEmpty()) {
+          firePreEvent(new PreAddPartitionEvent(tbl, partitionsToAdd, this));
         }
 
         newParts.addAll(createPartitionFolders(partitionsToAdd, tbl, addedPartitions));
