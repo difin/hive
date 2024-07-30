@@ -1755,7 +1755,6 @@
         <module>testutils</module>
         <module>upgrade-acid</module>
         <module>kafka-handler</module>
-        <module>hms-catalog</module>
         <module>packaging</module>
       </modules>
     </profile>
@@ -1770,6 +1769,7 @@
       <modules>
         <module>iceberg</module>
         <module>impala</module>
+        <module>hms-catalog</module>
       </modules>
     </profile>
 
