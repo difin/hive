@@ -52,7 +52,7 @@ public class ServletSecurity {
   private JWTValidator jwtValidator = null;
   private final Configuration conf;
 
-  ServletSecurity(Configuration conf, boolean jwt) {
+  public ServletSecurity(Configuration conf, boolean jwt) {
     this.conf = conf;
     this.isSecurityEnabled = UserGroupInformation.isSecurityEnabled();
     this.jwtAuthEnabled = jwt;
@@ -77,7 +77,7 @@ public class ServletSecurity {
    * Any http method executor.
    */
   @FunctionalInterface
-  interface MethodExecutor {
+  public interface MethodExecutor {
     void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
   }
 

@@ -18,7 +18,11 @@
 
 package org.apache.hive.service.servlet;
 
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.ServletSecurity;
 import org.apache.hadoop.hive.ql.QueryInfo;
+import org.apache.hive.service.auth.AuthType;
+import org.apache.hive.service.auth.HiveAuthConstants;
 import org.apache.hive.service.cli.operation.OperationManager;
 import org.apache.hive.service.cli.session.HiveSession;
 import org.apache.hive.service.cli.session.SessionManager;
@@ -55,10 +59,27 @@ public class QueriesRESTfulAPIServlet extends HttpServlet {
   private static final String REQ_SESSIONS = "sessions";
   private static final String REQ_ACTIVE = "active";
   private static final String REQ_HISTORICAL = "historical";
+  private final AuthType authType;
+  private final ServletSecurity security;
 
+  public QueriesRESTfulAPIServlet(HiveConf hiveConf) {
+    this.authType = AuthType.authTypeFromConf(hiveConf, true);
+    boolean jwt = authType.isEnabled(HiveAuthConstants.AuthTypes.JWT);
+    this.security = new ServletSecurity(hiveConf, jwt);
+  }
+
+  public void init() throws ServletException {
+    super.init();
+    security.init();
+  }
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response)
+  protected void doGet(HttpServletRequest request,
+                       HttpServletResponse response) throws ServletException, IOException {
+    security.execute(request, response, QueriesRESTfulAPIServlet.this::runGet);
+  }
+
+  public void runGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
         /*
             Available endpoints are:

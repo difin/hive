@@ -128,6 +128,7 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooDefs.Perms;
 import org.apache.zookeeper.data.ACL;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -444,14 +445,18 @@ public class HiveServer2 extends CompositeService {
           builder.addServlet("llap", LlapServlet.class);
           builder.addServlet("jdbcjar", JdbcJarDownloadServlet.class);
           builder.setContextRootRewriteTarget("/hiveserver2.jsp");
-
+          
           webServer = builder.build();
-          webServer.addServlet("query_page", "/query_page.html", QueryProfileServlet.class);
-          webServer.addServlet("api", "/api/*", QueriesRESTfulAPIServlet.class);
+          ServletHolder queryProfileServletHolder = new ServletHolder(new QueryProfileServlet(hiveConf));
+          ServletHolder queriesRESTfulAPIServletHolder = new ServletHolder(new QueriesRESTfulAPIServlet(hiveConf));
+          webServer.addServlet("query_page", "/query_page.html", queryProfileServletHolder);
+          webServer.addServlet("api", "/api/*", queriesRESTfulAPIServletHolder);
         }
       }
     } catch (IOException ie) {
       throw new ServiceException(ie);
+    } catch (Exception e) {
+      throw new ServiceException(e);
     }
 
     // Add a shutdown hook for catching SIGTERM & SIGINT

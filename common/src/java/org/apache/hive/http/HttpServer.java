@@ -792,6 +792,13 @@ public class HttpServer {
     webAppContext.addServlet(holder, pathSpec);
   }
 
+  public void addServlet(String name, String pathSpec, ServletHolder holder) {
+    if (name != null) {
+      holder.setName(name);
+    }
+    webAppContext.addServlet(holder, pathSpec);
+  }
+
 
   private static void disableDirectoryListingOnServlet(ServletContextHandler contextHandler) {
     contextHandler.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");

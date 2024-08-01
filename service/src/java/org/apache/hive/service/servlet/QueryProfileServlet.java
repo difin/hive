@@ -18,13 +18,15 @@
 package org.apache.hive.service.servlet;
 
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.ServletSecurity;
 import org.apache.hadoop.hive.ql.QueryInfo;
+import org.apache.hive.service.auth.AuthType;
+import org.apache.hive.service.auth.HiveAuthConstants;
 import org.apache.hive.service.cli.operation.OperationManager;
 import org.apache.hive.service.cli.session.SessionManager;
 import org.apache.hive.tmpl.QueryProfileTmpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -38,11 +40,28 @@ import java.io.IOException;
  */
 public class QueryProfileServlet extends HttpServlet {
   private static final Logger LOG = LoggerFactory.getLogger(QueryProfileServlet.class);
+  private final AuthType authType;
+  private final ServletSecurity security;
+
+  public QueryProfileServlet(HiveConf hiveConf) {
+    this.authType = AuthType.authTypeFromConf(hiveConf, true);
+    boolean jwt = authType.isEnabled(HiveAuthConstants.AuthTypes.JWT);
+    this.security = new ServletSecurity(hiveConf, jwt);
+  }
+
+  public void init() throws ServletException {
+    super.init();
+    security.init();
+  }
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-    String opId = (String) request.getParameter("operationId");
+  protected void doGet(HttpServletRequest request,
+                       HttpServletResponse response) throws ServletException, IOException {
+    security.execute(request, response, QueryProfileServlet.this::runGet);
+  }
+
+  public void runGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    String opId = request.getParameter("operationId");
     ServletContext ctx = getServletContext();
     SessionManager sessionManager =
       (SessionManager)ctx.getAttribute("hive.sm");
