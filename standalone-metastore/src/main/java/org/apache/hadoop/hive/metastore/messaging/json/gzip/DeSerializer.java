@@ -30,6 +30,7 @@ import org.apache.hadoop.hive.metastore.messaging.AddUniqueConstraintMessage;
 import org.apache.hadoop.hive.metastore.messaging.AllocWriteIdMessage;
 import org.apache.hadoop.hive.metastore.messaging.AlterDatabaseMessage;
 import org.apache.hadoop.hive.metastore.messaging.AlterPartitionMessage;
+import org.apache.hadoop.hive.metastore.messaging.AlterPartitionsMessage;
 import org.apache.hadoop.hive.metastore.messaging.AlterTableMessage;
 import org.apache.hadoop.hive.metastore.messaging.CommitTxnMessage;
 import org.apache.hadoop.hive.metastore.messaging.CommitCompactionMessage;
@@ -131,6 +132,11 @@ public class DeSerializer extends JSONMessageDeserializer {
   @Override
   public AlterPartitionMessage getAlterPartitionMessage(String messageBody) {
     return super.getAlterPartitionMessage(deCompress(messageBody));
+  }
+
+  @Override
+  public AlterPartitionsMessage getAlterPartitionsMessage(String messageBody) {
+    return super.getAlterPartitionsMessage(deCompress(messageBody));
   }
 
   @Override

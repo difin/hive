@@ -135,6 +135,8 @@ public abstract class MessageDeserializer {
    */
   public abstract AlterPartitionMessage getAlterPartitionMessage(String messageBody);
 
+  public abstract AlterPartitionsMessage getAlterPartitionsMessage(String messageBody);
+
   /**
    * Method to de-serialize DropPartitionMessage instance.
    */

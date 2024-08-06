@@ -77,6 +77,7 @@ public class TestCachedStoreUpdateUsingEvents {
     MetastoreConf.setBoolVar(conf, ConfVars.REPLCMENABLED, true);
     MetastoreConf.setBoolVar(conf, ConfVars.STATS_FETCH_BITVECTOR, true);
     MetastoreConf.setBoolVar(conf, ConfVars.STATS_FETCH_KLL, true);
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.NOTIFICATION_ALTER_PARTITIONS_V2_ENABLED, true);
     MetastoreConf.setVar(conf, ConfVars.REPLCMDIR, "cmroot");
     MetaStoreTestUtils.setConfForStandloneMode(conf);
 
@@ -396,7 +397,7 @@ public class TestCachedStoreUpdateUsingEvents {
 
     // Read the altered partition via CachedStore
     ptnRead = sharedCache.getPartitionFromCache(DEFAULT_CATALOG_NAME, dbName, tblName, Arrays.asList(ptnColVal1Alt));
-    Assert.assertEquals(ptn1Atl.getParameters(), ptnRead.getParameters());
+    Assert.assertEquals(null, ptnRead);
 
     ptnRead = sharedCache.getPartitionFromCache(DEFAULT_CATALOG_NAME, dbName, tblName, Arrays.asList(ptnColVal2));
     Assert.assertEquals(null, ptnRead);

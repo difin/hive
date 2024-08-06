@@ -148,6 +148,7 @@ import org.apache.hadoop.hive.metastore.api.WriteEventInfo;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.apache.hadoop.hive.metastore.messaging.AlterDatabaseMessage;
+import org.apache.hadoop.hive.metastore.messaging.AlterPartitionsMessage;
 import org.apache.hadoop.hive.metastore.messaging.CreateDatabaseMessage;
 import org.apache.hadoop.hive.metastore.messaging.CreateTableMessage;
 import org.apache.hadoop.hive.metastore.messaging.AlterTableMessage;
@@ -417,6 +418,12 @@ public class CachedStore implements RawStore, Configurable {
           //TODO : Use the stat object stored in the alter table message to update the stats in cache.
           updateStatsForAlterPart(rawStore, alterPartitionMessage.getTableObj(),
                   catalogName, dbName, tableName, alterPartitionMessage.getPtnObjAfter());
+          break;
+        case MessageBuilder.ALTER_PARTITIONS_EVENT:
+          AlterPartitionsMessage alterPtnsMessage = deserializer.getAlterPartitionsMessage(message);
+          List<List<String>> part_vals = new ArrayList<>();
+          alterPtnsMessage.getPartitionObjs().forEach(part -> part_vals.add(part.getValues()));
+          sharedCache.removePartitionsFromCache(catalogName, dbName, tableName, part_vals);
           break;
         case MessageBuilder.DROP_PARTITION_EVENT:
           DropPartitionMessage dropPartitionMessage = deserializer.getDropPartitionMessage(message);
