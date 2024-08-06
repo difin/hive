@@ -18,7 +18,6 @@
 
 package org.apache.hadoop.hive.ql.ddl.table.storage.compact;
 
-import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.CompactionRequest;
@@ -27,6 +26,7 @@ import org.apache.hadoop.hive.metastore.utils.JavaUtils;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +37,7 @@ import org.apache.hadoop.hive.metastore.api.ShowCompactResponseElement;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
+import org.apache.hadoop.hive.ql.ddl.DDLUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
@@ -65,34 +66,61 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
       }
     }
 
-    String partitionName = getPartitionName(table);
+    List<Partition> partitions = getPartitions(table);
 
-    CompactionResponse resp = compact(table, partitionName);
-    if (!resp.isAccepted()) {
-      String message = Constants.ERROR_MESSAGE_NO_DETAILS_AVAILABLE;
-      if (resp.isSetErrormessage()) {
-        message = resp.getErrormessage();
+    if (partitions.isEmpty()) {
+      CompactionResponse compactionResponse = compact(table, null);
+      parseCompactionResponse(compactionResponse, table, null);
+    } else { // Check for eligible partitions and initiate compaction
+      for (Partition partition : partitions) {
+        CompactionResponse compactionResponse = compact(table, partition.getName());
+        parseCompactionResponse(compactionResponse, table, partition.getName());
       }
-      throw new HiveException(ErrorMsg.COMPACTION_REFUSED,
-          table.getDbName(), table.getTableName(), partitionName == null ? "" : "(partition=" + partitionName + ")", message);
-    }
-
-    if (desc.isBlocking() && resp.isAccepted()) {
-      waitForCompactionToFinish(resp);
+      // If Iceberg table had partition evolution, it will create compaction request without partition specification,
+      // and it will compact all files from old partition specs, besides compacting partitions of current spec in parallel.
+      if (desc.getPartitionSpec() == null && 
+          DDLUtils.isIcebergTable(table) && table.getStorageHandler().hasUndergonePartitionEvolution(table)) {
+        CompactionResponse compactionResponse = compact(table, null);
+        parseCompactionResponse(compactionResponse, table, null);
+      }
     }
 
     return 0;
   }
 
-  private String getPartitionName(Table table) throws HiveException {
-    String partitionName = null;
+  private void parseCompactionResponse(CompactionResponse compactionResponse, Table table, String partitionName)
+      throws HiveException {
+    if (compactionResponse == null) {
+      context.getConsole().printInfo(
+          "Not enough deltas to initiate compaction for table=" + table.getTableName() + "partition=" + partitionName);
+      return;
+    }
+    if (!compactionResponse.isAccepted()) {
+      if (compactionResponse.isSetErrormessage()) {
+        throw new HiveException(ErrorMsg.COMPACTION_REFUSED, table.getDbName(), table.getTableName(),
+            partitionName == null ? "" : " partition(" + partitionName + ")", compactionResponse.getErrormessage());
+      }
+      context.getConsole().printInfo(
+          "Compaction already enqueued with id " + compactionResponse.getId() + "; State is " + compactionResponse.getState());
+      return;
+    }
+    context.getConsole().printInfo("Compaction enqueued with id " + compactionResponse.getId());
+    if (desc.isBlocking() && compactionResponse.isAccepted()) {
+      waitForCompactionToFinish(compactionResponse);
+    }
+  }
+
+  private List<Partition> getPartitions(Table table) throws HiveException {
+    List<Partition> partitions = new ArrayList<>();
     if (desc.getPartitionSpec() == null) {
       if (table.isPartitioned()) { // Compaction can only be done on the whole table if the table is non-partitioned.
-        throw new HiveException(ErrorMsg.NO_COMPACTION_PARTITION);
+        throw new HiveException(ErrorMsg.COMPACTION_NO_PARTITION);
+      }
+      if ((DDLUtils.isIcebergTable(table) && table.getStorageHandler().isPartitioned(table))) {
+        partitions = context.getDb().getPartitions(table);
       }
     } else {
       Map<String, String> partitionSpec = desc.getPartitionSpec();
-      List<Partition> partitions = context.getDb().getPartitions(table, partitionSpec);
       partitions = context.getDb().getPartitions(table, partitionSpec);
       if (partitions.isEmpty()) {
         throw new HiveException(ErrorMsg.INVALID_PARTITION_SPEC);
@@ -103,9 +131,8 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
       if (partitions.size() != 1) {
         throw new HiveException(ErrorMsg.TOO_MANY_COMPACTION_PARTITIONS);
       }
-      partitionName = partitions.get(0).getName();
     }
-    return partitionName;
+    return partitions;
   }
 
   private CompactionResponse compact(Table table, String partitionName) throws HiveException {

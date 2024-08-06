@@ -284,8 +284,8 @@ public class Context {
   public enum RewritePolicy {
 
     DEFAULT,
-    ALL_PARTITIONS,
-    PARTITION;
+    PARTITION,
+    FULL_TABLE;
 
     public static RewritePolicy fromString(String rewritePolicy) {
       if (rewritePolicy == null) {
