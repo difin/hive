@@ -80,7 +80,7 @@
     <hikaricp.version>2.6.1</hikaricp.version>
     <jackson.version>2.12.7.20221012</jackson.version>
     <javolution.version>5.5.1</javolution.version>
-    <jetty.version>9.4.43.v20210629</jetty.version>
+    <jetty.version>9.4.54.v20240208</jetty.version>
     <jexl.version>3.3</jexl.version>
     <junit.version>4.13.2</junit.version>
     <junit.jupiter.version>5.6.2</junit.jupiter.version>
