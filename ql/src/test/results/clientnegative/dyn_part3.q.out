@@ -6,9 +6,4 @@ POSTHOOK: query: create table nzhang_part( key string) partitioned by (value str
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@nzhang_part
-PREHOOK: query: insert overwrite table nzhang_part partition(value) select key, value from src
-PREHOOK: type: QUERY
-PREHOOK: Input: default@src
-PREHOOK: Output: default@nzhang_part
-#### A masked pattern was here ####
-FAILED: Execution Error, return code 2 from org.apache.hadoop.hive.ql.exec.mr.MapRedTask
+FAILED: SemanticException [Error 10096]: Dynamic partition strict mode requires at least one static partition column. To turn this off set hive.exec.dynamic.partition.mode=nonstrict

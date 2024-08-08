@@ -1,0 +1,1 @@
+FAILED: RuntimeException Cannot run all parts of query in llap. Failing since hive.llap.execution.mode is set to only

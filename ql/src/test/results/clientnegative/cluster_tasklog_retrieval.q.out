@@ -8,6 +8,10 @@ PREHOOK: query: FROM src
 SELECT evaluate_npe(src.key) LIMIT 1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@src
-PREHOOK: Output: hdfs://### HDFS PATH ###
 #### A masked pattern was here ####
-FAILED: Execution Error, return code 2 from org.apache.hadoop.hive.ql.exec.mr.MapRedTask
+POSTHOOK: query: FROM src
+SELECT evaluate_npe(src.key) LIMIT 1
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@src
+#### A masked pattern was here ####
+Failed with exception org.apache.hadoop.hive.ql.metadata.HiveException:Error evaluating evaluate_npe(key)
