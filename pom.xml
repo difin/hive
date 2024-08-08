@@ -124,7 +124,7 @@
     <impala.version>4.5.0.2025.0.20.0-SNAPSHOT</impala.version>
     <immutables.version>2.9.2</immutables.version>
     <ivy.version>2.5.2</ivy.version>
-    <jackson.version>2.16.1</jackson.version>
+    <jackson.version>2.15.0</jackson.version>
     <jamon.plugin.version>2.3.4</jamon.plugin.version>
     <jamon-runtime.version>2.3.1</jamon-runtime.version>
     <javax-servlet.version>3.1.0</javax-servlet.version>
