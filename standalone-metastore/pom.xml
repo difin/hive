@@ -55,7 +55,7 @@
     <maven.surefire.plugin.version>3.0.0-M4</maven.surefire.plugin.version>
 
     <!-- Dependency versions -->
-    <aircompressor.version>0.21</aircompressor.version>
+    <aircompressor.version>0.27</aircompressor.version>
     <antlr.version>4.9.3</antlr.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
     <apache-directory-server.version>1.5.7</apache-directory-server.version>
