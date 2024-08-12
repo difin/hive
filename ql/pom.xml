@@ -657,14 +657,6 @@
       <artifactId>tez-runtime-internals</artifactId>
       <optional>true</optional>
       <exclusions>
-              <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commmons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
        <exclusion>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-common</artifactId>
@@ -689,15 +681,12 @@
          <groupId>org.apache.hadoop</groupId>
          <artifactId>hadoop-yarn-client</artifactId>
        </exclusion>
-             <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commmons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tez</groupId>
+      <artifactId>tez-protobuf-history-plugin</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache.tez</groupId>
@@ -744,14 +733,6 @@
           <groupId>org.mortbay.jetty</groupId>
           <artifactId>jetty</artifactId>
         </exclusion>
-       <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commmons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
         <exclusion>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-common</artifactId>
@@ -775,14 +756,6 @@
         <exclusion>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-yarn-client</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commmons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
