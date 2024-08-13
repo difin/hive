@@ -12,6 +12,8 @@
 --! qt:replace:/(MAJOR\s+succeeded\s+)[a-zA-Z0-9\-\.\s+]+(\s+manual)/$1#Masked#$2/
 -- Mask the totalSize value as it can have slight variability, causing test flakiness
 --! qt:replace:/(\s+totalSize\s+)\S+(\s+)/$1#Masked#$2/
+-- Mask removed file size
+--! qt:replace:/(\S\"removed-files-size\\\":\\\")(\d+)(\\\")/$1#Masked#$3/
 
 set hive.llap.io.enabled=true;
 set hive.vectorized.execution.enabled=true;
