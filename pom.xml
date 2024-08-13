@@ -100,7 +100,7 @@
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <commons-math3.version>3.6.1</commons-math3.version>
     <cdh.logredactor.version>2.0.13</cdh.logredactor.version>
-    <commons-dbcp2.version>2.7.0</commons-dbcp2.version>
+    <commons-dbcp2.version>2.12.0</commons-dbcp2.version>
     <derby.version>10.14.3.0-cloudera1</derby.version>
     <dropwizard.version>3.1.0</dropwizard.version>
     <dropwizard-metrics-hadoop-metrics2-reporter.version>0.1.2</dropwizard-metrics-hadoop-metrics2-reporter.version>
