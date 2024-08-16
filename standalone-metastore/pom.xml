@@ -99,7 +99,7 @@
     <ST4.version>4.0.4</ST4.version>
     <zookeeper.version>3.8.1.7.2.18.400-4</zookeeper.version>
     <curator.version>5.4.0.7.2.18.400-4</curator.version>
-    <cron-utils.version>9.1.6</cron-utils.version>
+    <cron-utils.version>9.2.1</cron-utils.version>
     <httpcomponents.core.version>4.4.13</httpcomponents.core.version>
     <spring.version>5.2.24.RELEASE</spring.version>    <!-- Thrift properties -->
     <thrift.home>you-must-set-this-to-run-thrift</thrift.home>
