@@ -1033,7 +1033,8 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-			  <finalName>hive-core-shaded-exec-${project.version}</finalName>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <finalName>hive-core-shaded-exec-${project.version}</finalName>
               <shadedArtifactAttached>true</shadedArtifactAttached>
               <shadedClassifierName>core-shaded</shadedClassifierName>
               <artifactSet>
@@ -1062,6 +1063,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
                 <!--also see maven-jar-plugin execution.id=core-jar-->
               <artifactSet>
                 <includes>
