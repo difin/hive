@@ -3848,12 +3848,14 @@ class DropCatalogRequest(object):
     """
     Attributes:
      - name
+     - ifExists
 
     """
 
 
-    def __init__(self, name=None,):
+    def __init__(self, name=None, ifExists=None,):
         self.name = name
+        self.ifExists = ifExists
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -3869,6 +3871,11 @@ class DropCatalogRequest(object):
                     self.name = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.BOOL:
+                    self.ifExists = iprot.readBool()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -3882,6 +3889,10 @@ class DropCatalogRequest(object):
         if self.name is not None:
             oprot.writeFieldBegin('name', TType.STRING, 1)
             oprot.writeString(self.name.encode('utf-8') if sys.version_info[0] == 2 else self.name)
+            oprot.writeFieldEnd()
+        if self.ifExists is not None:
+            oprot.writeFieldBegin('ifExists', TType.BOOL, 2)
+            oprot.writeBool(self.ifExists)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -30555,6 +30566,7 @@ all_structs.append(DropCatalogRequest)
 DropCatalogRequest.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'name', 'UTF8', None, ),  # 1
+    (2, TType.BOOL, 'ifExists', None, None, ),  # 2
 )
 all_structs.append(Database)
 Database.thrift_spec = (

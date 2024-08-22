@@ -1230,6 +1230,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     public void drop_catalog(DropCatalogRequest rqst)
         throws NoSuchObjectException, InvalidOperationException, MetaException {
       String catName = rqst.getName();
+      boolean ifExists = rqst.isIfExists();
       startFunction("drop_catalog", ": " + catName);
       if (DEFAULT_CATALOG_NAME.equalsIgnoreCase(catName)) {
         endFunction("drop_catalog", false, null);
@@ -1239,7 +1240,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       boolean success = false;
       Exception ex = null;
       try {
-        dropCatalogCore(catName);
+        dropCatalogCore(catName, ifExists);
         success = true;
       } catch (NoSuchObjectException|InvalidOperationException|MetaException e) {
         ex = e;
@@ -1253,7 +1254,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
     }
 
-    private void dropCatalogCore(String catName)
+    private void dropCatalogCore(String catName, boolean ifExists)
         throws MetaException, NoSuchObjectException, InvalidOperationException {
       boolean success = false;
       Catalog cat = null;
@@ -1293,7 +1294,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           }
         }
 
-        ms.dropCatalog(catName) ;
+        ms.dropCatalog(catName);
         if (!transactionalListeners.isEmpty()) {
           transactionalListenerResponses =
               MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
@@ -1302,6 +1303,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
 
         success = ms.commitTransaction();
+      } catch (NoSuchObjectException e) {
+        if (!ifExists) {
+          throw new NoSuchObjectException(e.getMessage());
+        } else {
+          ms.rollbackTransaction();
+        }
       } finally {
         if (success) {
           wh.deleteDir(wh.getDnsPath(new Path(cat.getLocationUri())), false, false, false);

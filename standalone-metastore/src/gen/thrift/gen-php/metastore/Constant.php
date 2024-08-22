@@ -70,7 +70,7 @@ final class Constant extends \Thrift\Type\TConstant
 
     protected static function init_HMS_API()
     {
-        return "1.2.45";
+        return "1.2.46";
     }
 
     protected static function init_ACCESSTYPE_NONE()

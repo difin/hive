@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.45"
+const string HMS_API = "1.2.46"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -402,7 +402,8 @@ struct GetCatalogsResponse {
 }
 
 struct DropCatalogRequest {
-  1: string name
+  1: string name,
+  2: optional bool ifExists
 }
 
 // namespace for tables
