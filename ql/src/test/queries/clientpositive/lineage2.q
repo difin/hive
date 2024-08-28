@@ -3,6 +3,7 @@
 SET hive.vectorized.execution.enabled=false;
 set hive.mapred.mode=nonstrict;
 set hive.exec.post.hooks=org.apache.hadoop.hive.ql.hooks.LineageLogger;
+set hive.lineage.statement.filter=ALL;
 
 drop table if exists src2;
 create table src2 as select key key2, value value2 from src1;

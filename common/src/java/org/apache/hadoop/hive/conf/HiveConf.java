@@ -3905,6 +3905,15 @@ public class HiveConf extends Configuration {
         "partition columns or non-partition columns while displaying columns in describe\n" +
         "table. From 0.12 onwards, they are displayed separately. This flag will let you\n" +
         "get old behavior, if desired. See, test-case in patch for HIVE-6689."),
+    HIVE_LINEAGE_STATEMENT_FILTER("hive.lineage.statement.filter",
+        // In the Cloudera products column lineage information is used by Atlas only in the case of the
+        // following statement types
+        "CREATE_TABLE,CREATE_TABLE_AS_SELECT,CREATE_VIEW,CREATE_MATERIALIZED_VIEW,LOAD",
+        "Whether Hive provides lineage information to hooks for the specified statements only, " +
+            "the value is a comma-separated list (ex.: CREATE_MATERIALIZED_VIEW," +
+            "CREATE_TABLE,CREATE_TABLE_AS_SELECT). Possible values are: CREATE_TABLE, CREATE_TABLE_AS_SELECT, " +
+            "CREATE_VIEW, CREATE_MATERIALIZED_VIEW, LOAD, QUERY, ALL, NONE." +
+            " ALL means lineage information is always provided, NONE and empty string means never."),
 
     HIVE_SSL_PROTOCOL_BLACKLIST("hive.ssl.protocol.blacklist", "SSLv2,SSLv3",
         "SSL Versions to disable for all Hive Servers"),

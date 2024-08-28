@@ -13612,7 +13612,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           || postExecHooks.contains("org.apache.atlas.hive.hook.HiveHook")) {
         List<Transform> transformations = new ArrayList<Transform>();
         transformations.add(new HiveOpConverterPostProc());
-        transformations.add(new Generator(postExecHooks));
+        transformations.add(Generator.fromConf(conf));
         for (Transform t : transformations) {
           pCtx = t.transform(pCtx);
         }
@@ -16244,7 +16244,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
   private void copyInfoToQueryProperties(QueryProperties queryProperties) {
     if (qb != null) {
-      queryProperties.setQuery(qb.getIsQuery());
+      queryProperties.setQuery(qb.getIsQuery() && !forViewCreation);
       queryProperties.setAnalyzeCommand(qb.getParseInfo().isAnalyzeCommand());
       queryProperties.setNoScanAnalyzeCommand(qb.getParseInfo().isNoScanAnalyzeCommand());
       queryProperties.setAnalyzeRewrite(qb.isAnalyzeRewrite());
@@ -16256,6 +16256,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       queryProperties.setHasOuterOrderBy(!qb.getParseInfo().getIsSubQ() &&
           !qb.getParseInfo().getDestToOrderBy().isEmpty());
       queryProperties.setOuterQueryLimit(qb.getParseInfo().getOuterQueryLimit());
+      queryProperties.setView(forViewCreation);
       queryProperties.setMaterializedView(qb.isMaterializedView());
     }
   }
