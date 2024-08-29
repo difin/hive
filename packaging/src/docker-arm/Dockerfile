@@ -44,7 +44,7 @@ RUN curl -o /etc/yum.repos.d/rhel8_mirrors.repo https://mirror.infra.cloudera.co
 # install debugging tools and other dependencies
 RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN yum -y update && \
-  yum install -y java-11-openjdk-headless strace bind-utils openssl openssl-devel wget vim nmap-ncat nmap bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop procps lsof net-tools && \
+  yum install -y java-11-openjdk-headless java-11-openjdk-devel strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat nmap bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop procps lsof net-tools && \
   yum clean all && \
   rm -rf /var/cache/yum
 
@@ -153,7 +153,7 @@ RUN yum -y clean all && \
     /remove-unwanted.sh
 
 # postgres-jdbc fetches java-8 as a dependency, let's make java11 as default, pointed by /etc/alternatives/java
-RUN alternatives --set java java-11-openjdk.x86_64
+RUN alternatives --set java /usr/lib/jvm/java-11-openjdk-11.0.24.0.8-3.el8.aarch64/bin/java
 
 COPY bigtop-hive /usr/bin/hive
 RUN ln -s /usr/bin/hive /usr/bin/beeline

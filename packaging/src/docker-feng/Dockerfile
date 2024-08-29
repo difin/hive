@@ -1,5 +1,4 @@
-ARG HIVE_VERSION
-FROM hive:${HIVE_VERSION}
+FROM hive:${hive.tag}
 ARG IMPALA_VERSION
 USER root
 RUN mkdir -p /usr/lib/impala/

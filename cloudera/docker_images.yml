@@ -1,5 +1,8 @@
 # Copyright (c) 2020 Cloudera, Inc. All rights reserved.
 docker_images:
+  hive-arm:
+    image: hive-arm
+    multi_arch: intermediate
   hive: hive
   feng: feng
 
