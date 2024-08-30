@@ -14733,6 +14733,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           storageFormat.getInputFormat(), storageFormat.getOutputFormat(), location,
           storageFormat.getSerde(), storageFormat.getSerdeProps(), tblProps, ifNotExists,
           likeTableName, isUserStorageFormat);
+      tblLocation = getDefaultLocation(qualifiedTabName.getDb(), qualifiedTabName.getTable(), isExt);
+      SessionStateUtil.addResource(conf, META_TABLE_LOCATION, tblLocation);
       rootTasks.add(TaskFactory.get(new DDLWork(getInputs(), getOutputs(), crtTblLikeDesc)));
       break;
 
@@ -14793,7 +14795,11 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           }
 
         }
+        tblLocation = location;
+      } else {
+        tblLocation = getDefaultLocation(qualifiedTabName.getDb(), qualifiedTabName.getTable(), isExt);
       }
+      SessionStateUtil.addResource(conf, META_TABLE_LOCATION, tblLocation);
       if (!CollectionUtils.isEmpty(partCols)) {
         throw new SemanticException(
             "Partition columns can only declared using their names in CTAS statements");
