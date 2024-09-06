@@ -9,6 +9,7 @@ set hive.exec.reducers.max = 1;
 set hive.merge.mapfiles=false;
 set hive.merge.mapredfiles=false;
 set hive.default.nulls.last=false;
+set hive.cbo.fallback.strategy=NEVER;
 
 -- Create two bucketed and sorted tables
 CREATE TABLE test_table1 (key int, value STRING) PARTITIONED BY (ds STRING)
