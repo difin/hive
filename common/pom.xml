@@ -67,7 +67,7 @@
        <groupId>org.apache.commons</groupId>
        <artifactId>commons-lang3</artifactId>
        <version>${commons-lang3.version}</version>
-    </dependency>    
+    </dependency>
     <dependency>
        <groupId>org.apache.commons</groupId>
        <artifactId>commons-math3</artifactId>
@@ -137,6 +137,10 @@
       <artifactId>hadoop-common</artifactId>
       <optional>true</optional>
       <exclusions>
+        <exclusion>
+          <groupId>com.nimbusds</groupId>
+          <artifactId>nimbus-jose-jwt</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>commons-collections</groupId>
           <artifactId>commons-collections</artifactId>
@@ -213,6 +217,10 @@
       <exclusion>
         <groupId>org.codehaus.jettison</groupId>
         <artifactId>jettison</artifactId>
+      </exclusion>
+      <exclusion>
+        <groupId>com.nimbusds</groupId>
+        <artifactId>nimbus-jose-jwt</artifactId>
       </exclusion>
     </exclusions>
   </dependency>
