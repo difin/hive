@@ -58,7 +58,16 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
     if (!AcidUtils.isTransactionalTable(table) && !AcidUtils.isNonNativeAcidTable(table)) {
       throw new HiveException(ErrorMsg.NONACID_COMPACTION_NOT_SUPPORTED, table.getDbName(), table.getTableName());
     }
-    
+
+    if (desc.getFilterExpr() != null) {
+      if (!DDLUtils.isIcebergTable(table)) {
+        throw new HiveException(ErrorMsg.NONICEBERG_COMPACTION_WITH_FILTER_NOT_SUPPORTED, table.getDbName(), table.getTableName());
+      }
+      else if (desc.getPartitionSpec() != null) {
+        throw new HiveException(ErrorMsg.ICEBERG_COMPACTION_WITH_PART_SPEC_AND_FILTER_NOT_SUPPORTED, table.getDbName(), table.getTableName());
+      }
+    }
+
     if (table.getStorageHandler() != null) {
       Optional<ErrorMsg> error = table.getStorageHandler().isEligibleForCompaction(table, desc.getPartitionSpec());
       if (error.isPresent()) {
@@ -66,6 +75,12 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
       }
     }
 
+    // End if filter doesn't match any data on the unpartitioned table    
+    if (desc.getPartitionSpec() == null && desc.getFilterExpr() != null
+        && !table.getStorageHandler().hasDataMatchingFilterExpr(table, desc.getFilterExpr())) {
+      return 0;
+    }
+    
     List<Partition> partitions = getPartitions(table);
 
     if (partitions.isEmpty()) {
@@ -79,7 +94,9 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
       // If Iceberg table had partition evolution, it will create compaction request without partition specification,
       // and it will compact all files from old partition specs, besides compacting partitions of current spec in parallel.
       if (desc.getPartitionSpec() == null && 
-          DDLUtils.isIcebergTable(table) && table.getStorageHandler().hasUndergonePartitionEvolution(table)) {
+          DDLUtils.isIcebergTable(table) && table.getStorageHandler().hasUndergonePartitionEvolution(table) &&
+          (desc.getFilterExpr() == null || !table.getStorageHandler()
+              .getPartitionsByExpr(table, desc.getFilterExpr(), false).isEmpty())) {
         CompactionResponse compactionResponse = compact(table, null);
         parseCompactionResponse(compactionResponse, table, null);
       }
@@ -116,7 +133,9 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
       if (table.isPartitioned()) { // Compaction can only be done on the whole table if the table is non-partitioned.
         throw new HiveException(ErrorMsg.COMPACTION_NO_PARTITION);
       }
-      if ((DDLUtils.isIcebergTable(table) && table.getStorageHandler().isPartitioned(table))) {
+      if (desc.getFilterExpr() != null && DDLUtils.isIcebergTable(table) && table.getStorageHandler().isPartitioned(table)) {
+        partitions = table.getStorageHandler().getPartitionsByExpr(table, desc.getFilterExpr(), true);
+      } else if ((DDLUtils.isIcebergTable(table) && table.getStorageHandler().isPartitioned(table))) {
         partitions = context.getDb().getPartitions(table);
       }
     } else {

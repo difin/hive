@@ -26,32 +26,51 @@ set hive.optimize.shared.work.merge.ts.schema=true;
 create table ice_orc (
     first_name string, 
     last_name string,
-    dept_id bigint
+    dept_id bigint,
+    team_id bigint
  )
+partitioned by (company_id bigint)
 stored by iceberg stored as orc 
 tblproperties ('format-version'='2');
 
-insert into ice_orc VALUES ('fn1','ln1', 1);
-insert into ice_orc VALUES ('fn2','ln2', 1);
-insert into ice_orc VALUES ('fn3','ln3', 1);
-insert into ice_orc VALUES ('fn4','ln4', 1);
-delete from ice_orc where last_name in ('ln3', 'ln4');
+insert into ice_orc VALUES 
+    ('fn1','ln1', 1, 10, 100), 
+    ('fn2','ln2', 1, 10, 100);
+insert into ice_orc VALUES 
+    ('fn3','ln3', 2, 11, 100),
+    ('fn4','ln4', 2, 11, 100);
+insert into ice_orc VALUES 
+    ('fn5','ln5', 3, 12, 100),
+    ('fn6','ln6', 3, 12, 100);
+insert into ice_orc VALUES 
+    ('fn7','ln7', 4, 13, 100),
+    ('fn8','ln8', 4, 13, 100);
+    
+alter table ice_orc set partition spec(company_id, dept_id);
 
-alter table ice_orc set partition spec(dept_id);
+insert into ice_orc VALUES 
+    ('fn9', 'ln9',  1, 10, 100),
+    ('fn10','ln10', 1, 10, 100);
+insert into ice_orc VALUES 
+    ('fn11','ln11', 2, 11, 100),
+    ('fn12','ln12', 2, 11, 100);
+insert into ice_orc VALUES 
+    ('fn13','ln13', 3, 12, 100),
+    ('fn14','ln14', 3, 12, 100);
+insert into ice_orc VALUES 
+    ('fn15','ln15', 4, 13, 100),
+    ('fn16','ln16', 4, 13, 100);
 
-insert into ice_orc PARTITION(dept_id=2) VALUES ('fn5','ln5');
-insert into ice_orc PARTITION(dept_id=2) VALUES ('fn6','ln6');
-insert into ice_orc PARTITION(dept_id=2) VALUES ('fn7','ln7');
-insert into ice_orc PARTITION(dept_id=2) VALUES ('fn8','ln8');
-delete from ice_orc where last_name in ('ln7', 'ln8');
+delete from ice_orc where last_name in ('ln1', 'ln9');
+delete from ice_orc where last_name in ('ln3', 'ln11');
+delete from ice_orc where last_name in ('ln5', 'ln13');
+
+select * from ice_orc;
+describe formatted ice_orc;
+
+explain alter table ice_orc COMPACT 'major' and wait where team_id=10 or first_name in ('fn3', 'fn11') or last_name in ('ln7', 'ln15');
+alter table ice_orc COMPACT 'major' and wait where team_id=10 or first_name in ('fn3', 'fn11') or last_name in ('ln7', 'ln15');
 
 select * from ice_orc;
 describe formatted ice_orc;
 show compactions order by 'partition';
-
-alter table ice_orc COMPACT 'major' and wait;
-
-select * from ice_orc;
-describe formatted ice_orc;
-show compactions order by 'partition';
-

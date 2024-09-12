@@ -24,6 +24,7 @@ import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.ql.ddl.DDLDesc.DDLDescWithWriteId;
 import org.apache.hadoop.hive.ql.plan.Explain;
 import org.apache.hadoop.hive.ql.plan.Explain.Level;
+import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 
 /**
  * DDL task description for ALTER TABLE ... [PARTITION ... ] COMPACT 'major|minor' [POOL 'poolname'] [WITH OVERWRITE TBLPROPERTIES ...]
@@ -39,10 +40,12 @@ public class AlterTableCompactDesc implements DDLDescWithWriteId {
   private final int numberOfBuckets;
   private final Map<String, String> properties;
   private final String orderByClause;
+  private final ExprNodeDesc filterExpr;
   private Long writeId;
 
   public AlterTableCompactDesc(TableName tableName, Map<String, String> partitionSpec, String compactionType,
-      boolean isBlocking, String poolName, int numberOfBuckets, Map<String, String> properties, String orderByClause) {
+      boolean isBlocking, String poolName, int numberOfBuckets, Map<String, String> properties, String orderByClause,
+      ExprNodeDesc filterExpr) {
     this.tableName = tableName.getNotEmptyDbTable();
     this.partitionSpec = partitionSpec;
     this.compactionType = compactionType;
@@ -51,6 +54,7 @@ public class AlterTableCompactDesc implements DDLDescWithWriteId {
     this.numberOfBuckets = numberOfBuckets;
     this.properties = properties;
     this.orderByClause = orderByClause;
+    this.filterExpr = filterExpr;
   }
 
   @Explain(displayName = "table name", explainLevels = { Level.USER, Level.DEFAULT, Level.EXTENDED })
@@ -92,6 +96,10 @@ public class AlterTableCompactDesc implements DDLDescWithWriteId {
   @Explain(displayName = "order by", explainLevels = { Level.USER, Level.DEFAULT, Level.EXTENDED })
   public String getOrderByClause() {
     return orderByClause;
+  }
+
+  public ExprNodeDesc getFilterExpr() {
+    return filterExpr;
   }
 
   @Override
