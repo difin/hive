@@ -63,21 +63,21 @@ public class TestLdapAuthenticationProviderImpl {
   public void authenticateGivenBlankPassword() throws Exception {
     auth = new LdapAuthenticationProviderImpl(conf, new LdapSearchFactory());
     expectAuthenticationExceptionForInvalidPassword();
-    auth.Authenticate("user", "");
+    auth.authenticate("user", "");
   }
 
   @Test
   public void authenticateGivenStringWithNullCharacterForPassword() throws Exception {
     auth = new LdapAuthenticationProviderImpl(conf, new LdapSearchFactory());
     expectAuthenticationExceptionForInvalidPassword();
-    auth.Authenticate("user", "\0");
+    auth.authenticate("user", "\0");
   }
 
   @Test
   public void authenticateGivenNullForPassword() throws Exception {
     auth = new LdapAuthenticationProviderImpl(conf, new LdapSearchFactory());
     expectAuthenticationExceptionForInvalidPassword();
-    auth.Authenticate("user", null);
+    auth.authenticate("user", null);
   }
 
   @Test
@@ -91,7 +91,7 @@ public class TestLdapAuthenticationProviderImpl {
     when(factory.getInstance(conf, "cn=user1,ou=Users,dc=mycorp,dc=com", "Blah")).thenThrow(AuthenticationException.class);
 
     auth = new LdapAuthenticationProviderImpl(conf, factory);
-    auth.Authenticate("user1", "Blah");
+    auth.authenticate("user1", "Blah");
 
     verify(factory, times(2)).getInstance(isA(HiveConf.class), anyString(), eq("Blah"));
     verify(search, atLeastOnce()).close();
@@ -263,7 +263,7 @@ public class TestLdapAuthenticationProviderImpl {
     when(search.isUserMemberOfGroup("user1", groupDn)).thenReturn(true);
 
     auth = new LdapAuthenticationProviderImpl(conf, factory);
-    auth.Authenticate("user1", "Blah");
+    auth.authenticate("user1", "Blah");
 
     verify(factory, times(1)).getInstance(isA(HiveConf.class), anyString(), eq("Blah"));
     verify(search, times(1)).findGroupDn(anyString());
@@ -285,7 +285,7 @@ public class TestLdapAuthenticationProviderImpl {
     when(search.isUserMemberOfGroup("user1", groupDn)).thenReturn(false);
 
     auth = new LdapAuthenticationProviderImpl(conf, factory);
-    auth.Authenticate("user1", "Blah");
+    auth.authenticate("user1", "Blah");
   }
 
   @Test
@@ -308,7 +308,7 @@ public class TestLdapAuthenticationProviderImpl {
     when(search.isUserMemberOfGroup("user1", "cn=HIVE-USERS2,ou=Groups,ou=branch1,dc=mycorp,dc=com")).thenReturn(true);
 
     auth = new LdapAuthenticationProviderImpl(conf, factory);
-    auth.Authenticate("user1", "Blah");
+    auth.authenticate("user1", "Blah");
 
     verify(factory, times(1)).getInstance(isA(HiveConf.class), anyString(), eq("Blah"));
     verify(search, times(2)).findGroupDn(anyString());
@@ -333,7 +333,7 @@ public class TestLdapAuthenticationProviderImpl {
     when(search.findUserDn(eq(authUser))).thenReturn(authFullUser);
 
     auth = new LdapAuthenticationProviderImpl(conf, factory);
-    auth.Authenticate(authUser, authPass);
+    auth.authenticate(authUser, authPass);
 
     verify(factory, times(1)).getInstance(isA(HiveConf.class), eq(bindUser), eq(bindPass));
     verify(factory, times(1)).getInstance(isA(HiveConf.class), eq(authFullUser), eq(authPass));
@@ -351,7 +351,7 @@ public class TestLdapAuthenticationProviderImpl {
     conf.set(CredentialProviderFactory.CREDENTIAL_PROVIDER_PATH, credentialsPath);
 
     auth = new LdapAuthenticationProviderImpl(conf, factory);
-    auth.Authenticate(authUser, authPass);
+    auth.authenticate(authUser, authPass);
 
     verify(factory, times(1)).getInstance(isA(HiveConf.class), eq(authUser), eq(authPass));
   }
@@ -369,7 +369,7 @@ public class TestLdapAuthenticationProviderImpl {
     when(search.findUserDn(eq(authUser))).thenReturn(authFullUser);
 
     auth = new LdapAuthenticationProviderImpl(conf, factory);
-    auth.Authenticate(authUser, authPass);
+    auth.authenticate(authUser, authPass);
 
     verify(factory, times(1)).getInstance(isA(HiveConf.class), eq(bindUser), eq(bindPass));
     verify(factory, times(1)).getInstance(isA(HiveConf.class), eq(authFullUser), eq(authPass));
@@ -392,7 +392,7 @@ public class TestLdapAuthenticationProviderImpl {
     when(search.findUserDn(eq(authUser))).thenReturn(authFullUser);
 
     auth = new LdapAuthenticationProviderImpl(conf, factory);
-    auth.Authenticate(authUser, authPass);
+    auth.authenticate(authUser, authPass);
   }
 
   @Test
@@ -409,7 +409,7 @@ public class TestLdapAuthenticationProviderImpl {
     when(search.findUserDn(eq(authUser))).thenThrow(NamingException.class);
 
     auth = new LdapAuthenticationProviderImpl(conf, factory);
-    auth.Authenticate(authUser, authPass);
+    auth.authenticate(authUser, authPass);
   }
 
   @Test
@@ -425,7 +425,7 @@ public class TestLdapAuthenticationProviderImpl {
     when(factory.getInstance(any(HiveConf.class), eq(bindUser), eq(bindPass))).thenThrow(AuthenticationException.class);
 
     auth = new LdapAuthenticationProviderImpl(conf, factory);
-    auth.Authenticate(authUser, authPass);
+    auth.authenticate(authUser, authPass);
   }
 
   private void expectAuthenticationExceptionForInvalidPassword() {
@@ -436,7 +436,7 @@ public class TestLdapAuthenticationProviderImpl {
   private void authenticateUserAndCheckSearchIsClosed(String user) throws IOException {
     auth = new LdapAuthenticationProviderImpl(conf, factory);
     try {
-      auth.Authenticate(user, "password doesn't matter");
+      auth.authenticate(user, "password doesn't matter");
     } finally {
       verify(search, atLeastOnce()).close();
     }

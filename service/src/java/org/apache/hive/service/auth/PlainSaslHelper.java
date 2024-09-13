@@ -18,7 +18,6 @@
 package org.apache.hive.service.auth;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.security.Security;
 import java.util.HashMap;
 
@@ -162,7 +161,7 @@ public final class PlainSaslHelper {
       }
       PasswdAuthenticationProvider provider =
         AuthenticationProviderFactory.getAuthenticationProvider(authMethod);
-      provider.Authenticate(username, password);
+      provider.authenticate(username, password);
       if (ac != null) {
         ac.setAuthorized(true);
       }
