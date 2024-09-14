@@ -878,7 +878,7 @@
     <dependency>
       <groupId>org.roaringbitmap</groupId>
       <artifactId>RoaringBitmap</artifactId>
-      <version>0.9.22</version>
+      <version>${roaringbit.version}</version>
     </dependency>
     <dependency>
       <groupId>io.airlift</groupId>
@@ -1144,7 +1144,6 @@
                   <include>org.apache.calcite.avatica:avatica</include>
                   <include>com.esri.geometry:esri-geometry-api</include>
                   <include>org.roaringbitmap:RoaringBitmap</include>
-                  <include>org.roaringbitmap:shims</include>
                   <include>org.locationtech.jts:jts-core</include>
                   <include>org.apache.tez:tez-protobuf-history-plugin</include>
                 </includes>
