@@ -44,6 +44,7 @@ import org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 import org.apache.hadoop.hive.ql.lockmgr.HiveLock;
 import org.apache.hadoop.hive.ql.lockmgr.HiveLockMode;
 import org.apache.hadoop.hive.ql.lockmgr.LockException;
+import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.slf4j.Logger;
@@ -56,11 +57,9 @@ class ValidTxnManager {
   private static final String CLASS_NAME = Driver.class.getName();
   private static final Logger LOG = LoggerFactory.getLogger(CLASS_NAME);
 
-  private final Driver driver;
   private final DriverContext driverContext;
 
-  ValidTxnManager(Driver driver, DriverContext driverContext) {
-    this.driver = driver;
+  ValidTxnManager(DriverContext driverContext) {
     this.driverContext = driverContext;
   }
 
@@ -69,7 +68,19 @@ class ValidTxnManager {
    * This would happen if query requires exclusive/semi-shared lock, and there has been a committed transaction
    * on the table over which the lock is required.
    */
-  boolean isValidTxnListState() throws LockException {
+  boolean isValidTxnListState(Context context) throws LockException {
+    try {
+      context.getLoadTableOutputMap().forEach(
+          (ltd, we) -> {
+            HiveStorageHandler handler = we.getTable().getStorageHandler();
+            if (handler != null) {
+              handler.validateCurrentSnapshot(ltd.getTable());
+            }
+          });
+    } catch (Exception e) {
+      LOG.warn(e.getMessage());
+      return false;
+    }
     // 1) Get valid txn list.
     String txnString = driverContext.getConf().get(ValidTxnList.VALID_TXNS_KEY);
     if (txnString == null) {
@@ -79,7 +90,7 @@ class ValidTxnManager {
     // 2) Get locks that are relevant:
     // - Exclusive for INSERT OVERWRITE, when shared write is disabled (HiveConf.TXN_WRITE_X_LOCK=false).
     // - Excl-write for UPDATE/DELETE, when shared write is disabled, INSERT OVERWRITE - when enabled.
-    Set<String> nonSharedLockedTables = getNonSharedLockedTables();
+    Set<String> nonSharedLockedTables = getNonSharedLockedTables(context);
     if (nonSharedLockedTables.isEmpty()) {
       return true; // Nothing to check
     }
@@ -101,13 +112,13 @@ class ValidTxnManager {
     return false;
   }
 
-  private Set<String> getNonSharedLockedTables() {
-    if (CollectionUtils.isEmpty(driver.getContext().getHiveLocks())) {
+  private Set<String> getNonSharedLockedTables(Context context) {
+    if (CollectionUtils.isEmpty(context.getHiveLocks())) {
       return Collections.emptySet(); // Nothing to check
     }
 
     Set<String> nonSharedLockedTables = new HashSet<>();
-    for (HiveLock lock : driver.getContext().getHiveLocks()) {
+    for (HiveLock lock : context.getHiveLocks()) {
       if (lock.mayContainComponents()) {
         // The lock may have multiple components, e.g., DbHiveLock, hence we need to check for each of them
         for (LockComponent lockComponent : lock.getHiveLockComponents()) {

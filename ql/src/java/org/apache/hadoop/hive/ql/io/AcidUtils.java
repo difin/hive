@@ -2892,7 +2892,7 @@ public class AcidUtils {
     boolean isLocklessReadsEnabled = HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED);
     boolean skipReadLock = !conf.getBoolVar(ConfVars.HIVE_TXN_READ_LOCKS);
     boolean skipNonAcidReadLock = !conf.getBoolVar(ConfVars.HIVE_TXN_NONACID_READ_LOCKS);
-    
+
     boolean sharedWrite = !conf.getBoolVar(HiveConf.ConfVars.TXN_WRITE_X_LOCK);
     boolean isExternalEnabled = conf.getBoolVar(HiveConf.ConfVars.HIVE_TXN_EXT_LOCKING_ENABLED);
     boolean isMerge = operation == Context.Operation.MERGE;
@@ -2962,7 +2962,7 @@ public class AcidUtils {
     // overwrite) than we need a shared.  If it's update or delete then we
     // need a SHARED_WRITE.
     for (WriteEntity output : outputs) {
-      if (output.getType() == Entity.Type.DFS_DIR || output.getType() == Entity.Type.LOCAL_DIR 
+      if (output.getType() == Entity.Type.DFS_DIR || output.getType() == Entity.Type.LOCAL_DIR
           || !AcidUtils.needsLock(output, isExternalEnabled)) {
         // We don't lock files or directories. We also skip locking temp tables.
         continue;
@@ -3050,15 +3050,10 @@ public class AcidUtils {
           boolean isExclMergeInsert = conf.getBoolVar(ConfVars.TXN_MERGE_INSERT_X_LOCK) && isMerge;
           compBuilder.setSharedRead();
 
-          if (sharedWrite) {
+          if (sharedWrite || !isExclMergeInsert && isLocklessReadsEnabled) {
             compBuilder.setSharedWrite();
-          } else {
-            if (isExclMergeInsert) {
-              compBuilder.setExclWrite();
-              
-            } else if (isLocklessReadsEnabled) {
-              compBuilder.setSharedWrite();
-            }
+          } else if (isExclMergeInsert) {
+            compBuilder.setExclWrite();
           }
           if (isExclMergeInsert) {
             compBuilder.setOperationType(DataOperationType.UPDATE);
@@ -3215,7 +3210,7 @@ public class AcidUtils {
     }
     return TxnType.DEFAULT;
   }
-  
+
   private static boolean isReadOnlyTxn(ASTNode tree) {
     final ASTSearcher astSearcher = new ASTSearcher();
     return READ_TXN_TOKENS.contains(tree.getToken().getType())
@@ -3224,7 +3219,7 @@ public class AcidUtils {
           new int[]{HiveParser.TOK_INSERT, HiveParser.TOK_TAB})
       .noneMatch(pattern -> astSearcher.simpleBreadthFirstSearch(tree, pattern) != null));
   }
-  
+
   private static boolean isSoftDeleteTxn(Configuration conf, ASTNode tree) {
     boolean locklessReadsEnabled = HiveConf.getBoolVar(conf, ConfVars.HIVE_ACID_LOCKLESS_READS_ENABLED);
 

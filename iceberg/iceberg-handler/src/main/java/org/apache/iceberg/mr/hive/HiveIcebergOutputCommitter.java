@@ -529,7 +529,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
 
         commitCompaction(table, snapshotId, startTime, filesForCommit, partitionPath, fileSizeThreshold);
       } else {
-        commitOverwrite(table, branchName, startTime, filesForCommit);
+        commitOverwrite(table, branchName, snapshotId, startTime, filesForCommit);
       }
     }
   }
@@ -547,6 +547,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
    * Creates and commits an Iceberg change with the provided data and delete files.
    * If there are no delete files then an Iceberg 'append' is created, otherwise Iceberg 'overwrite' is created.
    * @param table      The table we are changing
+   * @param snapshotId The snapshot id of the table to use for validation
    * @param startTime  The start time of the commit - used only for logging
    * @param results    The object containing the new files we would like to add to the table
    * @param filterExpr Filter expression for conflict detection filter
@@ -587,6 +588,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
       RowDelta write = table.newRowDelta();
       results.dataFiles().forEach(write::addRows);
       results.deleteFiles().forEach(write::addDeletes);
+
       if (StringUtils.isNotEmpty(branchName)) {
         write.toBranch(HiveUtils.getTableSnapshotRef(branchName));
       }
@@ -625,11 +627,11 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
    * Creates and commits an Iceberg compaction change with the provided data files.
    * Either full table or a selected partition contents is replaced with compacted files.
    *
-   * @param table             The table we are changing
-   * @param snapshotId        The snapshot id of the table to use for validation
-   * @param startTime         The start time of the commit - used only for logging
-   * @param results           The object containing the new files
-   * @param partitionPath     The path of the compacted partition
+   * @param table         The table we are changing
+   * @param snapshotId    The snapshot id of the table to use for validation
+   * @param startTime     The start time of the commit - used only for logging
+   * @param results       The object containing the new files
+   * @param partitionPath The path of the compacted partition
    */
   private void commitCompaction(Table table, Long snapshotId, long startTime, FilesForCommit results,
       String partitionPath, long fileSizeThreshold) {
@@ -639,46 +641,53 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
         IcebergCompactionUtil.getDeleteFiles(table, snapshotId, partitionPath) : Collections.emptyList();
 
     RewriteFiles rewriteFiles = table.newRewrite();
-    rewriteFiles.validateFromSnapshot(getSnapshotId(table, null));
-    if (snapshotId != null) {
-      rewriteFiles.validateFromSnapshot(snapshotId);
-    }
-
     existingDataFiles.forEach(rewriteFiles::deleteFile);
     existingDeleteFiles.forEach(rewriteFiles::deleteFile);
     results.dataFiles().forEach(rewriteFiles::addFile);
 
+    if (snapshotId != null) {
+      rewriteFiles.validateFromSnapshot(snapshotId);
+    }
     rewriteFiles.commit();
     LOG.info("Compaction commit took {} ms for table: {} partition: {} with {} file(s)",
-        System.currentTimeMillis() - startTime, table, partitionPath == null ? "N/A" : partitionPath,
+        System.currentTimeMillis() - startTime, table, StringUtils.defaultString(partitionPath, "N/A"),
         results.dataFiles().size());
   }
 
   /**
    * Creates and commits an Iceberg insert overwrite change with the provided data files.
-   * For unpartitioned tables the table content is replaced with the new data files. If not data files are provided
-   * then the unpartitioned table is truncated.
-   * For partitioned tables the relevant partitions are replaced with the new data files. If no data files are provided
-   * then the unpartitioned table remains unchanged.
+   * For unpartitioned tables the table content is replaced with the new data files. Table is truncated
+   * if no data files are provided.
+   * For partitioned tables the relevant partitions are replaced with the new data files. Table remains unchanged
+   * unless data files are provided.
    *
-   * @param table                   The table we are changing
-   * @param startTime               The start time of the commit - used only for logging
-   * @param results                 The object containing the new files
+   * @param table      The table we are changing
+   * @param snapshotId The snapshot id of the table to use for validation
+   * @param startTime  The start time of the commit - used only for logging
+   * @param results    The object containing the new files
    */
-  private void commitOverwrite(Table table, String branchName, long startTime, FilesForCommit results) {
+  private void commitOverwrite(Table table, String branchName, Long snapshotId, long startTime,
+      FilesForCommit results) {
     Preconditions.checkArgument(results.deleteFiles().isEmpty(), "Can not handle deletes with overwrite");
     if (!results.dataFiles().isEmpty()) {
       ReplacePartitions overwrite = table.newReplacePartitions();
       results.dataFiles().forEach(overwrite::addFile);
+
       if (StringUtils.isNotEmpty(branchName)) {
         overwrite.toBranch(HiveUtils.getTableSnapshotRef(branchName));
       }
+      if (snapshotId != null) {
+        overwrite.validateFromSnapshot(snapshotId);
+      }
+      overwrite.validateNoConflictingDeletes();
+      overwrite.validateNoConflictingData();
       commit(overwrite);
       LOG.info("Overwrite commit took {} ms for table: {} with {} file(s)", System.currentTimeMillis() - startTime,
           table, results.dataFiles().size());
     } else if (table.spec().isUnpartitioned()) {
       DeleteFiles deleteFiles = table.newDelete();
       deleteFiles.deleteFromRowFilter(Expressions.alwaysTrue());
+
       if (StringUtils.isNotEmpty(branchName)) {
         deleteFiles.toBranch(HiveUtils.getTableSnapshotRef(branchName));
       }

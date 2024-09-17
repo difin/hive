@@ -29,6 +29,7 @@ import static org.apache.hadoop.hive.metastore.ColumnType.STRING_TYPE_NAME;
 import static org.apache.hadoop.hive.metastore.ColumnType.TIMESTAMP_TYPE_NAME;
 import static org.apache.hadoop.hive.metastore.ColumnType.TINYINT_TYPE_NAME;
 import static org.apache.hadoop.hive.metastore.ColumnType.VARCHAR_TYPE_NAME;
+import static org.apache.hadoop.hive.metastore.DatabaseProduct.toVarChar;
 import static org.apache.hadoop.hive.metastore.MetastoreDirectSqlUtils.*;
 
 import java.sql.Connection;
@@ -2410,9 +2411,9 @@ class MetaStoreDirectSql {
 
   long updateTableParam(Table table, String key, String expectedValue, String newValue) {
     String statement = TxnUtils.createUpdatePreparedStmt(
-      "\"TABLE_PARAMS\"",
-      ImmutableList.of("\"PARAM_VALUE\""),
-      ImmutableList.of("\"TBL_ID\"", "\"PARAM_KEY\"", "\"PARAM_VALUE\""));
+        "\"TABLE_PARAMS\"",
+        ImmutableList.of("\"PARAM_VALUE\""),
+        ImmutableList.of("\"TBL_ID\"", "\"PARAM_KEY\"", toVarChar(dbType, "\"PARAM_VALUE\"")));
     Query query = pm.newQuery("javax.jdo.query.SQL", statement);
     return (long) query.executeWithArray(newValue, table.getId(), key, expectedValue);
   }

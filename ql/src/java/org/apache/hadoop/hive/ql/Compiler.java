@@ -115,7 +115,7 @@ public class Compiler {
       driverContext.getTimeline().markEvent("Completed query compilation");
 
       if (HiveOperation.START_TRANSACTION == queryState.getHiveOperation()
-          || plan.hasAcidResources()) {
+          || plan.isRequiresOpenTransaction()) {
         openTxnAndGetValidTxnList();
       }
       verifyTxnState();

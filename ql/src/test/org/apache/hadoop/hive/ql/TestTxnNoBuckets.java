@@ -160,10 +160,10 @@ public class TestTxnNoBuckets extends TxnCommandsBaseForTests {
     */
 
     String expected[][] = {
-        {"{\"writeid\":2,\"bucketid\":536936449,\"rowid\":0}\t0\t0\t17", NO_BUCKETS_TBL_NAME + "/base_0000002_v0000012/bucket_00001"},
-        {"{\"writeid\":2,\"bucketid\":536870913,\"rowid\":0}\t1\t1\t17", NO_BUCKETS_TBL_NAME + "/base_0000002_v0000012/bucket_00000"},
-        {"{\"writeid\":1,\"bucketid\":536936448,\"rowid\":1}\t2\t2\t2", NO_BUCKETS_TBL_NAME + "/base_0000002_v0000012/bucket_00001"},
-        {"{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t3\t3\t3", NO_BUCKETS_TBL_NAME + "/base_0000002_v0000012/bucket_00000"}
+        {"{\"writeid\":2,\"bucketid\":536936449,\"rowid\":0}\t0\t0\t17", NO_BUCKETS_TBL_NAME + "/base_0000002_v0000011/bucket_00001"},
+        {"{\"writeid\":2,\"bucketid\":536870913,\"rowid\":0}\t1\t1\t17", NO_BUCKETS_TBL_NAME + "/base_0000002_v0000011/bucket_00000"},
+        {"{\"writeid\":1,\"bucketid\":536936448,\"rowid\":1}\t2\t2\t2", NO_BUCKETS_TBL_NAME + "/base_0000002_v0000011/bucket_00001"},
+        {"{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t3\t3\t3", NO_BUCKETS_TBL_NAME + "/base_0000002_v0000011/bucket_00000"}
     };
     checkResultAndVectorization(expected,
         "select ROW__ID, c1, c2, c3, INPUT__FILE__NAME"
@@ -177,8 +177,8 @@ public class TestTxnNoBuckets extends TxnCommandsBaseForTests {
     expectedFiles.add(NO_BUCKETS_TBL_NAME + "/delta_0000001_0000001_0000/bucket_00001_0");
     expectedFiles.add(NO_BUCKETS_TBL_NAME + "/delta_0000002_0000002_0001/bucket_00000_0");
     expectedFiles.add(NO_BUCKETS_TBL_NAME + "/delta_0000002_0000002_0001/bucket_00001_0");
-    expectedFiles.add(NO_BUCKETS_TBL_NAME + "/base_0000002_v0000012/bucket_00000");
-    expectedFiles.add(NO_BUCKETS_TBL_NAME + "/base_0000002_v0000012/bucket_00001");
+    expectedFiles.add(NO_BUCKETS_TBL_NAME + "/base_0000002_v0000011/bucket_00000");
+    expectedFiles.add(NO_BUCKETS_TBL_NAME + "/base_0000002_v0000011/bucket_00001");
     assertExpectedFileSet(expectedFiles, getWarehouseDir() + "/" + NO_BUCKETS_TBL_NAME, NO_BUCKETS_TBL_NAME);
 
     TestTxnCommands2.runCleaner(hiveConf);
@@ -187,8 +187,8 @@ public class TestTxnNoBuckets extends TxnCommandsBaseForTests {
     Assert.assertEquals("Unexpected result after clean", stringifyValues(result), rs);
 
     expectedFiles.clear();
-    expectedFiles.add(NO_BUCKETS_TBL_NAME + "/base_0000002_v0000012/bucket_00000");
-    expectedFiles.add(NO_BUCKETS_TBL_NAME + "/base_0000002_v0000012/bucket_00001");
+    expectedFiles.add(NO_BUCKETS_TBL_NAME + "/base_0000002_v0000011/bucket_00000");
+    expectedFiles.add(NO_BUCKETS_TBL_NAME + "/base_0000002_v0000011/bucket_00001");
     assertExpectedFileSet(expectedFiles, getWarehouseDir() + "/" + NO_BUCKETS_TBL_NAME, NO_BUCKETS_TBL_NAME);
   }
 
@@ -467,23 +467,23 @@ ekoifman:apache-hive-3.0.0-SNAPSHOT-bin ekoifman$ tree /Users/ekoifman/dev/hiver
     /*Compaction preserves location of rows wrt buckets/tranches (for now)*/
     String expected4[][] = {
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":1}\t1\t2",
-            "warehouse/t/base_10000002_v0000016/bucket_00000"},
+            "warehouse/t/base_10000002_v0000015/bucket_00000"},
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":2}\t2\t4",
-            "warehouse/t/base_10000002_v0000016/bucket_00000"},
+            "warehouse/t/base_10000002_v0000015/bucket_00000"},
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":6}\t5\t6",
-            "warehouse/t/base_10000002_v0000016/bucket_00000"},
+            "warehouse/t/base_10000002_v0000015/bucket_00000"},
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":7}\t9\t10",
-            "warehouse/t/base_10000002_v0000016/bucket_00000"},
+            "warehouse/t/base_10000002_v0000015/bucket_00000"},
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":3}\t10\t20",
-            "warehouse/t/base_10000002_v0000016/bucket_00000"},
+            "warehouse/t/base_10000002_v0000015/bucket_00000"},
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":0}\t12\t12",
-            "warehouse/t/base_10000002_v0000016/bucket_00000"},
+            "warehouse/t/base_10000002_v0000015/bucket_00000"},
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":4}\t20\t40",
-            "warehouse/t/base_10000002_v0000016/bucket_00000"},
+            "warehouse/t/base_10000002_v0000015/bucket_00000"},
         {"{\"writeid\":10000001,\"bucketid\":537067521,\"rowid\":0}\t50\t88",
-            "warehouse/t/base_10000002_v0000016/bucket_00003"},
+            "warehouse/t/base_10000002_v0000015/bucket_00003"},
         {"{\"writeid\":10000001,\"bucketid\":536870913,\"rowid\":0}\t60\t88",
-            "warehouse/t/base_10000002_v0000016/bucket_00000"},
+            "warehouse/t/base_10000002_v0000015/bucket_00000"},
     };
     checkExpected(rs, expected4,"after major compact");
   }
@@ -742,15 +742,15 @@ ekoifman:apache-hive-3.0.0-SNAPSHOT-bin ekoifman$ tree /Users/ekoifman/dev/hiver
     rs = runStatementOnDriver(query);
     String[][] expected5 = {//the row__ids are the same after compaction
         {"{\"writeid\":10000001,\"bucketid\":536870913,\"rowid\":0}\t1\t17",
-            "warehouse/t/base_10000001_v0000018/bucket_00000"},
+            "warehouse/t/base_10000001_v0000017/bucket_00000"},
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":1}\t2\t4",
-            "warehouse/t/base_10000001_v0000018/bucket_00000"},
+            "warehouse/t/base_10000001_v0000017/bucket_00000"},
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":2}\t5\t6",
-            "warehouse/t/base_10000001_v0000018/bucket_00000"},
+            "warehouse/t/base_10000001_v0000017/bucket_00000"},
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":3}\t6\t8",
-            "warehouse/t/base_10000001_v0000018/bucket_00000"},
+            "warehouse/t/base_10000001_v0000017/bucket_00000"},
         {"{\"writeid\":0,\"bucketid\":536870912,\"rowid\":4}\t9\t10",
-            "warehouse/t/base_10000001_v0000018/bucket_00000"}
+            "warehouse/t/base_10000001_v0000017/bucket_00000"}
     };
     checkExpected(rs, expected5, "After major compaction");
     //vectorized because there is INPUT__FILE__NAME
@@ -814,10 +814,10 @@ ekoifman:apache-hive-3.0.0-SNAPSHOT-bin ekoifman$ tree /Users/ekoifman/dev/hiver
         {"{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t1\t1\t4\t3", "t/p=1/q=1/delta_0000001_0000001_0000/bucket_00000_0"},
         {"{\"writeid\":3,\"bucketid\":536870912,\"rowid\":0}\t1\t1\t5\t1", "t/p=1/q=1/delta_0000003_0000003_0000/bucket_00000_0"},
         {"{\"writeid\":3,\"bucketid\":536870912,\"rowid\":1}\t1\t1\t5\t3", "t/p=1/q=1/delta_0000003_0000003_0000/bucket_00000_0"},
-        {"{\"writeid\":1,\"bucketid\":536870912,\"rowid\":0}\t1\t2\t4\t2", "t/p=1/q=2/base_0000003_v0000011/bucket_00000"},
-        {"{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t1\t2\t4\t4", "t/p=1/q=2/base_0000003_v0000011/bucket_00000"},
-        {"{\"writeid\":3,\"bucketid\":536870912,\"rowid\":0}\t1\t2\t5\t2", "t/p=1/q=2/base_0000003_v0000011/bucket_00000"},
-        {"{\"writeid\":3,\"bucketid\":536870912,\"rowid\":1}\t1\t2\t5\t4", "t/p=1/q=2/base_0000003_v0000011/bucket_00000"}
+        {"{\"writeid\":1,\"bucketid\":536870912,\"rowid\":0}\t1\t2\t4\t2", "t/p=1/q=2/base_0000003_v0000010/bucket_00000"},
+        {"{\"writeid\":1,\"bucketid\":536870912,\"rowid\":1}\t1\t2\t4\t4", "t/p=1/q=2/base_0000003_v0000010/bucket_00000"},
+        {"{\"writeid\":3,\"bucketid\":536870912,\"rowid\":0}\t1\t2\t5\t2", "t/p=1/q=2/base_0000003_v0000010/bucket_00000"},
+        {"{\"writeid\":3,\"bucketid\":536870912,\"rowid\":1}\t1\t2\t5\t4", "t/p=1/q=2/base_0000003_v0000010/bucket_00000"}
     };
     checkExpected(rs, expected2, "after major compaction");
 

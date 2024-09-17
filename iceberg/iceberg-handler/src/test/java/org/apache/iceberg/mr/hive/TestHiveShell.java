@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.IPStackUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory;
 import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
@@ -230,6 +231,8 @@ public class TestHiveShell {
 
     // set lifecycle hooks
     hiveConf.setVar(HiveConf.ConfVars.HIVE_QUERY_LIFETIME_HOOKS, HiveIcebergQueryLifeTimeHook.class.getName());
+
+    MetastoreConf.setBoolVar(hiveConf, MetastoreConf.ConfVars.TRY_DIRECT_SQL, true);
 
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_QUERY_HISTORY_ENABLED, false);
     return hiveConf;

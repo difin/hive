@@ -113,8 +113,8 @@ public class QueryPlan implements Serializable {
 
   private transient Long queryStartTime;
   private final HiveOperation operation;
-  private final boolean hasAcidReadWrite;
-  private final boolean hasAcidResources;
+  private final boolean acidResourcesInQuery;
+  private final boolean requiresOpenTransaction;
   private final Set<FileSinkDesc> acidSinks; // Note: both full-ACID and insert-only sinks.
   private final WriteEntity acidAnalyzeTable;
   private final DDLDescWithWriteId acidDdlDesc;
@@ -127,8 +127,8 @@ public class QueryPlan implements Serializable {
   protected QueryPlan(HiveOperation command) {
     this.reducerTimeStatsPerJobList = new ArrayList<>();
     this.operation = command;
-    this.hasAcidReadWrite = false;
-    this.hasAcidResources = false;
+    this.acidResourcesInQuery = false;
+    this.requiresOpenTransaction = false;
     this.acidSinks = Collections.emptySet();
     this.acidDdlDesc = null;
     this.acidAnalyzeTable = null;
@@ -159,8 +159,8 @@ public class QueryPlan implements Serializable {
     this.autoCommitValue = sem.getAutoCommitValue();
     this.resultSchema = resultSchema;
     // TODO: all this ACID stuff should be in some sub-object
-    this.hasAcidReadWrite = sem.hasAcidReadWrite();
-    this.hasAcidResources = sem.hasAcidResources();
+    this.acidResourcesInQuery = sem.hasTransactionalInQuery();
+    this.requiresOpenTransaction = sem.isRequiresOpenTransaction();
     this.acidSinks = sem.getAcidFileSinks();
     this.acidDdlDesc = sem.getAcidDdlDesc();
     this.acidAnalyzeTable = sem.getAcidAnalyzeTable();
@@ -170,12 +170,12 @@ public class QueryPlan implements Serializable {
   /**
    * @return true if any acid resources are read/written
    */
-  public boolean hasAcidReadWrite() {
-    return hasAcidReadWrite;
+  public boolean hasAcidResourcesInQuery() {
+    return acidResourcesInQuery;
   }
 
-  public boolean hasAcidResources() {
-    return hasAcidResources;
+  public boolean isRequiresOpenTransaction() {
+    return requiresOpenTransaction;
   }
 
   public WriteEntity getAcidAnalyzeTable() {

@@ -181,8 +181,8 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
       }
       aborted = true;
       Assert.assertEquals("FAILED: Hive Internal Error: org.apache.hadoop.hive.ql.lockmgr.LockException(" +
-          "Transaction manager has aborted the transaction txnid:20.  Reason: Aborting [txnid:20,20] due to a write " +
-          "conflict on default/rebalance_test committed by [txnid:19,20] d/u)", e.getErrorMessage());
+          "Transaction manager has aborted the transaction txnid:19.  Reason: Aborting [txnid:19,19] due to a write " +
+          "conflict on default/rebalance_test committed by [txnid:18,19] d/u)", e.getErrorMessage());
       // Delete the record, so the rest of the test can be the same in both cases
       executeStatementOnDriver("DELETE FROM " + tableName + " WHERE b = 12", driver);
     } finally {
@@ -232,7 +232,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         },
     };
     verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
-        new String[] {"bucket_00000", "bucket_00001", "bucket_00002", "bucket_00003"}, "base_0000007_v0000019");
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002", "bucket_00003"}, "base_0000007_v0000018");
   }
 
   @Test
@@ -288,7 +288,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         },
     };
     verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
-        new String[] {"bucket_00000", "bucket_00001", "bucket_00002","bucket_00003"}, "base_0000007_v0000019");
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002","bucket_00003"}, "base_0000007_v0000018");
   }
 
   @Test
@@ -342,7 +342,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         },
     };
     verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
-        new String[] {"bucket_00000", "bucket_00001", "bucket_00002","bucket_00003"}, "base_0000007_v0000019");
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002","bucket_00003"}, "base_0000007_v0000018");
   }
 
   @Test
@@ -451,7 +451,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         },
     };
     verifyRebalance(testDataProvider, tableName, "ds=tomorrow", expectedBuckets,
-        new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000015");
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000014");
   }
 
   @Test
@@ -525,7 +525,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         },
     };
     verifyRebalance(testDataProvider, tableName, null, expectedBuckets,
-        new String[] {"bucket_00000", "bucket_00001", "bucket_00002", "bucket_00003"}, "base_0000007_v0000019");
+        new String[] {"bucket_00000", "bucket_00001", "bucket_00002", "bucket_00003"}, "base_0000007_v0000018");
   }
 
   private TestDataProvider prepareRebalanceTestData(String tableName) throws Exception {

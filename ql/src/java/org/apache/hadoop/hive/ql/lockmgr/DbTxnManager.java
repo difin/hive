@@ -260,7 +260,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
     contention.*/
     init();
     getLockManager();
-    if(isTxnOpen()) {
+    if (isTxnOpen()) {
       throw new LockException("Transaction already opened. " + JavaUtils.txnIdToString(txnId));
     }
     try {
@@ -305,7 +305,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
       acquireLocksWithHeartbeatDelay(plan, ctx, username, 0);
     }
     catch(LockException e) {
-      if(e.getCause() instanceof TxnAbortedException) {
+      if (e.getCause() instanceof TxnAbortedException) {
         resetTxnInfo();
       }
       throw e;
@@ -323,7 +323,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
 
   private void markExplicitTransaction(QueryPlan queryPlan) throws LockException {
     isExplicitTransaction = true;
-    if(++startTransactionCount > 1) {
+    if (++startTransactionCount > 1) {
       throw new LockException(null, ErrorMsg.OP_NOT_ALLOWED_IN_TXN, queryPlan.getOperationName(),
         JavaUtils.txnIdToString(getCurrentTxnId()), queryPlan.getQueryId());
     }
@@ -338,11 +338,11 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
    * @throws LockException
    */
   private void verifyState(QueryPlan queryPlan) throws LockException {
-    if(!isTxnOpen() && queryPlan.hasAcidResources()) {
+    if (!isTxnOpen() && queryPlan.isRequiresOpenTransaction()) {
       throw new LockException("No transaction context for operation: " + queryPlan.getOperationName() +
         " for " + getQueryIdWaterMark(queryPlan));
     }
-    if(queryPlan.getOperation() == null) {
+    if (queryPlan.getOperation() == null) {
       throw new IllegalStateException("Unknown HiveOperation(null) for " + getQueryIdWaterMark(queryPlan));
     }
     numStatements++;
@@ -352,13 +352,13 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
         break;
       case COMMIT:
       case ROLLBACK:
-        if(!isExplicitTransaction) {
+        if (!isExplicitTransaction) {
           throw new LockException(null, ErrorMsg.OP_NOT_ALLOWED_IN_IMPLICIT_TXN, queryPlan.getOperationName());
         }
         break;
       default:
-        if(!queryPlan.getOperation().isAllowedInTransaction() && isExplicitTransaction) {
-          if(allowOperationInATransaction(queryPlan)) {
+        if (!queryPlan.getOperation().isAllowedInTransaction() && isExplicitTransaction) {
+          if (allowOperationInATransaction(queryPlan)) {
             break;
           }
           //look at queryPlan.outputs(WriteEntity.t - that's the table)
@@ -384,9 +384,9 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
   private boolean allowOperationInATransaction(QueryPlan queryPlan) {
     //Acid and MM tables support Load Data with transactional semantics.  This will allow Load Data
     //in a txn assuming we can determine the target is a suitable table type.
-    if(queryPlan.getOperation() == HiveOperation.LOAD && queryPlan.getOutputs() != null && queryPlan.getOutputs().size() == 1) {
+    if (queryPlan.getOperation() == HiveOperation.LOAD && queryPlan.getOutputs() != null && queryPlan.getOutputs().size() == 1) {
       WriteEntity writeEntity = queryPlan.getOutputs().iterator().next();
-      if(AcidUtils.isTransactionalTable(writeEntity.getTable())) {
+      if (AcidUtils.isTransactionalTable(writeEntity.getTable())) {
         switch (writeEntity.getWriteType()) {
           case INSERT:
             //allow operation in a txn
@@ -688,7 +688,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
   @Override
   public void heartbeat() throws LockException {
     List<HiveLock> locks;
-    if(isTxnOpen()) {
+    if (isTxnOpen()) {
       // Create one dummy lock so we can go through the loop below, though we only
       //really need txnId
       DbLockManager.DbHiveLock dummyLock = new DbLockManager.DbHiveLock(0L);
@@ -698,7 +698,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
     else {
       locks = lockMgr.getLocks(false, false);
     }
-    if(LOG.isInfoEnabled()) {
+    if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder("Sending heartbeat for ")
         .append(JavaUtils.txnIdToString(txnId)).append(" and");
       for(HiveLock lock : locks) {
@@ -706,7 +706,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
       }
       LOG.info(sb.toString());
     }
-    if(!isTxnOpen() && locks.isEmpty()) {
+    if (!isTxnOpen() && locks.isEmpty()) {
       // No locks, no txn, we outta here.
       if (LOG.isDebugEnabled()) {
         LOG.debug("No need to send heartbeat as there is no transaction and no locks.");
@@ -773,7 +773,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
 
   private ScheduledFuture<?> startHeartbeat(long initialDelay, long heartbeatInterval, Runnable heartbeater) {
     // For negative testing purpose..
-    if(conf.getBoolVar(HiveConf.ConfVars.HIVE_IN_TEST) && conf.getBoolVar(HiveConf.ConfVars.HIVETESTMODEFAILHEARTBEATER)) {
+    if (conf.getBoolVar(HiveConf.ConfVars.HIVE_IN_TEST) && conf.getBoolVar(HiveConf.ConfVars.HIVETESTMODEFAILHEARTBEATER)) {
       initialDelay = 0;
     } else if (initialDelay == 0) {
       /*make initialDelay a random number in [0, 0.75*heartbeatInterval] so that if a lot
@@ -926,17 +926,19 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
    */
   @Override
   public boolean recordSnapshot(QueryPlan queryPlan) {
-    assert isTxnOpen();
+    if (!isTxnOpen()) {
+      return false;
+    }
     assert numStatements > 0 : "was acquireLocks() called already?";
-    if(queryPlan.getOperation() == HiveOperation.START_TRANSACTION) {
+    if (queryPlan.getOperation() == HiveOperation.START_TRANSACTION) {
       //here if start of explicit txn
       assert isExplicitTransaction;
       assert numStatements == 1;
       return true;
     }
-    else if(!isExplicitTransaction) {
+    else if (!isExplicitTransaction) {
       assert numStatements == 1 : "numStatements=" + numStatements + " in implicit txn";
-      if (queryPlan.hasAcidReadWrite()) {
+      if (queryPlan.hasAcidResourcesInQuery()) {
         //1st and only stmt in implicit txn and uses acid resource
         return true;
       }
@@ -951,11 +953,11 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
 
   @Override
   public boolean isImplicitTransactionOpen(Context ctx) {
-    if(!isTxnOpen()) {
+    if (!isTxnOpen()) {
       //some commands like "show databases" don't start implicit transactions
       return false;
     }
-    if(!isExplicitTransaction) {
+    if (!isExplicitTransaction) {
       if (ctx == null || !ctx.isExplainSkipExecution()) {
         assert numStatements == 1 : "numStatements=" + numStatements;
       }
@@ -988,7 +990,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
   }
 
   private synchronized static void initHeartbeatExecutorService(int corePoolSize) {
-      if(heartbeatExecutorService != null) {
+      if (heartbeatExecutorService != null) {
         return;
       }
       // The following code will be executed only once when the service is not initialized
@@ -1183,7 +1185,7 @@ public final class DbTxnManager extends HiveTxnManagerImpl {
     public void run() {
       try {
         // For negative testing purpose..
-        if(conf.getBoolVar(HiveConf.ConfVars.HIVE_IN_TEST) && conf.getBoolVar(HiveConf.ConfVars.HIVETESTMODEFAILHEARTBEATER)) {
+        if (conf.getBoolVar(HiveConf.ConfVars.HIVE_IN_TEST) && conf.getBoolVar(HiveConf.ConfVars.HIVETESTMODEFAILHEARTBEATER)) {
           throw new LockException(HiveConf.ConfVars.HIVETESTMODEFAILHEARTBEATER.name() + "=true");
         }
         LOG.debug("Heartbeating...for currentUser: " + currentUser);

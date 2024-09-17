@@ -122,12 +122,12 @@ public enum DatabaseProduct {
 
   public static String toVarChar(DatabaseProduct dbType, String column) {
     switch (dbType) {
-    case DERBY:
-      return String.format("CAST(%s AS VARCHAR(4000))", column);
-    case ORACLE:
-      return String.format("to_char(%s)", column);
-    default:
-      return column;
+      case DERBY:
+        return String.format("CAST(%s AS VARCHAR(4000))", column);
+      case ORACLE:
+        return String.format("to_char(%s)", column);
+      default:
+        return column;
     }
   }
 
