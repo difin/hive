@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Copyright (c) 2020 Cloudera, Inc. All rights reserved.
 
 find . -name *.tar.gz | xargs rm -f
