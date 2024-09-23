@@ -207,6 +207,11 @@ import org.apache.iceberg.util.SnapshotUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.hadoop.hive.ql.metadata.VirtualColumn.FILE_PATH;
+import static org.apache.hadoop.hive.ql.metadata.VirtualColumn.PARTITION_HASH;
+import static org.apache.hadoop.hive.ql.metadata.VirtualColumn.PARTITION_PROJECTION;
+import static org.apache.hadoop.hive.ql.metadata.VirtualColumn.PARTITION_SPEC_ID;
+import static org.apache.hadoop.hive.ql.metadata.VirtualColumn.ROW_POSITION;
 import static org.apache.iceberg.TableProperties.DELETE_MODE;
 import static org.apache.iceberg.TableProperties.FORMAT_VERSION;
 import static org.apache.iceberg.TableProperties.MERGE_MODE;
@@ -225,13 +230,15 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
 
   public static final String TABLE_DEFAULT_LOCATION = "TABLE_DEFAULT_LOCATION";
 
-  private static final List<VirtualColumn> ACID_VIRTUAL_COLS = ImmutableList.of(VirtualColumn.PARTITION_SPEC_ID,
-      VirtualColumn.PARTITION_HASH, VirtualColumn.FILE_PATH, VirtualColumn.ROW_POSITION,
-      VirtualColumn.PARTITION_PROJECTION);
-  private static final List<FieldSchema> ACID_VIRTUAL_COLS_AS_FIELD_SCHEMA = ACID_VIRTUAL_COLS.stream()
-      .map(v -> new FieldSchema(v.getName(), v.getTypeInfo().getTypeName(), ""))
-      .collect(Collectors.toList());
+  private static final List<VirtualColumn> ACID_VIRTUAL_COLS = ImmutableList.of(
+      PARTITION_SPEC_ID, PARTITION_HASH, FILE_PATH, ROW_POSITION, PARTITION_PROJECTION);
 
+  private static final List<FieldSchema> ACID_VIRTUAL_COLS_AS_FIELD_SCHEMA = schema(ACID_VIRTUAL_COLS);
+
+  private static final List<FieldSchema> POSITION_DELETE_ORDERING =
+      orderBy(PARTITION_SPEC_ID, PARTITION_HASH, FILE_PATH, ROW_POSITION);
+
+  private static final List<FieldSchema> EMPTY_ORDERING = ImmutableList.of();
 
   private Configuration conf;
 
@@ -1239,7 +1246,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
 
   @Override
   public FieldSchema getRowId() {
-    VirtualColumn rowId = VirtualColumn.ROW_POSITION;
+    VirtualColumn rowId = ROW_POSITION;
     return new FieldSchema(rowId.getName(), rowId.getTypeInfo().getTypeName(), "");
   }
 
@@ -1247,11 +1254,14 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   public List<FieldSchema> acidSortColumns(org.apache.hadoop.hive.ql.metadata.Table table, Operation operation) {
     switch (operation) {
       case DELETE:
-        return ACID_VIRTUAL_COLS_AS_FIELD_SCHEMA;
+        return IcebergTableUtil.isFanoutEnabled(table.getParameters()) ?
+            EMPTY_ORDERING : POSITION_DELETE_ORDERING;
+      case MERGE:
+        return POSITION_DELETE_ORDERING;
       default:
         // For update operations we use the same sort order defined by
         // {@link #createDPContext(HiveConf, org.apache.hadoop.hive.ql.metadata.Table)}
-        return ImmutableList.of();
+        return EMPTY_ORDERING;
     }
   }
 
@@ -2169,14 +2179,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
 
   @Override
   public List<FileStatus> getMergeTaskInputFiles(Properties properties) throws IOException {
-    String tableName = properties.getProperty(Catalogs.NAME);
-    String snapshotRef = properties.getProperty(Catalogs.SNAPSHOT_REF);
-    Configuration configuration = SessionState.getSessionConf();
-    List<JobContext> originalContextList = HiveIcebergOutputCommitter
-            .generateJobContext(configuration, tableName, snapshotRef);
-    List<JobContext> jobContextList = originalContextList.stream()
-            .map(TezUtil::enrichContextWithVertexId)
-            .collect(Collectors.toList());
+    List<JobContext> jobContextList = IcebergMergeTaskProperties.getJobContexts(properties);
     if (jobContextList.isEmpty()) {
       return Collections.emptyList();
     }
@@ -2200,5 +2203,15 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
             Operation.DELETE.name());
     tableDesc.setProperty(HiveCustomStorageHandlerUtils.WRITE_OPERATION_CONFIG_PREFIX +
             tableDesc.getTableName(), Operation.DELETE.name());
+  }
+
+  private static List<FieldSchema> schema(List<VirtualColumn> exprs) {
+    return exprs.stream().map(v ->
+        new FieldSchema(v.getName(), v.getTypeInfo().getTypeName(), ""))
+      .collect(Collectors.toList());
+  }
+
+  private static List<FieldSchema> orderBy(VirtualColumn... exprs) {
+    return schema(Arrays.asList(exprs));
   }
 }
