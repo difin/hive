@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -44,24 +45,27 @@ import org.apache.hadoop.mapred.SequenceFileInputFormat;
 public class HiveSequenceFileInputFormat<K extends LongWritable, V extends BytesRefArrayWritable>
     extends SequenceFileInputFormat<K, V> {
 
+  private static final ThreadLocal<Set<FileStatus>> fileStatuses = new ThreadLocal<>();
+
   public HiveSequenceFileInputFormat() {
     setMinSplitSize(SequenceFile.SYNC_INTERVAL);
   }
 
-  private Set<FileStatus> fileStatuses = null;
-
-  public void setFiles(Set<FileStatus> fileStatuses) {
-    this.fileStatuses= fileStatuses;
+  public void setFiles(Set<FileStatus> files) {
+    fileStatuses.set(files);
   }
 
   @Override
   protected FileStatus[] listStatus(JobConf job) throws IOException {
-    if(fileStatuses== null || fileStatuses.isEmpty()) {
-      // In cases where list of files to fetch is not provided we will use SequenceFileInputFormat
-      // e.g. SELECT without a job
-      return super.listStatus(job);
+    try {
+      if (CollectionUtils.isEmpty(fileStatuses.get())) {
+        // In cases where list of files to fetch is not provided we will use SequenceFileInputFormat
+        // e.g. SELECT without a job
+        return super.listStatus(job);
+      }
+      return fileStatuses.get().toArray(new FileStatus[0]);
+    } finally {
+      fileStatuses.remove();
     }
-    FileStatus[] fsStatusArray = new FileStatus[fileStatuses.size()];
-    return fileStatuses.toArray(fsStatusArray);
   }
 }
