@@ -27,6 +27,14 @@ import java.sql.SQLTransactionRollbackException;
 public enum DatabaseProduct {
   DERBY, MYSQL, POSTGRES, ORACLE, SQLSERVER, OTHER;
 
+  public static final String DERBY_NAME = "derby";
+  public static final String SQL_SERVER_NAME = "sqlserver";
+  public static final String MYSQL_NAME = "mysql";
+  public static final String MARIADB_NAME = "mariadb";
+  public static final String POSTGRESQL_NAME = "postgresql";
+  public static final String ORACLE_NAME = "oracle";
+  public static final String UNDEFINED_NAME = "other";
+
   /**
    * Determine the database product type
    * @param productName string to defer database connection
@@ -37,15 +45,15 @@ public enum DatabaseProduct {
       return OTHER;
     }
     productName = productName.toLowerCase();
-    if (productName.contains("derby")) {
+    if (productName.contains(DERBY_NAME)) {
       return DERBY;
-    } else if (productName.contains("microsoft sql server")) {
+    } else if (productName.contains(SQL_SERVER_NAME)) {
       return SQLSERVER;
-    } else if (productName.contains("mysql")) {
+    } else if (productName.contains(MYSQL_NAME) || productName.contains(MARIADB_NAME)) {
       return MYSQL;
-    } else if (productName.contains("oracle")) {
+    } else if (productName.contains(ORACLE_NAME)) {
       return ORACLE;
-    } else if (productName.contains("postgresql")) {
+    } else if (productName.contains(POSTGRESQL_NAME)) {
       return POSTGRES;
     } else {
       return OTHER;
