@@ -1,5 +1,6 @@
 --! qt:dataset:src
 --! qt:replace:/(\s*totalSize\s+)\S+\s*/$1#Masked#/
+--! qt:replace:/\\\"rowCount\\\": [0-9\.E]+/\\\"rowCount\\\": ###Masked###/
 set hive.vectorized.execution.enabled=false;
 create table cmv_basetable_n4 (a int, b varchar(256), c decimal(10,2));
 
