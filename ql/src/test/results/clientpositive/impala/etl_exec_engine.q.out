@@ -341,8 +341,8 @@ stored as parquet TBLPROPERTIES ('transactional'='true', 'transactional_properti
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab1_hive
-HMS CALL get_table_req FOR emps_hive
 HMS CALL get_table_req FOR tab1_hive
+HMS CALL get_table_req FOR emps_hive
 PREHOOK: query: explain
 insert into tab1_hive
 select empid, deptno
@@ -559,8 +559,8 @@ Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
       Processor Tree:
         ListSink
 
-HMS CALL get_table_req FOR emps_hive
 HMS CALL get_table_req FOR tab1_hive
+HMS CALL get_table_req FOR emps_hive
 PREHOOK: query: explain
 insert into tab1_hive
 select empid, deptno
@@ -706,8 +706,8 @@ stored as parquet TBLPROPERTIES ('transactional'='true', 'transactional_properti
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@tab1_hive_part
-HMS CALL get_table_req FOR emps_hive
 HMS CALL get_table_req FOR tab1_hive_part
+HMS CALL get_table_req FOR emps_hive
 PREHOOK: query: explain
 insert into tab1_hive_part
 select empid, deptno, name
@@ -819,8 +819,8 @@ STAGE PLANS:
           Column Types: int, int
           Table: default.tab1_hive_part
 
-HMS CALL get_table_req FOR emps_hive
 HMS CALL get_table_req FOR tab1_hive_part
+HMS CALL get_table_req FOR emps_hive
 PREHOOK: query: explain
 insert into tab1_hive_part
 select empid, deptno, name
