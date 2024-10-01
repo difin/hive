@@ -784,7 +784,6 @@ public interface IMetaStoreClient {
    */
   List<Table> getTables(String catName, String dbName, List<String> tableNames, GetProjectionsSpec projectionsSpec)
           throws MetaException, InvalidOperationException, UnknownDBException, TException;
-
   /**
    * Get tables as objects (rather than just fetching their names).  This is more expensive and
    * should only be used if you actually need all the information about the tables.
@@ -3024,9 +3023,17 @@ public interface IMetaStoreClient {
    * @throws MetaException error accessing the RDBMS
    * @throws TException thrift transport error
    */
+  @Deprecated
   List<String> getFunctions(String dbName, String pattern)
       throws MetaException, TException;
 
+  /**
+   * Get all functions matching a pattern
+   * @param functionRequest function request.
+   * @throws TException thrift transport error
+   */
+  GetFunctionsResponse getFunctionsRequest(GetFunctionsRequest functionRequest)
+      throws TException;
   /**
    * Get all functions matching a pattern
    * @param catName catalog name.
@@ -3035,6 +3042,7 @@ public interface IMetaStoreClient {
    * @throws MetaException error accessing the RDBMS
    * @throws TException thrift transport error
    */
+  @Deprecated
   List<String> getFunctions(String catName, String dbName, String pattern)
       throws MetaException, TException;
 

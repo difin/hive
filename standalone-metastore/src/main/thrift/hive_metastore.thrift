@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.52"
+const string HMS_API = "1.2.53"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -1726,7 +1726,19 @@ struct DropDatabaseRequest {
   7: optional i64 txnId=0,
   8: optional bool deleteManagedDir=true
 }
-  
+
+struct GetFunctionsRequest {
+  1: required string dbName,
+  2: optional string catalogName,
+  3: optional string pattern,
+  4: optional bool returnNames=true
+}
+
+struct GetFunctionsResponse {
+  1: optional list<string> function_names,
+  2: optional list<Function> functions
+}
+
 // Request type for cm_recycle
 struct CmRecycleRequest {
   1: required string dataPath,
@@ -2910,6 +2922,8 @@ service ThriftHiveMetastore extends fb303.FacebookService
       throws (1:InvalidOperationException o1, 2:MetaException o2)
 
   list<string> get_functions(1:string dbName, 2:string pattern)
+      throws (1:MetaException o1)
+  GetFunctionsResponse get_functions_req(1:GetFunctionsRequest request)
       throws (1:MetaException o1)
   Function get_function(1:string dbName, 2:string funcName)
       throws (1:MetaException o1, 2:NoSuchObjectException o2)

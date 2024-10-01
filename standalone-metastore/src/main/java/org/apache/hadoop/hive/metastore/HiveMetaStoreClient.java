@@ -4573,6 +4573,11 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   }
 
   @Override
+  public GetFunctionsResponse getFunctionsRequest(GetFunctionsRequest functionRequest) throws TException {
+    return client.get_functions_req(functionRequest);
+  }
+
+  @Override
   public GetAllFunctionsResponse getAllFunctions() throws TException {
     return client.get_all_functions();
   }

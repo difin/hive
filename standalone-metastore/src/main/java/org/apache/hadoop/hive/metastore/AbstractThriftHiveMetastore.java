@@ -880,6 +880,11 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
+    public GetFunctionsResponse get_functions_req(GetFunctionsRequest req) throws MetaException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public Function get_function(String dbName, String funcName)
             throws MetaException, NoSuchObjectException, TException {
         throw new UnsupportedOperationException("this method is not supported");

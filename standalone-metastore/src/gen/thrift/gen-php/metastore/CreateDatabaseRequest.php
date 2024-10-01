@@ -227,16 +227,16 @@ class CreateDatabaseRequest
                 case 4:
                     if ($ftype == TType::MAP) {
                         $this->parameters = array();
-                        $_size1161 = 0;
-                        $_ktype1162 = 0;
-                        $_vtype1163 = 0;
-                        $xfer += $input->readMapBegin($_ktype1162, $_vtype1163, $_size1161);
-                        for ($_i1165 = 0; $_i1165 < $_size1161; ++$_i1165) {
-                            $key1166 = '';
-                            $val1167 = '';
-                            $xfer += $input->readString($key1166);
-                            $xfer += $input->readString($val1167);
-                            $this->parameters[$key1166] = $val1167;
+                        $_size1175 = 0;
+                        $_ktype1176 = 0;
+                        $_vtype1177 = 0;
+                        $xfer += $input->readMapBegin($_ktype1176, $_vtype1177, $_size1175);
+                        for ($_i1179 = 0; $_i1179 < $_size1175; ++$_i1179) {
+                            $key1180 = '';
+                            $val1181 = '';
+                            $xfer += $input->readString($key1180);
+                            $xfer += $input->readString($val1181);
+                            $this->parameters[$key1180] = $val1181;
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -335,9 +335,9 @@ class CreateDatabaseRequest
             }
             $xfer += $output->writeFieldBegin('parameters', TType::MAP, 4);
             $output->writeMapBegin(TType::STRING, TType::STRING, count($this->parameters));
-            foreach ($this->parameters as $kiter1168 => $viter1169) {
-                $xfer += $output->writeString($kiter1168);
-                $xfer += $output->writeString($viter1169);
+            foreach ($this->parameters as $kiter1182 => $viter1183) {
+                $xfer += $output->writeString($kiter1182);
+                $xfer += $output->writeString($viter1183);
             }
             $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();

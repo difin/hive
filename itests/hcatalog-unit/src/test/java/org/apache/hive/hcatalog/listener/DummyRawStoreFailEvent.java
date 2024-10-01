@@ -19,6 +19,7 @@
 package org.apache.hive.hcatalog.listener;
 
 import java.util.List;
+import java.util.Collections;
 
 import org.apache.hadoop.hive.metastore.ObjectStore;
 import org.apache.hadoop.hive.metastore.api.Catalog;
@@ -28,8 +29,14 @@ import org.apache.hadoop.hive.metastore.api.InvalidInputException;
 import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
+import org.apache.hadoop.hive.metastore.api.NotificationEvent;
+import org.apache.hadoop.hive.metastore.api.NotificationEventRequest;
+import org.apache.hadoop.hive.metastore.api.NotificationEventResponse;
+import org.apache.hadoop.hive.metastore.api.NotificationEventsCountRequest;
+import org.apache.hadoop.hive.metastore.api.NotificationEventsCountResponse;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.metastore.api.AggrStats;
 
 /**
  * An implementation {@link org.apache.hadoop.hive.metastore.RawStore}
@@ -40,6 +47,11 @@ import org.apache.hadoop.hive.metastore.api.Table;
  *
  */
 public class DummyRawStoreFailEvent extends ObjectStore {
+
+  private final ObjectStore objectStore;
+  public DummyRawStoreFailEvent() {
+    objectStore = new ObjectStore();
+  }
 
   private static boolean shouldEventSucceed = true;
   public static void setEventSucceed(boolean flag) {
@@ -164,6 +176,57 @@ public class DummyRawStoreFailEvent extends ObjectStore {
     }
   }
 
+  @Override
+  public Function getFunction(String catName, String dbName, String funcName)
+      throws MetaException {
+    return objectStore.getFunction(catName, dbName, funcName);
+  }
+
+  @Override
+  public List<Function> getAllFunctions(String catName)
+      throws MetaException {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<String> getFunctions(String catName, String dbName, String pattern)
+      throws MetaException {
+    return objectStore.getFunctions(catName, dbName, pattern);
+  }
+
+  @Override
+  public <T> List<T> getFunctionsRequest(String catName, String dbName,
+      String pattern, boolean isReturnNames) throws MetaException {
+    return objectStore.getFunctionsRequest(catName, dbName, pattern, isReturnNames);
+  }
+
+  @Override
+  public AggrStats get_aggr_stats_for(String catName, String dbName,
+                                      String tblName, List<String> partNames, List<String> colNames,
+                                      String engine)
+      throws MetaException {
+    return null;
+  }
+
+  @Override
+  public AggrStats get_aggr_stats_for(String catName, String dbName,
+                                      String tblName, List<String> partNames, List<String> colNames,
+                                      String engine, String writeIdList)
+      throws MetaException {
+    return null;
+  }
+
+  @Override
+  public NotificationEventResponse getNextNotification(NotificationEventRequest rqst) {
+    return objectStore.getNextNotification(rqst);
+  }
+
+  @Override
+  public void addNotificationEvent(NotificationEvent event) throws MetaException {
+    objectStore.addNotificationEvent(event);
+  }
+
+  @Override
   public void cleanNotificationEvents(int olderThan) {
     if (!shouldEventSucceed) {
       //throw exception to simulate an issue with cleaner thread
