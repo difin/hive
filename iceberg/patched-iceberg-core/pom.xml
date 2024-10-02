@@ -96,7 +96,6 @@
                                         **/StructLikeMap.class
                                         **/StructLikeWrapper.class
                                         **/HadoopInputFile.class
-                                        **/SerializableTable.class
                                         org.apache.iceberg.SnapshotProducer.class
                                     </excludes>
                                 </artifactItem>

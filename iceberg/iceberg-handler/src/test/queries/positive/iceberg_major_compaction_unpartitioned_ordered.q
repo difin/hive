@@ -18,6 +18,8 @@
 --! qt:replace:/(\S\"removed-files-size\\\":\\\")(\d+)(\\\")/$1#Masked#$3/
 -- Mask the totalSize value as it can have slight variability, causing test flakiness
 --! qt:replace:/(\s+totalSize\s+)\S+(\s+)/$1#Masked#$2/
+-- Mask iceberg version
+--! qt:replace:/(\S\"iceberg-version\\\":\\\")(\w+\s\w+\s\d+\.\d+\.\d+\s\(\w+\s\w+\))(\\\")/$1#Masked#$3/
 
 set hive.llap.io.enabled=true;
 set hive.vectorized.execution.enabled=true;
@@ -30,7 +32,7 @@ create table ice_orc (
 stored by iceberg stored as orc 
 tblproperties ('format-version'='2', 'hive.compactor.worker.pool'='iceberg', 'compactor.threshold.target.size'='1500');
 
-insert into ice_orc VALUES 
+insert into ice_orc VALUES
 ('fn1','ln1'),
 ('fn2','ln2'),
 ('fn3','ln3'),

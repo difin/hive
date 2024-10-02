@@ -87,7 +87,7 @@ public class TestHiveCommitLocks {
   private static HiveClientPool spyClientPool = null;
   private static CachedClientPool spyCachedClientPool = null;
   private static Configuration overriddenHiveConf;
-  private static AtomicReference<IMetaStoreClient> spyClientRef = new AtomicReference<>();
+  private static final AtomicReference<IMetaStoreClient> spyClientRef = new AtomicReference<>();
   private static IMetaStoreClient spyClient = null;
   HiveTableOperations ops = null;
   TableMetadata metadataV1 = null;
