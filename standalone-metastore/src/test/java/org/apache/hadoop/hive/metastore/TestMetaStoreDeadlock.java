@@ -35,6 +35,7 @@ import org.apache.hadoop.hive.metastore.client.builder.PartitionBuilder;
 import org.apache.hadoop.hive.metastore.client.builder.TableBuilder;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
+import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.thrift.TException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -62,14 +63,16 @@ public class TestMetaStoreDeadlock {
   public void testLockContention() throws Exception {
     String dbName = "_test_deadlock_";
     String tableName1 = "tbl1";
+    Table t;
     try (HiveMetaStoreClient msc = new HiveMetaStoreClient(conf)) {
       new DatabaseBuilder().setName(dbName).create(msc, conf);
       new TableBuilder().setDbName(dbName).setTableName(tableName1).addCol("a", "string").addPartCol("dt", "string")
           .create(msc, conf);
-      Table table1 = msc.getTable(dbName, tableName1);
-      new PartitionBuilder().inTable(table1).addValue("2024-09-29").addToTable(msc, conf);
+      t = msc.getTable(dbName, tableName1);
+      new PartitionBuilder().inTable(t).addValue("2024-09-29").addToTable(msc, conf);
     }
-    GetPartitionsByNamesRequest request = new GetPartitionsByNamesRequest(dbName, tableName1);
+    GetPartitionsByNamesRequest request = new GetPartitionsByNamesRequest(
+        MetaStoreUtils.prependCatalogToDbName(t.getCatName(), t.getDbName(), conf), tableName1);
     request.setNames(Arrays.asList("dt=2024-09-28"));
     request.setProcessorCapabilities(Arrays.asList("HIVEFULLACIDWRITE", "HIVEFULLACIDREAD", "HIVEMANAGEDINSERTWRITE"));
     Thread[] holdConnThreads = new Thread[POOL_SIZE];
