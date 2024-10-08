@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.txn.entities.CompactionInfo;
 
+import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,12 +119,15 @@ public abstract class CompactorThread extends Thread implements Configurable {
 
   private static AtomicInteger nextThreadId = new AtomicInteger(1000000);
 
-  public static void initializeAndStartThread(CompactorThread thread,
-                                              Configuration conf) throws Exception {
+  public static void initializeAndStartThread(CompactorThread thread, Configuration conf) {
     LOG.info("Starting compactor thread of type " + thread.getClass().getName());
     thread.setConf(conf);
     thread.setThreadId(nextThreadId.incrementAndGet());
-    thread.init(new AtomicBoolean());
+    try {
+      thread.init(new AtomicBoolean());
+    } catch (Exception e) {
+      throw new CompactionException(e, ErrorMsg.COMPACTION_THREAD_INITIALIZATION);
+    }
     thread.start();
   }
 

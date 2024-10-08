@@ -17,8 +17,11 @@
  */
 package org.apache.hadoop.hive.ql.txn.compactor;
 
+import com.google.common.collect.Maps;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.LockComponentBuilder;
@@ -50,6 +53,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -294,5 +298,16 @@ public class CompactorUtil {
     requestBuilder.setZeroWaitReadEnabled(!conf.getBoolVar(HiveConf.ConfVars.TXN_OVERWRITE_X_LOCK) ||
         !conf.getBoolVar(HiveConf.ConfVars.TXN_WRITE_X_LOCK));
     return requestBuilder.build();
+  }
+
+  public static Map<String, Integer> getPoolConf(HiveConf hiveConf) {
+    Map<String, Integer> poolConf = Maps.newHashMap();
+    for (Map.Entry<String, String> entry : hiveConf) {
+      Matcher matcher = Constants.COMPACTION_POOLS_PATTERN.matcher(entry.getKey());
+      if (matcher.matches()) {
+        poolConf.put(matcher.group(1), NumberUtils.toInt(entry.getValue(), 0));
+      }
+    }
+    return poolConf;
   }
 }
