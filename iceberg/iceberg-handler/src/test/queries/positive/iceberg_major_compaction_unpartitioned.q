@@ -55,6 +55,8 @@ select * from ice_orc;
 describe formatted ice_orc;
 
 explain alter table ice_orc COMPACT 'major' and wait;
+explain optimize table ice_orc rewrite data;
+
 alter table ice_orc COMPACT 'major' and wait;
 
 select * from ice_orc;
