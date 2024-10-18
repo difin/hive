@@ -22,7 +22,6 @@ import org.junit.BeforeClass;
 /**
  * TestZookeeperTokenStore with zookeeper SSL communication enabled.
  */
-@org.junit.Ignore ("CDPD-70023")
 public class TestZookeeperTokenStoreSSLEnabled extends ZooKeeperTokenStoreTestBase {
 
   public TestZookeeperTokenStoreSSLEnabled(){
