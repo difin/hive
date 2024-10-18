@@ -153,7 +153,7 @@ RUN yum -y clean all && \
     /remove-unwanted.sh
 
 # postgres-jdbc fetches java-8 as a dependency, let's make java11 as default, pointed by /etc/alternatives/java
-RUN alternatives --set java /usr/lib/jvm/java-11-openjdk-11.0.24.0.8-3.el8.aarch64/bin/java
+RUN alternatives --set java /usr/lib/jvm/java-11-openjdk-11.0.25.0.9-2.el8.aarch64/bin/java
 
 COPY bigtop-hive /usr/bin/hive
 RUN ln -s /usr/bin/hive /usr/bin/beeline
