@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.ql.ddl.table.storage.compact;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.CompactionRequest;
@@ -41,6 +42,8 @@ import org.apache.hadoop.hive.ql.ddl.DDLUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
+import org.apache.hadoop.hive.ql.txn.compactor.CompactorUtil;
+import org.apache.hadoop.hive.ql.txn.compactor.MetadataCache;
 
 import java.util.stream.Collectors;
 
@@ -48,6 +51,9 @@ import java.util.stream.Collectors;
  * Operation process of compacting a table.
  */
 public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDesc> {
+
+  private static MetadataCache metadataCache = new MetadataCache(true);
+      
   public AlterTableCompactOperation(DDLOperationContext context, AlterTableCompactDesc desc) {
     super(context, desc);
   }
@@ -157,8 +163,17 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
   private CompactionResponse compact(Table table, String partitionName) throws HiveException {
     CompactionRequest req = new CompactionRequest(table.getDbName(), table.getTableName(),
         CompactionType.valueOf(desc.getCompactionType().toUpperCase()));
+    
+    String poolName;
+    try {
+      poolName = ObjectUtils.defaultIfNull(desc.getPoolName(),
+          CompactorUtil.getPoolName(context.getConf(), table.getTTable(), metadataCache));
+    } catch (Exception e) {
+      throw new HiveException(e);
+    }
+
     req.setPartitionname(partitionName);
-    req.setPoolName(desc.getPoolName());
+    req.setPoolName(poolName);
     req.setProperties(desc.getProperties());
     req.setInitiatorId(JavaUtils.hostname() + "-" + HiveMetaStoreClient.MANUALLY_INITIATED_COMPACTION);
     req.setInitiatorVersion(HiveMetaStoreClient.class.getPackage().getImplementationVersion());

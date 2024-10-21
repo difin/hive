@@ -19,7 +19,6 @@ package org.apache.hadoop.hive.ql.txn.compactor;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -27,7 +26,6 @@ import org.apache.hadoop.hive.common.ServerUtils;
 import org.apache.hadoop.hive.common.ValidReadTxnList;
 import org.apache.hadoop.hive.common.ValidTxnList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
-import org.apache.hadoop.hive.conf.Constants;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.CompactionRequest;
 import org.apache.hadoop.hive.metastore.api.CompactionResponse;
@@ -178,7 +176,7 @@ public class Initiator extends MetaStoreCompactorThread {
               }
 
               Table t = metadataCache.computeIfAbsent(ci.getFullTableName(), () -> resolveTable(ci));
-              String poolName = getPoolName(ci, t);
+              String poolName = CompactorUtil.getPoolName(conf, t, metadataCache);
               Partition p = resolvePartition(ci);
               if (p == null && ci.partName != null) {
                 LOG.info("Can't find partition " + ci.getFullPartitionName() +
@@ -278,16 +276,6 @@ public class Initiator extends MetaStoreCompactorThread {
       }
       txnHandler.markFailed(ci);
     }
-  }
-
-  private String getPoolName(CompactionInfo ci, Table t) throws Exception {
-    Map<String, String> params = t.getParameters();
-    String poolName = params == null ? null : params.get(Constants.HIVE_COMPACTOR_WORKER_POOL);
-    if (StringUtils.isBlank(poolName)) {
-      params = metadataCache.computeIfAbsent(ci.dbname, () -> resolveDatabase(ci)).getParameters();
-      poolName = params == null ? null : params.get(Constants.HIVE_COMPACTOR_WORKER_POOL);
-    }
-    return poolName;
   }
 
   private Database resolveDatabase(CompactionInfo ci) throws MetaException, NoSuchObjectException {
