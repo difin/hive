@@ -435,8 +435,8 @@ public class ImpalaPlanner {
               new ImpalaInsertStmt(impalaTargetTable,
                   targetHelper.getDynPartitionExprs(ctx_.getResultExprs()));
           // repartition on partition keys
-          rootFragment = distributedPlanner.createInsertFragment(
-              rootFragment, insertStmt, ctx_.getRootAnalyzer(), fragments);
+          rootFragment = distributedPlanner.createDmlFragment(rootFragment, insertStmt,
+              ctx_.getRootAnalyzer(), fragments);
         }
         // Add sort node to the plan for partitioned tables. We can only add the sort node
         // if there are dynamic partitions.
