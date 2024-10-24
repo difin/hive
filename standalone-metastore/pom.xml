@@ -94,7 +94,7 @@
     <mockito-core.version>5.17.0</mockito-core.version>
     <nimbus-jose-jwt.version>10.4.2</nimbus-jose-jwt.version>
     <orc.version>1.8.3.7.3.2.0-SNAPSHOT</orc.version>
-    <protobuf.version>3.21.4</protobuf.version>
+    <protobuf.version>3.25.5</protobuf.version>
     <sqlline.version>1.9.0</sqlline.version>
     <netty.version>4.1.127.Final</netty.version>
     <jline.version>2.14.6</jline.version>
