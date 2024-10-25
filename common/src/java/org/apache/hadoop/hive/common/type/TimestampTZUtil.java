@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -39,7 +40,7 @@ import java.time.temporal.TemporalQueries;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +57,8 @@ public class TimestampTZUtil {
 
   private static final LocalTime DEFAULT_LOCAL_TIME = LocalTime.of(0, 0);
   private static final Pattern SINGLE_DIGIT_PATTERN = Pattern.compile("[\\+-]\\d:\\d\\d");
+
+  public static final String NOT_LEAP_YEAR = "not a leap year";
 
   private static final DateTimeFormatter TIMESTAMP_FORMATTER = new DateTimeFormatterBuilder()
       // Date and Time Parts
@@ -190,7 +193,18 @@ public class TimestampTZUtil {
         java.util.Date date = formatter.parse(ts.format(TIMESTAMP_FORMATTER));
         // Set the formatter to use a different timezone
         formatter.setTimeZone(TimeZone.getTimeZone(toZone));
-        Timestamp result = Timestamp.valueOf(formatter.format(date));
+        Timestamp result;
+        try {
+          result = Timestamp.valueOf(formatter.format(date));
+        } catch (IllegalArgumentException ex) {
+          if (ex.getCause().getMessage().contains(NOT_LEAP_YEAR)) {
+            int leapYearDateAdjustment = ts.getMonth() == Month.MARCH.getValue() ? 2 : -2;
+            result = Timestamp.valueOf(formatter.format(DateUtils.addDays(date, leapYearDateAdjustment)))
+                .minusDays(leapYearDateAdjustment);
+          } else {
+            throw ex;
+          }
+        }
         result.setNanos(ts.getNanos());
         return result;
       } catch (ParseException e) {

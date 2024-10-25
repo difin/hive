@@ -22,9 +22,14 @@ import org.apache.hadoop.hive.common.type.Timestamp;
 import org.apache.hadoop.hive.ql.io.parquet.timestamp.NanoTime;
 import org.apache.hadoop.hive.ql.io.parquet.timestamp.NanoTimeUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
+import org.junit.experimental.runners.Enclosed;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+
+import com.google.common.base.Strings;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -34,6 +39,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -50,133 +59,273 @@ import static org.junit.Assert.assertEquals;
  * class with a few changes to account for library upgrades (e.g., jodd-util). 
  * </p>
  */
-@RunWith(Parameterized.class)
+@RunWith(Enclosed.class)
 public class TestParquetTimestampsHive2Compatibility {
+
   private static final long NANOS_PER_HOUR = TimeUnit.HOURS.toNanos(1);
   private static final long NANOS_PER_MINUTE = TimeUnit.MINUTES.toNanos(1);
   private static final long NANOS_PER_SECOND = TimeUnit.SECONDS.toNanos(1);
   private static final long NANOS_PER_DAY = TimeUnit.DAYS.toNanos(1);
   private static final int GEN_TIMESTAMPS_NUMBER = 3000;
 
-  @Parameterized.Parameter
-  public String timestampString;
+  @RunWith(Parameterized.class)
+  public static class WriteHive2ReadHive4UsingLegacyConversionWithJulianLeapYearsTest {
+    /**
+     * Tests that timestamps written using Hive2 APIs on julian leap years are read correctly by Hive4 APIs when legacy
+     * conversion is on.
+     */
 
-  /**
-   * Tests that timestamps written using Hive2 APIs are read correctly by Hive2 APIs.
-   *
-   * This is test is here just for sanity reasons in case somebody changes something in the code and breaks
-   * the Hive2 APIs.
-   */
-  @Test
-  public void testWriteHive2ReadHive2() {
-    NanoTime nt = writeHive2(timestampString);
-    java.sql.Timestamp ts = readHive2(nt);
-    assertEquals(timestampString, ts.toString());
-  }
+    private String timestampString;
+    private String zoneId;
 
-  /**
-   * Tests that timestamps written using Hive2 APIs are read correctly by Hive4 APIs when legacy conversion is on.
-   */
-  @Test
-  public void testWriteHive2ReadHive4UsingLegacyConversion() {
-    NanoTime nt = writeHive2(timestampString);
-    Timestamp ts = readHive4(nt, TimeZone.getDefault().getID(), true);
-    assertEquals(timestampString, ts.toString());
-  }
-
-  /**
-   * Tests that timestamps written using Hive2 APIs are read correctly by Hive4 APIs when legacy conversion is on.
-   */
-  @Test
-  public void testWriteHive2ReadHive4UsingLegacyConversionWithZone() {
-    TimeZone original = TimeZone.getDefault();
-    try {
-      String zoneId = "US/Pacific";
-      TimeZone.setDefault(TimeZone.getTimeZone(zoneId));
-      NanoTime nt = writeHive2(timestampString);
-      Timestamp ts = readHive4(nt, zoneId, true);
-      assertEquals(timestampString, ts.toString());
-    } finally {
-      TimeZone.setDefault(original);
+    public WriteHive2ReadHive4UsingLegacyConversionWithJulianLeapYearsTest(String timestampString, String zoneId){
+      this.timestampString = timestampString;
+      this.zoneId = zoneId;
     }
-  }
-
-  /**
-   * Tests that timestamps written using Hive4 APIs are read correctly by Hive4 APIs when legacy conversion is on. 
-   */
-  @Test
-  public void testWriteHive4ReadHive4UsingLegacyConversion() {
-    String zoneId = "US/Pacific";
-    NanoTime nt = writeHive4(timestampString, zoneId, true);
-    Timestamp ts = readHive4(nt, zoneId, true);
-    assertEquals(timestampString, ts.toString());
-  }
-
-  /**
-   * Tests that timestamps written using Hive4 APIs are read correctly by Hive4 APIs when legacy conversion is off.
-   */
-  @Test
-  public void testWriteHive4ReadHive4UsingNewConversion() {
-    String zoneId = "US/Pacific";
-    NanoTime nt = writeHive4(timestampString, zoneId, false);
-    Timestamp ts = readHive4(nt, zoneId, false);
-    assertEquals(timestampString, ts.toString());
-  }
-
-  /**
-   * Tests that timestamps written using Hive4 APIs are read correctly by Hive2 APIs when legacy conversion is on when
-   * writing.
-   */
-  @Test
-  public void testWriteHive4UsingLegacyConversionReadHive2() {
-    NanoTime nt = writeHive4(timestampString, TimeZone.getDefault().getID(), true);
-    java.sql.Timestamp ts = readHive2(nt);
-    assertEquals(timestampString, ts.toString());
-  }
-
-  @Parameterized.Parameters(name = "{0}")
-  public static Collection<Object[]> generateTimestamps() {
-    List<Object[]> timestamps = new ArrayList<>();
-    for (int i = 0; i < GEN_TIMESTAMPS_NUMBER; i++) {
-      StringBuilder sb = new StringBuilder(29);
-      int year = (i % 9999) + 1;
-      sb.append(zeros(4 - digits(year)));
-      sb.append(year);
-      sb.append('-');
-      int month = (i % 12) + 1;
-      sb.append(zeros(2 - digits(month)));
-      sb.append(month);
-      sb.append('-');
-      int day = (i % 28) + 1;
-      sb.append(zeros(2 - digits(day)));
-      sb.append(day);
-      sb.append(' ');
-      int hour = i % 24;
-      sb.append(zeros(2 - digits(hour)));
-      sb.append(hour);
-      sb.append(':');
-      int minute = i % 60;
-      sb.append(zeros(2 - digits(minute)));
-      sb.append(minute);
-      sb.append(':');
-      int second = i % 60;
-      sb.append(zeros(2 - digits(second)));
-      sb.append(second);
-      sb.append('.');
-      // Bitwise OR with one to avoid times with trailing zeros
-      int nano = (i % 1000000000) | 1;
-      sb.append(zeros(9 - digits(nano)));
-      sb.append(nano);
-      String ts = sb.toString();
-      // Exclude dates falling in the default Gregorian change date since legacy code does not handle that interval
-      // gracefully. It is expected that these do not work well when legacy APIs are in use.
-      if (!ts.startsWith("1582-10")) {
-        timestamps.add(new Object[] { ts });
+    @Test
+    public void testWriteHive2ReadHive4UsingLegacyConversionWithJulianLeapYears() {
+      TimeZone original = TimeZone.getDefault();
+      try {
+        TimeZone.setDefault(TimeZone.getTimeZone(zoneId));
+        NanoTime nt = writeHive2(timestampString);
+        Timestamp ts = readHive4(nt, zoneId, true);
+        assertEquals(timestampString, ts.toString());
+      } finally {
+        TimeZone.setDefault(original);
       }
     }
-    timestamps.add(new Object[] { "9999-12-31 23:59:59.999" });
-    return timestamps;
+
+    @Parameters(name = "{0}")
+    public static List<String[]> generateTimestampsAndZoneIds() {
+      return generateJulianLeapYearTimestamps().flatMap(
+              timestampString -> Stream.of("Asia/Singapore", "Pacific/Kiritimati", "Etc/GMT+12", "Pacific/Niue")
+                      .map(zoneId -> new String[]{timestampString, zoneId})).collect(Collectors.toList());
+    }
+
+    private static Stream<String> generateJulianLeapYearTimestamps() {
+      return IntStream.range(1, 100)
+              .mapToObj(value -> Strings.padStart(String.valueOf(value * 100), 4, '0'))
+              .map(value -> value + "-03-01 00:00:00.000000001");
+    }
   }
+
+  @RunWith(Parameterized.class)
+  public static class WriteHive2ReadHive4UsingLegacyConversionWithJulianLeapYearsFor28thFebTest {
+
+    private String timestampString;
+    private String zoneId;
+
+    public WriteHive2ReadHive4UsingLegacyConversionWithJulianLeapYearsFor28thFebTest(String timestampString, String zoneId){
+      this.timestampString = timestampString;
+      this.zoneId = zoneId;
+    }
+
+    @Test
+    public void testWriteHive2ReadHive4UsingLegacyConversionWithJulianLeapYearsFor28thFeb() {
+      TimeZone original = TimeZone.getDefault();
+      try {
+        TimeZone.setDefault(TimeZone.getTimeZone(zoneId));
+        NanoTime nt = writeHive2(timestampString);
+        Timestamp ts = readHive4(nt, zoneId, true);
+        assertEquals(timestampString, ts.toString());
+      } finally {
+        TimeZone.setDefault(original);
+      }
+    }
+
+    @Parameters(name = "{0}")
+    public static List<String[]> generateTimestampsAndZoneIds28thFeb() {
+      return generateJulianLeapYearTimestamps28thFeb().flatMap(
+              timestampString -> Stream.of("Asia/Singapore", "Pacific/Kiritimati", "Etc/GMT+12", "Pacific/Niue")
+                      .map(zoneId -> new String[]{timestampString, zoneId})).collect(Collectors.toList());
+    }
+
+    private static Stream<String> generateJulianLeapYearTimestamps28thFeb() {
+      return IntStream.range(1, 100)
+              .mapToObj(value -> Strings.padStart(String.valueOf(value * 100), 4, '0'))
+              .map(value -> value + "-02-28 00:00:00.000000001");
+    }
+  }
+
+  @RunWith(Parameterized.class)
+  public static class WriteHive2ReadHive4UsingLegacyConversionWithJulianLeapYearsEdgeCaseTest {
+
+    private String fromZoneId;
+    private String toZoneId;
+    private String timestampString;
+    private String expected;
+
+    public WriteHive2ReadHive4UsingLegacyConversionWithJulianLeapYearsEdgeCaseTest(String fromZoneId, String toZoneId,
+                                                                                     String timestampString, String expected){
+      this.fromZoneId = fromZoneId;
+      this.toZoneId = toZoneId;
+      this.timestampString = timestampString;
+      this.expected = expected;
+    }
+
+    @Test
+    public void testWriteHive2ReadHive4UsingLegacyConversionWithJulianLeapYearsEdgeCase() {
+      TimeZone original = TimeZone.getDefault();
+      try {
+        TimeZone.setDefault(TimeZone.getTimeZone(fromZoneId));
+        NanoTime nt = writeHive2(timestampString);
+        Timestamp ts = readHive4(nt, toZoneId, true);
+        assertEquals(expected, ts.toString());
+      } finally {
+        TimeZone.setDefault(original);
+      }
+    }
+
+    @Parameters(name = " - From: Zone {0}, timestamp: {2}, To: Zone:{1}, expected Timestamp {3}")
+    public static List<String[]> julianLeapYearEdgeCases() {
+      return Stream.of(new String[]{"GMT-12:00", "GMT+14:00", "0200-02-27 22:00:00.000000001",
+                      "0200-03-01 00:00:00.000000001"},
+              new String[]{"GMT+14:00", "GMT-12:00", "0200-03-01 00:00:00.000000001",
+                      "0200-02-27 22:00:00.000000001"},
+              new String[]{"GMT+14:00", "GMT-12:00", "0200-03-02 00:00:00.000000001",
+                      "0200-02-28 22:00:00.000000001"},
+              new String[]{"GMT-12:00", "GMT+14:00", "0200-03-02 00:00:00.000000001",
+                      "0200-03-03 02:00:00.000000001"},
+              new String[]{"GMT-12:00", "GMT+12:00", "0200-02-28 00:00:00.000000001", "0200-03-01 00:00:00.000000001"},
+              new String[]{"GMT+12:00", "GMT-12:00", "0200-03-01 00:00:00.000000001", "0200-02-28 00:00:00.000000001"},
+              new String[]{"Asia/Singapore", "Asia/Singapore", "0200-03-01 00:00:00.000000001",
+                      "0200-03-01 00:00:00.000000001"}).collect(Collectors.toList());
+    }
+  }
+
+  @RunWith(Parameterized.class)
+  public static class ParquetTimestampsHive2CompatibilityTest {
+
+    /**
+     * Tests that timestamps written using Hive2 APIs are read correctly by Hive2 APIs.
+     *
+     * This is test is here just for sanity reasons in case somebody changes something in the code and breaks
+     * the Hive2 APIs.
+     */
+
+    private String timestampString;
+
+    public ParquetTimestampsHive2CompatibilityTest(String timestampString) {
+      this.timestampString = timestampString;
+    }
+
+    @Test
+    public void testWriteHive2ReadHive2() {
+      NanoTime nt = writeHive2(timestampString);
+      java.sql.Timestamp ts = readHive2(nt);
+      assertEquals(timestampString, ts.toString());
+    }
+
+    /**
+     * Tests that timestamps written using Hive2 APIs are read correctly by Hive4 APIs when legacy conversion is on.
+     */
+    @Test
+    public void testWriteHive2ReadHive4UsingLegacyConversion() {
+      NanoTime nt = writeHive2(timestampString);
+      Timestamp ts = readHive4(nt, TimeZone.getDefault().getID(), true);
+      assertEquals(timestampString, ts.toString());
+    }
+
+    /**
+     * Tests that timestamps written using Hive2 APIs are read correctly by Hive4 APIs when legacy conversion is on.
+     */
+    @Test
+    public void testWriteHive2ReadHive4UsingLegacyConversionWithZone() {
+      TimeZone original = TimeZone.getDefault();
+      try {
+        String zoneId = "US/Pacific";
+        TimeZone.setDefault(TimeZone.getTimeZone(zoneId));
+        NanoTime nt = writeHive2(timestampString);
+        Timestamp ts = readHive4(nt, zoneId, true);
+        assertEquals(timestampString, ts.toString());
+      } finally {
+        TimeZone.setDefault(original);
+      }
+    }
+
+    /**
+     * Tests that timestamps written using Hive4 APIs are read correctly by Hive4 APIs when legacy conversion is on.
+     */
+    @Test
+    public void testWriteHive4ReadHive4UsingLegacyConversion() {
+      String zoneId = "US/Pacific";
+      NanoTime nt = writeHive4(timestampString, zoneId, true);
+      Timestamp ts = readHive4(nt, zoneId, true);
+      assertEquals(timestampString, ts.toString());
+    }
+
+    /**
+     * Tests that timestamps written using Hive4 APIs are read correctly by Hive4 APIs when legacy conversion is off.
+     */
+    @Test
+    public void testWriteHive4ReadHive4UsingNewConversion() {
+      String zoneId = "US/Pacific";
+      NanoTime nt = writeHive4(timestampString, zoneId, false);
+      Timestamp ts = readHive4(nt, zoneId, false);
+      assertEquals(timestampString, ts.toString());
+    }
+
+    /**
+     * Tests that timestamps written using Hive4 APIs are read correctly by Hive2 APIs when legacy conversion is on when
+     * writing.
+     */
+    @Test
+    public void testWriteHive4UsingLegacyConversionReadHive2() {
+      NanoTime nt = writeHive4(timestampString, TimeZone.getDefault().getID(), true);
+      java.sql.Timestamp ts = readHive2(nt);
+      assertEquals(timestampString, ts.toString());
+    }
+
+    @Parameters
+    public static List<String[]> generateTimestamps() {
+      return Stream.concat(Stream.generate(new Supplier<String[]>() {
+                int i = 0;
+
+                @Override
+                public String[] get() {
+                  StringBuilder sb = new StringBuilder(29);
+                  int year = (i % 9999) + 1;
+                  sb.append(zeros(4 - digits(year)));
+                  sb.append(year);
+                  sb.append('-');
+                  int month = (i % 12) + 1;
+                  sb.append(zeros(2 - digits(month)));
+                  sb.append(month);
+                  sb.append('-');
+                  int day = (i % 28) + 1;
+                  sb.append(zeros(2 - digits(day)));
+                  sb.append(day);
+                  sb.append(' ');
+                  int hour = i % 24;
+                  sb.append(zeros(2 - digits(hour)));
+                  sb.append(hour);
+                  sb.append(':');
+                  int minute = i % 60;
+                  sb.append(zeros(2 - digits(minute)));
+                  sb.append(minute);
+                  sb.append(':');
+                  int second = i % 60;
+                  sb.append(zeros(2 - digits(second)));
+                  sb.append(second);
+                  sb.append('.');
+                  // Bitwise OR with one to avoid times with trailing zeros
+                  int nano = (i % 1000000000) | 1;
+                  sb.append(zeros(9 - digits(nano)));
+                  sb.append(nano);
+                  i++;
+                  return new String[]{sb.toString()};
+                }
+              })
+              // Exclude dates falling in the default Gregorian change date since legacy code does not handle that interval
+              // gracefully. It is expected that these do not work well when legacy APIs are in use.
+              .filter(s -> !s[0].startsWith("1582-10"))
+              .limit(3000), Stream.<String[]>of(new String[]{"9999-12-31 23:59:59.999"})).collect(Collectors.toList());
+    }
+  }
+
+  /** Generates timestamps for different timezone. Here we are testing UTC+14 : Pacific/Kiritimati ,
+   *  UTC-12 : Etc/GMT+12 along with few other zones
+   */
 
   private static int digits(int number) {
     int digits = 0;
@@ -232,7 +381,7 @@ public class TestParquetTimestampsHive2Compatibility {
       year = 1 - year;
     }
     JulianDate jDateTime = JulianDate.of(year, calendar.get(Calendar.MONTH) + 1,  //java calendar index starting at 1.
-        calendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0);
+            calendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0, 0);
     int days = jDateTime.getJulianDayNumber();
 
     long hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -290,5 +439,4 @@ public class TestParquetTimestampsHive2Compatibility {
   private static Timestamp readHive4(NanoTime nt, String targetZone, boolean legacyConversion) {
     return NanoTimeUtils.getTimestamp(nt, ZoneId.of(targetZone), legacyConversion);
   }
-
 }
