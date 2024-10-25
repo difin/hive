@@ -61,6 +61,7 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 import org.apache.hadoop.hive.ql.plan.ExprNodeDescUtils;
 import org.apache.hadoop.hive.ql.plan.FetchWork;
 import org.apache.hadoop.hive.ql.plan.GroupByDesc;
+import org.apache.hadoop.hive.ql.stats.Partish;
 import org.apache.hadoop.hive.ql.stats.StatsUtils;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFCount;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFMax;
@@ -939,31 +940,27 @@ public class StatsOptimizer extends Transform {
 
     private Long getRowCnt(
         ParseContext pCtx, TableScanOperator tsOp, Table tbl) throws HiveException {
-      Long rowCnt = 0L;
+      long rowCnt = 0L;
       if (tbl.isPartitioned()) {
         for (Partition part : pctx.getPrunedPartitions(
             tsOp.getConf().getAlias(), tsOp).getPartitions()) {
           if (!StatsUtils.areBasicStatsUptoDateForQueryAnswering(part.getTable(), part.getParameters())) {
             return null;
           }
-          Long partRowCnt = Long.parseLong(part.getParameters().get(StatsSetupConst.ROW_COUNT));
-          if (partRowCnt == null) {
-            Logger.debug("Partition doesn't have up to date stats " + part.getSpec());
-            return null;
-          }
+          long partRowCnt = Long.parseLong(part.getParameters().get(StatsSetupConst.ROW_COUNT));
           rowCnt += partRowCnt;
         }
       } else { // unpartitioned table
-        if (!StatsUtils.areBasicStatsUptoDateForQueryAnswering(tbl, tbl.getParameters())) {
+        Map<String, String> basicStats = tbl.getParameters();
+        if (MetaStoreUtils.isNonNativeTable(tbl.getTTable())) {
+          if (!tbl.getStorageHandler().canComputeQueryUsingStats(tbl)) {
+            return null;
+          }
+          basicStats = tbl.getStorageHandler().getBasicStatistics(Partish.buildFor(tbl));
+        } else if (!StatsUtils.areBasicStatsUptoDateForQueryAnswering(tbl, tbl.getParameters())) {
           return null;
         }
-        rowCnt = Long.parseLong(tbl.getProperty(StatsSetupConst.ROW_COUNT));
-        if (rowCnt == null) {
-          // if rowCnt < 1 than its either empty table or table on which stats are not
-          //  computed We assume the worse and don't attempt to optimize.
-          Logger.debug("Table doesn't have up to date stats " + tbl.getTableName());
-          rowCnt = null;
-        }
+        rowCnt = Long.parseLong(basicStats.get(StatsSetupConst.ROW_COUNT));
       }
       return rowCnt;
     }

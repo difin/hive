@@ -2024,10 +2024,7 @@ public class StatsUtils {
 
   public static boolean checkCanProvideStats(Table table) {
     if (MetaStoreUtils.isExternalTable(table.getTTable())) {
-      if (MetaStoreUtils.isNonNativeTable(table.getTTable()) && table.getStorageHandler().canProvideBasicStatistics()) {
-        return true;
-      }
-      return false;
+      return MetaStoreUtils.isNonNativeTable(table.getTTable()) && table.getStorageHandler().canProvideBasicStatistics();
     }
     return true;
   }
@@ -2037,7 +2034,7 @@ public class StatsUtils {
    * Can run additional checks compared to the version in StatsSetupConst.
    */
   public static boolean areBasicStatsUptoDateForQueryAnswering(Table table, Map<String, String> params) {
-    return checkCanProvideStats(table) == true ? StatsSetupConst.areBasicStatsUptoDate(params) : false;
+    return checkCanProvideStats(table) && StatsSetupConst.areBasicStatsUptoDate(params);
   }
 
   /**
@@ -2045,7 +2042,7 @@ public class StatsUtils {
    * Can run additional checks compared to the version in StatsSetupConst.
    */
   public static boolean areColumnStatsUptoDateForQueryAnswering(Table table, Map<String, String> params, String colName) {
-    return checkCanProvideStats(table) == true ? StatsSetupConst.areColumnStatsUptoDate(params, colName) : false;
+    return checkCanProvideStats(table) && StatsSetupConst.areColumnStatsUptoDate(params, colName);
   }
 
   /**
