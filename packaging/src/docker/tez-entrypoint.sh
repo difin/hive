@@ -18,6 +18,9 @@ HIVE_LIB=${HIVE_HOME}/lib
 export JVM_OPTS="-server -Djava.net.preferIPv4Stack=true -Dlog4j.configurationFile=${TEZ_LOG4J2_PROPERTIES_FILE_NAME} -DisThreadContextMapInheritable=true"
 export HIVE_LOG4J2_PROPERTIES_FILE_NAME=${TEZ_LOG4J2_PROPERTIES_FILE_NAME} #make services run by hive executable log properly
 
+# HADOOP_CLIENT_OPTS variable is applied to all processes started by the 'hive' executable
+export HADOOP_CLIENT_OPTS="-Xmx2048m"
+
 if [ "${TEZ_ASYNC_LOG_ENABLED}" = true ] ; then
     echo "Async log enabled for tez.."
     export JVM_OPTS="${JVM_OPTS} -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -Dlog4j2.asyncLoggerRingBufferSize=1000000"

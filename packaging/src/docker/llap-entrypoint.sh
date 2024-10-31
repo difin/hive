@@ -5,6 +5,9 @@
 # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html
 export HIVE_LOG4J2_PROPERTIES_FILE_NAME=${LLAP_LOG4J2_PROPERTIES_FILE_NAME} #make services run by hive executable log properly
 
+# HADOOP_CLIENT_OPTS variable is applied to all processes started by the 'hive' executable
+export HADOOP_CLIENT_OPTS="-Xmx2048m"
+
 RESP=`curl --connect-timeout 2 -s -f http://169.254.169.254/latest/meta-data/public-hostname`
 exit_status=$?
 FQDN=`hostname -f`
