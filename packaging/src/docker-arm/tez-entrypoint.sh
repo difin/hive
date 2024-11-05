@@ -19,7 +19,7 @@ export JVM_OPTS="-server -Djava.net.preferIPv4Stack=true -Dlog4j.configurationFi
 export HIVE_LOG4J2_PROPERTIES_FILE_NAME=${TEZ_LOG4J2_PROPERTIES_FILE_NAME} #make services run by hive executable log properly
 
 # HADOOP_CLIENT_OPTS variable is applied to all processes started by the 'hive' executable
-export HADOOP_CLIENT_OPTS="-Xmx2048m"
+export HADOOP_CLIENT_OPTS="-Xmx2048m ${HADOOP_CLIENT_OPTS}"
 
 if [ "${TEZ_ASYNC_LOG_ENABLED}" = true ] ; then
     echo "Async log enabled for tez.."
