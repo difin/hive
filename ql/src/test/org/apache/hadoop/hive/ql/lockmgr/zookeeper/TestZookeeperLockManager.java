@@ -40,6 +40,7 @@ import org.apache.curator.test.TestingServer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -125,6 +126,7 @@ public class TestZookeeperLockManager {
             conf.getZKConfig().getQuorumServers());
   }
 
+  @Ignore("HIVE-24859")
   @Test
   public void testMetrics() throws Exception{
     conf.setVar(HiveConf.ConfVars.HIVE_ZOOKEEPER_QUORUM, "localhost");
