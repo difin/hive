@@ -141,6 +141,7 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooDefs.Perms;
 import org.apache.zookeeper.data.ACL;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
@@ -519,14 +520,19 @@ public class HiveServer2 extends CompositeService {
     long otelExporterFrequency =
         hiveConf.getTimeVar(ConfVars.HIVE_OTEL_METRICS_FREQUENCY_SECONDS, TimeUnit.MILLISECONDS);
     if (otelExporterFrequency > 0) {
-      otelExporter = new OTELExporter(AutoConfiguredOpenTelemetrySdk.initialize().getOpenTelemetrySdk(),
-          cliService.getSessionManager(), otelExporterFrequency);
+      try {
+        otelExporter =
+            new OTELExporter(GlobalOpenTelemetry.get(), cliService.getSessionManager(), otelExporterFrequency,
+                getServerHost());
 
-      otelExporter.setName("OTEL Exporter");
-      otelExporter.setDaemon(true);
-      otelExporter.start();
+        otelExporter.setName("OTEL Exporter");
+        otelExporter.setDaemon(true);
+        otelExporter.start();
 
-      LOG.info("Started OTEL exporter with frequency {}", otelExporterFrequency);
+        LOG.info("Started OTEL exporter with frequency {}", otelExporterFrequency);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
     }
 
     // Add a shutdown hook for catching SIGTERM & SIGINT
