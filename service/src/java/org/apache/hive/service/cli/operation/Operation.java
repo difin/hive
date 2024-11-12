@@ -207,8 +207,7 @@ public abstract class Operation {
 
   protected final void assertState(List<OperationState> states) throws HiveSQLException {
     if (!states.contains(state)) {
-      throw new HiveSQLException("Expected states: " + states.toString() + ", but found "
-          + this.state);
+      throw new HiveSQLException("Expected states: " + states + ", but found " + this.state, null, null, queryState.getQueryId());
     }
     this.lastAccessTime = System.currentTimeMillis();
   }
@@ -369,13 +368,13 @@ public abstract class Operation {
       EnumSet<FetchOrientation> supportedOrientations) throws HiveSQLException {
     if (!supportedOrientations.contains(orientation)) {
       throw new HiveSQLException("The fetch type " + orientation.toString() +
-          " is not supported for this resultset", "HY106");
+          " is not supported for this resultset", "HY106", queryState.getQueryId());
     }
   }
 
-  protected HiveSQLException toSQLException(String prefix, CommandProcessorException e) {
+  protected HiveSQLException toSQLException(String prefix, CommandProcessorException e, String queryId) {
     HiveSQLException ex =
-        new HiveSQLException(prefix + ": " + e.getErrorMessage(), e.getSqlState(), e.getResponseCode());
+        new HiveSQLException(prefix + ": " + e.getErrorMessage(), e.getSqlState(), e.getResponseCode(), queryId);
     if (e.getException() != null) {
       ex.initCause(e.getException());
     }

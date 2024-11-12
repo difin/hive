@@ -56,7 +56,6 @@ import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.exec.FetchTask;
 import org.apache.hadoop.hive.ql.log.PerfLogger;
 import org.apache.hadoop.hive.ql.metadata.Hive;
-import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.serde.serdeConstants;
@@ -214,10 +213,10 @@ public class SQLOperation extends ExecuteStatementOperation {
       setHasResultSet(driver.hasResultSet());
     } catch (CommandProcessorException e) {
       setState(OperationState.ERROR);
-      throw toSQLException("Error while compiling statement", e);
+      throw toSQLException("Error while compiling statement", e, queryState.getQueryId());
     } catch (Throwable e) {
       setState(OperationState.ERROR);
-      throw new HiveSQLException("Error running query: " + e.toString(), e);
+      throw new HiveSQLException("Error running query: " + e.toString(), e, queryState.getQueryId());
     }
   }
 
@@ -249,11 +248,13 @@ public class SQLOperation extends ExecuteStatementOperation {
       }
       setState(OperationState.ERROR);
       if (e instanceof CommandProcessorException) {
-        throw toSQLException("Error while compiling statement", (CommandProcessorException)e);
+        throw toSQLException("Error while compiling statement", (CommandProcessorException) e, queryState.getQueryId());
       } else if (e instanceof HiveSQLException) {
-        throw (HiveSQLException) e;
+        throw new HiveSQLException(e, queryState.getQueryId());
+      } else if (e instanceof OutOfMemoryError) {
+        throw (OutOfMemoryError) e;
       } else {
-        throw new HiveSQLException("Error running query: " + e.toString(), e);
+        throw new HiveSQLException("Error running query", e, queryState.getQueryId());
       }
     }
     setState(OperationState.FINISHED);
@@ -290,7 +291,7 @@ public class SQLOperation extends ExecuteStatementOperation {
       } catch (RejectedExecutionException rejected) {
         setState(OperationState.ERROR);
         throw new HiveSQLException("The background threadpool cannot accept" +
-            " new task for execution, please retry the operation", rejected);
+            " new task for execution, please retry the operation", rejected, queryState.getQueryId());
       }
     }
   }
@@ -388,7 +389,7 @@ public class SQLOperation extends ExecuteStatementOperation {
     try {
       return Utils.getUGI();
     } catch (Exception e) {
-      throw new HiveSQLException("Unable to get current user", e);
+      throw new HiveSQLException("Unable to get current user", e, queryState.getQueryId());
     }
   }
 
@@ -498,7 +499,7 @@ public class SQLOperation extends ExecuteStatementOperation {
     } catch (IOException e) {
       throw new HiveSQLException(e);
     } catch (Exception e) {
-      throw new HiveSQLException("Unable to get the next row set with exception: " + e.getMessage(), e);
+      throw new HiveSQLException("Unable to get the next row set with exception: " + e.getMessage(), e, queryState.getQueryId());
     } finally {
       convey.clear();
     }
@@ -516,17 +517,17 @@ public class SQLOperation extends ExecuteStatementOperation {
           mapper.writeValue(out, statuses);
           return out.toString("UTF-8");
         } catch (JsonGenerationException e) {
-          throw new HiveSQLException(e);
+          throw new HiveSQLException(e, queryState.getQueryId());
         } catch (JsonMappingException e) {
-          throw new HiveSQLException(e);
+          throw new HiveSQLException(e, queryState.getQueryId());
         } catch (IOException e) {
-          throw new HiveSQLException(e);
+          throw new HiveSQLException(e, queryState.getQueryId());
         } finally {
           if (out != null) {
             try {
               out.close();
             } catch (IOException e) {
-              throw new HiveSQLException(e);
+              throw new HiveSQLException(e, queryState.getQueryId());
             }
           }
         }
