@@ -53,8 +53,7 @@
     <maven.antrun.plugin.version>1.7</maven.antrun.plugin.version>
     <checkstyle.conf.dir>${basedir}/checkstyle/</checkstyle.conf.dir>
     <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
-    <maven.surefire.plugin.version>3.0.0-M4</maven.surefire.plugin.version>
-
+    <maven.surefire.plugin.version>3.5.1</maven.surefire.plugin.version>
     <!-- Dependency versions -->
     <aircompressor.version>0.27</aircompressor.version>
     <antlr.version>4.9.3</antlr.version>
@@ -86,8 +85,8 @@
     <jetty.version>9.4.58.v20250814</jetty.version>
     <jexl.version>3.3</jexl.version>
     <junit.version>4.13.2</junit.version>
-    <junit.jupiter.version>5.6.2</junit.jupiter.version>
-    <junit.vintage.version>5.6.3</junit.vintage.version>
+    <junit.jupiter.version>5.11.2</junit.jupiter.version>
+    <junit.vintage.version>5.11.2</junit.vintage.version>
     <jwt.provider.api.version>0.10.0.0.1.0-b14</jwt.provider.api.version>
     <libfb303.version>0.9.3</libfb303.version>
     <libthrift.version>0.16.0</libthrift.version>

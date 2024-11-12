@@ -67,8 +67,7 @@
     <maven.build-helper.plugin.version>1.12</maven.build-helper.plugin.version>
     <maven.eclipse.plugin.version>2.10</maven.eclipse.plugin.version>
     <maven.shade.plugin.version>3.6.0</maven.shade.plugin.version>
-    <maven.surefire.plugin.version>3.0.0-M4</maven.surefire.plugin.version>
-
+    <maven.surefire.plugin.version>3.5.1</maven.surefire.plugin.version>
     <!-- Library Dependency Versions -->
     <accumulo.version>1.7.0.7.2.11.0-233</accumulo.version>
     <activemq.version>5.16.3</activemq.version>
@@ -139,8 +138,8 @@
     <jodd.version>6.0.0</jodd.version>
     <json.version>1.8</json.version>
     <junit.version>4.13.2</junit.version>
-    <junit.jupiter.version>5.10.0</junit.jupiter.version>
-    <junit.vintage.version>5.6.3</junit.vintage.version>
+    <junit.jupiter.version>5.11.2</junit.jupiter.version>
+    <junit.vintage.version>5.11.2</junit.vintage.version>
     <kafka.version>2.5.0.7.2.11.0-233</kafka.version>
     <kryo.version>4.0.2</kryo.version>
     <kudu.version>1.17.0.7.3.2.0-SNAPSHOT</kudu.version>
@@ -1649,6 +1648,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven.surefire.plugin.version}</version>
         <configuration>
+          <enableOutErrElements>false</enableOutErrElements>
           <excludes>
             <exclude>**/TestSerDe.java</exclude>
             <exclude>**/TestHiveMetaStore.java</exclude>
@@ -1661,10 +1661,11 @@
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <forkCount>1</forkCount>
           <reuseForks>false</reuseForks>
-          <failIfNoTests>false</failIfNoTests>
+          <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
           <argLine>
             @{jacoco.agent.args}
             ${maven.test.jvm.args}
+            -Xshare:off
           </argLine>
           <trimStackTrace>false</trimStackTrace>
           <additionalClasspathElements>
