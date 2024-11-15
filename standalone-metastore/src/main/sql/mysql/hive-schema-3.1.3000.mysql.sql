@@ -156,6 +156,50 @@ CREATE TABLE IF NOT EXISTS `GLOBAL_PRIVS` (
   UNIQUE KEY `GLOBALPRIVILEGEINDEX` (`AUTHORIZER`,`PRINCIPAL_NAME`,`PRINCIPAL_TYPE`,`USER_PRIV`,`GRANTOR`,`GRANTOR_TYPE`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `IDXS`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `IDXS` (
+  `INDEX_ID` bigint(20) NOT NULL,
+  `CREATE_TIME` int(11) NOT NULL,
+  `DEFERRED_REBUILD` bit(1) NOT NULL,
+  `INDEX_HANDLER_CLASS` varchar(4000) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `INDEX_NAME` varchar(128) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `INDEX_TBL_ID` bigint(20) DEFAULT NULL,
+  `LAST_ACCESS_TIME` int(11) NOT NULL,
+  `ORIG_TBL_ID` bigint(20) DEFAULT NULL,
+  `SD_ID` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`INDEX_ID`),
+  UNIQUE KEY `UNIQUEINDEX` (`INDEX_NAME`,`ORIG_TBL_ID`),
+  KEY `IDXS_N51` (`SD_ID`),
+  KEY `IDXS_N50` (`INDEX_TBL_ID`),
+  KEY `IDXS_N49` (`ORIG_TBL_ID`),
+  CONSTRAINT `IDXS_FK1` FOREIGN KEY (`ORIG_TBL_ID`) REFERENCES `TBLS` (`TBL_ID`),
+  CONSTRAINT `IDXS_FK2` FOREIGN KEY (`SD_ID`) REFERENCES `SDS` (`SD_ID`),
+  CONSTRAINT `IDXS_FK3` FOREIGN KEY (`INDEX_TBL_ID`) REFERENCES `TBLS` (`TBL_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `INDEX_PARAMS`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `INDEX_PARAMS` (
+  `INDEX_ID` bigint(20) NOT NULL,
+  `PARAM_KEY` varchar(256) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
+  `PARAM_VALUE` varchar(4000) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  PRIMARY KEY (`INDEX_ID`,`PARAM_KEY`),
+  KEY `INDEX_PARAMS_N49` (`INDEX_ID`),
+  CONSTRAINT `INDEX_PARAMS_FK1` FOREIGN KEY (`INDEX_ID`) REFERENCES `IDXS` (`INDEX_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 --
 -- Table structure for table `NUCLEUS_TABLES`
 --
@@ -1345,9 +1389,9 @@ CREATE TABLE IF NOT EXISTS `DC_PRIVS` (
   CONSTRAINT `DC_PRIVS_FK1` FOREIGN KEY (`NAME`) REFERENCES `DATACONNECTORS` (`NAME`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO CDH_VERSION (VER_ID, SCHEMA_VERSION, VERSION_COMMENT) VALUES (1, '3.1.3000.7.2.18.0-Update3', 'Hive release version 3.1.3000 for CDH 7.2.18.0-Update3');
+INSERT INTO CDH_VERSION (VER_ID, SCHEMA_VERSION, VERSION_COMMENT) VALUES (1, '3.1.3000.7.2.18.0-Update2', 'Hive release version 3.1.3000 for CDH 7.2.18.0-Update2');
 
-SELECT 'Initialized metastore schema to 3.1.3000.7.2.18.0-Update3';
+SELECT 'Initialized metastore schema to 3.1.3000.7.2.18.0-Update2';
 
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
