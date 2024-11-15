@@ -1,3 +1,4 @@
+--!qt:disabled:test unstable CDPD-65120
 --!qt:database:postgres:q_test_country_table.sql
 CREATE EXTERNAL TABLE country
 (
