@@ -57,6 +57,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveProject;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSortExchange;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSortLimit;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSemiJoin;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTableFunctionScan;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTableScan;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveValues;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.jdbc.HiveJdbcConverter;
@@ -174,6 +175,10 @@ public class PlanModifierForASTConv {
         if (!validSetopChild(inputRel)) {
           introduceDerivedTable(inputRel, setop);
         }
+      }
+    } else if (rel instanceof HiveTableFunctionScan) {
+      if (!validTableFunctionScanChild((HiveTableFunctionScan)rel)) {
+        introduceDerivedTable(rel.getInput(0), rel);
       }
     } else if (rel instanceof SingleRel) {
       if (rel instanceof HiveJdbcConverter) {
@@ -388,6 +393,11 @@ public class PlanModifierForASTConv {
 
   private static boolean validExchangeChild(HiveSortExchange sortNode) {
     return sortNode.getInput() instanceof Project;
+  }
+
+  private static boolean validTableFunctionScanChild(HiveTableFunctionScan htfsNode) {
+    return htfsNode.getInputs().size() == 1 &&
+        (htfsNode.getInput(0) instanceof Project || htfsNode.getInput(0) instanceof HiveTableScan);
   }
 
   private static boolean validSetopParent(RelNode setop, RelNode parent) {

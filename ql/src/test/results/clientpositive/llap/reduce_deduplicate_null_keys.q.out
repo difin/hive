@@ -73,10 +73,10 @@ STAGE PLANS:
                   Lateral View Forward
                     Statistics: Num rows: 1 Data size: 2 Basic stats: COMPLETE Column stats: COMPLETE
                     Select Operator
-                      Statistics: Num rows: 1 Data size: 276 Basic stats: COMPLETE Column stats: COMPLETE
+                      Statistics: Num rows: 1 Data size: 272 Basic stats: COMPLETE Column stats: COMPLETE
                       Lateral View Join Operator
                         outputColumnNames: _col5, _col6
-                        Statistics: Num rows: 2 Data size: 684 Basic stats: COMPLETE Column stats: COMPLETE
+                        Statistics: Num rows: 2 Data size: 680 Basic stats: COMPLETE Column stats: COMPLETE
                         Select Operator
                           expressions: _col5 (type: int), (_col5 + 1) (type: int)
                           outputColumnNames: _col0, _col1
@@ -95,7 +95,7 @@ STAGE PLANS:
                         function name: posexplode
                         Lateral View Join Operator
                           outputColumnNames: _col5, _col6
-                          Statistics: Num rows: 2 Data size: 684 Basic stats: COMPLETE Column stats: COMPLETE
+                          Statistics: Num rows: 2 Data size: 680 Basic stats: COMPLETE Column stats: COMPLETE
                           Select Operator
                             expressions: _col5 (type: int), (_col5 + 1) (type: int)
                             outputColumnNames: _col0, _col1
