@@ -27,7 +27,7 @@
         <hive.path.to.root>..</hive.path.to.root>
         <path.to.iceberg.root>.</path.to.iceberg.root>
         <iceberg.mockito-core.version>3.4.4</iceberg.mockito-core.version>
-        <iceberg.avro.version>1.11.3</iceberg.avro.version>
+        <iceberg.avro.version>1.11.4</iceberg.avro.version>
         <iceberg.junit.version>4.13</iceberg.junit.version>
         <iceberg.kryo.version>5.5.0</iceberg.kryo.version>
         <iceberg.checkstyle.plugin.version>3.1.2</iceberg.checkstyle.plugin.version>
