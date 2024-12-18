@@ -47,6 +47,10 @@
           <groupId>org.apache.log4j</groupId>
           <artifactId>log4j-1.2.17-cloudera6</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.jersey.media</groupId>
+          <artifactId>jersey-media-multipart</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

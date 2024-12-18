@@ -37,7 +37,7 @@
     <!-- used for vector code-gen -->
     <dependency>
       <groupId>org.apache.atlas</groupId>
-      <artifactId>atlas-client-v2</artifactId>
+      <artifactId>atlas-client-v2-shaded</artifactId>
       <version>${atlas.version}</version>
       <exclusions>
         <exclusion>
@@ -47,6 +47,10 @@
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>jul-to-slf4j</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.jersey.media</groupId>
+          <artifactId>jersey-media-multipart</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
