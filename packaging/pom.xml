@@ -241,6 +241,10 @@
               <artifactId>*</artifactId>
             </exclusion>
             <exclusion>
+              <groupId>org.apache.ozone</groupId>
+              <artifactId>ozone-filesystem-hadoop3</artifactId>
+            </exclusion>
+            <exclusion>
               <groupId>org.apache.hadoop</groupId>
               <artifactId>*</artifactId>
             </exclusion>
@@ -446,7 +450,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>docker</id>
+      <id>dockeramd</id>
       <build>
         <plugins>
           <plugin>
@@ -456,33 +460,6 @@
             <configuration>
               <imagePullPolicy>IfNotPresent</imagePullPolicy>
               <images>
-                <image>
-                  <alias>hive-buildx</alias>
-                  <name>hive-arm</name>
-                  <build>
-                    <contextDir>${project.basedir}/src/docker-arm</contextDir>
-                    <args>
-                      <CDH_VERSION>${project.version}</CDH_VERSION>
-                      <HADOOP_VERSION>${hadoop.version}</HADOOP_VERSION>
-                      <RANGER_VERSION>${ranger.version}</RANGER_VERSION>
-                      <TEZ_VERSION>${tez.version}</TEZ_VERSION>
-                      <ATLAS_VERSION>${atlas.version}</ATLAS_VERSION>
-                      <SOLR_VERSION>${solr.version}</SOLR_VERSION>
-                    </args>
-                    <buildx>
-                      <platforms>
-                        <platform>linux/arm64</platform>
-                      </platforms>
-                    </buildx>
-                    <tags>
-                      <tag>${hive.tag}</tag>
-                    </tags>
-                    <assembly>
-                      <mode>dir</mode>
-                      <descriptor>${project.basedir}/src/main/assembly/bin.xml</descriptor>
-                    </assembly>
-                  </build>
-                </image>
                 <image>
                   <alias>hive</alias>
                   <name>hive</name>
@@ -517,6 +494,87 @@
                     <tags>
                       <tag>${hive.tag}</tag>
                     </tags>
+                  </build>
+                </image>
+              </images>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.tez</groupId>
+          <artifactId>tez-api</artifactId>
+          <version>${tez.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tez</groupId>
+          <artifactId>tez-runtime-library</artifactId>
+          <version>${tez.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tez</groupId>
+          <artifactId>tez-runtime-internals</artifactId>
+          <version>${tez.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tez</groupId>
+          <artifactId>tez-mapreduce</artifactId>
+          <version>${tez.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tez</groupId>
+          <artifactId>tez-dag</artifactId>
+          <version>${tez.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.ranger</groupId>
+          <artifactId>ranger-hive-plugin</artifactId>
+          <version>${ranger.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.atlas</groupId>
+          <artifactId>hive-bridge</artifactId>
+          <version>${atlas.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.oozie</groupId>
+          <artifactId>oozie-client</artifactId>
+          <version>${oozie.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>dockerarm</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.44.0</version>
+            <configuration>
+              <imagePullPolicy>IfNotPresent</imagePullPolicy>
+              <images>
+                <image>
+                  <alias>hive</alias>
+                  <name>hive</name>
+                  <build>
+                    <contextDir>${project.basedir}/src/docker-arm</contextDir>
+                    <args>
+                      <CDH_VERSION>${project.version}</CDH_VERSION>
+                      <HADOOP_VERSION>${hadoop.version}</HADOOP_VERSION>
+                      <RANGER_VERSION>${ranger.version}</RANGER_VERSION>
+                      <TEZ_VERSION>${tez.version}</TEZ_VERSION>
+                      <ATLAS_VERSION>${atlas.version}</ATLAS_VERSION>
+                      <SOLR_VERSION>${solr.version}</SOLR_VERSION>
+                    </args>
+                    <tags>
+                      <tag>${hive.tag}</tag>
+                    </tags>
+                    <assembly>
+                      <mode>dir</mode>
+                      <descriptor>${project.basedir}/src/main/assembly/bin.xml</descriptor>
+                    </assembly>
                   </build>
                 </image>
               </images>

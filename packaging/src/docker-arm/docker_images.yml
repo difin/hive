@@ -1,9 +1,6 @@
 # Copyright (c) 2020 Cloudera, Inc. All rights reserved.
 docker_images:
   hive: hive
-  feng:
-    image: feng
-    multi_arch: false
 
 multi_arch: multi_splits
 registry: docker-private.infra.cloudera.com/cloudera
