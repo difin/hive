@@ -1402,7 +1402,7 @@ public class MetastoreConf {
         "hive.metastore.stats.auto.analyze.worker.count", 1,
         "Number of parallel analyze commands to run for background stats update."),
     STORAGE_SCHEMA_READER_IMPL("metastore.storage.schema.reader.impl", "metastore.storage.schema.reader.impl",
-        DefaultStorageSchemaReader.class.getName(),
+            "org.apache.hadoop.hive.metastore.SerDeStorageSchemaReader",
         "The class to use to read schemas from storage.  It must implement " +
         "org.apache.hadoop.hive.metastore.StorageSchemaReader"),
     STORE_MANAGER_TYPE("datanucleus.storeManagerType", "datanucleus.storeManagerType", "rdbms", "metadata store type"),
