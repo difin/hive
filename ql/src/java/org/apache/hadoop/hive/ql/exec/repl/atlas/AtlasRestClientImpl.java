@@ -47,7 +47,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.atlas.shaded.javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 
 /**
  * Implementation of RESTClient, encapsulates Atlas' REST APIs.
