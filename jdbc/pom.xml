@@ -173,7 +173,6 @@
                   <minimizeJar>${packaging.minimizeJar}</minimizeJar>
                   <shadedArtifactAttached>true</shadedArtifactAttached>
                   <shadedClassifierName>${hive.jdbc.driver.classifier}</shadedClassifierName>
-                  <createDependencyReducedPom>false</createDependencyReducedPom>
                   <artifactSet>
                     <excludes>
                       <exclude>org.apache.hadoop:hadoop-hdfs</exclude>
