@@ -132,7 +132,6 @@ RUN chmod 644 /usr/lib/hive/lib/ranger-hive-plugin-impl/solr-solrj-${SOLR_VERSIO
 
 COPY --from=atlas-base  /usr/lib/apache-atlas-hive-hook-${ATLAS_VERSION}/ /usr/lib/atlas/
 RUN ln -s /usr/lib/atlas/hook/hive/* /usr/lib/hive/lib/
-RUN ln -s /usr/lib/atlas/hook/hive/atlas-hive-plugin-impl/commons-configuration-*.jar /usr/lib/hive/lib/
 
 COPY --from=tez-base /usr/lib/tez /usr/lib/tez
 
