@@ -56,6 +56,21 @@
     </dependency>
     <dependency>
       <groupId>org.apache.atlas</groupId>
+      <artifactId>atlas-client-common</artifactId>
+      <version>${atlas.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jul-to-slf4j</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.atlas</groupId>
       <artifactId>atlas-intg</artifactId>
       <version>${atlas.version}</version>
       <exclusions>
