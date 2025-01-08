@@ -11,7 +11,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache</groupId>
@@ -67,7 +67,7 @@
     <datanucleus-core.version>5.2.10</datanucleus-core.version>
     <datanucleus-jdo.version>3.2.0-release</datanucleus-jdo.version>
     <datanucleus-rdbms.version>5.2.10</datanucleus-rdbms.version>
-    <derby.version>10.14.3.0-cloudera1</derby.version>
+    <derby.version>10.14.2.0</derby.version>
     <mariadb.version>2.5.0</mariadb.version>
     <mssql.version>6.2.1.jre8</mssql.version>
     <mysql.version>8.0.31</mysql.version>
@@ -76,9 +76,9 @@
     <dropwizard-metrics-hadoop-metrics2-reporter.version>0.1.2</dropwizard-metrics-hadoop-metrics2-reporter.version>
     <dropwizard.version>3.1.0</dropwizard.version>
     <guava.version>28.2-jre</guava.version>
-    <hadoop.version>3.1.1.7.2.18.400-4</hadoop.version>
+    <hadoop.version>3.1.1.7.3.1.0-197</hadoop.version>
     <hikaricp.version>2.6.1</hikaricp.version>
-    <jackson.version>2.12.7.20221012</jackson.version>
+    <jackson.version>2.15.0</jackson.version>
     <javolution.version>5.5.1</javolution.version>
     <jetty.version>9.4.54.v20240208</jetty.version>
     <jexl.version>3.3</jexl.version>
@@ -97,8 +97,8 @@
     <jline.version>2.14.6</jline.version>
     <storage-api.version>3.1.3000.2024.0.19.0-SNAPSHOT</storage-api.version>
     <ST4.version>4.0.4</ST4.version>
-    <zookeeper.version>3.8.1.7.2.18.400-4</zookeeper.version>
-    <curator.version>5.4.0.7.2.18.400-4</curator.version>
+    <zookeeper.version>3.8.1.7.3.1.0-197</zookeeper.version>
+    <curator.version>5.4.0.7.3.1.0-197</curator.version>
     <cron-utils.version>9.2.1</cron-utils.version>
     <httpcomponents.core.version>4.4.13</httpcomponents.core.version>
     <spring.version>5.3.39</spring.version>    <!-- Thrift properties -->
@@ -968,7 +968,7 @@
           <systemPropertyVariables>
             <build.dir>${project.build.directory}</build.dir>
             <datanucleus.schema.autoCreateAll>true</datanucleus.schema.autoCreateAll>
-            <derby.version>${derby.version}</derby.version>
+            <derby.version>10.14.2.0</derby.version>
             <derby.stream.error.file>${test.tmp.dir}/derby.log</derby.stream.error.file>
             <log4j.debug>true</log4j.debug>
             <java.io.tmpdir>${test.tmp.dir}</java.io.tmpdir>
