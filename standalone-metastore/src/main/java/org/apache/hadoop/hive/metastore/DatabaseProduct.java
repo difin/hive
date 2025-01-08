@@ -82,6 +82,17 @@ public enum DatabaseProduct {
         || (dbProduct == DERBY && "42X05".equalsIgnoreCase(e.getSQLState()));
   }
 
+  public static String toVarChar(DatabaseProduct dbType, String column) {
+    switch (dbType) {
+    case DERBY:
+      return String.format("CAST(%s AS VARCHAR(4000))", column);
+    case ORACLE:
+      return String.format("to_char(%s)", column);
+    default:
+      return column;
+    }
+  }
+
   /**
    * Whether the RDBMS has restrictions on IN list size (explicit, or poor perf-based).
    */

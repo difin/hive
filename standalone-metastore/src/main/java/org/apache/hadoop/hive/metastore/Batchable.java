@@ -19,6 +19,7 @@
 package org.apache.hadoop.hive.metastore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.jdo.Query;
 
@@ -69,6 +70,9 @@ public abstract class Batchable<I, R> {
       final int batchSize,
       List<I> input,
       Batchable<I, R> runnable) throws MetaException {
+    if (input == null || input.isEmpty()) {
+      return Collections.emptyList();
+    }
     if (batchSize == NO_BATCHING || batchSize >= input.size()) {
       return runnable.run(input);
     }
