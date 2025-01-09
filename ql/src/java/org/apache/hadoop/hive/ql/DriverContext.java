@@ -28,6 +28,9 @@ import org.apache.hadoop.hive.ql.cache.results.CacheUsage;
 import org.apache.hadoop.hive.ql.cache.results.QueryResultsCache.CacheEntry;
 import org.apache.hadoop.hive.ql.engine.EngineEventSequence;
 import org.apache.hadoop.hive.ql.exec.FetchTask;
+import org.apache.hadoop.hive.ql.exec.Utilities;
+import org.apache.hadoop.hive.ql.exec.tez.TezRuntimeContext;
+import org.apache.hadoop.hive.ql.exec.tez.TezTask;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.plan.mapper.StatsSource;
 
@@ -84,6 +87,8 @@ public class DriverContext {
   private String operationId;
   private String queryErrorMessage;
 
+  private TezRuntimeContext runtimeContext;
+
   public DriverContext(QueryState queryState, QueryInfo queryInfo, String userName, HookRunner hookRunner,
       HiveTxnManager initTxnManager) {
     this.queryState = queryState;
@@ -136,6 +141,18 @@ public class DriverContext {
 
   public void setPlan(QueryPlan plan) {
     this.plan = plan;
+    // only set runtimeContext if the plan is not null
+    // we don't want to nullify runtimeContext if this method is called with plan=null, which is the case when e.g.
+    // driver.releasePlan() tries to release resources/objects that are known to be heavy
+    if (plan != null) {
+      this.runtimeContext = Utilities.getFirstTezTask(plan.getRootTasks())
+          .map(TezTask::getRuntimeContext)
+          .orElse(null);
+    }
+  }
+
+  public TezRuntimeContext getRuntimeContext() {
+    return runtimeContext;
   }
 
   public Schema getSchema() {

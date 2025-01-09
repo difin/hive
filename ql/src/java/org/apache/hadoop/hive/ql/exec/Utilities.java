@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.io.Serializable;
@@ -2914,6 +2915,10 @@ public final class Utilities {
 
   public static List<TezTask> getTezTasks(List<Task<? extends Serializable>> tasks) {
     return getTasks(tasks, new TaskFilterFunction<>(TezTask.class));
+  }
+
+  public static Optional<TezTask> getFirstTezTask(List<Task<? extends Serializable>> tasks) {
+    return getTezTasks(tasks).stream().findFirst();
   }
 
   public static List<ExecDriver> getMRTasks(List<Task<? extends Serializable>> tasks) {
