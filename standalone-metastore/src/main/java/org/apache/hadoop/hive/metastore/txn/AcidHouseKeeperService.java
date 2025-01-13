@@ -40,6 +40,7 @@ public class AcidHouseKeeperService implements MetastoreTaskThread {
   private Configuration conf;
   private boolean isCompactorEnabled;
   private TxnStore txnHandler;
+  private boolean shouldUseMutex = true;
 
   @Override
   public void setConf(Configuration configuration) {
@@ -62,19 +63,14 @@ public class AcidHouseKeeperService implements MetastoreTaskThread {
 
   @Override
   public void run() {
-    TxnStore.MutexAPI.LockHandle handle = null;
-    try {
-      handle = txnHandler.getMutexAPI().acquireLock(TxnStore.MUTEX_KEY.HouseKeeper.name());
+    TxnStore.MutexAPI mutex = shouldUseMutex ? txnHandler.getMutexAPI() : new NoMutex();
+    try (AutoCloseable closeable = mutex.acquireLock(TxnStore.MUTEX_KEY.HouseKeeper.name())) {
       LOG.info("Starting to run AcidHouseKeeperService.");
       long start = System.currentTimeMillis();
       cleanTheHouse();
       LOG.debug("Total time AcidHouseKeeperService took: {} seconds.", elapsedSince(start));
     } catch (Throwable t) {
       LOG.error("Unexpected error in thread: {}, message: {}", Thread.currentThread().getName(), t.getMessage(), t);
-    } finally {
-      if (handle != null) {
-        handle.releaseLocks();
-      }
     }
   }
 
@@ -96,5 +92,10 @@ public class AcidHouseKeeperService implements MetastoreTaskThread {
 
   private long elapsedSince(long start) {
     return (System.currentTimeMillis() - start) / 1000;
+  }
+
+  @Override
+  public void enforceMutex(boolean enableMutex) {
+    this.shouldUseMutex = enableMutex;
   }
 }

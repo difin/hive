@@ -35,6 +35,7 @@ public class AcidTxnCleanerService implements MetastoreTaskThread {
 
   private Configuration conf;
   private TxnStore txnHandler;
+  private boolean shouldUseMutex = true;
 
   @Override
   public void setConf(Configuration configuration) {
@@ -54,22 +55,22 @@ public class AcidTxnCleanerService implements MetastoreTaskThread {
 
   @Override
   public void run() {
-    TxnStore.MutexAPI.LockHandle handle = null;
-    try {
-      handle = txnHandler.getMutexAPI().acquireLock(TxnStore.MUTEX_KEY.TxnCleaner.name());
+    TxnStore.MutexAPI mutex = shouldUseMutex ? txnHandler.getMutexAPI() : new NoMutex();
+    try (AutoCloseable closeable = mutex.acquireLock(TxnStore.MUTEX_KEY.TxnCleaner.name())) {
       long start = System.currentTimeMillis();
       txnHandler.cleanEmptyAbortedTxns();
       LOG.debug("Txn cleaner service took: {} seconds.", elapsedSince(start));
     } catch (Throwable t) {
       LOG.error("Unexpected error in thread: {}, message: {}", Thread.currentThread().getName(), t.getMessage(), t);
-    } finally {
-      if (handle != null) {
-        handle.releaseLocks();
-      }
     }
   }
 
   private long elapsedSince(long start) {
     return (System.currentTimeMillis() - start) / 1000;
+  }
+
+  @Override
+  public void enforceMutex(boolean enableMutex) {
+    this.shouldUseMutex = enableMutex;
   }
 }
