@@ -1,4 +1,3 @@
---! qt:disabled:Re-enable this q test once IMPALA-13465 is merged.
 set metastore.metadata.transformer.class=org.apache.hadoop.hive.metastore.MetastoreDefaultTransformer;
 
 --! qt:dataset:impala_dataset

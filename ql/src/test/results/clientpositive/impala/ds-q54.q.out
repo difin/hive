@@ -349,27 +349,27 @@ Per-Host Resources: mem-estimate=256.00MB mem-reservation=68.00MB thread-reserva
   |
   35:TOP-N [LIMIT=100]
   |  order by: casttoint(divide(sum(default.impala_tpcds_store_sales.ss_ext_sales_price), 50)) ASC NULLS LAST, count(*) ASC NULLS LAST
-  |  mem-estimate=20B mem-reservation=0B thread-reservation=0
-  |  tuple-ids=34 row-size=20B cardinality=1
+  |  mem-estimate=0B mem-reservation=0B thread-reservation=0
+  |  tuple-ids=34 row-size=20B cardinality=0
   |  in pipelines: 35(GETNEXT), 34(OPEN)
   |
   00:UNION
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
-  |  tuple-ids=33 row-size=20B cardinality=1
+  |  tuple-ids=33 row-size=20B cardinality=0
   |  in pipelines: 34(GETNEXT)
   |
   34:AGGREGATE [FINALIZE]
   |  output: count(*)
   |  group by: casttoint(divide(sum(default.impala_tpcds_store_sales.ss_ext_sales_price), CAST(50 AS DECIMAL(3,0))))
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=32 row-size=12B cardinality=1
+  |  tuple-ids=32 row-size=12B cardinality=0
   |  in pipelines: 34(GETNEXT), 33(OPEN)
   |
   33:AGGREGATE [FINALIZE]
   |  output: sum(default.impala_tpcds_store_sales.ss_ext_sales_price)
   |  group by: default.impala_tpcds_customer.c_customer_sk
   |  mem-estimate=128.00MB mem-reservation=34.00MB spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=31 row-size=20B cardinality=1
+  |  tuple-ids=31 row-size=20B cardinality=0
   |  in pipelines: 33(GETNEXT), 28(OPEN)
   |
   32:NESTED LOOP JOIN [INNER JOIN, BROADCAST]
