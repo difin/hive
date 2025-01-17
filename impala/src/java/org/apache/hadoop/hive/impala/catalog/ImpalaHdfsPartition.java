@@ -23,7 +23,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.impala.analysis.LiteralExpr;
@@ -37,8 +36,6 @@ import org.apache.impala.thrift.TNetworkAddress;
 import org.apache.impala.util.AcidUtils;
 import org.apache.impala.util.ListMap;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import org.slf4j.Logger;
@@ -90,7 +87,8 @@ public class ImpalaHdfsPartition extends HdfsPartition {
         null /*encodedInsertFileDescriptors*/, null /*encodedDeleteFileDescriptors*/,
         location, false, accessLevel, Maps.newHashMap() /*hmsParameters*/,
         null /*cachedMsPartitionDescriptor*/, null /*partitionStats*/, false, numRows, -1L,
-        null /*inFlightEvents*/, -1L /*createEventId*/, -1L /*lastCompactionId*/);
+        null /*inFlightEvents*/, -1L /*createEventId*/, -1L /*lastCompactionId*/,
+        new HdfsTable.FileMetadataStats(fileDescriptors));
     try {
       this.hostIndex = hostIndex;
       Preconditions.checkNotNull(getLocationPath().toUri().getScheme(),

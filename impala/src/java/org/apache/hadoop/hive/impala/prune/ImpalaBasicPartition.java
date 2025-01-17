@@ -35,7 +35,6 @@ import org.apache.impala.thrift.THdfsPartitionLocation;
 import org.apache.impala.thrift.TPartitionStats;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 /**
  * The basic partition information contains only the partition name.
@@ -52,13 +51,15 @@ public class ImpalaBasicPartition extends HdfsPartition {
 
   public ImpalaBasicPartition(String partitionName, List<LiteralExpr> partitionKeyValues)
       throws MetaException, CatalogException {
-    super(null /*table*/, -1L /*prevId*/, partitionName,
+    super(null /*table*/, -1L /*id*/, -1L /*prevId*/, partitionName,
         partitionKeyValues, null /*fileFormatDescriptor*/,
-        ImmutableList.copyOf(new ArrayList<byte[]>()) /*fileDescriptors*/,
+        ImmutableList.copyOf(new ArrayList<byte[]>()) /*encodedFileDescriptors*/,
         null /*encodedInsertFileDescriptors*/, null /*encodedDeleteFileDescriptors*/,
-        null /*location*/, false, null /*accessLevel*/, Maps.newHashMap() /*hmsParameters*/,
-        null /*cachedMsPartitionDescriptor*/, null /*partitionStats*/, false, -1L, -1L,
-        null /*inFlightEvents*/);
+        null /*location*/, false /*isMarkedCached*/, null /*accessLevel*/,
+        Maps.newHashMap() /*hmsParameters*/, null /*cachedMsPartitionDescriptor*/,
+        null /*partitionStats*/, false /*hasIncrementalStats*/, -1L /*numRows*/,
+        -1L /*writeId*/, null /*inFlightEvents*/, -1L /*createEventId*/,
+        -1L /*lastCompactionId*/, new HdfsTable.FileMetadataStats());
   }
 
   @Override
