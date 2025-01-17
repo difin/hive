@@ -32,7 +32,7 @@
     <oozie.version>5.1.0.7.2.18.400-40</oozie.version>
     <ranger.version>2.4.0.7.2.18.400-40</ranger.version>
     <solr.version>8.11.2.7.2.18.400-40</solr.version>
-    <hive.tag>2024.0.19.0-343</hive.tag>
+    <hive.tag>2024.0.19.0-353</hive.tag>
   </properties>
 
   <profiles>
