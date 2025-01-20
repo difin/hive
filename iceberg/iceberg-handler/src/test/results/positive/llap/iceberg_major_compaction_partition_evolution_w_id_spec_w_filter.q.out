@@ -305,7 +305,7 @@ Table Parameters:
 #### A masked pattern was here ####
 	rawDataSize         	0                   
 	serialization.format	1                   
-	snapshot-count      	15                  
+	snapshot-count      	14                  
 	storage_handler     	org.apache.iceberg.mr.hive.HiveIcebergStorageHandler
 	table_type          	ICEBERG             
 	totalSize           	#Masked#                
@@ -329,5 +329,5 @@ POSTHOOK: type: SHOW COMPACTIONS
 CompactionId	Database	Table	Partition	Type	State	Worker host	Worker	Enqueue Time	Start Time	Duration(ms)	HadoopJobId	Error message	Initiator host	Initiator	Pool name	TxnId	Next TxnId	Commit Time	Highest WriteID
 #Masked#	default	ice_orc	company_id=100/dept_id=1	MAJOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
 #Masked#	default	ice_orc	company_id=100/dept_id=2	MAJOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
-#Masked#	default	ice_orc	company_id=100/dept_id=4	MAJOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+#Masked#	default	ice_orc	company_id=100/dept_id=4	MAJOR	refused	#Masked#	manual	default	0	0	0	 --- 
 #Masked#	default	ice_orc	 --- 	MAJOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
