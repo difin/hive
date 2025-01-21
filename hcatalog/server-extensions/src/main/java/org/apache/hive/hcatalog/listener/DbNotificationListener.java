@@ -1078,7 +1078,7 @@ public class DbNotificationListener extends TransactionalMetaStoreEventListener 
     String select = sqlGenerator.addForUpdateClause("select \"WNL_ID\", \"WNL_FILES\" from" +
             " \"TXN_WRITE_NOTIFICATION_LOG\" " +
             "where \"WNL_DATABASE\" = ? " +
-            "and \"WNL_TABLE\" = ? " + " and \"WNL_PARTITION\" = ? " +
+            "and \"WNL_TABLE\" = ? " + " and (\"WNL_PARTITION\" = ? OR (? IS NULL AND \"WNL_PARTITION\" IS NULL)) " +
             "and \"WNL_TXNID\" = ? ");
     List<Integer> insertList = new ArrayList<>();
     Map<Integer, Pair<Long, String>> updateMap = new HashMap<>();
@@ -1094,7 +1094,8 @@ public class DbNotificationListener extends TransactionalMetaStoreEventListener 
         pst.setString(1, dbName);
         pst.setString(2, tblName);
         pst.setString(3, partition);
-        pst.setLong(4, txnId);
+        pst.setString(4, partition);
+        pst.setLong(5, txnId);
         rs = pst.executeQuery();
         if (!rs.next()) {
           insertList.add(i);
