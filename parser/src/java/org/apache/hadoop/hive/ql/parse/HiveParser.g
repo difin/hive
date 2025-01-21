@@ -505,6 +505,7 @@ TOK_AS_OF_TIME;
 TOK_AS_OF_VERSION;
 TOK_FROM_VERSION;
 TOK_AS_OF_TAG;
+TOK_WRITE_LOCALLY_ORDERED;
 }
 
 
@@ -548,6 +549,8 @@ import org.apache.hadoop.hive.conf.HiveConf;
     xlateMap.put("KW_NULLS", "NULLS");
     xlateMap.put("KW_LAST", "LAST");
     xlateMap.put("KW_ORDER", "ORDER");
+    xlateMap.put("KW_ORDERED", "ORDERED");
+    xlateMap.put("KW_LOCALLY", "LOCALLY");
     xlateMap.put("KW_BY", "BY");
     xlateMap.put("KW_GROUP", "GROUP");
     xlateMap.put("KW_WHERE", "WHERE");
@@ -1915,6 +1918,14 @@ tableImplBuckets
     -> ^(TOK_ALTERTABLE_BUCKETS $num)
     ;
 
+tableWriteLocallyOrdered
+@init { pushMsg("table sorted specification", state); }
+@after { popMsg(state); }
+    :
+      KW_WRITE KW_LOCALLY KW_ORDERED KW_BY sortCols=columnNameOrderList
+    -> ^(TOK_WRITE_LOCALLY_ORDERED $sortCols?)
+    ;
+    
 tableSkewed
 @init { pushMsg("table skewed specification", state); }
 @after { popMsg(state); }
@@ -2276,6 +2287,8 @@ columnNameOrder
             ^(TOK_TABSORTCOLNAMEDESC ^(TOK_NULLS_LAST identifier))
     -> {$orderSpec.tree.getType()==HiveParser.KW_ASC}?
             ^(TOK_TABSORTCOLNAMEASC ^($nullSpec identifier))
+    -> {$orderSpec.tree.getType()==HiveParser.KW_DESC}?
+            ^(TOK_TABSORTCOLNAMEDESC ^($nullSpec identifier))
     -> ^(TOK_TABSORTCOLNAMEDESC ^($nullSpec identifier))
     ;
 

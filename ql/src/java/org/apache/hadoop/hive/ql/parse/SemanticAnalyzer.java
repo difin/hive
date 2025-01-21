@@ -73,6 +73,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.antlr.runtime.ClassicToken;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
@@ -132,6 +134,8 @@ import org.apache.hadoop.hive.ql.cache.results.CacheUsage;
 import org.apache.hadoop.hive.ql.cache.results.QueryResultsCache;
 import org.apache.hadoop.hive.ql.ddl.DDLWork;
 import org.apache.hadoop.hive.ql.ddl.misc.hooks.InsertCommitHookDesc;
+import org.apache.hadoop.hive.ql.ddl.misc.sortoder.SortFieldDesc;
+import org.apache.hadoop.hive.ql.ddl.misc.sortoder.SortFields;
 import org.apache.hadoop.hive.ql.ddl.table.constraint.ConstraintsUtils;
 import org.apache.hadoop.hive.ql.ddl.table.convert.AlterTableConvertOperation;
 import org.apache.hadoop.hive.ql.ddl.table.create.CreateTableDesc;
@@ -332,9 +336,15 @@ import org.apache.hadoop.mapred.InputFormat;
 import org.apache.hadoop.mapred.OutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.hadoop.util.ReflectionUtils;
-
-
+import org.apache.hadoop.util.ReflectionUtils;import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+import com.google.common.math.IntMath;
+import com.google.common.math.LongMath;
 /**
  * Implementation of the semantic analyzer. It generates the query plan.
  * There are other specific semantic analyzers for some hive operations such as
@@ -480,7 +490,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
   };
 
   private int subQueryExpressionAliasCounter = 0;
-
+  private static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper();
   static class Phase1Ctx {
     String dest;
     int nextNum;
@@ -14439,7 +14449,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     boolean partitionTransformSpecExists = false;
     String likeFile = null;
     String likeFileFormat = null;
-
+    String sortOrder = null;
     RowFormatParams rowFormatParams = new RowFormatParams();
     StorageFormat storageFormat = new StorageFormat(conf);
 
@@ -14571,6 +14581,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           numBuckets = Integer.parseInt(child.getChild(2).getText());
         }
         break;
+      case HiveParser.TOK_WRITE_LOCALLY_ORDERED:
+        sortOrder = getSortOrderJson((ASTNode) child.getChild(0));
+        break;
       case HiveParser.TOK_TABLEROWFORMAT:
         rowFormatParams.analyzeRowFormat(child);
         break;
@@ -14699,7 +14712,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       isExt = isExternalTableChanged(tblProps, isTransactional, isExt, isDefaultTableTypeChanged);
       addDbAndTabToOutputs(new String[] {qualifiedTabName.getDb(), qualifiedTabName.getTable()},
           TableType.MANAGED_TABLE, isTemporary, tblProps, storageFormat);
-
+      if (!Strings.isNullOrEmpty(sortOrder)) {
+        tblProps.put("default-sort-order", sortOrder);
+      }
       CreateTableDesc crtTblDesc = new CreateTableDesc(qualifiedTabName,
           isExt, isTemporary, cols, partCols,
           bucketCols, sortCols, numBuckets, rowFormatParams.fieldDelim,
@@ -16682,7 +16697,26 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       rewrittenQueryStr.append(")");
     }
   }
-
+  
+  private String getSortOrderJson(ASTNode ast) {
+    List<SortFieldDesc> sortFieldDescList = new ArrayList<>();
+    SortFields sortFields = new SortFields(sortFieldDescList);
+    for (int i = 0; i < ast.getChildCount(); i++) {
+      ASTNode child = (ASTNode) ast.getChild(i);
+      SortFieldDesc.SortDirection sortDirection = child.getToken()
+          .getType() == HiveParser.TOK_TABSORTCOLNAMEDESC ? SortFieldDesc.SortDirection.DESC : SortFieldDesc.SortDirection.ASC;
+      child = (ASTNode) child.getChild(0);
+      String name = unescapeIdentifier(child.getChild(0).getText()).toLowerCase();
+      SortFieldDesc.NullOrder nullOrder = child.getToken().getType() == HiveParser.TOK_NULLS_FIRST ? SortFieldDesc.NullOrder.NULLS_FIRST : SortFieldDesc.NullOrder.NULLS_LAST;
+      sortFieldDescList.add(new SortFieldDesc(name, sortDirection, nullOrder));
+    }
+    try {
+      return JSON_OBJECT_MAPPER.writer().writeValueAsString(sortFields);
+    } catch (JsonProcessingException e) {
+      LOG.warn("Can not create write order json. ", e);      
+      return null;
+    }
+  }
   @Override
   public WriteEntity getAcidAnalyzeTable() {
     return acidAnalyzeTable;
