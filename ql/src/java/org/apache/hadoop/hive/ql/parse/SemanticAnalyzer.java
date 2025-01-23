@@ -7725,9 +7725,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         dpCtx.setRootPath(queryTmpdir);
       }
 
-      // Add NOT NULL constraint check
-      input = genConstraintsPlan(dest, qb, input);
-
       if (!qb.getIsQuery()) {
         isAlreadyContainsPartCols = Optional.ofNullable(destinationTable)
             .map(Table::getStorageHandler)
@@ -7742,6 +7739,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx, destinationTable);
         }
       }
+
+      // Add NOT NULL constraint check
+      input = genConstraintsPlan(dest, qb, input);
 
       if (destinationTable.isMaterializedView() &&
           mvRebuildMode == MaterializationRebuildMode.INSERT_OVERWRITE_REBUILD) {
@@ -7886,8 +7886,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
             + queryTmpdir + " from " + destinationPath);
       }
 
-      // Add NOT NULL constraint check
-      input = genConstraintsPlan(dest, qb, input);
       if (destinationTable.getStorageHandler() != null && destinationTable.getStorageHandler().alwaysUnpartitioned()) {
         partSpec = qbm.getPartSpecForAlias(dest);
       }
@@ -7905,6 +7903,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           input = genConversionSelectOperator(dest, qb, input, tableDescriptor, dpCtx, destinationTable);
         }
       }
+
+      // Add NOT NULL constraint check
+      input = genConstraintsPlan(dest, qb, input);
 
       if (destinationTable.isMaterializedView() &&
           mvRebuildMode == MaterializationRebuildMode.INSERT_OVERWRITE_REBUILD) {
