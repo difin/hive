@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.ArrayUtils;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
@@ -899,6 +900,16 @@ public class SharedWorkOptimizer extends Transform {
     if (mapJoinOp1.getConf().getPosBigTable() != mapJoinOp2.getConf().getPosBigTable()) {
       return false;
     }
+
+    // Map Joins when vectorized can have different formats for the hash tables built on the small table.
+    // Reusing hash tables between different join type can lead to ClassCastException or even wrong results.
+    if (ArrayUtils.isNotEmpty(mapJoinOp1.getConf().getConds())
+        && ArrayUtils.isNotEmpty(mapJoinOp2.getConf().getConds())
+        && mapJoinOp1.getConf().getConds()[0].getType() != mapJoinOp2.getConf().getConds()[0].getType()
+        && (mapJoinOp1.getConf().isNoOuterJoin() || mapJoinOp2.getConf().isNoOuterJoin())) {
+        return false;
+    }
+
 
     for (int i = 0; i < mapJoinOp1.getNumParent(); i ++) {
       if (i == mapJoinOp1.getConf().getPosBigTable()) {
