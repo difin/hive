@@ -471,7 +471,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   |
   46:EXCHANGE [UNPARTITIONED]
      mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=3 row-size=8B cardinality=1
+     tuple-ids=3 row-size=8B cardinality=0
      in pipelines: 02(GETNEXT)
 
 F01:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -481,7 +481,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   02:AGGREGATE
   |  output: count(*)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=3 row-size=8B cardinality=1
+  |  tuple-ids=3 row-size=8B cardinality=0
   |  in pipelines: 02(GETNEXT), 01(OPEN)
   |
   01:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -508,8 +508,8 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   |  in pipelines: 50(GETNEXT), 05(OPEN)
   |
   49:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=5 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=5 row-size=24B cardinality=0
      in pipelines: 05(GETNEXT)
 
 F03:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -519,7 +519,7 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   05:AGGREGATE
   |  output: sum(default.impala_tpcds_store_sales_0.ss_ext_discount_amt), count(default.impala_tpcds_store_sales_0.ss_ext_discount_amt)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=5 row-size=24B cardinality=1
+  |  tuple-ids=5 row-size=24B cardinality=0
   |  in pipelines: 05(GETNEXT), 04(OPEN)
   |
   04:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -546,8 +546,8 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   |  in pipelines: 53(GETNEXT), 08(OPEN)
   |
   52:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=7 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=7 row-size=24B cardinality=0
      in pipelines: 08(GETNEXT)
 
 F05:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -557,7 +557,7 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   08:AGGREGATE
   |  output: sum(default.impala_tpcds_store_sales_1.ss_net_profit), count(default.impala_tpcds_store_sales_1.ss_net_profit)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=7 row-size=24B cardinality=1
+  |  tuple-ids=7 row-size=24B cardinality=0
   |  in pipelines: 08(GETNEXT), 07(OPEN)
   |
   07:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -585,7 +585,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   |
   55:EXCHANGE [UNPARTITIONED]
      mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=9 row-size=8B cardinality=1
+     tuple-ids=9 row-size=8B cardinality=0
      in pipelines: 11(GETNEXT)
 
 F07:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -595,7 +595,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   11:AGGREGATE
   |  output: count(*)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=9 row-size=8B cardinality=1
+  |  tuple-ids=9 row-size=8B cardinality=0
   |  in pipelines: 11(GETNEXT), 10(OPEN)
   |
   10:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -622,8 +622,8 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   |  in pipelines: 59(GETNEXT), 14(OPEN)
   |
   58:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=11 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=11 row-size=24B cardinality=0
      in pipelines: 14(GETNEXT)
 
 F09:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -633,7 +633,7 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   14:AGGREGATE
   |  output: sum(default.impala_tpcds_store_sales_3.ss_ext_discount_amt), count(default.impala_tpcds_store_sales_3.ss_ext_discount_amt)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=11 row-size=24B cardinality=1
+  |  tuple-ids=11 row-size=24B cardinality=0
   |  in pipelines: 14(GETNEXT), 13(OPEN)
   |
   13:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -660,8 +660,8 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   |  in pipelines: 62(GETNEXT), 17(OPEN)
   |
   61:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=13 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=13 row-size=24B cardinality=0
      in pipelines: 17(GETNEXT)
 
 F11:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -671,7 +671,7 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   17:AGGREGATE
   |  output: sum(default.impala_tpcds_store_sales_4.ss_net_profit), count(default.impala_tpcds_store_sales_4.ss_net_profit)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=13 row-size=24B cardinality=1
+  |  tuple-ids=13 row-size=24B cardinality=0
   |  in pipelines: 17(GETNEXT), 16(OPEN)
   |
   16:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -699,7 +699,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   |
   64:EXCHANGE [UNPARTITIONED]
      mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=15 row-size=8B cardinality=1
+     tuple-ids=15 row-size=8B cardinality=0
      in pipelines: 20(GETNEXT)
 
 F13:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -709,7 +709,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   20:AGGREGATE
   |  output: count(*)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=15 row-size=8B cardinality=1
+  |  tuple-ids=15 row-size=8B cardinality=0
   |  in pipelines: 20(GETNEXT), 19(OPEN)
   |
   19:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -736,8 +736,8 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   |  in pipelines: 68(GETNEXT), 23(OPEN)
   |
   67:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=17 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=17 row-size=24B cardinality=0
      in pipelines: 23(GETNEXT)
 
 F15:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -747,7 +747,7 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   23:AGGREGATE
   |  output: sum(default.impala_tpcds_store_sales_6.ss_ext_discount_amt), count(default.impala_tpcds_store_sales_6.ss_ext_discount_amt)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=17 row-size=24B cardinality=1
+  |  tuple-ids=17 row-size=24B cardinality=0
   |  in pipelines: 23(GETNEXT), 22(OPEN)
   |
   22:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -774,8 +774,8 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   |  in pipelines: 71(GETNEXT), 26(OPEN)
   |
   70:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=19 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=19 row-size=24B cardinality=0
      in pipelines: 26(GETNEXT)
 
 F17:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -785,7 +785,7 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   26:AGGREGATE
   |  output: sum(default.impala_tpcds_store_sales_7.ss_net_profit), count(default.impala_tpcds_store_sales_7.ss_net_profit)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=19 row-size=24B cardinality=1
+  |  tuple-ids=19 row-size=24B cardinality=0
   |  in pipelines: 26(GETNEXT), 25(OPEN)
   |
   25:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -813,7 +813,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   |
   73:EXCHANGE [UNPARTITIONED]
      mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=21 row-size=8B cardinality=1
+     tuple-ids=21 row-size=8B cardinality=0
      in pipelines: 29(GETNEXT)
 
 F19:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -823,7 +823,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   29:AGGREGATE
   |  output: count(*)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=21 row-size=8B cardinality=1
+  |  tuple-ids=21 row-size=8B cardinality=0
   |  in pipelines: 29(GETNEXT), 28(OPEN)
   |
   28:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -850,8 +850,8 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   |  in pipelines: 77(GETNEXT), 32(OPEN)
   |
   76:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=23 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=23 row-size=24B cardinality=0
      in pipelines: 32(GETNEXT)
 
 F21:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -861,7 +861,7 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   32:AGGREGATE
   |  output: sum(default.impala_tpcds_store_sales_9.ss_ext_discount_amt), count(default.impala_tpcds_store_sales_9.ss_ext_discount_amt)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=23 row-size=24B cardinality=1
+  |  tuple-ids=23 row-size=24B cardinality=0
   |  in pipelines: 32(GETNEXT), 31(OPEN)
   |
   31:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -888,8 +888,8 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   |  in pipelines: 80(GETNEXT), 35(OPEN)
   |
   79:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=25 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=25 row-size=24B cardinality=0
      in pipelines: 35(GETNEXT)
 
 F23:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -899,7 +899,7 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   35:AGGREGATE
   |  output: sum(default.impala_tpcds_store_sales_10.ss_net_profit), count(default.impala_tpcds_store_sales_10.ss_net_profit)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=25 row-size=24B cardinality=1
+  |  tuple-ids=25 row-size=24B cardinality=0
   |  in pipelines: 35(GETNEXT), 34(OPEN)
   |
   34:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -927,7 +927,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   |
   82:EXCHANGE [UNPARTITIONED]
      mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=27 row-size=8B cardinality=1
+     tuple-ids=27 row-size=8B cardinality=0
      in pipelines: 38(GETNEXT)
 
 F25:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -937,7 +937,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   38:AGGREGATE
   |  output: count(*)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=27 row-size=8B cardinality=1
+  |  tuple-ids=27 row-size=8B cardinality=0
   |  in pipelines: 38(GETNEXT), 37(OPEN)
   |
   37:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -964,8 +964,8 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   |  in pipelines: 86(GETNEXT), 41(OPEN)
   |
   85:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=29 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=29 row-size=24B cardinality=0
      in pipelines: 41(GETNEXT)
 
 F27:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -975,7 +975,7 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   41:AGGREGATE
   |  output: sum(default.impala_tpcds_store_sales_12.ss_ext_discount_amt), count(default.impala_tpcds_store_sales_12.ss_ext_discount_amt)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=29 row-size=24B cardinality=1
+  |  tuple-ids=29 row-size=24B cardinality=0
   |  in pipelines: 41(GETNEXT), 40(OPEN)
   |
   40:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]
@@ -1002,8 +1002,8 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   |  in pipelines: 89(GETNEXT), 44(OPEN)
   |
   88:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=31 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=31 row-size=24B cardinality=0
      in pipelines: 44(GETNEXT)
 
 F29:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -1013,7 +1013,7 @@ Per-Host Resources: mem-estimate=128.00KB mem-reservation=0B thread-reservation=
   44:AGGREGATE
   |  output: sum(default.impala_tpcds_store_sales_13.ss_net_profit), count(default.impala_tpcds_store_sales_13.ss_net_profit)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=31 row-size=24B cardinality=1
+  |  tuple-ids=31 row-size=24B cardinality=0
   |  in pipelines: 44(GETNEXT), 43(OPEN)
   |
   43:SCAN HDFS [default.impala_tpcds_store_sales, RANDOM]

@@ -46,7 +46,7 @@ Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   |
   02:EXCHANGE [UNPARTITIONED]
      mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=2 row-size=8B cardinality=1
+     tuple-ids=2 row-size=8B cardinality=0
      in pipelines: 01(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -56,7 +56,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   01:AGGREGATE
   |  output: ndv(default.impala_tpch_lineitem.l_returnflag)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=2 row-size=8B cardinality=1
+  |  tuple-ids=2 row-size=8B cardinality=0
   |  in pipelines: 01(GETNEXT), 00(OPEN)
   |
   00:SCAN HDFS [default.impala_tpch_lineitem, RANDOM]

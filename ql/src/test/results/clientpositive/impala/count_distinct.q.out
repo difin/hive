@@ -20,7 +20,7 @@ STAGE PLANS:
     Impala
       Impala Plan: 
 F02:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
-Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=36.00KB mem-reservation=0B thread-reservation=1
   PLAN-ROOT SINK
   |  output exprs: count(CASE WHEN aggif(valid_tid(2,3) IN (2, 3), CASE valid_tid(2,3) WHEN 2 THEN 1 WHEN 3 THEN 2 END) = 1 AND CASE valid_tid(2,3) WHEN 2 THEN default.impala_tpch_lineitem.l_quantity WHEN 3 THEN NULL END IS NOT NULL THEN 1 ELSE NULL END), count(CASE WHEN aggif(valid_tid(2,3) IN (2, 3), CASE valid_tid(2,3) WHEN 2 THEN 1 WHEN 3 THEN 2 END) = 2 AND CASE valid_tid(2,3) WHEN 2 THEN NULL WHEN 3 THEN default.impala_tpch_lineitem.l_suppkey END IS NOT NULL THEN 1 ELSE NULL END)
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
@@ -32,8 +32,8 @@ Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   |  in pipelines: 07(GETNEXT), 03(OPEN)
   |
   06:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=5 row-size=16B cardinality=1
+     mem-estimate=20.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=5 row-size=16B cardinality=0
      in pipelines: 03(GETNEXT)
 
 F01:PLAN FRAGMENT [HASH(CASE valid_tid(2,3) WHEN 2 THEN murmur_hash(default.impala_tpch_lineitem.l_quantity) WHEN 3 THEN murmur_hash(NULL) END,CASE valid_tid(2,3) WHEN 2 THEN murmur_hash(NULL) WHEN 3 THEN murmur_hash(default.impala_tpch_lineitem.l_suppkey) END)] hosts=1 instances=1
@@ -43,7 +43,7 @@ Per-Host Resources: mem-estimate=384.00MB mem-reservation=102.00MB thread-reserv
   03:AGGREGATE
   |  output: count(CASE WHEN aggif(valid_tid(2,3) IN (2, 3), CASE valid_tid(2,3) WHEN 2 THEN 1 WHEN 3 THEN 2 END) = CAST(1 AS BIGINT) AND CASE valid_tid(2,3) WHEN 2 THEN default.impala_tpch_lineitem.l_quantity WHEN 3 THEN NULL END IS NOT NULL THEN CAST(1 AS BIGINT) ELSE NULL END), count(CASE WHEN aggif(valid_tid(2,3) IN (2, 3), CASE valid_tid(2,3) WHEN 2 THEN 1 WHEN 3 THEN 2 END) = CAST(2 AS BIGINT) AND CASE valid_tid(2,3) WHEN 2 THEN NULL WHEN 3 THEN default.impala_tpch_lineitem.l_suppkey END IS NOT NULL THEN CAST(1 AS BIGINT) ELSE NULL END)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=5 row-size=16B cardinality=1
+  |  tuple-ids=5 row-size=16B cardinality=0
   |  in pipelines: 03(GETNEXT), 02(OPEN)
   |
   02:AGGREGATE [FINALIZE]
@@ -726,8 +726,8 @@ Per-Host Resources: mem-estimate=256.06MB mem-reservation=68.00MB thread-reserva
   |  in pipelines: 05(GETNEXT), 00(OPEN)
   |
   04:EXCHANGE [HASH(CASE valid_tid(2,4,6) WHEN 2 THEN murmur_hash(default.impala_tpch_lineitem.l_suppkey) WHEN 4 THEN murmur_hash(default.impala_tpch_lineitem.l_quantity) WHEN 6 THEN 0 END)]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=2N,4N,6N row-size=32B cardinality=1
+     mem-estimate=44.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=2N,4N,6N row-size=32B cardinality=0
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -742,7 +742,7 @@ Per-Host Resources: mem-estimate=256.19MB mem-reservation=68.00MB thread-reserva
   |  Class 2
   |    output: count(default.impala_tpch_lineitem.l_quantity), count(default.impala_tpch_lineitem.l_orderkey)
   |  mem-estimate=256.02MB mem-reservation=68.00MB thread-reservation=0
-  |  tuple-ids=2N,4N,6N row-size=32B cardinality=1
+  |  tuple-ids=2N,4N,6N row-size=32B cardinality=0
   |  in pipelines: 00(GETNEXT)
   |
   00:SCAN HDFS [default.impala_tpch_lineitem, RANDOM]
@@ -845,8 +845,8 @@ Per-Host Resources: mem-estimate=384.08MB mem-reservation=102.00MB thread-reserv
   |  in pipelines: 05(GETNEXT), 00(OPEN)
   |
   04:EXCHANGE [HASH(CASE valid_tid(2,4,6,8) WHEN 2 THEN murmur_hash(default.impala_tpch_lineitem.l_suppkey) WHEN 4 THEN murmur_hash(default.impala_tpch_lineitem.l_quantity) WHEN 6 THEN murmur_hash(default.impala_tpch_lineitem.l_orderkey) WHEN 8 THEN 0 END)]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=2N,4N,6N,8N row-size=32B cardinality=1
+     mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=2N,4N,6N,8N row-size=32B cardinality=0
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -863,7 +863,7 @@ Per-Host Resources: mem-estimate=384.20MB mem-reservation=102.00MB thread-reserv
   |  Class 3
   |    output: count(default.impala_tpch_lineitem.l_quantity)
   |  mem-estimate=384.02MB mem-reservation=102.00MB thread-reservation=0
-  |  tuple-ids=2N,4N,6N,8N row-size=32B cardinality=1
+  |  tuple-ids=2N,4N,6N,8N row-size=32B cardinality=0
   |  in pipelines: 00(GETNEXT)
   |
   00:SCAN HDFS [default.impala_tpch_lineitem, RANDOM]
@@ -1201,8 +1201,8 @@ Per-Host Resources: mem-estimate=384.08MB mem-reservation=102.00MB thread-reserv
   |  in pipelines: 05(GETNEXT), 00(OPEN)
   |
   04:EXCHANGE [HASH(CASE valid_tid(2,4,6,8) WHEN 2 THEN murmur_hash(default.impala_tpch_lineitem.l_suppkey) WHEN 4 THEN murmur_hash(default.impala_tpch_lineitem.l_quantity) WHEN 6 THEN murmur_hash(default.impala_tpch_lineitem.l_orderkey) WHEN 8 THEN 0 END)]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=2N,4N,6N,8N row-size=32B cardinality=1
+     mem-estimate=48.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=2N,4N,6N,8N row-size=32B cardinality=0
      in pipelines: 00(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -1219,7 +1219,7 @@ Per-Host Resources: mem-estimate=384.20MB mem-reservation=102.00MB thread-reserv
   |  Class 3
   |    output: count(default.impala_tpch_lineitem.l_quantity)
   |  mem-estimate=384.02MB mem-reservation=102.00MB thread-reservation=0
-  |  tuple-ids=2N,4N,6N,8N row-size=32B cardinality=1
+  |  tuple-ids=2N,4N,6N,8N row-size=32B cardinality=0
   |  in pipelines: 00(GETNEXT)
   |
   00:SCAN HDFS [default.impala_tpch_lineitem, RANDOM]

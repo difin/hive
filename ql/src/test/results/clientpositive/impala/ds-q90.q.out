@@ -184,7 +184,7 @@ Per-Host Resources: mem-estimate=48.02KB mem-reservation=0B thread-reservation=1
   |
   22:EXCHANGE [UNPARTITIONED]
      mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=8 row-size=8B cardinality=1
+     tuple-ids=8 row-size=8B cardinality=0
      in pipelines: 08(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -194,7 +194,7 @@ Per-Host Resources: mem-estimate=5.86MB mem-reservation=5.81MB thread-reservatio
   08:AGGREGATE
   |  output: count(*)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=8 row-size=8B cardinality=1
+  |  tuple-ids=8 row-size=8B cardinality=0
   |  in pipelines: 08(GETNEXT), 01(OPEN)
   |
   07:HASH JOIN [INNER JOIN, BROADCAST]
@@ -306,7 +306,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   |
   27:EXCHANGE [UNPARTITIONED]
      mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=17 row-size=8B cardinality=1
+     tuple-ids=17 row-size=8B cardinality=0
      in pipelines: 16(GETNEXT)
 
 F05:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -316,7 +316,7 @@ Per-Host Resources: mem-estimate=5.86MB mem-reservation=5.81MB thread-reservatio
   16:AGGREGATE
   |  output: count(*)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=17 row-size=8B cardinality=1
+  |  tuple-ids=17 row-size=8B cardinality=0
   |  in pipelines: 16(GETNEXT), 09(OPEN)
   |
   15:HASH JOIN [INNER JOIN, BROADCAST]

@@ -110,7 +110,7 @@ STAGE PLANS:
     Impala
       Impala Plan: 
 F04:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
-Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
+Per-Host Resources: mem-estimate=36.00KB mem-reservation=0B thread-reservation=1
   PLAN-ROOT SINK
   |  output exprs: divide(sum(default.impala_tpch_lineitem.l_extendedprice), CAST(7.0 AS DECIMAL(2,1)))
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
@@ -122,8 +122,8 @@ Per-Host Resources: mem-estimate=32.00KB mem-reservation=0B thread-reservation=1
   |  in pipelines: 12(GETNEXT), 06(OPEN)
   |
   11:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=7 row-size=16B cardinality=1
+     mem-estimate=20.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=7 row-size=16B cardinality=0
      in pipelines: 06(GETNEXT)
 
 F00:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -133,7 +133,7 @@ Per-Host Resources: mem-estimate=3.95MB mem-reservation=3.88MB thread-reservatio
   06:AGGREGATE
   |  output: sum(default.impala_tpch_lineitem.l_extendedprice)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=7 row-size=16B cardinality=1
+  |  tuple-ids=7 row-size=16B cardinality=0
   |  in pipelines: 06(GETNEXT), 00(OPEN)
   |
   05:HASH JOIN [INNER JOIN, BROADCAST]

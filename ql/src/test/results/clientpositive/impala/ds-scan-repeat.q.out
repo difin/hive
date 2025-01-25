@@ -268,7 +268,7 @@ Per-Host Resources: mem-estimate=204.00KB mem-reservation=0B thread-reservation=
   |
   18:EXCHANGE [UNPARTITIONED]
      mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=11 row-size=8B cardinality=1
+     tuple-ids=11 row-size=8B cardinality=0
      in pipelines: 09(GETNEXT)
 
 F04:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -278,7 +278,7 @@ Per-Host Resources: mem-estimate=64.00KB mem-reservation=0B thread-reservation=1
   09:AGGREGATE
   |  output: count(*)
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=11 row-size=8B cardinality=1
+  |  tuple-ids=11 row-size=8B cardinality=0
   |  in pipelines: 09(GETNEXT), 08(OPEN)
   |
   08:SCAN HDFS [default.impala_tpcds_item, RANDOM]

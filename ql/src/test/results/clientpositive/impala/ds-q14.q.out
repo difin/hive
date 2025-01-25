@@ -734,8 +734,8 @@ Per-Host Resources: mem-estimate=650.00MB mem-reservation=171.94MB thread-reserv
   |  |  in pipelines: 183(GETNEXT), 122(OPEN)
   |  |
   |  182:EXCHANGE [UNPARTITIONED]
-  |     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-  |     tuple-ids=131 row-size=24B cardinality=1
+  |     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+  |     tuple-ids=131 row-size=24B cardinality=0
   |     in pipelines: 122(GETNEXT)
   |
   |--82:NESTED LOOP JOIN [INNER JOIN, BROADCAST]
@@ -757,8 +757,8 @@ Per-Host Resources: mem-estimate=650.00MB mem-reservation=171.94MB thread-reserv
   |  |  in pipelines: 157(GETNEXT), 81(OPEN)
   |  |
   |  156:EXCHANGE [UNPARTITIONED]
-  |     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-  |     tuple-ids=87 row-size=24B cardinality=1
+  |     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+  |     tuple-ids=87 row-size=24B cardinality=0
   |     in pipelines: 81(GETNEXT)
   |
   41:NESTED LOOP JOIN [INNER JOIN, BROADCAST]
@@ -780,8 +780,8 @@ Per-Host Resources: mem-estimate=650.00MB mem-reservation=171.94MB thread-reserv
   |  in pipelines: 131(GETNEXT), 40(OPEN)
   |
   130:EXCHANGE [UNPARTITIONED]
-     mem-estimate=16.00KB mem-reservation=0B thread-reservation=0
-     tuple-ids=43 row-size=24B cardinality=1
+     mem-estimate=28.00KB mem-reservation=0B thread-reservation=0
+     tuple-ids=43 row-size=24B cardinality=0
      in pipelines: 40(GETNEXT)
 
 F06:PLAN FRAGMENT [RANDOM] hosts=1 instances=1
@@ -791,7 +791,7 @@ Per-Host Resources: mem-estimate=1.97MB mem-reservation=1.94MB thread-reservatio
   40:AGGREGATE
   |  output: sum(multiply(casttodecimal(quantity), list_price)), count(multiply(casttodecimal(quantity), list_price))
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=43 row-size=24B cardinality=1
+  |  tuple-ids=43 row-size=24B cardinality=0
   |  in pipelines: 40(GETNEXT), 31(OPEN), 34(OPEN), 37(OPEN)
   |
   30:UNION
@@ -1373,7 +1373,7 @@ Per-Host Resources: mem-estimate=1.97MB mem-reservation=1.94MB thread-reservatio
   81:AGGREGATE
   |  output: sum(multiply(casttodecimal(quantity), list_price)), count(multiply(casttodecimal(quantity), list_price))
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=87 row-size=24B cardinality=1
+  |  tuple-ids=87 row-size=24B cardinality=0
   |  in pipelines: 81(GETNEXT), 72(OPEN), 75(OPEN), 78(OPEN)
   |
   71:UNION
@@ -1953,7 +1953,7 @@ Per-Host Resources: mem-estimate=1.97MB mem-reservation=1.94MB thread-reservatio
   122:AGGREGATE
   |  output: sum(multiply(casttodecimal(quantity), list_price)), count(multiply(casttodecimal(quantity), list_price))
   |  mem-estimate=16.00KB mem-reservation=0B spill-buffer=2.00MB thread-reservation=0
-  |  tuple-ids=131 row-size=24B cardinality=1
+  |  tuple-ids=131 row-size=24B cardinality=0
   |  in pipelines: 122(GETNEXT), 113(OPEN), 116(OPEN), 119(OPEN)
   |
   112:UNION
