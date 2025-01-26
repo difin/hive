@@ -10,7 +10,6 @@ set hive.exec.dynamic.partition.mode=nonstrict;
 set hive.support.concurrency=true;
 set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 set hive.default.nulls.last=false;
-set hive.cbo.fallback.strategy=NEVER;
 
 
 -- Bucketing tests are slow and some tablesample ones don't work w/o MM

@@ -9,7 +9,6 @@ set hive.merge.mapfiles=false;
 set hive.merge.mapredfiles=false; 
 
 set hive.auto.convert.sortmerge.join.to.mapjoin=true;
-set hive.cbo.fallback.strategy=NEVER;
 
 set hive.default.nulls.last=false;
 

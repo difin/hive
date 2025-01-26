@@ -13,7 +13,6 @@ set hive.merge.mapredfiles=false;
 set hive.auto.convert.sortmerge.join.bigtable.selection.policy=org.apache.hadoop.hive.ql.optimizer.LeftmostBigTableSelectorForAutoSMJ;
 
 set hive.auto.convert.sortmerge.join.to.mapjoin=true;
-set hive.cbo.fallback.strategy=NEVER;
 
 set hive.default.nulls.last=false;
 

@@ -9,7 +9,6 @@ set hive.merge.mapredfiles=false;
 
 set hive.metastore.aggregate.stats.cache.enabled=false;
 set hive.default.nulls.last=false;
-set hive.cbo.fallback.strategy=NEVER;
 
 -- Create two bucketed and sorted tables
 CREATE TABLE test_table1_n11 (key INT, value STRING) PARTITIONED BY (ds STRING)

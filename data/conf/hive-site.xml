@@ -407,11 +407,6 @@
 </property>
 
 <property>
-  <name>hive.cbo.fallback.strategy</name>
-  <value>TEST</value>
-</property>
-
-<property>
   <name>hive.tez.exec.print.summary</name>
   <value>true</value>
 </property>

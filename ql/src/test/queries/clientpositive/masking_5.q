@@ -1,7 +1,6 @@
 --! qt:dataset:src
 set hive.mapred.mode=nonstrict;
 set hive.security.authorization.manager=org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactoryForTest;
-set hive.cbo.fallback.strategy=NEVER;
 
 create table masking_test_n6 as select cast(key as int) as key, value from src;
 
