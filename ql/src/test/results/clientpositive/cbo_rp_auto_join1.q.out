@@ -148,7 +148,7 @@ STAGE PLANS:
           TableScan
             Reduce Output Operator
               key expressions: key (type: int)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: key (type: int)
               Statistics: Num rows: 5 Data size: 60 Basic stats: COMPLETE Column stats: COMPLETE
@@ -156,7 +156,7 @@ STAGE PLANS:
           TableScan
             Reduce Output Operator
               key expressions: key (type: int)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: key (type: int)
               Statistics: Num rows: 5 Data size: 60 Basic stats: COMPLETE Column stats: COMPLETE
@@ -356,7 +356,7 @@ STAGE PLANS:
           TableScan
             Reduce Output Operator
               key expressions: key (type: int)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: key (type: int)
               Statistics: Num rows: 5 Data size: 20 Basic stats: COMPLETE Column stats: COMPLETE
@@ -373,7 +373,7 @@ STAGE PLANS:
                 Statistics: Num rows: 10 Data size: 40 Basic stats: COMPLETE Column stats: COMPLETE
                 Reduce Output Operator
                   key expressions: key (type: int)
-                  null sort order: a
+                  null sort order: z
                   sort order: +
                   Map-reduce partition columns: key (type: int)
                   Statistics: Num rows: 10 Data size: 40 Basic stats: COMPLETE Column stats: COMPLETE
@@ -553,7 +553,7 @@ STAGE PLANS:
           TableScan
             Reduce Output Operator
               key expressions: key (type: int)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: key (type: int)
               Statistics: Num rows: 5 Data size: 60 Basic stats: COMPLETE Column stats: COMPLETE
@@ -561,7 +561,7 @@ STAGE PLANS:
           TableScan
             Reduce Output Operator
               key expressions: key (type: int)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: key (type: int)
               Statistics: Num rows: 5 Data size: 60 Basic stats: COMPLETE Column stats: COMPLETE
@@ -569,7 +569,7 @@ STAGE PLANS:
           TableScan
             Reduce Output Operator
               key expressions: key (type: int)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: key (type: int)
               Statistics: Num rows: 5 Data size: 100 Basic stats: COMPLETE Column stats: COMPLETE
@@ -691,7 +691,7 @@ STAGE PLANS:
           TableScan
             Reduce Output Operator
               key expressions: key (type: int)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: key (type: int)
               Statistics: Num rows: 5 Data size: 60 Basic stats: COMPLETE Column stats: COMPLETE
@@ -699,7 +699,7 @@ STAGE PLANS:
           TableScan
             Reduce Output Operator
               key expressions: key (type: int)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: key (type: int)
               Statistics: Num rows: 5 Data size: 60 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1347,7 +1347,7 @@ STAGE PLANS:
           TableScan
             Reduce Output Operator
               key expressions: key (type: int)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: key (type: int)
               Statistics: Num rows: 5 Data size: 60 Basic stats: COMPLETE Column stats: COMPLETE
@@ -1355,7 +1355,7 @@ STAGE PLANS:
           TableScan
             Reduce Output Operator
               key expressions: key (type: int)
-              null sort order: a
+              null sort order: z
               sort order: +
               Map-reduce partition columns: key (type: int)
               Statistics: Num rows: 5 Data size: 60 Basic stats: COMPLETE Column stats: COMPLETE
