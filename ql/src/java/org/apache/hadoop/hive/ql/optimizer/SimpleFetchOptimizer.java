@@ -130,7 +130,6 @@ public class SimpleFetchOptimizer extends Transform {
   }
 
   // returns non-null FetchTask instance when succeeded
-  @SuppressWarnings("unchecked")
   private FetchTask optimize(ParseContext pctx, String alias, TableScanOperator source)
       throws Exception {
     String mode = HiveConf.getVar(
@@ -163,7 +162,7 @@ public class SimpleFetchOptimizer extends Transform {
         if (data.hasOnlyPruningFilter()) {
           // partitioned table + query has only pruning filters
           return true;
-        } else if (data.isPartitioned() == false && data.isFiltered() == false) {
+        } else if (!data.isPartitioned() && !data.isFiltered()) {
           // unpartitioned table + no filters
           return true;
         }
@@ -233,12 +232,9 @@ public class SimpleFetchOptimizer extends Transform {
 
       if (op instanceof FilterOperator) {
         ExprNodeDesc predicate = ((FilterOperator) op).getConf().getPredicate();
-        if (predicate instanceof ExprNodeConstantDesc
-                && "boolean".equals(predicate.getTypeInfo().getTypeName())) {
-          continue;
-        } else if (PartitionPruner.onlyContainsPartnCols(table, predicate)) {
-          continue;
-        } else {
+        if (!(predicate instanceof ExprNodeConstantDesc
+                && "boolean".equals(predicate.getTypeInfo().getTypeName()))
+            && !PartitionPruner.onlyContainsPartnCols(table, predicate)) {
           onlyPruningFilter = false;
         }
       }
@@ -425,7 +421,7 @@ public class SimpleFetchOptimizer extends Transform {
       inputs.clear();
       Utilities.addSchemaEvolutionToTableScanOperator(table, scanOp);
       TableDesc tableDesc = Utilities.getTableDesc(table);
-      if (!table.isPartitioned()) {
+      if (!table.isPartitioned() || table.hasNonNativePartitionSupport()) {
         inputs.add(new ReadEntity(table, parent, !table.isView() && parent == null));
         FetchWork work = new FetchWork(table.getPath(), tableDesc);
         PlanUtils.configureInputJobPropertiesForStorageHandler(work.getTblDesc());
@@ -568,7 +564,7 @@ public class SimpleFetchOptimizer extends Transform {
 
         status = (threshold - dataSize) >= 0 ? Status.PASS : Status.FAIL;
       } else if (table != null && table.isPartitioned() && partsList != null) {
-        List<Long> dataSizes = StatsUtils.getBasicStatForPartitions(table, partsList.getNotDeniedPartns(),
+        List<Long> dataSizes = StatsUtils.getBasicStatForPartitions(partsList.getNotDeniedPartns(),
           StatsSetupConst.TOTAL_SIZE);
         long totalDataSize = StatsUtils.getSumIgnoreNegatives(dataSizes);
         if (totalDataSize <= 0) {

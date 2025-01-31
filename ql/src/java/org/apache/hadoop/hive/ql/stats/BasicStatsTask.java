@@ -21,7 +21,6 @@ package org.apache.hadoop.hive.ql.stats;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +83,7 @@ import static org.apache.hadoop.hive.common.StatsSetupConst.UPDATE_COUNT;
 public class BasicStatsTask implements Serializable, IStatsProcessor {
 
   private static final long serialVersionUID = 1L;
-  private static transient final Logger LOG = LoggerFactory.getLogger(BasicStatsTask.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BasicStatsTask.class);
 
   private Table table;
   private Collection<Partition> dpPartSpecs;
@@ -137,9 +136,10 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
       this.work = work;
       this.conf = conf;
       followedColStats1 = followedColStats2;
+
       Table table = partish.getTable();
       if (table.isNonNative() && table.getStorageHandler().canProvideBasicStatistics()) {
-        providedBasicStats = table.getStorageHandler().getBasicStatistics(partish);
+        providedBasicStats = table.getStorageHandler().computeBasicStatistics(partish);
       }
     }
 
@@ -222,7 +222,7 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
     }
 
     private void updateStats(StatsAggregator statsAggregator, Map<String, String> parameters,
-        String aggKey) throws HiveException {
+        String aggKey) {
       for (String statType : StatsSetupConst.STATS_REQUIRE_COMPUTE) {
         String value = statsAggregator.aggregateStats(aggKey, statType);
         if (value != null && !value.isEmpty()) {
@@ -309,11 +309,8 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
 
       String tableFullName = table.getDbName() + "." + table.getTableName();
 
-      List<Partish> partishes = new ArrayList<>();
-
       if (partitions == null) {
-        Partish p;
-        partishes.add(p = new Partish.PTable(table));
+        Partish p = new Partish.PTable(table);
 
         BasicStatsProcessor basicStatsProcessor = new BasicStatsProcessor(p, work, conf, followedColStats);
         basicStatsProcessor.collectFileStatus(wh, conf);
@@ -341,7 +338,7 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
         // Need to get the old stats of the partition
         // and update the table stats based on the old and new stats.
 
-        List<Partition> updates = new ArrayList<Partition>();
+        List<Partition> updates = Lists.newArrayList();
 
         final ExecutorService pool = buildBasicStatsExecutor();
 
@@ -350,9 +347,10 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
         List<TransactionalStatsProcessor> transactionalStatsProcessors = Lists.newLinkedList();
 
         try {
-          for(final Partition partn : partitions) {
-            Partish p;
-            BasicStatsProcessor bsp = new BasicStatsProcessor(p = new Partish.PPart(table, partn), work, conf, followedColStats);
+          for (final Partition partn : partitions) {
+            Partish p = new Partish.PPart(table, partn);
+
+            BasicStatsProcessor bsp = new BasicStatsProcessor(p, work, conf, followedColStats);
             processors.add(bsp);
             transactionalStatsProcessors.add(new TransactionalStatsProcessor(db, p));
 
@@ -379,9 +377,7 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
             ret = 1;
           }
         } finally {
-          if (pool != null) {
-            pool.shutdownNow();
-          }
+          pool.shutdownNow();
           LOG.debug("Finished getting file stats of all partitions!");
         }
 
@@ -521,7 +517,7 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
       // INSERT OVERWRITE command
       LoadTableDesc tbd = work.getLoadTableDesc();
       table = db.getTable(tbd.getTable().getTableName());
-      if (!table.isPartitioned()) {
+      if (!table.isPartitioned() || table.hasNonNativePartitionSupport()) {
         return null;
       }
       DynamicPartitionCtx dpCtx = tbd.getDPCtx();
@@ -533,14 +529,10 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
           return db.getPartitionsByNames(table, partNames);
         }
       } else { // static partition
-        return singletonList(db.getPartition(table, tbd.getPartitionSpec(), false));
+        return singletonList(db.getPartition(table, tbd.getPartitionSpec()));
       }
     }
     return emptyList();
-  }
-
-  public Collection<Partition> getDpPartSpecs() {
-    return dpPartSpecs;
   }
 
   @Override
@@ -550,8 +542,7 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
 
   public static String getAggregationPrefix(Table table, Partition partition) throws MetaException {
     String prefix = getAggregationPrefix0(table, partition);
-    String aggKey = prefix.endsWith(Path.SEPARATOR) ? prefix : prefix + Path.SEPARATOR;
-    return aggKey;
+    return prefix.endsWith(Path.SEPARATOR) ? prefix : prefix + Path.SEPARATOR;
   }
 
   private static String getAggregationPrefix0(Table table, Partition partition) throws MetaException {

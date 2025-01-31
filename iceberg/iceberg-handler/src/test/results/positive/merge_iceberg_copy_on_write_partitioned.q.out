@@ -71,11 +71,11 @@ STAGE PLANS:
         Reducer 10 <- Reducer 9 (SIMPLE_EDGE), Union 3 (CONTAINS)
         Reducer 2 <- Map 1 (SIMPLE_EDGE), Map 11 (SIMPLE_EDGE), Union 3 (CONTAINS)
         Reducer 4 <- Union 3 (SIMPLE_EDGE)
-        Reducer 5 <- Map 1 (SIMPLE_EDGE), Map 11 (SIMPLE_EDGE)
+        Reducer 5 <- Map 1 (SIMPLE_EDGE), Map 12 (SIMPLE_EDGE)
         Reducer 6 <- Reducer 5 (SIMPLE_EDGE), Reducer 8 (SIMPLE_EDGE), Union 3 (CONTAINS)
-        Reducer 7 <- Map 1 (SIMPLE_EDGE), Map 11 (SIMPLE_EDGE)
+        Reducer 7 <- Map 1 (SIMPLE_EDGE), Map 12 (SIMPLE_EDGE)
         Reducer 8 <- Reducer 7 (SIMPLE_EDGE)
-        Reducer 9 <- Map 1 (SIMPLE_EDGE), Map 11 (SIMPLE_EDGE)
+        Reducer 9 <- Map 1 (SIMPLE_EDGE), Map 12 (SIMPLE_EDGE)
 #### A masked pattern was here ####
       Vertices:
         Map 1 
@@ -141,7 +141,8 @@ STAGE PLANS:
             Map Operator Tree:
                 TableScan
                   alias: target_ice
-                  Statistics: Num rows: 4 Data size: 32 Basic stats: COMPLETE Column stats: COMPLETE
+                  filterExpr: (a <= 100) (type: boolean)
+                  Statistics: Num rows: 2 Data size: 16 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: (a <= 100) (type: boolean)
                     Statistics: Num rows: 1 Data size: 8 Basic stats: COMPLETE Column stats: COMPLETE
@@ -156,6 +157,12 @@ STAGE PLANS:
                         Map-reduce partition columns: _col5 (type: int)
                         Statistics: Num rows: 1 Data size: 396 Basic stats: COMPLETE Column stats: COMPLETE
                         value expressions: _col0 (type: int), _col1 (type: bigint), _col2 (type: string), _col3 (type: bigint), _col4 (type: string), _col6 (type: int)
+            Execution mode: vectorized
+        Map 12 
+            Map Operator Tree:
+                TableScan
+                  alias: target_ice
+                  Statistics: Num rows: 4 Data size: 380 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: FILE__PATH is not null (type: boolean)
                     Statistics: Num rows: 4 Data size: 380 Basic stats: COMPLETE Column stats: COMPLETE

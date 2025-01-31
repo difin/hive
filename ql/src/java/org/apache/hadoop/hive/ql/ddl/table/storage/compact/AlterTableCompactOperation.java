@@ -65,23 +65,24 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
   public int execute() throws HiveException {
     Table table = context.getDb().getTable(desc.getTableName());
     if (!AcidUtils.isTransactionalTable(table) && !AcidUtils.isNonNativeAcidTable(table)) {
-      throw new HiveException(ErrorMsg.NONACID_COMPACTION_NOT_SUPPORTED, table.getDbName(), table.getTableName());
+      throw new HiveException(ErrorMsg.NONACID_COMPACTION_NOT_SUPPORTED, 
+          table.getDbName(), table.getTableName());
     }
 
     if (desc.getFilterExpr() != null) {
       if (!DDLUtils.isIcebergTable(table)) {
-        throw new HiveException(ErrorMsg.NONICEBERG_COMPACTION_WITH_FILTER_NOT_SUPPORTED, table.getDbName(), table.getTableName());
+        throw new HiveException(ErrorMsg.NONICEBERG_COMPACTION_WITH_FILTER_NOT_SUPPORTED, 
+            table.getDbName(), table.getTableName());
       }
       else if (desc.getPartitionSpec() != null) {
-        throw new HiveException(ErrorMsg.ICEBERG_COMPACTION_WITH_PART_SPEC_AND_FILTER_NOT_SUPPORTED, table.getDbName(), table.getTableName());
+        throw new HiveException(ErrorMsg.ICEBERG_COMPACTION_WITH_PART_SPEC_AND_FILTER_NOT_SUPPORTED, 
+            table.getDbName(), table.getTableName());
       }
     }
 
-    if (table.getStorageHandler() != null) {
-      Optional<ErrorMsg> error = table.getStorageHandler().isEligibleForCompaction(table, desc.getPartitionSpec());
-      if (error.isPresent()) {
-        throw new HiveException(error.get(), table.getDbName(), table.getTableName());
-      }
+    if (desc.getPartitionSpec() != null && DDLUtils.hasTransformsInPartitionSpec(table)) {
+      throw new HiveException(ErrorMsg.COMPACTION_NON_IDENTITY_PARTITION_SPEC, 
+          table.getDbName(), table.getTableName());
     }
 
     // End if filter doesn't match any data on the unpartitioned table    

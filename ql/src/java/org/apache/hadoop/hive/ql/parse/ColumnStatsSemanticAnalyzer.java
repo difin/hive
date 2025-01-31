@@ -615,7 +615,8 @@ public class ColumnStatsSemanticAnalyzer extends SemanticAnalyzer {
       checkForPartitionColumns(
           colNames, Utilities.getColumnNamesFromFieldSchema(tbl.getPartitionKeys()));
       validateSpecifiedColumnNames(colNames);
-      if (conf.getBoolVar(ConfVars.HIVE_STATS_COLLECT_PART_LEVEL_STATS) && tbl.isPartitioned()) {
+      if (conf.getBoolVar(ConfVars.HIVE_STATS_COLLECT_PART_LEVEL_STATS) && tbl.isPartitioned()
+            && !tbl.hasNonNativePartitionSupport()) {
         isPartitionStats = true;
       }
 
@@ -690,7 +691,8 @@ public class ColumnStatsSemanticAnalyzer extends SemanticAnalyzer {
     checkForPartitionColumns(colNames,
         Utilities.getColumnNamesFromFieldSchema(tbl.getPartitionKeys()));
     validateSpecifiedColumnNames(colNames);
-    if (conf.getBoolVar(ConfVars.HIVE_STATS_COLLECT_PART_LEVEL_STATS) && tbl.isPartitioned()) {
+    if (conf.getBoolVar(ConfVars.HIVE_STATS_COLLECT_PART_LEVEL_STATS) && tbl.isPartitioned() 
+          && !tbl.hasNonNativePartitionSupport()) {
       isPartitionStats = true;
     }
 

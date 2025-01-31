@@ -3904,7 +3904,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
   }
 
   public Partition getPartition(Table tbl, Map<String, String> partSpec) throws HiveException {
-    if (tbl.getStorageHandler() != null && tbl.getStorageHandler().alwaysUnpartitioned()) {
+    if (tbl.hasNonNativePartitionSupport()) {
       return tbl.getStorageHandler().getPartition(tbl, partSpec, Context.RewritePolicy.get(conf));
     } else {
       return getPartition(tbl, partSpec, false);
@@ -4299,7 +4299,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
       Map<String, String> partSpec, short max) throws HiveException {
     List<String> names = null;
     Table t = getTable(dbName, tblName);
-    if (t.getStorageHandler() != null && t.getStorageHandler().alwaysUnpartitioned()) {
+    if (t.hasNonNativePartitionSupport()) {
       return t.getStorageHandler().getPartitionNames(t, partSpec);
     }
 
@@ -4342,8 +4342,8 @@ private void constructOneLBLocationMap(FileStatus fSta,
     perfLogger.PerfLogBegin(CLASS_NAME, PerfLogger.HIVE_GET_PARTITIONS);
 
     try {
-      if (tbl.getStorageHandler() != null && tbl.getStorageHandler().alwaysUnpartitioned()) {
-        return tbl.getStorageHandler().getPartitions(tbl, Collections.EMPTY_MAP);
+      if (tbl.hasNonNativePartitionSupport()) {
+        return tbl.getStorageHandler().getPartitions(tbl);
       } else {
         if (tbl.isPartitioned()) {
           List<org.apache.hadoop.hive.metastore.api.Partition> tParts;
@@ -4391,17 +4391,20 @@ private void constructOneLBLocationMap(FileStatus fSta,
     if (!tbl.isPartitioned()) {
       return Sets.newHashSet(new Partition(tbl));
     }
-
-    List<org.apache.hadoop.hive.metastore.api.Partition> tParts;
-    try {
-      tParts = getMSC().listPartitions(tbl.getDbName(), tbl.getTableName(), (short)-1);
-    } catch (Exception e) {
-      LOG.error(StringUtils.stringifyException(e));
-      throw new HiveException(e);
-    }
-    Set<Partition> parts = new LinkedHashSet<Partition>(tParts.size());
-    for (org.apache.hadoop.hive.metastore.api.Partition tpart : tParts) {
-      parts.add(new Partition(tbl, tpart));
+    Set<Partition> parts = Sets.newLinkedHashSet();
+    if (tbl.hasNonNativePartitionSupport()) {
+      parts.addAll(tbl.getStorageHandler().getPartitions(tbl));
+    } else {
+      List<org.apache.hadoop.hive.metastore.api.Partition> tParts;
+      try {
+        tParts = getMSC().listPartitions(tbl.getDbName(), tbl.getTableName(), (short)-1);
+      } catch (Exception e) {
+        LOG.error(StringUtils.stringifyException(e));
+        throw new HiveException(e);
+      }
+      for (org.apache.hadoop.hive.metastore.api.Partition tpart : tParts) {
+        parts.add(new Partition(tbl, tpart));
+      }
     }
     return parts;
   }
@@ -4437,7 +4440,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
         throw new HiveException(e);
       }
 
-      List<Partition> qlPartitions = new ArrayList<Partition>();
+      List<Partition> qlPartitions = new ArrayList<>();
       for (org.apache.hadoop.hive.metastore.api.Partition p : partitions) {
         qlPartitions.add( new Partition(tbl, p));
       }
@@ -4460,7 +4463,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
    */
   public List<Partition> getPartitions(Table tbl, Map<String, String> partialPartSpec)
   throws HiveException {
-    if (tbl.getStorageHandler() != null && tbl.getStorageHandler().alwaysUnpartitioned()) {
+    if (tbl.hasNonNativePartitionSupport()) {
       return tbl.getStorageHandler().getPartitions(tbl, partialPartSpec, false);
     } else {
       return getPartitions(tbl, partialPartSpec, (short)-1); 
@@ -4618,7 +4621,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
    * @param tbl The table containing the partitions.
    * @param expr A serialized expression for partition predicates.
    * @param conf Hive config.
-   * @param result the resulting list of partitions
+   * @param partitions the resulting list of partitions
    * @return whether the resulting list contains partitions which may or may not match the expr
    */
   public boolean getPartitionsByExpr(Table tbl, ExprNodeDesc expr, HiveConf conf,
@@ -4627,7 +4630,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
     perfLogger.PerfLogBegin(CLASS_NAME, PerfLogger.HIVE_GET_PARTITIONS_BY_EXPR);
     try {
       assert result != null;
-      if (tbl.getStorageHandler() != null && tbl.getStorageHandler().alwaysUnpartitioned()) {
+      if (tbl.hasNonNativePartitionSupport()) {
         result.addAll(tbl.getStorageHandler().getPartitionsByExpr(tbl, expr));
         return false;
       } else {
