@@ -101,8 +101,8 @@
     <curator.version>5.4.0.7.2.18.400-40</curator.version>
     <cron-utils.version>9.2.1</cron-utils.version>
     <httpcomponents.core.version>4.4.13</httpcomponents.core.version>
-    <spring.version>5.3.39</spring.version>    <!-- Thrift properties -->
-    <spring.ldap.version>2.4.1</spring.ldap.version>
+    <spring.version>5.3.39-cloudera-5.3.44</spring.version>    <!-- Thrift properties -->
+    <spring.ldap.version>2.4.4</spring.ldap.version>
     <thrift.home>you-must-set-this-to-run-thrift</thrift.home>
     <thrift.gen.dir>${basedir}/src/gen/thrift</thrift.gen.dir>
     <thrift.args>-I ${thrift.home} -strict --gen java:beans,generated_annotations=undated --gen cpp --gen php --gen py --gen rb

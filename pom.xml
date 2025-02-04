@@ -197,8 +197,8 @@
     <aws-secretsmanager-caching.version>1.0.1</aws-secretsmanager-caching.version>
     <aws-java-sdk.version>1.12.499</aws-java-sdk.version>
     <iceberg.version>1.5.2.2025.0.20.0-SNAPSHOT</iceberg.version>
-    <spring.version>5.3.39</spring.version>
-    <spring.ldap.version>2.4.1</spring.ldap.version>
+    <spring.version>5.3.39-cloudera-5.3.44</spring.version>
+    <spring.ldap.version>2.4.4</spring.ldap.version>
   </properties>
 
   <repositories>
