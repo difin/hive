@@ -384,37 +384,14 @@ public class IcebergTableUtil {
   }
 
   public static PartitionData toPartitionData(StructLike key, Types.StructType keyType) {
-    PartitionData data = new PartitionData(keyType);
-    for (int i = 0; i < keyType.fields().size(); i++) {
-      Object val = key.get(i, keyType.fields().get(i).type().typeId().javaClass());
-      if (val != null) {
-        data.set(i, val);
-      }
-    }
-    return data;
+    PartitionData keyTemplate = new PartitionData(keyType);
+    return keyTemplate.copyFor(key);
   }
 
   public static PartitionData toPartitionData(StructLike sourceKey, Types.StructType sourceKeyType,
       Types.StructType targetKeyType) {
-    PartitionData data = new PartitionData(targetKeyType);
-    for (int i = 0; i < targetKeyType.fields().size(); i++) {
-
-      int fi = i;
-      String fieldName = targetKeyType.fields().get(fi).name();
-      Object val = sourceKeyType.fields().stream()
-          .filter(f -> f.name().equals(fieldName)).findFirst()
-          .map(sourceKeyElem -> sourceKey.get(sourceKeyType.fields().indexOf(sourceKeyElem),
-              targetKeyType.fields().get(fi).type().typeId().javaClass()))
-          .orElseThrow(() -> new RuntimeException(
-              String.format("Error retrieving value of partition field %s", fieldName)));
-
-      if (val != null) {
-        data.set(fi, val);
-      } else {
-        throw new RuntimeException(String.format("Partition field's %s value is null", fieldName));
-      }
-    }
-    return data;
+    StructProjection projection = StructProjection.create(sourceKeyType, targetKeyType).wrap(sourceKey);
+    return toPartitionData(projection, targetKeyType);
   }
 
   public static Expression generateExpressionFromPartitionSpec(Table table, Map<String, String> partitionSpec)

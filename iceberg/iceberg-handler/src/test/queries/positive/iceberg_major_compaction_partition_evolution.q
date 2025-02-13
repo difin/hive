@@ -20,6 +20,8 @@
 --! qt:replace:/^[0-9]/#Masked#/
 -- Mask removed file size
 --! qt:replace:/(\S\"removed-files-size\\\":\\\")(\d+)(\\\")/$1#Masked#$3/
+-- Mask the totalSize value as it can have slight variability, causing test flakiness
+--! qt:replace:/(\s+totalSize\s+)\S+(\s+)/$1#Masked#$2/
 
 set hive.llap.io.enabled=true;
 set hive.vectorized.execution.enabled=true;
@@ -38,13 +40,16 @@ tblproperties ('format-version'='2', 'hive.compactor.worker.pool'='iceberg','com
 insert into ice_orc VALUES ('fn1','ln1', 1, 10, 100);
 insert into ice_orc VALUES ('fn2','ln2', 1, 10, 100);
 insert into ice_orc VALUES ('fn3','ln3', 1, 11, 100);
+insert into ice_orc VALUES (null,null, null, null, null);
 alter table ice_orc set partition spec(company_id, dept_id);
 insert into ice_orc VALUES ('fn4','ln4', 1, 11, 100);
 insert into ice_orc VALUES ('fn5','ln5', 2, 20, 100);
 insert into ice_orc VALUES ('fn6','ln6', 2, 20, 100);
+insert into ice_orc VALUES (null,null, null, null, null);
 alter table ice_orc set partition spec(company_id, dept_id, team_id);
 insert into ice_orc VALUES ('fn7','ln7', 2, 21, 100);
 insert into ice_orc VALUES ('fn8','ln8', 2, 21, 100);
+insert into ice_orc VALUES (null,null, null, null, null);
 
 update ice_orc set last_name = 'ln1a' where first_name='fn1';
 update ice_orc set last_name = 'ln2a' where first_name='fn2';
@@ -61,9 +66,17 @@ delete from ice_orc where last_name in ('ln1a', 'ln8a');
 select * from ice_orc;
 describe formatted ice_orc;
 
+select `partition`, spec_id, content, record_count
+from default.ice_orc.files
+order by `partition`, spec_id, content, record_count;
+
 explain alter table ice_orc COMPACT 'major' and wait;
 alter table ice_orc COMPACT 'major' and wait;
 
 select * from ice_orc;
 describe formatted ice_orc;
 show compactions order by 'partition';
+
+select `partition`, spec_id, content, record_count
+from default.ice_orc.files
+order by `partition`, spec_id, content, record_count;
