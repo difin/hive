@@ -199,6 +199,12 @@
     <iceberg.version>1.5.2.2025.0.20.0-SNAPSHOT</iceberg.version>
     <spring.version>5.3.39-cloudera-5.3.44</spring.version>
     <spring.ldap.version>2.4.4</spring.ldap.version>
+    <!-- Static code analysis, code coverage -->
+    <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+    <sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
+    <!-- this property will be overwritten by Jacoco when the profile for code coverage is active -->
+    <jacoco.agent.args/>
+    <jacoco.reportName>jacoco</jacoco.reportName>
   </properties>
 
   <repositories>
@@ -1652,9 +1658,13 @@
             <exclude>${test.excludes.additional}</exclude>
           </excludes>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <forkCount>1</forkCount>
           <reuseForks>false</reuseForks>
           <failIfNoTests>false</failIfNoTests>
-          <argLine>${maven.test.jvm.args}</argLine>
+          <argLine>
+            @{jacoco.agent.args}
+            ${maven.test.jvm.args}
+          </argLine>
           <trimStackTrace>false</trimStackTrace>
           <additionalClasspathElements>
             <additionalClasspathElement>${test.conf.dir}</additionalClasspathElement>
@@ -2043,6 +2053,156 @@
       <modules>
         <module>itests</module>
       </modules>
+    </profile>
+    <profile>
+      <!-- 1st step of code coverage analysis: -->
+      <!-- * enable this profile in the compile and the test phases -->
+      <!-- * enables instrumentation during build and generates coverage data files during testing -->
+      <id>withCoverage</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties/>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco-maven-plugin.version}</version>
+            <configuration>
+              <propertyName>jacoco.agent.args</propertyName>
+              <!-- Coverage data file to generate during tests: -->
+              <!-- * for local builds, it will be jacoco.exec -->
+              <!-- * when running in Jenkins with test splits they will be named as jacoco-split-NN.exec, where NN is the split number -->
+              <destFile>${project.build.directory}/${jacoco.reportName}.exec</destFile>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- 2nd step of code coverage analysis: -->
+      <!-- * enable this profile in the verify phase, after build and test runs completed -->
+      <!-- * merges all coverage data file into one, will include coverage files from modules and test splits -->
+      <id>mergeCoverage</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties/>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco-maven-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>merge</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>merge</goal>
+                </goals>
+                <configuration>
+                  <fileSets>
+                    <fileSet>
+                      <directory>${project.build.directory}</directory>
+                      <includes>
+                        <!-- Include coverage data files from local and Jenkins builds -->
+                        <!-- * for local builds, it will be jacoco.exec -->
+                        <!-- * when running in Jenkins with test splits they will be named as jacoco-split-NN.exec, where NN is the split number -->
+                        <include>jacoco*.exec</include>
+                      </includes>
+                    </fileSet>
+                  </fileSets>
+                  <destFile>${maven.multiModuleProjectDirectory}/target/jacoco-aggregate.exec</destFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- 3rd step of code coverage analysis: -->
+      <!-- * enable this profile in the verify phase, you need to run it after coverage data is merged -->
+      <!-- * generates aggregated coverage reports -->
+      <id>reportCoverage</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties/>
+      <build>
+        <plugins>
+          <!-- This is a workaround: -->
+          <!-- * jacoco:report-aggregate goal does not work when the coverage data file is given by the documented dataFileIncludes property -->
+          <!-- * so we replace all jacoco.exec with the merged jacoco-aggregate.exec from the project-root/target folder -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <configuration>
+                  <target>
+                    <copy file="${maven.multiModuleProjectDirectory}/target/jacoco-aggregate.exec" toFile="${project.build.directory}/jacoco.exec" overwrite="true"/>
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco-maven-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>report-aggregate</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>report-aggregate</goal>
+                </goals>
+                <configuration>
+                  <!-- Include current project in aggregated reports together with the dependencies, by default it's false -->
+                  <includeCurrentProject>true</includeCurrentProject>
+                  <outputDirectory>${project.build.directory}/jacoco-aggregate</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- 4th step of code coverage analysis: -->
+      <!-- * enables Sonar analysis after run with reportCoverage profile is completed -->
+      <!-- * needs java runtime 11+, it's enough to have a JVM version in a folder with the JAVA_HOME pointing to it -->
+      <id>sonar</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.language>java</sonar.language>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.java.binaries>${project.build.directory}/classes</sonar.java.binaries>
+        <sonar.exclusions>
+          **/gen/**/*,
+          **/test/**/*,
+          *.sh
+        </sonar.exclusions>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonarsource.scanner.maven</groupId>
+            <artifactId>sonar-maven-plugin</artifactId>
+            <version>${sonar-maven-plugin.version}</version>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
   <distributionManagement>
