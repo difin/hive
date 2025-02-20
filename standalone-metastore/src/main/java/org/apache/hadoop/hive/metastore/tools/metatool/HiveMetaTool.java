@@ -37,7 +37,7 @@ public final class HiveMetaTool {
     throw new UnsupportedOperationException("HiveMetaTool should not be instantiated");
   }
 
-  public static void execute(String[] args) throws Exception {
+  public static void main(String[] args) {
     HiveMetaToolCommandLine cl = HiveMetaToolCommandLine.parseArguments(args);
 
     MetaToolObjectStore objectStore = new MetaToolObjectStore();
@@ -56,7 +56,7 @@ public final class HiveMetaTool {
       } else if (cl.isDiffExtTblLocs()) {
         task = new MetaToolTaskDiffExtTblLocs();
       } else if (cl.isMetadataSummary()) {
-        task = new MetaToolTaskMetadataSummary();
+          task = new MetaToolTaskMetadataSummary();
       } else {
         throw new IllegalArgumentException("No task was specified!");
       }
@@ -64,20 +64,10 @@ public final class HiveMetaTool {
       task.setObjectStore(objectStore);
       task.setCommandLine(cl);
       task.execute();
-    } finally {
-      objectStore.shutdown();
-    }
-  }
-
-  public static void main(String[] args) {
-    int status = 0;
-    try {
-      execute(args);
     } catch (Exception e) {
-      status = -1;
       LOGGER.error("Exception occured", e);
     } finally {
-      System.exit(status);
+      objectStore.shutdown();
     }
   }
 }

@@ -180,14 +180,14 @@ public class TestHiveMetaTool extends TestCase {
   }
 
   public void testListFSRoot() throws Exception {
-    HiveMetaTool.execute(new String[] {"-listFSRoot"});
+    HiveMetaTool.main(new String[] {"-listFSRoot"});
     String out = os.toString();
     assertTrue(out + " doesn't contain " + client.getDatabase(DB_NAME).getLocationUri(),
         out.contains(client.getDatabase(DB_NAME).getLocationUri()));
   }
 
   public void testExecuteJDOQL() throws Exception {
-    HiveMetaTool.execute(
+    HiveMetaTool.main(
         new String[] {"-executeJDOQL", "select locationUri from org.apache.hadoop.hive.metastore.model.MDatabase"});
     String out = os.toString();
     assertTrue(out + " doesn't contain " + client.getDatabase(DB_NAME).getLocationUri(),
@@ -197,10 +197,10 @@ public class TestHiveMetaTool extends TestCase {
   public void testUpdateFSRootLocation() throws Exception {
     checkAvroSchemaURLProps(AVRO_URI);
 
-    HiveMetaTool.execute(new String[] {"-updateLocation", NEW_LOCATION, LOCATION, "-tablePropKey", "avro.schema.url"});
+    HiveMetaTool.main(new String[] {"-updateLocation", NEW_LOCATION, LOCATION, "-tablePropKey", "avro.schema.url"});
     checkAvroSchemaURLProps(NEW_AVRO_URI);
 
-    HiveMetaTool.execute(new String[] {"-updateLocation", LOCATION, NEW_LOCATION, "-tablePropKey", "avro.schema.url"});
+    HiveMetaTool.main(new String[] {"-updateLocation", LOCATION, NEW_LOCATION, "-tablePropKey", "avro.schema.url"});
     checkAvroSchemaURLProps(AVRO_URI);
   }
 
@@ -383,7 +383,7 @@ public class TestHiveMetaTool extends TestCase {
     return "file:" + extTblLocation;
   }
 
-  private JSONObject getListExtTblLocs(String dbName, String outLocation) throws Exception {
+  private JSONObject getListExtTblLocs(String dbName, String outLocation) throws IOException {
     File f = new File(outLocation);
     if (f.exists()) {
       FileUtil.fullyDelete(f);
@@ -391,7 +391,7 @@ public class TestHiveMetaTool extends TestCase {
     if (!(new File(outLocation).mkdirs())) {
       throw new RuntimeException("Could not create " + outLocation);
     }
-    HiveMetaTool.execute(new String[] {"-listExtTblLocs", dbName, outLocation});
+    HiveMetaTool.main(new String[] {"-listExtTblLocs", dbName, outLocation});
     for (File outFile : f.listFiles()) {
       String contents = new String(Files.readAllBytes(Paths.get(outFile.getAbsolutePath())));
       return new JSONObject(contents);
@@ -399,7 +399,7 @@ public class TestHiveMetaTool extends TestCase {
     return null;
   }
 
-  private JSONObject getDiffExtTblLocs(String fileLoc1, String fileLoc2, String outLocation) throws Exception {
+  private JSONObject getDiffExtTblLocs(String fileLoc1, String fileLoc2, String outLocation) throws IOException {
     File f = new File(outLocation);
     if (f.exists()) {
       FileUtil.fullyDelete(f);
@@ -411,7 +411,7 @@ public class TestHiveMetaTool extends TestCase {
     File f2 = new File(fileLoc2);
     for (File outFile1 : f1.listFiles()) {
       for (File outFile2 : f2.listFiles()) {
-        HiveMetaTool.execute(new String[] {"-diffExtTblLocs", outFile1.getAbsolutePath(), outFile2.getAbsolutePath(), outLocation});
+        HiveMetaTool.main(new String[] {"-diffExtTblLocs", outFile1.getAbsolutePath(), outFile2.getAbsolutePath(), outLocation});
         for(File outFile : f.listFiles()) {
           String contents = new String(Files.readAllBytes(Paths.get(outFile.getAbsolutePath())));
           return new JSONObject(contents);
