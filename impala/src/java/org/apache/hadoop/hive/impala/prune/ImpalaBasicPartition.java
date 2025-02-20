@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.fs.Path;
 import org.apache.impala.analysis.LiteralExpr;
 import org.apache.impala.catalog.CatalogException;
+import org.apache.impala.catalog.FileDescriptor;
 import org.apache.impala.catalog.HdfsFileFormat;
 import org.apache.impala.catalog.HdfsPartition;
 import org.apache.impala.catalog.HdfsStorageDescriptor;

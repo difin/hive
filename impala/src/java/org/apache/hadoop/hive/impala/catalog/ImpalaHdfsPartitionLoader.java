@@ -34,8 +34,8 @@ import org.apache.hadoop.hive.impala.catalog.ImpalaPartitionConverter.ImpalaGetP
 import org.apache.hadoop.hive.impala.catalog.ImpalaPartitionConverter.PartitionInfo;
 import org.apache.hadoop.hive.impala.prune.ImpalaBasicHdfsTable;
 import org.apache.impala.analysis.LiteralExpr;
+import org.apache.impala.catalog.FileDescriptor;
 import org.apache.impala.catalog.HdfsStorageDescriptor;
-import org.apache.impala.catalog.HdfsPartition.FileDescriptor;
 import org.apache.impala.catalog.HdfsPartitionLocationCompressor;
 import org.apache.impala.util.ListMap;
 import org.apache.impala.thrift.TAccessLevel;

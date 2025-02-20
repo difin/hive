@@ -26,6 +26,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.impala.analysis.LiteralExpr;
+import org.apache.impala.catalog.FileDescriptor;
 import org.apache.impala.catalog.HdfsPartition;
 import org.apache.impala.catalog.HdfsPartitionLocationCompressor;
 import org.apache.impala.catalog.HdfsStorageDescriptor;
@@ -66,18 +67,18 @@ public class ImpalaHdfsPartition extends HdfsPartition {
 
   private final FileSystem fs;
 
-  private final List<HdfsPartition.FileDescriptor> fileDescriptors;
+  private final List<FileDescriptor> fileDescriptors;
 
-  private final List<HdfsPartition.FileDescriptor> insertFileDescriptors;
+  private final List<FileDescriptor> insertFileDescriptors;
 
-  private final List<HdfsPartition.FileDescriptor> deleteFileDescriptors;
+  private final List<FileDescriptor> deleteFileDescriptors;
 
   private final boolean isFullAcidTable;
 
   public ImpalaHdfsPartition(
         List<LiteralExpr> partitionKeyValues,
         HdfsStorageDescriptor fileFormatDescriptor,
-        List<HdfsPartition.FileDescriptor> fileDescriptors, long id,
+        List<FileDescriptor> fileDescriptors, long id,
         HdfsPartitionLocationCompressor.Location location, TAccessLevel accessLevel,
         String partitionName, ListMap<TNetworkAddress> hostIndex, long numRows,
         boolean isFullAcidTable) throws HiveException {
@@ -108,7 +109,7 @@ public class ImpalaHdfsPartition extends HdfsPartition {
         Table msTbl,
         List<LiteralExpr> partitionKeyValues,
         HdfsStorageDescriptor fileFormatDescriptor,
-        List<HdfsPartition.FileDescriptor> fileDescriptors, long id,
+        List<FileDescriptor> fileDescriptors, long id,
         HdfsPartitionLocationCompressor.Location location, TAccessLevel accessLevel,
         String partitionName, ListMap<TNetworkAddress> hostIndex, long numRows
         ) throws HiveException {
@@ -116,7 +117,7 @@ public class ImpalaHdfsPartition extends HdfsPartition {
         partitionName, hostIndex, numRows, isFullAcidTable(msTbl));
   }
 
-  public ImpalaHdfsPartition(ImpalaHdfsPartition partition, List<HdfsPartition.FileDescriptor> fds)
+  public ImpalaHdfsPartition(ImpalaHdfsPartition partition, List<FileDescriptor> fds)
         throws HiveException {
     this(partition.getPartitionValues(),
         partition.getInputFormatDescriptor(), fds, partition.getId(),
@@ -129,13 +130,13 @@ public class ImpalaHdfsPartition extends HdfsPartition {
    * Method called by constructor which separates out the delete file descriptors from
    * the list of all file descriptors.
    */
-  private List<HdfsPartition.FileDescriptor> getDeleteFileDescriptors(boolean isFullAcidTable,
-      List<HdfsPartition.FileDescriptor> fds) {
-    ImmutableList.Builder<HdfsPartition.FileDescriptor> result = ImmutableList.builder();
+  private List<FileDescriptor> getDeleteFileDescriptors(boolean isFullAcidTable,
+      List<FileDescriptor> fds) {
+    ImmutableList.Builder<FileDescriptor> result = ImmutableList.builder();
     if (!isFullAcidTable) {
       return result.build();
     }
-    for (HdfsPartition.FileDescriptor fd : fds) {
+    for (FileDescriptor fd : fds) {
       if (AcidUtils.isDeleteDeltaFd(fd)) {
         result.add(fd);
       }
@@ -147,13 +148,13 @@ public class ImpalaHdfsPartition extends HdfsPartition {
    * Method called by constructor which separates out the insert file descriptors from
    * the list of all file descriptors.
    */
-  private List<HdfsPartition.FileDescriptor> getInsertFileDescriptors(boolean isFullAcidTable,
-      List<HdfsPartition.FileDescriptor> fds) {
-    ImmutableList.Builder<HdfsPartition.FileDescriptor> result = ImmutableList.builder();
+  private List<FileDescriptor> getInsertFileDescriptors(boolean isFullAcidTable,
+      List<FileDescriptor> fds) {
+    ImmutableList.Builder<FileDescriptor> result = ImmutableList.builder();
     if (!isFullAcidTable) {
       return result.build();
     }
-    for (HdfsPartition.FileDescriptor fd : fds) {
+    for (FileDescriptor fd : fds) {
       if (!AcidUtils.isDeleteDeltaFd(fd)) {
         result.add(fd);
       }
@@ -168,7 +169,7 @@ public class ImpalaHdfsPartition extends HdfsPartition {
   @Override
   public HdfsPartition genInsertDeltaPartition() {
     try {
-      List<HdfsPartition.FileDescriptor> fds =
+      List<FileDescriptor> fds =
           insertFileDescriptors.isEmpty() ?
               fileDescriptors : insertFileDescriptors;
       return new ImpalaHdfsPartition(this, fds);
@@ -214,7 +215,7 @@ public class ImpalaHdfsPartition extends HdfsPartition {
   }
 
   @Override
-  public List<HdfsPartition.FileDescriptor> getFileDescriptors() {
+  public List<FileDescriptor> getFileDescriptors() {
     return fileDescriptors;
   }
 
