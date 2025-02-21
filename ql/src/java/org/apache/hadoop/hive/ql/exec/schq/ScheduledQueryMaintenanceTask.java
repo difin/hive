@@ -28,6 +28,8 @@ import org.apache.hadoop.hive.ql.scheduled.ScheduledQueryExecutionService;
 import org.apache.hadoop.hive.ql.scheduled.ScheduledQueryMaintenanceWork;
 import org.apache.thrift.TException;
 
+import java.sql.SQLException;
+
 /**
  * Scheduled query maintenance task.
  *
@@ -54,7 +56,7 @@ public class ScheduledQueryMaintenanceTask extends Task<ScheduledQueryMaintenanc
         // * in case we created a new scheduled query - for say run every second
         ScheduledQueryExecutionService.forceScheduleCheck();
       }
-    } catch (TException | HiveException e) {
+    } catch (TException | HiveException | SQLException e) {
       setException(e);
       LOG.error("Failed", e);
       return 1;

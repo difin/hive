@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.metastore;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -4361,7 +4362,7 @@ public interface IMetaStoreClient {
   /**
    * Carries out maintenance of scheduled queries (insert/update/drop).
    */
-  void scheduledQueryMaintenance(ScheduledQueryMaintenanceRequest request) throws MetaException, TException;
+  void scheduledQueryMaintenance(ScheduledQueryMaintenanceRequest request) throws MetaException, TException, SQLException;
 
   /**
    * Checks whenever a query is available for execution.

@@ -106,11 +106,7 @@ import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -364,6 +360,53 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   public GetOpenTxnsResponse getOpenTxns(List<TxnType> excludeTxnTypes) throws MetaException {
     return new GetOpenTxnsListHandler(false).execute(jdbcResource)
         .toOpenTxnsResponse(excludeTxnTypes);
+  }
+
+  @Override
+  public List<Long> getOpenTxnForPolicy(List<Long> openTxnList, String dbName) {
+      ResultSet rs = null;
+      PreparedStatement pst = null;
+      Connection dbConn = null;
+      if (openTxnList.isEmpty()) {
+          return null;
+      }
+      try {
+          dbConn = getDbConn(Connection.TRANSACTION_READ_COMMITTED);
+          String query = "select RTM_TARGET_TXN_ID from REPL_TXN_MAP where RTM_TARGET_TXN_ID in (" + String.join(",", Collections.nCopies(openTxnList.size(), "?")) + ") and RTM_REPL_POLICY  =  ?   "; // need to refine this
+          pst = dbConn.prepareStatement(query);
+          for (int i = 0; i < openTxnList.size(); i++) {
+              pst.setLong(i + 1, openTxnList.get(i));
+          }
+          pst.setString(openTxnList.size() + 1, dbName + ".*");
+          LOG.debug("Going to execute query <" + query.replaceAll("\\?", "{}") + ">", quoteString(openTxnList.toString()));
+          rs = pst.executeQuery();
+          List<Long> resultList = new ArrayList<>();
+          while (rs.next()) {
+              resultList.add(rs.getLong(1));
+          }
+          if (resultList.isEmpty()) {
+              LOG.info("There are no Repl Created open transactions on DR side. So, no clean up required");
+          }
+          return resultList;
+      } catch (SQLException e) {
+          throw new RuntimeException(e);
+      } finally {
+          try {
+              // close the resources (result set, prepared statement, and database connection) here
+              if (rs != null) {
+                  rs.close();
+              }
+              if (pst != null) {
+                  pst.close();
+              }
+              if (dbConn != null) {
+                  dbConn.close();
+              }
+          } catch (SQLException e) {
+              // handle the SQL exception thrown while closing the resources here
+              e.printStackTrace();
+          }
+      }
   }
 
   /**
@@ -881,7 +924,9 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     timeout = milliseconds;
     return previous_timeout;
   }
-
+  Connection getDbConn(int isolationLevel) throws SQLException {
+    return getDbConn(isolationLevel, connPool);
+  }
   protected Connection getDbConn(int isolationLevel, DataSource connPool) throws SQLException {
     Connection dbConn = null;
     try {
@@ -961,6 +1006,10 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     throw new RuntimeException("This should never happen: " + JavaUtils.txnIdToString(txnid));
   }
 
+  static String quoteString(String input) {
+    return "'" + input + "'";
+  }
+  
   /**
    * Determine the current time, using the RDBMS as a source of truth
    * @return current time in milliseconds

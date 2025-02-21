@@ -17,6 +17,11 @@
  */
 package org.apache.hadoop.hive.metastore.client;
 
+import static org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil.cleanDb;
+import static org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil.getConnection;
+import static org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil.prepDb;
+import static org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil.queryToString;
+import static org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil.setConfValues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
@@ -25,8 +30,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,6 +47,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.curator.shaded.com.google.common.collect.Lists;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.ObjectStore;
 import org.apache.hadoop.hive.metastore.ObjectStoreTestHook;
@@ -54,6 +64,7 @@ import org.apache.hadoop.hive.metastore.api.ScheduledQueryMaintenanceRequestType
 import org.apache.hadoop.hive.metastore.api.ScheduledQueryPollRequest;
 import org.apache.hadoop.hive.metastore.api.ScheduledQueryPollResponse;
 import org.apache.hadoop.hive.metastore.api.ScheduledQueryProgressInfo;
+import org.apache.hadoop.hive.metastore.api.TxnType;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.apache.hadoop.hive.metastore.minihms.AbstractMetaStoreService;
@@ -211,6 +222,56 @@ public class TestMetastoreScheduledQueries extends MetaStoreClientTest {
     r.setType(ScheduledQueryMaintenanceRequestType.DROP);
     r.setScheduledQuery(schq);
     client.scheduledQueryMaintenance(r);
+  }
+
+
+  @Test
+  public void testDeleteWithOpenTxn() throws Exception {
+    if (!Objects.equals(client.getConfigValue(String.valueOf(ConfVars.THRIFT_URIS), ""), "")) {
+      System.out.println("It is not possible to create open transaction from here in Remote mode. So, skipping the test case");
+      return;
+    }
+    String testCaseNS = "delwithopentxn";
+    String replPolicy = "db100";
+    // insert
+    ScheduledQuery schq = createScheduledQuery3(createKey(replPolicy, testCaseNS));
+    ScheduledQueryMaintenanceRequest r = new ScheduledQueryMaintenanceRequest();
+    r.setType(ScheduledQueryMaintenanceRequestType.CREATE);
+    r.setScheduledQuery(schq);
+    client.scheduledQueryMaintenance(r);
+    // wait 2 sec to have the query exection
+    Thread.sleep(2000);
+    // invoke poll to create a dependent execution
+    ScheduledQueryPollRequest pollRequest = new ScheduledQueryPollRequest(testCaseNS);
+    client.scheduledQueryPoll(pollRequest);
+    Configuration conf = metaStore.getConf();
+    cleanDb(conf);
+    setConfValues(conf);
+    prepDb(conf);
+    String query = "select \"DB_ID\" from \"DBS\" where \"NAME\" = '" + "default" + "' and \"CTLG_NAME\" = '" + "hive" + "'";
+    String[] output = queryToString(conf, query).split("\n");
+    if (output.length == 1) {
+      query = "INSERT INTO \"DBS\"(\"DB_ID\", \"NAME\", \"CTLG_NAME\", \"DB_LOCATION_URI\")  VALUES (1, '" + "default" + "','" + "hive" + "','dummy')";
+      Statement stmt =
+              getConnection(conf).createStatement();
+      stmt.executeUpdate(query);
+    }
+
+    query = "INSERT INTO \"DBS\"(\"DB_ID\", \"NAME\", \"CTLG_NAME\", \"DB_LOCATION_URI\")  VALUES (2, '" + replPolicy + "','" + "hive" + "','dummy')";
+    Statement stmt =
+            getConnection(conf).createStatement();
+    stmt.executeUpdate(query);
+    List<Long> openTxnIds = new ArrayList<>(Arrays.asList(1L, 2L));
+    client.replOpenTxn(replPolicy + ".*", openTxnIds, "hive", TxnType.REPL_CREATED);
+    String[] replTxnMapOutput = queryToString(conf, "SELECT \"RTM_SRC_TXN_ID\" FROM \"REPL_TXN_MAP\"").split("\n");
+    assertEquals(replTxnMapOutput.length, 3);
+    // delete scheduled query
+    r.setType(ScheduledQueryMaintenanceRequestType.DROP);
+    client.scheduledQueryMaintenance(r);
+    // validate repl_txn_map table
+    replTxnMapOutput = queryToString(conf, "SELECT \"RTM_SRC_TXN_ID\" FROM \"REPL_TXN_MAP\"").split("\n");
+    assertEquals(replTxnMapOutput.length, 1);
+    cleanDb(conf);
   }
 
   @Test
@@ -407,7 +468,11 @@ public class TestMetastoreScheduledQueries extends MetaStoreClientTest {
     ScheduledQueryMaintenanceRequest r = new ScheduledQueryMaintenanceRequest();
     r.setType(ScheduledQueryMaintenanceRequestType.CREATE);
     r.setScheduledQuery(schq);
-    client.scheduledQueryMaintenance(r);
+    try {
+      client.scheduledQueryMaintenance(r);
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Test
@@ -612,7 +677,6 @@ public class TestMetastoreScheduledQueries extends MetaStoreClientTest {
       MetastoreConf.setBoolVar(metaStore.getConf(), ConfVars.SCHEDULED_QUERIES_ENABLED, true);
     }
   }
-
   private int getEpochSeconds() {
     return (int) (System.currentTimeMillis() / 1000);
   }
@@ -643,9 +707,18 @@ public class TestMetastoreScheduledQueries extends MetaStoreClientTest {
     schq.setQuery("select 12");
     return schq;
   }
-  
-	private PersistenceManager getPersistenceManager() {
-		return new ObjectStore().getPersistenceManager();
-	}
+  private ScheduledQuery createScheduledQuery3(ScheduledQueryKey key) {
+    ScheduledQuery schq = new ScheduledQuery();
+    schq.setScheduleKey(key);
+    schq.setEnabled(true);
+    schq.setSchedule("* * * * * ? *");
+    schq.setUser("user");
+    schq.setQuery("REPL LOAD db100 INTO db100");
+    return schq;
+  }
+
+  private PersistenceManager getPersistenceManager() {
+    return new ObjectStore().getPersistenceManager();
+  }
 
 }

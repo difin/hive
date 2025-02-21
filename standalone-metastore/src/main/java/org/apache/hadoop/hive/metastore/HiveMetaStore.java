@@ -53,6 +53,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.security.PrivilegedExceptionAction;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,6 +70,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.jdo.JDOException;
@@ -120,6 +125,7 @@ import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
 import org.apache.hadoop.hive.metastore.security.MetastoreDelegationTokenManager;
 import org.apache.hadoop.hive.metastore.txn.entities.CompactionInfo;
 import org.apache.hadoop.hive.metastore.txn.CompactionMetricsDataConverter;
+import org.apache.hadoop.hive.metastore.txn.entities.TxnStatus;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.metastore.utils.FilterUtils;
@@ -11218,14 +11224,58 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       startFunction("scheduled_query_poll");
       Exception ex = null;
       try {
+        String query = request.getScheduledQuery().getQuery();
+        ScheduledQueryMaintenanceRequestType requestType = request.getType();
         RawStore ms = getMS();
         ms.scheduledQueryMaintenance(request);
+
+        if (requestType == ScheduledQueryMaintenanceRequestType.DROP) {
+        abortReplCreatedOpenTxnsForDatabase(query);
+        }
       } catch (Exception e) {
         LOG.error("Caught exception", e);
         ex = e;
         throw e;
       } finally {
         endFunction("scheduled_query_poll", ex == null, ex);
+      }
+    }
+
+
+    private void abortReplCreatedOpenTxnsForDatabase(String query) throws TException {
+      List<Long> toBeAbortedTxns = null;
+      List<TxnType> txnListExcludingReplCreated = new ArrayList<>();
+      String pattern = "(?<=REPL LOAD )\\w+(?= INTO \\w+)";
+      Pattern regex = Pattern.compile(pattern);
+      Matcher matcher = regex.matcher(query);
+      String dbName;
+      if (matcher.find()) {
+        dbName = matcher.group();
+        for (TxnType type : TxnType.values()) {
+          // exclude REPL_CREATED txn
+          if (type != TxnType.REPL_CREATED) {
+            txnListExcludingReplCreated.add(type);
+          }
+        }
+        List<Long> openTxnList = null;
+        GetOpenTxnsResponse openTxnsResponse = null;
+        try {
+          openTxnsResponse = getTxnHandler()
+                  .getOpenTxns(txnListExcludingReplCreated);
+        } catch (Exception e) {
+          LOG.error("Got an error : " + e);
+        }
+        if (openTxnsResponse != null) {
+          openTxnList = openTxnsResponse.getOpen_txns();
+          if (openTxnList != null) {
+            toBeAbortedTxns = getTxnHandler()
+                    .getOpenTxnForPolicy(openTxnList, dbName);
+            if (toBeAbortedTxns != null) {
+              LOG.info("Aborting Repl created open transactions");
+              abort_txns(new AbortTxnsRequest(toBeAbortedTxns));
+            }
+          }
+        }
       }
     }
 

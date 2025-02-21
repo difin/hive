@@ -179,6 +179,8 @@ public interface TxnStore extends Configurable {
   @RetrySemantics.ReadOnly
   GetOpenTxnsResponse getOpenTxns(List<TxnType> excludeTxnTypes) throws MetaException;
 
+  List<Long> getOpenTxnForPolicy(List<Long> openTxnList, String dbName);
+
   /**
    * Get the count for open transactions.
    * @throws MetaException
