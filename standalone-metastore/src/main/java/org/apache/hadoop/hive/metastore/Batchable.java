@@ -24,6 +24,7 @@ import java.util.List;
 import javax.jdo.Query;
 
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public abstract class Batchable<I, R> {
   public static final int NO_BATCHING = -1;
 
   private List<Query> queries = null;
-  public abstract List<R> run(List<I> input) throws MetaException;
+  public abstract List<R> run(List<I> input) throws Exception;
 
   public void addQueryAfterUse(Query query) {
     if (queries == null) {
@@ -73,18 +74,22 @@ public abstract class Batchable<I, R> {
     if (input == null || input.isEmpty()) {
       return Collections.emptyList();
     }
-    if (batchSize == NO_BATCHING || batchSize >= input.size()) {
-      return runnable.run(input);
-    }
-    List<R> result = new ArrayList<R>(input.size());
-    for (int fromIndex = 0, toIndex = 0; toIndex < input.size(); fromIndex = toIndex) {
-      toIndex = Math.min(fromIndex + batchSize, input.size());
-      List<I> batchedInput = input.subList(fromIndex, toIndex);
-      List<R> batchedOutput = runnable.run(batchedInput);
-      if (batchedOutput != null) {
-        result.addAll(batchedOutput);
+    try {
+      if (batchSize == NO_BATCHING || batchSize >= input.size()) {
+        return runnable.run(input);
       }
+      List<R> result = new ArrayList<>(input.size());
+      for (int fromIndex = 0, toIndex = 0; toIndex < input.size(); fromIndex = toIndex) {
+        toIndex = Math.min(fromIndex + batchSize, input.size());
+        List<I> batchedInput = input.subList(fromIndex, toIndex);
+        List<R> batchedOutput = runnable.run(batchedInput);
+        if (batchedOutput != null) {
+          result.addAll(batchedOutput);
+        }
+      }
+      return result;
+    } catch (Exception e) {
+      throw MetaStoreUtils.newMetaException(e);
     }
-    return result;
   }
 }

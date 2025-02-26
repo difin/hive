@@ -111,6 +111,14 @@ public enum DatabaseProduct {
     return dbType == DERBY;
   }
 
+  public static boolean isMYSQL(DatabaseProduct dbType) {
+    return dbType == MYSQL;
+  }
+
+  public final boolean isSQLSERVER(DatabaseProduct dbType) {
+    return dbType == SQLSERVER;
+  }
+
   public static boolean isDuplicateKeyError(DatabaseProduct dbType, Throwable th) {
     SQLException ex = TxnUtils.getSqlException(th);
     switch (dbType) {
@@ -183,4 +191,32 @@ public enum DatabaseProduct {
       return null;
     }
   }
+
+  /**
+   * Gets the boolean value specific to database for the given input
+   * @param val boolean value
+   * @return database specific value
+   */
+  public Object getBoolean(DatabaseProduct dbType, boolean val) {
+    if (isDERBY(dbType)) {
+      return val ? "Y" : "N";
+    }
+    return val;
+  }
+
+  /**
+   * Get the max rows in a query with paramSize.
+   * @param batch the configured batch size
+   * @param paramSize the parameter size in a query statement
+   * @return the max allowed rows in a query
+   */
+  public int getMaxRows(int batch, int paramSize, DatabaseProduct dbType) {
+    if (isSQLSERVER(dbType)) {
+      // SQL Server supports a maximum of 2100 parameters in a request. Adjust the maxRowsInBatch accordingly
+      int maxAllowedRows = (2100 - paramSize) / paramSize;
+      return Math.min(batch, maxAllowedRows);
+    }
+    return batch;
+  }
+
 }
