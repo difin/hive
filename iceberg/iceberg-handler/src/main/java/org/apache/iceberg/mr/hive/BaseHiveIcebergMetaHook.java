@@ -45,6 +45,7 @@ import org.apache.hadoop.hive.ql.ddl.misc.sortoder.SortFieldDesc;
 import org.apache.hadoop.hive.ql.ddl.misc.sortoder.SortFields;
 import org.apache.hadoop.hive.ql.ddl.misc.sortoder.ZOrderFieldDesc;
 import org.apache.hadoop.hive.ql.ddl.misc.sortoder.ZOrderFields;
+import org.apache.hadoop.hive.ql.util.NullOrdering;
 import org.apache.iceberg.BaseMetastoreTableOperations;
 import org.apache.iceberg.BaseTable;
 import org.apache.iceberg.NullOrder;
@@ -279,7 +280,7 @@ public class BaseHiveIcebergMetaHook implements HiveMetaHook {
       if (sortFields != null && !sortFields.getSortFields().isEmpty()) {
         SortOrder.Builder sortOrderBuilder = SortOrder.builderFor(schema);
         sortFields.getSortFields().forEach(fieldDesc -> {
-          NullOrder nullOrder = fieldDesc.getNullOrder() == SortFieldDesc.NullOrder.NULLS_FIRST ?
+          NullOrder nullOrder = fieldDesc.getNullOrdering() == NullOrdering.NULLS_FIRST ?
               NullOrder.NULLS_FIRST : NullOrder.NULLS_LAST;
           SortDirection sortDirection = fieldDesc.getDirection() == SortFieldDesc.SortDirection.ASC ?
               SortDirection.ASC : SortDirection.DESC;

@@ -180,7 +180,7 @@ public class CreateTableAnalyzer extends CalcitePlanner {
               : SortFieldDesc.SortDirection.ASC;
       child = (ASTNode) child.getChild(0);
       String name = unescapeIdentifier(child.getChild(0).getText()).toLowerCase();
-      SortFieldDesc.NullOrder nullOrder = child.getToken().getType() == HiveParser.TOK_NULLS_FIRST ? SortFieldDesc.NullOrder.NULLS_FIRST : SortFieldDesc.NullOrder.NULLS_LAST;
+      NullOrdering nullOrder = child.getToken().getType() == HiveParser.TOK_NULLS_FIRST ? NullOrdering.NULLS_FIRST : NullOrdering.NULLS_LAST;
       sortFieldDescList.add(new SortFieldDesc(name, sortDirection, nullOrder));
     }
     try {
