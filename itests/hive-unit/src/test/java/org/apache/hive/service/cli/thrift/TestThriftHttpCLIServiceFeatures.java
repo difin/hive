@@ -157,6 +157,10 @@ public class TestThriftHttpCLIServiceFeatures  {
     hiveConf.setVar(ConfVars.HIVE_AUTHENTICATOR_MANAGER, SessionStateUserAuthenticator.class.getName());
     hiveConf.setBoolVar(ConfVars.HIVE_AUTHORIZATION_ENABLED, true);
 
+    // query history adds no value to this test
+    // this should be handled with HiveConfForTests when it's used here too
+    hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_QUERY_HISTORY_ENABLED, false);
+
     ThriftCLIServiceTest.startHiveServer2WithConf(hiveConf);
 
     ThriftCLIServiceTest.client = ThriftCLIServiceTest.getServiceClientInternal();

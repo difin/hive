@@ -111,4 +111,5 @@ public interface TezSession {
   void setOwnerThread();
   void setKillQuery(KillQuery kq);
   boolean killQuery(String reason) throws HiveException;
+  String getAppMasterUri();
 }

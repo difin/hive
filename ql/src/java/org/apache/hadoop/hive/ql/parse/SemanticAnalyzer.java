@@ -84,6 +84,7 @@ import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.runtime.tree.TreeWizard;
 import org.antlr.runtime.tree.TreeWizard.ContextVisitor;
+import org.apache.calcite.sql.SqlKind;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -1864,6 +1865,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         String currentDatabase = SessionState.get().getCurrentDatabase();
         String tab_name = getUnescapedName((ASTNode) ast.getChild(0).getChild(0), currentDatabase);
         qbp.addInsertIntoTable(tab_name, ast);
+        setSqlKind(SqlKind.INSERT);
 
       case HiveParser.TOK_DESTINATION:
         ctx_1.dest = this.ctx.getDestNamePrefix(ast, qb).toString() + ctx_1.nextNum;
@@ -1877,6 +1879,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
             isTmpFileDest = ch.getToken().getType() == HiveParser.TOK_TMP_FILE;
             if (ch.getToken().getType() == HiveParser.StringLiteral) {
               qbp.setInsertOverwriteDirectory(true);
+              // set DML for IOWD here as that's not covered by other codepaths
+              queryProperties.setQueryType(QueryProperties.QueryType.DML);
+              setSqlKind(SqlKind.INSERT);
             }
           } else {
             if (ast.getToken().getType() == HiveParser.TOK_DESTINATION
@@ -1885,6 +1890,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
                   SessionState.get().getCurrentDatabase());
               qbp.getInsertOverwriteTables().put(fullTableName.toLowerCase(), ast);
               qbp.setDestToOpType(ctx_1.dest, true);
+              setSqlKind(SqlKind.INSERT);
             }
           }
         }
@@ -8857,7 +8863,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     if (ltd != null) {
       queryState.getLineageState().mapDirToOp(ltd.getSourcePath(), output);
     }
-    if (queryState.getCommandType().equals(HiveOperation.CREATETABLE_AS_SELECT.getOperationName())) {
+    if (HiveOperation.CREATETABLE_AS_SELECT.equals(queryState.getHiveOperation())) {
 
       Path tlocation = null;
       String tName = Utilities.getDbTableName(tableDesc.getDbTableName())[1];
@@ -8878,7 +8884,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
       queryState.getLineageState()
           .mapDirToOp(tlocation, output);
-    } else if (queryState.getCommandType().equals(HiveOperation.CREATE_MATERIALIZED_VIEW.getOperationName())) {
+    } else if (HiveOperation.CREATE_MATERIALIZED_VIEW.equals(queryState.getHiveOperation())) {
       Path tlocation;
       String [] dbTable = Utilities.getDbTableName(createVwDesc.getViewName());
       try {
@@ -11973,7 +11979,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
             limit, extraMRStep);
         qb.getParseInfo().setOuterQueryLimit(limit);
       }
-      if (!queryState.getHiveOperation().equals(HiveOperation.CREATEVIEW)) {
+      if (!HiveOperation.CREATEVIEW.equals(queryState.getHiveOperation())) {
         curr = genFileSinkPlan(dest, qb, curr);
       }
     }
@@ -13360,6 +13366,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         return false;
       }
     } else {
+      // TODO: reiterate on this in HIVE-28750
       queryState.setCommandType(HiveOperation.QUERY);
     }
 
@@ -14465,6 +14472,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       isUserStorageFormat = true;
     }
 
+    // CREATE TABLE is a DDL and yet it's not handled by DDLSemanticAnalyzerFactory
+    // FIXME: HIVE-28724
+    queryProperties.setQueryType(QueryProperties.QueryType.DDL);
+
     /*
      * Check the 1st-level children and do simple semantic checks: 1) CTLT and
      * CTAS should not coexists. 2) CTLT or CTAS should not coexists with column
@@ -15004,6 +15015,10 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     LOG.info("Creating view " + dbDotTable + " position="
         + ast.getCharPositionInLine());
     int numCh = ast.getChildCount();
+
+    // all the CREATE VIEW statements are DDLs (including MV)
+    queryProperties.setQueryType(QueryProperties.QueryType.DDL);
+
     for (int num = 1; num < numCh; num++) {
       ASTNode child = (ASTNode) ast.getChild(num);
       if (storageFormat.fillStorageFormat(child)) {
@@ -16308,6 +16323,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       queryProperties.setCTAS(qb.getTableDesc() != null);
       queryProperties.setInsert(qb.getParseInfo().hasInsertTables());
       queryProperties.setETL(qb.isCTAS() || qb.getParseInfo().hasInsertTables());
+      if (qb.getParseInfo().hasInsertTables()) {
+        queryProperties.setQueryType(QueryProperties.QueryType.DML);
+      }
       queryProperties.setHasOuterOrderBy(!qb.getParseInfo().getIsSubQ() &&
           !qb.getParseInfo().getDestToOrderBy().isEmpty());
       queryProperties.setOuterQueryLimit(qb.getParseInfo().getOuterQueryLimit());

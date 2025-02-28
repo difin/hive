@@ -33,9 +33,8 @@ import com.google.common.base.Strings;
  * Constructs a driver for ql clients.
  */
 public class DriverFactory {
-
   public static IDriver newDriver(HiveConf conf) {
-    return newDriver(getNewQueryState(conf), null, null);
+    return newDriver(getNewQueryState(conf), DriverContext.getUserNameFromConf(conf), QueryInfo.getFromConf(conf));
   }
 
   public static IDriver newDriver(QueryState queryState, String userName, QueryInfo queryInfo) {

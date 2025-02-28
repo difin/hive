@@ -73,6 +73,7 @@ import org.apache.hadoop.hive.ql.plan.mapper.PlanMapper;
 import org.apache.hadoop.hive.ql.plan.mapper.StatsSource;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorResponse;
+import org.apache.hadoop.hive.ql.queryhistory.QueryHistoryService;
 import org.apache.hadoop.hive.ql.session.LineageState;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.session.SessionState.LogHelper;
@@ -87,7 +88,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 
 public class Driver implements IDriver {
-
   private static final String CLASS_NAME = Driver.class.getName();
   private static final Logger LOG = LoggerFactory.getLogger(CLASS_NAME);
   private static final LogHelper CONSOLE = new LogHelper(LOG);
@@ -140,18 +140,18 @@ public class Driver implements IDriver {
   // Pass lineageState when a driver instantiates another Driver to run
   // or compile another query
   public Driver(HiveConf conf, Context ctx, LineageState lineageState) {
-    this(QueryState.getNewQueryState(conf, lineageState), null, null);
+    this(QueryState.getNewQueryState(conf, lineageState), null,  QueryInfo.getFromConf(conf));
     context = ctx;
   }
 
   // Pass lineageState when a driver instantiates another Driver to run
   // or compile another query
   public Driver(HiveConf conf, String userName, LineageState lineageState) {
-    this(QueryState.getNewQueryState(conf, lineageState), userName, null);
+    this(QueryState.getNewQueryState(conf, lineageState), userName, QueryInfo.getFromConf(conf));
   }
 
   public Driver(QueryState queryState, String userName) {
-    this(queryState, userName, null, null);
+    this(queryState, userName, QueryInfo.getFromConf(queryState.getConf()), null);
   }
 
   public Driver(QueryState queryState, String userName, QueryInfo queryInfo) {
@@ -304,15 +304,7 @@ public class Driver implements IDriver {
   }
 
   private void setTriggerContext(String queryId) {
-    long queryStartTime;
-    // query info is created by SQLOperation which will have start time of the operation. When JDBC Statement is not
-    // used queryInfo will be null, in which case we take creation of Driver instance as query start time (which is also
-    // the time when query display object is created)
-    if (driverContext.getQueryInfo() != null) {
-      queryStartTime = driverContext.getQueryInfo().getBeginTime();
-    } else {
-      queryStartTime = driverContext.getQueryDisplay().getQueryStartTime();
-    }
+    long queryStartTime = driverContext.getQueryStartTime();
     WmContext wmContext = new WmContext(queryStartTime, queryId);
     context.setWmContext(wmContext);
   }
@@ -1183,6 +1175,7 @@ public class Driver implements IDriver {
   // is called to stop the query if it is running, clean query results, and release resources.
   @Override
   public void close() {
+    logQueryHistory();
     driverState.lock();
     try {
       releaseTaskQueue();
@@ -1200,6 +1193,16 @@ public class Driver implements IDriver {
       DriverState.removeDriverState();
     }
     destroy();
+  }
+
+  private void logQueryHistory() {
+    if (driverContext.getConf().getBoolVar(HiveConf.ConfVars.HIVE_QUERY_HISTORY_ENABLED)) {
+      if (driverState.isClosed() || driverState.isDestroyed()) {
+        LOG.warn("Driver instance {} already closed or destroyed, prevent handling query history", this);
+      } else {
+        QueryHistoryService.getInstance().logQuery(driverContext);
+      }
+    }
   }
 
   // is usually called after close() to commit or rollback a query and end the driver life cycle.

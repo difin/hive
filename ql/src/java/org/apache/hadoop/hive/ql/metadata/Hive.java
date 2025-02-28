@@ -259,7 +259,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @SuppressWarnings({"deprecation", "rawtypes"})
-public class Hive {
+public class Hive implements AutoCloseable {
 
   static final private Logger LOG = LoggerFactory.getLogger("hive.ql.metadata.Hive");
   private final String CLASS_NAME = Hive.class.getName();
@@ -6926,5 +6926,11 @@ private void constructOneLBLocationMap(FileStatus fSta,
     } catch (Exception e) {
       throw new HiveException(e);
     }
+  }
+
+
+  @Override
+  public void close() throws Exception {
+    close(true);
   }
 }

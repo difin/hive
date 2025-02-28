@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -1155,5 +1156,12 @@ public class TezSessionState implements TezSession {
     LOG.info("Killing the query {}: {}", queryId, reason);
     killQuery.killQuery(queryId, reason, conf, true);
     return true;
+  }
+
+  @Override
+  public String getAppMasterUri() {
+    return Optional.of(session).map(
+            tezClient -> tezClient.getAmHost() + ":" + tezClient.getAmPort())
+        .get();
   }
 }

@@ -82,6 +82,8 @@ public class TezJobMonitor {
   private final List<BaseWork> topSortedWorks;
 
   transient LogHelper console;
+  // Collecting execution summary might be a bit expensive, only do it if needed for query history.
+  private final boolean shouldCollectSummaryString;
 
   private StringWriter diagnostics = new StringWriter();
 
@@ -126,6 +128,8 @@ public class TezJobMonitor {
     console = SessionState.getConsole();
     updateFunction = updateFunction();
     this.counters = counters;
+    this.shouldCollectSummaryString = conf.getBoolVar(HiveConf.ConfVars.HIVE_QUERY_HISTORY_ENABLED) &&
+        conf.getBoolVar(ConfVars.HIVE_QUERY_HISTORY_EXEC_SUMMARY_ENABLED);
   }
 
   private RenderStrategy.UpdateFunction updateFunction() {
@@ -448,7 +452,9 @@ public class TezJobMonitor {
 
   private void printSummary(boolean success, Map<String, Progress> progressMap) {
     if (isProfilingEnabled() && success && progressMap != null) {
-
+      if (shouldCollectSummaryString){
+        console.startSummary();
+      }
       double duration = (System.currentTimeMillis() - this.executionStartTime) / 1000.0;
       console.printInfo("Status: DAG finished successfully in " + String.format("%.2f seconds", duration));
       console.printInfo("DAG ID: " + this.dagClient.getDagIdentifierString());
@@ -521,5 +527,9 @@ public class TezJobMonitor {
           ExceptionUtils.getStackTrace(e));
     }
     return TezProgressMonitor.NULL;
+  }
+
+  public LogHelper logger(){
+    return console;
   }
 }

@@ -27,6 +27,7 @@ import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.ql.ErrorMsg;
+import org.apache.hadoop.hive.ql.QueryProperties;
 import org.apache.hadoop.hive.ql.QueryState;
 import org.apache.hadoop.hive.ql.ddl.DDLWork;
 import org.apache.hadoop.hive.ql.ddl.DDLSemanticAnalyzerFactory.DDLType;
@@ -116,5 +117,11 @@ public class AlterTableCompactAnalyzer extends AbstractAlterTableAnalyzer {
     AlterTableCompactDesc desc = new AlterTableCompactDesc(tableName, partitionSpec, type, isBlocking, poolName,
         numberOfBuckets, mapProp, orderBy, filterExpr);
     rootTasks.add(TaskFactory.get(new DDLWork(getInputs(), getOutputs(), desc)));
+  }
+
+  @Override
+  public void setQueryType(ASTNode tree) {
+    // ALTER TABLE COMPACT doesn't change the table's metadata or the data itself
+    queryProperties.setQueryType(QueryProperties.QueryType.OTHER);
   }
 }

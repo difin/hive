@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
@@ -831,5 +832,15 @@ public final class ParseUtils {
       }
     }
     return result;
+  }
+
+  /**
+   * Returns the root node's string representation without the "TOK_" prefix.
+   * @param node the ASTNode
+   */
+  public static String getNodeName(ASTNode node) {
+    return Optional.ofNullable(node)
+        .map(ASTNode::getText).map(text -> text.substring("TOK_".length()))
+        .orElse("");
   }
 }

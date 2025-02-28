@@ -394,5 +394,9 @@ class TezSessionPoolSession implements TezSession {
     baseSession.setKillQuery(kq);
   }
 
+  @Override
+  public String getAppMasterUri() {
+    return baseSession.getAppMasterUri();
+  }
   // ********** End of the methods that we redirect to base.
 }

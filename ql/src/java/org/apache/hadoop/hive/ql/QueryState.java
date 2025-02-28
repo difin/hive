@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.ql;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.calcite.sql.SqlKind;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.ql.lockmgr.HiveTxnManager;
 import org.apache.hadoop.hive.ql.plan.HiveOperation;
@@ -47,6 +48,12 @@ public class QueryState {
    * type of the command.
    */
   private HiveOperation commandType;
+
+  /**
+   * The SqlKind of the command. This typically covers additional information to HiveOperation.QUERY,
+   * it could be: INSERT, DELETE, UPDATE, MERGE, EXPLAIN.
+   */
+  private SqlKind sqlKind;
 
   /**
    * Per-query Lineage state to track what happens in the query
@@ -140,6 +147,14 @@ public class QueryState {
 
   public void setCommandType(HiveOperation commandType) {
     this.commandType = commandType;
+  }
+
+  public SqlKind getSqlKind() {
+    return sqlKind;
+  }
+
+  public void setSqlKind(SqlKind sqlKind) {
+    this.sqlKind = sqlKind;
   }
 
   public HiveConf getConf() {
