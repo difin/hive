@@ -95,6 +95,7 @@
                                     <excludes>
                                         **/HadoopInputFile.class
                                         **/SerializableTable.class
+                                        org.apache.iceberg.SnapshotProducer.class
                                     </excludes>
                                 </artifactItem>
                             </artifactItems>
