@@ -47,9 +47,10 @@ RUN /remove-unwanted.sh
 FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as hive
 USER root
 # install debugging tools and other dependencies
+# and set UTC timezone
 RUN apk update && \
-    apk add --no-cache bash strace openssl wget vim  nmap netcat-openbsd bc krb5-libs gettext zstd  iftop procps net-tools bind-tools gnupg openssl-dev krb5
-
+    apk add --no-cache bash strace openssl wget vim  nmap netcat-openbsd bc krb5-libs gettext zstd  iftop procps net-tools bind-tools gnupg openssl-dev krb5 tzdata && \
+    ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 
 # add notice file
 ADD /NOTICE.txt /NOTICE.txt
