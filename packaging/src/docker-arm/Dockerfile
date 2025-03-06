@@ -1,60 +1,60 @@
 # Copyright (c) 2020 Cloudera, Inc. All rights reserved.
-FROM registry.access.redhat.com/ubi8/ubi:latest as hadoop-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as hadoop-base
 ARG HADOOP_VERSION
+USER root
 ADD hadoop-${HADOOP_VERSION}.tar.gz  /usr/lib/
 RUN ln -s /usr/lib/hadoop-${HADOOP_VERSION} /usr/lib/hadoop
 RUN rm -f /usr/lib/hadoop/share/hadoop/tools/lib/kafka-clients-0.8.2.1.jar
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi8/ubi:latest as ranger-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as ranger-base
 ARG RANGER_VERSION
+USER root
 ADD ranger-${RANGER_VERSION}-hive-plugin.tar.gz /usr/lib/
 RUN ln -s /usr/lib/ranger-${RANGER_VERSION}-hive-plugin /usr/lib/ranger-hive-plugin
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi8/ubi:latest as solr-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as solr-base
 ARG SOLR_VERSION
+USER root
 ADD solr-${SOLR_VERSION}.tar.gz /usr/lib/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi8/ubi:latest as atlas-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as atlas-base
 ARG ATLAS_VERSION
+USER root
 ADD apache-atlas-${ATLAS_VERSION}-hive-hook.tar.gz /usr/lib/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi8/ubi:latest as tez-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as tez-base
 ARG TEZ_VERSION
+USER root
 ADD tez-${TEZ_VERSION}.tar.gz /usr/lib/tez/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi8/ubi:latest as hive-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as hive-base
 ARG CDH_VERSION
+USER root
 COPY maven/apache-hive-${CDH_VERSION}-bin /usr/lib/hive/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM registry.access.redhat.com/ubi8/ubi:latest as hive
-# setup os and install packages
-RUN curl -o /etc/yum.repos.d/rhel8_mirrors.repo https://mirror.infra.cloudera.com/repos/rhel/server/8/8.10/rhel8.10_cldr_mirrors.repo
-# workaround until maybe RELENG-29894 is taken care of
-RUN awk '{gsub("http://", "https://"); print}' /etc/yum.repos.d/rhel8_mirrors.repo > /tmp/repo && mv /tmp/repo /etc/yum.repos.d/rhel8_mirrors.repo
-
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as hive
+USER root
 # install debugging tools and other dependencies
-RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-RUN yum -y update && \
-  yum install -y java-11-openjdk-headless java-11-openjdk-devel strace sysstat bind-utils openssl openssl-devel wget vim nmap-ncat nmap bc gnupg2 krb5-libs krb5-workstation gettext epel-release zstd libzstd iftop procps lsof net-tools && \
-  yum clean all && \
-  rm -rf /var/cache/yum
+RUN apk update && \
+    apk add --no-cache bash strace openssl wget vim  nmap netcat-openbsd bc krb5-libs gettext zstd  iftop procps net-tools bind-tools gnupg openssl-dev krb5
+
 
 # add notice file
 ADD /NOTICE.txt /NOTICE.txt
 
-ENV JAVA_HOME /etc/alternatives/jre
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk/jre
 
 # by default JVM caches successful DNS resolution infinitely. If a pod or node dies, the ip address changes
 # so we set TTL for DNS cache to non-zero value.
@@ -108,7 +108,8 @@ RUN mkdir -p /apps/llap/work && \
    mkdir -p /var/log/hive/audit/solr/spool && \
    chown -R hive:hive /var/log/hive/audit && \
    mkdir -p /var/lib/ranger/hive/policy-cache && \
-   chown -R hive:hive /var/lib/ranger/hive/policy-cache
+   chown -R hive:hive /var/lib/ranger/hive/policy-cache && \
+   chown -R hive:hive /usr/bin/nmap
 
 COPY createSymlink.sh remove-unwanted.sh healthz.sh healthz-ha.sh healthz-hms.sh /
 
@@ -147,16 +148,11 @@ RUN /createSymlink.sh ${CDH_VERSION}
 RUN mkdir -p /usr/lib/hive/lib/
 
 # install mysql JDBC connector for mysql and mariadb, and Oracle JDBC driver, then move them where the schematool can find them
-RUN yum -y clean all && \
-    yum -y install postgresql && \
-    rm -rf /var/cache/yum && \
+RUN apk add --no-cache postgresql && \
     wget --no-verbose https://s3.amazonaws.com/dev.hortonworks.com/ARTIFACTS/jdbc/1911/ojdbc8.jar -O /usr/lib/hive/lib/oracle-connector-java.jar && \
-    wget --no-verbose https://mirror.infra.cloudera.com/mysql/mysql-connector-j-8.2.0.jar  -O /usr/lib/hive/lib/mysql-connector-j-8.2.0.jar && \
+    wget --no-verbose https://mirror.infra.cloudera.com/mysql/mysql-connector-j-8.0.33.jar  -O /usr/lib/hive/lib/mysql-connector-j-8.0.33.jar && \
     wget --no-verbose --no-check-certificate https://jdbc.postgresql.org/download/postgresql-42.5.5.jar -O /usr/lib/hive/lib/postgresql-jdbc.jar && \
     /remove-unwanted.sh
-
-# postgres-jdbc fetches java-8 as a dependency, let's make java11 as default, pointed by /etc/alternatives/java
-RUN alternatives --set java /usr/lib/jvm/java-11-openjdk-11.0.25.0.9-2.el8.aarch64/bin/java
 
 # switch user and all related env
 USER hive
