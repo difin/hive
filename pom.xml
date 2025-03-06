@@ -80,7 +80,7 @@
     <apache-directory-server.version>1.5.7</apache-directory-server.version>
     <!-- Include arrow for LlapOutputFormatService -->
     <arrow.version>0.11.1.2025.0.20.0-SNAPSHOT</arrow.version>
-    <avatica.version>1.22.0.7.2.18.400-40</avatica.version>
+    <avatica.version>1.22.0.2025.0.20.0-SNAPSHOT</avatica.version>
     <avro.version>1.11.3.2025.0.20.0-SNAPSHOT</avro.version>
     <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
