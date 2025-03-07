@@ -174,7 +174,7 @@ ENV LLAP_DAEMON_HOME /usr/lib/hive
 ENV LLAP_DAEMON_BIN_HOME /usr/lib/hive/scripts/llap/bin
 
 # zlib native are present here in debian. also adding hadoop native libs
-ENV LD_LIBRARY_PATH /lib/x86_64-linux-gnu:/usr/lib/hadoop/lib/native
+ENV LD_LIBRARY_PATH /lib/aarch64-linux-gnu:/usr/lib/hadoop/lib/native
 
 # conf directories
 ENV HADOOP_CONF_DIR /etc/hadoop/conf
