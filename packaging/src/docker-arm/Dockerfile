@@ -76,6 +76,11 @@ ENV HADOOP_VERSION="${HADOOP_VERSION}"
 
 RUN useradd -ms /bin/bash hive
 
+# Add a user with UID 1000001 so kerberos authentication doesn't fail on hive components
+# when we run as user with UID 1000001 in CDW on prem.
+RUN groupadd hivehigh -g 1000001
+RUN useradd -ms /bin/bash -u 1000001 -g 1000001 hivehigh
+
 # async-profiler for perf profiling
 RUN mkdir /async-profiler && \
    wget https://github.com/jvm-profiling-tools/async-profiler/releases/download/v2.9/async-profiler-2.9-linux-x64.tar.gz && \
