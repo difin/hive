@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hive.http.HttpConstants;
 import org.apache.hive.http.HttpServer;
 import org.apache.hive.service.server.HiveServer2;
