@@ -1008,6 +1008,11 @@ public class MetastoreConf {
             "hive.metastore.authentication.ldap.bindpw", "",
 "The password for the bind user, to be used to search for the full name of the user being authenticated.\n" +
         "If the username is specified, this parameter must also be specified."),
+    METASTORE_TRUSTED_PROXY_TRUSTHEADER("metastore.authentication.trustedproxy",
+            "hive.metastore.authentication.trustedproxy", "",
+            "This config indicates whether the connection is authenticated before the requests lands on \n" +
+                    " Hive Metastore, so that HMS can avoid the authentication. Default value is '', which disables \n" +
+                    "trusted proxy authentication by default. If present we directly extract the client name from header.\""),
     LIMIT_PARTITION_REQUEST("metastore.limit.partition.request",
         "hive.metastore.limit.partition.request", -1,
         "This limits the number of partitions (whole partition objects) that can be requested " +

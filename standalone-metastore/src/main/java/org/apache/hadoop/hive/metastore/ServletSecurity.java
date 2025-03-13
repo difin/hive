@@ -46,10 +46,10 @@ import java.util.Optional;
 public class ServletSecurity implements SecureServletCaller {
   private static final Logger LOG = LoggerFactory.getLogger(ServletSecurity.class);
   static final String X_USER = MetaStoreUtils.USER_NAME_HTTP_HEADER;
-  private final boolean isSecurityEnabled;
-  private final boolean jwtAuthEnabled;
-  private JWTValidator jwtValidator = null;
-  private final Configuration conf;
+  protected final boolean isSecurityEnabled;
+  protected final boolean jwtAuthEnabled;
+  protected JWTValidator jwtValidator = null;
+  protected final Configuration conf;
 
   public ServletSecurity(Configuration conf, boolean jwt) {
     this.conf = conf;
@@ -72,14 +72,16 @@ public class ServletSecurity implements SecureServletCaller {
     }
   }
 
+
   /**
    * The method to call to secure the execution of a (http) method.
    * @param request the request
    * @param response the response
    * @param executor the method executor
-   * @throws ServletException if the method executor fails
+   * @throws ServletException if the method executor fail
    * @throws IOException if the Json in/out fail
    */
+  @Override
   public void execute(HttpServletRequest request, HttpServletResponse response, MethodExecutor executor)
       throws IOException {
     if (LOG.isDebugEnabled()) {
@@ -125,7 +127,7 @@ public class ServletSecurity implements SecureServletCaller {
     }
   }
 
-  private String extractUserName(HttpServletRequest request, HttpServletResponse response)
+  protected String extractUserName(HttpServletRequest request, HttpServletResponse response)
       throws HttpAuthenticationException {
     if (!jwtAuthEnabled) {
       String userFromHeader = request.getHeader(X_USER);

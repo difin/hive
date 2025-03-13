@@ -75,6 +75,24 @@ import java.util.stream.Collectors;
 public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implements MetaStoreFilterHook {
   private static final Logger    LOG              = LoggerFactory.getLogger(HiveMetaStoreAuthorizer.class);
 
+  /**
+   * The client configuration.
+   */
+  private static final ThreadLocal<Map<String,Object>> cConfig = new ThreadLocal<Map<String,Object>>(){
+
+    @Override
+    protected Map<String,Object> initialValue() {
+      return null;
+    }
+  };
+
+  public static void setClientConfig(Map<String,Object> map) {
+    cConfig.set(map);
+  }
+
+  /**
+   * The thread-local configuration.
+   */
   private static final ThreadLocal<Configuration> tConfig = new ThreadLocal<Configuration>() {
 
     @Override
@@ -237,12 +255,11 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
         }
         tableNames.add(tableMeta.getTableName());
       });
-      TableFilterContext tableFilterContext = TableFilterContext.createFromTableMetas(dbName, tableMetas);
+      TableFilterContext     tableFilterContext     = new TableFilterContext(dbName, tableNames);
       HiveMetaStoreAuthzInfo hiveMetaStoreAuthzInfo = tableFilterContext.getAuthzContext();
-      final List<String> filteredTableNames = filterTableNames(hiveMetaStoreAuthzInfo, dbName, tableNames);
+      final List<String>  filteredTableNames = filterTableNames(hiveMetaStoreAuthzInfo, dbName, tableNames);
       if (!CollectionUtils.isEmpty(filteredTableNames)) {
         Set<String> filteredTabs = new HashSet<>(filteredTableNames);
-        LOG.debug("<== HiveMetaStoreAuthorizer.filterTableMetas() : {}", filteredTabs);
         return tableMetas.stream().filter(tblMeta -> filteredTabs.contains(tblMeta.getTableName()))
             .collect(Collectors.toList());
       }
@@ -591,25 +608,31 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
   HiveAuthorizer createHiveMetaStoreAuthorizer() throws Exception {
     HiveAuthorizer ret = null;
     HiveConf hiveConf = (HiveConf)tConfig.get();
-    if(hiveConf == null){
+    if (hiveConf == null) {
       HiveConf hiveConf1 = new HiveConf(super.getConf(), HiveConf.class);
+//      Map<String, Object> clientMap = cConfig.get();
+//      if (clientMap != null) {
+//        clientMap.forEach((k, v) -> hiveConf1.set(k, Objects.toString(v)));
+//      }
       tConfig.set(hiveConf1);
       hiveConf = hiveConf1;
     }
     HiveAuthorizerFactory authorizerFactory = HiveUtils.getAuthorizerFactory(hiveConf, HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER);
 
     if (authorizerFactory != null) {
+      Map<String, Object> clientMap = cConfig.get();
       HiveMetastoreAuthenticationProvider authenticator = tAuthenticator.get();
-
       authenticator.setConf(hiveConf);
-
       HiveAuthzSessionContext.Builder authzContextBuilder = new HiveAuthzSessionContext.Builder();
-
-      authzContextBuilder.setClientType(HiveAuthzSessionContext.CLIENT_TYPE.HIVEMETASTORE);
+      boolean isRestCatalog = clientMap != null && Boolean.TRUE.equals(clientMap.get("REST_CATALOG"));
+      if (isRestCatalog) {
+        // if rest catalog, use alternate client type REST_CATALOG
+        authzContextBuilder.setClientType(HiveAuthzSessionContext.CLIENT_TYPE.REST_CATALOG);
+      } else {
+        authzContextBuilder.setClientType(HiveAuthzSessionContext.CLIENT_TYPE.HIVEMETASTORE);
+      }
       authzContextBuilder.setSessionString("HiveMetaStore");
-
       HiveAuthzSessionContext authzSessionContext = authzContextBuilder.build();
-
       ret = authorizerFactory.createHiveAuthorizer(new HiveMetastoreClientFactoryImpl(), hiveConf, authenticator, authzSessionContext);
     }
 

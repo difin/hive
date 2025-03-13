@@ -29,7 +29,7 @@ import org.apache.hadoop.hive.common.classification.InterfaceStability.Evolving;
 public final class HiveAuthzSessionContext {
 
   public enum CLIENT_TYPE {
-    HIVESERVER2, HIVECLI, HIVEMETASTORE, OTHER
+    HIVESERVER2, HIVECLI, HIVEMETASTORE, REST_CATALOG, OTHER
   };
 
   public static class Builder {

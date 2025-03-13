@@ -37,8 +37,7 @@ import org.apache.hadoop.hive.metastore.api.LockResponse;
 import org.apache.hadoop.hive.metastore.api.LockState;
 import org.apache.hadoop.hive.metastore.api.ShowLocksResponse;
 import org.apache.hadoop.hive.metastore.api.ShowLocksResponseElement;
-import org.apache.iceberg.CatalogProperties;
-import org.apache.iceberg.CatalogUtil;
+import org.apache.iceberg.ClientPool;
 import org.apache.iceberg.HasTableOperations;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Schema;
@@ -62,6 +61,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.apache.iceberg.PartitionSpec.builderFor;
 import static org.apache.iceberg.types.Types.NestedField.required;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -157,6 +157,15 @@ public class TestHiveCommitLocks {
     spyClient = spyClientRef.get();
   }
 
+  @AfterClass
+  public static void cleanup() {
+    try {
+      spyClientPool.close();
+    } catch (Throwable t) {
+      // Ignore any exception
+    }
+  }
+
   @BeforeEach
   public void before() throws Exception {
     this.tableLocation =
@@ -169,24 +178,29 @@ public class TestHiveCommitLocks {
     metadataV1 = ops.current();
 
     table.updateSchema()
-        .addColumn("n", Types.IntegerType.get())
-        .commit();
+            .addColumn("n", Types.IntegerType.get())
+            .commit();
 
     ops.refresh();
 
     metadataV2 = ops.current();
 
-    assertThat(ops.current().schema().columns()).hasSize(2);
-
+    Assert.assertEquals(2, ops.current().schema().columns().size());
+    HiveActor actor = new HiveCatalogActor("hive", overriddenHiveConf) {
+      @Override
+      protected ClientPool<IMetaStoreClient, TException> createPool(Map<String, String> properties) {
+        return spyCachedClientPool;
+      }
+    };
     spyOps =
-        spy(
-            new HiveTableOperations(
-                overriddenHiveConf,
-                spyCachedClientPool,
-                ops.io(),
-                catalog.name(),
-                dbName,
-                tableName));
+            spy(
+                    new HiveTableOperations(
+                            overriddenHiveConf,
+                            actor,
+                            ops.io(),
+                            catalog.name(),
+                            dbName,
+                            tableName));
     reset(spyClient);
   }
 
@@ -222,12 +236,12 @@ public class TestHiveCommitLocks {
 
     doReturn(waitLockResponse).when(spyClient).lock(any());
     doReturn(waitLockResponse)
-        .doReturn(waitLockResponse)
-        .doReturn(waitLockResponse)
-        .doReturn(waitLockResponse)
-        .doReturn(acquiredLockResponse)
-        .when(spyClient)
-        .checkLock(eq(dummyLockId));
+            .doReturn(waitLockResponse)
+            .doReturn(waitLockResponse)
+            .doReturn(waitLockResponse)
+            .doReturn(acquiredLockResponse)
+            .when(spyClient)
+            .checkLock(eq(dummyLockId));
     doNothing().when(spyClient).unlock(eq(dummyLockId));
     doNothing().when(spyClient).heartbeat(eq(0L), eq(dummyLockId));
 
@@ -240,13 +254,13 @@ public class TestHiveCommitLocks {
   public void testLockAcquisitionAfterFailedNotFoundLock() throws TException, InterruptedException {
     doReturn(emptyLocks).when(spyClient).showLocks(any());
     doThrow(new TException("Failed to connect to HMS"))
-        .doReturn(waitLockResponse)
-        .when(spyClient)
-        .lock(any());
+            .doReturn(waitLockResponse)
+            .when(spyClient)
+            .lock(any());
     doReturn(waitLockResponse)
-        .doReturn(acquiredLockResponse)
-        .when(spyClient)
-        .checkLock(eq(dummyLockId));
+            .doReturn(acquiredLockResponse)
+            .when(spyClient)
+            .checkLock(eq(dummyLockId));
     doNothing().when(spyOps).doUnlock(any());
     doNothing().when(spyClient).heartbeat(eq(0L), eq(dummyLockId));
 
@@ -261,14 +275,14 @@ public class TestHiveCommitLocks {
     ArgumentCaptor<LockRequest> lockRequestCaptor = ArgumentCaptor.forClass(LockRequest.class);
     doReturn(emptyLocks).when(spyClient).showLocks(any());
     doThrow(new TException("Failed to connect to HMS"))
-        .doReturn(waitLockResponse)
-        .when(spyClient)
-        .lock(lockRequestCaptor.capture());
+            .doReturn(waitLockResponse)
+            .when(spyClient)
+            .lock(lockRequestCaptor.capture());
 
     // Capture the lockRequest, and generate a response simulating that we have a lock
     ShowLocksResponse showLocksResponse = new ShowLocksResponse(Lists.newArrayList());
     ShowLocksResponseElement showLocksElement =
-        new ShowLocksResponseElementWrapper(lockRequestCaptor);
+            new ShowLocksResponseElementWrapper(lockRequestCaptor);
     showLocksResponse.getLocks().add(showLocksElement);
 
     doReturn(showLocksResponse).when(spyClient).showLocks(any());
@@ -298,12 +312,11 @@ public class TestHiveCommitLocks {
   public void testUnLockInterruptedUnLock() throws TException {
     doReturn(waitLockResponse).when(spyClient).lock(any());
     doReturn(acquiredLockResponse).when(spyClient).checkLock(eq(dummyLockId));
-    doAnswer(
-        invocation -> {
-          throw new InterruptedException("Interrupt test");
-        })
-      .doNothing()
-      .when(spyClient)
+    doAnswer(invocation -> {
+      throw new InterruptedException("Interrupt test");
+    })
+        .doNothing()
+        .when(spyClient)
         .unlock(eq(dummyLockId));
     doNothing().when(spyClient).heartbeat(eq(0L), eq(dummyLockId));
 
@@ -319,13 +332,13 @@ public class TestHiveCommitLocks {
       invocation -> {
         throw new InterruptedException("Interrupt test");
       })
-    .when(spyClient)
-        .lock(lockRequestCaptor.capture());
+          .when(spyClient)
+          .lock(lockRequestCaptor.capture());
 
     // Capture the lockRequest, and generate a response simulating that we have a lock
     ShowLocksResponse showLocksResponse = new ShowLocksResponse(Lists.newArrayList());
     ShowLocksResponseElement showLocksElement =
-        new ShowLocksResponseElementWrapper(lockRequestCaptor);
+            new ShowLocksResponseElementWrapper(lockRequestCaptor);
     showLocksResponse.getLocks().add(showLocksElement);
 
     doReturn(showLocksResponse).when(spyClient).showLocks(any());
@@ -334,10 +347,9 @@ public class TestHiveCommitLocks {
     doNothing().when(spyClient).heartbeat(eq(0L), eq(dummyLockId));
 
     assertThatThrownBy(() -> spyOps.doCommit(metadataV2, metadataV1))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessage(
-            "org.apache.iceberg.hive.LockException: " +
-                "Interrupted while creating lock on table hivedb.tbl");
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("org.apache.iceberg.hive.LockException: " +
+                        "Interrupted while creating lock on table hivedb.tbl");
 
     verify(spyClient, times(1)).unlock(eq(dummyLockId));
     // Make sure that we exit the lock loop on InterruptedException
@@ -348,20 +360,20 @@ public class TestHiveCommitLocks {
   public void testUnLockAfterInterruptedLockCheck() throws TException {
     doReturn(waitLockResponse).when(spyClient).lock(any());
     doAnswer(
-        invocation -> {
-          throw new InterruptedException("Interrupt test");
-        })
-        .when(spyClient)
-        .checkLock(eq(dummyLockId));
+      invocation -> {
+        throw new InterruptedException("Interrupt test");
+      })
+          .when(spyClient)
+          .checkLock(eq(dummyLockId));
 
     doNothing().when(spyClient).unlock(eq(dummyLockId));
     doNothing().when(spyClient).heartbeat(eq(0L), eq(dummyLockId));
 
     assertThatThrownBy(() -> spyOps.doCommit(metadataV2, metadataV1))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessage(
-            "org.apache.iceberg.hive.LockException: " +
-                "Could not acquire the lock on hivedb.tbl, lock request ended in state WAITING");
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage(
+                    "org.apache.iceberg.hive.LockException: " +
+                            "Could not acquire the lock on hivedb.tbl, lock request ended in state WAITING");
 
     verify(spyClient, times(1)).unlock(eq(dummyLockId));
     // Make sure that we exit the checkLock loop on InterruptedException
@@ -375,41 +387,17 @@ public class TestHiveCommitLocks {
       invocation -> {
         throw new InterruptedException("Interrupt test");
       })
-    .when(spyClient)
+        .when(spyClient)
         .getTable(any(), any());
 
     doNothing().when(spyClient).unlock(eq(dummyLockId));
     doNothing().when(spyClient).heartbeat(eq(0L), eq(dummyLockId));
 
     assertThatThrownBy(() -> spyOps.doCommit(metadataV2, metadataV1))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessage("Interrupted during commit");
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("Interrupted during commit");
 
     verify(spyClient, times(1)).unlock(eq(dummyLockId));
-  }
-
-  /** Wraps an ArgumentCaptor to provide data based on the request */
-  private class ShowLocksResponseElementWrapper extends ShowLocksResponseElement {
-    private ArgumentCaptor<LockRequest> wrapped;
-
-    private ShowLocksResponseElementWrapper(ArgumentCaptor<LockRequest> wrapped) {
-      this.wrapped = wrapped;
-    }
-
-    @Override
-    public String getAgentInfo() {
-      return wrapped.getValue().getAgentInfo();
-    }
-
-    @Override
-    public LockState getState() {
-      return LockState.WAITING;
-    }
-
-    @Override
-    public long getLockid() {
-      return dummyLockId;
-    }
   }
 
   @Test
@@ -417,28 +405,28 @@ public class TestHiveCommitLocks {
     doReturn(notAcquiredLockResponse).when(spyClient).lock(any());
 
     assertThatThrownBy(() -> spyOps.doCommit(metadataV2, metadataV1))
-        .isInstanceOf(CommitFailedException.class)
-        .hasMessage(
-            "org.apache.iceberg.hive.LockException: " +
-                "Could not acquire the lock on hivedb.tbl, lock request ended in state NOT_ACQUIRED");
+            .isInstanceOf(CommitFailedException.class)
+            .hasMessage(
+                    "org.apache.iceberg.hive.LockException: " +
+                            "Could not acquire the lock on hivedb.tbl, lock request ended in state NOT_ACQUIRED");
   }
 
   @Test
   public void testLockFailureAfterRetries() throws TException {
     doReturn(waitLockResponse).when(spyClient).lock(any());
     doReturn(waitLockResponse)
-        .doReturn(waitLockResponse)
-        .doReturn(waitLockResponse)
-        .doReturn(waitLockResponse)
-        .doReturn(notAcquiredLockResponse)
-        .when(spyClient)
-        .checkLock(eq(dummyLockId));
+            .doReturn(waitLockResponse)
+            .doReturn(waitLockResponse)
+            .doReturn(waitLockResponse)
+            .doReturn(notAcquiredLockResponse)
+            .when(spyClient)
+            .checkLock(eq(dummyLockId));
 
     assertThatThrownBy(() -> spyOps.doCommit(metadataV2, metadataV1))
-        .isInstanceOf(CommitFailedException.class)
-        .hasMessage(
-            "org.apache.iceberg.hive.LockException: " +
-                "Could not acquire the lock on hivedb.tbl, lock request ended in state NOT_ACQUIRED");
+            .isInstanceOf(CommitFailedException.class)
+            .hasMessage(
+                    "org.apache.iceberg.hive.LockException: " +
+                            "Could not acquire the lock on hivedb.tbl, lock request ended in state NOT_ACQUIRED");
   }
 
   @Test
@@ -447,10 +435,10 @@ public class TestHiveCommitLocks {
     doReturn(waitLockResponse).when(spyClient).checkLock(eq(dummyLockId));
 
     assertThatThrownBy(() -> spyOps.doCommit(metadataV2, metadataV1))
-        .isInstanceOf(CommitFailedException.class)
-        .hasMessageStartingWith("org.apache.iceberg.hive.LockException")
-        .hasMessageContaining("Timed out after")
-        .hasMessageEndingWith("waiting for lock on hivedb.tbl");
+            .isInstanceOf(CommitFailedException.class)
+            .hasMessageStartingWith("org.apache.iceberg.hive.LockException")
+            .hasMessageContaining("Timed out after")
+            .hasMessageEndingWith("waiting for lock on hivedb.tbl");
   }
 
   @Test
@@ -483,12 +471,12 @@ public class TestHiveCommitLocks {
   public void testPassThroughThriftExceptions() throws TException {
     doReturn(waitLockResponse).when(spyClient).lock(any());
     doReturn(waitLockResponse).doThrow(new TException("Test Thrift Exception"))
-        .when(spyClient).checkLock(eq(dummyLockId));
+            .when(spyClient).checkLock(eq(dummyLockId));
 
     assertThatThrownBy(() -> spyOps.doCommit(metadataV2, metadataV1))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessage(
-            "org.apache.iceberg.hive.LockException: Metastore operation failed for hivedb.tbl");
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage(
+                    "org.apache.iceberg.hive.LockException: Metastore operation failed for hivedb.tbl");
   }
 
   @Test
@@ -501,10 +489,10 @@ public class TestHiveCommitLocks {
     }).when(spyClient).checkLock(eq(dummyLockId));
 
     assertThatThrownBy(() -> spyOps.doCommit(metadataV2, metadataV1))
-        .isInstanceOf(CommitFailedException.class)
-        .hasMessage(
-            "org.apache.iceberg.hive.LockException: " +
-                "Could not acquire the lock on hivedb.tbl, lock request ended in state WAITING");
+            .isInstanceOf(CommitFailedException.class)
+            .hasMessage(
+                    "org.apache.iceberg.hive.LockException: " +
+                            "Could not acquire the lock on hivedb.tbl, lock request ended in state WAITING");
   }
 
   @Test
@@ -516,14 +504,15 @@ public class TestHiveCommitLocks {
     // simulate several concurrent commit operations on the same table
     ExecutorService executor = Executors.newFixedThreadPool(numConcurrentCommits);
     IntStream.range(0, numConcurrentCommits).forEach(i ->
-        executor.submit(() -> {
-          try {
-            spyOps.doCommit(metadataV2, metadataV1);
-          } catch (CommitFailedException e) {
-            // failures are expected here when checking the base version
-            // it's no problem, we're not testing the actual commit success here, only the HMS lock acquisition attempts
-          }
-        }));
+            executor.submit(() -> {
+              try {
+                spyOps.doCommit(metadataV2, metadataV1);
+              } catch (CommitFailedException e) {
+                // failures are expected here when checking the base version
+                // it's no problem, we're not testing the actual commit success here,
+                // only the HMS lock acquisition attempts
+              }
+            }));
     executor.shutdown();
     executor.awaitTermination(30, TimeUnit.SECONDS);
 
@@ -538,8 +527,8 @@ public class TestHiveCommitLocks {
   public void testLockHeartbeat() throws TException {
     doReturn(acquiredLockResponse).when(spyClient).lock(any());
     doAnswer(AdditionalAnswers.answersWithDelay(2000, InvocationOnMock::callRealMethod))
-        .when(spyClient)
-        .getTable(any(), any());
+            .when(spyClient)
+            .getTable(any(), any());
     doNothing().when(spyClient).heartbeat(eq(0L), eq(dummyLockId));
 
     spyOps.doCommit(metadataV2, metadataV1);
@@ -551,40 +540,45 @@ public class TestHiveCommitLocks {
   public void testLockHeartbeatFailureDuringCommit() throws TException, InterruptedException {
     doReturn(acquiredLockResponse).when(spyClient).lock(any());
     doAnswer(AdditionalAnswers.answersWithDelay(2000, InvocationOnMock::callRealMethod))
-        .when(spyOps)
-        .loadHmsTable();
+            .when(spyOps)
+            .loadHmsTable();
     doThrow(new TException("Failed to heart beat."))
-        .when(spyClient)
-        .heartbeat(eq(0L), eq(dummyLockId));
+            .when(spyClient)
+            .heartbeat(eq(0L), eq(dummyLockId));
 
     assertThatThrownBy(() -> spyOps.doCommit(metadataV2, metadataV1))
-        .isInstanceOf(CommitFailedException.class)
-        .hasMessage(
-            "org.apache.iceberg.hive.LockException: " +
-                "Failed to heartbeat for hive lock. Failed to heart beat.");
+            .isInstanceOf(CommitFailedException.class)
+            .hasMessage(
+                    "org.apache.iceberg.hive.LockException: " +
+                            "Failed to heartbeat for hive lock. Failed to heart beat.");
   }
 
   @Test
   public void testNoLockCallsWithNoLock() throws TException {
     Configuration confWithLock = new Configuration(overriddenHiveConf);
     confWithLock.setBoolean(ConfigProperties.LOCK_HIVE_ENABLED, false);
-
+    HiveActor actor = new HiveCatalogActor("hive", confWithLock) {
+      @Override
+      protected ClientPool<IMetaStoreClient, TException> createPool(Map<String, String> properties) {
+        return spyCachedClientPool;
+      }
+    };
     HiveTableOperations noLockSpyOps =
-        spy(
-            new HiveTableOperations(
-                confWithLock,
-                spyCachedClientPool,
-                ops.io(),
-                catalog.name(),
-                TABLE_IDENTIFIER.namespace().level(0),
-                TABLE_IDENTIFIER.name()));
+            spy(
+                    new HiveTableOperations(
+                            confWithLock,
+                            actor,
+                            ops.io(),
+                            catalog.name(),
+                            TABLE_IDENTIFIER.namespace().level(0),
+                            TABLE_IDENTIFIER.name()));
 
     ArgumentCaptor<EnvironmentContext> contextCaptor =
-        ArgumentCaptor.forClass(EnvironmentContext.class);
+            ArgumentCaptor.forClass(EnvironmentContext.class);
 
     doNothing()
-        .when(spyClient)
-        .alter_table_with_environmentContext(any(), any(), any(), contextCaptor.capture());
+            .when(spyClient)
+            .alter_table_with_environmentContext(any(), any(), any(), contextCaptor.capture());
 
     noLockSpyOps.doCommit(metadataV2, metadataV1);
 
@@ -599,5 +593,31 @@ public class TestHiveCommitLocks {
     assertThat(context).hasSize(3);
     assertThat(HiveTableOperations.METADATA_LOCATION_PROP).isEqualTo(context.get("expected_parameter_key"));
     assertThat(metadataV2.metadataFileLocation()).isEqualTo(context.get("expected_parameter_value"));
+  }
+
+  /**
+   * Wraps an ArgumentCaptor to provide data based on the request
+   */
+  private class ShowLocksResponseElementWrapper extends ShowLocksResponseElement {
+    private ArgumentCaptor<LockRequest> wrapped;
+
+    private ShowLocksResponseElementWrapper(ArgumentCaptor<LockRequest> wrapped) {
+      this.wrapped = wrapped;
+    }
+
+    @Override
+    public String getAgentInfo() {
+      return wrapped.getValue().getAgentInfo();
+    }
+
+    @Override
+    public LockState getState() {
+      return LockState.WAITING;
+    }
+
+    @Override
+    public long getLockid() {
+      return dummyLockId;
+    }
   }
 }

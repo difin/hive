@@ -29,10 +29,12 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaException;
 import org.apache.hadoop.hive.metastore.HiveMetaStore;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.MetaStoreSchemaInfo;
+import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
 import org.apache.hadoop.hive.metastore.ObjectStore;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.Database;
@@ -87,25 +89,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 
 public abstract class HMSTestBase {
+  protected static final Logger LOG = LoggerFactory.getLogger(HMSTestBase.class.getName());
   protected static final String baseDir = System.getProperty("basedir");
-
-  @Rule
-  public TemporaryFolder temp = new TemporaryFolder();
-
-  public static class TestSchemaInfo extends MetaStoreSchemaInfo {
-
-    public TestSchemaInfo(String metastoreHome, String dbType) throws HiveMetaException {
-      super(metastoreHome, dbType);
-    }
-    @Override
-    public String getMetaStoreScriptDir() {
-      return  new File(baseDir,"src/test/resources").getAbsolutePath() + File.separatorChar +
-          "scripts" + File.separatorChar + "metastore" +
-          File.separatorChar + "upgrade" + File.separatorChar + dbType;
-    }
-  }
-
+  protected static Random RND = new Random(20230922);
+  protected static final String USER_1 = "USER_1";
   protected static final String DB_NAME = "hivedb";
+
   protected static final long EVICTION_INTERVAL = TimeUnit.SECONDS.toMillis(10);
   private static final File jwtAuthorizedKeyFile =
       new File(baseDir,"src/test/resources/auth/jwt/jwt-authorized-key.json");
@@ -125,6 +114,21 @@ public abstract class HMSTestBase {
    */
 
 
+  public static class TestSchemaInfo extends MetaStoreSchemaInfo {
+    public TestSchemaInfo(String metastoreHome, String dbType) throws HiveMetaException {
+      super(metastoreHome, dbType);
+    }
+    @Override
+    public String getMetaStoreScriptDir() {
+      return  new File(baseDir,"src/test/resources").getAbsolutePath() + File.separatorChar +
+          "scripts" + File.separatorChar + "metastore" +
+          File.separatorChar + "upgrade" + File.separatorChar + dbType;
+    }
+  }
+
+  @Rule
+  public TemporaryFolder temp = new TemporaryFolder();
+
   protected Configuration conf = null;
 
   protected static final Logger LOG = LoggerFactory.getLogger(HMSTestBase.class.getName());
@@ -141,50 +145,57 @@ public abstract class HMSTestBase {
   protected HiveMetaStoreClient metastoreClient;
 
   protected int createMetastoreServer(Configuration conf) throws Exception {
-    return HMSTestUtils.startMetaStoreWithRetry(HadoopThriftAuthBridge.getBridge(), conf);
+    return MetaStoreTestUtils.startMetaStoreWithRetry(HadoopThriftAuthBridge.getBridge(), conf);
   }
 
   protected void stopMetastoreServer(int port) {
-    HMSTestUtils.close(port);
+    MetaStoreTestUtils.close(port);
   }
+
+  protected abstract void setCatalogClass(Configuration conf);
 
   @Before
   public void setUp() throws Exception {
     NS = "hms" + RND.nextInt(100);
     conf = MetastoreConf.newMetastoreConf();
-    HMSTestUtils.setConfForStandloneMode(conf);
-    conf.setBoolean(MetastoreConf.ConfVars.METRICS_ENABLED.getVarname(), true);
-    Metrics.initialize(conf);
+    MetaStoreTestUtils.setConfForStandloneMode(conf);
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.CAPABILITY_CHECK, false);
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.HIVE_IN_TEST, true);
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.HIVE_IN_TEST_ICEBERG, true);
 
-    String whpath = new File(baseDir,"target/tmp/warehouse").getAbsolutePath().toString();
-    // "hive.metastore.warehouse.external.dir"
+    conf.setBoolean(MetastoreConf.ConfVars.METRICS_ENABLED.getVarname(), true);
+    // "hive.metastore.warehouse.dir"
+    String whpath = new File(baseDir,"target/tmp/warehouse/managed").toURI()/*.getAbsolutePath()*/.toString();
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.WAREHOUSE, whpath);
-    MetastoreConf.setVar(conf, MetastoreConf.ConfVars.WAREHOUSE_EXTERNAL, whpath);
+    conf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, whpath);
+    // "hive.metastore.warehouse.external.dir"
+    String extwhpath = new File(baseDir,"target/tmp/warehouse/external").toURI()/*.getAbsolutePath()*/.toString();
+    MetastoreConf.setVar(conf, MetastoreConf.ConfVars.WAREHOUSE_EXTERNAL, extwhpath);
+    conf.set(HiveConf.ConfVars.HIVE_METASTORE_WAREHOUSE_EXTERNAL.varname, whpath);
+
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.SCHEMA_INFO_CLASS, "org.apache.iceberg.rest.HMSTestBase$TestSchemaInfo");
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.HIVE_IN_TEST, true);
     // Events that get cleaned happen in batches of 1 to exercise batching code
     MetastoreConf.setLongVar(conf, MetastoreConf.ConfVars.EVENT_CLEAN_MAX_EVENTS, 1L);
     MetastoreConf.setLongVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_PORT, 0);
-    MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_CLASS, "HMSCatalog");
-    //MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_CLASS, "HiveCatalog");
-    MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_AUTH, "jwt");
-    //MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_AUTH, "simple");
+    setCatalogClass(conf);
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_PATH, catalogPath);
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.THRIFT_METASTORE_AUTHENTICATION_JWT_JWKS_URL,
         "http://localhost:" + MOCK_JWKS_SERVER_PORT + "/jwks");
     MOCK_JWKS_SERVER.stubFor(get("/jwks")
         .willReturn(ok()
             .withBody(Files.readAllBytes(jwtVerificationJWKSFile.toPath()))));
+    Metrics.initialize(conf);
     // The server
     port = createMetastoreServer(conf);
     System.out.println("Starting MetaStore Server on port " + port);
     // The manager decl
     PropertyManager.declare(NS, HMSPropertyManager.class);
     // The client
-    metastoreClient = createClient(conf, port);
+    HiveMetaStoreClient metastoreClient = createClient(conf, port);
     Assert.assertNotNull("Unable to connect to the MetaStore server", metastoreClient);
 
-    // investigate its necessity
+    // create a managed root
     Warehouse wh = new Warehouse(conf);
     String location0 = wh.getDefaultDatabasePath("hivedb2023", false).toString();
     //wh.getDefaultDatabasePath()
@@ -241,7 +252,7 @@ public abstract class HMSTestBase {
   static Map<String, Long> reportMetricCounters(String... apis) {
     Map<String, Long> map = new LinkedHashMap<>();
     com.codahale.metrics.MetricRegistry registry = Metrics.getRegistry();
-    List<String> names = HMSCatalog.getMetricNames(apis);
+    List<String> names = HMSCatalogAdapter.getMetricNames(apis);
     for(String name : names) {
       Counter counter = registry.counter(name);
       if (counter != null) {
@@ -310,7 +321,7 @@ public abstract class HMSTestBase {
    * @return the server port
    * @throws Exception
    */
-  protected int createCatalogServer(Configuration conf, HMSCatalog catalog) throws Exception {
+  protected int createCatalogServer(Configuration conf, HiveCatalog catalog) throws Exception {
     if (catalogServer == null) {
       catalogServer = HMSCatalogServer.startServer(conf, catalog);
       if (catalogServer == null || !catalogServer.isStarted()) {

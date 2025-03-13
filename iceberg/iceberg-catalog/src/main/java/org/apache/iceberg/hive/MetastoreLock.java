@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.LockComponent;
 import org.apache.hadoop.hive.metastore.api.LockLevel;
 import org.apache.hadoop.hive.metastore.api.LockRequest;
@@ -42,7 +41,6 @@ import org.apache.hadoop.hive.metastore.api.LockType;
 import org.apache.hadoop.hive.metastore.api.ShowLocksRequest;
 import org.apache.hadoop.hive.metastore.api.ShowLocksResponse;
 import org.apache.hadoop.hive.metastore.api.ShowLocksResponseElement;
-import org.apache.iceberg.ClientPool;
 import org.apache.iceberg.exceptions.CommitFailedException;
 import org.apache.iceberg.relocated.com.google.common.annotations.VisibleForTesting;
 import org.apache.iceberg.relocated.com.google.common.base.MoreObjects;
@@ -76,8 +74,7 @@ public class MetastoreLock implements HiveLock {
   private static final long HIVE_TABLE_LEVEL_LOCK_EVICT_MS_DEFAULT = TimeUnit.MINUTES.toMillis(10);
   private static volatile Cache<String, ReentrantLock> commitLockCache;
 
-  private final ClientPool<IMetaStoreClient, TException> metaClients;
-
+  private final HiveActor actor;
   private final String databaseName;
   private final String tableName;
   private final String fullName;
@@ -96,19 +93,19 @@ public class MetastoreLock implements HiveLock {
   private ReentrantLock jvmLock = null;
   private Heartbeat heartbeat = null;
 
-  public MetastoreLock(Configuration conf, ClientPool<IMetaStoreClient, TException> metaClients,
+  public MetastoreLock(Configuration conf, HiveActor actor,
                        String catalogName, String databaseName, String tableName) {
-    this.metaClients = metaClients;
+    this.actor = actor;
     this.fullName = catalogName + "." + databaseName + "." + tableName;
     this.databaseName = databaseName;
     this.tableName = tableName;
 
     this.lockAcquireTimeout =
-        conf.getLong(HIVE_ACQUIRE_LOCK_TIMEOUT_MS, HIVE_ACQUIRE_LOCK_TIMEOUT_MS_DEFAULT);
+            conf.getLong(HIVE_ACQUIRE_LOCK_TIMEOUT_MS, HIVE_ACQUIRE_LOCK_TIMEOUT_MS_DEFAULT);
     this.lockCheckMinWaitTime =
-        conf.getLong(HIVE_LOCK_CHECK_MIN_WAIT_MS, HIVE_LOCK_CHECK_MIN_WAIT_MS_DEFAULT);
+            conf.getLong(HIVE_LOCK_CHECK_MIN_WAIT_MS, HIVE_LOCK_CHECK_MIN_WAIT_MS_DEFAULT);
     this.lockCheckMaxWaitTime =
-        conf.getLong(HIVE_LOCK_CHECK_MAX_WAIT_MS, HIVE_LOCK_CHECK_MAX_WAIT_MS_DEFAULT);
+            conf.getLong(HIVE_LOCK_CHECK_MAX_WAIT_MS, HIVE_LOCK_CHECK_MAX_WAIT_MS_DEFAULT);
     this.lockCreationTimeout =
             conf.getLong(HIVE_LOCK_CREATION_TIMEOUT_MS, HIVE_LOCK_CREATION_TIMEOUT_MS_DEFAULT);
     this.lockCreationMinWaitTime =
@@ -118,7 +115,7 @@ public class MetastoreLock implements HiveLock {
     this.lockHeartbeatIntervalTime =
             conf.getLong(HIVE_LOCK_HEARTBEAT_INTERVAL_MS, HIVE_LOCK_HEARTBEAT_INTERVAL_MS_DEFAULT);
     long tableLevelLockCacheEvictionTimeout =
-        conf.getLong(HIVE_TABLE_LEVEL_LOCK_EVICT_MS, HIVE_TABLE_LEVEL_LOCK_EVICT_MS_DEFAULT);
+            conf.getLong(HIVE_TABLE_LEVEL_LOCK_EVICT_MS, HIVE_TABLE_LEVEL_LOCK_EVICT_MS_DEFAULT);
 
     this.agentInfo = "Iceberg-" + UUID.randomUUID();
 
@@ -140,8 +137,7 @@ public class MetastoreLock implements HiveLock {
     hmsLockId = Optional.of(acquireLock());
 
     // Starting heartbeat for the HMS lock
-    heartbeat =
-            new Heartbeat(metaClients, hmsLockId.get(), lockHeartbeatIntervalTime);
+    heartbeat = new Heartbeat(actor, hmsLockId.get(), lockHeartbeatIntervalTime);
     heartbeat.schedule(exitingScheduledExecutorService);
   }
 
@@ -180,7 +176,7 @@ public class MetastoreLock implements HiveLock {
   private long acquireLock() throws LockException {
     if (hmsLockId.isPresent()) {
       throw new IllegalArgumentException(String.format("HMS lock ID=%s already acquired for table %s.%s",
-          hmsLockId.get(), databaseName, tableName));
+              hmsLockId.get(), databaseName, tableName));
     }
     LockInfo lockInfo = createLock();
 
@@ -197,33 +193,33 @@ public class MetastoreLock implements HiveLock {
         // Integer.MAX_VALUE, the above logic of `retries + 1` would overflow into Integer.MIN_VALUE. Hence,
         // the retry is set conservatively as `Integer.MAX_VALUE - 100` so it doesn't hit any boundary issues.
         Tasks.foreach(lockInfo.lockId)
-            .retry(Integer.MAX_VALUE - 100)
-            .exponentialBackoff(
-                lockCheckMinWaitTime,
-                lockCheckMaxWaitTime,
-                lockAcquireTimeout,
-                1.5)
-            .throwFailureWhenFinished()
-            .onlyRetryOn(WaitingForLockException.class)
-            .run(id -> {
-              try {
-                LockResponse response = metaClients.run(client -> client.checkLock(id));
-                LockState newState = response.getState();
-                lockInfo.lockState = newState;
-                if (newState.equals(LockState.WAITING)) {
-                  throw new WaitingForLockException(String.format(
-                          "Waiting for lock on table %s.%s", databaseName, tableName));
-                }
-              } catch (InterruptedException e) {
-                Thread.interrupted(); // Clear the interrupt status flag
-                LOG.warn(
-                        "Interrupted while waiting for lock on table {}.{}",
-                        databaseName,
-                        tableName,
-                        e);
-              }
+                .retry(Integer.MAX_VALUE - 100)
+                .exponentialBackoff(
+                        lockCheckMinWaitTime,
+                        lockCheckMaxWaitTime,
+                        lockAcquireTimeout,
+                        1.5)
+                .throwFailureWhenFinished()
+                .onlyRetryOn(WaitingForLockException.class)
+                .run(id -> {
+                  try {
+                    LockResponse response = actor.checkLock(id);
+                    LockState newState = response.getState();
+                    lockInfo.lockState = newState;
+                    if (newState.equals(LockState.WAITING)) {
+                      throw new WaitingForLockException(String.format(
+                              "Waiting for lock on table %s.%s", databaseName, tableName));
+                    }
+                  } catch (InterruptedException e) {
+                    Thread.interrupted(); // Clear the interrupt status flag
+                    LOG.warn(
+                            "Interrupted while waiting for lock on table {}.{}",
+                            databaseName,
+                            tableName,
+                            e);
+                  }
 
-            }, TException.class);
+                }, TException.class);
       }
     } catch (WaitingForLockException e) {
       timeout = true;
@@ -262,7 +258,7 @@ public class MetastoreLock implements HiveLock {
    *
    * @return The {@link LockInfo} object for the successfully created lock
    * @throws LockException When we are not able to fill the hostname for lock creation, or there is
-   *     an error during lock creation
+   *                       an error during lock creation
    */
   @SuppressWarnings("ReverseDnsLookup")
   private LockInfo createLock() throws LockException {
@@ -298,44 +294,44 @@ public class MetastoreLock implements HiveLock {
                     HiveVersion.min(HiveVersion.HIVE_2))
             .throwFailureWhenFinished()
             .run(
-                request -> {
+              request -> {
+                try {
+                  LockResponse lockResponse = actor.lock(request);
+                  lockInfo.lockId = lockResponse.getLockid();
+                  lockInfo.lockState = lockResponse.getState();
+                } catch (TException te) {
+                  LOG.warn("Failed to create lock {}", request, te);
                   try {
-                    LockResponse lockResponse = metaClients.run(client -> client.lock(request));
-                    lockInfo.lockId = lockResponse.getLockid();
-                    lockInfo.lockState = lockResponse.getState();
-                  } catch (TException te) {
-                    LOG.warn("Failed to create lock {}", request, te);
-                    try {
-                      // If we can not check for lock, or we do not find it, then rethrow the exception
-                      // Otherwise we are happy as the findLock sets the lockId and the state correctly
+                    // If we can not check for lock, or we do not find it, then rethrow the exception
+                    // Otherwise we are happy as the findLock sets the lockId and the state correctly
                       if (HiveVersion.min(HiveVersion.HIVE_2)) {
-                        LockInfo lockFound = findLock();
-                        if (lockFound != null) {
-                          lockInfo.lockId = lockFound.lockId;
-                          lockInfo.lockState = lockFound.lockState;
-                          LOG.info("Found lock {} by agentInfo {}", lockInfo, agentInfo);
-                          return;
-                        }
+                      LockInfo lockFound = findLock();
+                      if (lockFound != null) {
+                        lockInfo.lockId = lockFound.lockId;
+                        lockInfo.lockState = lockFound.lockState;
+                        LOG.info("Found lock {} by agentInfo {}", lockInfo, agentInfo);
+                        return;
                       }
-
-                      throw new LockException("Failed to find lock for table %s.%s", databaseName, tableName);
-                    } catch (InterruptedException e) {
-                      Thread.currentThread().interrupt();
-                      interrupted.set(true);
-                      LOG.warn(
-                              "Interrupted while trying to find lock for table {}.{}", databaseName, tableName, e);
-                      throw new LockException(
-                              e, "Interrupted while trying to find lock for table %s.%s", databaseName, tableName);
                     }
+
+                    throw new LockException("Failed to find lock for table %s.%s", databaseName, tableName);
                   } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     interrupted.set(true);
-                    LOG.warn("Interrupted while creating lock on table {}.{}", databaseName, tableName, e);
+                    LOG.warn(
+                            "Interrupted while trying to find lock for table {}.{}", databaseName, tableName, e);
                     throw new LockException(
-                            e, "Interrupted while creating lock on table %s.%s", databaseName, tableName);
+                            e, "Interrupted while trying to find lock for table %s.%s", databaseName, tableName);
                   }
-                },
-                LockException.class);
+                } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+                  interrupted.set(true);
+                  LOG.warn("Interrupted while creating lock on table {}.{}", databaseName, tableName, e);
+                  throw new LockException(
+                          e, "Interrupted while creating lock on table %s.%s", databaseName, tableName);
+                }
+              },
+              LockException.class);
 
     // This should be initialized always, or exception should be thrown.
     LOG.debug("Lock {} created for table {}.{}", lockInfo, databaseName, tableName);
@@ -358,7 +354,7 @@ public class MetastoreLock implements HiveLock {
     showLocksRequest.setTablename(tableName);
     ShowLocksResponse response;
     try {
-      response = metaClients.run(client -> client.showLocks(showLocksRequest));
+      response = actor.showLocks(showLocksRequest);
     } catch (TException e) {
       throw new LockException(e, "Failed to find lock for table %s.%s", databaseName, tableName);
     }
@@ -374,7 +370,6 @@ public class MetastoreLock implements HiveLock {
   }
 
   private void unlock(Optional<Long> lockId) {
-
     Long id = null;
     try {
       if (!lockId.isPresent()) {
@@ -421,11 +416,7 @@ public class MetastoreLock implements HiveLock {
 
   @VisibleForTesting
   void doUnlock(long lockId) throws TException, InterruptedException {
-    metaClients.run(
-        client -> {
-          client.unlock(lockId);
-          return null;
-        });
+    actor.unlock(lockId);
   }
 
 
@@ -459,15 +450,14 @@ public class MetastoreLock implements HiveLock {
   }
 
   private static class Heartbeat implements Runnable {
-    private final ClientPool<IMetaStoreClient, TException> hmsClients;
+    private final HiveActor actor;
     private final long lockId;
     private final long intervalMs;
     private ScheduledFuture<?> future;
     private volatile Exception encounteredException = null;
 
-    Heartbeat(
-            ClientPool<IMetaStoreClient, TException> hmsClients, long lockId, long intervalMs) {
-      this.hmsClients = hmsClients;
+    Heartbeat(HiveActor actor, long lockId, long intervalMs) {
+      this.actor = actor;
       this.lockId = lockId;
       this.intervalMs = intervalMs;
       this.future = null;
@@ -476,11 +466,7 @@ public class MetastoreLock implements HiveLock {
     @Override
     public void run() {
       try {
-        hmsClients.run(
-            client -> {
-              client.heartbeat(0, lockId);
-              return null;
-            });
+        actor.heartbeat(0, lockId);
       } catch (TException | InterruptedException e) {
         this.encounteredException = e;
         throw new CommitFailedException(e, "Failed to heartbeat for lock: %d", lockId);

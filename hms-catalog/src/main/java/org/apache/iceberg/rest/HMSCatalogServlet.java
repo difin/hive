@@ -23,7 +23,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.CharStreams;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.SecureServletCaller;
-import org.apache.hadoop.hive.metastore.ServletSecurity;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
+import org.apache.iceberg.relocated.com.google.common.io.CharStreams;
 import org.apache.iceberg.rest.HMSCatalogAdapter.HTTPMethod;
 import org.apache.iceberg.rest.HMSCatalogAdapter.Route;
 import org.apache.iceberg.rest.responses.ErrorResponse;
@@ -65,7 +68,7 @@ public class HMSCatalogServlet extends HttpServlet {
 
   private final HMSCatalogAdapter restCatalogAdapter;
   private final Map<String, String> responseHeaders =
-      ImmutableMap.of(CONTENT_TYPE, APPLICATION_JSON);
+      ImmutableMap.of(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 
   public HMSCatalogServlet(SecureServletCaller security, HMSCatalogAdapter restCatalogAdapter) {
     this.security = security;
@@ -87,7 +90,7 @@ public class HMSCatalogServlet extends HttpServlet {
     }
   }
 
-  protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
     security.execute(request, response, this::execute);
   }
 

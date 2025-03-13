@@ -19,10 +19,23 @@
 
 package org.apache.iceberg.hive;
 
-public interface HiveLock {
-  void lock() throws LockException;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
+import org.apache.iceberg.ClientPool;
+import org.apache.thrift.TException;
 
-  void ensureActive() throws LockException;
+import java.util.Map;
 
-  void unlock();
+/**
+ * A Multi-tenant / Kerberos-compatible thrift-client-based catalog actor.
+ */
+public class HiveCatalogActorMT extends HiveCatalogActor {
+  public HiveCatalogActorMT(String name, Configuration configuration) {
+    super(name, configuration);
+  }
+
+  @Override
+  protected ClientPool<IMetaStoreClient, TException> createPool(Map<String, String> properties) {
+    return new MultiTenancyClientPool(getConf(), properties);
+  }
 }

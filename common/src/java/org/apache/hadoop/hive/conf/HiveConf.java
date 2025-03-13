@@ -1933,7 +1933,7 @@ public class HiveConf extends Configuration {
         "The strategy defines when Hive fallbacks to legacy optimizer when CBO fails:" 
             + "NEVER, never use the legacy optimizer (all CBO errors are fatal);"
             + "ALWAYS, always use the legacy optimizer (CBO errors are not fatal);"
-            + "CONSERVATIVE, use the legacy optimizer only when the CBO error is not related to subqueries and views."), 
+            + "CONSERVATIVE, use the legacy optimizer only when the CBO error is not related to subqueries and views."),
     HIVE_CBO_CNF_NODES_LIMIT("hive.cbo.cnf.maxnodes", -1, "When converting to conjunctive normal form (CNF), fail if" +
         "the expression exceeds this threshold; the threshold is expressed in terms of number of nodes (leaves and" +
         "interior nodes). -1 to not set up a threshold."),
@@ -2289,6 +2289,12 @@ public class HiveConf extends Configuration {
     HIVE_ICEBERG_EXPIRE_SNAPSHOT_NUMTHREADS("hive.iceberg.expire.snapshot.numthreads", 4,
         "The number of threads to be used for deleting files during expire snapshot. If set to 0 or below it uses the" +
             " defult DirectExecutorService"),
+    HIVE_ICEBERG_CATALOG_ACTOR_CLASS("hive.iceberg.catalog.actor.class", "org.apache.iceberg.hive.HiveCatalogActor",
+            "Catalog actor implementation class. Default value is a thrift-based single-tenant catalog actor." +
+                    "For an embedded (no-thrift) catalog actor, use \"org.apache.iceberg.rest.HMSCatalogActor\"."+
+                    "For a thrift-based single-tenant actor, use \"org.apache.iceberg.hive.HiveCatalogActor\". " +
+                    "For a thrift-based multi-tenant catalog actor, use \"org.apache.iceberg.hive.HiveCatalogActorMT\"."),
+
 
     HIVE_ICEBERG_MASK_DEFAULT_LOCATION("hive.iceberg.mask.default.location", false,
         "If this is set to true the URI for auth will have the default location masked with DEFAULT_TABLE_LOCATION"),
@@ -4093,7 +4099,7 @@ public class HiveConf extends Configuration {
       "hs2ActivePassiveHA",
       "When HiveServer2 Active/Passive High Availability is enabled, uses this namespace for registering HS2\n" +
         "instances with zookeeper"),
-    HIVE_SERVER2_ACTIVE_PASSIVE_HA_HEALTHCHECK_PORT("hive.server2.active.passive.ha.healthcheck.port", 11002, 
+    HIVE_SERVER2_ACTIVE_PASSIVE_HA_HEALTHCHECK_PORT("hive.server2.active.passive.ha.healthcheck.port", 11002,
         "The port the HiveServer2 ha-healthcheck web app will listen on"),
     HIVE_SERVER2_TEZ_INTERACTIVE_QUEUE("hive.server2.tez.interactive.queue", "",
         "A single YARN queues to use for Hive Interactive sessions. When this is specified,\n" +
@@ -5910,7 +5916,7 @@ public class HiveConf extends Configuration {
             "The names of additional config files, such as ldap-site.xml," +
                     "tez-site.xml, etc in comma separated list."),
 
-    REWRITE_POLICY("hive.rewrite.data.policy", "DEFAULT", 
+    REWRITE_POLICY("hive.rewrite.data.policy", "DEFAULT",
         "Defines the rewrite policy, the valid values are those defined in RewritePolicy enum"),
 
     HIVE_OTEL_METRICS_FREQUENCY_SECONDS("hive.otel.metrics.frequency.seconds", "0s",

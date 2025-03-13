@@ -16,13 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.iceberg.hive;
 
-public interface HiveLock {
-  void lock() throws LockException;
+import org.apache.iceberg.HiveCachingCatalog;
+import org.apache.iceberg.catalog.Catalog;
 
-  void ensureActive() throws LockException;
+public class HiveCatalogFriend {
 
-  void unlock();
+  public static HiveActor getActorOf(Catalog acatalog) {
+    Catalog catalog = acatalog;
+    if (catalog instanceof HiveCachingCatalog<?>) {
+      catalog  = ((HiveCachingCatalog<?>) catalog).unwrap();
+    }
+    if (catalog instanceof HiveCatalog) {
+      return ((HiveCatalog) catalog).getActor();
+    }
+    return null;
+  }
 }

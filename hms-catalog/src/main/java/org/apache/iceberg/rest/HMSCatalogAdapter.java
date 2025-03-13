@@ -19,11 +19,15 @@
 
 package org.apache.iceberg.rest;
 
+import com.codahale.metrics.Counter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.metrics.Metrics;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.iceberg.BaseMetadataTable;
 import org.apache.iceberg.BaseTable;
 import org.apache.iceberg.Table;
+import org.apache.iceberg.TableAccess;
+import org.apache.iceberg.TableMetadata;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.SupportsNamespaces;
@@ -63,10 +67,16 @@ import org.apache.iceberg.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
+import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.codahale.metrics.Counter;
 
@@ -76,6 +86,8 @@ import com.codahale.metrics.Counter;
 
 /** Adaptor class to translate REST requests into {@link Catalog} API calls. */
 public class HMSCatalogAdapter implements RESTClient {
+  /**  The metric names prefix. */
+  static final String HMS_METRIC_PREFIX = "hmscatalog.";
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogAdapter.class);
   private static final Splitter SLASH = Splitter.on('/');
 
@@ -181,7 +193,7 @@ public class HMSCatalogAdapter implements RESTClient {
     static Route byName(String name) {
       try {
         return valueOf(name.toUpperCase());
-      } catch(IllegalArgumentException xill) {
+      } catch (IllegalArgumentException xill) {
         return null;
       }
     }
@@ -253,6 +265,35 @@ public class HMSCatalogAdapter implements RESTClient {
     public Class<? extends RESTResponse> responseClass() {
       return responseClass;
     }
+  }
+
+  /**
+   * @param route a route/api-call name
+   * @return the metric counter name for the api-call
+   */
+  static String hmsCatalogMetricCount(String route) {
+    return HMS_METRIC_PREFIX + route.toLowerCase() + ".count";
+  }
+
+  /**
+   * @param apis an optional list of known api call names
+   * @return the list of metric names for the HMSCatalog class
+   */
+  public static List<String> getMetricNames(String... apis) {
+    final List<Route> routes;
+    if (apis != null && apis.length > 0) {
+      routes = Arrays.stream(apis)
+          .map(Route::byName)
+          .filter(Objects::nonNull)
+          .collect(Collectors.toList());
+    } else {
+      routes = Arrays.asList(Route.values());
+    }
+    final List<String> metricNames = new ArrayList<>(routes.size());
+    for (Route route : routes) {
+      metricNames.add(hmsCatalogMetricCount(route.name()));
+    }
+    return metricNames;
   }
 
   @SuppressWarnings("MethodLength")
@@ -382,7 +423,7 @@ public class HMSCatalogAdapter implements RESTClient {
 
       case LOAD_TABLE: {
         TableIdentifier ident = identFromPathVars(vars);
-        return castResponse(responseType, CatalogHandlers.loadTable(catalog, ident));
+        return castResponse(responseType, loadTable(catalog, ident));
       }
 
       case REGISTER_TABLE: {
@@ -409,31 +450,109 @@ public class HMSCatalogAdapter implements RESTClient {
         castRequest(ReportMetricsRequest.class, body);
         return null;
       }
-/**
-      case COMMIT_TRANSACTION: {
-        CommitTransactionRequest request = castRequest(CommitTransactionRequest.class, body);
-        commitTransaction(catalog, request);
-        return null;
-      }
-*/
+
       default:
     }
-
     return null;
   }
 
+  /**
+   * Runs a function as Hive.
+   *
+   * @param func the function
+   * @param <T>  the function return type
+   * @return the function result
+   */
+  public static <T> T runAsHive(java.util.function.Supplier<T> func) {
+    try {
+      UserGroupInformation ugi = UserGroupInformation.getLoginUser();
+      PrivilegedExceptionAction<T> action = () -> func.get();
+      return ugi.doAs(action);
+    } catch (IOException e) {
+      LOG.error("unable to perform action as hive", e);
+      return null;
+    } catch (InterruptedException e) {
+      LOG.error("interrupted action as hive", e);
+      Thread.currentThread().interrupt();
+      return null;
+    }
+  }
+
+  /**
+   * Creates a load table response builder embedding a data sharing token if required.
+   * @param table the table instance (can not be null)
+   * @return the load table response
+   */
+  static LoadTableResponse.Builder dataSharingBuilder(BaseTable table) {
+    // This must be performed as Hive user: reading (file) metadata and fetching (url) knox
+    return runAsHive(() -> {
+      TableMetadata metaData = table.operations().current();
+      LoadTableResponse.Builder builder = LoadTableResponse.builder().withTableMetadata(metaData);
+      DataSharing dataSharing = HMSCatalogServer.getDataSharing();
+      if (dataSharing != null) {
+        Map<String, String> token = dataSharing.getAccessToken(table.location());
+        if (token != null && !token.isEmpty()) {
+          token.forEach(builder::addConfig);
+        }
+      }
+      return builder;
+    });
+  }
+
+  /**
+   * Ensures that the current user has access to the table it is trying to load.
+   * <p>If configured for data sharing, response will carry access token allowing reading table files.</p>
+   * @param catalog the catalog
+   * @param ident the table identifier
+   * @param table the table instance (can be null)
+   * @return the load table response
+   */
+  private static LoadTableResponse accessTable(Catalog catalog, TableIdentifier ident, Table table) {
+    if (table instanceof BaseTable) {
+      LoadTableResponse.Builder builder = dataSharingBuilder((BaseTable) table);
+      if (builder != null) {
+        boolean accessible;
+        // perform get_table_meta on behalf of current user to let Ranger check user auth for table
+        if (catalog instanceof TableAccess) {
+          accessible = ((TableAccess) catalog).isReadAllowed(ident);
+        } else {
+          accessible = TableAccess.isReadAllowed(catalog, ident);
+        }
+        if (!accessible) {
+          throw new NoSuchTableException("Table is not accessible %s", ident.toString());
+        }
+        return builder.build();
+      }
+    }
+    if (table instanceof BaseMetadataTable) {
+      throw new NoSuchTableException("Table does not exist: %s", ident.toString());
+    }
+    throw new IllegalStateException("Can not access table: " + ident.toString());
+  }
+
+  /**
+   * Loads a table.
+   * @param catalog the catalog
+   * @param ident the table identifier
+   * @return the load table response
+   */
+  static LoadTableResponse loadTable(Catalog catalog, TableIdentifier ident) {
+    return accessTable(catalog, ident, runAsHive(() -> catalog.loadTable(ident)));
+  }
+
+  /**
+   * Registers a table.
+   * @param catalog the catalog
+   * @param namespace the namespace
+   * @param request the register table request
+   * @return the load table reponse
+   */
   private static LoadTableResponse registerTable(Catalog catalog, Namespace namespace, RegisterTableRequest request) {
     request.validate();
     TableIdentifier ident = TableIdentifier.of(namespace, request.name());
     String location = request.metadataLocation();
-    Table table = catalog.registerTable(ident, location);
-    if (table instanceof BaseTable) {
-      return LoadTableResponse.builder().withTableMetadata(((BaseTable)table).operations().current()).build();
-    } else if (table instanceof BaseMetadataTable) {
-      throw new NoSuchTableException("Table does not exist: %s", new Object[]{ident.toString()});
-    } else {
-      throw new IllegalStateException("Cannot wrap catalog that does not produce BaseTable");
-    }
+    Table table = runAsHive(() -> catalog.registerTable(ident, location));
+    return accessTable(catalog, ident, table);
   }
 
   /**
@@ -485,6 +604,12 @@ public class HMSCatalogAdapter implements RESTClient {
           vars.putAll(queryParams);
         }
         vars.putAll(routeAndVars.second());
+        if (headers != null) {
+          String bearer = headers.get(HttpHeaders.AUTHORIZATION);
+          if (bearer != null) {
+            vars.put(HttpHeaders.AUTHORIZATION, bearer);
+          }
+        }
 
         return handleRequest(routeAndVars.first(), vars.build(), body, responseType);
 

@@ -21,15 +21,27 @@ package org.apache.iceberg.rest;
 
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.metastore.HMSServletSecurity;
 import org.apache.hadoop.hive.metastore.SecureServletCaller;
 import org.apache.hadoop.hive.metastore.ServletSecurity;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
+import org.apache.iceberg.HiveCachingCatalog;
 import org.apache.iceberg.catalog.Catalog;
+import org.apache.iceberg.hive.HiveActor;
 import org.apache.iceberg.hive.HiveCatalog;
+import org.apache.iceberg.hive.HiveCatalogActor;
+import org.apache.iceberg.hive.HiveCatalogFriend;
+import org.eclipse.jetty.server.ConnectionFactory;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,49 +50,80 @@ import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+
 
 public class HMSCatalogServer {
+  private static final String CACHE_EXPIRY = "hive.metastore.catalog.cache.expiry";
+  private static final String CACHE_AUTHORIZATION = "hive.metastore.catalog.cache.authorization";
+  private static final String JETTY_THREADPOOL_MIN = "hive.metastore.catalog.jetty.threadpool.min";
+  private static final String JETTY_THREADPOOL_MAX = "hive.metastore.catalog.jetty.threadpool.max";
+  private static final String JETTY_THREADPOOL_IDLE = "hive.metastore.catalog.jetty.threadpool.idle";
+  /**
+   * The metric names prefix.
+   */
+  static final String HMS_METRIC_PREFIX = "hmscatalog.";
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogServer.class);
   private static Reference<Catalog> catalogRef;
+  private static DataSharing dataSharing;
+
   static Catalog getLastCatalog() {
-    return catalogRef != null? catalogRef.get() :  null;
+    return catalogRef != null ? catalogRef.get() :  null;
+  }
+
+  static DataSharing getDataSharing() {
+    return dataSharing;
   }
 
   private HMSCatalogServer() {
     // nothing
   }
 
-  public static HttpServlet createServlet(SecureServletCaller security, Catalog catalog, Configuration configuration) throws IOException {
-    try (HMSCatalogAdapter adapter = new HMSCatalogAdapter(catalog, configuration)) {
+  public static HttpServlet createServlet(SecureServletCaller security, Catalog catalog) throws IOException {
+    try (HMSCatalogAdapter adapter = new HMSCatalogAdapter(catalog)) {
       return new HMSCatalogServlet(security, adapter);
     }
   }
 
   public static Catalog createCatalog(Configuration configuration) {
-    String clazz = MetastoreConf.getVar(configuration, MetastoreConf.ConfVars.CATALOG_CLASS);
-    Catalog catalog;
-    if ("HMSCatalog".equals(clazz)) {
-      catalog = new HMSCatalog(configuration);
-    } else {
-      catalog = new org.apache.iceberg.hive.HiveCatalog();
-      if (catalog instanceof Configurable) {
-        ((HiveCatalog) catalog).setConf(configuration);
-      }
+    final String curi = configuration.get(MetastoreConf.ConfVars.THRIFT_URIS.getVarname());
+    final String cwarehouse = configuration.get(MetastoreConf.ConfVars.WAREHOUSE.getVarname());
+    final String cextwarehouse = configuration.get(MetastoreConf.ConfVars.WAREHOUSE_EXTERNAL.getVarname());
+    final HiveCatalog catalog = new HiveCatalog();
+    catalog.setConf(configuration);
+    Map<String, String> properties = new TreeMap<>();
+    if (curi != null) {
+      properties.put("uri", curi);
     }
-    return catalog;
+    if (cwarehouse != null) {
+      properties.put("warehouse", cwarehouse);
+    }
+    if (cextwarehouse != null) {
+      properties.put("external-warehouse", cextwarehouse);
+    }
+    catalog.initialize("hive", properties);
+    HiveActor actor = HiveCatalogFriend.getActorOf(catalog);
+    if (actor instanceof HiveCatalogActor) {
+      HiveCatalogActor hiveActor = (HiveCatalogActor) actor;
+      hiveActor.setTableAccessAuthorizer(HMSServletSecurity::isTableAccessible);
+    }
+    long expiry = configuration.getLong(CACHE_EXPIRY, 60_000L);
+    boolean cacheAuthorization = configuration.getBoolean(CACHE_AUTHORIZATION, true);
+    return HiveCachingCatalog.wrap(catalog, expiry, cacheAuthorization);
   }
 
   public static HttpServlet createServlet(Configuration configuration, Catalog catalog) throws IOException {
     String auth = MetastoreConf.getVar(configuration, MetastoreConf.ConfVars.CATALOG_SERVLET_AUTH);
     boolean jwt = "jwt".equalsIgnoreCase(auth);
-    SecureServletCaller security = new ServletSecurity(configuration, jwt);
+    SecureServletCaller security = new HMSServletSecurity(configuration, jwt);
     Catalog actualCatalog = catalog;
     if (actualCatalog == null) {
       actualCatalog = createCatalog(configuration);
       actualCatalog.initialize("hive", Collections.emptyMap());
     }
     catalogRef = new SoftReference<>(actualCatalog);
-    return createServlet(security, actualCatalog, configuration);
+    return createServlet(security, actualCatalog);
   }
 
   /**
@@ -89,26 +132,45 @@ public class HMSCatalogServer {
    * @return the server instance
    * @throws Exception if servlet initialization fails
    */
-
-  public static Server startServer(Configuration conf, HMSCatalog catalog) throws Exception {
+  public static Server startServer(Configuration conf, HiveCatalog catalog) throws Exception {
+    dataSharing = new DataSharing(conf);
     int port = MetastoreConf.getIntVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_PORT);
     if (port < 0) {
       return null;
     }
     final HttpServlet servlet = createServlet(conf, catalog);
-    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+    final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
     context.setContextPath("/");
-    ServletHolder servletHolder = new ServletHolder(servlet);
+    final ServletHolder servletHolder = new ServletHolder(servlet);
     servletHolder.setInitParameter("javax.ws.rs.Application", "ServiceListPublic");
     final String cli = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_PATH);
-    context.addServlet(servletHolder, "/"+cli+"/*");
+    context.addServlet(servletHolder, "/" + cli + "/*");
     context.setVirtualHosts(null);
     context.setGzipHandler(new GzipHandler());
-
-    final Server httpServer = new Server(port);
+    final Server httpServer = createHttpServer(conf, port);
     httpServer.setHandler(context);
     LOG.info("Starting HMS REST Catalog Server with context path:/{}/ on port:{}", cli, port);
     httpServer.start();
+    return httpServer;
+  }
+
+  private static @NotNull Server createHttpServer(Configuration conf, int port) throws IOException {
+    final int maxThreads = conf.getInt(JETTY_THREADPOOL_MAX, 256);
+    final int minThreads = conf.getInt(JETTY_THREADPOOL_MIN, 8);
+    final int idleTimeout = conf.getInt(JETTY_THREADPOOL_IDLE, 60_000);
+    final QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
+    final Server httpServer = new Server(threadPool);
+    final ServerConnector connector = new ServerConnector(httpServer);
+    connector.setPort(port);
+    httpServer.setConnectors(new Connector[] {connector});
+    for (ConnectionFactory factory : connector.getConnectionFactories()) {
+      if (factory instanceof HttpConnectionFactory) {
+        HttpConnectionFactory httpFactory = (HttpConnectionFactory) factory;
+        HttpConfiguration httpConf = httpFactory.getHttpConfiguration();
+        httpConf.setSendServerVersion(false);
+        httpConf.setSendXPoweredBy(false);
+      }
+    }
     return httpServer;
   }
 
