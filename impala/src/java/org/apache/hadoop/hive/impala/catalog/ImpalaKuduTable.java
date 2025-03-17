@@ -27,6 +27,7 @@ import org.apache.impala.catalog.KuduTable;
 import org.apache.impala.catalog.TableLoadingException;
 import org.apache.impala.common.ImpalaException;
 import org.apache.impala.common.ImpalaRuntimeException;
+import org.apache.impala.util.NoOpEventSequence;
 
 public class ImpalaKuduTable extends KuduTable {
 
@@ -46,7 +47,7 @@ public class ImpalaKuduTable extends KuduTable {
       setTableStats(msTbl);
       // Load metadata from Kudu
       try {
-        loadSchemaFromKudu();
+        loadSchemaFromKudu(NoOpEventSequence.INSTANCE);
       } catch (ImpalaRuntimeException e) {
         // TableLoadingException extends CatalogException, which in turn extends
         // ImpalaException.
@@ -55,7 +56,7 @@ public class ImpalaKuduTable extends KuduTable {
       }
       // Load from HMS
       IMetaStoreClient msc = Hive.get().getMSC();
-      loadAllColumnStats(msc);
+      loadAllColumnStats(msc, NoOpEventSequence.INSTANCE);
     } catch (ImpalaException e) {
       throw new HiveException(e);
     }

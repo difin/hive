@@ -42,6 +42,7 @@ import org.apache.impala.thrift.TTable;
 import org.apache.impala.thrift.TTableInfoSelector;
 import org.apache.impala.thrift.TTableName;
 import org.apache.impala.util.AcidUtils;
+import org.apache.impala.util.NoOpEventSequence;
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -114,7 +115,7 @@ public class PartialCatalogInfoWriteIdTest extends CatalogMetastoreTestBase {
           st.stop().elapsed(TimeUnit.MILLISECONDS));
       client.close();
     }
-    catalog_.reset();
+    catalog_.reset(NoOpEventSequence.INSTANCE);
   }
 
   private static String getTblProperties() {
@@ -209,7 +210,7 @@ public class PartialCatalogInfoWriteIdTest extends CatalogMetastoreTestBase {
     // now insert into the table to advance the writeId
     executeHiveSql("insert into " + getTestTblName() + " values (2)");
     catalog_.invalidateTable(new TTableName(testDbName, testTblName), new Reference<>()
-      , new Reference<>());
+      , new Reference<>(), NoOpEventSequence.INSTANCE);
     Table tblAfterReload = catalog_.getOrLoadTable(testDbName, testTblName, "test", null);
     long tblVersion = tblAfterReload.getCatalogVersion();
     // issue a request which is older than what we have in catalog
@@ -599,7 +600,7 @@ public class PartialCatalogInfoWriteIdTest extends CatalogMetastoreTestBase {
 
   private void invalidateTbl(String db, String tbl) throws CatalogException {
     catalog_.invalidateTable(new TTableName(db, tbl), new Reference<>(),
-      new Reference<>());
+      new Reference<>(), NoOpEventSequence.INSTANCE);
     Assert.assertTrue("Table must not be loaded",
       catalog_.getTable(db, tbl) instanceof IncompleteTable);
   }

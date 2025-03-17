@@ -43,6 +43,7 @@ import org.apache.impala.catalog.PrunablePartition;
 import org.apache.impala.common.ImpalaException;
 import org.apache.impala.hive.common.MutableValidReaderWriteIdList;
 import org.apache.impala.util.ListMap;
+import org.apache.impala.util.NoOpEventSequence;
 import org.apache.impala.thrift.TAccessLevel;
 import org.apache.impala.thrift.TNetworkAddress;
 import org.apache.impala.thrift.THdfsFileDesc;
@@ -101,9 +102,9 @@ public class ImpalaHdfsTable extends HdfsTable {
       // CDPD-16908 the initial msTbl should have all column stats and metadata info,
       // there should be no need to refetch these.
       IMetaStoreClient msc = Hive.get().getMSC();
-      loadAllColumnStats(msc);
+      loadAllColumnStats(msc, NoOpEventSequence.INSTANCE);
       loadConstraintsInfo(msc, msTbl);
-      setAvroSchema(msc, msTbl);
+      setAvroSchema(msc, msTbl, NoOpEventSequence.INSTANCE);
       validWriteIds_ = compileTimeWriteIdList != null ?
           new MutableValidReaderWriteIdList(compileTimeWriteIdList) : null;
       initializePartitionMetadata(msTbl);

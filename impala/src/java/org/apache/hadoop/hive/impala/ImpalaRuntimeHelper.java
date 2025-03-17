@@ -73,6 +73,7 @@ import org.apache.impala.thrift.TCreateTableParams;
 import org.apache.impala.thrift.TTableName;
 import org.apache.impala.util.EventSequence;
 import org.apache.impala.util.FunctionUtils;
+import org.apache.impala.util.NoOpEventSequence;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -178,7 +179,8 @@ public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
             Boolean.parseBoolean(msTbl.getParameters().get(EXTERNAL_TABLE_PURGE))) {
           try {
             LOG.info("Table {} is being dropped from kudu", msTbl.getTableName());
-            KuduCatalogOpExecutor.dropTable(msTbl, /* if exists */ true);
+            KuduCatalogOpExecutor.dropTable(msTbl, /*ifExists*/ true,
+                /*kudu_table_reserve_seconds*/ 0, NoOpEventSequence.INSTANCE);
           } catch (Exception e) {
             throw new HiveException(e);
           }
@@ -249,7 +251,8 @@ public class ImpalaRuntimeHelper implements EngineRuntimeHelper {
           // Return if we are in Hive's q test. This allows us to exercise the
           // corresponding code path up to this point in the q test.
           if (context.getConf().getBoolVar(HiveConf.ConfVars.HIVE_IN_TEST)) return;
-          KuduCatalogOpExecutor.dropTable(msTbl, /* if exists */ true);
+          KuduCatalogOpExecutor.dropTable(msTbl, /*ifExists*/ true,
+              /*kudu_table_reserve_seconds*/ 0, NoOpEventSequence.INSTANCE);
         } catch (Exception e) {
           throw new HiveException(e);
         }
