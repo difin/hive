@@ -152,7 +152,7 @@ RUN mkdir -p /usr/lib/hive/lib/
 # install mysql JDBC connector for mysql and mariadb, and Oracle JDBC driver, then move them where the schematool can find them
 RUN apk add --no-cache postgresql && \
     wget --no-verbose https://s3.amazonaws.com/dev.hortonworks.com/ARTIFACTS/jdbc/1911/ojdbc8.jar -O /usr/lib/hive/lib/oracle-connector-java.jar && \
-    wget --no-verbose https://mirror.infra.cloudera.com/mysql/mysql-connector-j-8.0.33.jar  -O /usr/lib/hive/lib/mysql-connector-j-8.0.33.jar && \
+    wget --no-verbose https://mirror.infra.cloudera.com/mysql/mysql-connector-j-8.2.0.jar  -O /usr/lib/hive/lib/mysql-connector-j-8.2.0.jar && \
     wget --no-verbose --no-check-certificate https://jdbc.postgresql.org/download/postgresql-42.5.5.jar -O /usr/lib/hive/lib/postgresql-jdbc.jar && \
     /remove-unwanted.sh
 
