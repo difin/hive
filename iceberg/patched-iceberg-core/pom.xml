@@ -93,6 +93,8 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/classes</outputDirectory>
                                     <excludes>
+                                        **/StructLikeMap.class
+                                        **/StructLikeWrapper.class
                                         **/HadoopInputFile.class
                                         **/SerializableTable.class
                                         org.apache.iceberg.SnapshotProducer.class

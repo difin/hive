@@ -115,9 +115,11 @@
                                             <include>com.fasterxml*:*</include>
                                             <include>com.github.ben-manes*:*</include>
                                             <include>org.apache.hive:patched-iceberg-core</include>
+                                            <include>org.apache.hive:patched-iceberg-api</include>
                                         </includes>
                                         <excludes>
                                             <exclude>org.apache.iceberg:iceberg-core</exclude>
+                                            <include>org.apache.iceberg:iceberg-api</include>
                                         </excludes>
                                     </artifactSet>
                                     <filters>
