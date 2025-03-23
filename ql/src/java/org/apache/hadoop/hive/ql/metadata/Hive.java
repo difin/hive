@@ -1560,8 +1560,7 @@ public class Hive implements AutoCloseable {
       }
 
       // TODO: APIs with catalog names
-      List<String> partNames = ((null == partSpec)
-              ? null : getPartitionNames(table.getDbName(), table.getTableName(), partSpec, (short) -1));
+      List<String> partNames = (partSpec != null) ? getPartitionNames(table, partSpec, (short) -1) : null;
       if (snapshot == null) {
         getMSC().truncateTable(table.getFullTableName(), partNames);
       } else {
@@ -1824,17 +1823,11 @@ public class Hive implements AutoCloseable {
    * @throws LockException
    */
   private ValidWriteIdList getValidWriteIdList(String dbName, String tableName) throws LockException {
-    ValidWriteIdList validWriteIdList = null;
-    SessionState sessionState = SessionState.get();
-    HiveTxnManager txnMgr = sessionState != null? sessionState.getTxnMgr() : null;
-    long txnId = txnMgr != null ? txnMgr.getCurrentTxnId() : 0;
-    if (txnId > 0) {
-      validWriteIdList = AcidUtils.getTableValidWriteIdListWithTxnList(conf, dbName, tableName);
-    } else {
-      String fullTableName = getFullTableName(dbName, tableName);
-      validWriteIdList = new ValidReaderWriteIdList(fullTableName, new long[0], new BitSet(), Long.MAX_VALUE);
-    }
-    return validWriteIdList;
+    long txnId = Optional.ofNullable(SessionState.get())
+      .map(ss -> ss.getTxnMgr().getCurrentTxnId()).orElse(0L);
+
+    return (txnId > 0) ? AcidUtils.getTableValidWriteIdListWithTxnList(conf, dbName, tableName) :
+        new ValidReaderWriteIdList();
   }
 
   /**
@@ -4281,9 +4274,18 @@ private void constructOneLBLocationMap(FileStatus fSta,
 
   public List<String> getPartitionNames(String dbName, String tblName, short max)
       throws HiveException {
+    Table tbl = new Table(dbName, tblName);
+    return getPartitionNames(tbl, max);
+  }
+
+  public List<String> getPartitionNames(Table tbl, short max)
+      throws HiveException {
     List<String> names = null;
     try {
-      names = getMSC().listPartitionNames(dbName, tblName, max);
+      if (tbl.hasNonNativePartitionSupport()) {
+        return tbl.getStorageHandler().getPartitionNames(tbl);
+      }
+      names = getMSC().listPartitionNames(tbl.getDbName(), tbl.getTableName(), max);
     } catch (NoSuchObjectException nsoe) {
       // this means no partition exists for the given dbName and tblName
       // key value pairs - thrift cannot handle null return values, hence
@@ -4296,26 +4298,36 @@ private void constructOneLBLocationMap(FileStatus fSta,
     return names;
   }
 
-  public List<String> getPartitionNames(String dbName, String tblName,
-      Map<String, String> partSpec, short max) throws HiveException {
-    List<String> names = null;
-    Table t = getTable(dbName, tblName);
-    if (t.hasNonNativePartitionSupport()) {
-      return t.getStorageHandler().getPartitionNames(t, partSpec);
-    }
+  public List<String> getPartitionNames(String dbName, String tblName, Map<String, String> partSpec, short max)
+      throws HiveException {
+    Table tbl = getTable(dbName, tblName);
+    return getPartitionNames(tbl, partSpec, max);
+  }
 
-    List<String> pvals = MetaStoreUtils.getPvals(t.getPartCols(), partSpec);
+  public List<String> getPartitionNames(Table tbl, Map<String, String> partSpec, short max)
+      throws HiveException {
+    if (tbl.hasNonNativePartitionSupport()) {
+      return tbl.getStorageHandler().getPartitionNames(tbl, partSpec);
+    }
+    List<String> pvals = MetaStoreUtils.getPvals(tbl.getPartCols(), partSpec);
+    return getPartitionNamesByPartitionVals(tbl, pvals, max);
+  }
+
+  // get partition names from provided partition values
+  public List<String> getPartitionNamesByPartitionVals(Table tbl, List<String> pVals, short max)
+      throws HiveException {
+    List<String> names = null;
 
     try {
       GetPartitionNamesPsRequest req = new GetPartitionNamesPsRequest();
-      req.setTblName(tblName);
-      req.setDbName(dbName);
-      req.setPartValues(pvals);
+      req.setDbName(tbl.getDbName());
+      req.setTblName(tbl.getTableName());
+      req.setPartValues(pVals);
       req.setMaxParts(max);
-      if (AcidUtils.isTransactionalTable(t)) {
-        ValidWriteIdList validWriteIdList = getValidWriteIdList(dbName, tblName);
+      if (AcidUtils.isTransactionalTable(tbl)) {
+        ValidWriteIdList validWriteIdList = getValidWriteIdList(tbl.getDbName(), tbl.getTableName());
         req.setValidWriteIdList(validWriteIdList != null ? validWriteIdList.toString() : null);
-        req.setId(t.getTTable().getId());
+        req.setId(tbl.getTTable().getId());
       }
       GetPartitionNamesPsResponse res = getMSC().listPartitionNamesRequest(req);
       names = res.getNames();
@@ -4463,11 +4475,11 @@ private void constructOneLBLocationMap(FileStatus fSta,
    * @throws HiveException
    */
   public List<Partition> getPartitions(Table tbl, Map<String, String> partialPartSpec)
-  throws HiveException {
+      throws HiveException {
     if (tbl.hasNonNativePartitionSupport()) {
-      return tbl.getStorageHandler().getPartitions(tbl, partialPartSpec, false);
+      return tbl.getStorageHandler().getPartitions(tbl, partialPartSpec);
     } else {
-      return getPartitions(tbl, partialPartSpec, (short)-1); 
+      return getPartitions(tbl, partialPartSpec, (short) -1);
     }
   }
 
@@ -4483,19 +4495,15 @@ private void constructOneLBLocationMap(FileStatus fSta,
    * @return list of partition objects
    * @throws HiveException
    */
-  public List<Partition> getPartitionsByNames(Table tbl,
-      Map<String, String> partialPartSpec)
+  public List<Partition> getPartitionsByNames(Table tbl, Map<String, String> partialPartSpec)
       throws HiveException {
 
     if (!tbl.isPartitioned()) {
       throw new HiveException(ErrorMsg.TABLE_NOT_PARTITIONED, tbl.getTableName());
     }
+    List<String> names = getPartitionNames(tbl, partialPartSpec, (short) -1);
 
-    List<String> names = getPartitionNames(tbl.getDbName(), tbl.getTableName(),
-        partialPartSpec, (short)-1);
-
-    List<Partition> partitions = getPartitionsByNames(tbl, names);
-    return partitions;
+    return getPartitionsByNames(tbl, names);
   }
 
   /**
@@ -5854,7 +5862,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
   /**
    * Creates a metastore client. Currently it creates only JDBC based client as
    * File based store support is removed
-   * 
+   *
    * TODO: Update the construction of the MetaStore Client after HIVE-27473 (composable MetaStoreClients) is backported
    *
    * @returns a Meta Store Client
@@ -6050,23 +6058,33 @@ private void constructOneLBLocationMap(FileStatus fSta,
   }
 
   public List<ColumnStatisticsObj> getTableColumnStatistics(
-      String dbName, String tableName, List<String> colNames, boolean checkTransactional)
+      String dbName, String tblName, List<String> colNames, boolean checkTransactional)
+      throws HiveException {
+    Table tbl = getTable(dbName, tblName);
+    return getTableColumnStatistics(tbl, colNames, checkTransactional);
+  }
+
+  public List<ColumnStatisticsObj> getTableColumnStatistics(
+      Table tbl, List<String> colNames, boolean checkTransactional)
       throws HiveException {
 
     PerfLogger perfLogger = SessionState.getPerfLogger();
     perfLogger.PerfLogBegin(CLASS_NAME, PerfLogger.HIVE_GET_TABLE_COLUMN_STATS);
+
     List<ColumnStatisticsObj> retv = null;
     try {
       LOG.debug("Using stats engine: " + conf.getStatsField());
+      if (tbl.isNonNative() && tbl.getStorageHandler().canProvideColStatistics(tbl)) {
+        return tbl.getStorageHandler().getColStatistics(tbl);
+      }
       if (checkTransactional) {
-        Table tbl = getTable(dbName, tableName);
         AcidUtils.TableSnapshot tableSnapshot = AcidUtils.getTableSnapshot(conf, tbl);
-        retv = getMSC().getTableColumnStatistics(dbName, tableName, colNames,
-            conf.getStatsField(),
+        retv = getMSC().getTableColumnStatistics(tbl.getDbName(), tbl.getTableName(), colNames,
+            Constants.HIVE_ENGINE,
             tableSnapshot != null ? tableSnapshot.getValidWriteIdList() : null);
       } else {
-        retv = getMSC().getTableColumnStatistics(dbName, tableName, colNames,
-            conf.getStatsField());
+        retv = getMSC().getTableColumnStatistics(tbl.getDbName(), tbl.getTableName(), colNames,
+            Constants.HIVE_ENGINE);
       }
       return retv;
     } catch (Exception e) {
@@ -6098,50 +6116,29 @@ private void constructOneLBLocationMap(FileStatus fSta,
       throw new HiveException(e);
     }
   }
-
   public AggrStats getAggrColStatsFor(String dbName, String tblName,
-      List<String> colNames, List<String> partNames, boolean checkTransactional) {
-    return getAggrColStatsFor(dbName, tblName, colNames, partNames,
-        checkTransactional, -1L, -1L);
+      List<String> colNames, List<String> partName, boolean checkTransactional) throws HiveException {
+    Table tbl = getTable(dbName, tblName);
+    return getAggrColStatsFor(tbl, colNames, partName, checkTransactional);
   }
 
-  public AggrStats getAggrColStatsFor(String dbName, String tblName,
-     List<String> colNames, List<String> partNames, boolean checkTransactional,
-      long originalRowCount, long prunedRowCount) {
+  public AggrStats getAggrColStatsFor(Table tbl,
+      List<String> colNames, List<String> partName, boolean checkTransactional) {
+
     PerfLogger perfLogger = SessionState.getPerfLogger();
     perfLogger.PerfLogBegin(CLASS_NAME, PerfLogger.HIVE_GET_AGGR_COL_STATS);
+
     String writeIdList = null;
     try {
+      if (tbl.isNonNative() && tbl.getStorageHandler().canProvideColStatistics(tbl)) {
+        return tbl.getStorageHandler().getAggrColStatsFor(tbl, colNames, partName);
+      }
       if (checkTransactional) {
-        Table tbl = getTable(dbName, tblName);
         AcidUtils.TableSnapshot tableSnapshot = AcidUtils.getTableSnapshot(conf, tbl);
         writeIdList = tableSnapshot != null ? tableSnapshot.getValidWriteIdList() : null;
-        return getMSC().getAggrColStatsFor(dbName, tblName, colNames, partNames,
-            conf.getStatsField(), writeIdList);
       }
-      //XXX: CDPD-20696 Remove reference to Impala
-      if (conf.getEngine() == Engine.IMPALA) {
-        // TODO: This code needs to be removed when the fallback mechanism is in
-        //       catalogd / HMS (CDPD-10678) so we do not need any special handling
-        //       and using stats for different engines is completely transparent
-        //       for FENG
-        List<ColumnStatisticsObj> colStats = getMSC().getTableColumnStatistics(
-            dbName, tblName, colNames, conf.getStatsField());
-        // Adjust the stats based on supplied row counts if pruning actually reduced
-        // the row count:
-        double selectivity = originalRowCount == -1 ? 1.0 :
-            ((double) prunedRowCount)/originalRowCount;
-        if (selectivity != 1.0) {
-          List<ColumnStatisticsObj> adjustedColStats = new ArrayList<>();
-          for (ColumnStatisticsObj statsObj : colStats) {
-            adjustedColStats.add(getAdjustedColStats(statsObj, selectivity, prunedRowCount));
-          }
-          return new AggrStats(adjustedColStats, partNames.size());
-        }
-        return new AggrStats(colStats, partNames.size());
-      }
-      return getMSC().getAggrColStatsFor(dbName, tblName, colNames, partNames,
-          conf.getStatsField(), null);
+      return getMSC().getAggrColStatsFor(tbl.getDbName(), tbl.getTableName(), colNames, partName,
+          Constants.HIVE_ENGINE, writeIdList);
     } catch (Exception e) {
       LOG.debug(StringUtils.stringifyException(e));
       return new AggrStats(new ArrayList<>(),0);
