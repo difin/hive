@@ -18,6 +18,7 @@
 package org.apache.hadoop.hive.ql.txn.compactor;
 
 import com.google.common.collect.Maps;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -42,6 +43,7 @@ import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.metastore.utils.StringableMap;
 import org.apache.hadoop.hive.ql.io.AcidDirectory;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
+import org.apache.hadoop.hive.ql.io.AcidUtils.ParsedDelta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,16 +140,13 @@ public class CompactorUtil {
     return (p == null) ? t.getSd() : p.getSd();
   }
 
-  public static StorageDescriptor resolveStorageDescriptor(Table t) {
-    return resolveStorageDescriptor(t, null);
-  }
-
   public static boolean isDynPartAbort(Table t, String partName) {
     return Optional.ofNullable(t).map(Table::getPartitionKeys).filter(pk -> !pk.isEmpty()).isPresent()
             && partName == null;
   }
 
-  public static List<Partition> getPartitionsByNames(HiveConf conf, String dbName, String tableName, String partName) throws MetaException {
+  public static List<Partition> getPartitionsByNames(HiveConf conf, String dbName, String tableName, String partName)
+      throws MetaException {
     try {
       return getMSForConf(conf).getPartitionsByNames(getDefaultCatalog(conf), dbName, tableName,
               Collections.singletonList(partName));
@@ -223,7 +222,7 @@ public class CompactorUtil {
             break;
         }
 
-        if (parts == null || parts.size() == 0) {
+        if (CollectionUtils.isEmpty(parts)) {
           // The partition got dropped before we went looking for it.
           return null;
         }
@@ -272,37 +271,39 @@ public class CompactorUtil {
    *   <li>Query based compaction is not enabled OR</li>
    *   <li>The table has only acid data in it.</li>
    * </ul>
-   * @param tblproperties The properties of the table to check
+   * @param tblProperties The properties of the table to check
    * @param dir The {@link AcidDirectory} instance pointing to the table's folder on the filesystem.
    * @return Returns true if minor compaction is supported based on the given parameters, false otherwise.
    */
-  public static boolean isMinorCompactionSupported(HiveConf conf, Map<String, String> tblproperties, AcidDirectory dir) {
+  public static boolean isMinorCompactionSupported(HiveConf conf, Map<String, String> tblProperties, AcidDirectory dir) {
     //Query based Minor compaction is not possible for full acid tables having raw format (non-acid) data in them.
-    return AcidUtils.isInsertOnlyTable(tblproperties) || !conf.getBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED)
-        || !(dir.getOriginalFiles().size() > 0 || dir.getCurrentDirectories().stream().anyMatch(AcidUtils.ParsedDelta::isRawFormat));
+    return AcidUtils.isInsertOnlyTable(tblProperties)
+        || !conf.getBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED)
+        || dir.getOriginalFiles().isEmpty() && dir.getCurrentDirectories().stream().noneMatch(ParsedDelta::isRawFormat);
   }
 
-  public static LockRequest createLockRequest(HiveConf conf, CompactionInfo ci, long txnId, LockType lockType, DataOperationType opType) {
+  public static LockRequest createLockRequest(HiveConf conf, CompactionInfo ci, long txnId,
+      LockType lockType, DataOperationType opType) {
     String agentInfo = Thread.currentThread().getName();
-    LockRequestBuilder requestBuilder = new LockRequestBuilder(agentInfo);
-    requestBuilder.setUser(ci.runAs);
-    requestBuilder.setTransactionId(txnId);
 
     LockComponentBuilder lockCompBuilder = new LockComponentBuilder()
-        .setLock(lockType)
-        .setOperationType(opType)
-        .setDbName(ci.dbname)
-        .setTableName(ci.tableName)
-        .setIsTransactional(true);
+      .setLock(lockType)
+      .setOperationType(opType)
+      .setDbName(ci.dbname)
+      .setTableName(ci.tableName)
+      .setIsTransactional(true);
 
     if (ci.partName != null) {
       lockCompBuilder.setPartitionName(ci.partName);
     }
-    requestBuilder.addLockComponent(lockCompBuilder.build());
-
-    requestBuilder.setZeroWaitReadEnabled(!conf.getBoolVar(HiveConf.ConfVars.TXN_OVERWRITE_X_LOCK) ||
-        !conf.getBoolVar(HiveConf.ConfVars.TXN_WRITE_X_LOCK));
-    return requestBuilder.build();
+    return new LockRequestBuilder(agentInfo)
+      .setTransactionId(txnId)
+      .setUser(ci.runAs)
+      .setZeroWaitReadEnabled(
+          !conf.getBoolVar(HiveConf.ConfVars.TXN_OVERWRITE_X_LOCK)
+            || !conf.getBoolVar(HiveConf.ConfVars.TXN_WRITE_X_LOCK))
+      .addLockComponent(lockCompBuilder.build())
+      .build();
   }
 
   public static Map<String, Integer> getPoolConf(HiveConf hiveConf) {
