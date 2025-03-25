@@ -35,6 +35,7 @@ import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.DYNAMICPARTITIONCONV
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVEARCHIVEENABLED;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_DEFAULT_STORAGE_HANDLER;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVESTATSDBCLASS;
+import static org.apache.hadoop.hive.conf.HiveConf.shouldComputeLineage;
 import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.*;
 import static org.apache.hadoop.hive.ql.plan.HiveOperation.*;
 import static org.apache.hadoop.hive.ql.plan.HiveOperation.ALTERVIEW_PROPERTIES;
@@ -13677,14 +13678,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       if (conf.getEngine() == Engine.IMPALA) {
         return;
       }
-      // Generate lineage info if LineageLogger hook is configured.
-      // Add the transformation that computes the lineage information.
-      Set<String> postExecHooks = Sets.newHashSet(Splitter.on(",").trimResults()
-          .omitEmptyStrings()
-          .split(Strings.nullToEmpty(HiveConf.getVar(conf, HiveConf.ConfVars.POSTEXECHOOKS))));
-      if (postExecHooks.contains("org.apache.hadoop.hive.ql.hooks.PostExecutePrinter")
-          || postExecHooks.contains("org.apache.hadoop.hive.ql.hooks.LineageLogger")
-          || postExecHooks.contains("org.apache.atlas.hive.hook.HiveHook")) {
+      if (shouldComputeLineage(conf)) {
+        // Generate lineage info if LineageLogger hook is configured.
+        // Add the transformation that computes the lineage information.
         List<Transform> transformations = new ArrayList<Transform>();
         transformations.add(new HiveOpConverterPostProc());
         transformations.add(Generator.fromConf(conf));

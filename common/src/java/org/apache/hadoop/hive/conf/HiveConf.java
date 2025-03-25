@@ -62,6 +62,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7492,6 +7493,12 @@ public class HiveConf extends Configuration {
     for (Entry<String, String> entry : overlay.entrySet()) {
       verifyAndSet(entry.getKey(), entry.getValue());
     }
+  }
+
+  public static boolean shouldComputeLineage(HiveConf conf) {
+    Collection<String> lineageFilter =
+      conf.getTrimmedStringCollection(HiveConf.ConfVars.HIVE_LINEAGE_STATEMENT_FILTER.varname);
+    return !(lineageFilter.isEmpty() || lineageFilter.contains("NONE"));
   }
 
   public Map<String, String> subtree(String string) {
