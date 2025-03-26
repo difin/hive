@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
+import org.apache.hive.common.IPStackUtils;
 import org.apache.hive.service.cli.CLIService;
 import org.apache.hive.service.cli.OperationHandle;
 import org.apache.hive.service.cli.SessionHandle;
@@ -191,7 +192,7 @@ public class TestHS2HttpServer {
     String historicalQueriesRoute = "/queries/historical";
 
     final SessionHandle handle =
-        sm.openSession(TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V9, "user", "passw", "127.0.0.1",
+        sm.openSession(TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V9, "user", "passw", IPStackUtils.resolveLoopbackAddress(),
             new HashMap());
 
     String queryString = "SET " + HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY.varname
@@ -221,8 +222,8 @@ public class TestHS2HttpServer {
     Assert.assertTrue("[]".equals(initNoSessionsResponse));
 
     SessionHandle handle1 =
-        sm.openSession(TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V9, "user", "passw", "127.0.0.1",
-            new HashMap());
+        sm.openSession(TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V9, "user", "passw",
+            IPStackUtils.resolveLoopbackAddress(), new HashMap());
 
     String oneSessionResponse = readFromUrl(apiBaseURL + sessionsRoute);
 
@@ -232,13 +233,13 @@ public class TestHS2HttpServer {
     JsonNode session = sessionNodes.get(0);
     Assert.assertEquals(session.path("sessionId").asText(), handle1.getSessionId().toString());
     Assert.assertEquals(session.path("username").asText(), "user");
-    Assert.assertEquals(session.path("ipAddress").asText(), "127.0.0.1");
+    Assert.assertEquals(session.path("ipAddress").asText(), IPStackUtils.resolveLoopbackAddress());
     Assert.assertEquals(session.path("operationCount").asInt(), 0);
     Assert.assertTrue(session.path("activeTime").canConvertToInt());
     Assert.assertTrue(session.path("idleTime").canConvertToInt());
 
-    SessionHandle handle2 = sm.openSession(TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V9, "user", "passw", "127.0.0.1",
-        new HashMap());
+    SessionHandle handle2 = sm.openSession(TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V9,
+        "user", "passw", IPStackUtils.resolveLoopbackAddress(), new HashMap());
 
     String twoSessionsResponse = readFromUrl(apiBaseURL + sessionsRoute);
     List<JsonNode> twoSessionsNodes = getListOfNodes(twoSessionsResponse);
