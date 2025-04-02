@@ -96,6 +96,7 @@
     <commons-exec.version>1.1</commons-exec.version>
     <commons-io.version>2.14.0</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
+    <commons-logging.version>1.3.5</commons-logging.version>
     <zstd-jni.version>1.5.0-1</zstd-jni.version>
     <commons-pool2.version>2.11.1</commons-pool2.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -390,6 +391,11 @@
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
         <version>${commons-lang.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>${commons-logging.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
