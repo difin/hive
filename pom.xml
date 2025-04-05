@@ -203,7 +203,7 @@
     <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
     <sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
     <!-- this property will be overwritten by Jacoco when the profile for code coverage is active -->
-    <jacoco.agent.args/>
+    <jacoco.agent.args />
     <jacoco.reportName>jacoco</jacoco.reportName>
   </properties>
 
@@ -2062,7 +2062,7 @@
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
-      <properties/>
+      <properties />
       <build>
         <plugins>
           <plugin>
@@ -2088,7 +2088,7 @@
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
-      <properties/>
+      <properties />
       <build>
         <plugins>
           <plugin>
@@ -2130,7 +2130,7 @@
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
-      <properties/>
+      <properties />
       <build>
         <plugins>
           <!-- This is a workaround: -->
@@ -2144,7 +2144,7 @@
                 <phase>verify</phase>
                 <configuration>
                   <target>
-                    <copy file="${maven.multiModuleProjectDirectory}/target/jacoco-aggregate.exec" toFile="${project.build.directory}/jacoco.exec" overwrite="true"/>
+                    <copy file="${maven.multiModuleProjectDirectory}/target/jacoco-aggregate.exec" toFile="${project.build.directory}/jacoco.exec" overwrite="true" />
                   </target>
                 </configuration>
                 <goals>
