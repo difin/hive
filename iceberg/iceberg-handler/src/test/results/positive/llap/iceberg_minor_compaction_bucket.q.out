@@ -1,0 +1,275 @@
+PREHOOK: query: CREATE TABLE srcbucket_big(key int, value string, id int)
+PARTITIONED BY SPEC(bucket(4, key)) STORED BY ICEBERG
+TBLPROPERTIES ('compactor.threshold.min.input.files'='1')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: CREATE TABLE srcbucket_big(key int, value string, id int)
+PARTITIONED BY SPEC(bucket(4, key)) STORED BY ICEBERG
+TBLPROPERTIES ('compactor.threshold.min.input.files'='1')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 1),
+(null, 'val_102', 2),
+(103, 'val_103', 3),
+(104, null, 4),
+(105, 'val_105', 5),
+(null, null, 6)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 1),
+(null, 'val_102', 2),
+(103, 'val_103', 3),
+(104, null, 4),
+(105, 'val_105', 5),
+(null, null, 6)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4
+PREHOOK: type: ALTERTABLE_CREATETAG
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4
+POSTHOOK: type: ALTERTABLE_CREATETAG
+POSTHOOK: Input: default@srcbucket_big
+PREHOOK: query: ALTER TABLE srcbucket_big SET PARTITION SPEC (bucket(8, key))
+PREHOOK: type: ALTERTABLE_SETPARTSPEC
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: ALTER TABLE srcbucket_big SET PARTITION SPEC (bucket(8, key))
+POSTHOOK: type: ALTERTABLE_SETPARTSPEC
+POSTHOOK: Input: default@srcbucket_big
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 7),
+(null, 'val_102', 8),
+(103, 'val_103', 9),
+(104, null, 10),
+(105, 'val_105', 11),
+(null, null, 12)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 7),
+(null, 'val_102', 8),
+(103, 'val_103', 9),
+(104, null, 10),
+(105, 'val_105', 11),
+(null, null, 12)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4_and_8
+PREHOOK: type: ALTERTABLE_CREATETAG
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4_and_8
+POSTHOOK: type: ALTERTABLE_CREATETAG
+POSTHOOK: Input: default@srcbucket_big
+PREHOOK: query: CREATE TABLE src_small(key int, value string)
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@src_small
+POSTHOOK: query: CREATE TABLE src_small(key int, value string)
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@src_small
+PREHOOK: query: INSERT INTO src_small VALUES
+(101, 'val_101'),
+(null, 'val_102'),
+(103, 'val_103'),
+(104, null),
+(105, 'val_105'),
+(null, null)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@src_small
+POSTHOOK: query: INSERT INTO src_small VALUES
+(101, 'val_101'),
+(null, 'val_102'),
+(103, 'val_103'),
+(104, null),
+(105, 'val_105'),
+(null, null)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@src_small
+POSTHOOK: Lineage: src_small.key SCRIPT []
+POSTHOOK: Lineage: src_small.value SCRIPT []
+PREHOOK: query: select `partition`, spec_id, record_count
+from default.srcbucket_big.partitions
+order by `partition`, spec_id, record_count
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: select `partition`, spec_id, record_count
+from default.srcbucket_big.partitions
+order by `partition`, spec_id, record_count
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+{"key_bucket":0,"key_bucket_8":null}	0	3
+{"key_bucket":3,"key_bucket_8":null}	0	1
+{"key_bucket":null,"key_bucket_8":0}	1	1
+{"key_bucket":null,"key_bucket_8":3}	1	1
+{"key_bucket":null,"key_bucket_8":4}	1	2
+{"key_bucket":null,"key_bucket_8":null}	1	4
+PREHOOK: query: SELECT * FROM default.srcbucket_big ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+101	val_101	7
+NULL	val_102	8
+103	val_103	9
+104	NULL	10
+105	val_105	11
+NULL	NULL	12
+PREHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4 ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4 ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+PREHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4_and_8 ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4_and_8 ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+101	val_101	7
+NULL	val_102	8
+103	val_103	9
+104	NULL	10
+105	val_105	11
+NULL	NULL	12
+PREHOOK: query: alter table srcbucket_big compact 'minor' and wait
+PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@srcbucket_big
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: alter table srcbucket_big compact 'minor' and wait
+POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@srcbucket_big
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: show compactions order by 'partition'
+PREHOOK: type: SHOW COMPACTIONS
+POSTHOOK: query: show compactions order by 'partition'
+POSTHOOK: type: SHOW COMPACTIONS
+CompactionId	Database	Table	Partition	Type	State	Worker host	Worker	Enqueue Time	Start Time	Duration(ms)	HadoopJobId	Error message	Initiator host	Initiator	Pool name	TxnId	Next TxnId	Commit Time	Highest WriteId
+1	default	srcbucket_big	key_bucket_8=0	MINOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+2	default	srcbucket_big	key_bucket_8=3	MINOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+3	default	srcbucket_big	key_bucket_8=4	MINOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+4	default	srcbucket_big	key_bucket_8=null	MINOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+5	default	srcbucket_big	 --- 	MINOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+PREHOOK: query: select `partition`, spec_id, record_count
+from default.srcbucket_big.partitions
+order by `partition`, spec_id, record_count
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: select `partition`, spec_id, record_count
+from default.srcbucket_big.partitions
+order by `partition`, spec_id, record_count
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+{"key_bucket":null,"key_bucket_8":0}	1	6
+{"key_bucket":null,"key_bucket_8":3}	1	2
+{"key_bucket":null,"key_bucket_8":4}	1	8
+{"key_bucket":null,"key_bucket_8":null}	1	10
+PREHOOK: query: SELECT * FROM default.srcbucket_big ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+101	val_101	1
+101	val_101	1
+NULL	val_102	2
+NULL	val_102	2
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+104	NULL	4
+104	NULL	4
+104	NULL	4
+105	val_105	5
+105	val_105	5
+105	val_105	5
+NULL	NULL	6
+NULL	NULL	6
+NULL	NULL	6
+101	val_101	7
+NULL	val_102	8
+NULL	val_102	8
+103	val_103	9
+104	NULL	10
+104	NULL	10
+105	val_105	11
+NULL	NULL	12
+NULL	NULL	12
+PREHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4 ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4 ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+PREHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4_and_8 ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4_and_8 ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+101	val_101	7
+NULL	val_102	8
+103	val_103	9
+104	NULL	10
+105	val_105	11
+NULL	NULL	12
