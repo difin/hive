@@ -57,6 +57,7 @@
     <!-- Dependency versions -->
     <aircompressor.version>0.27</aircompressor.version>
     <antlr.version>4.9.3</antlr.version>
+    <avro.version>1.11.3.2025.0.19.1-SNAPSHOT</avro.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
     <apache-directory-server.version>1.5.7</apache-directory-server.version>
     <caffeine.version>2.8.4</caffeine.version>
@@ -262,6 +263,10 @@
       <optional>true</optional>
       <exclusions>
         <exclusion>
+          <groupId>org.apache.avro</groupId>
+          <artifactId>avro</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
@@ -394,6 +399,11 @@
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-storage-api</artifactId>
       <version>${storage-api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro</artifactId>
+      <version>${avro.version}</version>
     </dependency>
     <dependency>
         <groupId>org.apache.commons</groupId>
