@@ -375,10 +375,10 @@ STAGE PLANS:
     Tez
 #### A masked pattern was here ####
       Vertices:
-        Map 1
+        Map 1 
             Map Operator Tree:
                 TableScan
-                  alias: ice_orc
+                  alias: ice_orc.tag_v1
                   Snapshot ref: tag_v1
                   Statistics: Num rows: 4 Data size: 768 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -418,10 +418,10 @@ STAGE PLANS:
     Tez
 #### A masked pattern was here ####
       Vertices:
-        Map 1
+        Map 1 
             Map Operator Tree:
                 TableScan
-                  alias: ice_orc
+                  alias: ice_orc.tag_v2
                   Snapshot ref: tag_v2
                   Statistics: Num rows: 8 Data size: 1536 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
@@ -461,10 +461,10 @@ STAGE PLANS:
     Tez
 #### A masked pattern was here ####
       Vertices:
-        Map 1
+        Map 1 
             Map Operator Tree:
                 TableScan
-                  alias: ice_orc
+                  alias: ice_orc.tag_v3
                   Snapshot ref: tag_v3
                   Statistics: Num rows: 11 Data size: 4312 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
@@ -504,10 +504,10 @@ STAGE PLANS:
     Tez
 #### A masked pattern was here ####
       Vertices:
-        Map 1
+        Map 1 
             Map Operator Tree:
                 TableScan
-                  alias: ice_orc
+                  alias: ice_orc.tag_v4
                   Snapshot ref: tag_v4
                   Statistics: Num rows: 9 Data size: 3528 Basic stats: COMPLETE Column stats: NONE
                   Select Operator
@@ -547,7 +547,7 @@ STAGE PLANS:
     Tez
 #### A masked pattern was here ####
       Vertices:
-        Map 1
+        Map 1 
             Map Operator Tree:
                 TableScan
                   alias: ice_orc
@@ -589,10 +589,10 @@ STAGE PLANS:
     Tez
 #### A masked pattern was here ####
       Vertices:
-        Map 1
+        Map 1 
             Map Operator Tree:
                 TableScan
-                  alias: ice_orc
+                  alias: ice_orc.tag_v1
                   filterExpr: company_id is not null (type: boolean)
                   Snapshot ref: tag_v1
                   Statistics: Num rows: 4 Data size: 768 Basic stats: COMPLETE Column stats: COMPLETE
@@ -636,10 +636,10 @@ STAGE PLANS:
     Tez
 #### A masked pattern was here ####
       Vertices:
-        Map 1
+        Map 1 
             Map Operator Tree:
                 TableScan
-                  alias: ice_orc
+                  alias: ice_orc.tag_v2
                   filterExpr: company_id is not null (type: boolean)
                   Snapshot ref: tag_v2
                   Statistics: Num rows: 8 Data size: 1536 Basic stats: COMPLETE Column stats: COMPLETE
@@ -683,10 +683,10 @@ STAGE PLANS:
     Tez
 #### A masked pattern was here ####
       Vertices:
-        Map 1
+        Map 1 
             Map Operator Tree:
                 TableScan
-                  alias: ice_orc
+                  alias: ice_orc.tag_v3
                   filterExpr: company_id is not null (type: boolean)
                   Snapshot ref: tag_v3
                   Statistics: Num rows: 11 Data size: 4312 Basic stats: COMPLETE Column stats: NONE
@@ -733,7 +733,7 @@ STAGE PLANS:
         Map 1 
             Map Operator Tree:
                 TableScan
-                  alias: ice_orc
+                  alias: ice_orc.tag_v4
                   filterExpr: company_id is not null (type: boolean)
                   Snapshot ref: tag_v4
                   Statistics: Num rows: 9 Data size: 3528 Basic stats: COMPLETE Column stats: NONE
