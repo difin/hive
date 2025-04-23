@@ -27,6 +27,7 @@ import java.sql.Statement;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.hive.common.IPStackUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.service.auth.HiveAuthConstants;
@@ -87,7 +88,7 @@ public class ProxyAuthTest {
     /*
      * Connect via kerberos and get delegation token
      */
-    url = "jdbc:hive2://" + host + ":" + port + "/default;principal=" + serverPrincipal;
+    url = String.format("jdbc:hive2://%s/default;principal=%s", IPStackUtils.concatHostPort(host, port), serverPrincipal);
     con = DriverManager.getConnection(url);
     System.out.println("Connected successfully to " + url);
     // get delegation token for the given proxy user
@@ -101,7 +102,7 @@ public class ProxyAuthTest {
     System.setProperty(BEELINE_EXIT, "true");
 
     // connect using principal via Beeline with inputStream
-    url = "jdbc:hive2://" + host + ":" + port + "/default;principal=" + serverPrincipal;
+    url = String.format("jdbc:hive2://%s/default;principal=%s", IPStackUtils.concatHostPort(host, port), serverPrincipal);
     currentResultFile = generateSQL(null);
     beeLineArgs = new String[] { "-u", url, "-n", "foo", "-p", "bar"};
     System.out.println("Connection with kerberos, user/password via args, using input rediction");
@@ -109,7 +110,7 @@ public class ProxyAuthTest {
     compareResults( currentResultFile);
 
     // connect using principal via Beeline with inputStream
-    url = "jdbc:hive2://" + host + ":" + port + "/default;principal=" + serverPrincipal;
+    url = String.format("jdbc:hive2://%s/default;principal=%s", IPStackUtils.concatHostPort(host, port), serverPrincipal);
     currentResultFile = generateSQL(null);
     beeLineArgs = new String[] { "-u", url, "-n", "foo", "-p", "bar", "-f" , scriptFileName};
     System.out.println("Connection with kerberos, user/password via args, using input script");
@@ -117,7 +118,7 @@ public class ProxyAuthTest {
     compareResults( currentResultFile);
 
     // connect using principal via Beeline with inputStream
-    url = "jdbc:hive2://" + host + ":" + port + "/default;principal=" + serverPrincipal;
+    url = String.format("jdbc:hive2://%s/default;principal=%s", IPStackUtils.concatHostPort(host, port), serverPrincipal);
     currentResultFile = generateSQL(url+ " foo bar ");
     beeLineArgs = new String[] { "-u", url, "-f" , scriptFileName};
     System.out.println("Connection with kerberos, user/password via connect, using input script");
@@ -125,7 +126,7 @@ public class ProxyAuthTest {
     compareResults( currentResultFile);
 
     // connect using principal via Beeline with inputStream
-    url = "jdbc:hive2://" + host + ":" + port + "/default;principal=" + serverPrincipal;
+    url = String.format("jdbc:hive2://%s/default;principal=%s", IPStackUtils.concatHostPort(host, port), serverPrincipal);
     currentResultFile = generateSQL(url+ " foo bar ");
     beeLineArgs = new String[] { "-u", url, "-f" , scriptFileName};
     System.out.println("Connection with kerberos, user/password via connect, using input redirect");
@@ -137,14 +138,14 @@ public class ProxyAuthTest {
      */
     System.out.println("Store token into ugi and try");
     storeTokenInJobConf(token);
-    url = "jdbc:hive2://" + host + ":" + port + "/default;auth=delegationToken";
+    url = String.format("jdbc:hive2://%s/default;auth=delegationToken", IPStackUtils.concatHostPort(host, port));
     con = DriverManager.getConnection(url);
     System.out.println("Connecting to " + url);
     runTest();
     con.close();
 
     // connect using token via Beeline with inputStream
-    url = "jdbc:hive2://" + host + ":" + port + "/default";
+    url = String.format("jdbc:hive2://%s/default", IPStackUtils.concatHostPort(host, port));
     currentResultFile = generateSQL(null);
     beeLineArgs = new String[] { "-u", url, "-n", "foo", "-p", "bar", "-a", "delegationToken" };
     System.out.println("Connection with token, user/password via args, using input redirection");
@@ -152,7 +153,7 @@ public class ProxyAuthTest {
     compareResults( currentResultFile);
 
     // connect using token via Beeline using script
-    url = "jdbc:hive2://" + host + ":" + port + "/default";
+    url = String.format("jdbc:hive2://%s/default", IPStackUtils.concatHostPort(host, port));
     currentResultFile = generateSQL(null);
     beeLineArgs = new String[] { "-u", url, "-n", "foo", "-p", "bar", "-a", "delegationToken",
         "-f", scriptFileName};
@@ -161,7 +162,7 @@ public class ProxyAuthTest {
     compareResults( currentResultFile);
 
     // connect using token via Beeline using script
-    url = "jdbc:hive2://" + host + ":" + port + "/default";
+    url = String.format("jdbc:hive2://%s/default", IPStackUtils.concatHostPort(host, port));
     currentResultFile = generateSQL(url + " foo bar ");
     beeLineArgs = new String [] {"-a", "delegationToken", "-f", scriptFileName};
     System.out.println("Connection with token, user/password via connect, using input script");
@@ -169,7 +170,7 @@ public class ProxyAuthTest {
     compareResults( currentResultFile);
 
     // connect using token via Beeline using script
-    url = "jdbc:hive2://" + host + ":" + port + "/default";
+    url = String.format("jdbc:hive2://%s/default", IPStackUtils.concatHostPort(host, port));
     currentResultFile = generateSQL(url + " foo bar ");
     System.out.println("Connection with token, user/password via connect, using input script");
     beeLineArgs = new String [] {"-f", scriptFileName, "-a", "delegationToken"};
@@ -179,8 +180,8 @@ public class ProxyAuthTest {
     /*
      * Connect via kerberos with trusted proxy user
      */
-    url = "jdbc:hive2://" + host + ":" + port + "/default;principal=" + serverPrincipal
-          + ";hive.server2.proxy.user=" + proxyUser;
+    url = String.format("jdbc:hive2://%s/default;principal=%s;hive.server2.proxy.user=%s", 
+        IPStackUtils.concatHostPort(host, port), serverPrincipal, proxyUser);
     con = DriverManager.getConnection(url);
     System.out.println("Connected successfully to " + url);
     runTest();
@@ -194,7 +195,7 @@ public class ProxyAuthTest {
 
     /* verify the connection fails after canceling the token */
     try {
-      url = "jdbc:hive2://" + host + ":" + port + "/default;auth=delegationToken";
+      url = String.format("jdbc:hive2://%s/default;auth=delegationToken", IPStackUtils.concatHostPort(host, port));
       con = DriverManager.getConnection(url);
       throw new Exception ("connection should have failed after token cancellation");
     } catch (SQLException e) {

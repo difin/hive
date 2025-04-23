@@ -28,6 +28,7 @@ import org.apache.hadoop.security.Credentials;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.security.token.TokenIdentifier;
+import org.apache.hadoop.hive.common.IPStackUtils;
 import org.apache.hive.service.rpc.thrift.TSetClientInfoResp;
 
 import org.apache.hive.service.rpc.thrift.TSetClientInfoReq;
@@ -561,7 +562,7 @@ public class HiveConnection implements java.sql.Connection {
     } else if (!httpPath.startsWith("/")) {
       httpPath = "/" + httpPath;
     }
-    return schemeName + "://" + host + ":" + port + httpPath;
+    return schemeName + "://" + IPStackUtils.concatHostPort(host, port) + httpPath;
   }
 
   private TTransport createHttpTransport() throws SQLException, TTransportException {
