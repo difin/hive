@@ -1,0 +1,110 @@
+PREHOOK: query: CREATE TABLE srcbucket_big(key int, value string, id int)
+PARTITIONED BY SPEC(bucket(4, key)) STORED BY ICEBERG
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: CREATE TABLE srcbucket_big(key int, value string, id int)
+PARTITIONED BY SPEC(bucket(4, key)) STORED BY ICEBERG
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 1),
+(null, 'val_102', 2),
+(103, 'val_103', 3),
+(104, null, 4),
+(105, 'val_105', 5),
+(null, null, 6)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 1),
+(null, 'val_102', 2),
+(103, 'val_103', 3),
+(104, null, 4),
+(105, 'val_105', 5),
+(null, null, 6)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4
+PREHOOK: type: ALTERTABLE_CREATETAG
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4
+POSTHOOK: type: ALTERTABLE_CREATETAG
+POSTHOOK: Input: default@srcbucket_big
+PREHOOK: query: ALTER TABLE srcbucket_big SET PARTITION SPEC (bucket(8, key))
+PREHOOK: type: ALTERTABLE_SETPARTSPEC
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: ALTER TABLE srcbucket_big SET PARTITION SPEC (bucket(8, key))
+POSTHOOK: type: ALTERTABLE_SETPARTSPEC
+POSTHOOK: Input: default@srcbucket_big
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 7),
+(null, 'val_102', 8),
+(103, 'val_103', 9),
+(104, null, 10),
+(105, 'val_105', 11),
+(null, null, 12)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 7),
+(null, 'val_102', 8),
+(103, 'val_103', 9),
+(104, null, 10),
+(105, 'val_105', 11),
+(null, null, 12)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4_and_8
+PREHOOK: type: ALTERTABLE_CREATETAG
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4_and_8
+POSTHOOK: type: ALTERTABLE_CREATETAG
+POSTHOOK: Input: default@srcbucket_big
+PREHOOK: query: select `partition`, spec_id, record_count
+from default.srcbucket_big.partitions
+order by `partition`, spec_id, record_count
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: select `partition`, spec_id, record_count
+from default.srcbucket_big.partitions
+order by `partition`, spec_id, record_count
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+{"key_bucket":0,"key_bucket_8":null}	0	3
+{"key_bucket":3,"key_bucket_8":null}	0	1
+{"key_bucket":null,"key_bucket_8":0}	1	1
+{"key_bucket":null,"key_bucket_8":3}	1	1
+{"key_bucket":null,"key_bucket_8":4}	1	2
+{"key_bucket":null,"key_bucket_8":null}	1	4
+PREHOOK: query: SELECT key, value, id, FILE__PATH, PARTITION__HASH
+FROM default.srcbucket_big
+ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT key, value, id, FILE__PATH, PARTITION__HASH
+FROM default.srcbucket_big
+ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+101     val_101 1       file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket=0/00000-0-dfingerman_20250429102919_eb93c942-1ed9-4ea4-8806-f466d8dcb27c-job_17459477500891_0001-1-00001.parquet       961
+NULL    val_102 2       file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket=null/00000-0-dfingerman_20250429102919_eb93c942-1ed9-4ea4-8806-f466d8dcb27c-job_17459477500891_0001-1-00003.parquet    961
+103     val_103 3       file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket=3/00000-0-dfingerman_20250429102919_eb93c942-1ed9-4ea4-8806-f466d8dcb27c-job_17459477500891_0001-1-00002.parquet       1054
+104     NULL    4       file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket=0/00000-0-dfingerman_20250429102919_eb93c942-1ed9-4ea4-8806-f466d8dcb27c-job_17459477500891_0001-1-00001.parquet       961
+105     val_105 5       file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket=0/00000-0-dfingerman_20250429102919_eb93c942-1ed9-4ea4-8806-f466d8dcb27c-job_17459477500891_0001-1-00001.parquet       961
+NULL    NULL    6       file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket=null/00000-0-dfingerman_20250429102919_eb93c942-1ed9-4ea4-8806-f466d8dcb27c-job_17459477500891_0001-1-00003.parquet    961
+101     val_101 7       file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket_8=4/00000-0-dfingerman_20250429102933_cf84c4fc-3079-4de4-958a-073d198638e4-job_17459477500891_0001-2-00003.parquet     965
+NULL    val_102 8       file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket_8=null/00000-0-dfingerman_20250429102933_cf84c4fc-3079-4de4-958a-073d198638e4-job_17459477500891_0001-2-00004.parquet  961
+103     val_103 9       file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket_8=3/00000-0-dfingerman_20250429102933_cf84c4fc-3079-4de4-958a-073d198638e4-job_17459477500891_0001-2-00002.parquet     964
+104     NULL    10      file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket_8=0/00000-0-dfingerman_20250429102933_cf84c4fc-3079-4de4-958a-073d198638e4-job_17459477500891_0001-2-00001.parquet     961
+105     val_105 11      file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket_8=4/00000-0-dfingerman_20250429102933_cf84c4fc-3079-4de4-958a-073d198638e4-job_17459477500891_0001-2-00003.parquet     965
+NULL    NULL    12      file:/Users/dfingerman/workspace/hive-upstream-difin/itests/qtest-iceberg/target/localfs/warehouse/srcbucket_big/data/key_bucket_8=null/00000-0-dfingerman_20250429102933_cf84c4fc-3079-4de4-958a-073d198638e4-job_17459477500891_0001-2-00004.parquet  961
