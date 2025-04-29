@@ -103,8 +103,9 @@ public class IcebergQueryCompactor extends QueryCompactor  {
       Map<String, String> partSpecMap = new LinkedHashMap<>();
       Warehouse.makeSpecFromName(partSpecMap, new Path(partSpec), null);
 
-      compactionQuery = String.format("insert overwrite table %1$s select * from %1$s where %2$s=%3$d " +
-              "and %4$s is not null %5$s %6$s", compactTableName, VirtualColumn.PARTITION_HASH.getName(), partitionHash,
+      compactionQuery = String.format("insert overwrite table %1$s select * from %1$s where %2$s=%3$d and %4$s=%5$d " +
+              "and %6$s is not null %7$s %8$s", compactTableName, VirtualColumn.PARTITION_HASH.getName(), partitionHash,
+          VirtualColumn.PARTITION_SPEC_ID.getName(), icebergTable.spec().specId(),
           VirtualColumn.FILE_PATH.getName(), fileSizePredicate == null ? "" : "and " + fileSizePredicate, orderBy);
     }
 

@@ -20,6 +20,7 @@
 package org.apache.iceberg.mr.hive;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,6 +43,9 @@ import org.apache.iceberg.deletes.PositionDelete;
 import org.apache.iceberg.io.CloseableIterator;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.relocated.com.google.common.collect.Maps;
+import org.apache.iceberg.relocated.com.google.common.hash.HashCode;
+import org.apache.iceberg.relocated.com.google.common.hash.Hasher;
+import org.apache.iceberg.relocated.com.google.common.hash.Hashing;
 import org.apache.iceberg.types.Types;
 import org.apache.iceberg.util.SerializationUtil;
 import org.apache.iceberg.util.StructProjection;
@@ -243,6 +247,41 @@ public class IcebergAcidUtil {
     return rec.get(DELETE_FILE_META_COLS.get(MetadataColumns.ROW_POSITION), Long.class);
   }
 
+  private static long hashObjectArray(Object[] values) {
+    Hasher hasher = Hashing.murmur3_128().newHasher();
+
+    for (Object val : values) {
+      if (val == null) {
+        // Unique constant for null
+        hasher.putInt(0xDEADBEEF);
+      } else if (val instanceof Integer) {
+        hasher.putInt((Integer) val);
+      } else if (val instanceof Long) {
+        hasher.putLong((Long) val);
+      } else if (val instanceof String) {
+        hasher.putString((String) val, StandardCharsets.UTF_8);
+      } else if (val instanceof Boolean) {
+        hasher.putBoolean((Boolean) val);
+      } else if (val instanceof Short) {
+        hasher.putShort((Short) val);
+      } else if (val instanceof Byte) {
+        hasher.putByte((Byte) val);
+      } else if (val instanceof Character) {
+        hasher.putChar((Character) val);
+      } else if (val instanceof Double) {
+        hasher.putDouble((Double) val);
+      } else if (val instanceof Float) {
+        hasher.putFloat((Float) val);
+      } else {
+        // Fallback to object's string representation
+        hasher.putLong(Objects.hash(val));
+      }
+    }
+
+    HashCode hashCode = hasher.hash();
+    return hashCode.asLong();
+  }
+
   public static long computeHash(StructLike struct) {
     long partHash = -1;
     if (struct != null) {
@@ -250,7 +289,7 @@ public class IcebergAcidUtil {
       for (int i = 0; i < struct.size(); ++i) {
         partFields[i] = struct.get(i, Object.class);
       }
-      partHash = Objects.hash(partFields);
+      partHash = hashObjectArray(partFields);
     }
     return partHash;
   }

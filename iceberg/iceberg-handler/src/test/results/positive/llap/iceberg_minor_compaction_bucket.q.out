@@ -1,0 +1,357 @@
+PREHOOK: query: CREATE TABLE srcbucket_big(key int, value string, id int)
+PARTITIONED BY SPEC(bucket(4, key)) STORED BY ICEBERG
+TBLPROPERTIES ('compactor.threshold.min.input.files'='1')
+PREHOOK: type: CREATETABLE
+PREHOOK: Output: database:default
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: CREATE TABLE srcbucket_big(key int, value string, id int)
+PARTITIONED BY SPEC(bucket(4, key)) STORED BY ICEBERG
+TBLPROPERTIES ('compactor.threshold.min.input.files'='1')
+POSTHOOK: type: CREATETABLE
+POSTHOOK: Output: database:default
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 1),
+(null, 'val_102', 2),
+(103, 'val_103', 3),
+(104, null, 4),
+(105, 'val_105', 5),
+(null, null, 6)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 1),
+(null, 'val_102', 2),
+(103, 'val_103', 3),
+(104, null, 4),
+(105, 'val_105', 5),
+(null, null, 6)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4
+PREHOOK: type: ALTERTABLE_CREATETAG
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4
+POSTHOOK: type: ALTERTABLE_CREATETAG
+POSTHOOK: Input: default@srcbucket_big
+PREHOOK: query: ALTER TABLE srcbucket_big SET PARTITION SPEC (bucket(8, key))
+PREHOOK: type: ALTERTABLE_SETPARTSPEC
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: ALTER TABLE srcbucket_big SET PARTITION SPEC (bucket(8, key))
+POSTHOOK: type: ALTERTABLE_SETPARTSPEC
+POSTHOOK: Input: default@srcbucket_big
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 7),
+(null, 'val_102', 8),
+(103, 'val_103', 9),
+(104, null, 10),
+(105, 'val_105', 11),
+(null, null, 12)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: INSERT INTO srcbucket_big VALUES
+(101, 'val_101', 7),
+(null, 'val_102', 8),
+(103, 'val_103', 9),
+(104, null, 10),
+(105, 'val_105', 11),
+(null, null, 12)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4_and_8
+PREHOOK: type: ALTERTABLE_CREATETAG
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: ALTER TABLE srcbucket_big CREATE TAG bucket_4_and_8
+POSTHOOK: type: ALTERTABLE_CREATETAG
+POSTHOOK: Input: default@srcbucket_big
+PREHOOK: query: select `partition`, spec_id, record_count
+from default.srcbucket_big.partitions
+order by `partition`, spec_id, record_count
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: select `partition`, spec_id, record_count
+from default.srcbucket_big.partitions
+order by `partition`, spec_id, record_count
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+{"key_bucket":0,"key_bucket_8":null}	0	3
+{"key_bucket":3,"key_bucket_8":null}	0	1
+{"key_bucket":null,"key_bucket_8":0}	1	1
+{"key_bucket":null,"key_bucket_8":3}	1	1
+{"key_bucket":null,"key_bucket_8":4}	1	2
+{"key_bucket":null,"key_bucket_8":null}	1	4
+PREHOOK: query: SELECT * FROM default.srcbucket_big ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+101	val_101	7
+NULL	val_102	8
+103	val_103	9
+104	NULL	10
+105	val_105	11
+NULL	NULL	12
+PREHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4 ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4 ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+PREHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4_and_8 ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4_and_8 ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+101	val_101	7
+NULL	val_102	8
+103	val_103	9
+104	NULL	10
+105	val_105	11
+NULL	NULL	12
+PREHOOK: query: SELECT key, value, id, FILE__PATH, PARTITION__HASH
+FROM default.srcbucket_big
+ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT key, value, id, FILE__PATH, PARTITION__HASH
+FROM default.srcbucket_big
+ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+PREHOOK: query: desc formatted default.srcbucket_big
+PREHOOK: type: DESCTABLE
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: desc formatted default.srcbucket_big
+POSTHOOK: type: DESCTABLE
+POSTHOOK: Input: default@srcbucket_big
+# col_name            	data_type           	comment             
+key                 	int                 	                    
+value               	string              	                    
+id                  	int                 	                    
+	 	 
+# Partition Transform Information	 	 
+# col_name            	transform_type      	 
+key                 	BUCKET[8]           	 
+	 	 
+# Detailed Table Information	 	 
+Database:           	default             	 
+#### A masked pattern was here ####
+Retention:          	0                   	 
+#### A masked pattern was here ####
+Table Type:         	EXTERNAL_TABLE      	 
+Table Parameters:	 	 
+	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"id\":\"true\",\"key\":\"true\",\"value\":\"true\"}}
+	EXTERNAL            	TRUE                
+	bucketing_version   	2                   
+	compactor.threshold.min.input.files	1                   
+	current-schema      	{\"type\":\"struct\",\"schema-id\":0,\"fields\":[{\"id\":1,\"name\":\"key\",\"required\":false,\"type\":\"int\"},{\"id\":2,\"name\":\"value\",\"required\":false,\"type\":\"string\"},{\"id\":3,\"name\":\"id\",\"required\":false,\"type\":\"int\"}]}
+	current-snapshot-id 	5134389792450280296 
+	current-snapshot-summary	{\"added-data-files\":\"4\",\"added-records\":\"6\",\"added-files-size\":\"3663\",\"changed-partition-count\":\"4\",\"total-records\":\"12\",\"total-files-size\":\"6456\",\"total-data-files\":\"7\",\"total-delete-files\":\"0\",\"total-position-deletes\":\"0\",\"total-equality-deletes\":\"0\",\"iceberg-version\":\"Apache Iceberg 1.6.1 (commit 8e9d59d299be42b0bca9461457cd1e95dbaad086)\"}
+	current-snapshot-timestamp-ms	1746028150758       
+	default-partition-spec	{\"spec-id\":1,\"fields\":[{\"name\":\"key_bucket_8\",\"transform\":\"bucket[8]\",\"source-id\":1,\"field-id\":1001}]}
+	format-version      	2                   
+	iceberg.orc.files.only	false               
+#### A masked pattern was here ####
+	numFiles            	7                   
+	numPartitions       	6                   
+	numRows             	12                  
+	parquet.compression 	zstd                
+#### A masked pattern was here ####
+	rawDataSize         	0                   
+	serialization.format	1                   
+	snapshot-count      	2                   
+	storage_handler     	org.apache.iceberg.mr.hive.HiveIcebergStorageHandler
+	table_type          	ICEBERG             
+	totalSize           	#Masked#
+#### A masked pattern was here ####
+	uuid                	fba2288e-57b8-4bb5-96f5-26247f813786
+	write.delete.mode   	merge-on-read       
+	write.merge.mode    	merge-on-read       
+	write.update.mode   	merge-on-read       
+	 	 
+# Storage Information	 	 
+SerDe Library:      	org.apache.iceberg.mr.hive.HiveIcebergSerDe	 
+InputFormat:        	org.apache.iceberg.mr.hive.HiveIcebergInputFormat	 
+OutputFormat:       	org.apache.iceberg.mr.hive.HiveIcebergOutputFormat	 
+Compressed:         	No                  	 
+Sort Columns:       	[]                  	 
+PREHOOK: query: alter table srcbucket_big compact 'minor' and wait
+PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@srcbucket_big
+PREHOOK: Output: default@srcbucket_big
+POSTHOOK: query: alter table srcbucket_big compact 'minor' and wait
+POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@srcbucket_big
+POSTHOOK: Output: default@srcbucket_big
+PREHOOK: query: show compactions order by 'partition'
+PREHOOK: type: SHOW COMPACTIONS
+POSTHOOK: query: show compactions order by 'partition'
+POSTHOOK: type: SHOW COMPACTIONS
+CompactionId	Database	Table	Partition	Type	State	Worker host	Worker	Enqueue Time	Start Time	Duration(ms)	HadoopJobId	Error message	Initiator host	Initiator	Pool name	TxnId	Next TxnId	Commit Time	Highest WriteId
+1	default	srcbucket_big	key_bucket_8=0	MINOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+2	default	srcbucket_big	key_bucket_8=3	MINOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+3	default	srcbucket_big	key_bucket_8=4	MINOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+4	default	srcbucket_big	key_bucket_8=null	MINOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+5	default	srcbucket_big	 --- 	MINOR	succeeded	#Masked#	manual	default	0	0	0	 --- 
+PREHOOK: query: desc formatted default.srcbucket_big
+PREHOOK: type: DESCTABLE
+PREHOOK: Input: default@srcbucket_big
+POSTHOOK: query: desc formatted default.srcbucket_big
+POSTHOOK: type: DESCTABLE
+POSTHOOK: Input: default@srcbucket_big
+# col_name            	data_type           	comment             
+key                 	int                 	                    
+value               	string              	                    
+id                  	int                 	                    
+	 	 
+# Partition Transform Information	 	 
+# col_name            	transform_type      	 
+key                 	BUCKET[8]           	 
+	 	 
+# Detailed Table Information	 	 
+Database:           	default             	 
+#### A masked pattern was here ####
+Retention:          	0                   	 
+#### A masked pattern was here ####
+Table Type:         	EXTERNAL_TABLE      	 
+Table Parameters:	 	 
+	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"id\":\"true\",\"key\":\"true\",\"value\":\"true\"}}
+	EXTERNAL            	TRUE                
+	bucketing_version   	2                   
+	compactor.threshold.min.input.files	1                   
+	current-schema      	{\"type\":\"struct\",\"schema-id\":0,\"fields\":[{\"id\":1,\"name\":\"key\",\"required\":false,\"type\":\"int\"},{\"id\":2,\"name\":\"value\",\"required\":false,\"type\":\"string\"},{\"id\":3,\"name\":\"id\",\"required\":false,\"type\":\"int\"}]}
+	current-snapshot-id 	4234032310061239297 
+	current-snapshot-summary	{\"added-data-files\":\"4\",\"deleted-data-files\":\"3\",\"added-records\":\"6\",\"deleted-records\":\"6\",\"added-files-size\":\"3663\",\"removed-files-size\":\"2793\",\"changed-partition-count\":\"7\",\"total-records\":\"12\",\"total-files-size\":\"7326\",\"total-data-files\":\"8\",\"total-delete-files\":\"0\",\"total-position-deletes\":\"0\",\"total-equality-deletes\":\"0\",\"iceberg-version\":\"Apache Iceberg 1.6.1 (commit 8e9d59d299be42b0bca9461457cd1e95dbaad086)\"}
+	current-snapshot-timestamp-ms	1746028270770       
+	default-partition-spec	{\"spec-id\":1,\"fields\":[{\"name\":\"key_bucket_8\",\"transform\":\"bucket[8]\",\"source-id\":1,\"field-id\":1001}]}
+	format-version      	2                   
+	iceberg.orc.files.only	false               
+#### A masked pattern was here ####
+	numFiles            	8                   
+	numPartitions       	4                   
+	numRows             	12                  
+	parquet.compression 	zstd                
+#### A masked pattern was here ####
+	rawDataSize         	0                   
+	serialization.format	1                   
+	snapshot-count      	7                   
+	storage_handler     	org.apache.iceberg.mr.hive.HiveIcebergStorageHandler
+	table_type          	ICEBERG             
+	totalSize           	#Masked#
+#### A masked pattern was here ####
+	uuid                	fba2288e-57b8-4bb5-96f5-26247f813786
+	write.delete.mode   	merge-on-read       
+	write.merge.mode    	merge-on-read       
+	write.update.mode   	merge-on-read       
+	 	 
+# Storage Information	 	 
+SerDe Library:      	org.apache.iceberg.mr.hive.HiveIcebergSerDe	 
+InputFormat:        	org.apache.iceberg.mr.hive.HiveIcebergInputFormat	 
+OutputFormat:       	org.apache.iceberg.mr.hive.HiveIcebergOutputFormat	 
+Compressed:         	No                  	 
+Sort Columns:       	[]                  	 
+PREHOOK: query: select `partition`, spec_id, record_count
+from default.srcbucket_big.partitions
+order by `partition`, spec_id, record_count
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: select `partition`, spec_id, record_count
+from default.srcbucket_big.partitions
+order by `partition`, spec_id, record_count
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+{"key_bucket":null,"key_bucket_8":0}	1	2
+{"key_bucket":null,"key_bucket_8":3}	1	2
+{"key_bucket":null,"key_bucket_8":4}	1	4
+{"key_bucket":null,"key_bucket_8":null}	1	4
+PREHOOK: query: SELECT * FROM default.srcbucket_big ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+101	val_101	7
+NULL	val_102	8
+103	val_103	9
+104	NULL	10
+105	val_105	11
+NULL	NULL	12
+PREHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4 ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4 ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+PREHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4_and_8 ORDER BY id
+PREHOOK: type: QUERY
+PREHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+POSTHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4_and_8 ORDER BY id
+POSTHOOK: type: QUERY
+POSTHOOK: Input: default@srcbucket_big
+#### A masked pattern was here ####
+101	val_101	1
+NULL	val_102	2
+103	val_103	3
+104	NULL	4
+105	val_105	5
+NULL	NULL	6
+101	val_101	7
+NULL	val_102	8
+103	val_103	9
+104	NULL	10
+105	val_105	11
+NULL	NULL	12
