@@ -33,6 +33,8 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.iceberg.MetadataColumns;
+import org.apache.iceberg.StructLike;
+import org.apache.iceberg.Table;
 import org.apache.iceberg.io.CloseableIterator;
 import org.apache.iceberg.mr.hive.IcebergAcidUtil;
 import org.apache.iceberg.util.StructProjection;
@@ -51,8 +53,9 @@ public final class HiveBatchIterator implements CloseableIterator<HiveBatchConte
   private boolean advanced = false;
   private long rowOffset = Long.MIN_VALUE;
   private Map<Integer, ?> idToConstant;
+  private Table table;
 
-  HiveBatchIterator(RecordReader<NullWritable, VectorizedRowBatch> recordReader, JobConf job,
+  HiveBatchIterator(Table table, RecordReader<NullWritable, VectorizedRowBatch> recordReader, JobConf job,
       int[] partitionColIndices, Object[] partitionValues, Map<Integer, ?> idToConstant) {
     this.recordReader = recordReader;
     this.key = recordReader.createKey();
@@ -61,6 +64,7 @@ public final class HiveBatchIterator implements CloseableIterator<HiveBatchConte
     this.partitionColIndices = partitionColIndices;
     this.partitionValues = partitionValues;
     this.idToConstant = idToConstant;
+    this.table = table;
   }
 
   @Override
@@ -100,8 +104,9 @@ public final class HiveBatchIterator implements CloseableIterator<HiveBatchConte
               vrbCtx.addPartitionColsToBatch(batch.cols[idx], value, idx);
               break;
             case PARTITION_HASH:
-              value = IcebergAcidUtil.computeHash(
-                      (StructProjection) idToConstant.get(MetadataColumns.PARTITION_COLUMN_ID));
+              StructLike part = (StructProjection) idToConstant.get(MetadataColumns.PARTITION_COLUMN_ID);
+              int specId = (Integer) idToConstant.get(MetadataColumns.SPEC_ID.fieldId());
+              value = (long) IcebergAcidUtil.computeHash(table.specs().get(specId)).hash(part);
               vrbCtx.addPartitionColsToBatch(batch.cols[idx], value, idx);
               break;
             case FILE_PATH:

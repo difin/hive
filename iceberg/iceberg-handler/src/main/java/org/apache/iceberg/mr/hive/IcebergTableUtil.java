@@ -31,6 +31,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.type.TimestampTZ;
@@ -528,15 +529,17 @@ public class IcebergTableUtil {
       return FluentIterable.from(fileScanTasks)
           .transformAndConcat(task -> task.asDataTask().rows())
           .transform(row -> {
-            StructProjection data = row.get(IcebergTableUtil.PART_IDX, StructProjection.class);
+            StructProjection struct = row.get(IcebergTableUtil.PART_IDX, StructProjection.class);
             PartitionSpec spec = icebergTable.specs().get(row.get(IcebergTableUtil.SPEC_IDX, Integer.class));
-            PartitionData partitionData = IcebergTableUtil.toPartitionData(data,
+            PartitionData partitionData = IcebergTableUtil.toPartitionData(struct,
                 Partitioning.partitionType(icebergTable), spec.partitionType());
             String path = spec.partitionToPath(partitionData);
-            return Maps.immutableEntry(path, data);
+            return Maps.immutableEntry(path, Pair.of(spec, struct));
           })
           .filter(e -> e.getKey().equals(partitionPath))
-          .transform(e -> IcebergAcidUtil.computeHash(e.getValue()))
+          .transform(e -> IcebergAcidUtil.computeHash(e.getValue().getLeft())
+              .hash(e.getValue().getRight())
+          )
           .get(0);
     }
   }

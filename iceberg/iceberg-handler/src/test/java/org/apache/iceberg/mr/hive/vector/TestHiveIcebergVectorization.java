@@ -111,7 +111,7 @@ public class TestHiveIcebergVectorization extends HiveIcebergStorageHandlerWithE
     RecordReader<NullWritable, VectorizedRowBatch> internalVectorizedRecordReader =
         inputFormat.getRecordReader(new FileSplit(dataFilePath, 0L, Long.MAX_VALUE, new String[]{}), jobConf,
             new MockReporter());
-    HiveBatchIterator hiveBatchIterator = new HiveBatchIterator(
+    HiveBatchIterator hiveBatchIterator = new HiveBatchIterator(table,
         internalVectorizedRecordReader, jobConf, null, null, null);
 
     // Expected to be one batch exactly

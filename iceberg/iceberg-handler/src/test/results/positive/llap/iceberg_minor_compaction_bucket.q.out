@@ -180,9 +180,9 @@ Table Parameters:
 	bucketing_version   	2                   
 	compactor.threshold.min.input.files	1                   
 	current-schema      	{\"type\":\"struct\",\"schema-id\":0,\"fields\":[{\"id\":1,\"name\":\"key\",\"required\":false,\"type\":\"int\"},{\"id\":2,\"name\":\"value\",\"required\":false,\"type\":\"string\"},{\"id\":3,\"name\":\"id\",\"required\":false,\"type\":\"int\"}]}
-	current-snapshot-id 	5134389792450280296 
+	current-snapshot-id 	6971687794815089064 
 	current-snapshot-summary	{\"added-data-files\":\"4\",\"added-records\":\"6\",\"added-files-size\":\"3663\",\"changed-partition-count\":\"4\",\"total-records\":\"12\",\"total-files-size\":\"6456\",\"total-data-files\":\"7\",\"total-delete-files\":\"0\",\"total-position-deletes\":\"0\",\"total-equality-deletes\":\"0\",\"iceberg-version\":\"Apache Iceberg 1.6.1 (commit 8e9d59d299be42b0bca9461457cd1e95dbaad086)\"}
-	current-snapshot-timestamp-ms	1746028150758       
+	current-snapshot-timestamp-ms	1746052676714       
 	default-partition-spec	{\"spec-id\":1,\"fields\":[{\"name\":\"key_bucket_8\",\"transform\":\"bucket[8]\",\"source-id\":1,\"field-id\":1001}]}
 	format-version      	2                   
 	iceberg.orc.files.only	false               
@@ -199,7 +199,7 @@ Table Parameters:
 	table_type          	ICEBERG             
 	totalSize           	#Masked#
 #### A masked pattern was here ####
-	uuid                	fba2288e-57b8-4bb5-96f5-26247f813786
+	uuid                	8807a2bc-8dd3-42b8-800e-b03fae0ac8c3
 	write.delete.mode   	merge-on-read       
 	write.merge.mode    	merge-on-read       
 	write.update.mode   	merge-on-read       
@@ -255,16 +255,16 @@ Table Parameters:
 	bucketing_version   	2                   
 	compactor.threshold.min.input.files	1                   
 	current-schema      	{\"type\":\"struct\",\"schema-id\":0,\"fields\":[{\"id\":1,\"name\":\"key\",\"required\":false,\"type\":\"int\"},{\"id\":2,\"name\":\"value\",\"required\":false,\"type\":\"string\"},{\"id\":3,\"name\":\"id\",\"required\":false,\"type\":\"int\"}]}
-	current-snapshot-id 	4234032310061239297 
-	current-snapshot-summary	{\"added-data-files\":\"4\",\"deleted-data-files\":\"3\",\"added-records\":\"6\",\"deleted-records\":\"6\",\"added-files-size\":\"3663\",\"removed-files-size\":\"2793\",\"changed-partition-count\":\"7\",\"total-records\":\"12\",\"total-files-size\":\"7326\",\"total-data-files\":\"8\",\"total-delete-files\":\"0\",\"total-position-deletes\":\"0\",\"total-equality-deletes\":\"0\",\"iceberg-version\":\"Apache Iceberg 1.6.1 (commit 8e9d59d299be42b0bca9461457cd1e95dbaad086)\"}
-	current-snapshot-timestamp-ms	1746028270770       
+	current-snapshot-id 	6058766370058756324 
+	current-snapshot-summary	{\"added-data-files\":\"4\",\"deleted-data-files\":\"3\",\"added-records\":\"6\",\"deleted-records\":\"6\",\"added-files-size\":\"3663\",\"removed-files-size\":\"2793\",\"changed-partition-count\":\"7\",\"total-records\":\"54\",\"total-files-size\":\"13720\",\"total-data-files\":\"14\",\"total-delete-files\":\"0\",\"total-position-deletes\":\"0\",\"total-equality-deletes\":\"0\",\"iceberg-version\":\"Apache Iceberg 1.6.1 (commit 8e9d59d299be42b0bca9461457cd1e95dbaad086)\"}
+	current-snapshot-timestamp-ms	1746052809589       
 	default-partition-spec	{\"spec-id\":1,\"fields\":[{\"name\":\"key_bucket_8\",\"transform\":\"bucket[8]\",\"source-id\":1,\"field-id\":1001}]}
 	format-version      	2                   
 	iceberg.orc.files.only	false               
 #### A masked pattern was here ####
-	numFiles            	8                   
+	numFiles            	14                  
 	numPartitions       	4                   
-	numRows             	12                  
+	numRows             	54                  
 	parquet.compression 	zstd                
 #### A masked pattern was here ####
 	rawDataSize         	0                   
@@ -274,7 +274,7 @@ Table Parameters:
 	table_type          	ICEBERG             
 	totalSize           	#Masked#
 #### A masked pattern was here ####
-	uuid                	fba2288e-57b8-4bb5-96f5-26247f813786
+	uuid                	8807a2bc-8dd3-42b8-800e-b03fae0ac8c3
 	write.delete.mode   	merge-on-read       
 	write.merge.mode    	merge-on-read       
 	write.update.mode   	merge-on-read       
@@ -297,10 +297,10 @@ order by `partition`, spec_id, record_count
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@srcbucket_big
 #### A masked pattern was here ####
-{"key_bucket":null,"key_bucket_8":0}	1	2
-{"key_bucket":null,"key_bucket_8":3}	1	2
-{"key_bucket":null,"key_bucket_8":4}	1	4
-{"key_bucket":null,"key_bucket_8":null}	1	4
+{"key_bucket":null,"key_bucket_8":0}	1	9
+{"key_bucket":null,"key_bucket_8":3}	1	9
+{"key_bucket":null,"key_bucket_8":4}	1	18
+{"key_bucket":null,"key_bucket_8":null}	1	18
 PREHOOK: query: SELECT * FROM default.srcbucket_big ORDER BY id
 PREHOOK: type: QUERY
 PREHOOK: Input: default@srcbucket_big
@@ -316,10 +316,52 @@ NULL	val_102	2
 105	val_105	5
 NULL	NULL	6
 101	val_101	7
+101	val_101	7
+101	val_101	7
+101	val_101	7
+101	val_101	7
+101	val_101	7
+101	val_101	7
+101	val_101	7
+NULL	val_102	8
+NULL	val_102	8
+NULL	val_102	8
+NULL	val_102	8
+NULL	val_102	8
+NULL	val_102	8
+NULL	val_102	8
 NULL	val_102	8
 103	val_103	9
+103	val_103	9
+103	val_103	9
+103	val_103	9
+103	val_103	9
+103	val_103	9
+103	val_103	9
+103	val_103	9
+104	NULL	10
+104	NULL	10
+104	NULL	10
+104	NULL	10
+104	NULL	10
+104	NULL	10
+104	NULL	10
 104	NULL	10
 105	val_105	11
+105	val_105	11
+105	val_105	11
+105	val_105	11
+105	val_105	11
+105	val_105	11
+105	val_105	11
+105	val_105	11
+NULL	NULL	12
+NULL	NULL	12
+NULL	NULL	12
+NULL	NULL	12
+NULL	NULL	12
+NULL	NULL	12
+NULL	NULL	12
 NULL	NULL	12
 PREHOOK: query: SELECT * FROM default.srcbucket_big.tag_bucket_4 ORDER BY id
 PREHOOK: type: QUERY

@@ -167,8 +167,8 @@ public class HiveVectorizedReader {
           throw new UnsupportedOperationException("Vectorized Hive reading unimplemented for format: " + format);
       }
 
-      CloseableIterable<HiveBatchContext> vrbIterable =
-          createVectorizedRowBatchIterable(recordReader, job, partitionColIndices, partitionValues, idToConstant);
+      CloseableIterable<HiveBatchContext> vrbIterable = createVectorizedRowBatchIterable(table,
+          recordReader, job, partitionColIndices, partitionValues, idToConstant);
 
       return deleteFilter != null ? deleteFilter.filterBatch(vrbIterable) : vrbIterable;
 
@@ -252,12 +252,12 @@ public class HiveVectorizedReader {
     return inputFormat.getRecordReader(split, job, reporter);
   }
 
-  private static CloseableIterable<HiveBatchContext> createVectorizedRowBatchIterable(
+  private static CloseableIterable<HiveBatchContext> createVectorizedRowBatchIterable(Table table,
       RecordReader<NullWritable, VectorizedRowBatch> hiveRecordReader, JobConf job, int[] partitionColIndices,
       Object[] partitionValues, Map<Integer, ?> idToConstant) {
 
     HiveBatchIterator iterator =
-        new HiveBatchIterator(hiveRecordReader, job, partitionColIndices, partitionValues, idToConstant);
+        new HiveBatchIterator(table, hiveRecordReader, job, partitionColIndices, partitionValues, idToConstant);
 
     return new CloseableIterable<HiveBatchContext>() {
 

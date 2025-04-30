@@ -20,10 +20,8 @@
 package org.apache.iceberg.mr.hive;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,9 +41,7 @@ import org.apache.iceberg.deletes.PositionDelete;
 import org.apache.iceberg.io.CloseableIterator;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.relocated.com.google.common.collect.Maps;
-import org.apache.iceberg.relocated.com.google.common.hash.HashCode;
-import org.apache.iceberg.relocated.com.google.common.hash.Hasher;
-import org.apache.iceberg.relocated.com.google.common.hash.Hashing;
+import org.apache.iceberg.types.JavaHash;
 import org.apache.iceberg.types.Types;
 import org.apache.iceberg.util.SerializationUtil;
 import org.apache.iceberg.util.StructProjection;
@@ -210,10 +206,11 @@ public class IcebergAcidUtil {
     return rec.get(FILE_READ_META_COLS.get(MetadataColumns.SPEC_ID), Integer.class);
   }
 
-  public static long computePartitionHash(Record rec) {
+  public static long computePartitionHash(Table table, Record rec) {
     StructProjection part = rec.get(FILE_READ_META_COLS.get(PARTITION_STRUCT_META_COL), StructProjection.class);
+    PartitionSpec spec = table.specs().get(rec.get(FILE_READ_META_COLS.get(MetadataColumns.SPEC_ID), Integer.class));
     // we need to compute a hash value for the partition struct so that it can be used as a sorting key
-    return computeHash(part);
+    return computeHash(spec).hash(part);
   }
 
   public static PartitionKey parsePartitionKey(Record rec) {
@@ -247,51 +244,8 @@ public class IcebergAcidUtil {
     return rec.get(DELETE_FILE_META_COLS.get(MetadataColumns.ROW_POSITION), Long.class);
   }
 
-  private static long hashObjectArray(Object[] values) {
-    Hasher hasher = Hashing.murmur3_128().newHasher();
-
-    for (Object val : values) {
-      if (val == null) {
-        // Unique constant for null
-        hasher.putInt(0xDEADBEEF);
-      } else if (val instanceof Integer) {
-        hasher.putInt((Integer) val);
-      } else if (val instanceof Long) {
-        hasher.putLong((Long) val);
-      } else if (val instanceof String) {
-        hasher.putString((String) val, StandardCharsets.UTF_8);
-      } else if (val instanceof Boolean) {
-        hasher.putBoolean((Boolean) val);
-      } else if (val instanceof Short) {
-        hasher.putShort((Short) val);
-      } else if (val instanceof Byte) {
-        hasher.putByte((Byte) val);
-      } else if (val instanceof Character) {
-        hasher.putChar((Character) val);
-      } else if (val instanceof Double) {
-        hasher.putDouble((Double) val);
-      } else if (val instanceof Float) {
-        hasher.putFloat((Float) val);
-      } else {
-        // Fallback to object's string representation
-        hasher.putLong(Objects.hash(val));
-      }
-    }
-
-    HashCode hashCode = hasher.hash();
-    return hashCode.asLong();
-  }
-
-  public static long computeHash(StructLike struct) {
-    long partHash = -1;
-    if (struct != null) {
-      Object[] partFields = new Object[struct.size()];
-      for (int i = 0; i < struct.size(); ++i) {
-        partFields[i] = struct.get(i, Object.class);
-      }
-      partHash = hashObjectArray(partFields);
-    }
-    return partHash;
+  public static JavaHash<StructLike> computeHash(PartitionSpec spec) {
+    return JavaHash.forType(spec.partitionType());
   }
 
   public static void copyFields(GenericRecord source, int start, int len, GenericRecord target) {
@@ -341,7 +295,7 @@ public class IcebergAcidUtil {
       IcebergAcidUtil.copyFields(rec, FILE_READ_META_COLS.size(), current.size(), current);
       PositionDeleteInfo.setIntoConf(conf,
           IcebergAcidUtil.parseSpecId(rec),
-          IcebergAcidUtil.computePartitionHash(rec),
+          IcebergAcidUtil.computePartitionHash(table, rec),
           IcebergAcidUtil.parseFilePath(rec),
           IcebergAcidUtil.parseFilePosition(rec),
           StringUtils.EMPTY);
@@ -385,7 +339,7 @@ public class IcebergAcidUtil {
       T next = currentIterator.next();
       GenericRecord rec = (GenericRecord) next;
       return recordBuilder.withSpecId(partitionSpec.specId())
-          .withPartitionHash(computeHash(partition))
+          .withPartitionHash(computeHash(partitionSpec).hash(partition))
           .withFilePath(IcebergAcidUtil.getFilePath(rec))
           .withFilePosition(IcebergAcidUtil.getDeleteFilePosition(rec))
           .withPartitionKey(getSerializedPartitionKey(partition, partitionSpec)).build();
