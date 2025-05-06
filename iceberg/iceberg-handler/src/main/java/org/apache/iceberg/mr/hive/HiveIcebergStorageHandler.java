@@ -415,13 +415,8 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
       }
     }
     predicate.pushedPredicate = (ExprNodeGenericFuncDesc) pushedPredicate;
-    Expression filterExpr = HiveIcebergInputFormat.getFilterExpr(conf, predicate.pushedPredicate);
-    if (filterExpr != null) {
-      SessionStateUtil.addResource(conf, InputFormatConfig.QUERY_FILTERS, filterExpr);
-    }
     return predicate;
   }
-
 
   @Override
   public boolean canProvideBasicStatistics() {

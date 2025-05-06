@@ -73,7 +73,6 @@ import org.apache.iceberg.SnapshotRef;
 import org.apache.iceberg.SnapshotUpdate;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.exceptions.NotFoundException;
-import org.apache.iceberg.expressions.Expression;
 import org.apache.iceberg.expressions.Expressions;
 import org.apache.iceberg.hadoop.Util;
 import org.apache.iceberg.io.FileIO;
@@ -453,7 +452,6 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
     String branchName = null;
 
     Long snapshotId = null;
-    Expression filterExpr = Expressions.alwaysTrue();
 
     for (JobContext jobContext : jobContexts) {
       JobConf conf = jobContext.getJobConf();
@@ -461,12 +459,6 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
       branchName = conf.get(InputFormatConfig.OUTPUT_TABLE_SNAPSHOT_REF);
       snapshotId = getSnapshotId(outputTable.table, branchName);
 
-      Expression jobContextFilterExpr = (Expression) SessionStateUtil.getResource(conf, InputFormatConfig.QUERY_FILTERS)
-          .orElse(Expressions.alwaysTrue());
-      if (!filterExpr.equals(jobContextFilterExpr)) {
-        filterExpr = Expressions.and(filterExpr, jobContextFilterExpr);
-      }
-      LOG.debug("Filter Expression :{}", filterExpr);
       LOG.info("Committing job has started for table: {}, using location: {}",
           table, generateJobLocation(outputTable.table.location(), conf, jobContext.getJobID()));
 
@@ -503,7 +495,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
             table, jobContexts.stream().map(JobContext::getJobID)
                 .map(String::valueOf).collect(Collectors.joining(",")));
       } else {
-        commitWrite(table, branchName, snapshotId, startTime, filesForCommit, operation, filterExpr);
+        commitWrite(table, branchName, snapshotId, startTime, filesForCommit, operation);
       }
     } else {
 
@@ -546,10 +538,9 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
    * @param table      The table we are changing
    * @param startTime  The start time of the commit - used only for logging
    * @param results    The object containing the new files we would like to add to the table
-   * @param filterExpr Filter expression for conflict detection filter
    */
   private void commitWrite(Table table, String branchName, Long snapshotId, long startTime,
-      FilesForCommit results, Operation operation, Expression filterExpr) {
+      FilesForCommit results, Operation operation) {
 
     if (!results.replacedDataFiles().isEmpty()) {
       OverwriteFiles write = table.newOverwrite();
@@ -562,7 +553,6 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
       if (snapshotId != null) {
         write.validateFromSnapshot(snapshotId);
       }
-      write.conflictDetectionFilter(filterExpr);
       write.validateNoConflictingData();
       write.validateNoConflictingDeletes();
       commit(write);
@@ -587,8 +577,6 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
       if (snapshotId != null) {
         write.validateFromSnapshot(snapshotId);
       }
-      write.conflictDetectionFilter(filterExpr);
-
       if (!results.dataFiles().isEmpty()) {
         write.validateDeletedFiles();
         write.validateNoConflictingDeleteFiles();
