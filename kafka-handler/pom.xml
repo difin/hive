@@ -132,10 +132,6 @@
           <groupId>org.apache.shiro</groupId>
           <artifactId>shiro-crypto-cipher</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
       </exclusions>
       <classifier>test</classifier>
       <scope>test</scope>
@@ -148,10 +144,6 @@
         <exclusion>
           <groupId>org.apache.shiro</groupId>
           <artifactId>shiro-crypto-cipher</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
       </exclusions>
       <scope>test</scope>
