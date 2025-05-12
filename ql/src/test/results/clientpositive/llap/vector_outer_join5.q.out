@@ -124,26 +124,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -219,26 +216,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -815,26 +809,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -931,26 +922,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -1553,26 +1541,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -1702,26 +1687,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -2324,26 +2306,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -2440,26 +2419,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -3065,26 +3041,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -3178,26 +3151,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -3364,26 +3334,23 @@ POSTHOOK: Input: default@sorted_mod_4
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -4199,26 +4166,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -4294,26 +4258,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -4890,26 +4851,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -5006,26 +4964,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -5628,26 +5583,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -5764,26 +5716,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -6386,26 +6335,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -6502,26 +6448,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -7127,26 +7070,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -7240,26 +7180,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
@@ -7426,26 +7363,23 @@ POSTHOOK: Input: default@small_table2
               "name": "INPUT__FILE__NAME"
             },
             {
-              "fields": {
-                "fields": [
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "writeid"
-                  },
-                  {
-                    "type": "INTEGER",
-                    "nullable": true,
-                    "name": "bucketid"
-                  },
-                  {
-                    "type": "BIGINT",
-                    "nullable": true,
-                    "name": "rowid"
-                  }
-                ],
-                "nullable": true
-              },
+              "fields": [
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "writeid"
+                },
+                {
+                  "type": "INTEGER",
+                  "nullable": true,
+                  "name": "bucketid"
+                },
+                {
+                  "type": "BIGINT",
+                  "nullable": true,
+                  "name": "rowid"
+                }
+              ],
               "nullable": true,
               "name": "ROW__ID"
             },
