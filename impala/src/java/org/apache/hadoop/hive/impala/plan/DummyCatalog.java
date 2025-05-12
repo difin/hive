@@ -144,11 +144,6 @@ public class DummyCatalog implements FeCatalog {
   }
 
   @Override
-  public String getDefaultKuduMasterHosts() {
-    throw new RuntimeException("not implemented");
-  }
-
-  @Override
   public boolean isReady() {
     throw new RuntimeException("not implemented");
   }
