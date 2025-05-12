@@ -9868,7 +9868,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     private void authorizeProxyPrivilege() throws Exception {
       // Skip the auth in embedded mode or if the auth is disabled
       if (!isMetaStoreRemote() ||
-          !MetastoreConf.getBoolVar(conf, ConfVars.EVENT_DB_NOTIFICATION_API_AUTH)) {
+          !MetastoreConf.getBoolVar(conf, ConfVars.EVENT_DB_NOTIFICATION_API_AUTH) || conf.getBoolean(ConfVars.HIVE_IN_TEST.getVarname(),
+          false)) { // The predicate || conf.getBoolean(HIVE_IN_TEST.getVarname(),false) comes from HIVE-24484
         return;
       }
       String user = null;
@@ -11619,6 +11620,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         MetastoreConf.getIntVar(conf, ConfVars.METASTORE_THRIFT_HTTP_REQUEST_HEADER_SIZE));
     httpServerConf.setResponseHeaderSize(
         MetastoreConf.getIntVar(conf, ConfVars.METASTORE_THRIFT_HTTP_RESPONSE_HEADER_SIZE));
+    httpServerConf.setSendServerVersion(false);
+    httpServerConf.setSendXPoweredBy(false);
 
     final HttpConnectionFactory http = new HttpConnectionFactory(httpServerConf);
 
