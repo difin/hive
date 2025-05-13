@@ -126,14 +126,14 @@ class WriteNotificationLogBatchRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->requestList = array();
-                        $_size891 = 0;
-                        $_etype894 = 0;
-                        $xfer += $input->readListBegin($_etype894, $_size891);
-                        for ($_i895 = 0; $_i895 < $_size891; ++$_i895) {
-                            $elem896 = null;
-                            $elem896 = new \metastore\WriteNotificationLogRequest();
-                            $xfer += $elem896->read($input);
-                            $this->requestList []= $elem896;
+                        $_size898 = 0;
+                        $_etype901 = 0;
+                        $xfer += $input->readListBegin($_etype901, $_size898);
+                        for ($_i902 = 0; $_i902 < $_size898; ++$_i902) {
+                            $elem903 = null;
+                            $elem903 = new \metastore\WriteNotificationLogRequest();
+                            $xfer += $elem903->read($input);
+                            $this->requestList []= $elem903;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -175,8 +175,8 @@ class WriteNotificationLogBatchRequest
             }
             $xfer += $output->writeFieldBegin('requestList', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->requestList));
-            foreach ($this->requestList as $iter897) {
-                $xfer += $iter897->write($output);
+            foreach ($this->requestList as $iter904) {
+                $xfer += $iter904->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

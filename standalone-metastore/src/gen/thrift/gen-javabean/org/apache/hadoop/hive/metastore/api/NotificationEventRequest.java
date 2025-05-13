@@ -17,6 +17,7 @@ package org.apache.hadoop.hive.metastore.api;
   private static final org.apache.thrift.protocol.TField CAT_NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("catName", org.apache.thrift.protocol.TType.STRING, (short)4);
   private static final org.apache.thrift.protocol.TField DB_NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("dbName", org.apache.thrift.protocol.TType.STRING, (short)5);
   private static final org.apache.thrift.protocol.TField TABLE_NAMES_FIELD_DESC = new org.apache.thrift.protocol.TField("tableNames", org.apache.thrift.protocol.TType.LIST, (short)6);
+  private static final org.apache.thrift.protocol.TField EVENT_TYPE_LIST_FIELD_DESC = new org.apache.thrift.protocol.TField("eventTypeList", org.apache.thrift.protocol.TType.LIST, (short)7);
 
   private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new NotificationEventRequestStandardSchemeFactory();
   private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new NotificationEventRequestTupleSchemeFactory();
@@ -27,6 +28,7 @@ package org.apache.hadoop.hive.metastore.api;
   private @org.apache.thrift.annotation.Nullable java.lang.String catName; // optional
   private @org.apache.thrift.annotation.Nullable java.lang.String dbName; // optional
   private @org.apache.thrift.annotation.Nullable java.util.List<java.lang.String> tableNames; // optional
+  private @org.apache.thrift.annotation.Nullable java.util.List<java.lang.String> eventTypeList; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -35,7 +37,8 @@ package org.apache.hadoop.hive.metastore.api;
     EVENT_TYPE_SKIP_LIST((short)3, "eventTypeSkipList"),
     CAT_NAME((short)4, "catName"),
     DB_NAME((short)5, "dbName"),
-    TABLE_NAMES((short)6, "tableNames");
+    TABLE_NAMES((short)6, "tableNames"),
+    EVENT_TYPE_LIST((short)7, "eventTypeList");
 
     private static final java.util.Map<java.lang.String, _Fields> byName = new java.util.HashMap<java.lang.String, _Fields>();
 
@@ -63,6 +66,8 @@ package org.apache.hadoop.hive.metastore.api;
           return DB_NAME;
         case 6: // TABLE_NAMES
           return TABLE_NAMES;
+        case 7: // EVENT_TYPE_LIST
+          return EVENT_TYPE_LIST;
         default:
           return null;
       }
@@ -107,7 +112,7 @@ package org.apache.hadoop.hive.metastore.api;
   private static final int __LASTEVENT_ISSET_ID = 0;
   private static final int __MAXEVENTS_ISSET_ID = 1;
   private byte __isset_bitfield = 0;
-  private static final _Fields optionals[] = {_Fields.MAX_EVENTS,_Fields.EVENT_TYPE_SKIP_LIST,_Fields.CAT_NAME,_Fields.DB_NAME,_Fields.TABLE_NAMES};
+  private static final _Fields optionals[] = {_Fields.MAX_EVENTS,_Fields.EVENT_TYPE_SKIP_LIST,_Fields.CAT_NAME,_Fields.DB_NAME,_Fields.TABLE_NAMES,_Fields.EVENT_TYPE_LIST};
   public static final java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new java.util.EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -123,6 +128,9 @@ package org.apache.hadoop.hive.metastore.api;
     tmpMap.put(_Fields.DB_NAME, new org.apache.thrift.meta_data.FieldMetaData("dbName", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.TABLE_NAMES, new org.apache.thrift.meta_data.FieldMetaData("tableNames", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
+    tmpMap.put(_Fields.EVENT_TYPE_LIST, new org.apache.thrift.meta_data.FieldMetaData("eventTypeList", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
     metaDataMap = java.util.Collections.unmodifiableMap(tmpMap);
@@ -161,6 +169,10 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.List<java.lang.String> __this__tableNames = new java.util.ArrayList<java.lang.String>(other.tableNames);
       this.tableNames = __this__tableNames;
     }
+    if (other.isSetEventTypeList()) {
+      java.util.List<java.lang.String> __this__eventTypeList = new java.util.ArrayList<java.lang.String>(other.eventTypeList);
+      this.eventTypeList = __this__eventTypeList;
+    }
   }
 
   public NotificationEventRequest deepCopy() {
@@ -177,6 +189,7 @@ package org.apache.hadoop.hive.metastore.api;
     this.catName = null;
     this.dbName = null;
     this.tableNames = null;
+    this.eventTypeList = null;
   }
 
   public long getLastEvent() {
@@ -351,6 +364,46 @@ package org.apache.hadoop.hive.metastore.api;
     }
   }
 
+  public int getEventTypeListSize() {
+    return (this.eventTypeList == null) ? 0 : this.eventTypeList.size();
+  }
+
+  @org.apache.thrift.annotation.Nullable
+  public java.util.Iterator<java.lang.String> getEventTypeListIterator() {
+    return (this.eventTypeList == null) ? null : this.eventTypeList.iterator();
+  }
+
+  public void addToEventTypeList(java.lang.String elem) {
+    if (this.eventTypeList == null) {
+      this.eventTypeList = new java.util.ArrayList<java.lang.String>();
+    }
+    this.eventTypeList.add(elem);
+  }
+
+  @org.apache.thrift.annotation.Nullable
+  public java.util.List<java.lang.String> getEventTypeList() {
+    return this.eventTypeList;
+  }
+
+  public void setEventTypeList(@org.apache.thrift.annotation.Nullable java.util.List<java.lang.String> eventTypeList) {
+    this.eventTypeList = eventTypeList;
+  }
+
+  public void unsetEventTypeList() {
+    this.eventTypeList = null;
+  }
+
+  /** Returns true if field eventTypeList is set (has been assigned a value) and false otherwise */
+  public boolean isSetEventTypeList() {
+    return this.eventTypeList != null;
+  }
+
+  public void setEventTypeListIsSet(boolean value) {
+    if (!value) {
+      this.eventTypeList = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, @org.apache.thrift.annotation.Nullable java.lang.Object value) {
     switch (field) {
     case LAST_EVENT:
@@ -401,6 +454,14 @@ package org.apache.hadoop.hive.metastore.api;
       }
       break;
 
+    case EVENT_TYPE_LIST:
+      if (value == null) {
+        unsetEventTypeList();
+      } else {
+        setEventTypeList((java.util.List<java.lang.String>)value);
+      }
+      break;
+
     }
   }
 
@@ -425,6 +486,9 @@ package org.apache.hadoop.hive.metastore.api;
     case TABLE_NAMES:
       return getTableNames();
 
+    case EVENT_TYPE_LIST:
+      return getEventTypeList();
+
     }
     throw new java.lang.IllegalStateException();
   }
@@ -448,6 +512,8 @@ package org.apache.hadoop.hive.metastore.api;
       return isSetDbName();
     case TABLE_NAMES:
       return isSetTableNames();
+    case EVENT_TYPE_LIST:
+      return isSetEventTypeList();
     }
     throw new java.lang.IllegalStateException();
   }
@@ -519,6 +585,15 @@ package org.apache.hadoop.hive.metastore.api;
         return false;
     }
 
+    boolean this_present_eventTypeList = true && this.isSetEventTypeList();
+    boolean that_present_eventTypeList = true && that.isSetEventTypeList();
+    if (this_present_eventTypeList || that_present_eventTypeList) {
+      if (!(this_present_eventTypeList && that_present_eventTypeList))
+        return false;
+      if (!this.eventTypeList.equals(that.eventTypeList))
+        return false;
+    }
+
     return true;
   }
 
@@ -547,6 +622,10 @@ package org.apache.hadoop.hive.metastore.api;
     hashCode = hashCode * 8191 + ((isSetTableNames()) ? 131071 : 524287);
     if (isSetTableNames())
       hashCode = hashCode * 8191 + tableNames.hashCode();
+
+    hashCode = hashCode * 8191 + ((isSetEventTypeList()) ? 131071 : 524287);
+    if (isSetEventTypeList())
+      hashCode = hashCode * 8191 + eventTypeList.hashCode();
 
     return hashCode;
   }
@@ -619,6 +698,16 @@ package org.apache.hadoop.hive.metastore.api;
         return lastComparison;
       }
     }
+    lastComparison = java.lang.Boolean.compare(isSetEventTypeList(), other.isSetEventTypeList());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetEventTypeList()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.eventTypeList, other.eventTypeList);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -686,6 +775,16 @@ package org.apache.hadoop.hive.metastore.api;
         sb.append("null");
       } else {
         sb.append(this.tableNames);
+      }
+      first = false;
+    }
+    if (isSetEventTypeList()) {
+      if (!first) sb.append(", ");
+      sb.append("eventTypeList:");
+      if (this.eventTypeList == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.eventTypeList);
       }
       first = false;
     }
@@ -806,6 +905,24 @@ package org.apache.hadoop.hive.metastore.api;
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 7: // EVENT_TYPE_LIST
+            if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+              {
+                org.apache.thrift.protocol.TList _list910 = iprot.readListBegin();
+                struct.eventTypeList = new java.util.ArrayList<java.lang.String>(_list910.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem911;
+                for (int _i912 = 0; _i912 < _list910.size; ++_i912)
+                {
+                  _elem911 = iprot.readString();
+                  struct.eventTypeList.add(_elem911);
+                }
+                iprot.readListEnd();
+              }
+              struct.setEventTypeListIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -832,9 +949,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(EVENT_TYPE_SKIP_LIST_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.eventTypeSkipList.size()));
-            for (java.lang.String _iter910 : struct.eventTypeSkipList)
+            for (java.lang.String _iter913 : struct.eventTypeSkipList)
             {
-              oprot.writeString(_iter910);
+              oprot.writeString(_iter913);
             }
             oprot.writeListEnd();
           }
@@ -860,9 +977,23 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(TABLE_NAMES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.tableNames.size()));
-            for (java.lang.String _iter911 : struct.tableNames)
+            for (java.lang.String _iter914 : struct.tableNames)
             {
-              oprot.writeString(_iter911);
+              oprot.writeString(_iter914);
+            }
+            oprot.writeListEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+      }
+      if (struct.eventTypeList != null) {
+        if (struct.isSetEventTypeList()) {
+          oprot.writeFieldBegin(EVENT_TYPE_LIST_FIELD_DESC);
+          {
+            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.eventTypeList.size()));
+            for (java.lang.String _iter915 : struct.eventTypeList)
+            {
+              oprot.writeString(_iter915);
             }
             oprot.writeListEnd();
           }
@@ -903,16 +1034,19 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetTableNames()) {
         optionals.set(4);
       }
-      oprot.writeBitSet(optionals, 5);
+      if (struct.isSetEventTypeList()) {
+        optionals.set(5);
+      }
+      oprot.writeBitSet(optionals, 6);
       if (struct.isSetMaxEvents()) {
         oprot.writeI32(struct.maxEvents);
       }
       if (struct.isSetEventTypeSkipList()) {
         {
           oprot.writeI32(struct.eventTypeSkipList.size());
-          for (java.lang.String _iter912 : struct.eventTypeSkipList)
+          for (java.lang.String _iter916 : struct.eventTypeSkipList)
           {
-            oprot.writeString(_iter912);
+            oprot.writeString(_iter916);
           }
         }
       }
@@ -925,9 +1059,18 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetTableNames()) {
         {
           oprot.writeI32(struct.tableNames.size());
-          for (java.lang.String _iter913 : struct.tableNames)
+          for (java.lang.String _iter917 : struct.tableNames)
           {
-            oprot.writeString(_iter913);
+            oprot.writeString(_iter917);
+          }
+        }
+      }
+      if (struct.isSetEventTypeList()) {
+        {
+          oprot.writeI32(struct.eventTypeList.size());
+          for (java.lang.String _iter918 : struct.eventTypeList)
+          {
+            oprot.writeString(_iter918);
           }
         }
       }
@@ -938,20 +1081,20 @@ package org.apache.hadoop.hive.metastore.api;
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       struct.lastEvent = iprot.readI64();
       struct.setLastEventIsSet(true);
-      java.util.BitSet incoming = iprot.readBitSet(5);
+      java.util.BitSet incoming = iprot.readBitSet(6);
       if (incoming.get(0)) {
         struct.maxEvents = iprot.readI32();
         struct.setMaxEventsIsSet(true);
       }
       if (incoming.get(1)) {
         {
-          org.apache.thrift.protocol.TList _list914 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
-          struct.eventTypeSkipList = new java.util.ArrayList<java.lang.String>(_list914.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _elem915;
-          for (int _i916 = 0; _i916 < _list914.size; ++_i916)
+          org.apache.thrift.protocol.TList _list919 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.eventTypeSkipList = new java.util.ArrayList<java.lang.String>(_list919.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem920;
+          for (int _i921 = 0; _i921 < _list919.size; ++_i921)
           {
-            _elem915 = iprot.readString();
-            struct.eventTypeSkipList.add(_elem915);
+            _elem920 = iprot.readString();
+            struct.eventTypeSkipList.add(_elem920);
           }
         }
         struct.setEventTypeSkipListIsSet(true);
@@ -966,16 +1109,29 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(4)) {
         {
-          org.apache.thrift.protocol.TList _list917 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
-          struct.tableNames = new java.util.ArrayList<java.lang.String>(_list917.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _elem918;
-          for (int _i919 = 0; _i919 < _list917.size; ++_i919)
+          org.apache.thrift.protocol.TList _list922 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.tableNames = new java.util.ArrayList<java.lang.String>(_list922.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem923;
+          for (int _i924 = 0; _i924 < _list922.size; ++_i924)
           {
-            _elem918 = iprot.readString();
-            struct.tableNames.add(_elem918);
+            _elem923 = iprot.readString();
+            struct.tableNames.add(_elem923);
           }
         }
         struct.setTableNamesIsSet(true);
+      }
+      if (incoming.get(5)) {
+        {
+          org.apache.thrift.protocol.TList _list925 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.eventTypeList = new java.util.ArrayList<java.lang.String>(_list925.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem926;
+          for (int _i927 = 0; _i927 < _list925.size; ++_i927)
+          {
+            _elem926 = iprot.readString();
+            struct.eventTypeList.add(_elem926);
+          }
+        }
+        struct.setEventTypeListIsSet(true);
       }
     }
   }
