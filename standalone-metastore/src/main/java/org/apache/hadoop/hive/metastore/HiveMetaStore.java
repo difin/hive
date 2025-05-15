@@ -3488,7 +3488,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     private List<Path> dropPartitionsAndGetLocations(RawStore ms, String catName, String dbName,
         String tableName, Path tablePath, boolean checkLocation)
         throws MetaException, IOException, NoSuchObjectException {
-      int batchSize = MetastoreConf.getIntVar(conf, ConfVars.BATCH_RETRIEVE_OBJECTS_MAX);
+      int batchSize = MetastoreConf.getIntVar(conf, ConfVars.BATCH_RETRIEVE_MAX);
       String tableDnsPath = null;
       if (tablePath != null) {
         tableDnsPath = wh.getDnsPath(tablePath).toString();

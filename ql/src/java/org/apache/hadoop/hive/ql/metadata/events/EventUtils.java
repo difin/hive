@@ -57,7 +57,7 @@ public class EventUtils {
       if (batchSize == null){
         try {
           batchSize = Integer.parseInt(
-                  hiveDb.getMSC().getConfigValue(MetastoreConf.ConfVars.BATCH_RETRIEVE_MAX.toString(), "50"));
+                  hiveDb.getMSC().getConfigValue(MetastoreConf.ConfVars.BATCH_RETRIEVE_MAX.toString(), "300"));
           // TODO: we're asking the metastore what its configuration for this var is - we may
           // want to revisit to pull from client side instead. The reason I have it this way
           // is because the metastore is more likely to have a reasonable config for this than
