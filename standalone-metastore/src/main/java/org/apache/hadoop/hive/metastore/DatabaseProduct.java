@@ -18,15 +18,20 @@
 
 package org.apache.hadoop.hive.metastore;
 
-import org.apache.hadoop.hive.metastore.txn.TxnUtils;
+import javax.sql.DataSource;
 
+import org.apache.hadoop.hive.metastore.txn.TxnUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTransactionRollbackException;
 
 /** Database product infered via JDBC. */
 public enum DatabaseProduct {
   DERBY, MYSQL, POSTGRES, ORACLE, SQLSERVER, OTHER;
-
+  static final private Logger LOG = LoggerFactory.getLogger(DatabaseProduct.class.getName());
   public static final String DERBY_NAME = "derby";
   public static final String SQL_SERVER_NAME = "sqlserver";
   public static final String MYSQL_NAME = "mysql";
@@ -40,7 +45,7 @@ public enum DatabaseProduct {
    * @param productName string to defer database connection
    * @return database product type
    */
-  public static DatabaseProduct determineDatabaseProduct(String productName) throws SQLException {
+  public static DatabaseProduct determineDatabaseProduct(String productName) {
     if (productName == null) {
       return OTHER;
     }
@@ -57,6 +62,17 @@ public enum DatabaseProduct {
       return POSTGRES;
     } else {
       return OTHER;
+    }
+  }
+
+  public static DatabaseProduct determineDatabaseProduct(DataSource connPool) {
+    try (Connection conn = connPool.getConnection()) {
+      String s = conn.getMetaData().getDatabaseProductName();
+      return determineDatabaseProduct(s);
+    } catch (SQLException e) {
+      // Legacy code, should we throw the IllegalStateException instead?
+      LOG.warn("Cannot determine database product; assuming OTHER", e);
+      return DatabaseProduct.OTHER;
     }
   }
 

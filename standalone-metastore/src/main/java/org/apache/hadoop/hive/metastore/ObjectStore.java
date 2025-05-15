@@ -428,16 +428,11 @@ public class ObjectStore implements RawStore, Configurable {
     pm = PersistenceManagerProvider.getPersistenceManager(isForCompactor);
     LOG.info("RawStore: {}, with PersistenceManager: {}" +
         " created in the thread with id: {}", this, pm, Thread.currentThread().getId());
-    try {
-      String productName = MetaStoreDirectSql.getProductName(pm);
-      sqlGenerator = new SQLGenerator(DatabaseProduct.determineDatabaseProduct(productName), conf);
-    } catch (SQLException e) {
-      LOG.error("error trying to figure out the database product", e);
-      throw new RuntimeException(e);
-    }
+
     isInitialized = pm != null;
     if (isInitialized) {
-      dbType = determineDatabaseProduct();
+      dbType = PersistenceManagerProvider.getDatabaseProduct();
+      sqlGenerator = new SQLGenerator(dbType, conf);
       expressionProxy = PartFilterExprUtil.createExpressionProxy(conf);
       if (MetastoreConf.getBoolVar(getConf(), ConfVars.TRY_DIRECT_SQL)) {
         String schema = PersistenceManagerProvider.getProperty("javax.jdo.mapping.Schema");
@@ -447,27 +442,6 @@ public class ObjectStore implements RawStore, Configurable {
     }
     if (propertyStore == null) {
       propertyStore = new CachingPropertyStore(new JdoPropertyStore(this), conf);
-    }
-  }
-
-  private DatabaseProduct determineDatabaseProduct() {
-    try {
-      return DatabaseProduct.determineDatabaseProduct(getProductName(pm));
-    } catch (SQLException e) {
-      LOG.warn("Cannot determine database product; assuming OTHER", e);
-      return DatabaseProduct.OTHER;
-    }
-  }
-
-  private static String getProductName(PersistenceManager pm) {
-    JDOConnection jdoConn = pm.getDataStoreConnection();
-    try {
-      return ((Connection)jdoConn.getNativeConnection()).getMetaData().getDatabaseProductName();
-    } catch (Throwable t) {
-      LOG.warn("Error retrieving product name", t);
-      return null;
-    } finally {
-      jdoConn.close(); // We must release the connection before we call other pm methods.
     }
   }
 
@@ -4225,7 +4199,6 @@ public class ObjectStore implements RawStore, Configurable {
       boolean isConfigEnabled = MetastoreConf.getBoolVar(getConf(), ConfVars.TRY_DIRECT_SQL)
           && (MetastoreConf.getBoolVar(getConf(), ConfVars.TRY_DIRECT_SQL_DDL) || !isInTxn);
       if (isConfigEnabled && directSql == null) {
-        dbType = determineDatabaseProduct();
         directSql = new MetaStoreDirectSql(pm, getConf(), "");
       }
 
