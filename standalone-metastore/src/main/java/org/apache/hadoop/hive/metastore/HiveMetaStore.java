@@ -74,7 +74,6 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 
 import java.util.concurrent.SynchronousQueue;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -116,14 +115,12 @@ import org.apache.hadoop.hive.metastore.properties.PropertyMap;
 import org.apache.hadoop.hive.metastore.properties.PropertyStore;
 import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
 import org.apache.hadoop.hive.metastore.security.MetastoreDelegationTokenManager;
-import org.apache.hadoop.hive.metastore.thrift.TCustomServerSocket;
 import org.apache.hadoop.hive.metastore.txn.entities.CompactionInfo;
 import org.apache.hadoop.hive.metastore.txn.CompactionMetricsDataConverter;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.metastore.utils.FilterUtils;
 import org.apache.hadoop.security.SecurityUtil;
-import org.apache.hadoop.hive.metastore.utils.CommonCliOptions;
 import org.apache.hadoop.hive.metastore.utils.FileUtils;
 import org.apache.hadoop.hive.metastore.utils.HdfsUtils;
 import org.apache.hadoop.hive.metastore.utils.JavaUtils;
@@ -148,7 +145,10 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TServerEventHandler;
 import org.apache.thrift.server.TServlet;
 import org.apache.thrift.server.TThreadPoolServer;
+import org.apache.thrift.transport.TServerSocket;
+import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
+import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.TTransportFactory;
 
 import org.eclipse.jetty.server.HttpChannel;
@@ -11400,70 +11400,14 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     return delegationTokenManager.renewDelegationToken(tokenStrForm);
   }
 
-  /**
-   * HiveMetaStore specific CLI
-   *
-   */
-  static public class HiveMetastoreCli extends CommonCliOptions {
-    private int port;
-
-    @SuppressWarnings("static-access")
-    HiveMetastoreCli(Configuration configuration) {
-      super("hivemetastore", true);
-      this.port = MetastoreConf.getIntVar(configuration, ConfVars.SERVER_PORT);
-
-      // -p port
-      OPTIONS.addOption(OptionBuilder
-          .hasArg()
-          .withArgName("port")
-          .withDescription("Hive Metastore port number, default:"
-              + this.port)
-          .create('p'));
-
-    }
-
-    @Override
-    public void parse(String[] args) {
-      super.parse(args);
-
-      // support the old syntax "hivemetastore [port]" but complain
-      args = commandLine.getArgs();
-      if (args.length > 0) {
-        // complain about the deprecated syntax -- but still run
-        System.err.println(
-            "This usage has been deprecated, consider using the new command "
-                + "line syntax (run with -h to see usage information)");
-
-        this.port = new Integer(args[0]);
-      }
-
-      // notice that command line options take precedence over the
-      // deprecated (old style) naked args...
-
-      if (commandLine.hasOption('p')) {
-        this.port = Integer.parseInt(commandLine.getOptionValue('p'));
-      } else {
-        // legacy handling
-        String metastorePort = System.getenv("METASTORE_PORT");
-        if (metastorePort != null) {
-          this.port = Integer.parseInt(metastorePort);
-        }
-      }
-    }
-
-    public int getPort() {
-      return this.port;
-    }
-  }
-
   /*
  Interface to encapsulate Http and binary thrift server for
  HiveMetastore
   */
   private interface ThriftServer {
-    public void start() throws Throwable;
-    public boolean isRunning();
-    public IHMSHandler getHandler();
+    void start() throws Throwable;
+    boolean isRunning();
+    IHMSHandler getHandler();
   }
 
   /**
@@ -11498,7 +11442,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     startupShutdownMessage(HiveMetaStore.class, args, LOG);
 
     try {
-      String msg = "Starting hive metastore on port " + cli.port;
+      String msg = "Starting hive metastore on port " + cli.getPort();
       HMSHandler.LOG.info(msg);
       if (cli.isVerbose()) {
         System.err.println(msg);
@@ -11796,7 +11740,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
     IHMSHandler handler = newRetryingHMSHandler(baseHandler, conf);
 
-    TCustomServerSocket serverSocket;
+    TServerSocket serverSocket;
 
     if (useSasl) {
       processor = saslServer.wrapProcessor(
@@ -11814,7 +11758,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     }
 
     if (!useSSL) {
-      serverSocket = SecurityUtils.getServerSocket(conf, msHost, port);
+      serverSocket = SecurityUtils.getServerSocket(msHost, port);
     } else {
       String keyStorePath = MetastoreConf.getVar(conf, ConfVars.SSL_KEYSTORE_PATH).trim();
       if (keyStorePath.isEmpty()) {
@@ -11833,15 +11777,25 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         sslVersionBlacklist.add(sslVersion);
       }
 
-      serverSocket = SecurityUtils.getServerSSLSocket(conf, msHost, port, keyStorePath,
+      serverSocket = SecurityUtils.getServerSSLSocket(msHost, port, keyStorePath,
           keyStorePassword, keyStoreType, keyStoreAlgorithm, sslVersionBlacklist);
     }
 
-    if (tcpKeepAlive) {
-      serverSocket = new TServerSocketKeepAlive(serverSocket);
-    }
-
-    TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverSocket)
+    TThreadPoolServer.Args args =
+        new TThreadPoolServer.Args(new TServerSocket(serverSocket.getServerSocket()) {
+          @Override
+          public TSocket accept() throws TTransportException {
+            TSocket ts = super.accept();
+            // get the limit from the configuration for every new connection
+            int maxThriftMessageSize = (int) MetastoreConf.getSizeVar(
+                conf, MetastoreConf.ConfVars.THRIFT_METASTORE_CLIENT_MAX_MESSAGE_SIZE);
+            HMSHandler.LOG.debug("Thrift maxMessageSize = {}", maxThriftMessageSize);
+            if (maxThriftMessageSize > 0) {
+              ts.getConfiguration().setMaxMessageSize(maxThriftMessageSize);
+            }
+            return ts;
+          }
+        })
         .processor(processor)
         .transportFactory(transFactory)
         .protocolFactory(protocolFactory)

@@ -20,28 +20,19 @@ package org.apache.hadoop.hive.metastore;
 
 import java.net.SocketException;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.metastore.thrift.TCustomServerSocket;
-import org.apache.hadoop.hive.metastore.thrift.TCustomSocket;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 
 /**
  * TServerSocketKeepAlive - like TServerSocket, but will enable keepalive for
  * accepted sockets.
- *
+ * @TODO Remove it if possible
+ * this class is referenced by Impala/fe/src/main/java/org/apache/impala/catalog/metastore/CatalogMetastoreServer
  */
-public class TServerSocketKeepAlive extends TCustomServerSocket {
-  public TServerSocketKeepAlive(TCustomServerSocket serverSocket) throws TTransportException {
-    super(serverSocket.getServerSocket(), serverSocket.getTimeout(), serverSocket.getBufferSize());
-  }
-
+public class TServerSocketKeepAlive extends TServerSocket {
   public TServerSocketKeepAlive(TServerSocket serverSocket) throws TTransportException {
-    super(serverSocket.getServerSocket(), 0,
-        ((Long) MetastoreConf.ConfVars.THRIFT_SOCKET_BUFFER_SIZE.getDefaultVal()).intValue());
+    super(serverSocket.getServerSocket());
   }
 
   @Override

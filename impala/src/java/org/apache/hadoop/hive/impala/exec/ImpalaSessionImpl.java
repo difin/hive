@@ -106,7 +106,6 @@ public class ImpalaSessionImpl implements EngineSession {
       this.address = conf.getVar(HiveConf.ConfVars.HIVE_IMPALA_ADDRESS);
       this.connectionTimeout = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_CONNECT_TIMEOUT);
       this.impalaMaxTimerError = conf.getIntVar(HiveConf.ConfVars.HIVE_IMPALA_MAX_TIMER_ERROR);
-      this.socketBufferSize = conf.getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_SOCKET_BUFFER_SIZE);
       this.useHttp = conf.getBoolVar(HiveConf.ConfVars.HIVE_IMPALA_USE_HTTP);
       this.httpPath = conf.getVar(HiveConf.ConfVars.HIVE_IMPALA_HTTP_PATH);
       if (this.httpPath == null) {
@@ -354,7 +353,7 @@ public class ImpalaSessionImpl implements EngineSession {
         if (useHttp) {
           return new ImpalaHttpConnection(address, httpPath, connectionTimeout);
         } else {
-          return new ImpalaBinaryConnection(socketBufferSize, address, connectionTimeout);
+          return new ImpalaBinaryConnection(address, connectionTimeout);
         }
       } catch (TTransportException ex) {
         throw new HiveException(ex);

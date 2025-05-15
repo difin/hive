@@ -26,11 +26,6 @@ import java.security.cert.CertificateException;
 import javax.net.ssl.SSLContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
-import org.apache.hadoop.hive.metastore.thrift.TCustomSocket;
-import org.apache.hadoop.hive.metastore.thrift.TCustomServerSocket;
-import org.apache.hadoop.hive.metastore.thrift.TCustomSSLTransportFactory;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.security.DBTokenStore;
 import org.apache.hadoop.hive.metastore.security.DelegationTokenIdentifier;
@@ -50,6 +45,7 @@ import javax.security.auth.login.AppConfigurationEntry;
 import org.apache.thrift.transport.THttpClient;
 import org.apache.thrift.transport.TSSLTransportFactory;
 import org.apache.thrift.transport.TServerSocket;
+import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.http.config.Registry;
@@ -266,7 +262,7 @@ public class SecurityUtils {
     }
   }
 
-  public static TCustomServerSocket getServerSocket(Configuration conf, String hiveHost, int portNum) throws TTransportException {
+  public static TServerSocket getServerSocket(String hiveHost, int portNum) throws TTransportException {
     InetSocketAddress serverAddress;
     if (hiveHost == null || hiveHost.isEmpty()) {
       // Wildcard bind
@@ -274,15 +270,14 @@ public class SecurityUtils {
     } else {
       serverAddress = new InetSocketAddress(hiveHost, portNum);
     }
-    int bufferSize = MetastoreConf.getIntVar(conf, ConfVars.THRIFT_SOCKET_BUFFER_SIZE);
-    return new TCustomServerSocket(serverAddress, bufferSize);
+    return new TServerSocket(serverAddress);
   }
 
-  public static TCustomServerSocket getServerSSLSocket(Configuration conf, String hiveHost, int portNum, String keyStorePath,
+  public static TServerSocket getServerSSLSocket(String hiveHost, int portNum, String keyStorePath,
       String keyStorePassWord, String keyStoreType, String keyStoreAlgorithm, List<String> sslVersionBlacklist)
       throws TTransportException, UnknownHostException {
-    TCustomSSLTransportFactory.HiveTSSLTransportParameters params =
-        new TCustomSSLTransportFactory.HiveTSSLTransportParameters();
+    TSSLTransportFactory.TSSLTransportParameters params =
+        new TSSLTransportFactory.TSSLTransportParameters();
     String kStoreType = keyStoreType.isEmpty()? KeyStore.getDefaultType() : keyStoreType;
     String kStoreAlgorithm = keyStoreAlgorithm.isEmpty()?
             KeyManagerFactory.getDefaultAlgorithm() : keyStoreAlgorithm;
@@ -294,10 +289,8 @@ public class SecurityUtils {
     } else {
       serverAddress = new InetSocketAddress(hiveHost, portNum);
     }
-    int bufferSize = MetastoreConf.getIntVar(conf, ConfVars.THRIFT_SOCKET_BUFFER_SIZE);
-    TCustomServerSocket thriftServerSocket =
-        TCustomSSLTransportFactory.getServerSocket(portNum, 0, serverAddress.getAddress(), params,
-        bufferSize);
+    TServerSocket thriftServerSocket =
+        TSSLTransportFactory.getServerSocket(portNum, 0, serverAddress.getAddress(), params);
     if (thriftServerSocket.getServerSocket() instanceof SSLServerSocket) {
       List<String> sslVersionBlacklistLocal = new ArrayList<>();
       for (String sslVersion : sslVersionBlacklist) {
@@ -319,11 +312,11 @@ public class SecurityUtils {
     return thriftServerSocket;
   }
 
-  public static TTransport getSSLSocket(Configuration conf, String host, int port, int loginTimeout,
+  public static TTransport getSSLSocket(String host, int port, int loginTimeout,
       String trustStorePath, String trustStorePassWord, String trustStoreType,
       String trustStoreAlgorithm) throws TTransportException {
-    TCustomSSLTransportFactory.HiveTSSLTransportParameters params =
-        new TCustomSSLTransportFactory.HiveTSSLTransportParameters();    
+    TSSLTransportFactory.TSSLTransportParameters params =
+        new TSSLTransportFactory.TSSLTransportParameters();
     String tStoreType = trustStoreType.isEmpty()? KeyStore.getDefaultType() : trustStoreType;
     String tStoreAlgorithm = trustStoreAlgorithm.isEmpty()?
         TrustManagerFactory.getDefaultAlgorithm() : trustStoreAlgorithm;
@@ -332,21 +325,18 @@ public class SecurityUtils {
     params.requireClientAuth(true);
     // The underlying SSLSocket object is bound to host:port with the given SO_TIMEOUT and
     // SSLContext created with the given params
-    int bufferSize = MetastoreConf.getIntVar(conf, ConfVars.THRIFT_SOCKET_BUFFER_SIZE);
-    TCustomSocket tSSLSocket = TCustomSSLTransportFactory.getClientSocket(host,
-        port, loginTimeout, params, bufferSize);
-    return getSSLSocketWithHttps(conf, tSSLSocket);
+    TSocket tSSLSocket = TSSLTransportFactory.getClientSocket(host, port, loginTimeout, params);
+    return getSSLSocketWithHttps(tSSLSocket);
   }
 
   // Using endpoint identification algorithm as HTTPS enables us to do
   // CNAMEs/subjectAltName verification
-  private static TTransport getSSLSocketWithHttps(Configuration conf, TCustomSocket tSSLSocket) throws TTransportException {
+  private static TSocket getSSLSocketWithHttps(TSocket tSSLSocket) throws TTransportException {
     SSLSocket sslSocket = (SSLSocket) tSSLSocket.getSocket();
     SSLParameters sslParams = sslSocket.getSSLParameters();
     sslParams.setEndpointIdentificationAlgorithm("HTTPS");
     sslSocket.setSSLParameters(sslParams);
-    int bufferSize = MetastoreConf.getIntVar(conf, ConfVars.THRIFT_SOCKET_BUFFER_SIZE);
-    return new TCustomSocket(sslSocket, bufferSize);
+    return new TSocket(sslSocket);
   }
 
   public static THttpClient getThriftHttpsClient(String httpsUrl, String trustStorePath,

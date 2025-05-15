@@ -18,12 +18,11 @@
 package org.apache.hadoop.hive.impala.exec;
 
 import com.google.common.base.Preconditions;
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.thrift.TCustomSocket;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.impala.thrift.ImpalaHiveServer2Service;
+import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportException;
 
 import java.net.InetSocketAddress;
@@ -34,16 +33,15 @@ import java.net.InetSocketAddress;
 class ImpalaBinaryConnection implements ImpalaConnection {
   static private final TBinaryProtocol.Factory protocolFactory = new TBinaryProtocol.Factory();
   private final InetSocketAddress socketAddress;
-  private final TCustomSocket socket;
+  private final TSocket socket;
 
   /**
-   * @param socketBufferSize Size of buffer used by thrift socket
    * @param address Address in the form of "host:port" to a Impala coordinator. Host may be a hostname or IP.
    * @param timeout Socket timeout in milliseconds
    * @throws HiveException
-   * @throws TTRansportException
+   * @throws TTransportException
    */
-  ImpalaBinaryConnection(int socketBufferSize, String address, int timeout) throws HiveException, TTransportException {
+  ImpalaBinaryConnection(String address, int timeout) throws HiveException, TTransportException {
     String[] addr = address.split(":");
 
     if (addr.length != 2) {
@@ -58,8 +56,7 @@ class ImpalaBinaryConnection implements ImpalaConnection {
           "failed to parse port");
     }
     this.socketAddress = InetSocketAddress.createUnresolved(addr[0], port);
-    this.socket = new TCustomSocket(socketAddress.getHostString(),
-        socketAddress.getPort(), /*timeout*/ 0, /*timeout*/ 0, socketBufferSize);
+    this.socket = new TSocket(socketAddress.getHostString(), socketAddress.getPort());
     this.socket.setSocketTimeout(timeout);
   }
 
