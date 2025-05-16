@@ -55,7 +55,6 @@ import org.apache.hadoop.hive.llap.registry.LlapServiceInstanceSet;
 import org.apache.hadoop.hive.llap.registry.impl.LlapRegistryService;
 import org.apache.hadoop.hive.llap.security.LlapTokenIdentifier;
 import org.apache.hadoop.hive.llap.tez.Converters;
-import org.apache.hadoop.hive.ql.io.arrow.ArrowWrapperWritable;
 import org.apache.hadoop.hive.registry.ServiceInstanceSet;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.DataInputBuffer;
@@ -67,7 +66,6 @@ import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.Reporter;
-import org.apache.arrow.memory.BufferAllocator;
 import org.apache.hadoop.mapreduce.MRJobConfig;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.hadoop.security.Credentials;
@@ -107,9 +105,6 @@ public class LlapBaseInputFormat<V extends WritableComparable<?>>
   private String user; // "hive",
   private String pwd;  // ""
   private String query;
-  private boolean useArrow;
-  private long arrowAllocatorLimit;
-  private BufferAllocator allocator;
   private final Random rand = new Random();
 
   public static final String URL_KEY = "llap.if.hs2.connection";
@@ -124,29 +119,6 @@ public class LlapBaseInputFormat<V extends WritableComparable<?>>
 
   public static final String SPLIT_QUERY = "select get_llap_splits(\"%s\",%d)";
   public static final LlapServiceInstance[] serviceInstanceArray = new LlapServiceInstance[0];
-
-  public LlapBaseInputFormat(String url, String user, String pwd, String query) {
-    this.url = url;
-    this.user = user;
-    this.pwd = pwd;
-    this.query = query;
-  }
-
-  //Exposed only for testing, clients should use LlapBaseInputFormat(boolean, BufferAllocator instead)
-  public LlapBaseInputFormat(boolean useArrow, long arrowAllocatorLimit) {
-    this.useArrow = useArrow;
-    this.arrowAllocatorLimit = arrowAllocatorLimit;
-  }
-
-  public LlapBaseInputFormat(boolean useArrow, BufferAllocator allocator) {
-    this.useArrow = useArrow;
-    this.allocator = allocator;
-  }
-
-  public LlapBaseInputFormat() {
-    this.useArrow = false;
-  }
-
 
   @SuppressWarnings("unchecked")
   @Override
@@ -221,25 +193,8 @@ public class LlapBaseInputFormat<V extends WritableComparable<?>>
     LOG.info("Registered id: " + fragmentId);
 
     @SuppressWarnings("rawtypes")
-    LlapBaseRecordReader recordReader;
-    if(useArrow) {
-      if(allocator != null) {
-        //Client provided their own allocator
-        recordReader = new LlapArrowBatchRecordReader(
-            socket.getInputStream(), llapSplit.getSchema(),
-            ArrowWrapperWritable.class, job, llapClient, socket,
-            allocator);
-      } else {
-        //Client did not provide their own allocator, use constructor for global allocator
-        recordReader = new LlapArrowBatchRecordReader(
-            socket.getInputStream(), llapSplit.getSchema(),
-            ArrowWrapperWritable.class, job, llapClient, socket,
-            arrowAllocatorLimit);
-      }
-    } else {
-      recordReader = new LlapBaseRecordReader(socket.getInputStream(),
-          llapSplit.getSchema(), BytesWritable.class, job, llapClient, (java.io.Closeable)socket);
-    }
+    LlapBaseRecordReader recordReader = new LlapBaseRecordReader(socket.getInputStream(),
+        llapSplit.getSchema(), BytesWritable.class, job, llapClient, socket);
     umbilicalResponder.setRecordReader(recordReader);
     return recordReader;
   }

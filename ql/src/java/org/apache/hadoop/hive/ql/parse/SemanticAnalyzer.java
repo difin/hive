@@ -188,7 +188,6 @@ import org.apache.hadoop.hive.ql.io.AcidOutputFormat;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.io.AcidUtils.Operation;
 import org.apache.hadoop.hive.ql.io.KuduStorageFormatDescriptor;
-import org.apache.hadoop.hive.ql.io.arrow.ArrowColumnarBatchSerDe;
 import org.apache.hadoop.hive.ql.io.CombineHiveInputFormat;
 import org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat;
 import org.apache.hadoop.hive.ql.io.HiveOutputFormat;
@@ -8235,12 +8234,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
               }
               Class<? extends Deserializer> serdeClass = LazySimpleSerDe.class;
               if (fileFormat.equals(PlanUtils.LLAP_OUTPUT_FORMAT_KEY)) {
-                boolean useArrow = HiveConf.getBoolVar(conf, HiveConf.ConfVars.LLAP_OUTPUT_FORMAT_ARROW);
-                if (useArrow) {
-                  serdeClass = ArrowColumnarBatchSerDe.class;
-                } else {
-                  serdeClass = LazyBinarySerDe2.class;
-                }
+                serdeClass = LazyBinarySerDe2.class;
               }
               tableDescriptor =
                   PlanUtils.getDefaultQueryOutputTableDesc(cols, colTypes, fileFormat,
@@ -8608,8 +8602,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
   private boolean hasSetBatchSerializer(String serdeClassName) {
     return (serdeClassName.equalsIgnoreCase(ThriftJDBCBinarySerDe.class.getName()) &&
-      HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_SERIALIZE_IN_TASKS)) ||
-    serdeClassName.equalsIgnoreCase(ArrowColumnarBatchSerDe.class.getName());
+      HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_SERVER2_THRIFT_RESULTSET_SERIALIZE_IN_TASKS));
   }
 
   private ColsAndTypes deriveFileSinkColTypes(RowResolver inputRR, List<String> sortColumnNames, List<String> distributeColumnNames,

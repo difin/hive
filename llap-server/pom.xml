@@ -259,7 +259,6 @@
       <artifactId>disruptor</artifactId>
       <version>${disruptor.version}</version>
     </dependency>
-
     <!-- test intra-project -->
     <dependency>
       <groupId>org.apache.hive</groupId>
