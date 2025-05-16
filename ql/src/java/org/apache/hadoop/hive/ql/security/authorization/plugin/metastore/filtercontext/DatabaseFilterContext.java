@@ -19,6 +19,7 @@
 
 package org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.filtercontext;
 
+import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveOperationType;
@@ -30,18 +31,49 @@ import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.HiveMet
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DatabaseFilterContext extends  HiveMetaStoreAuthorizableEvent {
 
     private static final Log LOG = LogFactory.getLog(DatabaseFilterContext.class);
 
-    List<String> databases = null;
+    List<String> databaseNames = null;
+    Map<String, Database> databaseMap = null;
 
-    public DatabaseFilterContext(List<String> databases) {
+    public DatabaseFilterContext(List<String> dbNames) {
         super(null);
-        this.databases = databases;
+        this.databaseNames = dbNames;
         getAuthzContext();
+    }
+
+    private DatabaseFilterContext(List<String> dbNames, Map<String, Database> dbMap) {
+        super(null);
+        this.databaseNames = dbNames != null ? dbNames : new ArrayList<>();
+        this.databaseMap = dbMap != null ? dbMap : new HashMap<>();
+        getAuthzContext();
+    }
+
+    public static DatabaseFilterContext createFromNames(List<String> dbNames) {
+        return new DatabaseFilterContext(dbNames, null);
+    }
+
+    public static DatabaseFilterContext createFromDatabases(List<Database> databases) {
+        List<String> dbNames = new ArrayList<>();
+        Map<String, Database> dbMap = new HashMap<>();
+
+        if (databases != null) {
+            for (Database db : databases) {
+                if (db != null) {
+                    String dbName = db.getName();
+                    dbNames.add(dbName);
+                    dbMap.put(dbName, db);
+                }
+            }
+        }
+
+        return new DatabaseFilterContext(dbNames, dbMap);
     }
 
     @Override
@@ -51,28 +83,31 @@ public class DatabaseFilterContext extends  HiveMetaStoreAuthorizableEvent {
     }
 
     private List<HivePrivilegeObject> getInputHObjs() {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("==> DatabaseFilterContext.getOutputHObjs()");
+        LOG.debug("==> DatabaseFilterContext.getInputHObjs()");
+
+        List<HivePrivilegeObject> ret = new ArrayList<>();
+        HivePrivilegeObjectType type = HivePrivilegeObjectType.DATABASE;
+        HivePrivObjectActionType objectActionType = HivePrivObjectActionType.OTHER;
+        for (String dbName : databaseNames) {
+            Database db = (databaseMap != null) ? databaseMap.get(dbName) : null;
+            if (db != null) {
+                ret.add(getHivePrivilegeObject(db));
+            } else {
+                HivePrivilegeObject hivePrivilegeObject = new HivePrivilegeObject(
+                    type, dbName, null, null, null,
+                    objectActionType, null, null);
+                ret.add(hivePrivilegeObject);
+            }
         }
 
-        List<HivePrivilegeObject> ret   = new ArrayList<>();
-        for(String database: databases) {
-            HivePrivilegeObjectType  type                = HivePrivilegeObjectType.DATABASE;
-            HivePrivObjectActionType objectActionType    = HivePrivObjectActionType.OTHER;
-            HivePrivilegeObject      hivePrivilegeObject = new HivePrivilegeObject(type, database, null, null, null, objectActionType, null, null);
-            ret.add(hivePrivilegeObject);
-        }
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("<== DatabaseFilterContext.getOutputHObjs(): ret=" + ret);
-        }
+        LOG.debug("<== DatabaseFilterContext.getInputHObjs(): ret=" + ret);
 
         return ret;
     }
 
     private List<HivePrivilegeObject> getOutputHObjs() { return Collections.emptyList(); }
 
-    public List<String> getDatabases() {
-        return databases;
+    public List<String> getDatabaseNames() {
+        return databaseNames;
     }
 }

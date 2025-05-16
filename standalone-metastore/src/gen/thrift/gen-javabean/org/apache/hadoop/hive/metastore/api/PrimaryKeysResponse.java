@@ -329,14 +329,14 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // PRIMARY_KEYS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list434 = iprot.readListBegin();
-                struct.primaryKeys = new java.util.ArrayList<SQLPrimaryKey>(_list434.size);
-                @org.apache.thrift.annotation.Nullable SQLPrimaryKey _elem435;
-                for (int _i436 = 0; _i436 < _list434.size; ++_i436)
+                org.apache.thrift.protocol.TList _list442 = iprot.readListBegin();
+                struct.primaryKeys = new java.util.ArrayList<SQLPrimaryKey>(_list442.size);
+                @org.apache.thrift.annotation.Nullable SQLPrimaryKey _elem443;
+                for (int _i444 = 0; _i444 < _list442.size; ++_i444)
                 {
-                  _elem435 = new SQLPrimaryKey();
-                  _elem435.read(iprot);
-                  struct.primaryKeys.add(_elem435);
+                  _elem443 = new SQLPrimaryKey();
+                  _elem443.read(iprot);
+                  struct.primaryKeys.add(_elem443);
                 }
                 iprot.readListEnd();
               }
@@ -362,9 +362,9 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(PRIMARY_KEYS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.primaryKeys.size()));
-          for (SQLPrimaryKey _iter437 : struct.primaryKeys)
+          for (SQLPrimaryKey _iter445 : struct.primaryKeys)
           {
-            _iter437.write(oprot);
+            _iter445.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -389,9 +389,9 @@ package org.apache.hadoop.hive.metastore.api;
       org.apache.thrift.protocol.TTupleProtocol oprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       {
         oprot.writeI32(struct.primaryKeys.size());
-        for (SQLPrimaryKey _iter438 : struct.primaryKeys)
+        for (SQLPrimaryKey _iter446 : struct.primaryKeys)
         {
-          _iter438.write(oprot);
+          _iter446.write(oprot);
         }
       }
     }
@@ -400,14 +400,14 @@ package org.apache.hadoop.hive.metastore.api;
     public void read(org.apache.thrift.protocol.TProtocol prot, PrimaryKeysResponse struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list439 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-        struct.primaryKeys = new java.util.ArrayList<SQLPrimaryKey>(_list439.size);
-        @org.apache.thrift.annotation.Nullable SQLPrimaryKey _elem440;
-        for (int _i441 = 0; _i441 < _list439.size; ++_i441)
+        org.apache.thrift.protocol.TList _list447 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+        struct.primaryKeys = new java.util.ArrayList<SQLPrimaryKey>(_list447.size);
+        @org.apache.thrift.annotation.Nullable SQLPrimaryKey _elem448;
+        for (int _i449 = 0; _i449 < _list447.size; ++_i449)
         {
-          _elem440 = new SQLPrimaryKey();
-          _elem440.read(iprot);
-          struct.primaryKeys.add(_elem440);
+          _elem448 = new SQLPrimaryKey();
+          _elem448.read(iprot);
+          struct.primaryKeys.add(_elem448);
         }
       }
       struct.setPrimaryKeysIsSet(true);

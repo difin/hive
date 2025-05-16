@@ -80,13 +80,13 @@ class AbortTxnsRequest
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->txn_ids = array();
-                        $_size661 = 0;
-                        $_etype664 = 0;
-                        $xfer += $input->readListBegin($_etype664, $_size661);
-                        for ($_i665 = 0; $_i665 < $_size661; ++$_i665) {
-                            $elem666 = null;
-                            $xfer += $input->readI64($elem666);
-                            $this->txn_ids []= $elem666;
+                        $_size668 = 0;
+                        $_etype671 = 0;
+                        $xfer += $input->readListBegin($_etype671, $_size668);
+                        for ($_i672 = 0; $_i672 < $_size668; ++$_i672) {
+                            $elem673 = null;
+                            $xfer += $input->readI64($elem673);
+                            $this->txn_ids []= $elem673;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -120,8 +120,8 @@ class AbortTxnsRequest
             }
             $xfer += $output->writeFieldBegin('txn_ids', TType::LST, 1);
             $output->writeListBegin(TType::I64, count($this->txn_ids));
-            foreach ($this->txn_ids as $iter667) {
-                $xfer += $output->writeI64($iter667);
+            foreach ($this->txn_ids as $iter674) {
+                $xfer += $output->writeI64($iter674);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

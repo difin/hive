@@ -1299,6 +1299,11 @@ public class HiveMetaStoreClientPreCatalog implements IMetaStoreClient, AutoClos
     return null;
   }
 
+  @Override
+  public GetDatabaseObjectsResponse get_databases_req(GetDatabaseObjectsRequest request) throws TException {
+    throw new UnsupportedOperationException();
+  }
+
   /** {@inheritDoc} */
   @Override
   public List<String> getAllDataConnectorNames() throws MetaException {

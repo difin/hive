@@ -868,13 +868,13 @@ package org.apache.hadoop.hive.metastore.api;
           case 4: // TABLES_USED
             if (schemeField.type == org.apache.thrift.protocol.TType.SET) {
               {
-                org.apache.thrift.protocol.TSet _set264 = iprot.readSetBegin();
-                struct.tablesUsed = new java.util.HashSet<java.lang.String>(2*_set264.size);
-                @org.apache.thrift.annotation.Nullable java.lang.String _elem265;
-                for (int _i266 = 0; _i266 < _set264.size; ++_i266)
+                org.apache.thrift.protocol.TSet _set272 = iprot.readSetBegin();
+                struct.tablesUsed = new java.util.HashSet<java.lang.String>(2*_set272.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem273;
+                for (int _i274 = 0; _i274 < _set272.size; ++_i274)
                 {
-                  _elem265 = iprot.readString();
-                  struct.tablesUsed.add(_elem265);
+                  _elem273 = iprot.readString();
+                  struct.tablesUsed.add(_elem273);
                 }
                 iprot.readSetEnd();
               }
@@ -902,14 +902,14 @@ package org.apache.hadoop.hive.metastore.api;
           case 7: // SOURCE_TABLES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list267 = iprot.readListBegin();
-                struct.sourceTables = new java.util.ArrayList<SourceTable>(_list267.size);
-                @org.apache.thrift.annotation.Nullable SourceTable _elem268;
-                for (int _i269 = 0; _i269 < _list267.size; ++_i269)
+                org.apache.thrift.protocol.TList _list275 = iprot.readListBegin();
+                struct.sourceTables = new java.util.ArrayList<SourceTable>(_list275.size);
+                @org.apache.thrift.annotation.Nullable SourceTable _elem276;
+                for (int _i277 = 0; _i277 < _list275.size; ++_i277)
                 {
-                  _elem268 = new SourceTable();
-                  _elem268.read(iprot);
-                  struct.sourceTables.add(_elem268);
+                  _elem276 = new SourceTable();
+                  _elem276.read(iprot);
+                  struct.sourceTables.add(_elem276);
                 }
                 iprot.readListEnd();
               }
@@ -950,9 +950,9 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(TABLES_USED_FIELD_DESC);
         {
           oprot.writeSetBegin(new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.STRING, struct.tablesUsed.size()));
-          for (java.lang.String _iter270 : struct.tablesUsed)
+          for (java.lang.String _iter278 : struct.tablesUsed)
           {
-            oprot.writeString(_iter270);
+            oprot.writeString(_iter278);
           }
           oprot.writeSetEnd();
         }
@@ -975,9 +975,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(SOURCE_TABLES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.sourceTables.size()));
-            for (SourceTable _iter271 : struct.sourceTables)
+            for (SourceTable _iter279 : struct.sourceTables)
             {
-              _iter271.write(oprot);
+              _iter279.write(oprot);
             }
             oprot.writeListEnd();
           }
@@ -1006,9 +1006,9 @@ package org.apache.hadoop.hive.metastore.api;
       oprot.writeString(struct.tblName);
       {
         oprot.writeI32(struct.tablesUsed.size());
-        for (java.lang.String _iter272 : struct.tablesUsed)
+        for (java.lang.String _iter280 : struct.tablesUsed)
         {
-          oprot.writeString(_iter272);
+          oprot.writeString(_iter280);
         }
       }
       java.util.BitSet optionals = new java.util.BitSet();
@@ -1031,9 +1031,9 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetSourceTables()) {
         {
           oprot.writeI32(struct.sourceTables.size());
-          for (SourceTable _iter273 : struct.sourceTables)
+          for (SourceTable _iter281 : struct.sourceTables)
           {
-            _iter273.write(oprot);
+            _iter281.write(oprot);
           }
         }
       }
@@ -1049,13 +1049,13 @@ package org.apache.hadoop.hive.metastore.api;
       struct.tblName = iprot.readString();
       struct.setTblNameIsSet(true);
       {
-        org.apache.thrift.protocol.TSet _set274 = iprot.readSetBegin(org.apache.thrift.protocol.TType.STRING);
-        struct.tablesUsed = new java.util.HashSet<java.lang.String>(2*_set274.size);
-        @org.apache.thrift.annotation.Nullable java.lang.String _elem275;
-        for (int _i276 = 0; _i276 < _set274.size; ++_i276)
+        org.apache.thrift.protocol.TSet _set282 = iprot.readSetBegin(org.apache.thrift.protocol.TType.STRING);
+        struct.tablesUsed = new java.util.HashSet<java.lang.String>(2*_set282.size);
+        @org.apache.thrift.annotation.Nullable java.lang.String _elem283;
+        for (int _i284 = 0; _i284 < _set282.size; ++_i284)
         {
-          _elem275 = iprot.readString();
-          struct.tablesUsed.add(_elem275);
+          _elem283 = iprot.readString();
+          struct.tablesUsed.add(_elem283);
         }
       }
       struct.setTablesUsedIsSet(true);
@@ -1070,14 +1070,14 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(2)) {
         {
-          org.apache.thrift.protocol.TList _list277 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-          struct.sourceTables = new java.util.ArrayList<SourceTable>(_list277.size);
-          @org.apache.thrift.annotation.Nullable SourceTable _elem278;
-          for (int _i279 = 0; _i279 < _list277.size; ++_i279)
+          org.apache.thrift.protocol.TList _list285 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.sourceTables = new java.util.ArrayList<SourceTable>(_list285.size);
+          @org.apache.thrift.annotation.Nullable SourceTable _elem286;
+          for (int _i287 = 0; _i287 < _list285.size; ++_i287)
           {
-            _elem278 = new SourceTable();
-            _elem278.read(iprot);
-            struct.sourceTables.add(_elem278);
+            _elem286 = new SourceTable();
+            _elem286.read(iprot);
+            struct.sourceTables.add(_elem286);
           }
         }
         struct.setSourceTablesIsSet(true);

@@ -3618,6 +3618,8 @@ public interface IMetaStoreClient {
    */
   long getLatestTxnIdInConflict(long txnId) throws TException;
 
+  GetDatabaseObjectsResponse get_databases_req(GetDatabaseObjectsRequest request) throws TException;
+
   /**
    * A filter provided by the client that determines if a given notification event should be
    * returned.

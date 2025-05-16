@@ -166,13 +166,13 @@ class CreationMetadata
                 case 4:
                     if ($ftype == TType::SET) {
                         $this->tablesUsed = array();
-                        $_size233 = 0;
-                        $_etype236 = 0;
-                        $xfer += $input->readSetBegin($_etype236, $_size233);
-                        for ($_i237 = 0; $_i237 < $_size233; ++$_i237) {
-                            $elem238 = null;
-                            $xfer += $input->readString($elem238);
-                            $this->tablesUsed[$elem238] = true;
+                        $_size240 = 0;
+                        $_etype243 = 0;
+                        $xfer += $input->readSetBegin($_etype243, $_size240);
+                        for ($_i244 = 0; $_i244 < $_size240; ++$_i244) {
+                            $elem245 = null;
+                            $xfer += $input->readString($elem245);
+                            $this->tablesUsed[$elem245] = true;
                         }
                         $xfer += $input->readSetEnd();
                     } else {
@@ -196,14 +196,14 @@ class CreationMetadata
                 case 7:
                     if ($ftype == TType::LST) {
                         $this->sourceTables = array();
-                        $_size239 = 0;
-                        $_etype242 = 0;
-                        $xfer += $input->readListBegin($_etype242, $_size239);
-                        for ($_i243 = 0; $_i243 < $_size239; ++$_i243) {
-                            $elem244 = null;
-                            $elem244 = new \metastore\SourceTable();
-                            $xfer += $elem244->read($input);
-                            $this->sourceTables []= $elem244;
+                        $_size246 = 0;
+                        $_etype249 = 0;
+                        $xfer += $input->readListBegin($_etype249, $_size246);
+                        for ($_i250 = 0; $_i250 < $_size246; ++$_i250) {
+                            $elem251 = null;
+                            $elem251 = new \metastore\SourceTable();
+                            $xfer += $elem251->read($input);
+                            $this->sourceTables []= $elem251;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -245,8 +245,8 @@ class CreationMetadata
             }
             $xfer += $output->writeFieldBegin('tablesUsed', TType::SET, 4);
             $output->writeSetBegin(TType::STRING, count($this->tablesUsed));
-            foreach ($this->tablesUsed as $iter245 => $iter246) {
-                $xfer += $output->writeString($iter245);
+            foreach ($this->tablesUsed as $iter252 => $iter253) {
+                $xfer += $output->writeString($iter252);
             }
             $output->writeSetEnd();
             $xfer += $output->writeFieldEnd();
@@ -267,8 +267,8 @@ class CreationMetadata
             }
             $xfer += $output->writeFieldBegin('sourceTables', TType::LST, 7);
             $output->writeListBegin(TType::STRUCT, count($this->sourceTables));
-            foreach ($this->sourceTables as $iter247) {
-                $xfer += $iter247->write($output);
+            foreach ($this->sourceTables as $iter254) {
+                $xfer += $iter254->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

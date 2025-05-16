@@ -594,13 +594,13 @@ package org.apache.hadoop.hive.metastore.api;
           case 4: // MAP_SELECTION
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list1482 = iprot.readListBegin();
-                struct.mapSelection = new java.util.ArrayList<java.lang.String>(_list1482.size);
-                @org.apache.thrift.annotation.Nullable java.lang.String _elem1483;
-                for (int _i1484 = 0; _i1484 < _list1482.size; ++_i1484)
+                org.apache.thrift.protocol.TList _list1490 = iprot.readListBegin();
+                struct.mapSelection = new java.util.ArrayList<java.lang.String>(_list1490.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem1491;
+                for (int _i1492 = 0; _i1492 < _list1490.size; ++_i1492)
                 {
-                  _elem1483 = iprot.readString();
-                  struct.mapSelection.add(_elem1483);
+                  _elem1491 = iprot.readString();
+                  struct.mapSelection.add(_elem1491);
                 }
                 iprot.readListEnd();
               }
@@ -644,9 +644,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(MAP_SELECTION_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.mapSelection.size()));
-            for (java.lang.String _iter1485 : struct.mapSelection)
+            for (java.lang.String _iter1493 : struct.mapSelection)
             {
-              oprot.writeString(_iter1485);
+              oprot.writeString(_iter1493);
             }
             oprot.writeListEnd();
           }
@@ -691,9 +691,9 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetMapSelection()) {
         {
           oprot.writeI32(struct.mapSelection.size());
-          for (java.lang.String _iter1486 : struct.mapSelection)
+          for (java.lang.String _iter1494 : struct.mapSelection)
           {
-            oprot.writeString(_iter1486);
+            oprot.writeString(_iter1494);
           }
         }
       }
@@ -715,13 +715,13 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(2)) {
         {
-          org.apache.thrift.protocol.TList _list1487 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
-          struct.mapSelection = new java.util.ArrayList<java.lang.String>(_list1487.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _elem1488;
-          for (int _i1489 = 0; _i1489 < _list1487.size; ++_i1489)
+          org.apache.thrift.protocol.TList _list1495 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.mapSelection = new java.util.ArrayList<java.lang.String>(_list1495.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem1496;
+          for (int _i1497 = 0; _i1497 < _list1495.size; ++_i1497)
           {
-            _elem1488 = iprot.readString();
-            struct.mapSelection.add(_elem1488);
+            _elem1496 = iprot.readString();
+            struct.mapSelection.add(_elem1496);
           }
         }
         struct.setMapSelectionIsSet(true);

@@ -69,14 +69,14 @@ class GetValidWriteIdsResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->tblValidWriteIds = array();
-                        $_size703 = 0;
-                        $_etype706 = 0;
-                        $xfer += $input->readListBegin($_etype706, $_size703);
-                        for ($_i707 = 0; $_i707 < $_size703; ++$_i707) {
-                            $elem708 = null;
-                            $elem708 = new \metastore\TableValidWriteIds();
-                            $xfer += $elem708->read($input);
-                            $this->tblValidWriteIds []= $elem708;
+                        $_size710 = 0;
+                        $_etype713 = 0;
+                        $xfer += $input->readListBegin($_etype713, $_size710);
+                        for ($_i714 = 0; $_i714 < $_size710; ++$_i714) {
+                            $elem715 = null;
+                            $elem715 = new \metastore\TableValidWriteIds();
+                            $xfer += $elem715->read($input);
+                            $this->tblValidWriteIds []= $elem715;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +103,8 @@ class GetValidWriteIdsResponse
             }
             $xfer += $output->writeFieldBegin('tblValidWriteIds', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->tblValidWriteIds));
-            foreach ($this->tblValidWriteIds as $iter709) {
-                $xfer += $iter709->write($output);
+            foreach ($this->tblValidWriteIds as $iter716) {
+                $xfer += $iter716->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

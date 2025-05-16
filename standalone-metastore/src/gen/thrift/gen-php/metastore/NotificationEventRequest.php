@@ -162,13 +162,13 @@ class NotificationEventRequest
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->eventTypeSkipList = array();
-                        $_size798 = 0;
-                        $_etype801 = 0;
-                        $xfer += $input->readListBegin($_etype801, $_size798);
-                        for ($_i802 = 0; $_i802 < $_size798; ++$_i802) {
-                            $elem803 = null;
-                            $xfer += $input->readString($elem803);
-                            $this->eventTypeSkipList []= $elem803;
+                        $_size805 = 0;
+                        $_etype808 = 0;
+                        $xfer += $input->readListBegin($_etype808, $_size805);
+                        for ($_i809 = 0; $_i809 < $_size805; ++$_i809) {
+                            $elem810 = null;
+                            $xfer += $input->readString($elem810);
+                            $this->eventTypeSkipList []= $elem810;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -192,13 +192,13 @@ class NotificationEventRequest
                 case 6:
                     if ($ftype == TType::LST) {
                         $this->tableNames = array();
-                        $_size804 = 0;
-                        $_etype807 = 0;
-                        $xfer += $input->readListBegin($_etype807, $_size804);
-                        for ($_i808 = 0; $_i808 < $_size804; ++$_i808) {
-                            $elem809 = null;
-                            $xfer += $input->readString($elem809);
-                            $this->tableNames []= $elem809;
+                        $_size811 = 0;
+                        $_etype814 = 0;
+                        $xfer += $input->readListBegin($_etype814, $_size811);
+                        for ($_i815 = 0; $_i815 < $_size811; ++$_i815) {
+                            $elem816 = null;
+                            $xfer += $input->readString($elem816);
+                            $this->tableNames []= $elem816;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -208,13 +208,13 @@ class NotificationEventRequest
                 case 7:
                     if ($ftype == TType::LST) {
                         $this->eventTypeList = array();
-                        $_size810 = 0;
-                        $_etype813 = 0;
-                        $xfer += $input->readListBegin($_etype813, $_size810);
-                        for ($_i814 = 0; $_i814 < $_size810; ++$_i814) {
-                            $elem815 = null;
-                            $xfer += $input->readString($elem815);
-                            $this->eventTypeList []= $elem815;
+                        $_size817 = 0;
+                        $_etype820 = 0;
+                        $xfer += $input->readListBegin($_etype820, $_size817);
+                        for ($_i821 = 0; $_i821 < $_size817; ++$_i821) {
+                            $elem822 = null;
+                            $xfer += $input->readString($elem822);
+                            $this->eventTypeList []= $elem822;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -251,8 +251,8 @@ class NotificationEventRequest
             }
             $xfer += $output->writeFieldBegin('eventTypeSkipList', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->eventTypeSkipList));
-            foreach ($this->eventTypeSkipList as $iter816) {
-                $xfer += $output->writeString($iter816);
+            foreach ($this->eventTypeSkipList as $iter823) {
+                $xfer += $output->writeString($iter823);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -273,8 +273,8 @@ class NotificationEventRequest
             }
             $xfer += $output->writeFieldBegin('tableNames', TType::LST, 6);
             $output->writeListBegin(TType::STRING, count($this->tableNames));
-            foreach ($this->tableNames as $iter817) {
-                $xfer += $output->writeString($iter817);
+            foreach ($this->tableNames as $iter824) {
+                $xfer += $output->writeString($iter824);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -285,8 +285,8 @@ class NotificationEventRequest
             }
             $xfer += $output->writeFieldBegin('eventTypeList', TType::LST, 7);
             $output->writeListBegin(TType::STRING, count($this->eventTypeList));
-            foreach ($this->eventTypeList as $iter818) {
-                $xfer += $output->writeString($iter818);
+            foreach ($this->eventTypeList as $iter825) {
+                $xfer += $output->writeString($iter825);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

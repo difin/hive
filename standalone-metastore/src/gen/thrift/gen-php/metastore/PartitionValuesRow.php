@@ -68,13 +68,13 @@ class PartitionValuesRow
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->row = array();
-                        $_size582 = 0;
-                        $_etype585 = 0;
-                        $xfer += $input->readListBegin($_etype585, $_size582);
-                        for ($_i586 = 0; $_i586 < $_size582; ++$_i586) {
-                            $elem587 = null;
-                            $xfer += $input->readString($elem587);
-                            $this->row []= $elem587;
+                        $_size589 = 0;
+                        $_etype592 = 0;
+                        $xfer += $input->readListBegin($_etype592, $_size589);
+                        for ($_i593 = 0; $_i593 < $_size589; ++$_i593) {
+                            $elem594 = null;
+                            $xfer += $input->readString($elem594);
+                            $this->row []= $elem594;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -101,8 +101,8 @@ class PartitionValuesRow
             }
             $xfer += $output->writeFieldBegin('row', TType::LST, 1);
             $output->writeListBegin(TType::STRING, count($this->row));
-            foreach ($this->row as $iter588) {
-                $xfer += $output->writeString($iter588);
+            foreach ($this->row as $iter595) {
+                $xfer += $output->writeString($iter595);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

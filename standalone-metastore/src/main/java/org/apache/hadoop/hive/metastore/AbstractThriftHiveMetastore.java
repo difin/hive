@@ -118,6 +118,11 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
+    public GetDatabaseObjectsResponse get_databases_req(GetDatabaseObjectsRequest request) throws MetaException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public void alter_database(String dbname, Database db)
             throws MetaException, NoSuchObjectException, TException {
         throw new UnsupportedOperationException("this method is not supported");
