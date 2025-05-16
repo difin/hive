@@ -1642,6 +1642,9 @@
                     <bannedImport>**.shaded.**</bannedImport>
                     <bannedImport>jersey.repackaged.com.google.**</bannedImport>
                   </bannedImports>
+                  <allowedImports>
+                    <allowedImport>org.apache.atlas.shaded.**</allowedImport>
+                  </allowedImports>
                   <includeTestCode>true</includeTestCode>
                 </restrictImports>
               </rules>
