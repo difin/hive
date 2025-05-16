@@ -32,18 +32,23 @@ import org.apache.hadoop.hive.metastore.client.builder.*;
 import org.apache.hadoop.hive.metastore.events.*;
 import org.apache.hadoop.hive.ql.security.HadoopDefaultMetastoreAuthenticator;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveOperationType;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.filtercontext.TableFilterContext;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.jetbrains.annotations.NotNull;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.io.File;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -367,6 +372,73 @@ public class TestHiveMetaStoreAuthorizer {
         assert (true);
       }
     }
+  }
+
+  @Test
+  public void testTableFilterContextWithOwnership() throws Exception {
+    List<TableMeta> tableMetas = new ArrayList<>();
+    TableMeta ownerTableMeta = new TableMeta();
+    ownerTableMeta.setCatName("hive");
+    ownerTableMeta.setDbName(default_db);
+    ownerTableMeta.setTableName("owner_table");
+    ownerTableMeta.setOwnerName(authorizedUser);
+    ownerTableMeta.setOwnerType(org.apache.hadoop.hive.metastore.api.PrincipalType.USER);
+    tableMetas.add(ownerTableMeta);
+
+    TableMeta otherTableMeta = new TableMeta();
+    otherTableMeta.setCatName("hive");
+    otherTableMeta.setDbName(default_db);
+    otherTableMeta.setTableName("other_table");
+    otherTableMeta.setOwnerName(unAuthorizedUser);
+    otherTableMeta.setOwnerType(org.apache.hadoop.hive.metastore.api.PrincipalType.USER);
+    tableMetas.add(otherTableMeta);
+
+    TableFilterContext filterContext = TableFilterContext.createFromTableMetas(default_db, tableMetas);
+    List<Table> tables = filterContext.getTables();
+    assertEquals("Should have two tables in context", 2, tables.size());
+
+    boolean foundOwnerTable = false;
+    boolean foundOtherTable = false;
+
+    for (Table table : tables) {
+      if (table.getTableName().equals("owner_table")) {
+        foundOwnerTable = true;
+        assertEquals("owner_table should have authorized user as owner", authorizedUser, table.getOwner());
+        assertEquals("owner_table should have correct owner type",
+            org.apache.hadoop.hive.metastore.api.PrincipalType.USER, table.getOwnerType());
+      } else if (table.getTableName().equals("other_table")) {
+        foundOtherTable = true;
+        assertEquals("other_table should have unauthorized user as owner", unAuthorizedUser, table.getOwner());
+        assertEquals("other_table should have correct owner type",
+            org.apache.hadoop.hive.metastore.api.PrincipalType.USER, table.getOwnerType());
+      }
+    }
+
+    assertTrue("owner_table not found in tables", foundOwnerTable);
+    assertTrue("other_table not found in tables", foundOtherTable);
+
+    HiveMetaStoreAuthzInfo authzInfo = filterContext.getAuthzContext();
+    List<HivePrivilegeObject> privObjects = authzInfo.getInputHObjs();
+
+    assertEquals("Should have two privilege objects", 2, privObjects.size());
+
+    foundOwnerTable = false;
+    foundOtherTable = false;
+
+    for (HivePrivilegeObject obj : privObjects) {
+      if (obj.getObjectName().equals("owner_table")) {
+        foundOwnerTable = true;
+        assertEquals("owner_table privilege object should have authorized user as owner",
+            authorizedUser, obj.getOwnerName());
+      } else if (obj.getObjectName().equals("other_table")) {
+        foundOtherTable = true;
+        assertEquals("other_table privilege object should have unauthorized user as owner",
+            unAuthorizedUser, obj.getOwnerName());
+      }
+    }
+
+    assertTrue("owner_table not found in privilege objects", foundOwnerTable);
+    assertTrue("other_table not found in privilege objects", foundOtherTable);
   }
 
 
