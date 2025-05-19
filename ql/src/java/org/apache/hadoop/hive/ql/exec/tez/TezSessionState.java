@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hive.ql.exec.tez;
 
+import org.apache.hadoop.hive.common.JavaVersionUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -650,8 +652,8 @@ public class TezSessionState implements TezSession {
       conf.setIfUnset(TezConfiguration.TEZ_AM_LAUNCH_ENV, env);
     }
 
-    conf.setIfUnset(TezConfiguration.TEZ_AM_LAUNCH_CMD_OPTS,
-        org.apache.tez.mapreduce.hadoop.MRHelpers.getJavaOptsForMRAM(conf));
+    String mrAmJavaOpts = conf.get(TezConfiguration.TEZ_AM_LAUNCH_CMD_OPTS, MRHelpers.getJavaOptsForMRAM(conf));
+    conf.set(TezConfiguration.TEZ_AM_LAUNCH_CMD_OPTS, mrAmJavaOpts + JavaVersionUtils.getAddOpensFlagsIfNeeded());
 
     String queueName = conf.get(JobContext.QUEUE_NAME, YarnConfiguration.DEFAULT_QUEUE_NAME);
     conf.setIfUnset(TezConfiguration.TEZ_QUEUE_NAME, queueName);
