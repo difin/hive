@@ -18,15 +18,12 @@
 
 package org.apache.hadoop.hive.ql.exec.tez;
 
-import org.apache.hadoop.hive.ql.exec.tez.TezSession.HiveResources;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -94,6 +91,8 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
 
   private ExternalSessionsRegistry externalSessions = null;
 
+  private TezSessionPoolManagerMetrics metrics = null;
+
   /** Note: this is not thread-safe. */
   public static TezSessionPoolManager getInstance() {
     TezSessionPoolManager local = instance;
@@ -105,6 +104,7 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
   }
 
   protected TezSessionPoolManager() {
+    metrics = new TezSessionPoolManagerMetrics(this);
   }
 
   public void startPool(HiveConf conf, final WMFullResourcePlan resourcePlan) throws Exception {
@@ -123,6 +123,7 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
       LOG.info("Updated tez session pool manager with triggers {} from active resource plan: {}",
           appliedTriggers, resourcePlan.getPlan().getName());
     }
+    metrics.start(conf);
   }
 
   public void setupPool(HiveConf conf) throws Exception {
@@ -400,6 +401,7 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
       stopTriggerValidator();
     }
 
+    metrics.stop();
     instance = null;
   }
 
@@ -562,7 +564,7 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
 
   private void updateSessions() {
     if (sessionTriggerProvider != null) {
-      sessionTriggerProvider.setSessions(Collections.unmodifiableList(openSessions));
+      sessionTriggerProvider.setSessions(getSessions());
     }
   }
 
@@ -616,5 +618,9 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
       }
     }
     return counterNames;
+  }
+
+  public List<TezSession> getSessions() {
+    return Collections.unmodifiableList(openSessions);
   }
 }

@@ -215,4 +215,9 @@ public class TezExternalSessionState extends TezSessionState {
       }
     }
   }
+
+  @Override
+  public Map<String, Double> getMetrics() {
+    return registry.getMetrics(externalAppId);
+  }
 }

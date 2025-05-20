@@ -39,6 +39,7 @@ import org.apache.hadoop.hive.ql.wm.WmContext;
 import org.apache.hadoop.yarn.api.records.LocalResource;
 import org.apache.tez.client.TezClient;
 import org.apache.tez.dag.api.TezException;
+import org.apache.tez.dag.api.client.DAGStatus;
 
 /**
  * A bogus interface that basically describes the evolved usage patterns of TezSessionStateImpl.
@@ -112,4 +113,9 @@ public interface TezSession {
   void setKillQuery(KillQuery kq);
   boolean killQuery(String reason) throws HiveException;
   String getAppMasterUri();
+  default Map<String, Double> getMetrics() {
+    return new HashMap<>();
+  }
+  default void updateDagStatus(DAGStatus dagStatus) {
+  }
 }

@@ -56,6 +56,13 @@ public interface ExternalSessionsRegistry {
    */
   void close();
 
+  /**
+   * Returns metrics for a specific session denoted by the appId.
+   */
+  default Map<String, Double> getMetrics(String appId){
+    return new HashMap<>();
+  }
+
   Map<String, ExternalSessionsRegistry> INSTANCES = new HashMap<>();
 
   static ExternalSessionsRegistry getClient(final Configuration conf) throws MetaException {

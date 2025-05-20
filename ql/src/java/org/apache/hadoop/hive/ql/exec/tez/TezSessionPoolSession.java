@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.ql.exec.tez;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,6 +38,7 @@ import org.apache.hadoop.hive.registry.impl.TezAmInstance;
 import org.apache.hadoop.yarn.api.records.LocalResource;
 import org.apache.tez.client.TezClient;
 import org.apache.tez.dag.api.TezException;
+import org.apache.tez.dag.api.client.DAGStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -397,6 +399,16 @@ class TezSessionPoolSession implements TezSession {
   @Override
   public String getAppMasterUri() {
     return baseSession.getAppMasterUri();
+  }
+
+  @Override
+  public Map<String, Double> getMetrics(){
+    return baseSession.getMetrics();
+  }
+
+  @Override
+  public void updateDagStatus(DAGStatus dagStatus) {
+    baseSession.updateDagStatus(dagStatus);
   }
   // ********** End of the methods that we redirect to base.
 }
