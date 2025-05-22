@@ -786,7 +786,7 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
   @VisibleForTesting
   static String generateJobLocation(String location, Configuration conf, JobID jobId) {
     String queryId = conf.get(HiveConf.ConfVars.HIVEQUERYID.varname);
-    return location + "/temp/" + queryId + "-" + jobId;
+    return location + "/temp/" + (queryId == null ? "" : queryId) + "-" + jobId;
   }
 
   /**
