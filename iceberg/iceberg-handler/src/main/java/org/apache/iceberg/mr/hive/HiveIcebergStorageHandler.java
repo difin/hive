@@ -40,7 +40,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections.MapUtils;
@@ -192,7 +191,6 @@ import org.apache.iceberg.puffin.PuffinWriter;
 import org.apache.iceberg.relocated.com.google.common.annotations.VisibleForTesting;
 import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
 import org.apache.iceberg.relocated.com.google.common.base.Splitter;
-import org.apache.iceberg.relocated.com.google.common.base.Throwables;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.relocated.com.google.common.collect.Iterables;
@@ -342,7 +340,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
       boolean isMergeTaskEnabled = Boolean.parseBoolean(tableDesc.getProperty(
               HiveCustomStorageHandlerUtils.MERGE_TASK_ENABLED + tableName));
       if (isMergeTaskEnabled) {
-        HiveCustomStorageHandlerUtils.setMergeTaskEnabled(jobConf, tableName, isMergeTaskEnabled);
+        HiveCustomStorageHandlerUtils.setMergeTaskEnabled(jobConf, tableName, true);
       }
       String tables = jobConf.get(InputFormatConfig.OUTPUT_TABLES);
       tables = tables == null ? tableName : tables + TABLE_NAME_SEPARATOR + tableName;
@@ -360,7 +358,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
         Utilities.addDependencyJars(jobConf, HiveIcebergStorageHandler.class);
       }
     } catch (IOException e) {
-      Throwables.propagate(e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -510,14 +508,10 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   }
 
   private Table getTable(org.apache.hadoop.hive.ql.metadata.Table hmsTable) {
-    Table table;
-    final Optional<QueryState> queryState = SessionStateUtil.getQueryState(conf);
-    if (!queryState.isPresent() || queryState.get().getNumModifiedRows() > 0) {
-      table = IcebergTableUtil.getTable(conf, hmsTable.getTTable(), true);
-    } else {
-      table = IcebergTableUtil.getTable(conf, hmsTable.getTTable());
-    }
-    return table;
+    boolean skipCache = SessionStateUtil.getQueryState(conf)
+        .map(queryState -> queryState.getNumModifiedRows() > 0)
+        .orElse(true);
+    return IcebergTableUtil.getTable(conf, hmsTable.getTTable(), skipCache);
   }
 
   @Override
@@ -723,13 +717,12 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
     Table table = IcebergTableUtil.getTable(conf, tableDesc.getProperties());
 
     DynamicPartitionCtx dpCtx = new DynamicPartitionCtx(Maps.newLinkedHashMap(),
-        hiveConf.getVar(HiveConf.ConfVars.DEFAULTPARTITIONNAME),
-        hiveConf.getIntVar(HiveConf.ConfVars.DYNAMICPARTITIONMAXPARTSPERNODE));
-    List<Function<List<ExprNodeDesc>, ExprNodeDesc>> customSortExprs = Lists.newLinkedList();
-    dpCtx.setCustomSortExpressions(customSortExprs);
+        hiveConf.getVar(ConfVars.DEFAULTPARTITIONNAME),
+        hiveConf.getIntVar(ConfVars.DYNAMICPARTITIONMAXPARTSPERNODE));
 
-    if (table.spec().isPartitioned()) {
-      addCustomSortExpr(table, hmsTable, writeOperation, customSortExprs, getPartitionTransformSpec(hmsTable));
+    if (table.spec().isPartitioned() &&
+          hiveConf.getIntVar(ConfVars.HIVEOPTSORTDYNAMICPARTITIONTHRESHOLD) >= 0) {
+      addCustomSortExpr(table, hmsTable, writeOperation, dpCtx, getPartitionTransformSpec(hmsTable));
     }
 
     SortOrder sortOrder = table.sortOrder();
@@ -752,15 +745,14 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
         }
       }
 
-      addCustomSortExpr(table, hmsTable, writeOperation, customSortExprs, getSortTransformSpec(table));
+      addCustomSortExpr(table, hmsTable, writeOperation, dpCtx, getSortTransformSpec(table));
     }
-    dpCtx.setHasCustomSortExprs(!customSortExprs.isEmpty());
 
     return dpCtx;
   }
 
   private void addCustomSortExpr(Table table,  org.apache.hadoop.hive.ql.metadata.Table hmsTable,
-      Operation writeOperation, List<Function<List<ExprNodeDesc>, ExprNodeDesc>> customSortExprs,
+      Operation writeOperation, DynamicPartitionCtx dpCtx,
       List<TransformSpec> transformSpecs) {
     Map<String, Integer> fieldOrderMap = Maps.newHashMap();
     List<Types.NestedField> fields = table.schema().columns();
@@ -771,7 +763,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
     int offset = (shouldOverwrite(hmsTable, writeOperation) ?
         ACID_VIRTUAL_COLS_AS_FIELD_SCHEMA : acidSelectColumns(hmsTable, writeOperation)).size();
 
-    customSortExprs.addAll(transformSpecs.stream().map(spec ->
+    dpCtx.addCustomSortExpressions(transformSpecs.stream().map(spec ->
         IcebergTransformSortFunctionUtil.getCustomSortExprs(spec, fieldOrderMap.get(spec.getColumnName()) + offset)
     ).collect(Collectors.toList()));
   }
@@ -1310,7 +1302,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
                                             ExprNodeDesc syntheticFilterPredicate) {
     try {
       Collection<String> partitionColumns = ((HiveIcebergSerDe) table.getDeserializer()).partitionColumns();
-      if (partitionColumns.size() > 0) {
+      if (!partitionColumns.isEmpty()) {
         // The filter predicate contains ExprNodeDynamicListDesc object(s) for places where we will substitute
         // dynamic values later during execution. For Example:
         // GenericUDFIn(Column[ss_sold_date_sk], RS[5] <-- This is an ExprNodeDynamicListDesc)
@@ -1593,11 +1585,14 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
    */
   private void fallbackToNonVectorizedModeBasedOnProperties(Properties tableProps) {
     Schema tableSchema = SchemaParser.fromJson(tableProps.getProperty(InputFormatConfig.TABLE_SCHEMA));
+
     if (FileFormat.AVRO.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT)) ||
         isValidMetadataTable(tableProps.getProperty(IcebergAcidUtil.META_TABLE_PROPERTY)) ||
         hasOrcTimeInSchema(tableProps, tableSchema) ||
         !hasParquetNestedTypeWithinListOrMap(tableProps, tableSchema)) {
-      conf.setBoolean(HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED.varname, false);
+      // disable vectorization
+      SessionStateUtil.getQueryState(conf).ifPresent(queryState ->
+          queryState.getConf().setBoolVar(ConfVars.HIVE_VECTORIZATION_ENABLED, false));
     }
   }
 

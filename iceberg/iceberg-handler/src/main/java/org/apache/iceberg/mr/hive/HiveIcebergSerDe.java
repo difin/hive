@@ -83,11 +83,11 @@ public class HiveIcebergSerDe extends AbstractSerDe {
   }
 
   @Override
-  public void initialize(@Nullable Configuration configuration, Properties serDeProperties,
-                         Properties partitionProperties) throws SerDeException {
+  public void initialize(Configuration conf, Properties serDeProperties,
+      Properties partitionProperties) throws SerDeException {
     // CDPD only change to avoid backporting the whole SerDe refactor (HIVE-24332)
     // With this change we can use this in IcebergSerDe for HIVE-25610
-    super.initializeColumns(configuration, serDeProperties, partitionProperties);
+    super.initializeColumns(conf, serDeProperties, partitionProperties);
 
     // HiveIcebergSerDe.initialize is called multiple places in Hive code:
     // - When we are trying to create a table - HiveDDL data is stored at the serDeProperties, but no Iceberg table
@@ -110,7 +110,7 @@ public class HiveIcebergSerDe extends AbstractSerDe {
       }
     } else {
       try {
-        Table table = IcebergTableUtil.getTable(configuration, serDeProperties);
+        Table table = IcebergTableUtil.getTable(conf, serDeProperties);
         // always prefer the original table schema if there is one
         this.tableSchema = table.schema();
         this.partitionColumns = table.spec().fields().stream().map(PartitionField::name).collect(Collectors.toList());
@@ -122,7 +122,7 @@ public class HiveIcebergSerDe extends AbstractSerDe {
 
         if (serDeProperties.get("metadata_location") != null) {
           // If metadata location is provided, extract the schema details from it.
-          try (FileIO fileIO = new HadoopFileIO(configuration)) {
+          try (FileIO fileIO = new HadoopFileIO(conf)) {
             TableMetadata metadata = TableMetadataParser.read(fileIO, serDeProperties.getProperty("metadata_location"));
             this.tableSchema = metadata.schema();
             this.partitionColumns =
@@ -133,28 +133,28 @@ public class HiveIcebergSerDe extends AbstractSerDe {
             }
           }
         } else {
-          boolean autoConversion = configuration.getBoolean(InputFormatConfig.SCHEMA_AUTO_CONVERSION, false);
+          boolean autoConversion = conf.getBoolean(InputFormatConfig.SCHEMA_AUTO_CONVERSION, false);
           // If we can not load the table try the provided hive schema
           this.tableSchema = hiveSchemaOrThrow(e, autoConversion);
           // This is only for table creation, it is ok to have an empty partition column list
           this.partitionColumns = ImmutableList.of();
         }
         if (e instanceof NoSuchTableException &&
-            HiveTableUtil.isCtas(serDeProperties) &&
-            !Catalogs.hiveCatalog(configuration, serDeProperties)) {
+            HiveTableUtil.isCtas(serDeProperties) && !Catalogs.hiveCatalog(conf, serDeProperties)) {
           throw new SerDeException(CTAS_EXCEPTION_MSG);
         }
       }
     }
 
     this.projectedSchema =
-        projectedSchema(configuration, serDeProperties.getProperty(Catalogs.NAME), tableSchema, jobConf);
+        projectedSchema(conf, serDeProperties.getProperty(Catalogs.NAME), tableSchema, jobConf);
 
-    // Currently ClusteredWriter is used which requires that records are ordered by partition keys.
-    // Here we ensure that SortedDynPartitionOptimizer will kick in and do the sorting.
-    // TODO: remove once we have both Fanout and ClusteredWriter available: HIVE-25948
-    HiveConf.setIntVar(configuration, HiveConf.ConfVars.HIVEOPTSORTDYNAMICPARTITIONTHRESHOLD, 1);
-    HiveConf.setVar(configuration, HiveConf.ConfVars.DYNAMICPARTITIONINGMODE, "nonstrict");
+    if (!IcebergTableUtil.isFanoutEnabled(Maps.fromProperties(serDeProperties))) {
+      // ClusteredWriter requires that records are ordered by partition keys.
+      // Here we ensure that SortedDynPartitionOptimizer will kick in and do the sorting.
+      HiveConf.setIntVar(conf, HiveConf.ConfVars.HIVEOPTSORTDYNAMICPARTITIONTHRESHOLD, 1);
+    }
+    HiveConf.setVar(conf, HiveConf.ConfVars.DYNAMICPARTITIONINGMODE, "nonstrict");
     try {
       this.inspector = IcebergObjectInspector.create(projectedSchema);
     } catch (Exception e) {
@@ -162,12 +162,12 @@ public class HiveIcebergSerDe extends AbstractSerDe {
     }
   }
 
-  private static Schema projectedSchema(Configuration configuration, String tableName, Schema tableSchema,
-      Map<String, String> jobConfs) {
-    Context.Operation operation = HiveCustomStorageHandlerUtils.getWriteOperation(configuration::get, tableName);
+  private static Schema projectedSchema(Configuration conf, String tableName, Schema tableSchema,
+      Map<String, String> jobConf) {
+    Context.Operation operation = HiveCustomStorageHandlerUtils.getWriteOperation(conf::get, tableName);
     if (operation == null) {
-      jobConfs.put(InputFormatConfig.CASE_SENSITIVE, "false");
-      String[] selectedColumns = ColumnProjectionUtils.getReadColumnNames(configuration);
+      jobConf.put(InputFormatConfig.CASE_SENSITIVE, "false");
+      String[] selectedColumns = ColumnProjectionUtils.getReadColumnNames(conf);
       // When same table is joined multiple times, it is possible some selected columns are duplicated,
       // in this case wrong recordStructField position leads wrong value or ArrayIndexOutOfBoundException
       String[] distinctSelectedColumns = Arrays.stream(selectedColumns).distinct().toArray(String[]::new);
@@ -182,7 +182,7 @@ public class HiveIcebergSerDe extends AbstractSerDe {
         return projectedSchema;
       }
     }
-    boolean isCOW = IcebergTableUtil.isCopyOnWriteMode(operation, configuration::get);
+    boolean isCOW = IcebergTableUtil.isCopyOnWriteMode(operation, conf::get);
     if (isCOW) {
       return IcebergAcidUtil.createSerdeSchemaForDelete(tableSchema.columns());
     }
@@ -226,9 +226,7 @@ public class HiveIcebergSerDe extends AbstractSerDe {
 
   @Override
   public void handleJobLevelConfiguration(HiveConf conf) {
-    for (Map.Entry<String, String> confs : jobConf.entrySet()) {
-      conf.set(confs.getKey(), confs.getValue());
-    }
+    jobConf.forEach(conf::set);
   }
 
   @Override
@@ -275,7 +273,7 @@ public class HiveIcebergSerDe extends AbstractSerDe {
 
   /**
    * If the table already exists then returns the list of the current Iceberg partition column names.
-   * If the table is not partitioned by Iceberg, or the table does not exists yet then returns an empty list.
+   * If the table is not partitioned by Iceberg, or the table does not exist yet then returns an empty list.
    * @return The name of the Iceberg partition columns.
    */
   public Collection<String> partitionColumns() {

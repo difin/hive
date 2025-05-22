@@ -24,11 +24,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
+import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.ql.Context;
+import org.apache.hadoop.hive.ql.ddl.DDLUtils;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
@@ -390,6 +393,15 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
     this.temporary = temporary;
   }
 
+  public boolean isIcebergTable() {
+    if (getTable() != null) {
+      return DDLUtils.isIcebergTable(table);
+    } else { 
+      return MetaStoreUtils.isIcebergTable(
+          Maps.fromProperties(getTableInfo().getProperties()));
+    }
+  }
+
   public boolean isMmTable() {
     if (getTable() != null) {
       return AcidUtils.isInsertOnlyTable(table.getParameters());
@@ -397,6 +409,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
       return AcidUtils.isInsertOnlyTable(getTableInfo().getProperties());
     }
   }
+
   public boolean isFullAcidTable() {
     if(getTable() != null) {
       return AcidUtils.isFullAcidTable(table);

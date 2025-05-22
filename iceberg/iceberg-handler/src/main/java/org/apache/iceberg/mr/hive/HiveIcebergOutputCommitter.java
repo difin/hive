@@ -861,7 +861,6 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
           .onFailure((output, exc) -> LOG.warn("Failed to retrieve merge input file for the table {}", output, exc))
           .run(output -> {
             for (JobContext jobContext : outputs.get(output)) {
-              LOG.info("Cleaning job for jobID: {}, table: {}", jobContext.getJobID(), output);
               Table table = output.table;
               FileSystem fileSystem = new Path(table.location()).getFileSystem(jobConf);
               String jobLocation = generateJobLocation(table.location(), jobConf, jobContext.getJobID());
@@ -900,14 +899,14 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
    * @return Returns the list of file statuses of the output files in the jobContexts
    * @throws IOException Throws IOException
    */
-  public List<ContentFile> getOutputContentFiles(List<JobContext> jobContexts) throws IOException {
+  public List<ContentFile<?>> getOutputContentFiles(List<JobContext> jobContexts) throws IOException {
     Multimap<OutputTable, JobContext> outputs = collectOutputs(jobContexts);
     JobConf jobConf = jobContexts.get(0).getJobConf();
 
     ExecutorService fileExecutor = fileExecutor(jobConf);
     ExecutorService tableExecutor = tableExecutor(jobConf, outputs.keySet().size());
 
-    Collection<ContentFile> files = new ConcurrentLinkedQueue<>();
+    Collection<ContentFile<?>> files = new ConcurrentLinkedQueue<>();
     try {
       Tasks.foreach(outputs.keySet())
           .suppressFailureWhenFinished()
@@ -915,7 +914,6 @@ public class HiveIcebergOutputCommitter extends OutputCommitter {
           .onFailure((output, exc) -> LOG.warn("Failed to retrieve merge input file for the table {}", output, exc))
           .run(output -> {
             for (JobContext jobContext : outputs.get(output)) {
-              LOG.info("Cleaning job for jobID: {}, table: {}", jobContext.getJobID(), output);
               Table table = output.table;
               String jobLocation = generateJobLocation(table.location(), jobConf, jobContext.getJobID());
               // list jobLocation to get number of forCommit files
