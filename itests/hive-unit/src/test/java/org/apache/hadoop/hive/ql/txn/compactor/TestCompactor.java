@@ -73,6 +73,7 @@ import org.mockito.internal.util.reflection.FieldSetter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +83,7 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
+import static java.util.Collections.emptyMap;
 import static org.apache.hadoop.hive.common.AcidConstants.VISIBILITY_PATTERN;
 import static org.apache.hadoop.hive.ql.TestTxnCommands2.runCleaner;
 import static org.apache.hadoop.hive.ql.TestTxnCommands2.runInitiator;
@@ -418,10 +420,10 @@ public class TestCompactor extends TestCompactorBase {
 
     //compute stats before compaction
     CompactionInfo ci = new CompactionInfo(dbName, tblName, "bkt=0", CompactionType.MAJOR);
-    statsUpdater.gatherStats(ci, conf, System.getProperty("user.name"),
+    statsUpdater.gatherStats(conf, ci, emptyMap(), System.getProperty("user.name"),
             CompactorUtil.getCompactorJobQueueName(conf, ci, table), msClient);
     ci = new CompactionInfo(dbName, tblName, "bkt=1", CompactionType.MAJOR);
-    statsUpdater.gatherStats(ci, conf, System.getProperty("user.name"),
+    statsUpdater.gatherStats(conf, ci, emptyMap(), System.getProperty("user.name"),
             CompactorUtil.getCompactorJobQueueName(conf, ci, table), msClient);
 
     //Check basic stats are collected
@@ -512,7 +514,7 @@ public class TestCompactor extends TestCompactorBase {
 
     //compute stats before compaction
     CompactionInfo ci = new CompactionInfo(dbName, tblName, null, CompactionType.MAJOR);
-    statsUpdater.gatherStats(ci, conf, System.getProperty("user.name"),
+    statsUpdater.gatherStats(conf, ci, emptyMap(), System.getProperty("user.name"),
             CompactorUtil.getCompactorJobQueueName(conf, ci, table), msClient);
 
     //Check basic stats are collected
