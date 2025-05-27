@@ -1,5 +1,5 @@
 Found 1 items
--rw-r--r--   3 ### USER ### ### GROUP ###         16 ### HDFS DATE ### hdfs://### HDFS PATH ###
+-rw-r--r--   3 ### USER ### ### GROUP ###         ### SIZE ### ### HDFS DATE ### hdfs://### HDFS PATH ###
 PREHOOK: query: create temporary external table temp_table_external (c1 int, c2 int) location 'hdfs://### HDFS PATH ###'
 PREHOOK: type: CREATETABLE
 PREHOOK: Input: hdfs://### HDFS PATH ###
@@ -30,5 +30,5 @@ POSTHOOK: type: DROPTABLE
 POSTHOOK: Input: default@temp_table_external
 POSTHOOK: Output: default@temp_table_external
 Found 1 items
--rw-r--r--   3 ### USER ### ### GROUP ###         16 ### HDFS DATE ### hdfs://### HDFS PATH ###
+-rw-r--r--   3 ### USER ### ### GROUP ###         ### SIZE ### ### HDFS DATE ### hdfs://### HDFS PATH ###
 #### A masked pattern was here ####

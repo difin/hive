@@ -32,9 +32,9 @@ columns:struct columns { string key, string value}
 partitioned:false
 partitionColumns:
 totalNumberFiles:1
-totalFileSize:5812
-maxFileSize:5812
-minFileSize:5812
+totalFileSize:#Masked#
+maxFileSize:#Masked#
+minFileSize:#Masked#
 #### A masked pattern was here ####
 
 PREHOOK: query: SHOW TABLE EXTENDED from default LIKE `src`
@@ -49,9 +49,9 @@ columns:struct columns { string key, string value}
 partitioned:false
 partitionColumns:
 totalNumberFiles:1
-totalFileSize:5812
-maxFileSize:5812
-minFileSize:5812
+totalFileSize:#Masked#
+maxFileSize:#Masked#
+minFileSize:#Masked#
 #### A masked pattern was here ####
 
 PREHOOK: query: SHOW TABLE EXTENDED LIKE `src`
@@ -66,9 +66,9 @@ columns:struct columns { string key, string value}
 partitioned:false
 partitionColumns:
 totalNumberFiles:1
-totalFileSize:5812
-maxFileSize:5812
-minFileSize:5812
+totalFileSize:#Masked#
+maxFileSize:#Masked#
+minFileSize:#Masked#
 #### A masked pattern was here ####
 
 PREHOOK: query: SHOW TABLE EXTENDED LIKE `src.?`
@@ -99,9 +99,9 @@ columns:struct columns { string key, string value}
 partitioned:true
 partitionColumns:struct partition_columns { string ds, string hr}
 totalNumberFiles:1
-totalFileSize:5812
-maxFileSize:5812
-minFileSize:5812
+totalFileSize:#Masked#
+maxFileSize:#Masked#
+minFileSize:#Masked#
 #### A masked pattern was here ####
 
 PREHOOK: query: SHOW TABLE EXTENDED from default LIKE src
@@ -116,8 +116,8 @@ columns:struct columns { string key, string value}
 partitioned:false
 partitionColumns:
 totalNumberFiles:1
-totalFileSize:5812
-maxFileSize:5812
-minFileSize:5812
+totalFileSize:#Masked#
+maxFileSize:#Masked#
+minFileSize:#Masked#
 #### A masked pattern was here ####
 
