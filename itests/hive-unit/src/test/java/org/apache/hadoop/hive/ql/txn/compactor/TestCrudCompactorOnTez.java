@@ -38,16 +38,14 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.hive.common.StatsSetupConst;
 import org.apache.hadoop.hive.common.ValidTxnList;
-import org.apache.hadoop.hive.common.ValidWriteIdList;
-import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.CompactionRequest;
 import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.CompactionType;
-import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.ShowCompactRequest;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponse;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponseElement;
@@ -58,24 +56,17 @@ import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.ql.Driver;
 import org.apache.hadoop.hive.ql.DriverFactory;
-import org.apache.hadoop.hive.ql.TxnCommandsBaseForTests;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.ql.hooks.HiveProtoLoggingHook;
 import org.apache.hadoop.hive.ql.hooks.proto.HiveHookEvents;
-import org.apache.hadoop.hive.ql.io.AcidDirectory;
 import org.apache.hadoop.hive.ql.io.AcidOutputFormat;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.io.BucketCodec;
-import org.apache.hadoop.hive.ql.lockmgr.LockException;
 import org.apache.hadoop.hive.ql.metadata.Hive;
+import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
-import org.apache.hadoop.hive.ql.txn.compactor.Compactor;
-import org.apache.hadoop.hive.ql.txn.compactor.CompactorContext;
-import org.apache.hadoop.hive.ql.txn.compactor.CompactorFactory;
-import org.apache.hadoop.hive.ql.txn.compactor.CompactorPipeline;
-import org.apache.hadoop.hive.ql.txn.compactor.Worker;
 import org.apache.hive.streaming.HiveStreamingConnection;
 import org.apache.hive.streaming.StreamingConnection;
 import org.apache.hive.streaming.StrictDelimitedInputWriter;
@@ -88,7 +79,6 @@ import org.apache.orc.StripeInformation;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.impl.RecordReaderImpl;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -105,6 +95,8 @@ import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("deprecation")
 public class TestCrudCompactorOnTez extends CompactorOnTezTest {
+  private static final String DB = "default";
+  private static final String TABLE1 = "t1";
 
   @After
   public void tearDown() {
@@ -3655,5 +3647,44 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
 
     verify(primary.get(), times(1)).run(any());
     verify(secondary.get(), times(1)).run(any());
+  }
+
+  @Test
+  public void testMajorCompactionUpdateMissingColumnStats() throws Exception {
+    executeStatementOnDriver("drop table if exists " + TABLE1, driver);
+    executeStatementOnDriver("create table " + TABLE1 + "(a int, b varchar(128), c float) " +
+            "stored as orc TBLPROPERTIES ('transactional'='true')", driver);
+    executeStatementOnDriver("insert into " + TABLE1 + "(a, b, c) values (1, 'one', 1.1)", driver);
+    executeStatementOnDriver("insert into " + TABLE1 + "(a, b, c) values (2, 'two', 2.2)", driver);
+
+    executeStatementOnDriver("delete from " + TABLE1 + " where a = 1", driver);
+
+    CompactorTestUtil.runCompaction(conf, DB,  TABLE1 , CompactionType.MAJOR, true);
+    CompactorTestUtil.runCleaner(conf);
+    verifySuccessfulCompaction(1);
+
+    org.apache.hadoop.hive.ql.metadata.Table table = Hive.get().getTable(DB, TABLE1);
+
+    Assert.assertEquals(3, StatsSetupConst.getColumnsHavingStats(table.getParameters()).size());
+  }
+
+  @Test
+  public void testMajorCompactionUpdateMissingColumnStatsOfPartition() throws Exception {
+    executeStatementOnDriver("drop table if exists " + TABLE1, driver);
+    executeStatementOnDriver("create table " + TABLE1 + "(a int, b varchar(128), c float) partitioned by (p string) " +
+            "stored as orc TBLPROPERTIES ('transactional'='true')", driver);
+    executeStatementOnDriver("insert into " + TABLE1 + "(a, b, c, p) values (1, 'one', 1.1, 'p1')", driver);
+    executeStatementOnDriver("insert into " + TABLE1 + "(a, b, c, p) values (2, 'two', 2.2, 'p1')", driver);
+
+    executeStatementOnDriver("delete from " + TABLE1 + " where a = 1", driver);
+
+    CompactorTestUtil.runCompaction(conf, DB,  TABLE1 , CompactionType.MAJOR, true, "p=p1");
+    CompactorTestUtil.runCleaner(conf);
+    verifySuccessfulCompaction(1);
+
+    org.apache.hadoop.hive.ql.metadata.Table table = Hive.get().getTable(DB, TABLE1);
+    Partition partition = Hive.get().getPartition(table, new HashMap<String, String>() {{ put("p", "p1"); }});
+
+    Assert.assertEquals(3, StatsSetupConst.getColumnsHavingStats(partition.getParameters()).size());
   }
 }
