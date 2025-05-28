@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.NotificationEvent;
 import org.apache.hadoop.hive.metastore.api.WriteEventInfo;
 import org.apache.hadoop.hive.metastore.messaging.CommitTxnMessage;
+import org.apache.hadoop.hive.metastore.messaging.MessageBuilder;
 import org.apache.hadoop.hive.metastore.utils.StringUtils;
 import org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveFatalException;
@@ -45,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class CommitTxnHandler extends AbstractEventHandler<CommitTxnMessage> {
 
@@ -130,6 +132,20 @@ class CommitTxnHandler extends AbstractEventHandler<CommitTxnMessage> {
               })));
   }
 
+  private List<WriteEventInfo> getAllWriteEventInfoExceptMV(List<WriteEventInfo> writeEventInfoList) {
+    return writeEventInfoList.stream().filter(writeEventInfo -> {
+      try {
+        if (writeEventInfo.getTableObj() != null) {
+          Table table = new Table((org.apache.hadoop.hive.metastore.api.Table) MessageBuilder.getTObj(writeEventInfo.getTableObj(), org.apache.hadoop.hive.metastore.api.Table.class));
+          return !table.isMaterializedView();
+        }
+        return true;
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }).collect(Collectors.toList());
+  }
+
   @Override
   public void handle(Context withinContext) throws Exception {
     if (!ReplUtils.includeAcidTableInDump(withinContext.hiveConf)) {
@@ -163,6 +179,10 @@ class CommitTxnHandler extends AbstractEventHandler<CommitTxnMessage> {
         writeEventInfoList = getAllWriteEventInfo(withinContext);
       }
 
+      // Filtering out all write event info related to materialized view
+      if (writeEventInfoList != null) {
+        writeEventInfoList = getAllWriteEventInfoExceptMV(writeEventInfoList);
+      }
       int numEntry = (writeEventInfoList != null ? writeEventInfoList.size() : 0);
       if (numEntry != 0) {
         eventMessage.addWriteEventInfo(writeEventInfoList);
