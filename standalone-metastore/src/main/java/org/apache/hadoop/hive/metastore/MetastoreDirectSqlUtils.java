@@ -19,7 +19,6 @@
 
 package org.apache.hadoop.hive.metastore;
 
-import com.google.common.base.Joiner;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
@@ -45,12 +44,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 /**
  * Helper utilities used by DirectSQL code in HiveMetastore.
  */
-class MetastoreDirectSqlUtils {
+public class MetastoreDirectSqlUtils {
   private static final Logger LOG = LoggerFactory.getLogger(MetastoreDirectSqlUtils.class);
   private MetastoreDirectSqlUtils() {
 
@@ -509,7 +507,7 @@ class MetastoreDirectSqlUtils {
    * @throws MetaException
    *           if the column value cannot be converted into a Boolean object
    */
-  static Boolean extractSqlBoolean(Object value) throws MetaException {
+  public static Boolean extractSqlBoolean(Object value) throws MetaException {
     if (value == null) {
       return null;
     }

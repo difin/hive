@@ -39,6 +39,7 @@ import org.apache.hadoop.hive.common.StatsSetupConst;
 import org.apache.hadoop.hive.metastore.Batchable;
 import org.apache.hadoop.hive.metastore.DatabaseProduct;
 import org.apache.hadoop.hive.metastore.Deadline;
+import org.apache.hadoop.hive.metastore.MetastoreDirectSqlUtils;
 import org.apache.hadoop.hive.metastore.ObjectStore;
 import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.MetaException;
@@ -769,8 +770,7 @@ public class MetaToolObjectStore extends ObjectStore {
               Long tabId = Long.parseLong(String.valueOf(fields[0]));
               MetadataTableSummary summary = summaries.get(tabId);
               String lib = String.valueOf(fields[1]);
-              String compressionType = String.valueOf(fields[2]);
-              collectTabFormatSummary(transactionTables, tabId, summary, lib, compressionType);
+              collectTabFormatSummary(transactionTables, tabId, summary, lib, fields[2]);
             }
           }
         } finally {
@@ -823,7 +823,7 @@ public class MetaToolObjectStore extends ObjectStore {
   }
 
   private void collectTabFormatSummary(List<Long> transactionalTables, Long tableId,
-      MetadataTableSummary summary, String slib, String compressionType) {
+      MetadataTableSummary summary, String slib, Object compressionType) {
     String tblType = summary.getTableType();
     String fileType = TableFormat.extractFileFormat(slib);
     Set<String> nonNativeTabTypes = TableFormat.getNonNativeFormats();
@@ -837,10 +837,17 @@ public class MetaToolObjectStore extends ObjectStore {
     } else {
       tblType = tblType != null ? tblType.toUpperCase() : "NULL";
     }
-    if (compressionType.equals("0") || compressionType.equals("f")) {
+    Boolean tmpBoolean = null;
+    try {
+      tmpBoolean = MetastoreDirectSqlUtils.extractSqlBoolean(compressionType);
+    } catch (MetaException e) {
+      LOG.debug(e.getMessage());
+    }
+    compressionType = "Compressed";
+    if (tmpBoolean == null || !tmpBoolean) {
       compressionType = "None";
     }
-    summary.tableFormatSummary(tblType, compressionType, fileType);
+    summary.tableFormatSummary(tblType, compressionType.toString(), fileType);
   }
 
   private void collectBasicStats(Map<Long, MetadataTableSummary> summaries, Set<Long> nonPartedTabs,
