@@ -157,7 +157,7 @@ public class StatisticsTestUtils {
    * @return a KLL object initialized with the given values.
    */
   public static KllFloatsSketch createKll(float... values) {
-    KllFloatsSketch kll = new KllFloatsSketch();
+    KllFloatsSketch kll = KllFloatsSketch.newHeapInstance();
     for (float value : values) {
       kll.update(value);
     }
@@ -170,7 +170,7 @@ public class StatisticsTestUtils {
    * @return a KLL object initialized with the given values.
    */
   public static KllFloatsSketch createKll(double... values) {
-    KllFloatsSketch kll = new KllFloatsSketch();
+    KllFloatsSketch kll = KllFloatsSketch.newHeapInstance();
     for (double value : values) {
       kll.update(Double.valueOf(value).floatValue());
     }
@@ -183,7 +183,7 @@ public class StatisticsTestUtils {
    * @return a KLL object initialized with the given values.
    */
   public static KllFloatsSketch createKll(long... values) {
-    KllFloatsSketch kll = new KllFloatsSketch();
+    KllFloatsSketch kll = KllFloatsSketch.newHeapInstance();
     for (long value : values) {
       kll.update(value);
     }

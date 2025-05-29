@@ -34,7 +34,9 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.datasketches.SketchesArgumentException;
+import com.google.common.base.Preconditions;
+import org.apache.calcite.rel.metadata.RelMdUtil;
+import org.apache.datasketches.common.SketchesArgumentException;
 import org.apache.datasketches.kll.KllFloatsSketch;
 import org.apache.datasketches.memory.Memory;
 import org.apache.hadoop.hive.common.ndv.NumDistinctValueEstimator;
