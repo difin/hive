@@ -42,7 +42,8 @@ import static java.time.temporal.ChronoField.YEAR;
  * Timestamp is "uuuu-MM-dd HH:mm:ss[.SSS...]", where the time part is optional.
  * If time part is absent, a default '00:00:00.0' will be used.
  *
- * <table border="2">
+ * <table border="1">
+ * <caption></caption>
  * <tr>
  * <th>Field</th>
  * <th>Format</th>
@@ -132,8 +133,8 @@ public class Timestamp implements Comparable<Timestamp> {
 
   @Override
   public boolean equals(Object other) {
-    if (other instanceof Timestamp) {
-      return compareTo((Timestamp) other) == 0;
+    if (other instanceof Timestamp timestamp) {
+      return compareTo(timestamp) == 0;
     }
     return false;
   }

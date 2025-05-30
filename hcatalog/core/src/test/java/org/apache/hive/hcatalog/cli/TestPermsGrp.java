@@ -202,7 +202,7 @@ public class TestPermsGrp extends TestCase {
     List<String> argsList = new ArrayList<String>();
     argsList.add("-Dhive.support.concurrency=false");
     argsList
-        .add("-Dhive.security.authorization.manager=org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory");
+        .add("-Dhive.security.authorization.manager=org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory --add-opens=java.base/java.net=ALL-UNNAMED");
     argsList.addAll(Arrays.asList(args));
     HCatCli.main(argsList.toArray(new String[]{}));
   }

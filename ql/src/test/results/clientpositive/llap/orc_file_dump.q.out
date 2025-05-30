@@ -90,9 +90,9 @@ POSTHOOK: Lineage: orc_ppd_n0.ts SIMPLE [(staging_n4)staging_n4.FieldSchema(name
 PREHOOK: query: select * from orc_ppd_n0 limit 1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@orc_ppd_n0
-#### A masked pattern was here ####
+PREHOOK: Output: hdfs://### HDFS PATH ###
 -- BEGIN ORC FILE DUMP --
-#### A masked pattern was here ####
+Structure for hdfs://### HDFS PATH ###
 File Version: 0.12 with ORC_14
 Rows: 1049
 Compression: ZLIB
@@ -288,9 +288,9 @@ PREHOOK: Output: default@orc_ppd_n0
 PREHOOK: query: select * from orc_ppd_n0 limit 1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@orc_ppd_n0
-#### A masked pattern was here ####
+PREHOOK: Output: hdfs://### HDFS PATH ###
 -- BEGIN ORC FILE DUMP --
-#### A masked pattern was here ####
+Structure for hdfs://### HDFS PATH ###
 File Version: 0.12 with ORC_14
 Rows: 1049
 Compression: ZLIB
@@ -498,9 +498,9 @@ PREHOOK: query: select * from orc_ppd_part limit 1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@orc_ppd_part
 PREHOOK: Input: default@orc_ppd_part@ds=2015/hr=10
-#### A masked pattern was here ####
+PREHOOK: Output: hdfs://### HDFS PATH ###
 -- BEGIN ORC FILE DUMP --
-#### A masked pattern was here ####
+Structure for hdfs://### HDFS PATH ###
 File Version: 0.12 with ORC_14
 Rows: 1049
 Compression: ZLIB

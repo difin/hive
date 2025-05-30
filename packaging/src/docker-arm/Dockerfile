@@ -1,5 +1,5 @@
 # Copyright (c) 2020 Cloudera, Inc. All rights reserved.
-FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as hadoop-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-17-runtime-nofips as hadoop-base
 ARG HADOOP_VERSION
 USER root
 ADD hadoop-${HADOOP_VERSION}.tar.gz  /usr/lib/
@@ -8,7 +8,7 @@ RUN rm -f /usr/lib/hadoop/share/hadoop/tools/lib/kafka-clients-0.8.2.1.jar
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as ranger-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-17-runtime-nofips as ranger-base
 ARG RANGER_VERSION
 USER root
 ADD ranger-${RANGER_VERSION}-hive-plugin.tar.gz /usr/lib/
@@ -16,35 +16,35 @@ RUN ln -s /usr/lib/ranger-${RANGER_VERSION}-hive-plugin /usr/lib/ranger-hive-plu
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as solr-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-17-runtime-nofips as solr-base
 ARG SOLR_VERSION
 USER root
 ADD solr-${SOLR_VERSION}.tar.gz /usr/lib/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as atlas-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-17-runtime-nofips as atlas-base
 ARG ATLAS_VERSION
 USER root
 ADD apache-atlas-${ATLAS_VERSION}-hive-hook.tar.gz /usr/lib/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as tez-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-17-runtime-nofips as tez-base
 ARG TEZ_VERSION
 USER root
 ADD tez-${TEZ_VERSION}.tar.gz /usr/lib/tez/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as hive-base
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-17-runtime-nofips as hive-base
 ARG CDH_VERSION
 USER root
 COPY maven/apache-hive-${CDH_VERSION}-bin /usr/lib/hive/
 COPY remove-unwanted.sh /
 RUN /remove-unwanted.sh
 
-FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-11-runtime-nofips as hive
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-openjdk:jdk-17-runtime-nofips as hive
 USER root
 # install debugging tools and other dependencies
 # and set UTC timezone
@@ -55,7 +55,7 @@ RUN apk update && \
 # add notice file
 ADD /NOTICE.txt /NOTICE.txt
 
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk/jre
+ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk/jre
 
 # by default JVM caches successful DNS resolution infinitely. If a pod or node dies, the ip address changes
 # so we set TTL for DNS cache to non-zero value.

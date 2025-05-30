@@ -86,6 +86,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
+import org.mockito.ArgumentMatchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -972,7 +973,7 @@ public class TestObjectStore {
     spy.getAllTables(DEFAULT_CATALOG_NAME, DB1);
     spy.getPartitionCount();
     Mockito.verify(spy, Mockito.times(3))
-        .rollbackAndCleanup(Mockito.anyBoolean(), Mockito.<Query>anyObject());
+        .rollbackAndCleanup(Mockito.anyBoolean(), ArgumentMatchers.<Query>any());
   }
 
   @Test

@@ -131,13 +131,13 @@ select a, b from t1 where b = 1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@mv1
 PREHOOK: Input: default@t1
-#### A masked pattern was here ####
+PREHOOK: Output: hdfs://### HDFS PATH ###
 POSTHOOK: query: explain cbo
 select a, b from t1 where b = 1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@mv1
 POSTHOOK: Input: default@t1
-#### A masked pattern was here ####
+POSTHOOK: Output: hdfs://### HDFS PATH ###
 CBO PLAN:
 HiveTableScan(table=[[default, mv1]], table:alias=[default.mv1])
 
@@ -145,10 +145,10 @@ PREHOOK: query: select a, b from t1 where b = 1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@mv1
 PREHOOK: Input: default@t1
-#### A masked pattern was here ####
+PREHOOK: Output: hdfs://### HDFS PATH ###
 POSTHOOK: query: select a, b from t1 where b = 1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@mv1
 POSTHOOK: Input: default@t1
-#### A masked pattern was here ####
+POSTHOOK: Output: hdfs://### HDFS PATH ###
 1	1

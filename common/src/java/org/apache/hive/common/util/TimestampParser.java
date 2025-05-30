@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
  * three pre-defined formats:
  *
  * <table border="1">
+ *     <caption></caption>
  * <thead>
  * <tr>
  * <th>Formatter</th>
