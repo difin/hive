@@ -41,6 +41,9 @@ RUN /remove-unwanted.sh
 FROM registry.access.redhat.com/ubi8/ubi:latest as hive
 # setup os and install packages
 RUN curl -o /etc/yum.repos.d/rhel8_mirrors.repo https://mirror.infra.cloudera.com/repos/rhel/server/8/8.10/rhel8.10_cldr_mirrors.repo
+# workaround until maybe RELENG-29894 is taken care of
+RUN awk '{gsub("http://", "https://"); print}' /etc/yum.repos.d/rhel8_mirrors.repo > /tmp/repo && mv /tmp/repo /etc/yum.repos.d/rhel8_mirrors.repo
+
 # install debugging tools and other dependencies
 RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 RUN yum -y update && \
