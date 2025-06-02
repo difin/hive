@@ -29,17 +29,24 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.identity.LongIdentity;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.api.MetaException;
-import org.apache.hadoop.hive.metastore.model.*;
+import org.apache.hadoop.hive.metastore.model.MColumnDescriptor;
+import org.apache.hadoop.hive.metastore.model.MFieldSchema;
+import org.apache.hadoop.hive.metastore.model.MOrder;
+import org.apache.hadoop.hive.metastore.model.MPartition;
+import org.apache.hadoop.hive.metastore.model.MPartitionColumnPrivilege;
+import org.apache.hadoop.hive.metastore.model.MPartitionPrivilege;
+import org.apache.hadoop.hive.metastore.model.MSerDeInfo;
+import org.apache.hadoop.hive.metastore.model.MStorageDescriptor;
+import org.apache.hadoop.hive.metastore.model.MStringList;
 import org.apache.hadoop.hive.metastore.tools.SQLGenerator;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.jdo.JDOPersistenceManager;
-import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 
 /**
@@ -751,7 +758,7 @@ class DirectSqlInsertPart {
       serdeIdToSerDeInfo.put(serDeId, sd.getSerDeInfo());
 
       Long cdId;
-      DatastoreId storeId = (DatastoreId) pm.getObjectId(sd.getCD());
+      LongIdentity storeId = (LongIdentity) pm.getObjectId(sd.getCD());
       if (storeId == null) {
         cdId = getDataStoreId(MColumnDescriptor.class);
         cdIdToColumnDescriptor.put(cdId, sd.getCD());
