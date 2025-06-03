@@ -119,6 +119,7 @@ class ThriftHiveMetastore_append_partition_with_environment_context_args
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->part_vals = array();
+<<<<<<< HEAD
                         $_size1556 = 0;
                         $_etype1559 = 0;
                         $xfer += $input->readListBegin($_etype1559, $_size1556);
@@ -126,6 +127,15 @@ class ThriftHiveMetastore_append_partition_with_environment_context_args
                             $elem1561 = null;
                             $xfer += $input->readString($elem1561);
                             $this->part_vals []= $elem1561;
+=======
+                        $_size1549 = 0;
+                        $_etype1552 = 0;
+                        $xfer += $input->readListBegin($_etype1552, $_size1549);
+                        for ($_i1553 = 0; $_i1553 < $_size1549; ++$_i1553) {
+                            $elem1554 = null;
+                            $xfer += $input->readString($elem1554);
+                            $this->part_vals []= $elem1554;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -170,8 +180,13 @@ class ThriftHiveMetastore_append_partition_with_environment_context_args
             }
             $xfer += $output->writeFieldBegin('part_vals', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->part_vals));
+<<<<<<< HEAD
             foreach ($this->part_vals as $iter1562) {
                 $xfer += $output->writeString($iter1562);
+=======
+            foreach ($this->part_vals as $iter1555) {
+                $xfer += $output->writeString($iter1555);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

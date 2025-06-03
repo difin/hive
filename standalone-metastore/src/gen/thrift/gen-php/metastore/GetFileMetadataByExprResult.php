@@ -85,6 +85,7 @@ class GetFileMetadataByExprResult
                 case 1:
                     if ($ftype == TType::MAP) {
                         $this->metadata = array();
+<<<<<<< HEAD
                         $_size912 = 0;
                         $_ktype913 = 0;
                         $_vtype914 = 0;
@@ -96,6 +97,19 @@ class GetFileMetadataByExprResult
                             $val918 = new \metastore\MetadataPpdResult();
                             $xfer += $val918->read($input);
                             $this->metadata[$key917] = $val918;
+=======
+                        $_size905 = 0;
+                        $_ktype906 = 0;
+                        $_vtype907 = 0;
+                        $xfer += $input->readMapBegin($_ktype906, $_vtype907, $_size905);
+                        for ($_i909 = 0; $_i909 < $_size905; ++$_i909) {
+                            $key910 = 0;
+                            $val911 = new \metastore\MetadataPpdResult();
+                            $xfer += $input->readI64($key910);
+                            $val911 = new \metastore\MetadataPpdResult();
+                            $xfer += $val911->read($input);
+                            $this->metadata[$key910] = $val911;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -129,9 +143,15 @@ class GetFileMetadataByExprResult
             }
             $xfer += $output->writeFieldBegin('metadata', TType::MAP, 1);
             $output->writeMapBegin(TType::I64, TType::STRUCT, count($this->metadata));
+<<<<<<< HEAD
             foreach ($this->metadata as $kiter919 => $viter920) {
                 $xfer += $output->writeI64($kiter919);
                 $xfer += $viter920->write($output);
+=======
+            foreach ($this->metadata as $kiter912 => $viter913) {
+                $xfer += $output->writeI64($kiter912);
+                $xfer += $viter913->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();

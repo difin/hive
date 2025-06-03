@@ -331,6 +331,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // PROPERTIES
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TMap _map1514 = iprot.readMapBegin();
                 struct.properties = new java.util.HashMap<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>(2*_map1514.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _key1515;
@@ -352,6 +353,29 @@ package org.apache.hadoop.hive.metastore.api;
                     iprot.readMapEnd();
                   }
                   struct.properties.put(_key1515, _val1516);
+=======
+                org.apache.thrift.protocol.TMap _map1506 = iprot.readMapBegin();
+                struct.properties = new java.util.HashMap<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>(2*_map1506.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _key1507;
+                @org.apache.thrift.annotation.Nullable java.util.Map<java.lang.String,java.lang.String> _val1508;
+                for (int _i1509 = 0; _i1509 < _map1506.size; ++_i1509)
+                {
+                  _key1507 = iprot.readString();
+                  {
+                    org.apache.thrift.protocol.TMap _map1510 = iprot.readMapBegin();
+                    _val1508 = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1510.size);
+                    @org.apache.thrift.annotation.Nullable java.lang.String _key1511;
+                    @org.apache.thrift.annotation.Nullable java.lang.String _val1512;
+                    for (int _i1513 = 0; _i1513 < _map1510.size; ++_i1513)
+                    {
+                      _key1511 = iprot.readString();
+                      _val1512 = iprot.readString();
+                      _val1508.put(_key1511, _val1512);
+                    }
+                    iprot.readMapEnd();
+                  }
+                  struct.properties.put(_key1507, _val1508);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readMapEnd();
               }
@@ -377,6 +401,7 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(PROPERTIES_FIELD_DESC);
         {
           oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.MAP, struct.properties.size()));
+<<<<<<< HEAD
           for (java.util.Map.Entry<java.lang.String, java.util.Map<java.lang.String,java.lang.String>> _iter1522 : struct.properties.entrySet())
           {
             oprot.writeString(_iter1522.getKey());
@@ -386,6 +411,17 @@ package org.apache.hadoop.hive.metastore.api;
               {
                 oprot.writeString(_iter1523.getKey());
                 oprot.writeString(_iter1523.getValue());
+=======
+          for (java.util.Map.Entry<java.lang.String, java.util.Map<java.lang.String,java.lang.String>> _iter1514 : struct.properties.entrySet())
+          {
+            oprot.writeString(_iter1514.getKey());
+            {
+              oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, _iter1514.getValue().size()));
+              for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1515 : _iter1514.getValue().entrySet())
+              {
+                oprot.writeString(_iter1515.getKey());
+                oprot.writeString(_iter1515.getValue());
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
               }
               oprot.writeMapEnd();
             }
@@ -419,6 +455,7 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetProperties()) {
         {
           oprot.writeI32(struct.properties.size());
+<<<<<<< HEAD
           for (java.util.Map.Entry<java.lang.String, java.util.Map<java.lang.String,java.lang.String>> _iter1524 : struct.properties.entrySet())
           {
             oprot.writeString(_iter1524.getKey());
@@ -428,6 +465,17 @@ package org.apache.hadoop.hive.metastore.api;
               {
                 oprot.writeString(_iter1525.getKey());
                 oprot.writeString(_iter1525.getValue());
+=======
+          for (java.util.Map.Entry<java.lang.String, java.util.Map<java.lang.String,java.lang.String>> _iter1516 : struct.properties.entrySet())
+          {
+            oprot.writeString(_iter1516.getKey());
+            {
+              oprot.writeI32(_iter1516.getValue().size());
+              for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1517 : _iter1516.getValue().entrySet())
+              {
+                oprot.writeString(_iter1517.getKey());
+                oprot.writeString(_iter1517.getValue());
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
               }
             }
           }
@@ -441,6 +489,7 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TMap _map1526 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.MAP); 
           struct.properties = new java.util.HashMap<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>(2*_map1526.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _key1527;
@@ -461,6 +510,28 @@ package org.apache.hadoop.hive.metastore.api;
               }
             }
             struct.properties.put(_key1527, _val1528);
+=======
+          org.apache.thrift.protocol.TMap _map1518 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.MAP); 
+          struct.properties = new java.util.HashMap<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>(2*_map1518.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _key1519;
+          @org.apache.thrift.annotation.Nullable java.util.Map<java.lang.String,java.lang.String> _val1520;
+          for (int _i1521 = 0; _i1521 < _map1518.size; ++_i1521)
+          {
+            _key1519 = iprot.readString();
+            {
+              org.apache.thrift.protocol.TMap _map1522 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING); 
+              _val1520 = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1522.size);
+              @org.apache.thrift.annotation.Nullable java.lang.String _key1523;
+              @org.apache.thrift.annotation.Nullable java.lang.String _val1524;
+              for (int _i1525 = 0; _i1525 < _map1522.size; ++_i1525)
+              {
+                _key1523 = iprot.readString();
+                _val1524 = iprot.readString();
+                _val1520.put(_key1523, _val1524);
+              }
+            }
+            struct.properties.put(_key1519, _val1520);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setPropertiesIsSet(true);

@@ -192,6 +192,7 @@ class AlterPartitionsRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->partitions = array();
+<<<<<<< HEAD
                         $_size1184 = 0;
                         $_etype1187 = 0;
                         $xfer += $input->readListBegin($_etype1187, $_size1184);
@@ -200,6 +201,16 @@ class AlterPartitionsRequest
                             $elem1189 = new \metastore\Partition();
                             $xfer += $elem1189->read($input);
                             $this->partitions []= $elem1189;
+=======
+                        $_size1177 = 0;
+                        $_etype1180 = 0;
+                        $xfer += $input->readListBegin($_etype1180, $_size1177);
+                        for ($_i1181 = 0; $_i1181 < $_size1177; ++$_i1181) {
+                            $elem1182 = null;
+                            $elem1182 = new \metastore\Partition();
+                            $xfer += $elem1182->read($input);
+                            $this->partitions []= $elem1182;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -238,6 +249,7 @@ class AlterPartitionsRequest
                 case 9:
                     if ($ftype == TType::LST) {
                         $this->partitionColSchema = array();
+<<<<<<< HEAD
                         $_size1190 = 0;
                         $_etype1193 = 0;
                         $xfer += $input->readListBegin($_etype1193, $_size1190);
@@ -246,6 +258,16 @@ class AlterPartitionsRequest
                             $elem1195 = new \metastore\FieldSchema();
                             $xfer += $elem1195->read($input);
                             $this->partitionColSchema []= $elem1195;
+=======
+                        $_size1183 = 0;
+                        $_etype1186 = 0;
+                        $xfer += $input->readListBegin($_etype1186, $_size1183);
+                        for ($_i1187 = 0; $_i1187 < $_size1183; ++$_i1187) {
+                            $elem1188 = null;
+                            $elem1188 = new \metastore\FieldSchema();
+                            $xfer += $elem1188->read($input);
+                            $this->partitionColSchema []= $elem1188;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -287,8 +309,13 @@ class AlterPartitionsRequest
             }
             $xfer += $output->writeFieldBegin('partitions', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->partitions));
+<<<<<<< HEAD
             foreach ($this->partitions as $iter1196) {
                 $xfer += $iter1196->write($output);
+=======
+            foreach ($this->partitions as $iter1189) {
+                $xfer += $iter1189->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -322,8 +349,13 @@ class AlterPartitionsRequest
             }
             $xfer += $output->writeFieldBegin('partitionColSchema', TType::LST, 9);
             $output->writeListBegin(TType::STRUCT, count($this->partitionColSchema));
+<<<<<<< HEAD
             foreach ($this->partitionColSchema as $iter1197) {
                 $xfer += $iter1197->write($output);
+=======
+            foreach ($this->partitionColSchema as $iter1190) {
+                $xfer += $iter1190->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

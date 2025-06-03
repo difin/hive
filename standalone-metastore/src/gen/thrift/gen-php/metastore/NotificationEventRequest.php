@@ -199,6 +199,7 @@ class NotificationEventRequest
                             $elem816 = null;
                             $xfer += $input->readString($elem816);
                             $this->tableNames []= $elem816;
+<<<<<<< HEAD
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -215,6 +216,8 @@ class NotificationEventRequest
                             $elem822 = null;
                             $xfer += $input->readString($elem822);
                             $this->eventTypeList []= $elem822;
+=======
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -251,8 +254,13 @@ class NotificationEventRequest
             }
             $xfer += $output->writeFieldBegin('eventTypeSkipList', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->eventTypeSkipList));
+<<<<<<< HEAD
             foreach ($this->eventTypeSkipList as $iter823) {
                 $xfer += $output->writeString($iter823);
+=======
+            foreach ($this->eventTypeSkipList as $iter817) {
+                $xfer += $output->writeString($iter817);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -273,6 +281,7 @@ class NotificationEventRequest
             }
             $xfer += $output->writeFieldBegin('tableNames', TType::LST, 6);
             $output->writeListBegin(TType::STRING, count($this->tableNames));
+<<<<<<< HEAD
             foreach ($this->tableNames as $iter824) {
                 $xfer += $output->writeString($iter824);
             }
@@ -287,6 +296,10 @@ class NotificationEventRequest
             $output->writeListBegin(TType::STRING, count($this->eventTypeList));
             foreach ($this->eventTypeList as $iter825) {
                 $xfer += $output->writeString($iter825);
+=======
+            foreach ($this->tableNames as $iter818) {
+                $xfer += $output->writeString($iter818);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

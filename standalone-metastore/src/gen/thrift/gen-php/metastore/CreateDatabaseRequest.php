@@ -227,6 +227,7 @@ class CreateDatabaseRequest
                 case 4:
                     if ($ftype == TType::MAP) {
                         $this->parameters = array();
+<<<<<<< HEAD
                         $_size1175 = 0;
                         $_ktype1176 = 0;
                         $_vtype1177 = 0;
@@ -237,6 +238,18 @@ class CreateDatabaseRequest
                             $xfer += $input->readString($key1180);
                             $xfer += $input->readString($val1181);
                             $this->parameters[$key1180] = $val1181;
+=======
+                        $_size1168 = 0;
+                        $_ktype1169 = 0;
+                        $_vtype1170 = 0;
+                        $xfer += $input->readMapBegin($_ktype1169, $_vtype1170, $_size1168);
+                        for ($_i1172 = 0; $_i1172 < $_size1168; ++$_i1172) {
+                            $key1173 = '';
+                            $val1174 = '';
+                            $xfer += $input->readString($key1173);
+                            $xfer += $input->readString($val1174);
+                            $this->parameters[$key1173] = $val1174;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -335,9 +348,15 @@ class CreateDatabaseRequest
             }
             $xfer += $output->writeFieldBegin('parameters', TType::MAP, 4);
             $output->writeMapBegin(TType::STRING, TType::STRING, count($this->parameters));
+<<<<<<< HEAD
             foreach ($this->parameters as $kiter1182 => $viter1183) {
                 $xfer += $output->writeString($kiter1182);
                 $xfer += $output->writeString($viter1183);
+=======
+            foreach ($this->parameters as $kiter1175 => $viter1176) {
+                $xfer += $output->writeString($kiter1175);
+                $xfer += $output->writeString($viter1176);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();

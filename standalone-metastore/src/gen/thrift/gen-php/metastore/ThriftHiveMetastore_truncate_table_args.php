@@ -106,6 +106,7 @@ class ThriftHiveMetastore_truncate_table_args
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->partNames = array();
+<<<<<<< HEAD
                         $_size1451 = 0;
                         $_etype1454 = 0;
                         $xfer += $input->readListBegin($_etype1454, $_size1451);
@@ -113,6 +114,15 @@ class ThriftHiveMetastore_truncate_table_args
                             $elem1456 = null;
                             $xfer += $input->readString($elem1456);
                             $this->partNames []= $elem1456;
+=======
+                        $_size1444 = 0;
+                        $_etype1447 = 0;
+                        $xfer += $input->readListBegin($_etype1447, $_size1444);
+                        for ($_i1448 = 0; $_i1448 < $_size1444; ++$_i1448) {
+                            $elem1449 = null;
+                            $xfer += $input->readString($elem1449);
+                            $this->partNames []= $elem1449;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -149,8 +159,13 @@ class ThriftHiveMetastore_truncate_table_args
             }
             $xfer += $output->writeFieldBegin('partNames', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->partNames));
+<<<<<<< HEAD
             foreach ($this->partNames as $iter1457) {
                 $xfer += $output->writeString($iter1457);
+=======
+            foreach ($this->partNames as $iter1450) {
+                $xfer += $output->writeString($iter1450);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

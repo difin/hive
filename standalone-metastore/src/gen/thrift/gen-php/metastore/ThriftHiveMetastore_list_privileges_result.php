@@ -82,6 +82,7 @@ class ThriftHiveMetastore_list_privileges_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
+<<<<<<< HEAD
                         $_size1832 = 0;
                         $_etype1835 = 0;
                         $xfer += $input->readListBegin($_etype1835, $_size1832);
@@ -90,6 +91,16 @@ class ThriftHiveMetastore_list_privileges_result
                             $elem1837 = new \metastore\HiveObjectPrivilege();
                             $xfer += $elem1837->read($input);
                             $this->success []= $elem1837;
+=======
+                        $_size1825 = 0;
+                        $_etype1828 = 0;
+                        $xfer += $input->readListBegin($_etype1828, $_size1825);
+                        for ($_i1829 = 0; $_i1829 < $_size1825; ++$_i1829) {
+                            $elem1830 = null;
+                            $elem1830 = new \metastore\HiveObjectPrivilege();
+                            $xfer += $elem1830->read($input);
+                            $this->success []= $elem1830;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -124,8 +135,13 @@ class ThriftHiveMetastore_list_privileges_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRUCT, count($this->success));
+<<<<<<< HEAD
             foreach ($this->success as $iter1838) {
                 $xfer += $iter1838->write($output);
+=======
+            foreach ($this->success as $iter1831) {
+                $xfer += $iter1831->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

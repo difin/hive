@@ -21,9 +21,12 @@ package org.apache.iceberg.hive;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.GetDatabaseObjectsRequest;
+import org.apache.hadoop.hive.metastore.api.GetDatabaseObjectsResponse;
 import org.apache.hadoop.hive.metastore.api.LockRequest;
 import org.apache.hadoop.hive.metastore.api.LockResponse;
 import org.apache.hadoop.hive.metastore.api.ShowLocksRequest;
@@ -185,7 +188,13 @@ public class HiveCatalogActor implements HiveActor {
 
   @Override
   public List<String> listNamespaceNames() throws TException, InterruptedException {
-    return clients.run(IMetaStoreClient::getAllDatabases);
+    return clients.run(client -> {
+      GetDatabaseObjectsRequest request = new GetDatabaseObjectsRequest();
+      GetDatabaseObjectsResponse response = client.get_databases_req(request);
+      return response.getDatabases().stream()
+          .map(Database::getName)
+          .collect(Collectors.toList());
+    });
   }
 
   @Override

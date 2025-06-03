@@ -61,10 +61,9 @@ import java.io.File;
 import java.util.stream.Collectors;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -656,6 +655,58 @@ public class TestHiveMetaStoreAuthorizer {
       hmsHandler.drop_table(default_db, new_tblName, true);
     }
   }
+
+  @Test
+  public void testGetDatabaseObjects_UnauthorizedUser() throws Exception {
+    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(unAuthorizedUser));
+    try {
+      Database db = new DatabaseBuilder()
+          .setName(dbName)
+          .build(conf);
+      hmsHandler.create_database(db);
+      GetDatabaseObjectsRequest request = new GetDatabaseObjectsRequest();
+      request.setCatalogName("hive");
+      hmsHandler.get_databases_req(request);
+      fail("Expected exception for unauthorized user");
+    } catch (Exception e) {
+      String err = e.getMessage();
+      assertTrue("Exception message should contain operation type",
+          err.contains("Operation type") && err.contains("not allowed for user:" + unAuthorizedUser));
+    } finally {
+      UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(superUser));
+      try {
+        hmsHandler.drop_database(dbName, true, false);
+      } catch (Exception e) {
+        // Ignore cleanup errors
+      }
+    }
+  }
+
+  @Test
+public void testGetDatabaseObjects_AuthorizedUser() throws Exception {
+  UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
+  try {
+    Database db = new DatabaseBuilder()
+            .setName(dbName)
+            .setOwnerName(authorizedUser)
+            .build(conf);
+    hmsHandler.create_database(db);
+    GetDatabaseObjectsRequest request = new GetDatabaseObjectsRequest();
+    request.setCatalogName("hive");
+    GetDatabaseObjectsResponse response = hmsHandler.get_databases_req(request);
+
+    assertNotNull("Response should not be null", response);
+    assertNotNull("Databases list should not be null", response.getDatabases());
+    assertTrue("Should find the created database",
+        response.getDatabases().stream().anyMatch(d -> d.getName().equals(dbName)));
+  } finally {
+    try {
+      hmsHandler.drop_database(dbName, true, false);
+    } catch (Exception e) {
+      // Ignore cleanup errors
+    }
+  }
+}
 
   @Test
   public void testGetDatabaseObjects_WithPattern() throws Exception {

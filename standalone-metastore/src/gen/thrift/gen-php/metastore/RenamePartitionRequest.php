@@ -174,6 +174,7 @@ class RenamePartitionRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->partVals = array();
+<<<<<<< HEAD
                         $_size1198 = 0;
                         $_etype1201 = 0;
                         $xfer += $input->readListBegin($_etype1201, $_size1198);
@@ -181,6 +182,15 @@ class RenamePartitionRequest
                             $elem1203 = null;
                             $xfer += $input->readString($elem1203);
                             $this->partVals []= $elem1203;
+=======
+                        $_size1191 = 0;
+                        $_etype1194 = 0;
+                        $xfer += $input->readListBegin($_etype1194, $_size1191);
+                        for ($_i1195 = 0; $_i1195 < $_size1191; ++$_i1195) {
+                            $elem1196 = null;
+                            $xfer += $input->readString($elem1196);
+                            $this->partVals []= $elem1196;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -251,8 +261,13 @@ class RenamePartitionRequest
             }
             $xfer += $output->writeFieldBegin('partVals', TType::LST, 4);
             $output->writeListBegin(TType::STRING, count($this->partVals));
+<<<<<<< HEAD
             foreach ($this->partVals as $iter1204) {
                 $xfer += $output->writeString($iter1204);
+=======
+            foreach ($this->partVals as $iter1197) {
+                $xfer += $output->writeString($iter1197);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

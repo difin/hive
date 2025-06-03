@@ -149,6 +149,7 @@ class GetPartitionRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->partVals = array();
+<<<<<<< HEAD
                         $_size1254 = 0;
                         $_etype1257 = 0;
                         $xfer += $input->readListBegin($_etype1257, $_size1254);
@@ -156,6 +157,15 @@ class GetPartitionRequest
                             $elem1259 = null;
                             $xfer += $input->readString($elem1259);
                             $this->partVals []= $elem1259;
+=======
+                        $_size1247 = 0;
+                        $_etype1250 = 0;
+                        $xfer += $input->readListBegin($_etype1250, $_size1247);
+                        for ($_i1251 = 0; $_i1251 < $_size1247; ++$_i1251) {
+                            $elem1252 = null;
+                            $xfer += $input->readString($elem1252);
+                            $this->partVals []= $elem1252;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -211,8 +221,13 @@ class GetPartitionRequest
             }
             $xfer += $output->writeFieldBegin('partVals', TType::LST, 4);
             $output->writeListBegin(TType::STRING, count($this->partVals));
+<<<<<<< HEAD
             foreach ($this->partVals as $iter1260) {
                 $xfer += $output->writeString($iter1260);
+=======
+            foreach ($this->partVals as $iter1253) {
+                $xfer += $output->writeString($iter1253);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

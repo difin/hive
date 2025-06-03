@@ -13,7 +13,11 @@ from thrift.TRecursive import fix_spec
 import sys
 from .ttypes import *
 DDL_TIME = "transient_lastDdlTime"
+<<<<<<< HEAD
 HMS_API = "1.2.53"
+=======
+HMS_API = "1.2.45"
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
 ACCESSTYPE_NONE = 1
 ACCESSTYPE_READONLY = 2
 ACCESSTYPE_WRITEONLY = 4

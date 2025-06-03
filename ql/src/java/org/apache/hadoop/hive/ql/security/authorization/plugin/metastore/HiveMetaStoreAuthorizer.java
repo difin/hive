@@ -757,4 +757,3 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
     return null;
   }
 }
-

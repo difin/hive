@@ -118,6 +118,7 @@ class GetDatabaseRequest
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->processorCapabilities = array();
+<<<<<<< HEAD
                         $_size1035 = 0;
                         $_etype1038 = 0;
                         $xfer += $input->readListBegin($_etype1038, $_size1035);
@@ -125,6 +126,15 @@ class GetDatabaseRequest
                             $elem1040 = null;
                             $xfer += $input->readString($elem1040);
                             $this->processorCapabilities []= $elem1040;
+=======
+                        $_size1028 = 0;
+                        $_etype1031 = 0;
+                        $xfer += $input->readListBegin($_etype1031, $_size1028);
+                        for ($_i1032 = 0; $_i1032 < $_size1028; ++$_i1032) {
+                            $elem1033 = null;
+                            $xfer += $input->readString($elem1033);
+                            $this->processorCapabilities []= $elem1033;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -168,8 +178,13 @@ class GetDatabaseRequest
             }
             $xfer += $output->writeFieldBegin('processorCapabilities', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->processorCapabilities));
+<<<<<<< HEAD
             foreach ($this->processorCapabilities as $iter1041) {
                 $xfer += $output->writeString($iter1041);
+=======
+            foreach ($this->processorCapabilities as $iter1034) {
+                $xfer += $output->writeString($iter1034);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

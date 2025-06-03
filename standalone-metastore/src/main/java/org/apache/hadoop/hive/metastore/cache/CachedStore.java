@@ -2359,8 +2359,8 @@ public class CachedStore implements RawStore, Configurable {
           throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
     return updatePartitionColumnStatisticsInternal(table, mTable, colStats, partVals, validWriteIds, writeId);
   }
-  
-  private Map<String, String> updatePartitionColumnStatisticsInternal(Table table, MTable mTable, 
+
+  private Map<String, String> updatePartitionColumnStatisticsInternal(Table table, MTable mTable,
                                                                           ColumnStatistics colStats, List<String> partVals, String validWriteIds, long writeId)
       throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
     ColumnStatisticsDesc statsDesc = colStats.getStatsDesc();

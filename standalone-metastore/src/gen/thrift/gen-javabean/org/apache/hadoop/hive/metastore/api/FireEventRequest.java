@@ -861,6 +861,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 5: // PARTITION_VALS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list992 = iprot.readListBegin();
                 struct.partitionVals = new java.util.ArrayList<java.lang.String>(_list992.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem993;
@@ -868,6 +869,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem993 = iprot.readString();
                   struct.partitionVals.add(_elem993);
+=======
+                org.apache.thrift.protocol.TList _list984 = iprot.readListBegin();
+                struct.partitionVals = new java.util.ArrayList<java.lang.String>(_list984.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem985;
+                for (int _i986 = 0; _i986 < _list984.size; ++_i986)
+                {
+                  _elem985 = iprot.readString();
+                  struct.partitionVals.add(_elem985);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -887,6 +897,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 7: // TBL_PARAMS
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TMap _map995 = iprot.readMapBegin();
                 struct.tblParams = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map995.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _key996;
@@ -896,6 +907,17 @@ package org.apache.hadoop.hive.metastore.api;
                   _key996 = iprot.readString();
                   _val997 = iprot.readString();
                   struct.tblParams.put(_key996, _val997);
+=======
+                org.apache.thrift.protocol.TMap _map987 = iprot.readMapBegin();
+                struct.tblParams = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map987.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _key988;
+                @org.apache.thrift.annotation.Nullable java.lang.String _val989;
+                for (int _i990 = 0; _i990 < _map987.size; ++_i990)
+                {
+                  _key988 = iprot.readString();
+                  _val989 = iprot.readString();
+                  struct.tblParams.put(_key988, _val989);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readMapEnd();
               }
@@ -944,9 +966,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(PARTITION_VALS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.partitionVals.size()));
+<<<<<<< HEAD
             for (java.lang.String _iter999 : struct.partitionVals)
             {
               oprot.writeString(_iter999);
+=======
+            for (java.lang.String _iter991 : struct.partitionVals)
+            {
+              oprot.writeString(_iter991);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -965,10 +993,17 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(TBL_PARAMS_FIELD_DESC);
           {
             oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, struct.tblParams.size()));
+<<<<<<< HEAD
             for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1000 : struct.tblParams.entrySet())
             {
               oprot.writeString(_iter1000.getKey());
               oprot.writeString(_iter1000.getValue());
+=======
+            for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter992 : struct.tblParams.entrySet())
+            {
+              oprot.writeString(_iter992.getKey());
+              oprot.writeString(_iter992.getValue());
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeMapEnd();
           }
@@ -1020,9 +1055,15 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetPartitionVals()) {
         {
           oprot.writeI32(struct.partitionVals.size());
+<<<<<<< HEAD
           for (java.lang.String _iter1001 : struct.partitionVals)
           {
             oprot.writeString(_iter1001);
+=======
+          for (java.lang.String _iter993 : struct.partitionVals)
+          {
+            oprot.writeString(_iter993);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
@@ -1032,10 +1073,17 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetTblParams()) {
         {
           oprot.writeI32(struct.tblParams.size());
+<<<<<<< HEAD
           for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1002 : struct.tblParams.entrySet())
           {
             oprot.writeString(_iter1002.getKey());
             oprot.writeString(_iter1002.getValue());
+=======
+          for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter994 : struct.tblParams.entrySet())
+          {
+            oprot.writeString(_iter994.getKey());
+            oprot.writeString(_iter994.getValue());
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
@@ -1060,6 +1108,7 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(2)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1003 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.partitionVals = new java.util.ArrayList<java.lang.String>(_list1003.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem1004;
@@ -1067,6 +1116,15 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem1004 = iprot.readString();
             struct.partitionVals.add(_elem1004);
+=======
+          org.apache.thrift.protocol.TList _list995 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.partitionVals = new java.util.ArrayList<java.lang.String>(_list995.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem996;
+          for (int _i997 = 0; _i997 < _list995.size; ++_i997)
+          {
+            _elem996 = iprot.readString();
+            struct.partitionVals.add(_elem996);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setPartitionValsIsSet(true);
@@ -1077,6 +1135,7 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(4)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TMap _map1006 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING); 
           struct.tblParams = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1006.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _key1007;
@@ -1086,6 +1145,17 @@ package org.apache.hadoop.hive.metastore.api;
             _key1007 = iprot.readString();
             _val1008 = iprot.readString();
             struct.tblParams.put(_key1007, _val1008);
+=======
+          org.apache.thrift.protocol.TMap _map998 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING); 
+          struct.tblParams = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map998.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _key999;
+          @org.apache.thrift.annotation.Nullable java.lang.String _val1000;
+          for (int _i1001 = 0; _i1001 < _map998.size; ++_i1001)
+          {
+            _key999 = iprot.readString();
+            _val1000 = iprot.readString();
+            struct.tblParams.put(_key999, _val1000);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setTblParamsIsSet(true);

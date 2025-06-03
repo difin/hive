@@ -126,6 +126,7 @@ class WriteNotificationLogBatchRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->requestList = array();
+<<<<<<< HEAD
                         $_size905 = 0;
                         $_etype908 = 0;
                         $xfer += $input->readListBegin($_etype908, $_size905);
@@ -134,6 +135,16 @@ class WriteNotificationLogBatchRequest
                             $elem910 = new \metastore\WriteNotificationLogRequest();
                             $xfer += $elem910->read($input);
                             $this->requestList []= $elem910;
+=======
+                        $_size898 = 0;
+                        $_etype901 = 0;
+                        $xfer += $input->readListBegin($_etype901, $_size898);
+                        for ($_i902 = 0; $_i902 < $_size898; ++$_i902) {
+                            $elem903 = null;
+                            $elem903 = new \metastore\WriteNotificationLogRequest();
+                            $xfer += $elem903->read($input);
+                            $this->requestList []= $elem903;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -175,8 +186,13 @@ class WriteNotificationLogBatchRequest
             }
             $xfer += $output->writeFieldBegin('requestList', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->requestList));
+<<<<<<< HEAD
             foreach ($this->requestList as $iter911) {
                 $xfer += $iter911->write($output);
+=======
+            foreach ($this->requestList as $iter904) {
+                $xfer += $iter904->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

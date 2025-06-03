@@ -69,6 +69,7 @@ class FindSchemasByColsResp
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->schemaVersions = array();
+<<<<<<< HEAD
                         $_size1119 = 0;
                         $_etype1122 = 0;
                         $xfer += $input->readListBegin($_etype1122, $_size1119);
@@ -77,6 +78,16 @@ class FindSchemasByColsResp
                             $elem1124 = new \metastore\SchemaVersionDescriptor();
                             $xfer += $elem1124->read($input);
                             $this->schemaVersions []= $elem1124;
+=======
+                        $_size1112 = 0;
+                        $_etype1115 = 0;
+                        $xfer += $input->readListBegin($_etype1115, $_size1112);
+                        for ($_i1116 = 0; $_i1116 < $_size1112; ++$_i1116) {
+                            $elem1117 = null;
+                            $elem1117 = new \metastore\SchemaVersionDescriptor();
+                            $xfer += $elem1117->read($input);
+                            $this->schemaVersions []= $elem1117;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +114,13 @@ class FindSchemasByColsResp
             }
             $xfer += $output->writeFieldBegin('schemaVersions', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->schemaVersions));
+<<<<<<< HEAD
             foreach ($this->schemaVersions as $iter1125) {
                 $xfer += $iter1125->write($output);
+=======
+            foreach ($this->schemaVersions as $iter1118) {
+                $xfer += $iter1118->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

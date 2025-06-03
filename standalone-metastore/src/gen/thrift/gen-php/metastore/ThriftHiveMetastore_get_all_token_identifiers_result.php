@@ -68,6 +68,7 @@ class ThriftHiveMetastore_get_all_token_identifiers_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
+<<<<<<< HEAD
                         $_size1853 = 0;
                         $_etype1856 = 0;
                         $xfer += $input->readListBegin($_etype1856, $_size1853);
@@ -75,6 +76,15 @@ class ThriftHiveMetastore_get_all_token_identifiers_result
                             $elem1858 = null;
                             $xfer += $input->readString($elem1858);
                             $this->success []= $elem1858;
+=======
+                        $_size1846 = 0;
+                        $_etype1849 = 0;
+                        $xfer += $input->readListBegin($_etype1849, $_size1846);
+                        for ($_i1850 = 0; $_i1850 < $_size1846; ++$_i1850) {
+                            $elem1851 = null;
+                            $xfer += $input->readString($elem1851);
+                            $this->success []= $elem1851;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -101,8 +111,13 @@ class ThriftHiveMetastore_get_all_token_identifiers_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRING, count($this->success));
+<<<<<<< HEAD
             foreach ($this->success as $iter1859) {
                 $xfer += $output->writeString($iter1859);
+=======
+            foreach ($this->success as $iter1852) {
+                $xfer += $output->writeString($iter1852);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

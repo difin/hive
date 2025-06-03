@@ -225,6 +225,7 @@ class GetPartitionsPsWithAuthRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->partVals = array();
+<<<<<<< HEAD
                         $_size1282 = 0;
                         $_etype1285 = 0;
                         $xfer += $input->readListBegin($_etype1285, $_size1282);
@@ -232,6 +233,15 @@ class GetPartitionsPsWithAuthRequest
                             $elem1287 = null;
                             $xfer += $input->readString($elem1287);
                             $this->partVals []= $elem1287;
+=======
+                        $_size1275 = 0;
+                        $_etype1278 = 0;
+                        $xfer += $input->readListBegin($_etype1278, $_size1275);
+                        for ($_i1279 = 0; $_i1279 < $_size1275; ++$_i1279) {
+                            $elem1280 = null;
+                            $xfer += $input->readString($elem1280);
+                            $this->partVals []= $elem1280;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -255,6 +265,7 @@ class GetPartitionsPsWithAuthRequest
                 case 7:
                     if ($ftype == TType::LST) {
                         $this->groupNames = array();
+<<<<<<< HEAD
                         $_size1288 = 0;
                         $_etype1291 = 0;
                         $xfer += $input->readListBegin($_etype1291, $_size1288);
@@ -262,6 +273,15 @@ class GetPartitionsPsWithAuthRequest
                             $elem1293 = null;
                             $xfer += $input->readString($elem1293);
                             $this->groupNames []= $elem1293;
+=======
+                        $_size1281 = 0;
+                        $_etype1284 = 0;
+                        $xfer += $input->readListBegin($_etype1284, $_size1281);
+                        for ($_i1285 = 0; $_i1285 < $_size1281; ++$_i1285) {
+                            $elem1286 = null;
+                            $xfer += $input->readString($elem1286);
+                            $this->groupNames []= $elem1286;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -338,8 +358,13 @@ class GetPartitionsPsWithAuthRequest
             }
             $xfer += $output->writeFieldBegin('partVals', TType::LST, 4);
             $output->writeListBegin(TType::STRING, count($this->partVals));
+<<<<<<< HEAD
             foreach ($this->partVals as $iter1294) {
                 $xfer += $output->writeString($iter1294);
+=======
+            foreach ($this->partVals as $iter1287) {
+                $xfer += $output->writeString($iter1287);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -360,8 +385,13 @@ class GetPartitionsPsWithAuthRequest
             }
             $xfer += $output->writeFieldBegin('groupNames', TType::LST, 7);
             $output->writeListBegin(TType::STRING, count($this->groupNames));
+<<<<<<< HEAD
             foreach ($this->groupNames as $iter1295) {
                 $xfer += $output->writeString($iter1295);
+=======
+            foreach ($this->groupNames as $iter1288) {
+                $xfer += $output->writeString($iter1288);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

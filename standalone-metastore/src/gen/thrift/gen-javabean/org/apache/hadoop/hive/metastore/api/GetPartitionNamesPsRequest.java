@@ -837,6 +837,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 4: // PART_VALUES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1440 = iprot.readListBegin();
                 struct.partValues = new java.util.ArrayList<java.lang.String>(_list1440.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem1441;
@@ -844,6 +845,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem1441 = iprot.readString();
                   struct.partValues.add(_elem1441);
+=======
+                org.apache.thrift.protocol.TList _list1432 = iprot.readListBegin();
+                struct.partValues = new java.util.ArrayList<java.lang.String>(_list1432.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem1433;
+                for (int _i1434 = 0; _i1434 < _list1432.size; ++_i1434)
+                {
+                  _elem1433 = iprot.readString();
+                  struct.partValues.add(_elem1433);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -911,9 +921,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(PART_VALUES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.partValues.size()));
+<<<<<<< HEAD
             for (java.lang.String _iter1443 : struct.partValues)
             {
               oprot.writeString(_iter1443);
+=======
+            for (java.lang.String _iter1435 : struct.partValues)
+            {
+              oprot.writeString(_iter1435);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -979,9 +995,15 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetPartValues()) {
         {
           oprot.writeI32(struct.partValues.size());
+<<<<<<< HEAD
           for (java.lang.String _iter1444 : struct.partValues)
           {
             oprot.writeString(_iter1444);
+=======
+          for (java.lang.String _iter1436 : struct.partValues)
+          {
+            oprot.writeString(_iter1436);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
@@ -1010,6 +1032,7 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(1)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1445 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.partValues = new java.util.ArrayList<java.lang.String>(_list1445.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem1446;
@@ -1017,6 +1040,15 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem1446 = iprot.readString();
             struct.partValues.add(_elem1446);
+=======
+          org.apache.thrift.protocol.TList _list1437 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.partValues = new java.util.ArrayList<java.lang.String>(_list1437.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem1438;
+          for (int _i1439 = 0; _i1439 < _list1437.size; ++_i1439)
+          {
+            _elem1438 = iprot.readString();
+            struct.partValues.add(_elem1438);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setPartValuesIsSet(true);

@@ -69,6 +69,7 @@ class NotificationEventResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->events = array();
+<<<<<<< HEAD
                         $_size826 = 0;
                         $_etype829 = 0;
                         $xfer += $input->readListBegin($_etype829, $_size826);
@@ -77,6 +78,16 @@ class NotificationEventResponse
                             $elem831 = new \metastore\NotificationEvent();
                             $xfer += $elem831->read($input);
                             $this->events []= $elem831;
+=======
+                        $_size819 = 0;
+                        $_etype822 = 0;
+                        $xfer += $input->readListBegin($_etype822, $_size819);
+                        for ($_i823 = 0; $_i823 < $_size819; ++$_i823) {
+                            $elem824 = null;
+                            $elem824 = new \metastore\NotificationEvent();
+                            $xfer += $elem824->read($input);
+                            $this->events []= $elem824;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +114,13 @@ class NotificationEventResponse
             }
             $xfer += $output->writeFieldBegin('events', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->events));
+<<<<<<< HEAD
             foreach ($this->events as $iter832) {
                 $xfer += $iter832->write($output);
+=======
+            foreach ($this->events as $iter825) {
+                $xfer += $iter825->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

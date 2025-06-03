@@ -95,6 +95,7 @@ class ThriftHiveMetastore_get_partitions_pspec_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
+<<<<<<< HEAD
                         $_size1644 = 0;
                         $_etype1647 = 0;
                         $xfer += $input->readListBegin($_etype1647, $_size1644);
@@ -103,6 +104,16 @@ class ThriftHiveMetastore_get_partitions_pspec_result
                             $elem1649 = new \metastore\PartitionSpec();
                             $xfer += $elem1649->read($input);
                             $this->success []= $elem1649;
+=======
+                        $_size1637 = 0;
+                        $_etype1640 = 0;
+                        $xfer += $input->readListBegin($_etype1640, $_size1637);
+                        for ($_i1641 = 0; $_i1641 < $_size1637; ++$_i1641) {
+                            $elem1642 = null;
+                            $elem1642 = new \metastore\PartitionSpec();
+                            $xfer += $elem1642->read($input);
+                            $this->success []= $elem1642;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -145,8 +156,13 @@ class ThriftHiveMetastore_get_partitions_pspec_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRUCT, count($this->success));
+<<<<<<< HEAD
             foreach ($this->success as $iter1650) {
                 $xfer += $iter1650->write($output);
+=======
+            foreach ($this->success as $iter1643) {
+                $xfer += $iter1643->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

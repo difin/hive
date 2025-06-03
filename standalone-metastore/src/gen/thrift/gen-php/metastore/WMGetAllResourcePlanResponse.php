@@ -69,6 +69,7 @@ class WMGetAllResourcePlanResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->resourcePlans = array();
+<<<<<<< HEAD
                         $_size1084 = 0;
                         $_etype1087 = 0;
                         $xfer += $input->readListBegin($_etype1087, $_size1084);
@@ -77,6 +78,16 @@ class WMGetAllResourcePlanResponse
                             $elem1089 = new \metastore\WMResourcePlan();
                             $xfer += $elem1089->read($input);
                             $this->resourcePlans []= $elem1089;
+=======
+                        $_size1077 = 0;
+                        $_etype1080 = 0;
+                        $xfer += $input->readListBegin($_etype1080, $_size1077);
+                        for ($_i1081 = 0; $_i1081 < $_size1077; ++$_i1081) {
+                            $elem1082 = null;
+                            $elem1082 = new \metastore\WMResourcePlan();
+                            $xfer += $elem1082->read($input);
+                            $this->resourcePlans []= $elem1082;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +114,13 @@ class WMGetAllResourcePlanResponse
             }
             $xfer += $output->writeFieldBegin('resourcePlans', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->resourcePlans));
+<<<<<<< HEAD
             foreach ($this->resourcePlans as $iter1090) {
                 $xfer += $iter1090->write($output);
+=======
+            foreach ($this->resourcePlans as $iter1083) {
+                $xfer += $iter1083->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

@@ -39,6 +39,8 @@ import org.apache.hadoop.hive.metastore.api.ShowLocksRequest;
 import org.apache.hadoop.hive.metastore.api.ShowLocksResponse;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.UnlockRequest;
+import org.apache.hadoop.hive.metastore.api.GetDatabaseObjectsRequest;
+import org.apache.hadoop.hive.metastore.api.GetDatabaseObjectsResponse;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.iceberg.BaseMetastoreTableOperations;
 import org.apache.iceberg.TableMetadata;
@@ -54,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HMSCatalogActor implements HiveActor {
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogActor.class);
@@ -242,7 +245,13 @@ public class HMSCatalogActor implements HiveActor {
 
   @Override
   public List<String> listNamespaceNames() throws TException {
-    return run(h -> h.get_all_databases());
+    GetDatabaseObjectsRequest request = new GetDatabaseObjectsRequest();
+    return run(h -> {
+      GetDatabaseObjectsResponse response = h.get_databases_req(request);
+      return response.getDatabases().stream()
+          .map(Database::getName)
+          .collect(Collectors.toList());
+    });
   }
 
   @Override

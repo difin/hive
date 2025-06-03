@@ -91,6 +91,7 @@ class ThriftHiveMetastore_add_write_ids_to_min_history_args
                 case 2:
                     if ($ftype == TType::MAP) {
                         $this->writeIds = array();
+<<<<<<< HEAD
                         $_size1867 = 0;
                         $_ktype1868 = 0;
                         $_vtype1869 = 0;
@@ -101,6 +102,18 @@ class ThriftHiveMetastore_add_write_ids_to_min_history_args
                             $xfer += $input->readString($key1872);
                             $xfer += $input->readI64($val1873);
                             $this->writeIds[$key1872] = $val1873;
+=======
+                        $_size1860 = 0;
+                        $_ktype1861 = 0;
+                        $_vtype1862 = 0;
+                        $xfer += $input->readMapBegin($_ktype1861, $_vtype1862, $_size1860);
+                        for ($_i1864 = 0; $_i1864 < $_size1860; ++$_i1864) {
+                            $key1865 = '';
+                            $val1866 = 0;
+                            $xfer += $input->readString($key1865);
+                            $xfer += $input->readI64($val1866);
+                            $this->writeIds[$key1865] = $val1866;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -132,9 +145,15 @@ class ThriftHiveMetastore_add_write_ids_to_min_history_args
             }
             $xfer += $output->writeFieldBegin('writeIds', TType::MAP, 2);
             $output->writeMapBegin(TType::STRING, TType::I64, count($this->writeIds));
+<<<<<<< HEAD
             foreach ($this->writeIds as $kiter1874 => $viter1875) {
                 $xfer += $output->writeString($kiter1874);
                 $xfer += $output->writeI64($viter1875);
+=======
+            foreach ($this->writeIds as $kiter1867 => $viter1868) {
+                $xfer += $output->writeString($kiter1867);
+                $xfer += $output->writeI64($viter1868);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();

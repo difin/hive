@@ -102,6 +102,7 @@ class FireEventRequestData
                 case 2:
                     if ($ftype == TType::LST) {
                         $this->insertDatas = array();
+<<<<<<< HEAD
                         $_size868 = 0;
                         $_etype871 = 0;
                         $xfer += $input->readListBegin($_etype871, $_size868);
@@ -110,6 +111,16 @@ class FireEventRequestData
                             $elem873 = new \metastore\InsertEventRequestData();
                             $xfer += $elem873->read($input);
                             $this->insertDatas []= $elem873;
+=======
+                        $_size861 = 0;
+                        $_etype864 = 0;
+                        $xfer += $input->readListBegin($_etype864, $_size861);
+                        for ($_i865 = 0; $_i865 < $_size861; ++$_i865) {
+                            $elem866 = null;
+                            $elem866 = new \metastore\InsertEventRequestData();
+                            $xfer += $elem866->read($input);
+                            $this->insertDatas []= $elem866;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -151,8 +162,13 @@ class FireEventRequestData
             }
             $xfer += $output->writeFieldBegin('insertDatas', TType::LST, 2);
             $output->writeListBegin(TType::STRUCT, count($this->insertDatas));
+<<<<<<< HEAD
             foreach ($this->insertDatas as $iter874) {
                 $xfer += $iter874->write($output);
+=======
+            foreach ($this->insertDatas as $iter867) {
+                $xfer += $iter867->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

@@ -9,7 +9,11 @@ require 'hive_metastore_types'
 
 DDL_TIME = %q"transient_lastDdlTime"
 
+<<<<<<< HEAD
 HMS_API = %q"1.2.53"
+=======
+HMS_API = %q"1.2.45"
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
 
 ACCESSTYPE_NONE = 1
 

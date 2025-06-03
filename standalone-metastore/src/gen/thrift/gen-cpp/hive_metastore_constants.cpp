@@ -13,7 +13,11 @@ const hive_metastoreConstants g_hive_metastore_constants;
 hive_metastoreConstants::hive_metastoreConstants() {
   DDL_TIME = "transient_lastDdlTime";
 
+<<<<<<< HEAD
   HMS_API = "1.2.53";
+=======
+  HMS_API = "1.2.45";
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
 
   ACCESSTYPE_NONE = 1;
 

@@ -69,6 +69,7 @@ class GetFieldsResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->fields = array();
+<<<<<<< HEAD
                         $_size1240 = 0;
                         $_etype1243 = 0;
                         $xfer += $input->readListBegin($_etype1243, $_size1240);
@@ -77,6 +78,16 @@ class GetFieldsResponse
                             $elem1245 = new \metastore\FieldSchema();
                             $xfer += $elem1245->read($input);
                             $this->fields []= $elem1245;
+=======
+                        $_size1233 = 0;
+                        $_etype1236 = 0;
+                        $xfer += $input->readListBegin($_etype1236, $_size1233);
+                        for ($_i1237 = 0; $_i1237 < $_size1233; ++$_i1237) {
+                            $elem1238 = null;
+                            $elem1238 = new \metastore\FieldSchema();
+                            $xfer += $elem1238->read($input);
+                            $this->fields []= $elem1238;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +114,13 @@ class GetFieldsResponse
             }
             $xfer += $output->writeFieldBegin('fields', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->fields));
+<<<<<<< HEAD
             foreach ($this->fields as $iter1246) {
                 $xfer += $iter1246->write($output);
+=======
+            foreach ($this->fields as $iter1239) {
+                $xfer += $iter1239->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

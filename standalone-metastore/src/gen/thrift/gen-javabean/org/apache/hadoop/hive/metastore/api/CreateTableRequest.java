@@ -1206,6 +1206,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 3: // PRIMARY_KEYS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1278 = iprot.readListBegin();
                 struct.primaryKeys = new java.util.ArrayList<SQLPrimaryKey>(_list1278.size);
                 @org.apache.thrift.annotation.Nullable SQLPrimaryKey _elem1279;
@@ -1214,6 +1215,16 @@ package org.apache.hadoop.hive.metastore.api;
                   _elem1279 = new SQLPrimaryKey();
                   _elem1279.read(iprot);
                   struct.primaryKeys.add(_elem1279);
+=======
+                org.apache.thrift.protocol.TList _list1270 = iprot.readListBegin();
+                struct.primaryKeys = new java.util.ArrayList<SQLPrimaryKey>(_list1270.size);
+                @org.apache.thrift.annotation.Nullable SQLPrimaryKey _elem1271;
+                for (int _i1272 = 0; _i1272 < _list1270.size; ++_i1272)
+                {
+                  _elem1271 = new SQLPrimaryKey();
+                  _elem1271.read(iprot);
+                  struct.primaryKeys.add(_elem1271);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -1225,6 +1236,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 4: // FOREIGN_KEYS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1281 = iprot.readListBegin();
                 struct.foreignKeys = new java.util.ArrayList<SQLForeignKey>(_list1281.size);
                 @org.apache.thrift.annotation.Nullable SQLForeignKey _elem1282;
@@ -1233,6 +1245,16 @@ package org.apache.hadoop.hive.metastore.api;
                   _elem1282 = new SQLForeignKey();
                   _elem1282.read(iprot);
                   struct.foreignKeys.add(_elem1282);
+=======
+                org.apache.thrift.protocol.TList _list1273 = iprot.readListBegin();
+                struct.foreignKeys = new java.util.ArrayList<SQLForeignKey>(_list1273.size);
+                @org.apache.thrift.annotation.Nullable SQLForeignKey _elem1274;
+                for (int _i1275 = 0; _i1275 < _list1273.size; ++_i1275)
+                {
+                  _elem1274 = new SQLForeignKey();
+                  _elem1274.read(iprot);
+                  struct.foreignKeys.add(_elem1274);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -1244,6 +1266,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 5: // UNIQUE_CONSTRAINTS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1284 = iprot.readListBegin();
                 struct.uniqueConstraints = new java.util.ArrayList<SQLUniqueConstraint>(_list1284.size);
                 @org.apache.thrift.annotation.Nullable SQLUniqueConstraint _elem1285;
@@ -1252,6 +1275,16 @@ package org.apache.hadoop.hive.metastore.api;
                   _elem1285 = new SQLUniqueConstraint();
                   _elem1285.read(iprot);
                   struct.uniqueConstraints.add(_elem1285);
+=======
+                org.apache.thrift.protocol.TList _list1276 = iprot.readListBegin();
+                struct.uniqueConstraints = new java.util.ArrayList<SQLUniqueConstraint>(_list1276.size);
+                @org.apache.thrift.annotation.Nullable SQLUniqueConstraint _elem1277;
+                for (int _i1278 = 0; _i1278 < _list1276.size; ++_i1278)
+                {
+                  _elem1277 = new SQLUniqueConstraint();
+                  _elem1277.read(iprot);
+                  struct.uniqueConstraints.add(_elem1277);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -1263,6 +1296,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 6: // NOT_NULL_CONSTRAINTS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1287 = iprot.readListBegin();
                 struct.notNullConstraints = new java.util.ArrayList<SQLNotNullConstraint>(_list1287.size);
                 @org.apache.thrift.annotation.Nullable SQLNotNullConstraint _elem1288;
@@ -1271,6 +1305,16 @@ package org.apache.hadoop.hive.metastore.api;
                   _elem1288 = new SQLNotNullConstraint();
                   _elem1288.read(iprot);
                   struct.notNullConstraints.add(_elem1288);
+=======
+                org.apache.thrift.protocol.TList _list1279 = iprot.readListBegin();
+                struct.notNullConstraints = new java.util.ArrayList<SQLNotNullConstraint>(_list1279.size);
+                @org.apache.thrift.annotation.Nullable SQLNotNullConstraint _elem1280;
+                for (int _i1281 = 0; _i1281 < _list1279.size; ++_i1281)
+                {
+                  _elem1280 = new SQLNotNullConstraint();
+                  _elem1280.read(iprot);
+                  struct.notNullConstraints.add(_elem1280);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -1282,6 +1326,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 7: // DEFAULT_CONSTRAINTS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1290 = iprot.readListBegin();
                 struct.defaultConstraints = new java.util.ArrayList<SQLDefaultConstraint>(_list1290.size);
                 @org.apache.thrift.annotation.Nullable SQLDefaultConstraint _elem1291;
@@ -1290,6 +1335,16 @@ package org.apache.hadoop.hive.metastore.api;
                   _elem1291 = new SQLDefaultConstraint();
                   _elem1291.read(iprot);
                   struct.defaultConstraints.add(_elem1291);
+=======
+                org.apache.thrift.protocol.TList _list1282 = iprot.readListBegin();
+                struct.defaultConstraints = new java.util.ArrayList<SQLDefaultConstraint>(_list1282.size);
+                @org.apache.thrift.annotation.Nullable SQLDefaultConstraint _elem1283;
+                for (int _i1284 = 0; _i1284 < _list1282.size; ++_i1284)
+                {
+                  _elem1283 = new SQLDefaultConstraint();
+                  _elem1283.read(iprot);
+                  struct.defaultConstraints.add(_elem1283);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -1301,6 +1356,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 8: // CHECK_CONSTRAINTS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1293 = iprot.readListBegin();
                 struct.checkConstraints = new java.util.ArrayList<SQLCheckConstraint>(_list1293.size);
                 @org.apache.thrift.annotation.Nullable SQLCheckConstraint _elem1294;
@@ -1309,6 +1365,16 @@ package org.apache.hadoop.hive.metastore.api;
                   _elem1294 = new SQLCheckConstraint();
                   _elem1294.read(iprot);
                   struct.checkConstraints.add(_elem1294);
+=======
+                org.apache.thrift.protocol.TList _list1285 = iprot.readListBegin();
+                struct.checkConstraints = new java.util.ArrayList<SQLCheckConstraint>(_list1285.size);
+                @org.apache.thrift.annotation.Nullable SQLCheckConstraint _elem1286;
+                for (int _i1287 = 0; _i1287 < _list1285.size; ++_i1287)
+                {
+                  _elem1286 = new SQLCheckConstraint();
+                  _elem1286.read(iprot);
+                  struct.checkConstraints.add(_elem1286);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -1320,6 +1386,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 9: // PROCESSOR_CAPABILITIES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1296 = iprot.readListBegin();
                 struct.processorCapabilities = new java.util.ArrayList<java.lang.String>(_list1296.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem1297;
@@ -1327,6 +1394,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem1297 = iprot.readString();
                   struct.processorCapabilities.add(_elem1297);
+=======
+                org.apache.thrift.protocol.TList _list1288 = iprot.readListBegin();
+                struct.processorCapabilities = new java.util.ArrayList<java.lang.String>(_list1288.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem1289;
+                for (int _i1290 = 0; _i1290 < _list1288.size; ++_i1290)
+                {
+                  _elem1289 = iprot.readString();
+                  struct.processorCapabilities.add(_elem1289);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -1373,9 +1449,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(PRIMARY_KEYS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.primaryKeys.size()));
+<<<<<<< HEAD
             for (SQLPrimaryKey _iter1299 : struct.primaryKeys)
             {
               _iter1299.write(oprot);
+=======
+            for (SQLPrimaryKey _iter1291 : struct.primaryKeys)
+            {
+              _iter1291.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -1387,9 +1469,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(FOREIGN_KEYS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.foreignKeys.size()));
+<<<<<<< HEAD
             for (SQLForeignKey _iter1300 : struct.foreignKeys)
             {
               _iter1300.write(oprot);
+=======
+            for (SQLForeignKey _iter1292 : struct.foreignKeys)
+            {
+              _iter1292.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -1401,9 +1489,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(UNIQUE_CONSTRAINTS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.uniqueConstraints.size()));
+<<<<<<< HEAD
             for (SQLUniqueConstraint _iter1301 : struct.uniqueConstraints)
             {
               _iter1301.write(oprot);
+=======
+            for (SQLUniqueConstraint _iter1293 : struct.uniqueConstraints)
+            {
+              _iter1293.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -1415,9 +1509,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(NOT_NULL_CONSTRAINTS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.notNullConstraints.size()));
+<<<<<<< HEAD
             for (SQLNotNullConstraint _iter1302 : struct.notNullConstraints)
             {
               _iter1302.write(oprot);
+=======
+            for (SQLNotNullConstraint _iter1294 : struct.notNullConstraints)
+            {
+              _iter1294.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -1429,9 +1529,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(DEFAULT_CONSTRAINTS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.defaultConstraints.size()));
+<<<<<<< HEAD
             for (SQLDefaultConstraint _iter1303 : struct.defaultConstraints)
             {
               _iter1303.write(oprot);
+=======
+            for (SQLDefaultConstraint _iter1295 : struct.defaultConstraints)
+            {
+              _iter1295.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -1443,9 +1549,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(CHECK_CONSTRAINTS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.checkConstraints.size()));
+<<<<<<< HEAD
             for (SQLCheckConstraint _iter1304 : struct.checkConstraints)
             {
               _iter1304.write(oprot);
+=======
+            for (SQLCheckConstraint _iter1296 : struct.checkConstraints)
+            {
+              _iter1296.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -1457,9 +1569,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(PROCESSOR_CAPABILITIES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.processorCapabilities.size()));
+<<<<<<< HEAD
             for (java.lang.String _iter1305 : struct.processorCapabilities)
             {
               oprot.writeString(_iter1305);
+=======
+            for (java.lang.String _iter1297 : struct.processorCapabilities)
+            {
+              oprot.writeString(_iter1297);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -1526,63 +1644,105 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetPrimaryKeys()) {
         {
           oprot.writeI32(struct.primaryKeys.size());
+<<<<<<< HEAD
           for (SQLPrimaryKey _iter1306 : struct.primaryKeys)
           {
             _iter1306.write(oprot);
+=======
+          for (SQLPrimaryKey _iter1298 : struct.primaryKeys)
+          {
+            _iter1298.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
       if (struct.isSetForeignKeys()) {
         {
           oprot.writeI32(struct.foreignKeys.size());
+<<<<<<< HEAD
           for (SQLForeignKey _iter1307 : struct.foreignKeys)
           {
             _iter1307.write(oprot);
+=======
+          for (SQLForeignKey _iter1299 : struct.foreignKeys)
+          {
+            _iter1299.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
       if (struct.isSetUniqueConstraints()) {
         {
           oprot.writeI32(struct.uniqueConstraints.size());
+<<<<<<< HEAD
           for (SQLUniqueConstraint _iter1308 : struct.uniqueConstraints)
           {
             _iter1308.write(oprot);
+=======
+          for (SQLUniqueConstraint _iter1300 : struct.uniqueConstraints)
+          {
+            _iter1300.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
       if (struct.isSetNotNullConstraints()) {
         {
           oprot.writeI32(struct.notNullConstraints.size());
+<<<<<<< HEAD
           for (SQLNotNullConstraint _iter1309 : struct.notNullConstraints)
           {
             _iter1309.write(oprot);
+=======
+          for (SQLNotNullConstraint _iter1301 : struct.notNullConstraints)
+          {
+            _iter1301.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
       if (struct.isSetDefaultConstraints()) {
         {
           oprot.writeI32(struct.defaultConstraints.size());
+<<<<<<< HEAD
           for (SQLDefaultConstraint _iter1310 : struct.defaultConstraints)
           {
             _iter1310.write(oprot);
+=======
+          for (SQLDefaultConstraint _iter1302 : struct.defaultConstraints)
+          {
+            _iter1302.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
       if (struct.isSetCheckConstraints()) {
         {
           oprot.writeI32(struct.checkConstraints.size());
+<<<<<<< HEAD
           for (SQLCheckConstraint _iter1311 : struct.checkConstraints)
           {
             _iter1311.write(oprot);
+=======
+          for (SQLCheckConstraint _iter1303 : struct.checkConstraints)
+          {
+            _iter1303.write(oprot);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
       if (struct.isSetProcessorCapabilities()) {
         {
           oprot.writeI32(struct.processorCapabilities.size());
+<<<<<<< HEAD
           for (java.lang.String _iter1312 : struct.processorCapabilities)
           {
             oprot.writeString(_iter1312);
+=======
+          for (java.lang.String _iter1304 : struct.processorCapabilities)
+          {
+            oprot.writeString(_iter1304);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
@@ -1605,6 +1765,7 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(1)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1313 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
           struct.primaryKeys = new java.util.ArrayList<SQLPrimaryKey>(_list1313.size);
           @org.apache.thrift.annotation.Nullable SQLPrimaryKey _elem1314;
@@ -1613,12 +1774,23 @@ package org.apache.hadoop.hive.metastore.api;
             _elem1314 = new SQLPrimaryKey();
             _elem1314.read(iprot);
             struct.primaryKeys.add(_elem1314);
+=======
+          org.apache.thrift.protocol.TList _list1305 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.primaryKeys = new java.util.ArrayList<SQLPrimaryKey>(_list1305.size);
+          @org.apache.thrift.annotation.Nullable SQLPrimaryKey _elem1306;
+          for (int _i1307 = 0; _i1307 < _list1305.size; ++_i1307)
+          {
+            _elem1306 = new SQLPrimaryKey();
+            _elem1306.read(iprot);
+            struct.primaryKeys.add(_elem1306);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setPrimaryKeysIsSet(true);
       }
       if (incoming.get(2)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1316 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
           struct.foreignKeys = new java.util.ArrayList<SQLForeignKey>(_list1316.size);
           @org.apache.thrift.annotation.Nullable SQLForeignKey _elem1317;
@@ -1627,12 +1799,23 @@ package org.apache.hadoop.hive.metastore.api;
             _elem1317 = new SQLForeignKey();
             _elem1317.read(iprot);
             struct.foreignKeys.add(_elem1317);
+=======
+          org.apache.thrift.protocol.TList _list1308 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.foreignKeys = new java.util.ArrayList<SQLForeignKey>(_list1308.size);
+          @org.apache.thrift.annotation.Nullable SQLForeignKey _elem1309;
+          for (int _i1310 = 0; _i1310 < _list1308.size; ++_i1310)
+          {
+            _elem1309 = new SQLForeignKey();
+            _elem1309.read(iprot);
+            struct.foreignKeys.add(_elem1309);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setForeignKeysIsSet(true);
       }
       if (incoming.get(3)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1319 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
           struct.uniqueConstraints = new java.util.ArrayList<SQLUniqueConstraint>(_list1319.size);
           @org.apache.thrift.annotation.Nullable SQLUniqueConstraint _elem1320;
@@ -1641,12 +1824,23 @@ package org.apache.hadoop.hive.metastore.api;
             _elem1320 = new SQLUniqueConstraint();
             _elem1320.read(iprot);
             struct.uniqueConstraints.add(_elem1320);
+=======
+          org.apache.thrift.protocol.TList _list1311 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.uniqueConstraints = new java.util.ArrayList<SQLUniqueConstraint>(_list1311.size);
+          @org.apache.thrift.annotation.Nullable SQLUniqueConstraint _elem1312;
+          for (int _i1313 = 0; _i1313 < _list1311.size; ++_i1313)
+          {
+            _elem1312 = new SQLUniqueConstraint();
+            _elem1312.read(iprot);
+            struct.uniqueConstraints.add(_elem1312);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setUniqueConstraintsIsSet(true);
       }
       if (incoming.get(4)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1322 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
           struct.notNullConstraints = new java.util.ArrayList<SQLNotNullConstraint>(_list1322.size);
           @org.apache.thrift.annotation.Nullable SQLNotNullConstraint _elem1323;
@@ -1655,12 +1849,23 @@ package org.apache.hadoop.hive.metastore.api;
             _elem1323 = new SQLNotNullConstraint();
             _elem1323.read(iprot);
             struct.notNullConstraints.add(_elem1323);
+=======
+          org.apache.thrift.protocol.TList _list1314 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.notNullConstraints = new java.util.ArrayList<SQLNotNullConstraint>(_list1314.size);
+          @org.apache.thrift.annotation.Nullable SQLNotNullConstraint _elem1315;
+          for (int _i1316 = 0; _i1316 < _list1314.size; ++_i1316)
+          {
+            _elem1315 = new SQLNotNullConstraint();
+            _elem1315.read(iprot);
+            struct.notNullConstraints.add(_elem1315);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setNotNullConstraintsIsSet(true);
       }
       if (incoming.get(5)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1325 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
           struct.defaultConstraints = new java.util.ArrayList<SQLDefaultConstraint>(_list1325.size);
           @org.apache.thrift.annotation.Nullable SQLDefaultConstraint _elem1326;
@@ -1669,12 +1874,23 @@ package org.apache.hadoop.hive.metastore.api;
             _elem1326 = new SQLDefaultConstraint();
             _elem1326.read(iprot);
             struct.defaultConstraints.add(_elem1326);
+=======
+          org.apache.thrift.protocol.TList _list1317 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.defaultConstraints = new java.util.ArrayList<SQLDefaultConstraint>(_list1317.size);
+          @org.apache.thrift.annotation.Nullable SQLDefaultConstraint _elem1318;
+          for (int _i1319 = 0; _i1319 < _list1317.size; ++_i1319)
+          {
+            _elem1318 = new SQLDefaultConstraint();
+            _elem1318.read(iprot);
+            struct.defaultConstraints.add(_elem1318);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setDefaultConstraintsIsSet(true);
       }
       if (incoming.get(6)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1328 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
           struct.checkConstraints = new java.util.ArrayList<SQLCheckConstraint>(_list1328.size);
           @org.apache.thrift.annotation.Nullable SQLCheckConstraint _elem1329;
@@ -1683,12 +1899,23 @@ package org.apache.hadoop.hive.metastore.api;
             _elem1329 = new SQLCheckConstraint();
             _elem1329.read(iprot);
             struct.checkConstraints.add(_elem1329);
+=======
+          org.apache.thrift.protocol.TList _list1320 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
+          struct.checkConstraints = new java.util.ArrayList<SQLCheckConstraint>(_list1320.size);
+          @org.apache.thrift.annotation.Nullable SQLCheckConstraint _elem1321;
+          for (int _i1322 = 0; _i1322 < _list1320.size; ++_i1322)
+          {
+            _elem1321 = new SQLCheckConstraint();
+            _elem1321.read(iprot);
+            struct.checkConstraints.add(_elem1321);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setCheckConstraintsIsSet(true);
       }
       if (incoming.get(7)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1331 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.processorCapabilities = new java.util.ArrayList<java.lang.String>(_list1331.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem1332;
@@ -1696,6 +1923,15 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem1332 = iprot.readString();
             struct.processorCapabilities.add(_elem1332);
+=======
+          org.apache.thrift.protocol.TList _list1323 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.processorCapabilities = new java.util.ArrayList<java.lang.String>(_list1323.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem1324;
+          for (int _i1325 = 0; _i1325 < _list1323.size; ++_i1325)
+          {
+            _elem1324 = iprot.readString();
+            struct.processorCapabilities.add(_elem1324);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setProcessorCapabilitiesIsSet(true);

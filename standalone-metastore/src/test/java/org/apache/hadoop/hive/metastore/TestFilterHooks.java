@@ -54,6 +54,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.apache.hadoop.hive.metastore.client.builder.PartitionBuilder;
 import org.junit.experimental.categories.Category;
 
@@ -70,7 +71,7 @@ public class TestFilterHooks {
     }
 
     @Override
-    public List<String> filterDatabases(List<String> dbList) throws MetaException  {
+    public List<String> filterDatabases(List<String> dbList) throws MetaException {
       if (blockResults) {
         return new ArrayList<>();
       }
@@ -120,7 +121,7 @@ public class TestFilterHooks {
 
     @Override
     @Deprecated
-    public List<TableMeta> filterTableMetas(String catName, String dbName,List<TableMeta> tableMetas)
+    public List<TableMeta> filterTableMetas(String catName, String dbName, List<TableMeta> tableMetas)
         throws MetaException {
       return filterTableMetas(tableMetas);
     }
@@ -160,7 +161,7 @@ public class TestFilterHooks {
 
     @Override
     public List<String> filterPartitionNames(String catName, String dbName, String tblName,
-        List<String> partitionNames) throws MetaException {
+                                             List<String> partitionNames) throws MetaException {
       if (blockResults) {
         return new ArrayList<>();
       }
@@ -242,6 +243,7 @@ public class TestFilterHooks {
 
   /**
    * This is called in each test after the configuration is set in each test case
+   *
    * @throws Exception
    */
   protected void creatEnv(Configuration conf) throws Exception {
@@ -293,6 +295,7 @@ public class TestFilterHooks {
   /**
    * The default configuration should be disable filtering at HMS server
    * Disable the HMS client side filtering in order to see HMS server filtering behavior
+   *
    * @throws Exception
    */
   @Test
@@ -323,6 +326,7 @@ public class TestFilterHooks {
   /**
    * Enable the HMS server side filtering
    * Disable the HMS client side filtering in order to see HMS server filtering behavior
+   *
    * @throws Exception
    */
   @Test
@@ -343,6 +347,7 @@ public class TestFilterHooks {
   /**
    * Disable filtering at HMS client
    * By default, the HMS server side filtering is disabled, so we can see HMS client filtering behavior
+   *
    * @throws Exception
    */
   @Test
@@ -373,6 +378,7 @@ public class TestFilterHooks {
   /**
    * By default, the HMS Client side filtering is enabled
    * Disable the HMS server side filtering in order to see HMS client filtering behavior
+   *
    * @throws Exception
    */
   @Test
@@ -390,7 +396,6 @@ public class TestFilterHooks {
   }
 
   protected void testFilterForDb(boolean filterAtServer) throws Exception {
-
     // Skip this call when testing filter hook at HMS server because HMS server calls authorization
     // API for getDatabase(), and does not call filter hook
     if (!filterAtServer) {

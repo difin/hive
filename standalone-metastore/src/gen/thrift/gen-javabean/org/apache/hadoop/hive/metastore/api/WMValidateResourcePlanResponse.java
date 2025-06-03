@@ -417,6 +417,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // ERRORS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1238 = iprot.readListBegin();
                 struct.errors = new java.util.ArrayList<java.lang.String>(_list1238.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem1239;
@@ -424,6 +425,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem1239 = iprot.readString();
                   struct.errors.add(_elem1239);
+=======
+                org.apache.thrift.protocol.TList _list1230 = iprot.readListBegin();
+                struct.errors = new java.util.ArrayList<java.lang.String>(_list1230.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem1231;
+                for (int _i1232 = 0; _i1232 < _list1230.size; ++_i1232)
+                {
+                  _elem1231 = iprot.readString();
+                  struct.errors.add(_elem1231);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -435,6 +445,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 2: // WARNINGS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1241 = iprot.readListBegin();
                 struct.warnings = new java.util.ArrayList<java.lang.String>(_list1241.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem1242;
@@ -442,6 +453,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem1242 = iprot.readString();
                   struct.warnings.add(_elem1242);
+=======
+                org.apache.thrift.protocol.TList _list1233 = iprot.readListBegin();
+                struct.warnings = new java.util.ArrayList<java.lang.String>(_list1233.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem1234;
+                for (int _i1235 = 0; _i1235 < _list1233.size; ++_i1235)
+                {
+                  _elem1234 = iprot.readString();
+                  struct.warnings.add(_elem1234);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -468,9 +488,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(ERRORS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.errors.size()));
+<<<<<<< HEAD
             for (java.lang.String _iter1244 : struct.errors)
             {
               oprot.writeString(_iter1244);
+=======
+            for (java.lang.String _iter1236 : struct.errors)
+            {
+              oprot.writeString(_iter1236);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -482,9 +508,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(WARNINGS_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.warnings.size()));
+<<<<<<< HEAD
             for (java.lang.String _iter1245 : struct.warnings)
             {
               oprot.writeString(_iter1245);
+=======
+            for (java.lang.String _iter1237 : struct.warnings)
+            {
+              oprot.writeString(_iter1237);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -519,18 +551,30 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetErrors()) {
         {
           oprot.writeI32(struct.errors.size());
+<<<<<<< HEAD
           for (java.lang.String _iter1246 : struct.errors)
           {
             oprot.writeString(_iter1246);
+=======
+          for (java.lang.String _iter1238 : struct.errors)
+          {
+            oprot.writeString(_iter1238);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
       if (struct.isSetWarnings()) {
         {
           oprot.writeI32(struct.warnings.size());
+<<<<<<< HEAD
           for (java.lang.String _iter1247 : struct.warnings)
           {
             oprot.writeString(_iter1247);
+=======
+          for (java.lang.String _iter1239 : struct.warnings)
+          {
+            oprot.writeString(_iter1239);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
@@ -542,6 +586,7 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1248 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.errors = new java.util.ArrayList<java.lang.String>(_list1248.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem1249;
@@ -549,12 +594,22 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem1249 = iprot.readString();
             struct.errors.add(_elem1249);
+=======
+          org.apache.thrift.protocol.TList _list1240 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.errors = new java.util.ArrayList<java.lang.String>(_list1240.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem1241;
+          for (int _i1242 = 0; _i1242 < _list1240.size; ++_i1242)
+          {
+            _elem1241 = iprot.readString();
+            struct.errors.add(_elem1241);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setErrorsIsSet(true);
       }
       if (incoming.get(1)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1251 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.warnings = new java.util.ArrayList<java.lang.String>(_list1251.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem1252;
@@ -562,6 +617,15 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem1252 = iprot.readString();
             struct.warnings.add(_elem1252);
+=======
+          org.apache.thrift.protocol.TList _list1243 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.warnings = new java.util.ArrayList<java.lang.String>(_list1243.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem1244;
+          for (int _i1245 = 0; _i1245 < _list1243.size; ++_i1245)
+          {
+            _elem1244 = iprot.readString();
+            struct.warnings.add(_elem1244);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setWarningsIsSet(true);

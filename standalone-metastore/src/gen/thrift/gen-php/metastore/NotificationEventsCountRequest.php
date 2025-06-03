@@ -163,6 +163,7 @@ class NotificationEventsCountRequest
                 case 6:
                     if ($ftype == TType::LST) {
                         $this->tableNames = array();
+<<<<<<< HEAD
                         $_size833 = 0;
                         $_etype836 = 0;
                         $xfer += $input->readListBegin($_etype836, $_size833);
@@ -170,6 +171,15 @@ class NotificationEventsCountRequest
                             $elem838 = null;
                             $xfer += $input->readString($elem838);
                             $this->tableNames []= $elem838;
+=======
+                        $_size826 = 0;
+                        $_etype829 = 0;
+                        $xfer += $input->readListBegin($_etype829, $_size826);
+                        for ($_i830 = 0; $_i830 < $_size826; ++$_i830) {
+                            $elem831 = null;
+                            $xfer += $input->readString($elem831);
+                            $this->tableNames []= $elem831;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -221,8 +231,13 @@ class NotificationEventsCountRequest
             }
             $xfer += $output->writeFieldBegin('tableNames', TType::LST, 6);
             $output->writeListBegin(TType::STRING, count($this->tableNames));
+<<<<<<< HEAD
             foreach ($this->tableNames as $iter839) {
                 $xfer += $output->writeString($iter839);
+=======
+            foreach ($this->tableNames as $iter832) {
+                $xfer += $output->writeString($iter832);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

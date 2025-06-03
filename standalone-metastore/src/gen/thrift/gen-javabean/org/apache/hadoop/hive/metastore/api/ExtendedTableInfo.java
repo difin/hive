@@ -602,6 +602,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 3: // REQUIRED_READ_CAPABILITIES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1158 = iprot.readListBegin();
                 struct.requiredReadCapabilities = new java.util.ArrayList<java.lang.String>(_list1158.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem1159;
@@ -609,6 +610,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem1159 = iprot.readString();
                   struct.requiredReadCapabilities.add(_elem1159);
+=======
+                org.apache.thrift.protocol.TList _list1150 = iprot.readListBegin();
+                struct.requiredReadCapabilities = new java.util.ArrayList<java.lang.String>(_list1150.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem1151;
+                for (int _i1152 = 0; _i1152 < _list1150.size; ++_i1152)
+                {
+                  _elem1151 = iprot.readString();
+                  struct.requiredReadCapabilities.add(_elem1151);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -620,6 +630,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 4: // REQUIRED_WRITE_CAPABILITIES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1161 = iprot.readListBegin();
                 struct.requiredWriteCapabilities = new java.util.ArrayList<java.lang.String>(_list1161.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem1162;
@@ -627,6 +638,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem1162 = iprot.readString();
                   struct.requiredWriteCapabilities.add(_elem1162);
+=======
+                org.apache.thrift.protocol.TList _list1153 = iprot.readListBegin();
+                struct.requiredWriteCapabilities = new java.util.ArrayList<java.lang.String>(_list1153.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem1154;
+                for (int _i1155 = 0; _i1155 < _list1153.size; ++_i1155)
+                {
+                  _elem1154 = iprot.readString();
+                  struct.requiredWriteCapabilities.add(_elem1154);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -663,9 +683,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(REQUIRED_READ_CAPABILITIES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.requiredReadCapabilities.size()));
+<<<<<<< HEAD
             for (java.lang.String _iter1164 : struct.requiredReadCapabilities)
             {
               oprot.writeString(_iter1164);
+=======
+            for (java.lang.String _iter1156 : struct.requiredReadCapabilities)
+            {
+              oprot.writeString(_iter1156);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -677,9 +703,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(REQUIRED_WRITE_CAPABILITIES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.requiredWriteCapabilities.size()));
+<<<<<<< HEAD
             for (java.lang.String _iter1165 : struct.requiredWriteCapabilities)
             {
               oprot.writeString(_iter1165);
+=======
+            for (java.lang.String _iter1157 : struct.requiredWriteCapabilities)
+            {
+              oprot.writeString(_iter1157);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -721,18 +753,30 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetRequiredReadCapabilities()) {
         {
           oprot.writeI32(struct.requiredReadCapabilities.size());
+<<<<<<< HEAD
           for (java.lang.String _iter1166 : struct.requiredReadCapabilities)
           {
             oprot.writeString(_iter1166);
+=======
+          for (java.lang.String _iter1158 : struct.requiredReadCapabilities)
+          {
+            oprot.writeString(_iter1158);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
       if (struct.isSetRequiredWriteCapabilities()) {
         {
           oprot.writeI32(struct.requiredWriteCapabilities.size());
+<<<<<<< HEAD
           for (java.lang.String _iter1167 : struct.requiredWriteCapabilities)
           {
             oprot.writeString(_iter1167);
+=======
+          for (java.lang.String _iter1159 : struct.requiredWriteCapabilities)
+          {
+            oprot.writeString(_iter1159);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
@@ -750,6 +794,7 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(1)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1168 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.requiredReadCapabilities = new java.util.ArrayList<java.lang.String>(_list1168.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem1169;
@@ -757,12 +802,22 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem1169 = iprot.readString();
             struct.requiredReadCapabilities.add(_elem1169);
+=======
+          org.apache.thrift.protocol.TList _list1160 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.requiredReadCapabilities = new java.util.ArrayList<java.lang.String>(_list1160.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem1161;
+          for (int _i1162 = 0; _i1162 < _list1160.size; ++_i1162)
+          {
+            _elem1161 = iprot.readString();
+            struct.requiredReadCapabilities.add(_elem1161);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setRequiredReadCapabilitiesIsSet(true);
       }
       if (incoming.get(2)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1171 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.requiredWriteCapabilities = new java.util.ArrayList<java.lang.String>(_list1171.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem1172;
@@ -770,6 +825,15 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem1172 = iprot.readString();
             struct.requiredWriteCapabilities.add(_elem1172);
+=======
+          org.apache.thrift.protocol.TList _list1163 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.requiredWriteCapabilities = new java.util.ArrayList<java.lang.String>(_list1163.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem1164;
+          for (int _i1165 = 0; _i1165 < _list1163.size; ++_i1165)
+          {
+            _elem1164 = iprot.readString();
+            struct.requiredWriteCapabilities.add(_elem1164);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setRequiredWriteCapabilitiesIsSet(true);

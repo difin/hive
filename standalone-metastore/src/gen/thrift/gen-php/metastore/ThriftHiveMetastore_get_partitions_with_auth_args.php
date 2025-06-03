@@ -144,6 +144,7 @@ class ThriftHiveMetastore_get_partitions_with_auth_args
                 case 5:
                     if ($ftype == TType::LST) {
                         $this->group_names = array();
+<<<<<<< HEAD
                         $_size1630 = 0;
                         $_etype1633 = 0;
                         $xfer += $input->readListBegin($_etype1633, $_size1630);
@@ -151,6 +152,15 @@ class ThriftHiveMetastore_get_partitions_with_auth_args
                             $elem1635 = null;
                             $xfer += $input->readString($elem1635);
                             $this->group_names []= $elem1635;
+=======
+                        $_size1623 = 0;
+                        $_etype1626 = 0;
+                        $xfer += $input->readListBegin($_etype1626, $_size1623);
+                        for ($_i1627 = 0; $_i1627 < $_size1623; ++$_i1627) {
+                            $elem1628 = null;
+                            $xfer += $input->readString($elem1628);
+                            $this->group_names []= $elem1628;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -197,8 +207,13 @@ class ThriftHiveMetastore_get_partitions_with_auth_args
             }
             $xfer += $output->writeFieldBegin('group_names', TType::LST, 5);
             $output->writeListBegin(TType::STRING, count($this->group_names));
+<<<<<<< HEAD
             foreach ($this->group_names as $iter1636) {
                 $xfer += $output->writeString($iter1636);
+=======
+            foreach ($this->group_names as $iter1629) {
+                $xfer += $output->writeString($iter1629);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

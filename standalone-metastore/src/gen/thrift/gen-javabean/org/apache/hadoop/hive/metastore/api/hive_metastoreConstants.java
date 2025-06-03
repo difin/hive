@@ -11,7 +11,11 @@ package org.apache.hadoop.hive.metastore.api;
 
   public static final java.lang.String DDL_TIME = "transient_lastDdlTime";
 
+<<<<<<< HEAD
   public static final java.lang.String HMS_API = "1.2.53";
+=======
+  public static final java.lang.String HMS_API = "1.2.45";
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
 
   public static final byte ACCESSTYPE_NONE = (byte)1;
 

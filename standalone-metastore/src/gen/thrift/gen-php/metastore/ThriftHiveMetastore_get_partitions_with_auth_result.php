@@ -95,6 +95,7 @@ class ThriftHiveMetastore_get_partitions_with_auth_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
+<<<<<<< HEAD
                         $_size1637 = 0;
                         $_etype1640 = 0;
                         $xfer += $input->readListBegin($_etype1640, $_size1637);
@@ -103,6 +104,16 @@ class ThriftHiveMetastore_get_partitions_with_auth_result
                             $elem1642 = new \metastore\Partition();
                             $xfer += $elem1642->read($input);
                             $this->success []= $elem1642;
+=======
+                        $_size1630 = 0;
+                        $_etype1633 = 0;
+                        $xfer += $input->readListBegin($_etype1633, $_size1630);
+                        for ($_i1634 = 0; $_i1634 < $_size1630; ++$_i1634) {
+                            $elem1635 = null;
+                            $elem1635 = new \metastore\Partition();
+                            $xfer += $elem1635->read($input);
+                            $this->success []= $elem1635;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -145,8 +156,13 @@ class ThriftHiveMetastore_get_partitions_with_auth_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRUCT, count($this->success));
+<<<<<<< HEAD
             foreach ($this->success as $iter1643) {
                 $xfer += $iter1643->write($output);
+=======
+            foreach ($this->success as $iter1636) {
+                $xfer += $iter1636->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

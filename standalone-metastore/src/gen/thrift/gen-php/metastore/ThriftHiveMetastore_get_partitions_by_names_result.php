@@ -108,6 +108,7 @@ class ThriftHiveMetastore_get_partitions_by_names_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
+<<<<<<< HEAD
                         $_size1735 = 0;
                         $_etype1738 = 0;
                         $xfer += $input->readListBegin($_etype1738, $_size1735);
@@ -116,6 +117,16 @@ class ThriftHiveMetastore_get_partitions_by_names_result
                             $elem1740 = new \metastore\Partition();
                             $xfer += $elem1740->read($input);
                             $this->success []= $elem1740;
+=======
+                        $_size1728 = 0;
+                        $_etype1731 = 0;
+                        $xfer += $input->readListBegin($_etype1731, $_size1728);
+                        for ($_i1732 = 0; $_i1732 < $_size1728; ++$_i1732) {
+                            $elem1733 = null;
+                            $elem1733 = new \metastore\Partition();
+                            $xfer += $elem1733->read($input);
+                            $this->success []= $elem1733;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -166,8 +177,13 @@ class ThriftHiveMetastore_get_partitions_by_names_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRUCT, count($this->success));
+<<<<<<< HEAD
             foreach ($this->success as $iter1741) {
                 $xfer += $iter1741->write($output);
+=======
+            foreach ($this->success as $iter1734) {
+                $xfer += $iter1734->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

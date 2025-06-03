@@ -175,6 +175,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                 case 2:
                     if ($ftype == TType::LST) {
                         $this->primaryKeys = array();
+<<<<<<< HEAD
                         $_size1409 = 0;
                         $_etype1412 = 0;
                         $xfer += $input->readListBegin($_etype1412, $_size1409);
@@ -183,6 +184,16 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1414 = new \metastore\SQLPrimaryKey();
                             $xfer += $elem1414->read($input);
                             $this->primaryKeys []= $elem1414;
+=======
+                        $_size1402 = 0;
+                        $_etype1405 = 0;
+                        $xfer += $input->readListBegin($_etype1405, $_size1402);
+                        for ($_i1406 = 0; $_i1406 < $_size1402; ++$_i1406) {
+                            $elem1407 = null;
+                            $elem1407 = new \metastore\SQLPrimaryKey();
+                            $xfer += $elem1407->read($input);
+                            $this->primaryKeys []= $elem1407;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -192,6 +203,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->foreignKeys = array();
+<<<<<<< HEAD
                         $_size1415 = 0;
                         $_etype1418 = 0;
                         $xfer += $input->readListBegin($_etype1418, $_size1415);
@@ -200,6 +212,16 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1420 = new \metastore\SQLForeignKey();
                             $xfer += $elem1420->read($input);
                             $this->foreignKeys []= $elem1420;
+=======
+                        $_size1408 = 0;
+                        $_etype1411 = 0;
+                        $xfer += $input->readListBegin($_etype1411, $_size1408);
+                        for ($_i1412 = 0; $_i1412 < $_size1408; ++$_i1412) {
+                            $elem1413 = null;
+                            $elem1413 = new \metastore\SQLForeignKey();
+                            $xfer += $elem1413->read($input);
+                            $this->foreignKeys []= $elem1413;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -209,6 +231,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->uniqueConstraints = array();
+<<<<<<< HEAD
                         $_size1421 = 0;
                         $_etype1424 = 0;
                         $xfer += $input->readListBegin($_etype1424, $_size1421);
@@ -217,6 +240,16 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1426 = new \metastore\SQLUniqueConstraint();
                             $xfer += $elem1426->read($input);
                             $this->uniqueConstraints []= $elem1426;
+=======
+                        $_size1414 = 0;
+                        $_etype1417 = 0;
+                        $xfer += $input->readListBegin($_etype1417, $_size1414);
+                        for ($_i1418 = 0; $_i1418 < $_size1414; ++$_i1418) {
+                            $elem1419 = null;
+                            $elem1419 = new \metastore\SQLUniqueConstraint();
+                            $xfer += $elem1419->read($input);
+                            $this->uniqueConstraints []= $elem1419;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -226,6 +259,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                 case 5:
                     if ($ftype == TType::LST) {
                         $this->notNullConstraints = array();
+<<<<<<< HEAD
                         $_size1427 = 0;
                         $_etype1430 = 0;
                         $xfer += $input->readListBegin($_etype1430, $_size1427);
@@ -234,6 +268,16 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1432 = new \metastore\SQLNotNullConstraint();
                             $xfer += $elem1432->read($input);
                             $this->notNullConstraints []= $elem1432;
+=======
+                        $_size1420 = 0;
+                        $_etype1423 = 0;
+                        $xfer += $input->readListBegin($_etype1423, $_size1420);
+                        for ($_i1424 = 0; $_i1424 < $_size1420; ++$_i1424) {
+                            $elem1425 = null;
+                            $elem1425 = new \metastore\SQLNotNullConstraint();
+                            $xfer += $elem1425->read($input);
+                            $this->notNullConstraints []= $elem1425;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -243,6 +287,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                 case 6:
                     if ($ftype == TType::LST) {
                         $this->defaultConstraints = array();
+<<<<<<< HEAD
                         $_size1433 = 0;
                         $_etype1436 = 0;
                         $xfer += $input->readListBegin($_etype1436, $_size1433);
@@ -251,6 +296,16 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1438 = new \metastore\SQLDefaultConstraint();
                             $xfer += $elem1438->read($input);
                             $this->defaultConstraints []= $elem1438;
+=======
+                        $_size1426 = 0;
+                        $_etype1429 = 0;
+                        $xfer += $input->readListBegin($_etype1429, $_size1426);
+                        for ($_i1430 = 0; $_i1430 < $_size1426; ++$_i1430) {
+                            $elem1431 = null;
+                            $elem1431 = new \metastore\SQLDefaultConstraint();
+                            $xfer += $elem1431->read($input);
+                            $this->defaultConstraints []= $elem1431;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -260,6 +315,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                 case 7:
                     if ($ftype == TType::LST) {
                         $this->checkConstraints = array();
+<<<<<<< HEAD
                         $_size1439 = 0;
                         $_etype1442 = 0;
                         $xfer += $input->readListBegin($_etype1442, $_size1439);
@@ -268,6 +324,16 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1444 = new \metastore\SQLCheckConstraint();
                             $xfer += $elem1444->read($input);
                             $this->checkConstraints []= $elem1444;
+=======
+                        $_size1432 = 0;
+                        $_etype1435 = 0;
+                        $xfer += $input->readListBegin($_etype1435, $_size1432);
+                        for ($_i1436 = 0; $_i1436 < $_size1432; ++$_i1436) {
+                            $elem1437 = null;
+                            $elem1437 = new \metastore\SQLCheckConstraint();
+                            $xfer += $elem1437->read($input);
+                            $this->checkConstraints []= $elem1437;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -302,8 +368,13 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             }
             $xfer += $output->writeFieldBegin('primaryKeys', TType::LST, 2);
             $output->writeListBegin(TType::STRUCT, count($this->primaryKeys));
+<<<<<<< HEAD
             foreach ($this->primaryKeys as $iter1445) {
                 $xfer += $iter1445->write($output);
+=======
+            foreach ($this->primaryKeys as $iter1438) {
+                $xfer += $iter1438->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -314,8 +385,13 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             }
             $xfer += $output->writeFieldBegin('foreignKeys', TType::LST, 3);
             $output->writeListBegin(TType::STRUCT, count($this->foreignKeys));
+<<<<<<< HEAD
             foreach ($this->foreignKeys as $iter1446) {
                 $xfer += $iter1446->write($output);
+=======
+            foreach ($this->foreignKeys as $iter1439) {
+                $xfer += $iter1439->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -326,8 +402,13 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             }
             $xfer += $output->writeFieldBegin('uniqueConstraints', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->uniqueConstraints));
+<<<<<<< HEAD
             foreach ($this->uniqueConstraints as $iter1447) {
                 $xfer += $iter1447->write($output);
+=======
+            foreach ($this->uniqueConstraints as $iter1440) {
+                $xfer += $iter1440->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -338,8 +419,13 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             }
             $xfer += $output->writeFieldBegin('notNullConstraints', TType::LST, 5);
             $output->writeListBegin(TType::STRUCT, count($this->notNullConstraints));
+<<<<<<< HEAD
             foreach ($this->notNullConstraints as $iter1448) {
                 $xfer += $iter1448->write($output);
+=======
+            foreach ($this->notNullConstraints as $iter1441) {
+                $xfer += $iter1441->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -350,8 +436,13 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             }
             $xfer += $output->writeFieldBegin('defaultConstraints', TType::LST, 6);
             $output->writeListBegin(TType::STRUCT, count($this->defaultConstraints));
+<<<<<<< HEAD
             foreach ($this->defaultConstraints as $iter1449) {
                 $xfer += $iter1449->write($output);
+=======
+            foreach ($this->defaultConstraints as $iter1442) {
+                $xfer += $iter1442->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -362,8 +453,13 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             }
             $xfer += $output->writeFieldBegin('checkConstraints', TType::LST, 7);
             $output->writeListBegin(TType::STRUCT, count($this->checkConstraints));
+<<<<<<< HEAD
             foreach ($this->checkConstraints as $iter1450) {
                 $xfer += $iter1450->write($output);
+=======
+            foreach ($this->checkConstraints as $iter1443) {
+                $xfer += $iter1443->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

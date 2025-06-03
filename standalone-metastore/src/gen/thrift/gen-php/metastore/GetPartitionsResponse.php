@@ -69,6 +69,7 @@ class GetPartitionsResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->partitionSpec = array();
+<<<<<<< HEAD
                         $_size1219 = 0;
                         $_etype1222 = 0;
                         $xfer += $input->readListBegin($_etype1222, $_size1219);
@@ -77,6 +78,16 @@ class GetPartitionsResponse
                             $elem1224 = new \metastore\PartitionSpec();
                             $xfer += $elem1224->read($input);
                             $this->partitionSpec []= $elem1224;
+=======
+                        $_size1212 = 0;
+                        $_etype1215 = 0;
+                        $xfer += $input->readListBegin($_etype1215, $_size1212);
+                        for ($_i1216 = 0; $_i1216 < $_size1212; ++$_i1216) {
+                            $elem1217 = null;
+                            $elem1217 = new \metastore\PartitionSpec();
+                            $xfer += $elem1217->read($input);
+                            $this->partitionSpec []= $elem1217;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +114,13 @@ class GetPartitionsResponse
             }
             $xfer += $output->writeFieldBegin('partitionSpec', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->partitionSpec));
+<<<<<<< HEAD
             foreach ($this->partitionSpec as $iter1225) {
                 $xfer += $iter1225->write($output);
+=======
+            foreach ($this->partitionSpec as $iter1218) {
+                $xfer += $iter1218->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

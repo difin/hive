@@ -69,6 +69,7 @@ class ClientCapabilities
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->values = array();
+<<<<<<< HEAD
                         $_size972 = 0;
                         $_etype975 = 0;
                         $xfer += $input->readListBegin($_etype975, $_size972);
@@ -76,6 +77,15 @@ class ClientCapabilities
                             $elem977 = null;
                             $xfer += $input->readI32($elem977);
                             $this->values []= $elem977;
+=======
+                        $_size965 = 0;
+                        $_etype968 = 0;
+                        $xfer += $input->readListBegin($_etype968, $_size965);
+                        for ($_i969 = 0; $_i969 < $_size965; ++$_i969) {
+                            $elem970 = null;
+                            $xfer += $input->readI32($elem970);
+                            $this->values []= $elem970;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -102,8 +112,13 @@ class ClientCapabilities
             }
             $xfer += $output->writeFieldBegin('values', TType::LST, 1);
             $output->writeListBegin(TType::I32, count($this->values));
+<<<<<<< HEAD
             foreach ($this->values as $iter978) {
                 $xfer += $output->writeI32($iter978);
+=======
+            foreach ($this->values as $iter971) {
+                $xfer += $output->writeI32($iter971);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

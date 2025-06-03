@@ -105,6 +105,7 @@ class GetFileMetadataByExprRequest
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->fileIds = array();
+<<<<<<< HEAD
                         $_size921 = 0;
                         $_etype924 = 0;
                         $xfer += $input->readListBegin($_etype924, $_size921);
@@ -112,6 +113,15 @@ class GetFileMetadataByExprRequest
                             $elem926 = null;
                             $xfer += $input->readI64($elem926);
                             $this->fileIds []= $elem926;
+=======
+                        $_size914 = 0;
+                        $_etype917 = 0;
+                        $xfer += $input->readListBegin($_etype917, $_size914);
+                        for ($_i918 = 0; $_i918 < $_size914; ++$_i918) {
+                            $elem919 = null;
+                            $xfer += $input->readI64($elem919);
+                            $this->fileIds []= $elem919;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -159,8 +169,13 @@ class GetFileMetadataByExprRequest
             }
             $xfer += $output->writeFieldBegin('fileIds', TType::LST, 1);
             $output->writeListBegin(TType::I64, count($this->fileIds));
+<<<<<<< HEAD
             foreach ($this->fileIds as $iter927) {
                 $xfer += $output->writeI64($iter927);
+=======
+            foreach ($this->fileIds as $iter920) {
+                $xfer += $output->writeI64($iter920);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

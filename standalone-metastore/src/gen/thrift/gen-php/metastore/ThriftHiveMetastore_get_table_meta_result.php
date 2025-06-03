@@ -82,6 +82,7 @@ class ThriftHiveMetastore_get_table_meta_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
+<<<<<<< HEAD
                         $_size1493 = 0;
                         $_etype1496 = 0;
                         $xfer += $input->readListBegin($_etype1496, $_size1493);
@@ -90,6 +91,16 @@ class ThriftHiveMetastore_get_table_meta_result
                             $elem1498 = new \metastore\TableMeta();
                             $xfer += $elem1498->read($input);
                             $this->success []= $elem1498;
+=======
+                        $_size1486 = 0;
+                        $_etype1489 = 0;
+                        $xfer += $input->readListBegin($_etype1489, $_size1486);
+                        for ($_i1490 = 0; $_i1490 < $_size1486; ++$_i1490) {
+                            $elem1491 = null;
+                            $elem1491 = new \metastore\TableMeta();
+                            $xfer += $elem1491->read($input);
+                            $this->success []= $elem1491;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -124,8 +135,13 @@ class ThriftHiveMetastore_get_table_meta_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRUCT, count($this->success));
+<<<<<<< HEAD
             foreach ($this->success as $iter1499) {
                 $xfer += $iter1499->write($output);
+=======
+            foreach ($this->success as $iter1492) {
+                $xfer += $iter1492->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

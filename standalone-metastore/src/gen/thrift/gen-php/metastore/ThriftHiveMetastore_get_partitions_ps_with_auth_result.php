@@ -95,6 +95,7 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
+<<<<<<< HEAD
                         $_size1686 = 0;
                         $_etype1689 = 0;
                         $xfer += $input->readListBegin($_etype1689, $_size1686);
@@ -103,6 +104,16 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_result
                             $elem1691 = new \metastore\Partition();
                             $xfer += $elem1691->read($input);
                             $this->success []= $elem1691;
+=======
+                        $_size1679 = 0;
+                        $_etype1682 = 0;
+                        $xfer += $input->readListBegin($_etype1682, $_size1679);
+                        for ($_i1683 = 0; $_i1683 < $_size1679; ++$_i1683) {
+                            $elem1684 = null;
+                            $elem1684 = new \metastore\Partition();
+                            $xfer += $elem1684->read($input);
+                            $this->success []= $elem1684;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -145,8 +156,13 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRUCT, count($this->success));
+<<<<<<< HEAD
             foreach ($this->success as $iter1692) {
                 $xfer += $iter1692->write($output);
+=======
+            foreach ($this->success as $iter1685) {
+                $xfer += $iter1685->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

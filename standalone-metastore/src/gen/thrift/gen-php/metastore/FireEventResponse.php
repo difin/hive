@@ -68,6 +68,7 @@ class FireEventResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->eventIds = array();
+<<<<<<< HEAD
                         $_size891 = 0;
                         $_etype894 = 0;
                         $xfer += $input->readListBegin($_etype894, $_size891);
@@ -75,6 +76,15 @@ class FireEventResponse
                             $elem896 = null;
                             $xfer += $input->readI64($elem896);
                             $this->eventIds []= $elem896;
+=======
+                        $_size884 = 0;
+                        $_etype887 = 0;
+                        $xfer += $input->readListBegin($_etype887, $_size884);
+                        for ($_i888 = 0; $_i888 < $_size884; ++$_i888) {
+                            $elem889 = null;
+                            $xfer += $input->readI64($elem889);
+                            $this->eventIds []= $elem889;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -101,8 +111,13 @@ class FireEventResponse
             }
             $xfer += $output->writeFieldBegin('eventIds', TType::LST, 1);
             $output->writeListBegin(TType::I64, count($this->eventIds));
+<<<<<<< HEAD
             foreach ($this->eventIds as $iter897) {
                 $xfer += $output->writeI64($iter897);
+=======
+            foreach ($this->eventIds as $iter890) {
+                $xfer += $output->writeI64($iter890);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

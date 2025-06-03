@@ -68,6 +68,7 @@ class GetPartitionNamesPsResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->names = array();
+<<<<<<< HEAD
                         $_size1275 = 0;
                         $_etype1278 = 0;
                         $xfer += $input->readListBegin($_etype1278, $_size1275);
@@ -75,6 +76,15 @@ class GetPartitionNamesPsResponse
                             $elem1280 = null;
                             $xfer += $input->readString($elem1280);
                             $this->names []= $elem1280;
+=======
+                        $_size1268 = 0;
+                        $_etype1271 = 0;
+                        $xfer += $input->readListBegin($_etype1271, $_size1268);
+                        for ($_i1272 = 0; $_i1272 < $_size1268; ++$_i1272) {
+                            $elem1273 = null;
+                            $xfer += $input->readString($elem1273);
+                            $this->names []= $elem1273;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -101,8 +111,13 @@ class GetPartitionNamesPsResponse
             }
             $xfer += $output->writeFieldBegin('names', TType::LST, 1);
             $output->writeListBegin(TType::STRING, count($this->names));
+<<<<<<< HEAD
             foreach ($this->names as $iter1281) {
                 $xfer += $output->writeString($iter1281);
+=======
+            foreach ($this->names as $iter1274) {
+                $xfer += $output->writeString($iter1274);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

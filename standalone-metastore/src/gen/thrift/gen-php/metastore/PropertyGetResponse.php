@@ -80,6 +80,7 @@ class PropertyGetResponse
                 case 1:
                     if ($ftype == TType::MAP) {
                         $this->properties = array();
+<<<<<<< HEAD
                         $_size1333 = 0;
                         $_ktype1334 = 0;
                         $_vtype1335 = 0;
@@ -102,6 +103,30 @@ class PropertyGetResponse
                             }
                             $xfer += $input->readMapEnd();
                             $this->properties[$key1338] = $val1339;
+=======
+                        $_size1326 = 0;
+                        $_ktype1327 = 0;
+                        $_vtype1328 = 0;
+                        $xfer += $input->readMapBegin($_ktype1327, $_vtype1328, $_size1326);
+                        for ($_i1330 = 0; $_i1330 < $_size1326; ++$_i1330) {
+                            $key1331 = '';
+                            $val1332 = array();
+                            $xfer += $input->readString($key1331);
+                            $val1332 = array();
+                            $_size1333 = 0;
+                            $_ktype1334 = 0;
+                            $_vtype1335 = 0;
+                            $xfer += $input->readMapBegin($_ktype1334, $_vtype1335, $_size1333);
+                            for ($_i1337 = 0; $_i1337 < $_size1333; ++$_i1337) {
+                                $key1338 = '';
+                                $val1339 = '';
+                                $xfer += $input->readString($key1338);
+                                $xfer += $input->readString($val1339);
+                                $val1332[$key1338] = $val1339;
+                            }
+                            $xfer += $input->readMapEnd();
+                            $this->properties[$key1331] = $val1332;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -128,12 +153,21 @@ class PropertyGetResponse
             }
             $xfer += $output->writeFieldBegin('properties', TType::MAP, 1);
             $output->writeMapBegin(TType::STRING, TType::MAP, count($this->properties));
+<<<<<<< HEAD
             foreach ($this->properties as $kiter1347 => $viter1348) {
                 $xfer += $output->writeString($kiter1347);
                 $output->writeMapBegin(TType::STRING, TType::STRING, count($viter1348));
                 foreach ($viter1348 as $kiter1349 => $viter1350) {
                     $xfer += $output->writeString($kiter1349);
                     $xfer += $output->writeString($viter1350);
+=======
+            foreach ($this->properties as $kiter1340 => $viter1341) {
+                $xfer += $output->writeString($kiter1340);
+                $output->writeMapBegin(TType::STRING, TType::STRING, count($viter1341));
+                foreach ($viter1341 as $kiter1342 => $viter1343) {
+                    $xfer += $output->writeString($kiter1342);
+                    $xfer += $output->writeString($viter1343);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 $output->writeMapEnd();
             }

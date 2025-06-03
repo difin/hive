@@ -121,6 +121,7 @@ class ThriftHiveMetastore_exchange_partitions_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
+<<<<<<< HEAD
                         $_size1602 = 0;
                         $_etype1605 = 0;
                         $xfer += $input->readListBegin($_etype1605, $_size1602);
@@ -129,6 +130,16 @@ class ThriftHiveMetastore_exchange_partitions_result
                             $elem1607 = new \metastore\Partition();
                             $xfer += $elem1607->read($input);
                             $this->success []= $elem1607;
+=======
+                        $_size1595 = 0;
+                        $_etype1598 = 0;
+                        $xfer += $input->readListBegin($_etype1598, $_size1595);
+                        for ($_i1599 = 0; $_i1599 < $_size1595; ++$_i1599) {
+                            $elem1600 = null;
+                            $elem1600 = new \metastore\Partition();
+                            $xfer += $elem1600->read($input);
+                            $this->success []= $elem1600;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -187,8 +198,13 @@ class ThriftHiveMetastore_exchange_partitions_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRUCT, count($this->success));
+<<<<<<< HEAD
             foreach ($this->success as $iter1608) {
                 $xfer += $iter1608->write($output);
+=======
+            foreach ($this->success as $iter1601) {
+                $xfer += $iter1601->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

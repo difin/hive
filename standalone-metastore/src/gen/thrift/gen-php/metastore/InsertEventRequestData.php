@@ -135,6 +135,7 @@ class InsertEventRequestData
                 case 2:
                     if ($ftype == TType::LST) {
                         $this->filesAdded = array();
+<<<<<<< HEAD
                         $_size840 = 0;
                         $_etype843 = 0;
                         $xfer += $input->readListBegin($_etype843, $_size840);
@@ -142,6 +143,15 @@ class InsertEventRequestData
                             $elem845 = null;
                             $xfer += $input->readString($elem845);
                             $this->filesAdded []= $elem845;
+=======
+                        $_size833 = 0;
+                        $_etype836 = 0;
+                        $xfer += $input->readListBegin($_etype836, $_size833);
+                        for ($_i837 = 0; $_i837 < $_size833; ++$_i837) {
+                            $elem838 = null;
+                            $xfer += $input->readString($elem838);
+                            $this->filesAdded []= $elem838;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -151,6 +161,7 @@ class InsertEventRequestData
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->filesAddedChecksum = array();
+<<<<<<< HEAD
                         $_size846 = 0;
                         $_etype849 = 0;
                         $xfer += $input->readListBegin($_etype849, $_size846);
@@ -158,6 +169,15 @@ class InsertEventRequestData
                             $elem851 = null;
                             $xfer += $input->readString($elem851);
                             $this->filesAddedChecksum []= $elem851;
+=======
+                        $_size839 = 0;
+                        $_etype842 = 0;
+                        $xfer += $input->readListBegin($_etype842, $_size839);
+                        for ($_i843 = 0; $_i843 < $_size839; ++$_i843) {
+                            $elem844 = null;
+                            $xfer += $input->readString($elem844);
+                            $this->filesAddedChecksum []= $elem844;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -167,6 +187,7 @@ class InsertEventRequestData
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->subDirectoryList = array();
+<<<<<<< HEAD
                         $_size852 = 0;
                         $_etype855 = 0;
                         $xfer += $input->readListBegin($_etype855, $_size852);
@@ -174,6 +195,15 @@ class InsertEventRequestData
                             $elem857 = null;
                             $xfer += $input->readString($elem857);
                             $this->subDirectoryList []= $elem857;
+=======
+                        $_size845 = 0;
+                        $_etype848 = 0;
+                        $xfer += $input->readListBegin($_etype848, $_size845);
+                        for ($_i849 = 0; $_i849 < $_size845; ++$_i849) {
+                            $elem850 = null;
+                            $xfer += $input->readString($elem850);
+                            $this->subDirectoryList []= $elem850;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -183,6 +213,7 @@ class InsertEventRequestData
                 case 5:
                     if ($ftype == TType::LST) {
                         $this->partitionVal = array();
+<<<<<<< HEAD
                         $_size858 = 0;
                         $_etype861 = 0;
                         $xfer += $input->readListBegin($_etype861, $_size858);
@@ -190,6 +221,15 @@ class InsertEventRequestData
                             $elem863 = null;
                             $xfer += $input->readString($elem863);
                             $this->partitionVal []= $elem863;
+=======
+                        $_size851 = 0;
+                        $_etype854 = 0;
+                        $xfer += $input->readListBegin($_etype854, $_size851);
+                        for ($_i855 = 0; $_i855 < $_size851; ++$_i855) {
+                            $elem856 = null;
+                            $xfer += $input->readString($elem856);
+                            $this->partitionVal []= $elem856;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -221,8 +261,13 @@ class InsertEventRequestData
             }
             $xfer += $output->writeFieldBegin('filesAdded', TType::LST, 2);
             $output->writeListBegin(TType::STRING, count($this->filesAdded));
+<<<<<<< HEAD
             foreach ($this->filesAdded as $iter864) {
                 $xfer += $output->writeString($iter864);
+=======
+            foreach ($this->filesAdded as $iter857) {
+                $xfer += $output->writeString($iter857);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -233,8 +278,13 @@ class InsertEventRequestData
             }
             $xfer += $output->writeFieldBegin('filesAddedChecksum', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->filesAddedChecksum));
+<<<<<<< HEAD
             foreach ($this->filesAddedChecksum as $iter865) {
                 $xfer += $output->writeString($iter865);
+=======
+            foreach ($this->filesAddedChecksum as $iter858) {
+                $xfer += $output->writeString($iter858);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -245,8 +295,13 @@ class InsertEventRequestData
             }
             $xfer += $output->writeFieldBegin('subDirectoryList', TType::LST, 4);
             $output->writeListBegin(TType::STRING, count($this->subDirectoryList));
+<<<<<<< HEAD
             foreach ($this->subDirectoryList as $iter866) {
                 $xfer += $output->writeString($iter866);
+=======
+            foreach ($this->subDirectoryList as $iter859) {
+                $xfer += $output->writeString($iter859);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -257,8 +312,13 @@ class InsertEventRequestData
             }
             $xfer += $output->writeFieldBegin('partitionVal', TType::LST, 5);
             $output->writeListBegin(TType::STRING, count($this->partitionVal));
+<<<<<<< HEAD
             foreach ($this->partitionVal as $iter867) {
                 $xfer += $output->writeString($iter867);
+=======
+            foreach ($this->partitionVal as $iter860) {
+                $xfer += $output->writeString($iter860);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

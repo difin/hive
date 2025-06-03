@@ -69,6 +69,7 @@ class ThriftHiveMetastore_add_partitions_pspec_args
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->new_parts = array();
+<<<<<<< HEAD
                         $_size1542 = 0;
                         $_etype1545 = 0;
                         $xfer += $input->readListBegin($_etype1545, $_size1542);
@@ -77,6 +78,16 @@ class ThriftHiveMetastore_add_partitions_pspec_args
                             $elem1547 = new \metastore\PartitionSpec();
                             $xfer += $elem1547->read($input);
                             $this->new_parts []= $elem1547;
+=======
+                        $_size1535 = 0;
+                        $_etype1538 = 0;
+                        $xfer += $input->readListBegin($_etype1538, $_size1535);
+                        for ($_i1539 = 0; $_i1539 < $_size1535; ++$_i1539) {
+                            $elem1540 = null;
+                            $elem1540 = new \metastore\PartitionSpec();
+                            $xfer += $elem1540->read($input);
+                            $this->new_parts []= $elem1540;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +114,13 @@ class ThriftHiveMetastore_add_partitions_pspec_args
             }
             $xfer += $output->writeFieldBegin('new_parts', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->new_parts));
+<<<<<<< HEAD
             foreach ($this->new_parts as $iter1548) {
                 $xfer += $iter1548->write($output);
+=======
+            foreach ($this->new_parts as $iter1541) {
+                $xfer += $iter1541->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

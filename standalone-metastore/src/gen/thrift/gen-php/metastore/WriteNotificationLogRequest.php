@@ -165,6 +165,7 @@ class WriteNotificationLogRequest
                 case 6:
                     if ($ftype == TType::LST) {
                         $this->partitionVals = array();
+<<<<<<< HEAD
                         $_size898 = 0;
                         $_etype901 = 0;
                         $xfer += $input->readListBegin($_etype901, $_size898);
@@ -172,6 +173,15 @@ class WriteNotificationLogRequest
                             $elem903 = null;
                             $xfer += $input->readString($elem903);
                             $this->partitionVals []= $elem903;
+=======
+                        $_size891 = 0;
+                        $_etype894 = 0;
+                        $xfer += $input->readListBegin($_etype894, $_size891);
+                        for ($_i895 = 0; $_i895 < $_size891; ++$_i895) {
+                            $elem896 = null;
+                            $xfer += $input->readString($elem896);
+                            $this->partitionVals []= $elem896;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -226,8 +236,13 @@ class WriteNotificationLogRequest
             }
             $xfer += $output->writeFieldBegin('partitionVals', TType::LST, 6);
             $output->writeListBegin(TType::STRING, count($this->partitionVals));
+<<<<<<< HEAD
             foreach ($this->partitionVals as $iter904) {
                 $xfer += $output->writeString($iter904);
+=======
+            foreach ($this->partitionVals as $iter897) {
+                $xfer += $output->writeString($iter897);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

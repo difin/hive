@@ -106,6 +106,7 @@ class ThriftHiveMetastore_append_partition_args
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->part_vals = array();
+<<<<<<< HEAD
                         $_size1549 = 0;
                         $_etype1552 = 0;
                         $xfer += $input->readListBegin($_etype1552, $_size1549);
@@ -113,6 +114,15 @@ class ThriftHiveMetastore_append_partition_args
                             $elem1554 = null;
                             $xfer += $input->readString($elem1554);
                             $this->part_vals []= $elem1554;
+=======
+                        $_size1542 = 0;
+                        $_etype1545 = 0;
+                        $xfer += $input->readListBegin($_etype1545, $_size1542);
+                        for ($_i1546 = 0; $_i1546 < $_size1542; ++$_i1546) {
+                            $elem1547 = null;
+                            $xfer += $input->readString($elem1547);
+                            $this->part_vals []= $elem1547;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -149,8 +159,13 @@ class ThriftHiveMetastore_append_partition_args
             }
             $xfer += $output->writeFieldBegin('part_vals', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->part_vals));
+<<<<<<< HEAD
             foreach ($this->part_vals as $iter1555) {
                 $xfer += $output->writeString($iter1555);
+=======
+            foreach ($this->part_vals as $iter1548) {
+                $xfer += $output->writeString($iter1548);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

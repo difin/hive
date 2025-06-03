@@ -108,6 +108,7 @@ class ThriftHiveMetastore_get_fields_with_environment_context_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
+<<<<<<< HEAD
                         $_size1388 = 0;
                         $_etype1391 = 0;
                         $xfer += $input->readListBegin($_etype1391, $_size1388);
@@ -116,6 +117,16 @@ class ThriftHiveMetastore_get_fields_with_environment_context_result
                             $elem1393 = new \metastore\FieldSchema();
                             $xfer += $elem1393->read($input);
                             $this->success []= $elem1393;
+=======
+                        $_size1381 = 0;
+                        $_etype1384 = 0;
+                        $xfer += $input->readListBegin($_etype1384, $_size1381);
+                        for ($_i1385 = 0; $_i1385 < $_size1381; ++$_i1385) {
+                            $elem1386 = null;
+                            $elem1386 = new \metastore\FieldSchema();
+                            $xfer += $elem1386->read($input);
+                            $this->success []= $elem1386;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -166,8 +177,13 @@ class ThriftHiveMetastore_get_fields_with_environment_context_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRUCT, count($this->success));
+<<<<<<< HEAD
             foreach ($this->success as $iter1394) {
                 $xfer += $iter1394->write($output);
+=======
+            foreach ($this->success as $iter1387) {
+                $xfer += $iter1387->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

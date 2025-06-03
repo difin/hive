@@ -69,6 +69,7 @@ class GetOpenTxnsRequest
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->excludeTxnTypes = array();
+<<<<<<< HEAD
                         $_size1310 = 0;
                         $_etype1313 = 0;
                         $xfer += $input->readListBegin($_etype1313, $_size1310);
@@ -76,6 +77,15 @@ class GetOpenTxnsRequest
                             $elem1315 = null;
                             $xfer += $input->readI32($elem1315);
                             $this->excludeTxnTypes []= $elem1315;
+=======
+                        $_size1303 = 0;
+                        $_etype1306 = 0;
+                        $xfer += $input->readListBegin($_etype1306, $_size1303);
+                        for ($_i1307 = 0; $_i1307 < $_size1303; ++$_i1307) {
+                            $elem1308 = null;
+                            $xfer += $input->readI32($elem1308);
+                            $this->excludeTxnTypes []= $elem1308;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -102,8 +112,13 @@ class GetOpenTxnsRequest
             }
             $xfer += $output->writeFieldBegin('excludeTxnTypes', TType::LST, 1);
             $output->writeListBegin(TType::I32, count($this->excludeTxnTypes));
+<<<<<<< HEAD
             foreach ($this->excludeTxnTypes as $iter1316) {
                 $xfer += $output->writeI32($iter1316);
+=======
+            foreach ($this->excludeTxnTypes as $iter1309) {
+                $xfer += $output->writeI32($iter1309);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

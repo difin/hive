@@ -322,6 +322,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // EVENT_IDS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list1010 = iprot.readListBegin();
                 struct.eventIds = new java.util.ArrayList<java.lang.Long>(_list1010.size);
                 long _elem1011;
@@ -329,6 +330,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem1011 = iprot.readI64();
                   struct.eventIds.add(_elem1011);
+=======
+                org.apache.thrift.protocol.TList _list1002 = iprot.readListBegin();
+                struct.eventIds = new java.util.ArrayList<java.lang.Long>(_list1002.size);
+                long _elem1003;
+                for (int _i1004 = 0; _i1004 < _list1002.size; ++_i1004)
+                {
+                  _elem1003 = iprot.readI64();
+                  struct.eventIds.add(_elem1003);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -354,9 +364,15 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(EVENT_IDS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I64, struct.eventIds.size()));
+<<<<<<< HEAD
           for (long _iter1013 : struct.eventIds)
           {
             oprot.writeI64(_iter1013);
+=======
+          for (long _iter1005 : struct.eventIds)
+          {
+            oprot.writeI64(_iter1005);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
           oprot.writeListEnd();
         }
@@ -387,9 +403,15 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetEventIds()) {
         {
           oprot.writeI32(struct.eventIds.size());
+<<<<<<< HEAD
           for (long _iter1014 : struct.eventIds)
           {
             oprot.writeI64(_iter1014);
+=======
+          for (long _iter1006 : struct.eventIds)
+          {
+            oprot.writeI64(_iter1006);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
@@ -401,6 +423,7 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list1015 = iprot.readListBegin(org.apache.thrift.protocol.TType.I64);
           struct.eventIds = new java.util.ArrayList<java.lang.Long>(_list1015.size);
           long _elem1016;
@@ -408,6 +431,15 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem1016 = iprot.readI64();
             struct.eventIds.add(_elem1016);
+=======
+          org.apache.thrift.protocol.TList _list1007 = iprot.readListBegin(org.apache.thrift.protocol.TType.I64);
+          struct.eventIds = new java.util.ArrayList<java.lang.Long>(_list1007.size);
+          long _elem1008;
+          for (int _i1009 = 0; _i1009 < _list1007.size; ++_i1009)
+          {
+            _elem1008 = iprot.readI64();
+            struct.eventIds.add(_elem1008);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setEventIdsIsSet(true);

@@ -711,6 +711,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 2: // FILES_ADDED
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list952 = iprot.readListBegin();
                 struct.filesAdded = new java.util.ArrayList<java.lang.String>(_list952.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem953;
@@ -718,6 +719,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem953 = iprot.readString();
                   struct.filesAdded.add(_elem953);
+=======
+                org.apache.thrift.protocol.TList _list944 = iprot.readListBegin();
+                struct.filesAdded = new java.util.ArrayList<java.lang.String>(_list944.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem945;
+                for (int _i946 = 0; _i946 < _list944.size; ++_i946)
+                {
+                  _elem945 = iprot.readString();
+                  struct.filesAdded.add(_elem945);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -729,6 +739,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 3: // FILES_ADDED_CHECKSUM
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list955 = iprot.readListBegin();
                 struct.filesAddedChecksum = new java.util.ArrayList<java.lang.String>(_list955.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem956;
@@ -736,6 +747,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem956 = iprot.readString();
                   struct.filesAddedChecksum.add(_elem956);
+=======
+                org.apache.thrift.protocol.TList _list947 = iprot.readListBegin();
+                struct.filesAddedChecksum = new java.util.ArrayList<java.lang.String>(_list947.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem948;
+                for (int _i949 = 0; _i949 < _list947.size; ++_i949)
+                {
+                  _elem948 = iprot.readString();
+                  struct.filesAddedChecksum.add(_elem948);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -747,6 +767,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 4: // SUB_DIRECTORY_LIST
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list958 = iprot.readListBegin();
                 struct.subDirectoryList = new java.util.ArrayList<java.lang.String>(_list958.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem959;
@@ -754,6 +775,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem959 = iprot.readString();
                   struct.subDirectoryList.add(_elem959);
+=======
+                org.apache.thrift.protocol.TList _list950 = iprot.readListBegin();
+                struct.subDirectoryList = new java.util.ArrayList<java.lang.String>(_list950.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem951;
+                for (int _i952 = 0; _i952 < _list950.size; ++_i952)
+                {
+                  _elem951 = iprot.readString();
+                  struct.subDirectoryList.add(_elem951);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -765,6 +795,7 @@ package org.apache.hadoop.hive.metastore.api;
           case 5: // PARTITION_VAL
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
+<<<<<<< HEAD
                 org.apache.thrift.protocol.TList _list961 = iprot.readListBegin();
                 struct.partitionVal = new java.util.ArrayList<java.lang.String>(_list961.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem962;
@@ -772,6 +803,15 @@ package org.apache.hadoop.hive.metastore.api;
                 {
                   _elem962 = iprot.readString();
                   struct.partitionVal.add(_elem962);
+=======
+                org.apache.thrift.protocol.TList _list953 = iprot.readListBegin();
+                struct.partitionVal = new java.util.ArrayList<java.lang.String>(_list953.size);
+                @org.apache.thrift.annotation.Nullable java.lang.String _elem954;
+                for (int _i955 = 0; _i955 < _list953.size; ++_i955)
+                {
+                  _elem954 = iprot.readString();
+                  struct.partitionVal.add(_elem954);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                 }
                 iprot.readListEnd();
               }
@@ -802,9 +842,15 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(FILES_ADDED_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.filesAdded.size()));
+<<<<<<< HEAD
           for (java.lang.String _iter964 : struct.filesAdded)
           {
             oprot.writeString(_iter964);
+=======
+          for (java.lang.String _iter956 : struct.filesAdded)
+          {
+            oprot.writeString(_iter956);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
           oprot.writeListEnd();
         }
@@ -815,9 +861,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(FILES_ADDED_CHECKSUM_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.filesAddedChecksum.size()));
+<<<<<<< HEAD
             for (java.lang.String _iter965 : struct.filesAddedChecksum)
             {
               oprot.writeString(_iter965);
+=======
+            for (java.lang.String _iter957 : struct.filesAddedChecksum)
+            {
+              oprot.writeString(_iter957);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -829,9 +881,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(SUB_DIRECTORY_LIST_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.subDirectoryList.size()));
+<<<<<<< HEAD
             for (java.lang.String _iter966 : struct.subDirectoryList)
             {
               oprot.writeString(_iter966);
+=======
+            for (java.lang.String _iter958 : struct.subDirectoryList)
+            {
+              oprot.writeString(_iter958);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -843,9 +901,15 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(PARTITION_VAL_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.partitionVal.size()));
+<<<<<<< HEAD
             for (java.lang.String _iter967 : struct.partitionVal)
             {
               oprot.writeString(_iter967);
+=======
+            for (java.lang.String _iter959 : struct.partitionVal)
+            {
+              oprot.writeString(_iter959);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             oprot.writeListEnd();
           }
@@ -871,9 +935,15 @@ package org.apache.hadoop.hive.metastore.api;
       org.apache.thrift.protocol.TTupleProtocol oprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       {
         oprot.writeI32(struct.filesAdded.size());
+<<<<<<< HEAD
         for (java.lang.String _iter968 : struct.filesAdded)
         {
           oprot.writeString(_iter968);
+=======
+        for (java.lang.String _iter960 : struct.filesAdded)
+        {
+          oprot.writeString(_iter960);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
         }
       }
       java.util.BitSet optionals = new java.util.BitSet();
@@ -896,27 +966,45 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetFilesAddedChecksum()) {
         {
           oprot.writeI32(struct.filesAddedChecksum.size());
+<<<<<<< HEAD
           for (java.lang.String _iter969 : struct.filesAddedChecksum)
           {
             oprot.writeString(_iter969);
+=======
+          for (java.lang.String _iter961 : struct.filesAddedChecksum)
+          {
+            oprot.writeString(_iter961);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
       if (struct.isSetSubDirectoryList()) {
         {
           oprot.writeI32(struct.subDirectoryList.size());
+<<<<<<< HEAD
           for (java.lang.String _iter970 : struct.subDirectoryList)
           {
             oprot.writeString(_iter970);
+=======
+          for (java.lang.String _iter962 : struct.subDirectoryList)
+          {
+            oprot.writeString(_iter962);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
       if (struct.isSetPartitionVal()) {
         {
           oprot.writeI32(struct.partitionVal.size());
+<<<<<<< HEAD
           for (java.lang.String _iter971 : struct.partitionVal)
           {
             oprot.writeString(_iter971);
+=======
+          for (java.lang.String _iter963 : struct.partitionVal)
+          {
+            oprot.writeString(_iter963);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
       }
@@ -926,6 +1014,7 @@ package org.apache.hadoop.hive.metastore.api;
     public void read(org.apache.thrift.protocol.TProtocol prot, InsertEventRequestData struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       {
+<<<<<<< HEAD
         org.apache.thrift.protocol.TList _list972 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
         struct.filesAdded = new java.util.ArrayList<java.lang.String>(_list972.size);
         @org.apache.thrift.annotation.Nullable java.lang.String _elem973;
@@ -933,6 +1022,15 @@ package org.apache.hadoop.hive.metastore.api;
         {
           _elem973 = iprot.readString();
           struct.filesAdded.add(_elem973);
+=======
+        org.apache.thrift.protocol.TList _list964 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+        struct.filesAdded = new java.util.ArrayList<java.lang.String>(_list964.size);
+        @org.apache.thrift.annotation.Nullable java.lang.String _elem965;
+        for (int _i966 = 0; _i966 < _list964.size; ++_i966)
+        {
+          _elem965 = iprot.readString();
+          struct.filesAdded.add(_elem965);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
         }
       }
       struct.setFilesAddedIsSet(true);
@@ -943,6 +1041,7 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(1)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list975 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.filesAddedChecksum = new java.util.ArrayList<java.lang.String>(_list975.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem976;
@@ -950,12 +1049,22 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem976 = iprot.readString();
             struct.filesAddedChecksum.add(_elem976);
+=======
+          org.apache.thrift.protocol.TList _list967 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.filesAddedChecksum = new java.util.ArrayList<java.lang.String>(_list967.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem968;
+          for (int _i969 = 0; _i969 < _list967.size; ++_i969)
+          {
+            _elem968 = iprot.readString();
+            struct.filesAddedChecksum.add(_elem968);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setFilesAddedChecksumIsSet(true);
       }
       if (incoming.get(2)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list978 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.subDirectoryList = new java.util.ArrayList<java.lang.String>(_list978.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem979;
@@ -963,12 +1072,22 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem979 = iprot.readString();
             struct.subDirectoryList.add(_elem979);
+=======
+          org.apache.thrift.protocol.TList _list970 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.subDirectoryList = new java.util.ArrayList<java.lang.String>(_list970.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem971;
+          for (int _i972 = 0; _i972 < _list970.size; ++_i972)
+          {
+            _elem971 = iprot.readString();
+            struct.subDirectoryList.add(_elem971);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setSubDirectoryListIsSet(true);
       }
       if (incoming.get(3)) {
         {
+<<<<<<< HEAD
           org.apache.thrift.protocol.TList _list981 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.partitionVal = new java.util.ArrayList<java.lang.String>(_list981.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem982;
@@ -976,6 +1095,15 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _elem982 = iprot.readString();
             struct.partitionVal.add(_elem982);
+=======
+          org.apache.thrift.protocol.TList _list973 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+          struct.partitionVal = new java.util.ArrayList<java.lang.String>(_list973.size);
+          @org.apache.thrift.annotation.Nullable java.lang.String _elem974;
+          for (int _i975 = 0; _i975 < _list973.size; ++_i975)
+          {
+            _elem974 = iprot.readString();
+            struct.partitionVal.add(_elem974);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
           }
         }
         struct.setPartitionValIsSet(true);

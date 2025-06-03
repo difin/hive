@@ -69,6 +69,7 @@ class GetAllFunctionsResponse
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->functions = array();
+<<<<<<< HEAD
                         $_size965 = 0;
                         $_etype968 = 0;
                         $xfer += $input->readListBegin($_etype968, $_size965);
@@ -77,6 +78,16 @@ class GetAllFunctionsResponse
                             $elem970 = new \metastore\Function();
                             $xfer += $elem970->read($input);
                             $this->functions []= $elem970;
+=======
+                        $_size958 = 0;
+                        $_etype961 = 0;
+                        $xfer += $input->readListBegin($_etype961, $_size958);
+                        for ($_i962 = 0; $_i962 < $_size958; ++$_i962) {
+                            $elem963 = null;
+                            $elem963 = new \metastore\Function();
+                            $xfer += $elem963->read($input);
+                            $this->functions []= $elem963;
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -103,8 +114,13 @@ class GetAllFunctionsResponse
             }
             $xfer += $output->writeFieldBegin('functions', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->functions));
+<<<<<<< HEAD
             foreach ($this->functions as $iter971) {
                 $xfer += $iter971->write($output);
+=======
+            foreach ($this->functions as $iter964) {
+                $xfer += $iter964->write($output);
+>>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
