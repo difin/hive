@@ -158,10 +158,6 @@ RUN yum -y clean all && \
 # postgres-jdbc fetches java-8 as a dependency, let's make java11 as default, pointed by /etc/alternatives/java
 RUN alternatives --set java /usr/lib/jvm/java-11-openjdk-11.0.25.0.9-2.el8.aarch64/bin/java
 
-COPY bigtop-hive /usr/bin/hive
-RUN ln -s /usr/bin/hive /usr/bin/beeline
-RUN ln -s /usr/bin/hive /usr/bin/hiveserver2
-
 # switch user and all related env
 USER hive
 ENV USER hive
@@ -184,6 +180,8 @@ ENV HADOOP_CONF_DIR /etc/hadoop/conf
 ENV TEZ_CONF_DIR /etc/tez/conf
 ENV HIVE_CONF_DIR /etc/hive/conf
 ENV LLAP_DAEMON_CONF_DIR /etc/hive/conf
+
+ENV PATH $PATH:$HIVE_HOME/bin
 
 COPY entrypoint.sh hive-entrypoint.sh tez-entrypoint.sh llap-entrypoint.sh \
      custom-jars-localizer.sh udf-jars-localizer.sh sys-entrypoint.sh \
