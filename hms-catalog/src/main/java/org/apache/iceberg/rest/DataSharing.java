@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.iceberg.exceptions.NotAuthorizedException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +42,12 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Utilities for data sharing (Iceberg tables on s3).
@@ -71,11 +76,12 @@ public class DataSharing {
 
   private final String delegationTokenPath;
   private final String accessTokenPath;
-  private final URI idBrokerUri;
+  private final URI[] idBrokerUris;
   private final SslContextFactory sslFactory;
   private volatile IdBrokerDelegationToken delegationToken = null;
   private final String s3ClientRegion;
   private final String s3RemoteSigningEnabled;
+  private final AtomicInteger lastKnownGood = new AtomicInteger(0);
 
   /**
    * Remove leading and trailing slashes from URL segments so we can compose them.
@@ -92,52 +98,41 @@ public class DataSharing {
     return path;
   }
 
-  public DataSharing(Configuration conf) {
+  public DataSharing(Configuration conf) throws IOException {
     String dpath = conf.get(CONFVAR_IDBROKER_DELEGATION_PATH, "dt/knoxtoken/api/v1/token");
     delegationTokenPath = composable(dpath);
     String apath = conf.get(CONFVAR_IDBROKER_ACCESS_PATH, "aws-cab/cab/api/v1/credentials");
     accessTokenPath = composable(apath);
     s3ClientRegion = conf.get(CLIENT_REGION, "us-west-2");
     s3RemoteSigningEnabled = conf.get(S3_REMOTE_SIGNING_ENABLED, "false");
-    URI brokerUri = null;
-    String brokerUrlVar = conf.get(CONFVAR_IDBROKER_URL);
-    if (brokerUrlVar == null) {
-      LOG.info("idbroker url not configured");
-    } else {
-      try {
-        if (!brokerUrlVar.endsWith("/")) {
-          brokerUrlVar += "/";
-        }
-        brokerUri = URI.create(brokerUrlVar);
-      } catch (IllegalArgumentException iea) {
-        LOG.error("idbroker url misconfigured {}", brokerUrlVar);
-      }
+    String urls = conf.get(CONFVAR_IDBROKER_URL, "");
+    idBrokerUris = Arrays.stream(urls.split(","))
+        .map(String::trim)
+        .filter(s -> !s.isEmpty())
+        .map(u -> URI.create(u.endsWith("/") ? u : u + "/"))
+        .toArray(URI[]::new);
+    if (idBrokerUris.length == 0) {
+      throw new IllegalArgumentException("hive.metastore.catalog.idbroker.url is empty or malformed");
     }
-    SslContextFactory ssl = null;
-    if (brokerUri != null) {
-      if ("https".equals(brokerUri.getScheme())) {
-        try {
-          ssl = SecurityFriend.createSslContextFactory(conf);
-        } catch (IOException e) {
-          LOG.error("catalog datasharing idbroker url malformed {}", brokerUri, e);
-        }
-      }
-      try {
-        brokerUri.toURL();
-      } catch (MalformedURLException e) {
-        brokerUri = null;
-        LOG.error("catalog datasharing idbroker url malformed {}", brokerUri, e);
-      }
-    }
-    sslFactory = ssl;
-    idBrokerUri = brokerUri;
-    LOG.info("DataSharing agent initialized with broker uri: {} ", idBrokerUri);
+    this.sslFactory = "https".equalsIgnoreCase(idBrokerUris[0].getScheme()) ? SecurityFriend.createSslContextFactory(conf) : null;
+    LOG.info("DataSharing agent initialized with IdBroker endpoints: {}", Arrays.toString(idBrokerUris));
+  }
+
+  /**
+   * For testing purposes only - clears the delegation token to force a refresh
+   */
+  void clearDelegationTokenCache() {
+    this.delegationToken = null;
   }
 
   /**
    * Gets a data sharing access token from the idbroker.
-   * @return an access token
+   *
+   * @param table the table's manifest location
+   * @return an access token or null if no token could be obtained
+   * @throws NotAuthorizedException if the access token could not be fetched due to authorization issues
    */
+
   public Map<String, String> getAccessToken(String table) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("==> DataSharing.getAccessToken()");
@@ -155,16 +150,36 @@ public class DataSharing {
       }
       if (idt == null) {
         LOG.error("Failed to get IdBroker delegationToken");
+        throw new NotAuthorizedException(
+          "Unable to obtain IdBroker delegation token for current user");
       } else {
         token = fetchAccessToken(idt, table);
+        if (token.isEmpty()) {
+          throw new NotAuthorizedException(
+              "Unable to obtain S3 access token for table " + table);
+        }
       }
+    } catch (NotAuthorizedException e) {
+      // Rethrow NotAuthorizedException to indicate authorization failure
+      LOG.error("<== DataSharing.getAccessToken() : Authorization failure", e);
+      throw e;
     } catch (Exception e) {
-      LOG.info("<== DataSharing.getAccessToken() : Failed to fetch access token", e);
+      LOG.error("<== DataSharing.getAccessToken() : Failed to fetch access token", e);
+      throw new NotAuthorizedException("Failed to fetch access token: " + e.getMessage());
     }
     if (LOG.isDebugEnabled()) {
-      LOG.debug("<== DataSharing.getAccessToken() : {}", token == null ? "failed" : "successful");
+      LOG.debug("<== DataSharing.getAccessToken() : {}", "successful");
     }
     return token;
+  }
+
+  // RR helper
+  private int nextIndex(int attempt) {
+    return (lastKnownGood.get() + attempt) % idBrokerUris.length;
+  }
+
+  private URI resolve(int idx, String relPath) {
+    return idBrokerUris[idx].resolve(relPath);
   }
 
   /**
@@ -172,10 +187,8 @@ public class DataSharing {
    * @return the URL
    * @throws IOException if url composition fails
    */
-  URL delegationTokenUrl() throws IOException {
-    URL delegationTokenUrl = URI.create(idBrokerUri + delegationTokenPath).toURL();
-    LOG.info("==> DataSharing.fetchDelegationToken(), broker url: {} ", delegationTokenUrl);
-    return delegationTokenUrl;
+  URL delegationTokenUrl(int idx) throws IOException {
+    return resolve(idx, delegationTokenPath).toURL();
   }
 
   /**
@@ -186,23 +199,31 @@ public class DataSharing {
   private IdBrokerDelegationToken fetchDelegationToken() throws IOException {
     LOG.debug("==> DataSharing.fetchDelegationToken()");
     IdBrokerDelegationToken token = null;
-    try {
-      Object result = clientCall(null, delegationTokenUrl(), HTTP_GET, null);
-      LOG.info("==> DataSharing.fetchDelegationToken(), broker response: {} ", result);
-      if (result instanceof Map) {
-        Object sessionToken = ((Map<?, ?>) result).get(ACCESS_TOKEN);
-        LOG.debug("==> DataSharing.fetchDelegationToken(), access_token from response: {} ", sessionToken);
-        if (sessionToken != null) {
-          String expirationDate = (((Map<?, ?>) result).get(EXPIRES_IN)).toString();
-          LOG.debug("==> DataSharing.fetchDelegationToken(), access_token is not null: expiration is {} ",
-              expirationDate);
-          token = new IdBrokerDelegationToken(sessionToken.toString(), Double.valueOf(expirationDate).longValue());
-        } else {
-          LOG.info("<== DataSharing.fetchDelegationToken(): access_token value is null");
+    for (int attempt = 0; attempt < idBrokerUris.length && token == null; ++attempt) {
+      int idx = nextIndex(attempt);
+      try {
+        URL brokerUrl = delegationTokenUrl(idx);
+        LOG.info("==> DataSharing.fetchDelegationToken(), trying broker url: {} (attempt {}/{})", 
+            brokerUrl, attempt, idBrokerUris.length);
+
+        Object result = clientCall(null, brokerUrl, HTTP_GET, null);
+        LOG.info("==> DataSharing.fetchDelegationToken(), broker response: {} ", result);
+        if (result instanceof Map) {
+          Object sessionToken = ((Map<?, ?>) result).get(ACCESS_TOKEN);
+          LOG.debug("==> DataSharing.fetchDelegationToken(), access_token from response: {} ", sessionToken);
+          if (sessionToken != null) {
+            String expirationDate = (((Map<?, ?>) result).get(EXPIRES_IN)).toString();
+            LOG.debug("==> DataSharing.fetchDelegationToken(), access_token is not null: expiration is {} ",
+                expirationDate);
+            token = new IdBrokerDelegationToken(sessionToken.toString(), Double.valueOf(expirationDate).longValue());
+            lastKnownGood.set(idx);
+          } else {
+            LOG.info("<== DataSharing.fetchDelegationToken(): access_token value is null");
+          }
         }
+      } catch (Exception e) {
+        LOG.warn("Delegation-token fetch failed from {} ({})", idBrokerUris[idx], e.toString());
       }
-    } catch (Exception e) {
-      LOG.error("Exception while fetching delegation token", e);
     }
     LOG.info("<== DataSharing.fetchDelegationToken(): {}", (token == null ? " failed" : "successful"));
     return token;
@@ -221,8 +242,8 @@ public class DataSharing {
       // derive the root location for the table, hack until we find a better way
       tableRoot = table.substring(0, table.lastIndexOf("/metadata"));
     }
-    URL accessTokenUrl = URI.create(idBrokerUri + accessTokenPath
-        +  "?path=" + urlEncodeUTF8(tableRoot) + "&permissions=read-only").toURL();
+    int idx = lastKnownGood.get();
+    URL accessTokenUrl = resolve(idx, accessTokenPath + "?path=" + urlEncodeUTF8(tableRoot) + "&permissions=read-only").toURL();
     LOG.debug("==> DataSharing.accessTokenUrl() returning : {} ", accessTokenUrl);
     return accessTokenUrl;
   }
@@ -239,7 +260,6 @@ public class DataSharing {
     Map<String, String> tokenRes = new HashMap<>();
     try {
       Object result = clientCall(idt.getDelegationToken(), accessTokenUrl(table), HTTP_GET, null);
-//      LOG.info("==> DataSharing.fetchAccessToken(), broker response: {} ", result);
       if (result instanceof Map) {
         Map<?, ?> resultMap = (Map<?, ?>) result;
         Map<?, ?> assumedRoleUser = (Map<?, ?>) resultMap.get("AssumedRoleUser");

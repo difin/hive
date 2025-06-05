@@ -462,13 +462,25 @@ public class HMSCatalogAdapter implements RESTClient {
    * @param func the function
    * @param <T>  the function return type
    * @return the function result
+   * @throws NotAuthorizedException if authorization fails during the execution
    */
   public static <T> T runAsHive(java.util.function.Supplier<T> func) {
     try {
       UserGroupInformation ugi = UserGroupInformation.getLoginUser();
-      PrivilegedExceptionAction<T> action = () -> func.get();
+      PrivilegedExceptionAction<T> action = () -> {
+        try {
+          return func.get();
+        } catch (NotAuthorizedException e) {
+          LOG.error("Not authorized to perform action as hive", e);
+          throw e;
+        }
+      };
       return ugi.doAs(action);
     } catch (IOException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof NotAuthorizedException) {
+        throw (NotAuthorizedException) cause;
+      }
       LOG.error("unable to perform action as hive", e);
       return null;
     } catch (InterruptedException e) {
