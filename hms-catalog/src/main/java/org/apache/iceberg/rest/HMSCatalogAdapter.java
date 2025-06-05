@@ -18,6 +18,8 @@
  */
 
 package org.apache.iceberg.rest;
+
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.metrics.Metrics;
 import org.apache.iceberg.BaseMetadataTable;
 import org.apache.iceberg.BaseTable;
@@ -38,6 +40,7 @@ import org.apache.iceberg.exceptions.NotAuthorizedException;
 import org.apache.iceberg.exceptions.RESTException;
 import org.apache.iceberg.exceptions.UnprocessableEntityException;
 import org.apache.iceberg.exceptions.ValidationException;
+import org.apache.iceberg.metering.CatalogMeteringEventPublisher;
 import org.apache.iceberg.relocated.com.google.common.base.Splitter;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.rest.requests.CreateNamespaceRequest;
@@ -96,8 +99,14 @@ public class HMSCatalogAdapter implements RESTClient {
   private final Catalog catalog;
   private final SupportsNamespaces asNamespaceCatalog;
 
-  public HMSCatalogAdapter(Catalog catalog) {
+  private final CatalogMeteringEventPublisher catalogMeteringEventPublisher;
+
+  private final Configuration configuration;
+
+  public HMSCatalogAdapter(Catalog catalog, Configuration configuration) {
     this.catalog = catalog;
+    this.configuration = configuration;
+    this.catalogMeteringEventPublisher = new CatalogMeteringEventPublisher(configuration);
     this.asNamespaceCatalog =
         catalog instanceof SupportsNamespaces ? (SupportsNamespaces) catalog : null;
   }
@@ -255,6 +264,7 @@ public class HMSCatalogAdapter implements RESTClient {
     if (counter != null) {
       counter.inc();
     }
+    catalogMeteringEventPublisher.updateAPICount();
     switch (route) {
       case TOKENS: {
         @SuppressWarnings("unchecked")

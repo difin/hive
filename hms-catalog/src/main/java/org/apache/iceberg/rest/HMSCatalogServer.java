@@ -50,8 +50,8 @@ public class HMSCatalogServer {
     // nothing
   }
 
-  public static HttpServlet createServlet(SecureServletCaller security, Catalog catalog) throws IOException {
-    try (HMSCatalogAdapter adapter = new HMSCatalogAdapter(catalog)) {
+  public static HttpServlet createServlet(SecureServletCaller security, Catalog catalog, Configuration configuration) throws IOException {
+    try (HMSCatalogAdapter adapter = new HMSCatalogAdapter(catalog, configuration)) {
       return new HMSCatalogServlet(security, adapter);
     }
   }
@@ -80,7 +80,7 @@ public class HMSCatalogServer {
       actualCatalog.initialize("hive", Collections.emptyMap());
     }
     catalogRef = new SoftReference<>(actualCatalog);
-    return createServlet(security, actualCatalog);
+    return createServlet(security, actualCatalog, configuration);
   }
 
   /**
