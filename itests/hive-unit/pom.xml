@@ -31,6 +31,7 @@
     <hive.path.to.root>../..</hive.path.to.root>
     <testcontainers.version>1.15.0</testcontainers.version>
     <htmlunit.version>2.70.0</htmlunit.version>
+    <junit.jupiter.version>5.6.2</junit.jupiter.version>
   </properties>
 
   <dependencies>
@@ -508,6 +509,12 @@
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
       <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit.jupiter.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -35,6 +35,9 @@ import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.EnvironmentContext;
 import org.apache.hadoop.hive.metastore.api.InvalidOperationException;
+import org.apache.hadoop.hive.metastore.api.NotificationEvent;
+import org.apache.hadoop.hive.metastore.messaging.MessageDeserializer;
+import org.apache.hadoop.hive.metastore.messaging.MessageFactory;
 import org.apache.hadoop.hive.metastore.utils.StringUtils;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
@@ -530,6 +533,17 @@ public class ReplUtils {
     @Override
     public void serialize(Long epoch, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
       jsonGenerator.writeString(Instant.ofEpochSecond(epoch).toString());
+    }
+  }
+
+  public static MessageDeserializer getEventDeserializer(NotificationEvent event) {
+    try {
+      return MessageFactory.getInstance(event.getMessageFormat()).getDeserializer();
+    } catch (Exception e) {
+      String message =
+              "could not create appropriate messageFactory for format " + event.getMessageFormat();
+      LOG.error(message, e);
+      throw new IllegalStateException(message, e);
     }
   }
 }
