@@ -609,10 +609,14 @@ package org.apache.hadoop.hive.metastore.api;
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TList _list1026 = iprot.readListBegin();
                 struct.requestList = new java.util.ArrayList<WriteNotificationLogRequest>(_list1026.size);
                 @org.apache.thrift.annotation.Nullable WriteNotificationLogRequest _elem1027;
                 for (int _i1028 = 0; _i1028 < _list1026.size; ++_i1028)
+<<<<<<< HEAD
                 {
                   _elem1027 = new WriteNotificationLogRequest();
                   _elem1027.read(iprot);
@@ -627,6 +631,12 @@ package org.apache.hadoop.hive.metastore.api;
                   _elem1019.read(iprot);
                   struct.requestList.add(_elem1019);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+                {
+                  _elem1027 = new WriteNotificationLogRequest();
+                  _elem1027.read(iprot);
+                  struct.requestList.add(_elem1027);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 iprot.readListEnd();
               }
@@ -668,6 +678,7 @@ package org.apache.hadoop.hive.metastore.api;
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.requestList.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
           for (WriteNotificationLogRequest _iter1029 : struct.requestList)
           {
             _iter1029.write(oprot);
@@ -676,6 +687,11 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _iter1021.write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          for (WriteNotificationLogRequest _iter1029 : struct.requestList)
+          {
+            _iter1029.write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
           oprot.writeListEnd();
         }
@@ -704,6 +720,7 @@ package org.apache.hadoop.hive.metastore.api;
       {
         oprot.writeI32(struct.requestList.size());
 <<<<<<< HEAD
+<<<<<<< HEAD
         for (WriteNotificationLogRequest _iter1030 : struct.requestList)
         {
           _iter1030.write(oprot);
@@ -712,6 +729,11 @@ package org.apache.hadoop.hive.metastore.api;
         {
           _iter1022.write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+        for (WriteNotificationLogRequest _iter1030 : struct.requestList)
+        {
+          _iter1030.write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
       }
     }
@@ -727,10 +749,14 @@ package org.apache.hadoop.hive.metastore.api;
       struct.setTableIsSet(true);
       {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         org.apache.thrift.protocol.TList _list1031 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
         struct.requestList = new java.util.ArrayList<WriteNotificationLogRequest>(_list1031.size);
         @org.apache.thrift.annotation.Nullable WriteNotificationLogRequest _elem1032;
         for (int _i1033 = 0; _i1033 < _list1031.size; ++_i1033)
+<<<<<<< HEAD
         {
           _elem1032 = new WriteNotificationLogRequest();
           _elem1032.read(iprot);
@@ -745,6 +771,12 @@ package org.apache.hadoop.hive.metastore.api;
           _elem1024.read(iprot);
           struct.requestList.add(_elem1024);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+        {
+          _elem1032 = new WriteNotificationLogRequest();
+          _elem1032.read(iprot);
+          struct.requestList.add(_elem1032);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
       }
       struct.setRequestListIsSet(true);

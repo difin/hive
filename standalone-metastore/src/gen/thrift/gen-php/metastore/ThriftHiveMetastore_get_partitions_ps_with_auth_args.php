@@ -147,6 +147,9 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_args
                     if ($ftype == TType::LST) {
                         $this->part_vals = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1672 = 0;
                         $_etype1675 = 0;
                         $xfer += $input->readListBegin($_etype1675, $_size1672);
@@ -154,6 +157,7 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_args
                             $elem1677 = null;
                             $xfer += $input->readString($elem1677);
                             $this->part_vals []= $elem1677;
+<<<<<<< HEAD
 =======
                         $_size1665 = 0;
                         $_etype1668 = 0;
@@ -163,6 +167,8 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_args
                             $xfer += $input->readString($elem1670);
                             $this->part_vals []= $elem1670;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -187,6 +193,9 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_args
                     if ($ftype == TType::LST) {
                         $this->group_names = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1678 = 0;
                         $_etype1681 = 0;
                         $xfer += $input->readListBegin($_etype1681, $_size1678);
@@ -194,6 +203,7 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_args
                             $elem1683 = null;
                             $xfer += $input->readString($elem1683);
                             $this->group_names []= $elem1683;
+<<<<<<< HEAD
 =======
                         $_size1671 = 0;
                         $_etype1674 = 0;
@@ -203,6 +213,8 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_args
                             $xfer += $input->readString($elem1676);
                             $this->group_names []= $elem1676;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -240,12 +252,17 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_args
             $xfer += $output->writeFieldBegin('part_vals', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->part_vals));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->part_vals as $iter1684) {
                 $xfer += $output->writeString($iter1684);
 =======
             foreach ($this->part_vals as $iter1677) {
                 $xfer += $output->writeString($iter1677);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->part_vals as $iter1684) {
+                $xfer += $output->writeString($iter1684);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -267,12 +284,17 @@ class ThriftHiveMetastore_get_partitions_ps_with_auth_args
             $xfer += $output->writeFieldBegin('group_names', TType::LST, 6);
             $output->writeListBegin(TType::STRING, count($this->group_names));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->group_names as $iter1685) {
                 $xfer += $output->writeString($iter1685);
 =======
             foreach ($this->group_names as $iter1678) {
                 $xfer += $output->writeString($iter1678);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->group_names as $iter1685) {
+                $xfer += $output->writeString($iter1685);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

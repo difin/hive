@@ -179,6 +179,9 @@ class FireEventRequest
                     if ($ftype == TType::LST) {
                         $this->partitionVals = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size875 = 0;
                         $_etype878 = 0;
                         $xfer += $input->readListBegin($_etype878, $_size875);
@@ -186,6 +189,7 @@ class FireEventRequest
                             $elem880 = null;
                             $xfer += $input->readString($elem880);
                             $this->partitionVals []= $elem880;
+<<<<<<< HEAD
 =======
                         $_size868 = 0;
                         $_etype871 = 0;
@@ -195,6 +199,8 @@ class FireEventRequest
                             $xfer += $input->readString($elem873);
                             $this->partitionVals []= $elem873;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -212,6 +218,9 @@ class FireEventRequest
                     if ($ftype == TType::MAP) {
                         $this->tblParams = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size881 = 0;
                         $_ktype882 = 0;
                         $_vtype883 = 0;
@@ -222,6 +231,7 @@ class FireEventRequest
                             $xfer += $input->readString($key886);
                             $xfer += $input->readString($val887);
                             $this->tblParams[$key886] = $val887;
+<<<<<<< HEAD
 =======
                         $_size874 = 0;
                         $_ktype875 = 0;
@@ -234,6 +244,8 @@ class FireEventRequest
                             $xfer += $input->readString($val880);
                             $this->tblParams[$key879] = $val880;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -284,12 +296,17 @@ class FireEventRequest
             $xfer += $output->writeFieldBegin('partitionVals', TType::LST, 5);
             $output->writeListBegin(TType::STRING, count($this->partitionVals));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->partitionVals as $iter888) {
                 $xfer += $output->writeString($iter888);
 =======
             foreach ($this->partitionVals as $iter881) {
                 $xfer += $output->writeString($iter881);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->partitionVals as $iter888) {
+                $xfer += $output->writeString($iter888);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -306,6 +323,7 @@ class FireEventRequest
             $xfer += $output->writeFieldBegin('tblParams', TType::MAP, 7);
             $output->writeMapBegin(TType::STRING, TType::STRING, count($this->tblParams));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->tblParams as $kiter889 => $viter890) {
                 $xfer += $output->writeString($kiter889);
                 $xfer += $output->writeString($viter890);
@@ -314,6 +332,11 @@ class FireEventRequest
                 $xfer += $output->writeString($kiter882);
                 $xfer += $output->writeString($viter883);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->tblParams as $kiter889 => $viter890) {
+                $xfer += $output->writeString($kiter889);
+                $xfer += $output->writeString($viter890);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();

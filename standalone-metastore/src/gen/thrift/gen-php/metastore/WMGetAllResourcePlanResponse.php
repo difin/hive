@@ -70,6 +70,9 @@ class WMGetAllResourcePlanResponse
                     if ($ftype == TType::LST) {
                         $this->resourcePlans = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1084 = 0;
                         $_etype1087 = 0;
                         $xfer += $input->readListBegin($_etype1087, $_size1084);
@@ -78,6 +81,7 @@ class WMGetAllResourcePlanResponse
                             $elem1089 = new \metastore\WMResourcePlan();
                             $xfer += $elem1089->read($input);
                             $this->resourcePlans []= $elem1089;
+<<<<<<< HEAD
 =======
                         $_size1077 = 0;
                         $_etype1080 = 0;
@@ -88,6 +92,8 @@ class WMGetAllResourcePlanResponse
                             $xfer += $elem1082->read($input);
                             $this->resourcePlans []= $elem1082;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -115,12 +121,17 @@ class WMGetAllResourcePlanResponse
             $xfer += $output->writeFieldBegin('resourcePlans', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->resourcePlans));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->resourcePlans as $iter1090) {
                 $xfer += $iter1090->write($output);
 =======
             foreach ($this->resourcePlans as $iter1083) {
                 $xfer += $iter1083->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->resourcePlans as $iter1090) {
+                $xfer += $iter1090->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

@@ -85,6 +85,9 @@ class GetFileMetadataResult
                     if ($ftype == TType::MAP) {
                         $this->metadata = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size928 = 0;
                         $_ktype929 = 0;
                         $_vtype930 = 0;
@@ -95,6 +98,7 @@ class GetFileMetadataResult
                             $xfer += $input->readI64($key933);
                             $xfer += $input->readString($val934);
                             $this->metadata[$key933] = $val934;
+<<<<<<< HEAD
 =======
                         $_size921 = 0;
                         $_ktype922 = 0;
@@ -107,6 +111,8 @@ class GetFileMetadataResult
                             $xfer += $input->readString($val927);
                             $this->metadata[$key926] = $val927;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -141,6 +147,7 @@ class GetFileMetadataResult
             $xfer += $output->writeFieldBegin('metadata', TType::MAP, 1);
             $output->writeMapBegin(TType::I64, TType::STRING, count($this->metadata));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->metadata as $kiter935 => $viter936) {
                 $xfer += $output->writeI64($kiter935);
                 $xfer += $output->writeString($viter936);
@@ -149,6 +156,11 @@ class GetFileMetadataResult
                 $xfer += $output->writeI64($kiter928);
                 $xfer += $output->writeString($viter929);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->metadata as $kiter935 => $viter936) {
+                $xfer += $output->writeI64($kiter935);
+                $xfer += $output->writeString($viter936);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();

@@ -85,6 +85,9 @@ class WMValidateResourcePlanResponse
                     if ($ftype == TType::LST) {
                         $this->errors = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1091 = 0;
                         $_etype1094 = 0;
                         $xfer += $input->readListBegin($_etype1094, $_size1091);
@@ -92,6 +95,7 @@ class WMValidateResourcePlanResponse
                             $elem1096 = null;
                             $xfer += $input->readString($elem1096);
                             $this->errors []= $elem1096;
+<<<<<<< HEAD
 =======
                         $_size1084 = 0;
                         $_etype1087 = 0;
@@ -101,6 +105,8 @@ class WMValidateResourcePlanResponse
                             $xfer += $input->readString($elem1089);
                             $this->errors []= $elem1089;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -111,6 +117,9 @@ class WMValidateResourcePlanResponse
                     if ($ftype == TType::LST) {
                         $this->warnings = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1097 = 0;
                         $_etype1100 = 0;
                         $xfer += $input->readListBegin($_etype1100, $_size1097);
@@ -118,6 +127,7 @@ class WMValidateResourcePlanResponse
                             $elem1102 = null;
                             $xfer += $input->readString($elem1102);
                             $this->warnings []= $elem1102;
+<<<<<<< HEAD
 =======
                         $_size1090 = 0;
                         $_etype1093 = 0;
@@ -127,6 +137,8 @@ class WMValidateResourcePlanResponse
                             $xfer += $input->readString($elem1095);
                             $this->warnings []= $elem1095;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -154,12 +166,17 @@ class WMValidateResourcePlanResponse
             $xfer += $output->writeFieldBegin('errors', TType::LST, 1);
             $output->writeListBegin(TType::STRING, count($this->errors));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->errors as $iter1103) {
                 $xfer += $output->writeString($iter1103);
 =======
             foreach ($this->errors as $iter1096) {
                 $xfer += $output->writeString($iter1096);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->errors as $iter1103) {
+                $xfer += $output->writeString($iter1103);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -171,12 +188,17 @@ class WMValidateResourcePlanResponse
             $xfer += $output->writeFieldBegin('warnings', TType::LST, 2);
             $output->writeListBegin(TType::STRING, count($this->warnings));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->warnings as $iter1104) {
                 $xfer += $output->writeString($iter1104);
 =======
             foreach ($this->warnings as $iter1097) {
                 $xfer += $output->writeString($iter1097);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->warnings as $iter1104) {
+                $xfer += $output->writeString($iter1104);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

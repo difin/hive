@@ -322,10 +322,14 @@ package org.apache.hadoop.hive.metastore.api;
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TList _list1254 = iprot.readListBegin();
                 struct.triggers = new java.util.ArrayList<WMTrigger>(_list1254.size);
                 @org.apache.thrift.annotation.Nullable WMTrigger _elem1255;
                 for (int _i1256 = 0; _i1256 < _list1254.size; ++_i1256)
+<<<<<<< HEAD
                 {
                   _elem1255 = new WMTrigger();
                   _elem1255.read(iprot);
@@ -340,6 +344,12 @@ package org.apache.hadoop.hive.metastore.api;
                   _elem1247.read(iprot);
                   struct.triggers.add(_elem1247);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+                {
+                  _elem1255 = new WMTrigger();
+                  _elem1255.read(iprot);
+                  struct.triggers.add(_elem1255);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 iprot.readListEnd();
               }
@@ -367,6 +377,7 @@ package org.apache.hadoop.hive.metastore.api;
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.triggers.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
             for (WMTrigger _iter1257 : struct.triggers)
             {
               _iter1257.write(oprot);
@@ -375,6 +386,11 @@ package org.apache.hadoop.hive.metastore.api;
             {
               _iter1249.write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for (WMTrigger _iter1257 : struct.triggers)
+            {
+              _iter1257.write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             oprot.writeListEnd();
           }
@@ -407,6 +423,7 @@ package org.apache.hadoop.hive.metastore.api;
         {
           oprot.writeI32(struct.triggers.size());
 <<<<<<< HEAD
+<<<<<<< HEAD
           for (WMTrigger _iter1258 : struct.triggers)
           {
             _iter1258.write(oprot);
@@ -415,6 +432,11 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _iter1250.write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          for (WMTrigger _iter1258 : struct.triggers)
+          {
+            _iter1258.write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
       }
@@ -427,10 +449,14 @@ package org.apache.hadoop.hive.metastore.api;
       if (incoming.get(0)) {
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           org.apache.thrift.protocol.TList _list1259 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
           struct.triggers = new java.util.ArrayList<WMTrigger>(_list1259.size);
           @org.apache.thrift.annotation.Nullable WMTrigger _elem1260;
           for (int _i1261 = 0; _i1261 < _list1259.size; ++_i1261)
+<<<<<<< HEAD
           {
             _elem1260 = new WMTrigger();
             _elem1260.read(iprot);
@@ -445,6 +471,12 @@ package org.apache.hadoop.hive.metastore.api;
             _elem1252.read(iprot);
             struct.triggers.add(_elem1252);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          {
+            _elem1260 = new WMTrigger();
+            _elem1260.read(iprot);
+            struct.triggers.add(_elem1260);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
         struct.setTriggersIsSet(true);

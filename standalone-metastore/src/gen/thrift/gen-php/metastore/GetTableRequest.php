@@ -233,6 +233,9 @@ class GetTableRequest
                     if ($ftype == TType::LST) {
                         $this->processorCapabilities = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size986 = 0;
                         $_etype989 = 0;
                         $xfer += $input->readListBegin($_etype989, $_size986);
@@ -240,6 +243,7 @@ class GetTableRequest
                             $elem991 = null;
                             $xfer += $input->readString($elem991);
                             $this->processorCapabilities []= $elem991;
+<<<<<<< HEAD
 =======
                         $_size979 = 0;
                         $_etype982 = 0;
@@ -249,6 +253,8 @@ class GetTableRequest
                             $xfer += $input->readString($elem984);
                             $this->processorCapabilities []= $elem984;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -337,12 +343,17 @@ class GetTableRequest
             $xfer += $output->writeFieldBegin('processorCapabilities', TType::LST, 8);
             $output->writeListBegin(TType::STRING, count($this->processorCapabilities));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->processorCapabilities as $iter992) {
                 $xfer += $output->writeString($iter992);
 =======
             foreach ($this->processorCapabilities as $iter985) {
                 $xfer += $output->writeString($iter985);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->processorCapabilities as $iter992) {
+                $xfer += $output->writeString($iter992);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

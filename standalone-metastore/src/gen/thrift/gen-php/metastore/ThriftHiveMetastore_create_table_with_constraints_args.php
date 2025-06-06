@@ -176,6 +176,9 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                     if ($ftype == TType::LST) {
                         $this->primaryKeys = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1409 = 0;
                         $_etype1412 = 0;
                         $xfer += $input->readListBegin($_etype1412, $_size1409);
@@ -184,6 +187,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1414 = new \metastore\SQLPrimaryKey();
                             $xfer += $elem1414->read($input);
                             $this->primaryKeys []= $elem1414;
+<<<<<<< HEAD
 =======
                         $_size1402 = 0;
                         $_etype1405 = 0;
@@ -194,6 +198,8 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $xfer += $elem1407->read($input);
                             $this->primaryKeys []= $elem1407;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -204,6 +210,9 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                     if ($ftype == TType::LST) {
                         $this->foreignKeys = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1415 = 0;
                         $_etype1418 = 0;
                         $xfer += $input->readListBegin($_etype1418, $_size1415);
@@ -212,6 +221,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1420 = new \metastore\SQLForeignKey();
                             $xfer += $elem1420->read($input);
                             $this->foreignKeys []= $elem1420;
+<<<<<<< HEAD
 =======
                         $_size1408 = 0;
                         $_etype1411 = 0;
@@ -222,6 +232,8 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $xfer += $elem1413->read($input);
                             $this->foreignKeys []= $elem1413;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -232,6 +244,9 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                     if ($ftype == TType::LST) {
                         $this->uniqueConstraints = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1421 = 0;
                         $_etype1424 = 0;
                         $xfer += $input->readListBegin($_etype1424, $_size1421);
@@ -240,6 +255,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1426 = new \metastore\SQLUniqueConstraint();
                             $xfer += $elem1426->read($input);
                             $this->uniqueConstraints []= $elem1426;
+<<<<<<< HEAD
 =======
                         $_size1414 = 0;
                         $_etype1417 = 0;
@@ -250,6 +266,8 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $xfer += $elem1419->read($input);
                             $this->uniqueConstraints []= $elem1419;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -260,6 +278,9 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                     if ($ftype == TType::LST) {
                         $this->notNullConstraints = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1427 = 0;
                         $_etype1430 = 0;
                         $xfer += $input->readListBegin($_etype1430, $_size1427);
@@ -268,6 +289,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1432 = new \metastore\SQLNotNullConstraint();
                             $xfer += $elem1432->read($input);
                             $this->notNullConstraints []= $elem1432;
+<<<<<<< HEAD
 =======
                         $_size1420 = 0;
                         $_etype1423 = 0;
@@ -278,6 +300,8 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $xfer += $elem1425->read($input);
                             $this->notNullConstraints []= $elem1425;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -288,6 +312,9 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                     if ($ftype == TType::LST) {
                         $this->defaultConstraints = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1433 = 0;
                         $_etype1436 = 0;
                         $xfer += $input->readListBegin($_etype1436, $_size1433);
@@ -296,6 +323,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1438 = new \metastore\SQLDefaultConstraint();
                             $xfer += $elem1438->read($input);
                             $this->defaultConstraints []= $elem1438;
+<<<<<<< HEAD
 =======
                         $_size1426 = 0;
                         $_etype1429 = 0;
@@ -306,6 +334,8 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $xfer += $elem1431->read($input);
                             $this->defaultConstraints []= $elem1431;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -316,6 +346,9 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                     if ($ftype == TType::LST) {
                         $this->checkConstraints = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1439 = 0;
                         $_etype1442 = 0;
                         $xfer += $input->readListBegin($_etype1442, $_size1439);
@@ -324,6 +357,7 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $elem1444 = new \metastore\SQLCheckConstraint();
                             $xfer += $elem1444->read($input);
                             $this->checkConstraints []= $elem1444;
+<<<<<<< HEAD
 =======
                         $_size1432 = 0;
                         $_etype1435 = 0;
@@ -334,6 +368,8 @@ class ThriftHiveMetastore_create_table_with_constraints_args
                             $xfer += $elem1437->read($input);
                             $this->checkConstraints []= $elem1437;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -369,12 +405,17 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             $xfer += $output->writeFieldBegin('primaryKeys', TType::LST, 2);
             $output->writeListBegin(TType::STRUCT, count($this->primaryKeys));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->primaryKeys as $iter1445) {
                 $xfer += $iter1445->write($output);
 =======
             foreach ($this->primaryKeys as $iter1438) {
                 $xfer += $iter1438->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->primaryKeys as $iter1445) {
+                $xfer += $iter1445->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -386,12 +427,17 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             $xfer += $output->writeFieldBegin('foreignKeys', TType::LST, 3);
             $output->writeListBegin(TType::STRUCT, count($this->foreignKeys));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->foreignKeys as $iter1446) {
                 $xfer += $iter1446->write($output);
 =======
             foreach ($this->foreignKeys as $iter1439) {
                 $xfer += $iter1439->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->foreignKeys as $iter1446) {
+                $xfer += $iter1446->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -403,12 +449,17 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             $xfer += $output->writeFieldBegin('uniqueConstraints', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->uniqueConstraints));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->uniqueConstraints as $iter1447) {
                 $xfer += $iter1447->write($output);
 =======
             foreach ($this->uniqueConstraints as $iter1440) {
                 $xfer += $iter1440->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->uniqueConstraints as $iter1447) {
+                $xfer += $iter1447->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -420,12 +471,17 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             $xfer += $output->writeFieldBegin('notNullConstraints', TType::LST, 5);
             $output->writeListBegin(TType::STRUCT, count($this->notNullConstraints));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->notNullConstraints as $iter1448) {
                 $xfer += $iter1448->write($output);
 =======
             foreach ($this->notNullConstraints as $iter1441) {
                 $xfer += $iter1441->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->notNullConstraints as $iter1448) {
+                $xfer += $iter1448->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -437,12 +493,17 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             $xfer += $output->writeFieldBegin('defaultConstraints', TType::LST, 6);
             $output->writeListBegin(TType::STRUCT, count($this->defaultConstraints));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->defaultConstraints as $iter1449) {
                 $xfer += $iter1449->write($output);
 =======
             foreach ($this->defaultConstraints as $iter1442) {
                 $xfer += $iter1442->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->defaultConstraints as $iter1449) {
+                $xfer += $iter1449->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -454,12 +515,17 @@ class ThriftHiveMetastore_create_table_with_constraints_args
             $xfer += $output->writeFieldBegin('checkConstraints', TType::LST, 7);
             $output->writeListBegin(TType::STRUCT, count($this->checkConstraints));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->checkConstraints as $iter1450) {
                 $xfer += $iter1450->write($output);
 =======
             foreach ($this->checkConstraints as $iter1443) {
                 $xfer += $iter1443->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->checkConstraints as $iter1450) {
+                $xfer += $iter1450->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

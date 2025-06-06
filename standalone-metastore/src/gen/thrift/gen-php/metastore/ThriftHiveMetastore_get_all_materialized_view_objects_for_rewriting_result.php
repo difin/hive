@@ -83,6 +83,9 @@ class ThriftHiveMetastore_get_all_materialized_view_objects_for_rewriting_result
                     if ($ftype == TType::LST) {
                         $this->success = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1472 = 0;
                         $_etype1475 = 0;
                         $xfer += $input->readListBegin($_etype1475, $_size1472);
@@ -91,6 +94,7 @@ class ThriftHiveMetastore_get_all_materialized_view_objects_for_rewriting_result
                             $elem1477 = new \metastore\Table();
                             $xfer += $elem1477->read($input);
                             $this->success []= $elem1477;
+<<<<<<< HEAD
 =======
                         $_size1465 = 0;
                         $_etype1468 = 0;
@@ -101,6 +105,8 @@ class ThriftHiveMetastore_get_all_materialized_view_objects_for_rewriting_result
                             $xfer += $elem1470->read($input);
                             $this->success []= $elem1470;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -136,12 +142,17 @@ class ThriftHiveMetastore_get_all_materialized_view_objects_for_rewriting_result
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRUCT, count($this->success));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->success as $iter1478) {
                 $xfer += $iter1478->write($output);
 =======
             foreach ($this->success as $iter1471) {
                 $xfer += $iter1471->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->success as $iter1478) {
+                $xfer += $iter1478->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

@@ -70,6 +70,9 @@ class FindSchemasByColsResp
                     if ($ftype == TType::LST) {
                         $this->schemaVersions = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1119 = 0;
                         $_etype1122 = 0;
                         $xfer += $input->readListBegin($_etype1122, $_size1119);
@@ -78,6 +81,7 @@ class FindSchemasByColsResp
                             $elem1124 = new \metastore\SchemaVersionDescriptor();
                             $xfer += $elem1124->read($input);
                             $this->schemaVersions []= $elem1124;
+<<<<<<< HEAD
 =======
                         $_size1112 = 0;
                         $_etype1115 = 0;
@@ -88,6 +92,8 @@ class FindSchemasByColsResp
                             $xfer += $elem1117->read($input);
                             $this->schemaVersions []= $elem1117;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -115,12 +121,17 @@ class FindSchemasByColsResp
             $xfer += $output->writeFieldBegin('schemaVersions', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->schemaVersions));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->schemaVersions as $iter1125) {
                 $xfer += $iter1125->write($output);
 =======
             foreach ($this->schemaVersions as $iter1118) {
                 $xfer += $iter1118->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->schemaVersions as $iter1125) {
+                $xfer += $iter1125->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

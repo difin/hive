@@ -193,6 +193,9 @@ class AlterPartitionsRequest
                     if ($ftype == TType::LST) {
                         $this->partitions = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1184 = 0;
                         $_etype1187 = 0;
                         $xfer += $input->readListBegin($_etype1187, $_size1184);
@@ -201,6 +204,7 @@ class AlterPartitionsRequest
                             $elem1189 = new \metastore\Partition();
                             $xfer += $elem1189->read($input);
                             $this->partitions []= $elem1189;
+<<<<<<< HEAD
 =======
                         $_size1177 = 0;
                         $_etype1180 = 0;
@@ -211,6 +215,8 @@ class AlterPartitionsRequest
                             $xfer += $elem1182->read($input);
                             $this->partitions []= $elem1182;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -250,6 +256,9 @@ class AlterPartitionsRequest
                     if ($ftype == TType::LST) {
                         $this->partitionColSchema = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1190 = 0;
                         $_etype1193 = 0;
                         $xfer += $input->readListBegin($_etype1193, $_size1190);
@@ -258,6 +267,7 @@ class AlterPartitionsRequest
                             $elem1195 = new \metastore\FieldSchema();
                             $xfer += $elem1195->read($input);
                             $this->partitionColSchema []= $elem1195;
+<<<<<<< HEAD
 =======
                         $_size1183 = 0;
                         $_etype1186 = 0;
@@ -268,6 +278,8 @@ class AlterPartitionsRequest
                             $xfer += $elem1188->read($input);
                             $this->partitionColSchema []= $elem1188;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -310,12 +322,17 @@ class AlterPartitionsRequest
             $xfer += $output->writeFieldBegin('partitions', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->partitions));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->partitions as $iter1196) {
                 $xfer += $iter1196->write($output);
 =======
             foreach ($this->partitions as $iter1189) {
                 $xfer += $iter1189->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->partitions as $iter1196) {
+                $xfer += $iter1196->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -350,12 +367,17 @@ class AlterPartitionsRequest
             $xfer += $output->writeFieldBegin('partitionColSchema', TType::LST, 9);
             $output->writeListBegin(TType::STRUCT, count($this->partitionColSchema));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->partitionColSchema as $iter1197) {
                 $xfer += $iter1197->write($output);
 =======
             foreach ($this->partitionColSchema as $iter1190) {
                 $xfer += $iter1190->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->partitionColSchema as $iter1197) {
+                $xfer += $iter1197->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

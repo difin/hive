@@ -127,6 +127,9 @@ class WriteNotificationLogBatchRequest
                     if ($ftype == TType::LST) {
                         $this->requestList = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size905 = 0;
                         $_etype908 = 0;
                         $xfer += $input->readListBegin($_etype908, $_size905);
@@ -135,6 +138,7 @@ class WriteNotificationLogBatchRequest
                             $elem910 = new \metastore\WriteNotificationLogRequest();
                             $xfer += $elem910->read($input);
                             $this->requestList []= $elem910;
+<<<<<<< HEAD
 =======
                         $_size898 = 0;
                         $_etype901 = 0;
@@ -145,6 +149,8 @@ class WriteNotificationLogBatchRequest
                             $xfer += $elem903->read($input);
                             $this->requestList []= $elem903;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -187,12 +193,17 @@ class WriteNotificationLogBatchRequest
             $xfer += $output->writeFieldBegin('requestList', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->requestList));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->requestList as $iter911) {
                 $xfer += $iter911->write($output);
 =======
             foreach ($this->requestList as $iter904) {
                 $xfer += $iter904->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->requestList as $iter911) {
+                $xfer += $iter911->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

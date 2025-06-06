@@ -70,6 +70,9 @@ class PartitionsResponse
                     if ($ftype == TType::LST) {
                         $this->partitions = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1261 = 0;
                         $_etype1264 = 0;
                         $xfer += $input->readListBegin($_etype1264, $_size1261);
@@ -78,6 +81,7 @@ class PartitionsResponse
                             $elem1266 = new \metastore\Partition();
                             $xfer += $elem1266->read($input);
                             $this->partitions []= $elem1266;
+<<<<<<< HEAD
 =======
                         $_size1254 = 0;
                         $_etype1257 = 0;
@@ -88,6 +92,8 @@ class PartitionsResponse
                             $xfer += $elem1259->read($input);
                             $this->partitions []= $elem1259;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -115,12 +121,17 @@ class PartitionsResponse
             $xfer += $output->writeFieldBegin('partitions', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->partitions));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->partitions as $iter1267) {
                 $xfer += $iter1267->write($output);
 =======
             foreach ($this->partitions as $iter1260) {
                 $xfer += $iter1260->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->partitions as $iter1267) {
+                $xfer += $iter1267->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

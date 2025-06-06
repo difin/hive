@@ -14,10 +14,14 @@ hive_metastoreConstants::hive_metastoreConstants() {
   DDL_TIME = "transient_lastDdlTime";
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   HMS_API = "1.2.53";
 =======
   HMS_API = "1.2.45";
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+  HMS_API = "1.2.46";
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 
   ACCESSTYPE_NONE = 1;
 

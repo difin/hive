@@ -22435,16 +22435,22 @@ class get_databases_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1351, _size1348) = iprot.readListBegin()
                     for _i1352 in range(_size1348):
                         _elem1353 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1353)
+<<<<<<< HEAD
 =======
                     (_etype1344, _size1341) = iprot.readListBegin()
                     for _i1345 in range(_size1341):
                         _elem1346 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1346)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -22467,12 +22473,17 @@ class get_databases_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1354 in self.success:
                 oprot.writeString(iter1354.encode('utf-8') if sys.version_info[0] == 2 else iter1354)
 =======
             for iter1347 in self.success:
                 oprot.writeString(iter1347.encode('utf-8') if sys.version_info[0] == 2 else iter1347)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1354 in self.success:
+                oprot.writeString(iter1354.encode('utf-8') if sys.version_info[0] == 2 else iter1354)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -22571,16 +22582,22 @@ class get_all_databases_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1358, _size1355) = iprot.readListBegin()
                     for _i1359 in range(_size1355):
                         _elem1360 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1360)
+<<<<<<< HEAD
 =======
                     (_etype1351, _size1348) = iprot.readListBegin()
                     for _i1352 in range(_size1348):
                         _elem1353 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1353)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -22603,12 +22620,17 @@ class get_all_databases_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1361 in self.success:
                 oprot.writeString(iter1361.encode('utf-8') if sys.version_info[0] == 2 else iter1361)
 =======
             for iter1354 in self.success:
                 oprot.writeString(iter1354.encode('utf-8') if sys.version_info[0] == 2 else iter1354)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1361 in self.success:
+                oprot.writeString(iter1361.encode('utf-8') if sys.version_info[0] == 2 else iter1361)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -23463,16 +23485,22 @@ class get_dataconnectors_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1365, _size1362) = iprot.readListBegin()
                     for _i1366 in range(_size1362):
                         _elem1367 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1367)
+<<<<<<< HEAD
 =======
                     (_etype1358, _size1355) = iprot.readListBegin()
                     for _i1359 in range(_size1355):
                         _elem1360 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1360)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -23495,12 +23523,17 @@ class get_dataconnectors_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1368 in self.success:
                 oprot.writeString(iter1368.encode('utf-8') if sys.version_info[0] == 2 else iter1368)
 =======
             for iter1361 in self.success:
                 oprot.writeString(iter1361.encode('utf-8') if sys.version_info[0] == 2 else iter1361)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1368 in self.success:
+                oprot.writeString(iter1368.encode('utf-8') if sys.version_info[0] == 2 else iter1368)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -24222,12 +24255,16 @@ class get_type_all_result(object):
                 if ftype == TType.MAP:
                     self.success = {}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_ktype1370, _vtype1371, _size1369) = iprot.readMapBegin()
                     for _i1373 in range(_size1369):
                         _key1374 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         _val1375 = Type()
                         _val1375.read(iprot)
                         self.success[_key1374] = _val1375
+<<<<<<< HEAD
 =======
                     (_ktype1363, _vtype1364, _size1362) = iprot.readMapBegin()
                     for _i1366 in range(_size1362):
@@ -24236,6 +24273,8 @@ class get_type_all_result(object):
                         _val1368.read(iprot)
                         self.success[_key1367] = _val1368
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readMapEnd()
                 else:
                     iprot.skip(ftype)
@@ -24258,6 +24297,7 @@ class get_type_all_result(object):
             oprot.writeFieldBegin('success', TType.MAP, 0)
             oprot.writeMapBegin(TType.STRING, TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for kiter1376, viter1377 in self.success.items():
                 oprot.writeString(kiter1376.encode('utf-8') if sys.version_info[0] == 2 else kiter1376)
                 viter1377.write(oprot)
@@ -24266,6 +24306,11 @@ class get_type_all_result(object):
                 oprot.writeString(kiter1369.encode('utf-8') if sys.version_info[0] == 2 else kiter1369)
                 viter1370.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for kiter1376, viter1377 in self.success.items():
+                oprot.writeString(kiter1376.encode('utf-8') if sys.version_info[0] == 2 else kiter1376)
+                viter1377.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeMapEnd()
             oprot.writeFieldEnd()
         if self.o2 is not None:
@@ -24399,11 +24444,15 @@ class get_fields_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1381, _size1378) = iprot.readListBegin()
                     for _i1382 in range(_size1378):
                         _elem1383 = FieldSchema()
                         _elem1383.read(iprot)
                         self.success.append(_elem1383)
+<<<<<<< HEAD
 =======
                     (_etype1374, _size1371) = iprot.readListBegin()
                     for _i1375 in range(_size1371):
@@ -24411,6 +24460,8 @@ class get_fields_result(object):
                         _elem1376.read(iprot)
                         self.success.append(_elem1376)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -24443,12 +24494,17 @@ class get_fields_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1384 in self.success:
                 iter1384.write(oprot)
 =======
             for iter1377 in self.success:
                 iter1377.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1384 in self.success:
+                iter1384.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -24605,11 +24661,15 @@ class get_fields_with_environment_context_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1388, _size1385) = iprot.readListBegin()
                     for _i1389 in range(_size1385):
                         _elem1390 = FieldSchema()
                         _elem1390.read(iprot)
                         self.success.append(_elem1390)
+<<<<<<< HEAD
 =======
                     (_etype1381, _size1378) = iprot.readListBegin()
                     for _i1382 in range(_size1378):
@@ -24617,6 +24677,8 @@ class get_fields_with_environment_context_result(object):
                         _elem1383.read(iprot)
                         self.success.append(_elem1383)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -24649,12 +24711,17 @@ class get_fields_with_environment_context_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1391 in self.success:
                 iter1391.write(oprot)
 =======
             for iter1384 in self.success:
                 iter1384.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1391 in self.success:
+                iter1391.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -24959,11 +25026,15 @@ class get_schema_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1395, _size1392) = iprot.readListBegin()
                     for _i1396 in range(_size1392):
                         _elem1397 = FieldSchema()
                         _elem1397.read(iprot)
                         self.success.append(_elem1397)
+<<<<<<< HEAD
 =======
                     (_etype1388, _size1385) = iprot.readListBegin()
                     for _i1389 in range(_size1385):
@@ -24971,6 +25042,8 @@ class get_schema_result(object):
                         _elem1390.read(iprot)
                         self.success.append(_elem1390)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -25003,12 +25076,17 @@ class get_schema_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1398 in self.success:
                 iter1398.write(oprot)
 =======
             for iter1391 in self.success:
                 iter1391.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1398 in self.success:
+                iter1398.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -25165,11 +25243,15 @@ class get_schema_with_environment_context_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1402, _size1399) = iprot.readListBegin()
                     for _i1403 in range(_size1399):
                         _elem1404 = FieldSchema()
                         _elem1404.read(iprot)
                         self.success.append(_elem1404)
+<<<<<<< HEAD
 =======
                     (_etype1395, _size1392) = iprot.readListBegin()
                     for _i1396 in range(_size1392):
@@ -25177,6 +25259,8 @@ class get_schema_with_environment_context_result(object):
                         _elem1397.read(iprot)
                         self.success.append(_elem1397)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -25209,12 +25293,17 @@ class get_schema_with_environment_context_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1405 in self.success:
                 iter1405.write(oprot)
 =======
             for iter1398 in self.success:
                 iter1398.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1405 in self.success:
+                iter1405.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -25792,11 +25881,15 @@ class create_table_with_constraints_args(object):
                 if ftype == TType.LIST:
                     self.primaryKeys = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1409, _size1406) = iprot.readListBegin()
                     for _i1410 in range(_size1406):
                         _elem1411 = SQLPrimaryKey()
                         _elem1411.read(iprot)
                         self.primaryKeys.append(_elem1411)
+<<<<<<< HEAD
 =======
                     (_etype1402, _size1399) = iprot.readListBegin()
                     for _i1403 in range(_size1399):
@@ -25804,6 +25897,8 @@ class create_table_with_constraints_args(object):
                         _elem1404.read(iprot)
                         self.primaryKeys.append(_elem1404)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -25811,11 +25906,15 @@ class create_table_with_constraints_args(object):
                 if ftype == TType.LIST:
                     self.foreignKeys = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1415, _size1412) = iprot.readListBegin()
                     for _i1416 in range(_size1412):
                         _elem1417 = SQLForeignKey()
                         _elem1417.read(iprot)
                         self.foreignKeys.append(_elem1417)
+<<<<<<< HEAD
 =======
                     (_etype1408, _size1405) = iprot.readListBegin()
                     for _i1409 in range(_size1405):
@@ -25823,6 +25922,8 @@ class create_table_with_constraints_args(object):
                         _elem1410.read(iprot)
                         self.foreignKeys.append(_elem1410)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -25830,11 +25931,15 @@ class create_table_with_constraints_args(object):
                 if ftype == TType.LIST:
                     self.uniqueConstraints = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1421, _size1418) = iprot.readListBegin()
                     for _i1422 in range(_size1418):
                         _elem1423 = SQLUniqueConstraint()
                         _elem1423.read(iprot)
                         self.uniqueConstraints.append(_elem1423)
+<<<<<<< HEAD
 =======
                     (_etype1414, _size1411) = iprot.readListBegin()
                     for _i1415 in range(_size1411):
@@ -25842,6 +25947,8 @@ class create_table_with_constraints_args(object):
                         _elem1416.read(iprot)
                         self.uniqueConstraints.append(_elem1416)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -25849,11 +25956,15 @@ class create_table_with_constraints_args(object):
                 if ftype == TType.LIST:
                     self.notNullConstraints = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1427, _size1424) = iprot.readListBegin()
                     for _i1428 in range(_size1424):
                         _elem1429 = SQLNotNullConstraint()
                         _elem1429.read(iprot)
                         self.notNullConstraints.append(_elem1429)
+<<<<<<< HEAD
 =======
                     (_etype1420, _size1417) = iprot.readListBegin()
                     for _i1421 in range(_size1417):
@@ -25861,6 +25972,8 @@ class create_table_with_constraints_args(object):
                         _elem1422.read(iprot)
                         self.notNullConstraints.append(_elem1422)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -25868,11 +25981,15 @@ class create_table_with_constraints_args(object):
                 if ftype == TType.LIST:
                     self.defaultConstraints = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1433, _size1430) = iprot.readListBegin()
                     for _i1434 in range(_size1430):
                         _elem1435 = SQLDefaultConstraint()
                         _elem1435.read(iprot)
                         self.defaultConstraints.append(_elem1435)
+<<<<<<< HEAD
 =======
                     (_etype1426, _size1423) = iprot.readListBegin()
                     for _i1427 in range(_size1423):
@@ -25880,6 +25997,8 @@ class create_table_with_constraints_args(object):
                         _elem1428.read(iprot)
                         self.defaultConstraints.append(_elem1428)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -25887,11 +26006,15 @@ class create_table_with_constraints_args(object):
                 if ftype == TType.LIST:
                     self.checkConstraints = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1439, _size1436) = iprot.readListBegin()
                     for _i1440 in range(_size1436):
                         _elem1441 = SQLCheckConstraint()
                         _elem1441.read(iprot)
                         self.checkConstraints.append(_elem1441)
+<<<<<<< HEAD
 =======
                     (_etype1432, _size1429) = iprot.readListBegin()
                     for _i1433 in range(_size1429):
@@ -25899,6 +26022,8 @@ class create_table_with_constraints_args(object):
                         _elem1434.read(iprot)
                         self.checkConstraints.append(_elem1434)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -25920,17 +26045,23 @@ class create_table_with_constraints_args(object):
             oprot.writeFieldBegin('primaryKeys', TType.LIST, 2)
             oprot.writeListBegin(TType.STRUCT, len(self.primaryKeys))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1442 in self.primaryKeys:
                 iter1442.write(oprot)
 =======
             for iter1435 in self.primaryKeys:
                 iter1435.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1442 in self.primaryKeys:
+                iter1442.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.foreignKeys is not None:
             oprot.writeFieldBegin('foreignKeys', TType.LIST, 3)
             oprot.writeListBegin(TType.STRUCT, len(self.foreignKeys))
+<<<<<<< HEAD
 <<<<<<< HEAD
             for iter1443 in self.foreignKeys:
                 iter1443.write(oprot)
@@ -25938,11 +26069,16 @@ class create_table_with_constraints_args(object):
             for iter1436 in self.foreignKeys:
                 iter1436.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1443 in self.foreignKeys:
+                iter1443.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.uniqueConstraints is not None:
             oprot.writeFieldBegin('uniqueConstraints', TType.LIST, 4)
             oprot.writeListBegin(TType.STRUCT, len(self.uniqueConstraints))
+<<<<<<< HEAD
 <<<<<<< HEAD
             for iter1444 in self.uniqueConstraints:
                 iter1444.write(oprot)
@@ -25950,11 +26086,16 @@ class create_table_with_constraints_args(object):
             for iter1437 in self.uniqueConstraints:
                 iter1437.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1444 in self.uniqueConstraints:
+                iter1444.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.notNullConstraints is not None:
             oprot.writeFieldBegin('notNullConstraints', TType.LIST, 5)
             oprot.writeListBegin(TType.STRUCT, len(self.notNullConstraints))
+<<<<<<< HEAD
 <<<<<<< HEAD
             for iter1445 in self.notNullConstraints:
                 iter1445.write(oprot)
@@ -25962,11 +26103,16 @@ class create_table_with_constraints_args(object):
             for iter1438 in self.notNullConstraints:
                 iter1438.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1445 in self.notNullConstraints:
+                iter1445.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.defaultConstraints is not None:
             oprot.writeFieldBegin('defaultConstraints', TType.LIST, 6)
             oprot.writeListBegin(TType.STRUCT, len(self.defaultConstraints))
+<<<<<<< HEAD
 <<<<<<< HEAD
             for iter1446 in self.defaultConstraints:
                 iter1446.write(oprot)
@@ -25974,11 +26120,16 @@ class create_table_with_constraints_args(object):
             for iter1439 in self.defaultConstraints:
                 iter1439.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1446 in self.defaultConstraints:
+                iter1446.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.checkConstraints is not None:
             oprot.writeFieldBegin('checkConstraints', TType.LIST, 7)
             oprot.writeListBegin(TType.STRUCT, len(self.checkConstraints))
+<<<<<<< HEAD
 <<<<<<< HEAD
             for iter1447 in self.checkConstraints:
                 iter1447.write(oprot)
@@ -25986,6 +26137,10 @@ class create_table_with_constraints_args(object):
             for iter1440 in self.checkConstraints:
                 iter1440.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1447 in self.checkConstraints:
+                iter1447.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -27779,16 +27934,22 @@ class truncate_table_args(object):
                 if ftype == TType.LIST:
                     self.partNames = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1451, _size1448) = iprot.readListBegin()
                     for _i1452 in range(_size1448):
                         _elem1453 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.partNames.append(_elem1453)
+<<<<<<< HEAD
 =======
                     (_etype1444, _size1441) = iprot.readListBegin()
                     for _i1445 in range(_size1441):
                         _elem1446 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.partNames.append(_elem1446)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -27814,12 +27975,17 @@ class truncate_table_args(object):
             oprot.writeFieldBegin('partNames', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.partNames))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1454 in self.partNames:
                 oprot.writeString(iter1454.encode('utf-8') if sys.version_info[0] == 2 else iter1454)
 =======
             for iter1447 in self.partNames:
                 oprot.writeString(iter1447.encode('utf-8') if sys.version_info[0] == 2 else iter1447)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1454 in self.partNames:
+                oprot.writeString(iter1454.encode('utf-8') if sys.version_info[0] == 2 else iter1454)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -28146,16 +28312,22 @@ class get_tables_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1458, _size1455) = iprot.readListBegin()
                     for _i1459 in range(_size1455):
                         _elem1460 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1460)
+<<<<<<< HEAD
 =======
                     (_etype1451, _size1448) = iprot.readListBegin()
                     for _i1452 in range(_size1448):
                         _elem1453 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1453)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -28178,12 +28350,17 @@ class get_tables_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1461 in self.success:
                 oprot.writeString(iter1461.encode('utf-8') if sys.version_info[0] == 2 else iter1461)
 =======
             for iter1454 in self.success:
                 oprot.writeString(iter1454.encode('utf-8') if sys.version_info[0] == 2 else iter1454)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1461 in self.success:
+                oprot.writeString(iter1461.encode('utf-8') if sys.version_info[0] == 2 else iter1461)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -28325,16 +28502,22 @@ class get_tables_by_type_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1465, _size1462) = iprot.readListBegin()
                     for _i1466 in range(_size1462):
                         _elem1467 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1467)
+<<<<<<< HEAD
 =======
                     (_etype1458, _size1455) = iprot.readListBegin()
                     for _i1459 in range(_size1455):
                         _elem1460 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1460)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -28357,12 +28540,17 @@ class get_tables_by_type_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1468 in self.success:
                 oprot.writeString(iter1468.encode('utf-8') if sys.version_info[0] == 2 else iter1468)
 =======
             for iter1461 in self.success:
                 oprot.writeString(iter1461.encode('utf-8') if sys.version_info[0] == 2 else iter1461)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1468 in self.success:
+                oprot.writeString(iter1468.encode('utf-8') if sys.version_info[0] == 2 else iter1468)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -28461,11 +28649,15 @@ class get_all_materialized_view_objects_for_rewriting_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1472, _size1469) = iprot.readListBegin()
                     for _i1473 in range(_size1469):
                         _elem1474 = Table()
                         _elem1474.read(iprot)
                         self.success.append(_elem1474)
+<<<<<<< HEAD
 =======
                     (_etype1465, _size1462) = iprot.readListBegin()
                     for _i1466 in range(_size1462):
@@ -28473,6 +28665,8 @@ class get_all_materialized_view_objects_for_rewriting_result(object):
                         _elem1467.read(iprot)
                         self.success.append(_elem1467)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -28495,12 +28689,17 @@ class get_all_materialized_view_objects_for_rewriting_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1475 in self.success:
                 iter1475.write(oprot)
 =======
             for iter1468 in self.success:
                 iter1468.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1475 in self.success:
+                iter1475.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -28618,16 +28817,22 @@ class get_materialized_views_for_rewriting_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1479, _size1476) = iprot.readListBegin()
                     for _i1480 in range(_size1476):
                         _elem1481 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1481)
+<<<<<<< HEAD
 =======
                     (_etype1472, _size1469) = iprot.readListBegin()
                     for _i1473 in range(_size1469):
                         _elem1474 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1474)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -28650,12 +28855,17 @@ class get_materialized_views_for_rewriting_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1482 in self.success:
                 oprot.writeString(iter1482.encode('utf-8') if sys.version_info[0] == 2 else iter1482)
 =======
             for iter1475 in self.success:
                 oprot.writeString(iter1475.encode('utf-8') if sys.version_info[0] == 2 else iter1475)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1482 in self.success:
+                oprot.writeString(iter1482.encode('utf-8') if sys.version_info[0] == 2 else iter1482)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -28723,16 +28933,22 @@ class get_table_meta_args(object):
                 if ftype == TType.LIST:
                     self.tbl_types = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1486, _size1483) = iprot.readListBegin()
                     for _i1487 in range(_size1483):
                         _elem1488 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.tbl_types.append(_elem1488)
+<<<<<<< HEAD
 =======
                     (_etype1479, _size1476) = iprot.readListBegin()
                     for _i1480 in range(_size1476):
                         _elem1481 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.tbl_types.append(_elem1481)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -28758,12 +28974,17 @@ class get_table_meta_args(object):
             oprot.writeFieldBegin('tbl_types', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.tbl_types))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1489 in self.tbl_types:
                 oprot.writeString(iter1489.encode('utf-8') if sys.version_info[0] == 2 else iter1489)
 =======
             for iter1482 in self.tbl_types:
                 oprot.writeString(iter1482.encode('utf-8') if sys.version_info[0] == 2 else iter1482)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1489 in self.tbl_types:
+                oprot.writeString(iter1489.encode('utf-8') if sys.version_info[0] == 2 else iter1489)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -28817,11 +29038,15 @@ class get_table_meta_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1493, _size1490) = iprot.readListBegin()
                     for _i1494 in range(_size1490):
                         _elem1495 = TableMeta()
                         _elem1495.read(iprot)
                         self.success.append(_elem1495)
+<<<<<<< HEAD
 =======
                     (_etype1486, _size1483) = iprot.readListBegin()
                     for _i1487 in range(_size1483):
@@ -28829,6 +29054,8 @@ class get_table_meta_result(object):
                         _elem1488.read(iprot)
                         self.success.append(_elem1488)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -28851,12 +29078,17 @@ class get_table_meta_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1496 in self.success:
                 iter1496.write(oprot)
 =======
             for iter1489 in self.success:
                 iter1489.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1496 in self.success:
+                iter1496.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -28974,16 +29206,22 @@ class get_all_tables_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1500, _size1497) = iprot.readListBegin()
                     for _i1501 in range(_size1497):
                         _elem1502 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1502)
+<<<<<<< HEAD
 =======
                     (_etype1493, _size1490) = iprot.readListBegin()
                     for _i1494 in range(_size1490):
                         _elem1495 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1495)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -29006,12 +29244,17 @@ class get_all_tables_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1503 in self.success:
                 oprot.writeString(iter1503.encode('utf-8') if sys.version_info[0] == 2 else iter1503)
 =======
             for iter1496 in self.success:
                 oprot.writeString(iter1496.encode('utf-8') if sys.version_info[0] == 2 else iter1496)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1503 in self.success:
+                oprot.writeString(iter1503.encode('utf-8') if sys.version_info[0] == 2 else iter1503)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -29232,16 +29475,22 @@ class get_table_objects_by_name_args(object):
                 if ftype == TType.LIST:
                     self.tbl_names = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1507, _size1504) = iprot.readListBegin()
                     for _i1508 in range(_size1504):
                         _elem1509 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.tbl_names.append(_elem1509)
+<<<<<<< HEAD
 =======
                     (_etype1500, _size1497) = iprot.readListBegin()
                     for _i1501 in range(_size1497):
                         _elem1502 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.tbl_names.append(_elem1502)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -29263,12 +29512,17 @@ class get_table_objects_by_name_args(object):
             oprot.writeFieldBegin('tbl_names', TType.LIST, 2)
             oprot.writeListBegin(TType.STRING, len(self.tbl_names))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1510 in self.tbl_names:
                 oprot.writeString(iter1510.encode('utf-8') if sys.version_info[0] == 2 else iter1510)
 =======
             for iter1503 in self.tbl_names:
                 oprot.writeString(iter1503.encode('utf-8') if sys.version_info[0] == 2 else iter1503)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1510 in self.tbl_names:
+                oprot.writeString(iter1510.encode('utf-8') if sys.version_info[0] == 2 else iter1510)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -29319,11 +29573,15 @@ class get_table_objects_by_name_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1514, _size1511) = iprot.readListBegin()
                     for _i1515 in range(_size1511):
                         _elem1516 = Table()
                         _elem1516.read(iprot)
                         self.success.append(_elem1516)
+<<<<<<< HEAD
 =======
                     (_etype1507, _size1504) = iprot.readListBegin()
                     for _i1508 in range(_size1504):
@@ -29331,6 +29589,8 @@ class get_table_objects_by_name_result(object):
                         _elem1509.read(iprot)
                         self.success.append(_elem1509)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -29348,12 +29608,17 @@ class get_table_objects_by_name_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1517 in self.success:
                 iter1517.write(oprot)
 =======
             for iter1510 in self.success:
                 iter1510.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1517 in self.success:
+                iter1517.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -29467,11 +29732,15 @@ class get_tables_ext_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1521, _size1518) = iprot.readListBegin()
                     for _i1522 in range(_size1518):
                         _elem1523 = ExtendedTableInfo()
                         _elem1523.read(iprot)
                         self.success.append(_elem1523)
+<<<<<<< HEAD
 =======
                     (_etype1514, _size1511) = iprot.readListBegin()
                     for _i1515 in range(_size1511):
@@ -29479,6 +29748,8 @@ class get_tables_ext_result(object):
                         _elem1516.read(iprot)
                         self.success.append(_elem1516)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -29501,12 +29772,17 @@ class get_tables_ext_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1524 in self.success:
                 iter1524.write(oprot)
 =======
             for iter1517 in self.success:
                 iter1517.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1524 in self.success:
+                iter1524.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -30320,16 +30596,22 @@ class get_table_names_by_filter_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1528, _size1525) = iprot.readListBegin()
                     for _i1529 in range(_size1525):
                         _elem1530 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1530)
+<<<<<<< HEAD
 =======
                     (_etype1521, _size1518) = iprot.readListBegin()
                     for _i1522 in range(_size1518):
                         _elem1523 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1523)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -30362,12 +30644,17 @@ class get_table_names_by_filter_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1531 in self.success:
                 oprot.writeString(iter1531.encode('utf-8') if sys.version_info[0] == 2 else iter1531)
 =======
             for iter1524 in self.success:
                 oprot.writeString(iter1524.encode('utf-8') if sys.version_info[0] == 2 else iter1524)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1531 in self.success:
+                oprot.writeString(iter1531.encode('utf-8') if sys.version_info[0] == 2 else iter1531)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -31423,11 +31710,15 @@ class add_partitions_args(object):
                 if ftype == TType.LIST:
                     self.new_parts = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1535, _size1532) = iprot.readListBegin()
                     for _i1536 in range(_size1532):
                         _elem1537 = Partition()
                         _elem1537.read(iprot)
                         self.new_parts.append(_elem1537)
+<<<<<<< HEAD
 =======
                     (_etype1528, _size1525) = iprot.readListBegin()
                     for _i1529 in range(_size1525):
@@ -31435,6 +31726,8 @@ class add_partitions_args(object):
                         _elem1530.read(iprot)
                         self.new_parts.append(_elem1530)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -31452,12 +31745,17 @@ class add_partitions_args(object):
             oprot.writeFieldBegin('new_parts', TType.LIST, 1)
             oprot.writeListBegin(TType.STRUCT, len(self.new_parts))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1538 in self.new_parts:
                 iter1538.write(oprot)
 =======
             for iter1531 in self.new_parts:
                 iter1531.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1538 in self.new_parts:
+                iter1538.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -31604,11 +31902,15 @@ class add_partitions_pspec_args(object):
                 if ftype == TType.LIST:
                     self.new_parts = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1542, _size1539) = iprot.readListBegin()
                     for _i1543 in range(_size1539):
                         _elem1544 = PartitionSpec()
                         _elem1544.read(iprot)
                         self.new_parts.append(_elem1544)
+<<<<<<< HEAD
 =======
                     (_etype1535, _size1532) = iprot.readListBegin()
                     for _i1536 in range(_size1532):
@@ -31616,6 +31918,8 @@ class add_partitions_pspec_args(object):
                         _elem1537.read(iprot)
                         self.new_parts.append(_elem1537)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -31633,12 +31937,17 @@ class add_partitions_pspec_args(object):
             oprot.writeFieldBegin('new_parts', TType.LIST, 1)
             oprot.writeListBegin(TType.STRUCT, len(self.new_parts))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1545 in self.new_parts:
                 iter1545.write(oprot)
 =======
             for iter1538 in self.new_parts:
                 iter1538.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1545 in self.new_parts:
+                iter1545.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -31799,16 +32108,22 @@ class append_partition_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1549, _size1546) = iprot.readListBegin()
                     for _i1550 in range(_size1546):
                         _elem1551 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1551)
+<<<<<<< HEAD
 =======
                     (_etype1542, _size1539) = iprot.readListBegin()
                     for _i1543 in range(_size1539):
                         _elem1544 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1544)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -31834,12 +32149,17 @@ class append_partition_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1552 in self.part_vals:
                 oprot.writeString(iter1552.encode('utf-8') if sys.version_info[0] == 2 else iter1552)
 =======
             for iter1545 in self.part_vals:
                 oprot.writeString(iter1545.encode('utf-8') if sys.version_info[0] == 2 else iter1545)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1552 in self.part_vals:
+                oprot.writeString(iter1552.encode('utf-8') if sys.version_info[0] == 2 else iter1552)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -32166,16 +32486,22 @@ class append_partition_with_environment_context_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1556, _size1553) = iprot.readListBegin()
                     for _i1557 in range(_size1553):
                         _elem1558 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1558)
+<<<<<<< HEAD
 =======
                     (_etype1549, _size1546) = iprot.readListBegin()
                     for _i1550 in range(_size1546):
                         _elem1551 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1551)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -32207,12 +32533,17 @@ class append_partition_with_environment_context_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1559 in self.part_vals:
                 oprot.writeString(iter1559.encode('utf-8') if sys.version_info[0] == 2 else iter1559)
 =======
             for iter1552 in self.part_vals:
                 oprot.writeString(iter1552.encode('utf-8') if sys.version_info[0] == 2 else iter1552)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1559 in self.part_vals:
+                oprot.writeString(iter1559.encode('utf-8') if sys.version_info[0] == 2 else iter1559)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.environment_context is not None:
@@ -32764,16 +33095,22 @@ class drop_partition_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1563, _size1560) = iprot.readListBegin()
                     for _i1564 in range(_size1560):
                         _elem1565 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1565)
+<<<<<<< HEAD
 =======
                     (_etype1556, _size1553) = iprot.readListBegin()
                     for _i1557 in range(_size1553):
                         _elem1558 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1558)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -32804,12 +33141,17 @@ class drop_partition_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1566 in self.part_vals:
                 oprot.writeString(iter1566.encode('utf-8') if sys.version_info[0] == 2 else iter1566)
 =======
             for iter1559 in self.part_vals:
                 oprot.writeString(iter1559.encode('utf-8') if sys.version_info[0] == 2 else iter1559)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1566 in self.part_vals:
+                oprot.writeString(iter1566.encode('utf-8') if sys.version_info[0] == 2 else iter1566)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.deleteData is not None:
@@ -32969,16 +33311,22 @@ class drop_partition_with_environment_context_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1570, _size1567) = iprot.readListBegin()
                     for _i1571 in range(_size1567):
                         _elem1572 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1572)
+<<<<<<< HEAD
 =======
                     (_etype1563, _size1560) = iprot.readListBegin()
                     for _i1564 in range(_size1560):
                         _elem1565 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1565)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -33015,12 +33363,17 @@ class drop_partition_with_environment_context_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1573 in self.part_vals:
                 oprot.writeString(iter1573.encode('utf-8') if sys.version_info[0] == 2 else iter1573)
 =======
             for iter1566 in self.part_vals:
                 oprot.writeString(iter1566.encode('utf-8') if sys.version_info[0] == 2 else iter1566)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1573 in self.part_vals:
+                oprot.writeString(iter1573.encode('utf-8') if sys.version_info[0] == 2 else iter1573)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.deleteData is not None:
@@ -33709,16 +34062,22 @@ class get_partition_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1577, _size1574) = iprot.readListBegin()
                     for _i1578 in range(_size1574):
                         _elem1579 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1579)
+<<<<<<< HEAD
 =======
                     (_etype1570, _size1567) = iprot.readListBegin()
                     for _i1571 in range(_size1567):
                         _elem1572 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1572)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -33744,12 +34103,17 @@ class get_partition_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1580 in self.part_vals:
                 oprot.writeString(iter1580.encode('utf-8') if sys.version_info[0] == 2 else iter1580)
 =======
             for iter1573 in self.part_vals:
                 oprot.writeString(iter1573.encode('utf-8') if sys.version_info[0] == 2 else iter1573)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1580 in self.part_vals:
+                oprot.writeString(iter1580.encode('utf-8') if sys.version_info[0] == 2 else iter1580)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -34044,11 +34408,15 @@ class exchange_partition_args(object):
                 if ftype == TType.MAP:
                     self.partitionSpecs = {}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_ktype1582, _vtype1583, _size1581) = iprot.readMapBegin()
                     for _i1585 in range(_size1581):
                         _key1586 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         _val1587 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.partitionSpecs[_key1586] = _val1587
+<<<<<<< HEAD
 =======
                     (_ktype1575, _vtype1576, _size1574) = iprot.readMapBegin()
                     for _i1578 in range(_size1574):
@@ -34056,6 +34424,8 @@ class exchange_partition_args(object):
                         _val1580 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.partitionSpecs[_key1579] = _val1580
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readMapEnd()
                 else:
                     iprot.skip(ftype)
@@ -34093,6 +34463,7 @@ class exchange_partition_args(object):
             oprot.writeFieldBegin('partitionSpecs', TType.MAP, 1)
             oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.partitionSpecs))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for kiter1588, viter1589 in self.partitionSpecs.items():
                 oprot.writeString(kiter1588.encode('utf-8') if sys.version_info[0] == 2 else kiter1588)
                 oprot.writeString(viter1589.encode('utf-8') if sys.version_info[0] == 2 else viter1589)
@@ -34101,6 +34472,11 @@ class exchange_partition_args(object):
                 oprot.writeString(kiter1581.encode('utf-8') if sys.version_info[0] == 2 else kiter1581)
                 oprot.writeString(viter1582.encode('utf-8') if sys.version_info[0] == 2 else viter1582)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for kiter1588, viter1589 in self.partitionSpecs.items():
+                oprot.writeString(kiter1588.encode('utf-8') if sys.version_info[0] == 2 else kiter1588)
+                oprot.writeString(viter1589.encode('utf-8') if sys.version_info[0] == 2 else viter1589)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeMapEnd()
             oprot.writeFieldEnd()
         if self.source_db is not None:
@@ -34288,11 +34664,15 @@ class exchange_partitions_args(object):
                 if ftype == TType.MAP:
                     self.partitionSpecs = {}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_ktype1591, _vtype1592, _size1590) = iprot.readMapBegin()
                     for _i1594 in range(_size1590):
                         _key1595 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         _val1596 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.partitionSpecs[_key1595] = _val1596
+<<<<<<< HEAD
 =======
                     (_ktype1584, _vtype1585, _size1583) = iprot.readMapBegin()
                     for _i1587 in range(_size1583):
@@ -34300,6 +34680,8 @@ class exchange_partitions_args(object):
                         _val1589 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.partitionSpecs[_key1588] = _val1589
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readMapEnd()
                 else:
                     iprot.skip(ftype)
@@ -34337,6 +34719,7 @@ class exchange_partitions_args(object):
             oprot.writeFieldBegin('partitionSpecs', TType.MAP, 1)
             oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.partitionSpecs))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for kiter1597, viter1598 in self.partitionSpecs.items():
                 oprot.writeString(kiter1597.encode('utf-8') if sys.version_info[0] == 2 else kiter1597)
                 oprot.writeString(viter1598.encode('utf-8') if sys.version_info[0] == 2 else viter1598)
@@ -34345,6 +34728,11 @@ class exchange_partitions_args(object):
                 oprot.writeString(kiter1590.encode('utf-8') if sys.version_info[0] == 2 else kiter1590)
                 oprot.writeString(viter1591.encode('utf-8') if sys.version_info[0] == 2 else viter1591)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for kiter1597, viter1598 in self.partitionSpecs.items():
+                oprot.writeString(kiter1597.encode('utf-8') if sys.version_info[0] == 2 else kiter1597)
+                oprot.writeString(viter1598.encode('utf-8') if sys.version_info[0] == 2 else viter1598)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeMapEnd()
             oprot.writeFieldEnd()
         if self.source_db is not None:
@@ -34422,11 +34810,15 @@ class exchange_partitions_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1602, _size1599) = iprot.readListBegin()
                     for _i1603 in range(_size1599):
                         _elem1604 = Partition()
                         _elem1604.read(iprot)
                         self.success.append(_elem1604)
+<<<<<<< HEAD
 =======
                     (_etype1595, _size1592) = iprot.readListBegin()
                     for _i1596 in range(_size1592):
@@ -34434,6 +34826,8 @@ class exchange_partitions_result(object):
                         _elem1597.read(iprot)
                         self.success.append(_elem1597)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -34471,12 +34865,17 @@ class exchange_partitions_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1605 in self.success:
                 iter1605.write(oprot)
 =======
             for iter1598 in self.success:
                 iter1598.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1605 in self.success:
+                iter1605.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -34563,16 +34962,22 @@ class get_partition_with_auth_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1609, _size1606) = iprot.readListBegin()
                     for _i1610 in range(_size1606):
                         _elem1611 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1611)
+<<<<<<< HEAD
 =======
                     (_etype1602, _size1599) = iprot.readListBegin()
                     for _i1603 in range(_size1599):
                         _elem1604 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1604)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -34585,16 +34990,22 @@ class get_partition_with_auth_args(object):
                 if ftype == TType.LIST:
                     self.group_names = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1615, _size1612) = iprot.readListBegin()
                     for _i1616 in range(_size1612):
                         _elem1617 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.group_names.append(_elem1617)
+<<<<<<< HEAD
 =======
                     (_etype1608, _size1605) = iprot.readListBegin()
                     for _i1609 in range(_size1605):
                         _elem1610 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.group_names.append(_elem1610)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -34620,12 +35031,17 @@ class get_partition_with_auth_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1618 in self.part_vals:
                 oprot.writeString(iter1618.encode('utf-8') if sys.version_info[0] == 2 else iter1618)
 =======
             for iter1611 in self.part_vals:
                 oprot.writeString(iter1611.encode('utf-8') if sys.version_info[0] == 2 else iter1611)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1618 in self.part_vals:
+                oprot.writeString(iter1618.encode('utf-8') if sys.version_info[0] == 2 else iter1618)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.user_name is not None:
@@ -34636,12 +35052,17 @@ class get_partition_with_auth_args(object):
             oprot.writeFieldBegin('group_names', TType.LIST, 5)
             oprot.writeListBegin(TType.STRING, len(self.group_names))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1619 in self.group_names:
                 oprot.writeString(iter1619.encode('utf-8') if sys.version_info[0] == 2 else iter1619)
 =======
             for iter1612 in self.group_names:
                 oprot.writeString(iter1612.encode('utf-8') if sys.version_info[0] == 2 else iter1612)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1619 in self.group_names:
+                oprot.writeString(iter1619.encode('utf-8') if sys.version_info[0] == 2 else iter1619)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -35043,11 +35464,15 @@ class get_partitions_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1623, _size1620) = iprot.readListBegin()
                     for _i1624 in range(_size1620):
                         _elem1625 = Partition()
                         _elem1625.read(iprot)
                         self.success.append(_elem1625)
+<<<<<<< HEAD
 =======
                     (_etype1616, _size1613) = iprot.readListBegin()
                     for _i1617 in range(_size1613):
@@ -35055,6 +35480,8 @@ class get_partitions_result(object):
                         _elem1618.read(iprot)
                         self.success.append(_elem1618)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -35082,12 +35509,17 @@ class get_partitions_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1626 in self.success:
                 iter1626.write(oprot)
 =======
             for iter1619 in self.success:
                 iter1619.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1626 in self.success:
+                iter1626.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -35323,16 +35755,22 @@ class get_partitions_with_auth_args(object):
                 if ftype == TType.LIST:
                     self.group_names = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1630, _size1627) = iprot.readListBegin()
                     for _i1631 in range(_size1627):
                         _elem1632 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.group_names.append(_elem1632)
+<<<<<<< HEAD
 =======
                     (_etype1623, _size1620) = iprot.readListBegin()
                     for _i1624 in range(_size1620):
                         _elem1625 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.group_names.append(_elem1625)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -35366,12 +35804,17 @@ class get_partitions_with_auth_args(object):
             oprot.writeFieldBegin('group_names', TType.LIST, 5)
             oprot.writeListBegin(TType.STRING, len(self.group_names))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1633 in self.group_names:
                 oprot.writeString(iter1633.encode('utf-8') if sys.version_info[0] == 2 else iter1633)
 =======
             for iter1626 in self.group_names:
                 oprot.writeString(iter1626.encode('utf-8') if sys.version_info[0] == 2 else iter1626)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1633 in self.group_names:
+                oprot.writeString(iter1633.encode('utf-8') if sys.version_info[0] == 2 else iter1633)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -35429,11 +35872,15 @@ class get_partitions_with_auth_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1637, _size1634) = iprot.readListBegin()
                     for _i1638 in range(_size1634):
                         _elem1639 = Partition()
                         _elem1639.read(iprot)
                         self.success.append(_elem1639)
+<<<<<<< HEAD
 =======
                     (_etype1630, _size1627) = iprot.readListBegin()
                     for _i1631 in range(_size1627):
@@ -35441,6 +35888,8 @@ class get_partitions_with_auth_result(object):
                         _elem1632.read(iprot)
                         self.success.append(_elem1632)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -35468,12 +35917,17 @@ class get_partitions_with_auth_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1640 in self.success:
                 iter1640.write(oprot)
 =======
             for iter1633 in self.success:
                 iter1633.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1640 in self.success:
+                iter1640.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -35622,11 +36076,15 @@ class get_partitions_pspec_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1644, _size1641) = iprot.readListBegin()
                     for _i1645 in range(_size1641):
                         _elem1646 = PartitionSpec()
                         _elem1646.read(iprot)
                         self.success.append(_elem1646)
+<<<<<<< HEAD
 =======
                     (_etype1637, _size1634) = iprot.readListBegin()
                     for _i1638 in range(_size1634):
@@ -35634,6 +36092,8 @@ class get_partitions_pspec_result(object):
                         _elem1639.read(iprot)
                         self.success.append(_elem1639)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -35661,12 +36121,17 @@ class get_partitions_pspec_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1647 in self.success:
                 iter1647.write(oprot)
 =======
             for iter1640 in self.success:
                 iter1640.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1647 in self.success:
+                iter1647.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -35815,16 +36280,22 @@ class get_partition_names_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1651, _size1648) = iprot.readListBegin()
                     for _i1652 in range(_size1648):
                         _elem1653 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1653)
+<<<<<<< HEAD
 =======
                     (_etype1644, _size1641) = iprot.readListBegin()
                     for _i1645 in range(_size1641):
                         _elem1646 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1646)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -35852,12 +36323,17 @@ class get_partition_names_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1654 in self.success:
                 oprot.writeString(iter1654.encode('utf-8') if sys.version_info[0] == 2 else iter1654)
 =======
             for iter1647 in self.success:
                 oprot.writeString(iter1647.encode('utf-8') if sys.version_info[0] == 2 else iter1647)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1654 in self.success:
+                oprot.writeString(iter1654.encode('utf-8') if sys.version_info[0] == 2 else iter1654)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -36081,16 +36557,22 @@ class get_partitions_ps_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1658, _size1655) = iprot.readListBegin()
                     for _i1659 in range(_size1655):
                         _elem1660 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1660)
+<<<<<<< HEAD
 =======
                     (_etype1651, _size1648) = iprot.readListBegin()
                     for _i1652 in range(_size1648):
                         _elem1653 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1653)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -36121,12 +36603,17 @@ class get_partitions_ps_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1661 in self.part_vals:
                 oprot.writeString(iter1661.encode('utf-8') if sys.version_info[0] == 2 else iter1661)
 =======
             for iter1654 in self.part_vals:
                 oprot.writeString(iter1654.encode('utf-8') if sys.version_info[0] == 2 else iter1654)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1661 in self.part_vals:
+                oprot.writeString(iter1661.encode('utf-8') if sys.version_info[0] == 2 else iter1661)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.max_parts is not None:
@@ -36187,11 +36674,15 @@ class get_partitions_ps_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1665, _size1662) = iprot.readListBegin()
                     for _i1666 in range(_size1662):
                         _elem1667 = Partition()
                         _elem1667.read(iprot)
                         self.success.append(_elem1667)
+<<<<<<< HEAD
 =======
                     (_etype1658, _size1655) = iprot.readListBegin()
                     for _i1659 in range(_size1655):
@@ -36199,6 +36690,8 @@ class get_partitions_ps_result(object):
                         _elem1660.read(iprot)
                         self.success.append(_elem1660)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -36226,12 +36719,17 @@ class get_partitions_ps_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1668 in self.success:
                 iter1668.write(oprot)
 =======
             for iter1661 in self.success:
                 iter1661.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1668 in self.success:
+                iter1668.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -36310,16 +36808,22 @@ class get_partitions_ps_with_auth_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1672, _size1669) = iprot.readListBegin()
                     for _i1673 in range(_size1669):
                         _elem1674 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1674)
+<<<<<<< HEAD
 =======
                     (_etype1665, _size1662) = iprot.readListBegin()
                     for _i1666 in range(_size1662):
                         _elem1667 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1667)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -36337,16 +36841,22 @@ class get_partitions_ps_with_auth_args(object):
                 if ftype == TType.LIST:
                     self.group_names = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1678, _size1675) = iprot.readListBegin()
                     for _i1679 in range(_size1675):
                         _elem1680 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.group_names.append(_elem1680)
+<<<<<<< HEAD
 =======
                     (_etype1671, _size1668) = iprot.readListBegin()
                     for _i1672 in range(_size1668):
                         _elem1673 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.group_names.append(_elem1673)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -36372,12 +36882,17 @@ class get_partitions_ps_with_auth_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1681 in self.part_vals:
                 oprot.writeString(iter1681.encode('utf-8') if sys.version_info[0] == 2 else iter1681)
 =======
             for iter1674 in self.part_vals:
                 oprot.writeString(iter1674.encode('utf-8') if sys.version_info[0] == 2 else iter1674)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1681 in self.part_vals:
+                oprot.writeString(iter1681.encode('utf-8') if sys.version_info[0] == 2 else iter1681)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.max_parts is not None:
@@ -36392,12 +36907,17 @@ class get_partitions_ps_with_auth_args(object):
             oprot.writeFieldBegin('group_names', TType.LIST, 6)
             oprot.writeListBegin(TType.STRING, len(self.group_names))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1682 in self.group_names:
                 oprot.writeString(iter1682.encode('utf-8') if sys.version_info[0] == 2 else iter1682)
 =======
             for iter1675 in self.group_names:
                 oprot.writeString(iter1675.encode('utf-8') if sys.version_info[0] == 2 else iter1675)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1682 in self.group_names:
+                oprot.writeString(iter1682.encode('utf-8') if sys.version_info[0] == 2 else iter1682)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -36456,11 +36976,15 @@ class get_partitions_ps_with_auth_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1686, _size1683) = iprot.readListBegin()
                     for _i1687 in range(_size1683):
                         _elem1688 = Partition()
                         _elem1688.read(iprot)
                         self.success.append(_elem1688)
+<<<<<<< HEAD
 =======
                     (_etype1679, _size1676) = iprot.readListBegin()
                     for _i1680 in range(_size1676):
@@ -36468,6 +36992,8 @@ class get_partitions_ps_with_auth_result(object):
                         _elem1681.read(iprot)
                         self.success.append(_elem1681)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -36495,12 +37021,17 @@ class get_partitions_ps_with_auth_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1689 in self.success:
                 iter1689.write(oprot)
 =======
             for iter1682 in self.success:
                 iter1682.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1689 in self.success:
+                iter1689.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -36724,16 +37255,22 @@ class get_partition_names_ps_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1693, _size1690) = iprot.readListBegin()
                     for _i1694 in range(_size1690):
                         _elem1695 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1695)
+<<<<<<< HEAD
 =======
                     (_etype1686, _size1683) = iprot.readListBegin()
                     for _i1687 in range(_size1683):
                         _elem1688 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1688)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -36764,12 +37301,17 @@ class get_partition_names_ps_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1696 in self.part_vals:
                 oprot.writeString(iter1696.encode('utf-8') if sys.version_info[0] == 2 else iter1696)
 =======
             for iter1689 in self.part_vals:
                 oprot.writeString(iter1689.encode('utf-8') if sys.version_info[0] == 2 else iter1689)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1696 in self.part_vals:
+                oprot.writeString(iter1696.encode('utf-8') if sys.version_info[0] == 2 else iter1696)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.max_parts is not None:
@@ -36830,16 +37372,22 @@ class get_partition_names_ps_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1700, _size1697) = iprot.readListBegin()
                     for _i1701 in range(_size1697):
                         _elem1702 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1702)
+<<<<<<< HEAD
 =======
                     (_etype1693, _size1690) = iprot.readListBegin()
                     for _i1694 in range(_size1690):
                         _elem1695 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1695)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -36867,12 +37415,17 @@ class get_partition_names_ps_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1703 in self.success:
                 oprot.writeString(iter1703.encode('utf-8') if sys.version_info[0] == 2 else iter1703)
 =======
             for iter1696 in self.success:
                 oprot.writeString(iter1696.encode('utf-8') if sys.version_info[0] == 2 else iter1696)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1703 in self.success:
+                oprot.writeString(iter1703.encode('utf-8') if sys.version_info[0] == 2 else iter1703)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -37182,11 +37735,15 @@ class get_partitions_by_filter_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1707, _size1704) = iprot.readListBegin()
                     for _i1708 in range(_size1704):
                         _elem1709 = Partition()
                         _elem1709.read(iprot)
                         self.success.append(_elem1709)
+<<<<<<< HEAD
 =======
                     (_etype1700, _size1697) = iprot.readListBegin()
                     for _i1701 in range(_size1697):
@@ -37194,6 +37751,8 @@ class get_partitions_by_filter_result(object):
                         _elem1702.read(iprot)
                         self.success.append(_elem1702)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -37221,12 +37780,17 @@ class get_partitions_by_filter_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1710 in self.success:
                 iter1710.write(oprot)
 =======
             for iter1703 in self.success:
                 iter1703.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1710 in self.success:
+                iter1710.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -37352,11 +37916,15 @@ class get_partitions_by_filter_req_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1714, _size1711) = iprot.readListBegin()
                     for _i1715 in range(_size1711):
                         _elem1716 = Partition()
                         _elem1716.read(iprot)
                         self.success.append(_elem1716)
+<<<<<<< HEAD
 =======
                     (_etype1707, _size1704) = iprot.readListBegin()
                     for _i1708 in range(_size1704):
@@ -37364,6 +37932,8 @@ class get_partitions_by_filter_req_result(object):
                         _elem1709.read(iprot)
                         self.success.append(_elem1709)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -37391,12 +37961,17 @@ class get_partitions_by_filter_req_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1717 in self.success:
                 iter1717.write(oprot)
 =======
             for iter1710 in self.success:
                 iter1710.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1717 in self.success:
+                iter1717.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -37557,11 +38132,15 @@ class get_part_specs_by_filter_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1721, _size1718) = iprot.readListBegin()
                     for _i1722 in range(_size1718):
                         _elem1723 = PartitionSpec()
                         _elem1723.read(iprot)
                         self.success.append(_elem1723)
+<<<<<<< HEAD
 =======
                     (_etype1714, _size1711) = iprot.readListBegin()
                     for _i1715 in range(_size1711):
@@ -37569,6 +38148,8 @@ class get_part_specs_by_filter_result(object):
                         _elem1716.read(iprot)
                         self.success.append(_elem1716)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -37596,12 +38177,17 @@ class get_part_specs_by_filter_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1724 in self.success:
                 iter1724.write(oprot)
 =======
             for iter1717 in self.success:
                 iter1717.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1724 in self.success:
+                iter1724.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -37994,16 +38580,22 @@ class get_partitions_by_names_args(object):
                 if ftype == TType.LIST:
                     self.names = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1728, _size1725) = iprot.readListBegin()
                     for _i1729 in range(_size1725):
                         _elem1730 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.names.append(_elem1730)
+<<<<<<< HEAD
 =======
                     (_etype1721, _size1718) = iprot.readListBegin()
                     for _i1722 in range(_size1718):
                         _elem1723 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.names.append(_elem1723)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -38029,12 +38621,17 @@ class get_partitions_by_names_args(object):
             oprot.writeFieldBegin('names', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.names))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1731 in self.names:
                 oprot.writeString(iter1731.encode('utf-8') if sys.version_info[0] == 2 else iter1731)
 =======
             for iter1724 in self.names:
                 oprot.writeString(iter1724.encode('utf-8') if sys.version_info[0] == 2 else iter1724)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1731 in self.names:
+                oprot.writeString(iter1731.encode('utf-8') if sys.version_info[0] == 2 else iter1731)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -38092,11 +38689,15 @@ class get_partitions_by_names_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1735, _size1732) = iprot.readListBegin()
                     for _i1736 in range(_size1732):
                         _elem1737 = Partition()
                         _elem1737.read(iprot)
                         self.success.append(_elem1737)
+<<<<<<< HEAD
 =======
                     (_etype1728, _size1725) = iprot.readListBegin()
                     for _i1729 in range(_size1725):
@@ -38104,6 +38705,8 @@ class get_partitions_by_names_result(object):
                         _elem1730.read(iprot)
                         self.success.append(_elem1730)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -38136,12 +38739,17 @@ class get_partitions_by_names_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1738 in self.success:
                 iter1738.write(oprot)
 =======
             for iter1731 in self.success:
                 iter1731.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1738 in self.success:
+                iter1738.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -38541,11 +39149,15 @@ class alter_partitions_args(object):
                 if ftype == TType.LIST:
                     self.new_parts = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1742, _size1739) = iprot.readListBegin()
                     for _i1743 in range(_size1739):
                         _elem1744 = Partition()
                         _elem1744.read(iprot)
                         self.new_parts.append(_elem1744)
+<<<<<<< HEAD
 =======
                     (_etype1735, _size1732) = iprot.readListBegin()
                     for _i1736 in range(_size1732):
@@ -38553,6 +39165,8 @@ class alter_partitions_args(object):
                         _elem1737.read(iprot)
                         self.new_parts.append(_elem1737)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -38578,12 +39192,17 @@ class alter_partitions_args(object):
             oprot.writeFieldBegin('new_parts', TType.LIST, 3)
             oprot.writeListBegin(TType.STRUCT, len(self.new_parts))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1745 in self.new_parts:
                 iter1745.write(oprot)
 =======
             for iter1738 in self.new_parts:
                 iter1738.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1745 in self.new_parts:
+                iter1745.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -38725,11 +39344,15 @@ class alter_partitions_with_environment_context_args(object):
                 if ftype == TType.LIST:
                     self.new_parts = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1749, _size1746) = iprot.readListBegin()
                     for _i1750 in range(_size1746):
                         _elem1751 = Partition()
                         _elem1751.read(iprot)
                         self.new_parts.append(_elem1751)
+<<<<<<< HEAD
 =======
                     (_etype1742, _size1739) = iprot.readListBegin()
                     for _i1743 in range(_size1739):
@@ -38737,6 +39360,8 @@ class alter_partitions_with_environment_context_args(object):
                         _elem1744.read(iprot)
                         self.new_parts.append(_elem1744)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -38768,12 +39393,17 @@ class alter_partitions_with_environment_context_args(object):
             oprot.writeFieldBegin('new_parts', TType.LIST, 3)
             oprot.writeListBegin(TType.STRUCT, len(self.new_parts))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1752 in self.new_parts:
                 iter1752.write(oprot)
 =======
             for iter1745 in self.new_parts:
                 iter1745.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1752 in self.new_parts:
+                iter1752.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.environment_context is not None:
@@ -39243,16 +39873,22 @@ class rename_partition_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1756, _size1753) = iprot.readListBegin()
                     for _i1757 in range(_size1753):
                         _elem1758 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1758)
+<<<<<<< HEAD
 =======
                     (_etype1749, _size1746) = iprot.readListBegin()
                     for _i1750 in range(_size1746):
                         _elem1751 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1751)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -39284,12 +39920,17 @@ class rename_partition_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1759 in self.part_vals:
                 oprot.writeString(iter1759.encode('utf-8') if sys.version_info[0] == 2 else iter1759)
 =======
             for iter1752 in self.part_vals:
                 oprot.writeString(iter1752.encode('utf-8') if sys.version_info[0] == 2 else iter1752)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1759 in self.part_vals:
+                oprot.writeString(iter1759.encode('utf-8') if sys.version_info[0] == 2 else iter1759)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.new_part is not None:
@@ -39571,16 +40212,22 @@ class partition_name_has_valid_characters_args(object):
                 if ftype == TType.LIST:
                     self.part_vals = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1763, _size1760) = iprot.readListBegin()
                     for _i1764 in range(_size1760):
                         _elem1765 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1765)
+<<<<<<< HEAD
 =======
                     (_etype1756, _size1753) = iprot.readListBegin()
                     for _i1757 in range(_size1753):
                         _elem1758 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals.append(_elem1758)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -39603,12 +40250,17 @@ class partition_name_has_valid_characters_args(object):
             oprot.writeFieldBegin('part_vals', TType.LIST, 1)
             oprot.writeListBegin(TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1766 in self.part_vals:
                 oprot.writeString(iter1766.encode('utf-8') if sys.version_info[0] == 2 else iter1766)
 =======
             for iter1759 in self.part_vals:
                 oprot.writeString(iter1759.encode('utf-8') if sys.version_info[0] == 2 else iter1759)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1766 in self.part_vals:
+                oprot.writeString(iter1766.encode('utf-8') if sys.version_info[0] == 2 else iter1766)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.throw_exception is not None:
@@ -39947,16 +40599,22 @@ class partition_name_to_vals_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1770, _size1767) = iprot.readListBegin()
                     for _i1771 in range(_size1767):
                         _elem1772 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1772)
+<<<<<<< HEAD
 =======
                     (_etype1763, _size1760) = iprot.readListBegin()
                     for _i1764 in range(_size1760):
                         _elem1765 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1765)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -39979,12 +40637,17 @@ class partition_name_to_vals_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1773 in self.success:
                 oprot.writeString(iter1773.encode('utf-8') if sys.version_info[0] == 2 else iter1773)
 =======
             for iter1766 in self.success:
                 oprot.writeString(iter1766.encode('utf-8') if sys.version_info[0] == 2 else iter1766)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1773 in self.success:
+                oprot.writeString(iter1773.encode('utf-8') if sys.version_info[0] == 2 else iter1773)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -40102,11 +40765,15 @@ class partition_name_to_spec_result(object):
                 if ftype == TType.MAP:
                     self.success = {}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_ktype1775, _vtype1776, _size1774) = iprot.readMapBegin()
                     for _i1778 in range(_size1774):
                         _key1779 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         _val1780 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success[_key1779] = _val1780
+<<<<<<< HEAD
 =======
                     (_ktype1768, _vtype1769, _size1767) = iprot.readMapBegin()
                     for _i1771 in range(_size1767):
@@ -40114,6 +40781,8 @@ class partition_name_to_spec_result(object):
                         _val1773 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success[_key1772] = _val1773
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readMapEnd()
                 else:
                     iprot.skip(ftype)
@@ -40136,6 +40805,7 @@ class partition_name_to_spec_result(object):
             oprot.writeFieldBegin('success', TType.MAP, 0)
             oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for kiter1781, viter1782 in self.success.items():
                 oprot.writeString(kiter1781.encode('utf-8') if sys.version_info[0] == 2 else kiter1781)
                 oprot.writeString(viter1782.encode('utf-8') if sys.version_info[0] == 2 else viter1782)
@@ -40144,6 +40814,11 @@ class partition_name_to_spec_result(object):
                 oprot.writeString(kiter1774.encode('utf-8') if sys.version_info[0] == 2 else kiter1774)
                 oprot.writeString(viter1775.encode('utf-8') if sys.version_info[0] == 2 else viter1775)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for kiter1781, viter1782 in self.success.items():
+                oprot.writeString(kiter1781.encode('utf-8') if sys.version_info[0] == 2 else kiter1781)
+                oprot.writeString(viter1782.encode('utf-8') if sys.version_info[0] == 2 else viter1782)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeMapEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -40213,11 +40888,15 @@ class markPartitionForEvent_args(object):
                 if ftype == TType.MAP:
                     self.part_vals = {}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_ktype1784, _vtype1785, _size1783) = iprot.readMapBegin()
                     for _i1787 in range(_size1783):
                         _key1788 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         _val1789 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals[_key1788] = _val1789
+<<<<<<< HEAD
 =======
                     (_ktype1777, _vtype1778, _size1776) = iprot.readMapBegin()
                     for _i1780 in range(_size1776):
@@ -40225,6 +40904,8 @@ class markPartitionForEvent_args(object):
                         _val1782 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals[_key1781] = _val1782
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readMapEnd()
                 else:
                     iprot.skip(ftype)
@@ -40255,6 +40936,7 @@ class markPartitionForEvent_args(object):
             oprot.writeFieldBegin('part_vals', TType.MAP, 3)
             oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for kiter1790, viter1791 in self.part_vals.items():
                 oprot.writeString(kiter1790.encode('utf-8') if sys.version_info[0] == 2 else kiter1790)
                 oprot.writeString(viter1791.encode('utf-8') if sys.version_info[0] == 2 else viter1791)
@@ -40263,6 +40945,11 @@ class markPartitionForEvent_args(object):
                 oprot.writeString(kiter1783.encode('utf-8') if sys.version_info[0] == 2 else kiter1783)
                 oprot.writeString(viter1784.encode('utf-8') if sys.version_info[0] == 2 else viter1784)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for kiter1790, viter1791 in self.part_vals.items():
+                oprot.writeString(kiter1790.encode('utf-8') if sys.version_info[0] == 2 else kiter1790)
+                oprot.writeString(viter1791.encode('utf-8') if sys.version_info[0] == 2 else viter1791)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeMapEnd()
             oprot.writeFieldEnd()
         if self.eventType is not None:
@@ -40457,11 +41144,15 @@ class isPartitionMarkedForEvent_args(object):
                 if ftype == TType.MAP:
                     self.part_vals = {}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_ktype1793, _vtype1794, _size1792) = iprot.readMapBegin()
                     for _i1796 in range(_size1792):
                         _key1797 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         _val1798 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals[_key1797] = _val1798
+<<<<<<< HEAD
 =======
                     (_ktype1786, _vtype1787, _size1785) = iprot.readMapBegin()
                     for _i1789 in range(_size1785):
@@ -40469,6 +41160,8 @@ class isPartitionMarkedForEvent_args(object):
                         _val1791 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.part_vals[_key1790] = _val1791
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readMapEnd()
                 else:
                     iprot.skip(ftype)
@@ -40499,6 +41192,7 @@ class isPartitionMarkedForEvent_args(object):
             oprot.writeFieldBegin('part_vals', TType.MAP, 3)
             oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.part_vals))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for kiter1799, viter1800 in self.part_vals.items():
                 oprot.writeString(kiter1799.encode('utf-8') if sys.version_info[0] == 2 else kiter1799)
                 oprot.writeString(viter1800.encode('utf-8') if sys.version_info[0] == 2 else viter1800)
@@ -40507,6 +41201,11 @@ class isPartitionMarkedForEvent_args(object):
                 oprot.writeString(kiter1792.encode('utf-8') if sys.version_info[0] == 2 else kiter1792)
                 oprot.writeString(viter1793.encode('utf-8') if sys.version_info[0] == 2 else viter1793)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for kiter1799, viter1800 in self.part_vals.items():
+                oprot.writeString(kiter1799.encode('utf-8') if sys.version_info[0] == 2 else kiter1799)
+                oprot.writeString(viter1800.encode('utf-8') if sys.version_info[0] == 2 else viter1800)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeMapEnd()
             oprot.writeFieldEnd()
         if self.eventType is not None:
@@ -44549,16 +45248,22 @@ class get_functions_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1804, _size1801) = iprot.readListBegin()
                     for _i1805 in range(_size1801):
                         _elem1806 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1806)
+<<<<<<< HEAD
 =======
                     (_etype1797, _size1794) = iprot.readListBegin()
                     for _i1798 in range(_size1794):
                         _elem1799 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1799)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -44581,12 +45286,17 @@ class get_functions_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1807 in self.success:
                 oprot.writeString(iter1807.encode('utf-8') if sys.version_info[0] == 2 else iter1807)
 =======
             for iter1800 in self.success:
                 oprot.writeString(iter1800.encode('utf-8') if sys.version_info[0] == 2 else iter1800)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1807 in self.success:
+                oprot.writeString(iter1807.encode('utf-8') if sys.version_info[0] == 2 else iter1807)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -45370,16 +46080,22 @@ class get_role_names_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1811, _size1808) = iprot.readListBegin()
                     for _i1812 in range(_size1808):
                         _elem1813 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1813)
+<<<<<<< HEAD
 =======
                     (_etype1804, _size1801) = iprot.readListBegin()
                     for _i1805 in range(_size1801):
                         _elem1806 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1806)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -45402,12 +46118,17 @@ class get_role_names_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1814 in self.success:
                 oprot.writeString(iter1814.encode('utf-8') if sys.version_info[0] == 2 else iter1814)
 =======
             for iter1807 in self.success:
                 oprot.writeString(iter1807.encode('utf-8') if sys.version_info[0] == 2 else iter1807)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1814 in self.success:
+                oprot.writeString(iter1814.encode('utf-8') if sys.version_info[0] == 2 else iter1814)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -45891,11 +46612,15 @@ class list_roles_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1818, _size1815) = iprot.readListBegin()
                     for _i1819 in range(_size1815):
                         _elem1820 = Role()
                         _elem1820.read(iprot)
                         self.success.append(_elem1820)
+<<<<<<< HEAD
 =======
                     (_etype1811, _size1808) = iprot.readListBegin()
                     for _i1812 in range(_size1808):
@@ -45903,6 +46628,8 @@ class list_roles_result(object):
                         _elem1813.read(iprot)
                         self.success.append(_elem1813)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -45925,12 +46652,17 @@ class list_roles_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1821 in self.success:
                 iter1821.write(oprot)
 =======
             for iter1814 in self.success:
                 iter1814.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1821 in self.success:
+                iter1821.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -46410,16 +47142,22 @@ class get_privilege_set_args(object):
                 if ftype == TType.LIST:
                     self.group_names = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1825, _size1822) = iprot.readListBegin()
                     for _i1826 in range(_size1822):
                         _elem1827 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.group_names.append(_elem1827)
+<<<<<<< HEAD
 =======
                     (_etype1818, _size1815) = iprot.readListBegin()
                     for _i1819 in range(_size1815):
                         _elem1820 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.group_names.append(_elem1820)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -46445,12 +47183,17 @@ class get_privilege_set_args(object):
             oprot.writeFieldBegin('group_names', TType.LIST, 3)
             oprot.writeListBegin(TType.STRING, len(self.group_names))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1828 in self.group_names:
                 oprot.writeString(iter1828.encode('utf-8') if sys.version_info[0] == 2 else iter1828)
 =======
             for iter1821 in self.group_names:
                 oprot.writeString(iter1821.encode('utf-8') if sys.version_info[0] == 2 else iter1821)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1828 in self.group_names:
+                oprot.writeString(iter1828.encode('utf-8') if sys.version_info[0] == 2 else iter1828)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -46665,11 +47408,15 @@ class list_privileges_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1832, _size1829) = iprot.readListBegin()
                     for _i1833 in range(_size1829):
                         _elem1834 = HiveObjectPrivilege()
                         _elem1834.read(iprot)
                         self.success.append(_elem1834)
+<<<<<<< HEAD
 =======
                     (_etype1825, _size1822) = iprot.readListBegin()
                     for _i1826 in range(_size1822):
@@ -46677,6 +47424,8 @@ class list_privileges_result(object):
                         _elem1827.read(iprot)
                         self.success.append(_elem1827)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -46699,12 +47448,17 @@ class list_privileges_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1835 in self.success:
                 iter1835.write(oprot)
 =======
             for iter1828 in self.success:
                 iter1828.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1835 in self.success:
+                iter1835.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -47336,16 +48090,22 @@ class set_ugi_args(object):
                 if ftype == TType.LIST:
                     self.group_names = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1839, _size1836) = iprot.readListBegin()
                     for _i1840 in range(_size1836):
                         _elem1841 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.group_names.append(_elem1841)
+<<<<<<< HEAD
 =======
                     (_etype1832, _size1829) = iprot.readListBegin()
                     for _i1833 in range(_size1829):
                         _elem1834 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.group_names.append(_elem1834)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -47367,12 +48127,17 @@ class set_ugi_args(object):
             oprot.writeFieldBegin('group_names', TType.LIST, 2)
             oprot.writeListBegin(TType.STRING, len(self.group_names))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1842 in self.group_names:
                 oprot.writeString(iter1842.encode('utf-8') if sys.version_info[0] == 2 else iter1842)
 =======
             for iter1835 in self.group_names:
                 oprot.writeString(iter1835.encode('utf-8') if sys.version_info[0] == 2 else iter1835)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1842 in self.group_names:
+                oprot.writeString(iter1842.encode('utf-8') if sys.version_info[0] == 2 else iter1842)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -47425,16 +48190,22 @@ class set_ugi_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1846, _size1843) = iprot.readListBegin()
                     for _i1847 in range(_size1843):
                         _elem1848 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1848)
+<<<<<<< HEAD
 =======
                     (_etype1839, _size1836) = iprot.readListBegin()
                     for _i1840 in range(_size1836):
                         _elem1841 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1841)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -47457,12 +48228,17 @@ class set_ugi_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1849 in self.success:
                 oprot.writeString(iter1849.encode('utf-8') if sys.version_info[0] == 2 else iter1849)
 =======
             for iter1842 in self.success:
                 oprot.writeString(iter1842.encode('utf-8') if sys.version_info[0] == 2 else iter1842)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1849 in self.success:
+                oprot.writeString(iter1849.encode('utf-8') if sys.version_info[0] == 2 else iter1849)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -48346,16 +49122,22 @@ class get_all_token_identifiers_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1853, _size1850) = iprot.readListBegin()
                     for _i1854 in range(_size1850):
                         _elem1855 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1855)
+<<<<<<< HEAD
 =======
                     (_etype1846, _size1843) = iprot.readListBegin()
                     for _i1847 in range(_size1843):
                         _elem1848 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1848)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -48373,12 +49155,17 @@ class get_all_token_identifiers_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1856 in self.success:
                 oprot.writeString(iter1856.encode('utf-8') if sys.version_info[0] == 2 else iter1856)
 =======
             for iter1849 in self.success:
                 oprot.writeString(iter1849.encode('utf-8') if sys.version_info[0] == 2 else iter1849)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1856 in self.success:
+                oprot.writeString(iter1856.encode('utf-8') if sys.version_info[0] == 2 else iter1856)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -48876,16 +49663,22 @@ class get_master_keys_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1860, _size1857) = iprot.readListBegin()
                     for _i1861 in range(_size1857):
                         _elem1862 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1862)
+<<<<<<< HEAD
 =======
                     (_etype1853, _size1850) = iprot.readListBegin()
                     for _i1854 in range(_size1850):
                         _elem1855 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1855)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -48903,12 +49696,17 @@ class get_master_keys_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1863 in self.success:
                 oprot.writeString(iter1863.encode('utf-8') if sys.version_info[0] == 2 else iter1863)
 =======
             for iter1856 in self.success:
                 oprot.writeString(iter1856.encode('utf-8') if sys.version_info[0] == 2 else iter1856)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1863 in self.success:
+                oprot.writeString(iter1863.encode('utf-8') if sys.version_info[0] == 2 else iter1863)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -50076,11 +50874,15 @@ class add_write_ids_to_min_history_args(object):
                 if ftype == TType.MAP:
                     self.writeIds = {}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_ktype1865, _vtype1866, _size1864) = iprot.readMapBegin()
                     for _i1868 in range(_size1864):
                         _key1869 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         _val1870 = iprot.readI64()
                         self.writeIds[_key1869] = _val1870
+<<<<<<< HEAD
 =======
                     (_ktype1858, _vtype1859, _size1857) = iprot.readMapBegin()
                     for _i1861 in range(_size1857):
@@ -50088,6 +50890,8 @@ class add_write_ids_to_min_history_args(object):
                         _val1863 = iprot.readI64()
                         self.writeIds[_key1862] = _val1863
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readMapEnd()
                 else:
                     iprot.skip(ftype)
@@ -50109,6 +50913,7 @@ class add_write_ids_to_min_history_args(object):
             oprot.writeFieldBegin('writeIds', TType.MAP, 2)
             oprot.writeMapBegin(TType.STRING, TType.I64, len(self.writeIds))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for kiter1871, viter1872 in self.writeIds.items():
                 oprot.writeString(kiter1871.encode('utf-8') if sys.version_info[0] == 2 else kiter1871)
                 oprot.writeI64(viter1872)
@@ -50117,6 +50922,11 @@ class add_write_ids_to_min_history_args(object):
                 oprot.writeString(kiter1864.encode('utf-8') if sys.version_info[0] == 2 else kiter1864)
                 oprot.writeI64(viter1865)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for kiter1871, viter1872 in self.writeIds.items():
+                oprot.writeString(kiter1871.encode('utf-8') if sys.version_info[0] == 2 else kiter1871)
+                oprot.writeI64(viter1872)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeMapEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -52730,16 +53540,22 @@ class find_columns_with_stats_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1876, _size1873) = iprot.readListBegin()
                     for _i1877 in range(_size1873):
                         _elem1878 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1878)
+<<<<<<< HEAD
 =======
                     (_etype1869, _size1866) = iprot.readListBegin()
                     for _i1870 in range(_size1866):
                         _elem1871 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1871)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -52757,12 +53573,17 @@ class find_columns_with_stats_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1879 in self.success:
                 oprot.writeString(iter1879.encode('utf-8') if sys.version_info[0] == 2 else iter1879)
 =======
             for iter1872 in self.success:
                 oprot.writeString(iter1872.encode('utf-8') if sys.version_info[0] == 2 else iter1872)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1879 in self.success:
+                oprot.writeString(iter1879.encode('utf-8') if sys.version_info[0] == 2 else iter1879)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -59319,11 +60140,15 @@ class get_schema_all_versions_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1883, _size1880) = iprot.readListBegin()
                     for _i1884 in range(_size1880):
                         _elem1885 = SchemaVersion()
                         _elem1885.read(iprot)
                         self.success.append(_elem1885)
+<<<<<<< HEAD
 =======
                     (_etype1876, _size1873) = iprot.readListBegin()
                     for _i1877 in range(_size1873):
@@ -59331,6 +60156,8 @@ class get_schema_all_versions_result(object):
                         _elem1878.read(iprot)
                         self.success.append(_elem1878)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -59358,12 +60185,17 @@ class get_schema_all_versions_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1886 in self.success:
                 iter1886.write(oprot)
 =======
             for iter1879 in self.success:
                 iter1879.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1886 in self.success:
+                iter1886.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -60753,11 +61585,15 @@ class get_runtime_stats_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1890, _size1887) = iprot.readListBegin()
                     for _i1891 in range(_size1887):
                         _elem1892 = RuntimeStat()
                         _elem1892.read(iprot)
                         self.success.append(_elem1892)
+<<<<<<< HEAD
 =======
                     (_etype1883, _size1880) = iprot.readListBegin()
                     for _i1884 in range(_size1880):
@@ -60765,6 +61601,8 @@ class get_runtime_stats_result(object):
                         _elem1885.read(iprot)
                         self.success.append(_elem1885)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -60787,12 +61625,17 @@ class get_runtime_stats_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1893 in self.success:
                 iter1893.write(oprot)
 =======
             for iter1886 in self.success:
                 iter1886.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1893 in self.success:
+                iter1893.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -62430,16 +63273,22 @@ class get_all_stored_procedures_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1897, _size1894) = iprot.readListBegin()
                     for _i1898 in range(_size1894):
                         _elem1899 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1899)
+<<<<<<< HEAD
 =======
                     (_etype1890, _size1887) = iprot.readListBegin()
                     for _i1891 in range(_size1887):
                         _elem1892 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1892)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -62462,12 +63311,17 @@ class get_all_stored_procedures_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1900 in self.success:
                 oprot.writeString(iter1900.encode('utf-8') if sys.version_info[0] == 2 else iter1900)
 =======
             for iter1893 in self.success:
                 oprot.writeString(iter1893.encode('utf-8') if sys.version_info[0] == 2 else iter1893)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1900 in self.success:
+                oprot.writeString(iter1900.encode('utf-8') if sys.version_info[0] == 2 else iter1900)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -62860,16 +63714,22 @@ class get_all_packages_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1904, _size1901) = iprot.readListBegin()
                     for _i1905 in range(_size1901):
                         _elem1906 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1906)
+<<<<<<< HEAD
 =======
                     (_etype1897, _size1894) = iprot.readListBegin()
                     for _i1898 in range(_size1894):
                         _elem1899 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                         self.success.append(_elem1899)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -62892,12 +63752,17 @@ class get_all_packages_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRING, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1907 in self.success:
                 oprot.writeString(iter1907.encode('utf-8') if sys.version_info[0] == 2 else iter1907)
 =======
             for iter1900 in self.success:
                 oprot.writeString(iter1900.encode('utf-8') if sys.version_info[0] == 2 else iter1900)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1907 in self.success:
+                oprot.writeString(iter1907.encode('utf-8') if sys.version_info[0] == 2 else iter1907)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:
@@ -63141,11 +64006,15 @@ class get_all_write_event_info_result(object):
                 if ftype == TType.LIST:
                     self.success = []
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     (_etype1911, _size1908) = iprot.readListBegin()
                     for _i1912 in range(_size1908):
                         _elem1913 = WriteEventInfo()
                         _elem1913.read(iprot)
                         self.success.append(_elem1913)
+<<<<<<< HEAD
 =======
                     (_etype1904, _size1901) = iprot.readListBegin()
                     for _i1905 in range(_size1901):
@@ -63153,6 +64022,8 @@ class get_all_write_event_info_result(object):
                         _elem1906.read(iprot)
                         self.success.append(_elem1906)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -63175,12 +64046,17 @@ class get_all_write_event_info_result(object):
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
 <<<<<<< HEAD
+<<<<<<< HEAD
             for iter1914 in self.success:
                 iter1914.write(oprot)
 =======
             for iter1907 in self.success:
                 iter1907.write(oprot)
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            for iter1914 in self.success:
+                iter1914.write(oprot)
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         if self.o1 is not None:

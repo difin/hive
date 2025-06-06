@@ -171,10 +171,14 @@ package org.apache.hadoop.hive.metastore.api;
             java.util.List<InsertEventRequestData> insertDatas;
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
               org.apache.thrift.protocol.TList _list984 = iprot.readListBegin();
               insertDatas = new java.util.ArrayList<InsertEventRequestData>(_list984.size);
               @org.apache.thrift.annotation.Nullable InsertEventRequestData _elem985;
               for (int _i986 = 0; _i986 < _list984.size; ++_i986)
+<<<<<<< HEAD
               {
                 _elem985 = new InsertEventRequestData();
                 _elem985.read(iprot);
@@ -189,6 +193,12 @@ package org.apache.hadoop.hive.metastore.api;
                 _elem977.read(iprot);
                 insertDatas.add(_elem977);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+              {
+                _elem985 = new InsertEventRequestData();
+                _elem985.read(iprot);
+                insertDatas.add(_elem985);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
               }
               iprot.readListEnd();
             }
@@ -227,6 +237,7 @@ package org.apache.hadoop.hive.metastore.api;
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, insertDatas.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
           for (InsertEventRequestData _iter987 : insertDatas)
           {
             _iter987.write(oprot);
@@ -235,6 +246,11 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _iter979.write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          for (InsertEventRequestData _iter987 : insertDatas)
+          {
+            _iter987.write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
           oprot.writeListEnd();
         }
@@ -262,10 +278,14 @@ package org.apache.hadoop.hive.metastore.api;
           java.util.List<InsertEventRequestData> insertDatas;
           {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             org.apache.thrift.protocol.TList _list988 = iprot.readListBegin();
             insertDatas = new java.util.ArrayList<InsertEventRequestData>(_list988.size);
             @org.apache.thrift.annotation.Nullable InsertEventRequestData _elem989;
             for (int _i990 = 0; _i990 < _list988.size; ++_i990)
+<<<<<<< HEAD
             {
               _elem989 = new InsertEventRequestData();
               _elem989.read(iprot);
@@ -280,6 +300,12 @@ package org.apache.hadoop.hive.metastore.api;
               _elem981.read(iprot);
               insertDatas.add(_elem981);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              _elem989 = new InsertEventRequestData();
+              _elem989.read(iprot);
+              insertDatas.add(_elem989);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             iprot.readListEnd();
           }
@@ -308,6 +334,7 @@ package org.apache.hadoop.hive.metastore.api;
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, insertDatas.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
           for (InsertEventRequestData _iter991 : insertDatas)
           {
             _iter991.write(oprot);
@@ -316,6 +343,11 @@ package org.apache.hadoop.hive.metastore.api;
           {
             _iter983.write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          for (InsertEventRequestData _iter991 : insertDatas)
+          {
+            _iter991.write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
           oprot.writeListEnd();
         }

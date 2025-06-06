@@ -70,6 +70,9 @@ class WMGetTriggersForResourePlanResponse
                     if ($ftype == TType::LST) {
                         $this->triggers = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1105 = 0;
                         $_etype1108 = 0;
                         $xfer += $input->readListBegin($_etype1108, $_size1105);
@@ -78,6 +81,7 @@ class WMGetTriggersForResourePlanResponse
                             $elem1110 = new \metastore\WMTrigger();
                             $xfer += $elem1110->read($input);
                             $this->triggers []= $elem1110;
+<<<<<<< HEAD
 =======
                         $_size1098 = 0;
                         $_etype1101 = 0;
@@ -88,6 +92,8 @@ class WMGetTriggersForResourePlanResponse
                             $xfer += $elem1103->read($input);
                             $this->triggers []= $elem1103;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -115,12 +121,17 @@ class WMGetTriggersForResourePlanResponse
             $xfer += $output->writeFieldBegin('triggers', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->triggers));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->triggers as $iter1111) {
                 $xfer += $iter1111->write($output);
 =======
             foreach ($this->triggers as $iter1104) {
                 $xfer += $iter1104->write($output);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->triggers as $iter1111) {
+                $xfer += $iter1111->write($output);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

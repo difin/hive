@@ -107,6 +107,9 @@ class ThriftHiveMetastore_append_partition_args
                     if ($ftype == TType::LST) {
                         $this->part_vals = array();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1549 = 0;
                         $_etype1552 = 0;
                         $xfer += $input->readListBegin($_etype1552, $_size1549);
@@ -114,6 +117,7 @@ class ThriftHiveMetastore_append_partition_args
                             $elem1554 = null;
                             $xfer += $input->readString($elem1554);
                             $this->part_vals []= $elem1554;
+<<<<<<< HEAD
 =======
                         $_size1542 = 0;
                         $_etype1545 = 0;
@@ -123,6 +127,8 @@ class ThriftHiveMetastore_append_partition_args
                             $xfer += $input->readString($elem1547);
                             $this->part_vals []= $elem1547;
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -160,12 +166,17 @@ class ThriftHiveMetastore_append_partition_args
             $xfer += $output->writeFieldBegin('part_vals', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->part_vals));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->part_vals as $iter1555) {
                 $xfer += $output->writeString($iter1555);
 =======
             foreach ($this->part_vals as $iter1548) {
                 $xfer += $output->writeString($iter1548);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->part_vals as $iter1555) {
+                $xfer += $output->writeString($iter1555);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

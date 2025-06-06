@@ -2975,12 +2975,16 @@ uint32_t ThriftHiveMetastore_get_databases_result::read(::apache::thrift::protoc
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1851;
             ::apache::thrift::protocol::TType _etype1854;
             xfer += iprot->readListBegin(_etype1854, _size1851);
             this->success.resize(_size1851);
             uint32_t _i1855;
             for (_i1855 = 0; _i1855 < _size1851; ++_i1855)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i1855]);
 =======
@@ -2993,6 +2997,10 @@ uint32_t ThriftHiveMetastore_get_databases_result::read(::apache::thrift::protoc
             {
               xfer += iprot->readString(this->success[_i1849]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i1855]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -3032,6 +3040,7 @@ uint32_t ThriftHiveMetastore_get_databases_result::write(::apache::thrift::proto
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1856;
       for (_iter1856 = this->success.begin(); _iter1856 != this->success.end(); ++_iter1856)
       {
@@ -3042,6 +3051,12 @@ uint32_t ThriftHiveMetastore_get_databases_result::write(::apache::thrift::proto
       {
         xfer += oprot->writeString((*_iter1850));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter1856;
+      for (_iter1856 = this->success.begin(); _iter1856 != this->success.end(); ++_iter1856)
+      {
+        xfer += oprot->writeString((*_iter1856));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -3087,12 +3102,16 @@ uint32_t ThriftHiveMetastore_get_databases_presult::read(::apache::thrift::proto
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1857;
             ::apache::thrift::protocol::TType _etype1860;
             xfer += iprot->readListBegin(_etype1860, _size1857);
             (*(this->success)).resize(_size1857);
             uint32_t _i1861;
             for (_i1861 = 0; _i1861 < _size1857; ++_i1861)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i1861]);
 =======
@@ -3105,6 +3124,10 @@ uint32_t ThriftHiveMetastore_get_databases_presult::read(::apache::thrift::proto
             {
               xfer += iprot->readString((*(this->success))[_i1855]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i1861]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -3222,12 +3245,16 @@ uint32_t ThriftHiveMetastore_get_all_databases_result::read(::apache::thrift::pr
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1862;
             ::apache::thrift::protocol::TType _etype1865;
             xfer += iprot->readListBegin(_etype1865, _size1862);
             this->success.resize(_size1862);
             uint32_t _i1866;
             for (_i1866 = 0; _i1866 < _size1862; ++_i1866)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i1866]);
 =======
@@ -3240,6 +3267,10 @@ uint32_t ThriftHiveMetastore_get_all_databases_result::read(::apache::thrift::pr
             {
               xfer += iprot->readString(this->success[_i1860]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i1866]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -3279,6 +3310,7 @@ uint32_t ThriftHiveMetastore_get_all_databases_result::write(::apache::thrift::p
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1867;
       for (_iter1867 = this->success.begin(); _iter1867 != this->success.end(); ++_iter1867)
       {
@@ -3289,6 +3321,12 @@ uint32_t ThriftHiveMetastore_get_all_databases_result::write(::apache::thrift::p
       {
         xfer += oprot->writeString((*_iter1861));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter1867;
+      for (_iter1867 = this->success.begin(); _iter1867 != this->success.end(); ++_iter1867)
+      {
+        xfer += oprot->writeString((*_iter1867));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -3334,12 +3372,16 @@ uint32_t ThriftHiveMetastore_get_all_databases_presult::read(::apache::thrift::p
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1868;
             ::apache::thrift::protocol::TType _etype1871;
             xfer += iprot->readListBegin(_etype1871, _size1868);
             (*(this->success)).resize(_size1868);
             uint32_t _i1872;
             for (_i1872 = 0; _i1872 < _size1868; ++_i1872)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i1872]);
 =======
@@ -3352,6 +3394,10 @@ uint32_t ThriftHiveMetastore_get_all_databases_presult::read(::apache::thrift::p
             {
               xfer += iprot->readString((*(this->success))[_i1866]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i1872]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -4612,12 +4658,16 @@ uint32_t ThriftHiveMetastore_get_dataconnectors_result::read(::apache::thrift::p
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1873;
             ::apache::thrift::protocol::TType _etype1876;
             xfer += iprot->readListBegin(_etype1876, _size1873);
             this->success.resize(_size1873);
             uint32_t _i1877;
             for (_i1877 = 0; _i1877 < _size1873; ++_i1877)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i1877]);
 =======
@@ -4630,6 +4680,10 @@ uint32_t ThriftHiveMetastore_get_dataconnectors_result::read(::apache::thrift::p
             {
               xfer += iprot->readString(this->success[_i1871]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i1877]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -4669,6 +4723,7 @@ uint32_t ThriftHiveMetastore_get_dataconnectors_result::write(::apache::thrift::
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1878;
       for (_iter1878 = this->success.begin(); _iter1878 != this->success.end(); ++_iter1878)
       {
@@ -4679,6 +4734,12 @@ uint32_t ThriftHiveMetastore_get_dataconnectors_result::write(::apache::thrift::
       {
         xfer += oprot->writeString((*_iter1872));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter1878;
+      for (_iter1878 = this->success.begin(); _iter1878 != this->success.end(); ++_iter1878)
+      {
+        xfer += oprot->writeString((*_iter1878));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -4724,12 +4785,16 @@ uint32_t ThriftHiveMetastore_get_dataconnectors_presult::read(::apache::thrift::
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1879;
             ::apache::thrift::protocol::TType _etype1882;
             xfer += iprot->readListBegin(_etype1882, _size1879);
             (*(this->success)).resize(_size1879);
             uint32_t _i1883;
             for (_i1883 = 0; _i1883 < _size1879; ++_i1883)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i1883]);
 =======
@@ -4742,6 +4807,10 @@ uint32_t ThriftHiveMetastore_get_dataconnectors_presult::read(::apache::thrift::
             {
               xfer += iprot->readString((*(this->success))[_i1877]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i1883]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -5804,12 +5873,16 @@ uint32_t ThriftHiveMetastore_get_type_all_result::read(::apache::thrift::protoco
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1884;
             ::apache::thrift::protocol::TType _ktype1885;
             ::apache::thrift::protocol::TType _vtype1886;
             xfer += iprot->readMapBegin(_ktype1885, _vtype1886, _size1884);
             uint32_t _i1888;
             for (_i1888 = 0; _i1888 < _size1884; ++_i1888)
+<<<<<<< HEAD
             {
               std::string _key1889;
               xfer += iprot->readString(_key1889);
@@ -5828,6 +5901,13 @@ uint32_t ThriftHiveMetastore_get_type_all_result::read(::apache::thrift::protoco
               Type& _val1884 = this->success[_key1883];
               xfer += _val1884.read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              std::string _key1889;
+              xfer += iprot->readString(_key1889);
+              Type& _val1890 = this->success[_key1889];
+              xfer += _val1890.read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -5867,6 +5947,7 @@ uint32_t ThriftHiveMetastore_get_type_all_result::write(::apache::thrift::protoc
     {
       xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::map<std::string, Type> ::const_iterator _iter1891;
       for (_iter1891 = this->success.begin(); _iter1891 != this->success.end(); ++_iter1891)
       {
@@ -5879,6 +5960,13 @@ uint32_t ThriftHiveMetastore_get_type_all_result::write(::apache::thrift::protoc
         xfer += oprot->writeString(_iter1885->first);
         xfer += _iter1885->second.write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::map<std::string, Type> ::const_iterator _iter1891;
+      for (_iter1891 = this->success.begin(); _iter1891 != this->success.end(); ++_iter1891)
+      {
+        xfer += oprot->writeString(_iter1891->first);
+        xfer += _iter1891->second.write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeMapEnd();
     }
@@ -5924,12 +6012,16 @@ uint32_t ThriftHiveMetastore_get_type_all_presult::read(::apache::thrift::protoc
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1892;
             ::apache::thrift::protocol::TType _ktype1893;
             ::apache::thrift::protocol::TType _vtype1894;
             xfer += iprot->readMapBegin(_ktype1893, _vtype1894, _size1892);
             uint32_t _i1896;
             for (_i1896 = 0; _i1896 < _size1892; ++_i1896)
+<<<<<<< HEAD
             {
               std::string _key1897;
               xfer += iprot->readString(_key1897);
@@ -5948,6 +6040,13 @@ uint32_t ThriftHiveMetastore_get_type_all_presult::read(::apache::thrift::protoc
               Type& _val1892 = (*(this->success))[_key1891];
               xfer += _val1892.read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              std::string _key1897;
+              xfer += iprot->readString(_key1897);
+              Type& _val1898 = (*(this->success))[_key1897];
+              xfer += _val1898.read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -6102,12 +6201,16 @@ uint32_t ThriftHiveMetastore_get_fields_result::read(::apache::thrift::protocol:
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1899;
             ::apache::thrift::protocol::TType _etype1902;
             xfer += iprot->readListBegin(_etype1902, _size1899);
             this->success.resize(_size1899);
             uint32_t _i1903;
             for (_i1903 = 0; _i1903 < _size1899; ++_i1903)
+<<<<<<< HEAD
             {
               xfer += this->success[_i1903].read(iprot);
 =======
@@ -6120,6 +6223,10 @@ uint32_t ThriftHiveMetastore_get_fields_result::read(::apache::thrift::protocol:
             {
               xfer += this->success[_i1897].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i1903].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -6175,6 +6282,7 @@ uint32_t ThriftHiveMetastore_get_fields_result::write(::apache::thrift::protocol
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<FieldSchema> ::const_iterator _iter1904;
       for (_iter1904 = this->success.begin(); _iter1904 != this->success.end(); ++_iter1904)
       {
@@ -6185,6 +6293,12 @@ uint32_t ThriftHiveMetastore_get_fields_result::write(::apache::thrift::protocol
       {
         xfer += (*_iter1898).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<FieldSchema> ::const_iterator _iter1904;
+      for (_iter1904 = this->success.begin(); _iter1904 != this->success.end(); ++_iter1904)
+      {
+        xfer += (*_iter1904).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -6238,12 +6352,16 @@ uint32_t ThriftHiveMetastore_get_fields_presult::read(::apache::thrift::protocol
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1905;
             ::apache::thrift::protocol::TType _etype1908;
             xfer += iprot->readListBegin(_etype1908, _size1905);
             (*(this->success)).resize(_size1905);
             uint32_t _i1909;
             for (_i1909 = 0; _i1909 < _size1905; ++_i1909)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i1909].read(iprot);
 =======
@@ -6256,6 +6374,10 @@ uint32_t ThriftHiveMetastore_get_fields_presult::read(::apache::thrift::protocol
             {
               xfer += (*(this->success))[_i1903].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i1909].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -6442,12 +6564,16 @@ uint32_t ThriftHiveMetastore_get_fields_with_environment_context_result::read(::
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1910;
             ::apache::thrift::protocol::TType _etype1913;
             xfer += iprot->readListBegin(_etype1913, _size1910);
             this->success.resize(_size1910);
             uint32_t _i1914;
             for (_i1914 = 0; _i1914 < _size1910; ++_i1914)
+<<<<<<< HEAD
             {
               xfer += this->success[_i1914].read(iprot);
 =======
@@ -6460,6 +6586,10 @@ uint32_t ThriftHiveMetastore_get_fields_with_environment_context_result::read(::
             {
               xfer += this->success[_i1908].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i1914].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -6515,6 +6645,7 @@ uint32_t ThriftHiveMetastore_get_fields_with_environment_context_result::write(:
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<FieldSchema> ::const_iterator _iter1915;
       for (_iter1915 = this->success.begin(); _iter1915 != this->success.end(); ++_iter1915)
       {
@@ -6525,6 +6656,12 @@ uint32_t ThriftHiveMetastore_get_fields_with_environment_context_result::write(:
       {
         xfer += (*_iter1909).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<FieldSchema> ::const_iterator _iter1915;
+      for (_iter1915 = this->success.begin(); _iter1915 != this->success.end(); ++_iter1915)
+      {
+        xfer += (*_iter1915).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -6578,12 +6715,16 @@ uint32_t ThriftHiveMetastore_get_fields_with_environment_context_presult::read(:
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1916;
             ::apache::thrift::protocol::TType _etype1919;
             xfer += iprot->readListBegin(_etype1919, _size1916);
             (*(this->success)).resize(_size1916);
             uint32_t _i1920;
             for (_i1920 = 0; _i1920 < _size1916; ++_i1920)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i1920].read(iprot);
 =======
@@ -6596,6 +6737,10 @@ uint32_t ThriftHiveMetastore_get_fields_with_environment_context_presult::read(:
             {
               xfer += (*(this->success))[_i1914].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i1920].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -7013,12 +7158,16 @@ uint32_t ThriftHiveMetastore_get_schema_result::read(::apache::thrift::protocol:
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1921;
             ::apache::thrift::protocol::TType _etype1924;
             xfer += iprot->readListBegin(_etype1924, _size1921);
             this->success.resize(_size1921);
             uint32_t _i1925;
             for (_i1925 = 0; _i1925 < _size1921; ++_i1925)
+<<<<<<< HEAD
             {
               xfer += this->success[_i1925].read(iprot);
 =======
@@ -7031,6 +7180,10 @@ uint32_t ThriftHiveMetastore_get_schema_result::read(::apache::thrift::protocol:
             {
               xfer += this->success[_i1919].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i1925].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -7086,6 +7239,7 @@ uint32_t ThriftHiveMetastore_get_schema_result::write(::apache::thrift::protocol
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<FieldSchema> ::const_iterator _iter1926;
       for (_iter1926 = this->success.begin(); _iter1926 != this->success.end(); ++_iter1926)
       {
@@ -7096,6 +7250,12 @@ uint32_t ThriftHiveMetastore_get_schema_result::write(::apache::thrift::protocol
       {
         xfer += (*_iter1920).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<FieldSchema> ::const_iterator _iter1926;
+      for (_iter1926 = this->success.begin(); _iter1926 != this->success.end(); ++_iter1926)
+      {
+        xfer += (*_iter1926).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -7149,12 +7309,16 @@ uint32_t ThriftHiveMetastore_get_schema_presult::read(::apache::thrift::protocol
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1927;
             ::apache::thrift::protocol::TType _etype1930;
             xfer += iprot->readListBegin(_etype1930, _size1927);
             (*(this->success)).resize(_size1927);
             uint32_t _i1931;
             for (_i1931 = 0; _i1931 < _size1927; ++_i1931)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i1931].read(iprot);
 =======
@@ -7167,6 +7331,10 @@ uint32_t ThriftHiveMetastore_get_schema_presult::read(::apache::thrift::protocol
             {
               xfer += (*(this->success))[_i1925].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i1931].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -7353,12 +7521,16 @@ uint32_t ThriftHiveMetastore_get_schema_with_environment_context_result::read(::
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1932;
             ::apache::thrift::protocol::TType _etype1935;
             xfer += iprot->readListBegin(_etype1935, _size1932);
             this->success.resize(_size1932);
             uint32_t _i1936;
             for (_i1936 = 0; _i1936 < _size1932; ++_i1936)
+<<<<<<< HEAD
             {
               xfer += this->success[_i1936].read(iprot);
 =======
@@ -7371,6 +7543,10 @@ uint32_t ThriftHiveMetastore_get_schema_with_environment_context_result::read(::
             {
               xfer += this->success[_i1930].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i1936].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -7426,6 +7602,7 @@ uint32_t ThriftHiveMetastore_get_schema_with_environment_context_result::write(:
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<FieldSchema> ::const_iterator _iter1937;
       for (_iter1937 = this->success.begin(); _iter1937 != this->success.end(); ++_iter1937)
       {
@@ -7436,6 +7613,12 @@ uint32_t ThriftHiveMetastore_get_schema_with_environment_context_result::write(:
       {
         xfer += (*_iter1931).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<FieldSchema> ::const_iterator _iter1937;
+      for (_iter1937 = this->success.begin(); _iter1937 != this->success.end(); ++_iter1937)
+      {
+        xfer += (*_iter1937).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -7489,12 +7672,16 @@ uint32_t ThriftHiveMetastore_get_schema_with_environment_context_presult::read(:
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1938;
             ::apache::thrift::protocol::TType _etype1941;
             xfer += iprot->readListBegin(_etype1941, _size1938);
             (*(this->success)).resize(_size1938);
             uint32_t _i1942;
             for (_i1942 = 0; _i1942 < _size1938; ++_i1942)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i1942].read(iprot);
 =======
@@ -7507,6 +7694,10 @@ uint32_t ThriftHiveMetastore_get_schema_with_environment_context_presult::read(:
             {
               xfer += (*(this->success))[_i1936].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i1942].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -8347,12 +8538,16 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
           {
             this->primaryKeys.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1943;
             ::apache::thrift::protocol::TType _etype1946;
             xfer += iprot->readListBegin(_etype1946, _size1943);
             this->primaryKeys.resize(_size1943);
             uint32_t _i1947;
             for (_i1947 = 0; _i1947 < _size1943; ++_i1947)
+<<<<<<< HEAD
             {
               xfer += this->primaryKeys[_i1947].read(iprot);
 =======
@@ -8365,6 +8560,10 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
             {
               xfer += this->primaryKeys[_i1941].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->primaryKeys[_i1947].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -8378,12 +8577,16 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
           {
             this->foreignKeys.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1948;
             ::apache::thrift::protocol::TType _etype1951;
             xfer += iprot->readListBegin(_etype1951, _size1948);
             this->foreignKeys.resize(_size1948);
             uint32_t _i1952;
             for (_i1952 = 0; _i1952 < _size1948; ++_i1952)
+<<<<<<< HEAD
             {
               xfer += this->foreignKeys[_i1952].read(iprot);
 =======
@@ -8396,6 +8599,10 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
             {
               xfer += this->foreignKeys[_i1946].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->foreignKeys[_i1952].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -8409,12 +8616,16 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
           {
             this->uniqueConstraints.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1953;
             ::apache::thrift::protocol::TType _etype1956;
             xfer += iprot->readListBegin(_etype1956, _size1953);
             this->uniqueConstraints.resize(_size1953);
             uint32_t _i1957;
             for (_i1957 = 0; _i1957 < _size1953; ++_i1957)
+<<<<<<< HEAD
             {
               xfer += this->uniqueConstraints[_i1957].read(iprot);
 =======
@@ -8427,6 +8638,10 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
             {
               xfer += this->uniqueConstraints[_i1951].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->uniqueConstraints[_i1957].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -8440,12 +8655,16 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
           {
             this->notNullConstraints.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1958;
             ::apache::thrift::protocol::TType _etype1961;
             xfer += iprot->readListBegin(_etype1961, _size1958);
             this->notNullConstraints.resize(_size1958);
             uint32_t _i1962;
             for (_i1962 = 0; _i1962 < _size1958; ++_i1962)
+<<<<<<< HEAD
             {
               xfer += this->notNullConstraints[_i1962].read(iprot);
 =======
@@ -8458,6 +8677,10 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
             {
               xfer += this->notNullConstraints[_i1956].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->notNullConstraints[_i1962].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -8471,12 +8694,16 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
           {
             this->defaultConstraints.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1963;
             ::apache::thrift::protocol::TType _etype1966;
             xfer += iprot->readListBegin(_etype1966, _size1963);
             this->defaultConstraints.resize(_size1963);
             uint32_t _i1967;
             for (_i1967 = 0; _i1967 < _size1963; ++_i1967)
+<<<<<<< HEAD
             {
               xfer += this->defaultConstraints[_i1967].read(iprot);
 =======
@@ -8489,6 +8716,10 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
             {
               xfer += this->defaultConstraints[_i1961].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->defaultConstraints[_i1967].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -8502,12 +8733,16 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
           {
             this->checkConstraints.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1968;
             ::apache::thrift::protocol::TType _etype1971;
             xfer += iprot->readListBegin(_etype1971, _size1968);
             this->checkConstraints.resize(_size1968);
             uint32_t _i1972;
             for (_i1972 = 0; _i1972 < _size1968; ++_i1972)
+<<<<<<< HEAD
             {
               xfer += this->checkConstraints[_i1972].read(iprot);
 =======
@@ -8520,6 +8755,10 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::read(::apache::
             {
               xfer += this->checkConstraints[_i1966].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->checkConstraints[_i1972].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -8553,6 +8792,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->primaryKeys.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<SQLPrimaryKey> ::const_iterator _iter1973;
     for (_iter1973 = this->primaryKeys.begin(); _iter1973 != this->primaryKeys.end(); ++_iter1973)
     {
@@ -8563,6 +8803,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
     {
       xfer += (*_iter1967).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLPrimaryKey> ::const_iterator _iter1973;
+    for (_iter1973 = this->primaryKeys.begin(); _iter1973 != this->primaryKeys.end(); ++_iter1973)
+    {
+      xfer += (*_iter1973).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8571,6 +8817,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
   xfer += oprot->writeFieldBegin("foreignKeys", ::apache::thrift::protocol::T_LIST, 3);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->foreignKeys.size()));
+<<<<<<< HEAD
 <<<<<<< HEAD
     std::vector<SQLForeignKey> ::const_iterator _iter1974;
     for (_iter1974 = this->foreignKeys.begin(); _iter1974 != this->foreignKeys.end(); ++_iter1974)
@@ -8582,6 +8829,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
     {
       xfer += (*_iter1968).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLForeignKey> ::const_iterator _iter1974;
+    for (_iter1974 = this->foreignKeys.begin(); _iter1974 != this->foreignKeys.end(); ++_iter1974)
+    {
+      xfer += (*_iter1974).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8590,6 +8843,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
   xfer += oprot->writeFieldBegin("uniqueConstraints", ::apache::thrift::protocol::T_LIST, 4);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->uniqueConstraints.size()));
+<<<<<<< HEAD
 <<<<<<< HEAD
     std::vector<SQLUniqueConstraint> ::const_iterator _iter1975;
     for (_iter1975 = this->uniqueConstraints.begin(); _iter1975 != this->uniqueConstraints.end(); ++_iter1975)
@@ -8601,6 +8855,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
     {
       xfer += (*_iter1969).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLUniqueConstraint> ::const_iterator _iter1975;
+    for (_iter1975 = this->uniqueConstraints.begin(); _iter1975 != this->uniqueConstraints.end(); ++_iter1975)
+    {
+      xfer += (*_iter1975).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8609,6 +8869,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
   xfer += oprot->writeFieldBegin("notNullConstraints", ::apache::thrift::protocol::T_LIST, 5);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->notNullConstraints.size()));
+<<<<<<< HEAD
 <<<<<<< HEAD
     std::vector<SQLNotNullConstraint> ::const_iterator _iter1976;
     for (_iter1976 = this->notNullConstraints.begin(); _iter1976 != this->notNullConstraints.end(); ++_iter1976)
@@ -8620,6 +8881,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
     {
       xfer += (*_iter1970).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLNotNullConstraint> ::const_iterator _iter1976;
+    for (_iter1976 = this->notNullConstraints.begin(); _iter1976 != this->notNullConstraints.end(); ++_iter1976)
+    {
+      xfer += (*_iter1976).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8628,6 +8895,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
   xfer += oprot->writeFieldBegin("defaultConstraints", ::apache::thrift::protocol::T_LIST, 6);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->defaultConstraints.size()));
+<<<<<<< HEAD
 <<<<<<< HEAD
     std::vector<SQLDefaultConstraint> ::const_iterator _iter1977;
     for (_iter1977 = this->defaultConstraints.begin(); _iter1977 != this->defaultConstraints.end(); ++_iter1977)
@@ -8639,6 +8907,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
     {
       xfer += (*_iter1971).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLDefaultConstraint> ::const_iterator _iter1977;
+    for (_iter1977 = this->defaultConstraints.begin(); _iter1977 != this->defaultConstraints.end(); ++_iter1977)
+    {
+      xfer += (*_iter1977).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8647,6 +8921,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
   xfer += oprot->writeFieldBegin("checkConstraints", ::apache::thrift::protocol::T_LIST, 7);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->checkConstraints.size()));
+<<<<<<< HEAD
 <<<<<<< HEAD
     std::vector<SQLCheckConstraint> ::const_iterator _iter1978;
     for (_iter1978 = this->checkConstraints.begin(); _iter1978 != this->checkConstraints.end(); ++_iter1978)
@@ -8658,6 +8933,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_args::write(::apache:
     {
       xfer += (*_iter1972).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLCheckConstraint> ::const_iterator _iter1978;
+    for (_iter1978 = this->checkConstraints.begin(); _iter1978 != this->checkConstraints.end(); ++_iter1978)
+    {
+      xfer += (*_iter1978).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8686,6 +8967,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>((*(this->primaryKeys)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<SQLPrimaryKey> ::const_iterator _iter1979;
     for (_iter1979 = (*(this->primaryKeys)).begin(); _iter1979 != (*(this->primaryKeys)).end(); ++_iter1979)
     {
@@ -8696,6 +8978,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
     {
       xfer += (*_iter1973).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLPrimaryKey> ::const_iterator _iter1979;
+    for (_iter1979 = (*(this->primaryKeys)).begin(); _iter1979 != (*(this->primaryKeys)).end(); ++_iter1979)
+    {
+      xfer += (*_iter1979).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8704,6 +8992,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
   xfer += oprot->writeFieldBegin("foreignKeys", ::apache::thrift::protocol::T_LIST, 3);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>((*(this->foreignKeys)).size()));
+<<<<<<< HEAD
 <<<<<<< HEAD
     std::vector<SQLForeignKey> ::const_iterator _iter1980;
     for (_iter1980 = (*(this->foreignKeys)).begin(); _iter1980 != (*(this->foreignKeys)).end(); ++_iter1980)
@@ -8715,6 +9004,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
     {
       xfer += (*_iter1974).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLForeignKey> ::const_iterator _iter1980;
+    for (_iter1980 = (*(this->foreignKeys)).begin(); _iter1980 != (*(this->foreignKeys)).end(); ++_iter1980)
+    {
+      xfer += (*_iter1980).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8723,6 +9018,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
   xfer += oprot->writeFieldBegin("uniqueConstraints", ::apache::thrift::protocol::T_LIST, 4);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>((*(this->uniqueConstraints)).size()));
+<<<<<<< HEAD
 <<<<<<< HEAD
     std::vector<SQLUniqueConstraint> ::const_iterator _iter1981;
     for (_iter1981 = (*(this->uniqueConstraints)).begin(); _iter1981 != (*(this->uniqueConstraints)).end(); ++_iter1981)
@@ -8734,6 +9030,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
     {
       xfer += (*_iter1975).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLUniqueConstraint> ::const_iterator _iter1981;
+    for (_iter1981 = (*(this->uniqueConstraints)).begin(); _iter1981 != (*(this->uniqueConstraints)).end(); ++_iter1981)
+    {
+      xfer += (*_iter1981).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8742,6 +9044,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
   xfer += oprot->writeFieldBegin("notNullConstraints", ::apache::thrift::protocol::T_LIST, 5);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>((*(this->notNullConstraints)).size()));
+<<<<<<< HEAD
 <<<<<<< HEAD
     std::vector<SQLNotNullConstraint> ::const_iterator _iter1982;
     for (_iter1982 = (*(this->notNullConstraints)).begin(); _iter1982 != (*(this->notNullConstraints)).end(); ++_iter1982)
@@ -8753,6 +9056,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
     {
       xfer += (*_iter1976).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLNotNullConstraint> ::const_iterator _iter1982;
+    for (_iter1982 = (*(this->notNullConstraints)).begin(); _iter1982 != (*(this->notNullConstraints)).end(); ++_iter1982)
+    {
+      xfer += (*_iter1982).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8761,6 +9070,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
   xfer += oprot->writeFieldBegin("defaultConstraints", ::apache::thrift::protocol::T_LIST, 6);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>((*(this->defaultConstraints)).size()));
+<<<<<<< HEAD
 <<<<<<< HEAD
     std::vector<SQLDefaultConstraint> ::const_iterator _iter1983;
     for (_iter1983 = (*(this->defaultConstraints)).begin(); _iter1983 != (*(this->defaultConstraints)).end(); ++_iter1983)
@@ -8772,6 +9082,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
     {
       xfer += (*_iter1977).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLDefaultConstraint> ::const_iterator _iter1983;
+    for (_iter1983 = (*(this->defaultConstraints)).begin(); _iter1983 != (*(this->defaultConstraints)).end(); ++_iter1983)
+    {
+      xfer += (*_iter1983).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -8780,6 +9096,7 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
   xfer += oprot->writeFieldBegin("checkConstraints", ::apache::thrift::protocol::T_LIST, 7);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>((*(this->checkConstraints)).size()));
+<<<<<<< HEAD
 <<<<<<< HEAD
     std::vector<SQLCheckConstraint> ::const_iterator _iter1984;
     for (_iter1984 = (*(this->checkConstraints)).begin(); _iter1984 != (*(this->checkConstraints)).end(); ++_iter1984)
@@ -8791,6 +9108,12 @@ uint32_t ThriftHiveMetastore_create_table_with_constraints_pargs::write(::apache
     {
       xfer += (*_iter1978).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<SQLCheckConstraint> ::const_iterator _iter1984;
+    for (_iter1984 = (*(this->checkConstraints)).begin(); _iter1984 != (*(this->checkConstraints)).end(); ++_iter1984)
+    {
+      xfer += (*_iter1984).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -11473,12 +11796,16 @@ uint32_t ThriftHiveMetastore_truncate_table_args::read(::apache::thrift::protoco
           {
             this->partNames.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1985;
             ::apache::thrift::protocol::TType _etype1988;
             xfer += iprot->readListBegin(_etype1988, _size1985);
             this->partNames.resize(_size1985);
             uint32_t _i1989;
             for (_i1989 = 0; _i1989 < _size1985; ++_i1989)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->partNames[_i1989]);
 =======
@@ -11491,6 +11818,10 @@ uint32_t ThriftHiveMetastore_truncate_table_args::read(::apache::thrift::protoco
             {
               xfer += iprot->readString(this->partNames[_i1983]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->partNames[_i1989]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -11528,6 +11859,7 @@ uint32_t ThriftHiveMetastore_truncate_table_args::write(::apache::thrift::protoc
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->partNames.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter1990;
     for (_iter1990 = this->partNames.begin(); _iter1990 != this->partNames.end(); ++_iter1990)
     {
@@ -11538,6 +11870,12 @@ uint32_t ThriftHiveMetastore_truncate_table_args::write(::apache::thrift::protoc
     {
       xfer += oprot->writeString((*_iter1984));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter1990;
+    for (_iter1990 = this->partNames.begin(); _iter1990 != this->partNames.end(); ++_iter1990)
+    {
+      xfer += oprot->writeString((*_iter1990));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -11570,6 +11908,7 @@ uint32_t ThriftHiveMetastore_truncate_table_pargs::write(::apache::thrift::proto
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->partNames)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter1991;
     for (_iter1991 = (*(this->partNames)).begin(); _iter1991 != (*(this->partNames)).end(); ++_iter1991)
     {
@@ -11580,6 +11919,12 @@ uint32_t ThriftHiveMetastore_truncate_table_pargs::write(::apache::thrift::proto
     {
       xfer += oprot->writeString((*_iter1985));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter1991;
+    for (_iter1991 = (*(this->partNames)).begin(); _iter1991 != (*(this->partNames)).end(); ++_iter1991)
+    {
+      xfer += oprot->writeString((*_iter1991));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -12031,12 +12376,16 @@ uint32_t ThriftHiveMetastore_get_tables_result::read(::apache::thrift::protocol:
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1992;
             ::apache::thrift::protocol::TType _etype1995;
             xfer += iprot->readListBegin(_etype1995, _size1992);
             this->success.resize(_size1992);
             uint32_t _i1996;
             for (_i1996 = 0; _i1996 < _size1992; ++_i1996)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i1996]);
 =======
@@ -12049,6 +12398,10 @@ uint32_t ThriftHiveMetastore_get_tables_result::read(::apache::thrift::protocol:
             {
               xfer += iprot->readString(this->success[_i1990]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i1996]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -12088,6 +12441,7 @@ uint32_t ThriftHiveMetastore_get_tables_result::write(::apache::thrift::protocol
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1997;
       for (_iter1997 = this->success.begin(); _iter1997 != this->success.end(); ++_iter1997)
       {
@@ -12098,6 +12452,12 @@ uint32_t ThriftHiveMetastore_get_tables_result::write(::apache::thrift::protocol
       {
         xfer += oprot->writeString((*_iter1991));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter1997;
+      for (_iter1997 = this->success.begin(); _iter1997 != this->success.end(); ++_iter1997)
+      {
+        xfer += oprot->writeString((*_iter1997));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -12143,12 +12503,16 @@ uint32_t ThriftHiveMetastore_get_tables_presult::read(::apache::thrift::protocol
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1998;
             ::apache::thrift::protocol::TType _etype2001;
             xfer += iprot->readListBegin(_etype2001, _size1998);
             (*(this->success)).resize(_size1998);
             uint32_t _i2002;
             for (_i2002 = 0; _i2002 < _size1998; ++_i2002)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2002]);
 =======
@@ -12161,6 +12525,10 @@ uint32_t ThriftHiveMetastore_get_tables_presult::read(::apache::thrift::protocol
             {
               xfer += iprot->readString((*(this->success))[_i1996]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2002]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -12331,12 +12699,16 @@ uint32_t ThriftHiveMetastore_get_tables_by_type_result::read(::apache::thrift::p
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2003;
             ::apache::thrift::protocol::TType _etype2006;
             xfer += iprot->readListBegin(_etype2006, _size2003);
             this->success.resize(_size2003);
             uint32_t _i2007;
             for (_i2007 = 0; _i2007 < _size2003; ++_i2007)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2007]);
 =======
@@ -12349,6 +12721,10 @@ uint32_t ThriftHiveMetastore_get_tables_by_type_result::read(::apache::thrift::p
             {
               xfer += iprot->readString(this->success[_i2001]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2007]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -12388,6 +12764,7 @@ uint32_t ThriftHiveMetastore_get_tables_by_type_result::write(::apache::thrift::
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2008;
       for (_iter2008 = this->success.begin(); _iter2008 != this->success.end(); ++_iter2008)
       {
@@ -12398,6 +12775,12 @@ uint32_t ThriftHiveMetastore_get_tables_by_type_result::write(::apache::thrift::
       {
         xfer += oprot->writeString((*_iter2002));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2008;
+      for (_iter2008 = this->success.begin(); _iter2008 != this->success.end(); ++_iter2008)
+      {
+        xfer += oprot->writeString((*_iter2008));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -12443,12 +12826,16 @@ uint32_t ThriftHiveMetastore_get_tables_by_type_presult::read(::apache::thrift::
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2009;
             ::apache::thrift::protocol::TType _etype2012;
             xfer += iprot->readListBegin(_etype2012, _size2009);
             (*(this->success)).resize(_size2009);
             uint32_t _i2013;
             for (_i2013 = 0; _i2013 < _size2009; ++_i2013)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2013]);
 =======
@@ -12461,6 +12848,10 @@ uint32_t ThriftHiveMetastore_get_tables_by_type_presult::read(::apache::thrift::
             {
               xfer += iprot->readString((*(this->success))[_i2007]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2013]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -12578,12 +12969,16 @@ uint32_t ThriftHiveMetastore_get_all_materialized_view_objects_for_rewriting_res
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2014;
             ::apache::thrift::protocol::TType _etype2017;
             xfer += iprot->readListBegin(_etype2017, _size2014);
             this->success.resize(_size2014);
             uint32_t _i2018;
             for (_i2018 = 0; _i2018 < _size2014; ++_i2018)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2018].read(iprot);
 =======
@@ -12596,6 +12991,10 @@ uint32_t ThriftHiveMetastore_get_all_materialized_view_objects_for_rewriting_res
             {
               xfer += this->success[_i2012].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2018].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -12635,6 +13034,7 @@ uint32_t ThriftHiveMetastore_get_all_materialized_view_objects_for_rewriting_res
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Table> ::const_iterator _iter2019;
       for (_iter2019 = this->success.begin(); _iter2019 != this->success.end(); ++_iter2019)
       {
@@ -12645,6 +13045,12 @@ uint32_t ThriftHiveMetastore_get_all_materialized_view_objects_for_rewriting_res
       {
         xfer += (*_iter2013).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Table> ::const_iterator _iter2019;
+      for (_iter2019 = this->success.begin(); _iter2019 != this->success.end(); ++_iter2019)
+      {
+        xfer += (*_iter2019).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -12690,12 +13096,16 @@ uint32_t ThriftHiveMetastore_get_all_materialized_view_objects_for_rewriting_pre
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2020;
             ::apache::thrift::protocol::TType _etype2023;
             xfer += iprot->readListBegin(_etype2023, _size2020);
             (*(this->success)).resize(_size2020);
             uint32_t _i2024;
             for (_i2024 = 0; _i2024 < _size2020; ++_i2024)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2024].read(iprot);
 =======
@@ -12708,6 +13118,10 @@ uint32_t ThriftHiveMetastore_get_all_materialized_view_objects_for_rewriting_pre
             {
               xfer += (*(this->success))[_i2018].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2024].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -12846,12 +13260,16 @@ uint32_t ThriftHiveMetastore_get_materialized_views_for_rewriting_result::read(:
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2025;
             ::apache::thrift::protocol::TType _etype2028;
             xfer += iprot->readListBegin(_etype2028, _size2025);
             this->success.resize(_size2025);
             uint32_t _i2029;
             for (_i2029 = 0; _i2029 < _size2025; ++_i2029)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2029]);
 =======
@@ -12864,6 +13282,10 @@ uint32_t ThriftHiveMetastore_get_materialized_views_for_rewriting_result::read(:
             {
               xfer += iprot->readString(this->success[_i2023]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2029]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -12903,6 +13325,7 @@ uint32_t ThriftHiveMetastore_get_materialized_views_for_rewriting_result::write(
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2030;
       for (_iter2030 = this->success.begin(); _iter2030 != this->success.end(); ++_iter2030)
       {
@@ -12913,6 +13336,12 @@ uint32_t ThriftHiveMetastore_get_materialized_views_for_rewriting_result::write(
       {
         xfer += oprot->writeString((*_iter2024));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2030;
+      for (_iter2030 = this->success.begin(); _iter2030 != this->success.end(); ++_iter2030)
+      {
+        xfer += oprot->writeString((*_iter2030));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -12958,12 +13387,16 @@ uint32_t ThriftHiveMetastore_get_materialized_views_for_rewriting_presult::read(
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2031;
             ::apache::thrift::protocol::TType _etype2034;
             xfer += iprot->readListBegin(_etype2034, _size2031);
             (*(this->success)).resize(_size2031);
             uint32_t _i2035;
             for (_i2035 = 0; _i2035 < _size2031; ++_i2035)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2035]);
 =======
@@ -12976,6 +13409,10 @@ uint32_t ThriftHiveMetastore_get_materialized_views_for_rewriting_presult::read(
             {
               xfer += iprot->readString((*(this->success))[_i2029]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2035]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -13051,12 +13488,16 @@ uint32_t ThriftHiveMetastore_get_table_meta_args::read(::apache::thrift::protoco
           {
             this->tbl_types.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2036;
             ::apache::thrift::protocol::TType _etype2039;
             xfer += iprot->readListBegin(_etype2039, _size2036);
             this->tbl_types.resize(_size2036);
             uint32_t _i2040;
             for (_i2040 = 0; _i2040 < _size2036; ++_i2040)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->tbl_types[_i2040]);
 =======
@@ -13069,6 +13510,10 @@ uint32_t ThriftHiveMetastore_get_table_meta_args::read(::apache::thrift::protoco
             {
               xfer += iprot->readString(this->tbl_types[_i2034]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->tbl_types[_i2040]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -13106,6 +13551,7 @@ uint32_t ThriftHiveMetastore_get_table_meta_args::write(::apache::thrift::protoc
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->tbl_types.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2041;
     for (_iter2041 = this->tbl_types.begin(); _iter2041 != this->tbl_types.end(); ++_iter2041)
     {
@@ -13116,6 +13562,12 @@ uint32_t ThriftHiveMetastore_get_table_meta_args::write(::apache::thrift::protoc
     {
       xfer += oprot->writeString((*_iter2035));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2041;
+    for (_iter2041 = this->tbl_types.begin(); _iter2041 != this->tbl_types.end(); ++_iter2041)
+    {
+      xfer += oprot->writeString((*_iter2041));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -13148,6 +13600,7 @@ uint32_t ThriftHiveMetastore_get_table_meta_pargs::write(::apache::thrift::proto
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->tbl_types)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2042;
     for (_iter2042 = (*(this->tbl_types)).begin(); _iter2042 != (*(this->tbl_types)).end(); ++_iter2042)
     {
@@ -13158,6 +13611,12 @@ uint32_t ThriftHiveMetastore_get_table_meta_pargs::write(::apache::thrift::proto
     {
       xfer += oprot->writeString((*_iter2036));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2042;
+    for (_iter2042 = (*(this->tbl_types)).begin(); _iter2042 != (*(this->tbl_types)).end(); ++_iter2042)
+    {
+      xfer += oprot->writeString((*_iter2042));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -13199,12 +13658,16 @@ uint32_t ThriftHiveMetastore_get_table_meta_result::read(::apache::thrift::proto
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2043;
             ::apache::thrift::protocol::TType _etype2046;
             xfer += iprot->readListBegin(_etype2046, _size2043);
             this->success.resize(_size2043);
             uint32_t _i2047;
             for (_i2047 = 0; _i2047 < _size2043; ++_i2047)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2047].read(iprot);
 =======
@@ -13217,6 +13680,10 @@ uint32_t ThriftHiveMetastore_get_table_meta_result::read(::apache::thrift::proto
             {
               xfer += this->success[_i2041].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2047].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -13256,6 +13723,7 @@ uint32_t ThriftHiveMetastore_get_table_meta_result::write(::apache::thrift::prot
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<TableMeta> ::const_iterator _iter2048;
       for (_iter2048 = this->success.begin(); _iter2048 != this->success.end(); ++_iter2048)
       {
@@ -13266,6 +13734,12 @@ uint32_t ThriftHiveMetastore_get_table_meta_result::write(::apache::thrift::prot
       {
         xfer += (*_iter2042).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<TableMeta> ::const_iterator _iter2048;
+      for (_iter2048 = this->success.begin(); _iter2048 != this->success.end(); ++_iter2048)
+      {
+        xfer += (*_iter2048).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -13311,12 +13785,16 @@ uint32_t ThriftHiveMetastore_get_table_meta_presult::read(::apache::thrift::prot
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2049;
             ::apache::thrift::protocol::TType _etype2052;
             xfer += iprot->readListBegin(_etype2052, _size2049);
             (*(this->success)).resize(_size2049);
             uint32_t _i2053;
             for (_i2053 = 0; _i2053 < _size2049; ++_i2053)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2053].read(iprot);
 =======
@@ -13329,6 +13807,10 @@ uint32_t ThriftHiveMetastore_get_table_meta_presult::read(::apache::thrift::prot
             {
               xfer += (*(this->success))[_i2047].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2053].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -13467,12 +13949,16 @@ uint32_t ThriftHiveMetastore_get_all_tables_result::read(::apache::thrift::proto
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2054;
             ::apache::thrift::protocol::TType _etype2057;
             xfer += iprot->readListBegin(_etype2057, _size2054);
             this->success.resize(_size2054);
             uint32_t _i2058;
             for (_i2058 = 0; _i2058 < _size2054; ++_i2058)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2058]);
 =======
@@ -13485,6 +13971,10 @@ uint32_t ThriftHiveMetastore_get_all_tables_result::read(::apache::thrift::proto
             {
               xfer += iprot->readString(this->success[_i2052]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2058]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -13524,6 +14014,7 @@ uint32_t ThriftHiveMetastore_get_all_tables_result::write(::apache::thrift::prot
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2059;
       for (_iter2059 = this->success.begin(); _iter2059 != this->success.end(); ++_iter2059)
       {
@@ -13534,6 +14025,12 @@ uint32_t ThriftHiveMetastore_get_all_tables_result::write(::apache::thrift::prot
       {
         xfer += oprot->writeString((*_iter2053));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2059;
+      for (_iter2059 = this->success.begin(); _iter2059 != this->success.end(); ++_iter2059)
+      {
+        xfer += oprot->writeString((*_iter2059));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -13579,12 +14076,16 @@ uint32_t ThriftHiveMetastore_get_all_tables_presult::read(::apache::thrift::prot
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2060;
             ::apache::thrift::protocol::TType _etype2063;
             xfer += iprot->readListBegin(_etype2063, _size2060);
             (*(this->success)).resize(_size2060);
             uint32_t _i2064;
             for (_i2064 = 0; _i2064 < _size2060; ++_i2064)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2064]);
 =======
@@ -13597,6 +14098,10 @@ uint32_t ThriftHiveMetastore_get_all_tables_presult::read(::apache::thrift::prot
             {
               xfer += iprot->readString((*(this->success))[_i2058]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2064]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -13907,12 +14412,16 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_args::read(::apache::thri
           {
             this->tbl_names.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2065;
             ::apache::thrift::protocol::TType _etype2068;
             xfer += iprot->readListBegin(_etype2068, _size2065);
             this->tbl_names.resize(_size2065);
             uint32_t _i2069;
             for (_i2069 = 0; _i2069 < _size2065; ++_i2069)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->tbl_names[_i2069]);
 =======
@@ -13925,6 +14434,10 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_args::read(::apache::thri
             {
               xfer += iprot->readString(this->tbl_names[_i2063]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->tbl_names[_i2069]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -13958,6 +14471,7 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_args::write(::apache::thr
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->tbl_names.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2070;
     for (_iter2070 = this->tbl_names.begin(); _iter2070 != this->tbl_names.end(); ++_iter2070)
     {
@@ -13968,6 +14482,12 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_args::write(::apache::thr
     {
       xfer += oprot->writeString((*_iter2064));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2070;
+    for (_iter2070 = this->tbl_names.begin(); _iter2070 != this->tbl_names.end(); ++_iter2070)
+    {
+      xfer += oprot->writeString((*_iter2070));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -13996,6 +14516,7 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_pargs::write(::apache::th
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->tbl_names)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2071;
     for (_iter2071 = (*(this->tbl_names)).begin(); _iter2071 != (*(this->tbl_names)).end(); ++_iter2071)
     {
@@ -14006,6 +14527,12 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_pargs::write(::apache::th
     {
       xfer += oprot->writeString((*_iter2065));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2071;
+    for (_iter2071 = (*(this->tbl_names)).begin(); _iter2071 != (*(this->tbl_names)).end(); ++_iter2071)
+    {
+      xfer += oprot->writeString((*_iter2071));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -14047,12 +14574,16 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_result::read(::apache::th
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2072;
             ::apache::thrift::protocol::TType _etype2075;
             xfer += iprot->readListBegin(_etype2075, _size2072);
             this->success.resize(_size2072);
             uint32_t _i2076;
             for (_i2076 = 0; _i2076 < _size2072; ++_i2076)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2076].read(iprot);
 =======
@@ -14065,6 +14596,10 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_result::read(::apache::th
             {
               xfer += this->success[_i2070].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2076].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -14096,6 +14631,7 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_result::write(::apache::t
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Table> ::const_iterator _iter2077;
       for (_iter2077 = this->success.begin(); _iter2077 != this->success.end(); ++_iter2077)
       {
@@ -14106,6 +14642,12 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_result::write(::apache::t
       {
         xfer += (*_iter2071).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Table> ::const_iterator _iter2077;
+      for (_iter2077 = this->success.begin(); _iter2077 != this->success.end(); ++_iter2077)
+      {
+        xfer += (*_iter2077).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -14147,12 +14689,16 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_presult::read(::apache::t
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2078;
             ::apache::thrift::protocol::TType _etype2081;
             xfer += iprot->readListBegin(_etype2081, _size2078);
             (*(this->success)).resize(_size2078);
             uint32_t _i2082;
             for (_i2082 = 0; _i2082 < _size2078; ++_i2082)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2082].read(iprot);
 =======
@@ -14165,6 +14711,10 @@ uint32_t ThriftHiveMetastore_get_table_objects_by_name_presult::read(::apache::t
             {
               xfer += (*(this->success))[_i2076].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2082].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -14295,12 +14845,16 @@ uint32_t ThriftHiveMetastore_get_tables_ext_result::read(::apache::thrift::proto
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2083;
             ::apache::thrift::protocol::TType _etype2086;
             xfer += iprot->readListBegin(_etype2086, _size2083);
             this->success.resize(_size2083);
             uint32_t _i2087;
             for (_i2087 = 0; _i2087 < _size2083; ++_i2087)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2087].read(iprot);
 =======
@@ -14313,6 +14867,10 @@ uint32_t ThriftHiveMetastore_get_tables_ext_result::read(::apache::thrift::proto
             {
               xfer += this->success[_i2081].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2087].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -14352,6 +14910,7 @@ uint32_t ThriftHiveMetastore_get_tables_ext_result::write(::apache::thrift::prot
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<ExtendedTableInfo> ::const_iterator _iter2088;
       for (_iter2088 = this->success.begin(); _iter2088 != this->success.end(); ++_iter2088)
       {
@@ -14362,6 +14921,12 @@ uint32_t ThriftHiveMetastore_get_tables_ext_result::write(::apache::thrift::prot
       {
         xfer += (*_iter2082).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<ExtendedTableInfo> ::const_iterator _iter2088;
+      for (_iter2088 = this->success.begin(); _iter2088 != this->success.end(); ++_iter2088)
+      {
+        xfer += (*_iter2088).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -14407,12 +14972,16 @@ uint32_t ThriftHiveMetastore_get_tables_ext_presult::read(::apache::thrift::prot
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2089;
             ::apache::thrift::protocol::TType _etype2092;
             xfer += iprot->readListBegin(_etype2092, _size2089);
             (*(this->success)).resize(_size2089);
             uint32_t _i2093;
             for (_i2093 = 0; _i2093 < _size2089; ++_i2093)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2093].read(iprot);
 =======
@@ -14425,6 +14994,10 @@ uint32_t ThriftHiveMetastore_get_tables_ext_presult::read(::apache::thrift::prot
             {
               xfer += (*(this->success))[_i2087].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2093].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -15607,12 +16180,16 @@ uint32_t ThriftHiveMetastore_get_table_names_by_filter_result::read(::apache::th
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2094;
             ::apache::thrift::protocol::TType _etype2097;
             xfer += iprot->readListBegin(_etype2097, _size2094);
             this->success.resize(_size2094);
             uint32_t _i2098;
             for (_i2098 = 0; _i2098 < _size2094; ++_i2098)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2098]);
 =======
@@ -15625,6 +16202,10 @@ uint32_t ThriftHiveMetastore_get_table_names_by_filter_result::read(::apache::th
             {
               xfer += iprot->readString(this->success[_i2092]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2098]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -15680,6 +16261,7 @@ uint32_t ThriftHiveMetastore_get_table_names_by_filter_result::write(::apache::t
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2099;
       for (_iter2099 = this->success.begin(); _iter2099 != this->success.end(); ++_iter2099)
       {
@@ -15690,6 +16272,12 @@ uint32_t ThriftHiveMetastore_get_table_names_by_filter_result::write(::apache::t
       {
         xfer += oprot->writeString((*_iter2093));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2099;
+      for (_iter2099 = this->success.begin(); _iter2099 != this->success.end(); ++_iter2099)
+      {
+        xfer += oprot->writeString((*_iter2099));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -15743,12 +16331,16 @@ uint32_t ThriftHiveMetastore_get_table_names_by_filter_presult::read(::apache::t
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2100;
             ::apache::thrift::protocol::TType _etype2103;
             xfer += iprot->readListBegin(_etype2103, _size2100);
             (*(this->success)).resize(_size2100);
             uint32_t _i2104;
             for (_i2104 = 0; _i2104 < _size2100; ++_i2104)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2104]);
 =======
@@ -15761,6 +16353,10 @@ uint32_t ThriftHiveMetastore_get_table_names_by_filter_presult::read(::apache::t
             {
               xfer += iprot->readString((*(this->success))[_i2098]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2104]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -17322,12 +17918,16 @@ uint32_t ThriftHiveMetastore_add_partitions_args::read(::apache::thrift::protoco
           {
             this->new_parts.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2105;
             ::apache::thrift::protocol::TType _etype2108;
             xfer += iprot->readListBegin(_etype2108, _size2105);
             this->new_parts.resize(_size2105);
             uint32_t _i2109;
             for (_i2109 = 0; _i2109 < _size2105; ++_i2109)
+<<<<<<< HEAD
             {
               xfer += this->new_parts[_i2109].read(iprot);
 =======
@@ -17340,6 +17940,10 @@ uint32_t ThriftHiveMetastore_add_partitions_args::read(::apache::thrift::protoco
             {
               xfer += this->new_parts[_i2103].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->new_parts[_i2109].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -17369,6 +17973,7 @@ uint32_t ThriftHiveMetastore_add_partitions_args::write(::apache::thrift::protoc
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->new_parts.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<Partition> ::const_iterator _iter2110;
     for (_iter2110 = this->new_parts.begin(); _iter2110 != this->new_parts.end(); ++_iter2110)
     {
@@ -17379,6 +17984,12 @@ uint32_t ThriftHiveMetastore_add_partitions_args::write(::apache::thrift::protoc
     {
       xfer += (*_iter2104).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<Partition> ::const_iterator _iter2110;
+    for (_iter2110 = this->new_parts.begin(); _iter2110 != this->new_parts.end(); ++_iter2110)
+    {
+      xfer += (*_iter2110).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -17403,6 +18014,7 @@ uint32_t ThriftHiveMetastore_add_partitions_pargs::write(::apache::thrift::proto
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>((*(this->new_parts)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<Partition> ::const_iterator _iter2111;
     for (_iter2111 = (*(this->new_parts)).begin(); _iter2111 != (*(this->new_parts)).end(); ++_iter2111)
     {
@@ -17413,6 +18025,12 @@ uint32_t ThriftHiveMetastore_add_partitions_pargs::write(::apache::thrift::proto
     {
       xfer += (*_iter2105).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<Partition> ::const_iterator _iter2111;
+    for (_iter2111 = (*(this->new_parts)).begin(); _iter2111 != (*(this->new_parts)).end(); ++_iter2111)
+    {
+      xfer += (*_iter2111).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -17622,12 +18240,16 @@ uint32_t ThriftHiveMetastore_add_partitions_pspec_args::read(::apache::thrift::p
           {
             this->new_parts.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2112;
             ::apache::thrift::protocol::TType _etype2115;
             xfer += iprot->readListBegin(_etype2115, _size2112);
             this->new_parts.resize(_size2112);
             uint32_t _i2116;
             for (_i2116 = 0; _i2116 < _size2112; ++_i2116)
+<<<<<<< HEAD
             {
               xfer += this->new_parts[_i2116].read(iprot);
 =======
@@ -17640,6 +18262,10 @@ uint32_t ThriftHiveMetastore_add_partitions_pspec_args::read(::apache::thrift::p
             {
               xfer += this->new_parts[_i2110].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->new_parts[_i2116].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -17669,6 +18295,7 @@ uint32_t ThriftHiveMetastore_add_partitions_pspec_args::write(::apache::thrift::
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->new_parts.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<PartitionSpec> ::const_iterator _iter2117;
     for (_iter2117 = this->new_parts.begin(); _iter2117 != this->new_parts.end(); ++_iter2117)
     {
@@ -17679,6 +18306,12 @@ uint32_t ThriftHiveMetastore_add_partitions_pspec_args::write(::apache::thrift::
     {
       xfer += (*_iter2111).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<PartitionSpec> ::const_iterator _iter2117;
+    for (_iter2117 = this->new_parts.begin(); _iter2117 != this->new_parts.end(); ++_iter2117)
+    {
+      xfer += (*_iter2117).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -17703,6 +18336,7 @@ uint32_t ThriftHiveMetastore_add_partitions_pspec_pargs::write(::apache::thrift:
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>((*(this->new_parts)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<PartitionSpec> ::const_iterator _iter2118;
     for (_iter2118 = (*(this->new_parts)).begin(); _iter2118 != (*(this->new_parts)).end(); ++_iter2118)
     {
@@ -17713,6 +18347,12 @@ uint32_t ThriftHiveMetastore_add_partitions_pspec_pargs::write(::apache::thrift:
     {
       xfer += (*_iter2112).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<PartitionSpec> ::const_iterator _iter2118;
+    for (_iter2118 = (*(this->new_parts)).begin(); _iter2118 != (*(this->new_parts)).end(); ++_iter2118)
+    {
+      xfer += (*_iter2118).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -17938,12 +18578,16 @@ uint32_t ThriftHiveMetastore_append_partition_args::read(::apache::thrift::proto
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2119;
             ::apache::thrift::protocol::TType _etype2122;
             xfer += iprot->readListBegin(_etype2122, _size2119);
             this->part_vals.resize(_size2119);
             uint32_t _i2123;
             for (_i2123 = 0; _i2123 < _size2119; ++_i2123)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2123]);
 =======
@@ -17956,6 +18600,10 @@ uint32_t ThriftHiveMetastore_append_partition_args::read(::apache::thrift::proto
             {
               xfer += iprot->readString(this->part_vals[_i2117]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2123]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -17993,6 +18641,7 @@ uint32_t ThriftHiveMetastore_append_partition_args::write(::apache::thrift::prot
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2124;
     for (_iter2124 = this->part_vals.begin(); _iter2124 != this->part_vals.end(); ++_iter2124)
     {
@@ -18003,6 +18652,12 @@ uint32_t ThriftHiveMetastore_append_partition_args::write(::apache::thrift::prot
     {
       xfer += oprot->writeString((*_iter2118));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2124;
+    for (_iter2124 = this->part_vals.begin(); _iter2124 != this->part_vals.end(); ++_iter2124)
+    {
+      xfer += oprot->writeString((*_iter2124));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -18035,6 +18690,7 @@ uint32_t ThriftHiveMetastore_append_partition_pargs::write(::apache::thrift::pro
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2125;
     for (_iter2125 = (*(this->part_vals)).begin(); _iter2125 != (*(this->part_vals)).end(); ++_iter2125)
     {
@@ -18045,6 +18701,12 @@ uint32_t ThriftHiveMetastore_append_partition_pargs::write(::apache::thrift::pro
     {
       xfer += oprot->writeString((*_iter2119));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2125;
+    for (_iter2125 = (*(this->part_vals)).begin(); _iter2125 != (*(this->part_vals)).end(); ++_iter2125)
+    {
+      xfer += oprot->writeString((*_iter2125));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -18517,12 +19179,16 @@ uint32_t ThriftHiveMetastore_append_partition_with_environment_context_args::rea
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2126;
             ::apache::thrift::protocol::TType _etype2129;
             xfer += iprot->readListBegin(_etype2129, _size2126);
             this->part_vals.resize(_size2126);
             uint32_t _i2130;
             for (_i2130 = 0; _i2130 < _size2126; ++_i2130)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2130]);
 =======
@@ -18535,6 +19201,10 @@ uint32_t ThriftHiveMetastore_append_partition_with_environment_context_args::rea
             {
               xfer += iprot->readString(this->part_vals[_i2124]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2130]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -18580,6 +19250,7 @@ uint32_t ThriftHiveMetastore_append_partition_with_environment_context_args::wri
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2131;
     for (_iter2131 = this->part_vals.begin(); _iter2131 != this->part_vals.end(); ++_iter2131)
     {
@@ -18590,6 +19261,12 @@ uint32_t ThriftHiveMetastore_append_partition_with_environment_context_args::wri
     {
       xfer += oprot->writeString((*_iter2125));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2131;
+    for (_iter2131 = this->part_vals.begin(); _iter2131 != this->part_vals.end(); ++_iter2131)
+    {
+      xfer += oprot->writeString((*_iter2131));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -18626,6 +19303,7 @@ uint32_t ThriftHiveMetastore_append_partition_with_environment_context_pargs::wr
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2132;
     for (_iter2132 = (*(this->part_vals)).begin(); _iter2132 != (*(this->part_vals)).end(); ++_iter2132)
     {
@@ -18636,6 +19314,12 @@ uint32_t ThriftHiveMetastore_append_partition_with_environment_context_pargs::wr
     {
       xfer += oprot->writeString((*_iter2126));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2132;
+    for (_iter2132 = (*(this->part_vals)).begin(); _iter2132 != (*(this->part_vals)).end(); ++_iter2132)
+    {
+      xfer += oprot->writeString((*_iter2132));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -19439,12 +20123,16 @@ uint32_t ThriftHiveMetastore_drop_partition_args::read(::apache::thrift::protoco
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2133;
             ::apache::thrift::protocol::TType _etype2136;
             xfer += iprot->readListBegin(_etype2136, _size2133);
             this->part_vals.resize(_size2133);
             uint32_t _i2137;
             for (_i2137 = 0; _i2137 < _size2133; ++_i2137)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2137]);
 =======
@@ -19457,6 +20145,10 @@ uint32_t ThriftHiveMetastore_drop_partition_args::read(::apache::thrift::protoco
             {
               xfer += iprot->readString(this->part_vals[_i2131]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2137]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -19502,6 +20194,7 @@ uint32_t ThriftHiveMetastore_drop_partition_args::write(::apache::thrift::protoc
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2138;
     for (_iter2138 = this->part_vals.begin(); _iter2138 != this->part_vals.end(); ++_iter2138)
     {
@@ -19512,6 +20205,12 @@ uint32_t ThriftHiveMetastore_drop_partition_args::write(::apache::thrift::protoc
     {
       xfer += oprot->writeString((*_iter2132));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2138;
+    for (_iter2138 = this->part_vals.begin(); _iter2138 != this->part_vals.end(); ++_iter2138)
+    {
+      xfer += oprot->writeString((*_iter2138));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -19548,6 +20247,7 @@ uint32_t ThriftHiveMetastore_drop_partition_pargs::write(::apache::thrift::proto
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2139;
     for (_iter2139 = (*(this->part_vals)).begin(); _iter2139 != (*(this->part_vals)).end(); ++_iter2139)
     {
@@ -19558,6 +20258,12 @@ uint32_t ThriftHiveMetastore_drop_partition_pargs::write(::apache::thrift::proto
     {
       xfer += oprot->writeString((*_iter2133));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2139;
+    for (_iter2139 = (*(this->part_vals)).begin(); _iter2139 != (*(this->part_vals)).end(); ++_iter2139)
+    {
+      xfer += oprot->writeString((*_iter2139));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -19767,12 +20473,16 @@ uint32_t ThriftHiveMetastore_drop_partition_with_environment_context_args::read(
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2140;
             ::apache::thrift::protocol::TType _etype2143;
             xfer += iprot->readListBegin(_etype2143, _size2140);
             this->part_vals.resize(_size2140);
             uint32_t _i2144;
             for (_i2144 = 0; _i2144 < _size2140; ++_i2144)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2144]);
 =======
@@ -19785,6 +20495,10 @@ uint32_t ThriftHiveMetastore_drop_partition_with_environment_context_args::read(
             {
               xfer += iprot->readString(this->part_vals[_i2138]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2144]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -19838,6 +20552,7 @@ uint32_t ThriftHiveMetastore_drop_partition_with_environment_context_args::write
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2145;
     for (_iter2145 = this->part_vals.begin(); _iter2145 != this->part_vals.end(); ++_iter2145)
     {
@@ -19848,6 +20563,12 @@ uint32_t ThriftHiveMetastore_drop_partition_with_environment_context_args::write
     {
       xfer += oprot->writeString((*_iter2139));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2145;
+    for (_iter2145 = this->part_vals.begin(); _iter2145 != this->part_vals.end(); ++_iter2145)
+    {
+      xfer += oprot->writeString((*_iter2145));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -19888,6 +20609,7 @@ uint32_t ThriftHiveMetastore_drop_partition_with_environment_context_pargs::writ
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2146;
     for (_iter2146 = (*(this->part_vals)).begin(); _iter2146 != (*(this->part_vals)).end(); ++_iter2146)
     {
@@ -19898,6 +20620,12 @@ uint32_t ThriftHiveMetastore_drop_partition_with_environment_context_pargs::writ
     {
       xfer += oprot->writeString((*_iter2140));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2146;
+    for (_iter2146 = (*(this->part_vals)).begin(); _iter2146 != (*(this->part_vals)).end(); ++_iter2146)
+    {
+      xfer += oprot->writeString((*_iter2146));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -20904,12 +21632,16 @@ uint32_t ThriftHiveMetastore_get_partition_args::read(::apache::thrift::protocol
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2147;
             ::apache::thrift::protocol::TType _etype2150;
             xfer += iprot->readListBegin(_etype2150, _size2147);
             this->part_vals.resize(_size2147);
             uint32_t _i2151;
             for (_i2151 = 0; _i2151 < _size2147; ++_i2151)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2151]);
 =======
@@ -20922,6 +21654,10 @@ uint32_t ThriftHiveMetastore_get_partition_args::read(::apache::thrift::protocol
             {
               xfer += iprot->readString(this->part_vals[_i2145]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2151]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -20959,6 +21695,7 @@ uint32_t ThriftHiveMetastore_get_partition_args::write(::apache::thrift::protoco
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2152;
     for (_iter2152 = this->part_vals.begin(); _iter2152 != this->part_vals.end(); ++_iter2152)
     {
@@ -20969,6 +21706,12 @@ uint32_t ThriftHiveMetastore_get_partition_args::write(::apache::thrift::protoco
     {
       xfer += oprot->writeString((*_iter2146));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2152;
+    for (_iter2152 = this->part_vals.begin(); _iter2152 != this->part_vals.end(); ++_iter2152)
+    {
+      xfer += oprot->writeString((*_iter2152));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -21001,6 +21744,7 @@ uint32_t ThriftHiveMetastore_get_partition_pargs::write(::apache::thrift::protoc
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2153;
     for (_iter2153 = (*(this->part_vals)).begin(); _iter2153 != (*(this->part_vals)).end(); ++_iter2153)
     {
@@ -21011,6 +21755,12 @@ uint32_t ThriftHiveMetastore_get_partition_pargs::write(::apache::thrift::protoc
     {
       xfer += oprot->writeString((*_iter2147));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2153;
+    for (_iter2153 = (*(this->part_vals)).begin(); _iter2153 != (*(this->part_vals)).end(); ++_iter2153)
+    {
+      xfer += oprot->writeString((*_iter2153));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -21427,12 +22177,16 @@ uint32_t ThriftHiveMetastore_exchange_partition_args::read(::apache::thrift::pro
           {
             this->partitionSpecs.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2154;
             ::apache::thrift::protocol::TType _ktype2155;
             ::apache::thrift::protocol::TType _vtype2156;
             xfer += iprot->readMapBegin(_ktype2155, _vtype2156, _size2154);
             uint32_t _i2158;
             for (_i2158 = 0; _i2158 < _size2154; ++_i2158)
+<<<<<<< HEAD
             {
               std::string _key2159;
               xfer += iprot->readString(_key2159);
@@ -21451,6 +22205,13 @@ uint32_t ThriftHiveMetastore_exchange_partition_args::read(::apache::thrift::pro
               std::string& _val2154 = this->partitionSpecs[_key2153];
               xfer += iprot->readString(_val2154);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              std::string _key2159;
+              xfer += iprot->readString(_key2159);
+              std::string& _val2160 = this->partitionSpecs[_key2159];
+              xfer += iprot->readString(_val2160);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -21512,6 +22273,7 @@ uint32_t ThriftHiveMetastore_exchange_partition_args::write(::apache::thrift::pr
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->partitionSpecs.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::map<std::string, std::string> ::const_iterator _iter2161;
     for (_iter2161 = this->partitionSpecs.begin(); _iter2161 != this->partitionSpecs.end(); ++_iter2161)
     {
@@ -21524,6 +22286,13 @@ uint32_t ThriftHiveMetastore_exchange_partition_args::write(::apache::thrift::pr
       xfer += oprot->writeString(_iter2155->first);
       xfer += oprot->writeString(_iter2155->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::map<std::string, std::string> ::const_iterator _iter2161;
+    for (_iter2161 = this->partitionSpecs.begin(); _iter2161 != this->partitionSpecs.end(); ++_iter2161)
+    {
+      xfer += oprot->writeString(_iter2161->first);
+      xfer += oprot->writeString(_iter2161->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -21564,6 +22333,7 @@ uint32_t ThriftHiveMetastore_exchange_partition_pargs::write(::apache::thrift::p
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->partitionSpecs)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::map<std::string, std::string> ::const_iterator _iter2162;
     for (_iter2162 = (*(this->partitionSpecs)).begin(); _iter2162 != (*(this->partitionSpecs)).end(); ++_iter2162)
     {
@@ -21576,6 +22346,13 @@ uint32_t ThriftHiveMetastore_exchange_partition_pargs::write(::apache::thrift::p
       xfer += oprot->writeString(_iter2156->first);
       xfer += oprot->writeString(_iter2156->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::map<std::string, std::string> ::const_iterator _iter2162;
+    for (_iter2162 = (*(this->partitionSpecs)).begin(); _iter2162 != (*(this->partitionSpecs)).end(); ++_iter2162)
+    {
+      xfer += oprot->writeString(_iter2162->first);
+      xfer += oprot->writeString(_iter2162->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -21821,12 +22598,16 @@ uint32_t ThriftHiveMetastore_exchange_partitions_args::read(::apache::thrift::pr
           {
             this->partitionSpecs.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2163;
             ::apache::thrift::protocol::TType _ktype2164;
             ::apache::thrift::protocol::TType _vtype2165;
             xfer += iprot->readMapBegin(_ktype2164, _vtype2165, _size2163);
             uint32_t _i2167;
             for (_i2167 = 0; _i2167 < _size2163; ++_i2167)
+<<<<<<< HEAD
             {
               std::string _key2168;
               xfer += iprot->readString(_key2168);
@@ -21845,6 +22626,13 @@ uint32_t ThriftHiveMetastore_exchange_partitions_args::read(::apache::thrift::pr
               std::string& _val2163 = this->partitionSpecs[_key2162];
               xfer += iprot->readString(_val2163);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              std::string _key2168;
+              xfer += iprot->readString(_key2168);
+              std::string& _val2169 = this->partitionSpecs[_key2168];
+              xfer += iprot->readString(_val2169);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -21906,6 +22694,7 @@ uint32_t ThriftHiveMetastore_exchange_partitions_args::write(::apache::thrift::p
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->partitionSpecs.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::map<std::string, std::string> ::const_iterator _iter2170;
     for (_iter2170 = this->partitionSpecs.begin(); _iter2170 != this->partitionSpecs.end(); ++_iter2170)
     {
@@ -21918,6 +22707,13 @@ uint32_t ThriftHiveMetastore_exchange_partitions_args::write(::apache::thrift::p
       xfer += oprot->writeString(_iter2164->first);
       xfer += oprot->writeString(_iter2164->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::map<std::string, std::string> ::const_iterator _iter2170;
+    for (_iter2170 = this->partitionSpecs.begin(); _iter2170 != this->partitionSpecs.end(); ++_iter2170)
+    {
+      xfer += oprot->writeString(_iter2170->first);
+      xfer += oprot->writeString(_iter2170->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -21958,6 +22754,7 @@ uint32_t ThriftHiveMetastore_exchange_partitions_pargs::write(::apache::thrift::
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->partitionSpecs)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::map<std::string, std::string> ::const_iterator _iter2171;
     for (_iter2171 = (*(this->partitionSpecs)).begin(); _iter2171 != (*(this->partitionSpecs)).end(); ++_iter2171)
     {
@@ -21970,6 +22767,13 @@ uint32_t ThriftHiveMetastore_exchange_partitions_pargs::write(::apache::thrift::
       xfer += oprot->writeString(_iter2165->first);
       xfer += oprot->writeString(_iter2165->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::map<std::string, std::string> ::const_iterator _iter2171;
+    for (_iter2171 = (*(this->partitionSpecs)).begin(); _iter2171 != (*(this->partitionSpecs)).end(); ++_iter2171)
+    {
+      xfer += oprot->writeString(_iter2171->first);
+      xfer += oprot->writeString(_iter2171->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -22027,12 +22831,16 @@ uint32_t ThriftHiveMetastore_exchange_partitions_result::read(::apache::thrift::
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2172;
             ::apache::thrift::protocol::TType _etype2175;
             xfer += iprot->readListBegin(_etype2175, _size2172);
             this->success.resize(_size2172);
             uint32_t _i2176;
             for (_i2176 = 0; _i2176 < _size2172; ++_i2176)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2176].read(iprot);
 =======
@@ -22045,6 +22853,10 @@ uint32_t ThriftHiveMetastore_exchange_partitions_result::read(::apache::thrift::
             {
               xfer += this->success[_i2170].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2176].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -22108,6 +22920,7 @@ uint32_t ThriftHiveMetastore_exchange_partitions_result::write(::apache::thrift:
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Partition> ::const_iterator _iter2177;
       for (_iter2177 = this->success.begin(); _iter2177 != this->success.end(); ++_iter2177)
       {
@@ -22118,6 +22931,12 @@ uint32_t ThriftHiveMetastore_exchange_partitions_result::write(::apache::thrift:
       {
         xfer += (*_iter2171).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Partition> ::const_iterator _iter2177;
+      for (_iter2177 = this->success.begin(); _iter2177 != this->success.end(); ++_iter2177)
+      {
+        xfer += (*_iter2177).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -22175,12 +22994,16 @@ uint32_t ThriftHiveMetastore_exchange_partitions_presult::read(::apache::thrift:
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2178;
             ::apache::thrift::protocol::TType _etype2181;
             xfer += iprot->readListBegin(_etype2181, _size2178);
             (*(this->success)).resize(_size2178);
             uint32_t _i2182;
             for (_i2182 = 0; _i2182 < _size2178; ++_i2182)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2182].read(iprot);
 =======
@@ -22193,6 +23016,10 @@ uint32_t ThriftHiveMetastore_exchange_partitions_presult::read(::apache::thrift:
             {
               xfer += (*(this->success))[_i2176].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2182].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -22292,12 +23119,16 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_args::read(::apache::thrift
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2183;
             ::apache::thrift::protocol::TType _etype2186;
             xfer += iprot->readListBegin(_etype2186, _size2183);
             this->part_vals.resize(_size2183);
             uint32_t _i2187;
             for (_i2187 = 0; _i2187 < _size2183; ++_i2187)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2187]);
 =======
@@ -22310,6 +23141,10 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_args::read(::apache::thrift
             {
               xfer += iprot->readString(this->part_vals[_i2181]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2187]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -22331,12 +23166,16 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_args::read(::apache::thrift
           {
             this->group_names.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2188;
             ::apache::thrift::protocol::TType _etype2191;
             xfer += iprot->readListBegin(_etype2191, _size2188);
             this->group_names.resize(_size2188);
             uint32_t _i2192;
             for (_i2192 = 0; _i2192 < _size2188; ++_i2192)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->group_names[_i2192]);
 =======
@@ -22349,6 +23188,10 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_args::read(::apache::thrift
             {
               xfer += iprot->readString(this->group_names[_i2186]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->group_names[_i2192]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -22386,6 +23229,7 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_args::write(::apache::thrif
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2193;
     for (_iter2193 = this->part_vals.begin(); _iter2193 != this->part_vals.end(); ++_iter2193)
     {
@@ -22396,6 +23240,12 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_args::write(::apache::thrif
     {
       xfer += oprot->writeString((*_iter2187));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2193;
+    for (_iter2193 = this->part_vals.begin(); _iter2193 != this->part_vals.end(); ++_iter2193)
+    {
+      xfer += oprot->writeString((*_iter2193));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -22409,6 +23259,7 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_args::write(::apache::thrif
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->group_names.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2194;
     for (_iter2194 = this->group_names.begin(); _iter2194 != this->group_names.end(); ++_iter2194)
     {
@@ -22419,6 +23270,12 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_args::write(::apache::thrif
     {
       xfer += oprot->writeString((*_iter2188));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2194;
+    for (_iter2194 = this->group_names.begin(); _iter2194 != this->group_names.end(); ++_iter2194)
+    {
+      xfer += oprot->writeString((*_iter2194));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -22451,6 +23308,7 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_pargs::write(::apache::thri
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2195;
     for (_iter2195 = (*(this->part_vals)).begin(); _iter2195 != (*(this->part_vals)).end(); ++_iter2195)
     {
@@ -22461,6 +23319,12 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_pargs::write(::apache::thri
     {
       xfer += oprot->writeString((*_iter2189));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2195;
+    for (_iter2195 = (*(this->part_vals)).begin(); _iter2195 != (*(this->part_vals)).end(); ++_iter2195)
+    {
+      xfer += oprot->writeString((*_iter2195));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -22474,6 +23338,7 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_pargs::write(::apache::thri
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->group_names)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2196;
     for (_iter2196 = (*(this->group_names)).begin(); _iter2196 != (*(this->group_names)).end(); ++_iter2196)
     {
@@ -22484,6 +23349,12 @@ uint32_t ThriftHiveMetastore_get_partition_with_auth_pargs::write(::apache::thri
     {
       xfer += oprot->writeString((*_iter2190));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2196;
+    for (_iter2196 = (*(this->group_names)).begin(); _iter2196 != (*(this->group_names)).end(); ++_iter2196)
+    {
+      xfer += oprot->writeString((*_iter2196));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -23043,12 +23914,16 @@ uint32_t ThriftHiveMetastore_get_partitions_result::read(::apache::thrift::proto
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2197;
             ::apache::thrift::protocol::TType _etype2200;
             xfer += iprot->readListBegin(_etype2200, _size2197);
             this->success.resize(_size2197);
             uint32_t _i2201;
             for (_i2201 = 0; _i2201 < _size2197; ++_i2201)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2201].read(iprot);
 =======
@@ -23061,6 +23936,10 @@ uint32_t ThriftHiveMetastore_get_partitions_result::read(::apache::thrift::proto
             {
               xfer += this->success[_i2195].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2201].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -23108,6 +23987,7 @@ uint32_t ThriftHiveMetastore_get_partitions_result::write(::apache::thrift::prot
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Partition> ::const_iterator _iter2202;
       for (_iter2202 = this->success.begin(); _iter2202 != this->success.end(); ++_iter2202)
       {
@@ -23118,6 +23998,12 @@ uint32_t ThriftHiveMetastore_get_partitions_result::write(::apache::thrift::prot
       {
         xfer += (*_iter2196).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Partition> ::const_iterator _iter2202;
+      for (_iter2202 = this->success.begin(); _iter2202 != this->success.end(); ++_iter2202)
+      {
+        xfer += (*_iter2202).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -23167,12 +24053,16 @@ uint32_t ThriftHiveMetastore_get_partitions_presult::read(::apache::thrift::prot
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2203;
             ::apache::thrift::protocol::TType _etype2206;
             xfer += iprot->readListBegin(_etype2206, _size2203);
             (*(this->success)).resize(_size2203);
             uint32_t _i2207;
             for (_i2207 = 0; _i2207 < _size2203; ++_i2207)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2207].read(iprot);
 =======
@@ -23185,6 +24075,10 @@ uint32_t ThriftHiveMetastore_get_partitions_presult::read(::apache::thrift::prot
             {
               xfer += (*(this->success))[_i2201].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2207].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -23511,12 +24405,16 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_args::read(::apache::thrif
           {
             this->group_names.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2208;
             ::apache::thrift::protocol::TType _etype2211;
             xfer += iprot->readListBegin(_etype2211, _size2208);
             this->group_names.resize(_size2208);
             uint32_t _i2212;
             for (_i2212 = 0; _i2212 < _size2208; ++_i2212)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->group_names[_i2212]);
 =======
@@ -23529,6 +24427,10 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_args::read(::apache::thrif
             {
               xfer += iprot->readString(this->group_names[_i2206]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->group_names[_i2212]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -23574,6 +24476,7 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_args::write(::apache::thri
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->group_names.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2213;
     for (_iter2213 = this->group_names.begin(); _iter2213 != this->group_names.end(); ++_iter2213)
     {
@@ -23584,6 +24487,12 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_args::write(::apache::thri
     {
       xfer += oprot->writeString((*_iter2207));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2213;
+    for (_iter2213 = this->group_names.begin(); _iter2213 != this->group_names.end(); ++_iter2213)
+    {
+      xfer += oprot->writeString((*_iter2213));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -23624,6 +24533,7 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_pargs::write(::apache::thr
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->group_names)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2214;
     for (_iter2214 = (*(this->group_names)).begin(); _iter2214 != (*(this->group_names)).end(); ++_iter2214)
     {
@@ -23634,6 +24544,12 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_pargs::write(::apache::thr
     {
       xfer += oprot->writeString((*_iter2208));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2214;
+    for (_iter2214 = (*(this->group_names)).begin(); _iter2214 != (*(this->group_names)).end(); ++_iter2214)
+    {
+      xfer += oprot->writeString((*_iter2214));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -23675,12 +24591,16 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_result::read(::apache::thr
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2215;
             ::apache::thrift::protocol::TType _etype2218;
             xfer += iprot->readListBegin(_etype2218, _size2215);
             this->success.resize(_size2215);
             uint32_t _i2219;
             for (_i2219 = 0; _i2219 < _size2215; ++_i2219)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2219].read(iprot);
 =======
@@ -23693,6 +24613,10 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_result::read(::apache::thr
             {
               xfer += this->success[_i2213].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2219].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -23740,6 +24664,7 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_result::write(::apache::th
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Partition> ::const_iterator _iter2220;
       for (_iter2220 = this->success.begin(); _iter2220 != this->success.end(); ++_iter2220)
       {
@@ -23750,6 +24675,12 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_result::write(::apache::th
       {
         xfer += (*_iter2214).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Partition> ::const_iterator _iter2220;
+      for (_iter2220 = this->success.begin(); _iter2220 != this->success.end(); ++_iter2220)
+      {
+        xfer += (*_iter2220).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -23799,12 +24730,16 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_presult::read(::apache::th
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2221;
             ::apache::thrift::protocol::TType _etype2224;
             xfer += iprot->readListBegin(_etype2224, _size2221);
             (*(this->success)).resize(_size2221);
             uint32_t _i2225;
             for (_i2225 = 0; _i2225 < _size2221; ++_i2225)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2225].read(iprot);
 =======
@@ -23817,6 +24752,10 @@ uint32_t ThriftHiveMetastore_get_partitions_with_auth_presult::read(::apache::th
             {
               xfer += (*(this->success))[_i2219].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2225].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -23995,12 +24934,16 @@ uint32_t ThriftHiveMetastore_get_partitions_pspec_result::read(::apache::thrift:
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2226;
             ::apache::thrift::protocol::TType _etype2229;
             xfer += iprot->readListBegin(_etype2229, _size2226);
             this->success.resize(_size2226);
             uint32_t _i2230;
             for (_i2230 = 0; _i2230 < _size2226; ++_i2230)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2230].read(iprot);
 =======
@@ -24013,6 +24956,10 @@ uint32_t ThriftHiveMetastore_get_partitions_pspec_result::read(::apache::thrift:
             {
               xfer += this->success[_i2224].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2230].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -24060,6 +25007,7 @@ uint32_t ThriftHiveMetastore_get_partitions_pspec_result::write(::apache::thrift
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<PartitionSpec> ::const_iterator _iter2231;
       for (_iter2231 = this->success.begin(); _iter2231 != this->success.end(); ++_iter2231)
       {
@@ -24070,6 +25018,12 @@ uint32_t ThriftHiveMetastore_get_partitions_pspec_result::write(::apache::thrift
       {
         xfer += (*_iter2225).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<PartitionSpec> ::const_iterator _iter2231;
+      for (_iter2231 = this->success.begin(); _iter2231 != this->success.end(); ++_iter2231)
+      {
+        xfer += (*_iter2231).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -24119,12 +25073,16 @@ uint32_t ThriftHiveMetastore_get_partitions_pspec_presult::read(::apache::thrift
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2232;
             ::apache::thrift::protocol::TType _etype2235;
             xfer += iprot->readListBegin(_etype2235, _size2232);
             (*(this->success)).resize(_size2232);
             uint32_t _i2236;
             for (_i2236 = 0; _i2236 < _size2232; ++_i2236)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2236].read(iprot);
 =======
@@ -24137,6 +25095,10 @@ uint32_t ThriftHiveMetastore_get_partitions_pspec_presult::read(::apache::thrift
             {
               xfer += (*(this->success))[_i2230].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2236].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -24315,12 +25277,16 @@ uint32_t ThriftHiveMetastore_get_partition_names_result::read(::apache::thrift::
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2237;
             ::apache::thrift::protocol::TType _etype2240;
             xfer += iprot->readListBegin(_etype2240, _size2237);
             this->success.resize(_size2237);
             uint32_t _i2241;
             for (_i2241 = 0; _i2241 < _size2237; ++_i2241)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2241]);
 =======
@@ -24333,6 +25299,10 @@ uint32_t ThriftHiveMetastore_get_partition_names_result::read(::apache::thrift::
             {
               xfer += iprot->readString(this->success[_i2235]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2241]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -24380,6 +25350,7 @@ uint32_t ThriftHiveMetastore_get_partition_names_result::write(::apache::thrift:
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2242;
       for (_iter2242 = this->success.begin(); _iter2242 != this->success.end(); ++_iter2242)
       {
@@ -24390,6 +25361,12 @@ uint32_t ThriftHiveMetastore_get_partition_names_result::write(::apache::thrift:
       {
         xfer += oprot->writeString((*_iter2236));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2242;
+      for (_iter2242 = this->success.begin(); _iter2242 != this->success.end(); ++_iter2242)
+      {
+        xfer += oprot->writeString((*_iter2242));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -24439,12 +25416,16 @@ uint32_t ThriftHiveMetastore_get_partition_names_presult::read(::apache::thrift:
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2243;
             ::apache::thrift::protocol::TType _etype2246;
             xfer += iprot->readListBegin(_etype2246, _size2243);
             (*(this->success)).resize(_size2243);
             uint32_t _i2247;
             for (_i2247 = 0; _i2247 < _size2243; ++_i2247)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2247]);
 =======
@@ -24457,6 +25438,10 @@ uint32_t ThriftHiveMetastore_get_partition_names_presult::read(::apache::thrift:
             {
               xfer += iprot->readString((*(this->success))[_i2241]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2247]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -24767,12 +25752,16 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_args::read(::apache::thrift::prot
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2248;
             ::apache::thrift::protocol::TType _etype2251;
             xfer += iprot->readListBegin(_etype2251, _size2248);
             this->part_vals.resize(_size2248);
             uint32_t _i2252;
             for (_i2252 = 0; _i2252 < _size2248; ++_i2252)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2252]);
 =======
@@ -24785,6 +25774,10 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_args::read(::apache::thrift::prot
             {
               xfer += iprot->readString(this->part_vals[_i2246]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2252]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -24830,6 +25823,7 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_args::write(::apache::thrift::pro
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2253;
     for (_iter2253 = this->part_vals.begin(); _iter2253 != this->part_vals.end(); ++_iter2253)
     {
@@ -24840,6 +25834,12 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_args::write(::apache::thrift::pro
     {
       xfer += oprot->writeString((*_iter2247));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2253;
+    for (_iter2253 = this->part_vals.begin(); _iter2253 != this->part_vals.end(); ++_iter2253)
+    {
+      xfer += oprot->writeString((*_iter2253));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -24876,6 +25876,7 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_pargs::write(::apache::thrift::pr
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2254;
     for (_iter2254 = (*(this->part_vals)).begin(); _iter2254 != (*(this->part_vals)).end(); ++_iter2254)
     {
@@ -24886,6 +25887,12 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_pargs::write(::apache::thrift::pr
     {
       xfer += oprot->writeString((*_iter2248));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2254;
+    for (_iter2254 = (*(this->part_vals)).begin(); _iter2254 != (*(this->part_vals)).end(); ++_iter2254)
+    {
+      xfer += oprot->writeString((*_iter2254));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -24931,12 +25938,16 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_result::read(::apache::thrift::pr
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2255;
             ::apache::thrift::protocol::TType _etype2258;
             xfer += iprot->readListBegin(_etype2258, _size2255);
             this->success.resize(_size2255);
             uint32_t _i2259;
             for (_i2259 = 0; _i2259 < _size2255; ++_i2259)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2259].read(iprot);
 =======
@@ -24949,6 +25960,10 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_result::read(::apache::thrift::pr
             {
               xfer += this->success[_i2253].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2259].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -24996,6 +26011,7 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_result::write(::apache::thrift::p
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Partition> ::const_iterator _iter2260;
       for (_iter2260 = this->success.begin(); _iter2260 != this->success.end(); ++_iter2260)
       {
@@ -25006,6 +26022,12 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_result::write(::apache::thrift::p
       {
         xfer += (*_iter2254).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Partition> ::const_iterator _iter2260;
+      for (_iter2260 = this->success.begin(); _iter2260 != this->success.end(); ++_iter2260)
+      {
+        xfer += (*_iter2260).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -25055,12 +26077,16 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_presult::read(::apache::thrift::p
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2261;
             ::apache::thrift::protocol::TType _etype2264;
             xfer += iprot->readListBegin(_etype2264, _size2261);
             (*(this->success)).resize(_size2261);
             uint32_t _i2265;
             for (_i2265 = 0; _i2265 < _size2261; ++_i2265)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2265].read(iprot);
 =======
@@ -25073,6 +26099,10 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_presult::read(::apache::thrift::p
             {
               xfer += (*(this->success))[_i2259].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2265].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -25156,12 +26186,16 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_args::read(::apache::th
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2266;
             ::apache::thrift::protocol::TType _etype2269;
             xfer += iprot->readListBegin(_etype2269, _size2266);
             this->part_vals.resize(_size2266);
             uint32_t _i2270;
             for (_i2270 = 0; _i2270 < _size2266; ++_i2270)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2270]);
 =======
@@ -25174,6 +26208,10 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_args::read(::apache::th
             {
               xfer += iprot->readString(this->part_vals[_i2264]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2270]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -25203,12 +26241,16 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_args::read(::apache::th
           {
             this->group_names.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2271;
             ::apache::thrift::protocol::TType _etype2274;
             xfer += iprot->readListBegin(_etype2274, _size2271);
             this->group_names.resize(_size2271);
             uint32_t _i2275;
             for (_i2275 = 0; _i2275 < _size2271; ++_i2275)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->group_names[_i2275]);
 =======
@@ -25221,6 +26263,10 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_args::read(::apache::th
             {
               xfer += iprot->readString(this->group_names[_i2269]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->group_names[_i2275]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -25258,6 +26304,7 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_args::write(::apache::t
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2276;
     for (_iter2276 = this->part_vals.begin(); _iter2276 != this->part_vals.end(); ++_iter2276)
     {
@@ -25268,6 +26315,12 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_args::write(::apache::t
     {
       xfer += oprot->writeString((*_iter2270));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2276;
+    for (_iter2276 = this->part_vals.begin(); _iter2276 != this->part_vals.end(); ++_iter2276)
+    {
+      xfer += oprot->writeString((*_iter2276));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -25285,6 +26338,7 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_args::write(::apache::t
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->group_names.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2277;
     for (_iter2277 = this->group_names.begin(); _iter2277 != this->group_names.end(); ++_iter2277)
     {
@@ -25295,6 +26349,12 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_args::write(::apache::t
     {
       xfer += oprot->writeString((*_iter2271));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2277;
+    for (_iter2277 = this->group_names.begin(); _iter2277 != this->group_names.end(); ++_iter2277)
+    {
+      xfer += oprot->writeString((*_iter2277));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -25327,6 +26387,7 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_pargs::write(::apache::
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2278;
     for (_iter2278 = (*(this->part_vals)).begin(); _iter2278 != (*(this->part_vals)).end(); ++_iter2278)
     {
@@ -25337,6 +26398,12 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_pargs::write(::apache::
     {
       xfer += oprot->writeString((*_iter2272));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2278;
+    for (_iter2278 = (*(this->part_vals)).begin(); _iter2278 != (*(this->part_vals)).end(); ++_iter2278)
+    {
+      xfer += oprot->writeString((*_iter2278));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -25354,6 +26421,7 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_pargs::write(::apache::
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->group_names)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2279;
     for (_iter2279 = (*(this->group_names)).begin(); _iter2279 != (*(this->group_names)).end(); ++_iter2279)
     {
@@ -25364,6 +26432,12 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_pargs::write(::apache::
     {
       xfer += oprot->writeString((*_iter2273));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2279;
+    for (_iter2279 = (*(this->group_names)).begin(); _iter2279 != (*(this->group_names)).end(); ++_iter2279)
+    {
+      xfer += oprot->writeString((*_iter2279));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -25405,12 +26479,16 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_result::read(::apache::
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2280;
             ::apache::thrift::protocol::TType _etype2283;
             xfer += iprot->readListBegin(_etype2283, _size2280);
             this->success.resize(_size2280);
             uint32_t _i2284;
             for (_i2284 = 0; _i2284 < _size2280; ++_i2284)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2284].read(iprot);
 =======
@@ -25423,6 +26501,10 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_result::read(::apache::
             {
               xfer += this->success[_i2278].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2284].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -25470,6 +26552,7 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_result::write(::apache:
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Partition> ::const_iterator _iter2285;
       for (_iter2285 = this->success.begin(); _iter2285 != this->success.end(); ++_iter2285)
       {
@@ -25480,6 +26563,12 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_result::write(::apache:
       {
         xfer += (*_iter2279).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Partition> ::const_iterator _iter2285;
+      for (_iter2285 = this->success.begin(); _iter2285 != this->success.end(); ++_iter2285)
+      {
+        xfer += (*_iter2285).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -25529,12 +26618,16 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_presult::read(::apache:
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2286;
             ::apache::thrift::protocol::TType _etype2289;
             xfer += iprot->readListBegin(_etype2289, _size2286);
             (*(this->success)).resize(_size2286);
             uint32_t _i2290;
             for (_i2290 = 0; _i2290 < _size2286; ++_i2290)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2290].read(iprot);
 =======
@@ -25547,6 +26640,10 @@ uint32_t ThriftHiveMetastore_get_partitions_ps_with_auth_presult::read(::apache:
             {
               xfer += (*(this->success))[_i2284].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2290].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -25857,12 +26954,16 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_args::read(::apache::thrift:
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2291;
             ::apache::thrift::protocol::TType _etype2294;
             xfer += iprot->readListBegin(_etype2294, _size2291);
             this->part_vals.resize(_size2291);
             uint32_t _i2295;
             for (_i2295 = 0; _i2295 < _size2291; ++_i2295)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2295]);
 =======
@@ -25875,6 +26976,10 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_args::read(::apache::thrift:
             {
               xfer += iprot->readString(this->part_vals[_i2289]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2295]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -25920,6 +27025,7 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_args::write(::apache::thrift
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2296;
     for (_iter2296 = this->part_vals.begin(); _iter2296 != this->part_vals.end(); ++_iter2296)
     {
@@ -25930,6 +27036,12 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_args::write(::apache::thrift
     {
       xfer += oprot->writeString((*_iter2290));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2296;
+    for (_iter2296 = this->part_vals.begin(); _iter2296 != this->part_vals.end(); ++_iter2296)
+    {
+      xfer += oprot->writeString((*_iter2296));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -25966,6 +27078,7 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_pargs::write(::apache::thrif
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2297;
     for (_iter2297 = (*(this->part_vals)).begin(); _iter2297 != (*(this->part_vals)).end(); ++_iter2297)
     {
@@ -25976,6 +27089,12 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_pargs::write(::apache::thrif
     {
       xfer += oprot->writeString((*_iter2291));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2297;
+    for (_iter2297 = (*(this->part_vals)).begin(); _iter2297 != (*(this->part_vals)).end(); ++_iter2297)
+    {
+      xfer += oprot->writeString((*_iter2297));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -26021,12 +27140,16 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_result::read(::apache::thrif
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2298;
             ::apache::thrift::protocol::TType _etype2301;
             xfer += iprot->readListBegin(_etype2301, _size2298);
             this->success.resize(_size2298);
             uint32_t _i2302;
             for (_i2302 = 0; _i2302 < _size2298; ++_i2302)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2302]);
 =======
@@ -26039,6 +27162,10 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_result::read(::apache::thrif
             {
               xfer += iprot->readString(this->success[_i2296]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2302]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -26086,6 +27213,7 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_result::write(::apache::thri
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2303;
       for (_iter2303 = this->success.begin(); _iter2303 != this->success.end(); ++_iter2303)
       {
@@ -26096,6 +27224,12 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_result::write(::apache::thri
       {
         xfer += oprot->writeString((*_iter2297));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2303;
+      for (_iter2303 = this->success.begin(); _iter2303 != this->success.end(); ++_iter2303)
+      {
+        xfer += oprot->writeString((*_iter2303));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -26145,12 +27279,16 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_presult::read(::apache::thri
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2304;
             ::apache::thrift::protocol::TType _etype2307;
             xfer += iprot->readListBegin(_etype2307, _size2304);
             (*(this->success)).resize(_size2304);
             uint32_t _i2308;
             for (_i2308 = 0; _i2308 < _size2304; ++_i2308)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2308]);
 =======
@@ -26163,6 +27301,10 @@ uint32_t ThriftHiveMetastore_get_partition_names_ps_presult::read(::apache::thri
             {
               xfer += iprot->readString((*(this->success))[_i2302]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2308]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -26584,12 +27726,16 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_result::read(::apache::thr
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2309;
             ::apache::thrift::protocol::TType _etype2312;
             xfer += iprot->readListBegin(_etype2312, _size2309);
             this->success.resize(_size2309);
             uint32_t _i2313;
             for (_i2313 = 0; _i2313 < _size2309; ++_i2313)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2313].read(iprot);
 =======
@@ -26602,6 +27748,10 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_result::read(::apache::thr
             {
               xfer += this->success[_i2307].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2313].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -26649,6 +27799,7 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_result::write(::apache::th
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Partition> ::const_iterator _iter2314;
       for (_iter2314 = this->success.begin(); _iter2314 != this->success.end(); ++_iter2314)
       {
@@ -26659,6 +27810,12 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_result::write(::apache::th
       {
         xfer += (*_iter2308).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Partition> ::const_iterator _iter2314;
+      for (_iter2314 = this->success.begin(); _iter2314 != this->success.end(); ++_iter2314)
+      {
+        xfer += (*_iter2314).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -26708,12 +27865,16 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_presult::read(::apache::th
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2315;
             ::apache::thrift::protocol::TType _etype2318;
             xfer += iprot->readListBegin(_etype2318, _size2315);
             (*(this->success)).resize(_size2315);
             uint32_t _i2319;
             for (_i2319 = 0; _i2319 < _size2315; ++_i2319)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2319].read(iprot);
 =======
@@ -26726,6 +27887,10 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_presult::read(::apache::th
             {
               xfer += (*(this->success))[_i2313].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2319].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -26872,12 +28037,16 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_req_result::read(::apache:
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2320;
             ::apache::thrift::protocol::TType _etype2323;
             xfer += iprot->readListBegin(_etype2323, _size2320);
             this->success.resize(_size2320);
             uint32_t _i2324;
             for (_i2324 = 0; _i2324 < _size2320; ++_i2324)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2324].read(iprot);
 =======
@@ -26890,6 +28059,10 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_req_result::read(::apache:
             {
               xfer += this->success[_i2318].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2324].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -26937,6 +28110,7 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_req_result::write(::apache
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Partition> ::const_iterator _iter2325;
       for (_iter2325 = this->success.begin(); _iter2325 != this->success.end(); ++_iter2325)
       {
@@ -26947,6 +28121,12 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_req_result::write(::apache
       {
         xfer += (*_iter2319).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Partition> ::const_iterator _iter2325;
+      for (_iter2325 = this->success.begin(); _iter2325 != this->success.end(); ++_iter2325)
+      {
+        xfer += (*_iter2325).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -26996,12 +28176,16 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_req_presult::read(::apache
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2326;
             ::apache::thrift::protocol::TType _etype2329;
             xfer += iprot->readListBegin(_etype2329, _size2326);
             (*(this->success)).resize(_size2326);
             uint32_t _i2330;
             for (_i2330 = 0; _i2330 < _size2326; ++_i2330)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2330].read(iprot);
 =======
@@ -27014,6 +28198,10 @@ uint32_t ThriftHiveMetastore_get_partitions_by_filter_req_presult::read(::apache
             {
               xfer += (*(this->success))[_i2324].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2330].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -27208,12 +28396,16 @@ uint32_t ThriftHiveMetastore_get_part_specs_by_filter_result::read(::apache::thr
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2331;
             ::apache::thrift::protocol::TType _etype2334;
             xfer += iprot->readListBegin(_etype2334, _size2331);
             this->success.resize(_size2331);
             uint32_t _i2335;
             for (_i2335 = 0; _i2335 < _size2331; ++_i2335)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2335].read(iprot);
 =======
@@ -27226,6 +28418,10 @@ uint32_t ThriftHiveMetastore_get_part_specs_by_filter_result::read(::apache::thr
             {
               xfer += this->success[_i2329].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2335].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -27273,6 +28469,7 @@ uint32_t ThriftHiveMetastore_get_part_specs_by_filter_result::write(::apache::th
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<PartitionSpec> ::const_iterator _iter2336;
       for (_iter2336 = this->success.begin(); _iter2336 != this->success.end(); ++_iter2336)
       {
@@ -27283,6 +28480,12 @@ uint32_t ThriftHiveMetastore_get_part_specs_by_filter_result::write(::apache::th
       {
         xfer += (*_iter2330).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<PartitionSpec> ::const_iterator _iter2336;
+      for (_iter2336 = this->success.begin(); _iter2336 != this->success.end(); ++_iter2336)
+      {
+        xfer += (*_iter2336).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -27332,12 +28535,16 @@ uint32_t ThriftHiveMetastore_get_part_specs_by_filter_presult::read(::apache::th
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2337;
             ::apache::thrift::protocol::TType _etype2340;
             xfer += iprot->readListBegin(_etype2340, _size2337);
             (*(this->success)).resize(_size2337);
             uint32_t _i2341;
             for (_i2341 = 0; _i2341 < _size2337; ++_i2341)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2341].read(iprot);
 =======
@@ -27350,6 +28557,10 @@ uint32_t ThriftHiveMetastore_get_part_specs_by_filter_presult::read(::apache::th
             {
               xfer += (*(this->success))[_i2335].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2341].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -27919,12 +29130,16 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_args::read(::apache::thrift
           {
             this->names.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2342;
             ::apache::thrift::protocol::TType _etype2345;
             xfer += iprot->readListBegin(_etype2345, _size2342);
             this->names.resize(_size2342);
             uint32_t _i2346;
             for (_i2346 = 0; _i2346 < _size2342; ++_i2346)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->names[_i2346]);
 =======
@@ -27937,6 +29152,10 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_args::read(::apache::thrift
             {
               xfer += iprot->readString(this->names[_i2340]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->names[_i2346]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -27974,6 +29193,7 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_args::write(::apache::thrif
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->names.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2347;
     for (_iter2347 = this->names.begin(); _iter2347 != this->names.end(); ++_iter2347)
     {
@@ -27984,6 +29204,12 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_args::write(::apache::thrif
     {
       xfer += oprot->writeString((*_iter2341));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2347;
+    for (_iter2347 = this->names.begin(); _iter2347 != this->names.end(); ++_iter2347)
+    {
+      xfer += oprot->writeString((*_iter2347));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -28016,6 +29242,7 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_pargs::write(::apache::thri
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->names)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2348;
     for (_iter2348 = (*(this->names)).begin(); _iter2348 != (*(this->names)).end(); ++_iter2348)
     {
@@ -28026,6 +29253,12 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_pargs::write(::apache::thri
     {
       xfer += oprot->writeString((*_iter2342));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2348;
+    for (_iter2348 = (*(this->names)).begin(); _iter2348 != (*(this->names)).end(); ++_iter2348)
+    {
+      xfer += oprot->writeString((*_iter2348));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -28067,12 +29300,16 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_result::read(::apache::thri
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2349;
             ::apache::thrift::protocol::TType _etype2352;
             xfer += iprot->readListBegin(_etype2352, _size2349);
             this->success.resize(_size2349);
             uint32_t _i2353;
             for (_i2353 = 0; _i2353 < _size2349; ++_i2353)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2353].read(iprot);
 =======
@@ -28085,6 +29322,10 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_result::read(::apache::thri
             {
               xfer += this->success[_i2347].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2353].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -28140,6 +29381,7 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_result::write(::apache::thr
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Partition> ::const_iterator _iter2354;
       for (_iter2354 = this->success.begin(); _iter2354 != this->success.end(); ++_iter2354)
       {
@@ -28150,6 +29392,12 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_result::write(::apache::thr
       {
         xfer += (*_iter2348).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Partition> ::const_iterator _iter2354;
+      for (_iter2354 = this->success.begin(); _iter2354 != this->success.end(); ++_iter2354)
+      {
+        xfer += (*_iter2354).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -28203,12 +29451,16 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_presult::read(::apache::thr
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2355;
             ::apache::thrift::protocol::TType _etype2358;
             xfer += iprot->readListBegin(_etype2358, _size2355);
             (*(this->success)).resize(_size2355);
             uint32_t _i2359;
             for (_i2359 = 0; _i2359 < _size2355; ++_i2359)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2359].read(iprot);
 =======
@@ -28221,6 +29473,10 @@ uint32_t ThriftHiveMetastore_get_partitions_by_names_presult::read(::apache::thr
             {
               xfer += (*(this->success))[_i2353].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2359].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -28798,12 +30054,16 @@ uint32_t ThriftHiveMetastore_alter_partitions_args::read(::apache::thrift::proto
           {
             this->new_parts.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2360;
             ::apache::thrift::protocol::TType _etype2363;
             xfer += iprot->readListBegin(_etype2363, _size2360);
             this->new_parts.resize(_size2360);
             uint32_t _i2364;
             for (_i2364 = 0; _i2364 < _size2360; ++_i2364)
+<<<<<<< HEAD
             {
               xfer += this->new_parts[_i2364].read(iprot);
 =======
@@ -28816,6 +30076,10 @@ uint32_t ThriftHiveMetastore_alter_partitions_args::read(::apache::thrift::proto
             {
               xfer += this->new_parts[_i2358].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->new_parts[_i2364].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -28853,6 +30117,7 @@ uint32_t ThriftHiveMetastore_alter_partitions_args::write(::apache::thrift::prot
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->new_parts.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<Partition> ::const_iterator _iter2365;
     for (_iter2365 = this->new_parts.begin(); _iter2365 != this->new_parts.end(); ++_iter2365)
     {
@@ -28863,6 +30128,12 @@ uint32_t ThriftHiveMetastore_alter_partitions_args::write(::apache::thrift::prot
     {
       xfer += (*_iter2359).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<Partition> ::const_iterator _iter2365;
+    for (_iter2365 = this->new_parts.begin(); _iter2365 != this->new_parts.end(); ++_iter2365)
+    {
+      xfer += (*_iter2365).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -28895,6 +30166,7 @@ uint32_t ThriftHiveMetastore_alter_partitions_pargs::write(::apache::thrift::pro
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>((*(this->new_parts)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<Partition> ::const_iterator _iter2366;
     for (_iter2366 = (*(this->new_parts)).begin(); _iter2366 != (*(this->new_parts)).end(); ++_iter2366)
     {
@@ -28905,6 +30177,12 @@ uint32_t ThriftHiveMetastore_alter_partitions_pargs::write(::apache::thrift::pro
     {
       xfer += (*_iter2360).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<Partition> ::const_iterator _iter2366;
+    for (_iter2366 = (*(this->new_parts)).begin(); _iter2366 != (*(this->new_parts)).end(); ++_iter2366)
+    {
+      xfer += (*_iter2366).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -29090,12 +30368,16 @@ uint32_t ThriftHiveMetastore_alter_partitions_with_environment_context_args::rea
           {
             this->new_parts.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2367;
             ::apache::thrift::protocol::TType _etype2370;
             xfer += iprot->readListBegin(_etype2370, _size2367);
             this->new_parts.resize(_size2367);
             uint32_t _i2371;
             for (_i2371 = 0; _i2371 < _size2367; ++_i2371)
+<<<<<<< HEAD
             {
               xfer += this->new_parts[_i2371].read(iprot);
 =======
@@ -29108,6 +30390,10 @@ uint32_t ThriftHiveMetastore_alter_partitions_with_environment_context_args::rea
             {
               xfer += this->new_parts[_i2365].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->new_parts[_i2371].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -29153,6 +30439,7 @@ uint32_t ThriftHiveMetastore_alter_partitions_with_environment_context_args::wri
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->new_parts.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<Partition> ::const_iterator _iter2372;
     for (_iter2372 = this->new_parts.begin(); _iter2372 != this->new_parts.end(); ++_iter2372)
     {
@@ -29163,6 +30450,12 @@ uint32_t ThriftHiveMetastore_alter_partitions_with_environment_context_args::wri
     {
       xfer += (*_iter2366).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<Partition> ::const_iterator _iter2372;
+    for (_iter2372 = this->new_parts.begin(); _iter2372 != this->new_parts.end(); ++_iter2372)
+    {
+      xfer += (*_iter2372).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -29199,6 +30492,7 @@ uint32_t ThriftHiveMetastore_alter_partitions_with_environment_context_pargs::wr
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>((*(this->new_parts)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<Partition> ::const_iterator _iter2373;
     for (_iter2373 = (*(this->new_parts)).begin(); _iter2373 != (*(this->new_parts)).end(); ++_iter2373)
     {
@@ -29209,6 +30503,12 @@ uint32_t ThriftHiveMetastore_alter_partitions_with_environment_context_pargs::wr
     {
       xfer += (*_iter2367).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<Partition> ::const_iterator _iter2373;
+    for (_iter2373 = (*(this->new_parts)).begin(); _iter2373 != (*(this->new_parts)).end(); ++_iter2373)
+    {
+      xfer += (*_iter2373).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -29880,12 +31180,16 @@ uint32_t ThriftHiveMetastore_rename_partition_args::read(::apache::thrift::proto
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2374;
             ::apache::thrift::protocol::TType _etype2377;
             xfer += iprot->readListBegin(_etype2377, _size2374);
             this->part_vals.resize(_size2374);
             uint32_t _i2378;
             for (_i2378 = 0; _i2378 < _size2374; ++_i2378)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2378]);
 =======
@@ -29898,6 +31202,10 @@ uint32_t ThriftHiveMetastore_rename_partition_args::read(::apache::thrift::proto
             {
               xfer += iprot->readString(this->part_vals[_i2372]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2378]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -29943,6 +31251,7 @@ uint32_t ThriftHiveMetastore_rename_partition_args::write(::apache::thrift::prot
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2379;
     for (_iter2379 = this->part_vals.begin(); _iter2379 != this->part_vals.end(); ++_iter2379)
     {
@@ -29953,6 +31262,12 @@ uint32_t ThriftHiveMetastore_rename_partition_args::write(::apache::thrift::prot
     {
       xfer += oprot->writeString((*_iter2373));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2379;
+    for (_iter2379 = this->part_vals.begin(); _iter2379 != this->part_vals.end(); ++_iter2379)
+    {
+      xfer += oprot->writeString((*_iter2379));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -29989,6 +31304,7 @@ uint32_t ThriftHiveMetastore_rename_partition_pargs::write(::apache::thrift::pro
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2380;
     for (_iter2380 = (*(this->part_vals)).begin(); _iter2380 != (*(this->part_vals)).end(); ++_iter2380)
     {
@@ -29999,6 +31315,12 @@ uint32_t ThriftHiveMetastore_rename_partition_pargs::write(::apache::thrift::pro
     {
       xfer += oprot->writeString((*_iter2374));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2380;
+    for (_iter2380 = (*(this->part_vals)).begin(); _iter2380 != (*(this->part_vals)).end(); ++_iter2380)
+    {
+      xfer += oprot->writeString((*_iter2380));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -30399,12 +31721,16 @@ uint32_t ThriftHiveMetastore_partition_name_has_valid_characters_args::read(::ap
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2381;
             ::apache::thrift::protocol::TType _etype2384;
             xfer += iprot->readListBegin(_etype2384, _size2381);
             this->part_vals.resize(_size2381);
             uint32_t _i2385;
             for (_i2385 = 0; _i2385 < _size2381; ++_i2385)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->part_vals[_i2385]);
 =======
@@ -30417,6 +31743,10 @@ uint32_t ThriftHiveMetastore_partition_name_has_valid_characters_args::read(::ap
             {
               xfer += iprot->readString(this->part_vals[_i2379]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->part_vals[_i2385]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -30454,6 +31784,7 @@ uint32_t ThriftHiveMetastore_partition_name_has_valid_characters_args::write(::a
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2386;
     for (_iter2386 = this->part_vals.begin(); _iter2386 != this->part_vals.end(); ++_iter2386)
     {
@@ -30464,6 +31795,12 @@ uint32_t ThriftHiveMetastore_partition_name_has_valid_characters_args::write(::a
     {
       xfer += oprot->writeString((*_iter2380));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2386;
+    for (_iter2386 = this->part_vals.begin(); _iter2386 != this->part_vals.end(); ++_iter2386)
+    {
+      xfer += oprot->writeString((*_iter2386));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -30492,6 +31829,7 @@ uint32_t ThriftHiveMetastore_partition_name_has_valid_characters_pargs::write(::
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2387;
     for (_iter2387 = (*(this->part_vals)).begin(); _iter2387 != (*(this->part_vals)).end(); ++_iter2387)
     {
@@ -30502,6 +31840,12 @@ uint32_t ThriftHiveMetastore_partition_name_has_valid_characters_pargs::write(::
     {
       xfer += oprot->writeString((*_iter2381));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2387;
+    for (_iter2387 = (*(this->part_vals)).begin(); _iter2387 != (*(this->part_vals)).end(); ++_iter2387)
+    {
+      xfer += oprot->writeString((*_iter2387));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -30977,12 +32321,16 @@ uint32_t ThriftHiveMetastore_partition_name_to_vals_result::read(::apache::thrif
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2388;
             ::apache::thrift::protocol::TType _etype2391;
             xfer += iprot->readListBegin(_etype2391, _size2388);
             this->success.resize(_size2388);
             uint32_t _i2392;
             for (_i2392 = 0; _i2392 < _size2388; ++_i2392)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2392]);
 =======
@@ -30995,6 +32343,10 @@ uint32_t ThriftHiveMetastore_partition_name_to_vals_result::read(::apache::thrif
             {
               xfer += iprot->readString(this->success[_i2386]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2392]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -31034,6 +32386,7 @@ uint32_t ThriftHiveMetastore_partition_name_to_vals_result::write(::apache::thri
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2393;
       for (_iter2393 = this->success.begin(); _iter2393 != this->success.end(); ++_iter2393)
       {
@@ -31044,6 +32397,12 @@ uint32_t ThriftHiveMetastore_partition_name_to_vals_result::write(::apache::thri
       {
         xfer += oprot->writeString((*_iter2387));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2393;
+      for (_iter2393 = this->success.begin(); _iter2393 != this->success.end(); ++_iter2393)
+      {
+        xfer += oprot->writeString((*_iter2393));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -31089,12 +32448,16 @@ uint32_t ThriftHiveMetastore_partition_name_to_vals_presult::read(::apache::thri
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2394;
             ::apache::thrift::protocol::TType _etype2397;
             xfer += iprot->readListBegin(_etype2397, _size2394);
             (*(this->success)).resize(_size2394);
             uint32_t _i2398;
             for (_i2398 = 0; _i2398 < _size2394; ++_i2398)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2398]);
 =======
@@ -31107,6 +32470,10 @@ uint32_t ThriftHiveMetastore_partition_name_to_vals_presult::read(::apache::thri
             {
               xfer += iprot->readString((*(this->success))[_i2392]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2398]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -31245,12 +32612,16 @@ uint32_t ThriftHiveMetastore_partition_name_to_spec_result::read(::apache::thrif
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2399;
             ::apache::thrift::protocol::TType _ktype2400;
             ::apache::thrift::protocol::TType _vtype2401;
             xfer += iprot->readMapBegin(_ktype2400, _vtype2401, _size2399);
             uint32_t _i2403;
             for (_i2403 = 0; _i2403 < _size2399; ++_i2403)
+<<<<<<< HEAD
             {
               std::string _key2404;
               xfer += iprot->readString(_key2404);
@@ -31269,6 +32640,13 @@ uint32_t ThriftHiveMetastore_partition_name_to_spec_result::read(::apache::thrif
               std::string& _val2399 = this->success[_key2398];
               xfer += iprot->readString(_val2399);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              std::string _key2404;
+              xfer += iprot->readString(_key2404);
+              std::string& _val2405 = this->success[_key2404];
+              xfer += iprot->readString(_val2405);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -31308,6 +32686,7 @@ uint32_t ThriftHiveMetastore_partition_name_to_spec_result::write(::apache::thri
     {
       xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::map<std::string, std::string> ::const_iterator _iter2406;
       for (_iter2406 = this->success.begin(); _iter2406 != this->success.end(); ++_iter2406)
       {
@@ -31320,6 +32699,13 @@ uint32_t ThriftHiveMetastore_partition_name_to_spec_result::write(::apache::thri
         xfer += oprot->writeString(_iter2400->first);
         xfer += oprot->writeString(_iter2400->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::map<std::string, std::string> ::const_iterator _iter2406;
+      for (_iter2406 = this->success.begin(); _iter2406 != this->success.end(); ++_iter2406)
+      {
+        xfer += oprot->writeString(_iter2406->first);
+        xfer += oprot->writeString(_iter2406->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeMapEnd();
     }
@@ -31365,12 +32751,16 @@ uint32_t ThriftHiveMetastore_partition_name_to_spec_presult::read(::apache::thri
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2407;
             ::apache::thrift::protocol::TType _ktype2408;
             ::apache::thrift::protocol::TType _vtype2409;
             xfer += iprot->readMapBegin(_ktype2408, _vtype2409, _size2407);
             uint32_t _i2411;
             for (_i2411 = 0; _i2411 < _size2407; ++_i2411)
+<<<<<<< HEAD
             {
               std::string _key2412;
               xfer += iprot->readString(_key2412);
@@ -31389,6 +32779,13 @@ uint32_t ThriftHiveMetastore_partition_name_to_spec_presult::read(::apache::thri
               std::string& _val2407 = (*(this->success))[_key2406];
               xfer += iprot->readString(_val2407);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              std::string _key2412;
+              xfer += iprot->readString(_key2412);
+              std::string& _val2413 = (*(this->success))[_key2412];
+              xfer += iprot->readString(_val2413);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -31464,12 +32861,16 @@ uint32_t ThriftHiveMetastore_markPartitionForEvent_args::read(::apache::thrift::
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2414;
             ::apache::thrift::protocol::TType _ktype2415;
             ::apache::thrift::protocol::TType _vtype2416;
             xfer += iprot->readMapBegin(_ktype2415, _vtype2416, _size2414);
             uint32_t _i2418;
             for (_i2418 = 0; _i2418 < _size2414; ++_i2418)
+<<<<<<< HEAD
             {
               std::string _key2419;
               xfer += iprot->readString(_key2419);
@@ -31488,6 +32889,13 @@ uint32_t ThriftHiveMetastore_markPartitionForEvent_args::read(::apache::thrift::
               std::string& _val2414 = this->part_vals[_key2413];
               xfer += iprot->readString(_val2414);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              std::string _key2419;
+              xfer += iprot->readString(_key2419);
+              std::string& _val2420 = this->part_vals[_key2419];
+              xfer += iprot->readString(_val2420);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -31499,6 +32907,7 @@ uint32_t ThriftHiveMetastore_markPartitionForEvent_args::read(::apache::thrift::
       case 4:
         if (ftype == ::apache::thrift::protocol::T_I32) {
 <<<<<<< HEAD
+<<<<<<< HEAD
           int32_t ecast2421;
           xfer += iprot->readI32(ecast2421);
           this->eventType = static_cast<PartitionEventType::type>(ecast2421);
@@ -31507,6 +32916,11 @@ uint32_t ThriftHiveMetastore_markPartitionForEvent_args::read(::apache::thrift::
           xfer += iprot->readI32(ecast2415);
           this->eventType = static_cast<PartitionEventType::type>(ecast2415);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          int32_t ecast2421;
+          xfer += iprot->readI32(ecast2421);
+          this->eventType = static_cast<PartitionEventType::type>(ecast2421);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.eventType = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -31541,6 +32955,7 @@ uint32_t ThriftHiveMetastore_markPartitionForEvent_args::write(::apache::thrift:
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::map<std::string, std::string> ::const_iterator _iter2422;
     for (_iter2422 = this->part_vals.begin(); _iter2422 != this->part_vals.end(); ++_iter2422)
     {
@@ -31553,6 +32968,13 @@ uint32_t ThriftHiveMetastore_markPartitionForEvent_args::write(::apache::thrift:
       xfer += oprot->writeString(_iter2416->first);
       xfer += oprot->writeString(_iter2416->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::map<std::string, std::string> ::const_iterator _iter2422;
+    for (_iter2422 = this->part_vals.begin(); _iter2422 != this->part_vals.end(); ++_iter2422)
+    {
+      xfer += oprot->writeString(_iter2422->first);
+      xfer += oprot->writeString(_iter2422->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -31589,6 +33011,7 @@ uint32_t ThriftHiveMetastore_markPartitionForEvent_pargs::write(::apache::thrift
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::map<std::string, std::string> ::const_iterator _iter2423;
     for (_iter2423 = (*(this->part_vals)).begin(); _iter2423 != (*(this->part_vals)).end(); ++_iter2423)
     {
@@ -31601,6 +33024,13 @@ uint32_t ThriftHiveMetastore_markPartitionForEvent_pargs::write(::apache::thrift
       xfer += oprot->writeString(_iter2417->first);
       xfer += oprot->writeString(_iter2417->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::map<std::string, std::string> ::const_iterator _iter2423;
+    for (_iter2423 = (*(this->part_vals)).begin(); _iter2423 != (*(this->part_vals)).end(); ++_iter2423)
+    {
+      xfer += oprot->writeString(_iter2423->first);
+      xfer += oprot->writeString(_iter2423->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -31870,12 +33300,16 @@ uint32_t ThriftHiveMetastore_isPartitionMarkedForEvent_args::read(::apache::thri
           {
             this->part_vals.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2424;
             ::apache::thrift::protocol::TType _ktype2425;
             ::apache::thrift::protocol::TType _vtype2426;
             xfer += iprot->readMapBegin(_ktype2425, _vtype2426, _size2424);
             uint32_t _i2428;
             for (_i2428 = 0; _i2428 < _size2424; ++_i2428)
+<<<<<<< HEAD
             {
               std::string _key2429;
               xfer += iprot->readString(_key2429);
@@ -31894,6 +33328,13 @@ uint32_t ThriftHiveMetastore_isPartitionMarkedForEvent_args::read(::apache::thri
               std::string& _val2424 = this->part_vals[_key2423];
               xfer += iprot->readString(_val2424);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              std::string _key2429;
+              xfer += iprot->readString(_key2429);
+              std::string& _val2430 = this->part_vals[_key2429];
+              xfer += iprot->readString(_val2430);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -31905,6 +33346,7 @@ uint32_t ThriftHiveMetastore_isPartitionMarkedForEvent_args::read(::apache::thri
       case 4:
         if (ftype == ::apache::thrift::protocol::T_I32) {
 <<<<<<< HEAD
+<<<<<<< HEAD
           int32_t ecast2431;
           xfer += iprot->readI32(ecast2431);
           this->eventType = static_cast<PartitionEventType::type>(ecast2431);
@@ -31913,6 +33355,11 @@ uint32_t ThriftHiveMetastore_isPartitionMarkedForEvent_args::read(::apache::thri
           xfer += iprot->readI32(ecast2425);
           this->eventType = static_cast<PartitionEventType::type>(ecast2425);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          int32_t ecast2431;
+          xfer += iprot->readI32(ecast2431);
+          this->eventType = static_cast<PartitionEventType::type>(ecast2431);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.eventType = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -31947,6 +33394,7 @@ uint32_t ThriftHiveMetastore_isPartitionMarkedForEvent_args::write(::apache::thr
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->part_vals.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::map<std::string, std::string> ::const_iterator _iter2432;
     for (_iter2432 = this->part_vals.begin(); _iter2432 != this->part_vals.end(); ++_iter2432)
     {
@@ -31959,6 +33407,13 @@ uint32_t ThriftHiveMetastore_isPartitionMarkedForEvent_args::write(::apache::thr
       xfer += oprot->writeString(_iter2426->first);
       xfer += oprot->writeString(_iter2426->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::map<std::string, std::string> ::const_iterator _iter2432;
+    for (_iter2432 = this->part_vals.begin(); _iter2432 != this->part_vals.end(); ++_iter2432)
+    {
+      xfer += oprot->writeString(_iter2432->first);
+      xfer += oprot->writeString(_iter2432->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -31995,6 +33450,7 @@ uint32_t ThriftHiveMetastore_isPartitionMarkedForEvent_pargs::write(::apache::th
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->part_vals)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::map<std::string, std::string> ::const_iterator _iter2433;
     for (_iter2433 = (*(this->part_vals)).begin(); _iter2433 != (*(this->part_vals)).end(); ++_iter2433)
     {
@@ -32007,6 +33463,13 @@ uint32_t ThriftHiveMetastore_isPartitionMarkedForEvent_pargs::write(::apache::th
       xfer += oprot->writeString(_iter2427->first);
       xfer += oprot->writeString(_iter2427->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::map<std::string, std::string> ::const_iterator _iter2433;
+    for (_iter2433 = (*(this->part_vals)).begin(); _iter2433 != (*(this->part_vals)).end(); ++_iter2433)
+    {
+      xfer += oprot->writeString(_iter2433->first);
+      xfer += oprot->writeString(_iter2433->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -38136,12 +39599,16 @@ uint32_t ThriftHiveMetastore_get_functions_result::read(::apache::thrift::protoc
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2434;
             ::apache::thrift::protocol::TType _etype2437;
             xfer += iprot->readListBegin(_etype2437, _size2434);
             this->success.resize(_size2434);
             uint32_t _i2438;
             for (_i2438 = 0; _i2438 < _size2434; ++_i2438)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2438]);
 =======
@@ -38154,6 +39621,10 @@ uint32_t ThriftHiveMetastore_get_functions_result::read(::apache::thrift::protoc
             {
               xfer += iprot->readString(this->success[_i2432]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2438]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -38193,6 +39664,7 @@ uint32_t ThriftHiveMetastore_get_functions_result::write(::apache::thrift::proto
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2439;
       for (_iter2439 = this->success.begin(); _iter2439 != this->success.end(); ++_iter2439)
       {
@@ -38203,6 +39675,12 @@ uint32_t ThriftHiveMetastore_get_functions_result::write(::apache::thrift::proto
       {
         xfer += oprot->writeString((*_iter2433));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2439;
+      for (_iter2439 = this->success.begin(); _iter2439 != this->success.end(); ++_iter2439)
+      {
+        xfer += oprot->writeString((*_iter2439));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -38248,12 +39726,16 @@ uint32_t ThriftHiveMetastore_get_functions_presult::read(::apache::thrift::proto
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2440;
             ::apache::thrift::protocol::TType _etype2443;
             xfer += iprot->readListBegin(_etype2443, _size2440);
             (*(this->success)).resize(_size2440);
             uint32_t _i2444;
             for (_i2444 = 0; _i2444 < _size2440; ++_i2444)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2444]);
 =======
@@ -38266,6 +39748,10 @@ uint32_t ThriftHiveMetastore_get_functions_presult::read(::apache::thrift::proto
             {
               xfer += iprot->readString((*(this->success))[_i2438]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2444]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -39433,12 +40919,16 @@ uint32_t ThriftHiveMetastore_get_role_names_result::read(::apache::thrift::proto
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2445;
             ::apache::thrift::protocol::TType _etype2448;
             xfer += iprot->readListBegin(_etype2448, _size2445);
             this->success.resize(_size2445);
             uint32_t _i2449;
             for (_i2449 = 0; _i2449 < _size2445; ++_i2449)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2449]);
 =======
@@ -39451,6 +40941,10 @@ uint32_t ThriftHiveMetastore_get_role_names_result::read(::apache::thrift::proto
             {
               xfer += iprot->readString(this->success[_i2443]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2449]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -39490,6 +40984,7 @@ uint32_t ThriftHiveMetastore_get_role_names_result::write(::apache::thrift::prot
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2450;
       for (_iter2450 = this->success.begin(); _iter2450 != this->success.end(); ++_iter2450)
       {
@@ -39500,6 +40995,12 @@ uint32_t ThriftHiveMetastore_get_role_names_result::write(::apache::thrift::prot
       {
         xfer += oprot->writeString((*_iter2444));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2450;
+      for (_iter2450 = this->success.begin(); _iter2450 != this->success.end(); ++_iter2450)
+      {
+        xfer += oprot->writeString((*_iter2450));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -39545,12 +41046,16 @@ uint32_t ThriftHiveMetastore_get_role_names_presult::read(::apache::thrift::prot
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2451;
             ::apache::thrift::protocol::TType _etype2454;
             xfer += iprot->readListBegin(_etype2454, _size2451);
             (*(this->success)).resize(_size2451);
             uint32_t _i2455;
             for (_i2455 = 0; _i2455 < _size2451; ++_i2455)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2455]);
 =======
@@ -39563,6 +41068,10 @@ uint32_t ThriftHiveMetastore_get_role_names_presult::read(::apache::thrift::prot
             {
               xfer += iprot->readString((*(this->success))[_i2449]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2455]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -39636,6 +41145,7 @@ uint32_t ThriftHiveMetastore_grant_role_args::read(::apache::thrift::protocol::T
       case 3:
         if (ftype == ::apache::thrift::protocol::T_I32) {
 <<<<<<< HEAD
+<<<<<<< HEAD
           int32_t ecast2456;
           xfer += iprot->readI32(ecast2456);
           this->principal_type = static_cast<PrincipalType::type>(ecast2456);
@@ -39644,6 +41154,11 @@ uint32_t ThriftHiveMetastore_grant_role_args::read(::apache::thrift::protocol::T
           xfer += iprot->readI32(ecast2450);
           this->principal_type = static_cast<PrincipalType::type>(ecast2450);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          int32_t ecast2456;
+          xfer += iprot->readI32(ecast2456);
+          this->principal_type = static_cast<PrincipalType::type>(ecast2456);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.principal_type = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -39660,6 +41175,7 @@ uint32_t ThriftHiveMetastore_grant_role_args::read(::apache::thrift::protocol::T
       case 5:
         if (ftype == ::apache::thrift::protocol::T_I32) {
 <<<<<<< HEAD
+<<<<<<< HEAD
           int32_t ecast2457;
           xfer += iprot->readI32(ecast2457);
           this->grantorType = static_cast<PrincipalType::type>(ecast2457);
@@ -39668,6 +41184,11 @@ uint32_t ThriftHiveMetastore_grant_role_args::read(::apache::thrift::protocol::T
           xfer += iprot->readI32(ecast2451);
           this->grantorType = static_cast<PrincipalType::type>(ecast2451);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          int32_t ecast2457;
+          xfer += iprot->readI32(ecast2457);
+          this->grantorType = static_cast<PrincipalType::type>(ecast2457);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.grantorType = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -39939,6 +41460,7 @@ uint32_t ThriftHiveMetastore_revoke_role_args::read(::apache::thrift::protocol::
       case 3:
         if (ftype == ::apache::thrift::protocol::T_I32) {
 <<<<<<< HEAD
+<<<<<<< HEAD
           int32_t ecast2458;
           xfer += iprot->readI32(ecast2458);
           this->principal_type = static_cast<PrincipalType::type>(ecast2458);
@@ -39947,6 +41469,11 @@ uint32_t ThriftHiveMetastore_revoke_role_args::read(::apache::thrift::protocol::
           xfer += iprot->readI32(ecast2452);
           this->principal_type = static_cast<PrincipalType::type>(ecast2452);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          int32_t ecast2458;
+          xfer += iprot->readI32(ecast2458);
+          this->principal_type = static_cast<PrincipalType::type>(ecast2458);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.principal_type = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -40178,6 +41705,7 @@ uint32_t ThriftHiveMetastore_list_roles_args::read(::apache::thrift::protocol::T
       case 2:
         if (ftype == ::apache::thrift::protocol::T_I32) {
 <<<<<<< HEAD
+<<<<<<< HEAD
           int32_t ecast2459;
           xfer += iprot->readI32(ecast2459);
           this->principal_type = static_cast<PrincipalType::type>(ecast2459);
@@ -40186,6 +41714,11 @@ uint32_t ThriftHiveMetastore_list_roles_args::read(::apache::thrift::protocol::T
           xfer += iprot->readI32(ecast2453);
           this->principal_type = static_cast<PrincipalType::type>(ecast2453);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          int32_t ecast2459;
+          xfer += iprot->readI32(ecast2459);
+          this->principal_type = static_cast<PrincipalType::type>(ecast2459);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.principal_type = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -40275,12 +41808,16 @@ uint32_t ThriftHiveMetastore_list_roles_result::read(::apache::thrift::protocol:
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2460;
             ::apache::thrift::protocol::TType _etype2463;
             xfer += iprot->readListBegin(_etype2463, _size2460);
             this->success.resize(_size2460);
             uint32_t _i2464;
             for (_i2464 = 0; _i2464 < _size2460; ++_i2464)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2464].read(iprot);
 =======
@@ -40293,6 +41830,10 @@ uint32_t ThriftHiveMetastore_list_roles_result::read(::apache::thrift::protocol:
             {
               xfer += this->success[_i2458].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2464].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -40332,6 +41873,7 @@ uint32_t ThriftHiveMetastore_list_roles_result::write(::apache::thrift::protocol
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<Role> ::const_iterator _iter2465;
       for (_iter2465 = this->success.begin(); _iter2465 != this->success.end(); ++_iter2465)
       {
@@ -40342,6 +41884,12 @@ uint32_t ThriftHiveMetastore_list_roles_result::write(::apache::thrift::protocol
       {
         xfer += (*_iter2459).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<Role> ::const_iterator _iter2465;
+      for (_iter2465 = this->success.begin(); _iter2465 != this->success.end(); ++_iter2465)
+      {
+        xfer += (*_iter2465).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -40387,12 +41935,16 @@ uint32_t ThriftHiveMetastore_list_roles_presult::read(::apache::thrift::protocol
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2466;
             ::apache::thrift::protocol::TType _etype2469;
             xfer += iprot->readListBegin(_etype2469, _size2466);
             (*(this->success)).resize(_size2466);
             uint32_t _i2470;
             for (_i2470 = 0; _i2470 < _size2466; ++_i2470)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2470].read(iprot);
 =======
@@ -40405,6 +41957,10 @@ uint32_t ThriftHiveMetastore_list_roles_presult::read(::apache::thrift::protocol
             {
               xfer += (*(this->success))[_i2464].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2470].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -41101,12 +42657,16 @@ uint32_t ThriftHiveMetastore_get_privilege_set_args::read(::apache::thrift::prot
           {
             this->group_names.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2471;
             ::apache::thrift::protocol::TType _etype2474;
             xfer += iprot->readListBegin(_etype2474, _size2471);
             this->group_names.resize(_size2471);
             uint32_t _i2475;
             for (_i2475 = 0; _i2475 < _size2471; ++_i2475)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->group_names[_i2475]);
 =======
@@ -41119,6 +42679,10 @@ uint32_t ThriftHiveMetastore_get_privilege_set_args::read(::apache::thrift::prot
             {
               xfer += iprot->readString(this->group_names[_i2469]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->group_names[_i2475]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -41156,6 +42720,7 @@ uint32_t ThriftHiveMetastore_get_privilege_set_args::write(::apache::thrift::pro
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->group_names.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2476;
     for (_iter2476 = this->group_names.begin(); _iter2476 != this->group_names.end(); ++_iter2476)
     {
@@ -41166,6 +42731,12 @@ uint32_t ThriftHiveMetastore_get_privilege_set_args::write(::apache::thrift::pro
     {
       xfer += oprot->writeString((*_iter2470));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2476;
+    for (_iter2476 = this->group_names.begin(); _iter2476 != this->group_names.end(); ++_iter2476)
+    {
+      xfer += oprot->writeString((*_iter2476));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -41198,6 +42769,7 @@ uint32_t ThriftHiveMetastore_get_privilege_set_pargs::write(::apache::thrift::pr
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->group_names)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2477;
     for (_iter2477 = (*(this->group_names)).begin(); _iter2477 != (*(this->group_names)).end(); ++_iter2477)
     {
@@ -41208,6 +42780,12 @@ uint32_t ThriftHiveMetastore_get_privilege_set_pargs::write(::apache::thrift::pr
     {
       xfer += oprot->writeString((*_iter2471));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2477;
+    for (_iter2477 = (*(this->group_names)).begin(); _iter2477 != (*(this->group_names)).end(); ++_iter2477)
+    {
+      xfer += oprot->writeString((*_iter2477));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -41383,6 +42961,7 @@ uint32_t ThriftHiveMetastore_list_privileges_args::read(::apache::thrift::protoc
       case 2:
         if (ftype == ::apache::thrift::protocol::T_I32) {
 <<<<<<< HEAD
+<<<<<<< HEAD
           int32_t ecast2478;
           xfer += iprot->readI32(ecast2478);
           this->principal_type = static_cast<PrincipalType::type>(ecast2478);
@@ -41391,6 +42970,11 @@ uint32_t ThriftHiveMetastore_list_privileges_args::read(::apache::thrift::protoc
           xfer += iprot->readI32(ecast2472);
           this->principal_type = static_cast<PrincipalType::type>(ecast2472);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+          int32_t ecast2478;
+          xfer += iprot->readI32(ecast2478);
+          this->principal_type = static_cast<PrincipalType::type>(ecast2478);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.principal_type = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -41496,12 +43080,16 @@ uint32_t ThriftHiveMetastore_list_privileges_result::read(::apache::thrift::prot
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2479;
             ::apache::thrift::protocol::TType _etype2482;
             xfer += iprot->readListBegin(_etype2482, _size2479);
             this->success.resize(_size2479);
             uint32_t _i2483;
             for (_i2483 = 0; _i2483 < _size2479; ++_i2483)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2483].read(iprot);
 =======
@@ -41514,6 +43102,10 @@ uint32_t ThriftHiveMetastore_list_privileges_result::read(::apache::thrift::prot
             {
               xfer += this->success[_i2477].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2483].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -41553,6 +43145,7 @@ uint32_t ThriftHiveMetastore_list_privileges_result::write(::apache::thrift::pro
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<HiveObjectPrivilege> ::const_iterator _iter2484;
       for (_iter2484 = this->success.begin(); _iter2484 != this->success.end(); ++_iter2484)
       {
@@ -41563,6 +43156,12 @@ uint32_t ThriftHiveMetastore_list_privileges_result::write(::apache::thrift::pro
       {
         xfer += (*_iter2478).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<HiveObjectPrivilege> ::const_iterator _iter2484;
+      for (_iter2484 = this->success.begin(); _iter2484 != this->success.end(); ++_iter2484)
+      {
+        xfer += (*_iter2484).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -41608,12 +43207,16 @@ uint32_t ThriftHiveMetastore_list_privileges_presult::read(::apache::thrift::pro
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2485;
             ::apache::thrift::protocol::TType _etype2488;
             xfer += iprot->readListBegin(_etype2488, _size2485);
             (*(this->success)).resize(_size2485);
             uint32_t _i2489;
             for (_i2489 = 0; _i2489 < _size2485; ++_i2489)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2489].read(iprot);
 =======
@@ -41626,6 +43229,10 @@ uint32_t ThriftHiveMetastore_list_privileges_presult::read(::apache::thrift::pro
             {
               xfer += (*(this->success))[_i2483].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2489].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -42553,12 +44160,16 @@ uint32_t ThriftHiveMetastore_set_ugi_args::read(::apache::thrift::protocol::TPro
           {
             this->group_names.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2490;
             ::apache::thrift::protocol::TType _etype2493;
             xfer += iprot->readListBegin(_etype2493, _size2490);
             this->group_names.resize(_size2490);
             uint32_t _i2494;
             for (_i2494 = 0; _i2494 < _size2490; ++_i2494)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->group_names[_i2494]);
 =======
@@ -42571,6 +44182,10 @@ uint32_t ThriftHiveMetastore_set_ugi_args::read(::apache::thrift::protocol::TPro
             {
               xfer += iprot->readString(this->group_names[_i2488]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->group_names[_i2494]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -42604,6 +44219,7 @@ uint32_t ThriftHiveMetastore_set_ugi_args::write(::apache::thrift::protocol::TPr
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->group_names.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2495;
     for (_iter2495 = this->group_names.begin(); _iter2495 != this->group_names.end(); ++_iter2495)
     {
@@ -42614,6 +44230,12 @@ uint32_t ThriftHiveMetastore_set_ugi_args::write(::apache::thrift::protocol::TPr
     {
       xfer += oprot->writeString((*_iter2489));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2495;
+    for (_iter2495 = this->group_names.begin(); _iter2495 != this->group_names.end(); ++_iter2495)
+    {
+      xfer += oprot->writeString((*_iter2495));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -42642,6 +44264,7 @@ uint32_t ThriftHiveMetastore_set_ugi_pargs::write(::apache::thrift::protocol::TP
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->group_names)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter2496;
     for (_iter2496 = (*(this->group_names)).begin(); _iter2496 != (*(this->group_names)).end(); ++_iter2496)
     {
@@ -42652,6 +44275,12 @@ uint32_t ThriftHiveMetastore_set_ugi_pargs::write(::apache::thrift::protocol::TP
     {
       xfer += oprot->writeString((*_iter2490));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::vector<std::string> ::const_iterator _iter2496;
+    for (_iter2496 = (*(this->group_names)).begin(); _iter2496 != (*(this->group_names)).end(); ++_iter2496)
+    {
+      xfer += oprot->writeString((*_iter2496));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -42693,12 +44322,16 @@ uint32_t ThriftHiveMetastore_set_ugi_result::read(::apache::thrift::protocol::TP
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2497;
             ::apache::thrift::protocol::TType _etype2500;
             xfer += iprot->readListBegin(_etype2500, _size2497);
             this->success.resize(_size2497);
             uint32_t _i2501;
             for (_i2501 = 0; _i2501 < _size2497; ++_i2501)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2501]);
 =======
@@ -42711,6 +44344,10 @@ uint32_t ThriftHiveMetastore_set_ugi_result::read(::apache::thrift::protocol::TP
             {
               xfer += iprot->readString(this->success[_i2495]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2501]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -42750,6 +44387,7 @@ uint32_t ThriftHiveMetastore_set_ugi_result::write(::apache::thrift::protocol::T
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2502;
       for (_iter2502 = this->success.begin(); _iter2502 != this->success.end(); ++_iter2502)
       {
@@ -42760,6 +44398,12 @@ uint32_t ThriftHiveMetastore_set_ugi_result::write(::apache::thrift::protocol::T
       {
         xfer += oprot->writeString((*_iter2496));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2502;
+      for (_iter2502 = this->success.begin(); _iter2502 != this->success.end(); ++_iter2502)
+      {
+        xfer += oprot->writeString((*_iter2502));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -42805,12 +44449,16 @@ uint32_t ThriftHiveMetastore_set_ugi_presult::read(::apache::thrift::protocol::T
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2503;
             ::apache::thrift::protocol::TType _etype2506;
             xfer += iprot->readListBegin(_etype2506, _size2503);
             (*(this->success)).resize(_size2503);
             uint32_t _i2507;
             for (_i2507 = 0; _i2507 < _size2503; ++_i2507)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2507]);
 =======
@@ -42823,6 +44471,10 @@ uint32_t ThriftHiveMetastore_set_ugi_presult::read(::apache::thrift::protocol::T
             {
               xfer += iprot->readString((*(this->success))[_i2501]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2507]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -44134,12 +45786,16 @@ uint32_t ThriftHiveMetastore_get_all_token_identifiers_result::read(::apache::th
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2508;
             ::apache::thrift::protocol::TType _etype2511;
             xfer += iprot->readListBegin(_etype2511, _size2508);
             this->success.resize(_size2508);
             uint32_t _i2512;
             for (_i2512 = 0; _i2512 < _size2508; ++_i2512)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2512]);
 =======
@@ -44152,6 +45808,10 @@ uint32_t ThriftHiveMetastore_get_all_token_identifiers_result::read(::apache::th
             {
               xfer += iprot->readString(this->success[_i2506]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2512]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -44183,6 +45843,7 @@ uint32_t ThriftHiveMetastore_get_all_token_identifiers_result::write(::apache::t
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2513;
       for (_iter2513 = this->success.begin(); _iter2513 != this->success.end(); ++_iter2513)
       {
@@ -44193,6 +45854,12 @@ uint32_t ThriftHiveMetastore_get_all_token_identifiers_result::write(::apache::t
       {
         xfer += oprot->writeString((*_iter2507));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2513;
+      for (_iter2513 = this->success.begin(); _iter2513 != this->success.end(); ++_iter2513)
+      {
+        xfer += oprot->writeString((*_iter2513));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -44234,12 +45901,16 @@ uint32_t ThriftHiveMetastore_get_all_token_identifiers_presult::read(::apache::t
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2514;
             ::apache::thrift::protocol::TType _etype2517;
             xfer += iprot->readListBegin(_etype2517, _size2514);
             (*(this->success)).resize(_size2514);
             uint32_t _i2518;
             for (_i2518 = 0; _i2518 < _size2514; ++_i2518)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2518]);
 =======
@@ -44252,6 +45923,10 @@ uint32_t ThriftHiveMetastore_get_all_token_identifiers_presult::read(::apache::t
             {
               xfer += iprot->readString((*(this->success))[_i2512]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2518]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -44978,12 +46653,16 @@ uint32_t ThriftHiveMetastore_get_master_keys_result::read(::apache::thrift::prot
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2519;
             ::apache::thrift::protocol::TType _etype2522;
             xfer += iprot->readListBegin(_etype2522, _size2519);
             this->success.resize(_size2519);
             uint32_t _i2523;
             for (_i2523 = 0; _i2523 < _size2519; ++_i2523)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2523]);
 =======
@@ -44996,6 +46675,10 @@ uint32_t ThriftHiveMetastore_get_master_keys_result::read(::apache::thrift::prot
             {
               xfer += iprot->readString(this->success[_i2517]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2523]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -45027,6 +46710,7 @@ uint32_t ThriftHiveMetastore_get_master_keys_result::write(::apache::thrift::pro
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2524;
       for (_iter2524 = this->success.begin(); _iter2524 != this->success.end(); ++_iter2524)
       {
@@ -45037,6 +46721,12 @@ uint32_t ThriftHiveMetastore_get_master_keys_result::write(::apache::thrift::pro
       {
         xfer += oprot->writeString((*_iter2518));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2524;
+      for (_iter2524 = this->success.begin(); _iter2524 != this->success.end(); ++_iter2524)
+      {
+        xfer += oprot->writeString((*_iter2524));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -45078,12 +46768,16 @@ uint32_t ThriftHiveMetastore_get_master_keys_presult::read(::apache::thrift::pro
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2525;
             ::apache::thrift::protocol::TType _etype2528;
             xfer += iprot->readListBegin(_etype2528, _size2525);
             (*(this->success)).resize(_size2525);
             uint32_t _i2529;
             for (_i2529 = 0; _i2529 < _size2525; ++_i2529)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2529]);
 =======
@@ -45096,6 +46790,10 @@ uint32_t ThriftHiveMetastore_get_master_keys_presult::read(::apache::thrift::pro
             {
               xfer += iprot->readString((*(this->success))[_i2523]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2529]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -46845,12 +48543,16 @@ uint32_t ThriftHiveMetastore_add_write_ids_to_min_history_args::read(::apache::t
           {
             this->writeIds.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2530;
             ::apache::thrift::protocol::TType _ktype2531;
             ::apache::thrift::protocol::TType _vtype2532;
             xfer += iprot->readMapBegin(_ktype2531, _vtype2532, _size2530);
             uint32_t _i2534;
             for (_i2534 = 0; _i2534 < _size2530; ++_i2534)
+<<<<<<< HEAD
             {
               std::string _key2535;
               xfer += iprot->readString(_key2535);
@@ -46869,6 +48571,13 @@ uint32_t ThriftHiveMetastore_add_write_ids_to_min_history_args::read(::apache::t
               int64_t& _val2530 = this->writeIds[_key2529];
               xfer += iprot->readI64(_val2530);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              std::string _key2535;
+              xfer += iprot->readString(_key2535);
+              int64_t& _val2536 = this->writeIds[_key2535];
+              xfer += iprot->readI64(_val2536);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -46902,6 +48611,7 @@ uint32_t ThriftHiveMetastore_add_write_ids_to_min_history_args::write(::apache::
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_I64, static_cast<uint32_t>(this->writeIds.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::map<std::string, int64_t> ::const_iterator _iter2537;
     for (_iter2537 = this->writeIds.begin(); _iter2537 != this->writeIds.end(); ++_iter2537)
     {
@@ -46914,6 +48624,13 @@ uint32_t ThriftHiveMetastore_add_write_ids_to_min_history_args::write(::apache::
       xfer += oprot->writeString(_iter2531->first);
       xfer += oprot->writeI64(_iter2531->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::map<std::string, int64_t> ::const_iterator _iter2537;
+    for (_iter2537 = this->writeIds.begin(); _iter2537 != this->writeIds.end(); ++_iter2537)
+    {
+      xfer += oprot->writeString(_iter2537->first);
+      xfer += oprot->writeI64(_iter2537->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -46942,6 +48659,7 @@ uint32_t ThriftHiveMetastore_add_write_ids_to_min_history_pargs::write(::apache:
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_I64, static_cast<uint32_t>((*(this->writeIds)).size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::map<std::string, int64_t> ::const_iterator _iter2538;
     for (_iter2538 = (*(this->writeIds)).begin(); _iter2538 != (*(this->writeIds)).end(); ++_iter2538)
     {
@@ -46954,6 +48672,13 @@ uint32_t ThriftHiveMetastore_add_write_ids_to_min_history_pargs::write(::apache:
       xfer += oprot->writeString(_iter2532->first);
       xfer += oprot->writeI64(_iter2532->second);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+    std::map<std::string, int64_t> ::const_iterator _iter2538;
+    for (_iter2538 = (*(this->writeIds)).begin(); _iter2538 != (*(this->writeIds)).end(); ++_iter2538)
+    {
+      xfer += oprot->writeString(_iter2538->first);
+      xfer += oprot->writeI64(_iter2538->second);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -50854,12 +52579,16 @@ uint32_t ThriftHiveMetastore_find_columns_with_stats_result::read(::apache::thri
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2539;
             ::apache::thrift::protocol::TType _etype2542;
             xfer += iprot->readListBegin(_etype2542, _size2539);
             this->success.resize(_size2539);
             uint32_t _i2543;
             for (_i2543 = 0; _i2543 < _size2539; ++_i2543)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2543]);
 =======
@@ -50872,6 +52601,10 @@ uint32_t ThriftHiveMetastore_find_columns_with_stats_result::read(::apache::thri
             {
               xfer += iprot->readString(this->success[_i2537]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2543]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -50903,6 +52636,7 @@ uint32_t ThriftHiveMetastore_find_columns_with_stats_result::write(::apache::thr
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2544;
       for (_iter2544 = this->success.begin(); _iter2544 != this->success.end(); ++_iter2544)
       {
@@ -50913,6 +52647,12 @@ uint32_t ThriftHiveMetastore_find_columns_with_stats_result::write(::apache::thr
       {
         xfer += oprot->writeString((*_iter2538));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2544;
+      for (_iter2544 = this->success.begin(); _iter2544 != this->success.end(); ++_iter2544)
+      {
+        xfer += oprot->writeString((*_iter2544));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -50954,12 +52694,16 @@ uint32_t ThriftHiveMetastore_find_columns_with_stats_presult::read(::apache::thr
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2545;
             ::apache::thrift::protocol::TType _etype2548;
             xfer += iprot->readListBegin(_etype2548, _size2545);
             (*(this->success)).resize(_size2545);
             uint32_t _i2549;
             for (_i2549 = 0; _i2549 < _size2545; ++_i2549)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2549]);
 =======
@@ -50972,6 +52716,10 @@ uint32_t ThriftHiveMetastore_find_columns_with_stats_presult::read(::apache::thr
             {
               xfer += iprot->readString((*(this->success))[_i2543]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2549]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -60895,12 +62643,16 @@ uint32_t ThriftHiveMetastore_get_schema_all_versions_result::read(::apache::thri
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2550;
             ::apache::thrift::protocol::TType _etype2553;
             xfer += iprot->readListBegin(_etype2553, _size2550);
             this->success.resize(_size2550);
             uint32_t _i2554;
             for (_i2554 = 0; _i2554 < _size2550; ++_i2554)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2554].read(iprot);
 =======
@@ -60913,6 +62665,10 @@ uint32_t ThriftHiveMetastore_get_schema_all_versions_result::read(::apache::thri
             {
               xfer += this->success[_i2548].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2554].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -60960,6 +62716,7 @@ uint32_t ThriftHiveMetastore_get_schema_all_versions_result::write(::apache::thr
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<SchemaVersion> ::const_iterator _iter2555;
       for (_iter2555 = this->success.begin(); _iter2555 != this->success.end(); ++_iter2555)
       {
@@ -60970,6 +62727,12 @@ uint32_t ThriftHiveMetastore_get_schema_all_versions_result::write(::apache::thr
       {
         xfer += (*_iter2549).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<SchemaVersion> ::const_iterator _iter2555;
+      for (_iter2555 = this->success.begin(); _iter2555 != this->success.end(); ++_iter2555)
+      {
+        xfer += (*_iter2555).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -61019,12 +62782,16 @@ uint32_t ThriftHiveMetastore_get_schema_all_versions_presult::read(::apache::thr
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2556;
             ::apache::thrift::protocol::TType _etype2559;
             xfer += iprot->readListBegin(_etype2559, _size2556);
             (*(this->success)).resize(_size2556);
             uint32_t _i2560;
             for (_i2560 = 0; _i2560 < _size2556; ++_i2560)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2560].read(iprot);
 =======
@@ -61037,6 +62804,10 @@ uint32_t ThriftHiveMetastore_get_schema_all_versions_presult::read(::apache::thr
             {
               xfer += (*(this->success))[_i2554].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2560].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -63090,12 +64861,16 @@ uint32_t ThriftHiveMetastore_get_runtime_stats_result::read(::apache::thrift::pr
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2561;
             ::apache::thrift::protocol::TType _etype2564;
             xfer += iprot->readListBegin(_etype2564, _size2561);
             this->success.resize(_size2561);
             uint32_t _i2565;
             for (_i2565 = 0; _i2565 < _size2561; ++_i2565)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2565].read(iprot);
 =======
@@ -63108,6 +64883,10 @@ uint32_t ThriftHiveMetastore_get_runtime_stats_result::read(::apache::thrift::pr
             {
               xfer += this->success[_i2559].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2565].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -63147,6 +64926,7 @@ uint32_t ThriftHiveMetastore_get_runtime_stats_result::write(::apache::thrift::p
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<RuntimeStat> ::const_iterator _iter2566;
       for (_iter2566 = this->success.begin(); _iter2566 != this->success.end(); ++_iter2566)
       {
@@ -63157,6 +64937,12 @@ uint32_t ThriftHiveMetastore_get_runtime_stats_result::write(::apache::thrift::p
       {
         xfer += (*_iter2560).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<RuntimeStat> ::const_iterator _iter2566;
+      for (_iter2566 = this->success.begin(); _iter2566 != this->success.end(); ++_iter2566)
+      {
+        xfer += (*_iter2566).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -63202,12 +64988,16 @@ uint32_t ThriftHiveMetastore_get_runtime_stats_presult::read(::apache::thrift::p
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2567;
             ::apache::thrift::protocol::TType _etype2570;
             xfer += iprot->readListBegin(_etype2570, _size2567);
             (*(this->success)).resize(_size2567);
             uint32_t _i2571;
             for (_i2571 = 0; _i2571 < _size2567; ++_i2571)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2571].read(iprot);
 =======
@@ -63220,6 +65010,10 @@ uint32_t ThriftHiveMetastore_get_runtime_stats_presult::read(::apache::thrift::p
             {
               xfer += (*(this->success))[_i2565].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2571].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -65655,12 +67449,16 @@ uint32_t ThriftHiveMetastore_get_all_stored_procedures_result::read(::apache::th
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2572;
             ::apache::thrift::protocol::TType _etype2575;
             xfer += iprot->readListBegin(_etype2575, _size2572);
             this->success.resize(_size2572);
             uint32_t _i2576;
             for (_i2576 = 0; _i2576 < _size2572; ++_i2576)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2576]);
 =======
@@ -65673,6 +67471,10 @@ uint32_t ThriftHiveMetastore_get_all_stored_procedures_result::read(::apache::th
             {
               xfer += iprot->readString(this->success[_i2570]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2576]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -65712,6 +67514,7 @@ uint32_t ThriftHiveMetastore_get_all_stored_procedures_result::write(::apache::t
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2577;
       for (_iter2577 = this->success.begin(); _iter2577 != this->success.end(); ++_iter2577)
       {
@@ -65722,6 +67525,12 @@ uint32_t ThriftHiveMetastore_get_all_stored_procedures_result::write(::apache::t
       {
         xfer += oprot->writeString((*_iter2571));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2577;
+      for (_iter2577 = this->success.begin(); _iter2577 != this->success.end(); ++_iter2577)
+      {
+        xfer += oprot->writeString((*_iter2577));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -65767,12 +67576,16 @@ uint32_t ThriftHiveMetastore_get_all_stored_procedures_presult::read(::apache::t
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2578;
             ::apache::thrift::protocol::TType _etype2581;
             xfer += iprot->readListBegin(_etype2581, _size2578);
             (*(this->success)).resize(_size2578);
             uint32_t _i2582;
             for (_i2582 = 0; _i2582 < _size2578; ++_i2582)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2582]);
 =======
@@ -65785,6 +67598,10 @@ uint32_t ThriftHiveMetastore_get_all_stored_procedures_presult::read(::apache::t
             {
               xfer += iprot->readString((*(this->success))[_i2576]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2582]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -66337,12 +68154,16 @@ uint32_t ThriftHiveMetastore_get_all_packages_result::read(::apache::thrift::pro
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2583;
             ::apache::thrift::protocol::TType _etype2586;
             xfer += iprot->readListBegin(_etype2586, _size2583);
             this->success.resize(_size2583);
             uint32_t _i2587;
             for (_i2587 = 0; _i2587 < _size2583; ++_i2587)
+<<<<<<< HEAD
             {
               xfer += iprot->readString(this->success[_i2587]);
 =======
@@ -66355,6 +68176,10 @@ uint32_t ThriftHiveMetastore_get_all_packages_result::read(::apache::thrift::pro
             {
               xfer += iprot->readString(this->success[_i2581]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString(this->success[_i2587]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -66394,6 +68219,7 @@ uint32_t ThriftHiveMetastore_get_all_packages_result::write(::apache::thrift::pr
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter2588;
       for (_iter2588 = this->success.begin(); _iter2588 != this->success.end(); ++_iter2588)
       {
@@ -66404,6 +68230,12 @@ uint32_t ThriftHiveMetastore_get_all_packages_result::write(::apache::thrift::pr
       {
         xfer += oprot->writeString((*_iter2582));
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<std::string> ::const_iterator _iter2588;
+      for (_iter2588 = this->success.begin(); _iter2588 != this->success.end(); ++_iter2588)
+      {
+        xfer += oprot->writeString((*_iter2588));
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -66449,12 +68281,16 @@ uint32_t ThriftHiveMetastore_get_all_packages_presult::read(::apache::thrift::pr
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2589;
             ::apache::thrift::protocol::TType _etype2592;
             xfer += iprot->readListBegin(_etype2592, _size2589);
             (*(this->success)).resize(_size2589);
             uint32_t _i2593;
             for (_i2593 = 0; _i2593 < _size2589; ++_i2593)
+<<<<<<< HEAD
             {
               xfer += iprot->readString((*(this->success))[_i2593]);
 =======
@@ -66467,6 +68303,10 @@ uint32_t ThriftHiveMetastore_get_all_packages_presult::read(::apache::thrift::pr
             {
               xfer += iprot->readString((*(this->success))[_i2587]);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += iprot->readString((*(this->success))[_i2593]);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -66792,12 +68632,16 @@ uint32_t ThriftHiveMetastore_get_all_write_event_info_result::read(::apache::thr
           {
             this->success.clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2594;
             ::apache::thrift::protocol::TType _etype2597;
             xfer += iprot->readListBegin(_etype2597, _size2594);
             this->success.resize(_size2594);
             uint32_t _i2598;
             for (_i2598 = 0; _i2598 < _size2594; ++_i2598)
+<<<<<<< HEAD
             {
               xfer += this->success[_i2598].read(iprot);
 =======
@@ -66810,6 +68654,10 @@ uint32_t ThriftHiveMetastore_get_all_write_event_info_result::read(::apache::thr
             {
               xfer += this->success[_i2592].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += this->success[_i2598].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -66849,6 +68697,7 @@ uint32_t ThriftHiveMetastore_get_all_write_event_info_result::write(::apache::th
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
 <<<<<<< HEAD
+<<<<<<< HEAD
       std::vector<WriteEventInfo> ::const_iterator _iter2599;
       for (_iter2599 = this->success.begin(); _iter2599 != this->success.end(); ++_iter2599)
       {
@@ -66859,6 +68708,12 @@ uint32_t ThriftHiveMetastore_get_all_write_event_info_result::write(::apache::th
       {
         xfer += (*_iter2593).write(oprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+      std::vector<WriteEventInfo> ::const_iterator _iter2599;
+      for (_iter2599 = this->success.begin(); _iter2599 != this->success.end(); ++_iter2599)
+      {
+        xfer += (*_iter2599).write(oprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -66904,12 +68759,16 @@ uint32_t ThriftHiveMetastore_get_all_write_event_info_presult::read(::apache::th
           {
             (*(this->success)).clear();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size2600;
             ::apache::thrift::protocol::TType _etype2603;
             xfer += iprot->readListBegin(_etype2603, _size2600);
             (*(this->success)).resize(_size2600);
             uint32_t _i2604;
             for (_i2604 = 0; _i2604 < _size2600; ++_i2604)
+<<<<<<< HEAD
             {
               xfer += (*(this->success))[_i2604].read(iprot);
 =======
@@ -66922,6 +68781,10 @@ uint32_t ThriftHiveMetastore_get_all_write_event_info_presult::read(::apache::th
             {
               xfer += (*(this->success))[_i2598].read(iprot);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            {
+              xfer += (*(this->success))[_i2604].read(iprot);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }

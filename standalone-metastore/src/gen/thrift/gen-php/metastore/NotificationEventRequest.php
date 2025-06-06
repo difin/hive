@@ -224,6 +224,22 @@ class NotificationEventRequest
                         $xfer += $input->skip($ftype);
                     }
                     break;
+                case 7:
+                    if ($ftype == TType::LST) {
+                        $this->eventTypeList = array();
+                        $_size817 = 0;
+                        $_etype820 = 0;
+                        $xfer += $input->readListBegin($_etype820, $_size817);
+                        for ($_i821 = 0; $_i821 < $_size817; ++$_i821) {
+                            $elem822 = null;
+                            $xfer += $input->readString($elem822);
+                            $this->eventTypeList []= $elem822;
+                        }
+                        $xfer += $input->readListEnd();
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
                 default:
                     $xfer += $input->skip($ftype);
                     break;
@@ -255,12 +271,17 @@ class NotificationEventRequest
             $xfer += $output->writeFieldBegin('eventTypeSkipList', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->eventTypeSkipList));
 <<<<<<< HEAD
+<<<<<<< HEAD
             foreach ($this->eventTypeSkipList as $iter823) {
                 $xfer += $output->writeString($iter823);
 =======
             foreach ($this->eventTypeSkipList as $iter817) {
                 $xfer += $output->writeString($iter817);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+            foreach ($this->eventTypeSkipList as $iter823) {
+                $xfer += $output->writeString($iter823);
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -282,6 +303,9 @@ class NotificationEventRequest
             $xfer += $output->writeFieldBegin('tableNames', TType::LST, 6);
             $output->writeListBegin(TType::STRING, count($this->tableNames));
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             foreach ($this->tableNames as $iter824) {
                 $xfer += $output->writeString($iter824);
             }
@@ -296,10 +320,13 @@ class NotificationEventRequest
             $output->writeListBegin(TType::STRING, count($this->eventTypeList));
             foreach ($this->eventTypeList as $iter825) {
                 $xfer += $output->writeString($iter825);
+<<<<<<< HEAD
 =======
             foreach ($this->tableNames as $iter818) {
                 $xfer += $output->writeString($iter818);
 >>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
+=======
+>>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
