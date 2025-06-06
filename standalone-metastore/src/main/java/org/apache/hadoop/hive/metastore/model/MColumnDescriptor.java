@@ -16,9 +16,6 @@
  * limitations under the License.
  */
 
-/**
- *
- */
 package org.apache.hadoop.hive.metastore.model;
 
 import java.util.List;

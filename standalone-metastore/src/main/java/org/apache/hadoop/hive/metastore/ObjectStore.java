@@ -2682,7 +2682,7 @@ public class ObjectStore implements RawStore, Configurable {
           throw new MetaException("Partition does not belong to target table "
               + dbName + "." + tblName + ": " + part);
         }
-        MPartition mpart = convertToMPart(part, table, true);
+        MPartition mpart = convertToMPart(part, table);
         mParts.add(mpart);
         int now = (int) (System.currentTimeMillis() / 1000);
         List<MPartitionPrivilege> mPartPrivileges = new ArrayList<>();
@@ -2785,7 +2785,7 @@ public class ObjectStore implements RawStore, Configurable {
         Partition part = iterator.next();
 
         if (isValidPartition(part, partitionKeys, ifNotExists)) {
-          MPartition mpart = convertToMPart(part, table, true);
+          MPartition mpart = convertToMPart(part, table);
           pm.makePersistent(mpart);
           if (tabGrants != null) {
             for (MTablePrivilege tab : tabGrants) {
@@ -2831,7 +2831,7 @@ public class ObjectStore implements RawStore, Configurable {
         tabColumnGrants = this.listTableAllColumnGrants(
             catName, part.getDbName(), part.getTableName());
       }
-      MPartition mpart = convertToMPart(part, table, true);
+      MPartition mpart = convertToMPart(part, table);
       pm.makePersistent(mpart);
 
       int now = (int) (System.currentTimeMillis() / 1000);
@@ -3015,33 +3015,12 @@ public class ObjectStore implements RawStore, Configurable {
    * is true, then this partition's storage descriptor's column descriptor will point
    * to the same one as the table's storage descriptor.
    * @param part the partition to convert
-   * @param useTableCD whether to try to use the parent table's column descriptor.
-   * @return the model partition object, and null if the input partition is null.
-   */
-  private MPartition convertToMPart(Partition part, boolean useTableCD)
-      throws InvalidObjectException, MetaException {
-    // NOTE: we don't set writeId in this method. Write ID is only set after validating the
-    //       existing write ID against the caller's valid list.
-    if (part == null) {
-      return null;
-    }
-    MTable mt = getMTable(part.getCatName(), part.getDbName(), part.getTableName());
-    return convertToMPart(part, mt, useTableCD);
-  }
-
-  /**
-   * Convert a Partition object into an MPartition, which is an object backed by the db
-   * If the Partition's set of columns is the same as the parent table's AND useTableCD
-   * is true, then this partition's storage descriptor's column descriptor will point
-   * to the same one as the table's storage descriptor.
-   * @param part the partition to convert
    * @param mt the parent table object
-   * @param useTableCD whether to try to use the parent table's column descriptor.
    * @return the model partition object, and null if the input partition is null.
    * @throws InvalidObjectException
    * @throws MetaException
    */
-  private MPartition convertToMPart(Partition part, MTable mt, boolean useTableCD)
+  private MPartition convertToMPart(Partition part, MTable mt)
       throws InvalidObjectException, MetaException {
     if (part == null) {
       return null;
@@ -3055,8 +3034,7 @@ public class ObjectStore implements RawStore, Configurable {
     // use the parent table's, so we do not create a duplicate column descriptor,
     // thereby saving space
     MStorageDescriptor msd;
-    if (useTableCD &&
-        mt.getSd() != null && mt.getSd().getCD() != null &&
+    if (mt.getSd() != null && mt.getSd().getCD() != null &&
         mt.getSd().getCD().getCols() != null &&
         part.getSd() != null &&
         convertToFieldSchemas(mt.getSd().getCD().getCols()).
@@ -5020,7 +4998,7 @@ public class ObjectStore implements RawStore, Configurable {
     catName = normalizeIdentifier(catName);
     name = normalizeIdentifier(name);
     dbname = normalizeIdentifier(dbname);
-    MPartition newp = convertToMPart(newPart, table, false);
+    MPartition newp = convertToMPart(newPart, table);
     MColumnDescriptor oldCD = null;
     MStorageDescriptor oldSD = oldp.getSd();
     if (oldSD != null) {
@@ -5087,9 +5065,6 @@ public class ObjectStore implements RawStore, Configurable {
     }
     try {
       openTransaction();
-      if (newPart.isSetWriteId()) {
-        LOG.warn("Alter partitions with write ID called without transaction information");
-      }
       Ref<MColumnDescriptor> oldCd = new Ref<>();
       MTable table = this.getMTable(catName, dbname, name);
       MPartition oldp = getMPartition(catName, dbname, name, part_vals, table);
