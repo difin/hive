@@ -146,6 +146,8 @@ public class MetaStoreUtils {
 
   private static final DateTimeFormatter TIMESTAMP_FORMATTER = createDateTimeFormatter("uuuu-MM-dd HH:mm:ss");
 
+  public static final String IS_TRUNCATE_OP = "is_truncate_op";
+
   private static DateTimeFormatter createDateTimeFormatter(String format) {
     return DateTimeFormatter.ofPattern(format).withZone(TimeZone.getTimeZone("UTC").toZoneId())
         .withResolverStyle(ResolverStyle.STRICT);

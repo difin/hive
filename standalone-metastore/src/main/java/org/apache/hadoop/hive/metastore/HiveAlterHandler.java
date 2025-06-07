@@ -843,11 +843,9 @@ public class HiveAlterHandler implements AlterHandler {
 
   @Override
   public List<Partition> alterPartitions(final RawStore msdb, Warehouse wh, final String catName,
-                                         final String dbname, final String name,
-                                         final List<Partition> new_parts,
-                                         EnvironmentContext environmentContext,
-                                         String writeIdList, long writeId,
-                                         IHMSHandler handler)
+      final String dbname, final String name, final List<Partition> new_parts,
+      EnvironmentContext environmentContext, String writeIdList, long writeId,
+      IHMSHandler handler)
       throws InvalidOperationException, InvalidObjectException, AlreadyExistsException, MetaException {
     List<Partition> oldParts = new ArrayList<>();
     List<List<String>> partValsList = new ArrayList<>();
@@ -901,13 +899,17 @@ public class HiveAlterHandler implements AlterHandler {
       }
 
       msdb.alterPartitions(catName, dbname, name, partValsList, new_parts, writeId, writeIdList);
-
+      boolean is_truncate = Optional.ofNullable(environmentContext)
+              .map(EnvironmentContext::getProperties)
+              .map(prop -> prop.get(MetaStoreUtils.IS_TRUNCATE_OP))
+              .map(Boolean::parseBoolean)
+              .orElse(false);
       if (transactionalListeners != null && !transactionalListeners.isEmpty()) {
         boolean shouldSendSingleEvent = MetastoreConf.getBoolVar(handler.getConf(),
             MetastoreConf.ConfVars.NOTIFICATION_ALTER_PARTITIONS_V2_ENABLED);
         if (shouldSendSingleEvent) {
           MetaStoreListenerNotifier.notifyEvent(transactionalListeners, EventMessage.EventType.ALTER_PARTITIONS,
-              new AlterPartitionsEvent(oldParts, new_parts, tbl, false, true, handler), environmentContext);
+              new AlterPartitionsEvent(oldParts, new_parts, tbl, is_truncate, true, handler), environmentContext);
         } else {
           Iterator<Partition> oldPartsIt = oldParts.iterator();
           for (Partition newPart : new_parts) {
@@ -919,7 +921,7 @@ public class HiveAlterHandler implements AlterHandler {
                   "Missing old partition corresponding to new partition " + "when invoking MetaStoreEventListener for alterPartitions event.");
             }
             MetaStoreListenerNotifier.notifyEvent(transactionalListeners, EventMessage.EventType.ALTER_PARTITION,
-                new AlterPartitionEvent(oldPart, newPart, tbl, false, true, newPart.getWriteId(), handler),
+                new AlterPartitionEvent(oldPart, newPart, tbl, is_truncate, true, newPart.getWriteId(), handler),
                 environmentContext);
           }
         }

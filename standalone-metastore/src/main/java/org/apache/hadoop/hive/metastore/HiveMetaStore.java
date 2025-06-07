@@ -37,6 +37,7 @@ import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCa
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.parseDbName;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.CAT_NAME;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.DB_NAME;
+import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.IS_TRUNCATE_OP;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.prependCatalogToDbName;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.prependNotNullCatToDbName;
 import static org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdentifier;
@@ -3617,94 +3618,94 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       return;
     }
 
-    private void alterPartitionForTruncate(RawStore ms, String catName, String dbName, String tableName,
-        Table table, Partition partition, String validWriteIds, long writeId) throws Exception {
+    private void alterPartitionsForTruncate(RawStore ms, String catName, String dbName, String tableName,
+        Table table, List<Partition> partitions, String validWriteIds, long writeId) throws Exception {
       EnvironmentContext environmentContext = new EnvironmentContext();
-      updateStatsForTruncate(partition.getParameters(), environmentContext);
-
-      if (!transactionalListeners.isEmpty()) {
-        MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
-                EventType.ALTER_PARTITION,
-                new AlterPartitionEvent(partition, partition, table, true, true,
-                        writeId, this));
+      if (partitions.isEmpty()) {
+        return;
       }
 
-      if (!listeners.isEmpty()) {
-        MetaStoreListenerNotifier.notifyEvent(listeners,
-                EventType.ALTER_PARTITION,
-                new AlterPartitionEvent(partition, partition, table, true, true, writeId, this));
+      for (Partition partition: partitions) {
+        updateStatsForTruncate(partition.getParameters(), environmentContext);
+        if (writeId > 0) {
+          partition.setWriteId(writeId);
+        }
+      }
+      environmentContext.putToProperties(IS_TRUNCATE_OP, Boolean.toString(true));
+      alterHandler.alterPartitions(ms, wh, catName, dbName, tableName, partitions, environmentContext,
+              validWriteIds, writeId, this);
+      if (transactionalListeners != null && !transactionalListeners.isEmpty()) {
+        boolean shouldSendSingleEvent = MetastoreConf.getBoolVar(this.getConf(),
+            MetastoreConf.ConfVars.NOTIFICATION_ALTER_PARTITIONS_V2_ENABLED);
+        if (shouldSendSingleEvent) {
+          MetaStoreListenerNotifier.notifyEvent(transactionalListeners, EventType.ALTER_PARTITIONS,
+              new AlterPartitionsEvent(partitions, partitions, table, true, true, this), environmentContext);
+        } else {
+          for (Partition partition : partitions) {
+            MetaStoreListenerNotifier.notifyEvent(transactionalListeners, EventType.ALTER_PARTITION,
+                new AlterPartitionEvent(partition, partition, table, true, true, partition.getWriteId(), this),
+                environmentContext);
+          }
+        }
       }
 
-      if (writeId > 0) {
-        partition.setWriteId(writeId);
+      if (listeners != null && !listeners.isEmpty()) {
+        boolean shouldSendSingleEvent = MetastoreConf.getBoolVar(this.getConf(),
+            MetastoreConf.ConfVars.NOTIFICATION_ALTER_PARTITIONS_V2_ENABLED);
+        if (shouldSendSingleEvent) {
+          MetaStoreListenerNotifier.notifyEvent(listeners, EventType.ALTER_PARTITIONS,
+              new AlterPartitionsEvent(partitions, partitions, table, true, true, this), environmentContext);
+        } else {
+          for (Partition partition : partitions) {
+            MetaStoreListenerNotifier.notifyEvent(listeners, EventType.ALTER_PARTITION,
+                new AlterPartitionEvent(partition, partition, table, true, true, partition.getWriteId(), this),
+                environmentContext);
+          }
+        }
       }
-      alterHandler.alterPartition(ms, wh, catName, dbName, tableName, null, partition,
-          environmentContext, this, validWriteIds);
     }
 
     private void alterTableStatsForTruncate(RawStore ms, String catName, String dbName,
-        String tableName, Table table, List<String> partNames,
+        String tableName, Table table, List<Partition> partitionsList,
         String validWriteIds, long writeId) throws Exception {
-      if (partNames == null) {
-        if (0 != table.getPartitionKeysSize()) {
-          for (Partition partition : ms.getPartitions(catName, dbName, tableName, -1)) {
-            alterPartitionForTruncate(ms, catName, dbName, tableName, table, partition,
-                validWriteIds, writeId);
-          }
-        } else {
-          EnvironmentContext environmentContext = new EnvironmentContext();
-          updateStatsForTruncate(table.getParameters(), environmentContext);
-
-          boolean isReplicated = isDbReplicationTarget(ms.getDatabase(catName, dbName));
-          if (!transactionalListeners.isEmpty()) {
-            MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
-                    EventType.ALTER_TABLE,
-                    new AlterTableEvent(table, table, true, true,
-                            writeId, this, isReplicated));
-          }
-
-          if (!listeners.isEmpty()) {
-            MetaStoreListenerNotifier.notifyEvent(listeners,
-                    EventType.ALTER_TABLE,
-                    new AlterTableEvent(table, table, true, true,
-                            writeId, this, isReplicated));
-          }
-
-          // TODO: this should actually pass thru and set writeId for txn stats.
-          if (writeId > 0) {
-            table.setWriteId(writeId);
-          }
-          alterHandler.alterTable(ms, wh, catName, dbName, tableName, table,
-              environmentContext, this, validWriteIds);
-        }
+      if (0 != table.getPartitionKeysSize()) {
+        alterPartitionsForTruncate(ms, catName, dbName, tableName, table, partitionsList,
+            validWriteIds, writeId);
       } else {
-        for (Partition partition : ms.getPartitionsByNames(catName, dbName, tableName, partNames)) {
-          alterPartitionForTruncate(ms, catName, dbName, tableName, table, partition,
-              validWriteIds, writeId);
+        EnvironmentContext environmentContext = new EnvironmentContext();
+        updateStatsForTruncate(table.getParameters(), environmentContext);
+        boolean isReplicated = isDbReplicationTarget(ms.getDatabase(catName, dbName));
+        if (!transactionalListeners.isEmpty()) {
+          MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
+              EventType.ALTER_TABLE,
+              new AlterTableEvent(table, table, true, true,
+                  writeId, this, isReplicated));
         }
+
+        if (!listeners.isEmpty()) {
+          MetaStoreListenerNotifier.notifyEvent(listeners,
+              EventType.ALTER_TABLE,
+              new AlterTableEvent(table, table, true, true,
+                  writeId, this, isReplicated));
+        }
+        // TODO: this should actually pass thru and set writeId for txn stats.
+        if (writeId > 0) {
+          table.setWriteId(writeId);
+        }
+        ms.alterTable(catName, dbName, tableName, table, validWriteIds);
       }
       return;
     }
 
-    private List<Path> getLocationsForTruncate(final RawStore ms,
-                                               final String catName,
-                                               final String dbName,
-                                               final String tableName,
-                                               final Table table,
-                                               final List<String> partNames) throws Exception {
+    private List<Path> getLocationsForTruncate(final Table table,
+        List<Partition> partitionsList) {
       List<Path> locations = new ArrayList<>();
-      if (partNames == null) {
-        if (0 != table.getPartitionKeysSize()) {
-          for (Partition partition : ms.getPartitions(catName, dbName, tableName, -1)) {
-            locations.add(new Path(partition.getSd().getLocation()));
-          }
-        } else {
-          locations.add(new Path(table.getSd().getLocation()));
-        }
-      } else {
-        for (Partition partition : ms.getPartitionsByNames(catName, dbName, tableName, partNames)) {
+      if (0 != table.getPartitionKeysSize()) {
+        for (Partition partition : partitionsList) {
           locations.add(new Path(partition.getSd().getLocation()));
         }
+      } else {
+        locations.add(new Path(table.getSd().getLocation()));
       }
       return locations;
     }
@@ -3741,11 +3742,20 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             .map(prop -> prop.get(TRUNCATE_SKIP_DATA_DELETION))
             .map(Boolean::parseBoolean)
             .orElse(false);
+        List<Partition> partitionsList = new ArrayList<>();
+        if (partNames == null) {
+          if (0 != tbl.getPartitionKeysSize()) {
+            partitionsList = getMS().getPartitions(parsedDbName[CAT_NAME], parsedDbName[DB_NAME],
+                tableName, -1);
+          }
+        } else {
+          partitionsList = getMS().getPartitionsByNames(parsedDbName[CAT_NAME], parsedDbName[DB_NAME],
+              tableName, partNames);
+        }
 
         if (TxnUtils.isTransactionalTable(tbl) || !skipDataDeletion) {
           // This is not transactional
-          for (Path location : getLocationsForTruncate(getMS(), parsedDbName[CAT_NAME],
-              parsedDbName[DB_NAME], tableName, tbl, partNames)) {
+          for (Path location : getLocationsForTruncate(tbl, partitionsList)) {
             if (!skipDataDeletion) {
               truncateDataFiles(tbl, parsedDbName, location);
             } else {
@@ -3758,7 +3768,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
 
         // Alter the table/partition stats and also notify truncate table event
         alterTableStatsForTruncate(getMS(), parsedDbName[CAT_NAME], parsedDbName[DB_NAME],
-            tableName, tbl, partNames, validWriteIds, writeId);
+            tableName, tbl, partitionsList, validWriteIds, writeId);
       } catch (IOException e) {
         throw new MetaException(e.getMessage());
       } catch (MetaException | NoSuchObjectException e) {
