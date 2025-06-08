@@ -100,7 +100,7 @@ public interface TxnStore extends Configurable {
   String TXN_KEY_START = "_meta";
 
   enum MUTEX_KEY {
-    Initiator, Cleaner, HouseKeeper, TxnCleaner,
+    Initiator, Cleaner, HouseKeeper, IcebergHouseKeeper, TxnCleaner,
     CompactionScheduler, MaterializationRebuild
   }
   // Compactor states (Should really be enum)

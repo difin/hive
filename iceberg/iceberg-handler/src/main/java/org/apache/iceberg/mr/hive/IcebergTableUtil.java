@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -590,5 +593,14 @@ public class IcebergTableUtil {
       snapshot = table.currentSnapshot();
     }
     return snapshot;
+  }
+
+  public static ExecutorService newDeleteThreadPool(String completeName, int numThreads) {
+    AtomicInteger deleteThreadsIndex = new AtomicInteger(0);
+    return Executors.newFixedThreadPool(numThreads, runnable -> {
+      Thread thread = new Thread(runnable);
+      thread.setName("remove-snapshot-" + completeName + "-" + deleteThreadsIndex.getAndIncrement());
+      return thread;
+    });
   }
 }

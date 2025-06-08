@@ -2292,7 +2292,7 @@ public class HiveConf extends Configuration {
         "Use stats from iceberg table snapshot for query planning. This has two values metastore and iceberg"),
     HIVE_ICEBERG_EXPIRE_SNAPSHOT_NUMTHREADS("hive.iceberg.expire.snapshot.numthreads", 4,
         "The number of threads to be used for deleting files during expire snapshot. If set to 0 or below it uses the" +
-            " defult DirectExecutorService"),
+            " default DirectExecutorService"),
     HIVE_ICEBERG_CATALOG_ACTOR_CLASS("hive.iceberg.catalog.actor.class", "org.apache.iceberg.hive.HiveCatalogActor",
             "Catalog actor implementation class. Default value is a thrift-based single-tenant catalog actor." +
                     "For an embedded (no-thrift) catalog actor, use \"org.apache.iceberg.rest.HMSCatalogActor\"."+
