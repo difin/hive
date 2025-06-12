@@ -124,7 +124,7 @@ public class MarkCleanedFunction implements TransactionalFunction<Void> {
         .addValue("state", TxnStatus.ABORTED.getSqlConst(), Types.CHAR)
         .addValue("db", info.dbname)
         .addValue("table", info.tableName)
-        .addValue("partition", info.partName);
+        .addValue("partition", info.partName, Types.VARCHAR);
 
     int totalCount = 0;
     if (!info.hasUncompactedAborts && info.highestWriteId != 0) {
