@@ -53,7 +53,7 @@ public class LlapTaskUmbilicalServer {
   private Map<String, int[]> tokenRefMap = new HashMap<String, int[]>();
 
   public LlapTaskUmbilicalServer(Configuration conf, LlapTaskUmbilicalProtocol umbilical, int numHandlers) throws IOException {
-    jobTokenSecretManager = new JobTokenSecretManager();
+    jobTokenSecretManager = new JobTokenSecretManager(conf);
     int umbilicalPort = HiveConf.getIntVar(conf, HiveConf.ConfVars.LLAP_TASK_UMBILICAL_SERVER_PORT);
     if (umbilicalPort <= 0) {
       umbilicalPort = 0;
