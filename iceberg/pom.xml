@@ -37,7 +37,7 @@
         <google.errorprone.version>2.5.1</google.errorprone.version>
         <caffeine.version>2.9.3</caffeine.version>
         <validate.skip>false</validate.skip>
-        <assertj.version>3.24.2</assertj.version>
+        <assertj.version>3.27.3</assertj.version>
     <awaitility.version>4.2.1</awaitility.version>
         <immutables.value.version>2.10.0</immutables.value.version>
     </properties>

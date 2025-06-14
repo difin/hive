@@ -78,7 +78,7 @@
     <antlr4.version>4.9.3</antlr4.version>
     <apache-directory-server.version>2.0.0-M24</apache-directory-server.version>
     <avatica.version>1.26.0.7.3.2.100-SNAPSHOT</avatica.version>
-    <avro.version>1.11.3.7.3.2.100-SNAPSHOT</avro.version>
+    <avro.version>1.12.0</avro.version>
     <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
     <calcite.version>1.33.0.7.3.2.100-SNAPSHOT</calcite.version>
@@ -200,7 +200,7 @@
     <validation-api.version>1.1.0.Final</validation-api.version>
     <aws-secretsmanager-caching.version>1.0.1</aws-secretsmanager-caching.version>
     <aws-java-sdk.version>1.12.791</aws-java-sdk.version>
-    <iceberg.version>1.6.1</iceberg.version>
+    <iceberg.version>1.9.1</iceberg.version>
     <spring.version>5.3.44.cldr-b1</spring.version>
     <spring.ldap.version>2.4.4</spring.ldap.version>
     <!-- Static code analysis, code coverage -->

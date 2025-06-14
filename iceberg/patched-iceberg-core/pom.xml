@@ -93,15 +93,10 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/classes</outputDirectory>
                                     <excludes>
+                                        **/HadoopInputFile.class
                                         **/StructLikeMap.class
                                         **/StructLikeWrapper.class
-                                        **/HadoopInputFile.class
-                                        org.apache.iceberg.avro.ValueReaders.class
-                                        org.apache.iceberg.avro.ValueWriters.class
-                                        org.apache.iceberg.BaseScan.class
                                         org.apache.iceberg.PartitionsTable.class
-                                        org.apache.iceberg.Partitioning.class
-                                        org.apache.iceberg.SnapshotProducer.class
                                     </excludes>
                                 </artifactItem>
                             </artifactItems>
