@@ -106,14 +106,30 @@ public class DataSharing {
     s3ClientRegion = conf.get(CLIENT_REGION, "us-west-2");
     s3RemoteSigningEnabled = conf.get(S3_REMOTE_SIGNING_ENABLED, "false");
     String urls = conf.get(CONFVAR_IDBROKER_URL, "");
-    idBrokerUris = Arrays.stream(urls.split(","))
-        .map(String::trim)
-        .filter(s -> !s.isEmpty())
-        .map(u -> URI.create(u.endsWith("/") ? u : u + "/"))
-        .toArray(URI[]::new);
-    if (idBrokerUris.length == 0) {
-      throw new IllegalArgumentException("hive.metastore.catalog.idbroker.url is empty or malformed");
+    if (urls == null || urls.trim().isEmpty()) {
+      throw new IllegalArgumentException(
+          "Data sharing requires configuration property '" + CONFVAR_IDBROKER_URL + "' " +
+              "to be set with one or more comma-separated IdBroker URLs. " +
+              "Example: https://broker1:8444/gateway,https://broker2:8444/gateway"
+      );
     }
+    // split the URLs by comma, trim whitespace, and ensure they are valid URIs
+    try {
+      idBrokerUris = Arrays.stream(urls.split(",")).map(String::trim).filter(s -> !s.isEmpty()).map(u -> {
+        try {
+          return URI.create(u.endsWith("/") ? u : u + "/");
+        } catch (IllegalArgumentException e) {
+          throw new IllegalArgumentException("Invalid IdBroker URL: " + u, e);
+        }
+      }).toArray(URI[]::new);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Failed to parse IdBroker URLs from property '" + CONFVAR_IDBROKER_URL + "' with value: " + urls, e);
+    }
+    // ensure we have at least one valid URI
+    if (idBrokerUris.length == 0) {
+      throw new IllegalArgumentException("No valid IdBroker URLs found in property '" + CONFVAR_IDBROKER_URL + "' with value: " + urls);
+    }
+
     this.sslFactory = "https".equalsIgnoreCase(idBrokerUris[0].getScheme()) ? SecurityFriend.createSslContextFactory(conf) : null;
     LOG.info("DataSharing agent initialized with IdBroker endpoints: {}", Arrays.toString(idBrokerUris));
   }
@@ -203,7 +219,7 @@ public class DataSharing {
       int idx = nextIndex(attempt);
       try {
         URL brokerUrl = delegationTokenUrl(idx);
-        LOG.info("==> DataSharing.fetchDelegationToken(), trying broker url: {} (attempt {}/{})", 
+        LOG.info("==> DataSharing.fetchDelegationToken(), trying broker url: {} (attempt {}/{})",
             brokerUrl, attempt, idBrokerUris.length);
 
         Object result = clientCall(null, brokerUrl, HTTP_GET, null);

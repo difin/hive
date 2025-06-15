@@ -64,13 +64,31 @@ public class HMSCatalogServer {
   static final String HMS_METRIC_PREFIX = "hmscatalog.";
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogServer.class);
   private static Reference<Catalog> catalogRef;
-  private static DataSharing dataSharing;
+  private static volatile DataSharing dataSharing;
 
   static Catalog getLastCatalog() {
     return catalogRef != null ? catalogRef.get() :  null;
   }
 
+  private static boolean isDataSharingEnabled(Configuration conf) {
+    String idBrokerUrl = conf.get(DataSharing.CONFVAR_IDBROKER_URL, "");
+    return !idBrokerUrl.trim().isEmpty();
+  }
+
   static DataSharing getDataSharing() {
+    return dataSharing;
+  }
+
+  private static synchronized DataSharing initializeDataSharing(Configuration conf) {
+    if (dataSharing == null && isDataSharingEnabled(conf)) {
+      try {
+        dataSharing = new DataSharing(conf);
+        LOG.info("Data sharing initialized successfully");
+      } catch (Exception e) {
+        LOG.warn("Failed to initialize data sharing, continuing without it: {}", e.getMessage());
+        // leave dataSharing null to indicate unavailable
+      }
+    }
     return dataSharing;
   }
 
@@ -131,7 +149,7 @@ public class HMSCatalogServer {
    * @throws Exception if servlet initialization fails
    */
   public static Server startServer(Configuration conf, HiveCatalog catalog) throws Exception {
-    dataSharing = new DataSharing(conf);
+    initializeDataSharing(conf);
     int port = MetastoreConf.getIntVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_PORT);
     if (port < 0) {
       return null;
