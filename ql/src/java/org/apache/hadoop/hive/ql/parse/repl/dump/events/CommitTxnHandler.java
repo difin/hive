@@ -183,6 +183,11 @@ class CommitTxnHandler extends AbstractEventHandler<CommitTxnMessage> {
       if (writeEventInfoList != null) {
         writeEventInfoList = getAllWriteEventInfoExceptMV(writeEventInfoList);
       }
+
+      // Filtering out all write event i related to materialized view
+      if (writeEventInfoList != null) {
+        writeEventInfoList = getAllWriteEventInfoExceptMV(writeEventInfoList);
+      }
       int numEntry = (writeEventInfoList != null ? writeEventInfoList.size() : 0);
       if (numEntry != 0) {
         eventMessage.addWriteEventInfo(writeEventInfoList);
