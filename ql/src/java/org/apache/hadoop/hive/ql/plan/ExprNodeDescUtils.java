@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPAnd;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPOr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.hive.ql.exec.ColumnInfo;
@@ -35,10 +36,10 @@ import org.apache.hadoop.hive.ql.exec.Operator;
 import org.apache.hadoop.hive.ql.exec.ReduceSinkOperator;
 import org.apache.hadoop.hive.ql.exec.RowSchema;
 import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.optimizer.ConstantPropagateProcFactory;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
-import org.apache.hadoop.hive.ql.parse.type.TypeCheckProcFactory;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFBridge;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPEqual;
@@ -1133,6 +1134,55 @@ public class ExprNodeDescUtils {
     if (columnDesc instanceof ExprNodeGenericFuncDesc) {
       ExprNodeGenericFuncDesc exprNodeGenericFuncDesc = (ExprNodeGenericFuncDesc) columnDesc;
       return (exprNodeGenericFuncDesc.getGenericUDF() instanceof GenericUDFStruct);
+    }
+    return false;
+  }
+
+  public static ExprNodeDesc disjunction(ExprNodeDesc e1, ExprNodeDesc e2) throws UDFArgumentException {
+    if (e1 == null) {
+      return e2;
+    }
+    if (e2 == null) {
+      return e1;
+    }
+    if (e1.isSame(e2)) {
+      return e1;
+    }
+    List<ExprNodeDesc> operands = new ArrayList<>();
+    disjunctiveDecomposition(e1, operands);
+    disjunctiveDecomposition(e2, operands);
+    return disjunction(operands);
+  }
+
+  public static ExprNodeDesc disjunction(List<ExprNodeDesc> operands) throws UDFArgumentException {
+    if (operands.isEmpty()) {
+      return null;
+    }
+    if (operands.size() == 1) {
+      return operands.get(0);
+    }
+    return ExprNodeGenericFuncDesc.newInstance(new GenericUDFOPOr(), operands);
+  }
+
+  public static void disjunctiveDecomposition(ExprNodeDesc expr, List<ExprNodeDesc> operands) {
+    if (isOr(expr)) {
+      for (ExprNodeDesc c : expr.getChildren()) {
+        disjunctiveDecomposition(c, operands);
+      }
+    } else {
+      for (ExprNodeDesc o : operands) {
+        if (o.isSame(expr)) {
+          return;
+        }
+      }
+      operands.add(expr);
+    }
+  }
+
+  public static boolean isOr(ExprNodeDesc expr) {
+    if (expr instanceof ExprNodeGenericFuncDesc) {
+      ExprNodeGenericFuncDesc exprNodeGenericFuncDesc = (ExprNodeGenericFuncDesc) expr;
+      return (exprNodeGenericFuncDesc.getGenericUDF() instanceof GenericUDFOPOr);
     }
     return false;
   }
