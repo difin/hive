@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class CatalogMeteringEventPublisher {
   private static final Logger logger = LoggerFactory.getLogger(CatalogMeteringEventPublisher.class);
-  private static final String FILE_PREFIX = "metering-event.json.";
+  private static final String FILE_PREFIX = "events.json.";
   private static final String DEFAULT_FILE_PERMISSIONS = "775";
   private static final String METERING_FILE_LOC_DIR = "/var/metering/rest-catalog";
   private static final long FILE_ROTATION_INTERVAL_MS = TimeUnit.HOURS.toMillis(24);
