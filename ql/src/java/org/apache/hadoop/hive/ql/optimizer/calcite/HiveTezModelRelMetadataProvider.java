@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.cost.HiveOnTezCostModel;
 import org.apache.hadoop.hive.ql.optimizer.calcite.cost.HiveRelMdCost;
 import org.apache.hadoop.hive.ql.optimizer.calcite.stats.HiveRelMdCollation;
 import org.apache.hadoop.hive.ql.optimizer.calcite.stats.HiveRelMdColumnUniqueness;
+import org.apache.hadoop.hive.ql.optimizer.calcite.stats.HiveRelMdCumulativeCost;
 import org.apache.hadoop.hive.ql.optimizer.calcite.stats.HiveRelMdDistinctRowCount;
 import org.apache.hadoop.hive.ql.optimizer.calcite.stats.HiveRelMdDistribution;
 import org.apache.hadoop.hive.ql.optimizer.calcite.stats.HiveRelMdExpressionLineage;
@@ -44,6 +45,7 @@ public class HiveTezModelRelMetadataProvider {
         ChainedRelMetadataProvider.of(
             ImmutableList.of(
                 HiveRelMdDistinctRowCount.SOURCE,
+                HiveRelMdCumulativeCost.SOURCE,
                 new HiveRelMdCost(HiveOnTezCostModel.getCostModel(new HiveConf())).getMetadataProvider(),
                 HiveRelMdSelectivity.SOURCE,
                 HiveRelMdRowCount.SOURCE,
