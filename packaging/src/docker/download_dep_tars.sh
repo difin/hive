@@ -6,7 +6,7 @@
 # 5. Prints a recommended way to build hive image from hive repo root folder
 
 PLATFORM="${PLATFORM:-redhat8}"
-CDH_PREFIX=${CDH_PREFIX:="7.2.18.0"}       #TODO: get last from https://release.infra.cloudera.com/hwre-api/releasedbuilds?stack=CDH&type=public
+CDH_PREFIX=${CDH_PREFIX:=$(sed -nE 's|.*<hadoop.version>.*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)-[0-9]+.*</hadoop.version>.*|\1|p' pom.xml)} # according to hadoop.version in pom.xml
 CDWH_PREFIX=${CDWH_PREFIX:=$(curl -s "https://release.infra.cloudera.com/hwre-api/stackinfo?stack=CDWH&build_type=dev" | jq '.[] | select(.branch=="cdw-master")' | jq ."stack_version" | tr -d '"')}
 
 function get_component_version(){
