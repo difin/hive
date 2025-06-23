@@ -314,6 +314,7 @@ class MetaStoreDirectSql {
   }
 
   private boolean runTestQuery() {
+    boolean doTrace = LOG.isDebugEnabled();
     Transaction tx = pm.currentTransaction();
     boolean doCommit = false;
     if (!tx.isActive()) {
@@ -322,11 +323,13 @@ class MetaStoreDirectSql {
     }
     Query query = null;
     // Run a self-test query. If it doesn't work, we will self-disable. What a PITA...
-    String selfTestQuery = "select \"DB_ID\" from " + DBS + "";
+    String selfTestQuery = "select \"DB_ID\" from " + DBS + " WHERE \"DB_ID\"=1";
     try {
       prepareTxn();
       query = pm.newQuery("javax.jdo.query.SQL", selfTestQuery);
+      long start = doTrace ? System.nanoTime() : 0;
       query.execute();
+      MetastoreDirectSqlUtils.timingTrace(doTrace, selfTestQuery, start, doTrace ? System.nanoTime() : 0);
       return true;
     } catch (Throwable t) {
       doCommit = false;
