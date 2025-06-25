@@ -25,6 +25,7 @@ import org.apache.calcite.rex.RexUtil;
 import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.hadoop.hive.impala.operator.InIterateOperator;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveIn;
 import org.apache.hadoop.hive.ql.parse.type.FunctionHelper;
 
 import java.util.List;
@@ -53,7 +54,7 @@ public class InFunctionResolver extends ImpalaFunctionResolverImpl {
         return InIterateOperator.IN_ITERATE;
       }
     }
-    return defaultOp;
+    return HiveIn.INSTANCE;
   }
 
   @Override

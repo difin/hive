@@ -1109,10 +1109,10 @@ public class HiveSubQRemoveRelBuilder {
         postCondition = condition;
       }
       if(semiJoinType != null) {
-        join = correlateFactory.createCorrelate(left.rel, right.rel, id,
+        join = correlateFactory.createCorrelate(left.rel, right.rel, ImmutableList.of(), id,
                 requiredColumns, semiJoinType);
       } else {
-        join = correlateFactory.createCorrelate(left.rel, right.rel, id,
+        join = correlateFactory.createCorrelate(left.rel, right.rel, ImmutableList.of(), id,
                 requiredColumns, joinType);
       }
     } else {

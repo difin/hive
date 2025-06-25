@@ -10248,7 +10248,7 @@ STAGE PLANS:
             Map Operator Tree:
                 TableScan
                   alias: over10k_n6
-                  filterExpr: (s) IN ('tom allen', 'bob steinbeck') (type: boolean)
+                  filterExpr: (s) IN ('bob steinbeck', 'tom allen') (type: boolean)
                   Statistics: Num rows: 1 Data size: 344 Basic stats: COMPLETE Column stats: NONE
                   TableScan Vectorization:
                       native: true
@@ -10257,8 +10257,8 @@ STAGE PLANS:
                     Filter Vectorization:
                         className: VectorFilterOperator
                         native: true
-                        predicateExpression: FilterStringColumnInList(col 7, values tom allen, bob steinbeck)
-                    predicate: (s) IN ('tom allen', 'bob steinbeck') (type: boolean)
+                        predicateExpression: FilterStringColumnInList(col 7, values bob steinbeck, tom allen)
+                    predicate: (s) IN ('bob steinbeck', 'tom allen') (type: boolean)
                     Statistics: Num rows: 1 Data size: 344 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: s (type: string), dec (type: decimal(4,2))
@@ -10534,7 +10534,7 @@ STAGE PLANS:
             Map Operator Tree:
                 TableScan
                   alias: over10k_n6
-                  filterExpr: (s) IN ('tom allen', 'bob steinbeck') (type: boolean)
+                  filterExpr: (s) IN ('bob steinbeck', 'tom allen') (type: boolean)
                   Statistics: Num rows: 1 Data size: 196 Basic stats: COMPLETE Column stats: NONE
                   TableScan Vectorization:
                       native: true
@@ -10543,8 +10543,8 @@ STAGE PLANS:
                     Filter Vectorization:
                         className: VectorFilterOperator
                         native: true
-                        predicateExpression: FilterStringColumnInList(col 7, values tom allen, bob steinbeck)
-                    predicate: (s) IN ('tom allen', 'bob steinbeck') (type: boolean)
+                        predicateExpression: FilterStringColumnInList(col 7, values bob steinbeck, tom allen)
+                    predicate: (s) IN ('bob steinbeck', 'tom allen') (type: boolean)
                     Statistics: Num rows: 1 Data size: 196 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: s (type: string)
@@ -10811,7 +10811,7 @@ STAGE PLANS:
             Map Operator Tree:
                 TableScan
                   alias: over10k_n6
-                  filterExpr: (s) IN ('tom allen', 'bob steinbeck') (type: boolean)
+                  filterExpr: (s) IN ('bob steinbeck', 'tom allen') (type: boolean)
                   Statistics: Num rows: 1 Data size: 336 Basic stats: COMPLETE Column stats: NONE
                   TableScan Vectorization:
                       native: true
@@ -10820,8 +10820,8 @@ STAGE PLANS:
                     Filter Vectorization:
                         className: VectorFilterOperator
                         native: true
-                        predicateExpression: FilterStringColumnInList(col 7, values tom allen, bob steinbeck)
-                    predicate: (s) IN ('tom allen', 'bob steinbeck') (type: boolean)
+                        predicateExpression: FilterStringColumnInList(col 7, values bob steinbeck, tom allen)
+                    predicate: (s) IN ('bob steinbeck', 'tom allen') (type: boolean)
                     Statistics: Num rows: 1 Data size: 336 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: s (type: string), bo (type: boolean)
@@ -11092,7 +11092,7 @@ STAGE PLANS:
             Map Operator Tree:
                 TableScan
                   alias: over10k_n6
-                  filterExpr: (s) IN ('tom allen', 'bob steinbeck') (type: boolean)
+                  filterExpr: (s) IN ('bob steinbeck', 'tom allen') (type: boolean)
                   Statistics: Num rows: 1 Data size: 192 Basic stats: COMPLETE Column stats: NONE
                   TableScan Vectorization:
                       native: true
@@ -11101,8 +11101,8 @@ STAGE PLANS:
                     Filter Vectorization:
                         className: VectorFilterOperator
                         native: true
-                        predicateExpression: FilterStringColumnInList(col 7, values tom allen, bob steinbeck)
-                    predicate: (s) IN ('tom allen', 'bob steinbeck') (type: boolean)
+                        predicateExpression: FilterStringColumnInList(col 7, values bob steinbeck, tom allen)
+                    predicate: (s) IN ('bob steinbeck', 'tom allen') (type: boolean)
                     Statistics: Num rows: 1 Data size: 192 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: i (type: int)
@@ -11381,7 +11381,7 @@ STAGE PLANS:
             Map Operator Tree:
                 TableScan
                   alias: over10k_n6
-                  filterExpr: (s) IN ('tom allen', 'bob steinbeck') (type: boolean)
+                  filterExpr: (s) IN ('bob steinbeck', 'tom allen') (type: boolean)
                   Statistics: Num rows: 1 Data size: 304 Basic stats: COMPLETE Column stats: NONE
                   TableScan Vectorization:
                       native: true
@@ -11390,8 +11390,8 @@ STAGE PLANS:
                     Filter Vectorization:
                         className: VectorFilterOperator
                         native: true
-                        predicateExpression: FilterStringColumnInList(col 7, values tom allen, bob steinbeck)
-                    predicate: (s) IN ('tom allen', 'bob steinbeck') (type: boolean)
+                        predicateExpression: FilterStringColumnInList(col 7, values bob steinbeck, tom allen)
+                    predicate: (s) IN ('bob steinbeck', 'tom allen') (type: boolean)
                     Statistics: Num rows: 1 Data size: 304 Basic stats: COMPLETE Column stats: NONE
                     Reduce Output Operator
                       key expressions: s (type: string), dec (type: decimal(4,2))

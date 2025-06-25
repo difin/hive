@@ -37,6 +37,7 @@ import org.apache.calcite.rex.RexTableInputRef;
 import org.apache.calcite.rex.RexVisitorImpl;
 import org.apache.calcite.util.Pair;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.optimizer.calcite.SearchTransformer;
 import org.apache.impala.analysis.Analyzer;
 import org.apache.impala.analysis.Expr;
 
@@ -64,17 +65,23 @@ public class ImpalaRexVisitor extends RexVisitorImpl<Expr> {
 
   @Override
   public Expr visitCall(RexCall rexCall) {
-    try {
+    switch (rexCall.getKind()) {
+    case CAST:
       RexNode removedRexNode = ImpalaRexCall.removeRedundantCast(rexCall);
       // if removedRexNode is different from original call, we know we removed the cast
       // and we return the expression of the operand within the cast.
       if (removedRexNode != rexCall) {
         return removedRexNode.accept(this);
       }
-      List<Expr> params = Lists.newArrayList();
-      for (RexNode operand : rexCall.getOperands()) {
-        params.add(operand.accept(this));
-      }
+      break;
+    case SEARCH:
+      return new SearchTransformer<>(rexBuilder, rexCall).transform().accept(this);
+    }
+    List<Expr> params = Lists.newArrayList();
+    for (RexNode operand : rexCall.getOperands()) {
+      params.add(operand.accept(this));
+    }
+    try {
       return ImpalaRexCall.getExpr(analyzer, rexCall, params, rexBuilder);
     } catch (HiveException e) {
       throw new RuntimeException(e);

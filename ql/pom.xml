@@ -827,6 +827,10 @@
       <artifactId>janino</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.immutables</groupId>
+      <artifactId>value-annotations</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
     </dependency>
@@ -1120,6 +1124,7 @@
                   <include>com.esri.geometry:esri-geometry-api</include>
                   <include>org.roaringbitmap:RoaringBitmap</include>
                   <include>org.roaringbitmap:shims</include>
+                  <include>org.locationtech.jts:jts-core</include>
                 </includes>
               </artifactSet>
               <filters>

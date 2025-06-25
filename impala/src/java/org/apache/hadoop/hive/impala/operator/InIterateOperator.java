@@ -18,18 +18,21 @@
 package org.apache.hadoop.hive.impala.operator;
 
 import org.apache.calcite.sql.SqlKind;
-import org.apache.calcite.sql.fun.SqlInOperator;
+import org.apache.calcite.sql.SqlSpecialOperator;
+import org.apache.calcite.sql.type.InferTypes;
+import org.apache.calcite.sql.type.ReturnTypes;
 
 /**
  * Operator for "in iterate" which is used when there are InputRefs in
  * the "in" clause.
  */
-public class InIterateOperator extends SqlInOperator {
+public class InIterateOperator extends SqlSpecialOperator {
 
   public static final InIterateOperator IN_ITERATE = new InIterateOperator();
 
   public InIterateOperator() {
-    super("in_iterate", SqlKind.IN);
+    super("in_iterate", SqlKind.OTHER_FUNCTION, 32, true, 
+        ReturnTypes.BOOLEAN_NULLABLE, InferTypes.FIRST_KNOWN, null);
   }
 }
 

@@ -44,6 +44,7 @@ import org.apache.hadoop.hive.impala.funcmapper.ImpalaFunctionUtil;
 import org.apache.hadoop.hive.impala.funcmapper.ImpalaTypeConverter;
 import org.apache.hadoop.hive.impala.funcmapper.ScalarFunctionDetails;
 import org.apache.hadoop.hive.impala.funcmapper.TimeIntervalOpFunctionResolver;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveIn;
 import org.apache.impala.analysis.Analyzer;
 import org.apache.impala.analysis.BinaryPredicate;
 import org.apache.impala.analysis.CaseWhenClause;
@@ -120,12 +121,6 @@ public class ImpalaRexCall {
       case CASE:
         retExpr = createCaseExpr(analyzer, fn, params, impalaRetType);
         break;
-      case IN:
-        retExpr = createInExpr(analyzer, fn, params, false, impalaRetType);
-        break;
-      case NOT_IN:
-        retExpr = createInExpr(analyzer, fn, params, true, impalaRetType);
-        break;
       case IS_NULL:
         Preconditions.checkState(params.size() == 1);
         retExpr = new ImpalaIsNullExpr(analyzer, fn, params.get(0), false, impalaRetType);
@@ -154,7 +149,11 @@ public class ImpalaRexCall {
         }
         break;
       default:
-        retExpr = new ImpalaFunctionCallExpr(analyzer, fn, params, rexCall, impalaRetType);
+        if (rexCall.getOperator() == HiveIn.INSTANCE) {
+          retExpr = createInExpr(analyzer, fn, params, false, impalaRetType);
+        } else {
+          retExpr = new ImpalaFunctionCallExpr(analyzer, fn, params, rexCall, impalaRetType);
+        }
         break;
     }
 
@@ -315,19 +314,15 @@ public class ImpalaRexCall {
    * that function exists in Impala.
    */
   public static RexNode removeRedundantCast(RexCall rexCall) {
-    RexNode returnRexCall = rexCall;
-    if (rexCall.getKind() != SqlKind.CAST) {
-      return returnRexCall;
-    }
     RelDataType r1 = rexCall.getType();
     RelDataType r2 = rexCall.getOperands().get(0).getType();
     // If the datatype has the same precision and scale, there is no need for the case (Impala
     // will fail in this case).
     if (r1.getSqlTypeName() == r2.getSqlTypeName() && r1.getPrecision() == r2.getPrecision() &&
         r1.getScale() == r2.getScale()) {
-      returnRexCall = rexCall.getOperands().get(0);
+      return rexCall.getOperands().get(0);
     }
-    return returnRexCall;
+    return rexCall;
   }
 
   /**

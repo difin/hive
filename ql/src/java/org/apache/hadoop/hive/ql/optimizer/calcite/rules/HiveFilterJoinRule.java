@@ -28,7 +28,6 @@ import org.apache.calcite.plan.RelOptRuleOperand;
 import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.plan.RelOptUtil.InputFinder;
 import org.apache.calcite.plan.RelOptUtil.RexInputConverter;
-import org.apache.calcite.plan.RelRule;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.core.Filter;
 import org.apache.calcite.rel.core.Join;
@@ -41,7 +40,6 @@ import org.apache.calcite.rex.RexCall;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.rex.RexUtil;
 import org.apache.calcite.tools.RelBuilder;
-import org.apache.calcite.tools.RelBuilderFactory;
 import org.apache.calcite.util.ImmutableBitSet;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveCalciteUtil;
 import org.apache.hadoop.hive.ql.optimizer.calcite.HiveRelFactories;
@@ -64,17 +62,14 @@ public abstract class HiveFilterJoinRule extends FilterJoinRule {
   /**
    * Creates a PushFilterPastJoinRule with an explicit root operand.
    */
-  protected HiveFilterJoinRule(RelOptRuleOperand operand, String id, boolean smart,
-      RelBuilderFactory relBuilderFactory) {
+  protected HiveFilterJoinRule(RelOptRuleOperand operand, String id){
     super(
-      (Config) RelRule.Config.EMPTY
+      FilterIntoJoinRule.FilterIntoJoinRuleConfig.DEFAULT
         .withDescription("FilterJoinRule:" + id)
         .withOperandSupplier(b0 ->
-          b0.exactly(operand))
-        .as(FilterJoinRule.Config.class)
-        .withSmart(smart)
-        .withPredicate((join, joinType, exp) -> true)
-        .withRelBuilderFactory(relBuilderFactory)
+          b0.exactly(operand)).withRelBuilderFactory(HiveRelFactories.HIVE_BUILDER)
+        .as(Config.class)
+        
     );
   }
 
@@ -105,7 +100,7 @@ public abstract class HiveFilterJoinRule extends FilterJoinRule {
   public static class HiveFilterJoinMergeRule extends HiveFilterJoinRule {
     public HiveFilterJoinMergeRule() {
       super(operand(Filter.class, operand(Join.class, any())),
-          HiveFilterJoinMergeRule.class.getSimpleName(), true, HiveRelFactories.HIVE_BUILDER);
+          HiveFilterJoinMergeRule.class.getSimpleName());
     }
 
     @Override
@@ -128,7 +123,7 @@ public abstract class HiveFilterJoinRule extends FilterJoinRule {
   public static class HiveFilterJoinTransposeRule extends HiveFilterJoinRule {
     public HiveFilterJoinTransposeRule() {
       super(RelOptRule.operand(Join.class, RelOptRule.any()),
-          HiveFilterJoinTransposeRule.class.getSimpleName(), true, HiveRelFactories.HIVE_BUILDER);
+          HiveFilterJoinTransposeRule.class.getSimpleName());
     }
 
     @Override

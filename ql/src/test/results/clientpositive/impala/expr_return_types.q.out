@@ -565,7 +565,7 @@ STAGE PLANS:
 F01:PLAN FRAGMENT [UNPARTITIONED] hosts=1 instances=1
 Per-Host Resources: mem-estimate=16.00KB mem-reservation=0B thread-reservation=1
   PLAN-ROOT SINK
-  |  output exprs: default.type_test.tt_int > CAST(4 AS INT) AND default.type_test.tt_int < CAST(10 AS INT) OR default.type_test.tt_int = CAST(33 AS INT)
+  |  output exprs: default.type_test.tt_int = CAST(33 AS INT) OR default.type_test.tt_int > CAST(4 AS INT) AND default.type_test.tt_int < CAST(10 AS INT)
   |  mem-estimate=0B mem-reservation=0B thread-reservation=0
   |
   01:EXCHANGE [UNPARTITIONED]

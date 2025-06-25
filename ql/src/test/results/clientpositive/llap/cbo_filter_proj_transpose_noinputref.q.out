@@ -48,6 +48,6 @@ HiveProject(m=[CAST(_UTF-16LE'2':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):V
     HiveProject(DUMMY=[0])
       HiveTableScan(table=[[default, test1]], table:alias=[test1])
     HiveProject(m=[CAST(_UTF-16LE'2':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"):VARCHAR(2147483647) CHARACTER SET "UTF-16LE"])
-      HiveFilter(condition=[=(_UTF-16LE'2', $0)])
+      HiveFilter(condition=[=($0, _UTF-16LE'2')])
         HiveTableScan(table=[[default, test2]], table:alias=[d])
 

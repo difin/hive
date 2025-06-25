@@ -19,6 +19,7 @@ package org.apache.hadoop.hive.impala.calcite.rules;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -196,7 +197,8 @@ public class HiveImpalaRexOverRule extends RelOptRule {
      *  Count = count() over([partition by clause])
      */
     public RexNode replaceNTile(RexOver over) {
-      RelDataType bigintType = rexBuilder.getTypeFactory().createSqlType(SqlTypeName.BIGINT);
+      RelDataType bigintType = rexBuilder.getTypeFactory().createTypeWithNullability(
+          rexBuilder.getTypeFactory().createSqlType(SqlTypeName.BIGINT), true);
       RexNode rowNumberNode = rexBuilder.makeOver(bigintType, SqlStdOperatorTable.ROW_NUMBER,
           new ArrayList<>(), over.getWindow().partitionKeys, over.getWindow().orderKeys,
           over.getWindow().getLowerBound(), over.getWindow().getUpperBound(),
@@ -208,16 +210,16 @@ public class HiveImpalaRexOverRule extends RelOptRule {
           over.getWindow().isRows(), true, false, over.isDistinct(), over.ignoreNulls());
       RexNode one =
           rexBuilder.makeCast(bigintType, rexBuilder.makeExactLiteral(BigDecimal.valueOf(1)));
-      RexNode zero =
-          rexBuilder.makeCast(bigintType, rexBuilder.makeExactLiteral(BigDecimal.valueOf(0)));
       RexNode minCountNTile =
-          rexBuilder.makeCall(MIN_OPERATOR, countNode, over.getOperands().get(0));
+          rexBuilder.makeCall(bigintType, MIN_OPERATOR, Arrays.asList(countNode, over.getOperands().get(0)));
       RexNode rowNumberMinusOne =
-          rexBuilder.makeCall(SqlStdOperatorTable.MINUS, rowNumberNode, one);
+          rexBuilder.makeCall(bigintType, SqlStdOperatorTable.MINUS, Arrays.asList(rowNumberNode, one));
       RexNode numeratorInt =
-          rexBuilder.makeCall(SqlStdOperatorTable.MULTIPLY, minCountNTile, rowNumberMinusOne);
-      RexNode NTileMinusOne  = rexBuilder.makeCall(INT_DIVIDE_OPERATOR, numeratorInt, countNode);
-      return rexBuilder.makeCall(SqlStdOperatorTable.PLUS, NTileMinusOne, one);
+          rexBuilder.makeCall(bigintType, SqlStdOperatorTable.MULTIPLY,
+              Arrays.asList(minCountNTile, rowNumberMinusOne));
+      RexNode ntileMinusOne =
+          rexBuilder.makeCall(bigintType, INT_DIVIDE_OPERATOR, Arrays.asList(numeratorInt, countNode));
+      return rexBuilder.makeCall(bigintType, SqlStdOperatorTable.PLUS, Arrays.asList(ntileMinusOne, one));
     }
   }
 
