@@ -19,6 +19,7 @@ package org.apache.hadoop.hive.metastore;
 
 import com.google.common.base.Preconditions;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hive.metastore.auth.jwt.JWTValidator;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
@@ -93,9 +94,9 @@ public class ServletSecurity implements SecureServletCaller {
             request.getHeader(headerName));
       }
     }
+    UserGroupInformation clientUgi = null;
     try {
       String userFromHeader = extractUserName(request, response);
-      UserGroupInformation clientUgi;
       // Temporary, and useless for now. Here only to allow this to work on an otherwise kerberized
       // server.
       if (isSecurityEnabled || jwtAuthEnabled) {
@@ -124,6 +125,17 @@ public class ServletSecurity implements SecureServletCaller {
       response.getWriter().println("Authentication error: " + e.getMessage());
       // Also log the error message on server side
       LOG.error("Authentication error: ", e);
+    } finally {
+      if (clientUgi != null) {
+        try {
+          FileSystem.closeAllForUGI(clientUgi);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully cleaned up FileSystem handles for user: {}", clientUgi.getUserName());
+          }
+        } catch (IOException cleanupException) {
+          LOG.error("Failed to clean up FileSystem handles for UGI: {}", clientUgi, cleanupException);
+        }
+      }
     }
   }
 

@@ -18,6 +18,7 @@
 package org.apache.hadoop.hive.metastore;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hive.metastore.api.TableMeta;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.HiveMetaStoreAuthorizer;
@@ -160,6 +161,14 @@ public class HMSServletSecurity extends ServletSecurity {
       } finally {
         HMSGroup.setGroups(null);
         setAuthClientConfig(null);
+        try {
+          FileSystem.closeAllForUGI(clientUgi);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Successfully cleaned up FileSystem handles for user: {}", clientUgi.getUserName());
+          }
+        } catch (IOException cleanupException) {
+          LOG.error("Failed to clean up FileSystem handles for UGI: {}", clientUgi, cleanupException);
+        }
       }
     } catch (AuthorizationException | HttpAuthenticationException e) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
