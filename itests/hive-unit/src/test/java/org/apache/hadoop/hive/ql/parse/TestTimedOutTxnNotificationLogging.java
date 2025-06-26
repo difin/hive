@@ -52,7 +52,7 @@ import org.junit.runners.Parameterized;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 
 @RunWith(Parameterized.class)
