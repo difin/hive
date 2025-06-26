@@ -82,7 +82,7 @@
     <avro.version>1.11.3.2025.0.20.0-SNAPSHOT</avro.version>
     <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
-    <calcite.version>1.25.0.2025.0.20.0-SNAPSHOT</calcite.version>
+    <calcite.version>1.33.0.2025.0.20.0-SNAPSHOT</calcite.version>
     <datanucleus-api-jdo.version>5.2.8</datanucleus-api-jdo.version>
     <datanucleus-core.version>5.2.10</datanucleus-core.version>
     <datanucleus-jdo.version>3.2.0-release</datanucleus-jdo.version>
