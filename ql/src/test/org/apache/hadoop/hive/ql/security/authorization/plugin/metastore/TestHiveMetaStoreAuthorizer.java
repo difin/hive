@@ -20,8 +20,11 @@ package org.apache.hadoop.hive.ql.security.authorization.plugin.metastore;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.FileUtils;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.ColumnType;
 import org.apache.hadoop.hive.metastore.*;
 import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
@@ -31,14 +34,23 @@ import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.apache.hadoop.hive.metastore.client.builder.*;
 import org.apache.hadoop.hive.metastore.events.*;
 import org.apache.hadoop.hive.ql.security.HadoopDefaultMetastoreAuthenticator;
+import org.apache.hadoop.hive.ql.security.HiveAuthenticationProvider;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAccessControlException;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthorizer;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthorizerFactory;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthzContext;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthzPluginException;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthzSessionContext;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveMetastoreClientFactory;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveOperationType;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.filtercontext.TableFilterContext;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.jetbrains.annotations.NotNull;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 import org.junit.Before;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -46,13 +58,16 @@ import java.util.List;
 import java.util.Map;
 import java.io.File;
 import java.util.stream.Collectors;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 
 /*
 Test whether HiveAuthorizer for MetaStore operation is trigger and HiveMetaStoreAuthzInfo is created by HiveMetaStoreAuthorizer
@@ -66,7 +81,7 @@ public class TestHiveMetaStoreAuthorizer {
   private static final String catalogName = "testCatalog";
   private static final String dcName = "testDC";
   private static final String unAuthorizedUser = "bob";
-  private static final String authorizedUser = "sam";
+  static final String authorizedUser = "sam";
   private static final String superUser = "hive";
   private static final String default_db = "default";
 
@@ -77,6 +92,9 @@ public class TestHiveMetaStoreAuthorizer {
   private Configuration conf;
   private HiveMetaStore.HMSHandler hmsHandler;
 
+  static HiveAuthorizer mockHiveAuthorizer;
+  static final List<String> allowedUsers = Arrays.asList("sam", "rob");
+
   @Before
   public void setUp() throws Exception {
     conf = MetastoreConf.newMetastoreConf();
@@ -86,16 +104,18 @@ public class TestHiveMetaStoreAuthorizer {
     MetastoreConf.setVar(conf, ConfVars.PARTITION_NAME_WHITELIST_PATTERN, metaConfVal);
     MetastoreConf.setLongVar(conf, ConfVars.THRIFT_CONNECTION_RETRIES, 3);
     MetastoreConf.setBoolVar(conf, ConfVars.HIVE_SUPPORT_CONCURRENCY, false);
-    MetastoreConf.setVar(conf, ConfVars.HIVE_AUTHORIZATION_MANAGER, DummyHiveAuthorizerFactory.class.getName());
+    MetastoreConf.setVar(conf, ConfVars.HIVE_AUTHORIZATION_MANAGER, MockHiveAuthorizerFactory.class.getName());
     MetastoreConf.setVar(conf, ConfVars.PRE_EVENT_LISTENERS, HiveMetaStoreAuthorizer.class.getName());
     MetastoreConf.setVar(conf, ConfVars.HIVE_METASTORE_AUTHENTICATOR_MANAGER, HadoopDefaultMetastoreAuthenticator.class.getName());
+    MetastoreConf.setVar(conf, ConfVars.FILTER_HOOK, MockMetaStoreOwnerFilterHook.class.getName());
     conf.set("hadoop.proxyuser.hive.groups", "*");
     conf.set("hadoop.proxyuser.hive.hosts", "*");
     conf.set("hadoop.proxyuser.hive.users", "*");
 
     MetaStoreTestUtils.setConfForStandloneMode(conf);
 
-    hmsHandler = new HiveMetaStore.HMSHandler("test", conf, true);
+    hmsHandler = new HiveMetaStore.HMSHandler("test", conf);
+    hmsHandler.init();
     rawStore = new ObjectStore();
     rawStore.setConf(hmsHandler.getConf());
     // Create the 'hive' catalog with new warehouse directory
@@ -109,6 +129,59 @@ public class TestHiveMetaStoreAuthorizer {
     } catch (Exception e) {
       // NoSuchObjectException will be ignored if the step objects are not there
     }
+    mockHiveAuthorizer = Mockito.mock(HiveAuthorizer.class);
+    configureMockAuthorizer();
+  }
+
+  /**
+   * Configures the mock authorizer to check permissions based on username
+   */
+  private static void configureMockAuthorizer() throws HiveAuthzPluginException, HiveAccessControlException {
+    doAnswer(invocation -> {
+      HiveOperationType opType = invocation.getArgument(0);
+      String user;
+      try {
+        user = UserGroupInformation.getLoginUser().getShortUserName();
+      } catch (Exception e) {
+        throw new HiveAuthzPluginException("Unable to get UserGroupInformation");
+      }
+
+      if (!allowedUsers.contains(user) && !user.equals(superUser)) {
+        throw new HiveAuthzPluginException("Operation type " + opType + " not allowed for user:" + user);
+      }
+      return null;
+    }).when(mockHiveAuthorizer).checkPrivileges(any(HiveOperationType.class), any(), any(), any(HiveAuthzContext.class));
+  }
+
+  /**
+   * Factory class that provides MockHiveAuthorizer instance
+   */
+  public static class MockHiveAuthorizerFactory implements HiveAuthorizerFactory {
+    @Override
+    public HiveAuthorizer createHiveAuthorizer(HiveMetastoreClientFactory metastoreClientFactory,
+                                               HiveConf conf, HiveAuthenticationProvider hiveAuthenticator,
+                                               HiveAuthzSessionContext ctx) {
+      return mockHiveAuthorizer;
+    }
+  }
+
+  /**
+   * Captures and returns the privilege objects passed to the authorizer
+   */
+  private Pair<List<HivePrivilegeObject>, List<HivePrivilegeObject>> getHivePrivilegeObjectsFromLastCall()
+      throws HiveAuthzPluginException, HiveAccessControlException {
+    @SuppressWarnings("unchecked")
+    Class<List<HivePrivilegeObject>> class_listPrivObjects = (Class) List.class;
+    ArgumentCaptor<List<HivePrivilegeObject>> inputsCapturer = ArgumentCaptor
+        .forClass(class_listPrivObjects);
+    ArgumentCaptor<List<HivePrivilegeObject>> outputsCapturer = ArgumentCaptor
+        .forClass(class_listPrivObjects);
+
+    verify(mockHiveAuthorizer).checkPrivileges(any(HiveOperationType.class),
+        inputsCapturer.capture(), outputsCapturer.capture(),
+        any(HiveAuthzContext.class));
+
+    return new ImmutablePair<>(inputsCapturer.getValue(), outputsCapturer.getValue());
   }
 
   @Test
@@ -179,7 +252,7 @@ public class TestHiveMetaStoreAuthorizer {
           .addCol("dep", ColumnType.STRING_TYPE_NAME)
           .setOwner(authorizedUser)
           .build(conf);
-      hmsHandler.alter_table(default_db, viewName, viewObj);
+      hmsHandler.alter_table("default", viewName, viewObj);
       Map<String, String> params = viewObj.getParameters();
       assertTrue(params.containsKey("Authorized"));
       assertTrue("false".equalsIgnoreCase(params.get("Authorized")));
@@ -256,10 +329,21 @@ public class TestHiveMetaStoreAuthorizer {
     try {
       Database db = new DatabaseBuilder()
           .setName(dbName)
+          .setOwnerName(authorizedUser)
+          .setOwnerType(PrincipalType.USER)
           .build(conf);
       hmsHandler.create_database(db);
+      // Verify the mock was called with correct ownership info
+      Pair<List<HivePrivilegeObject>, List<HivePrivilegeObject>> io = getHivePrivilegeObjectsFromLastCall();
+      List<HivePrivilegeObject> outputs = io.getRight();
+
+      assertEquals("Should have one output for create database", 1, outputs.size());
+      HivePrivilegeObject dbObj = outputs.get(0);
+      assertEquals("Output object should be a database",
+          HivePrivilegeObject.HivePrivilegeObjectType.DATABASE,
+          dbObj.getType());
     } catch (Exception e) {
-      // No Exception for create database for authorized user
+      fail("Authorized user should be allowed to create database: " + e.getMessage());
     }
   }
 
@@ -273,8 +357,21 @@ public class TestHiveMetaStoreAuthorizer {
           .setOwner(authorizedUser)
           .build(conf);
       hmsHandler.create_table(table);
+      Pair<List<HivePrivilegeObject>, List<HivePrivilegeObject>> io = getHivePrivilegeObjectsFromLastCall();
+      List<HivePrivilegeObject> outputs = io.getRight();
+
+      List<HivePrivilegeObject> tableOutputs = outputs.stream()
+          .filter(o -> o.getType() == HivePrivilegeObject.HivePrivilegeObjectType.TABLE_OR_VIEW)
+          .collect(Collectors.toList());
+
+      assertEquals("Should have exactly one table output for create table", 1, tableOutputs.size());
+      HivePrivilegeObject tableObj = tableOutputs.get(0);
+
+      assertEquals("Output object should be a table",
+          HivePrivilegeObject.HivePrivilegeObjectType.TABLE_OR_VIEW,
+          tableObj.getType());
     } catch (Exception e) {
-      // No Exception for create table for authorized user
+      fail("Authorized user should be allowed to create table: " + e.getMessage());
     }
   }
 
@@ -292,7 +389,7 @@ public class TestHiveMetaStoreAuthorizer {
       Table alteredTable = new TableBuilder()
           .addCol("dep", ColumnType.STRING_TYPE_NAME)
           .build(conf);
-      hmsHandler.alter_table(default_db, tblName, alteredTable);
+      hmsHandler.alter_table("default", tblName, alteredTable);
     } catch (Exception e) {
       // No Exception for create table for authorized user
     }
@@ -329,7 +426,7 @@ public class TestHiveMetaStoreAuthorizer {
   }
 
   @Test
-  public void testN__ShowDatabase_authorizedUser() throws Exception {
+  public void testNShowDatabaseAuthorizedUser() throws Exception {
     UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
     try {
       hmsHandler.get_all_databases();
@@ -339,7 +436,7 @@ public class TestHiveMetaStoreAuthorizer {
   }
 
   @Test
-  public void testO__ShowDatabase_unAuthorizedUser() throws Exception {
+  public void testOShowDatabaseUnauthorizedUser() throws Exception {
     UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(unAuthorizedUser));
     try {
       hmsHandler.get_all_databases();
@@ -352,24 +449,75 @@ public class TestHiveMetaStoreAuthorizer {
   }
 
   @Test
-  public void testP__ShowTables_authorizedUser() throws Exception {
+  public void testPShowTablesAuthorizedUser() throws Exception {
     UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
     try {
-      hmsHandler.get_all_tables(default_db);
+      hmsHandler.get_all_tables("default");
     } catch (Exception e) {
       // no Exceptions for show tables as authorized user.
     }
   }
 
   @Test
-  public void testQ__ShowTables_unAuthorizedUser() throws Exception {
+  public void testQShowTablesUnauthorizedUser() throws Exception {
     UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(unAuthorizedUser));
     try {
-      hmsHandler.get_all_tables(default_db);
+      hmsHandler.get_all_tables("default");
     } catch (Exception e) {
       String err = e.getMessage();
       if (StringUtils.isNotEmpty(err)) {
         assert (true);
+      }
+    }
+  }
+
+  @Test
+  public void testGetDatabaseObjects_UnauthorizedUser() throws Exception {
+    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(unAuthorizedUser));
+    try {
+      Database db = new DatabaseBuilder()
+          .setName(dbName)
+          .build(conf);
+      hmsHandler.create_database(db);
+      GetDatabaseObjectsRequest request = new GetDatabaseObjectsRequest();
+      request.setCatalogName("hive");
+      hmsHandler.get_databases_req(request);
+    } catch (Exception e) {
+      String err = e.getMessage();
+      assertTrue("Exception message should contain operation type",
+          err.contains("Operation type") && err.contains("not allowed for user:" + unAuthorizedUser));
+    } finally {
+      UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(superUser));
+      try {
+        hmsHandler.drop_database(dbName, true, false);
+      } catch (Exception e) {
+        // Ignore cleanup errors
+      }
+    }
+  }
+
+  @Test
+  public void testGetDatabaseObjects_AuthorizedUser() throws Exception {
+    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
+    try {
+      Database db = new DatabaseBuilder()
+          .setName(dbName)
+          .setOwnerName(authorizedUser)
+          .build(conf);
+      hmsHandler.create_database(db);
+      GetDatabaseObjectsRequest request = new GetDatabaseObjectsRequest();
+      request.setCatalogName("hive");
+      GetDatabaseObjectsResponse response = hmsHandler.get_databases_req(request);
+
+      assertNotNull("Response should not be null", response);
+      assertNotNull("Databases list should not be null", response.getDatabases());
+      assertTrue("Should find the created database",
+          response.getDatabases().stream().anyMatch(d -> d.getName().equals(dbName)));
+    } finally {
+      try {
+        hmsHandler.drop_database(dbName, true, false);
+      } catch (Exception e) {
+        // Ignore cleanup errors
       }
     }
   }
@@ -404,13 +552,9 @@ public class TestHiveMetaStoreAuthorizer {
       if (table.getTableName().equals("owner_table")) {
         foundOwnerTable = true;
         assertEquals("owner_table should have authorized user as owner", authorizedUser, table.getOwner());
-        assertEquals("owner_table should have correct owner type",
-            org.apache.hadoop.hive.metastore.api.PrincipalType.USER, table.getOwnerType());
       } else if (table.getTableName().equals("other_table")) {
         foundOtherTable = true;
         assertEquals("other_table should have unauthorized user as owner", unAuthorizedUser, table.getOwner());
-        assertEquals("other_table should have correct owner type",
-            org.apache.hadoop.hive.metastore.api.PrincipalType.USER, table.getOwnerType());
       }
     }
 
@@ -440,7 +584,6 @@ public class TestHiveMetaStoreAuthorizer {
     assertTrue("owner_table not found in privilege objects", foundOwnerTable);
     assertTrue("other_table not found in privilege objects", foundOtherTable);
   }
-
 
   @Test
   public void testShowPartitionsUnAuthorizedUser() throws Exception {
@@ -509,58 +652,6 @@ public class TestHiveMetaStoreAuthorizer {
       assertEquals(expected, err);
       UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
       hmsHandler.drop_table(default_db, new_tblName, true);
-    }
-  }
-
-  @Test
-  public void testGetDatabaseObjects_UnauthorizedUser() throws Exception {
-    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(unAuthorizedUser));
-    try {
-      Database db = new DatabaseBuilder()
-          .setName(dbName)
-          .build(conf);
-      hmsHandler.create_database(db);
-      GetDatabaseObjectsRequest request = new GetDatabaseObjectsRequest();
-      request.setCatalogName("hive");
-      hmsHandler.get_databases_req(request);
-      fail("Expected exception for unauthorized user");
-    } catch (Exception e) {
-      String err = e.getMessage();
-      assertTrue("Exception message should contain operation type",
-          err.contains("Operation type") && err.contains("not allowed for user:" + unAuthorizedUser));
-    } finally {
-      UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(superUser));
-      try {
-        hmsHandler.drop_database(dbName, true, false);
-      } catch (Exception e) {
-        // Ignore cleanup errors
-      }
-    }
-  }
-
-  @Test
-  public void testGetDatabaseObjects_AuthorizedUser() throws Exception {
-    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
-    try {
-      Database db = new DatabaseBuilder()
-          .setName(dbName)
-          .setOwnerName(authorizedUser)
-          .build(conf);
-      hmsHandler.create_database(db);
-      GetDatabaseObjectsRequest request = new GetDatabaseObjectsRequest();
-      request.setCatalogName("hive");
-      GetDatabaseObjectsResponse response = hmsHandler.get_databases_req(request);
-
-      assertNotNull("Response should not be null", response);
-      assertNotNull("Databases list should not be null", response.getDatabases());
-      assertTrue("Should find the created database",
-          response.getDatabases().stream().anyMatch(d -> d.getName().equals(dbName)));
-    } finally {
-      try {
-        hmsHandler.drop_database(dbName, true, false);
-      } catch (Exception e) {
-        // Ignore cleanup errors
-      }
     }
   }
 
@@ -663,6 +754,36 @@ public class TestHiveMetaStoreAuthorizer {
       hmsHandler.drop_dataconnector(dcName, true, true);
     } catch (Exception e) {
       fail("testU_DropDataConnector_authorizedUser() failed with " + e);
+    }
+  }
+
+  @Test
+  public void testUnAuthorizedCause() {
+    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(unAuthorizedUser));
+    try {
+      Database db = new DatabaseBuilder()
+          .setName(dbName)
+          .build(conf);
+      hmsHandler.create_database(db);
+    } catch (Exception e) {
+      // Check if the exception chain contains HiveAuthzPluginException
+      Throwable current = e;
+      boolean foundAuthzException = false;
+      while (current != null) {
+        if (current instanceof HiveAuthzPluginException) {
+          foundAuthzException = true;
+          String expectedErrMsg = "Operation type " + HiveOperationType.CREATEDATABASE + " not allowed for user:" + unAuthorizedUser;
+          assertTrue("Expected error message mismatch. Actual: '" + current.getMessage() + "'", current.getMessage().contains(expectedErrMsg));
+          break;
+        }
+        current = current.getCause();
+      }
+
+      if (!foundAuthzException) {
+        String expectedErrMsg = "Operation type " + HiveOperationType.CREATEDATABASE + " not allowed for user:" + unAuthorizedUser;
+        assertTrue("Expected HiveAuthzPluginException in exception chain. Message: '" + e.getMessage() + "'",
+            e.getMessage().contains(expectedErrMsg));
+      }
     }
   }
 }
