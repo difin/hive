@@ -40,14 +40,16 @@ public class TablePropertySummary extends IcebergSummaryRetriever {
   private static final String VERSION = "version";
   private static final String WRITE_WAP_PROPERTY = "write.wap.enabled";
   private List<PropertyRetriever> retrievers;
+  private boolean formatJson;
 
   @Override
-  public void initialize(Configuration conf, boolean formatJson) {
+  public void initialize(Configuration conf, boolean json) {
     super.initialize(conf, formatJson);
     this.retrievers = Arrays.asList(
         new WriteFormatSummary(),
         new DistributionModeSummary(),
         new UpdateModeSummary());
+    this.formatJson = json;
   }
 
   @Override

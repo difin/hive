@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.metasummary.MetadataTableSummary;
 import org.apache.hadoop.hive.metastore.metasummary.SummaryMapBuilder;
 import org.apache.iceberg.BlobMetadata;
@@ -36,6 +37,14 @@ public class PuffinStatisticsSummary extends IcebergSummaryRetriever {
   private static final String STATS = "stats";
   private static final String PUFFIN_STATS_ENABLED = "puffin_enabled";
   private static final String PUFFIN_STATS_BLOB = "puffin_blobs";
+
+  private boolean formatJson;
+
+  @Override
+  public void initialize(Configuration conf, boolean json) {
+    super.initialize(conf, json);
+    this.formatJson = json;
+  }
 
   @Override
   public List<String> getFieldNames() {

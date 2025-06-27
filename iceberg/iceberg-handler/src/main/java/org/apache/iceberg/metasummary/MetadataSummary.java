@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.collections4.IteratorUtils;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.metasummary.MetadataTableSummary;
 import org.apache.hadoop.hive.metastore.metasummary.SummaryMapBuilder;
 import org.apache.iceberg.FileScanTask;
@@ -59,6 +60,14 @@ public class MetadataSummary extends IcebergSummaryRetriever {
   public static final String MANIFESTS_SIZE = "manifestsSize";
   public static final String NUM_BRANCHES = "numBranches";
   public static final String NUM_TAGS = "numTags";
+
+  private boolean formatJson;
+
+  @Override
+  public void initialize(Configuration conf, boolean json) {
+    super.initialize(conf, json);
+    this.formatJson = json;
+  }
 
   @Override
   public List<String> getFieldNames() {

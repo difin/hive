@@ -145,7 +145,7 @@ public class IcebergSummaryHandler implements MetaSummaryHandler {
   @Override
   public void close() throws Exception {
     if (catalog != null) {
-      catalog.close();
+      // catalog.close();
     }
   }
 

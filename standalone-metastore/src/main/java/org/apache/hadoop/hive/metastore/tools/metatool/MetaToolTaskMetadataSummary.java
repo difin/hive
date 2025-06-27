@@ -150,7 +150,7 @@ public class MetaToolTaskMetadataSummary extends MetaToolTask {
     this.formatConsole = formatOption.equalsIgnoreCase("-console");
     boolean formatCsv = formatOption.equalsIgnoreCase("-csv");
     if (!formatJson && !formatCsv && !formatConsole) {
-      System.err.println("Invalid format option: " + formatOption + 
+      System.err.println("Invalid format option: " + formatOption +
           " to -metadataSummary, only -json, -csv and -console are allowed");
       return null;
     }
