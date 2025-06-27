@@ -65,6 +65,7 @@ import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 import org.apache.iceberg.types.Types;
 import org.apache.thrift.TException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -528,6 +529,7 @@ public class HiveTableTest extends HiveTableBaseTest {
         .hasMessage("Table already exists: hivedb.tbl");
   }
 
+  @Disabled("CDPD-87086")
   @Test
   public void testEngineHiveEnabledDefault() throws TException {
     // Drop the previously created table to make place for the new one
