@@ -4492,10 +4492,15 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
     }
 
-    private List<Partition> add_partitions_core(final RawStore ms, String catName,
-        String dbName, String tblName, List<Partition> parts, final boolean ifNotExists,
-        boolean isSkipColSchemaForPartition) throws TException {
+    private List<Partition> add_partitions_core(final RawStore ms,
+        AddPartitionsRequest request) throws TException {
       logInfo("add_partitions");
+      String catName = request.getCatName();
+      String dbName = request.getDbName();
+      String tblName = request.getTblName();
+      if (dbName == null || tblName == null) {
+        throw new MetaException("The database and table name cannot be null.");
+      }
       boolean success = false;
       // Ensures that the list doesn't have dups, and keeps track of directories we have created.
       final Map<PartValEqWrapperLite, Boolean> addedPartitions = new ConcurrentHashMap<>();
@@ -4505,8 +4510,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       Map<String, String> transactionalListenerResponses = Collections.emptyMap();
       Database db = null;
 
-      List<ColumnStatistics> partsColStats = new ArrayList<>(parts.size());
-      List<Long> partsWriteIds = new ArrayList<>(parts.size());
+      List<ColumnStatistics> partsColStats = new ArrayList<>();
+      List<Long> partsWriteIds = new ArrayList<>();
 
       throwUnsupportedExceptionIfRemoteDB(dbName, "add_partitions");
 
@@ -4517,35 +4522,55 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         tbl = ms.getTable(catName, dbName, tblName);
         if (tbl == null) {
           throw new InvalidObjectException("Unable to add partitions because "
-              + TableName.getQualified(catName, dbName, tblName) +
-              " does not exist");
+              + TableName.getQualified(catName, dbName, tblName) + " does not exist");
         }
 
         db = ms.getDatabase(catName, dbName);
 
-        Set<PartValEqWrapperLite> partsToAdd = new HashSet<>(parts.size());
-        List<Partition> partitionsToAdd = new ArrayList<>(parts.size());
+        Set<PartValEqWrapperLite> partsToAdd = new HashSet<>();
         List<FieldSchema> partitionKeys = tbl.getPartitionKeys();
-        for (final Partition part : parts) {
-          if(isSkipColSchemaForPartition) {
+        Map<String, Partition> nameToPart = new LinkedHashMap<>();
+        for (final Partition part : request.getParts()) {
+          if (request.isSkipColumnSchemaForPartition()) {
             part.getSd().setCols(tbl.getSd().getCols());
           }
+          // Collect partition column stats to be updated if present. Partition objects passed down
+          // here at the time of replication may have statistics in them, which is required to be
+          // updated in the metadata. But we don't want it to be part of the Partition object when
+          // it's being created or altered, lest it becomes part of the notification event.
+          if (part.isSetColStats()) {
+            partsColStats.add(part.getColStats());
+            part.unsetColStats();
+            partsWriteIds.add(part.getWriteId());
+          }
+
           // Iterate through the partitions and validate them. If one of the partitions is
           // incorrect, an exception will be thrown before the threads which create the partition
           // folders are submitted. This way we can be sure that no partition and no partition
           // folder will be created if the list contains an invalid partition.
-          if (validatePartition(part, catName, tblName, dbName, partsToAdd, ms, ifNotExists,
-              partitionKeys)) {
-            partitionsToAdd.add(part);
-          } else {
-            existingParts.add(part);
-          }
+          validatePartition(part, catName, tblName, dbName, partsToAdd);
+          nameToPart.put(Warehouse.makePartName(partitionKeys, part.getValues()), part);
         }
 
-        // Only authorize on newly created partitions
-        if (!partitionsToAdd.isEmpty()) {
-          firePreEvent(new PreAddPartitionEvent(tbl, partitionsToAdd, this));
+        List<Partition> existedParts =
+            ms.getPartitionsByNames(catName, dbName, tblName,
+                new GetPartitionsArgs.GetPartitionsArgsBuilder().partNames(new ArrayList<>(nameToPart.keySet())).build());
+        List<String> existedPartNames = new ArrayList<>();
+        for (Partition part : existedParts) {
+          String partName = Warehouse.makePartName(partitionKeys, part.getValues());
+          existedPartNames.add(partName);
+          existingParts.add(nameToPart.remove(partName));
         }
+        if (!request.isIfNotExists() && !existedPartNames.isEmpty()) {
+          throw new AlreadyExistsException("Partition(s) already exist, partition name(s): " + existedPartNames);
+        }
+
+        if (nameToPart.isEmpty()) {
+          return Collections.emptyList();
+        }
+        List<Partition> partitionsToAdd = new ArrayList<>(nameToPart.values());
+        // Only authorize on newly created partitions
+        firePreEvent(new PreAddPartitionEvent(tbl, partitionsToAdd, this));
 
         newParts.addAll(createPartitionFolders(partitionsToAdd, tbl, addedPartitions));
 
@@ -4560,22 +4585,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
               MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
                                                     EventType.ADD_PARTITION,
                                                     new AddPartitionEvent(tbl, newParts, true, this));
-        }
-
-        if (!listeners.isEmpty()) {
-          MetaStoreListenerNotifier.notifyEvent(listeners,
-                  EventType.ADD_PARTITION,
-                  new AddPartitionEvent(tbl, newParts, true, this),
-                  null,
-                  transactionalListenerResponses, ms);
-
-          if (!existingParts.isEmpty()) {
-            // The request has succeeded but we failed to add these partitions.
-            MetaStoreListenerNotifier.notifyEvent(listeners,
-                    EventType.ADD_PARTITION,
-                    new AddPartitionEvent(tbl, existingParts, false, this),
-                    null, null, ms);
-          }
         }
 
         // Update partition column statistics if available. We need a valid writeId list to
@@ -4603,12 +4612,20 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         if (!success) {
             ms.rollbackTransaction();
             cleanupPartitionFolders(addedPartitions, db);
+          }
+          if (!listeners.isEmpty()) {
+            MetaStoreListenerNotifier.notifyEvent(listeners,
+                EventType.ADD_PARTITION,
+                new AddPartitionEvent(tbl, newParts, success, this),
+                null,
+                transactionalListenerResponses, ms);
 
-            if (!listeners.isEmpty()) {
+            if (!existingParts.isEmpty()) {
+              // The request has succeeded but we failed to add these partitions.
               MetaStoreListenerNotifier.notifyEvent(listeners,
-                                                    EventType.ADD_PARTITION,
-                                                    new AddPartitionEvent(tbl, parts, false, this),
-                                                    null, null, ms);
+                  EventType.ADD_PARTITION,
+                  new AddPartitionEvent(tbl, existingParts, false, this),
+                  null, null, ms);
             }
           }
         } finally {
@@ -4662,16 +4679,14 @@ public class HiveMetaStore extends ThriftHiveMetastore {
      * @param tblName
      * @param dbName
      * @param partsToAdd
-     * @param ms
-     * @param ifNotExists
-     * @return
      * @throws MetaException
      * @throws TException
      */
-    private boolean validatePartition(final Partition part, final String catName,
-        final String tblName, final String dbName, final Set<PartValEqWrapperLite> partsToAdd,
-        final RawStore ms, final boolean ifNotExists, List<FieldSchema> partitionKeys) throws MetaException, TException {
-
+    private void validatePartition(final Partition part, final String catName,
+        final String tblName, final String dbName, final Set<PartValEqWrapperLite> partsToAdd)
+        throws MetaException, TException {
+      MetaStoreUtils.validatePartitionNameCharacters(part.getValues(),
+          partitionValidationPattern);
       if (part.getDbName() == null || part.getTableName() == null) {
         throw new MetaException("The database and table name must be set in the partition.");
       }
@@ -4693,19 +4708,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         throw new MetaException("Partition value cannot be null.");
       }
 
-      boolean shouldAdd = startAddPartition(ms, part, partitionKeys, ifNotExists);
-      if (!shouldAdd) {
-        LOG.info("Not adding partition {} as it already exists", part);
-        return false;
-      }
-
       if (!partsToAdd.add(new PartValEqWrapperLite(part))) {
         // Technically, for ifNotExists case, we could insert one and discard the other
         // because the first one now "exists", but it seems better to report the problem
         // upstream as such a command doesn't make sense.
         throw new MetaException("Duplicate partitions in the list: " + part);
       }
-      return true;
     }
 
     /**
@@ -4813,8 +4821,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             p.setCatName(getDefaultCatalog(conf));
           }
         });
-        List<Partition> parts = add_partitions_core(getMS(), request.getCatName(), request.getDbName(),
-            request.getTblName(), request.getParts(), request.isIfNotExists(), request.isSkipColumnSchemaForPartition());
+        List<Partition> parts = add_partitions_core(getMS(), request);
         if (request.isNeedResult()) {
           if (isColSkippedForPartitions) {
             if (!parts.isEmpty()) {
@@ -4856,8 +4863,11 @@ public class HiveMetaStore extends ThriftHiveMetastore {
             p.setCatName(defaultCat);
           }
         }
-        ret = add_partitions_core(getMS(), parts.get(0).getCatName(), parts.get(0).getDbName(),
-            parts.get(0).getTableName(), parts, false, false).size();
+        Partition part0 = parts.get(0);
+        AddPartitionsRequest request =
+            new AddPartitionsRequest(part0.getDbName(), part0.getTableName(), parts, false);
+        request.setCatName(part0.getCatName());
+        ret = add_partitions_core(getMS(), request).size();
         assert ret == parts.size();
       } catch (Exception e) {
         ex = e;
@@ -4880,107 +4890,52 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     @Override
     public int add_partitions_pspec(final List<PartitionSpec> partSpecs)
         throws TException {
-      logInfo("add_partitions_pspec");
-
       if (partSpecs.isEmpty()) {
         return 0;
       }
 
+      String catName = partSpecs.get(0).isSetCatName() ? partSpecs.get(0).getCatName() : getDefaultCatalog(conf);
       String dbName = partSpecs.get(0).getDbName();
       String tableName = partSpecs.get(0).getTableName();
-      // If the catalog name isn't set, we need to go through and set it.
-      String catName;
-      if (!partSpecs.get(0).isSetCatName()) {
-        catName = getDefaultCatalog(conf);
-        partSpecs.forEach(ps -> ps.setCatName(catName));
-      } else {
-        catName = partSpecs.get(0).getCatName();
-      }
+      startTableFunction("add_partitions_pspec", catName, dbName, tableName);
 
-      return add_partitions_pspec_core(getMS(), catName, dbName, tableName, partSpecs, false);
-    }
-
-    private int add_partitions_pspec_core(RawStore ms, String catName, String dbName,
-                                          String tblName, List<PartitionSpec> partSpecs,
-                                          boolean ifNotExists)
-        throws TException {
-      boolean success = false;
-      if (dbName == null || tblName == null) {
-        throw new MetaException("The database and table name cannot be null.");
-      }
-      // Ensures that the list doesn't have dups, and keeps track of directories we have created.
-      final Map<PartValEqWrapperLite, Boolean> addedPartitions = new ConcurrentHashMap<>();
-      PartitionSpecProxy partitionSpecProxy = PartitionSpecProxy.Factory.get(partSpecs);
-      final PartitionSpecProxy.PartitionIterator partitionIterator = partitionSpecProxy
-          .getPartitionIterator();
-      Table tbl = null;
-      Map<String, String> transactionalListenerResponses = Collections.emptyMap();
-      Database db = null;
-      Lock tableLock = getTableLockFor(dbName, tblName);
-      tableLock.lock();
+      Integer ret = null;
+      Exception ex = null;
       try {
-        ms.openTransaction();
-        try {
-          db = ms.getDatabase(catName, dbName);
-        } catch (NoSuchObjectException notExists) {
-          throw new InvalidObjectException("Unable to add partitions because "
-                  + "database or table " + dbName + "." + tblName + " does not exist");
+        // If the catalog name isn't set, we need to go through and set it.
+        if (!partSpecs.get(0).isSetCatName()) {
+          partSpecs.forEach(ps -> ps.setCatName(catName));
         }
-        if (db.getType() == DatabaseType.REMOTE)
-          throw new MetaException("Operation add_partitions_pspec not supported on tables in REMOTE database");
-        tbl = ms.getTable(catName, dbName, tblName, null);
-        if (tbl == null) {
-          throw new InvalidObjectException("Unable to add partitions because "
-              + "database or table " + dbName + "." + tblName + " does not exist");
-        }
+        dbName = normalizeIdentifier(dbName);
+        tableName = normalizeIdentifier(tableName);
 
-        firePreEvent(new PreAddPartitionEvent(tbl, partitionSpecProxy, this));
-        Set<PartValEqWrapperLite> partsToAdd = new HashSet<>(partitionSpecProxy.size());
+        PartitionSpecProxy partitionSpecProxy = PartitionSpecProxy.Factory.get(partSpecs);
+        final PartitionSpecProxy.PartitionIterator partitionIterator = partitionSpecProxy
+            .getPartitionIterator();
         List<Partition> partitionsToAdd = new ArrayList<>(partitionSpecProxy.size());
-        List<FieldSchema> partitionKeys = tbl.getPartitionKeys();
         while (partitionIterator.hasNext()) {
-          // Iterate through the partitions and validate them. If one of the partitions is
-          // incorrect, an exception will be thrown before the threads which create the partition
-          // folders are submitted. This way we can be sure that no partition or partition folder
-          // will be created if the list contains an invalid partition.
           final Partition part = partitionIterator.getCurrent();
-          if (validatePartition(part, catName, tblName, dbName, partsToAdd, ms, ifNotExists,
-              partitionKeys)) {
-            partitionsToAdd.add(part);
-          }
+          // Normalize dbName and tblName of each part
+          // to follow the case-insensitive behavior of replaced add_partitions_pspec_core
+          part.setDbName(normalizeIdentifier(part.getDbName()));
+          part.setTableName(normalizeIdentifier(part.getTableName()));
+
+          partitionsToAdd.add(part);
           partitionIterator.next();
         }
-
-        createPartitionFolders(partitionsToAdd, tbl, addedPartitions);
-
-        ms.addPartitions(catName, dbName, tblName, partitionSpecProxy, ifNotExists);
-
-        if (!transactionalListeners.isEmpty()) {
-          transactionalListenerResponses =
-              MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
-                                                    EventType.ADD_PARTITION,
-                                                    new AddPartitionEvent(tbl, partitionSpecProxy, true, this));
+        AddPartitionsRequest request = new AddPartitionsRequest(dbName, tableName, partitionsToAdd, false);
+        request.setCatName(catName);
+        ret = add_partitions_core(getMS(), request).size();
+      } catch (Exception e) {
+        ex = e;
+        if (e instanceof TException) {
+          throw (TException) e;
         }
-
-        success = ms.commitTransaction();
-        return addedPartitions.size();
+        throw new MetaException(e.getMessage());
       } finally {
-        try {
-          if (!success) {
-            ms.rollbackTransaction();
-            cleanupPartitionFolders(addedPartitions, db);
-          }
-          if (!listeners.isEmpty()) {
-            MetaStoreListenerNotifier.notifyEvent(listeners,
-                                                  EventType.ADD_PARTITION,
-                                                  new AddPartitionEvent(tbl, partitionSpecProxy, true, this),
-                                                  null,
-                                                  transactionalListenerResponses, ms);
-          }
-        } finally {
-          tableLock.unlock();
-        }
+        endFunction("add_partitions_pspec", ret != null, ex, tableName);
       }
+      return ret;
     }
 
     private boolean startAddPartition(
