@@ -72,6 +72,7 @@ import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -90,6 +91,7 @@ public class HMSCatalogAdapter implements RESTClient {
   static final String HMS_METRIC_PREFIX = "hmscatalog.";
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogAdapter.class);
   private static final Splitter SLASH = Splitter.on('/');
+  private static final AtomicInteger REQUEST_ID_COUNTER = new AtomicInteger(0);
 
   private static final Map<Class<? extends Exception>, Integer> EXCEPTION_ERROR_CODES =
       ImmutableMap.<Class<? extends Exception>, Integer>builder()
@@ -296,11 +298,14 @@ public class HMSCatalogAdapter implements RESTClient {
     return metricNames;
   }
 
+
+
   @SuppressWarnings("MethodLength")
   public <T extends RESTResponse> T handleRequest(
-      Route route, Map<String, String> vars, Object body, Class<T> responseType) {
+      Route route, Map<String, String> vars, Object body, Class<T> responseType, String requestId) {
     // update HMS catalog route counter metric
-    final String metricName = HMSCatalog.hmsCatalogMetricCount(route.name());
+    LOG.debug("API_HANDLER [{}] Processing route: {}", requestId, route);
+    final String metricName = hmsCatalogMetricCount(route.name());
     Counter counter = Metrics.getOrCreateCounter(metricName);
     if (counter != null) {
       counter.inc();
@@ -308,6 +313,7 @@ public class HMSCatalogAdapter implements RESTClient {
     catalogMeteringEventPublisher.updateAPICount();
     switch (route) {
       case TOKENS: {
+        LOG.debug("API_OPERATION [{}] Processing OAuth token request", requestId);
         @SuppressWarnings("unchecked")
         Map<String, String> request = (Map<String, String>) castRequest(Map.class, body);
         String grantType = request.get("grant_type");
@@ -341,9 +347,11 @@ public class HMSCatalogAdapter implements RESTClient {
       }
 
       case CONFIG:
+        LOG.debug("API_OPERATION [{}] Retrieving catalog configuration", requestId);
         return castResponse(responseType, ConfigResponse.builder().build());
 
       case LIST_NAMESPACES:
+        LOG.debug("API_OPERATION [{}] Listing namespaces", requestId);
         if (asNamespaceCatalog != null) {
           Namespace ns;
           if (vars.containsKey("parent")) {
@@ -361,31 +369,40 @@ public class HMSCatalogAdapter implements RESTClient {
         break;
 
       case CREATE_NAMESPACE:
+        LOG.debug("API_OPERATION [{}] Creating namespace", requestId);
         if (asNamespaceCatalog != null) {
           CreateNamespaceRequest request = castRequest(CreateNamespaceRequest.class, body);
+          LOG.debug("API_OPERATION [{}] Creating namespace: {}", requestId, request.namespace());
           return castResponse(
               responseType, CatalogHandlers.createNamespace(asNamespaceCatalog, request));
         }
         break;
 
       case LOAD_NAMESPACE:
+        LOG.debug("API_OPERATION [{}] Loading namespace", requestId);
         if (asNamespaceCatalog != null) {
           Namespace namespace = namespaceFromPathVars(vars);
+          LOG.debug("API_OPERATION [{}] Loading namespace: {}", requestId, namespace);
           return castResponse(
               responseType, CatalogHandlers.loadNamespace(asNamespaceCatalog, namespace));
         }
         break;
 
       case DROP_NAMESPACE:
+        LOG.debug("API_OPERATION [{}] Dropping namespace", requestId);
         if (asNamespaceCatalog != null) {
-          CatalogHandlers.dropNamespace(asNamespaceCatalog, namespaceFromPathVars(vars));
+          Namespace namespace = namespaceFromPathVars(vars);
+          LOG.debug("API_OPERATION [{}] Dropping namespace: {}", requestId, namespace);
+          CatalogHandlers.dropNamespace(asNamespaceCatalog, namespace);
           return null;
         }
         break;
 
       case UPDATE_NAMESPACE:
+        LOG.debug("API_OPERATION [{}] Updating namespace properties", requestId);
         if (asNamespaceCatalog != null) {
           Namespace namespace = namespaceFromPathVars(vars);
+          LOG.debug("API_OPERATION [{}] Updating namespace properties: {}", requestId, namespace);
           UpdateNamespacePropertiesRequest request =
               castRequest(UpdateNamespacePropertiesRequest.class, body);
           return castResponse(
@@ -396,6 +413,7 @@ public class HMSCatalogAdapter implements RESTClient {
 
       case LIST_TABLES: {
         Namespace namespace = namespaceFromPathVars(vars);
+        LOG.debug("API_OPERATION [{}] Listing tables in namespace: {}", requestId, namespace);
         return castResponse(responseType, CatalogHandlers.listTables(catalog, namespace));
       }
 
@@ -403,32 +421,40 @@ public class HMSCatalogAdapter implements RESTClient {
         Namespace namespace = namespaceFromPathVars(vars);
         CreateTableRequest request = castRequest(CreateTableRequest.class, body);
         request.validate();
+        LOG.debug("API_OPERATION [{}] Creating table '{}' in namespace: {}", requestId, request.name(), namespace);
         if (request.stageCreate()) {
+          LOG.debug("API_OPERATION [{}] Staging table creation", requestId);
           return castResponse(
               responseType, CatalogHandlers.stageTableCreate(catalog, namespace, request));
         } else {
+          LOG.debug("API_OPERATION [{}] Direct table creation", requestId);
           return castResponse(
               responseType, CatalogHandlers.createTable(catalog, namespace, request));
         }
       }
 
       case DROP_TABLE: {
-        if (PropertyUtil.propertyAsBoolean(vars, "purgeRequested", false)) {
-          CatalogHandlers.purgeTable(catalog, identFromPathVars(vars));
+        TableIdentifier ident = identFromPathVars(vars);
+        boolean purgeRequested = PropertyUtil.propertyAsBoolean(vars, "purgeRequested", false);
+        LOG.debug("API_OPERATION [{}] Dropping table: {} (purge: {})", requestId, ident, purgeRequested);
+        if (purgeRequested) {
+          CatalogHandlers.purgeTable(catalog, ident);
         } else {
-          CatalogHandlers.dropTable(catalog, identFromPathVars(vars));
+          CatalogHandlers.dropTable(catalog, ident);
         }
         return null;
       }
 
       case LOAD_TABLE: {
         TableIdentifier ident = identFromPathVars(vars);
+        LOG.debug("API_OPERATION [{}] Loading table: {}", requestId, ident);
         return castResponse(responseType, loadTable(catalog, ident));
       }
 
       case REGISTER_TABLE: {
         Namespace namespace = namespaceFromPathVars(vars);
         RegisterTableRequest request = castRequest(RegisterTableRequest.class, body);
+        LOG.debug("API_OPERATION [{}] Registering table '{}' in namespace: {}", requestId, request.name(), namespace);
         return castResponse(
             responseType, registerTable(catalog, namespace, request));
       }
@@ -436,22 +462,27 @@ public class HMSCatalogAdapter implements RESTClient {
       case UPDATE_TABLE: {
         TableIdentifier ident = identFromPathVars(vars);
         UpdateTableRequest request = castRequest(UpdateTableRequest.class, body);
+        LOG.debug("API_OPERATION [{}] Updating table: {}", requestId, ident);
         return castResponse(responseType, CatalogHandlers.updateTable(catalog, ident, request));
       }
 
       case RENAME_TABLE: {
         RenameTableRequest request = castRequest(RenameTableRequest.class, body);
+        LOG.debug("API_OPERATION [{}] Renaming table from '{}' to '{}'",
+            requestId, request.source(), request.destination());
         CatalogHandlers.renameTable(catalog, request);
         return null;
       }
 
       case REPORT_METRICS: {
         // nothing to do here other than checking that we're getting the correct request
+        LOG.debug("API_OPERATION [{}] Reporting metrics", requestId);
         castRequest(ReportMetricsRequest.class, body);
         return null;
       }
 
       default:
+        LOG.error("API_UNHANDLED_ROUTE [{}] Route matched but no handler found: {}", requestId, route);
     }
     return null;
   }
@@ -502,10 +533,19 @@ public class HMSCatalogAdapter implements RESTClient {
       LoadTableResponse.Builder builder = LoadTableResponse.builder().withTableMetadata(metaData);
       DataSharing dataSharing = HMSCatalogServer.getDataSharing();
       if (dataSharing != null) {
-        Map<String, String> token = dataSharing.getAccessToken(table.location());
-        if (token != null && !token.isEmpty()) {
-          token.forEach(builder::addConfig);
+        try {
+          Map<String, String> token = dataSharing.getAccessToken(table.location());
+          if (token != null && !token.isEmpty()) {
+            token.forEach(builder::addConfig);
+            LOG.debug("Added data sharing credentials for table at location: {}", table.location());
+          }
+        } catch (Exception e) {
+          // Log warning but don't fail the entire operation
+          LOG.warn("Failed to obtain data sharing token for table {}, continuing without credentials: {}",
+              table.location(), e.getMessage());
         }
+      } else {
+        LOG.debug("Data sharing not configured, skipping credential injection for table: {}", table.location());
       }
       return builder;
     });
@@ -607,9 +647,13 @@ public class HMSCatalogAdapter implements RESTClient {
       Class<T> responseType,
       Map<String, String> headers,
       Consumer<ErrorResponse> errorHandler) {
+    String requestId = generateRequestId();
+    String clientInfo = extractClientInfo(headers);
+    LOG.info("API_CALL [{}] {} {} from client [{}]", requestId, method, path, clientInfo);
     ErrorResponse.Builder errorBuilder = ErrorResponse.builder();
     Pair<Route, Map<String, String>> routeAndVars = Route.from(method, path);
     if (routeAndVars != null) {
+      LOG.debug("API_ROUTE_MATCHED [{}] Route: {}", requestId, routeAndVars.first());
       try {
         ImmutableMap.Builder<String, String> vars = ImmutableMap.builder();
         if (queryParams != null) {
@@ -622,25 +666,78 @@ public class HMSCatalogAdapter implements RESTClient {
             vars.put(HttpHeaders.AUTHORIZATION, bearer);
           }
         }
-
-        return handleRequest(routeAndVars.first(), vars.build(), body, responseType);
-
+        T result = handleRequest(routeAndVars.first(), vars.build(), body, responseType, requestId);
+        LOG.info("API_SUCCESS [{}] {} {} completed successfully", requestId, method, path);
+        return result;
       } catch (RuntimeException e) {
+        LOG.warn("API_ERROR [{}] {} {} failed: {} - {}",
+            requestId, method, path, e.getClass().getSimpleName(), e.getMessage());
         configureResponseFromException(e, errorBuilder);
       }
-
     } else {
+      LOG.warn("API_UNSUPPORTED [{}] {} {} from client [{}] - No matching route found", requestId, method, path, clientInfo);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("API_UNSUPPORTED_DETAILS [{}] Available routes: {}",
+            requestId, getSupportedRoutesSummary());
+      }
       errorBuilder
           .responseCode(400)
           .withType("BadRequestException")
-          .withMessage(String.format("No route for request: %s %s", method, path));
+          .withMessage(String.format("No route for request: %s %s. Supported API version: v1. " +
+              "Please check the API documentation for valid endpoints.", method, path));
     }
 
     ErrorResponse error = errorBuilder.build();
+    LOG.info("API_ERROR_RESPONSE [{}] Returning error: {} - {}", requestId, error.type(), error.message());
     errorHandler.accept(error);
 
     // if the error handler doesn't throw an exception, throw a generic one
     throw new RESTException("Unhandled error: %s", error);
+  }
+
+  // helper methods for logging
+
+  /**
+   * Generates a unique request ID for tracking API calls through the system.
+   * This helps correlate log entries for the same request.
+   */
+  private String generateRequestId() {
+    int queryId = REQUEST_ID_COUNTER.incrementAndGet() % 10000;
+    return String.format("%d-%04d", System.currentTimeMillis(), queryId);
+  }
+
+  /**
+   * Extracts client information from request headers for monitoring.
+   * This helps identify which clients are using which APIs.
+   */
+  private String extractClientInfo(Map<String, String> headers) {
+    if (headers == null) return "unknown";
+
+    StringBuilder clientInfo = new StringBuilder();
+
+    String userAgent = headers.get("User-Agent");
+    if (userAgent != null) {
+      // Keep user agent info concise for logging
+      String shortUA = userAgent.length() > 50 ? userAgent.substring(0, 50) + "..." : userAgent;
+      clientInfo.append(shortUA);
+    }
+
+    String forwarded = headers.get("X-Forwarded-For");
+    if (forwarded != null) {
+      if (clientInfo.length() > 0) clientInfo.append(" from ");
+      clientInfo.append(forwarded);
+    }
+
+    return clientInfo.length() > 0 ? clientInfo.toString() : "unknown";
+  }
+
+  /**
+   * Provides a summary of supported routes for debugging unsupported API calls.
+   */
+  private String getSupportedRoutesSummary() {
+    return Arrays.stream(Route.values())
+        .map(Enum::toString)
+        .collect(Collectors.joining(", "));
   }
 
   @Override
