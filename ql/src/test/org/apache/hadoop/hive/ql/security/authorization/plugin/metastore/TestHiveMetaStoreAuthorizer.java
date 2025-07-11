@@ -48,6 +48,7 @@ import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.filterc
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
+import org.apache.thrift.TException;
 import org.junit.Before;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -67,6 +68,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 
 /*
@@ -91,7 +93,7 @@ public class TestHiveMetaStoreAuthorizer {
   private RawStore rawStore;
   private Configuration conf;
   private HiveMetaStore.HMSHandler hmsHandler;
-
+  private static final List<String> PARTCOL_SCHEMA = Lists.newArrayList("yyyy", "mm", "dd");
   static HiveAuthorizer mockHiveAuthorizer;
   static final List<String> allowedUsers = Arrays.asList("sam", "rob");
 
@@ -785,5 +787,106 @@ public class TestHiveMetaStoreAuthorizer {
             e.getMessage().contains(expectedErrMsg));
       }
     }
+  }
+
+
+  /**
+   * Captures and returns the privilege objects for Alter Partition
+   */
+  private Pair<List<HivePrivilegeObject>, List<HivePrivilegeObject>> getHivePrivilegeObjectsForAlterPartition()
+      throws HiveAuthzPluginException, HiveAccessControlException {
+    @SuppressWarnings("unchecked")
+    Class<List<HivePrivilegeObject>> class_listPrivObjects = (Class) List.class;
+    ArgumentCaptor<List<HivePrivilegeObject>> inputsCapturer = ArgumentCaptor
+        .forClass(class_listPrivObjects);
+    ArgumentCaptor<List<HivePrivilegeObject>> outputsCapturer = ArgumentCaptor
+        .forClass(class_listPrivObjects);
+
+    verify(mockHiveAuthorizer).checkPrivileges(eq(HiveOperationType.ALTERPARTITION_FILEFORMAT),
+        inputsCapturer.capture(), outputsCapturer.capture(),
+        any(HiveAuthzContext.class));
+
+    return new ImmutablePair<>(inputsCapturer.getValue(), outputsCapturer.getValue());
+  }
+
+  @Test
+  public void testV_AlterPartition_DFSUriPrivObject() {
+    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser(authorizedUser));
+    try {
+      List<List<String>> testValues = createTable4PartColsParts();
+      List<Partition> oldParts = hmsHandler.get_partitions(dbName, tblName, (short) -1);
+      Partition oldPart = oldParts.get(3);
+      Partition newPart = makeTestChangesOnPartition(oldPart);
+
+      hmsHandler.rename_partition(dbName, tblName,oldPart.getValues(),newPart);
+
+      Pair<List<HivePrivilegeObject>, List<HivePrivilegeObject>> io = getHivePrivilegeObjectsForAlterPartition();
+      List<HivePrivilegeObject> outputs = io.getRight();
+
+      List<HivePrivilegeObject> tableOutputs = outputs.stream()
+          .filter(o -> o.getType() == HivePrivilegeObject.HivePrivilegeObjectType.DFS_URI)
+          .collect(Collectors.toList());
+
+      assertEquals("Should have one DFS_URI privilege object", 1, tableOutputs.size());
+      HivePrivilegeObject DFSUriObj = tableOutputs.get(0);
+
+      assertEquals("DFS_URI should be same as new partition location",
+          oldPart.getSd().getLocation()+ "/hh=01", DFSUriObj.getObjectName());
+    } catch (Exception e) {
+      fail("testV_AlterPartition_DFSUriPrivObject() failed with " + e);
+    }
+  }
+
+  protected Table createPartitionedTestTable(String dbName, String tableName,
+      List<String> partCols, boolean setPartitionLevelPrivilages)
+      throws Exception {
+
+    Database db = new DatabaseBuilder()
+        .setName(dbName)
+        .build(conf);
+    hmsHandler.create_database(db);
+
+    TableBuilder builder = new TableBuilder()
+        .setDbName(dbName)
+        .setTableName(tableName)
+        .addCol("id", "int")
+        .addCol("name", "string");
+
+    partCols.forEach(col -> builder.addPartCol(col, "string"));
+    Table table = builder.build(conf);
+
+    hmsHandler.create_table(table);
+    return table;
+  }
+
+  protected List<List<String>> createTable4PartColsParts() throws
+      Exception {
+    Table table = createPartitionedTestTable(dbName, tblName, PARTCOL_SCHEMA, false);
+    List<List<String>> testValues = Lists.newArrayList(
+        Lists.newArrayList("1999", "01", "02"),
+        Lists.newArrayList("2009", "02", "10"),
+        Lists.newArrayList("2017", "10", "26"),
+        Lists.newArrayList("2017", "11", "27"));
+
+    for (List<String> vals : testValues) {
+      addPartition(table, vals);
+    }
+
+    return testValues;
+  }
+
+  protected void addPartition(Table table, List<String> values)
+      throws TException {
+    PartitionBuilder partitionBuilder = new PartitionBuilder().inTable(table);
+    values.forEach(val -> partitionBuilder.addValue(val));
+    hmsHandler.add_partition(partitionBuilder.build(conf));
+  }
+
+  protected static Partition makeTestChangesOnPartition(Partition partition) {
+    Partition newPart = new Partition(partition);
+    newPart.getParameters().put("hmsTestParam001", "testValue001");
+    newPart.getSd().setLocation(partition.getSd().getLocation() + "/hh=01");
+    newPart.setValues(Lists.newArrayList("2018", "11", "27"));
+    return newPart;
   }
 }

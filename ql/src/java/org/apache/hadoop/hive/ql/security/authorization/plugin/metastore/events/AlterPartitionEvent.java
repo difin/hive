@@ -19,17 +19,20 @@
 
 package org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.events;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.events.PreAlterPartitionEvent;
 import org.apache.hadoop.hive.metastore.events.PreEventContext;
+import org.apache.hadoop.hive.ql.metadata.Hive;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveOperationType;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject;
-import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject.HivePrivilegeObjectType;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.HiveMetaStoreAuthorizableEvent;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.HiveMetaStoreAuthzInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +42,7 @@ import java.util.List;
  */
 
 public class AlterPartitionEvent extends HiveMetaStoreAuthorizableEvent {
-  private static final Log LOG = LogFactory.getLog(AlterPartitionEvent.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AlterPartitionEvent.class);
 
   private String COMMAND_STR = "alter table %s partition %s";
 
@@ -55,26 +58,20 @@ public class AlterPartitionEvent extends HiveMetaStoreAuthorizableEvent {
   }
 
   private List<HivePrivilegeObject> getInputHObjs() {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("==> AlterPartitionEvent.getInputHObjs()");
-    }
+    LOG.debug("==> AlterPartitionEvent.getInputHObjs()");
 
     List<HivePrivilegeObject> ret   = new ArrayList<>();
     PreAlterPartitionEvent    event = (PreAlterPartitionEvent) preEventContext;
 
     ret.add(getHivePrivilegeObject(event.getTable()));
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("<== AlterPartitionEvent.getInputHObjs()" + ret);
-    }
+    LOG.debug("<== AlterPartitionEvent.getInputHObjs() ret={}", ret);
 
     return ret;
   }
 
   private List<HivePrivilegeObject> getOutputHObjs() {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("==> AlterPartitionEvent.getOutputHObjs()");
-    }
+    LOG.debug("==> AlterPartitionEvent.getOutputHObjs()");
 
     List<HivePrivilegeObject> ret   = new ArrayList<>();
     PreAlterPartitionEvent    event = (PreAlterPartitionEvent) preEventContext;
@@ -82,19 +79,37 @@ public class AlterPartitionEvent extends HiveMetaStoreAuthorizableEvent {
     ret.add(getHivePrivilegeObject(event.getTable()));
 
     Partition newPartition = event.getNewPartition();
-    String    newUri       = (newPartition != null) ? getSdLocation(newPartition.getSd()) : "";
+    String oldUri = "";
 
-    if (StringUtils.isNotEmpty(newUri)) {
-        ret.add(getHivePrivilegeObjectDfsUri(newUri));
+    if (event.getOldPartVals() != null && event.getOldPartVals().size() > 0) {
+      oldUri = this.getOldPartSdLocation(event);
+    }
+
+    String newUri = (newPartition != null) ? getSdLocation(newPartition.getSd()) : "";
+
+    // Skip DFS_URI auth if new partition loc is empty or old and new partition loc are same
+    if (StringUtils.isNotEmpty(newUri) && !StringUtils.equalsIgnoreCase(oldUri, newUri)) {
+      ret.add(getHivePrivilegeObjectDfsUri(newUri));
     }
 
     COMMAND_STR = buildCommandString(COMMAND_STR, event.getTableName(), newPartition);
 
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("<== AlterPartitionEvent.getOutputHObjs()" + ret );
-    }
+    LOG.debug("<== AlterPartitionEvent.getOutputHObjs() ret={}", ret);
 
     return ret;
+  }
+
+  private String getOldPartSdLocation(PreAlterPartitionEvent event) {
+    Table table = new Table(event.getTable());
+    try {
+      org.apache.hadoop.hive.ql.metadata.Partition partition = Hive.get().getPartition(table,
+          Warehouse.makeSpecFromValues(event.getTable().getPartitionKeys(), event.getOldPartVals()),false);
+
+      return partition.getLocation();
+
+    } catch (HiveException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private String buildCommandString(String cmdStr, String tbl, Partition partition ) {
@@ -102,8 +117,8 @@ public class AlterPartitionEvent extends HiveMetaStoreAuthorizableEvent {
 
     if (tbl != null) {
       String tblName    = (StringUtils.isNotEmpty(tbl) ? " " + tbl : "");
-      String partionStr = (partition != null) ? partition.toString() : "";
-      ret               = String.format(cmdStr, tblName, partionStr);
+      String partitionStr = (partition != null) ? partition.toString() : "";
+      ret               = String.format(cmdStr, tblName, partitionStr);
     }
 
     return ret;
