@@ -77,6 +77,7 @@ import org.apache.hadoop.hive.metastore.datasource.DataSourceProvider;
 import org.apache.hadoop.hive.metastore.datasource.DataSourceProviderFactory;
 import org.apache.hadoop.hive.metastore.events.AbortTxnEvent;
 import org.apache.hadoop.hive.metastore.events.AcidWriteEvent;
+import org.apache.hadoop.hive.metastore.events.CommitTxnEvent;
 import org.apache.hadoop.hive.metastore.events.ListenerEvent;
 import org.apache.hadoop.hive.metastore.messaging.EventMessage;
 import org.apache.hadoop.hive.metastore.metrics.Metrics;
@@ -86,6 +87,7 @@ import org.apache.hadoop.hive.metastore.txn.entities.CompactionState;
 import org.apache.hadoop.hive.metastore.txn.entities.LockInfo;
 import org.apache.hadoop.hive.metastore.txn.entities.MetricsInfo;
 import org.apache.hadoop.hive.metastore.txn.entities.TxnStatus;
+import org.apache.hadoop.hive.metastore.txn.entities.TxnWriteDetails;
 import org.apache.hadoop.hive.metastore.txn.jdbc.commands.*;
 import org.apache.hadoop.hive.metastore.txn.jdbc.functions.*;
 import org.apache.hadoop.hive.metastore.txn.jdbc.queries.*;
@@ -120,6 +122,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 
 import static org.apache.hadoop.hive.metastore.txn.TxnUtils.getEpochFn;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCatalog;
@@ -451,14 +454,38 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
   @Override
   public void abortTxn(AbortTxnRequest rqst) throws NoSuchTxnException, MetaException, TxnAbortedException {
+    List<TxnWriteDetails> txnWriteDetails = new ArrayList<>();
+    if (transactionalListeners != null) {
+      //Find the write details for this transaction.
+      //Doing it here before the metadata tables are updated below.
+      txnWriteDetails = getWriteIdsForTxnID(rqst.getTxnid());
+    }
     TxnType txnType = new AbortTxnFunction(rqst).execute(jdbcResource);
     if (txnType != null) {
       if (transactionalListeners != null && (!rqst.isSetReplPolicy() || !TxnType.DEFAULT.equals(rqst.getTxn_type()))) {
-        MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners, EventMessage.EventType.ABORT_TXN,
-            new AbortTxnEvent(rqst.getTxnid(), txnType, null,getTxnDbsUpdated(rqst.getTxnid())), jdbcResource.getConnection(), sqlGenerator);
+        notifyCommitOrAbortEvent(rqst.getTxnid(),EventMessage.EventType.ABORT_TXN, txnType, jdbcResource.getConnection(), txnWriteDetails, transactionalListeners);
       }
     }
   }
+
+  public static void notifyCommitOrAbortEvent(long txnId, EventMessage.EventType eventType, TxnType txnType, Connection dbConn,
+                                       List<TxnWriteDetails> txnWriteDetails, List<TransactionalMetaStoreEventListener> transactionalListeners) throws MetaException {
+    List<Long> writeIds = txnWriteDetails.stream()
+            .map(TxnWriteDetails::getWriteId)
+            .collect(Collectors.toList());
+    List<String> databases = txnWriteDetails.stream()
+            .map(TxnWriteDetails::getDbName)
+            .collect(Collectors.toList());
+    ListenerEvent txnEvent;
+    if (eventType.equals(EventMessage.EventType.ABORT_TXN)) {
+      txnEvent = new AbortTxnEvent(txnId, txnType, null, databases, writeIds);
+    } else {
+      txnEvent = new CommitTxnEvent(txnId, txnType, null, databases, writeIds);
+    }
+    MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners,
+            eventType, txnEvent, dbConn, sqlGenerator);
+  }
+
 
   @Override
   public void abortTxns(AbortTxnsRequest rqst) throws MetaException {
@@ -466,6 +493,13 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     TxnErrorMsg txnErrorMsg = TxnErrorMsg.NONE;
     if (rqst.isSetErrorCode()) {
       txnErrorMsg = TxnErrorMsg.getTxnErrorMsg(rqst.getErrorCode());
+    }
+    HashMap<Long, List<TxnWriteDetails>> txnWriteDetailsMap = new HashMap<>();
+    if (transactionalListeners != null) {
+      //Find the write details for this transaction.
+      //Doing it here before the metadata tables are updated below.
+      for(Long txnId : txnIds)
+        txnWriteDetailsMap.put(txnId, getWriteIdsForTxnID(txnId));
     }
 
     List<String> queries = new ArrayList<>();
@@ -499,10 +533,8 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
       if (transactionalListeners != null) {
         for (Long txnId : txnIds) {
-          List<String> dbsUpdated = getTxnDbsUpdated(txnId);
-          MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners,
-              EventMessage.EventType.ABORT_TXN, new AbortTxnEvent(txnId,
-                  nonReadOnlyTxns.getOrDefault(txnId, TxnType.READ_ONLY), null, dbsUpdated), dbConn, sqlGenerator);
+          notifyCommitOrAbortEvent(txnId,EventMessage.EventType.ABORT_TXN,
+                  nonReadOnlyTxns.getOrDefault(txnId, TxnType.READ_ONLY), dbConn, txnWriteDetailsMap.get(txnId), transactionalListeners);
         }
       }
     } catch (SQLException e) {
@@ -834,11 +866,11 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   @Override
   public List<String> getTxnDbsUpdated(long txnId) throws MetaException {
     List<String> dbsUpdated = new ArrayList<String>();
-    
+
     String query = "SELECT DISTINCT \"T2W_DATABASE\" " +
             " FROM \"TXN_TO_WRITE_ID\" \"COMMITTED\"" +
             "   WHERE \"T2W_TXNID\" = " + txnId;
-    
+
     Connection dbConn = jdbcResource.getConnection();
     LOG.debug("Going to execute query <{}>", query);
     try (Statement stmt = dbConn.createStatement(); ResultSet rs = stmt.executeQuery(
@@ -1013,7 +1045,7 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   static String quoteString(String input) {
     return "'" + input + "'";
   }
-  
+
   /**
    * Determine the current time, using the RDBMS as a source of truth
    * @return current time in milliseconds
@@ -1082,5 +1114,24 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     }
     return true;
   }
+  /**
+   * Returns the databases and writeID updated by txnId.
+   * Queries TXN_TO_WRITE_ID using txnId.
+   *
+   * @param txnId Transaction ID for which write IDs are requested.
+   * @throws MetaException
+   */
+  public List<TxnWriteDetails> getWriteIdsForTxnID(long txnId) throws MetaException {
+    try {
+      return sqlRetryHandler.executeWithRetry(
+              new SqlRetryCallProperties().withCallerId("GetWriteIdsForTxnIDHandler"),
+              () -> jdbcResource.execute(new GetWriteIdsForTxnIDHandler(txnId)));
+    } catch (MetaException e) {
+      throw e;
+    } catch (TException e) {
+      throw new MetaException(e.getMessage());
+    }
+  }
+
 
 }

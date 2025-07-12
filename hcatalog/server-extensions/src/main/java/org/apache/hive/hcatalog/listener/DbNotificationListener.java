@@ -650,7 +650,7 @@ public class DbNotificationListener extends TransactionalMetaStoreEventListener 
       return;
     }
     CommitTxnMessage msg =
-        MessageBuilder.getInstance().buildCommitTxnMessage(commitTxnEvent.getTxnId());
+        MessageBuilder.getInstance().buildCommitTxnMessage(commitTxnEvent.getTxnId(), commitTxnEvent.getDatabases(), commitTxnEvent.getWriteId());
 
     NotificationEvent event =
         new NotificationEvent(0, now(), EventType.COMMIT_TXN.toString(),
@@ -670,7 +670,7 @@ public class DbNotificationListener extends TransactionalMetaStoreEventListener 
       return;
     }
     AbortTxnMessage msg =
-        MessageBuilder.getInstance().buildAbortTxnMessage(abortTxnEvent.getTxnId(), abortTxnEvent.getDbsUpdated());
+        MessageBuilder.getInstance().buildAbortTxnMessage(abortTxnEvent.getTxnId(), abortTxnEvent.getDbsUpdated(), abortTxnEvent.getWriteId());
     NotificationEvent event =
         new NotificationEvent(0, now(), EventType.ABORT_TXN.toString(),
             msgEncoder.getSerializer().serialize(msg));

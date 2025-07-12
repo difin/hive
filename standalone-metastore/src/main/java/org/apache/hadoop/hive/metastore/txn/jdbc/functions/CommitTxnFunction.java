@@ -41,6 +41,7 @@ import org.apache.hadoop.hive.metastore.txn.TxnHandler;
 import org.apache.hadoop.hive.metastore.txn.entities.TxnStatus;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
+import org.apache.hadoop.hive.metastore.txn.entities.TxnWriteDetails;
 import org.apache.hadoop.hive.metastore.txn.jdbc.commands.DeleteReplTxnMapEntryCommand;
 import org.apache.hadoop.hive.metastore.txn.jdbc.commands.InsertCompletedTxnComponentsCommand;
 import org.apache.hadoop.hive.metastore.txn.jdbc.commands.RemoveTxnsFromMinHistoryLevelCommand;
@@ -48,6 +49,7 @@ import org.apache.hadoop.hive.metastore.txn.jdbc.commands.RemoveWriteIdsFromMinH
 import org.apache.hadoop.hive.metastore.txn.jdbc.queries.FindTxnStateHandler;
 import org.apache.hadoop.hive.metastore.txn.jdbc.queries.GetCompactionInfoHandler;
 import org.apache.hadoop.hive.metastore.txn.jdbc.queries.GetOpenTxnTypeAndLockHandler;
+import org.apache.hadoop.hive.metastore.txn.jdbc.queries.GetWriteIdsForTxnIDHandler;
 import org.apache.hadoop.hive.metastore.txn.jdbc.queries.TxnIdHandler;
 import org.apache.hadoop.hive.metastore.txn.jdbc.queries.TargetTxnIdListHandler;
 import org.apache.hadoop.hive.metastore.txn.jdbc.MultiDataSourceJdbcResource;
@@ -72,6 +74,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.apache.hadoop.hive.metastore.DatabaseProduct.MYSQL;
+import static org.apache.hadoop.hive.metastore.txn.TxnHandler.notifyCommitOrAbortEvent;
 import static org.apache.hadoop.hive.metastore.txn.TxnUtils.getEpochFn;
 import static org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdentifier;
 
@@ -95,6 +98,14 @@ public class CommitTxnFunction implements TransactionalFunction<TxnType> {
 
     boolean isReplayedReplTxn = TxnType.REPL_CREATED.equals(rqst.getTxn_type());
     boolean isHiveReplTxn = rqst.isSetReplPolicy() && TxnType.DEFAULT.equals(rqst.getTxn_type());
+    //Find the write details for this transaction.
+    //Doing it here before the metadata tables are updated below.
+    List<TxnWriteDetails> txnWriteDetails = new ArrayList<>();
+
+    if (!isHiveReplTxn) {
+      txnWriteDetails = jdbcResource.execute(new GetWriteIdsForTxnIDHandler(rqst.getTxnid()));
+
+    }
     // Get the current TXN
     TransactionContext context = jdbcResource.getTransactionManager().getActiveTransaction();
     Long commitId = null;
@@ -261,7 +272,7 @@ public class CommitTxnFunction implements TransactionalFunction<TxnType> {
     }
 
     if (!isHiveReplTxn) {
-      createCommitNotificationEvent(jdbcResource, txnid , txnType);
+      createCommitNotificationEvent(jdbcResource, txnid , txnType, txnWriteDetails);
     }
 
     LOG.debug("Going to commit");
@@ -570,15 +581,16 @@ public class CommitTxnFunction implements TransactionalFunction<TxnType> {
 
   /**
    * Create Notifiaction Events on txn commit
+   *
    * @param txnid committed txn
    * @param txnType transaction type
+   * @param txnWriteDetails write details of the transaction
    * @throws MetaException ex
    */
-  private void createCommitNotificationEvent(MultiDataSourceJdbcResource jdbcResource, long txnid, TxnType txnType)
+  private void createCommitNotificationEvent(MultiDataSourceJdbcResource jdbcResource, long txnid, TxnType txnType, List<TxnWriteDetails> txnWriteDetails)
       throws MetaException {
     if (transactionalListeners != null) {
-      MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners,
-          EventMessage.EventType.COMMIT_TXN, new CommitTxnEvent(txnid, txnType), jdbcResource.getConnection(), jdbcResource.getSqlGenerator());
+      notifyCommitOrAbortEvent(txnid, EventMessage.EventType.COMMIT_TXN, txnType, jdbcResource.getConnection(), txnWriteDetails, transactionalListeners);
 
       CompactionInfo compactionInfo = jdbcResource.execute(new GetCompactionInfoHandler(txnid, true));
       if (compactionInfo != null) {
@@ -591,7 +603,7 @@ public class CommitTxnFunction implements TransactionalFunction<TxnType> {
       
     }
   }
-  
+
   private static class DbEntityParam {
     final long id;
     final String key;
