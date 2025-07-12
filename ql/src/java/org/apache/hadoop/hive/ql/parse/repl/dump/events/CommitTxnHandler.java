@@ -29,7 +29,6 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.NotificationEvent;
 import org.apache.hadoop.hive.metastore.api.WriteEventInfo;
 import org.apache.hadoop.hive.metastore.messaging.CommitTxnMessage;
-import org.apache.hadoop.hive.metastore.messaging.json.JSONMessageEncoder;
 import org.apache.hadoop.hive.metastore.messaging.MessageBuilder;
 import org.apache.hadoop.hive.metastore.utils.StringUtils;
 import org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils;
@@ -225,11 +224,11 @@ class CommitTxnHandler extends AbstractEventHandler<CommitTxnMessage> {
       if (numEntry != 0) {
         eventMessage.addWriteEventInfo(writeEventInfoList);
         payload = jsonMessageEncoder.getSerializer().serialize(eventMessage);
-        LOG.debug("payload for commit txn event : " + eventMessageAsJSON);
+          LOG.debug("payload for commit txn event : {}", eventMessageAsJSON);
       }
 
       org.apache.hadoop.hive.ql.metadata.Table qlMdTablePrev = null;
-      org.apache.hadoop.hive.ql.metadata.Table qlMdTable = null;
+      org.apache.hadoop.hive.ql.metadata.Table qlMdTable;
       List<Partition> qlPtns = new ArrayList<>();
       List<List<String>> filesTobeAdded = new ArrayList<>();
 

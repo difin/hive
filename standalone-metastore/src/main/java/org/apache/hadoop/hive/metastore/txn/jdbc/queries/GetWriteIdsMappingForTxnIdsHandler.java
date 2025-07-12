@@ -27,39 +27,36 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-/**
- * Returns the databases and writeID updated by txnId.
- * Queries TXN_TO_WRITE_ID using txnId.
- */
-public class GetWriteIdsForTxnIDHandler implements QueryHandler<List<TxnWriteDetails>> {
+public class GetWriteIdsMappingForTxnIdsHandler  implements QueryHandler<List<TxnWriteDetails>> {
 
-    private final long txnId;
+    private final Set<Long> txnIds;
 
-    public GetWriteIdsForTxnIDHandler(long txnId) {
-        this.txnId = txnId;
+    public GetWriteIdsMappingForTxnIdsHandler(Set<Long> txnIds) {
+        this.txnIds= txnIds;
     }
 
     @Override
     public String getParameterizedQueryString(DatabaseProduct databaseProduct) throws MetaException {
-        return "SELECT DISTINCT \"T2W_DATABASE\", \"T2W_WRITEID\" FROM \"TXN_TO_WRITE_ID\" \"COMMITTED\" WHERE \"T2W_TXNID\" = :txnId";
+        return "SELECT DISTINCT \"T2W_TXNID\", \"T2W_DATABASE\", \"T2W_WRITEID\" FROM \"TXN_TO_WRITE_ID\" \"COMMITTED\" WHERE \"T2W_TXNID\" IN (:txnIds)";
     }
 
     @Override
     public SqlParameterSource getQueryParameters() {
-        return new MapSqlParameterSource().addValue("txnId", txnId);
+        return new MapSqlParameterSource().addValue("txnIds", txnIds, Types.BIGINT);
     }
 
     @Override
     public List<TxnWriteDetails> extractData(ResultSet rs) throws SQLException, DataAccessException {
         List<TxnWriteDetails> dbsUpdated = new ArrayList<>();
         while (rs.next()) {
-            TxnWriteDetails entry = new TxnWriteDetails(txnId, rs.getString(1), rs.getLong(2));
+            TxnWriteDetails entry = new TxnWriteDetails(rs.getLong(1), rs.getString(2), rs.getLong(3));
             dbsUpdated.add(entry);
         }
         return dbsUpdated;
     }
 }
-

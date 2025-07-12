@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
@@ -1913,4 +1915,34 @@ public class TestDbNotificationListener {
     // Event 11: ADD_PARTITION, Event 12: ALTER_PARTITION events
     driver.run("alter table " + tableName + " add partition (ds = 'yesterday')");
   }
+
+  @Test
+  public void commitTxnWithAllocateWriteID() throws Exception {
+    long txnId1 = msClient.openTxn("me", TxnType.READ_ONLY);
+    long txnId2 = msClient.openTxn("me", TxnType.DEFAULT);
+
+    NotificationEventResponse rsp = msClient.getNextNotification(firstEventId, 0, null);
+    assertEquals(1, rsp.getEventsSize());
+
+    msClient.commitTxn(txnId1);
+    rsp = msClient.getNextNotification(firstEventId + 1, 0, null);
+    assertEquals(0, rsp.getEventsSize());
+
+    msClient.allocateTableWriteId(txnId2, "test", "t1");
+    msClient.commitTxn(txnId2);
+    rsp = msClient.getNextNotification(firstEventId + 1, 0, null);
+    NotificationEvent commitEvent = rsp.getEvents().get(1);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    Map<String, Object> commitMessage = objectMapper.readValue(commitEvent.getMessage(), Map.class);
+    assertEquals(List.of(1), commitMessage.get("writeIds"));
+    assertEquals(List.of("test"), commitMessage.get("databases"));
+
+    assertEquals(2, rsp.getEventsSize()); // alloc_write_id and commit_txn events
+
+    assertEquals(firstEventId + 3, commitEvent.getEventId());
+    assertTrue(commitEvent.getEventTime() >= startTime);
+    assertEquals(EventType.COMMIT_TXN.toString(), commitEvent.getEventType());
+  }
+
 }
