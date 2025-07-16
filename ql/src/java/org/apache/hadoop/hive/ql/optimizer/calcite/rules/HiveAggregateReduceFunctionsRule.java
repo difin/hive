@@ -35,6 +35,7 @@ import org.apache.calcite.rex.RexLiteral;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.sql.SqlAggFunction;
 import org.apache.calcite.sql.SqlKind;
+import org.apache.calcite.sql.fun.SqlLibraryOperators;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.type.InferTypes;
 import org.apache.calcite.sql.type.ReturnTypes;
@@ -533,8 +534,17 @@ public class HiveAggregateReduceFunctionsRule extends RelOptRule {
 
     final RexNode diff =
         rexBuilder.makeCall(
-            SqlStdOperatorTable.MINUS,
-            sumArgSquared, avgSumSquaredArg);
+            SqlStdOperatorTable.MINUS, sumArgSquared, avgSumSquaredArg);
+
+    RelDataType oldArgType = SqlTypeUtil.projectTypes(oldAggRel.getInput().getRowType(), oldCall.getArgList()).get(0);
+
+    RexNode correctedDiff = null;
+    if (oldArgType.getSqlTypeName() == SqlTypeName.DOUBLE || oldArgType.getSqlTypeName() == SqlTypeName.DECIMAL) {
+      correctedDiff =
+          rexBuilder.makeCall(SqlLibraryOperators.GREATEST, rexBuilder.makeExactLiteral(BigDecimal.ZERO), diff);
+    } else {
+      correctedDiff = diff;
+    }
 
     final RexNode denominator;
     if (biased) {
@@ -557,7 +567,7 @@ public class HiveAggregateReduceFunctionsRule extends RelOptRule {
 
     final RexNode div =
         rexBuilder.makeCall(
-            SqlStdOperatorTable.DIVIDE, diff, denominator);
+            SqlStdOperatorTable.DIVIDE, correctedDiff, denominator);
 
     RexNode result = div;
     if (sqrt) {
