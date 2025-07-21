@@ -76,6 +76,7 @@ public class TestOptimisticRetry extends HiveIcebergStorageHandlerWithEngineBase
 
   @Test
   public void testConcurrentOverwriteAndUpdate() {
+    TestUtilPhaser.getInstance();
     testTables.createTable(shell, "customers", HiveIcebergStorageHandlerTestUtils.CUSTOMER_SCHEMA,
         PartitionSpec.unpartitioned(), fileFormat, HiveIcebergStorageHandlerTestUtils.OTHER_CUSTOMER_RECORDS_2,
         formatVersion);
@@ -85,6 +86,7 @@ public class TestOptimisticRetry extends HiveIcebergStorageHandlerWithEngineBase
 
     // The query shouldn't throw exception but rather retry & commit.
     Tasks.range(2).executeWith(Executors.newFixedThreadPool(2)).run(i -> {
+      TestUtilPhaser.getInstance().getPhaser().register();
       init(shell, testTables, temp, executionEngine);
       HiveConf.setBoolVar(shell.getHiveConf(), HiveConf.ConfVars.HIVE_VECTORIZATION_ENABLED, isVectorized);
       HiveConf.setVar(shell.getHiveConf(), HiveConf.ConfVars.HIVEFETCHTASKCONVERSION, "none");
@@ -92,6 +94,7 @@ public class TestOptimisticRetry extends HiveIcebergStorageHandlerWithEngineBase
       shell.executeStatement(sql[i]);
       shell.closeSession();
     });
+    TestUtilPhaser.destroyInstance();
   }
 
 
