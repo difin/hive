@@ -88,15 +88,13 @@ public abstract class CliAdapter {
           @Override
           public void evaluate() throws Throwable {
             if (!cliConfig.isSkipMetastoreDatabaseRules()) {
-              metaStoreHandler.setSystemProperties(); // for QTestUtil pre-initialization
-            }
-            CliAdapter.this.beforeClass(); // instantiating QTestUtil
-
-            if (!cliConfig.isSkipMetastoreDatabaseRules()) {
               metaStoreHandler.getRule().before();
               metaStoreHandler.getRule().install();
               metaStoreHandler.getRule().upgradeToLatest();
+              metaStoreHandler.setSystemProperties(); // for QTestUtil pre-initialization
             }
+
+            CliAdapter.this.beforeClass(); // instantiating QTestUtil
 
             if (getQt() != null) {
               if (!cliConfig.isSkipMetastoreDatabaseRules()) {

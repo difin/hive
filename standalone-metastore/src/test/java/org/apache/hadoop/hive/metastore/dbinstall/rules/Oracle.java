@@ -17,29 +17,28 @@
  */
 package org.apache.hadoop.hive.metastore.dbinstall.rules;
 
+import org.testcontainers.containers.OracleContainer;
+import org.testcontainers.utility.DockerImageName;
+
+import java.io.IOException;
+
 /**
  * JUnit TestRule for Oracle.
  */
 public class Oracle extends DatabaseRule {
+  private final DockerImageName name =
+      DockerImageName.parse(EXTERNAL_DB_DOCKER_PREFIX + "abstractdog/oracle-xe:18.4.0-slim")
+        .asCompatibleSubstituteFor(DockerImageName.parse("gvenzl/oracle-xe"));
+  private final OracleContainer container = new OracleContainer(name).withEnv("ORACLE_PASSWORD", "oracle");
 
   @Override
-  public String getDockerImageName() {
-    return EXTERNAL_DB_DOCKER_PREFIX + "abstractdog/oracle-xe:18.4.0-slim";
+  public void before() throws IOException, InterruptedException {
+    container.start();
   }
 
   @Override
-  public String[] getDockerAdditionalArgs() {
-    return buildArray(
-        "-p",
-        "1521:1521",
-        "-e",
-        "DEFAULT_SYS_PASS=" + getDbRootPassword(),
-        "-e",
-        "ORACLE_ALLOW_REMOTE=true",
-        "-d",
-        "-e",
-        "ORACLE_PASSWORD=" + getDbRootPassword()
-    );
+  public void after() {
+    container.stop();
   }
 
   @Override
@@ -54,27 +53,22 @@ public class Oracle extends DatabaseRule {
 
   @Override
   public String getDbRootPassword() {
-    return "oracle";
+    return container.getPassword();
   }
 
   @Override
   public String getJdbcDriver() {
-    return "oracle.jdbc.OracleDriver";
+    return container.getDriverClassName();
   }
 
   @Override
-  public String getJdbcUrl(String hostAddress) {
-    return "jdbc:oracle:thin:@//" + hostAddress + ":1521/xe";
+  public String getJdbcUrl() {
+    return container.getJdbcUrl();
   }
 
   @Override
-  public String getInitialJdbcUrl(String hostAddress) {
-    return "jdbc:oracle:thin:@//" + hostAddress + ":1521/xe";
-  }
-
-  @Override
-  public boolean isContainerReady(ProcessResults pr) {
-    return pr.stdout.contains("DATABASE IS READY TO USE!");
+  public String getInitialJdbcUrl() {
+    return container.getJdbcUrl();
   }
 
   @Override

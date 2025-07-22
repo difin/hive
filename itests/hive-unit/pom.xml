@@ -29,7 +29,6 @@
 
   <properties>
     <hive.path.to.root>../..</hive.path.to.root>
-    <testcontainers.version>1.21.3</testcontainers.version>
     <htmlunit.version>2.70.0</htmlunit.version>
   </properties>
 
@@ -517,7 +516,6 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
-      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

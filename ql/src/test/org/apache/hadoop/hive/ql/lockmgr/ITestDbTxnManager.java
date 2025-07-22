@@ -20,11 +20,7 @@ package org.apache.hadoop.hive.ql.lockmgr;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.dbinstall.rules.DatabaseRule;
-import org.apache.hadoop.hive.metastore.dbinstall.rules.Derby;
-import org.apache.hadoop.hive.metastore.dbinstall.rules.Mssql;
-import org.apache.hadoop.hive.metastore.dbinstall.rules.Mysql;
-import org.apache.hadoop.hive.metastore.dbinstall.rules.Oracle;
-import org.apache.hadoop.hive.metastore.dbinstall.rules.Postgres;
+import org.apache.hadoop.hive.metastore.dbinstall.rules.MetastoreRuleFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -46,7 +42,10 @@ public class ITestDbTxnManager extends TestDbTxnManager2 {
     String metastoreType =
         System.getProperty(SYS_PROP_METASTORE_DB) == null ? "derby" : System.getProperty(SYS_PROP_METASTORE_DB)
             .toLowerCase();
-    rule = getDatabaseRule(metastoreType).setVerbose(false);
+    rule = MetastoreRuleFactory.create(metastoreType).setVerbose(false);
+    // Start the docker container and create the hive user
+    rule.before();
+    rule.install();
 
     conf.setVar(HiveConf.ConfVars.METASTOREDBTYPE, metastoreType.toUpperCase());
 
@@ -60,29 +59,11 @@ public class ITestDbTxnManager extends TestDbTxnManager2 {
 
     LOG.info("Set metastore connection to url: {}",
         MetastoreConf.getVar(conf, MetastoreConf.ConfVars.CONNECT_URL_KEY));
-    // Start the docker container and create the hive user
-    rule.before();
-    rule.createUser();
     // We do not run the install script, it will be called anyway before every test in prepDb
   }
 
   @AfterClass
   public static void tearDownDb() {
     rule.after();
-  }
-
-  private static DatabaseRule getDatabaseRule(String metastoreType) {
-    switch (metastoreType) {
-    case "postgres":
-      return new Postgres();
-    case "oracle":
-      return new Oracle();
-    case "mysql":
-      return new Mysql();
-    case "mssql":
-      return new Mssql();
-    default:
-      return new Derby();
-    }
   }
 }
