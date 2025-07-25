@@ -24,8 +24,6 @@ import com.google.common.io.CharStreams;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.SecureServletCaller;
 import org.apache.hadoop.hive.metastore.ServletSecurity;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.iceberg.rest.HMSCatalogAdapter.HTTPMethod;
 import org.apache.iceberg.rest.HMSCatalogAdapter.Route;
 import org.apache.iceberg.rest.responses.ErrorResponse;
@@ -58,6 +56,8 @@ import java.util.stream.Collectors;
  */
 public class HMSCatalogServlet extends HttpServlet {
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogServlet.class);
+  private static final String CONTENT_TYPE = "Content-Type";
+  private static final String APPLICATION_JSON = "application/json";
   /**
    * The security.
    */
@@ -65,7 +65,7 @@ public class HMSCatalogServlet extends HttpServlet {
 
   private final HMSCatalogAdapter restCatalogAdapter;
   private final Map<String, String> responseHeaders =
-      ImmutableMap.of(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+      ImmutableMap.of(CONTENT_TYPE, APPLICATION_JSON);
 
   public HMSCatalogServlet(SecureServletCaller security, HMSCatalogAdapter restCatalogAdapter) {
     this.security = security;
