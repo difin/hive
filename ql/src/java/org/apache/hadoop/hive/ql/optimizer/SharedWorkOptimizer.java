@@ -420,7 +420,7 @@ public class SharedWorkOptimizer extends Transform {
                   } else {
                     exprNode = ExprNodeGenericFuncDesc.newInstance(
                         new GenericUDFOPOr(),
-                        Arrays.asList(exprNode, newDiscardableTsFilterExpr));
+                        Lists.newArrayList(exprNode, newDiscardableTsFilterExpr));
                   }
                 }
               }
@@ -1947,7 +1947,7 @@ public class SharedWorkOptimizer extends Transform {
         } else {
           ExprNodeGenericFuncDesc newPred = ExprNodeGenericFuncDesc.newInstance(
               new GenericUDFOPAnd(),
-              Arrays.asList(tableScanExprNode.clone(), filterExprNode));
+              Lists.newArrayList(tableScanExprNode.clone(), filterExprNode));
           filterOp.getConf().setPredicate(newPred);
         }
       } else {
