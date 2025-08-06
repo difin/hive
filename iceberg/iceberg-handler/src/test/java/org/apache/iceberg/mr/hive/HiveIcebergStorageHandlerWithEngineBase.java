@@ -117,15 +117,12 @@ public abstract class HiveIcebergStorageHandlerWithEngineBase {
     for (FileFormat fileFormat : HiveIcebergStorageHandlerTestUtils.FILE_FORMATS) {
       for (String engine : EXECUTION_ENGINES) {
         IntStream.of(2, 1).forEach(formatVersion -> {
-          // include Tez tests only for Java 8
-          if (javaVersion.equals("1.8")) {
-            testParams.add(new Object[]{fileFormat, engine, TestTables.TestTableType.HIVE_CATALOG, false,
+          testParams.add(new Object[]{fileFormat, engine, TestTables.TestTableType.HIVE_CATALOG, false,
+              formatVersion});
+          // test for vectorization=ON in case of ORC and PARQUET format with Tez engine
+          if (fileFormat != FileFormat.METADATA && "tez".equals(engine) && HiveVersion.min(HiveVersion.HIVE_3)) {
+            testParams.add(new Object[]{fileFormat, engine, TestTables.TestTableType.HIVE_CATALOG, true,
                 formatVersion});
-            // test for vectorization=ON in case of ORC and PARQUET format with Tez engine
-            if (fileFormat != FileFormat.METADATA && "tez".equals(engine) && HiveVersion.min(HiveVersion.HIVE_3)) {
-              testParams.add(new Object[]{fileFormat, engine, TestTables.TestTableType.HIVE_CATALOG, true,
-                  formatVersion});
-            }
           }
         });
       }

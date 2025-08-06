@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -39,7 +40,6 @@ import org.apache.hadoop.hive.common.StringInternUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.hive.ql.DriverState;
@@ -102,11 +102,11 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
 
     @Override
     public Set<Integer> call() throws Exception {
-      Set<Integer> nonCombinablePathIndices = new HashSet<Integer>();
+      Set<Integer> nonCombinablePathIndices = new HashSet<>();
       for (int i = 0; i < length; i++) {
         PartitionDesc part = HiveFileFormatUtils.getFromPathRecursively(
-                pathToPartitionInfo, paths[i + start],
-                IOPrepareCache.get().allocatePartitionDescMap());
+            pathToPartitionInfo, paths[i + start],
+            IOPrepareCache.get().allocatePartitionDescMap());
         // Use HiveInputFormat if any of the paths is not splittable
         Class<? extends InputFormat> inputFormatClass = part.getInputFileFormatClass();
         InputFormat<WritableComparable, Writable> inputFormat =
@@ -145,17 +145,17 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
     private Map<Path, PartitionDesc> pathToPartitionInfo;
 
     public CombineHiveInputSplit() throws IOException {
-      this(ShimLoader.getHadoopShims().getCombineFileInputFormat()
-          .getInputSplitShim());
+      this(ShimLoader.getHadoopShims().getCombineFileInputFormat().getInputSplitShim());
     }
 
-    public CombineHiveInputSplit(CombineFileSplit inputSplitShim) throws IOException {
+    private CombineHiveInputSplit(CombineFileSplit inputSplitShim) throws IOException {
       this(inputSplitShim.getJob(), inputSplitShim);
     }
-    public CombineHiveInputSplit(JobConf job, CombineFileSplit inputSplitShim)
-        throws IOException {
+
+    public CombineHiveInputSplit(JobConf job, CombineFileSplit inputSplitShim) throws IOException {
       this(job, inputSplitShim, null);
     }
+
     public CombineHiveInputSplit(JobConf job, CombineFileSplit inputSplitShim,
         Map<Path, PartitionDesc> pathToPartitionInfo) throws IOException {
       this.inputSplitShim = inputSplitShim;
@@ -169,16 +169,11 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
         // CombinedSplit.
         Path[] ipaths = inputSplitShim.getPaths();
         if (ipaths.length > 0) {
-          PartitionDesc part = HiveFileFormatUtils
-              .getFromPathRecursively(this.pathToPartitionInfo,
-                  ipaths[0], IOPrepareCache.get().getPartitionDescMap());
+          PartitionDesc part = HiveFileFormatUtils.getFromPathRecursively(
+              this.pathToPartitionInfo, ipaths[0], IOPrepareCache.get().getPartitionDescMap());
           inputFormatClassName = part.getInputFileFormatClass().getName();
         }
       }
-    }
-
-    public CombineFileSplit getInputSplitShim() {
-      return inputSplitShim;
     }
 
     /**
@@ -186,10 +181,6 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
      */
     public String inputFormatClassName() {
       return inputFormatClassName;
-    }
-
-    public void setInputFormatClassName(String inputFormatClassName) {
-      this.inputFormatClassName = inputFormatClassName;
     }
 
     @Override
@@ -304,8 +295,7 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
     private final String deserializerClassName;
 
     public CombinePathInputFormat(List<Operator<? extends OperatorDesc>> opList,
-                                  String inputFormatClassName,
-                                  String deserializerClassName) {
+          String inputFormatClassName, String deserializerClassName) {
       this.opList = opList;
       this.inputFormatClassName = inputFormatClassName;
       this.deserializerClassName = deserializerClassName;
@@ -313,12 +303,10 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof CombinePathInputFormat) {
-        CombinePathInputFormat mObj = (CombinePathInputFormat) o;
-        return (opList.equals(mObj.opList)) &&
-            (inputFormatClassName.equals(mObj.inputFormatClassName)) &&
-            (deserializerClassName == null ? (mObj.deserializerClassName == null) :
-                deserializerClassName.equals(mObj.deserializerClassName));
+      if (o instanceof CombinePathInputFormat mObj) {
+        return opList.equals(mObj.opList) &&
+            inputFormatClassName.equals(mObj.inputFormatClassName) &&
+            Objects.equals(deserializerClassName, mObj.deserializerClassName);
       }
       return false;
     }
@@ -351,17 +339,16 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
     if (combine.getInputPathsShim(job).length == 0) {
       throw new IOException("No input paths specified in job");
     }
-    ArrayList<InputSplit> result = new ArrayList<InputSplit>();
+    List<InputSplit> result = new ArrayList<>();
 
     // combine splits only from same tables and same partitions. Do not combine splits from multiple
     // tables or multiple partitions.
     Path[] paths = StringInternUtils.internUriStringsInPathArray(combine.getInputPathsShim(job));
 
-    List<Path> inpDirs = new ArrayList<Path>();
-    List<Path> inpFiles = new ArrayList<Path>();
-    Map<CombinePathInputFormat, CombineFilter> poolMap =
-      new HashMap<CombinePathInputFormat, CombineFilter>();
-    Set<Path> poolSet = new HashSet<Path>();
+    List<Path> inpDirs = new ArrayList<>();
+    List<Path> inpFiles = new ArrayList<>();
+    Map<CombinePathInputFormat, CombineFilter> poolMap = new HashMap<>();
+    Set<Path> poolSet = new HashSet<>();
     DriverState driverState = DriverState.getDriverState();
 
     for (Path path : paths) {
@@ -386,7 +373,6 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
       } catch (Exception e) {
         // ignore
       }
-      FileSystem inpFs = path.getFileSystem(job);
 
       //don't combine if inputformat is a SymlinkTextInputFormat
       if (inputFormat instanceof SymlinkTextInputFormat) {
@@ -427,7 +413,7 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
         // parent directory will be grouped into one pool but not files from different parent
         // directories. This guarantees that a split will combine all files in the same partition
         // but won't cross multiple partitions if the user has asked so.
-        if (!path.getFileSystem(job).getFileStatus(path).isDir()) { // path is not directory
+        if (!path.getFileSystem(job).getFileStatus(path).isDirectory()) { // path is not directory
           filterPath = path.getParent();
           inpFiles.add(path);
           poolSet.add(filterPath);
@@ -438,7 +424,7 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
     }
 
     // Processing directories
-    List<CombineFileSplit> iss = new ArrayList<CombineFileSplit>();
+    List<CombineFileSplit> iss = new ArrayList<>();
     if (!mrwork.isMapperCannotSpanPartns()) {
       //mapper can span partitions
       //combine into as few as one split, subject to the PathFilters set
@@ -449,7 +435,7 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
         processPaths(job, combine, iss, path);
       }
 
-      if (inpFiles.size() > 0) {
+      if (!inpFiles.isEmpty()) {
         // Processing files
         for (Path filterPath : poolSet) {
           combine.createPool(job, new CombineFilter(filterPath));
@@ -467,7 +453,7 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
       result.add(csplit);
     }
     LOG.debug("Number of splits " + result.size());
-    return result.toArray(new InputSplit[result.size()]);
+    return result.toArray(new InputSplit[0]);
   }
 
   /**
@@ -481,7 +467,7 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
     int numPathPerThread = (int) Math.ceil((double) paths.length / numThreads);
 
     ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-    List<Future<Set<Integer>>> futureList = new ArrayList<Future<Set<Integer>>>(numThreads);
+    List<Future<Set<Integer>>> futureList = new ArrayList<>(numThreads);
     try {
       boolean isMerge = mrwork != null && mrwork.isMergeFromResolver();
       for (int i = 0; i < numThreads; i++) {
@@ -490,7 +476,7 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
         futureList.add(executor.submit(new CheckNonCombinablePathCallable(
             paths, start, length, job, isMerge)));
       }
-      Set<Integer> nonCombinablePathIndices = new HashSet<Integer>();
+      Set<Integer> nonCombinablePathIndices = new HashSet<>();
       for (Future<Set<Integer>> future : futureList) {
         nonCombinablePathIndices.addAll(future.get());
       }
@@ -509,12 +495,12 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
     perfLogger.PerfLogBegin(CLASS_NAME, PerfLogger.GET_SPLITS);
     init(job);
 
-    ArrayList<InputSplit> result = new ArrayList<InputSplit>();
+    List<InputSplit> result = new ArrayList<>();
 
     Path[] paths = getInputPaths(job);
 
-    List<Path> nonCombinablePaths = new ArrayList<Path>(paths.length / 2);
-    List<Path> combinablePaths = new ArrayList<Path>(paths.length / 2);
+    List<Path> nonCombinablePaths = new ArrayList<>(paths.length / 2);
+    List<Path> combinablePaths = new ArrayList<>(paths.length / 2);
 
     int numThreads = Math.min(MAX_CHECK_NONCOMBINABLE_THREAD_NUM,
         (int) Math.ceil((double) paths.length / DEFAULT_NUM_PATH_PER_THREAD));
@@ -543,25 +529,19 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
     }
 
     // Process the normal splits
-    if (nonCombinablePaths.size() > 0) {
-      FileInputFormat.setInputPaths(job, nonCombinablePaths.toArray
-          (new Path[nonCombinablePaths.size()]));
+    if (!nonCombinablePaths.isEmpty()) {
+      FileInputFormat.setInputPaths(job, nonCombinablePaths.toArray(new Path[0]));
       InputSplit[] splits = super.getSplits(job, numSplits);
-      for (InputSplit split : splits) {
-        result.add(split);
-      }
+      result.addAll(Arrays.asList(splits));
     }
 
     // Process the combine splits
-    if (combinablePaths.size() > 0) {
-      FileInputFormat.setInputPaths(job, combinablePaths.toArray
-          (new Path[combinablePaths.size()]));
+    if (!combinablePaths.isEmpty()) {
+      FileInputFormat.setInputPaths(job, combinablePaths.toArray(new Path[0]));
       Map<Path, PartitionDesc> pathToPartitionInfo = this.pathToPartitionInfo != null ?
           this.pathToPartitionInfo : Utilities.getMapWork(job).getPathToPartitionInfo();
       InputSplit[] splits = getCombineSplits(job, numSplits, pathToPartitionInfo);
-      for (InputSplit split : splits) {
-        result.add(split);
-      }
+      result.addAll(Arrays.asList(splits));
     }
 
     // Restore the old path information back
@@ -583,7 +563,7 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
 
     LOG.info("Number of all splits " + result.size());
     perfLogger.PerfLogEnd(CLASS_NAME, PerfLogger.GET_SPLITS);
-    return result.toArray(new InputSplit[result.size()]);
+    return result.toArray(new InputSplit[0]);
   }
 
   private void processPaths(JobConf job, CombineFileInputFormatShim combine,
@@ -606,8 +586,8 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
    */
   private List<CombineFileSplit> sampleSplits(List<CombineFileSplit> splits) {
     Map<String, SplitSample> nameToSamples = mrwork.getNameToSplitSample();
-    List<CombineFileSplit> retLists = new ArrayList<CombineFileSplit>();
-    Map<String, ArrayList<CombineFileSplit>> aliasToSplitList = new HashMap<String, ArrayList<CombineFileSplit>>();
+    List<CombineFileSplit> retLists = new ArrayList<>();
+    Map<String, ArrayList<CombineFileSplit>> aliasToSplitList = new HashMap<>();
     Map<Path, List<String>> pathToAliases = mrwork.getPathToAliases();
     Map<Path, List<String>> pathToAliasesNoScheme = removeScheme(pathToAliases);
 
@@ -635,7 +615,7 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
         // split exclusively serves alias, which needs to be sampled
         // add it to the split list of the alias.
         if (!aliasToSplitList.containsKey(alias)) {
-          aliasToSplitList.put(alias, new ArrayList<CombineFileSplit>());
+          aliasToSplitList.put(alias, new ArrayList<>());
         }
         aliasToSplitList.get(alias).add(split);
       } else {
@@ -695,17 +675,14 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
   @Override
   public RecordReader getRecordReader(InputSplit split, JobConf job,
       Reporter reporter) throws IOException {
-    if (!(split instanceof CombineHiveInputSplit)) {
+    if (!(split instanceof CombineHiveInputSplit hsplit)) {
       return super.getRecordReader(split, job, reporter);
     }
 
-    CombineHiveInputSplit hsplit = (CombineHiveInputSplit) split;
-
     String inputFormatClassName = null;
-    Class inputFormatClass = null;
     try {
       inputFormatClassName = hsplit.inputFormatClassName();
-      inputFormatClass = job.getClassByName(inputFormatClassName);
+      job.getClassByName(inputFormatClassName);
     } catch (Exception e) {
       throw new IOException("cannot find class " + inputFormatClassName);
     }
@@ -713,13 +690,11 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
     pushProjectionsAndFiltersAndAsOf(job, hsplit.getPath(0));
 
     return ShimLoader.getHadoopShims().getCombineFileInputFormat()
-        .getRecordReader(job,
-        (CombineFileSplit) split, reporter,
-        CombineHiveRecordReader.class);
+        .getRecordReader(job, (CombineFileSplit) split, reporter, CombineHiveRecordReader.class);
   }
 
   static class CombineFilter implements PathFilter {
-    private final Set<String> pStrings = new HashSet<String>();
+    private final Set<String> pStrings = new HashSet<>();
 
     // store a path prefix in this TestFilter
     // PRECONDITION: p should always be a directory
@@ -740,8 +715,8 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
     @Override
     public boolean accept(Path path) {
       boolean find = false;
-      while (path != null && !find) {
-         if(pStrings.contains(path.toUri().getPath())) {
+      while (path != null) {
+         if (pStrings.contains(path.toUri().getPath())) {
           find = true;
           break;
         }
@@ -770,6 +745,7 @@ public class CombineHiveInputFormat<K extends WritableComparable, V extends Writ
   }
 
   public interface MergeSplits extends AvoidSplitCombination {
-    FileSplit createMergeSplit(Configuration conf, CombineHiveInputSplit split, Integer partition, Properties splitProperties) throws IOException;
+    FileSplit createMergeSplit(CombineHiveInputSplit split, Integer partition, Properties splitProperties)
+        throws IOException;
   }
 }

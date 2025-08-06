@@ -1033,7 +1033,7 @@ public class TestHiveIcebergStorageHandlerNoScan {
       Assert.assertNotNull(hmsParams.get(hive_metastoreConstants.DDL_TIME));
       Assert.assertNotNull(hmsParams.get(serdeConstants.SERIALIZATION_FORMAT));
     } else {
-      Assert.assertEquals(7, hmsParams.size());
+      Assert.assertEquals(10, hmsParams.size());
       Assert.assertNull(hmsParams.get(TableProperties.ENGINE_HIVE_ENABLED));
     }
 
@@ -1067,7 +1067,7 @@ public class TestHiveIcebergStorageHandlerNoScan {
       Assert.assertEquals(hmsParams.get(BaseMetastoreTableOperations.PREVIOUS_METADATA_LOCATION_PROP), prevSnapshot);
       Assert.assertEquals(hmsParams.get(BaseMetastoreTableOperations.METADATA_LOCATION_PROP), newSnapshot);
     } else {
-      Assert.assertEquals(7, hmsParams.size());
+      Assert.assertEquals(10, hmsParams.size());
     }
 
     // Remove some Iceberg props and see if they're removed from HMS table props as well
@@ -2015,7 +2015,7 @@ public class TestHiveIcebergStorageHandlerNoScan {
   }
 
   @Test
-  public void testSnycProperties() throws TException, InterruptedException {
+  public void testSyncProperties() throws TException, InterruptedException {
     Assume.assumeTrue("This test is only for hive catalog", testTableType == TestTables.TestTableType.HIVE_CATALOG);
 
     // Test create v2 iceberg table and check iceberg properties & hms properties

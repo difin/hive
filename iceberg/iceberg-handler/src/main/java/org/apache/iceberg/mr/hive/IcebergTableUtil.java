@@ -97,13 +97,15 @@ import static org.apache.iceberg.RowLevelOperationMode.COPY_ON_WRITE;
 import static org.apache.iceberg.RowLevelOperationMode.MERGE_ON_READ;
 
 public class IcebergTableUtil {
+  private static final Logger LOG = LoggerFactory.getLogger(IcebergTableUtil.class);
+
+  public static final String PARTITION_TRANSFORM_SPEC_NOT_FOUND =
+      "Iceberg partition transform spec is not found in QueryState.";
 
   public static final int SPEC_IDX = 1;
   public static final int PART_IDX = 0;
-  private static final Logger LOG = LoggerFactory.getLogger(IcebergTableUtil.class);
 
   private IcebergTableUtil() {
-
   }
 
   /**
@@ -242,7 +244,7 @@ public class IcebergTableUtil {
         .map(o -> (List<TransformSpec>) o).orElse(null);
 
     if (partitionTransformSpecList == null) {
-      LOG.warn("Iceberg partition transform spec is not found in QueryState.");
+      LOG.warn(PARTITION_TRANSFORM_SPEC_NOT_FOUND);
       return null;
     }
     PartitionSpec.Builder builder = PartitionSpec.builderFor(schema);
@@ -264,10 +266,10 @@ public class IcebergTableUtil {
           builder.hour(spec.getColumnName());
           break;
         case TRUNCATE:
-          builder.truncate(spec.getColumnName(), spec.getTransformParam().get());
+          builder.truncate(spec.getColumnName(), spec.getTransformParam());
           break;
         case BUCKET:
-          builder.bucket(spec.getColumnName(), spec.getTransformParam().get());
+          builder.bucket(spec.getColumnName(), spec.getTransformParam());
           break;
       }
     });
@@ -291,7 +293,7 @@ public class IcebergTableUtil {
         .map(o -> (List<TransformSpec>) o).orElse(null);
 
     if (partitionTransformSpecList == null) {
-      LOG.warn("Iceberg partition transform spec is not found in QueryState.");
+      LOG.warn(PARTITION_TRANSFORM_SPEC_NOT_FOUND);
       return;
     }
     partitionTransformSpecList.forEach(spec -> {
@@ -312,10 +314,10 @@ public class IcebergTableUtil {
           updatePartitionSpec.addField(Expressions.hour(spec.getColumnName()));
           break;
         case TRUNCATE:
-          updatePartitionSpec.addField(Expressions.truncate(spec.getColumnName(), spec.getTransformParam().get()));
+          updatePartitionSpec.addField(Expressions.truncate(spec.getColumnName(), spec.getTransformParam()));
           break;
         case BUCKET:
-          updatePartitionSpec.addField(Expressions.bucket(spec.getColumnName(), spec.getTransformParam().get()));
+          updatePartitionSpec.addField(Expressions.bucket(spec.getColumnName(), spec.getTransformParam()));
           break;
       }
     });
@@ -329,7 +331,7 @@ public class IcebergTableUtil {
 
   public static boolean isBucket(TransformSpec spec) {
     // Iceberg's bucket transform requires a bucket number to be specified
-    return spec.getTransformType() == TransformType.BUCKET && spec.getTransformParam().isPresent();
+    return spec.getTransformType() == TransformType.BUCKET && spec.getTransformParam() != null;
   }
 
   /**
@@ -389,13 +391,33 @@ public class IcebergTableUtil {
     table.manageSnapshots().cherrypick(snapshotId).commit();
   }
 
-  public static boolean isV2Table(Map<String, String> props) {
-    return props != null && isV2Table(props::getOrDefault);
+  public static boolean isV2TableOrAbove(Map<String, String> props) {
+    return IcebergTableUtil.formatVersion(props) >= 2;
   }
 
-  public static boolean isV2Table(BinaryOperator<String> props) {
+  public static boolean isV2TableOrAbove(BinaryOperator<String> props) {
+    return IcebergTableUtil.formatVersion(props) >= 2;
+  }
+
+  public static Integer formatVersion(Map<String, String> props) {
+    if (props == null) {
+      // TODO: switch to v3 once fully supported
+      return 2; // default to v2
+    }
+    return IcebergTableUtil.formatVersion(props::getOrDefault);
+  }
+
+  private static Integer formatVersion(BinaryOperator<String> props) {
     String version = props.apply(TableProperties.FORMAT_VERSION, null);
-    return "2".equals(version);
+    if (version == null) {
+      // TODO: switch to v3 once fully supported
+      return 2; // default to v2
+    }
+    try {
+      return Integer.parseInt(version);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid format version: " + version, e);
+    }
   }
 
   public static FileFormat defaultFileFormat(Table table) {
@@ -410,25 +432,19 @@ public class IcebergTableUtil {
   }
 
   private static String getWriteModeDefault(BinaryOperator<String> props) {
-    return (isV2Table(props) ? MERGE_ON_READ : COPY_ON_WRITE).modeName();
+    return (isV2TableOrAbove(props) ? MERGE_ON_READ : COPY_ON_WRITE).modeName();
   }
 
   public static boolean isCopyOnWriteMode(Context.Operation operation, BinaryOperator<String> props) {
-    String mode = null;
-    switch (operation) {
-      case DELETE:
-        mode = props.apply(TableProperties.DELETE_MODE,
-            getWriteModeDefault(props));
-        break;
-      case UPDATE:
-        mode = props.apply(TableProperties.UPDATE_MODE,
-            getWriteModeDefault(props));
-        break;
-      case MERGE:
-        mode = props.apply(TableProperties.MERGE_MODE,
-            getWriteModeDefault(props));
-        break;
-    }
+    final String mode = switch (operation) {
+      case DELETE -> props.apply(
+          TableProperties.DELETE_MODE, getWriteModeDefault(props));
+      case UPDATE -> props.apply(
+          TableProperties.UPDATE_MODE, getWriteModeDefault(props));
+      case MERGE -> props.apply(
+          TableProperties.MERGE_MODE, getWriteModeDefault(props));
+      default -> null;
+    };
     return COPY_ON_WRITE.modeName().equalsIgnoreCase(mode);
   }
 
