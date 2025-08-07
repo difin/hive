@@ -403,11 +403,6 @@ However, we need to define it here, for the following reasons:
 </property>
 
 <property>
-  <name>dfs.client.retry.policy.enabled</name>
-  <value>true</value>
-</property>
-
-<property>
   <name>hive.security.authorization.scheduled.queries.supported</name>
   <value>false</value>
 </property>
