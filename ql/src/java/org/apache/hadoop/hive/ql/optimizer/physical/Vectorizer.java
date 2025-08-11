@@ -4897,15 +4897,19 @@ public class Vectorizer implements PhysicalPlanResolver {
     return parent;
   }
 
-  private static void fillInPTFEvaluators(List<WindowFunctionDef> windowsFunctions,
-      String[] evaluatorFunctionNames, boolean[] evaluatorsAreDistinct,
+  private static void fillInPTFEvaluators(
+      List<WindowFunctionDef> windowsFunctions,
+      String[] evaluatorFunctionNames,
+      boolean[] evaluatorsAreDistinct,
+      boolean[] evaluatorsRespectNulls,
       WindowFrameDef[] evaluatorWindowFrameDefs,
-      List<ExprNodeDesc>[] evaluatorInputExprNodeDescLists) throws HiveException {
+      List<ExprNodeDesc>[] evaluatorInputExprNodeDescLists) {
     final int functionCount = windowsFunctions.size();
     for (int i = 0; i < functionCount; i++) {
       WindowFunctionDef winFunc = windowsFunctions.get(i);
       evaluatorFunctionNames[i] = winFunc.getName();
       evaluatorsAreDistinct[i] = winFunc.isDistinct();
+      evaluatorsRespectNulls[i] = winFunc.respectNulls();
       evaluatorWindowFrameDefs[i] = winFunc.getWindowFrame();
 
       List<PTFExpressionDef> args = winFunc.getArgs();
@@ -5016,6 +5020,7 @@ public class Vectorizer implements PhysicalPlanResolver {
 
     String[] evaluatorFunctionNames = new String[functionCount];
     boolean[] evaluatorsAreDistinct = new boolean[functionCount];
+    boolean[] evaluatorsRespectNulls = new boolean[functionCount];
     WindowFrameDef[] evaluatorWindowFrameDefs = new WindowFrameDef[functionCount];
     List<ExprNodeDesc>[] evaluatorInputExprNodeDescLists = (List<ExprNodeDesc>[]) new List<?>[functionCount];
 
@@ -5023,6 +5028,7 @@ public class Vectorizer implements PhysicalPlanResolver {
         windowsFunctions,
         evaluatorFunctionNames,
         evaluatorsAreDistinct,
+        evaluatorsRespectNulls,
         evaluatorWindowFrameDefs,
         evaluatorInputExprNodeDescLists);
 
@@ -5035,6 +5041,7 @@ public class Vectorizer implements PhysicalPlanResolver {
 
     vectorPTFDesc.setEvaluatorFunctionNames(evaluatorFunctionNames);
     vectorPTFDesc.setEvaluatorsAreDistinct(evaluatorsAreDistinct);
+    vectorPTFDesc.setEvaluatorsRespectNulls(evaluatorsRespectNulls);
     vectorPTFDesc.setEvaluatorWindowFrameDefs(evaluatorWindowFrameDefs);
     vectorPTFDesc.setEvaluatorInputExprNodeDescLists(evaluatorInputExprNodeDescLists);
 
