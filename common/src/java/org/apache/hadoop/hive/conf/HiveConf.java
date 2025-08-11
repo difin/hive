@@ -1508,7 +1508,7 @@ public class HiveConf extends Configuration {
      * @deprecated Use MetastoreConf.DIRECT_SQL_PARTITION_BATCH_SIZE
      */
     @Deprecated
-    METASTORE_DIRECT_SQL_PARTITION_BATCH_SIZE("hive.metastore.direct.sql.batch.size", 0,
+    METASTORE_DIRECT_SQL_PARTITION_BATCH_SIZE("hive.metastore.direct.sql.batch.size", 1000,
         "Batch size for partition and other object retrieval from the underlying DB in direct\n" +
         "SQL. For some DBs like Oracle and MSSQL, there are hardcoded or perf-based limitations\n" +
         "that necessitate this. For DBs that can handle the queries, this isn't necessary and\n" +
