@@ -28,8 +28,13 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.hadoop.hive.common.cli.EscapeCRLFHelper;
 
@@ -40,7 +45,8 @@ import org.apache.hadoop.hive.common.cli.EscapeCRLFHelper;
 abstract class Rows implements Iterator {
   protected final BeeLine beeLine;
   final ResultSetMetaData rsMeta;
-  final Boolean[] primaryKeys;
+  final boolean[] primaryKeyColumns;
+  boolean isPrimaryKeyColumnsInitialized;
   final NumberFormat numberFormat;
   private boolean convertBinaryArray;
   private final String nullStr;
@@ -49,14 +55,15 @@ abstract class Rows implements Iterator {
     this.beeLine = beeLine;
     nullStr = beeLine.getOpts().getNullString();
     rsMeta = rs.getMetaData();
-    int count = rsMeta.getColumnCount();
-    primaryKeys = new Boolean[count];
     if (beeLine.getOpts().getNumberFormat().equals("default")) {
       numberFormat = null;
     } else {
       numberFormat = new DecimalFormat(beeLine.getOpts().getNumberFormat());
     }
     this.convertBinaryArray = beeLine.getOpts().getConvertBinaryArrayToString();
+
+    int count = this.rsMeta.getColumnCount();
+    primaryKeyColumns = new boolean[count];
   }
 
   public void remove() {
@@ -75,42 +82,48 @@ abstract class Rows implements Iterator {
    * JDBC driver property implements {@link ResultSetMetaData#getTableName} (many do not), it
    * is not reliable for all databases.
    */
-  boolean isPrimaryKey(int col) {
-    if (primaryKeys[col] != null) {
-      return primaryKeys[col].booleanValue();
+  boolean isPrimaryKeyCol(int col) {
+    if (!isPrimaryKeyColumnsInitialized) {
+      initializePrimaryKeyMetadata();
     }
 
-    try {
-      // this doesn't always work, since some JDBC drivers (e.g.,
-      // Oracle's) return a blank string from getTableName.
-      String table = rsMeta.getTableName(col + 1);
-      String column = rsMeta.getColumnName(col + 1);
-
-      if (table == null || table.length() == 0 ||
-          column == null || column.length() == 0) {
-        return (primaryKeys[col] = new Boolean(false)).booleanValue();
-      }
-
-      ResultSet pks = beeLine.getDatabaseConnection().getDatabaseMetaData().getPrimaryKeys(
-          beeLine.getDatabaseConnection().getDatabaseMetaData().getConnection().getCatalog(), null, table);
-
-      try {
-        while (pks.next()) {
-          if (column.equalsIgnoreCase(
-              pks.getString("COLUMN_NAME"))) {
-            return (primaryKeys[col] = new Boolean(true)).booleanValue();
-          }
-        }
-      } finally {
-        pks.close();
-      }
-
-      return (primaryKeys[col] = new Boolean(false)).booleanValue();
-    } catch (SQLException sqle) {
-      return (primaryKeys[col] = new Boolean(false)).booleanValue();
-    }
+    return primaryKeyColumns[col];
   }
 
+  private void initializePrimaryKeyMetadata() {
+    Map<String, List<String>> tablePrimaryKeys = new HashMap<>();
+
+    try {
+      for (int i = 0; i < primaryKeyColumns.length; i++) {
+        String table = rsMeta.getTableName(i + 1);
+        String column = rsMeta.getColumnName(i + 1);
+
+        if (table == null || table.isEmpty() || column == null || column.isEmpty()) {
+          continue;
+        }
+
+        if (!tablePrimaryKeys.containsKey(table)) {
+          try (ResultSet pks = beeLine.getDatabaseConnection().getDatabaseMetaData().getPrimaryKeys(
+                  beeLine.getDatabaseConnection().getDatabaseMetaData().getConnection().getCatalog(), null, table)) {
+
+            List<String> pkNames = new ArrayList<>();
+
+        while (pks.next()) {
+              pkNames.add(pks.getString("COLUMN_NAME"));
+          }
+
+            tablePrimaryKeys.put(table, pkNames);
+        }
+      }
+
+        primaryKeyColumns[i] = tablePrimaryKeys.get(table).contains(column);
+      }
+    } catch (SQLException e) {
+      // Do nothing. We cannot decide if the given column is a primary key so we keep it as false
+    }
+
+    isPrimaryKeyColumnsInitialized = true;
+  }
 
   class Row {
     final String[] values;
@@ -135,7 +148,7 @@ abstract class Rows implements Iterator {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
       return Arrays.asList(values).toString();
     }
 
@@ -157,7 +170,7 @@ abstract class Rows implements Iterator {
       } catch (Throwable t) {
       }
 
-       for (int i = 0; i < size; i++) {
+      for (int i = 0; i < size; i++) {
         Object o = rs.getObject(i + 1);
         String value = null;
 
