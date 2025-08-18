@@ -79,7 +79,7 @@ STAGE PLANS:
                 TableScan
                   alias: store_sales
                   filterExpr: (ss_customer_sk is not null and ss_store_sk is not null and ss_promo_sk is not null) (type: boolean)
-                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_251_container, bigKeyColName:ss_customer_sk, smallTablePos:0, keyRatio:4.798164803147028E-5
+                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_251_container, bigKeyColName:ss_customer_sk, smallTablePos:0, keyRatio:4.798175710799457E-5
                   Statistics: Num rows: 82510879939 Data size: 12277050858184 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: (ss_customer_sk is not null and ss_store_sk is not null and ss_promo_sk is not null) (type: boolean)
@@ -107,7 +107,7 @@ STAGE PLANS:
                           outputColumnNames: _col1, _col2, _col3, _col4
                           input vertices:
                             1 Map 6
-                          Statistics: Num rows: 118561176 Data size: 136 Basic stats: COMPLETE Column stats: COMPLETE
+                          Statistics: Num rows: 118561431 Data size: 136 Basic stats: COMPLETE Column stats: COMPLETE
                           Map Join Operator
                             condition map:
                                  Inner Join 0 to 1
@@ -117,7 +117,7 @@ STAGE PLANS:
                             outputColumnNames: _col1, _col3, _col4
                             input vertices:
                               1 Map 7
-                            Statistics: Num rows: 23754047 Data size: 128 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 23754098 Data size: 128 Basic stats: COMPLETE Column stats: COMPLETE
                             Map Join Operator
                               condition map:
                                    Inner Join 0 to 1
@@ -127,7 +127,7 @@ STAGE PLANS:
                               outputColumnNames: _col1, _col4
                               input vertices:
                                 1 Map 8
-                              Statistics: Num rows: 23754047 Data size: 120 Basic stats: COMPLETE Column stats: COMPLETE
+                              Statistics: Num rows: 23754098 Data size: 120 Basic stats: COMPLETE Column stats: COMPLETE
                               Map Join Operator
                                 condition map:
                                      Inner Join 0 to 1
@@ -137,7 +137,7 @@ STAGE PLANS:
                                 outputColumnNames: _col7
                                 input vertices:
                                   0 Map 1
-                                Statistics: Num rows: 3959008 Data size: 112 Basic stats: COMPLETE Column stats: COMPLETE
+                                Statistics: Num rows: 3959017 Data size: 112 Basic stats: COMPLETE Column stats: COMPLETE
                                 Group By Operator
                                   aggregations: sum(_col7)
                                   minReductionHashAggr: 0.99
@@ -290,7 +290,7 @@ STAGE PLANS:
                 TableScan
                   alias: store_sales
                   filterExpr: (ss_customer_sk is not null and ss_store_sk is not null) (type: boolean)
-                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_252_container, bigKeyColName:ss_customer_sk, smallTablePos:0, keyRatio:4.913658662951276E-5
+                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_252_container, bigKeyColName:ss_customer_sk, smallTablePos:0, keyRatio:4.9136683586423244E-5
                   Statistics: Num rows: 82510879939 Data size: 11632478818736 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: (ss_customer_sk is not null and ss_store_sk is not null) (type: boolean)
@@ -318,7 +318,7 @@ STAGE PLANS:
                           outputColumnNames: _col1, _col2, _col3
                           input vertices:
                             1 Map 6
-                          Statistics: Num rows: 121414971 Data size: 128 Basic stats: COMPLETE Column stats: COMPLETE
+                          Statistics: Num rows: 121415232 Data size: 128 Basic stats: COMPLETE Column stats: COMPLETE
                           Map Join Operator
                             condition map:
                                  Inner Join 0 to 1
@@ -328,7 +328,7 @@ STAGE PLANS:
                             outputColumnNames: _col1, _col3
                             input vertices:
                               1 Map 7
-                            Statistics: Num rows: 24325812 Data size: 120 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 24325865 Data size: 120 Basic stats: COMPLETE Column stats: COMPLETE
                             Map Join Operator
                               condition map:
                                    Inner Join 0 to 1
@@ -338,7 +338,7 @@ STAGE PLANS:
                               outputColumnNames: _col6
                               input vertices:
                                 0 Map 1
-                              Statistics: Num rows: 4054303 Data size: 112 Basic stats: COMPLETE Column stats: COMPLETE
+                              Statistics: Num rows: 4054311 Data size: 112 Basic stats: COMPLETE Column stats: COMPLETE
                               Group By Operator
                                 aggregations: sum(_col6)
                                 minReductionHashAggr: 0.99

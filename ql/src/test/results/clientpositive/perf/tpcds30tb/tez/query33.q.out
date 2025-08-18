@@ -22,7 +22,7 @@ STAGE PLANS:
                 TableScan
                   alias: store_sales
                   filterExpr: ss_addr_sk is not null (type: boolean)
-                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_271_container, bigKeyColName:ss_addr_sk, smallTablePos:1, keyRatio:1.5949411774215885E-8
+                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_271_container, bigKeyColName:ss_addr_sk, smallTablePos:1, keyRatio:1.3573967467417775E-8
                   Statistics: Num rows: 82510879939 Data size: 10987909046272 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: ss_addr_sk is not null (type: boolean)
@@ -60,7 +60,7 @@ STAGE PLANS:
                             outputColumnNames: _col2, _col10
                             input vertices:
                               1 Map 8
-                            Statistics: Num rows: 227384408 Data size: 909533152 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 227384896 Data size: 909535104 Basic stats: COMPLETE Column stats: COMPLETE
                             Map Join Operator
                               condition map:
                                    Left Semi Join 0 to 1
@@ -70,7 +70,7 @@ STAGE PLANS:
                               outputColumnNames: _col2, _col10
                               input vertices:
                                 1 Map 9
-                              Statistics: Num rows: 227384408 Data size: 909533152 Basic stats: COMPLETE Column stats: COMPLETE
+                              Statistics: Num rows: 227384896 Data size: 909535104 Basic stats: COMPLETE Column stats: COMPLETE
                               Group By Operator
                                 aggregations: sum(_col2)
                                 keys: _col10 (type: int)
@@ -92,7 +92,7 @@ STAGE PLANS:
                 TableScan
                   alias: catalog_sales
                   filterExpr: cs_bill_addr_sk is not null (type: boolean)
-                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_275_container, bigKeyColName:cs_item_sk, smallTablePos:1, keyRatio:0.0027954892505937553
+                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_275_container, bigKeyColName:cs_item_sk, smallTablePos:1, keyRatio:0.002795495249880953
                   Statistics: Num rows: 43005109025 Data size: 5835793041376 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: cs_bill_addr_sk is not null (type: boolean)
@@ -130,7 +130,7 @@ STAGE PLANS:
                             outputColumnNames: _col2, _col10
                             input vertices:
                               1 Map 8
-                            Statistics: Num rows: 120220320 Data size: 1928745152 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 120220578 Data size: 1928775080 Basic stats: COMPLETE Column stats: COMPLETE
                             Map Join Operator
                               condition map:
                                    Left Semi Join 0 to 1
@@ -140,7 +140,7 @@ STAGE PLANS:
                               outputColumnNames: _col2, _col10
                               input vertices:
                                 1 Map 9
-                              Statistics: Num rows: 120220320 Data size: 1928745152 Basic stats: COMPLETE Column stats: COMPLETE
+                              Statistics: Num rows: 120220578 Data size: 1928775080 Basic stats: COMPLETE Column stats: COMPLETE
                               Group By Operator
                                 aggregations: sum(_col2)
                                 keys: _col10 (type: int)
@@ -162,7 +162,7 @@ STAGE PLANS:
                 TableScan
                   alias: web_sales
                   filterExpr: ws_bill_addr_sk is not null (type: boolean)
-                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_277_container, bigKeyColName:ws_bill_addr_sk, smallTablePos:1, keyRatio:6.09410527196747E-8
+                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_277_container, bigKeyColName:ws_bill_addr_sk, smallTablePos:1, keyRatio:5.186472571887208E-8
                   Statistics: Num rows: 21594638446 Data size: 2936546611376 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: ws_bill_addr_sk is not null (type: boolean)
@@ -200,7 +200,7 @@ STAGE PLANS:
                             outputColumnNames: _col2, _col10
                             input vertices:
                               1 Map 8
-                            Statistics: Num rows: 60941208 Data size: 6766605856 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 60941338 Data size: 6766620936 Basic stats: COMPLETE Column stats: COMPLETE
                             Map Join Operator
                               condition map:
                                    Left Semi Join 0 to 1
@@ -210,7 +210,7 @@ STAGE PLANS:
                               outputColumnNames: _col2, _col10
                               input vertices:
                                 1 Map 9
-                              Statistics: Num rows: 60941208 Data size: 6766605856 Basic stats: COMPLETE Column stats: COMPLETE
+                              Statistics: Num rows: 60941338 Data size: 6766620936 Basic stats: COMPLETE Column stats: COMPLETE
                               Group By Operator
                                 aggregations: sum(_col2)
                                 keys: _col10 (type: int)

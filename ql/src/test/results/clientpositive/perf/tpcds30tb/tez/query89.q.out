@@ -18,7 +18,7 @@ STAGE PLANS:
                 TableScan
                   alias: store_sales
                   filterExpr: ss_store_sk is not null (type: boolean)
-                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_82_container, bigKeyColName:ss_store_sk, smallTablePos:1, keyRatio:0.0027806824526610506
+                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_82_container, bigKeyColName:ss_store_sk, smallTablePos:1, keyRatio:0.002780688415511045
                   Statistics: Num rows: 82510879939 Data size: 10988352362648 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: ss_store_sk is not null (type: boolean)
@@ -36,7 +36,7 @@ STAGE PLANS:
                         outputColumnNames: _col1, _col2, _col3, _col5, _col6, _col7
                         input vertices:
                           1 Map 5
-                        Statistics: Num rows: 1141571997 Data size: 331055879250 Basic stats: COMPLETE Column stats: COMPLETE
+                        Statistics: Num rows: 1141574446 Data size: 331056589460 Basic stats: COMPLETE Column stats: COMPLETE
                         Map Join Operator
                           condition map:
                                Inner Join 0 to 1
@@ -46,7 +46,7 @@ STAGE PLANS:
                           outputColumnNames: _col1, _col2, _col5, _col6, _col7, _col9
                           input vertices:
                             1 Map 6
-                          Statistics: Num rows: 229436556 Data size: 65618855136 Basic stats: COMPLETE Column stats: COMPLETE
+                          Statistics: Num rows: 229437048 Data size: 65618995848 Basic stats: COMPLETE Column stats: COMPLETE
                           Map Join Operator
                             condition map:
                                  Inner Join 0 to 1
@@ -56,7 +56,7 @@ STAGE PLANS:
                             outputColumnNames: _col2, _col5, _col6, _col7, _col9, _col11, _col12
                             input vertices:
                               1 Map 7
-                            Statistics: Num rows: 229436556 Data size: 106687998652 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 229437048 Data size: 106688227432 Basic stats: COMPLETE Column stats: COMPLETE
                             Group By Operator
                               aggregations: sum(_col2)
                               keys: _col5 (type: char(50)), _col6 (type: char(50)), _col7 (type: char(50)), _col9 (type: int), _col11 (type: varchar(50)), _col12 (type: varchar(50))

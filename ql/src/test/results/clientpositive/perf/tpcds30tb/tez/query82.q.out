@@ -120,7 +120,7 @@ STAGE PLANS:
                 TableScan
                   alias: store_sales
                   filterExpr: (ss_item_sk BETWEEN DynamicValue(RS_12_item_i_item_sk_min) AND DynamicValue(RS_12_item_i_item_sk_max) and in_bloom_filter(ss_item_sk, DynamicValue(RS_12_item_i_item_sk_bloom_filter))) (type: boolean)
-                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_83_container, bigKeyColName:ss_item_sk, smallTablePos:0, keyRatio:0.0017251082505229268
+                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_83_container, bigKeyColName:ss_item_sk, smallTablePos:0, keyRatio:0.001725111954016964
                   Statistics: Num rows: 86404891377 Data size: 691239131016 Basic stats: COMPLETE Column stats: COMPLETE
                   Filter Operator
                     predicate: (ss_item_sk BETWEEN DynamicValue(RS_12_item_i_item_sk_min) AND DynamicValue(RS_12_item_i_item_sk_max) and in_bloom_filter(ss_item_sk, DynamicValue(RS_12_item_i_item_sk_bloom_filter))) (type: boolean)
@@ -138,12 +138,12 @@ STAGE PLANS:
                         outputColumnNames: _col3, _col4, _col5
                         input vertices:
                           0 Map 1
-                        Statistics: Num rows: 149057791 Data size: 59026885124 Basic stats: COMPLETE Column stats: COMPLETE
+                        Statistics: Num rows: 149058111 Data size: 59027011844 Basic stats: COMPLETE Column stats: COMPLETE
                         Top N Key Operator
                           sort order: +++
                           keys: _col3 (type: string), _col4 (type: varchar(200)), _col5 (type: decimal(7,2))
                           null sort order: zzz
-                          Statistics: Num rows: 149057791 Data size: 59026885124 Basic stats: COMPLETE Column stats: COMPLETE
+                          Statistics: Num rows: 149058111 Data size: 59027011844 Basic stats: COMPLETE Column stats: COMPLETE
                           top n: 100
                           Group By Operator
                             keys: _col3 (type: string), _col4 (type: varchar(200)), _col5 (type: decimal(7,2))

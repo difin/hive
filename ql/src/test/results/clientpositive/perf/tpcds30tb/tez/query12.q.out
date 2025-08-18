@@ -17,7 +17,7 @@ STAGE PLANS:
             Map Operator Tree:
                 TableScan
                   alias: web_sales
-                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_52_container, bigKeyColName:ws_item_sk, smallTablePos:1, keyRatio:0.030300956815565664
+                  probeDecodeDetails: cacheKey:HASH_MAP_MAPJOIN_52_container, bigKeyColName:ws_item_sk, smallTablePos:1, keyRatio:0.030301021831703974
                   Statistics: Num rows: 21594638446 Data size: 2763811113552 Basic stats: COMPLETE Column stats: COMPLETE
                   Select Operator
                     expressions: ws_item_sk (type: bigint), ws_ext_sales_price (type: decimal(7,2)), ws_sold_date_sk (type: bigint)
@@ -42,7 +42,7 @@ STAGE PLANS:
                         outputColumnNames: _col1, _col5, _col6, _col7, _col8, _col9
                         input vertices:
                           1 Map 6
-                        Statistics: Num rows: 654338207 Data size: 451190719790 Basic stats: COMPLETE Column stats: COMPLETE
+                        Statistics: Num rows: 654339611 Data size: 451191688550 Basic stats: COMPLETE Column stats: COMPLETE
                         Group By Operator
                           aggregations: sum(_col1)
                           keys: _col9 (type: char(50)), _col8 (type: char(50)), _col5 (type: string), _col6 (type: varchar(200)), _col7 (type: decimal(7,2))
