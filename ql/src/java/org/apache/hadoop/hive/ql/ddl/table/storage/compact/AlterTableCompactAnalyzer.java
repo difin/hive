@@ -116,6 +116,7 @@ public class AlterTableCompactAnalyzer extends AbstractAlterTableAnalyzer {
 
     AlterTableCompactDesc desc = new AlterTableCompactDesc(tableName, partitionSpec, type, isBlocking, poolName,
         numberOfBuckets, mapProp, orderBy, filterExpr);
+    addInputsOutputsAlterTable(tableName, partitionSpec, desc, desc.getType(), false);
     rootTasks.add(TaskFactory.get(new DDLWork(getInputs(), getOutputs(), desc)));
   }
 
