@@ -56,10 +56,6 @@
             <scope>test</scope>
             <exclusions>
               <exclusion>
-                <groupId>org.apache.ozone</groupId>
-                <artifactId>ozone-filesystem-hadoop3</artifactId>
-              </exclusion>
-              <exclusion>
                 <groupId>org.apache.hive</groupId>
                 <artifactId>*</artifactId>
               </exclusion>
@@ -126,10 +122,6 @@
             <type>test-jar</type>
             <scope>test</scope>
             <exclusions>
-              <exclusion>
-                <groupId>org.apache.ozone</groupId>
-                <artifactId>ozone-filesystem-hadoop3</artifactId>
-              </exclusion>
               <exclusion>
                 <groupId>org.apache.hive</groupId>
                 <artifactId>*</artifactId>

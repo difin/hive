@@ -1,8 +1,0 @@
-# Copyright (c) 2020 Cloudera, Inc. All rights reserved.
-docker_images:
-  hive: hive
-
-multi_arch: multi_splits
-registry: docker-private.infra.cloudera.com/cloudera
-docker_image_tag:
-  build_tag: latest
