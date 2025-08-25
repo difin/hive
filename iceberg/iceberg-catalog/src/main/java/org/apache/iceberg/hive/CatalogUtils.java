@@ -22,18 +22,18 @@ package org.apache.iceberg.hive;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;
 import org.apache.iceberg.BaseMetastoreTableOperations;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableSet;
+import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 
 public class CatalogUtils {
   public static final String NAME = "name";
   public static final String LOCATION = "location";
   public static final String CATALOG_CONFIG_PREFIX = "iceberg.catalog.";
-  public static final String CUSTOM_CATALOG_CONFIG_PREFIX = "iceberg.%s-catalog";
-  public static final String CATALOG_CONFIG_TYPE = CATALOG_CONFIG_PREFIX + "type";
-  public static final String CATALOG_WAREHOUSE_TEMPLATE = CUSTOM_CATALOG_CONFIG_PREFIX + ".warehouse";
+  public static final String CATALOG_WAREHOUSE_TEMPLATE = "iceberg.catalog.%s.warehouse";
   public static final String CATALOG_DEFAULT_CONFIG_PREFIX = "iceberg.catalog-default.";
   public static final Set<String> PROPERTIES_TO_REMOVE = ImmutableSet.of(
       // We don't want to push down the metadata location props to Iceberg from HMS,
@@ -92,5 +92,29 @@ public class CatalogUtils {
           properties.put(icebergKey, e.getValue());
         });
     return properties;
+  }
+
+  /**
+   * Collect all the catalog specific configuration from the global hive configuration.
+   * @param conf a Hadoop configuration
+   * @param catalogName name of the catalog
+   * @return complete map of catalog properties
+   */
+  public static Map<String, String> getCatalogProperties(Configuration conf, String catalogName) {
+    Map<String, String> catalogProperties = Maps.newHashMap();
+    String keyPrefix = CATALOG_CONFIG_PREFIX + catalogName;
+    conf.forEach(config -> {
+      if (config.getKey().startsWith(CatalogUtils.CATALOG_DEFAULT_CONFIG_PREFIX)) {
+        catalogProperties.putIfAbsent(
+            config.getKey().substring(CatalogUtils.CATALOG_DEFAULT_CONFIG_PREFIX.length()),
+            config.getValue());
+      } else if (config.getKey().startsWith(keyPrefix)) {
+        catalogProperties.put(
+            config.getKey().substring(keyPrefix.length() + 1),
+            config.getValue());
+      }
+    });
+
+    return catalogProperties;
   }
 }

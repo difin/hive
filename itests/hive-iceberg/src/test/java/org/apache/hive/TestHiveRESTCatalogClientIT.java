@@ -69,7 +69,7 @@ public class TestHiveRESTCatalogClientIT {
 
   private static final String DB_NAME = "ice_db";
   private static final String TABLE_NAME = "ice_tbl";
-  private static final String CATALOG_NAME = "rest_cat";
+  private static final String CATALOG_NAME = "ice01";
   private static final String HIVE_ICEBERG_STORAGE_HANDLER = "org.apache.iceberg.mr.hive.HiveIcebergStorageHandler";
   
   private Configuration conf;
@@ -87,15 +87,14 @@ public class TestHiveRESTCatalogClientIT {
   @BeforeAll
   public void setup() throws Exception {
     // Starting msClient with Iceberg REST Catalog client underneath
-    String restCatalogPrefix = String.format(CatalogUtils.CUSTOM_CATALOG_CONFIG_PREFIX,
-        CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
+    String restCatalogPrefix = String.format("%s%s.", CatalogUtils.CATALOG_CONFIG_PREFIX, CATALOG_NAME);
 
     conf = REST_CATALOG_EXTENSION.getConf();
-    conf.set(CatalogUtils.CATALOG_CONFIG_TYPE, CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
+    conf.set(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), CATALOG_NAME);
     conf.set(MetastoreConf.ConfVars.METASTORE_CLIENT_IMPL.getVarname(),
         "org.apache.iceberg.hive.client.HiveRESTCatalogClient");
-    conf.set(restCatalogPrefix + ".uri", REST_CATALOG_EXTENSION.getRestEndpoint());
-    conf.set(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), CATALOG_NAME);
+    conf.set(restCatalogPrefix + "uri", REST_CATALOG_EXTENSION.getRestEndpoint());
+    conf.set(restCatalogPrefix + "type", CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
 
     HiveMetaHookLoader hookLoader = tbl -> {
       HiveStorageHandler storageHandler;
@@ -132,7 +131,7 @@ public class TestHiveRESTCatalogClientIT {
     hive.createDatabase(db, true);
 
     // --- Get Database ---
-    Database retrievedDB = hive.getDatabase(DB_NAME);
+    Database retrievedDB = hive.getDatabase(CATALOG_NAME, DB_NAME);
     Assertions.assertEquals(DB_NAME, retrievedDB.getName());
     Assertions.assertEquals(CATALOG_NAME, retrievedDB.getCatalogName());
 

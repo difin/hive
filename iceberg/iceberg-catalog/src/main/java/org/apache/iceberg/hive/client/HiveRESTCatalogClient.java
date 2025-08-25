@@ -52,7 +52,6 @@ import org.apache.iceberg.hive.MetastoreUtil;
 import org.apache.iceberg.hive.RuntimeMetaException;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
-import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 import org.apache.iceberg.rest.RESTCatalog;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -65,7 +64,6 @@ public class HiveRESTCatalogClient extends BaseMetaStoreClient {
   public static final String DB_OWNER_TYPE = "ownerType";
 
   private static final Logger LOG = LoggerFactory.getLogger(HiveRESTCatalogClient.class);
-  public static final String CATALOG_CONFIG_PREFIX = "iceberg.rest-catalog.";
 
   private RESTCatalog restCatalog;
 
@@ -82,7 +80,7 @@ public class HiveRESTCatalogClient extends BaseMetaStoreClient {
   public void reconnect()  {
     close();
     String catName = MetaStoreUtils.getDefaultCatalog(conf);
-    Map<String, String> properties = getCatalogProperties(conf);
+    Map<String, String> properties = CatalogUtils.getCatalogProperties(conf, MetaStoreUtils.getCatalogName(conf));
     restCatalog = (RESTCatalog) CatalogUtil.buildIcebergCatalog(catName, properties, null);
   }
 
@@ -96,20 +94,6 @@ public class HiveRESTCatalogClient extends BaseMetaStoreClient {
       throw new RuntimeMetaException(e.getCause(), "Failed to close existing REST catalog");
     }
   }
-
-  private static Map<String, String> getCatalogProperties(Configuration conf) {
-    Map<String, String> catalogProperties = Maps.newHashMap();
-    conf.forEach(config -> {
-      if (config.getKey().startsWith(CATALOG_CONFIG_PREFIX)) {
-        catalogProperties.put(
-            config.getKey().substring(CATALOG_CONFIG_PREFIX.length()),
-            config.getValue());
-      }
-    });
-    catalogProperties.put(CatalogUtil.ICEBERG_CATALOG_TYPE, CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
-    return catalogProperties;
-  }
-
 
   @Override
   public List<String> getDatabases(String catName, String dbPattern) {

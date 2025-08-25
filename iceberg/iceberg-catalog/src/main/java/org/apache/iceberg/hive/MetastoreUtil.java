@@ -137,7 +137,7 @@ public class MetastoreUtil {
         HiveOperationsBase.HIVE_TABLE_PROPERTY_MAX_SIZE_DEFAULT);
     HMSTablePropertyHelper.updateHmsTableForIcebergTable(metadata.metadataFileLocation(), result, metadata,
         null, true, maxHiveTablePropertySize, null);
-    result.getParameters().put(CatalogUtil.ICEBERG_CATALOG_TYPE, conf.get(CatalogUtils.CATALOG_CONFIG_TYPE));
+    result.getParameters().put(CatalogUtil.ICEBERG_CATALOG_TYPE, MetaStoreUtils.getCatalogType(conf));
     result.setSd(toHiveStorageDescriptor(table));
     return result;
   }

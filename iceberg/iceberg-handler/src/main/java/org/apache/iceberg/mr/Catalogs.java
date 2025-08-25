@@ -19,13 +19,11 @@
 
 package org.apache.iceberg.mr;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.metastore.utils.StringUtils;
 import org.apache.iceberg.CatalogProperties;
 import org.apache.iceberg.CatalogUtil;
 import org.apache.iceberg.PartitionSpec;
@@ -199,7 +197,7 @@ public final class Catalogs {
     if (catalogType != null) {
       return CatalogUtil.ICEBERG_CATALOG_TYPE_HIVE.equalsIgnoreCase(catalogType);
     }
-    return getCatalogProperties(conf, catalogName).get(CatalogProperties.CATALOG_IMPL) == null;
+    return CatalogUtils.getCatalogProperties(conf, catalogName).get(CatalogProperties.CATALOG_IMPL) == null;
   }
 
   public static boolean hadoopCatalog(Configuration conf, Properties props) {
@@ -213,7 +211,7 @@ public final class Catalogs {
       return CatalogUtil.ICEBERG_CATALOG_TYPE_HADOOP.equalsIgnoreCase(catalogType);
     }
     return CatalogUtil.ICEBERG_CATALOG_HADOOP.equals(
-        getCatalogProperties(conf, catalogName).get(CatalogProperties.CATALOG_IMPL));
+        CatalogUtils.getCatalogProperties(conf, catalogName).get(CatalogProperties.CATALOG_IMPL));
   }
 
   /**
@@ -261,47 +259,8 @@ public final class Catalogs {
     } else {
       String name = catalogName == null ? ICEBERG_DEFAULT_CATALOG_NAME : catalogName;
       return Optional.of(CatalogUtil.buildIcebergCatalog(name,
-              getCatalogProperties(conf, name), conf));
+          CatalogUtils.getCatalogProperties(conf, name), conf));
     }
-  }
-
-  /**
-   * Collect all the catalog specific configuration from the global hive configuration.
-   * @param conf a Hadoop configuration
-   * @param catalogName name of the catalog
-   * @return complete map of catalog properties
-   */
-  private static Map<String, String> getCatalogProperties(Configuration conf, String catalogName) {
-    Map<String, String> catalogProperties = Maps.newHashMap();
-
-    List<String> keyPrefixes = List.of(
-        InputFormatConfig.CATALOG_CONFIG_PREFIX + catalogName,
-        String.format(CatalogUtils.CUSTOM_CATALOG_CONFIG_PREFIX, catalogName));
-
-    conf.forEach(config -> {
-      if (config.getKey().startsWith(CatalogUtils.CATALOG_DEFAULT_CONFIG_PREFIX)) {
-        catalogProperties.putIfAbsent(
-                config.getKey().substring(CatalogUtils.CATALOG_DEFAULT_CONFIG_PREFIX.length()),
-                config.getValue());
-      } else {
-        keyPrefixes.forEach(keyPrefix -> {
-          if (config.getKey().startsWith(keyPrefix)) {
-            catalogProperties.put(
-                config.getKey().substring(keyPrefix.length() + 1),
-                config.getValue());
-          }
-        });
-      }
-    });
-
-    String catType = conf.get(CatalogUtils.CATALOG_CONFIG_TYPE);
-
-    if (StringUtils.isEmpty(catalogProperties.get(CatalogUtil.ICEBERG_CATALOG_TYPE)) &&
-        !StringUtils.isEmpty(catType) && !ICEBERG_DEFAULT_CATALOG_NAME.equals(catalogName)) {
-      catalogProperties.put(CatalogUtil.ICEBERG_CATALOG_TYPE, catType);
-    }
-
-    return catalogProperties;
   }
 
   /**

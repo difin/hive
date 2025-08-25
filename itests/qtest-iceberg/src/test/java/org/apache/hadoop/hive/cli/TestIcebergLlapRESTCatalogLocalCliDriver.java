@@ -81,15 +81,14 @@ public class TestIcebergLlapRESTCatalogLocalCliDriver {
 
   @Before
   public void setupHiveConfig() {
-    String restCatalogType = CatalogUtil.ICEBERG_CATALOG_TYPE_REST;
-    String restCatalogPrefix = String.format(CatalogUtils.CUSTOM_CATALOG_CONFIG_PREFIX, restCatalogType);
+    String restCatalogPrefix = String.format("%s%s.", CatalogUtils.CATALOG_CONFIG_PREFIX, CATALOG_NAME);
 
     Configuration conf = SessionState.get().getConf();
-    conf.set(CatalogUtils.CATALOG_CONFIG_TYPE, restCatalogType);
+    conf.set(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), CATALOG_NAME);
     conf.set(MetastoreConf.ConfVars.METASTORE_CLIENT_IMPL.getVarname(),
         "org.apache.iceberg.hive.client.HiveRESTCatalogClient");
-    conf.set(restCatalogPrefix + ".uri", REST_CATALOG_EXTENSION.getRestEndpoint());
-    conf.set(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), CATALOG_NAME);
+    conf.set(restCatalogPrefix + "uri", REST_CATALOG_EXTENSION.getRestEndpoint());
+    conf.set(restCatalogPrefix + "type", CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
   }
 
   @Before

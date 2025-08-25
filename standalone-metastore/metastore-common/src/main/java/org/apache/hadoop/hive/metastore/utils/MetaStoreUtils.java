@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.TimeZone;
 import java.util.function.Predicate;
@@ -83,6 +84,8 @@ public class MetaStoreUtils {
   private static final DateTimeFormatter DATE_FORMATTER = createDateTimeFormatter("uuuu-MM-dd");
 
   private static final DateTimeFormatter TIMESTAMP_FORMATTER = createDateTimeFormatter("uuuu-MM-dd HH:mm:ss");
+
+  public static final String ICEBERG_CATALOG = "iceberg.catalog";
 
   private static DateTimeFormatter createDateTimeFormatter(String format) {
     return DateTimeFormatter.ofPattern(format).withZone(TimeZone.getTimeZone("UTC").toZoneId())
@@ -1133,6 +1136,20 @@ public class MetaStoreUtils {
       catName = Warehouse.DEFAULT_CATALOG_NAME;
     }
     return catName;
+  }
+
+  public static String getCatalogName(Configuration conf) {
+    return Optional.ofNullable(conf.get(ICEBERG_CATALOG))
+        .or(() -> Optional.ofNullable(MetastoreConf.getVar(conf, MetastoreConf.ConfVars.CATALOG_DEFAULT)))
+        .orElse("");
+  }
+
+  public static String getCatalogType(Configuration conf) {
+    return Optional.ofNullable(getCatalogName(conf))
+        .filter(StringUtils::isNotEmpty)
+        .map(catalogName -> String.format("iceberg.catalog.%s.type", catalogName))
+        .map(conf::get)
+        .orElse("");
   }
 
   public static boolean isView(Table table) {
