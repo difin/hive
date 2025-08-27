@@ -21,13 +21,18 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hive.metastore.api.TableMeta;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.HiveMetaStoreAuthorizer;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.authorize.AuthorizationException;
 import org.apache.hadoop.security.authorize.ProxyUsers;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+import com.github.benmanes.caffeine.cache.Ticker;
+
+import java.time.Duration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,14 +53,48 @@ public class HMSServletSecurity extends ServletSecurity {
   private static final Logger LOG = LoggerFactory.getLogger(HMSServletSecurity.class);
   private static final String KNOX = "knox";
   private static final String X_USER_GROUPS = "X-Knox-Actor-Groups-1";
+  private static final String CLIENT_TYPE_KEY = "client_type";
+  private static final String REST_CATALOG_VALUE = "rest_catalog";
+
+  private final Cache<UgiKey, UserGroupInformation> ugiCache;
 
   public HMSServletSecurity(Configuration conf, boolean jwt) {
     super(conf, jwt);
     ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
+    long ugiCacheExpiryMs = getCacheExpiryMs(conf);
+    int ugiCacheMaxSize = getCacheMaxSize(conf);
+
+    this.ugiCache = createCacheWithConfig(ugiCacheExpiryMs, ugiCacheMaxSize);
+  }
+
+  /**
+   * Gets the cache expiry time
+   */
+  private long getCacheExpiryMs(Configuration conf) {
+    try {
+      return MetastoreConf.getLongVar(conf, MetastoreConf.ConfVars.AGGREGATE_STATS_CACHE_TTL) * 1000L;
+    } catch (AssertionError | Exception e) {
+      String configKey = MetastoreConf.ConfVars.AGGREGATE_STATS_CACHE_TTL.getVarname();
+      long ttlSeconds = conf.getLong(configKey, 600L);
+      return ttlSeconds * 1000L;
+    }
+  }
+
+  /**
+   * Gets the cache max size
+   */
+  private int getCacheMaxSize(Configuration conf) {
+    try {
+      return MetastoreConf.getIntVar(conf, MetastoreConf.ConfVars.SERVER_MAX_THREADS);
+    } catch (AssertionError | Exception e) {
+      String configKey = MetastoreConf.ConfVars.SERVER_MAX_THREADS.getVarname();
+      return conf.getInt(configKey, 1000);
+    }
   }
 
   /**
    * Extracts the username from a request.
+   *
    * @param request a request?doAs=username
    * @return the username
    */
@@ -72,7 +111,8 @@ public class HMSServletSecurity extends ServletSecurity {
 
   /**
    * Check that the proxy user comes from a trusted IP and is authorized do-as for a given real user.
-   * @param realUser the real user
+   *
+   * @param realUser  the real user
    * @param proxyUser the proxy user
    * @param ipAddress the proxy host ip address
    * @throws IOException
@@ -119,6 +159,93 @@ public class HMSServletSecurity extends ServletSecurity {
     return super.extractUserName(request, response);
   }
 
+  Cache<UgiKey, UserGroupInformation> getUgiCache() {
+    return ugiCache;
+  }
+
+  static class UgiKey {
+    private final String realUser;
+    private final String loginUser;
+
+    public UgiKey(String realUser, String loginUser) {
+      this.realUser = realUser;
+      this.loginUser = loginUser;
+    }
+
+    @Override
+    public int hashCode() {
+      return realUser.hashCode() + (37 * loginUser.hashCode());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof UgiKey) {
+        UgiKey other = (UgiKey) obj;
+        return realUser.equals(other.realUser) && loginUser.equals(other.loginUser);
+      }
+      return false;
+    }
+
+    String getRealUser() {
+      return realUser;
+    }
+
+    String getLoginUser() {
+      return loginUser;
+    }
+  }
+
+  /**
+   * Creates a UGI cache with the specified expiration time and maximum size.
+   *
+   * @param expirationMs Time in milliseconds after which entries expire due to inactivity
+   * @param maxSize      Maximum number of entries the cache can hold
+   * @return A configured Caffeine cache for UGI objects
+   */
+  private Cache<UgiKey, UserGroupInformation> createCacheWithConfig(long expirationMs, int maxSize) {
+    RemovalListener<UgiKey, UserGroupInformation> cleanupListener =
+        (key, ugi, cause) -> {
+          if (ugi != null) {
+            try {
+              FileSystem.closeAllForUGI(ugi);
+              if (LOG.isDebugEnabled()) {
+                LOG.debug("Cleaned up FileSystem handles for evicted UGI: {} (cause: {})",
+                    ugi.getUserName(), cause);
+              }
+            } catch (IOException cleanupException) {
+              LOG.error("Failed to clean up FileSystem handles for evicted UGI: {} (cause: {})",
+                  ugi, cause, cleanupException);
+            }
+          }
+        };
+
+    Caffeine<UgiKey, UserGroupInformation> builder = Caffeine.<UgiKey, UserGroupInformation>newBuilder()
+        .maximumSize(maxSize)
+        .executor(Runnable::run)
+        .removalListener(cleanupListener);
+
+    if (expirationMs > 0) {
+      builder.expireAfterAccess(Duration.ofMillis(expirationMs))
+          .ticker(Ticker.systemTicker());
+    }
+
+    return builder.build();
+  }
+
+  UserGroupInformation getUgi(String realUser, UserGroupInformation loginUser) {
+    UgiKey key = new UgiKey(realUser, loginUser.getUserName());
+    return ugiCache.get(key, v -> {
+      return UserGroupInformation.createProxyUser(realUser, loginUser);
+    });
+  }
+
+  /**
+   * Creates a cache for testing purposes with both custom expiration and size.
+   */
+  Cache<UgiKey, UserGroupInformation> createTableCacheForTesting(long expirationMs, int maxSize) {
+    return createCacheWithConfig(expirationMs, maxSize);
+  }
+
   @Override
   public void execute(HttpServletRequest request, HttpServletResponse response, MethodExecutor executor)
       throws IOException {
@@ -135,17 +262,17 @@ public class HMSServletSecurity extends ServletSecurity {
       String userFromHeader = extractUserName(request, response);
       UserGroupInformation clientUgi;
       LOG.info("Creating proxy user for: {}", userFromHeader);
-      clientUgi = UserGroupInformation.createProxyUser(userFromHeader, UserGroupInformation.getLoginUser());
+      clientUgi = getUgi(userFromHeader, UserGroupInformation.getLoginUser());
       String groupsHeader = request.getHeader(X_USER_GROUPS);
       if (groupsHeader != null && !groupsHeader.isEmpty() && !"$primary_group".equals(groupsHeader)) {
         HMSGroup.set(userFromHeader, groupsHeader);
         LOG.info("Groups are set for user {} in the request header:{}", userFromHeader, groupsHeader);
-      } else if (null != getDoAsQueryParam(request)){
+      } else if (null != getDoAsQueryParam(request)) {
         // FIXME: remove after Knox has support for Knox-Groups
         HMSGroup.set(userFromHeader, userFromHeader);
         LOG.info("Patching groups for user in the request header:{}", userFromHeader);
       }
-      setAuthClientConfig(Collections.singletonMap("REST_CATALOG", true));
+      setAuthClientConfig(Collections.singletonMap(CLIENT_TYPE_KEY, REST_CATALOG_VALUE));
       PrivilegedExceptionAction<Void> action = () -> {
         executor.execute(request, response);
         return null;
@@ -161,14 +288,6 @@ public class HMSServletSecurity extends ServletSecurity {
       } finally {
         HMSGroup.setGroups(null);
         setAuthClientConfig(null);
-        try {
-          FileSystem.closeAllForUGI(clientUgi);
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("Successfully cleaned up FileSystem handles for user: {}", clientUgi.getUserName());
-          }
-        } catch (IOException cleanupException) {
-          LOG.error("Failed to clean up FileSystem handles for UGI: {}", clientUgi, cleanupException);
-        }
       }
     } catch (AuthorizationException | HttpAuthenticationException e) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -199,8 +318,10 @@ public class HMSServletSecurity extends ServletSecurity {
       return false;
     }
   }
+
   private static final String AUTH_CLAZZ = "org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.HiveMetaStoreAuthorizer";
   private static final Method SET_AUTHZ_CLIENT_CONFIG = getAuthzClientConfig();
+
   public static Method getAuthzClientConfig() {
     try {
       Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(AUTH_CLAZZ);
