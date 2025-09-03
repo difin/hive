@@ -19,11 +19,9 @@
 
 package org.apache.iceberg.rest;
 
-import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.HMSServletSecurity;
 import org.apache.hadoop.hive.metastore.SecureServletCaller;
-import org.apache.hadoop.hive.metastore.ServletSecurity;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.iceberg.HiveCachingCatalog;
 import org.apache.iceberg.catalog.Catalog;
@@ -80,8 +78,8 @@ public class HMSCatalogServer {
     // nothing
   }
 
-  public static HttpServlet createServlet(SecureServletCaller security, Catalog catalog) throws IOException {
-    try (HMSCatalogAdapter adapter = new HMSCatalogAdapter(catalog)) {
+  public static HttpServlet createServlet(SecureServletCaller security, Catalog catalog, Configuration configuration) throws IOException {
+    try (HMSCatalogAdapter adapter = new HMSCatalogAdapter(catalog, configuration)) {
       return new HMSCatalogServlet(security, adapter);
     }
   }
@@ -123,7 +121,7 @@ public class HMSCatalogServer {
       actualCatalog.initialize("hive", Collections.emptyMap());
     }
     catalogRef = new SoftReference<>(actualCatalog);
-    return createServlet(security, actualCatalog);
+    return createServlet(security, actualCatalog, configuration);
   }
 
   /**

@@ -37,6 +37,8 @@ import org.apache.hadoop.hive.metastore.api.LockResponse;
 import org.apache.hadoop.hive.metastore.api.LockState;
 import org.apache.hadoop.hive.metastore.api.ShowLocksResponse;
 import org.apache.hadoop.hive.metastore.api.ShowLocksResponseElement;
+import org.apache.iceberg.CatalogProperties;
+import org.apache.iceberg.CatalogUtil;
 import org.apache.iceberg.ClientPool;
 import org.apache.iceberg.HasTableOperations;
 import org.apache.iceberg.PartitionSpec;
@@ -52,6 +54,7 @@ import org.apache.iceberg.types.Types;
 import org.apache.thrift.TException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,11 +64,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.apache.iceberg.PartitionSpec.builderFor;
 import static org.apache.iceberg.types.Types.NestedField.required;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
@@ -157,15 +160,6 @@ public class TestHiveCommitLocks {
     spyClient = spyClientRef.get();
   }
 
-  @AfterClass
-  public static void cleanup() {
-    try {
-      spyClientPool.close();
-    } catch (Throwable t) {
-      // Ignore any exception
-    }
-  }
-
   @BeforeEach
   public void before() throws Exception {
     this.tableLocation =
@@ -185,7 +179,7 @@ public class TestHiveCommitLocks {
 
     metadataV2 = ops.current();
 
-    Assert.assertEquals(2, ops.current().schema().columns().size());
+    Assertions.assertEquals(2, ops.current().schema().columns().size());
     HiveActor actor = new HiveCatalogActor("hive", overriddenHiveConf) {
       @Override
       protected ClientPool<IMetaStoreClient, TException> createPool(Map<String, String> properties) {

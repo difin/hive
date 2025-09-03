@@ -28,13 +28,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.StatsSetupConst;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
+import org.apache.hadoop.util.Preconditions;
 import org.apache.hive.iceberg.com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.iceberg.BaseMetastoreTableOperations;
+import org.apache.iceberg.ClientPool;
 import org.apache.iceberg.PartitionSpecParser;
 import org.apache.iceberg.Snapshot;
 import org.apache.iceberg.SnapshotSummary;
@@ -81,7 +84,7 @@ public class HiveTableOperations extends BaseMetastoreTableOperations
   static final String NO_LOCK_EXPECTED_KEY = "expected_parameter_key";
   static final String NO_LOCK_EXPECTED_VALUE = "expected_parameter_value";
 
-  private static final String HIVE_ICEBERG_STORAGE_HANDLER = "org.apache.iceberg.mr.hive.HiveIcebergStorageHandler";
+  public static final String HIVE_ICEBERG_STORAGE_HANDLER = "org.apache.iceberg.mr.hive.HiveIcebergStorageHandler";
 
   private static final BiMap<String, String> ICEBERG_TO_HMS_TRANSLATION = ImmutableBiMap.of(
           // gc.enabled in Iceberg and external.table.purge in Hive are meant to do the same things but
@@ -159,7 +162,7 @@ public class HiveTableOperations extends BaseMetastoreTableOperations
     try {
       Table table = actor.getTable(database, tableName);
       if (table != null) {
-        validateTableIsIceberg(table, fullName);
+        HiveOperationsBase.validateTableIsIceberg(table, fullName);
         metadataLocation = table.getParameters().get(METADATA_LOCATION_PROP);
       } else {
         if (currentMetadataLocation() != null) {
@@ -317,8 +320,7 @@ public class HiveTableOperations extends BaseMetastoreTableOperations
     LOG.info("Committed to table {} with the new metadata location {}", fullName, newMetadataLocation);
   }
 
-  @VisibleForTesting
-  void persistTable(Table hmsTable, boolean updateHiveTable, String expectedMetadataLocation)
+  public void persistTable(Table hmsTable, boolean updateHiveTable, String expectedMetadataLocation)
           throws TException, InterruptedException {
     if (updateHiveTable) {
       actor.alterTable(
@@ -344,7 +346,6 @@ public class HiveTableOperations extends BaseMetastoreTableOperations
   protected Table newHmsTable(TableMetadata metadata) {
     Preconditions.checkNotNull(metadata, "'metadata' parameter can't be null");
     final long currentTimeMillis = System.currentTimeMillis();
-
     Table newTable = new Table(tableName,
         database,
         metadata.property(HiveCatalog.HMS_TABLE_OWNER, HiveHadoopUtil.currentUser()),
@@ -414,7 +415,7 @@ public class HiveTableOperations extends BaseMetastoreTableOperations
   }
 
   private static void setStorageHandler(Map<String, String> parameters, boolean hiveEngineEnabled) {
-    // If needed set the 'storage_handler' property to enable query from Hive
+    // If needed, set the 'storage_handler' property to enable query from Hive
     if (hiveEngineEnabled) {
       parameters.put(hive_metastoreConstants.META_TABLE_STORAGE, HiveOperationsBase.HIVE_ICEBERG_STORAGE_HANDLER);
     } else {
@@ -496,7 +497,11 @@ public class HiveTableOperations extends BaseMetastoreTableOperations
 
   @Override
   public ClientPool<IMetaStoreClient, TException> metaClients() {
-    return metaClients;
+    if (actor instanceof HiveCatalogActor) {
+      HiveCatalogActor hiveActor = (HiveCatalogActor) actor;
+      return hiveActor.clientPool();
+    }
+    return null;
   }
 
   private void cleanupMetadataAndUnlock(CommitStatus commitStatus, String metadataLocation,

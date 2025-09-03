@@ -503,7 +503,7 @@ public class TestHiveCatalog extends HMSTestBase {
 
     assertThatThrownBy(() -> nsCatalog.createNamespace(namespace1))
         .isInstanceOf(AlreadyExistsException.class)
-        .hasMessage("Namespace '" + namespace1 + "' already exists!");
+        .hasMessage("Namespace already exists: " + namespace1);
 
     String hiveLocalDir = temp.newFolder().toURI().toString();
     // remove the trailing slash of the URI

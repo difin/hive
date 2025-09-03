@@ -49,6 +49,7 @@ public class TestLoadHiveCatalog {
       metastore = null;
     }
   }
+
   private static CachedClientPool getPool(HiveActor actor) {
     if (actor instanceof HiveCatalogActor) {
       return (CachedClientPool) ((HiveCatalogActor) actor).clientPool();
@@ -75,7 +76,7 @@ public class TestLoadHiveCatalog {
 
     CachedClientPool clientPool1 = getPool(hiveCatalog1.getActor());
     CachedClientPool clientPool2 = getPool(hiveCatalog2.getActor());
-    Assert.assertSame(clientPool1.clientPool(), clientPool2.clientPool());
+    assertThat(clientPool2.clientPool()).isSameAs(clientPool1.clientPool());
 
     Configuration conf1 = new Configuration(metastore.hiveConf());
     Configuration conf2 = new Configuration(metastore.hiveConf());
@@ -97,7 +98,7 @@ public class TestLoadHiveCatalog {
                             conf2);
     clientPool1 = getPool(hiveCatalog1.getActor());
     clientPool2 = getPool(hiveCatalog2.getActor());
-    Assert.assertSame(clientPool1.clientPool(), clientPool2.clientPool());
+    assertThat(clientPool2.clientPool()).isSameAs(clientPool1.clientPool());
 
     conf2.set("any.key", "any.value2");
     hiveCatalog2 =
@@ -108,6 +109,6 @@ public class TestLoadHiveCatalog {
                             ImmutableMap.of(CatalogProperties.CLIENT_POOL_CACHE_KEYS, "conf:any.key"),
                             conf2);
     clientPool2 = getPool(hiveCatalog2.getActor());
-    Assert.assertNotSame(clientPool1.clientPool(), clientPool2.clientPool());
+    assertThat(clientPool2.clientPool()).isSameAs(clientPool1.clientPool());
   }
 }

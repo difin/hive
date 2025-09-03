@@ -5,7 +5,7 @@
   <parent>
     <artifactId>hive</artifactId>
     <groupId>org.apache.hive</groupId>
-    <version>3.1.3000.7.3.2.0-SNAPSHOT</version>
+    <version>3.1.3000.2025.0.20.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -20,7 +20,7 @@
     <maven.compiler.target>8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <log4j2.debug>false</log4j2.debug>
-    <hive.version>3.1.3000.7.3.2.0-SNAPSHOT</hive.version>
+    <hive.version>3.1.3000.2025.0.20.0-SNAPSHOT</hive.version>
     <revision>${hive.version}</revision>
   </properties>
   <dependencies>
@@ -100,6 +100,7 @@
       <version>2.9.2</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

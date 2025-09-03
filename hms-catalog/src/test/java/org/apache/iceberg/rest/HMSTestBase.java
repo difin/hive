@@ -103,8 +103,6 @@ public abstract class HMSTestBase {
   protected static final File jwtVerificationJWKSFile =
       new File(baseDir,"src/test/resources/auth/jwt/jwt-verification-jwks.json");
 
-  public static final String USER_1 = "USER_1";
-
   protected static final int MOCK_JWKS_SERVER_PORT = 8089;
   @ClassRule
   public static final WireMockRule MOCK_JWKS_SERVER = new WireMockRule(MOCK_JWKS_SERVER_PORT);
@@ -128,13 +126,8 @@ public abstract class HMSTestBase {
 
   @Rule
   public TemporaryFolder temp = new TemporaryFolder();
-
   protected Configuration conf = null;
-
-  protected static final Logger LOG = LoggerFactory.getLogger(HMSTestBase.class.getName());
-  static Random RND = new Random(20230922);
   protected String NS = "hms" + RND.nextInt(100);
-
   protected int port = -1;
   protected int catalogPort = -1;
   protected final String catalogPath = "hmscatalog";

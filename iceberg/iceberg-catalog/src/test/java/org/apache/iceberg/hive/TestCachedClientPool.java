@@ -81,11 +81,17 @@ public class TestCachedClientPool {
     UserGroupInformation foo2 = UserGroupInformation.createProxyUser("foo", current);
     UserGroupInformation bar = UserGroupInformation.createProxyUser("bar", current);
 
-    Key key1 = foo1.doAs(
-        (PrivilegedAction<Key>) () -> CachedClientPool.extractKey("user_name,conf:key1", hiveConf));
-    Key key2 = foo2.doAs(
-        (PrivilegedAction<Key>) () -> CachedClientPool.extractKey("conf:key1,user_name", hiveConf));
-    Assert.assertEquals("Key elements order shouldn't matter", key1, key2);
+    HiveConf hiveConf = HIVE_METASTORE_EXTENSION.hiveConf();
+
+    Key key1 =
+        foo1.doAs(
+          (PrivilegedAction<Key>)
+            () -> CachedClientPool.extractKey("user_name,conf:key1", hiveConf));
+    Key key2 =
+        foo2.doAs(
+          (PrivilegedAction<Key>)
+            () -> CachedClientPool.extractKey("conf:key1,user_name", hiveConf));
+    assertThat(key2).as("Key elements order shouldn't matter").isEqualTo(key1);
 
     key1 = foo1.doAs((PrivilegedAction<Key>) () -> CachedClientPool.extractKey("ugi", hiveConf));
     key2 = bar.doAs((PrivilegedAction<Key>) () -> CachedClientPool.extractKey("ugi", hiveConf));

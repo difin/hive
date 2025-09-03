@@ -21,12 +21,9 @@ package org.apache.iceberg.rest;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.CharStreams;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.SecureServletCaller;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpHeaders;
-import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
-import org.apache.iceberg.relocated.com.google.common.io.CharStreams;
 import org.apache.iceberg.rest.HMSCatalogAdapter.HTTPMethod;
 import org.apache.iceberg.rest.HMSCatalogAdapter.Route;
 import org.apache.iceberg.rest.responses.ErrorResponse;
