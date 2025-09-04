@@ -90,6 +90,8 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
     cConfig.set(map);
   }
 
+  public static Map<String, Object> getClientConfig() { return cConfig.get(); }
+
   /**
    * The thread-local configuration.
    */
@@ -370,6 +372,18 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
       List<HivePrivilegeObject> hivePrivilegeObjects = hiveMetaStoreAuthzInfo.getInputHObjs();
       HiveAuthzContext hiveAuthzContext = hiveMetaStoreAuthzInfo.getHiveAuthzContext();
 
+      Map<String, Object> clientConfig = cConfig.get();
+      if (clientConfig != null) {
+        HiveAuthzContext.Builder builder = new HiveAuthzContext.Builder();
+        builder.setClientConfig(clientConfig);
+        if (hiveAuthzContext != null) {
+          builder.setCommandString(hiveAuthzContext.getCommandString());
+          builder.setUserIpAddress(hiveAuthzContext.getIpAddress());
+          builder.setForwardedAddresses(hiveAuthzContext.getForwardedAddresses());
+        }
+        hiveAuthzContext = builder.build();
+      }
+
       List<HivePrivilegeObject> filteredHivePrivilegeObjects =
           hiveAuthorizer.filterListCmdObjects(hivePrivilegeObjects, hiveAuthzContext);
 
@@ -474,6 +488,17 @@ public class HiveMetaStoreAuthorizer extends MetaStorePreEventListener implement
       HiveAuthorizer            hiveAuthorizer               = createHiveMetaStoreAuthorizer();
       List<HivePrivilegeObject> hivePrivilegeObjects         = hiveMetaStoreAuthzInfo.getInputHObjs();
       HiveAuthzContext          hiveAuthzContext             = hiveMetaStoreAuthzInfo.getHiveAuthzContext();
+      Map<String, Object> clientConfig = cConfig.get();
+      if (clientConfig != null) {
+        HiveAuthzContext.Builder builder = new HiveAuthzContext.Builder();
+        builder.setClientConfig(clientConfig);
+        if (hiveAuthzContext != null) {
+          builder.setCommandString(hiveAuthzContext.getCommandString());
+          builder.setUserIpAddress(hiveAuthzContext.getIpAddress());
+          builder.setForwardedAddresses(hiveAuthzContext.getForwardedAddresses());
+        }
+        hiveAuthzContext = builder.build();
+      }
       List<HivePrivilegeObject> filteredHivePrivilegeObjects = hiveAuthorizer.filterListCmdObjects(hivePrivilegeObjects, hiveAuthzContext);
       if (CollectionUtils.isNotEmpty(filteredHivePrivilegeObjects)) {
         ret = getFilteredTableNames(filteredHivePrivilegeObjects, dbName, tableNames);

@@ -18,8 +18,9 @@
 
 package org.apache.hadoop.hive.metastore;
 
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthzContext;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.HiveMetaStoreAuthorizer;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -28,24 +29,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class TestHMSGroup {
   private static final List<String> G09 = Collections.singletonList("0123456789");
 
   @After
   public void cleanup() {
-    // Clean up thread local state after each test to prevent interference
     HMSGroup.setGroups(null);
+    HiveMetaStoreAuthorizer.setClientConfig(null);
   }
 
   @Test
   public void testSetGet() {
     HMSGroup.set("henrib", "0123456789");
-    Assert.assertEquals(G09, HMSGroup.get("henrib"));
+    assertEquals(G09, HMSGroup.get("henrib"));
     String json = HMSGroup.getGroups();
-    Assert.assertNotNull(json);
+    assertNotNull(json);
     json = json.replace("henrib", "naveen");
     HMSGroup.setGroups(json);
-    Assert.assertEquals(G09, HMSGroup.get("naveen"));
+    assertEquals(G09, HMSGroup.get("naveen"));
   }
 
   @Test
@@ -53,11 +60,11 @@ public class TestHMSGroup {
     // Test setting and getting multiple groups for a user
     HMSGroup.set("testuser", "group1", "group2", "group3");
     List<String> groups = HMSGroup.get("testuser");
-    Assert.assertNotNull("Groups should not be null", groups);
-    Assert.assertEquals("Should have 3 groups", 3, groups.size());
-    Assert.assertTrue("Should contain group1", groups.contains("group1"));
-    Assert.assertTrue("Should contain group2", groups.contains("group2"));
-    Assert.assertTrue("Should contain group3", groups.contains("group3"));
+    assertNotNull("Groups should not be null", groups);
+    assertEquals("Should have 3 groups", 3, groups.size());
+    assertTrue("Should contain group1", groups.contains("group1"));
+    assertTrue("Should contain group2", groups.contains("group2"));
+    assertTrue("Should contain group3", groups.contains("group3"));
   }
 
   @Test
@@ -65,42 +72,42 @@ public class TestHMSGroup {
     // Test setting empty groups
     HMSGroup.set("emptyuser");
     List<String> groups = HMSGroup.get("emptyuser");
-    Assert.assertNotNull("Groups should not be null", groups);
-    Assert.assertTrue("Groups should be empty", groups.isEmpty());
+    assertNotNull("Groups should not be null", groups);
+    assertTrue("Groups should be empty", groups.isEmpty());
   }
 
   @Test
   public void testNullAndEmptyInputs() {
     // Test behavior with null user
     List<String> nullUserGroups = HMSGroup.get(null);
-    Assert.assertNull("Should return null for null user when no groups set", nullUserGroups);
+    assertNull("Should return null for null user when no groups set", nullUserGroups);
 
     // Test behavior with non-existent user
     List<String> nonExistentGroups = HMSGroup.get("nonexistent");
-    Assert.assertNull("Should return null for non-existent user", nonExistentGroups);
+    assertNull("Should return null for non-existent user", nonExistentGroups);
 
     // Test setting groups to null
     HMSGroup.setGroups(null);
-    Assert.assertNull("Should return null after clearing groups", HMSGroup.getGroups());
+    assertNull("Should return null after clearing groups", HMSGroup.getGroups());
   }
 
   @Test
   public void testInvalidJsonHandling() {
     // Test deserialization with invalid JSON
     Map<String, List<String>> result = HMSGroup.deserializeGroups("invalid-json");
-    Assert.assertNull("Should return null for invalid JSON", result);
+    assertNull("Should return null for invalid JSON", result);
 
     // Test deserialization with empty string
     result = HMSGroup.deserializeGroups("");
-    Assert.assertNull("Should return null for empty string", result);
+    assertNull("Should return null for empty string", result);
 
     // Test deserialization with null
     result = HMSGroup.deserializeGroups(null);
-    Assert.assertNull("Should return null for null input", result);
+    assertNull("Should return null for null input", result);
 
     // Test setting invalid JSON
     HMSGroup.setGroups("invalid-json-string");
-    Assert.assertNull("Groups should be null after setting invalid JSON", HMSGroup.getGroups());
+    assertNull("Groups should be null after setting invalid JSON", HMSGroup.getGroups());
   }
 
   @Test
@@ -113,17 +120,17 @@ public class TestHMSGroup {
 
     // Serialize
     String serialized = HMSGroup.serializeGroups(originalGroups);
-    Assert.assertNotNull("Serialized groups should not be null", serialized);
-    Assert.assertTrue("Serialized string should contain JSON", serialized.contains("{"));
+    assertNotNull("Serialized groups should not be null", serialized);
+    assertTrue("Serialized string should contain JSON", serialized.contains("{"));
 
     // Deserialize
     Map<String, List<String>> deserialized = HMSGroup.deserializeGroups(serialized);
-    Assert.assertNotNull("Deserialized groups should not be null", deserialized);
-    Assert.assertEquals("Should have same number of users", originalGroups.size(), deserialized.size());
+    assertNotNull("Deserialized groups should not be null", deserialized);
+    assertEquals("Should have same number of users", originalGroups.size(), deserialized.size());
 
     // Verify each user's groups
     for (String user : originalGroups.keySet()) {
-      Assert.assertEquals("Groups should match for user " + user, originalGroups.get(user), deserialized.get(user));
+      assertEquals("Groups should match for user " + user, originalGroups.get(user), deserialized.get(user));
     }
   }
 
@@ -131,11 +138,11 @@ public class TestHMSGroup {
   public void testSerializeNullAndEmpty() {
     // Test serializing null groups
     String nullSerialized = HMSGroup.serializeGroups(null);
-    Assert.assertNull("Should return null for null groups", nullSerialized);
+    assertNull("Should return null for null groups", nullSerialized);
 
     // Test serializing empty map
     String emptySerialized = HMSGroup.serializeGroups(Collections.emptyMap());
-    Assert.assertNull("Should return null for empty groups map", emptySerialized);
+    assertNull("Should return null for empty groups map", emptySerialized);
   }
 
   @Test
@@ -173,16 +180,16 @@ public class TestHMSGroup {
       thread1.join();
       thread2.join();
     } catch (InterruptedException e) {
-      Assert.fail("Thread interrupted: " + e.getMessage());
+      fail("Thread interrupted: " + e.getMessage());
     }
 
     // Check for exceptions
-    Assert.assertNull("Thread 1 should not have thrown exception", exceptions[0]);
-    Assert.assertNull("Thread 2 should not have thrown exception", exceptions[1]);
+    assertNull("Thread 1 should not have thrown exception", exceptions[0]);
+    assertNull("Thread 2 should not have thrown exception", exceptions[1]);
 
     // Verify thread isolation
-    Assert.assertEquals("Thread 1 should have its own groups", "thread1group", results[0]);
-    Assert.assertEquals("Thread 2 should have its own groups", "thread2group", results[1]);
+    assertEquals("Thread 1 should have its own groups", "thread1group", results[0]);
+    assertEquals("Thread 2 should have its own groups", "thread2group", results[1]);
   }
 
   @Test
@@ -191,11 +198,11 @@ public class TestHMSGroup {
     HMSGroup.set("jsontest", "group1", "group2");
     String json = HMSGroup.getGroups();
 
-    Assert.assertNotNull("JSON should not be null", json);
-    Assert.assertTrue("JSON should contain user key", json.contains("jsontest"));
-    Assert.assertTrue("JSON should contain group1", json.contains("group1"));
-    Assert.assertTrue("JSON should contain group2", json.contains("group2"));
-    Assert.assertTrue("JSON should be valid JSON format", json.startsWith("{") && json.endsWith("}"));
+    assertNotNull("JSON should not be null", json);
+    assertTrue("JSON should contain user key", json.contains("jsontest"));
+    assertTrue("JSON should contain group1", json.contains("group1"));
+    assertTrue("JSON should contain group2", json.contains("group2"));
+    assertTrue("JSON should be valid JSON format", json.startsWith("{") && json.endsWith("}"));
   }
 
   @Test
@@ -209,8 +216,50 @@ public class TestHMSGroup {
     // Multiple rapid accesses should all return the same result
     for (int i = 0; i < 100; i++) {
       List<String> retrieved = HMSGroup.get(testUser);
-      Assert.assertNotNull("Groups should not be null on iteration " + i, retrieved);
-      Assert.assertEquals("Should have correct number of groups on iteration " + i, 3, retrieved.size());
+      assertNotNull("Groups should not be null on iteration " + i, retrieved);
+      assertEquals("Should have correct number of groups on iteration " + i, 3, retrieved.size());
     }
+  }
+
+  // Authorization and client configuration tests
+  @Test
+  public void testClientConfigAuditFlow() {
+    Map<String, Object> restConfig = Collections.singletonMap("REST_CATALOG", true);
+    HiveMetaStoreAuthorizer.setClientConfig(restConfig);
+    Map<String, Object> activeConfig = HiveMetaStoreAuthorizer.getClientConfig();
+    assertNotNull("REST catalog request should have client config", activeConfig);
+    assertTrue("Should be identified as REST catalog", (Boolean) activeConfig.get("REST_CATALOG"));
+    HiveMetaStoreAuthorizer.setClientConfig(null);
+
+    Map<String, Object> hmsConfig = HiveMetaStoreAuthorizer.getClientConfig();
+    assertNull("Regular HMS request should have no client config", hmsConfig);
+  }
+
+  @Test
+  public void testThreadLocalCleanup() {
+    Map<String, Object> config = Collections.singletonMap("REST_CATALOG", true);
+    HiveMetaStoreAuthorizer.setClientConfig(config);
+    Map<String, Object> retrievedConfig = HiveMetaStoreAuthorizer.getClientConfig();
+    assertNotNull("Client config should be set", retrievedConfig);
+    assertTrue("Should contain REST_CATALOG flag", (Boolean) retrievedConfig.get("REST_CATALOG"));
+    HiveMetaStoreAuthorizer.setClientConfig(null);
+    assertNull("Client config should be null after cleanup", HiveMetaStoreAuthorizer.getClientConfig());
+  }
+
+  @Test
+  public void testClientConfigPropagationToAuthzContext() {
+    Map<String, Object> clientConfig = Collections.singletonMap("REST_CATALOG", true);
+    HiveMetaStoreAuthorizer.setClientConfig(clientConfig);
+    Map<String, Object> retrievedConfig = HiveMetaStoreAuthorizer.getClientConfig();
+
+    if (retrievedConfig != null) {
+      HiveAuthzContext.Builder builder = new HiveAuthzContext.Builder();
+      builder.setClientConfig(retrievedConfig);
+      builder.setCommandString("SHOW TABLES"); // Example command
+      HiveAuthzContext context = builder.build();
+      assertNotNull("Authorization context should contain client config", context.getClientConfig());
+      assertTrue("Context should indicate REST catalog origin", (Boolean) context.getClientConfig().get("REST_CATALOG"));
+    }
+    HiveMetaStoreAuthorizer.setClientConfig(null);
   }
 }
