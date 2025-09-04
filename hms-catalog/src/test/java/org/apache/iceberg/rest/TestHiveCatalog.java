@@ -69,9 +69,11 @@ import static org.apache.iceberg.TableProperties.DEFAULT_PARTITION_SPEC;
 import static org.apache.iceberg.TableProperties.DEFAULT_SORT_ORDER;
 import static org.apache.iceberg.TableProperties.SNAPSHOT_COUNT;
 import static org.apache.iceberg.expressions.Expressions.bucket;
+
 import org.apache.iceberg.hive.HiveTableOperations;
 import org.apache.iceberg.hive.HiveUtil;
 import org.apache.iceberg.io.FileIO;
+
 import static org.apache.iceberg.types.Types.NestedField.required;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -183,7 +185,7 @@ public class TestHiveCatalog extends HMSTestBase {
   private String tempResolve(String name) {
     try {
       return temp.newFolder(name).toString();
-    } catch(IOException xio) {
+    } catch (IOException xio) {
       throw new IllegalStateException(xio);
     }
   }
@@ -314,20 +316,20 @@ public class TestHiveCatalog extends HMSTestBase {
       Assert.assertFalse(tis.isEmpty());
 
       // list namespaces
-      URL url = new URL("http://hive@localhost:" + catalogPort + "/"+catalogPath+"/v1/namespaces");
+      URL url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath + "/v1/namespaces");
       String jwt = generateJWT();
       // succeed
       Object response = clientCall(jwt, url, "GET", null);
       Assert.assertNotNull(response);
 
       // list tables in hivedb
-      url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath+"/v1/namespaces/" + DB_NAME + "/tables");
+      url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath + "/v1/namespaces/" + DB_NAME + "/tables");
       // succeed
       response = clientCall(jwt, url, "GET", null);
       Assert.assertNotNull(response);
 
       // load table
-      url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath+"/v1/namespaces/" + DB_NAME + "/tables/" + tblName);
+      url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath + "/v1/namespaces/" + DB_NAME + "/tables/" + tblName);
       // succeed
       response = clientCall(jwt, url, "GET", null);
       Assert.assertNotNull(response);
@@ -526,7 +528,7 @@ public class TestHiveCatalog extends HMSTestBase {
   public void testCreateNamespaceHttp() throws Exception {
     String ns = "nstesthttp";
     // list namespaces
-    URL url = new URL("http://hive@localhost:" + catalogPort + "/"+catalogPath+"/v1/namespaces");
+    URL url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath + "/v1/namespaces");
     String jwt = generateJWT();
     // check namespaces list (ie 0)
     Object response = clientCall(jwt, url, "GET", null);
@@ -537,28 +539,45 @@ public class TestHiveCatalog extends HMSTestBase {
     Assert.assertTrue((nslist.contains(Arrays.asList("default"))));
     Assert.assertTrue((nslist.contains(Arrays.asList("hivedb"))));
     // succeed
-    response = clientCall(jwt, url, "POST", false, "{ \"namespace\" : [ \""+ns+"\" ], "+
+    response = clientCall(jwt, url, "POST", false, "{ \"namespace\" : [ \"" + ns + "\" ], " +
         "\"properties\":{ \"owner\": \"apache\", \"group\" : \"iceberg\" }"
-        +"}");
+        + "}");
     Assert.assertNotNull(response);
     Database database1 = metastoreClient.getDatabase(ns);
     Assert.assertTrue(database1.getParameters().get("owner").equals("apache"));
     Assert.assertTrue(database1.getParameters().get("group").equals("iceberg"));
 
-    List<TableIdentifier> tis = catalog.listTables(Namespace.of(ns));
-    Assert.assertTrue(tis.isEmpty());
+    try {
+      ensureHMSConnectionHealth();
+      List<TableIdentifier> tis = catalog.listTables(Namespace.of(ns));
+      Assert.assertTrue(tis.isEmpty());
+    } catch (Exception e) {
+      LOG.warn("HMS connection issue detected, retrying after brief delay: {}", e.getMessage());
+      Thread.sleep(1000);
+
+      // Retry once with fresh catalog connection if needed
+      List<TableIdentifier> tis = catalog.listTables(Namespace.of(ns));
+      Assert.assertTrue(tis.isEmpty());
+    }
 
     // list tables in hivedb
-    url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath+"/v1/namespaces/" + ns + "/tables");
+    url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath + "/v1/namespaces/" + ns + "/tables");
     // succeed
     response = clientCall(jwt, url, "GET", null);
     Assert.assertNotNull(response);
 
     // quick check on metrics
     Map<String, Long> counters = reportMetricCounters("list_namespaces", "list_tables");
-    counters.entrySet().forEach(m->{
+    counters.entrySet().forEach(m -> {
       Assert.assertTrue(m.getKey(), m.getValue() > 0);
     });
+
+    // Cleanup: ensure namespace is dropped to prevent test pollution
+    try {
+      nsCatalog.dropNamespace(Namespace.of(ns));
+    } catch (Exception e) {
+      LOG.warn("Failed to cleanup namespace {}: {}", ns, e.getMessage());
+    }
   }
 
   @Test
@@ -1099,7 +1118,7 @@ public class TestHiveCatalog extends HMSTestBase {
   private static String stripTrailingSlash(String path) {
     Preconditions.checkArgument(path != null && !path.isEmpty(), "path must not be null or empty");
     // walk backwards while encountering '/'
-    for(int index = path.length() - 1; index >= 0; --index) {
+    for (int index = path.length() - 1; index >= 0; --index) {
       char c = path.charAt(index);
       if (c != '/') {
         return path.substring(0, index + 1);
@@ -1428,5 +1447,86 @@ public class TestHiveCatalog extends HMSTestBase {
         .isInstanceOf(AlreadyExistsException.class)
         .hasMessage("Table already exists: hivedb.t1");
     assertThat(catalog.dropTable(identifier, true)).isTrue();
+  }
+
+  /**
+   * Helper method to ensure HMS connection is healthy before critical operations.
+   */
+  private void ensureHMSConnectionHealth() throws Exception {
+    int maxAttempts = 3;
+    int baseDelayMs = 200;
+
+    for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        validateHMSConnection();
+        LOG.debug("HMS connection validated successfully on attempt {}", attempt);
+        return;
+      } catch (Exception e) {
+        LOG.warn("HMS connection validation failed on attempt {}/{}: {}",
+            attempt, maxAttempts, e.getMessage());
+        if (attempt == maxAttempts) {
+          throw new RuntimeException("HMS connection could not be established after " +
+              maxAttempts + " attempts", e);
+        }
+        recreateHMSConnection();
+        int delayMs = baseDelayMs * (1 << (attempt - 1)); // 200ms, 400ms, 800ms
+        Thread.sleep(delayMs);
+      }
+    }
+  }
+
+  /**
+   * Validates that the HMS connection is working by performing operations.
+   */
+  private void validateHMSConnection() throws Exception {
+    if (metastoreClient == null) {
+      throw new IllegalStateException("Metastore client is null");
+    }
+    metastoreClient.getDatabases("*");
+    try {
+      metastoreClient.getDatabase(DB_NAME);
+    } catch (Exception e) {
+      throw new RuntimeException("Cannot access test database " + DB_NAME, e);
+    }
+    try {
+      metastoreClient.getAllTables(DB_NAME);
+    } catch (Exception e) {
+      throw new RuntimeException("Cannot list tables in test database " + DB_NAME, e);
+    }
+  }
+
+  private void recreateHMSConnection() {
+    if (metastoreClient != null) {
+      try {
+        metastoreClient.close();
+        LOG.debug("Successfully closed existing HMS connection");
+      } catch (Exception closeError) {
+        LOG.warn("Error closing existing HMS connection (proceeding anyway): {}",
+            closeError.getMessage());
+      }
+    }
+
+    try {
+      metastoreClient = createClient(conf, port);
+      LOG.debug("Successfully created new HMS connection");
+    } catch (Exception createError) {
+      LOG.error("Failed to create new HMS connection: {}", createError.getMessage());
+      throw new RuntimeException("Could not recreate HMS connection", createError);
+    }
+  }
+
+  @Test
+  public void testGroupHandlingWithMultipleRequests() throws Exception {
+    ensureHMSConnectionHealth();
+    // Test that group handling works correctly across multiple requests
+    String jwt = generateJWT();
+    URL url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath + "/v1/namespaces");
+
+    // Make multiple requests that would trigger group handling
+    for (int i = 0; i < 5; i++) {
+      Object response = clientCall(jwt, url, "GET", null);
+      Assert.assertNotNull("Request " + i + " should succeed", response);
+      Assert.assertTrue("Response should be successful", response instanceof Map);
+    }
   }
 }

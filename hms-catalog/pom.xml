@@ -22,6 +22,7 @@
     <log4j2.debug>false</log4j2.debug>
     <hive.version>${project.parent.version}</hive.version>
     <revision>${hive.version}</revision>
+    <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
   </properties>
   <dependencies>
 
@@ -310,6 +311,12 @@
           <includes>
             <include>TestHMSCatalog.java</include>
             <include>TestHiveCatalog.java</include>
+            <include>TestDataSharing.java</include>
+            <include>TestHMSGroup.java</include>
+            <include>TestHMSServletSecurityIntegration.java</include>
+            <include>TestHMSCatalogEdgeCases.java</include>
+            <include>TestHMSCatalogRESTSecurity.java</include>
+            <include>TestCatalogMetering.java</include>
           </includes>
         </configuration>
       </plugin>
@@ -361,7 +368,30 @@
           </execution>
         </executions>
       </plugin>
-
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <destFile>${project.build.directory}/jacoco.exec</destFile>
+              <propertyName>jacoco.agent.argLine</propertyName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

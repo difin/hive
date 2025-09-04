@@ -195,7 +195,7 @@ public abstract class HMSTestBase {
     String location = temp.newFolder("hivedb2023").getAbsolutePath().toString();
     Database db = new Database(DB_NAME, "catalog test", location, Collections.emptyMap());
     metastoreClient.createDatabase(db);
-
+    setupDataSharingForTests(conf);
     Server iceServer = HiveMetaStore.getIcebergServer();
     int tries = 5;
     while(iceServer == null && tries-- > 0) {
@@ -353,9 +353,18 @@ public abstract class HMSTestBase {
   public static class ServerResponse {
     private final int code;
     private final String content;
+
     public ServerResponse(int code, String content) {
       this.code = code;
       this.content = content;
+    }
+
+    public int getCode() {
+      return code;
+    }
+
+    public String getContent() {
+      return content;
     }
   }
 
@@ -405,6 +414,16 @@ public abstract class HMSTestBase {
     }
     // no response stream,
     return responseCode;
+  }
+
+  private void setupDataSharingForTests(Configuration conf) {
+    if (shouldEnableDataSharingForTest()) {
+      conf.set(DataSharing.CONFVAR_IDBROKER_URL, "http://localhost:18080/mock-gateway");
+    }
+  }
+
+  protected boolean shouldEnableDataSharingForTest() {
+    return false;
   }
 
 }

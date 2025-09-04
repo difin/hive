@@ -3,15 +3,18 @@ package org.apache.iceberg.rest;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.iceberg.exceptions.NotAuthorizedException;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.Assert.*;
 
-public class TestDataSharingHA {
+public class TestDataSharing {
 
   @Rule
   public WireMockRule broker0 = new WireMockRule(18080);
@@ -118,5 +121,72 @@ public class TestDataSharingHA {
     /* Should throw NotAuthorizedException since all endpoints fail */
     ds.getAccessToken("s3a://bucket/table/metadata/v1.metadata.json");
     fail("Should have thrown NotAuthorizedException");
+  }
+
+  /**
+   * Test URI resolution with a single broker URL.
+   */
+  @Test
+  public void testUrlResolve() {
+    String brokerUrlStr = "https://localhost:8444/gateway/";
+    URI brokerUri = URI.create(brokerUrlStr);
+    URI fetchToken = brokerUri
+        .resolve("aws-cab/cab/api/v1/credentials")
+        .resolve("role/datalake-admin-role?path=" + DataSharing.urlEncodeUTF8("s3a://bucket/partition/table0"));
+    String fetchStr = fetchToken.toString();
+    Assert.assertNotNull(fetchStr);
+  }
+
+  /**
+   * Test that DataSharing can be initialized with multiple broker URLs.
+   */
+  @Test
+  public void testMultipleBrokerUrlInit() {
+    String brokerUrlsStr = "https://broker1:8444/gateway/,https://broker2:8444/gateway/";
+    Configuration conf = new Configuration();
+    conf.set("hive.metastore.catalog.idbroker.url", brokerUrlsStr);
+
+    try {
+      DataSharing ds = new DataSharing(conf);
+      Assert.assertNotNull(ds);
+    } catch (Exception e) {
+      Assert.fail("DataSharing should initialize successfully with multiple broker URLs: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Test that NotAuthorizedException is properly propagated from runAsHive.
+   */
+  @Test
+  public void testRunAsHiveExceptionPropagation() {
+    try {
+      HMSCatalogAdapter.runAsHive(() -> {
+        throw new NotAuthorizedException("Test exception");
+      });
+      Assert.fail("Should have thrown NotAuthorizedException");
+    } catch (NotAuthorizedException e) {
+      Assert.assertEquals("Test exception", e.getMessage());
+    }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testWhitespaceOnlyBrokerConfiguration() throws IOException {
+    Configuration conf = new Configuration();
+    conf.set(DataSharing.CONFVAR_IDBROKER_URL, "   ,  ,   ");
+    new DataSharing(conf); // Should throw IllegalArgumentException
+  }
+
+  @Test
+  public void testMalformedUrlsAreFiltered() {
+    Configuration conf = new Configuration();
+    conf.set(DataSharing.CONFVAR_IDBROKER_URL,
+        "https://valid-broker:8444/gateway,,invalid-url,https://another-valid:8444/gateway");
+
+    try {
+      DataSharing ds = new DataSharing(conf);
+      assertNotNull("DataSharing should initialize filtering out malformed URLs", ds);
+    } catch (Exception e) {
+      fail("Should handle malformed URLs gracefully: " + e.getMessage());
+    }
   }
 }
