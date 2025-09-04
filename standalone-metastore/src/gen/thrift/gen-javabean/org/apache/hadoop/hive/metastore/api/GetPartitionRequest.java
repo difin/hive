@@ -764,32 +764,13 @@ package org.apache.hadoop.hive.metastore.api;
           case 4: // PART_VALS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TList _list1424 = iprot.readListBegin();
                 struct.partVals = new java.util.ArrayList<java.lang.String>(_list1424.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem1425;
                 for (int _i1426 = 0; _i1426 < _list1424.size; ++_i1426)
-<<<<<<< HEAD
                 {
                   _elem1425 = iprot.readString();
                   struct.partVals.add(_elem1425);
-=======
-                org.apache.thrift.protocol.TList _list1416 = iprot.readListBegin();
-                struct.partVals = new java.util.ArrayList<java.lang.String>(_list1416.size);
-                @org.apache.thrift.annotation.Nullable java.lang.String _elem1417;
-                for (int _i1418 = 0; _i1418 < _list1416.size; ++_i1418)
-                {
-                  _elem1417 = iprot.readString();
-                  struct.partVals.add(_elem1417);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-                {
-                  _elem1425 = iprot.readString();
-                  struct.partVals.add(_elem1425);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 iprot.readListEnd();
               }
@@ -848,21 +829,9 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(PART_VALS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.partVals.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (java.lang.String _iter1427 : struct.partVals)
           {
             oprot.writeString(_iter1427);
-=======
-          for (java.lang.String _iter1419 : struct.partVals)
-          {
-            oprot.writeString(_iter1419);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (java.lang.String _iter1427 : struct.partVals)
-          {
-            oprot.writeString(_iter1427);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
           oprot.writeListEnd();
         }
@@ -901,21 +870,9 @@ package org.apache.hadoop.hive.metastore.api;
       oprot.writeString(struct.tblName);
       {
         oprot.writeI32(struct.partVals.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
         for (java.lang.String _iter1428 : struct.partVals)
         {
           oprot.writeString(_iter1428);
-=======
-        for (java.lang.String _iter1420 : struct.partVals)
-        {
-          oprot.writeString(_iter1420);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-        for (java.lang.String _iter1428 : struct.partVals)
-        {
-          oprot.writeString(_iter1428);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
       }
       java.util.BitSet optionals = new java.util.BitSet();
@@ -948,32 +905,13 @@ package org.apache.hadoop.hive.metastore.api;
       struct.tblName = iprot.readString();
       struct.setTblNameIsSet(true);
       {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         org.apache.thrift.protocol.TList _list1429 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
         struct.partVals = new java.util.ArrayList<java.lang.String>(_list1429.size);
         @org.apache.thrift.annotation.Nullable java.lang.String _elem1430;
         for (int _i1431 = 0; _i1431 < _list1429.size; ++_i1431)
-<<<<<<< HEAD
         {
           _elem1430 = iprot.readString();
           struct.partVals.add(_elem1430);
-=======
-        org.apache.thrift.protocol.TList _list1421 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
-        struct.partVals = new java.util.ArrayList<java.lang.String>(_list1421.size);
-        @org.apache.thrift.annotation.Nullable java.lang.String _elem1422;
-        for (int _i1423 = 0; _i1423 < _list1421.size; ++_i1423)
-        {
-          _elem1422 = iprot.readString();
-          struct.partVals.add(_elem1422);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-        {
-          _elem1430 = iprot.readString();
-          struct.partVals.add(_elem1430);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
       }
       struct.setPartValsIsSet(true);

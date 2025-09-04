@@ -229,10 +229,6 @@ class GetPartitionsRequest
                 case 6:
                     if ($ftype == TType::LST) {
                         $this->groupNames = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1226 = 0;
                         $_etype1229 = 0;
                         $xfer += $input->readListBegin($_etype1229, $_size1226);
@@ -240,18 +236,6 @@ class GetPartitionsRequest
                             $elem1231 = null;
                             $xfer += $input->readString($elem1231);
                             $this->groupNames []= $elem1231;
-<<<<<<< HEAD
-=======
-                        $_size1219 = 0;
-                        $_etype1222 = 0;
-                        $xfer += $input->readListBegin($_etype1222, $_size1219);
-                        for ($_i1223 = 0; $_i1223 < $_size1219; ++$_i1223) {
-                            $elem1224 = null;
-                            $xfer += $input->readString($elem1224);
-                            $this->groupNames []= $elem1224;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -277,10 +261,6 @@ class GetPartitionsRequest
                 case 9:
                     if ($ftype == TType::LST) {
                         $this->processorCapabilities = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1232 = 0;
                         $_etype1235 = 0;
                         $xfer += $input->readListBegin($_etype1235, $_size1232);
@@ -288,18 +268,6 @@ class GetPartitionsRequest
                             $elem1237 = null;
                             $xfer += $input->readString($elem1237);
                             $this->processorCapabilities []= $elem1237;
-<<<<<<< HEAD
-=======
-                        $_size1225 = 0;
-                        $_etype1228 = 0;
-                        $xfer += $input->readListBegin($_etype1228, $_size1225);
-                        for ($_i1229 = 0; $_i1229 < $_size1225; ++$_i1229) {
-                            $elem1230 = null;
-                            $xfer += $input->readString($elem1230);
-                            $this->processorCapabilities []= $elem1230;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -365,18 +333,8 @@ class GetPartitionsRequest
             }
             $xfer += $output->writeFieldBegin('groupNames', TType::LST, 6);
             $output->writeListBegin(TType::STRING, count($this->groupNames));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->groupNames as $iter1238) {
                 $xfer += $output->writeString($iter1238);
-=======
-            foreach ($this->groupNames as $iter1231) {
-                $xfer += $output->writeString($iter1231);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->groupNames as $iter1238) {
-                $xfer += $output->writeString($iter1238);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -403,18 +361,8 @@ class GetPartitionsRequest
             }
             $xfer += $output->writeFieldBegin('processorCapabilities', TType::LST, 9);
             $output->writeListBegin(TType::STRING, count($this->processorCapabilities));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->processorCapabilities as $iter1239) {
                 $xfer += $output->writeString($iter1239);
-=======
-            foreach ($this->processorCapabilities as $iter1232) {
-                $xfer += $output->writeString($iter1232);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->processorCapabilities as $iter1239) {
-                $xfer += $output->writeString($iter1239);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

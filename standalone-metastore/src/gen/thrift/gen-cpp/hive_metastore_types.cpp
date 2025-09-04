@@ -28540,18 +28540,12 @@ void swap(ShowCompactRequest &a, ShowCompactRequest &b) {
 
 ShowCompactRequest::ShowCompactRequest(const ShowCompactRequest& other1005) {
   poolName = other1005.poolName;
-<<<<<<< HEAD
   order = other1005.order;
-=======
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
   __isset = other1005.__isset;
 }
 ShowCompactRequest& ShowCompactRequest::operator=(const ShowCompactRequest& other1006) {
   poolName = other1006.poolName;
-<<<<<<< HEAD
   order = other1006.order;
-=======
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
   __isset = other1006.__isset;
   return *this;
 }
@@ -30340,24 +30334,10 @@ uint32_t NotificationEventRequest::write(::apache::thrift::protocol::TProtocol* 
     xfer += oprot->writeFieldBegin("eventTypeSkipList", ::apache::thrift::protocol::T_LIST, 3);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->eventTypeSkipList.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1062;
       for (_iter1062 = this->eventTypeSkipList.begin(); _iter1062 != this->eventTypeSkipList.end(); ++_iter1062)
       {
         xfer += oprot->writeString((*_iter1062));
-=======
-      std::vector<std::string> ::const_iterator _iter1057;
-      for (_iter1057 = this->eventTypeSkipList.begin(); _iter1057 != this->eventTypeSkipList.end(); ++_iter1057)
-      {
-        xfer += oprot->writeString((*_iter1057));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1062;
-      for (_iter1062 = this->eventTypeSkipList.begin(); _iter1062 != this->eventTypeSkipList.end(); ++_iter1062)
-      {
-        xfer += oprot->writeString((*_iter1062));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -30377,8 +30357,6 @@ uint32_t NotificationEventRequest::write(::apache::thrift::protocol::TProtocol* 
     xfer += oprot->writeFieldBegin("tableNames", ::apache::thrift::protocol::T_LIST, 6);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->tableNames.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1063;
       for (_iter1063 = this->tableNames.begin(); _iter1063 != this->tableNames.end(); ++_iter1063)
       {
@@ -30396,31 +30374,6 @@ uint32_t NotificationEventRequest::write(::apache::thrift::protocol::TProtocol* 
       for (_iter1064 = this->eventTypeList.begin(); _iter1064 != this->eventTypeList.end(); ++_iter1064)
       {
         xfer += oprot->writeString((*_iter1064));
-=======
-      std::vector<std::string> ::const_iterator _iter1058;
-      for (_iter1058 = this->tableNames.begin(); _iter1058 != this->tableNames.end(); ++_iter1058)
-      {
-        xfer += oprot->writeString((*_iter1058));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1063;
-      for (_iter1063 = this->tableNames.begin(); _iter1063 != this->tableNames.end(); ++_iter1063)
-      {
-        xfer += oprot->writeString((*_iter1063));
-      }
-      xfer += oprot->writeListEnd();
-    }
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.eventTypeList) {
-    xfer += oprot->writeFieldBegin("eventTypeList", ::apache::thrift::protocol::T_LIST, 7);
-    {
-      xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->eventTypeList.size()));
-      std::vector<std::string> ::const_iterator _iter1064;
-      for (_iter1064 = this->eventTypeList.begin(); _iter1064 != this->eventTypeList.end(); ++_iter1064)
-      {
-        xfer += oprot->writeString((*_iter1064));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -30443,10 +30396,6 @@ void swap(NotificationEventRequest &a, NotificationEventRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 NotificationEventRequest::NotificationEventRequest(const NotificationEventRequest& other1065) {
   lastEvent = other1065.lastEvent;
   maxEvents = other1065.maxEvents;
@@ -30456,7 +30405,6 @@ NotificationEventRequest::NotificationEventRequest(const NotificationEventReques
   tableNames = other1065.tableNames;
   eventTypeList = other1065.eventTypeList;
   __isset = other1065.__isset;
-<<<<<<< HEAD
 }
 NotificationEventRequest& NotificationEventRequest::operator=(const NotificationEventRequest& other1066) {
   lastEvent = other1066.lastEvent;
@@ -30467,37 +30415,6 @@ NotificationEventRequest& NotificationEventRequest::operator=(const Notification
   tableNames = other1066.tableNames;
   eventTypeList = other1066.eventTypeList;
   __isset = other1066.__isset;
-=======
-NotificationEventRequest::NotificationEventRequest(const NotificationEventRequest& other1059) {
-  lastEvent = other1059.lastEvent;
-  maxEvents = other1059.maxEvents;
-  eventTypeSkipList = other1059.eventTypeSkipList;
-  catName = other1059.catName;
-  dbName = other1059.dbName;
-  tableNames = other1059.tableNames;
-  __isset = other1059.__isset;
-}
-NotificationEventRequest& NotificationEventRequest::operator=(const NotificationEventRequest& other1060) {
-  lastEvent = other1060.lastEvent;
-  maxEvents = other1060.maxEvents;
-  eventTypeSkipList = other1060.eventTypeSkipList;
-  catName = other1060.catName;
-  dbName = other1060.dbName;
-  tableNames = other1060.tableNames;
-  __isset = other1060.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-NotificationEventRequest& NotificationEventRequest::operator=(const NotificationEventRequest& other1066) {
-  lastEvent = other1066.lastEvent;
-  maxEvents = other1066.maxEvents;
-  eventTypeSkipList = other1066.eventTypeSkipList;
-  catName = other1066.catName;
-  dbName = other1066.dbName;
-  tableNames = other1066.tableNames;
-  eventTypeList = other1066.eventTypeList;
-  __isset = other1066.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void NotificationEventRequest::printTo(std::ostream& out) const {
@@ -30728,10 +30645,6 @@ void swap(NotificationEvent &a, NotificationEvent &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 NotificationEvent::NotificationEvent(const NotificationEvent& other1067) {
   eventId = other1067.eventId;
   eventTime = other1067.eventTime;
@@ -30742,7 +30655,6 @@ NotificationEvent::NotificationEvent(const NotificationEvent& other1067) {
   messageFormat = other1067.messageFormat;
   catName = other1067.catName;
   __isset = other1067.__isset;
-<<<<<<< HEAD
 }
 NotificationEvent& NotificationEvent::operator=(const NotificationEvent& other1068) {
   eventId = other1068.eventId;
@@ -30754,42 +30666,6 @@ NotificationEvent& NotificationEvent::operator=(const NotificationEvent& other10
   messageFormat = other1068.messageFormat;
   catName = other1068.catName;
   __isset = other1068.__isset;
-=======
-NotificationEvent::NotificationEvent(const NotificationEvent& other1061) {
-  eventId = other1061.eventId;
-  eventTime = other1061.eventTime;
-  eventType = other1061.eventType;
-  dbName = other1061.dbName;
-  tableName = other1061.tableName;
-  message = other1061.message;
-  messageFormat = other1061.messageFormat;
-  catName = other1061.catName;
-  __isset = other1061.__isset;
-}
-NotificationEvent& NotificationEvent::operator=(const NotificationEvent& other1062) {
-  eventId = other1062.eventId;
-  eventTime = other1062.eventTime;
-  eventType = other1062.eventType;
-  dbName = other1062.dbName;
-  tableName = other1062.tableName;
-  message = other1062.message;
-  messageFormat = other1062.messageFormat;
-  catName = other1062.catName;
-  __isset = other1062.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-NotificationEvent& NotificationEvent::operator=(const NotificationEvent& other1068) {
-  eventId = other1068.eventId;
-  eventTime = other1068.eventTime;
-  eventType = other1068.eventType;
-  dbName = other1068.dbName;
-  tableName = other1068.tableName;
-  message = other1068.message;
-  messageFormat = other1068.messageFormat;
-  catName = other1068.catName;
-  __isset = other1068.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void NotificationEvent::printTo(std::ostream& out) const {
@@ -30847,33 +30723,14 @@ uint32_t NotificationEventResponse::read(::apache::thrift::protocol::TProtocol* 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->events.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1069;
             ::apache::thrift::protocol::TType _etype1072;
             xfer += iprot->readListBegin(_etype1072, _size1069);
             this->events.resize(_size1069);
             uint32_t _i1073;
             for (_i1073 = 0; _i1073 < _size1069; ++_i1073)
-<<<<<<< HEAD
             {
               xfer += this->events[_i1073].read(iprot);
-=======
-            uint32_t _size1063;
-            ::apache::thrift::protocol::TType _etype1066;
-            xfer += iprot->readListBegin(_etype1066, _size1063);
-            this->events.resize(_size1063);
-            uint32_t _i1067;
-            for (_i1067 = 0; _i1067 < _size1063; ++_i1067)
-            {
-              xfer += this->events[_i1067].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->events[_i1073].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -30904,24 +30761,10 @@ uint32_t NotificationEventResponse::write(::apache::thrift::protocol::TProtocol*
   xfer += oprot->writeFieldBegin("events", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->events.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<NotificationEvent> ::const_iterator _iter1074;
     for (_iter1074 = this->events.begin(); _iter1074 != this->events.end(); ++_iter1074)
     {
       xfer += (*_iter1074).write(oprot);
-=======
-    std::vector<NotificationEvent> ::const_iterator _iter1068;
-    for (_iter1068 = this->events.begin(); _iter1068 != this->events.end(); ++_iter1068)
-    {
-      xfer += (*_iter1068).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<NotificationEvent> ::const_iterator _iter1074;
-    for (_iter1074 = this->events.begin(); _iter1074 != this->events.end(); ++_iter1074)
-    {
-      xfer += (*_iter1074).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -30937,27 +30780,11 @@ void swap(NotificationEventResponse &a, NotificationEventResponse &b) {
   swap(a.events, b.events);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 NotificationEventResponse::NotificationEventResponse(const NotificationEventResponse& other1075) {
   events = other1075.events;
 }
 NotificationEventResponse& NotificationEventResponse::operator=(const NotificationEventResponse& other1076) {
   events = other1076.events;
-=======
-NotificationEventResponse::NotificationEventResponse(const NotificationEventResponse& other1069) {
-  events = other1069.events;
-}
-NotificationEventResponse& NotificationEventResponse::operator=(const NotificationEventResponse& other1070) {
-  events = other1070.events;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-NotificationEventResponse::NotificationEventResponse(const NotificationEventResponse& other1075) {
-  events = other1075.events;
-}
-NotificationEventResponse& NotificationEventResponse::operator=(const NotificationEventResponse& other1076) {
-  events = other1076.events;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void NotificationEventResponse::printTo(std::ostream& out) const {
@@ -31045,27 +30872,11 @@ void swap(CurrentNotificationEventId &a, CurrentNotificationEventId &b) {
   swap(a.eventId, b.eventId);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 CurrentNotificationEventId::CurrentNotificationEventId(const CurrentNotificationEventId& other1077) noexcept {
   eventId = other1077.eventId;
 }
 CurrentNotificationEventId& CurrentNotificationEventId::operator=(const CurrentNotificationEventId& other1078) noexcept {
   eventId = other1078.eventId;
-=======
-CurrentNotificationEventId::CurrentNotificationEventId(const CurrentNotificationEventId& other1071) noexcept {
-  eventId = other1071.eventId;
-}
-CurrentNotificationEventId& CurrentNotificationEventId::operator=(const CurrentNotificationEventId& other1072) noexcept {
-  eventId = other1072.eventId;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-CurrentNotificationEventId::CurrentNotificationEventId(const CurrentNotificationEventId& other1077) noexcept {
-  eventId = other1077.eventId;
-}
-CurrentNotificationEventId& CurrentNotificationEventId::operator=(const CurrentNotificationEventId& other1078) noexcept {
-  eventId = other1078.eventId;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void CurrentNotificationEventId::printTo(std::ostream& out) const {
@@ -31181,33 +30992,14 @@ uint32_t NotificationEventsCountRequest::read(::apache::thrift::protocol::TProto
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->tableNames.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1079;
             ::apache::thrift::protocol::TType _etype1082;
             xfer += iprot->readListBegin(_etype1082, _size1079);
             this->tableNames.resize(_size1079);
             uint32_t _i1083;
             for (_i1083 = 0; _i1083 < _size1079; ++_i1083)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->tableNames[_i1083]);
-=======
-            uint32_t _size1073;
-            ::apache::thrift::protocol::TType _etype1076;
-            xfer += iprot->readListBegin(_etype1076, _size1073);
-            this->tableNames.resize(_size1073);
-            uint32_t _i1077;
-            for (_i1077 = 0; _i1077 < _size1073; ++_i1077)
-            {
-              xfer += iprot->readString(this->tableNames[_i1077]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->tableNames[_i1083]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -31264,24 +31056,10 @@ uint32_t NotificationEventsCountRequest::write(::apache::thrift::protocol::TProt
     xfer += oprot->writeFieldBegin("tableNames", ::apache::thrift::protocol::T_LIST, 6);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->tableNames.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1084;
       for (_iter1084 = this->tableNames.begin(); _iter1084 != this->tableNames.end(); ++_iter1084)
       {
         xfer += oprot->writeString((*_iter1084));
-=======
-      std::vector<std::string> ::const_iterator _iter1078;
-      for (_iter1078 = this->tableNames.begin(); _iter1078 != this->tableNames.end(); ++_iter1078)
-      {
-        xfer += oprot->writeString((*_iter1078));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1084;
-      for (_iter1084 = this->tableNames.begin(); _iter1084 != this->tableNames.end(); ++_iter1084)
-      {
-        xfer += oprot->writeString((*_iter1084));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -31303,10 +31081,6 @@ void swap(NotificationEventsCountRequest &a, NotificationEventsCountRequest &b) 
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 NotificationEventsCountRequest::NotificationEventsCountRequest(const NotificationEventsCountRequest& other1085) {
   fromEventId = other1085.fromEventId;
   dbName = other1085.dbName;
@@ -31315,7 +31089,6 @@ NotificationEventsCountRequest::NotificationEventsCountRequest(const Notificatio
   limit = other1085.limit;
   tableNames = other1085.tableNames;
   __isset = other1085.__isset;
-<<<<<<< HEAD
 }
 NotificationEventsCountRequest& NotificationEventsCountRequest::operator=(const NotificationEventsCountRequest& other1086) {
   fromEventId = other1086.fromEventId;
@@ -31325,36 +31098,6 @@ NotificationEventsCountRequest& NotificationEventsCountRequest::operator=(const 
   limit = other1086.limit;
   tableNames = other1086.tableNames;
   __isset = other1086.__isset;
-=======
-NotificationEventsCountRequest::NotificationEventsCountRequest(const NotificationEventsCountRequest& other1079) {
-  fromEventId = other1079.fromEventId;
-  dbName = other1079.dbName;
-  catName = other1079.catName;
-  toEventId = other1079.toEventId;
-  limit = other1079.limit;
-  tableNames = other1079.tableNames;
-  __isset = other1079.__isset;
-}
-NotificationEventsCountRequest& NotificationEventsCountRequest::operator=(const NotificationEventsCountRequest& other1080) {
-  fromEventId = other1080.fromEventId;
-  dbName = other1080.dbName;
-  catName = other1080.catName;
-  toEventId = other1080.toEventId;
-  limit = other1080.limit;
-  tableNames = other1080.tableNames;
-  __isset = other1080.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-NotificationEventsCountRequest& NotificationEventsCountRequest::operator=(const NotificationEventsCountRequest& other1086) {
-  fromEventId = other1086.fromEventId;
-  dbName = other1086.dbName;
-  catName = other1086.catName;
-  toEventId = other1086.toEventId;
-  limit = other1086.limit;
-  tableNames = other1086.tableNames;
-  __isset = other1086.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void NotificationEventsCountRequest::printTo(std::ostream& out) const {
@@ -31447,27 +31190,11 @@ void swap(NotificationEventsCountResponse &a, NotificationEventsCountResponse &b
   swap(a.eventsCount, b.eventsCount);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 NotificationEventsCountResponse::NotificationEventsCountResponse(const NotificationEventsCountResponse& other1087) noexcept {
   eventsCount = other1087.eventsCount;
 }
 NotificationEventsCountResponse& NotificationEventsCountResponse::operator=(const NotificationEventsCountResponse& other1088) noexcept {
   eventsCount = other1088.eventsCount;
-=======
-NotificationEventsCountResponse::NotificationEventsCountResponse(const NotificationEventsCountResponse& other1081) noexcept {
-  eventsCount = other1081.eventsCount;
-}
-NotificationEventsCountResponse& NotificationEventsCountResponse::operator=(const NotificationEventsCountResponse& other1082) noexcept {
-  eventsCount = other1082.eventsCount;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-NotificationEventsCountResponse::NotificationEventsCountResponse(const NotificationEventsCountResponse& other1087) noexcept {
-  eventsCount = other1087.eventsCount;
-}
-NotificationEventsCountResponse& NotificationEventsCountResponse::operator=(const NotificationEventsCountResponse& other1088) noexcept {
-  eventsCount = other1088.eventsCount;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void NotificationEventsCountResponse::printTo(std::ostream& out) const {
@@ -31546,33 +31273,14 @@ uint32_t InsertEventRequestData::read(::apache::thrift::protocol::TProtocol* ipr
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->filesAdded.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1089;
             ::apache::thrift::protocol::TType _etype1092;
             xfer += iprot->readListBegin(_etype1092, _size1089);
             this->filesAdded.resize(_size1089);
             uint32_t _i1093;
             for (_i1093 = 0; _i1093 < _size1089; ++_i1093)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->filesAdded[_i1093]);
-=======
-            uint32_t _size1083;
-            ::apache::thrift::protocol::TType _etype1086;
-            xfer += iprot->readListBegin(_etype1086, _size1083);
-            this->filesAdded.resize(_size1083);
-            uint32_t _i1087;
-            for (_i1087 = 0; _i1087 < _size1083; ++_i1087)
-            {
-              xfer += iprot->readString(this->filesAdded[_i1087]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->filesAdded[_i1093]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -31585,33 +31293,14 @@ uint32_t InsertEventRequestData::read(::apache::thrift::protocol::TProtocol* ipr
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->filesAddedChecksum.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1094;
             ::apache::thrift::protocol::TType _etype1097;
             xfer += iprot->readListBegin(_etype1097, _size1094);
             this->filesAddedChecksum.resize(_size1094);
             uint32_t _i1098;
             for (_i1098 = 0; _i1098 < _size1094; ++_i1098)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->filesAddedChecksum[_i1098]);
-=======
-            uint32_t _size1088;
-            ::apache::thrift::protocol::TType _etype1091;
-            xfer += iprot->readListBegin(_etype1091, _size1088);
-            this->filesAddedChecksum.resize(_size1088);
-            uint32_t _i1092;
-            for (_i1092 = 0; _i1092 < _size1088; ++_i1092)
-            {
-              xfer += iprot->readString(this->filesAddedChecksum[_i1092]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->filesAddedChecksum[_i1098]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -31624,33 +31313,14 @@ uint32_t InsertEventRequestData::read(::apache::thrift::protocol::TProtocol* ipr
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->subDirectoryList.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1099;
             ::apache::thrift::protocol::TType _etype1102;
             xfer += iprot->readListBegin(_etype1102, _size1099);
             this->subDirectoryList.resize(_size1099);
             uint32_t _i1103;
             for (_i1103 = 0; _i1103 < _size1099; ++_i1103)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->subDirectoryList[_i1103]);
-=======
-            uint32_t _size1093;
-            ::apache::thrift::protocol::TType _etype1096;
-            xfer += iprot->readListBegin(_etype1096, _size1093);
-            this->subDirectoryList.resize(_size1093);
-            uint32_t _i1097;
-            for (_i1097 = 0; _i1097 < _size1093; ++_i1097)
-            {
-              xfer += iprot->readString(this->subDirectoryList[_i1097]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->subDirectoryList[_i1103]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -31663,33 +31333,14 @@ uint32_t InsertEventRequestData::read(::apache::thrift::protocol::TProtocol* ipr
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partitionVal.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1104;
             ::apache::thrift::protocol::TType _etype1107;
             xfer += iprot->readListBegin(_etype1107, _size1104);
             this->partitionVal.resize(_size1104);
             uint32_t _i1108;
             for (_i1108 = 0; _i1108 < _size1104; ++_i1108)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->partitionVal[_i1108]);
-=======
-            uint32_t _size1098;
-            ::apache::thrift::protocol::TType _etype1101;
-            xfer += iprot->readListBegin(_etype1101, _size1098);
-            this->partitionVal.resize(_size1098);
-            uint32_t _i1102;
-            for (_i1102 = 0; _i1102 < _size1098; ++_i1102)
-            {
-              xfer += iprot->readString(this->partitionVal[_i1102]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->partitionVal[_i1108]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -31725,24 +31376,10 @@ uint32_t InsertEventRequestData::write(::apache::thrift::protocol::TProtocol* op
   xfer += oprot->writeFieldBegin("filesAdded", ::apache::thrift::protocol::T_LIST, 2);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->filesAdded.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter1109;
     for (_iter1109 = this->filesAdded.begin(); _iter1109 != this->filesAdded.end(); ++_iter1109)
     {
       xfer += oprot->writeString((*_iter1109));
-=======
-    std::vector<std::string> ::const_iterator _iter1103;
-    for (_iter1103 = this->filesAdded.begin(); _iter1103 != this->filesAdded.end(); ++_iter1103)
-    {
-      xfer += oprot->writeString((*_iter1103));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<std::string> ::const_iterator _iter1109;
-    for (_iter1109 = this->filesAdded.begin(); _iter1109 != this->filesAdded.end(); ++_iter1109)
-    {
-      xfer += oprot->writeString((*_iter1109));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -31752,24 +31389,10 @@ uint32_t InsertEventRequestData::write(::apache::thrift::protocol::TProtocol* op
     xfer += oprot->writeFieldBegin("filesAddedChecksum", ::apache::thrift::protocol::T_LIST, 3);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->filesAddedChecksum.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1110;
       for (_iter1110 = this->filesAddedChecksum.begin(); _iter1110 != this->filesAddedChecksum.end(); ++_iter1110)
       {
         xfer += oprot->writeString((*_iter1110));
-=======
-      std::vector<std::string> ::const_iterator _iter1104;
-      for (_iter1104 = this->filesAddedChecksum.begin(); _iter1104 != this->filesAddedChecksum.end(); ++_iter1104)
-      {
-        xfer += oprot->writeString((*_iter1104));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1110;
-      for (_iter1110 = this->filesAddedChecksum.begin(); _iter1110 != this->filesAddedChecksum.end(); ++_iter1110)
-      {
-        xfer += oprot->writeString((*_iter1110));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -31779,24 +31402,10 @@ uint32_t InsertEventRequestData::write(::apache::thrift::protocol::TProtocol* op
     xfer += oprot->writeFieldBegin("subDirectoryList", ::apache::thrift::protocol::T_LIST, 4);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->subDirectoryList.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1111;
       for (_iter1111 = this->subDirectoryList.begin(); _iter1111 != this->subDirectoryList.end(); ++_iter1111)
       {
         xfer += oprot->writeString((*_iter1111));
-=======
-      std::vector<std::string> ::const_iterator _iter1105;
-      for (_iter1105 = this->subDirectoryList.begin(); _iter1105 != this->subDirectoryList.end(); ++_iter1105)
-      {
-        xfer += oprot->writeString((*_iter1105));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1111;
-      for (_iter1111 = this->subDirectoryList.begin(); _iter1111 != this->subDirectoryList.end(); ++_iter1111)
-      {
-        xfer += oprot->writeString((*_iter1111));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -31806,24 +31415,10 @@ uint32_t InsertEventRequestData::write(::apache::thrift::protocol::TProtocol* op
     xfer += oprot->writeFieldBegin("partitionVal", ::apache::thrift::protocol::T_LIST, 5);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->partitionVal.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1112;
       for (_iter1112 = this->partitionVal.begin(); _iter1112 != this->partitionVal.end(); ++_iter1112)
       {
         xfer += oprot->writeString((*_iter1112));
-=======
-      std::vector<std::string> ::const_iterator _iter1106;
-      for (_iter1106 = this->partitionVal.begin(); _iter1106 != this->partitionVal.end(); ++_iter1106)
-      {
-        xfer += oprot->writeString((*_iter1106));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1112;
-      for (_iter1112 = this->partitionVal.begin(); _iter1112 != this->partitionVal.end(); ++_iter1112)
-      {
-        xfer += oprot->writeString((*_iter1112));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -31844,10 +31439,6 @@ void swap(InsertEventRequestData &a, InsertEventRequestData &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 InsertEventRequestData::InsertEventRequestData(const InsertEventRequestData& other1113) {
   replace = other1113.replace;
   filesAdded = other1113.filesAdded;
@@ -31855,7 +31446,6 @@ InsertEventRequestData::InsertEventRequestData(const InsertEventRequestData& oth
   subDirectoryList = other1113.subDirectoryList;
   partitionVal = other1113.partitionVal;
   __isset = other1113.__isset;
-<<<<<<< HEAD
 }
 InsertEventRequestData& InsertEventRequestData::operator=(const InsertEventRequestData& other1114) {
   replace = other1114.replace;
@@ -31864,33 +31454,6 @@ InsertEventRequestData& InsertEventRequestData::operator=(const InsertEventReque
   subDirectoryList = other1114.subDirectoryList;
   partitionVal = other1114.partitionVal;
   __isset = other1114.__isset;
-=======
-InsertEventRequestData::InsertEventRequestData(const InsertEventRequestData& other1107) {
-  replace = other1107.replace;
-  filesAdded = other1107.filesAdded;
-  filesAddedChecksum = other1107.filesAddedChecksum;
-  subDirectoryList = other1107.subDirectoryList;
-  partitionVal = other1107.partitionVal;
-  __isset = other1107.__isset;
-}
-InsertEventRequestData& InsertEventRequestData::operator=(const InsertEventRequestData& other1108) {
-  replace = other1108.replace;
-  filesAdded = other1108.filesAdded;
-  filesAddedChecksum = other1108.filesAddedChecksum;
-  subDirectoryList = other1108.subDirectoryList;
-  partitionVal = other1108.partitionVal;
-  __isset = other1108.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-InsertEventRequestData& InsertEventRequestData::operator=(const InsertEventRequestData& other1114) {
-  replace = other1114.replace;
-  filesAdded = other1114.filesAdded;
-  filesAddedChecksum = other1114.filesAddedChecksum;
-  subDirectoryList = other1114.subDirectoryList;
-  partitionVal = other1114.partitionVal;
-  __isset = other1114.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void InsertEventRequestData::printTo(std::ostream& out) const {
@@ -31963,33 +31526,14 @@ uint32_t FireEventRequestData::read(::apache::thrift::protocol::TProtocol* iprot
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->insertDatas.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1115;
             ::apache::thrift::protocol::TType _etype1118;
             xfer += iprot->readListBegin(_etype1118, _size1115);
             this->insertDatas.resize(_size1115);
             uint32_t _i1119;
             for (_i1119 = 0; _i1119 < _size1115; ++_i1119)
-<<<<<<< HEAD
             {
               xfer += this->insertDatas[_i1119].read(iprot);
-=======
-            uint32_t _size1109;
-            ::apache::thrift::protocol::TType _etype1112;
-            xfer += iprot->readListBegin(_etype1112, _size1109);
-            this->insertDatas.resize(_size1109);
-            uint32_t _i1113;
-            for (_i1113 = 0; _i1113 < _size1109; ++_i1113)
-            {
-              xfer += this->insertDatas[_i1113].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->insertDatas[_i1119].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -32032,24 +31576,10 @@ uint32_t FireEventRequestData::write(::apache::thrift::protocol::TProtocol* opro
     xfer += oprot->writeFieldBegin("insertDatas", ::apache::thrift::protocol::T_LIST, 2);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->insertDatas.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<InsertEventRequestData> ::const_iterator _iter1120;
       for (_iter1120 = this->insertDatas.begin(); _iter1120 != this->insertDatas.end(); ++_iter1120)
       {
         xfer += (*_iter1120).write(oprot);
-=======
-      std::vector<InsertEventRequestData> ::const_iterator _iter1114;
-      for (_iter1114 = this->insertDatas.begin(); _iter1114 != this->insertDatas.end(); ++_iter1114)
-      {
-        xfer += (*_iter1114).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<InsertEventRequestData> ::const_iterator _iter1120;
-      for (_iter1120 = this->insertDatas.begin(); _iter1120 != this->insertDatas.end(); ++_iter1120)
-      {
-        xfer += (*_iter1120).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -32073,43 +31603,17 @@ void swap(FireEventRequestData &a, FireEventRequestData &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 FireEventRequestData::FireEventRequestData(const FireEventRequestData& other1121) {
   insertData = other1121.insertData;
   insertDatas = other1121.insertDatas;
   refreshEvent = other1121.refreshEvent;
   __isset = other1121.__isset;
-<<<<<<< HEAD
 }
 FireEventRequestData& FireEventRequestData::operator=(const FireEventRequestData& other1122) {
   insertData = other1122.insertData;
   insertDatas = other1122.insertDatas;
   refreshEvent = other1122.refreshEvent;
   __isset = other1122.__isset;
-=======
-FireEventRequestData::FireEventRequestData(const FireEventRequestData& other1115) {
-  insertData = other1115.insertData;
-  insertDatas = other1115.insertDatas;
-  refreshEvent = other1115.refreshEvent;
-  __isset = other1115.__isset;
-}
-FireEventRequestData& FireEventRequestData::operator=(const FireEventRequestData& other1116) {
-  insertData = other1116.insertData;
-  insertDatas = other1116.insertDatas;
-  refreshEvent = other1116.refreshEvent;
-  __isset = other1116.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-FireEventRequestData& FireEventRequestData::operator=(const FireEventRequestData& other1122) {
-  insertData = other1122.insertData;
-  insertDatas = other1122.insertDatas;
-  refreshEvent = other1122.refreshEvent;
-  __isset = other1122.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void FireEventRequestData::printTo(std::ostream& out) const {
@@ -32224,33 +31728,14 @@ uint32_t FireEventRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partitionVals.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1123;
             ::apache::thrift::protocol::TType _etype1126;
             xfer += iprot->readListBegin(_etype1126, _size1123);
             this->partitionVals.resize(_size1123);
             uint32_t _i1127;
             for (_i1127 = 0; _i1127 < _size1123; ++_i1127)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->partitionVals[_i1127]);
-=======
-            uint32_t _size1117;
-            ::apache::thrift::protocol::TType _etype1120;
-            xfer += iprot->readListBegin(_etype1120, _size1117);
-            this->partitionVals.resize(_size1117);
-            uint32_t _i1121;
-            for (_i1121 = 0; _i1121 < _size1117; ++_i1121)
-            {
-              xfer += iprot->readString(this->partitionVals[_i1121]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->partitionVals[_i1127]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -32271,42 +31756,17 @@ uint32_t FireEventRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->tblParams.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1128;
             ::apache::thrift::protocol::TType _ktype1129;
             ::apache::thrift::protocol::TType _vtype1130;
             xfer += iprot->readMapBegin(_ktype1129, _vtype1130, _size1128);
             uint32_t _i1132;
             for (_i1132 = 0; _i1132 < _size1128; ++_i1132)
-<<<<<<< HEAD
             {
               std::string _key1133;
               xfer += iprot->readString(_key1133);
               std::string& _val1134 = this->tblParams[_key1133];
               xfer += iprot->readString(_val1134);
-=======
-            uint32_t _size1122;
-            ::apache::thrift::protocol::TType _ktype1123;
-            ::apache::thrift::protocol::TType _vtype1124;
-            xfer += iprot->readMapBegin(_ktype1123, _vtype1124, _size1122);
-            uint32_t _i1126;
-            for (_i1126 = 0; _i1126 < _size1122; ++_i1126)
-            {
-              std::string _key1127;
-              xfer += iprot->readString(_key1127);
-              std::string& _val1128 = this->tblParams[_key1127];
-              xfer += iprot->readString(_val1128);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              std::string _key1133;
-              xfer += iprot->readString(_key1133);
-              std::string& _val1134 = this->tblParams[_key1133];
-              xfer += iprot->readString(_val1134);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -32358,24 +31818,10 @@ uint32_t FireEventRequest::write(::apache::thrift::protocol::TProtocol* oprot) c
     xfer += oprot->writeFieldBegin("partitionVals", ::apache::thrift::protocol::T_LIST, 5);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->partitionVals.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1135;
       for (_iter1135 = this->partitionVals.begin(); _iter1135 != this->partitionVals.end(); ++_iter1135)
       {
         xfer += oprot->writeString((*_iter1135));
-=======
-      std::vector<std::string> ::const_iterator _iter1129;
-      for (_iter1129 = this->partitionVals.begin(); _iter1129 != this->partitionVals.end(); ++_iter1129)
-      {
-        xfer += oprot->writeString((*_iter1129));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1135;
-      for (_iter1135 = this->partitionVals.begin(); _iter1135 != this->partitionVals.end(); ++_iter1135)
-      {
-        xfer += oprot->writeString((*_iter1135));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -32390,27 +31836,11 @@ uint32_t FireEventRequest::write(::apache::thrift::protocol::TProtocol* oprot) c
     xfer += oprot->writeFieldBegin("tblParams", ::apache::thrift::protocol::T_MAP, 7);
     {
       xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->tblParams.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::map<std::string, std::string> ::const_iterator _iter1136;
       for (_iter1136 = this->tblParams.begin(); _iter1136 != this->tblParams.end(); ++_iter1136)
       {
         xfer += oprot->writeString(_iter1136->first);
         xfer += oprot->writeString(_iter1136->second);
-=======
-      std::map<std::string, std::string> ::const_iterator _iter1130;
-      for (_iter1130 = this->tblParams.begin(); _iter1130 != this->tblParams.end(); ++_iter1130)
-      {
-        xfer += oprot->writeString(_iter1130->first);
-        xfer += oprot->writeString(_iter1130->second);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::map<std::string, std::string> ::const_iterator _iter1136;
-      for (_iter1136 = this->tblParams.begin(); _iter1136 != this->tblParams.end(); ++_iter1136)
-      {
-        xfer += oprot->writeString(_iter1136->first);
-        xfer += oprot->writeString(_iter1136->second);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeMapEnd();
     }
@@ -32433,10 +31863,6 @@ void swap(FireEventRequest &a, FireEventRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 FireEventRequest::FireEventRequest(const FireEventRequest& other1137) {
   successful = other1137.successful;
   data = other1137.data;
@@ -32446,7 +31872,6 @@ FireEventRequest::FireEventRequest(const FireEventRequest& other1137) {
   catName = other1137.catName;
   tblParams = other1137.tblParams;
   __isset = other1137.__isset;
-<<<<<<< HEAD
 }
 FireEventRequest& FireEventRequest::operator=(const FireEventRequest& other1138) {
   successful = other1138.successful;
@@ -32457,39 +31882,6 @@ FireEventRequest& FireEventRequest::operator=(const FireEventRequest& other1138)
   catName = other1138.catName;
   tblParams = other1138.tblParams;
   __isset = other1138.__isset;
-=======
-FireEventRequest::FireEventRequest(const FireEventRequest& other1131) {
-  successful = other1131.successful;
-  data = other1131.data;
-  dbName = other1131.dbName;
-  tableName = other1131.tableName;
-  partitionVals = other1131.partitionVals;
-  catName = other1131.catName;
-  tblParams = other1131.tblParams;
-  __isset = other1131.__isset;
-}
-FireEventRequest& FireEventRequest::operator=(const FireEventRequest& other1132) {
-  successful = other1132.successful;
-  data = other1132.data;
-  dbName = other1132.dbName;
-  tableName = other1132.tableName;
-  partitionVals = other1132.partitionVals;
-  catName = other1132.catName;
-  tblParams = other1132.tblParams;
-  __isset = other1132.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-FireEventRequest& FireEventRequest::operator=(const FireEventRequest& other1138) {
-  successful = other1138.successful;
-  data = other1138.data;
-  dbName = other1138.dbName;
-  tableName = other1138.tableName;
-  partitionVals = other1138.partitionVals;
-  catName = other1138.catName;
-  tblParams = other1138.tblParams;
-  __isset = other1138.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void FireEventRequest::printTo(std::ostream& out) const {
@@ -32545,33 +31937,14 @@ uint32_t FireEventResponse::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->eventIds.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1139;
             ::apache::thrift::protocol::TType _etype1142;
             xfer += iprot->readListBegin(_etype1142, _size1139);
             this->eventIds.resize(_size1139);
             uint32_t _i1143;
             for (_i1143 = 0; _i1143 < _size1139; ++_i1143)
-<<<<<<< HEAD
             {
               xfer += iprot->readI64(this->eventIds[_i1143]);
-=======
-            uint32_t _size1133;
-            ::apache::thrift::protocol::TType _etype1136;
-            xfer += iprot->readListBegin(_etype1136, _size1133);
-            this->eventIds.resize(_size1133);
-            uint32_t _i1137;
-            for (_i1137 = 0; _i1137 < _size1133; ++_i1137)
-            {
-              xfer += iprot->readI64(this->eventIds[_i1137]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readI64(this->eventIds[_i1143]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -32600,24 +31973,10 @@ uint32_t FireEventResponse::write(::apache::thrift::protocol::TProtocol* oprot) 
   xfer += oprot->writeFieldBegin("eventIds", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I64, static_cast<uint32_t>(this->eventIds.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<int64_t> ::const_iterator _iter1144;
     for (_iter1144 = this->eventIds.begin(); _iter1144 != this->eventIds.end(); ++_iter1144)
     {
       xfer += oprot->writeI64((*_iter1144));
-=======
-    std::vector<int64_t> ::const_iterator _iter1138;
-    for (_iter1138 = this->eventIds.begin(); _iter1138 != this->eventIds.end(); ++_iter1138)
-    {
-      xfer += oprot->writeI64((*_iter1138));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<int64_t> ::const_iterator _iter1144;
-    for (_iter1144 = this->eventIds.begin(); _iter1144 != this->eventIds.end(); ++_iter1144)
-    {
-      xfer += oprot->writeI64((*_iter1144));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -32634,8 +31993,6 @@ void swap(FireEventResponse &a, FireEventResponse &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 FireEventResponse::FireEventResponse(const FireEventResponse& other1145) {
   eventIds = other1145.eventIds;
   __isset = other1145.__isset;
@@ -32643,24 +32000,6 @@ FireEventResponse::FireEventResponse(const FireEventResponse& other1145) {
 FireEventResponse& FireEventResponse::operator=(const FireEventResponse& other1146) {
   eventIds = other1146.eventIds;
   __isset = other1146.__isset;
-=======
-FireEventResponse::FireEventResponse(const FireEventResponse& other1139) {
-  eventIds = other1139.eventIds;
-  __isset = other1139.__isset;
-}
-FireEventResponse& FireEventResponse::operator=(const FireEventResponse& other1140) {
-  eventIds = other1140.eventIds;
-  __isset = other1140.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-FireEventResponse::FireEventResponse(const FireEventResponse& other1145) {
-  eventIds = other1145.eventIds;
-  __isset = other1145.__isset;
-}
-FireEventResponse& FireEventResponse::operator=(const FireEventResponse& other1146) {
-  eventIds = other1146.eventIds;
-  __isset = other1146.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void FireEventResponse::printTo(std::ostream& out) const {
@@ -32776,33 +32115,14 @@ uint32_t WriteNotificationLogRequest::read(::apache::thrift::protocol::TProtocol
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partitionVals.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1147;
             ::apache::thrift::protocol::TType _etype1150;
             xfer += iprot->readListBegin(_etype1150, _size1147);
             this->partitionVals.resize(_size1147);
             uint32_t _i1151;
             for (_i1151 = 0; _i1151 < _size1147; ++_i1151)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->partitionVals[_i1151]);
-=======
-            uint32_t _size1141;
-            ::apache::thrift::protocol::TType _etype1144;
-            xfer += iprot->readListBegin(_etype1144, _size1141);
-            this->partitionVals.resize(_size1141);
-            uint32_t _i1145;
-            for (_i1145 = 0; _i1145 < _size1141; ++_i1145)
-            {
-              xfer += iprot->readString(this->partitionVals[_i1145]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->partitionVals[_i1151]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -32862,24 +32182,10 @@ uint32_t WriteNotificationLogRequest::write(::apache::thrift::protocol::TProtoco
     xfer += oprot->writeFieldBegin("partitionVals", ::apache::thrift::protocol::T_LIST, 6);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->partitionVals.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1152;
       for (_iter1152 = this->partitionVals.begin(); _iter1152 != this->partitionVals.end(); ++_iter1152)
       {
         xfer += oprot->writeString((*_iter1152));
-=======
-      std::vector<std::string> ::const_iterator _iter1146;
-      for (_iter1146 = this->partitionVals.begin(); _iter1146 != this->partitionVals.end(); ++_iter1146)
-      {
-        xfer += oprot->writeString((*_iter1146));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1152;
-      for (_iter1152 = this->partitionVals.begin(); _iter1152 != this->partitionVals.end(); ++_iter1152)
-      {
-        xfer += oprot->writeString((*_iter1152));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -32901,10 +32207,6 @@ void swap(WriteNotificationLogRequest &a, WriteNotificationLogRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WriteNotificationLogRequest::WriteNotificationLogRequest(const WriteNotificationLogRequest& other1153) {
   txnId = other1153.txnId;
   writeId = other1153.writeId;
@@ -32913,7 +32215,6 @@ WriteNotificationLogRequest::WriteNotificationLogRequest(const WriteNotification
   fileInfo = other1153.fileInfo;
   partitionVals = other1153.partitionVals;
   __isset = other1153.__isset;
-<<<<<<< HEAD
 }
 WriteNotificationLogRequest& WriteNotificationLogRequest::operator=(const WriteNotificationLogRequest& other1154) {
   txnId = other1154.txnId;
@@ -32923,36 +32224,6 @@ WriteNotificationLogRequest& WriteNotificationLogRequest::operator=(const WriteN
   fileInfo = other1154.fileInfo;
   partitionVals = other1154.partitionVals;
   __isset = other1154.__isset;
-=======
-WriteNotificationLogRequest::WriteNotificationLogRequest(const WriteNotificationLogRequest& other1147) {
-  txnId = other1147.txnId;
-  writeId = other1147.writeId;
-  db = other1147.db;
-  table = other1147.table;
-  fileInfo = other1147.fileInfo;
-  partitionVals = other1147.partitionVals;
-  __isset = other1147.__isset;
-}
-WriteNotificationLogRequest& WriteNotificationLogRequest::operator=(const WriteNotificationLogRequest& other1148) {
-  txnId = other1148.txnId;
-  writeId = other1148.writeId;
-  db = other1148.db;
-  table = other1148.table;
-  fileInfo = other1148.fileInfo;
-  partitionVals = other1148.partitionVals;
-  __isset = other1148.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WriteNotificationLogRequest& WriteNotificationLogRequest::operator=(const WriteNotificationLogRequest& other1154) {
-  txnId = other1154.txnId;
-  writeId = other1154.writeId;
-  db = other1154.db;
-  table = other1154.table;
-  fileInfo = other1154.fileInfo;
-  partitionVals = other1154.partitionVals;
-  __isset = other1154.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WriteNotificationLogRequest::printTo(std::ostream& out) const {
@@ -33022,27 +32293,11 @@ void swap(WriteNotificationLogResponse &a, WriteNotificationLogResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WriteNotificationLogResponse::WriteNotificationLogResponse(const WriteNotificationLogResponse& other1155) noexcept {
   (void) other1155;
 }
 WriteNotificationLogResponse& WriteNotificationLogResponse::operator=(const WriteNotificationLogResponse& other1156) noexcept {
   (void) other1156;
-=======
-WriteNotificationLogResponse::WriteNotificationLogResponse(const WriteNotificationLogResponse& other1149) noexcept {
-  (void) other1149;
-}
-WriteNotificationLogResponse& WriteNotificationLogResponse::operator=(const WriteNotificationLogResponse& other1150) noexcept {
-  (void) other1150;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WriteNotificationLogResponse::WriteNotificationLogResponse(const WriteNotificationLogResponse& other1155) noexcept {
-  (void) other1155;
-}
-WriteNotificationLogResponse& WriteNotificationLogResponse::operator=(const WriteNotificationLogResponse& other1156) noexcept {
-  (void) other1156;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WriteNotificationLogResponse::printTo(std::ostream& out) const {
@@ -33131,33 +32386,14 @@ uint32_t WriteNotificationLogBatchRequest::read(::apache::thrift::protocol::TPro
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->requestList.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1157;
             ::apache::thrift::protocol::TType _etype1160;
             xfer += iprot->readListBegin(_etype1160, _size1157);
             this->requestList.resize(_size1157);
             uint32_t _i1161;
             for (_i1161 = 0; _i1161 < _size1157; ++_i1161)
-<<<<<<< HEAD
             {
               xfer += this->requestList[_i1161].read(iprot);
-=======
-            uint32_t _size1151;
-            ::apache::thrift::protocol::TType _etype1154;
-            xfer += iprot->readListBegin(_etype1154, _size1151);
-            this->requestList.resize(_size1151);
-            uint32_t _i1155;
-            for (_i1155 = 0; _i1155 < _size1151; ++_i1155)
-            {
-              xfer += this->requestList[_i1155].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->requestList[_i1161].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -33206,24 +32442,10 @@ uint32_t WriteNotificationLogBatchRequest::write(::apache::thrift::protocol::TPr
   xfer += oprot->writeFieldBegin("requestList", ::apache::thrift::protocol::T_LIST, 4);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->requestList.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<WriteNotificationLogRequest> ::const_iterator _iter1162;
     for (_iter1162 = this->requestList.begin(); _iter1162 != this->requestList.end(); ++_iter1162)
     {
       xfer += (*_iter1162).write(oprot);
-=======
-    std::vector<WriteNotificationLogRequest> ::const_iterator _iter1156;
-    for (_iter1156 = this->requestList.begin(); _iter1156 != this->requestList.end(); ++_iter1156)
-    {
-      xfer += (*_iter1156).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<WriteNotificationLogRequest> ::const_iterator _iter1162;
-    for (_iter1162 = this->requestList.begin(); _iter1162 != this->requestList.end(); ++_iter1162)
-    {
-      xfer += (*_iter1162).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -33242,43 +32464,17 @@ void swap(WriteNotificationLogBatchRequest &a, WriteNotificationLogBatchRequest 
   swap(a.requestList, b.requestList);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WriteNotificationLogBatchRequest::WriteNotificationLogBatchRequest(const WriteNotificationLogBatchRequest& other1163) {
   catalog = other1163.catalog;
   db = other1163.db;
   table = other1163.table;
   requestList = other1163.requestList;
-<<<<<<< HEAD
 }
 WriteNotificationLogBatchRequest& WriteNotificationLogBatchRequest::operator=(const WriteNotificationLogBatchRequest& other1164) {
   catalog = other1164.catalog;
   db = other1164.db;
   table = other1164.table;
   requestList = other1164.requestList;
-=======
-WriteNotificationLogBatchRequest::WriteNotificationLogBatchRequest(const WriteNotificationLogBatchRequest& other1157) {
-  catalog = other1157.catalog;
-  db = other1157.db;
-  table = other1157.table;
-  requestList = other1157.requestList;
-}
-WriteNotificationLogBatchRequest& WriteNotificationLogBatchRequest::operator=(const WriteNotificationLogBatchRequest& other1158) {
-  catalog = other1158.catalog;
-  db = other1158.db;
-  table = other1158.table;
-  requestList = other1158.requestList;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WriteNotificationLogBatchRequest& WriteNotificationLogBatchRequest::operator=(const WriteNotificationLogBatchRequest& other1164) {
-  catalog = other1164.catalog;
-  db = other1164.db;
-  table = other1164.table;
-  requestList = other1164.requestList;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WriteNotificationLogBatchRequest::printTo(std::ostream& out) const {
@@ -33346,27 +32542,11 @@ void swap(WriteNotificationLogBatchResponse &a, WriteNotificationLogBatchRespons
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WriteNotificationLogBatchResponse::WriteNotificationLogBatchResponse(const WriteNotificationLogBatchResponse& other1165) noexcept {
   (void) other1165;
 }
 WriteNotificationLogBatchResponse& WriteNotificationLogBatchResponse::operator=(const WriteNotificationLogBatchResponse& other1166) noexcept {
   (void) other1166;
-=======
-WriteNotificationLogBatchResponse::WriteNotificationLogBatchResponse(const WriteNotificationLogBatchResponse& other1159) noexcept {
-  (void) other1159;
-}
-WriteNotificationLogBatchResponse& WriteNotificationLogBatchResponse::operator=(const WriteNotificationLogBatchResponse& other1160) noexcept {
-  (void) other1160;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WriteNotificationLogBatchResponse::WriteNotificationLogBatchResponse(const WriteNotificationLogBatchResponse& other1165) noexcept {
-  (void) other1165;
-}
-WriteNotificationLogBatchResponse& WriteNotificationLogBatchResponse::operator=(const WriteNotificationLogBatchResponse& other1166) noexcept {
-  (void) other1166;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WriteNotificationLogBatchResponse::printTo(std::ostream& out) const {
@@ -33472,38 +32652,15 @@ void swap(MetadataPpdResult &a, MetadataPpdResult &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 MetadataPpdResult::MetadataPpdResult(const MetadataPpdResult& other1167) {
   metadata = other1167.metadata;
   includeBitset = other1167.includeBitset;
   __isset = other1167.__isset;
-<<<<<<< HEAD
 }
 MetadataPpdResult& MetadataPpdResult::operator=(const MetadataPpdResult& other1168) {
   metadata = other1168.metadata;
   includeBitset = other1168.includeBitset;
   __isset = other1168.__isset;
-=======
-MetadataPpdResult::MetadataPpdResult(const MetadataPpdResult& other1161) {
-  metadata = other1161.metadata;
-  includeBitset = other1161.includeBitset;
-  __isset = other1161.__isset;
-}
-MetadataPpdResult& MetadataPpdResult::operator=(const MetadataPpdResult& other1162) {
-  metadata = other1162.metadata;
-  includeBitset = other1162.includeBitset;
-  __isset = other1162.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-MetadataPpdResult& MetadataPpdResult::operator=(const MetadataPpdResult& other1168) {
-  metadata = other1168.metadata;
-  includeBitset = other1168.includeBitset;
-  __isset = other1168.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void MetadataPpdResult::printTo(std::ostream& out) const {
@@ -33560,42 +32717,17 @@ uint32_t GetFileMetadataByExprResult::read(::apache::thrift::protocol::TProtocol
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->metadata.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1169;
             ::apache::thrift::protocol::TType _ktype1170;
             ::apache::thrift::protocol::TType _vtype1171;
             xfer += iprot->readMapBegin(_ktype1170, _vtype1171, _size1169);
             uint32_t _i1173;
             for (_i1173 = 0; _i1173 < _size1169; ++_i1173)
-<<<<<<< HEAD
             {
               int64_t _key1174;
               xfer += iprot->readI64(_key1174);
               MetadataPpdResult& _val1175 = this->metadata[_key1174];
               xfer += _val1175.read(iprot);
-=======
-            uint32_t _size1163;
-            ::apache::thrift::protocol::TType _ktype1164;
-            ::apache::thrift::protocol::TType _vtype1165;
-            xfer += iprot->readMapBegin(_ktype1164, _vtype1165, _size1163);
-            uint32_t _i1167;
-            for (_i1167 = 0; _i1167 < _size1163; ++_i1167)
-            {
-              int64_t _key1168;
-              xfer += iprot->readI64(_key1168);
-              MetadataPpdResult& _val1169 = this->metadata[_key1168];
-              xfer += _val1169.read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              int64_t _key1174;
-              xfer += iprot->readI64(_key1174);
-              MetadataPpdResult& _val1175 = this->metadata[_key1174];
-              xfer += _val1175.read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -33636,27 +32768,11 @@ uint32_t GetFileMetadataByExprResult::write(::apache::thrift::protocol::TProtoco
   xfer += oprot->writeFieldBegin("metadata", ::apache::thrift::protocol::T_MAP, 1);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_I64, ::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->metadata.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::map<int64_t, MetadataPpdResult> ::const_iterator _iter1176;
     for (_iter1176 = this->metadata.begin(); _iter1176 != this->metadata.end(); ++_iter1176)
     {
       xfer += oprot->writeI64(_iter1176->first);
       xfer += _iter1176->second.write(oprot);
-=======
-    std::map<int64_t, MetadataPpdResult> ::const_iterator _iter1170;
-    for (_iter1170 = this->metadata.begin(); _iter1170 != this->metadata.end(); ++_iter1170)
-    {
-      xfer += oprot->writeI64(_iter1170->first);
-      xfer += _iter1170->second.write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::map<int64_t, MetadataPpdResult> ::const_iterator _iter1176;
-    for (_iter1176 = this->metadata.begin(); _iter1176 != this->metadata.end(); ++_iter1176)
-    {
-      xfer += oprot->writeI64(_iter1176->first);
-      xfer += _iter1176->second.write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -33677,8 +32793,6 @@ void swap(GetFileMetadataByExprResult &a, GetFileMetadataByExprResult &b) {
   swap(a.isSupported, b.isSupported);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetFileMetadataByExprResult::GetFileMetadataByExprResult(const GetFileMetadataByExprResult& other1177) {
   metadata = other1177.metadata;
   isSupported = other1177.isSupported;
@@ -33686,24 +32800,6 @@ GetFileMetadataByExprResult::GetFileMetadataByExprResult(const GetFileMetadataBy
 GetFileMetadataByExprResult& GetFileMetadataByExprResult::operator=(const GetFileMetadataByExprResult& other1178) {
   metadata = other1178.metadata;
   isSupported = other1178.isSupported;
-=======
-GetFileMetadataByExprResult::GetFileMetadataByExprResult(const GetFileMetadataByExprResult& other1171) {
-  metadata = other1171.metadata;
-  isSupported = other1171.isSupported;
-}
-GetFileMetadataByExprResult& GetFileMetadataByExprResult::operator=(const GetFileMetadataByExprResult& other1172) {
-  metadata = other1172.metadata;
-  isSupported = other1172.isSupported;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetFileMetadataByExprResult::GetFileMetadataByExprResult(const GetFileMetadataByExprResult& other1177) {
-  metadata = other1177.metadata;
-  isSupported = other1177.isSupported;
-}
-GetFileMetadataByExprResult& GetFileMetadataByExprResult::operator=(const GetFileMetadataByExprResult& other1178) {
-  metadata = other1178.metadata;
-  isSupported = other1178.isSupported;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetFileMetadataByExprResult::printTo(std::ostream& out) const {
@@ -33770,33 +32866,14 @@ uint32_t GetFileMetadataByExprRequest::read(::apache::thrift::protocol::TProtoco
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->fileIds.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1179;
             ::apache::thrift::protocol::TType _etype1182;
             xfer += iprot->readListBegin(_etype1182, _size1179);
             this->fileIds.resize(_size1179);
             uint32_t _i1183;
             for (_i1183 = 0; _i1183 < _size1179; ++_i1183)
-<<<<<<< HEAD
             {
               xfer += iprot->readI64(this->fileIds[_i1183]);
-=======
-            uint32_t _size1173;
-            ::apache::thrift::protocol::TType _etype1176;
-            xfer += iprot->readListBegin(_etype1176, _size1173);
-            this->fileIds.resize(_size1173);
-            uint32_t _i1177;
-            for (_i1177 = 0; _i1177 < _size1173; ++_i1177)
-            {
-              xfer += iprot->readI64(this->fileIds[_i1177]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readI64(this->fileIds[_i1183]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -33823,21 +32900,9 @@ uint32_t GetFileMetadataByExprRequest::read(::apache::thrift::protocol::TProtoco
         break;
       case 4:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1184;
           xfer += iprot->readI32(ecast1184);
           this->type = static_cast<FileMetadataExprType::type>(ecast1184);
-=======
-          int32_t ecast1178;
-          xfer += iprot->readI32(ecast1178);
-          this->type = static_cast<FileMetadataExprType::type>(ecast1178);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1184;
-          xfer += iprot->readI32(ecast1184);
-          this->type = static_cast<FileMetadataExprType::type>(ecast1184);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.type = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -33867,24 +32932,10 @@ uint32_t GetFileMetadataByExprRequest::write(::apache::thrift::protocol::TProtoc
   xfer += oprot->writeFieldBegin("fileIds", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I64, static_cast<uint32_t>(this->fileIds.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<int64_t> ::const_iterator _iter1185;
     for (_iter1185 = this->fileIds.begin(); _iter1185 != this->fileIds.end(); ++_iter1185)
     {
       xfer += oprot->writeI64((*_iter1185));
-=======
-    std::vector<int64_t> ::const_iterator _iter1179;
-    for (_iter1179 = this->fileIds.begin(); _iter1179 != this->fileIds.end(); ++_iter1179)
-    {
-      xfer += oprot->writeI64((*_iter1179));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<int64_t> ::const_iterator _iter1185;
-    for (_iter1185 = this->fileIds.begin(); _iter1185 != this->fileIds.end(); ++_iter1185)
-    {
-      xfer += oprot->writeI64((*_iter1185));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -33918,17 +32969,12 @@ void swap(GetFileMetadataByExprRequest &a, GetFileMetadataByExprRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetFileMetadataByExprRequest::GetFileMetadataByExprRequest(const GetFileMetadataByExprRequest& other1186) {
   fileIds = other1186.fileIds;
   expr = other1186.expr;
   doGetFooters = other1186.doGetFooters;
   type = other1186.type;
   __isset = other1186.__isset;
-<<<<<<< HEAD
 }
 GetFileMetadataByExprRequest& GetFileMetadataByExprRequest::operator=(const GetFileMetadataByExprRequest& other1187) {
   fileIds = other1187.fileIds;
@@ -33936,30 +32982,6 @@ GetFileMetadataByExprRequest& GetFileMetadataByExprRequest::operator=(const GetF
   doGetFooters = other1187.doGetFooters;
   type = other1187.type;
   __isset = other1187.__isset;
-=======
-GetFileMetadataByExprRequest::GetFileMetadataByExprRequest(const GetFileMetadataByExprRequest& other1180) {
-  fileIds = other1180.fileIds;
-  expr = other1180.expr;
-  doGetFooters = other1180.doGetFooters;
-  type = other1180.type;
-  __isset = other1180.__isset;
-}
-GetFileMetadataByExprRequest& GetFileMetadataByExprRequest::operator=(const GetFileMetadataByExprRequest& other1181) {
-  fileIds = other1181.fileIds;
-  expr = other1181.expr;
-  doGetFooters = other1181.doGetFooters;
-  type = other1181.type;
-  __isset = other1181.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetFileMetadataByExprRequest& GetFileMetadataByExprRequest::operator=(const GetFileMetadataByExprRequest& other1187) {
-  fileIds = other1187.fileIds;
-  expr = other1187.expr;
-  doGetFooters = other1187.doGetFooters;
-  type = other1187.type;
-  __isset = other1187.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetFileMetadataByExprRequest::printTo(std::ostream& out) const {
@@ -34018,42 +33040,17 @@ uint32_t GetFileMetadataResult::read(::apache::thrift::protocol::TProtocol* ipro
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->metadata.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1188;
             ::apache::thrift::protocol::TType _ktype1189;
             ::apache::thrift::protocol::TType _vtype1190;
             xfer += iprot->readMapBegin(_ktype1189, _vtype1190, _size1188);
             uint32_t _i1192;
             for (_i1192 = 0; _i1192 < _size1188; ++_i1192)
-<<<<<<< HEAD
             {
               int64_t _key1193;
               xfer += iprot->readI64(_key1193);
               std::string& _val1194 = this->metadata[_key1193];
               xfer += iprot->readBinary(_val1194);
-=======
-            uint32_t _size1182;
-            ::apache::thrift::protocol::TType _ktype1183;
-            ::apache::thrift::protocol::TType _vtype1184;
-            xfer += iprot->readMapBegin(_ktype1183, _vtype1184, _size1182);
-            uint32_t _i1186;
-            for (_i1186 = 0; _i1186 < _size1182; ++_i1186)
-            {
-              int64_t _key1187;
-              xfer += iprot->readI64(_key1187);
-              std::string& _val1188 = this->metadata[_key1187];
-              xfer += iprot->readBinary(_val1188);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              int64_t _key1193;
-              xfer += iprot->readI64(_key1193);
-              std::string& _val1194 = this->metadata[_key1193];
-              xfer += iprot->readBinary(_val1194);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -34094,27 +33091,11 @@ uint32_t GetFileMetadataResult::write(::apache::thrift::protocol::TProtocol* opr
   xfer += oprot->writeFieldBegin("metadata", ::apache::thrift::protocol::T_MAP, 1);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_I64, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->metadata.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::map<int64_t, std::string> ::const_iterator _iter1195;
     for (_iter1195 = this->metadata.begin(); _iter1195 != this->metadata.end(); ++_iter1195)
     {
       xfer += oprot->writeI64(_iter1195->first);
       xfer += oprot->writeBinary(_iter1195->second);
-=======
-    std::map<int64_t, std::string> ::const_iterator _iter1189;
-    for (_iter1189 = this->metadata.begin(); _iter1189 != this->metadata.end(); ++_iter1189)
-    {
-      xfer += oprot->writeI64(_iter1189->first);
-      xfer += oprot->writeBinary(_iter1189->second);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::map<int64_t, std::string> ::const_iterator _iter1195;
-    for (_iter1195 = this->metadata.begin(); _iter1195 != this->metadata.end(); ++_iter1195)
-    {
-      xfer += oprot->writeI64(_iter1195->first);
-      xfer += oprot->writeBinary(_iter1195->second);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -34135,8 +33116,6 @@ void swap(GetFileMetadataResult &a, GetFileMetadataResult &b) {
   swap(a.isSupported, b.isSupported);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetFileMetadataResult::GetFileMetadataResult(const GetFileMetadataResult& other1196) {
   metadata = other1196.metadata;
   isSupported = other1196.isSupported;
@@ -34144,24 +33123,6 @@ GetFileMetadataResult::GetFileMetadataResult(const GetFileMetadataResult& other1
 GetFileMetadataResult& GetFileMetadataResult::operator=(const GetFileMetadataResult& other1197) {
   metadata = other1197.metadata;
   isSupported = other1197.isSupported;
-=======
-GetFileMetadataResult::GetFileMetadataResult(const GetFileMetadataResult& other1190) {
-  metadata = other1190.metadata;
-  isSupported = other1190.isSupported;
-}
-GetFileMetadataResult& GetFileMetadataResult::operator=(const GetFileMetadataResult& other1191) {
-  metadata = other1191.metadata;
-  isSupported = other1191.isSupported;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetFileMetadataResult::GetFileMetadataResult(const GetFileMetadataResult& other1196) {
-  metadata = other1196.metadata;
-  isSupported = other1196.isSupported;
-}
-GetFileMetadataResult& GetFileMetadataResult::operator=(const GetFileMetadataResult& other1197) {
-  metadata = other1197.metadata;
-  isSupported = other1197.isSupported;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetFileMetadataResult::printTo(std::ostream& out) const {
@@ -34213,33 +33174,14 @@ uint32_t GetFileMetadataRequest::read(::apache::thrift::protocol::TProtocol* ipr
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->fileIds.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1198;
             ::apache::thrift::protocol::TType _etype1201;
             xfer += iprot->readListBegin(_etype1201, _size1198);
             this->fileIds.resize(_size1198);
             uint32_t _i1202;
             for (_i1202 = 0; _i1202 < _size1198; ++_i1202)
-<<<<<<< HEAD
             {
               xfer += iprot->readI64(this->fileIds[_i1202]);
-=======
-            uint32_t _size1192;
-            ::apache::thrift::protocol::TType _etype1195;
-            xfer += iprot->readListBegin(_etype1195, _size1192);
-            this->fileIds.resize(_size1192);
-            uint32_t _i1196;
-            for (_i1196 = 0; _i1196 < _size1192; ++_i1196)
-            {
-              xfer += iprot->readI64(this->fileIds[_i1196]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readI64(this->fileIds[_i1202]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -34270,24 +33212,10 @@ uint32_t GetFileMetadataRequest::write(::apache::thrift::protocol::TProtocol* op
   xfer += oprot->writeFieldBegin("fileIds", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I64, static_cast<uint32_t>(this->fileIds.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<int64_t> ::const_iterator _iter1203;
     for (_iter1203 = this->fileIds.begin(); _iter1203 != this->fileIds.end(); ++_iter1203)
     {
       xfer += oprot->writeI64((*_iter1203));
-=======
-    std::vector<int64_t> ::const_iterator _iter1197;
-    for (_iter1197 = this->fileIds.begin(); _iter1197 != this->fileIds.end(); ++_iter1197)
-    {
-      xfer += oprot->writeI64((*_iter1197));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<int64_t> ::const_iterator _iter1203;
-    for (_iter1203 = this->fileIds.begin(); _iter1203 != this->fileIds.end(); ++_iter1203)
-    {
-      xfer += oprot->writeI64((*_iter1203));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -34303,27 +33231,11 @@ void swap(GetFileMetadataRequest &a, GetFileMetadataRequest &b) {
   swap(a.fileIds, b.fileIds);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetFileMetadataRequest::GetFileMetadataRequest(const GetFileMetadataRequest& other1204) {
   fileIds = other1204.fileIds;
 }
 GetFileMetadataRequest& GetFileMetadataRequest::operator=(const GetFileMetadataRequest& other1205) {
   fileIds = other1205.fileIds;
-=======
-GetFileMetadataRequest::GetFileMetadataRequest(const GetFileMetadataRequest& other1198) {
-  fileIds = other1198.fileIds;
-}
-GetFileMetadataRequest& GetFileMetadataRequest::operator=(const GetFileMetadataRequest& other1199) {
-  fileIds = other1199.fileIds;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetFileMetadataRequest::GetFileMetadataRequest(const GetFileMetadataRequest& other1204) {
-  fileIds = other1204.fileIds;
-}
-GetFileMetadataRequest& GetFileMetadataRequest::operator=(const GetFileMetadataRequest& other1205) {
-  fileIds = other1205.fileIds;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetFileMetadataRequest::printTo(std::ostream& out) const {
@@ -34388,27 +33300,11 @@ void swap(PutFileMetadataResult &a, PutFileMetadataResult &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 PutFileMetadataResult::PutFileMetadataResult(const PutFileMetadataResult& other1206) noexcept {
   (void) other1206;
 }
 PutFileMetadataResult& PutFileMetadataResult::operator=(const PutFileMetadataResult& other1207) noexcept {
   (void) other1207;
-=======
-PutFileMetadataResult::PutFileMetadataResult(const PutFileMetadataResult& other1200) noexcept {
-  (void) other1200;
-}
-PutFileMetadataResult& PutFileMetadataResult::operator=(const PutFileMetadataResult& other1201) noexcept {
-  (void) other1201;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-PutFileMetadataResult::PutFileMetadataResult(const PutFileMetadataResult& other1206) noexcept {
-  (void) other1206;
-}
-PutFileMetadataResult& PutFileMetadataResult::operator=(const PutFileMetadataResult& other1207) noexcept {
-  (void) other1207;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void PutFileMetadataResult::printTo(std::ostream& out) const {
@@ -34468,33 +33364,14 @@ uint32_t PutFileMetadataRequest::read(::apache::thrift::protocol::TProtocol* ipr
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->fileIds.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1208;
             ::apache::thrift::protocol::TType _etype1211;
             xfer += iprot->readListBegin(_etype1211, _size1208);
             this->fileIds.resize(_size1208);
             uint32_t _i1212;
             for (_i1212 = 0; _i1212 < _size1208; ++_i1212)
-<<<<<<< HEAD
             {
               xfer += iprot->readI64(this->fileIds[_i1212]);
-=======
-            uint32_t _size1202;
-            ::apache::thrift::protocol::TType _etype1205;
-            xfer += iprot->readListBegin(_etype1205, _size1202);
-            this->fileIds.resize(_size1202);
-            uint32_t _i1206;
-            for (_i1206 = 0; _i1206 < _size1202; ++_i1206)
-            {
-              xfer += iprot->readI64(this->fileIds[_i1206]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readI64(this->fileIds[_i1212]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -34507,33 +33384,14 @@ uint32_t PutFileMetadataRequest::read(::apache::thrift::protocol::TProtocol* ipr
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->metadata.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1213;
             ::apache::thrift::protocol::TType _etype1216;
             xfer += iprot->readListBegin(_etype1216, _size1213);
             this->metadata.resize(_size1213);
             uint32_t _i1217;
             for (_i1217 = 0; _i1217 < _size1213; ++_i1217)
-<<<<<<< HEAD
             {
               xfer += iprot->readBinary(this->metadata[_i1217]);
-=======
-            uint32_t _size1207;
-            ::apache::thrift::protocol::TType _etype1210;
-            xfer += iprot->readListBegin(_etype1210, _size1207);
-            this->metadata.resize(_size1207);
-            uint32_t _i1211;
-            for (_i1211 = 0; _i1211 < _size1207; ++_i1211)
-            {
-              xfer += iprot->readBinary(this->metadata[_i1211]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readBinary(this->metadata[_i1217]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -34544,21 +33402,9 @@ uint32_t PutFileMetadataRequest::read(::apache::thrift::protocol::TProtocol* ipr
         break;
       case 3:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1218;
           xfer += iprot->readI32(ecast1218);
           this->type = static_cast<FileMetadataExprType::type>(ecast1218);
-=======
-          int32_t ecast1212;
-          xfer += iprot->readI32(ecast1212);
-          this->type = static_cast<FileMetadataExprType::type>(ecast1212);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1218;
-          xfer += iprot->readI32(ecast1218);
-          this->type = static_cast<FileMetadataExprType::type>(ecast1218);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.type = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -34588,24 +33434,10 @@ uint32_t PutFileMetadataRequest::write(::apache::thrift::protocol::TProtocol* op
   xfer += oprot->writeFieldBegin("fileIds", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I64, static_cast<uint32_t>(this->fileIds.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<int64_t> ::const_iterator _iter1219;
     for (_iter1219 = this->fileIds.begin(); _iter1219 != this->fileIds.end(); ++_iter1219)
     {
       xfer += oprot->writeI64((*_iter1219));
-=======
-    std::vector<int64_t> ::const_iterator _iter1213;
-    for (_iter1213 = this->fileIds.begin(); _iter1213 != this->fileIds.end(); ++_iter1213)
-    {
-      xfer += oprot->writeI64((*_iter1213));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<int64_t> ::const_iterator _iter1219;
-    for (_iter1219 = this->fileIds.begin(); _iter1219 != this->fileIds.end(); ++_iter1219)
-    {
-      xfer += oprot->writeI64((*_iter1219));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -34614,24 +33446,10 @@ uint32_t PutFileMetadataRequest::write(::apache::thrift::protocol::TProtocol* op
   xfer += oprot->writeFieldBegin("metadata", ::apache::thrift::protocol::T_LIST, 2);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->metadata.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter1220;
     for (_iter1220 = this->metadata.begin(); _iter1220 != this->metadata.end(); ++_iter1220)
     {
       xfer += oprot->writeBinary((*_iter1220));
-=======
-    std::vector<std::string> ::const_iterator _iter1214;
-    for (_iter1214 = this->metadata.begin(); _iter1214 != this->metadata.end(); ++_iter1214)
-    {
-      xfer += oprot->writeBinary((*_iter1214));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<std::string> ::const_iterator _iter1220;
-    for (_iter1220 = this->metadata.begin(); _iter1220 != this->metadata.end(); ++_iter1220)
-    {
-      xfer += oprot->writeBinary((*_iter1220));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -34655,43 +33473,17 @@ void swap(PutFileMetadataRequest &a, PutFileMetadataRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 PutFileMetadataRequest::PutFileMetadataRequest(const PutFileMetadataRequest& other1221) {
   fileIds = other1221.fileIds;
   metadata = other1221.metadata;
   type = other1221.type;
   __isset = other1221.__isset;
-<<<<<<< HEAD
 }
 PutFileMetadataRequest& PutFileMetadataRequest::operator=(const PutFileMetadataRequest& other1222) {
   fileIds = other1222.fileIds;
   metadata = other1222.metadata;
   type = other1222.type;
   __isset = other1222.__isset;
-=======
-PutFileMetadataRequest::PutFileMetadataRequest(const PutFileMetadataRequest& other1215) {
-  fileIds = other1215.fileIds;
-  metadata = other1215.metadata;
-  type = other1215.type;
-  __isset = other1215.__isset;
-}
-PutFileMetadataRequest& PutFileMetadataRequest::operator=(const PutFileMetadataRequest& other1216) {
-  fileIds = other1216.fileIds;
-  metadata = other1216.metadata;
-  type = other1216.type;
-  __isset = other1216.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-PutFileMetadataRequest& PutFileMetadataRequest::operator=(const PutFileMetadataRequest& other1222) {
-  fileIds = other1222.fileIds;
-  metadata = other1222.metadata;
-  type = other1222.type;
-  __isset = other1222.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void PutFileMetadataRequest::printTo(std::ostream& out) const {
@@ -34758,27 +33550,11 @@ void swap(ClearFileMetadataResult &a, ClearFileMetadataResult &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ClearFileMetadataResult::ClearFileMetadataResult(const ClearFileMetadataResult& other1223) noexcept {
   (void) other1223;
 }
 ClearFileMetadataResult& ClearFileMetadataResult::operator=(const ClearFileMetadataResult& other1224) noexcept {
   (void) other1224;
-=======
-ClearFileMetadataResult::ClearFileMetadataResult(const ClearFileMetadataResult& other1217) noexcept {
-  (void) other1217;
-}
-ClearFileMetadataResult& ClearFileMetadataResult::operator=(const ClearFileMetadataResult& other1218) noexcept {
-  (void) other1218;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-ClearFileMetadataResult::ClearFileMetadataResult(const ClearFileMetadataResult& other1223) noexcept {
-  (void) other1223;
-}
-ClearFileMetadataResult& ClearFileMetadataResult::operator=(const ClearFileMetadataResult& other1224) noexcept {
-  (void) other1224;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ClearFileMetadataResult::printTo(std::ostream& out) const {
@@ -34828,33 +33604,14 @@ uint32_t ClearFileMetadataRequest::read(::apache::thrift::protocol::TProtocol* i
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->fileIds.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1225;
             ::apache::thrift::protocol::TType _etype1228;
             xfer += iprot->readListBegin(_etype1228, _size1225);
             this->fileIds.resize(_size1225);
             uint32_t _i1229;
             for (_i1229 = 0; _i1229 < _size1225; ++_i1229)
-<<<<<<< HEAD
             {
               xfer += iprot->readI64(this->fileIds[_i1229]);
-=======
-            uint32_t _size1219;
-            ::apache::thrift::protocol::TType _etype1222;
-            xfer += iprot->readListBegin(_etype1222, _size1219);
-            this->fileIds.resize(_size1219);
-            uint32_t _i1223;
-            for (_i1223 = 0; _i1223 < _size1219; ++_i1223)
-            {
-              xfer += iprot->readI64(this->fileIds[_i1223]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readI64(this->fileIds[_i1229]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -34885,24 +33642,10 @@ uint32_t ClearFileMetadataRequest::write(::apache::thrift::protocol::TProtocol* 
   xfer += oprot->writeFieldBegin("fileIds", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I64, static_cast<uint32_t>(this->fileIds.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<int64_t> ::const_iterator _iter1230;
     for (_iter1230 = this->fileIds.begin(); _iter1230 != this->fileIds.end(); ++_iter1230)
     {
       xfer += oprot->writeI64((*_iter1230));
-=======
-    std::vector<int64_t> ::const_iterator _iter1224;
-    for (_iter1224 = this->fileIds.begin(); _iter1224 != this->fileIds.end(); ++_iter1224)
-    {
-      xfer += oprot->writeI64((*_iter1224));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<int64_t> ::const_iterator _iter1230;
-    for (_iter1230 = this->fileIds.begin(); _iter1230 != this->fileIds.end(); ++_iter1230)
-    {
-      xfer += oprot->writeI64((*_iter1230));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -34918,27 +33661,11 @@ void swap(ClearFileMetadataRequest &a, ClearFileMetadataRequest &b) {
   swap(a.fileIds, b.fileIds);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ClearFileMetadataRequest::ClearFileMetadataRequest(const ClearFileMetadataRequest& other1231) {
   fileIds = other1231.fileIds;
 }
 ClearFileMetadataRequest& ClearFileMetadataRequest::operator=(const ClearFileMetadataRequest& other1232) {
   fileIds = other1232.fileIds;
-=======
-ClearFileMetadataRequest::ClearFileMetadataRequest(const ClearFileMetadataRequest& other1225) {
-  fileIds = other1225.fileIds;
-}
-ClearFileMetadataRequest& ClearFileMetadataRequest::operator=(const ClearFileMetadataRequest& other1226) {
-  fileIds = other1226.fileIds;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-ClearFileMetadataRequest::ClearFileMetadataRequest(const ClearFileMetadataRequest& other1231) {
-  fileIds = other1231.fileIds;
-}
-ClearFileMetadataRequest& ClearFileMetadataRequest::operator=(const ClearFileMetadataRequest& other1232) {
-  fileIds = other1232.fileIds;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ClearFileMetadataRequest::printTo(std::ostream& out) const {
@@ -35026,27 +33753,11 @@ void swap(CacheFileMetadataResult &a, CacheFileMetadataResult &b) {
   swap(a.isSupported, b.isSupported);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 CacheFileMetadataResult::CacheFileMetadataResult(const CacheFileMetadataResult& other1233) noexcept {
   isSupported = other1233.isSupported;
 }
 CacheFileMetadataResult& CacheFileMetadataResult::operator=(const CacheFileMetadataResult& other1234) noexcept {
   isSupported = other1234.isSupported;
-=======
-CacheFileMetadataResult::CacheFileMetadataResult(const CacheFileMetadataResult& other1227) noexcept {
-  isSupported = other1227.isSupported;
-}
-CacheFileMetadataResult& CacheFileMetadataResult::operator=(const CacheFileMetadataResult& other1228) noexcept {
-  isSupported = other1228.isSupported;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-CacheFileMetadataResult::CacheFileMetadataResult(const CacheFileMetadataResult& other1233) noexcept {
-  isSupported = other1233.isSupported;
-}
-CacheFileMetadataResult& CacheFileMetadataResult::operator=(const CacheFileMetadataResult& other1234) noexcept {
-  isSupported = other1234.isSupported;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void CacheFileMetadataResult::printTo(std::ostream& out) const {
@@ -35193,17 +33904,12 @@ void swap(CacheFileMetadataRequest &a, CacheFileMetadataRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 CacheFileMetadataRequest::CacheFileMetadataRequest(const CacheFileMetadataRequest& other1235) {
   dbName = other1235.dbName;
   tblName = other1235.tblName;
   partName = other1235.partName;
   isAllParts = other1235.isAllParts;
   __isset = other1235.__isset;
-<<<<<<< HEAD
 }
 CacheFileMetadataRequest& CacheFileMetadataRequest::operator=(const CacheFileMetadataRequest& other1236) {
   dbName = other1236.dbName;
@@ -35211,30 +33917,6 @@ CacheFileMetadataRequest& CacheFileMetadataRequest::operator=(const CacheFileMet
   partName = other1236.partName;
   isAllParts = other1236.isAllParts;
   __isset = other1236.__isset;
-=======
-CacheFileMetadataRequest::CacheFileMetadataRequest(const CacheFileMetadataRequest& other1229) {
-  dbName = other1229.dbName;
-  tblName = other1229.tblName;
-  partName = other1229.partName;
-  isAllParts = other1229.isAllParts;
-  __isset = other1229.__isset;
-}
-CacheFileMetadataRequest& CacheFileMetadataRequest::operator=(const CacheFileMetadataRequest& other1230) {
-  dbName = other1230.dbName;
-  tblName = other1230.tblName;
-  partName = other1230.partName;
-  isAllParts = other1230.isAllParts;
-  __isset = other1230.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-CacheFileMetadataRequest& CacheFileMetadataRequest::operator=(const CacheFileMetadataRequest& other1236) {
-  dbName = other1236.dbName;
-  tblName = other1236.tblName;
-  partName = other1236.partName;
-  isAllParts = other1236.isAllParts;
-  __isset = other1236.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void CacheFileMetadataRequest::printTo(std::ostream& out) const {
@@ -35288,33 +33970,14 @@ uint32_t GetAllFunctionsResponse::read(::apache::thrift::protocol::TProtocol* ip
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->functions.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1237;
             ::apache::thrift::protocol::TType _etype1240;
             xfer += iprot->readListBegin(_etype1240, _size1237);
             this->functions.resize(_size1237);
             uint32_t _i1241;
             for (_i1241 = 0; _i1241 < _size1237; ++_i1241)
-<<<<<<< HEAD
             {
               xfer += this->functions[_i1241].read(iprot);
-=======
-            uint32_t _size1231;
-            ::apache::thrift::protocol::TType _etype1234;
-            xfer += iprot->readListBegin(_etype1234, _size1231);
-            this->functions.resize(_size1231);
-            uint32_t _i1235;
-            for (_i1235 = 0; _i1235 < _size1231; ++_i1235)
-            {
-              xfer += this->functions[_i1235].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->functions[_i1241].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -35344,24 +34007,10 @@ uint32_t GetAllFunctionsResponse::write(::apache::thrift::protocol::TProtocol* o
     xfer += oprot->writeFieldBegin("functions", ::apache::thrift::protocol::T_LIST, 1);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->functions.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<Function> ::const_iterator _iter1242;
       for (_iter1242 = this->functions.begin(); _iter1242 != this->functions.end(); ++_iter1242)
       {
         xfer += (*_iter1242).write(oprot);
-=======
-      std::vector<Function> ::const_iterator _iter1236;
-      for (_iter1236 = this->functions.begin(); _iter1236 != this->functions.end(); ++_iter1236)
-      {
-        xfer += (*_iter1236).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<Function> ::const_iterator _iter1242;
-      for (_iter1242 = this->functions.begin(); _iter1242 != this->functions.end(); ++_iter1242)
-      {
-        xfer += (*_iter1242).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -35378,8 +34027,6 @@ void swap(GetAllFunctionsResponse &a, GetAllFunctionsResponse &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetAllFunctionsResponse::GetAllFunctionsResponse(const GetAllFunctionsResponse& other1243) {
   functions = other1243.functions;
   __isset = other1243.__isset;
@@ -35387,24 +34034,6 @@ GetAllFunctionsResponse::GetAllFunctionsResponse(const GetAllFunctionsResponse& 
 GetAllFunctionsResponse& GetAllFunctionsResponse::operator=(const GetAllFunctionsResponse& other1244) {
   functions = other1244.functions;
   __isset = other1244.__isset;
-=======
-GetAllFunctionsResponse::GetAllFunctionsResponse(const GetAllFunctionsResponse& other1237) {
-  functions = other1237.functions;
-  __isset = other1237.__isset;
-}
-GetAllFunctionsResponse& GetAllFunctionsResponse::operator=(const GetAllFunctionsResponse& other1238) {
-  functions = other1238.functions;
-  __isset = other1238.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetAllFunctionsResponse::GetAllFunctionsResponse(const GetAllFunctionsResponse& other1243) {
-  functions = other1243.functions;
-  __isset = other1243.__isset;
-}
-GetAllFunctionsResponse& GetAllFunctionsResponse::operator=(const GetAllFunctionsResponse& other1244) {
-  functions = other1244.functions;
-  __isset = other1244.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetAllFunctionsResponse::printTo(std::ostream& out) const {
@@ -35455,39 +34084,16 @@ uint32_t ClientCapabilities::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->values.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1245;
             ::apache::thrift::protocol::TType _etype1248;
             xfer += iprot->readListBegin(_etype1248, _size1245);
             this->values.resize(_size1245);
             uint32_t _i1249;
             for (_i1249 = 0; _i1249 < _size1245; ++_i1249)
-<<<<<<< HEAD
             {
               int32_t ecast1250;
               xfer += iprot->readI32(ecast1250);
               this->values[_i1249] = static_cast<ClientCapability::type>(ecast1250);
-=======
-            uint32_t _size1239;
-            ::apache::thrift::protocol::TType _etype1242;
-            xfer += iprot->readListBegin(_etype1242, _size1239);
-            this->values.resize(_size1239);
-            uint32_t _i1243;
-            for (_i1243 = 0; _i1243 < _size1239; ++_i1243)
-            {
-              int32_t ecast1244;
-              xfer += iprot->readI32(ecast1244);
-              this->values[_i1243] = static_cast<ClientCapability::type>(ecast1244);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              int32_t ecast1250;
-              xfer += iprot->readI32(ecast1250);
-              this->values[_i1249] = static_cast<ClientCapability::type>(ecast1250);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -35518,24 +34124,10 @@ uint32_t ClientCapabilities::write(::apache::thrift::protocol::TProtocol* oprot)
   xfer += oprot->writeFieldBegin("values", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I32, static_cast<uint32_t>(this->values.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<ClientCapability::type> ::const_iterator _iter1251;
     for (_iter1251 = this->values.begin(); _iter1251 != this->values.end(); ++_iter1251)
     {
       xfer += oprot->writeI32(static_cast<int32_t>((*_iter1251)));
-=======
-    std::vector<ClientCapability::type> ::const_iterator _iter1245;
-    for (_iter1245 = this->values.begin(); _iter1245 != this->values.end(); ++_iter1245)
-    {
-      xfer += oprot->writeI32(static_cast<int32_t>((*_iter1245)));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<ClientCapability::type> ::const_iterator _iter1251;
-    for (_iter1251 = this->values.begin(); _iter1251 != this->values.end(); ++_iter1251)
-    {
-      xfer += oprot->writeI32(static_cast<int32_t>((*_iter1251)));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -35551,27 +34143,11 @@ void swap(ClientCapabilities &a, ClientCapabilities &b) {
   swap(a.values, b.values);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ClientCapabilities::ClientCapabilities(const ClientCapabilities& other1252) {
   values = other1252.values;
 }
 ClientCapabilities& ClientCapabilities::operator=(const ClientCapabilities& other1253) {
   values = other1253.values;
-=======
-ClientCapabilities::ClientCapabilities(const ClientCapabilities& other1246) {
-  values = other1246.values;
-}
-ClientCapabilities& ClientCapabilities::operator=(const ClientCapabilities& other1247) {
-  values = other1247.values;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-ClientCapabilities::ClientCapabilities(const ClientCapabilities& other1252) {
-  values = other1252.values;
-}
-ClientCapabilities& ClientCapabilities::operator=(const ClientCapabilities& other1253) {
-  values = other1253.values;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ClientCapabilities::printTo(std::ostream& out) const {
@@ -35629,33 +34205,14 @@ uint32_t GetProjectionsSpec::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->fieldList.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1254;
             ::apache::thrift::protocol::TType _etype1257;
             xfer += iprot->readListBegin(_etype1257, _size1254);
             this->fieldList.resize(_size1254);
             uint32_t _i1258;
             for (_i1258 = 0; _i1258 < _size1254; ++_i1258)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->fieldList[_i1258]);
-=======
-            uint32_t _size1248;
-            ::apache::thrift::protocol::TType _etype1251;
-            xfer += iprot->readListBegin(_etype1251, _size1248);
-            this->fieldList.resize(_size1248);
-            uint32_t _i1252;
-            for (_i1252 = 0; _i1252 < _size1248; ++_i1252)
-            {
-              xfer += iprot->readString(this->fieldList[_i1252]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->fieldList[_i1258]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -35700,24 +34257,10 @@ uint32_t GetProjectionsSpec::write(::apache::thrift::protocol::TProtocol* oprot)
   xfer += oprot->writeFieldBegin("fieldList", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->fieldList.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter1259;
     for (_iter1259 = this->fieldList.begin(); _iter1259 != this->fieldList.end(); ++_iter1259)
     {
       xfer += oprot->writeString((*_iter1259));
-=======
-    std::vector<std::string> ::const_iterator _iter1253;
-    for (_iter1253 = this->fieldList.begin(); _iter1253 != this->fieldList.end(); ++_iter1253)
-    {
-      xfer += oprot->writeString((*_iter1253));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<std::string> ::const_iterator _iter1259;
-    for (_iter1259 = this->fieldList.begin(); _iter1259 != this->fieldList.end(); ++_iter1259)
-    {
-      xfer += oprot->writeString((*_iter1259));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -35744,43 +34287,17 @@ void swap(GetProjectionsSpec &a, GetProjectionsSpec &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetProjectionsSpec::GetProjectionsSpec(const GetProjectionsSpec& other1260) {
   fieldList = other1260.fieldList;
   includeParamKeyPattern = other1260.includeParamKeyPattern;
   excludeParamKeyPattern = other1260.excludeParamKeyPattern;
   __isset = other1260.__isset;
-<<<<<<< HEAD
 }
 GetProjectionsSpec& GetProjectionsSpec::operator=(const GetProjectionsSpec& other1261) {
   fieldList = other1261.fieldList;
   includeParamKeyPattern = other1261.includeParamKeyPattern;
   excludeParamKeyPattern = other1261.excludeParamKeyPattern;
   __isset = other1261.__isset;
-=======
-GetProjectionsSpec::GetProjectionsSpec(const GetProjectionsSpec& other1254) {
-  fieldList = other1254.fieldList;
-  includeParamKeyPattern = other1254.includeParamKeyPattern;
-  excludeParamKeyPattern = other1254.excludeParamKeyPattern;
-  __isset = other1254.__isset;
-}
-GetProjectionsSpec& GetProjectionsSpec::operator=(const GetProjectionsSpec& other1255) {
-  fieldList = other1255.fieldList;
-  includeParamKeyPattern = other1255.includeParamKeyPattern;
-  excludeParamKeyPattern = other1255.excludeParamKeyPattern;
-  __isset = other1255.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetProjectionsSpec& GetProjectionsSpec::operator=(const GetProjectionsSpec& other1261) {
-  fieldList = other1261.fieldList;
-  includeParamKeyPattern = other1261.includeParamKeyPattern;
-  excludeParamKeyPattern = other1261.excludeParamKeyPattern;
-  __isset = other1261.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetProjectionsSpec::printTo(std::ostream& out) const {
@@ -35931,33 +34448,14 @@ uint32_t GetTableRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->processorCapabilities.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1262;
             ::apache::thrift::protocol::TType _etype1265;
             xfer += iprot->readListBegin(_etype1265, _size1262);
             this->processorCapabilities.resize(_size1262);
             uint32_t _i1266;
             for (_i1266 = 0; _i1266 < _size1262; ++_i1266)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->processorCapabilities[_i1266]);
-=======
-            uint32_t _size1256;
-            ::apache::thrift::protocol::TType _etype1259;
-            xfer += iprot->readListBegin(_etype1259, _size1256);
-            this->processorCapabilities.resize(_size1256);
-            uint32_t _i1260;
-            for (_i1260 = 0; _i1260 < _size1256; ++_i1260)
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1260]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1266]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -36051,24 +34549,10 @@ uint32_t GetTableRequest::write(::apache::thrift::protocol::TProtocol* oprot) co
     xfer += oprot->writeFieldBegin("processorCapabilities", ::apache::thrift::protocol::T_LIST, 8);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->processorCapabilities.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1267;
       for (_iter1267 = this->processorCapabilities.begin(); _iter1267 != this->processorCapabilities.end(); ++_iter1267)
       {
         xfer += oprot->writeString((*_iter1267));
-=======
-      std::vector<std::string> ::const_iterator _iter1261;
-      for (_iter1261 = this->processorCapabilities.begin(); _iter1261 != this->processorCapabilities.end(); ++_iter1261)
-      {
-        xfer += oprot->writeString((*_iter1261));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1267;
-      for (_iter1267 = this->processorCapabilities.begin(); _iter1267 != this->processorCapabilities.end(); ++_iter1267)
-      {
-        xfer += oprot->writeString((*_iter1267));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -36115,10 +34599,6 @@ void swap(GetTableRequest &a, GetTableRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetTableRequest::GetTableRequest(const GetTableRequest& other1268) {
   dbName = other1268.dbName;
   tblName = other1268.tblName;
@@ -36132,7 +34612,6 @@ GetTableRequest::GetTableRequest(const GetTableRequest& other1268) {
   id = other1268.id;
   getFileMetadata = other1268.getFileMetadata;
   __isset = other1268.__isset;
-<<<<<<< HEAD
 }
 GetTableRequest& GetTableRequest::operator=(const GetTableRequest& other1269) {
   dbName = other1269.dbName;
@@ -36147,51 +34626,6 @@ GetTableRequest& GetTableRequest::operator=(const GetTableRequest& other1269) {
   id = other1269.id;
   getFileMetadata = other1269.getFileMetadata;
   __isset = other1269.__isset;
-=======
-GetTableRequest::GetTableRequest(const GetTableRequest& other1262) {
-  dbName = other1262.dbName;
-  tblName = other1262.tblName;
-  capabilities = other1262.capabilities;
-  catName = other1262.catName;
-  validWriteIdList = other1262.validWriteIdList;
-  getColumnStats = other1262.getColumnStats;
-  processorCapabilities = other1262.processorCapabilities;
-  processorIdentifier = other1262.processorIdentifier;
-  engine = other1262.engine;
-  id = other1262.id;
-  getFileMetadata = other1262.getFileMetadata;
-  __isset = other1262.__isset;
-}
-GetTableRequest& GetTableRequest::operator=(const GetTableRequest& other1263) {
-  dbName = other1263.dbName;
-  tblName = other1263.tblName;
-  capabilities = other1263.capabilities;
-  catName = other1263.catName;
-  validWriteIdList = other1263.validWriteIdList;
-  getColumnStats = other1263.getColumnStats;
-  processorCapabilities = other1263.processorCapabilities;
-  processorIdentifier = other1263.processorIdentifier;
-  engine = other1263.engine;
-  id = other1263.id;
-  getFileMetadata = other1263.getFileMetadata;
-  __isset = other1263.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetTableRequest& GetTableRequest::operator=(const GetTableRequest& other1269) {
-  dbName = other1269.dbName;
-  tblName = other1269.tblName;
-  capabilities = other1269.capabilities;
-  catName = other1269.catName;
-  validWriteIdList = other1269.validWriteIdList;
-  getColumnStats = other1269.getColumnStats;
-  processorCapabilities = other1269.processorCapabilities;
-  processorIdentifier = other1269.processorIdentifier;
-  engine = other1269.engine;
-  id = other1269.id;
-  getFileMetadata = other1269.getFileMetadata;
-  __isset = other1269.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetTableRequest::printTo(std::ostream& out) const {
@@ -36309,38 +34743,15 @@ void swap(GetTableResult &a, GetTableResult &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetTableResult::GetTableResult(const GetTableResult& other1270) {
   table = other1270.table;
   isStatsCompliant = other1270.isStatsCompliant;
   __isset = other1270.__isset;
-<<<<<<< HEAD
 }
 GetTableResult& GetTableResult::operator=(const GetTableResult& other1271) {
   table = other1271.table;
   isStatsCompliant = other1271.isStatsCompliant;
   __isset = other1271.__isset;
-=======
-GetTableResult::GetTableResult(const GetTableResult& other1264) {
-  table = other1264.table;
-  isStatsCompliant = other1264.isStatsCompliant;
-  __isset = other1264.__isset;
-}
-GetTableResult& GetTableResult::operator=(const GetTableResult& other1265) {
-  table = other1265.table;
-  isStatsCompliant = other1265.isStatsCompliant;
-  __isset = other1265.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetTableResult& GetTableResult::operator=(const GetTableResult& other1271) {
-  table = other1271.table;
-  isStatsCompliant = other1271.isStatsCompliant;
-  __isset = other1271.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetTableResult::printTo(std::ostream& out) const {
@@ -36435,33 +34846,14 @@ uint32_t GetTablesRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->tblNames.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1272;
             ::apache::thrift::protocol::TType _etype1275;
             xfer += iprot->readListBegin(_etype1275, _size1272);
             this->tblNames.resize(_size1272);
             uint32_t _i1276;
             for (_i1276 = 0; _i1276 < _size1272; ++_i1276)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->tblNames[_i1276]);
-=======
-            uint32_t _size1266;
-            ::apache::thrift::protocol::TType _etype1269;
-            xfer += iprot->readListBegin(_etype1269, _size1266);
-            this->tblNames.resize(_size1266);
-            uint32_t _i1270;
-            for (_i1270 = 0; _i1270 < _size1266; ++_i1270)
-            {
-              xfer += iprot->readString(this->tblNames[_i1270]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->tblNames[_i1276]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -36490,33 +34882,14 @@ uint32_t GetTablesRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->processorCapabilities.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1277;
             ::apache::thrift::protocol::TType _etype1280;
             xfer += iprot->readListBegin(_etype1280, _size1277);
             this->processorCapabilities.resize(_size1277);
             uint32_t _i1281;
             for (_i1281 = 0; _i1281 < _size1277; ++_i1281)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->processorCapabilities[_i1281]);
-=======
-            uint32_t _size1271;
-            ::apache::thrift::protocol::TType _etype1274;
-            xfer += iprot->readListBegin(_etype1274, _size1271);
-            this->processorCapabilities.resize(_size1271);
-            uint32_t _i1275;
-            for (_i1275 = 0; _i1275 < _size1271; ++_i1275)
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1275]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1281]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -36576,24 +34949,10 @@ uint32_t GetTablesRequest::write(::apache::thrift::protocol::TProtocol* oprot) c
     xfer += oprot->writeFieldBegin("tblNames", ::apache::thrift::protocol::T_LIST, 2);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->tblNames.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1282;
       for (_iter1282 = this->tblNames.begin(); _iter1282 != this->tblNames.end(); ++_iter1282)
       {
         xfer += oprot->writeString((*_iter1282));
-=======
-      std::vector<std::string> ::const_iterator _iter1276;
-      for (_iter1276 = this->tblNames.begin(); _iter1276 != this->tblNames.end(); ++_iter1276)
-      {
-        xfer += oprot->writeString((*_iter1276));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1282;
-      for (_iter1282 = this->tblNames.begin(); _iter1282 != this->tblNames.end(); ++_iter1282)
-      {
-        xfer += oprot->writeString((*_iter1282));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -36613,24 +34972,10 @@ uint32_t GetTablesRequest::write(::apache::thrift::protocol::TProtocol* oprot) c
     xfer += oprot->writeFieldBegin("processorCapabilities", ::apache::thrift::protocol::T_LIST, 5);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->processorCapabilities.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1283;
       for (_iter1283 = this->processorCapabilities.begin(); _iter1283 != this->processorCapabilities.end(); ++_iter1283)
       {
         xfer += oprot->writeString((*_iter1283));
-=======
-      std::vector<std::string> ::const_iterator _iter1277;
-      for (_iter1277 = this->processorCapabilities.begin(); _iter1277 != this->processorCapabilities.end(); ++_iter1277)
-      {
-        xfer += oprot->writeString((*_iter1277));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1283;
-      for (_iter1283 = this->processorCapabilities.begin(); _iter1283 != this->processorCapabilities.end(); ++_iter1283)
-      {
-        xfer += oprot->writeString((*_iter1283));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -36669,10 +35014,6 @@ void swap(GetTablesRequest &a, GetTablesRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetTablesRequest::GetTablesRequest(const GetTablesRequest& other1284) {
   dbName = other1284.dbName;
   tblNames = other1284.tblNames;
@@ -36683,7 +35024,6 @@ GetTablesRequest::GetTablesRequest(const GetTablesRequest& other1284) {
   projectionSpec = other1284.projectionSpec;
   tablesPattern = other1284.tablesPattern;
   __isset = other1284.__isset;
-<<<<<<< HEAD
 }
 GetTablesRequest& GetTablesRequest::operator=(const GetTablesRequest& other1285) {
   dbName = other1285.dbName;
@@ -36695,42 +35035,6 @@ GetTablesRequest& GetTablesRequest::operator=(const GetTablesRequest& other1285)
   projectionSpec = other1285.projectionSpec;
   tablesPattern = other1285.tablesPattern;
   __isset = other1285.__isset;
-=======
-GetTablesRequest::GetTablesRequest(const GetTablesRequest& other1278) {
-  dbName = other1278.dbName;
-  tblNames = other1278.tblNames;
-  capabilities = other1278.capabilities;
-  catName = other1278.catName;
-  processorCapabilities = other1278.processorCapabilities;
-  processorIdentifier = other1278.processorIdentifier;
-  projectionSpec = other1278.projectionSpec;
-  tablesPattern = other1278.tablesPattern;
-  __isset = other1278.__isset;
-}
-GetTablesRequest& GetTablesRequest::operator=(const GetTablesRequest& other1279) {
-  dbName = other1279.dbName;
-  tblNames = other1279.tblNames;
-  capabilities = other1279.capabilities;
-  catName = other1279.catName;
-  processorCapabilities = other1279.processorCapabilities;
-  processorIdentifier = other1279.processorIdentifier;
-  projectionSpec = other1279.projectionSpec;
-  tablesPattern = other1279.tablesPattern;
-  __isset = other1279.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetTablesRequest& GetTablesRequest::operator=(const GetTablesRequest& other1285) {
-  dbName = other1285.dbName;
-  tblNames = other1285.tblNames;
-  capabilities = other1285.capabilities;
-  catName = other1285.catName;
-  processorCapabilities = other1285.processorCapabilities;
-  processorIdentifier = other1285.processorIdentifier;
-  projectionSpec = other1285.projectionSpec;
-  tablesPattern = other1285.tablesPattern;
-  __isset = other1285.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetTablesRequest::printTo(std::ostream& out) const {
@@ -36788,33 +35092,14 @@ uint32_t GetTablesResult::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->tables.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1286;
             ::apache::thrift::protocol::TType _etype1289;
             xfer += iprot->readListBegin(_etype1289, _size1286);
             this->tables.resize(_size1286);
             uint32_t _i1290;
             for (_i1290 = 0; _i1290 < _size1286; ++_i1290)
-<<<<<<< HEAD
             {
               xfer += this->tables[_i1290].read(iprot);
-=======
-            uint32_t _size1280;
-            ::apache::thrift::protocol::TType _etype1283;
-            xfer += iprot->readListBegin(_etype1283, _size1280);
-            this->tables.resize(_size1280);
-            uint32_t _i1284;
-            for (_i1284 = 0; _i1284 < _size1280; ++_i1284)
-            {
-              xfer += this->tables[_i1284].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->tables[_i1290].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -36845,24 +35130,10 @@ uint32_t GetTablesResult::write(::apache::thrift::protocol::TProtocol* oprot) co
   xfer += oprot->writeFieldBegin("tables", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->tables.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<Table> ::const_iterator _iter1291;
     for (_iter1291 = this->tables.begin(); _iter1291 != this->tables.end(); ++_iter1291)
     {
       xfer += (*_iter1291).write(oprot);
-=======
-    std::vector<Table> ::const_iterator _iter1285;
-    for (_iter1285 = this->tables.begin(); _iter1285 != this->tables.end(); ++_iter1285)
-    {
-      xfer += (*_iter1285).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<Table> ::const_iterator _iter1291;
-    for (_iter1291 = this->tables.begin(); _iter1291 != this->tables.end(); ++_iter1291)
-    {
-      xfer += (*_iter1291).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -36878,27 +35149,11 @@ void swap(GetTablesResult &a, GetTablesResult &b) {
   swap(a.tables, b.tables);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetTablesResult::GetTablesResult(const GetTablesResult& other1292) {
   tables = other1292.tables;
 }
 GetTablesResult& GetTablesResult::operator=(const GetTablesResult& other1293) {
   tables = other1293.tables;
-=======
-GetTablesResult::GetTablesResult(const GetTablesResult& other1286) {
-  tables = other1286.tables;
-}
-GetTablesResult& GetTablesResult::operator=(const GetTablesResult& other1287) {
-  tables = other1287.tables;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetTablesResult::GetTablesResult(const GetTablesResult& other1292) {
-  tables = other1292.tables;
-}
-GetTablesResult& GetTablesResult::operator=(const GetTablesResult& other1293) {
-  tables = other1293.tables;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetTablesResult::printTo(std::ostream& out) const {
@@ -37019,33 +35274,14 @@ uint32_t GetTablesExtRequest::read(::apache::thrift::protocol::TProtocol* iprot)
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->processorCapabilities.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1294;
             ::apache::thrift::protocol::TType _etype1297;
             xfer += iprot->readListBegin(_etype1297, _size1294);
             this->processorCapabilities.resize(_size1294);
             uint32_t _i1298;
             for (_i1298 = 0; _i1298 < _size1294; ++_i1298)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->processorCapabilities[_i1298]);
-=======
-            uint32_t _size1288;
-            ::apache::thrift::protocol::TType _etype1291;
-            xfer += iprot->readListBegin(_etype1291, _size1288);
-            this->processorCapabilities.resize(_size1288);
-            uint32_t _i1292;
-            for (_i1292 = 0; _i1292 < _size1288; ++_i1292)
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1292]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1298]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -37112,24 +35348,10 @@ uint32_t GetTablesExtRequest::write(::apache::thrift::protocol::TProtocol* oprot
     xfer += oprot->writeFieldBegin("processorCapabilities", ::apache::thrift::protocol::T_LIST, 6);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->processorCapabilities.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1299;
       for (_iter1299 = this->processorCapabilities.begin(); _iter1299 != this->processorCapabilities.end(); ++_iter1299)
       {
         xfer += oprot->writeString((*_iter1299));
-=======
-      std::vector<std::string> ::const_iterator _iter1293;
-      for (_iter1293 = this->processorCapabilities.begin(); _iter1293 != this->processorCapabilities.end(); ++_iter1293)
-      {
-        xfer += oprot->writeString((*_iter1293));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1299;
-      for (_iter1299 = this->processorCapabilities.begin(); _iter1299 != this->processorCapabilities.end(); ++_iter1299)
-      {
-        xfer += oprot->writeString((*_iter1299));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -37157,10 +35379,6 @@ void swap(GetTablesExtRequest &a, GetTablesExtRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetTablesExtRequest::GetTablesExtRequest(const GetTablesExtRequest& other1300) {
   catalog = other1300.catalog;
   database = other1300.database;
@@ -37170,7 +35388,6 @@ GetTablesExtRequest::GetTablesExtRequest(const GetTablesExtRequest& other1300) {
   processorCapabilities = other1300.processorCapabilities;
   processorIdentifier = other1300.processorIdentifier;
   __isset = other1300.__isset;
-<<<<<<< HEAD
 }
 GetTablesExtRequest& GetTablesExtRequest::operator=(const GetTablesExtRequest& other1301) {
   catalog = other1301.catalog;
@@ -37181,39 +35398,6 @@ GetTablesExtRequest& GetTablesExtRequest::operator=(const GetTablesExtRequest& o
   processorCapabilities = other1301.processorCapabilities;
   processorIdentifier = other1301.processorIdentifier;
   __isset = other1301.__isset;
-=======
-GetTablesExtRequest::GetTablesExtRequest(const GetTablesExtRequest& other1294) {
-  catalog = other1294.catalog;
-  database = other1294.database;
-  tableNamePattern = other1294.tableNamePattern;
-  requestedFields = other1294.requestedFields;
-  limit = other1294.limit;
-  processorCapabilities = other1294.processorCapabilities;
-  processorIdentifier = other1294.processorIdentifier;
-  __isset = other1294.__isset;
-}
-GetTablesExtRequest& GetTablesExtRequest::operator=(const GetTablesExtRequest& other1295) {
-  catalog = other1295.catalog;
-  database = other1295.database;
-  tableNamePattern = other1295.tableNamePattern;
-  requestedFields = other1295.requestedFields;
-  limit = other1295.limit;
-  processorCapabilities = other1295.processorCapabilities;
-  processorIdentifier = other1295.processorIdentifier;
-  __isset = other1295.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetTablesExtRequest& GetTablesExtRequest::operator=(const GetTablesExtRequest& other1301) {
-  catalog = other1301.catalog;
-  database = other1301.database;
-  tableNamePattern = other1301.tableNamePattern;
-  requestedFields = other1301.requestedFields;
-  limit = other1301.limit;
-  processorCapabilities = other1301.processorCapabilities;
-  processorIdentifier = other1301.processorIdentifier;
-  __isset = other1301.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetTablesExtRequest::printTo(std::ostream& out) const {
@@ -37301,33 +35485,14 @@ uint32_t ExtendedTableInfo::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->requiredReadCapabilities.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1302;
             ::apache::thrift::protocol::TType _etype1305;
             xfer += iprot->readListBegin(_etype1305, _size1302);
             this->requiredReadCapabilities.resize(_size1302);
             uint32_t _i1306;
             for (_i1306 = 0; _i1306 < _size1302; ++_i1306)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->requiredReadCapabilities[_i1306]);
-=======
-            uint32_t _size1296;
-            ::apache::thrift::protocol::TType _etype1299;
-            xfer += iprot->readListBegin(_etype1299, _size1296);
-            this->requiredReadCapabilities.resize(_size1296);
-            uint32_t _i1300;
-            for (_i1300 = 0; _i1300 < _size1296; ++_i1300)
-            {
-              xfer += iprot->readString(this->requiredReadCapabilities[_i1300]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->requiredReadCapabilities[_i1306]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -37340,33 +35505,14 @@ uint32_t ExtendedTableInfo::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->requiredWriteCapabilities.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1307;
             ::apache::thrift::protocol::TType _etype1310;
             xfer += iprot->readListBegin(_etype1310, _size1307);
             this->requiredWriteCapabilities.resize(_size1307);
             uint32_t _i1311;
             for (_i1311 = 0; _i1311 < _size1307; ++_i1311)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->requiredWriteCapabilities[_i1311]);
-=======
-            uint32_t _size1301;
-            ::apache::thrift::protocol::TType _etype1304;
-            xfer += iprot->readListBegin(_etype1304, _size1301);
-            this->requiredWriteCapabilities.resize(_size1301);
-            uint32_t _i1305;
-            for (_i1305 = 0; _i1305 < _size1301; ++_i1305)
-            {
-              xfer += iprot->readString(this->requiredWriteCapabilities[_i1305]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->requiredWriteCapabilities[_i1311]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -37407,24 +35553,10 @@ uint32_t ExtendedTableInfo::write(::apache::thrift::protocol::TProtocol* oprot) 
     xfer += oprot->writeFieldBegin("requiredReadCapabilities", ::apache::thrift::protocol::T_LIST, 3);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->requiredReadCapabilities.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1312;
       for (_iter1312 = this->requiredReadCapabilities.begin(); _iter1312 != this->requiredReadCapabilities.end(); ++_iter1312)
       {
         xfer += oprot->writeString((*_iter1312));
-=======
-      std::vector<std::string> ::const_iterator _iter1306;
-      for (_iter1306 = this->requiredReadCapabilities.begin(); _iter1306 != this->requiredReadCapabilities.end(); ++_iter1306)
-      {
-        xfer += oprot->writeString((*_iter1306));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1312;
-      for (_iter1312 = this->requiredReadCapabilities.begin(); _iter1312 != this->requiredReadCapabilities.end(); ++_iter1312)
-      {
-        xfer += oprot->writeString((*_iter1312));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -37434,24 +35566,10 @@ uint32_t ExtendedTableInfo::write(::apache::thrift::protocol::TProtocol* oprot) 
     xfer += oprot->writeFieldBegin("requiredWriteCapabilities", ::apache::thrift::protocol::T_LIST, 4);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->requiredWriteCapabilities.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1313;
       for (_iter1313 = this->requiredWriteCapabilities.begin(); _iter1313 != this->requiredWriteCapabilities.end(); ++_iter1313)
       {
         xfer += oprot->writeString((*_iter1313));
-=======
-      std::vector<std::string> ::const_iterator _iter1307;
-      for (_iter1307 = this->requiredWriteCapabilities.begin(); _iter1307 != this->requiredWriteCapabilities.end(); ++_iter1307)
-      {
-        xfer += oprot->writeString((*_iter1307));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1313;
-      for (_iter1313 = this->requiredWriteCapabilities.begin(); _iter1313 != this->requiredWriteCapabilities.end(); ++_iter1313)
-      {
-        xfer += oprot->writeString((*_iter1313));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -37471,17 +35589,12 @@ void swap(ExtendedTableInfo &a, ExtendedTableInfo &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 ExtendedTableInfo::ExtendedTableInfo(const ExtendedTableInfo& other1314) {
   tblName = other1314.tblName;
   accessType = other1314.accessType;
   requiredReadCapabilities = other1314.requiredReadCapabilities;
   requiredWriteCapabilities = other1314.requiredWriteCapabilities;
   __isset = other1314.__isset;
-<<<<<<< HEAD
 }
 ExtendedTableInfo& ExtendedTableInfo::operator=(const ExtendedTableInfo& other1315) {
   tblName = other1315.tblName;
@@ -37489,30 +35602,6 @@ ExtendedTableInfo& ExtendedTableInfo::operator=(const ExtendedTableInfo& other13
   requiredReadCapabilities = other1315.requiredReadCapabilities;
   requiredWriteCapabilities = other1315.requiredWriteCapabilities;
   __isset = other1315.__isset;
-=======
-ExtendedTableInfo::ExtendedTableInfo(const ExtendedTableInfo& other1308) {
-  tblName = other1308.tblName;
-  accessType = other1308.accessType;
-  requiredReadCapabilities = other1308.requiredReadCapabilities;
-  requiredWriteCapabilities = other1308.requiredWriteCapabilities;
-  __isset = other1308.__isset;
-}
-ExtendedTableInfo& ExtendedTableInfo::operator=(const ExtendedTableInfo& other1309) {
-  tblName = other1309.tblName;
-  accessType = other1309.accessType;
-  requiredReadCapabilities = other1309.requiredReadCapabilities;
-  requiredWriteCapabilities = other1309.requiredWriteCapabilities;
-  __isset = other1309.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-ExtendedTableInfo& ExtendedTableInfo::operator=(const ExtendedTableInfo& other1315) {
-  tblName = other1315.tblName;
-  accessType = other1315.accessType;
-  requiredReadCapabilities = other1315.requiredReadCapabilities;
-  requiredWriteCapabilities = other1315.requiredWriteCapabilities;
-  __isset = other1315.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ExtendedTableInfo::printTo(std::ostream& out) const {
@@ -37597,33 +35686,14 @@ uint32_t GetDatabaseRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->processorCapabilities.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1316;
             ::apache::thrift::protocol::TType _etype1319;
             xfer += iprot->readListBegin(_etype1319, _size1316);
             this->processorCapabilities.resize(_size1316);
             uint32_t _i1320;
             for (_i1320 = 0; _i1320 < _size1316; ++_i1320)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->processorCapabilities[_i1320]);
-=======
-            uint32_t _size1310;
-            ::apache::thrift::protocol::TType _etype1313;
-            xfer += iprot->readListBegin(_etype1313, _size1310);
-            this->processorCapabilities.resize(_size1310);
-            uint32_t _i1314;
-            for (_i1314 = 0; _i1314 < _size1310; ++_i1314)
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1314]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1320]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -37671,24 +35741,10 @@ uint32_t GetDatabaseRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("processorCapabilities", ::apache::thrift::protocol::T_LIST, 3);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->processorCapabilities.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1321;
       for (_iter1321 = this->processorCapabilities.begin(); _iter1321 != this->processorCapabilities.end(); ++_iter1321)
       {
         xfer += oprot->writeString((*_iter1321));
-=======
-      std::vector<std::string> ::const_iterator _iter1315;
-      for (_iter1315 = this->processorCapabilities.begin(); _iter1315 != this->processorCapabilities.end(); ++_iter1315)
-      {
-        xfer += oprot->writeString((*_iter1315));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1321;
-      for (_iter1321 = this->processorCapabilities.begin(); _iter1321 != this->processorCapabilities.end(); ++_iter1321)
-      {
-        xfer += oprot->writeString((*_iter1321));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -37713,17 +35769,12 @@ void swap(GetDatabaseRequest &a, GetDatabaseRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetDatabaseRequest::GetDatabaseRequest(const GetDatabaseRequest& other1322) {
   name = other1322.name;
   catalogName = other1322.catalogName;
   processorCapabilities = other1322.processorCapabilities;
   processorIdentifier = other1322.processorIdentifier;
   __isset = other1322.__isset;
-<<<<<<< HEAD
 }
 GetDatabaseRequest& GetDatabaseRequest::operator=(const GetDatabaseRequest& other1323) {
   name = other1323.name;
@@ -37731,30 +35782,6 @@ GetDatabaseRequest& GetDatabaseRequest::operator=(const GetDatabaseRequest& othe
   processorCapabilities = other1323.processorCapabilities;
   processorIdentifier = other1323.processorIdentifier;
   __isset = other1323.__isset;
-=======
-GetDatabaseRequest::GetDatabaseRequest(const GetDatabaseRequest& other1316) {
-  name = other1316.name;
-  catalogName = other1316.catalogName;
-  processorCapabilities = other1316.processorCapabilities;
-  processorIdentifier = other1316.processorIdentifier;
-  __isset = other1316.__isset;
-}
-GetDatabaseRequest& GetDatabaseRequest::operator=(const GetDatabaseRequest& other1317) {
-  name = other1317.name;
-  catalogName = other1317.catalogName;
-  processorCapabilities = other1317.processorCapabilities;
-  processorIdentifier = other1317.processorIdentifier;
-  __isset = other1317.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetDatabaseRequest& GetDatabaseRequest::operator=(const GetDatabaseRequest& other1323) {
-  name = other1323.name;
-  catalogName = other1323.catalogName;
-  processorCapabilities = other1323.processorCapabilities;
-  processorIdentifier = other1323.processorIdentifier;
-  __isset = other1323.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetDatabaseRequest::printTo(std::ostream& out) const {
@@ -37982,10 +36009,6 @@ void swap(DropDatabaseRequest &a, DropDatabaseRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 DropDatabaseRequest::DropDatabaseRequest(const DropDatabaseRequest& other1324) {
   name = other1324.name;
   catalogName = other1324.catalogName;
@@ -37996,7 +36019,6 @@ DropDatabaseRequest::DropDatabaseRequest(const DropDatabaseRequest& other1324) {
   txnId = other1324.txnId;
   deleteManagedDir = other1324.deleteManagedDir;
   __isset = other1324.__isset;
-<<<<<<< HEAD
 }
 DropDatabaseRequest& DropDatabaseRequest::operator=(const DropDatabaseRequest& other1325) {
   name = other1325.name;
@@ -38008,42 +36030,6 @@ DropDatabaseRequest& DropDatabaseRequest::operator=(const DropDatabaseRequest& o
   txnId = other1325.txnId;
   deleteManagedDir = other1325.deleteManagedDir;
   __isset = other1325.__isset;
-=======
-DropDatabaseRequest::DropDatabaseRequest(const DropDatabaseRequest& other1318) {
-  name = other1318.name;
-  catalogName = other1318.catalogName;
-  ignoreUnknownDb = other1318.ignoreUnknownDb;
-  deleteData = other1318.deleteData;
-  cascade = other1318.cascade;
-  softDelete = other1318.softDelete;
-  txnId = other1318.txnId;
-  deleteManagedDir = other1318.deleteManagedDir;
-  __isset = other1318.__isset;
-}
-DropDatabaseRequest& DropDatabaseRequest::operator=(const DropDatabaseRequest& other1319) {
-  name = other1319.name;
-  catalogName = other1319.catalogName;
-  ignoreUnknownDb = other1319.ignoreUnknownDb;
-  deleteData = other1319.deleteData;
-  cascade = other1319.cascade;
-  softDelete = other1319.softDelete;
-  txnId = other1319.txnId;
-  deleteManagedDir = other1319.deleteManagedDir;
-  __isset = other1319.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-DropDatabaseRequest& DropDatabaseRequest::operator=(const DropDatabaseRequest& other1325) {
-  name = other1325.name;
-  catalogName = other1325.catalogName;
-  ignoreUnknownDb = other1325.ignoreUnknownDb;
-  deleteData = other1325.deleteData;
-  cascade = other1325.cascade;
-  softDelete = other1325.softDelete;
-  txnId = other1325.txnId;
-  deleteManagedDir = other1325.deleteManagedDir;
-  __isset = other1325.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void DropDatabaseRequest::printTo(std::ostream& out) const {
@@ -38196,17 +36182,12 @@ void swap(GetFunctionsRequest &a, GetFunctionsRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetFunctionsRequest::GetFunctionsRequest(const GetFunctionsRequest& other1326) {
   dbName = other1326.dbName;
   catalogName = other1326.catalogName;
   pattern = other1326.pattern;
   returnNames = other1326.returnNames;
   __isset = other1326.__isset;
-<<<<<<< HEAD
 }
 GetFunctionsRequest& GetFunctionsRequest::operator=(const GetFunctionsRequest& other1327) {
   dbName = other1327.dbName;
@@ -38214,30 +36195,6 @@ GetFunctionsRequest& GetFunctionsRequest::operator=(const GetFunctionsRequest& o
   pattern = other1327.pattern;
   returnNames = other1327.returnNames;
   __isset = other1327.__isset;
-=======
-GetFunctionsRequest::GetFunctionsRequest(const GetFunctionsRequest& other1320) {
-  dbName = other1320.dbName;
-  catalogName = other1320.catalogName;
-  pattern = other1320.pattern;
-  returnNames = other1320.returnNames;
-  __isset = other1320.__isset;
-}
-GetFunctionsRequest& GetFunctionsRequest::operator=(const GetFunctionsRequest& other1321) {
-  dbName = other1321.dbName;
-  catalogName = other1321.catalogName;
-  pattern = other1321.pattern;
-  returnNames = other1321.returnNames;
-  __isset = other1321.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetFunctionsRequest& GetFunctionsRequest::operator=(const GetFunctionsRequest& other1327) {
-  dbName = other1327.dbName;
-  catalogName = other1327.catalogName;
-  pattern = other1327.pattern;
-  returnNames = other1327.returnNames;
-  __isset = other1327.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetFunctionsRequest::printTo(std::ostream& out) const {
@@ -38296,33 +36253,14 @@ uint32_t GetFunctionsResponse::read(::apache::thrift::protocol::TProtocol* iprot
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->function_names.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1328;
             ::apache::thrift::protocol::TType _etype1331;
             xfer += iprot->readListBegin(_etype1331, _size1328);
             this->function_names.resize(_size1328);
             uint32_t _i1332;
             for (_i1332 = 0; _i1332 < _size1328; ++_i1332)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->function_names[_i1332]);
-=======
-            uint32_t _size1322;
-            ::apache::thrift::protocol::TType _etype1325;
-            xfer += iprot->readListBegin(_etype1325, _size1322);
-            this->function_names.resize(_size1322);
-            uint32_t _i1326;
-            for (_i1326 = 0; _i1326 < _size1322; ++_i1326)
-            {
-              xfer += iprot->readString(this->function_names[_i1326]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->function_names[_i1332]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -38335,33 +36273,14 @@ uint32_t GetFunctionsResponse::read(::apache::thrift::protocol::TProtocol* iprot
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->functions.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1333;
             ::apache::thrift::protocol::TType _etype1336;
             xfer += iprot->readListBegin(_etype1336, _size1333);
             this->functions.resize(_size1333);
             uint32_t _i1337;
             for (_i1337 = 0; _i1337 < _size1333; ++_i1337)
-<<<<<<< HEAD
             {
               xfer += this->functions[_i1337].read(iprot);
-=======
-            uint32_t _size1327;
-            ::apache::thrift::protocol::TType _etype1330;
-            xfer += iprot->readListBegin(_etype1330, _size1327);
-            this->functions.resize(_size1327);
-            uint32_t _i1331;
-            for (_i1331 = 0; _i1331 < _size1327; ++_i1331)
-            {
-              xfer += this->functions[_i1331].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->functions[_i1337].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -38391,24 +36310,10 @@ uint32_t GetFunctionsResponse::write(::apache::thrift::protocol::TProtocol* opro
     xfer += oprot->writeFieldBegin("function_names", ::apache::thrift::protocol::T_LIST, 1);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->function_names.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1338;
       for (_iter1338 = this->function_names.begin(); _iter1338 != this->function_names.end(); ++_iter1338)
       {
         xfer += oprot->writeString((*_iter1338));
-=======
-      std::vector<std::string> ::const_iterator _iter1332;
-      for (_iter1332 = this->function_names.begin(); _iter1332 != this->function_names.end(); ++_iter1332)
-      {
-        xfer += oprot->writeString((*_iter1332));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1338;
-      for (_iter1338 = this->function_names.begin(); _iter1338 != this->function_names.end(); ++_iter1338)
-      {
-        xfer += oprot->writeString((*_iter1338));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -38418,24 +36323,10 @@ uint32_t GetFunctionsResponse::write(::apache::thrift::protocol::TProtocol* opro
     xfer += oprot->writeFieldBegin("functions", ::apache::thrift::protocol::T_LIST, 2);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->functions.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<Function> ::const_iterator _iter1339;
       for (_iter1339 = this->functions.begin(); _iter1339 != this->functions.end(); ++_iter1339)
       {
         xfer += (*_iter1339).write(oprot);
-=======
-      std::vector<Function> ::const_iterator _iter1333;
-      for (_iter1333 = this->functions.begin(); _iter1333 != this->functions.end(); ++_iter1333)
-      {
-        xfer += (*_iter1333).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<Function> ::const_iterator _iter1339;
-      for (_iter1339 = this->functions.begin(); _iter1339 != this->functions.end(); ++_iter1339)
-      {
-        xfer += (*_iter1339).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -38453,38 +36344,15 @@ void swap(GetFunctionsResponse &a, GetFunctionsResponse &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetFunctionsResponse::GetFunctionsResponse(const GetFunctionsResponse& other1340) {
   function_names = other1340.function_names;
   functions = other1340.functions;
   __isset = other1340.__isset;
-<<<<<<< HEAD
 }
 GetFunctionsResponse& GetFunctionsResponse::operator=(const GetFunctionsResponse& other1341) {
   function_names = other1341.function_names;
   functions = other1341.functions;
   __isset = other1341.__isset;
-=======
-GetFunctionsResponse::GetFunctionsResponse(const GetFunctionsResponse& other1334) {
-  function_names = other1334.function_names;
-  functions = other1334.functions;
-  __isset = other1334.__isset;
-}
-GetFunctionsResponse& GetFunctionsResponse::operator=(const GetFunctionsResponse& other1335) {
-  function_names = other1335.function_names;
-  functions = other1335.functions;
-  __isset = other1335.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetFunctionsResponse& GetFunctionsResponse::operator=(const GetFunctionsResponse& other1341) {
-  function_names = other1341.function_names;
-  functions = other1341.functions;
-  __isset = other1341.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetFunctionsResponse::printTo(std::ostream& out) const {
@@ -38593,8 +36461,6 @@ void swap(CmRecycleRequest &a, CmRecycleRequest &b) {
   swap(a.purge, b.purge);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 CmRecycleRequest::CmRecycleRequest(const CmRecycleRequest& other1342) {
   dataPath = other1342.dataPath;
   purge = other1342.purge;
@@ -38602,24 +36468,6 @@ CmRecycleRequest::CmRecycleRequest(const CmRecycleRequest& other1342) {
 CmRecycleRequest& CmRecycleRequest::operator=(const CmRecycleRequest& other1343) {
   dataPath = other1343.dataPath;
   purge = other1343.purge;
-=======
-CmRecycleRequest::CmRecycleRequest(const CmRecycleRequest& other1336) {
-  dataPath = other1336.dataPath;
-  purge = other1336.purge;
-}
-CmRecycleRequest& CmRecycleRequest::operator=(const CmRecycleRequest& other1337) {
-  dataPath = other1337.dataPath;
-  purge = other1337.purge;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-CmRecycleRequest::CmRecycleRequest(const CmRecycleRequest& other1342) {
-  dataPath = other1342.dataPath;
-  purge = other1342.purge;
-}
-CmRecycleRequest& CmRecycleRequest::operator=(const CmRecycleRequest& other1343) {
-  dataPath = other1343.dataPath;
-  purge = other1343.purge;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void CmRecycleRequest::printTo(std::ostream& out) const {
@@ -38685,27 +36533,11 @@ void swap(CmRecycleResponse &a, CmRecycleResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 CmRecycleResponse::CmRecycleResponse(const CmRecycleResponse& other1344) noexcept {
   (void) other1344;
 }
 CmRecycleResponse& CmRecycleResponse::operator=(const CmRecycleResponse& other1345) noexcept {
   (void) other1345;
-=======
-CmRecycleResponse::CmRecycleResponse(const CmRecycleResponse& other1338) noexcept {
-  (void) other1338;
-}
-CmRecycleResponse& CmRecycleResponse::operator=(const CmRecycleResponse& other1339) noexcept {
-  (void) other1339;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-CmRecycleResponse::CmRecycleResponse(const CmRecycleResponse& other1344) noexcept {
-  (void) other1344;
-}
-CmRecycleResponse& CmRecycleResponse::operator=(const CmRecycleResponse& other1345) noexcept {
-  (void) other1345;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void CmRecycleResponse::printTo(std::ostream& out) const {
@@ -38831,21 +36663,9 @@ uint32_t TableMeta::read(::apache::thrift::protocol::TProtocol* iprot) {
         break;
       case 7:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1346;
           xfer += iprot->readI32(ecast1346);
           this->ownerType = static_cast<PrincipalType::type>(ecast1346);
-=======
-          int32_t ecast1340;
-          xfer += iprot->readI32(ecast1340);
-          this->ownerType = static_cast<PrincipalType::type>(ecast1340);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1346;
-          xfer += iprot->readI32(ecast1346);
-          this->ownerType = static_cast<PrincipalType::type>(ecast1346);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.ownerType = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -38923,10 +36743,6 @@ void swap(TableMeta &a, TableMeta &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 TableMeta::TableMeta(const TableMeta& other1347) {
   dbName = other1347.dbName;
   tableName = other1347.tableName;
@@ -38936,7 +36752,6 @@ TableMeta::TableMeta(const TableMeta& other1347) {
   ownerName = other1347.ownerName;
   ownerType = other1347.ownerType;
   __isset = other1347.__isset;
-<<<<<<< HEAD
 }
 TableMeta& TableMeta::operator=(const TableMeta& other1348) {
   dbName = other1348.dbName;
@@ -38947,39 +36762,6 @@ TableMeta& TableMeta::operator=(const TableMeta& other1348) {
   ownerName = other1348.ownerName;
   ownerType = other1348.ownerType;
   __isset = other1348.__isset;
-=======
-TableMeta::TableMeta(const TableMeta& other1341) {
-  dbName = other1341.dbName;
-  tableName = other1341.tableName;
-  tableType = other1341.tableType;
-  comments = other1341.comments;
-  catName = other1341.catName;
-  ownerName = other1341.ownerName;
-  ownerType = other1341.ownerType;
-  __isset = other1341.__isset;
-}
-TableMeta& TableMeta::operator=(const TableMeta& other1342) {
-  dbName = other1342.dbName;
-  tableName = other1342.tableName;
-  tableType = other1342.tableType;
-  comments = other1342.comments;
-  catName = other1342.catName;
-  ownerName = other1342.ownerName;
-  ownerType = other1342.ownerType;
-  __isset = other1342.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-TableMeta& TableMeta::operator=(const TableMeta& other1348) {
-  dbName = other1348.dbName;
-  tableName = other1348.tableName;
-  tableType = other1348.tableType;
-  comments = other1348.comments;
-  catName = other1348.catName;
-  ownerName = other1348.ownerName;
-  ownerType = other1348.ownerType;
-  __isset = other1348.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void TableMeta::printTo(std::ostream& out) const {
@@ -39093,8 +36875,6 @@ void swap(Materialization &a, Materialization &b) {
   swap(a.sourceTablesCompacted, b.sourceTablesCompacted);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 Materialization::Materialization(const Materialization& other1349) noexcept {
   sourceTablesUpdateDeleteModified = other1349.sourceTablesUpdateDeleteModified;
   sourceTablesCompacted = other1349.sourceTablesCompacted;
@@ -39102,24 +36882,6 @@ Materialization::Materialization(const Materialization& other1349) noexcept {
 Materialization& Materialization::operator=(const Materialization& other1350) noexcept {
   sourceTablesUpdateDeleteModified = other1350.sourceTablesUpdateDeleteModified;
   sourceTablesCompacted = other1350.sourceTablesCompacted;
-=======
-Materialization::Materialization(const Materialization& other1343) noexcept {
-  sourceTablesUpdateDeleteModified = other1343.sourceTablesUpdateDeleteModified;
-  sourceTablesCompacted = other1343.sourceTablesCompacted;
-}
-Materialization& Materialization::operator=(const Materialization& other1344) noexcept {
-  sourceTablesUpdateDeleteModified = other1344.sourceTablesUpdateDeleteModified;
-  sourceTablesCompacted = other1344.sourceTablesCompacted;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-Materialization::Materialization(const Materialization& other1349) noexcept {
-  sourceTablesUpdateDeleteModified = other1349.sourceTablesUpdateDeleteModified;
-  sourceTablesCompacted = other1349.sourceTablesCompacted;
-}
-Materialization& Materialization::operator=(const Materialization& other1350) noexcept {
-  sourceTablesUpdateDeleteModified = other1350.sourceTablesUpdateDeleteModified;
-  sourceTablesCompacted = other1350.sourceTablesCompacted;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void Materialization::printTo(std::ostream& out) const {
@@ -39192,21 +36954,9 @@ uint32_t WMResourcePlan::read(::apache::thrift::protocol::TProtocol* iprot) {
         break;
       case 2:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1351;
           xfer += iprot->readI32(ecast1351);
           this->status = static_cast<WMResourcePlanStatus::type>(ecast1351);
-=======
-          int32_t ecast1345;
-          xfer += iprot->readI32(ecast1345);
-          this->status = static_cast<WMResourcePlanStatus::type>(ecast1345);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1351;
-          xfer += iprot->readI32(ecast1351);
-          this->status = static_cast<WMResourcePlanStatus::type>(ecast1351);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.status = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -39280,17 +37030,12 @@ void swap(WMResourcePlan &a, WMResourcePlan &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMResourcePlan::WMResourcePlan(const WMResourcePlan& other1352) {
   name = other1352.name;
   status = other1352.status;
   queryParallelism = other1352.queryParallelism;
   defaultPoolPath = other1352.defaultPoolPath;
   __isset = other1352.__isset;
-<<<<<<< HEAD
 }
 WMResourcePlan& WMResourcePlan::operator=(const WMResourcePlan& other1353) {
   name = other1353.name;
@@ -39298,30 +37043,6 @@ WMResourcePlan& WMResourcePlan::operator=(const WMResourcePlan& other1353) {
   queryParallelism = other1353.queryParallelism;
   defaultPoolPath = other1353.defaultPoolPath;
   __isset = other1353.__isset;
-=======
-WMResourcePlan::WMResourcePlan(const WMResourcePlan& other1346) {
-  name = other1346.name;
-  status = other1346.status;
-  queryParallelism = other1346.queryParallelism;
-  defaultPoolPath = other1346.defaultPoolPath;
-  __isset = other1346.__isset;
-}
-WMResourcePlan& WMResourcePlan::operator=(const WMResourcePlan& other1347) {
-  name = other1347.name;
-  status = other1347.status;
-  queryParallelism = other1347.queryParallelism;
-  defaultPoolPath = other1347.defaultPoolPath;
-  __isset = other1347.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMResourcePlan& WMResourcePlan::operator=(const WMResourcePlan& other1353) {
-  name = other1353.name;
-  status = other1353.status;
-  queryParallelism = other1353.queryParallelism;
-  defaultPoolPath = other1353.defaultPoolPath;
-  __isset = other1353.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMResourcePlan::printTo(std::ostream& out) const {
@@ -39406,21 +37127,9 @@ uint32_t WMNullableResourcePlan::read(::apache::thrift::protocol::TProtocol* ipr
         break;
       case 2:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1354;
           xfer += iprot->readI32(ecast1354);
           this->status = static_cast<WMResourcePlanStatus::type>(ecast1354);
-=======
-          int32_t ecast1348;
-          xfer += iprot->readI32(ecast1348);
-          this->status = static_cast<WMResourcePlanStatus::type>(ecast1348);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1354;
-          xfer += iprot->readI32(ecast1354);
-          this->status = static_cast<WMResourcePlanStatus::type>(ecast1354);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.status = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -39521,10 +37230,6 @@ void swap(WMNullableResourcePlan &a, WMNullableResourcePlan &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMNullableResourcePlan::WMNullableResourcePlan(const WMNullableResourcePlan& other1355) {
   name = other1355.name;
   status = other1355.status;
@@ -39533,7 +37238,6 @@ WMNullableResourcePlan::WMNullableResourcePlan(const WMNullableResourcePlan& oth
   defaultPoolPath = other1355.defaultPoolPath;
   isSetDefaultPoolPath = other1355.isSetDefaultPoolPath;
   __isset = other1355.__isset;
-<<<<<<< HEAD
 }
 WMNullableResourcePlan& WMNullableResourcePlan::operator=(const WMNullableResourcePlan& other1356) {
   name = other1356.name;
@@ -39543,36 +37247,6 @@ WMNullableResourcePlan& WMNullableResourcePlan::operator=(const WMNullableResour
   defaultPoolPath = other1356.defaultPoolPath;
   isSetDefaultPoolPath = other1356.isSetDefaultPoolPath;
   __isset = other1356.__isset;
-=======
-WMNullableResourcePlan::WMNullableResourcePlan(const WMNullableResourcePlan& other1349) {
-  name = other1349.name;
-  status = other1349.status;
-  queryParallelism = other1349.queryParallelism;
-  isSetQueryParallelism = other1349.isSetQueryParallelism;
-  defaultPoolPath = other1349.defaultPoolPath;
-  isSetDefaultPoolPath = other1349.isSetDefaultPoolPath;
-  __isset = other1349.__isset;
-}
-WMNullableResourcePlan& WMNullableResourcePlan::operator=(const WMNullableResourcePlan& other1350) {
-  name = other1350.name;
-  status = other1350.status;
-  queryParallelism = other1350.queryParallelism;
-  isSetQueryParallelism = other1350.isSetQueryParallelism;
-  defaultPoolPath = other1350.defaultPoolPath;
-  isSetDefaultPoolPath = other1350.isSetDefaultPoolPath;
-  __isset = other1350.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMNullableResourcePlan& WMNullableResourcePlan::operator=(const WMNullableResourcePlan& other1356) {
-  name = other1356.name;
-  status = other1356.status;
-  queryParallelism = other1356.queryParallelism;
-  isSetQueryParallelism = other1356.isSetQueryParallelism;
-  defaultPoolPath = other1356.defaultPoolPath;
-  isSetDefaultPoolPath = other1356.isSetDefaultPoolPath;
-  __isset = other1356.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMNullableResourcePlan::printTo(std::ostream& out) const {
@@ -39743,10 +37417,6 @@ void swap(WMPool &a, WMPool &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMPool::WMPool(const WMPool& other1357) {
   resourcePlanName = other1357.resourcePlanName;
   poolPath = other1357.poolPath;
@@ -39754,7 +37424,6 @@ WMPool::WMPool(const WMPool& other1357) {
   queryParallelism = other1357.queryParallelism;
   schedulingPolicy = other1357.schedulingPolicy;
   __isset = other1357.__isset;
-<<<<<<< HEAD
 }
 WMPool& WMPool::operator=(const WMPool& other1358) {
   resourcePlanName = other1358.resourcePlanName;
@@ -39763,33 +37432,6 @@ WMPool& WMPool::operator=(const WMPool& other1358) {
   queryParallelism = other1358.queryParallelism;
   schedulingPolicy = other1358.schedulingPolicy;
   __isset = other1358.__isset;
-=======
-WMPool::WMPool(const WMPool& other1351) {
-  resourcePlanName = other1351.resourcePlanName;
-  poolPath = other1351.poolPath;
-  allocFraction = other1351.allocFraction;
-  queryParallelism = other1351.queryParallelism;
-  schedulingPolicy = other1351.schedulingPolicy;
-  __isset = other1351.__isset;
-}
-WMPool& WMPool::operator=(const WMPool& other1352) {
-  resourcePlanName = other1352.resourcePlanName;
-  poolPath = other1352.poolPath;
-  allocFraction = other1352.allocFraction;
-  queryParallelism = other1352.queryParallelism;
-  schedulingPolicy = other1352.schedulingPolicy;
-  __isset = other1352.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMPool& WMPool::operator=(const WMPool& other1358) {
-  resourcePlanName = other1358.resourcePlanName;
-  poolPath = other1358.poolPath;
-  allocFraction = other1358.allocFraction;
-  queryParallelism = other1358.queryParallelism;
-  schedulingPolicy = other1358.schedulingPolicy;
-  __isset = other1358.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMPool::printTo(std::ostream& out) const {
@@ -39978,10 +37620,6 @@ void swap(WMNullablePool &a, WMNullablePool &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMNullablePool::WMNullablePool(const WMNullablePool& other1359) {
   resourcePlanName = other1359.resourcePlanName;
   poolPath = other1359.poolPath;
@@ -39990,7 +37628,6 @@ WMNullablePool::WMNullablePool(const WMNullablePool& other1359) {
   schedulingPolicy = other1359.schedulingPolicy;
   isSetSchedulingPolicy = other1359.isSetSchedulingPolicy;
   __isset = other1359.__isset;
-<<<<<<< HEAD
 }
 WMNullablePool& WMNullablePool::operator=(const WMNullablePool& other1360) {
   resourcePlanName = other1360.resourcePlanName;
@@ -40000,36 +37637,6 @@ WMNullablePool& WMNullablePool::operator=(const WMNullablePool& other1360) {
   schedulingPolicy = other1360.schedulingPolicy;
   isSetSchedulingPolicy = other1360.isSetSchedulingPolicy;
   __isset = other1360.__isset;
-=======
-WMNullablePool::WMNullablePool(const WMNullablePool& other1353) {
-  resourcePlanName = other1353.resourcePlanName;
-  poolPath = other1353.poolPath;
-  allocFraction = other1353.allocFraction;
-  queryParallelism = other1353.queryParallelism;
-  schedulingPolicy = other1353.schedulingPolicy;
-  isSetSchedulingPolicy = other1353.isSetSchedulingPolicy;
-  __isset = other1353.__isset;
-}
-WMNullablePool& WMNullablePool::operator=(const WMNullablePool& other1354) {
-  resourcePlanName = other1354.resourcePlanName;
-  poolPath = other1354.poolPath;
-  allocFraction = other1354.allocFraction;
-  queryParallelism = other1354.queryParallelism;
-  schedulingPolicy = other1354.schedulingPolicy;
-  isSetSchedulingPolicy = other1354.isSetSchedulingPolicy;
-  __isset = other1354.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMNullablePool& WMNullablePool::operator=(const WMNullablePool& other1360) {
-  resourcePlanName = other1360.resourcePlanName;
-  poolPath = other1360.poolPath;
-  allocFraction = other1360.allocFraction;
-  queryParallelism = other1360.queryParallelism;
-  schedulingPolicy = other1360.schedulingPolicy;
-  isSetSchedulingPolicy = other1360.isSetSchedulingPolicy;
-  __isset = other1360.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMNullablePool::printTo(std::ostream& out) const {
@@ -40200,10 +37807,6 @@ void swap(WMTrigger &a, WMTrigger &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMTrigger::WMTrigger(const WMTrigger& other1361) {
   resourcePlanName = other1361.resourcePlanName;
   triggerName = other1361.triggerName;
@@ -40211,7 +37814,6 @@ WMTrigger::WMTrigger(const WMTrigger& other1361) {
   actionExpression = other1361.actionExpression;
   isInUnmanaged = other1361.isInUnmanaged;
   __isset = other1361.__isset;
-<<<<<<< HEAD
 }
 WMTrigger& WMTrigger::operator=(const WMTrigger& other1362) {
   resourcePlanName = other1362.resourcePlanName;
@@ -40220,33 +37822,6 @@ WMTrigger& WMTrigger::operator=(const WMTrigger& other1362) {
   actionExpression = other1362.actionExpression;
   isInUnmanaged = other1362.isInUnmanaged;
   __isset = other1362.__isset;
-=======
-WMTrigger::WMTrigger(const WMTrigger& other1355) {
-  resourcePlanName = other1355.resourcePlanName;
-  triggerName = other1355.triggerName;
-  triggerExpression = other1355.triggerExpression;
-  actionExpression = other1355.actionExpression;
-  isInUnmanaged = other1355.isInUnmanaged;
-  __isset = other1355.__isset;
-}
-WMTrigger& WMTrigger::operator=(const WMTrigger& other1356) {
-  resourcePlanName = other1356.resourcePlanName;
-  triggerName = other1356.triggerName;
-  triggerExpression = other1356.triggerExpression;
-  actionExpression = other1356.actionExpression;
-  isInUnmanaged = other1356.isInUnmanaged;
-  __isset = other1356.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMTrigger& WMTrigger::operator=(const WMTrigger& other1362) {
-  resourcePlanName = other1362.resourcePlanName;
-  triggerName = other1362.triggerName;
-  triggerExpression = other1362.triggerExpression;
-  actionExpression = other1362.actionExpression;
-  isInUnmanaged = other1362.isInUnmanaged;
-  __isset = other1362.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMTrigger::printTo(std::ostream& out) const {
@@ -40417,10 +37992,6 @@ void swap(WMMapping &a, WMMapping &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMMapping::WMMapping(const WMMapping& other1363) {
   resourcePlanName = other1363.resourcePlanName;
   entityType = other1363.entityType;
@@ -40428,7 +37999,6 @@ WMMapping::WMMapping(const WMMapping& other1363) {
   poolPath = other1363.poolPath;
   ordering = other1363.ordering;
   __isset = other1363.__isset;
-<<<<<<< HEAD
 }
 WMMapping& WMMapping::operator=(const WMMapping& other1364) {
   resourcePlanName = other1364.resourcePlanName;
@@ -40437,33 +38007,6 @@ WMMapping& WMMapping::operator=(const WMMapping& other1364) {
   poolPath = other1364.poolPath;
   ordering = other1364.ordering;
   __isset = other1364.__isset;
-=======
-WMMapping::WMMapping(const WMMapping& other1357) {
-  resourcePlanName = other1357.resourcePlanName;
-  entityType = other1357.entityType;
-  entityName = other1357.entityName;
-  poolPath = other1357.poolPath;
-  ordering = other1357.ordering;
-  __isset = other1357.__isset;
-}
-WMMapping& WMMapping::operator=(const WMMapping& other1358) {
-  resourcePlanName = other1358.resourcePlanName;
-  entityType = other1358.entityType;
-  entityName = other1358.entityName;
-  poolPath = other1358.poolPath;
-  ordering = other1358.ordering;
-  __isset = other1358.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMMapping& WMMapping::operator=(const WMMapping& other1364) {
-  resourcePlanName = other1364.resourcePlanName;
-  entityType = other1364.entityType;
-  entityName = other1364.entityName;
-  poolPath = other1364.poolPath;
-  ordering = other1364.ordering;
-  __isset = other1364.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMMapping::printTo(std::ostream& out) const {
@@ -40575,8 +38118,6 @@ void swap(WMPoolTrigger &a, WMPoolTrigger &b) {
   swap(a.trigger, b.trigger);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMPoolTrigger::WMPoolTrigger(const WMPoolTrigger& other1365) {
   pool = other1365.pool;
   trigger = other1365.trigger;
@@ -40584,24 +38125,6 @@ WMPoolTrigger::WMPoolTrigger(const WMPoolTrigger& other1365) {
 WMPoolTrigger& WMPoolTrigger::operator=(const WMPoolTrigger& other1366) {
   pool = other1366.pool;
   trigger = other1366.trigger;
-=======
-WMPoolTrigger::WMPoolTrigger(const WMPoolTrigger& other1359) {
-  pool = other1359.pool;
-  trigger = other1359.trigger;
-}
-WMPoolTrigger& WMPoolTrigger::operator=(const WMPoolTrigger& other1360) {
-  pool = other1360.pool;
-  trigger = other1360.trigger;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMPoolTrigger::WMPoolTrigger(const WMPoolTrigger& other1365) {
-  pool = other1365.pool;
-  trigger = other1365.trigger;
-}
-WMPoolTrigger& WMPoolTrigger::operator=(const WMPoolTrigger& other1366) {
-  pool = other1366.pool;
-  trigger = other1366.trigger;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMPoolTrigger::printTo(std::ostream& out) const {
@@ -40681,33 +38204,14 @@ uint32_t WMFullResourcePlan::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->pools.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1367;
             ::apache::thrift::protocol::TType _etype1370;
             xfer += iprot->readListBegin(_etype1370, _size1367);
             this->pools.resize(_size1367);
             uint32_t _i1371;
             for (_i1371 = 0; _i1371 < _size1367; ++_i1371)
-<<<<<<< HEAD
             {
               xfer += this->pools[_i1371].read(iprot);
-=======
-            uint32_t _size1361;
-            ::apache::thrift::protocol::TType _etype1364;
-            xfer += iprot->readListBegin(_etype1364, _size1361);
-            this->pools.resize(_size1361);
-            uint32_t _i1365;
-            for (_i1365 = 0; _i1365 < _size1361; ++_i1365)
-            {
-              xfer += this->pools[_i1365].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->pools[_i1371].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -40720,33 +38224,14 @@ uint32_t WMFullResourcePlan::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->mappings.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1372;
             ::apache::thrift::protocol::TType _etype1375;
             xfer += iprot->readListBegin(_etype1375, _size1372);
             this->mappings.resize(_size1372);
             uint32_t _i1376;
             for (_i1376 = 0; _i1376 < _size1372; ++_i1376)
-<<<<<<< HEAD
             {
               xfer += this->mappings[_i1376].read(iprot);
-=======
-            uint32_t _size1366;
-            ::apache::thrift::protocol::TType _etype1369;
-            xfer += iprot->readListBegin(_etype1369, _size1366);
-            this->mappings.resize(_size1366);
-            uint32_t _i1370;
-            for (_i1370 = 0; _i1370 < _size1366; ++_i1370)
-            {
-              xfer += this->mappings[_i1370].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->mappings[_i1376].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -40759,33 +38244,14 @@ uint32_t WMFullResourcePlan::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->triggers.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1377;
             ::apache::thrift::protocol::TType _etype1380;
             xfer += iprot->readListBegin(_etype1380, _size1377);
             this->triggers.resize(_size1377);
             uint32_t _i1381;
             for (_i1381 = 0; _i1381 < _size1377; ++_i1381)
-<<<<<<< HEAD
             {
               xfer += this->triggers[_i1381].read(iprot);
-=======
-            uint32_t _size1371;
-            ::apache::thrift::protocol::TType _etype1374;
-            xfer += iprot->readListBegin(_etype1374, _size1371);
-            this->triggers.resize(_size1371);
-            uint32_t _i1375;
-            for (_i1375 = 0; _i1375 < _size1371; ++_i1375)
-            {
-              xfer += this->triggers[_i1375].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->triggers[_i1381].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -40798,33 +38264,14 @@ uint32_t WMFullResourcePlan::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->poolTriggers.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1382;
             ::apache::thrift::protocol::TType _etype1385;
             xfer += iprot->readListBegin(_etype1385, _size1382);
             this->poolTriggers.resize(_size1382);
             uint32_t _i1386;
             for (_i1386 = 0; _i1386 < _size1382; ++_i1386)
-<<<<<<< HEAD
             {
               xfer += this->poolTriggers[_i1386].read(iprot);
-=======
-            uint32_t _size1376;
-            ::apache::thrift::protocol::TType _etype1379;
-            xfer += iprot->readListBegin(_etype1379, _size1376);
-            this->poolTriggers.resize(_size1376);
-            uint32_t _i1380;
-            for (_i1380 = 0; _i1380 < _size1376; ++_i1380)
-            {
-              xfer += this->poolTriggers[_i1380].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->poolTriggers[_i1386].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -40861,24 +38308,10 @@ uint32_t WMFullResourcePlan::write(::apache::thrift::protocol::TProtocol* oprot)
   xfer += oprot->writeFieldBegin("pools", ::apache::thrift::protocol::T_LIST, 2);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->pools.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<WMPool> ::const_iterator _iter1387;
     for (_iter1387 = this->pools.begin(); _iter1387 != this->pools.end(); ++_iter1387)
     {
       xfer += (*_iter1387).write(oprot);
-=======
-    std::vector<WMPool> ::const_iterator _iter1381;
-    for (_iter1381 = this->pools.begin(); _iter1381 != this->pools.end(); ++_iter1381)
-    {
-      xfer += (*_iter1381).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<WMPool> ::const_iterator _iter1387;
-    for (_iter1387 = this->pools.begin(); _iter1387 != this->pools.end(); ++_iter1387)
-    {
-      xfer += (*_iter1387).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -40888,24 +38321,10 @@ uint32_t WMFullResourcePlan::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("mappings", ::apache::thrift::protocol::T_LIST, 3);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->mappings.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<WMMapping> ::const_iterator _iter1388;
       for (_iter1388 = this->mappings.begin(); _iter1388 != this->mappings.end(); ++_iter1388)
       {
         xfer += (*_iter1388).write(oprot);
-=======
-      std::vector<WMMapping> ::const_iterator _iter1382;
-      for (_iter1382 = this->mappings.begin(); _iter1382 != this->mappings.end(); ++_iter1382)
-      {
-        xfer += (*_iter1382).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<WMMapping> ::const_iterator _iter1388;
-      for (_iter1388 = this->mappings.begin(); _iter1388 != this->mappings.end(); ++_iter1388)
-      {
-        xfer += (*_iter1388).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -40915,24 +38334,10 @@ uint32_t WMFullResourcePlan::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("triggers", ::apache::thrift::protocol::T_LIST, 4);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->triggers.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<WMTrigger> ::const_iterator _iter1389;
       for (_iter1389 = this->triggers.begin(); _iter1389 != this->triggers.end(); ++_iter1389)
       {
         xfer += (*_iter1389).write(oprot);
-=======
-      std::vector<WMTrigger> ::const_iterator _iter1383;
-      for (_iter1383 = this->triggers.begin(); _iter1383 != this->triggers.end(); ++_iter1383)
-      {
-        xfer += (*_iter1383).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<WMTrigger> ::const_iterator _iter1389;
-      for (_iter1389 = this->triggers.begin(); _iter1389 != this->triggers.end(); ++_iter1389)
-      {
-        xfer += (*_iter1389).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -40942,24 +38347,10 @@ uint32_t WMFullResourcePlan::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("poolTriggers", ::apache::thrift::protocol::T_LIST, 5);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->poolTriggers.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<WMPoolTrigger> ::const_iterator _iter1390;
       for (_iter1390 = this->poolTriggers.begin(); _iter1390 != this->poolTriggers.end(); ++_iter1390)
       {
         xfer += (*_iter1390).write(oprot);
-=======
-      std::vector<WMPoolTrigger> ::const_iterator _iter1384;
-      for (_iter1384 = this->poolTriggers.begin(); _iter1384 != this->poolTriggers.end(); ++_iter1384)
-      {
-        xfer += (*_iter1384).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<WMPoolTrigger> ::const_iterator _iter1390;
-      for (_iter1390 = this->poolTriggers.begin(); _iter1390 != this->poolTriggers.end(); ++_iter1390)
-      {
-        xfer += (*_iter1390).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -40980,10 +38371,6 @@ void swap(WMFullResourcePlan &a, WMFullResourcePlan &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMFullResourcePlan::WMFullResourcePlan(const WMFullResourcePlan& other1391) {
   plan = other1391.plan;
   pools = other1391.pools;
@@ -40991,7 +38378,6 @@ WMFullResourcePlan::WMFullResourcePlan(const WMFullResourcePlan& other1391) {
   triggers = other1391.triggers;
   poolTriggers = other1391.poolTriggers;
   __isset = other1391.__isset;
-<<<<<<< HEAD
 }
 WMFullResourcePlan& WMFullResourcePlan::operator=(const WMFullResourcePlan& other1392) {
   plan = other1392.plan;
@@ -41000,33 +38386,6 @@ WMFullResourcePlan& WMFullResourcePlan::operator=(const WMFullResourcePlan& othe
   triggers = other1392.triggers;
   poolTriggers = other1392.poolTriggers;
   __isset = other1392.__isset;
-=======
-WMFullResourcePlan::WMFullResourcePlan(const WMFullResourcePlan& other1385) {
-  plan = other1385.plan;
-  pools = other1385.pools;
-  mappings = other1385.mappings;
-  triggers = other1385.triggers;
-  poolTriggers = other1385.poolTriggers;
-  __isset = other1385.__isset;
-}
-WMFullResourcePlan& WMFullResourcePlan::operator=(const WMFullResourcePlan& other1386) {
-  plan = other1386.plan;
-  pools = other1386.pools;
-  mappings = other1386.mappings;
-  triggers = other1386.triggers;
-  poolTriggers = other1386.poolTriggers;
-  __isset = other1386.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMFullResourcePlan& WMFullResourcePlan::operator=(const WMFullResourcePlan& other1392) {
-  plan = other1392.plan;
-  pools = other1392.pools;
-  mappings = other1392.mappings;
-  triggers = other1392.triggers;
-  poolTriggers = other1392.poolTriggers;
-  __isset = other1392.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMFullResourcePlan::printTo(std::ostream& out) const {
@@ -41137,38 +38496,15 @@ void swap(WMCreateResourcePlanRequest &a, WMCreateResourcePlanRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMCreateResourcePlanRequest::WMCreateResourcePlanRequest(const WMCreateResourcePlanRequest& other1393) {
   resourcePlan = other1393.resourcePlan;
   copyFrom = other1393.copyFrom;
   __isset = other1393.__isset;
-<<<<<<< HEAD
 }
 WMCreateResourcePlanRequest& WMCreateResourcePlanRequest::operator=(const WMCreateResourcePlanRequest& other1394) {
   resourcePlan = other1394.resourcePlan;
   copyFrom = other1394.copyFrom;
   __isset = other1394.__isset;
-=======
-WMCreateResourcePlanRequest::WMCreateResourcePlanRequest(const WMCreateResourcePlanRequest& other1387) {
-  resourcePlan = other1387.resourcePlan;
-  copyFrom = other1387.copyFrom;
-  __isset = other1387.__isset;
-}
-WMCreateResourcePlanRequest& WMCreateResourcePlanRequest::operator=(const WMCreateResourcePlanRequest& other1388) {
-  resourcePlan = other1388.resourcePlan;
-  copyFrom = other1388.copyFrom;
-  __isset = other1388.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMCreateResourcePlanRequest& WMCreateResourcePlanRequest::operator=(const WMCreateResourcePlanRequest& other1394) {
-  resourcePlan = other1394.resourcePlan;
-  copyFrom = other1394.copyFrom;
-  __isset = other1394.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMCreateResourcePlanRequest::printTo(std::ostream& out) const {
@@ -41234,27 +38570,11 @@ void swap(WMCreateResourcePlanResponse &a, WMCreateResourcePlanResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMCreateResourcePlanResponse::WMCreateResourcePlanResponse(const WMCreateResourcePlanResponse& other1395) noexcept {
   (void) other1395;
 }
 WMCreateResourcePlanResponse& WMCreateResourcePlanResponse::operator=(const WMCreateResourcePlanResponse& other1396) noexcept {
   (void) other1396;
-=======
-WMCreateResourcePlanResponse::WMCreateResourcePlanResponse(const WMCreateResourcePlanResponse& other1389) noexcept {
-  (void) other1389;
-}
-WMCreateResourcePlanResponse& WMCreateResourcePlanResponse::operator=(const WMCreateResourcePlanResponse& other1390) noexcept {
-  (void) other1390;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMCreateResourcePlanResponse::WMCreateResourcePlanResponse(const WMCreateResourcePlanResponse& other1395) noexcept {
-  (void) other1395;
-}
-WMCreateResourcePlanResponse& WMCreateResourcePlanResponse::operator=(const WMCreateResourcePlanResponse& other1396) noexcept {
-  (void) other1396;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMCreateResourcePlanResponse::printTo(std::ostream& out) const {
@@ -41318,27 +38638,11 @@ void swap(WMGetActiveResourcePlanRequest &a, WMGetActiveResourcePlanRequest &b) 
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMGetActiveResourcePlanRequest::WMGetActiveResourcePlanRequest(const WMGetActiveResourcePlanRequest& other1397) noexcept {
   (void) other1397;
 }
 WMGetActiveResourcePlanRequest& WMGetActiveResourcePlanRequest::operator=(const WMGetActiveResourcePlanRequest& other1398) noexcept {
   (void) other1398;
-=======
-WMGetActiveResourcePlanRequest::WMGetActiveResourcePlanRequest(const WMGetActiveResourcePlanRequest& other1391) noexcept {
-  (void) other1391;
-}
-WMGetActiveResourcePlanRequest& WMGetActiveResourcePlanRequest::operator=(const WMGetActiveResourcePlanRequest& other1392) noexcept {
-  (void) other1392;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMGetActiveResourcePlanRequest::WMGetActiveResourcePlanRequest(const WMGetActiveResourcePlanRequest& other1397) noexcept {
-  (void) other1397;
-}
-WMGetActiveResourcePlanRequest& WMGetActiveResourcePlanRequest::operator=(const WMGetActiveResourcePlanRequest& other1398) noexcept {
-  (void) other1398;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMGetActiveResourcePlanRequest::printTo(std::ostream& out) const {
@@ -41425,8 +38729,6 @@ void swap(WMGetActiveResourcePlanResponse &a, WMGetActiveResourcePlanResponse &b
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMGetActiveResourcePlanResponse::WMGetActiveResourcePlanResponse(const WMGetActiveResourcePlanResponse& other1399) {
   resourcePlan = other1399.resourcePlan;
   __isset = other1399.__isset;
@@ -41434,24 +38736,6 @@ WMGetActiveResourcePlanResponse::WMGetActiveResourcePlanResponse(const WMGetActi
 WMGetActiveResourcePlanResponse& WMGetActiveResourcePlanResponse::operator=(const WMGetActiveResourcePlanResponse& other1400) {
   resourcePlan = other1400.resourcePlan;
   __isset = other1400.__isset;
-=======
-WMGetActiveResourcePlanResponse::WMGetActiveResourcePlanResponse(const WMGetActiveResourcePlanResponse& other1393) {
-  resourcePlan = other1393.resourcePlan;
-  __isset = other1393.__isset;
-}
-WMGetActiveResourcePlanResponse& WMGetActiveResourcePlanResponse::operator=(const WMGetActiveResourcePlanResponse& other1394) {
-  resourcePlan = other1394.resourcePlan;
-  __isset = other1394.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMGetActiveResourcePlanResponse::WMGetActiveResourcePlanResponse(const WMGetActiveResourcePlanResponse& other1399) {
-  resourcePlan = other1399.resourcePlan;
-  __isset = other1399.__isset;
-}
-WMGetActiveResourcePlanResponse& WMGetActiveResourcePlanResponse::operator=(const WMGetActiveResourcePlanResponse& other1400) {
-  resourcePlan = other1400.resourcePlan;
-  __isset = other1400.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMGetActiveResourcePlanResponse::printTo(std::ostream& out) const {
@@ -41539,8 +38823,6 @@ void swap(WMGetResourcePlanRequest &a, WMGetResourcePlanRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMGetResourcePlanRequest::WMGetResourcePlanRequest(const WMGetResourcePlanRequest& other1401) {
   resourcePlanName = other1401.resourcePlanName;
   __isset = other1401.__isset;
@@ -41548,24 +38830,6 @@ WMGetResourcePlanRequest::WMGetResourcePlanRequest(const WMGetResourcePlanReques
 WMGetResourcePlanRequest& WMGetResourcePlanRequest::operator=(const WMGetResourcePlanRequest& other1402) {
   resourcePlanName = other1402.resourcePlanName;
   __isset = other1402.__isset;
-=======
-WMGetResourcePlanRequest::WMGetResourcePlanRequest(const WMGetResourcePlanRequest& other1395) {
-  resourcePlanName = other1395.resourcePlanName;
-  __isset = other1395.__isset;
-}
-WMGetResourcePlanRequest& WMGetResourcePlanRequest::operator=(const WMGetResourcePlanRequest& other1396) {
-  resourcePlanName = other1396.resourcePlanName;
-  __isset = other1396.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMGetResourcePlanRequest::WMGetResourcePlanRequest(const WMGetResourcePlanRequest& other1401) {
-  resourcePlanName = other1401.resourcePlanName;
-  __isset = other1401.__isset;
-}
-WMGetResourcePlanRequest& WMGetResourcePlanRequest::operator=(const WMGetResourcePlanRequest& other1402) {
-  resourcePlanName = other1402.resourcePlanName;
-  __isset = other1402.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMGetResourcePlanRequest::printTo(std::ostream& out) const {
@@ -41653,8 +38917,6 @@ void swap(WMGetResourcePlanResponse &a, WMGetResourcePlanResponse &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMGetResourcePlanResponse::WMGetResourcePlanResponse(const WMGetResourcePlanResponse& other1403) {
   resourcePlan = other1403.resourcePlan;
   __isset = other1403.__isset;
@@ -41662,24 +38924,6 @@ WMGetResourcePlanResponse::WMGetResourcePlanResponse(const WMGetResourcePlanResp
 WMGetResourcePlanResponse& WMGetResourcePlanResponse::operator=(const WMGetResourcePlanResponse& other1404) {
   resourcePlan = other1404.resourcePlan;
   __isset = other1404.__isset;
-=======
-WMGetResourcePlanResponse::WMGetResourcePlanResponse(const WMGetResourcePlanResponse& other1397) {
-  resourcePlan = other1397.resourcePlan;
-  __isset = other1397.__isset;
-}
-WMGetResourcePlanResponse& WMGetResourcePlanResponse::operator=(const WMGetResourcePlanResponse& other1398) {
-  resourcePlan = other1398.resourcePlan;
-  __isset = other1398.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMGetResourcePlanResponse::WMGetResourcePlanResponse(const WMGetResourcePlanResponse& other1403) {
-  resourcePlan = other1403.resourcePlan;
-  __isset = other1403.__isset;
-}
-WMGetResourcePlanResponse& WMGetResourcePlanResponse::operator=(const WMGetResourcePlanResponse& other1404) {
-  resourcePlan = other1404.resourcePlan;
-  __isset = other1404.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMGetResourcePlanResponse::printTo(std::ostream& out) const {
@@ -41744,27 +38988,11 @@ void swap(WMGetAllResourcePlanRequest &a, WMGetAllResourcePlanRequest &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMGetAllResourcePlanRequest::WMGetAllResourcePlanRequest(const WMGetAllResourcePlanRequest& other1405) noexcept {
   (void) other1405;
 }
 WMGetAllResourcePlanRequest& WMGetAllResourcePlanRequest::operator=(const WMGetAllResourcePlanRequest& other1406) noexcept {
   (void) other1406;
-=======
-WMGetAllResourcePlanRequest::WMGetAllResourcePlanRequest(const WMGetAllResourcePlanRequest& other1399) noexcept {
-  (void) other1399;
-}
-WMGetAllResourcePlanRequest& WMGetAllResourcePlanRequest::operator=(const WMGetAllResourcePlanRequest& other1400) noexcept {
-  (void) other1400;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMGetAllResourcePlanRequest::WMGetAllResourcePlanRequest(const WMGetAllResourcePlanRequest& other1405) noexcept {
-  (void) other1405;
-}
-WMGetAllResourcePlanRequest& WMGetAllResourcePlanRequest::operator=(const WMGetAllResourcePlanRequest& other1406) noexcept {
-  (void) other1406;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMGetAllResourcePlanRequest::printTo(std::ostream& out) const {
@@ -41814,33 +39042,14 @@ uint32_t WMGetAllResourcePlanResponse::read(::apache::thrift::protocol::TProtoco
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->resourcePlans.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1407;
             ::apache::thrift::protocol::TType _etype1410;
             xfer += iprot->readListBegin(_etype1410, _size1407);
             this->resourcePlans.resize(_size1407);
             uint32_t _i1411;
             for (_i1411 = 0; _i1411 < _size1407; ++_i1411)
-<<<<<<< HEAD
             {
               xfer += this->resourcePlans[_i1411].read(iprot);
-=======
-            uint32_t _size1401;
-            ::apache::thrift::protocol::TType _etype1404;
-            xfer += iprot->readListBegin(_etype1404, _size1401);
-            this->resourcePlans.resize(_size1401);
-            uint32_t _i1405;
-            for (_i1405 = 0; _i1405 < _size1401; ++_i1405)
-            {
-              xfer += this->resourcePlans[_i1405].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->resourcePlans[_i1411].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -41870,24 +39079,10 @@ uint32_t WMGetAllResourcePlanResponse::write(::apache::thrift::protocol::TProtoc
     xfer += oprot->writeFieldBegin("resourcePlans", ::apache::thrift::protocol::T_LIST, 1);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->resourcePlans.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<WMResourcePlan> ::const_iterator _iter1412;
       for (_iter1412 = this->resourcePlans.begin(); _iter1412 != this->resourcePlans.end(); ++_iter1412)
       {
         xfer += (*_iter1412).write(oprot);
-=======
-      std::vector<WMResourcePlan> ::const_iterator _iter1406;
-      for (_iter1406 = this->resourcePlans.begin(); _iter1406 != this->resourcePlans.end(); ++_iter1406)
-      {
-        xfer += (*_iter1406).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<WMResourcePlan> ::const_iterator _iter1412;
-      for (_iter1412 = this->resourcePlans.begin(); _iter1412 != this->resourcePlans.end(); ++_iter1412)
-      {
-        xfer += (*_iter1412).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -41904,8 +39099,6 @@ void swap(WMGetAllResourcePlanResponse &a, WMGetAllResourcePlanResponse &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMGetAllResourcePlanResponse::WMGetAllResourcePlanResponse(const WMGetAllResourcePlanResponse& other1413) {
   resourcePlans = other1413.resourcePlans;
   __isset = other1413.__isset;
@@ -41913,24 +39106,6 @@ WMGetAllResourcePlanResponse::WMGetAllResourcePlanResponse(const WMGetAllResourc
 WMGetAllResourcePlanResponse& WMGetAllResourcePlanResponse::operator=(const WMGetAllResourcePlanResponse& other1414) {
   resourcePlans = other1414.resourcePlans;
   __isset = other1414.__isset;
-=======
-WMGetAllResourcePlanResponse::WMGetAllResourcePlanResponse(const WMGetAllResourcePlanResponse& other1407) {
-  resourcePlans = other1407.resourcePlans;
-  __isset = other1407.__isset;
-}
-WMGetAllResourcePlanResponse& WMGetAllResourcePlanResponse::operator=(const WMGetAllResourcePlanResponse& other1408) {
-  resourcePlans = other1408.resourcePlans;
-  __isset = other1408.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMGetAllResourcePlanResponse::WMGetAllResourcePlanResponse(const WMGetAllResourcePlanResponse& other1413) {
-  resourcePlans = other1413.resourcePlans;
-  __isset = other1413.__isset;
-}
-WMGetAllResourcePlanResponse& WMGetAllResourcePlanResponse::operator=(const WMGetAllResourcePlanResponse& other1414) {
-  resourcePlans = other1414.resourcePlans;
-  __isset = other1414.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMGetAllResourcePlanResponse::printTo(std::ostream& out) const {
@@ -42094,10 +39269,6 @@ void swap(WMAlterResourcePlanRequest &a, WMAlterResourcePlanRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMAlterResourcePlanRequest::WMAlterResourcePlanRequest(const WMAlterResourcePlanRequest& other1415) {
   resourcePlanName = other1415.resourcePlanName;
   resourcePlan = other1415.resourcePlan;
@@ -42105,7 +39276,6 @@ WMAlterResourcePlanRequest::WMAlterResourcePlanRequest(const WMAlterResourcePlan
   isForceDeactivate = other1415.isForceDeactivate;
   isReplace = other1415.isReplace;
   __isset = other1415.__isset;
-<<<<<<< HEAD
 }
 WMAlterResourcePlanRequest& WMAlterResourcePlanRequest::operator=(const WMAlterResourcePlanRequest& other1416) {
   resourcePlanName = other1416.resourcePlanName;
@@ -42114,33 +39284,6 @@ WMAlterResourcePlanRequest& WMAlterResourcePlanRequest::operator=(const WMAlterR
   isForceDeactivate = other1416.isForceDeactivate;
   isReplace = other1416.isReplace;
   __isset = other1416.__isset;
-=======
-WMAlterResourcePlanRequest::WMAlterResourcePlanRequest(const WMAlterResourcePlanRequest& other1409) {
-  resourcePlanName = other1409.resourcePlanName;
-  resourcePlan = other1409.resourcePlan;
-  isEnableAndActivate = other1409.isEnableAndActivate;
-  isForceDeactivate = other1409.isForceDeactivate;
-  isReplace = other1409.isReplace;
-  __isset = other1409.__isset;
-}
-WMAlterResourcePlanRequest& WMAlterResourcePlanRequest::operator=(const WMAlterResourcePlanRequest& other1410) {
-  resourcePlanName = other1410.resourcePlanName;
-  resourcePlan = other1410.resourcePlan;
-  isEnableAndActivate = other1410.isEnableAndActivate;
-  isForceDeactivate = other1410.isForceDeactivate;
-  isReplace = other1410.isReplace;
-  __isset = other1410.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMAlterResourcePlanRequest& WMAlterResourcePlanRequest::operator=(const WMAlterResourcePlanRequest& other1416) {
-  resourcePlanName = other1416.resourcePlanName;
-  resourcePlan = other1416.resourcePlan;
-  isEnableAndActivate = other1416.isEnableAndActivate;
-  isForceDeactivate = other1416.isForceDeactivate;
-  isReplace = other1416.isReplace;
-  __isset = other1416.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMAlterResourcePlanRequest::printTo(std::ostream& out) const {
@@ -42232,8 +39375,6 @@ void swap(WMAlterResourcePlanResponse &a, WMAlterResourcePlanResponse &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMAlterResourcePlanResponse::WMAlterResourcePlanResponse(const WMAlterResourcePlanResponse& other1417) {
   fullResourcePlan = other1417.fullResourcePlan;
   __isset = other1417.__isset;
@@ -42241,24 +39382,6 @@ WMAlterResourcePlanResponse::WMAlterResourcePlanResponse(const WMAlterResourcePl
 WMAlterResourcePlanResponse& WMAlterResourcePlanResponse::operator=(const WMAlterResourcePlanResponse& other1418) {
   fullResourcePlan = other1418.fullResourcePlan;
   __isset = other1418.__isset;
-=======
-WMAlterResourcePlanResponse::WMAlterResourcePlanResponse(const WMAlterResourcePlanResponse& other1411) {
-  fullResourcePlan = other1411.fullResourcePlan;
-  __isset = other1411.__isset;
-}
-WMAlterResourcePlanResponse& WMAlterResourcePlanResponse::operator=(const WMAlterResourcePlanResponse& other1412) {
-  fullResourcePlan = other1412.fullResourcePlan;
-  __isset = other1412.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMAlterResourcePlanResponse::WMAlterResourcePlanResponse(const WMAlterResourcePlanResponse& other1417) {
-  fullResourcePlan = other1417.fullResourcePlan;
-  __isset = other1417.__isset;
-}
-WMAlterResourcePlanResponse& WMAlterResourcePlanResponse::operator=(const WMAlterResourcePlanResponse& other1418) {
-  fullResourcePlan = other1418.fullResourcePlan;
-  __isset = other1418.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMAlterResourcePlanResponse::printTo(std::ostream& out) const {
@@ -42346,8 +39469,6 @@ void swap(WMValidateResourcePlanRequest &a, WMValidateResourcePlanRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMValidateResourcePlanRequest::WMValidateResourcePlanRequest(const WMValidateResourcePlanRequest& other1419) {
   resourcePlanName = other1419.resourcePlanName;
   __isset = other1419.__isset;
@@ -42355,24 +39476,6 @@ WMValidateResourcePlanRequest::WMValidateResourcePlanRequest(const WMValidateRes
 WMValidateResourcePlanRequest& WMValidateResourcePlanRequest::operator=(const WMValidateResourcePlanRequest& other1420) {
   resourcePlanName = other1420.resourcePlanName;
   __isset = other1420.__isset;
-=======
-WMValidateResourcePlanRequest::WMValidateResourcePlanRequest(const WMValidateResourcePlanRequest& other1413) {
-  resourcePlanName = other1413.resourcePlanName;
-  __isset = other1413.__isset;
-}
-WMValidateResourcePlanRequest& WMValidateResourcePlanRequest::operator=(const WMValidateResourcePlanRequest& other1414) {
-  resourcePlanName = other1414.resourcePlanName;
-  __isset = other1414.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMValidateResourcePlanRequest::WMValidateResourcePlanRequest(const WMValidateResourcePlanRequest& other1419) {
-  resourcePlanName = other1419.resourcePlanName;
-  __isset = other1419.__isset;
-}
-WMValidateResourcePlanRequest& WMValidateResourcePlanRequest::operator=(const WMValidateResourcePlanRequest& other1420) {
-  resourcePlanName = other1420.resourcePlanName;
-  __isset = other1420.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMValidateResourcePlanRequest::printTo(std::ostream& out) const {
@@ -42428,33 +39531,14 @@ uint32_t WMValidateResourcePlanResponse::read(::apache::thrift::protocol::TProto
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->errors.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1421;
             ::apache::thrift::protocol::TType _etype1424;
             xfer += iprot->readListBegin(_etype1424, _size1421);
             this->errors.resize(_size1421);
             uint32_t _i1425;
             for (_i1425 = 0; _i1425 < _size1421; ++_i1425)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->errors[_i1425]);
-=======
-            uint32_t _size1415;
-            ::apache::thrift::protocol::TType _etype1418;
-            xfer += iprot->readListBegin(_etype1418, _size1415);
-            this->errors.resize(_size1415);
-            uint32_t _i1419;
-            for (_i1419 = 0; _i1419 < _size1415; ++_i1419)
-            {
-              xfer += iprot->readString(this->errors[_i1419]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->errors[_i1425]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -42467,33 +39551,14 @@ uint32_t WMValidateResourcePlanResponse::read(::apache::thrift::protocol::TProto
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->warnings.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1426;
             ::apache::thrift::protocol::TType _etype1429;
             xfer += iprot->readListBegin(_etype1429, _size1426);
             this->warnings.resize(_size1426);
             uint32_t _i1430;
             for (_i1430 = 0; _i1430 < _size1426; ++_i1430)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->warnings[_i1430]);
-=======
-            uint32_t _size1420;
-            ::apache::thrift::protocol::TType _etype1423;
-            xfer += iprot->readListBegin(_etype1423, _size1420);
-            this->warnings.resize(_size1420);
-            uint32_t _i1424;
-            for (_i1424 = 0; _i1424 < _size1420; ++_i1424)
-            {
-              xfer += iprot->readString(this->warnings[_i1424]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->warnings[_i1430]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -42523,24 +39588,10 @@ uint32_t WMValidateResourcePlanResponse::write(::apache::thrift::protocol::TProt
     xfer += oprot->writeFieldBegin("errors", ::apache::thrift::protocol::T_LIST, 1);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->errors.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1431;
       for (_iter1431 = this->errors.begin(); _iter1431 != this->errors.end(); ++_iter1431)
       {
         xfer += oprot->writeString((*_iter1431));
-=======
-      std::vector<std::string> ::const_iterator _iter1425;
-      for (_iter1425 = this->errors.begin(); _iter1425 != this->errors.end(); ++_iter1425)
-      {
-        xfer += oprot->writeString((*_iter1425));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1431;
-      for (_iter1431 = this->errors.begin(); _iter1431 != this->errors.end(); ++_iter1431)
-      {
-        xfer += oprot->writeString((*_iter1431));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -42550,24 +39601,10 @@ uint32_t WMValidateResourcePlanResponse::write(::apache::thrift::protocol::TProt
     xfer += oprot->writeFieldBegin("warnings", ::apache::thrift::protocol::T_LIST, 2);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->warnings.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1432;
       for (_iter1432 = this->warnings.begin(); _iter1432 != this->warnings.end(); ++_iter1432)
       {
         xfer += oprot->writeString((*_iter1432));
-=======
-      std::vector<std::string> ::const_iterator _iter1426;
-      for (_iter1426 = this->warnings.begin(); _iter1426 != this->warnings.end(); ++_iter1426)
-      {
-        xfer += oprot->writeString((*_iter1426));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1432;
-      for (_iter1432 = this->warnings.begin(); _iter1432 != this->warnings.end(); ++_iter1432)
-      {
-        xfer += oprot->writeString((*_iter1432));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -42585,38 +39622,15 @@ void swap(WMValidateResourcePlanResponse &a, WMValidateResourcePlanResponse &b) 
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMValidateResourcePlanResponse::WMValidateResourcePlanResponse(const WMValidateResourcePlanResponse& other1433) {
   errors = other1433.errors;
   warnings = other1433.warnings;
   __isset = other1433.__isset;
-<<<<<<< HEAD
 }
 WMValidateResourcePlanResponse& WMValidateResourcePlanResponse::operator=(const WMValidateResourcePlanResponse& other1434) {
   errors = other1434.errors;
   warnings = other1434.warnings;
   __isset = other1434.__isset;
-=======
-WMValidateResourcePlanResponse::WMValidateResourcePlanResponse(const WMValidateResourcePlanResponse& other1427) {
-  errors = other1427.errors;
-  warnings = other1427.warnings;
-  __isset = other1427.__isset;
-}
-WMValidateResourcePlanResponse& WMValidateResourcePlanResponse::operator=(const WMValidateResourcePlanResponse& other1428) {
-  errors = other1428.errors;
-  warnings = other1428.warnings;
-  __isset = other1428.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMValidateResourcePlanResponse& WMValidateResourcePlanResponse::operator=(const WMValidateResourcePlanResponse& other1434) {
-  errors = other1434.errors;
-  warnings = other1434.warnings;
-  __isset = other1434.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMValidateResourcePlanResponse::printTo(std::ostream& out) const {
@@ -42705,8 +39719,6 @@ void swap(WMDropResourcePlanRequest &a, WMDropResourcePlanRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMDropResourcePlanRequest::WMDropResourcePlanRequest(const WMDropResourcePlanRequest& other1435) {
   resourcePlanName = other1435.resourcePlanName;
   __isset = other1435.__isset;
@@ -42714,24 +39726,6 @@ WMDropResourcePlanRequest::WMDropResourcePlanRequest(const WMDropResourcePlanReq
 WMDropResourcePlanRequest& WMDropResourcePlanRequest::operator=(const WMDropResourcePlanRequest& other1436) {
   resourcePlanName = other1436.resourcePlanName;
   __isset = other1436.__isset;
-=======
-WMDropResourcePlanRequest::WMDropResourcePlanRequest(const WMDropResourcePlanRequest& other1429) {
-  resourcePlanName = other1429.resourcePlanName;
-  __isset = other1429.__isset;
-}
-WMDropResourcePlanRequest& WMDropResourcePlanRequest::operator=(const WMDropResourcePlanRequest& other1430) {
-  resourcePlanName = other1430.resourcePlanName;
-  __isset = other1430.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMDropResourcePlanRequest::WMDropResourcePlanRequest(const WMDropResourcePlanRequest& other1435) {
-  resourcePlanName = other1435.resourcePlanName;
-  __isset = other1435.__isset;
-}
-WMDropResourcePlanRequest& WMDropResourcePlanRequest::operator=(const WMDropResourcePlanRequest& other1436) {
-  resourcePlanName = other1436.resourcePlanName;
-  __isset = other1436.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMDropResourcePlanRequest::printTo(std::ostream& out) const {
@@ -42796,27 +39790,11 @@ void swap(WMDropResourcePlanResponse &a, WMDropResourcePlanResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMDropResourcePlanResponse::WMDropResourcePlanResponse(const WMDropResourcePlanResponse& other1437) noexcept {
   (void) other1437;
 }
 WMDropResourcePlanResponse& WMDropResourcePlanResponse::operator=(const WMDropResourcePlanResponse& other1438) noexcept {
   (void) other1438;
-=======
-WMDropResourcePlanResponse::WMDropResourcePlanResponse(const WMDropResourcePlanResponse& other1431) noexcept {
-  (void) other1431;
-}
-WMDropResourcePlanResponse& WMDropResourcePlanResponse::operator=(const WMDropResourcePlanResponse& other1432) noexcept {
-  (void) other1432;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMDropResourcePlanResponse::WMDropResourcePlanResponse(const WMDropResourcePlanResponse& other1437) noexcept {
-  (void) other1437;
-}
-WMDropResourcePlanResponse& WMDropResourcePlanResponse::operator=(const WMDropResourcePlanResponse& other1438) noexcept {
-  (void) other1438;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMDropResourcePlanResponse::printTo(std::ostream& out) const {
@@ -42903,8 +39881,6 @@ void swap(WMCreateTriggerRequest &a, WMCreateTriggerRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMCreateTriggerRequest::WMCreateTriggerRequest(const WMCreateTriggerRequest& other1439) {
   trigger = other1439.trigger;
   __isset = other1439.__isset;
@@ -42912,24 +39888,6 @@ WMCreateTriggerRequest::WMCreateTriggerRequest(const WMCreateTriggerRequest& oth
 WMCreateTriggerRequest& WMCreateTriggerRequest::operator=(const WMCreateTriggerRequest& other1440) {
   trigger = other1440.trigger;
   __isset = other1440.__isset;
-=======
-WMCreateTriggerRequest::WMCreateTriggerRequest(const WMCreateTriggerRequest& other1433) {
-  trigger = other1433.trigger;
-  __isset = other1433.__isset;
-}
-WMCreateTriggerRequest& WMCreateTriggerRequest::operator=(const WMCreateTriggerRequest& other1434) {
-  trigger = other1434.trigger;
-  __isset = other1434.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMCreateTriggerRequest::WMCreateTriggerRequest(const WMCreateTriggerRequest& other1439) {
-  trigger = other1439.trigger;
-  __isset = other1439.__isset;
-}
-WMCreateTriggerRequest& WMCreateTriggerRequest::operator=(const WMCreateTriggerRequest& other1440) {
-  trigger = other1440.trigger;
-  __isset = other1440.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMCreateTriggerRequest::printTo(std::ostream& out) const {
@@ -42994,27 +39952,11 @@ void swap(WMCreateTriggerResponse &a, WMCreateTriggerResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMCreateTriggerResponse::WMCreateTriggerResponse(const WMCreateTriggerResponse& other1441) noexcept {
   (void) other1441;
 }
 WMCreateTriggerResponse& WMCreateTriggerResponse::operator=(const WMCreateTriggerResponse& other1442) noexcept {
   (void) other1442;
-=======
-WMCreateTriggerResponse::WMCreateTriggerResponse(const WMCreateTriggerResponse& other1435) noexcept {
-  (void) other1435;
-}
-WMCreateTriggerResponse& WMCreateTriggerResponse::operator=(const WMCreateTriggerResponse& other1436) noexcept {
-  (void) other1436;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMCreateTriggerResponse::WMCreateTriggerResponse(const WMCreateTriggerResponse& other1441) noexcept {
-  (void) other1441;
-}
-WMCreateTriggerResponse& WMCreateTriggerResponse::operator=(const WMCreateTriggerResponse& other1442) noexcept {
-  (void) other1442;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMCreateTriggerResponse::printTo(std::ostream& out) const {
@@ -43101,8 +40043,6 @@ void swap(WMAlterTriggerRequest &a, WMAlterTriggerRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMAlterTriggerRequest::WMAlterTriggerRequest(const WMAlterTriggerRequest& other1443) {
   trigger = other1443.trigger;
   __isset = other1443.__isset;
@@ -43110,24 +40050,6 @@ WMAlterTriggerRequest::WMAlterTriggerRequest(const WMAlterTriggerRequest& other1
 WMAlterTriggerRequest& WMAlterTriggerRequest::operator=(const WMAlterTriggerRequest& other1444) {
   trigger = other1444.trigger;
   __isset = other1444.__isset;
-=======
-WMAlterTriggerRequest::WMAlterTriggerRequest(const WMAlterTriggerRequest& other1437) {
-  trigger = other1437.trigger;
-  __isset = other1437.__isset;
-}
-WMAlterTriggerRequest& WMAlterTriggerRequest::operator=(const WMAlterTriggerRequest& other1438) {
-  trigger = other1438.trigger;
-  __isset = other1438.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMAlterTriggerRequest::WMAlterTriggerRequest(const WMAlterTriggerRequest& other1443) {
-  trigger = other1443.trigger;
-  __isset = other1443.__isset;
-}
-WMAlterTriggerRequest& WMAlterTriggerRequest::operator=(const WMAlterTriggerRequest& other1444) {
-  trigger = other1444.trigger;
-  __isset = other1444.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMAlterTriggerRequest::printTo(std::ostream& out) const {
@@ -43192,27 +40114,11 @@ void swap(WMAlterTriggerResponse &a, WMAlterTriggerResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMAlterTriggerResponse::WMAlterTriggerResponse(const WMAlterTriggerResponse& other1445) noexcept {
   (void) other1445;
 }
 WMAlterTriggerResponse& WMAlterTriggerResponse::operator=(const WMAlterTriggerResponse& other1446) noexcept {
   (void) other1446;
-=======
-WMAlterTriggerResponse::WMAlterTriggerResponse(const WMAlterTriggerResponse& other1439) noexcept {
-  (void) other1439;
-}
-WMAlterTriggerResponse& WMAlterTriggerResponse::operator=(const WMAlterTriggerResponse& other1440) noexcept {
-  (void) other1440;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMAlterTriggerResponse::WMAlterTriggerResponse(const WMAlterTriggerResponse& other1445) noexcept {
-  (void) other1445;
-}
-WMAlterTriggerResponse& WMAlterTriggerResponse::operator=(const WMAlterTriggerResponse& other1446) noexcept {
-  (void) other1446;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMAlterTriggerResponse::printTo(std::ostream& out) const {
@@ -43318,38 +40224,15 @@ void swap(WMDropTriggerRequest &a, WMDropTriggerRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMDropTriggerRequest::WMDropTriggerRequest(const WMDropTriggerRequest& other1447) {
   resourcePlanName = other1447.resourcePlanName;
   triggerName = other1447.triggerName;
   __isset = other1447.__isset;
-<<<<<<< HEAD
 }
 WMDropTriggerRequest& WMDropTriggerRequest::operator=(const WMDropTriggerRequest& other1448) {
   resourcePlanName = other1448.resourcePlanName;
   triggerName = other1448.triggerName;
   __isset = other1448.__isset;
-=======
-WMDropTriggerRequest::WMDropTriggerRequest(const WMDropTriggerRequest& other1441) {
-  resourcePlanName = other1441.resourcePlanName;
-  triggerName = other1441.triggerName;
-  __isset = other1441.__isset;
-}
-WMDropTriggerRequest& WMDropTriggerRequest::operator=(const WMDropTriggerRequest& other1442) {
-  resourcePlanName = other1442.resourcePlanName;
-  triggerName = other1442.triggerName;
-  __isset = other1442.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMDropTriggerRequest& WMDropTriggerRequest::operator=(const WMDropTriggerRequest& other1448) {
-  resourcePlanName = other1448.resourcePlanName;
-  triggerName = other1448.triggerName;
-  __isset = other1448.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMDropTriggerRequest::printTo(std::ostream& out) const {
@@ -43415,27 +40298,11 @@ void swap(WMDropTriggerResponse &a, WMDropTriggerResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMDropTriggerResponse::WMDropTriggerResponse(const WMDropTriggerResponse& other1449) noexcept {
   (void) other1449;
 }
 WMDropTriggerResponse& WMDropTriggerResponse::operator=(const WMDropTriggerResponse& other1450) noexcept {
   (void) other1450;
-=======
-WMDropTriggerResponse::WMDropTriggerResponse(const WMDropTriggerResponse& other1443) noexcept {
-  (void) other1443;
-}
-WMDropTriggerResponse& WMDropTriggerResponse::operator=(const WMDropTriggerResponse& other1444) noexcept {
-  (void) other1444;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMDropTriggerResponse::WMDropTriggerResponse(const WMDropTriggerResponse& other1449) noexcept {
-  (void) other1449;
-}
-WMDropTriggerResponse& WMDropTriggerResponse::operator=(const WMDropTriggerResponse& other1450) noexcept {
-  (void) other1450;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMDropTriggerResponse::printTo(std::ostream& out) const {
@@ -43522,8 +40389,6 @@ void swap(WMGetTriggersForResourePlanRequest &a, WMGetTriggersForResourePlanRequ
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMGetTriggersForResourePlanRequest::WMGetTriggersForResourePlanRequest(const WMGetTriggersForResourePlanRequest& other1451) {
   resourcePlanName = other1451.resourcePlanName;
   __isset = other1451.__isset;
@@ -43531,24 +40396,6 @@ WMGetTriggersForResourePlanRequest::WMGetTriggersForResourePlanRequest(const WMG
 WMGetTriggersForResourePlanRequest& WMGetTriggersForResourePlanRequest::operator=(const WMGetTriggersForResourePlanRequest& other1452) {
   resourcePlanName = other1452.resourcePlanName;
   __isset = other1452.__isset;
-=======
-WMGetTriggersForResourePlanRequest::WMGetTriggersForResourePlanRequest(const WMGetTriggersForResourePlanRequest& other1445) {
-  resourcePlanName = other1445.resourcePlanName;
-  __isset = other1445.__isset;
-}
-WMGetTriggersForResourePlanRequest& WMGetTriggersForResourePlanRequest::operator=(const WMGetTriggersForResourePlanRequest& other1446) {
-  resourcePlanName = other1446.resourcePlanName;
-  __isset = other1446.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMGetTriggersForResourePlanRequest::WMGetTriggersForResourePlanRequest(const WMGetTriggersForResourePlanRequest& other1451) {
-  resourcePlanName = other1451.resourcePlanName;
-  __isset = other1451.__isset;
-}
-WMGetTriggersForResourePlanRequest& WMGetTriggersForResourePlanRequest::operator=(const WMGetTriggersForResourePlanRequest& other1452) {
-  resourcePlanName = other1452.resourcePlanName;
-  __isset = other1452.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMGetTriggersForResourePlanRequest::printTo(std::ostream& out) const {
@@ -43599,33 +40446,14 @@ uint32_t WMGetTriggersForResourePlanResponse::read(::apache::thrift::protocol::T
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->triggers.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1453;
             ::apache::thrift::protocol::TType _etype1456;
             xfer += iprot->readListBegin(_etype1456, _size1453);
             this->triggers.resize(_size1453);
             uint32_t _i1457;
             for (_i1457 = 0; _i1457 < _size1453; ++_i1457)
-<<<<<<< HEAD
             {
               xfer += this->triggers[_i1457].read(iprot);
-=======
-            uint32_t _size1447;
-            ::apache::thrift::protocol::TType _etype1450;
-            xfer += iprot->readListBegin(_etype1450, _size1447);
-            this->triggers.resize(_size1447);
-            uint32_t _i1451;
-            for (_i1451 = 0; _i1451 < _size1447; ++_i1451)
-            {
-              xfer += this->triggers[_i1451].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->triggers[_i1457].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -43655,24 +40483,10 @@ uint32_t WMGetTriggersForResourePlanResponse::write(::apache::thrift::protocol::
     xfer += oprot->writeFieldBegin("triggers", ::apache::thrift::protocol::T_LIST, 1);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->triggers.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<WMTrigger> ::const_iterator _iter1458;
       for (_iter1458 = this->triggers.begin(); _iter1458 != this->triggers.end(); ++_iter1458)
       {
         xfer += (*_iter1458).write(oprot);
-=======
-      std::vector<WMTrigger> ::const_iterator _iter1452;
-      for (_iter1452 = this->triggers.begin(); _iter1452 != this->triggers.end(); ++_iter1452)
-      {
-        xfer += (*_iter1452).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<WMTrigger> ::const_iterator _iter1458;
-      for (_iter1458 = this->triggers.begin(); _iter1458 != this->triggers.end(); ++_iter1458)
-      {
-        xfer += (*_iter1458).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -43689,8 +40503,6 @@ void swap(WMGetTriggersForResourePlanResponse &a, WMGetTriggersForResourePlanRes
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMGetTriggersForResourePlanResponse::WMGetTriggersForResourePlanResponse(const WMGetTriggersForResourePlanResponse& other1459) {
   triggers = other1459.triggers;
   __isset = other1459.__isset;
@@ -43698,24 +40510,6 @@ WMGetTriggersForResourePlanResponse::WMGetTriggersForResourePlanResponse(const W
 WMGetTriggersForResourePlanResponse& WMGetTriggersForResourePlanResponse::operator=(const WMGetTriggersForResourePlanResponse& other1460) {
   triggers = other1460.triggers;
   __isset = other1460.__isset;
-=======
-WMGetTriggersForResourePlanResponse::WMGetTriggersForResourePlanResponse(const WMGetTriggersForResourePlanResponse& other1453) {
-  triggers = other1453.triggers;
-  __isset = other1453.__isset;
-}
-WMGetTriggersForResourePlanResponse& WMGetTriggersForResourePlanResponse::operator=(const WMGetTriggersForResourePlanResponse& other1454) {
-  triggers = other1454.triggers;
-  __isset = other1454.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMGetTriggersForResourePlanResponse::WMGetTriggersForResourePlanResponse(const WMGetTriggersForResourePlanResponse& other1459) {
-  triggers = other1459.triggers;
-  __isset = other1459.__isset;
-}
-WMGetTriggersForResourePlanResponse& WMGetTriggersForResourePlanResponse::operator=(const WMGetTriggersForResourePlanResponse& other1460) {
-  triggers = other1460.triggers;
-  __isset = other1460.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMGetTriggersForResourePlanResponse::printTo(std::ostream& out) const {
@@ -43803,8 +40597,6 @@ void swap(WMCreatePoolRequest &a, WMCreatePoolRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMCreatePoolRequest::WMCreatePoolRequest(const WMCreatePoolRequest& other1461) {
   pool = other1461.pool;
   __isset = other1461.__isset;
@@ -43812,24 +40604,6 @@ WMCreatePoolRequest::WMCreatePoolRequest(const WMCreatePoolRequest& other1461) {
 WMCreatePoolRequest& WMCreatePoolRequest::operator=(const WMCreatePoolRequest& other1462) {
   pool = other1462.pool;
   __isset = other1462.__isset;
-=======
-WMCreatePoolRequest::WMCreatePoolRequest(const WMCreatePoolRequest& other1455) {
-  pool = other1455.pool;
-  __isset = other1455.__isset;
-}
-WMCreatePoolRequest& WMCreatePoolRequest::operator=(const WMCreatePoolRequest& other1456) {
-  pool = other1456.pool;
-  __isset = other1456.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMCreatePoolRequest::WMCreatePoolRequest(const WMCreatePoolRequest& other1461) {
-  pool = other1461.pool;
-  __isset = other1461.__isset;
-}
-WMCreatePoolRequest& WMCreatePoolRequest::operator=(const WMCreatePoolRequest& other1462) {
-  pool = other1462.pool;
-  __isset = other1462.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMCreatePoolRequest::printTo(std::ostream& out) const {
@@ -43894,27 +40668,11 @@ void swap(WMCreatePoolResponse &a, WMCreatePoolResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMCreatePoolResponse::WMCreatePoolResponse(const WMCreatePoolResponse& other1463) noexcept {
   (void) other1463;
 }
 WMCreatePoolResponse& WMCreatePoolResponse::operator=(const WMCreatePoolResponse& other1464) noexcept {
   (void) other1464;
-=======
-WMCreatePoolResponse::WMCreatePoolResponse(const WMCreatePoolResponse& other1457) noexcept {
-  (void) other1457;
-}
-WMCreatePoolResponse& WMCreatePoolResponse::operator=(const WMCreatePoolResponse& other1458) noexcept {
-  (void) other1458;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMCreatePoolResponse::WMCreatePoolResponse(const WMCreatePoolResponse& other1463) noexcept {
-  (void) other1463;
-}
-WMCreatePoolResponse& WMCreatePoolResponse::operator=(const WMCreatePoolResponse& other1464) noexcept {
-  (void) other1464;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMCreatePoolResponse::printTo(std::ostream& out) const {
@@ -44020,38 +40778,15 @@ void swap(WMAlterPoolRequest &a, WMAlterPoolRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMAlterPoolRequest::WMAlterPoolRequest(const WMAlterPoolRequest& other1465) {
   pool = other1465.pool;
   poolPath = other1465.poolPath;
   __isset = other1465.__isset;
-<<<<<<< HEAD
 }
 WMAlterPoolRequest& WMAlterPoolRequest::operator=(const WMAlterPoolRequest& other1466) {
   pool = other1466.pool;
   poolPath = other1466.poolPath;
   __isset = other1466.__isset;
-=======
-WMAlterPoolRequest::WMAlterPoolRequest(const WMAlterPoolRequest& other1459) {
-  pool = other1459.pool;
-  poolPath = other1459.poolPath;
-  __isset = other1459.__isset;
-}
-WMAlterPoolRequest& WMAlterPoolRequest::operator=(const WMAlterPoolRequest& other1460) {
-  pool = other1460.pool;
-  poolPath = other1460.poolPath;
-  __isset = other1460.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMAlterPoolRequest& WMAlterPoolRequest::operator=(const WMAlterPoolRequest& other1466) {
-  pool = other1466.pool;
-  poolPath = other1466.poolPath;
-  __isset = other1466.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMAlterPoolRequest::printTo(std::ostream& out) const {
@@ -44117,27 +40852,11 @@ void swap(WMAlterPoolResponse &a, WMAlterPoolResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMAlterPoolResponse::WMAlterPoolResponse(const WMAlterPoolResponse& other1467) noexcept {
   (void) other1467;
 }
 WMAlterPoolResponse& WMAlterPoolResponse::operator=(const WMAlterPoolResponse& other1468) noexcept {
   (void) other1468;
-=======
-WMAlterPoolResponse::WMAlterPoolResponse(const WMAlterPoolResponse& other1461) noexcept {
-  (void) other1461;
-}
-WMAlterPoolResponse& WMAlterPoolResponse::operator=(const WMAlterPoolResponse& other1462) noexcept {
-  (void) other1462;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMAlterPoolResponse::WMAlterPoolResponse(const WMAlterPoolResponse& other1467) noexcept {
-  (void) other1467;
-}
-WMAlterPoolResponse& WMAlterPoolResponse::operator=(const WMAlterPoolResponse& other1468) noexcept {
-  (void) other1468;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMAlterPoolResponse::printTo(std::ostream& out) const {
@@ -44243,38 +40962,15 @@ void swap(WMDropPoolRequest &a, WMDropPoolRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMDropPoolRequest::WMDropPoolRequest(const WMDropPoolRequest& other1469) {
   resourcePlanName = other1469.resourcePlanName;
   poolPath = other1469.poolPath;
   __isset = other1469.__isset;
-<<<<<<< HEAD
 }
 WMDropPoolRequest& WMDropPoolRequest::operator=(const WMDropPoolRequest& other1470) {
   resourcePlanName = other1470.resourcePlanName;
   poolPath = other1470.poolPath;
   __isset = other1470.__isset;
-=======
-WMDropPoolRequest::WMDropPoolRequest(const WMDropPoolRequest& other1463) {
-  resourcePlanName = other1463.resourcePlanName;
-  poolPath = other1463.poolPath;
-  __isset = other1463.__isset;
-}
-WMDropPoolRequest& WMDropPoolRequest::operator=(const WMDropPoolRequest& other1464) {
-  resourcePlanName = other1464.resourcePlanName;
-  poolPath = other1464.poolPath;
-  __isset = other1464.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMDropPoolRequest& WMDropPoolRequest::operator=(const WMDropPoolRequest& other1470) {
-  resourcePlanName = other1470.resourcePlanName;
-  poolPath = other1470.poolPath;
-  __isset = other1470.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMDropPoolRequest::printTo(std::ostream& out) const {
@@ -44340,27 +41036,11 @@ void swap(WMDropPoolResponse &a, WMDropPoolResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMDropPoolResponse::WMDropPoolResponse(const WMDropPoolResponse& other1471) noexcept {
   (void) other1471;
 }
 WMDropPoolResponse& WMDropPoolResponse::operator=(const WMDropPoolResponse& other1472) noexcept {
   (void) other1472;
-=======
-WMDropPoolResponse::WMDropPoolResponse(const WMDropPoolResponse& other1465) noexcept {
-  (void) other1465;
-}
-WMDropPoolResponse& WMDropPoolResponse::operator=(const WMDropPoolResponse& other1466) noexcept {
-  (void) other1466;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMDropPoolResponse::WMDropPoolResponse(const WMDropPoolResponse& other1471) noexcept {
-  (void) other1471;
-}
-WMDropPoolResponse& WMDropPoolResponse::operator=(const WMDropPoolResponse& other1472) noexcept {
-  (void) other1472;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMDropPoolResponse::printTo(std::ostream& out) const {
@@ -44466,38 +41146,15 @@ void swap(WMCreateOrUpdateMappingRequest &a, WMCreateOrUpdateMappingRequest &b) 
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMCreateOrUpdateMappingRequest::WMCreateOrUpdateMappingRequest(const WMCreateOrUpdateMappingRequest& other1473) {
   mapping = other1473.mapping;
   update = other1473.update;
   __isset = other1473.__isset;
-<<<<<<< HEAD
 }
 WMCreateOrUpdateMappingRequest& WMCreateOrUpdateMappingRequest::operator=(const WMCreateOrUpdateMappingRequest& other1474) {
   mapping = other1474.mapping;
   update = other1474.update;
   __isset = other1474.__isset;
-=======
-WMCreateOrUpdateMappingRequest::WMCreateOrUpdateMappingRequest(const WMCreateOrUpdateMappingRequest& other1467) {
-  mapping = other1467.mapping;
-  update = other1467.update;
-  __isset = other1467.__isset;
-}
-WMCreateOrUpdateMappingRequest& WMCreateOrUpdateMappingRequest::operator=(const WMCreateOrUpdateMappingRequest& other1468) {
-  mapping = other1468.mapping;
-  update = other1468.update;
-  __isset = other1468.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMCreateOrUpdateMappingRequest& WMCreateOrUpdateMappingRequest::operator=(const WMCreateOrUpdateMappingRequest& other1474) {
-  mapping = other1474.mapping;
-  update = other1474.update;
-  __isset = other1474.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMCreateOrUpdateMappingRequest::printTo(std::ostream& out) const {
@@ -44563,27 +41220,11 @@ void swap(WMCreateOrUpdateMappingResponse &a, WMCreateOrUpdateMappingResponse &b
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMCreateOrUpdateMappingResponse::WMCreateOrUpdateMappingResponse(const WMCreateOrUpdateMappingResponse& other1475) noexcept {
   (void) other1475;
 }
 WMCreateOrUpdateMappingResponse& WMCreateOrUpdateMappingResponse::operator=(const WMCreateOrUpdateMappingResponse& other1476) noexcept {
   (void) other1476;
-=======
-WMCreateOrUpdateMappingResponse::WMCreateOrUpdateMappingResponse(const WMCreateOrUpdateMappingResponse& other1469) noexcept {
-  (void) other1469;
-}
-WMCreateOrUpdateMappingResponse& WMCreateOrUpdateMappingResponse::operator=(const WMCreateOrUpdateMappingResponse& other1470) noexcept {
-  (void) other1470;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMCreateOrUpdateMappingResponse::WMCreateOrUpdateMappingResponse(const WMCreateOrUpdateMappingResponse& other1475) noexcept {
-  (void) other1475;
-}
-WMCreateOrUpdateMappingResponse& WMCreateOrUpdateMappingResponse::operator=(const WMCreateOrUpdateMappingResponse& other1476) noexcept {
-  (void) other1476;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMCreateOrUpdateMappingResponse::printTo(std::ostream& out) const {
@@ -44670,8 +41311,6 @@ void swap(WMDropMappingRequest &a, WMDropMappingRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMDropMappingRequest::WMDropMappingRequest(const WMDropMappingRequest& other1477) {
   mapping = other1477.mapping;
   __isset = other1477.__isset;
@@ -44679,24 +41318,6 @@ WMDropMappingRequest::WMDropMappingRequest(const WMDropMappingRequest& other1477
 WMDropMappingRequest& WMDropMappingRequest::operator=(const WMDropMappingRequest& other1478) {
   mapping = other1478.mapping;
   __isset = other1478.__isset;
-=======
-WMDropMappingRequest::WMDropMappingRequest(const WMDropMappingRequest& other1471) {
-  mapping = other1471.mapping;
-  __isset = other1471.__isset;
-}
-WMDropMappingRequest& WMDropMappingRequest::operator=(const WMDropMappingRequest& other1472) {
-  mapping = other1472.mapping;
-  __isset = other1472.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMDropMappingRequest::WMDropMappingRequest(const WMDropMappingRequest& other1477) {
-  mapping = other1477.mapping;
-  __isset = other1477.__isset;
-}
-WMDropMappingRequest& WMDropMappingRequest::operator=(const WMDropMappingRequest& other1478) {
-  mapping = other1478.mapping;
-  __isset = other1478.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMDropMappingRequest::printTo(std::ostream& out) const {
@@ -44761,27 +41382,11 @@ void swap(WMDropMappingResponse &a, WMDropMappingResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMDropMappingResponse::WMDropMappingResponse(const WMDropMappingResponse& other1479) noexcept {
   (void) other1479;
 }
 WMDropMappingResponse& WMDropMappingResponse::operator=(const WMDropMappingResponse& other1480) noexcept {
   (void) other1480;
-=======
-WMDropMappingResponse::WMDropMappingResponse(const WMDropMappingResponse& other1473) noexcept {
-  (void) other1473;
-}
-WMDropMappingResponse& WMDropMappingResponse::operator=(const WMDropMappingResponse& other1474) noexcept {
-  (void) other1474;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMDropMappingResponse::WMDropMappingResponse(const WMDropMappingResponse& other1479) noexcept {
-  (void) other1479;
-}
-WMDropMappingResponse& WMDropMappingResponse::operator=(const WMDropMappingResponse& other1480) noexcept {
-  (void) other1480;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMDropMappingResponse::printTo(std::ostream& out) const {
@@ -44925,17 +41530,12 @@ void swap(WMCreateOrDropTriggerToPoolMappingRequest &a, WMCreateOrDropTriggerToP
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 WMCreateOrDropTriggerToPoolMappingRequest::WMCreateOrDropTriggerToPoolMappingRequest(const WMCreateOrDropTriggerToPoolMappingRequest& other1481) {
   resourcePlanName = other1481.resourcePlanName;
   triggerName = other1481.triggerName;
   poolPath = other1481.poolPath;
   drop = other1481.drop;
   __isset = other1481.__isset;
-<<<<<<< HEAD
 }
 WMCreateOrDropTriggerToPoolMappingRequest& WMCreateOrDropTriggerToPoolMappingRequest::operator=(const WMCreateOrDropTriggerToPoolMappingRequest& other1482) {
   resourcePlanName = other1482.resourcePlanName;
@@ -44943,30 +41543,6 @@ WMCreateOrDropTriggerToPoolMappingRequest& WMCreateOrDropTriggerToPoolMappingReq
   poolPath = other1482.poolPath;
   drop = other1482.drop;
   __isset = other1482.__isset;
-=======
-WMCreateOrDropTriggerToPoolMappingRequest::WMCreateOrDropTriggerToPoolMappingRequest(const WMCreateOrDropTriggerToPoolMappingRequest& other1475) {
-  resourcePlanName = other1475.resourcePlanName;
-  triggerName = other1475.triggerName;
-  poolPath = other1475.poolPath;
-  drop = other1475.drop;
-  __isset = other1475.__isset;
-}
-WMCreateOrDropTriggerToPoolMappingRequest& WMCreateOrDropTriggerToPoolMappingRequest::operator=(const WMCreateOrDropTriggerToPoolMappingRequest& other1476) {
-  resourcePlanName = other1476.resourcePlanName;
-  triggerName = other1476.triggerName;
-  poolPath = other1476.poolPath;
-  drop = other1476.drop;
-  __isset = other1476.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-WMCreateOrDropTriggerToPoolMappingRequest& WMCreateOrDropTriggerToPoolMappingRequest::operator=(const WMCreateOrDropTriggerToPoolMappingRequest& other1482) {
-  resourcePlanName = other1482.resourcePlanName;
-  triggerName = other1482.triggerName;
-  poolPath = other1482.poolPath;
-  drop = other1482.drop;
-  __isset = other1482.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMCreateOrDropTriggerToPoolMappingRequest::printTo(std::ostream& out) const {
@@ -45034,27 +41610,11 @@ void swap(WMCreateOrDropTriggerToPoolMappingResponse &a, WMCreateOrDropTriggerTo
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 WMCreateOrDropTriggerToPoolMappingResponse::WMCreateOrDropTriggerToPoolMappingResponse(const WMCreateOrDropTriggerToPoolMappingResponse& other1483) noexcept {
   (void) other1483;
 }
 WMCreateOrDropTriggerToPoolMappingResponse& WMCreateOrDropTriggerToPoolMappingResponse::operator=(const WMCreateOrDropTriggerToPoolMappingResponse& other1484) noexcept {
   (void) other1484;
-=======
-WMCreateOrDropTriggerToPoolMappingResponse::WMCreateOrDropTriggerToPoolMappingResponse(const WMCreateOrDropTriggerToPoolMappingResponse& other1477) noexcept {
-  (void) other1477;
-}
-WMCreateOrDropTriggerToPoolMappingResponse& WMCreateOrDropTriggerToPoolMappingResponse::operator=(const WMCreateOrDropTriggerToPoolMappingResponse& other1478) noexcept {
-  (void) other1478;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-WMCreateOrDropTriggerToPoolMappingResponse::WMCreateOrDropTriggerToPoolMappingResponse(const WMCreateOrDropTriggerToPoolMappingResponse& other1483) noexcept {
-  (void) other1483;
-}
-WMCreateOrDropTriggerToPoolMappingResponse& WMCreateOrDropTriggerToPoolMappingResponse::operator=(const WMCreateOrDropTriggerToPoolMappingResponse& other1484) noexcept {
-  (void) other1484;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void WMCreateOrDropTriggerToPoolMappingResponse::printTo(std::ostream& out) const {
@@ -45135,21 +41695,9 @@ uint32_t ISchema::read(::apache::thrift::protocol::TProtocol* iprot) {
     {
       case 1:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1485;
           xfer += iprot->readI32(ecast1485);
           this->schemaType = static_cast<SchemaType::type>(ecast1485);
-=======
-          int32_t ecast1479;
-          xfer += iprot->readI32(ecast1479);
-          this->schemaType = static_cast<SchemaType::type>(ecast1479);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1485;
-          xfer += iprot->readI32(ecast1485);
-          this->schemaType = static_cast<SchemaType::type>(ecast1485);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.schemaType = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -45181,21 +41729,9 @@ uint32_t ISchema::read(::apache::thrift::protocol::TProtocol* iprot) {
         break;
       case 5:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1486;
           xfer += iprot->readI32(ecast1486);
           this->compatibility = static_cast<SchemaCompatibility::type>(ecast1486);
-=======
-          int32_t ecast1480;
-          xfer += iprot->readI32(ecast1480);
-          this->compatibility = static_cast<SchemaCompatibility::type>(ecast1480);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1486;
-          xfer += iprot->readI32(ecast1486);
-          this->compatibility = static_cast<SchemaCompatibility::type>(ecast1486);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.compatibility = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -45203,21 +41739,9 @@ uint32_t ISchema::read(::apache::thrift::protocol::TProtocol* iprot) {
         break;
       case 6:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1487;
           xfer += iprot->readI32(ecast1487);
           this->validationLevel = static_cast<SchemaValidation::type>(ecast1487);
-=======
-          int32_t ecast1481;
-          xfer += iprot->readI32(ecast1481);
-          this->validationLevel = static_cast<SchemaValidation::type>(ecast1481);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1487;
-          xfer += iprot->readI32(ecast1487);
-          this->validationLevel = static_cast<SchemaValidation::type>(ecast1487);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.validationLevel = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -45321,10 +41845,6 @@ void swap(ISchema &a, ISchema &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 ISchema::ISchema(const ISchema& other1488) {
   schemaType = other1488.schemaType;
   name = other1488.name;
@@ -45336,7 +41856,6 @@ ISchema::ISchema(const ISchema& other1488) {
   schemaGroup = other1488.schemaGroup;
   description = other1488.description;
   __isset = other1488.__isset;
-<<<<<<< HEAD
 }
 ISchema& ISchema::operator=(const ISchema& other1489) {
   schemaType = other1489.schemaType;
@@ -45349,45 +41868,6 @@ ISchema& ISchema::operator=(const ISchema& other1489) {
   schemaGroup = other1489.schemaGroup;
   description = other1489.description;
   __isset = other1489.__isset;
-=======
-ISchema::ISchema(const ISchema& other1482) {
-  schemaType = other1482.schemaType;
-  name = other1482.name;
-  catName = other1482.catName;
-  dbName = other1482.dbName;
-  compatibility = other1482.compatibility;
-  validationLevel = other1482.validationLevel;
-  canEvolve = other1482.canEvolve;
-  schemaGroup = other1482.schemaGroup;
-  description = other1482.description;
-  __isset = other1482.__isset;
-}
-ISchema& ISchema::operator=(const ISchema& other1483) {
-  schemaType = other1483.schemaType;
-  name = other1483.name;
-  catName = other1483.catName;
-  dbName = other1483.dbName;
-  compatibility = other1483.compatibility;
-  validationLevel = other1483.validationLevel;
-  canEvolve = other1483.canEvolve;
-  schemaGroup = other1483.schemaGroup;
-  description = other1483.description;
-  __isset = other1483.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-ISchema& ISchema::operator=(const ISchema& other1489) {
-  schemaType = other1489.schemaType;
-  name = other1489.name;
-  catName = other1489.catName;
-  dbName = other1489.dbName;
-  compatibility = other1489.compatibility;
-  validationLevel = other1489.validationLevel;
-  canEvolve = other1489.canEvolve;
-  schemaGroup = other1489.schemaGroup;
-  description = other1489.description;
-  __isset = other1489.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ISchema::printTo(std::ostream& out) const {
@@ -45515,43 +41995,17 @@ void swap(ISchemaName &a, ISchemaName &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 ISchemaName::ISchemaName(const ISchemaName& other1490) {
   catName = other1490.catName;
   dbName = other1490.dbName;
   schemaName = other1490.schemaName;
   __isset = other1490.__isset;
-<<<<<<< HEAD
 }
 ISchemaName& ISchemaName::operator=(const ISchemaName& other1491) {
   catName = other1491.catName;
   dbName = other1491.dbName;
   schemaName = other1491.schemaName;
   __isset = other1491.__isset;
-=======
-ISchemaName::ISchemaName(const ISchemaName& other1484) {
-  catName = other1484.catName;
-  dbName = other1484.dbName;
-  schemaName = other1484.schemaName;
-  __isset = other1484.__isset;
-}
-ISchemaName& ISchemaName::operator=(const ISchemaName& other1485) {
-  catName = other1485.catName;
-  dbName = other1485.dbName;
-  schemaName = other1485.schemaName;
-  __isset = other1485.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-ISchemaName& ISchemaName::operator=(const ISchemaName& other1491) {
-  catName = other1491.catName;
-  dbName = other1491.dbName;
-  schemaName = other1491.schemaName;
-  __isset = other1491.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ISchemaName::printTo(std::ostream& out) const {
@@ -45656,38 +42110,15 @@ void swap(AlterISchemaRequest &a, AlterISchemaRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 AlterISchemaRequest::AlterISchemaRequest(const AlterISchemaRequest& other1492) {
   name = other1492.name;
   newSchema = other1492.newSchema;
   __isset = other1492.__isset;
-<<<<<<< HEAD
 }
 AlterISchemaRequest& AlterISchemaRequest::operator=(const AlterISchemaRequest& other1493) {
   name = other1493.name;
   newSchema = other1493.newSchema;
   __isset = other1493.__isset;
-=======
-AlterISchemaRequest::AlterISchemaRequest(const AlterISchemaRequest& other1486) {
-  name = other1486.name;
-  newSchema = other1486.newSchema;
-  __isset = other1486.__isset;
-}
-AlterISchemaRequest& AlterISchemaRequest::operator=(const AlterISchemaRequest& other1487) {
-  name = other1487.name;
-  newSchema = other1487.newSchema;
-  __isset = other1487.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-AlterISchemaRequest& AlterISchemaRequest::operator=(const AlterISchemaRequest& other1493) {
-  name = other1493.name;
-  newSchema = other1493.newSchema;
-  __isset = other1493.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void AlterISchemaRequest::printTo(std::ostream& out) const {
@@ -45804,33 +42235,14 @@ uint32_t SchemaVersion::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->cols.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1494;
             ::apache::thrift::protocol::TType _etype1497;
             xfer += iprot->readListBegin(_etype1497, _size1494);
             this->cols.resize(_size1494);
             uint32_t _i1498;
             for (_i1498 = 0; _i1498 < _size1494; ++_i1498)
-<<<<<<< HEAD
             {
               xfer += this->cols[_i1498].read(iprot);
-=======
-            uint32_t _size1488;
-            ::apache::thrift::protocol::TType _etype1491;
-            xfer += iprot->readListBegin(_etype1491, _size1488);
-            this->cols.resize(_size1488);
-            uint32_t _i1492;
-            for (_i1492 = 0; _i1492 < _size1488; ++_i1492)
-            {
-              xfer += this->cols[_i1492].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->cols[_i1498].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -45841,21 +42253,9 @@ uint32_t SchemaVersion::read(::apache::thrift::protocol::TProtocol* iprot) {
         break;
       case 5:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1499;
           xfer += iprot->readI32(ecast1499);
           this->state = static_cast<SchemaVersionState::type>(ecast1499);
-=======
-          int32_t ecast1493;
-          xfer += iprot->readI32(ecast1493);
-          this->state = static_cast<SchemaVersionState::type>(ecast1493);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1499;
-          xfer += iprot->readI32(ecast1499);
-          this->state = static_cast<SchemaVersionState::type>(ecast1499);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.state = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -45933,24 +42333,10 @@ uint32_t SchemaVersion::write(::apache::thrift::protocol::TProtocol* oprot) cons
   xfer += oprot->writeFieldBegin("cols", ::apache::thrift::protocol::T_LIST, 4);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->cols.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<FieldSchema> ::const_iterator _iter1500;
     for (_iter1500 = this->cols.begin(); _iter1500 != this->cols.end(); ++_iter1500)
     {
       xfer += (*_iter1500).write(oprot);
-=======
-    std::vector<FieldSchema> ::const_iterator _iter1494;
-    for (_iter1494 = this->cols.begin(); _iter1494 != this->cols.end(); ++_iter1494)
-    {
-      xfer += (*_iter1494).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<FieldSchema> ::const_iterator _iter1500;
-    for (_iter1500 = this->cols.begin(); _iter1500 != this->cols.end(); ++_iter1500)
-    {
-      xfer += (*_iter1500).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -46006,10 +42392,6 @@ void swap(SchemaVersion &a, SchemaVersion &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 SchemaVersion::SchemaVersion(const SchemaVersion& other1501) {
   schema = other1501.schema;
   version = other1501.version;
@@ -46022,7 +42404,6 @@ SchemaVersion::SchemaVersion(const SchemaVersion& other1501) {
   name = other1501.name;
   serDe = other1501.serDe;
   __isset = other1501.__isset;
-<<<<<<< HEAD
 }
 SchemaVersion& SchemaVersion::operator=(const SchemaVersion& other1502) {
   schema = other1502.schema;
@@ -46036,48 +42417,6 @@ SchemaVersion& SchemaVersion::operator=(const SchemaVersion& other1502) {
   name = other1502.name;
   serDe = other1502.serDe;
   __isset = other1502.__isset;
-=======
-SchemaVersion::SchemaVersion(const SchemaVersion& other1495) {
-  schema = other1495.schema;
-  version = other1495.version;
-  createdAt = other1495.createdAt;
-  cols = other1495.cols;
-  state = other1495.state;
-  description = other1495.description;
-  schemaText = other1495.schemaText;
-  fingerprint = other1495.fingerprint;
-  name = other1495.name;
-  serDe = other1495.serDe;
-  __isset = other1495.__isset;
-}
-SchemaVersion& SchemaVersion::operator=(const SchemaVersion& other1496) {
-  schema = other1496.schema;
-  version = other1496.version;
-  createdAt = other1496.createdAt;
-  cols = other1496.cols;
-  state = other1496.state;
-  description = other1496.description;
-  schemaText = other1496.schemaText;
-  fingerprint = other1496.fingerprint;
-  name = other1496.name;
-  serDe = other1496.serDe;
-  __isset = other1496.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-SchemaVersion& SchemaVersion::operator=(const SchemaVersion& other1502) {
-  schema = other1502.schema;
-  version = other1502.version;
-  createdAt = other1502.createdAt;
-  cols = other1502.cols;
-  state = other1502.state;
-  description = other1502.description;
-  schemaText = other1502.schemaText;
-  fingerprint = other1502.fingerprint;
-  name = other1502.name;
-  serDe = other1502.serDe;
-  __isset = other1502.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void SchemaVersion::printTo(std::ostream& out) const {
@@ -46189,38 +42528,15 @@ void swap(SchemaVersionDescriptor &a, SchemaVersionDescriptor &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 SchemaVersionDescriptor::SchemaVersionDescriptor(const SchemaVersionDescriptor& other1503) {
   schema = other1503.schema;
   version = other1503.version;
   __isset = other1503.__isset;
-<<<<<<< HEAD
 }
 SchemaVersionDescriptor& SchemaVersionDescriptor::operator=(const SchemaVersionDescriptor& other1504) {
   schema = other1504.schema;
   version = other1504.version;
   __isset = other1504.__isset;
-=======
-SchemaVersionDescriptor::SchemaVersionDescriptor(const SchemaVersionDescriptor& other1497) {
-  schema = other1497.schema;
-  version = other1497.version;
-  __isset = other1497.__isset;
-}
-SchemaVersionDescriptor& SchemaVersionDescriptor::operator=(const SchemaVersionDescriptor& other1498) {
-  schema = other1498.schema;
-  version = other1498.version;
-  __isset = other1498.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-SchemaVersionDescriptor& SchemaVersionDescriptor::operator=(const SchemaVersionDescriptor& other1504) {
-  schema = other1504.schema;
-  version = other1504.version;
-  __isset = other1504.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void SchemaVersionDescriptor::printTo(std::ostream& out) const {
@@ -46347,43 +42663,17 @@ void swap(FindSchemasByColsRqst &a, FindSchemasByColsRqst &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 FindSchemasByColsRqst::FindSchemasByColsRqst(const FindSchemasByColsRqst& other1505) {
   colName = other1505.colName;
   colNamespace = other1505.colNamespace;
   type = other1505.type;
   __isset = other1505.__isset;
-<<<<<<< HEAD
 }
 FindSchemasByColsRqst& FindSchemasByColsRqst::operator=(const FindSchemasByColsRqst& other1506) {
   colName = other1506.colName;
   colNamespace = other1506.colNamespace;
   type = other1506.type;
   __isset = other1506.__isset;
-=======
-FindSchemasByColsRqst::FindSchemasByColsRqst(const FindSchemasByColsRqst& other1499) {
-  colName = other1499.colName;
-  colNamespace = other1499.colNamespace;
-  type = other1499.type;
-  __isset = other1499.__isset;
-}
-FindSchemasByColsRqst& FindSchemasByColsRqst::operator=(const FindSchemasByColsRqst& other1500) {
-  colName = other1500.colName;
-  colNamespace = other1500.colNamespace;
-  type = other1500.type;
-  __isset = other1500.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-FindSchemasByColsRqst& FindSchemasByColsRqst::operator=(const FindSchemasByColsRqst& other1506) {
-  colName = other1506.colName;
-  colNamespace = other1506.colNamespace;
-  type = other1506.type;
-  __isset = other1506.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void FindSchemasByColsRqst::printTo(std::ostream& out) const {
@@ -46435,33 +42725,14 @@ uint32_t FindSchemasByColsResp::read(::apache::thrift::protocol::TProtocol* ipro
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->schemaVersions.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1507;
             ::apache::thrift::protocol::TType _etype1510;
             xfer += iprot->readListBegin(_etype1510, _size1507);
             this->schemaVersions.resize(_size1507);
             uint32_t _i1511;
             for (_i1511 = 0; _i1511 < _size1507; ++_i1511)
-<<<<<<< HEAD
             {
               xfer += this->schemaVersions[_i1511].read(iprot);
-=======
-            uint32_t _size1501;
-            ::apache::thrift::protocol::TType _etype1504;
-            xfer += iprot->readListBegin(_etype1504, _size1501);
-            this->schemaVersions.resize(_size1501);
-            uint32_t _i1505;
-            for (_i1505 = 0; _i1505 < _size1501; ++_i1505)
-            {
-              xfer += this->schemaVersions[_i1505].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->schemaVersions[_i1511].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -46490,24 +42761,10 @@ uint32_t FindSchemasByColsResp::write(::apache::thrift::protocol::TProtocol* opr
   xfer += oprot->writeFieldBegin("schemaVersions", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->schemaVersions.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<SchemaVersionDescriptor> ::const_iterator _iter1512;
     for (_iter1512 = this->schemaVersions.begin(); _iter1512 != this->schemaVersions.end(); ++_iter1512)
     {
       xfer += (*_iter1512).write(oprot);
-=======
-    std::vector<SchemaVersionDescriptor> ::const_iterator _iter1506;
-    for (_iter1506 = this->schemaVersions.begin(); _iter1506 != this->schemaVersions.end(); ++_iter1506)
-    {
-      xfer += (*_iter1506).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<SchemaVersionDescriptor> ::const_iterator _iter1512;
-    for (_iter1512 = this->schemaVersions.begin(); _iter1512 != this->schemaVersions.end(); ++_iter1512)
-    {
-      xfer += (*_iter1512).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -46524,8 +42781,6 @@ void swap(FindSchemasByColsResp &a, FindSchemasByColsResp &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 FindSchemasByColsResp::FindSchemasByColsResp(const FindSchemasByColsResp& other1513) {
   schemaVersions = other1513.schemaVersions;
   __isset = other1513.__isset;
@@ -46533,24 +42788,6 @@ FindSchemasByColsResp::FindSchemasByColsResp(const FindSchemasByColsResp& other1
 FindSchemasByColsResp& FindSchemasByColsResp::operator=(const FindSchemasByColsResp& other1514) {
   schemaVersions = other1514.schemaVersions;
   __isset = other1514.__isset;
-=======
-FindSchemasByColsResp::FindSchemasByColsResp(const FindSchemasByColsResp& other1507) {
-  schemaVersions = other1507.schemaVersions;
-  __isset = other1507.__isset;
-}
-FindSchemasByColsResp& FindSchemasByColsResp::operator=(const FindSchemasByColsResp& other1508) {
-  schemaVersions = other1508.schemaVersions;
-  __isset = other1508.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-FindSchemasByColsResp::FindSchemasByColsResp(const FindSchemasByColsResp& other1513) {
-  schemaVersions = other1513.schemaVersions;
-  __isset = other1513.__isset;
-}
-FindSchemasByColsResp& FindSchemasByColsResp::operator=(const FindSchemasByColsResp& other1514) {
-  schemaVersions = other1514.schemaVersions;
-  __isset = other1514.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void FindSchemasByColsResp::printTo(std::ostream& out) const {
@@ -46653,38 +42890,15 @@ void swap(MapSchemaVersionToSerdeRequest &a, MapSchemaVersionToSerdeRequest &b) 
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 MapSchemaVersionToSerdeRequest::MapSchemaVersionToSerdeRequest(const MapSchemaVersionToSerdeRequest& other1515) {
   schemaVersion = other1515.schemaVersion;
   serdeName = other1515.serdeName;
   __isset = other1515.__isset;
-<<<<<<< HEAD
 }
 MapSchemaVersionToSerdeRequest& MapSchemaVersionToSerdeRequest::operator=(const MapSchemaVersionToSerdeRequest& other1516) {
   schemaVersion = other1516.schemaVersion;
   serdeName = other1516.serdeName;
   __isset = other1516.__isset;
-=======
-MapSchemaVersionToSerdeRequest::MapSchemaVersionToSerdeRequest(const MapSchemaVersionToSerdeRequest& other1509) {
-  schemaVersion = other1509.schemaVersion;
-  serdeName = other1509.serdeName;
-  __isset = other1509.__isset;
-}
-MapSchemaVersionToSerdeRequest& MapSchemaVersionToSerdeRequest::operator=(const MapSchemaVersionToSerdeRequest& other1510) {
-  schemaVersion = other1510.schemaVersion;
-  serdeName = other1510.serdeName;
-  __isset = other1510.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-MapSchemaVersionToSerdeRequest& MapSchemaVersionToSerdeRequest::operator=(const MapSchemaVersionToSerdeRequest& other1516) {
-  schemaVersion = other1516.schemaVersion;
-  serdeName = other1516.serdeName;
-  __isset = other1516.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void MapSchemaVersionToSerdeRequest::printTo(std::ostream& out) const {
@@ -46745,21 +42959,9 @@ uint32_t SetSchemaVersionStateRequest::read(::apache::thrift::protocol::TProtoco
         break;
       case 2:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1517;
           xfer += iprot->readI32(ecast1517);
           this->state = static_cast<SchemaVersionState::type>(ecast1517);
-=======
-          int32_t ecast1511;
-          xfer += iprot->readI32(ecast1511);
-          this->state = static_cast<SchemaVersionState::type>(ecast1511);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1517;
-          xfer += iprot->readI32(ecast1517);
-          this->state = static_cast<SchemaVersionState::type>(ecast1517);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.state = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -46802,38 +43004,15 @@ void swap(SetSchemaVersionStateRequest &a, SetSchemaVersionStateRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 SetSchemaVersionStateRequest::SetSchemaVersionStateRequest(const SetSchemaVersionStateRequest& other1518) {
   schemaVersion = other1518.schemaVersion;
   state = other1518.state;
   __isset = other1518.__isset;
-<<<<<<< HEAD
 }
 SetSchemaVersionStateRequest& SetSchemaVersionStateRequest::operator=(const SetSchemaVersionStateRequest& other1519) {
   schemaVersion = other1519.schemaVersion;
   state = other1519.state;
   __isset = other1519.__isset;
-=======
-SetSchemaVersionStateRequest::SetSchemaVersionStateRequest(const SetSchemaVersionStateRequest& other1512) {
-  schemaVersion = other1512.schemaVersion;
-  state = other1512.state;
-  __isset = other1512.__isset;
-}
-SetSchemaVersionStateRequest& SetSchemaVersionStateRequest::operator=(const SetSchemaVersionStateRequest& other1513) {
-  schemaVersion = other1513.schemaVersion;
-  state = other1513.state;
-  __isset = other1513.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-SetSchemaVersionStateRequest& SetSchemaVersionStateRequest::operator=(const SetSchemaVersionStateRequest& other1519) {
-  schemaVersion = other1519.schemaVersion;
-  state = other1519.state;
-  __isset = other1519.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void SetSchemaVersionStateRequest::printTo(std::ostream& out) const {
@@ -46920,8 +43099,6 @@ void swap(GetSerdeRequest &a, GetSerdeRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetSerdeRequest::GetSerdeRequest(const GetSerdeRequest& other1520) {
   serdeName = other1520.serdeName;
   __isset = other1520.__isset;
@@ -46929,24 +43106,6 @@ GetSerdeRequest::GetSerdeRequest(const GetSerdeRequest& other1520) {
 GetSerdeRequest& GetSerdeRequest::operator=(const GetSerdeRequest& other1521) {
   serdeName = other1521.serdeName;
   __isset = other1521.__isset;
-=======
-GetSerdeRequest::GetSerdeRequest(const GetSerdeRequest& other1514) {
-  serdeName = other1514.serdeName;
-  __isset = other1514.__isset;
-}
-GetSerdeRequest& GetSerdeRequest::operator=(const GetSerdeRequest& other1515) {
-  serdeName = other1515.serdeName;
-  __isset = other1515.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetSerdeRequest::GetSerdeRequest(const GetSerdeRequest& other1520) {
-  serdeName = other1520.serdeName;
-  __isset = other1520.__isset;
-}
-GetSerdeRequest& GetSerdeRequest::operator=(const GetSerdeRequest& other1521) {
-  serdeName = other1521.serdeName;
-  __isset = other1521.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetSerdeRequest::printTo(std::ostream& out) const {
@@ -47074,43 +43233,17 @@ void swap(RuntimeStat &a, RuntimeStat &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 RuntimeStat::RuntimeStat(const RuntimeStat& other1522) {
   createTime = other1522.createTime;
   weight = other1522.weight;
   payload = other1522.payload;
   __isset = other1522.__isset;
-<<<<<<< HEAD
 }
 RuntimeStat& RuntimeStat::operator=(const RuntimeStat& other1523) {
   createTime = other1523.createTime;
   weight = other1523.weight;
   payload = other1523.payload;
   __isset = other1523.__isset;
-=======
-RuntimeStat::RuntimeStat(const RuntimeStat& other1516) {
-  createTime = other1516.createTime;
-  weight = other1516.weight;
-  payload = other1516.payload;
-  __isset = other1516.__isset;
-}
-RuntimeStat& RuntimeStat::operator=(const RuntimeStat& other1517) {
-  createTime = other1517.createTime;
-  weight = other1517.weight;
-  payload = other1517.payload;
-  __isset = other1517.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-RuntimeStat& RuntimeStat::operator=(const RuntimeStat& other1523) {
-  createTime = other1523.createTime;
-  weight = other1523.weight;
-  payload = other1523.payload;
-  __isset = other1523.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void RuntimeStat::printTo(std::ostream& out) const {
@@ -47220,8 +43353,6 @@ void swap(GetRuntimeStatsRequest &a, GetRuntimeStatsRequest &b) {
   swap(a.maxCreateTime, b.maxCreateTime);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetRuntimeStatsRequest::GetRuntimeStatsRequest(const GetRuntimeStatsRequest& other1524) noexcept {
   maxWeight = other1524.maxWeight;
   maxCreateTime = other1524.maxCreateTime;
@@ -47229,24 +43360,6 @@ GetRuntimeStatsRequest::GetRuntimeStatsRequest(const GetRuntimeStatsRequest& oth
 GetRuntimeStatsRequest& GetRuntimeStatsRequest::operator=(const GetRuntimeStatsRequest& other1525) noexcept {
   maxWeight = other1525.maxWeight;
   maxCreateTime = other1525.maxCreateTime;
-=======
-GetRuntimeStatsRequest::GetRuntimeStatsRequest(const GetRuntimeStatsRequest& other1518) noexcept {
-  maxWeight = other1518.maxWeight;
-  maxCreateTime = other1518.maxCreateTime;
-}
-GetRuntimeStatsRequest& GetRuntimeStatsRequest::operator=(const GetRuntimeStatsRequest& other1519) noexcept {
-  maxWeight = other1519.maxWeight;
-  maxCreateTime = other1519.maxCreateTime;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetRuntimeStatsRequest::GetRuntimeStatsRequest(const GetRuntimeStatsRequest& other1524) noexcept {
-  maxWeight = other1524.maxWeight;
-  maxCreateTime = other1524.maxCreateTime;
-}
-GetRuntimeStatsRequest& GetRuntimeStatsRequest::operator=(const GetRuntimeStatsRequest& other1525) noexcept {
-  maxWeight = other1525.maxWeight;
-  maxCreateTime = other1525.maxCreateTime;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetRuntimeStatsRequest::printTo(std::ostream& out) const {
@@ -47359,33 +43472,14 @@ uint32_t CreateTableRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->primaryKeys.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1526;
             ::apache::thrift::protocol::TType _etype1529;
             xfer += iprot->readListBegin(_etype1529, _size1526);
             this->primaryKeys.resize(_size1526);
             uint32_t _i1530;
             for (_i1530 = 0; _i1530 < _size1526; ++_i1530)
-<<<<<<< HEAD
             {
               xfer += this->primaryKeys[_i1530].read(iprot);
-=======
-            uint32_t _size1520;
-            ::apache::thrift::protocol::TType _etype1523;
-            xfer += iprot->readListBegin(_etype1523, _size1520);
-            this->primaryKeys.resize(_size1520);
-            uint32_t _i1524;
-            for (_i1524 = 0; _i1524 < _size1520; ++_i1524)
-            {
-              xfer += this->primaryKeys[_i1524].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->primaryKeys[_i1530].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -47398,33 +43492,14 @@ uint32_t CreateTableRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->foreignKeys.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1531;
             ::apache::thrift::protocol::TType _etype1534;
             xfer += iprot->readListBegin(_etype1534, _size1531);
             this->foreignKeys.resize(_size1531);
             uint32_t _i1535;
             for (_i1535 = 0; _i1535 < _size1531; ++_i1535)
-<<<<<<< HEAD
             {
               xfer += this->foreignKeys[_i1535].read(iprot);
-=======
-            uint32_t _size1525;
-            ::apache::thrift::protocol::TType _etype1528;
-            xfer += iprot->readListBegin(_etype1528, _size1525);
-            this->foreignKeys.resize(_size1525);
-            uint32_t _i1529;
-            for (_i1529 = 0; _i1529 < _size1525; ++_i1529)
-            {
-              xfer += this->foreignKeys[_i1529].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->foreignKeys[_i1535].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -47437,33 +43512,14 @@ uint32_t CreateTableRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->uniqueConstraints.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1536;
             ::apache::thrift::protocol::TType _etype1539;
             xfer += iprot->readListBegin(_etype1539, _size1536);
             this->uniqueConstraints.resize(_size1536);
             uint32_t _i1540;
             for (_i1540 = 0; _i1540 < _size1536; ++_i1540)
-<<<<<<< HEAD
             {
               xfer += this->uniqueConstraints[_i1540].read(iprot);
-=======
-            uint32_t _size1530;
-            ::apache::thrift::protocol::TType _etype1533;
-            xfer += iprot->readListBegin(_etype1533, _size1530);
-            this->uniqueConstraints.resize(_size1530);
-            uint32_t _i1534;
-            for (_i1534 = 0; _i1534 < _size1530; ++_i1534)
-            {
-              xfer += this->uniqueConstraints[_i1534].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->uniqueConstraints[_i1540].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -47476,33 +43532,14 @@ uint32_t CreateTableRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->notNullConstraints.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1541;
             ::apache::thrift::protocol::TType _etype1544;
             xfer += iprot->readListBegin(_etype1544, _size1541);
             this->notNullConstraints.resize(_size1541);
             uint32_t _i1545;
             for (_i1545 = 0; _i1545 < _size1541; ++_i1545)
-<<<<<<< HEAD
             {
               xfer += this->notNullConstraints[_i1545].read(iprot);
-=======
-            uint32_t _size1535;
-            ::apache::thrift::protocol::TType _etype1538;
-            xfer += iprot->readListBegin(_etype1538, _size1535);
-            this->notNullConstraints.resize(_size1535);
-            uint32_t _i1539;
-            for (_i1539 = 0; _i1539 < _size1535; ++_i1539)
-            {
-              xfer += this->notNullConstraints[_i1539].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->notNullConstraints[_i1545].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -47515,33 +43552,14 @@ uint32_t CreateTableRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->defaultConstraints.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1546;
             ::apache::thrift::protocol::TType _etype1549;
             xfer += iprot->readListBegin(_etype1549, _size1546);
             this->defaultConstraints.resize(_size1546);
             uint32_t _i1550;
             for (_i1550 = 0; _i1550 < _size1546; ++_i1550)
-<<<<<<< HEAD
             {
               xfer += this->defaultConstraints[_i1550].read(iprot);
-=======
-            uint32_t _size1540;
-            ::apache::thrift::protocol::TType _etype1543;
-            xfer += iprot->readListBegin(_etype1543, _size1540);
-            this->defaultConstraints.resize(_size1540);
-            uint32_t _i1544;
-            for (_i1544 = 0; _i1544 < _size1540; ++_i1544)
-            {
-              xfer += this->defaultConstraints[_i1544].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->defaultConstraints[_i1550].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -47554,33 +43572,14 @@ uint32_t CreateTableRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->checkConstraints.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1551;
             ::apache::thrift::protocol::TType _etype1554;
             xfer += iprot->readListBegin(_etype1554, _size1551);
             this->checkConstraints.resize(_size1551);
             uint32_t _i1555;
             for (_i1555 = 0; _i1555 < _size1551; ++_i1555)
-<<<<<<< HEAD
             {
               xfer += this->checkConstraints[_i1555].read(iprot);
-=======
-            uint32_t _size1545;
-            ::apache::thrift::protocol::TType _etype1548;
-            xfer += iprot->readListBegin(_etype1548, _size1545);
-            this->checkConstraints.resize(_size1545);
-            uint32_t _i1549;
-            for (_i1549 = 0; _i1549 < _size1545; ++_i1549)
-            {
-              xfer += this->checkConstraints[_i1549].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->checkConstraints[_i1555].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -47593,33 +43592,14 @@ uint32_t CreateTableRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->processorCapabilities.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1556;
             ::apache::thrift::protocol::TType _etype1559;
             xfer += iprot->readListBegin(_etype1559, _size1556);
             this->processorCapabilities.resize(_size1556);
             uint32_t _i1560;
             for (_i1560 = 0; _i1560 < _size1556; ++_i1560)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->processorCapabilities[_i1560]);
-=======
-            uint32_t _size1550;
-            ::apache::thrift::protocol::TType _etype1553;
-            xfer += iprot->readListBegin(_etype1553, _size1550);
-            this->processorCapabilities.resize(_size1550);
-            uint32_t _i1554;
-            for (_i1554 = 0; _i1554 < _size1550; ++_i1554)
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1554]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1560]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -47668,24 +43648,10 @@ uint32_t CreateTableRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("primaryKeys", ::apache::thrift::protocol::T_LIST, 3);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->primaryKeys.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<SQLPrimaryKey> ::const_iterator _iter1561;
       for (_iter1561 = this->primaryKeys.begin(); _iter1561 != this->primaryKeys.end(); ++_iter1561)
       {
         xfer += (*_iter1561).write(oprot);
-=======
-      std::vector<SQLPrimaryKey> ::const_iterator _iter1555;
-      for (_iter1555 = this->primaryKeys.begin(); _iter1555 != this->primaryKeys.end(); ++_iter1555)
-      {
-        xfer += (*_iter1555).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<SQLPrimaryKey> ::const_iterator _iter1561;
-      for (_iter1561 = this->primaryKeys.begin(); _iter1561 != this->primaryKeys.end(); ++_iter1561)
-      {
-        xfer += (*_iter1561).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -47695,24 +43661,10 @@ uint32_t CreateTableRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("foreignKeys", ::apache::thrift::protocol::T_LIST, 4);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->foreignKeys.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<SQLForeignKey> ::const_iterator _iter1562;
       for (_iter1562 = this->foreignKeys.begin(); _iter1562 != this->foreignKeys.end(); ++_iter1562)
       {
         xfer += (*_iter1562).write(oprot);
-=======
-      std::vector<SQLForeignKey> ::const_iterator _iter1556;
-      for (_iter1556 = this->foreignKeys.begin(); _iter1556 != this->foreignKeys.end(); ++_iter1556)
-      {
-        xfer += (*_iter1556).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<SQLForeignKey> ::const_iterator _iter1562;
-      for (_iter1562 = this->foreignKeys.begin(); _iter1562 != this->foreignKeys.end(); ++_iter1562)
-      {
-        xfer += (*_iter1562).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -47722,24 +43674,10 @@ uint32_t CreateTableRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("uniqueConstraints", ::apache::thrift::protocol::T_LIST, 5);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->uniqueConstraints.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<SQLUniqueConstraint> ::const_iterator _iter1563;
       for (_iter1563 = this->uniqueConstraints.begin(); _iter1563 != this->uniqueConstraints.end(); ++_iter1563)
       {
         xfer += (*_iter1563).write(oprot);
-=======
-      std::vector<SQLUniqueConstraint> ::const_iterator _iter1557;
-      for (_iter1557 = this->uniqueConstraints.begin(); _iter1557 != this->uniqueConstraints.end(); ++_iter1557)
-      {
-        xfer += (*_iter1557).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<SQLUniqueConstraint> ::const_iterator _iter1563;
-      for (_iter1563 = this->uniqueConstraints.begin(); _iter1563 != this->uniqueConstraints.end(); ++_iter1563)
-      {
-        xfer += (*_iter1563).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -47749,24 +43687,10 @@ uint32_t CreateTableRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("notNullConstraints", ::apache::thrift::protocol::T_LIST, 6);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->notNullConstraints.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<SQLNotNullConstraint> ::const_iterator _iter1564;
       for (_iter1564 = this->notNullConstraints.begin(); _iter1564 != this->notNullConstraints.end(); ++_iter1564)
       {
         xfer += (*_iter1564).write(oprot);
-=======
-      std::vector<SQLNotNullConstraint> ::const_iterator _iter1558;
-      for (_iter1558 = this->notNullConstraints.begin(); _iter1558 != this->notNullConstraints.end(); ++_iter1558)
-      {
-        xfer += (*_iter1558).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<SQLNotNullConstraint> ::const_iterator _iter1564;
-      for (_iter1564 = this->notNullConstraints.begin(); _iter1564 != this->notNullConstraints.end(); ++_iter1564)
-      {
-        xfer += (*_iter1564).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -47776,24 +43700,10 @@ uint32_t CreateTableRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("defaultConstraints", ::apache::thrift::protocol::T_LIST, 7);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->defaultConstraints.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<SQLDefaultConstraint> ::const_iterator _iter1565;
       for (_iter1565 = this->defaultConstraints.begin(); _iter1565 != this->defaultConstraints.end(); ++_iter1565)
       {
         xfer += (*_iter1565).write(oprot);
-=======
-      std::vector<SQLDefaultConstraint> ::const_iterator _iter1559;
-      for (_iter1559 = this->defaultConstraints.begin(); _iter1559 != this->defaultConstraints.end(); ++_iter1559)
-      {
-        xfer += (*_iter1559).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<SQLDefaultConstraint> ::const_iterator _iter1565;
-      for (_iter1565 = this->defaultConstraints.begin(); _iter1565 != this->defaultConstraints.end(); ++_iter1565)
-      {
-        xfer += (*_iter1565).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -47803,24 +43713,10 @@ uint32_t CreateTableRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("checkConstraints", ::apache::thrift::protocol::T_LIST, 8);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->checkConstraints.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<SQLCheckConstraint> ::const_iterator _iter1566;
       for (_iter1566 = this->checkConstraints.begin(); _iter1566 != this->checkConstraints.end(); ++_iter1566)
       {
         xfer += (*_iter1566).write(oprot);
-=======
-      std::vector<SQLCheckConstraint> ::const_iterator _iter1560;
-      for (_iter1560 = this->checkConstraints.begin(); _iter1560 != this->checkConstraints.end(); ++_iter1560)
-      {
-        xfer += (*_iter1560).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<SQLCheckConstraint> ::const_iterator _iter1566;
-      for (_iter1566 = this->checkConstraints.begin(); _iter1566 != this->checkConstraints.end(); ++_iter1566)
-      {
-        xfer += (*_iter1566).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -47830,24 +43726,10 @@ uint32_t CreateTableRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("processorCapabilities", ::apache::thrift::protocol::T_LIST, 9);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->processorCapabilities.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1567;
       for (_iter1567 = this->processorCapabilities.begin(); _iter1567 != this->processorCapabilities.end(); ++_iter1567)
       {
         xfer += oprot->writeString((*_iter1567));
-=======
-      std::vector<std::string> ::const_iterator _iter1561;
-      for (_iter1561 = this->processorCapabilities.begin(); _iter1561 != this->processorCapabilities.end(); ++_iter1561)
-      {
-        xfer += oprot->writeString((*_iter1561));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1567;
-      for (_iter1567 = this->processorCapabilities.begin(); _iter1567 != this->processorCapabilities.end(); ++_iter1567)
-      {
-        xfer += oprot->writeString((*_iter1567));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -47878,10 +43760,6 @@ void swap(CreateTableRequest &a, CreateTableRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 CreateTableRequest::CreateTableRequest(const CreateTableRequest& other1568) {
   table = other1568.table;
   envContext = other1568.envContext;
@@ -47894,7 +43772,6 @@ CreateTableRequest::CreateTableRequest(const CreateTableRequest& other1568) {
   processorCapabilities = other1568.processorCapabilities;
   processorIdentifier = other1568.processorIdentifier;
   __isset = other1568.__isset;
-<<<<<<< HEAD
 }
 CreateTableRequest& CreateTableRequest::operator=(const CreateTableRequest& other1569) {
   table = other1569.table;
@@ -47908,48 +43785,6 @@ CreateTableRequest& CreateTableRequest::operator=(const CreateTableRequest& othe
   processorCapabilities = other1569.processorCapabilities;
   processorIdentifier = other1569.processorIdentifier;
   __isset = other1569.__isset;
-=======
-CreateTableRequest::CreateTableRequest(const CreateTableRequest& other1562) {
-  table = other1562.table;
-  envContext = other1562.envContext;
-  primaryKeys = other1562.primaryKeys;
-  foreignKeys = other1562.foreignKeys;
-  uniqueConstraints = other1562.uniqueConstraints;
-  notNullConstraints = other1562.notNullConstraints;
-  defaultConstraints = other1562.defaultConstraints;
-  checkConstraints = other1562.checkConstraints;
-  processorCapabilities = other1562.processorCapabilities;
-  processorIdentifier = other1562.processorIdentifier;
-  __isset = other1562.__isset;
-}
-CreateTableRequest& CreateTableRequest::operator=(const CreateTableRequest& other1563) {
-  table = other1563.table;
-  envContext = other1563.envContext;
-  primaryKeys = other1563.primaryKeys;
-  foreignKeys = other1563.foreignKeys;
-  uniqueConstraints = other1563.uniqueConstraints;
-  notNullConstraints = other1563.notNullConstraints;
-  defaultConstraints = other1563.defaultConstraints;
-  checkConstraints = other1563.checkConstraints;
-  processorCapabilities = other1563.processorCapabilities;
-  processorIdentifier = other1563.processorIdentifier;
-  __isset = other1563.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-CreateTableRequest& CreateTableRequest::operator=(const CreateTableRequest& other1569) {
-  table = other1569.table;
-  envContext = other1569.envContext;
-  primaryKeys = other1569.primaryKeys;
-  foreignKeys = other1569.foreignKeys;
-  uniqueConstraints = other1569.uniqueConstraints;
-  notNullConstraints = other1569.notNullConstraints;
-  defaultConstraints = other1569.defaultConstraints;
-  checkConstraints = other1569.checkConstraints;
-  processorCapabilities = other1569.processorCapabilities;
-  processorIdentifier = other1569.processorIdentifier;
-  __isset = other1569.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void CreateTableRequest::printTo(std::ostream& out) const {
@@ -48088,42 +43923,17 @@ uint32_t CreateDatabaseRequest::read(::apache::thrift::protocol::TProtocol* ipro
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->parameters.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1570;
             ::apache::thrift::protocol::TType _ktype1571;
             ::apache::thrift::protocol::TType _vtype1572;
             xfer += iprot->readMapBegin(_ktype1571, _vtype1572, _size1570);
             uint32_t _i1574;
             for (_i1574 = 0; _i1574 < _size1570; ++_i1574)
-<<<<<<< HEAD
             {
               std::string _key1575;
               xfer += iprot->readString(_key1575);
               std::string& _val1576 = this->parameters[_key1575];
               xfer += iprot->readString(_val1576);
-=======
-            uint32_t _size1564;
-            ::apache::thrift::protocol::TType _ktype1565;
-            ::apache::thrift::protocol::TType _vtype1566;
-            xfer += iprot->readMapBegin(_ktype1565, _vtype1566, _size1564);
-            uint32_t _i1568;
-            for (_i1568 = 0; _i1568 < _size1564; ++_i1568)
-            {
-              std::string _key1569;
-              xfer += iprot->readString(_key1569);
-              std::string& _val1570 = this->parameters[_key1569];
-              xfer += iprot->readString(_val1570);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              std::string _key1575;
-              xfer += iprot->readString(_key1575);
-              std::string& _val1576 = this->parameters[_key1575];
-              xfer += iprot->readString(_val1576);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -48150,21 +43960,9 @@ uint32_t CreateDatabaseRequest::read(::apache::thrift::protocol::TProtocol* ipro
         break;
       case 7:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1577;
           xfer += iprot->readI32(ecast1577);
           this->ownerType = static_cast<PrincipalType::type>(ecast1577);
-=======
-          int32_t ecast1571;
-          xfer += iprot->readI32(ecast1571);
-          this->ownerType = static_cast<PrincipalType::type>(ecast1571);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1577;
-          xfer += iprot->readI32(ecast1577);
-          this->ownerType = static_cast<PrincipalType::type>(ecast1577);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.ownerType = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -48247,27 +44045,11 @@ uint32_t CreateDatabaseRequest::write(::apache::thrift::protocol::TProtocol* opr
     xfer += oprot->writeFieldBegin("parameters", ::apache::thrift::protocol::T_MAP, 4);
     {
       xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->parameters.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::map<std::string, std::string> ::const_iterator _iter1578;
       for (_iter1578 = this->parameters.begin(); _iter1578 != this->parameters.end(); ++_iter1578)
       {
         xfer += oprot->writeString(_iter1578->first);
         xfer += oprot->writeString(_iter1578->second);
-=======
-      std::map<std::string, std::string> ::const_iterator _iter1572;
-      for (_iter1572 = this->parameters.begin(); _iter1572 != this->parameters.end(); ++_iter1572)
-      {
-        xfer += oprot->writeString(_iter1572->first);
-        xfer += oprot->writeString(_iter1572->second);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::map<std::string, std::string> ::const_iterator _iter1578;
-      for (_iter1578 = this->parameters.begin(); _iter1578 != this->parameters.end(); ++_iter1578)
-      {
-        xfer += oprot->writeString(_iter1578->first);
-        xfer += oprot->writeString(_iter1578->second);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeMapEnd();
     }
@@ -48335,10 +44117,6 @@ void swap(CreateDatabaseRequest &a, CreateDatabaseRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 CreateDatabaseRequest::CreateDatabaseRequest(const CreateDatabaseRequest& other1579) {
   databaseName = other1579.databaseName;
   description = other1579.description;
@@ -48353,7 +44131,6 @@ CreateDatabaseRequest::CreateDatabaseRequest(const CreateDatabaseRequest& other1
   type = other1579.type;
   dataConnectorName = other1579.dataConnectorName;
   __isset = other1579.__isset;
-<<<<<<< HEAD
 }
 CreateDatabaseRequest& CreateDatabaseRequest::operator=(const CreateDatabaseRequest& other1580) {
   databaseName = other1580.databaseName;
@@ -48369,54 +44146,6 @@ CreateDatabaseRequest& CreateDatabaseRequest::operator=(const CreateDatabaseRequ
   type = other1580.type;
   dataConnectorName = other1580.dataConnectorName;
   __isset = other1580.__isset;
-=======
-CreateDatabaseRequest::CreateDatabaseRequest(const CreateDatabaseRequest& other1573) {
-  databaseName = other1573.databaseName;
-  description = other1573.description;
-  locationUri = other1573.locationUri;
-  parameters = other1573.parameters;
-  privileges = other1573.privileges;
-  ownerName = other1573.ownerName;
-  ownerType = other1573.ownerType;
-  catalogName = other1573.catalogName;
-  createTime = other1573.createTime;
-  managedLocationUri = other1573.managedLocationUri;
-  type = other1573.type;
-  dataConnectorName = other1573.dataConnectorName;
-  __isset = other1573.__isset;
-}
-CreateDatabaseRequest& CreateDatabaseRequest::operator=(const CreateDatabaseRequest& other1574) {
-  databaseName = other1574.databaseName;
-  description = other1574.description;
-  locationUri = other1574.locationUri;
-  parameters = other1574.parameters;
-  privileges = other1574.privileges;
-  ownerName = other1574.ownerName;
-  ownerType = other1574.ownerType;
-  catalogName = other1574.catalogName;
-  createTime = other1574.createTime;
-  managedLocationUri = other1574.managedLocationUri;
-  type = other1574.type;
-  dataConnectorName = other1574.dataConnectorName;
-  __isset = other1574.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-CreateDatabaseRequest& CreateDatabaseRequest::operator=(const CreateDatabaseRequest& other1580) {
-  databaseName = other1580.databaseName;
-  description = other1580.description;
-  locationUri = other1580.locationUri;
-  parameters = other1580.parameters;
-  privileges = other1580.privileges;
-  ownerName = other1580.ownerName;
-  ownerType = other1580.ownerType;
-  catalogName = other1580.catalogName;
-  createTime = other1580.createTime;
-  managedLocationUri = other1580.managedLocationUri;
-  type = other1580.type;
-  dataConnectorName = other1580.dataConnectorName;
-  __isset = other1580.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void CreateDatabaseRequest::printTo(std::ostream& out) const {
@@ -48513,8 +44242,6 @@ void swap(CreateDataConnectorRequest &a, CreateDataConnectorRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 CreateDataConnectorRequest::CreateDataConnectorRequest(const CreateDataConnectorRequest& other1581) {
   connector = other1581.connector;
   __isset = other1581.__isset;
@@ -48522,24 +44249,6 @@ CreateDataConnectorRequest::CreateDataConnectorRequest(const CreateDataConnector
 CreateDataConnectorRequest& CreateDataConnectorRequest::operator=(const CreateDataConnectorRequest& other1582) {
   connector = other1582.connector;
   __isset = other1582.__isset;
-=======
-CreateDataConnectorRequest::CreateDataConnectorRequest(const CreateDataConnectorRequest& other1575) {
-  connector = other1575.connector;
-  __isset = other1575.__isset;
-}
-CreateDataConnectorRequest& CreateDataConnectorRequest::operator=(const CreateDataConnectorRequest& other1576) {
-  connector = other1576.connector;
-  __isset = other1576.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-CreateDataConnectorRequest::CreateDataConnectorRequest(const CreateDataConnectorRequest& other1581) {
-  connector = other1581.connector;
-  __isset = other1581.__isset;
-}
-CreateDataConnectorRequest& CreateDataConnectorRequest::operator=(const CreateDataConnectorRequest& other1582) {
-  connector = other1582.connector;
-  __isset = other1582.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void CreateDataConnectorRequest::printTo(std::ostream& out) const {
@@ -48627,27 +44336,11 @@ void swap(GetDataConnectorRequest &a, GetDataConnectorRequest &b) {
   swap(a.connectorName, b.connectorName);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetDataConnectorRequest::GetDataConnectorRequest(const GetDataConnectorRequest& other1583) {
   connectorName = other1583.connectorName;
 }
 GetDataConnectorRequest& GetDataConnectorRequest::operator=(const GetDataConnectorRequest& other1584) {
   connectorName = other1584.connectorName;
-=======
-GetDataConnectorRequest::GetDataConnectorRequest(const GetDataConnectorRequest& other1577) {
-  connectorName = other1577.connectorName;
-}
-GetDataConnectorRequest& GetDataConnectorRequest::operator=(const GetDataConnectorRequest& other1578) {
-  connectorName = other1578.connectorName;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetDataConnectorRequest::GetDataConnectorRequest(const GetDataConnectorRequest& other1583) {
-  connectorName = other1583.connectorName;
-}
-GetDataConnectorRequest& GetDataConnectorRequest::operator=(const GetDataConnectorRequest& other1584) {
-  connectorName = other1584.connectorName;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetDataConnectorRequest::printTo(std::ostream& out) const {
@@ -48735,27 +44428,11 @@ void swap(ScheduledQueryPollRequest &a, ScheduledQueryPollRequest &b) {
   swap(a.clusterNamespace, b.clusterNamespace);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ScheduledQueryPollRequest::ScheduledQueryPollRequest(const ScheduledQueryPollRequest& other1585) {
   clusterNamespace = other1585.clusterNamespace;
 }
 ScheduledQueryPollRequest& ScheduledQueryPollRequest::operator=(const ScheduledQueryPollRequest& other1586) {
   clusterNamespace = other1586.clusterNamespace;
-=======
-ScheduledQueryPollRequest::ScheduledQueryPollRequest(const ScheduledQueryPollRequest& other1579) {
-  clusterNamespace = other1579.clusterNamespace;
-}
-ScheduledQueryPollRequest& ScheduledQueryPollRequest::operator=(const ScheduledQueryPollRequest& other1580) {
-  clusterNamespace = other1580.clusterNamespace;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-ScheduledQueryPollRequest::ScheduledQueryPollRequest(const ScheduledQueryPollRequest& other1585) {
-  clusterNamespace = other1585.clusterNamespace;
-}
-ScheduledQueryPollRequest& ScheduledQueryPollRequest::operator=(const ScheduledQueryPollRequest& other1586) {
-  clusterNamespace = other1586.clusterNamespace;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ScheduledQueryPollRequest::printTo(std::ostream& out) const {
@@ -48863,8 +44540,6 @@ void swap(ScheduledQueryKey &a, ScheduledQueryKey &b) {
   swap(a.clusterNamespace, b.clusterNamespace);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ScheduledQueryKey::ScheduledQueryKey(const ScheduledQueryKey& other1587) {
   scheduleName = other1587.scheduleName;
   clusterNamespace = other1587.clusterNamespace;
@@ -48872,24 +44547,6 @@ ScheduledQueryKey::ScheduledQueryKey(const ScheduledQueryKey& other1587) {
 ScheduledQueryKey& ScheduledQueryKey::operator=(const ScheduledQueryKey& other1588) {
   scheduleName = other1588.scheduleName;
   clusterNamespace = other1588.clusterNamespace;
-=======
-ScheduledQueryKey::ScheduledQueryKey(const ScheduledQueryKey& other1581) {
-  scheduleName = other1581.scheduleName;
-  clusterNamespace = other1581.clusterNamespace;
-}
-ScheduledQueryKey& ScheduledQueryKey::operator=(const ScheduledQueryKey& other1582) {
-  scheduleName = other1582.scheduleName;
-  clusterNamespace = other1582.clusterNamespace;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-ScheduledQueryKey::ScheduledQueryKey(const ScheduledQueryKey& other1587) {
-  scheduleName = other1587.scheduleName;
-  clusterNamespace = other1587.clusterNamespace;
-}
-ScheduledQueryKey& ScheduledQueryKey::operator=(const ScheduledQueryKey& other1588) {
-  scheduleName = other1588.scheduleName;
-  clusterNamespace = other1588.clusterNamespace;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ScheduledQueryKey::printTo(std::ostream& out) const {
@@ -49035,17 +44692,12 @@ void swap(ScheduledQueryPollResponse &a, ScheduledQueryPollResponse &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 ScheduledQueryPollResponse::ScheduledQueryPollResponse(const ScheduledQueryPollResponse& other1589) {
   scheduleKey = other1589.scheduleKey;
   executionId = other1589.executionId;
   query = other1589.query;
   user = other1589.user;
   __isset = other1589.__isset;
-<<<<<<< HEAD
 }
 ScheduledQueryPollResponse& ScheduledQueryPollResponse::operator=(const ScheduledQueryPollResponse& other1590) {
   scheduleKey = other1590.scheduleKey;
@@ -49053,30 +44705,6 @@ ScheduledQueryPollResponse& ScheduledQueryPollResponse::operator=(const Schedule
   query = other1590.query;
   user = other1590.user;
   __isset = other1590.__isset;
-=======
-ScheduledQueryPollResponse::ScheduledQueryPollResponse(const ScheduledQueryPollResponse& other1583) {
-  scheduleKey = other1583.scheduleKey;
-  executionId = other1583.executionId;
-  query = other1583.query;
-  user = other1583.user;
-  __isset = other1583.__isset;
-}
-ScheduledQueryPollResponse& ScheduledQueryPollResponse::operator=(const ScheduledQueryPollResponse& other1584) {
-  scheduleKey = other1584.scheduleKey;
-  executionId = other1584.executionId;
-  query = other1584.query;
-  user = other1584.user;
-  __isset = other1584.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-ScheduledQueryPollResponse& ScheduledQueryPollResponse::operator=(const ScheduledQueryPollResponse& other1590) {
-  scheduleKey = other1590.scheduleKey;
-  executionId = other1590.executionId;
-  query = other1590.query;
-  user = other1590.user;
-  __isset = other1590.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ScheduledQueryPollResponse::printTo(std::ostream& out) const {
@@ -49263,10 +44891,6 @@ void swap(ScheduledQuery &a, ScheduledQuery &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 ScheduledQuery::ScheduledQuery(const ScheduledQuery& other1591) {
   scheduleKey = other1591.scheduleKey;
   enabled = other1591.enabled;
@@ -49275,7 +44899,6 @@ ScheduledQuery::ScheduledQuery(const ScheduledQuery& other1591) {
   query = other1591.query;
   nextExecution = other1591.nextExecution;
   __isset = other1591.__isset;
-<<<<<<< HEAD
 }
 ScheduledQuery& ScheduledQuery::operator=(const ScheduledQuery& other1592) {
   scheduleKey = other1592.scheduleKey;
@@ -49285,36 +44908,6 @@ ScheduledQuery& ScheduledQuery::operator=(const ScheduledQuery& other1592) {
   query = other1592.query;
   nextExecution = other1592.nextExecution;
   __isset = other1592.__isset;
-=======
-ScheduledQuery::ScheduledQuery(const ScheduledQuery& other1585) {
-  scheduleKey = other1585.scheduleKey;
-  enabled = other1585.enabled;
-  schedule = other1585.schedule;
-  user = other1585.user;
-  query = other1585.query;
-  nextExecution = other1585.nextExecution;
-  __isset = other1585.__isset;
-}
-ScheduledQuery& ScheduledQuery::operator=(const ScheduledQuery& other1586) {
-  scheduleKey = other1586.scheduleKey;
-  enabled = other1586.enabled;
-  schedule = other1586.schedule;
-  user = other1586.user;
-  query = other1586.query;
-  nextExecution = other1586.nextExecution;
-  __isset = other1586.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-ScheduledQuery& ScheduledQuery::operator=(const ScheduledQuery& other1592) {
-  scheduleKey = other1592.scheduleKey;
-  enabled = other1592.enabled;
-  schedule = other1592.schedule;
-  user = other1592.user;
-  query = other1592.query;
-  nextExecution = other1592.nextExecution;
-  __isset = other1592.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ScheduledQuery::printTo(std::ostream& out) const {
@@ -49373,21 +44966,9 @@ uint32_t ScheduledQueryMaintenanceRequest::read(::apache::thrift::protocol::TPro
     {
       case 1:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1593;
           xfer += iprot->readI32(ecast1593);
           this->type = static_cast<ScheduledQueryMaintenanceRequestType::type>(ecast1593);
-=======
-          int32_t ecast1587;
-          xfer += iprot->readI32(ecast1587);
-          this->type = static_cast<ScheduledQueryMaintenanceRequestType::type>(ecast1587);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1593;
-          xfer += iprot->readI32(ecast1593);
-          this->type = static_cast<ScheduledQueryMaintenanceRequestType::type>(ecast1593);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           isset_type = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -49441,8 +45022,6 @@ void swap(ScheduledQueryMaintenanceRequest &a, ScheduledQueryMaintenanceRequest 
   swap(a.scheduledQuery, b.scheduledQuery);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ScheduledQueryMaintenanceRequest::ScheduledQueryMaintenanceRequest(const ScheduledQueryMaintenanceRequest& other1594) {
   type = other1594.type;
   scheduledQuery = other1594.scheduledQuery;
@@ -49450,24 +45029,6 @@ ScheduledQueryMaintenanceRequest::ScheduledQueryMaintenanceRequest(const Schedul
 ScheduledQueryMaintenanceRequest& ScheduledQueryMaintenanceRequest::operator=(const ScheduledQueryMaintenanceRequest& other1595) {
   type = other1595.type;
   scheduledQuery = other1595.scheduledQuery;
-=======
-ScheduledQueryMaintenanceRequest::ScheduledQueryMaintenanceRequest(const ScheduledQueryMaintenanceRequest& other1588) {
-  type = other1588.type;
-  scheduledQuery = other1588.scheduledQuery;
-}
-ScheduledQueryMaintenanceRequest& ScheduledQueryMaintenanceRequest::operator=(const ScheduledQueryMaintenanceRequest& other1589) {
-  type = other1589.type;
-  scheduledQuery = other1589.scheduledQuery;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-ScheduledQueryMaintenanceRequest::ScheduledQueryMaintenanceRequest(const ScheduledQueryMaintenanceRequest& other1594) {
-  type = other1594.type;
-  scheduledQuery = other1594.scheduledQuery;
-}
-ScheduledQueryMaintenanceRequest& ScheduledQueryMaintenanceRequest::operator=(const ScheduledQueryMaintenanceRequest& other1595) {
-  type = other1595.type;
-  scheduledQuery = other1595.scheduledQuery;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ScheduledQueryMaintenanceRequest::printTo(std::ostream& out) const {
@@ -49540,21 +45101,9 @@ uint32_t ScheduledQueryProgressInfo::read(::apache::thrift::protocol::TProtocol*
         break;
       case 2:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1596;
           xfer += iprot->readI32(ecast1596);
           this->state = static_cast<QueryState::type>(ecast1596);
-=======
-          int32_t ecast1590;
-          xfer += iprot->readI32(ecast1590);
-          this->state = static_cast<QueryState::type>(ecast1590);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1596;
-          xfer += iprot->readI32(ecast1596);
-          this->state = static_cast<QueryState::type>(ecast1596);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           isset_state = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -49630,17 +45179,12 @@ void swap(ScheduledQueryProgressInfo &a, ScheduledQueryProgressInfo &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 ScheduledQueryProgressInfo::ScheduledQueryProgressInfo(const ScheduledQueryProgressInfo& other1597) {
   scheduledExecutionId = other1597.scheduledExecutionId;
   state = other1597.state;
   executorQueryId = other1597.executorQueryId;
   errorMessage = other1597.errorMessage;
   __isset = other1597.__isset;
-<<<<<<< HEAD
 }
 ScheduledQueryProgressInfo& ScheduledQueryProgressInfo::operator=(const ScheduledQueryProgressInfo& other1598) {
   scheduledExecutionId = other1598.scheduledExecutionId;
@@ -49648,30 +45192,6 @@ ScheduledQueryProgressInfo& ScheduledQueryProgressInfo::operator=(const Schedule
   executorQueryId = other1598.executorQueryId;
   errorMessage = other1598.errorMessage;
   __isset = other1598.__isset;
-=======
-ScheduledQueryProgressInfo::ScheduledQueryProgressInfo(const ScheduledQueryProgressInfo& other1591) {
-  scheduledExecutionId = other1591.scheduledExecutionId;
-  state = other1591.state;
-  executorQueryId = other1591.executorQueryId;
-  errorMessage = other1591.errorMessage;
-  __isset = other1591.__isset;
-}
-ScheduledQueryProgressInfo& ScheduledQueryProgressInfo::operator=(const ScheduledQueryProgressInfo& other1592) {
-  scheduledExecutionId = other1592.scheduledExecutionId;
-  state = other1592.state;
-  executorQueryId = other1592.executorQueryId;
-  errorMessage = other1592.errorMessage;
-  __isset = other1592.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-ScheduledQueryProgressInfo& ScheduledQueryProgressInfo::operator=(const ScheduledQueryProgressInfo& other1598) {
-  scheduledExecutionId = other1598.scheduledExecutionId;
-  state = other1598.state;
-  executorQueryId = other1598.executorQueryId;
-  errorMessage = other1598.errorMessage;
-  __isset = other1598.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ScheduledQueryProgressInfo::printTo(std::ostream& out) const {
@@ -49789,33 +45309,14 @@ uint32_t AlterPartitionsRequest::read(::apache::thrift::protocol::TProtocol* ipr
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partitions.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1599;
             ::apache::thrift::protocol::TType _etype1602;
             xfer += iprot->readListBegin(_etype1602, _size1599);
             this->partitions.resize(_size1599);
             uint32_t _i1603;
             for (_i1603 = 0; _i1603 < _size1599; ++_i1603)
-<<<<<<< HEAD
             {
               xfer += this->partitions[_i1603].read(iprot);
-=======
-            uint32_t _size1593;
-            ::apache::thrift::protocol::TType _etype1596;
-            xfer += iprot->readListBegin(_etype1596, _size1593);
-            this->partitions.resize(_size1593);
-            uint32_t _i1597;
-            for (_i1597 = 0; _i1597 < _size1593; ++_i1597)
-            {
-              xfer += this->partitions[_i1597].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->partitions[_i1603].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -49860,33 +45361,14 @@ uint32_t AlterPartitionsRequest::read(::apache::thrift::protocol::TProtocol* ipr
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partitionColSchema.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1604;
             ::apache::thrift::protocol::TType _etype1607;
             xfer += iprot->readListBegin(_etype1607, _size1604);
             this->partitionColSchema.resize(_size1604);
             uint32_t _i1608;
             for (_i1608 = 0; _i1608 < _size1604; ++_i1608)
-<<<<<<< HEAD
             {
               xfer += this->partitionColSchema[_i1608].read(iprot);
-=======
-            uint32_t _size1598;
-            ::apache::thrift::protocol::TType _etype1601;
-            xfer += iprot->readListBegin(_etype1601, _size1598);
-            this->partitionColSchema.resize(_size1598);
-            uint32_t _i1602;
-            for (_i1602 = 0; _i1602 < _size1598; ++_i1602)
-            {
-              xfer += this->partitionColSchema[_i1602].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->partitionColSchema[_i1608].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -49934,24 +45416,10 @@ uint32_t AlterPartitionsRequest::write(::apache::thrift::protocol::TProtocol* op
   xfer += oprot->writeFieldBegin("partitions", ::apache::thrift::protocol::T_LIST, 4);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->partitions.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<Partition> ::const_iterator _iter1609;
     for (_iter1609 = this->partitions.begin(); _iter1609 != this->partitions.end(); ++_iter1609)
     {
       xfer += (*_iter1609).write(oprot);
-=======
-    std::vector<Partition> ::const_iterator _iter1603;
-    for (_iter1603 = this->partitions.begin(); _iter1603 != this->partitions.end(); ++_iter1603)
-    {
-      xfer += (*_iter1603).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<Partition> ::const_iterator _iter1609;
-    for (_iter1609 = this->partitions.begin(); _iter1609 != this->partitions.end(); ++_iter1609)
-    {
-      xfer += (*_iter1609).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -49981,24 +45449,10 @@ uint32_t AlterPartitionsRequest::write(::apache::thrift::protocol::TProtocol* op
     xfer += oprot->writeFieldBegin("partitionColSchema", ::apache::thrift::protocol::T_LIST, 9);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->partitionColSchema.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<FieldSchema> ::const_iterator _iter1610;
       for (_iter1610 = this->partitionColSchema.begin(); _iter1610 != this->partitionColSchema.end(); ++_iter1610)
       {
         xfer += (*_iter1610).write(oprot);
-=======
-      std::vector<FieldSchema> ::const_iterator _iter1604;
-      for (_iter1604 = this->partitionColSchema.begin(); _iter1604 != this->partitionColSchema.end(); ++_iter1604)
-      {
-        xfer += (*_iter1604).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<FieldSchema> ::const_iterator _iter1610;
-      for (_iter1610 = this->partitionColSchema.begin(); _iter1610 != this->partitionColSchema.end(); ++_iter1610)
-      {
-        xfer += (*_iter1610).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -50023,10 +45477,6 @@ void swap(AlterPartitionsRequest &a, AlterPartitionsRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 AlterPartitionsRequest::AlterPartitionsRequest(const AlterPartitionsRequest& other1611) {
   catName = other1611.catName;
   dbName = other1611.dbName;
@@ -50038,7 +45488,6 @@ AlterPartitionsRequest::AlterPartitionsRequest(const AlterPartitionsRequest& oth
   skipColumnSchemaForPartition = other1611.skipColumnSchemaForPartition;
   partitionColSchema = other1611.partitionColSchema;
   __isset = other1611.__isset;
-<<<<<<< HEAD
 }
 AlterPartitionsRequest& AlterPartitionsRequest::operator=(const AlterPartitionsRequest& other1612) {
   catName = other1612.catName;
@@ -50051,45 +45500,6 @@ AlterPartitionsRequest& AlterPartitionsRequest::operator=(const AlterPartitionsR
   skipColumnSchemaForPartition = other1612.skipColumnSchemaForPartition;
   partitionColSchema = other1612.partitionColSchema;
   __isset = other1612.__isset;
-=======
-AlterPartitionsRequest::AlterPartitionsRequest(const AlterPartitionsRequest& other1605) {
-  catName = other1605.catName;
-  dbName = other1605.dbName;
-  tableName = other1605.tableName;
-  partitions = other1605.partitions;
-  environmentContext = other1605.environmentContext;
-  writeId = other1605.writeId;
-  validWriteIdList = other1605.validWriteIdList;
-  skipColumnSchemaForPartition = other1605.skipColumnSchemaForPartition;
-  partitionColSchema = other1605.partitionColSchema;
-  __isset = other1605.__isset;
-}
-AlterPartitionsRequest& AlterPartitionsRequest::operator=(const AlterPartitionsRequest& other1606) {
-  catName = other1606.catName;
-  dbName = other1606.dbName;
-  tableName = other1606.tableName;
-  partitions = other1606.partitions;
-  environmentContext = other1606.environmentContext;
-  writeId = other1606.writeId;
-  validWriteIdList = other1606.validWriteIdList;
-  skipColumnSchemaForPartition = other1606.skipColumnSchemaForPartition;
-  partitionColSchema = other1606.partitionColSchema;
-  __isset = other1606.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-AlterPartitionsRequest& AlterPartitionsRequest::operator=(const AlterPartitionsRequest& other1612) {
-  catName = other1612.catName;
-  dbName = other1612.dbName;
-  tableName = other1612.tableName;
-  partitions = other1612.partitions;
-  environmentContext = other1612.environmentContext;
-  writeId = other1612.writeId;
-  validWriteIdList = other1612.validWriteIdList;
-  skipColumnSchemaForPartition = other1612.skipColumnSchemaForPartition;
-  partitionColSchema = other1612.partitionColSchema;
-  __isset = other1612.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void AlterPartitionsRequest::printTo(std::ostream& out) const {
@@ -50162,27 +45572,11 @@ void swap(AlterPartitionsResponse &a, AlterPartitionsResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 AlterPartitionsResponse::AlterPartitionsResponse(const AlterPartitionsResponse& other1613) noexcept {
   (void) other1613;
 }
 AlterPartitionsResponse& AlterPartitionsResponse::operator=(const AlterPartitionsResponse& other1614) noexcept {
   (void) other1614;
-=======
-AlterPartitionsResponse::AlterPartitionsResponse(const AlterPartitionsResponse& other1607) noexcept {
-  (void) other1607;
-}
-AlterPartitionsResponse& AlterPartitionsResponse::operator=(const AlterPartitionsResponse& other1608) noexcept {
-  (void) other1608;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-AlterPartitionsResponse::AlterPartitionsResponse(const AlterPartitionsResponse& other1613) noexcept {
-  (void) other1613;
-}
-AlterPartitionsResponse& AlterPartitionsResponse::operator=(const AlterPartitionsResponse& other1614) noexcept {
-  (void) other1614;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void AlterPartitionsResponse::printTo(std::ostream& out) const {
@@ -50291,33 +45685,14 @@ uint32_t RenamePartitionRequest::read(::apache::thrift::protocol::TProtocol* ipr
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partVals.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1615;
             ::apache::thrift::protocol::TType _etype1618;
             xfer += iprot->readListBegin(_etype1618, _size1615);
             this->partVals.resize(_size1615);
             uint32_t _i1619;
             for (_i1619 = 0; _i1619 < _size1615; ++_i1619)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->partVals[_i1619]);
-=======
-            uint32_t _size1609;
-            ::apache::thrift::protocol::TType _etype1612;
-            xfer += iprot->readListBegin(_etype1612, _size1609);
-            this->partVals.resize(_size1609);
-            uint32_t _i1613;
-            for (_i1613 = 0; _i1613 < _size1609; ++_i1613)
-            {
-              xfer += iprot->readString(this->partVals[_i1613]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->partVals[_i1619]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -50399,24 +45774,10 @@ uint32_t RenamePartitionRequest::write(::apache::thrift::protocol::TProtocol* op
   xfer += oprot->writeFieldBegin("partVals", ::apache::thrift::protocol::T_LIST, 4);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->partVals.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter1620;
     for (_iter1620 = this->partVals.begin(); _iter1620 != this->partVals.end(); ++_iter1620)
     {
       xfer += oprot->writeString((*_iter1620));
-=======
-    std::vector<std::string> ::const_iterator _iter1614;
-    for (_iter1614 = this->partVals.begin(); _iter1614 != this->partVals.end(); ++_iter1614)
-    {
-      xfer += oprot->writeString((*_iter1614));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<std::string> ::const_iterator _iter1620;
-    for (_iter1620 = this->partVals.begin(); _iter1620 != this->partVals.end(); ++_iter1620)
-    {
-      xfer += oprot->writeString((*_iter1620));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -50459,10 +45820,6 @@ void swap(RenamePartitionRequest &a, RenamePartitionRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 RenamePartitionRequest::RenamePartitionRequest(const RenamePartitionRequest& other1621) {
   catName = other1621.catName;
   dbName = other1621.dbName;
@@ -50473,7 +45830,6 @@ RenamePartitionRequest::RenamePartitionRequest(const RenamePartitionRequest& oth
   txnId = other1621.txnId;
   clonePart = other1621.clonePart;
   __isset = other1621.__isset;
-<<<<<<< HEAD
 }
 RenamePartitionRequest& RenamePartitionRequest::operator=(const RenamePartitionRequest& other1622) {
   catName = other1622.catName;
@@ -50485,42 +45841,6 @@ RenamePartitionRequest& RenamePartitionRequest::operator=(const RenamePartitionR
   txnId = other1622.txnId;
   clonePart = other1622.clonePart;
   __isset = other1622.__isset;
-=======
-RenamePartitionRequest::RenamePartitionRequest(const RenamePartitionRequest& other1615) {
-  catName = other1615.catName;
-  dbName = other1615.dbName;
-  tableName = other1615.tableName;
-  partVals = other1615.partVals;
-  newPart = other1615.newPart;
-  validWriteIdList = other1615.validWriteIdList;
-  txnId = other1615.txnId;
-  clonePart = other1615.clonePart;
-  __isset = other1615.__isset;
-}
-RenamePartitionRequest& RenamePartitionRequest::operator=(const RenamePartitionRequest& other1616) {
-  catName = other1616.catName;
-  dbName = other1616.dbName;
-  tableName = other1616.tableName;
-  partVals = other1616.partVals;
-  newPart = other1616.newPart;
-  validWriteIdList = other1616.validWriteIdList;
-  txnId = other1616.txnId;
-  clonePart = other1616.clonePart;
-  __isset = other1616.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-RenamePartitionRequest& RenamePartitionRequest::operator=(const RenamePartitionRequest& other1622) {
-  catName = other1622.catName;
-  dbName = other1622.dbName;
-  tableName = other1622.tableName;
-  partVals = other1622.partVals;
-  newPart = other1622.newPart;
-  validWriteIdList = other1622.validWriteIdList;
-  txnId = other1622.txnId;
-  clonePart = other1622.clonePart;
-  __isset = other1622.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void RenamePartitionRequest::printTo(std::ostream& out) const {
@@ -50592,27 +45912,11 @@ void swap(RenamePartitionResponse &a, RenamePartitionResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 RenamePartitionResponse::RenamePartitionResponse(const RenamePartitionResponse& other1623) noexcept {
   (void) other1623;
 }
 RenamePartitionResponse& RenamePartitionResponse::operator=(const RenamePartitionResponse& other1624) noexcept {
   (void) other1624;
-=======
-RenamePartitionResponse::RenamePartitionResponse(const RenamePartitionResponse& other1617) noexcept {
-  (void) other1617;
-}
-RenamePartitionResponse& RenamePartitionResponse::operator=(const RenamePartitionResponse& other1618) noexcept {
-  (void) other1618;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-RenamePartitionResponse::RenamePartitionResponse(const RenamePartitionResponse& other1623) noexcept {
-  (void) other1623;
-}
-RenamePartitionResponse& RenamePartitionResponse::operator=(const RenamePartitionResponse& other1624) noexcept {
-  (void) other1624;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void RenamePartitionResponse::printTo(std::ostream& out) const {
@@ -50768,33 +46072,14 @@ uint32_t AlterTableRequest::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->processorCapabilities.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1625;
             ::apache::thrift::protocol::TType _etype1628;
             xfer += iprot->readListBegin(_etype1628, _size1625);
             this->processorCapabilities.resize(_size1625);
             uint32_t _i1629;
             for (_i1629 = 0; _i1629 < _size1625; ++_i1629)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->processorCapabilities[_i1629]);
-=======
-            uint32_t _size1619;
-            ::apache::thrift::protocol::TType _etype1622;
-            xfer += iprot->readListBegin(_etype1622, _size1619);
-            this->processorCapabilities.resize(_size1619);
-            uint32_t _i1623;
-            for (_i1623 = 0; _i1623 < _size1619; ++_i1623)
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1623]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1629]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -50886,24 +46171,10 @@ uint32_t AlterTableRequest::write(::apache::thrift::protocol::TProtocol* oprot) 
     xfer += oprot->writeFieldBegin("processorCapabilities", ::apache::thrift::protocol::T_LIST, 8);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->processorCapabilities.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1630;
       for (_iter1630 = this->processorCapabilities.begin(); _iter1630 != this->processorCapabilities.end(); ++_iter1630)
       {
         xfer += oprot->writeString((*_iter1630));
-=======
-      std::vector<std::string> ::const_iterator _iter1624;
-      for (_iter1624 = this->processorCapabilities.begin(); _iter1624 != this->processorCapabilities.end(); ++_iter1624)
-      {
-        xfer += oprot->writeString((*_iter1624));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1630;
-      for (_iter1630 = this->processorCapabilities.begin(); _iter1630 != this->processorCapabilities.end(); ++_iter1630)
-      {
-        xfer += oprot->writeString((*_iter1630));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -50945,10 +46216,6 @@ void swap(AlterTableRequest &a, AlterTableRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 AlterTableRequest::AlterTableRequest(const AlterTableRequest& other1631) {
   catName = other1631.catName;
   dbName = other1631.dbName;
@@ -50959,7 +46226,6 @@ AlterTableRequest::AlterTableRequest(const AlterTableRequest& other1631) {
   validWriteIdList = other1631.validWriteIdList;
   processorCapabilities = other1631.processorCapabilities;
   processorIdentifier = other1631.processorIdentifier;
-<<<<<<< HEAD
   expectedParameterKey = other1631.expectedParameterKey;
   expectedParameterValue = other1631.expectedParameterValue;
   __isset = other1631.__isset;
@@ -50977,46 +46243,6 @@ AlterTableRequest& AlterTableRequest::operator=(const AlterTableRequest& other16
   expectedParameterKey = other1632.expectedParameterKey;
   expectedParameterValue = other1632.expectedParameterValue;
   __isset = other1632.__isset;
-=======
-AlterTableRequest::AlterTableRequest(const AlterTableRequest& other1625) {
-  catName = other1625.catName;
-  dbName = other1625.dbName;
-  tableName = other1625.tableName;
-  table = other1625.table;
-  environmentContext = other1625.environmentContext;
-  writeId = other1625.writeId;
-  validWriteIdList = other1625.validWriteIdList;
-  processorCapabilities = other1625.processorCapabilities;
-  processorIdentifier = other1625.processorIdentifier;
-  __isset = other1625.__isset;
-}
-AlterTableRequest& AlterTableRequest::operator=(const AlterTableRequest& other1626) {
-  catName = other1626.catName;
-  dbName = other1626.dbName;
-  tableName = other1626.tableName;
-  table = other1626.table;
-  environmentContext = other1626.environmentContext;
-  writeId = other1626.writeId;
-  validWriteIdList = other1626.validWriteIdList;
-  processorCapabilities = other1626.processorCapabilities;
-  processorIdentifier = other1626.processorIdentifier;
-  __isset = other1626.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-  __isset = other1631.__isset;
-}
-AlterTableRequest& AlterTableRequest::operator=(const AlterTableRequest& other1632) {
-  catName = other1632.catName;
-  dbName = other1632.dbName;
-  tableName = other1632.tableName;
-  table = other1632.table;
-  environmentContext = other1632.environmentContext;
-  writeId = other1632.writeId;
-  validWriteIdList = other1632.validWriteIdList;
-  processorCapabilities = other1632.processorCapabilities;
-  processorIdentifier = other1632.processorIdentifier;
-  __isset = other1632.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void AlterTableRequest::printTo(std::ostream& out) const {
@@ -51091,27 +46317,11 @@ void swap(AlterTableResponse &a, AlterTableResponse &b) {
   (void) b;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 AlterTableResponse::AlterTableResponse(const AlterTableResponse& other1633) noexcept {
   (void) other1633;
 }
 AlterTableResponse& AlterTableResponse::operator=(const AlterTableResponse& other1634) noexcept {
   (void) other1634;
-=======
-AlterTableResponse::AlterTableResponse(const AlterTableResponse& other1627) noexcept {
-  (void) other1627;
-}
-AlterTableResponse& AlterTableResponse::operator=(const AlterTableResponse& other1628) noexcept {
-  (void) other1628;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-AlterTableResponse::AlterTableResponse(const AlterTableResponse& other1633) noexcept {
-  (void) other1633;
-}
-AlterTableResponse& AlterTableResponse::operator=(const AlterTableResponse& other1634) noexcept {
-  (void) other1634;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void AlterTableResponse::printTo(std::ostream& out) const {
@@ -51164,21 +46374,9 @@ uint32_t GetPartitionsFilterSpec::read(::apache::thrift::protocol::TProtocol* ip
     {
       case 7:
         if (ftype == ::apache::thrift::protocol::T_I32) {
-<<<<<<< HEAD
-<<<<<<< HEAD
           int32_t ecast1635;
           xfer += iprot->readI32(ecast1635);
           this->filterMode = static_cast<PartitionFilterMode::type>(ecast1635);
-=======
-          int32_t ecast1629;
-          xfer += iprot->readI32(ecast1629);
-          this->filterMode = static_cast<PartitionFilterMode::type>(ecast1629);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          int32_t ecast1635;
-          xfer += iprot->readI32(ecast1635);
-          this->filterMode = static_cast<PartitionFilterMode::type>(ecast1635);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           this->__isset.filterMode = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -51188,33 +46386,14 @@ uint32_t GetPartitionsFilterSpec::read(::apache::thrift::protocol::TProtocol* ip
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->filters.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1636;
             ::apache::thrift::protocol::TType _etype1639;
             xfer += iprot->readListBegin(_etype1639, _size1636);
             this->filters.resize(_size1636);
             uint32_t _i1640;
             for (_i1640 = 0; _i1640 < _size1636; ++_i1640)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->filters[_i1640]);
-=======
-            uint32_t _size1630;
-            ::apache::thrift::protocol::TType _etype1633;
-            xfer += iprot->readListBegin(_etype1633, _size1630);
-            this->filters.resize(_size1630);
-            uint32_t _i1634;
-            for (_i1634 = 0; _i1634 < _size1630; ++_i1634)
-            {
-              xfer += iprot->readString(this->filters[_i1634]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->filters[_i1640]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -51249,24 +46428,10 @@ uint32_t GetPartitionsFilterSpec::write(::apache::thrift::protocol::TProtocol* o
     xfer += oprot->writeFieldBegin("filters", ::apache::thrift::protocol::T_LIST, 8);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->filters.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1641;
       for (_iter1641 = this->filters.begin(); _iter1641 != this->filters.end(); ++_iter1641)
       {
         xfer += oprot->writeString((*_iter1641));
-=======
-      std::vector<std::string> ::const_iterator _iter1635;
-      for (_iter1635 = this->filters.begin(); _iter1635 != this->filters.end(); ++_iter1635)
-      {
-        xfer += oprot->writeString((*_iter1635));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1641;
-      for (_iter1641 = this->filters.begin(); _iter1641 != this->filters.end(); ++_iter1641)
-      {
-        xfer += oprot->writeString((*_iter1641));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -51284,38 +46449,15 @@ void swap(GetPartitionsFilterSpec &a, GetPartitionsFilterSpec &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetPartitionsFilterSpec::GetPartitionsFilterSpec(const GetPartitionsFilterSpec& other1642) {
   filterMode = other1642.filterMode;
   filters = other1642.filters;
   __isset = other1642.__isset;
-<<<<<<< HEAD
 }
 GetPartitionsFilterSpec& GetPartitionsFilterSpec::operator=(const GetPartitionsFilterSpec& other1643) {
   filterMode = other1643.filterMode;
   filters = other1643.filters;
   __isset = other1643.__isset;
-=======
-GetPartitionsFilterSpec::GetPartitionsFilterSpec(const GetPartitionsFilterSpec& other1636) {
-  filterMode = other1636.filterMode;
-  filters = other1636.filters;
-  __isset = other1636.__isset;
-}
-GetPartitionsFilterSpec& GetPartitionsFilterSpec::operator=(const GetPartitionsFilterSpec& other1637) {
-  filterMode = other1637.filterMode;
-  filters = other1637.filters;
-  __isset = other1637.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetPartitionsFilterSpec& GetPartitionsFilterSpec::operator=(const GetPartitionsFilterSpec& other1643) {
-  filterMode = other1643.filterMode;
-  filters = other1643.filters;
-  __isset = other1643.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPartitionsFilterSpec::printTo(std::ostream& out) const {
@@ -51366,33 +46508,14 @@ uint32_t GetPartitionsResponse::read(::apache::thrift::protocol::TProtocol* ipro
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partitionSpec.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1644;
             ::apache::thrift::protocol::TType _etype1647;
             xfer += iprot->readListBegin(_etype1647, _size1644);
             this->partitionSpec.resize(_size1644);
             uint32_t _i1648;
             for (_i1648 = 0; _i1648 < _size1644; ++_i1648)
-<<<<<<< HEAD
             {
               xfer += this->partitionSpec[_i1648].read(iprot);
-=======
-            uint32_t _size1638;
-            ::apache::thrift::protocol::TType _etype1641;
-            xfer += iprot->readListBegin(_etype1641, _size1638);
-            this->partitionSpec.resize(_size1638);
-            uint32_t _i1642;
-            for (_i1642 = 0; _i1642 < _size1638; ++_i1642)
-            {
-              xfer += this->partitionSpec[_i1642].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->partitionSpec[_i1648].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -51421,24 +46544,10 @@ uint32_t GetPartitionsResponse::write(::apache::thrift::protocol::TProtocol* opr
   xfer += oprot->writeFieldBegin("partitionSpec", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->partitionSpec.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<PartitionSpec> ::const_iterator _iter1649;
     for (_iter1649 = this->partitionSpec.begin(); _iter1649 != this->partitionSpec.end(); ++_iter1649)
     {
       xfer += (*_iter1649).write(oprot);
-=======
-    std::vector<PartitionSpec> ::const_iterator _iter1643;
-    for (_iter1643 = this->partitionSpec.begin(); _iter1643 != this->partitionSpec.end(); ++_iter1643)
-    {
-      xfer += (*_iter1643).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<PartitionSpec> ::const_iterator _iter1649;
-    for (_iter1649 = this->partitionSpec.begin(); _iter1649 != this->partitionSpec.end(); ++_iter1649)
-    {
-      xfer += (*_iter1649).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -51455,8 +46564,6 @@ void swap(GetPartitionsResponse &a, GetPartitionsResponse &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetPartitionsResponse::GetPartitionsResponse(const GetPartitionsResponse& other1650) {
   partitionSpec = other1650.partitionSpec;
   __isset = other1650.__isset;
@@ -51464,24 +46571,6 @@ GetPartitionsResponse::GetPartitionsResponse(const GetPartitionsResponse& other1
 GetPartitionsResponse& GetPartitionsResponse::operator=(const GetPartitionsResponse& other1651) {
   partitionSpec = other1651.partitionSpec;
   __isset = other1651.__isset;
-=======
-GetPartitionsResponse::GetPartitionsResponse(const GetPartitionsResponse& other1644) {
-  partitionSpec = other1644.partitionSpec;
-  __isset = other1644.__isset;
-}
-GetPartitionsResponse& GetPartitionsResponse::operator=(const GetPartitionsResponse& other1645) {
-  partitionSpec = other1645.partitionSpec;
-  __isset = other1645.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetPartitionsResponse::GetPartitionsResponse(const GetPartitionsResponse& other1650) {
-  partitionSpec = other1650.partitionSpec;
-  __isset = other1650.__isset;
-}
-GetPartitionsResponse& GetPartitionsResponse::operator=(const GetPartitionsResponse& other1651) {
-  partitionSpec = other1651.partitionSpec;
-  __isset = other1651.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPartitionsResponse::printTo(std::ostream& out) const {
@@ -51618,33 +46707,14 @@ uint32_t GetPartitionsRequest::read(::apache::thrift::protocol::TProtocol* iprot
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->groupNames.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1652;
             ::apache::thrift::protocol::TType _etype1655;
             xfer += iprot->readListBegin(_etype1655, _size1652);
             this->groupNames.resize(_size1652);
             uint32_t _i1656;
             for (_i1656 = 0; _i1656 < _size1652; ++_i1656)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->groupNames[_i1656]);
-=======
-            uint32_t _size1646;
-            ::apache::thrift::protocol::TType _etype1649;
-            xfer += iprot->readListBegin(_etype1649, _size1646);
-            this->groupNames.resize(_size1646);
-            uint32_t _i1650;
-            for (_i1650 = 0; _i1650 < _size1646; ++_i1650)
-            {
-              xfer += iprot->readString(this->groupNames[_i1650]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->groupNames[_i1656]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -51673,33 +46743,14 @@ uint32_t GetPartitionsRequest::read(::apache::thrift::protocol::TProtocol* iprot
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->processorCapabilities.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1657;
             ::apache::thrift::protocol::TType _etype1660;
             xfer += iprot->readListBegin(_etype1660, _size1657);
             this->processorCapabilities.resize(_size1657);
             uint32_t _i1661;
             for (_i1661 = 0; _i1661 < _size1657; ++_i1661)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->processorCapabilities[_i1661]);
-=======
-            uint32_t _size1651;
-            ::apache::thrift::protocol::TType _etype1654;
-            xfer += iprot->readListBegin(_etype1654, _size1651);
-            this->processorCapabilities.resize(_size1651);
-            uint32_t _i1655;
-            for (_i1655 = 0; _i1655 < _size1651; ++_i1655)
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1655]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->processorCapabilities[_i1661]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -51768,24 +46819,10 @@ uint32_t GetPartitionsRequest::write(::apache::thrift::protocol::TProtocol* opro
     xfer += oprot->writeFieldBegin("groupNames", ::apache::thrift::protocol::T_LIST, 6);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->groupNames.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1662;
       for (_iter1662 = this->groupNames.begin(); _iter1662 != this->groupNames.end(); ++_iter1662)
       {
         xfer += oprot->writeString((*_iter1662));
-=======
-      std::vector<std::string> ::const_iterator _iter1656;
-      for (_iter1656 = this->groupNames.begin(); _iter1656 != this->groupNames.end(); ++_iter1656)
-      {
-        xfer += oprot->writeString((*_iter1656));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1662;
-      for (_iter1662 = this->groupNames.begin(); _iter1662 != this->groupNames.end(); ++_iter1662)
-      {
-        xfer += oprot->writeString((*_iter1662));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -51803,24 +46840,10 @@ uint32_t GetPartitionsRequest::write(::apache::thrift::protocol::TProtocol* opro
     xfer += oprot->writeFieldBegin("processorCapabilities", ::apache::thrift::protocol::T_LIST, 9);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->processorCapabilities.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1663;
       for (_iter1663 = this->processorCapabilities.begin(); _iter1663 != this->processorCapabilities.end(); ++_iter1663)
       {
         xfer += oprot->writeString((*_iter1663));
-=======
-      std::vector<std::string> ::const_iterator _iter1657;
-      for (_iter1657 = this->processorCapabilities.begin(); _iter1657 != this->processorCapabilities.end(); ++_iter1657)
-      {
-        xfer += oprot->writeString((*_iter1657));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1663;
-      for (_iter1663 = this->processorCapabilities.begin(); _iter1663 != this->processorCapabilities.end(); ++_iter1663)
-      {
-        xfer += oprot->writeString((*_iter1663));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -51857,10 +46880,6 @@ void swap(GetPartitionsRequest &a, GetPartitionsRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetPartitionsRequest::GetPartitionsRequest(const GetPartitionsRequest& other1664) {
   catName = other1664.catName;
   dbName = other1664.dbName;
@@ -51874,7 +46893,6 @@ GetPartitionsRequest::GetPartitionsRequest(const GetPartitionsRequest& other1664
   processorIdentifier = other1664.processorIdentifier;
   validWriteIdList = other1664.validWriteIdList;
   __isset = other1664.__isset;
-<<<<<<< HEAD
 }
 GetPartitionsRequest& GetPartitionsRequest::operator=(const GetPartitionsRequest& other1665) {
   catName = other1665.catName;
@@ -51889,51 +46907,6 @@ GetPartitionsRequest& GetPartitionsRequest::operator=(const GetPartitionsRequest
   processorIdentifier = other1665.processorIdentifier;
   validWriteIdList = other1665.validWriteIdList;
   __isset = other1665.__isset;
-=======
-GetPartitionsRequest::GetPartitionsRequest(const GetPartitionsRequest& other1658) {
-  catName = other1658.catName;
-  dbName = other1658.dbName;
-  tblName = other1658.tblName;
-  withAuth = other1658.withAuth;
-  user = other1658.user;
-  groupNames = other1658.groupNames;
-  projectionSpec = other1658.projectionSpec;
-  filterSpec = other1658.filterSpec;
-  processorCapabilities = other1658.processorCapabilities;
-  processorIdentifier = other1658.processorIdentifier;
-  validWriteIdList = other1658.validWriteIdList;
-  __isset = other1658.__isset;
-}
-GetPartitionsRequest& GetPartitionsRequest::operator=(const GetPartitionsRequest& other1659) {
-  catName = other1659.catName;
-  dbName = other1659.dbName;
-  tblName = other1659.tblName;
-  withAuth = other1659.withAuth;
-  user = other1659.user;
-  groupNames = other1659.groupNames;
-  projectionSpec = other1659.projectionSpec;
-  filterSpec = other1659.filterSpec;
-  processorCapabilities = other1659.processorCapabilities;
-  processorIdentifier = other1659.processorIdentifier;
-  validWriteIdList = other1659.validWriteIdList;
-  __isset = other1659.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetPartitionsRequest& GetPartitionsRequest::operator=(const GetPartitionsRequest& other1665) {
-  catName = other1665.catName;
-  dbName = other1665.dbName;
-  tblName = other1665.tblName;
-  withAuth = other1665.withAuth;
-  user = other1665.user;
-  groupNames = other1665.groupNames;
-  projectionSpec = other1665.projectionSpec;
-  filterSpec = other1665.filterSpec;
-  processorCapabilities = other1665.processorCapabilities;
-  processorIdentifier = other1665.processorIdentifier;
-  validWriteIdList = other1665.validWriteIdList;
-  __isset = other1665.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPartitionsRequest::printTo(std::ostream& out) const {
@@ -52128,10 +47101,6 @@ void swap(GetFieldsRequest &a, GetFieldsRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetFieldsRequest::GetFieldsRequest(const GetFieldsRequest& other1666) {
   catName = other1666.catName;
   dbName = other1666.dbName;
@@ -52140,7 +47109,6 @@ GetFieldsRequest::GetFieldsRequest(const GetFieldsRequest& other1666) {
   validWriteIdList = other1666.validWriteIdList;
   id = other1666.id;
   __isset = other1666.__isset;
-<<<<<<< HEAD
 }
 GetFieldsRequest& GetFieldsRequest::operator=(const GetFieldsRequest& other1667) {
   catName = other1667.catName;
@@ -52150,36 +47118,6 @@ GetFieldsRequest& GetFieldsRequest::operator=(const GetFieldsRequest& other1667)
   validWriteIdList = other1667.validWriteIdList;
   id = other1667.id;
   __isset = other1667.__isset;
-=======
-GetFieldsRequest::GetFieldsRequest(const GetFieldsRequest& other1660) {
-  catName = other1660.catName;
-  dbName = other1660.dbName;
-  tblName = other1660.tblName;
-  envContext = other1660.envContext;
-  validWriteIdList = other1660.validWriteIdList;
-  id = other1660.id;
-  __isset = other1660.__isset;
-}
-GetFieldsRequest& GetFieldsRequest::operator=(const GetFieldsRequest& other1661) {
-  catName = other1661.catName;
-  dbName = other1661.dbName;
-  tblName = other1661.tblName;
-  envContext = other1661.envContext;
-  validWriteIdList = other1661.validWriteIdList;
-  id = other1661.id;
-  __isset = other1661.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetFieldsRequest& GetFieldsRequest::operator=(const GetFieldsRequest& other1667) {
-  catName = other1667.catName;
-  dbName = other1667.dbName;
-  tblName = other1667.tblName;
-  envContext = other1667.envContext;
-  validWriteIdList = other1667.validWriteIdList;
-  id = other1667.id;
-  __isset = other1667.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetFieldsRequest::printTo(std::ostream& out) const {
@@ -52235,33 +47173,14 @@ uint32_t GetFieldsResponse::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->fields.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1668;
             ::apache::thrift::protocol::TType _etype1671;
             xfer += iprot->readListBegin(_etype1671, _size1668);
             this->fields.resize(_size1668);
             uint32_t _i1672;
             for (_i1672 = 0; _i1672 < _size1668; ++_i1672)
-<<<<<<< HEAD
             {
               xfer += this->fields[_i1672].read(iprot);
-=======
-            uint32_t _size1662;
-            ::apache::thrift::protocol::TType _etype1665;
-            xfer += iprot->readListBegin(_etype1665, _size1662);
-            this->fields.resize(_size1662);
-            uint32_t _i1666;
-            for (_i1666 = 0; _i1666 < _size1662; ++_i1666)
-            {
-              xfer += this->fields[_i1666].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->fields[_i1672].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -52292,24 +47211,10 @@ uint32_t GetFieldsResponse::write(::apache::thrift::protocol::TProtocol* oprot) 
   xfer += oprot->writeFieldBegin("fields", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->fields.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<FieldSchema> ::const_iterator _iter1673;
     for (_iter1673 = this->fields.begin(); _iter1673 != this->fields.end(); ++_iter1673)
     {
       xfer += (*_iter1673).write(oprot);
-=======
-    std::vector<FieldSchema> ::const_iterator _iter1667;
-    for (_iter1667 = this->fields.begin(); _iter1667 != this->fields.end(); ++_iter1667)
-    {
-      xfer += (*_iter1667).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<FieldSchema> ::const_iterator _iter1673;
-    for (_iter1673 = this->fields.begin(); _iter1673 != this->fields.end(); ++_iter1673)
-    {
-      xfer += (*_iter1673).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -52325,27 +47230,11 @@ void swap(GetFieldsResponse &a, GetFieldsResponse &b) {
   swap(a.fields, b.fields);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetFieldsResponse::GetFieldsResponse(const GetFieldsResponse& other1674) {
   fields = other1674.fields;
 }
 GetFieldsResponse& GetFieldsResponse::operator=(const GetFieldsResponse& other1675) {
   fields = other1675.fields;
-=======
-GetFieldsResponse::GetFieldsResponse(const GetFieldsResponse& other1668) {
-  fields = other1668.fields;
-}
-GetFieldsResponse& GetFieldsResponse::operator=(const GetFieldsResponse& other1669) {
-  fields = other1669.fields;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetFieldsResponse::GetFieldsResponse(const GetFieldsResponse& other1674) {
-  fields = other1674.fields;
-}
-GetFieldsResponse& GetFieldsResponse::operator=(const GetFieldsResponse& other1675) {
-  fields = other1675.fields;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetFieldsResponse::printTo(std::ostream& out) const {
@@ -52530,10 +47419,6 @@ void swap(GetSchemaRequest &a, GetSchemaRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetSchemaRequest::GetSchemaRequest(const GetSchemaRequest& other1676) {
   catName = other1676.catName;
   dbName = other1676.dbName;
@@ -52542,7 +47427,6 @@ GetSchemaRequest::GetSchemaRequest(const GetSchemaRequest& other1676) {
   validWriteIdList = other1676.validWriteIdList;
   id = other1676.id;
   __isset = other1676.__isset;
-<<<<<<< HEAD
 }
 GetSchemaRequest& GetSchemaRequest::operator=(const GetSchemaRequest& other1677) {
   catName = other1677.catName;
@@ -52552,36 +47436,6 @@ GetSchemaRequest& GetSchemaRequest::operator=(const GetSchemaRequest& other1677)
   validWriteIdList = other1677.validWriteIdList;
   id = other1677.id;
   __isset = other1677.__isset;
-=======
-GetSchemaRequest::GetSchemaRequest(const GetSchemaRequest& other1670) {
-  catName = other1670.catName;
-  dbName = other1670.dbName;
-  tblName = other1670.tblName;
-  envContext = other1670.envContext;
-  validWriteIdList = other1670.validWriteIdList;
-  id = other1670.id;
-  __isset = other1670.__isset;
-}
-GetSchemaRequest& GetSchemaRequest::operator=(const GetSchemaRequest& other1671) {
-  catName = other1671.catName;
-  dbName = other1671.dbName;
-  tblName = other1671.tblName;
-  envContext = other1671.envContext;
-  validWriteIdList = other1671.validWriteIdList;
-  id = other1671.id;
-  __isset = other1671.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetSchemaRequest& GetSchemaRequest::operator=(const GetSchemaRequest& other1677) {
-  catName = other1677.catName;
-  dbName = other1677.dbName;
-  tblName = other1677.tblName;
-  envContext = other1677.envContext;
-  validWriteIdList = other1677.validWriteIdList;
-  id = other1677.id;
-  __isset = other1677.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetSchemaRequest::printTo(std::ostream& out) const {
@@ -52637,33 +47491,14 @@ uint32_t GetSchemaResponse::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->fields.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1678;
             ::apache::thrift::protocol::TType _etype1681;
             xfer += iprot->readListBegin(_etype1681, _size1678);
             this->fields.resize(_size1678);
             uint32_t _i1682;
             for (_i1682 = 0; _i1682 < _size1678; ++_i1682)
-<<<<<<< HEAD
             {
               xfer += this->fields[_i1682].read(iprot);
-=======
-            uint32_t _size1672;
-            ::apache::thrift::protocol::TType _etype1675;
-            xfer += iprot->readListBegin(_etype1675, _size1672);
-            this->fields.resize(_size1672);
-            uint32_t _i1676;
-            for (_i1676 = 0; _i1676 < _size1672; ++_i1676)
-            {
-              xfer += this->fields[_i1676].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->fields[_i1682].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -52694,24 +47529,10 @@ uint32_t GetSchemaResponse::write(::apache::thrift::protocol::TProtocol* oprot) 
   xfer += oprot->writeFieldBegin("fields", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->fields.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<FieldSchema> ::const_iterator _iter1683;
     for (_iter1683 = this->fields.begin(); _iter1683 != this->fields.end(); ++_iter1683)
     {
       xfer += (*_iter1683).write(oprot);
-=======
-    std::vector<FieldSchema> ::const_iterator _iter1677;
-    for (_iter1677 = this->fields.begin(); _iter1677 != this->fields.end(); ++_iter1677)
-    {
-      xfer += (*_iter1677).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<FieldSchema> ::const_iterator _iter1683;
-    for (_iter1683 = this->fields.begin(); _iter1683 != this->fields.end(); ++_iter1683)
-    {
-      xfer += (*_iter1683).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -52727,27 +47548,11 @@ void swap(GetSchemaResponse &a, GetSchemaResponse &b) {
   swap(a.fields, b.fields);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetSchemaResponse::GetSchemaResponse(const GetSchemaResponse& other1684) {
   fields = other1684.fields;
 }
 GetSchemaResponse& GetSchemaResponse::operator=(const GetSchemaResponse& other1685) {
   fields = other1685.fields;
-=======
-GetSchemaResponse::GetSchemaResponse(const GetSchemaResponse& other1678) {
-  fields = other1678.fields;
-}
-GetSchemaResponse& GetSchemaResponse::operator=(const GetSchemaResponse& other1679) {
-  fields = other1679.fields;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetSchemaResponse::GetSchemaResponse(const GetSchemaResponse& other1684) {
-  fields = other1684.fields;
-}
-GetSchemaResponse& GetSchemaResponse::operator=(const GetSchemaResponse& other1685) {
-  fields = other1685.fields;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetSchemaResponse::printTo(std::ostream& out) const {
@@ -52847,33 +47652,14 @@ uint32_t GetPartitionRequest::read(::apache::thrift::protocol::TProtocol* iprot)
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partVals.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1686;
             ::apache::thrift::protocol::TType _etype1689;
             xfer += iprot->readListBegin(_etype1689, _size1686);
             this->partVals.resize(_size1686);
             uint32_t _i1690;
             for (_i1690 = 0; _i1690 < _size1686; ++_i1690)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->partVals[_i1690]);
-=======
-            uint32_t _size1680;
-            ::apache::thrift::protocol::TType _etype1683;
-            xfer += iprot->readListBegin(_etype1683, _size1680);
-            this->partVals.resize(_size1680);
-            uint32_t _i1684;
-            for (_i1684 = 0; _i1684 < _size1680; ++_i1684)
-            {
-              xfer += iprot->readString(this->partVals[_i1684]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->partVals[_i1690]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -52937,24 +47723,10 @@ uint32_t GetPartitionRequest::write(::apache::thrift::protocol::TProtocol* oprot
   xfer += oprot->writeFieldBegin("partVals", ::apache::thrift::protocol::T_LIST, 4);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->partVals.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter1691;
     for (_iter1691 = this->partVals.begin(); _iter1691 != this->partVals.end(); ++_iter1691)
     {
       xfer += oprot->writeString((*_iter1691));
-=======
-    std::vector<std::string> ::const_iterator _iter1685;
-    for (_iter1685 = this->partVals.begin(); _iter1685 != this->partVals.end(); ++_iter1685)
-    {
-      xfer += oprot->writeString((*_iter1685));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<std::string> ::const_iterator _iter1691;
-    for (_iter1691 = this->partVals.begin(); _iter1691 != this->partVals.end(); ++_iter1691)
-    {
-      xfer += oprot->writeString((*_iter1691));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -52986,10 +47758,6 @@ void swap(GetPartitionRequest &a, GetPartitionRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetPartitionRequest::GetPartitionRequest(const GetPartitionRequest& other1692) {
   catName = other1692.catName;
   dbName = other1692.dbName;
@@ -52998,7 +47766,6 @@ GetPartitionRequest::GetPartitionRequest(const GetPartitionRequest& other1692) {
   validWriteIdList = other1692.validWriteIdList;
   id = other1692.id;
   __isset = other1692.__isset;
-<<<<<<< HEAD
 }
 GetPartitionRequest& GetPartitionRequest::operator=(const GetPartitionRequest& other1693) {
   catName = other1693.catName;
@@ -53008,36 +47775,6 @@ GetPartitionRequest& GetPartitionRequest::operator=(const GetPartitionRequest& o
   validWriteIdList = other1693.validWriteIdList;
   id = other1693.id;
   __isset = other1693.__isset;
-=======
-GetPartitionRequest::GetPartitionRequest(const GetPartitionRequest& other1686) {
-  catName = other1686.catName;
-  dbName = other1686.dbName;
-  tblName = other1686.tblName;
-  partVals = other1686.partVals;
-  validWriteIdList = other1686.validWriteIdList;
-  id = other1686.id;
-  __isset = other1686.__isset;
-}
-GetPartitionRequest& GetPartitionRequest::operator=(const GetPartitionRequest& other1687) {
-  catName = other1687.catName;
-  dbName = other1687.dbName;
-  tblName = other1687.tblName;
-  partVals = other1687.partVals;
-  validWriteIdList = other1687.validWriteIdList;
-  id = other1687.id;
-  __isset = other1687.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetPartitionRequest& GetPartitionRequest::operator=(const GetPartitionRequest& other1693) {
-  catName = other1693.catName;
-  dbName = other1693.dbName;
-  tblName = other1693.tblName;
-  partVals = other1693.partVals;
-  validWriteIdList = other1693.validWriteIdList;
-  id = other1693.id;
-  __isset = other1693.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPartitionRequest::printTo(std::ostream& out) const {
@@ -53130,27 +47867,11 @@ void swap(GetPartitionResponse &a, GetPartitionResponse &b) {
   swap(a.partition, b.partition);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetPartitionResponse::GetPartitionResponse(const GetPartitionResponse& other1694) {
   partition = other1694.partition;
 }
 GetPartitionResponse& GetPartitionResponse::operator=(const GetPartitionResponse& other1695) {
   partition = other1695.partition;
-=======
-GetPartitionResponse::GetPartitionResponse(const GetPartitionResponse& other1688) {
-  partition = other1688.partition;
-}
-GetPartitionResponse& GetPartitionResponse::operator=(const GetPartitionResponse& other1689) {
-  partition = other1689.partition;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetPartitionResponse::GetPartitionResponse(const GetPartitionResponse& other1694) {
-  partition = other1694.partition;
-}
-GetPartitionResponse& GetPartitionResponse::operator=(const GetPartitionResponse& other1695) {
-  partition = other1695.partition;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPartitionResponse::printTo(std::ostream& out) const {
@@ -53392,10 +48113,6 @@ void swap(PartitionsRequest &a, PartitionsRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 PartitionsRequest::PartitionsRequest(const PartitionsRequest& other1696) {
   catName = other1696.catName;
   dbName = other1696.dbName;
@@ -53407,7 +48124,6 @@ PartitionsRequest::PartitionsRequest(const PartitionsRequest& other1696) {
   includeParamKeyPattern = other1696.includeParamKeyPattern;
   excludeParamKeyPattern = other1696.excludeParamKeyPattern;
   __isset = other1696.__isset;
-<<<<<<< HEAD
 }
 PartitionsRequest& PartitionsRequest::operator=(const PartitionsRequest& other1697) {
   catName = other1697.catName;
@@ -53420,45 +48136,6 @@ PartitionsRequest& PartitionsRequest::operator=(const PartitionsRequest& other16
   includeParamKeyPattern = other1697.includeParamKeyPattern;
   excludeParamKeyPattern = other1697.excludeParamKeyPattern;
   __isset = other1697.__isset;
-=======
-PartitionsRequest::PartitionsRequest(const PartitionsRequest& other1690) {
-  catName = other1690.catName;
-  dbName = other1690.dbName;
-  tblName = other1690.tblName;
-  maxParts = other1690.maxParts;
-  validWriteIdList = other1690.validWriteIdList;
-  id = other1690.id;
-  skipColumnSchemaForPartition = other1690.skipColumnSchemaForPartition;
-  includeParamKeyPattern = other1690.includeParamKeyPattern;
-  excludeParamKeyPattern = other1690.excludeParamKeyPattern;
-  __isset = other1690.__isset;
-}
-PartitionsRequest& PartitionsRequest::operator=(const PartitionsRequest& other1691) {
-  catName = other1691.catName;
-  dbName = other1691.dbName;
-  tblName = other1691.tblName;
-  maxParts = other1691.maxParts;
-  validWriteIdList = other1691.validWriteIdList;
-  id = other1691.id;
-  skipColumnSchemaForPartition = other1691.skipColumnSchemaForPartition;
-  includeParamKeyPattern = other1691.includeParamKeyPattern;
-  excludeParamKeyPattern = other1691.excludeParamKeyPattern;
-  __isset = other1691.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-PartitionsRequest& PartitionsRequest::operator=(const PartitionsRequest& other1697) {
-  catName = other1697.catName;
-  dbName = other1697.dbName;
-  tblName = other1697.tblName;
-  maxParts = other1697.maxParts;
-  validWriteIdList = other1697.validWriteIdList;
-  id = other1697.id;
-  skipColumnSchemaForPartition = other1697.skipColumnSchemaForPartition;
-  includeParamKeyPattern = other1697.includeParamKeyPattern;
-  excludeParamKeyPattern = other1697.excludeParamKeyPattern;
-  __isset = other1697.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void PartitionsRequest::printTo(std::ostream& out) const {
@@ -53681,10 +48358,6 @@ void swap(GetPartitionsByFilterRequest &a, GetPartitionsByFilterRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetPartitionsByFilterRequest::GetPartitionsByFilterRequest(const GetPartitionsByFilterRequest& other1698) {
   catName = other1698.catName;
   dbName = other1698.dbName;
@@ -53695,7 +48368,6 @@ GetPartitionsByFilterRequest::GetPartitionsByFilterRequest(const GetPartitionsBy
   includeParamKeyPattern = other1698.includeParamKeyPattern;
   excludeParamKeyPattern = other1698.excludeParamKeyPattern;
   __isset = other1698.__isset;
-<<<<<<< HEAD
 }
 GetPartitionsByFilterRequest& GetPartitionsByFilterRequest::operator=(const GetPartitionsByFilterRequest& other1699) {
   catName = other1699.catName;
@@ -53707,42 +48379,6 @@ GetPartitionsByFilterRequest& GetPartitionsByFilterRequest::operator=(const GetP
   includeParamKeyPattern = other1699.includeParamKeyPattern;
   excludeParamKeyPattern = other1699.excludeParamKeyPattern;
   __isset = other1699.__isset;
-=======
-GetPartitionsByFilterRequest::GetPartitionsByFilterRequest(const GetPartitionsByFilterRequest& other1692) {
-  catName = other1692.catName;
-  dbName = other1692.dbName;
-  tblName = other1692.tblName;
-  filter = other1692.filter;
-  maxParts = other1692.maxParts;
-  skipColumnSchemaForPartition = other1692.skipColumnSchemaForPartition;
-  includeParamKeyPattern = other1692.includeParamKeyPattern;
-  excludeParamKeyPattern = other1692.excludeParamKeyPattern;
-  __isset = other1692.__isset;
-}
-GetPartitionsByFilterRequest& GetPartitionsByFilterRequest::operator=(const GetPartitionsByFilterRequest& other1693) {
-  catName = other1693.catName;
-  dbName = other1693.dbName;
-  tblName = other1693.tblName;
-  filter = other1693.filter;
-  maxParts = other1693.maxParts;
-  skipColumnSchemaForPartition = other1693.skipColumnSchemaForPartition;
-  includeParamKeyPattern = other1693.includeParamKeyPattern;
-  excludeParamKeyPattern = other1693.excludeParamKeyPattern;
-  __isset = other1693.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetPartitionsByFilterRequest& GetPartitionsByFilterRequest::operator=(const GetPartitionsByFilterRequest& other1699) {
-  catName = other1699.catName;
-  dbName = other1699.dbName;
-  tblName = other1699.tblName;
-  filter = other1699.filter;
-  maxParts = other1699.maxParts;
-  skipColumnSchemaForPartition = other1699.skipColumnSchemaForPartition;
-  includeParamKeyPattern = other1699.includeParamKeyPattern;
-  excludeParamKeyPattern = other1699.excludeParamKeyPattern;
-  __isset = other1699.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPartitionsByFilterRequest::printTo(std::ostream& out) const {
@@ -53800,33 +48436,14 @@ uint32_t PartitionsResponse::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partitions.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1700;
             ::apache::thrift::protocol::TType _etype1703;
             xfer += iprot->readListBegin(_etype1703, _size1700);
             this->partitions.resize(_size1700);
             uint32_t _i1704;
             for (_i1704 = 0; _i1704 < _size1700; ++_i1704)
-<<<<<<< HEAD
             {
               xfer += this->partitions[_i1704].read(iprot);
-=======
-            uint32_t _size1694;
-            ::apache::thrift::protocol::TType _etype1697;
-            xfer += iprot->readListBegin(_etype1697, _size1694);
-            this->partitions.resize(_size1694);
-            uint32_t _i1698;
-            for (_i1698 = 0; _i1698 < _size1694; ++_i1698)
-            {
-              xfer += this->partitions[_i1698].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->partitions[_i1704].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -53857,24 +48474,10 @@ uint32_t PartitionsResponse::write(::apache::thrift::protocol::TProtocol* oprot)
   xfer += oprot->writeFieldBegin("partitions", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->partitions.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<Partition> ::const_iterator _iter1705;
     for (_iter1705 = this->partitions.begin(); _iter1705 != this->partitions.end(); ++_iter1705)
     {
       xfer += (*_iter1705).write(oprot);
-=======
-    std::vector<Partition> ::const_iterator _iter1699;
-    for (_iter1699 = this->partitions.begin(); _iter1699 != this->partitions.end(); ++_iter1699)
-    {
-      xfer += (*_iter1699).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<Partition> ::const_iterator _iter1705;
-    for (_iter1705 = this->partitions.begin(); _iter1705 != this->partitions.end(); ++_iter1705)
-    {
-      xfer += (*_iter1705).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -53890,27 +48493,11 @@ void swap(PartitionsResponse &a, PartitionsResponse &b) {
   swap(a.partitions, b.partitions);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 PartitionsResponse::PartitionsResponse(const PartitionsResponse& other1706) {
   partitions = other1706.partitions;
 }
 PartitionsResponse& PartitionsResponse::operator=(const PartitionsResponse& other1707) {
   partitions = other1707.partitions;
-=======
-PartitionsResponse::PartitionsResponse(const PartitionsResponse& other1700) {
-  partitions = other1700.partitions;
-}
-PartitionsResponse& PartitionsResponse::operator=(const PartitionsResponse& other1701) {
-  partitions = other1701.partitions;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-PartitionsResponse::PartitionsResponse(const PartitionsResponse& other1706) {
-  partitions = other1706.partitions;
-}
-PartitionsResponse& PartitionsResponse::operator=(const PartitionsResponse& other1707) {
-  partitions = other1707.partitions;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void PartitionsResponse::printTo(std::ostream& out) const {
@@ -54015,33 +48602,14 @@ uint32_t GetPartitionNamesPsRequest::read(::apache::thrift::protocol::TProtocol*
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partValues.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1708;
             ::apache::thrift::protocol::TType _etype1711;
             xfer += iprot->readListBegin(_etype1711, _size1708);
             this->partValues.resize(_size1708);
             uint32_t _i1712;
             for (_i1712 = 0; _i1712 < _size1708; ++_i1712)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->partValues[_i1712]);
-=======
-            uint32_t _size1702;
-            ::apache::thrift::protocol::TType _etype1705;
-            xfer += iprot->readListBegin(_etype1705, _size1702);
-            this->partValues.resize(_size1702);
-            uint32_t _i1706;
-            for (_i1706 = 0; _i1706 < _size1702; ++_i1706)
-            {
-              xfer += iprot->readString(this->partValues[_i1706]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->partValues[_i1712]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -54112,24 +48680,10 @@ uint32_t GetPartitionNamesPsRequest::write(::apache::thrift::protocol::TProtocol
     xfer += oprot->writeFieldBegin("partValues", ::apache::thrift::protocol::T_LIST, 4);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->partValues.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1713;
       for (_iter1713 = this->partValues.begin(); _iter1713 != this->partValues.end(); ++_iter1713)
       {
         xfer += oprot->writeString((*_iter1713));
-=======
-      std::vector<std::string> ::const_iterator _iter1707;
-      for (_iter1707 = this->partValues.begin(); _iter1707 != this->partValues.end(); ++_iter1707)
-      {
-        xfer += oprot->writeString((*_iter1707));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1713;
-      for (_iter1713 = this->partValues.begin(); _iter1713 != this->partValues.end(); ++_iter1713)
-      {
-        xfer += oprot->writeString((*_iter1713));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -54167,10 +48721,6 @@ void swap(GetPartitionNamesPsRequest &a, GetPartitionNamesPsRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetPartitionNamesPsRequest::GetPartitionNamesPsRequest(const GetPartitionNamesPsRequest& other1714) {
   catName = other1714.catName;
   dbName = other1714.dbName;
@@ -54180,7 +48730,6 @@ GetPartitionNamesPsRequest::GetPartitionNamesPsRequest(const GetPartitionNamesPs
   validWriteIdList = other1714.validWriteIdList;
   id = other1714.id;
   __isset = other1714.__isset;
-<<<<<<< HEAD
 }
 GetPartitionNamesPsRequest& GetPartitionNamesPsRequest::operator=(const GetPartitionNamesPsRequest& other1715) {
   catName = other1715.catName;
@@ -54191,39 +48740,6 @@ GetPartitionNamesPsRequest& GetPartitionNamesPsRequest::operator=(const GetParti
   validWriteIdList = other1715.validWriteIdList;
   id = other1715.id;
   __isset = other1715.__isset;
-=======
-GetPartitionNamesPsRequest::GetPartitionNamesPsRequest(const GetPartitionNamesPsRequest& other1708) {
-  catName = other1708.catName;
-  dbName = other1708.dbName;
-  tblName = other1708.tblName;
-  partValues = other1708.partValues;
-  maxParts = other1708.maxParts;
-  validWriteIdList = other1708.validWriteIdList;
-  id = other1708.id;
-  __isset = other1708.__isset;
-}
-GetPartitionNamesPsRequest& GetPartitionNamesPsRequest::operator=(const GetPartitionNamesPsRequest& other1709) {
-  catName = other1709.catName;
-  dbName = other1709.dbName;
-  tblName = other1709.tblName;
-  partValues = other1709.partValues;
-  maxParts = other1709.maxParts;
-  validWriteIdList = other1709.validWriteIdList;
-  id = other1709.id;
-  __isset = other1709.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetPartitionNamesPsRequest& GetPartitionNamesPsRequest::operator=(const GetPartitionNamesPsRequest& other1715) {
-  catName = other1715.catName;
-  dbName = other1715.dbName;
-  tblName = other1715.tblName;
-  partValues = other1715.partValues;
-  maxParts = other1715.maxParts;
-  validWriteIdList = other1715.validWriteIdList;
-  id = other1715.id;
-  __isset = other1715.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPartitionNamesPsRequest::printTo(std::ostream& out) const {
@@ -54280,33 +48796,14 @@ uint32_t GetPartitionNamesPsResponse::read(::apache::thrift::protocol::TProtocol
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->names.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1716;
             ::apache::thrift::protocol::TType _etype1719;
             xfer += iprot->readListBegin(_etype1719, _size1716);
             this->names.resize(_size1716);
             uint32_t _i1720;
             for (_i1720 = 0; _i1720 < _size1716; ++_i1720)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->names[_i1720]);
-=======
-            uint32_t _size1710;
-            ::apache::thrift::protocol::TType _etype1713;
-            xfer += iprot->readListBegin(_etype1713, _size1710);
-            this->names.resize(_size1710);
-            uint32_t _i1714;
-            for (_i1714 = 0; _i1714 < _size1710; ++_i1714)
-            {
-              xfer += iprot->readString(this->names[_i1714]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->names[_i1720]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -54337,24 +48834,10 @@ uint32_t GetPartitionNamesPsResponse::write(::apache::thrift::protocol::TProtoco
   xfer += oprot->writeFieldBegin("names", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->names.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<std::string> ::const_iterator _iter1721;
     for (_iter1721 = this->names.begin(); _iter1721 != this->names.end(); ++_iter1721)
     {
       xfer += oprot->writeString((*_iter1721));
-=======
-    std::vector<std::string> ::const_iterator _iter1715;
-    for (_iter1715 = this->names.begin(); _iter1715 != this->names.end(); ++_iter1715)
-    {
-      xfer += oprot->writeString((*_iter1715));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<std::string> ::const_iterator _iter1721;
-    for (_iter1721 = this->names.begin(); _iter1721 != this->names.end(); ++_iter1721)
-    {
-      xfer += oprot->writeString((*_iter1721));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -54370,27 +48853,11 @@ void swap(GetPartitionNamesPsResponse &a, GetPartitionNamesPsResponse &b) {
   swap(a.names, b.names);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetPartitionNamesPsResponse::GetPartitionNamesPsResponse(const GetPartitionNamesPsResponse& other1722) {
   names = other1722.names;
 }
 GetPartitionNamesPsResponse& GetPartitionNamesPsResponse::operator=(const GetPartitionNamesPsResponse& other1723) {
   names = other1723.names;
-=======
-GetPartitionNamesPsResponse::GetPartitionNamesPsResponse(const GetPartitionNamesPsResponse& other1716) {
-  names = other1716.names;
-}
-GetPartitionNamesPsResponse& GetPartitionNamesPsResponse::operator=(const GetPartitionNamesPsResponse& other1717) {
-  names = other1717.names;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetPartitionNamesPsResponse::GetPartitionNamesPsResponse(const GetPartitionNamesPsResponse& other1722) {
-  names = other1722.names;
-}
-GetPartitionNamesPsResponse& GetPartitionNamesPsResponse::operator=(const GetPartitionNamesPsResponse& other1723) {
-  names = other1723.names;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPartitionNamesPsResponse::printTo(std::ostream& out) const {
@@ -54520,33 +48987,14 @@ uint32_t GetPartitionsPsWithAuthRequest::read(::apache::thrift::protocol::TProto
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partVals.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1724;
             ::apache::thrift::protocol::TType _etype1727;
             xfer += iprot->readListBegin(_etype1727, _size1724);
             this->partVals.resize(_size1724);
             uint32_t _i1728;
             for (_i1728 = 0; _i1728 < _size1724; ++_i1728)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->partVals[_i1728]);
-=======
-            uint32_t _size1718;
-            ::apache::thrift::protocol::TType _etype1721;
-            xfer += iprot->readListBegin(_etype1721, _size1718);
-            this->partVals.resize(_size1718);
-            uint32_t _i1722;
-            for (_i1722 = 0; _i1722 < _size1718; ++_i1722)
-            {
-              xfer += iprot->readString(this->partVals[_i1722]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->partVals[_i1728]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -54575,33 +49023,14 @@ uint32_t GetPartitionsPsWithAuthRequest::read(::apache::thrift::protocol::TProto
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->groupNames.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1729;
             ::apache::thrift::protocol::TType _etype1732;
             xfer += iprot->readListBegin(_etype1732, _size1729);
             this->groupNames.resize(_size1729);
             uint32_t _i1733;
             for (_i1733 = 0; _i1733 < _size1729; ++_i1733)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->groupNames[_i1733]);
-=======
-            uint32_t _size1723;
-            ::apache::thrift::protocol::TType _etype1726;
-            xfer += iprot->readListBegin(_etype1726, _size1723);
-            this->groupNames.resize(_size1723);
-            uint32_t _i1727;
-            for (_i1727 = 0; _i1727 < _size1723; ++_i1727)
-            {
-              xfer += iprot->readString(this->groupNames[_i1727]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->groupNames[_i1733]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -54688,24 +49117,10 @@ uint32_t GetPartitionsPsWithAuthRequest::write(::apache::thrift::protocol::TProt
     xfer += oprot->writeFieldBegin("partVals", ::apache::thrift::protocol::T_LIST, 4);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->partVals.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1734;
       for (_iter1734 = this->partVals.begin(); _iter1734 != this->partVals.end(); ++_iter1734)
       {
         xfer += oprot->writeString((*_iter1734));
-=======
-      std::vector<std::string> ::const_iterator _iter1728;
-      for (_iter1728 = this->partVals.begin(); _iter1728 != this->partVals.end(); ++_iter1728)
-      {
-        xfer += oprot->writeString((*_iter1728));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1734;
-      for (_iter1734 = this->partVals.begin(); _iter1734 != this->partVals.end(); ++_iter1734)
-      {
-        xfer += oprot->writeString((*_iter1734));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -54725,24 +49140,10 @@ uint32_t GetPartitionsPsWithAuthRequest::write(::apache::thrift::protocol::TProt
     xfer += oprot->writeFieldBegin("groupNames", ::apache::thrift::protocol::T_LIST, 7);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->groupNames.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1735;
       for (_iter1735 = this->groupNames.begin(); _iter1735 != this->groupNames.end(); ++_iter1735)
       {
         xfer += oprot->writeString((*_iter1735));
-=======
-      std::vector<std::string> ::const_iterator _iter1729;
-      for (_iter1729 = this->groupNames.begin(); _iter1729 != this->groupNames.end(); ++_iter1729)
-      {
-        xfer += oprot->writeString((*_iter1729));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1735;
-      for (_iter1735 = this->groupNames.begin(); _iter1735 != this->groupNames.end(); ++_iter1735)
-      {
-        xfer += oprot->writeString((*_iter1735));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -54795,10 +49196,6 @@ void swap(GetPartitionsPsWithAuthRequest &a, GetPartitionsPsWithAuthRequest &b) 
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetPartitionsPsWithAuthRequest::GetPartitionsPsWithAuthRequest(const GetPartitionsPsWithAuthRequest& other1736) {
   catName = other1736.catName;
   dbName = other1736.dbName;
@@ -54813,7 +49210,6 @@ GetPartitionsPsWithAuthRequest::GetPartitionsPsWithAuthRequest(const GetPartitio
   includeParamKeyPattern = other1736.includeParamKeyPattern;
   excludeParamKeyPattern = other1736.excludeParamKeyPattern;
   __isset = other1736.__isset;
-<<<<<<< HEAD
 }
 GetPartitionsPsWithAuthRequest& GetPartitionsPsWithAuthRequest::operator=(const GetPartitionsPsWithAuthRequest& other1737) {
   catName = other1737.catName;
@@ -54829,54 +49225,6 @@ GetPartitionsPsWithAuthRequest& GetPartitionsPsWithAuthRequest::operator=(const 
   includeParamKeyPattern = other1737.includeParamKeyPattern;
   excludeParamKeyPattern = other1737.excludeParamKeyPattern;
   __isset = other1737.__isset;
-=======
-GetPartitionsPsWithAuthRequest::GetPartitionsPsWithAuthRequest(const GetPartitionsPsWithAuthRequest& other1730) {
-  catName = other1730.catName;
-  dbName = other1730.dbName;
-  tblName = other1730.tblName;
-  partVals = other1730.partVals;
-  maxParts = other1730.maxParts;
-  userName = other1730.userName;
-  groupNames = other1730.groupNames;
-  validWriteIdList = other1730.validWriteIdList;
-  id = other1730.id;
-  skipColumnSchemaForPartition = other1730.skipColumnSchemaForPartition;
-  includeParamKeyPattern = other1730.includeParamKeyPattern;
-  excludeParamKeyPattern = other1730.excludeParamKeyPattern;
-  __isset = other1730.__isset;
-}
-GetPartitionsPsWithAuthRequest& GetPartitionsPsWithAuthRequest::operator=(const GetPartitionsPsWithAuthRequest& other1731) {
-  catName = other1731.catName;
-  dbName = other1731.dbName;
-  tblName = other1731.tblName;
-  partVals = other1731.partVals;
-  maxParts = other1731.maxParts;
-  userName = other1731.userName;
-  groupNames = other1731.groupNames;
-  validWriteIdList = other1731.validWriteIdList;
-  id = other1731.id;
-  skipColumnSchemaForPartition = other1731.skipColumnSchemaForPartition;
-  includeParamKeyPattern = other1731.includeParamKeyPattern;
-  excludeParamKeyPattern = other1731.excludeParamKeyPattern;
-  __isset = other1731.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetPartitionsPsWithAuthRequest& GetPartitionsPsWithAuthRequest::operator=(const GetPartitionsPsWithAuthRequest& other1737) {
-  catName = other1737.catName;
-  dbName = other1737.dbName;
-  tblName = other1737.tblName;
-  partVals = other1737.partVals;
-  maxParts = other1737.maxParts;
-  userName = other1737.userName;
-  groupNames = other1737.groupNames;
-  validWriteIdList = other1737.validWriteIdList;
-  id = other1737.id;
-  skipColumnSchemaForPartition = other1737.skipColumnSchemaForPartition;
-  includeParamKeyPattern = other1737.includeParamKeyPattern;
-  excludeParamKeyPattern = other1737.excludeParamKeyPattern;
-  __isset = other1737.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPartitionsPsWithAuthRequest::printTo(std::ostream& out) const {
@@ -54938,33 +49286,14 @@ uint32_t GetPartitionsPsWithAuthResponse::read(::apache::thrift::protocol::TProt
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->partitions.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1738;
             ::apache::thrift::protocol::TType _etype1741;
             xfer += iprot->readListBegin(_etype1741, _size1738);
             this->partitions.resize(_size1738);
             uint32_t _i1742;
             for (_i1742 = 0; _i1742 < _size1738; ++_i1742)
-<<<<<<< HEAD
             {
               xfer += this->partitions[_i1742].read(iprot);
-=======
-            uint32_t _size1732;
-            ::apache::thrift::protocol::TType _etype1735;
-            xfer += iprot->readListBegin(_etype1735, _size1732);
-            this->partitions.resize(_size1732);
-            uint32_t _i1736;
-            for (_i1736 = 0; _i1736 < _size1732; ++_i1736)
-            {
-              xfer += this->partitions[_i1736].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->partitions[_i1742].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -54995,24 +49324,10 @@ uint32_t GetPartitionsPsWithAuthResponse::write(::apache::thrift::protocol::TPro
   xfer += oprot->writeFieldBegin("partitions", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->partitions.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<Partition> ::const_iterator _iter1743;
     for (_iter1743 = this->partitions.begin(); _iter1743 != this->partitions.end(); ++_iter1743)
     {
       xfer += (*_iter1743).write(oprot);
-=======
-    std::vector<Partition> ::const_iterator _iter1737;
-    for (_iter1737 = this->partitions.begin(); _iter1737 != this->partitions.end(); ++_iter1737)
-    {
-      xfer += (*_iter1737).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<Partition> ::const_iterator _iter1743;
-    for (_iter1743 = this->partitions.begin(); _iter1743 != this->partitions.end(); ++_iter1743)
-    {
-      xfer += (*_iter1743).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -55028,27 +49343,11 @@ void swap(GetPartitionsPsWithAuthResponse &a, GetPartitionsPsWithAuthResponse &b
   swap(a.partitions, b.partitions);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetPartitionsPsWithAuthResponse::GetPartitionsPsWithAuthResponse(const GetPartitionsPsWithAuthResponse& other1744) {
   partitions = other1744.partitions;
 }
 GetPartitionsPsWithAuthResponse& GetPartitionsPsWithAuthResponse::operator=(const GetPartitionsPsWithAuthResponse& other1745) {
   partitions = other1745.partitions;
-=======
-GetPartitionsPsWithAuthResponse::GetPartitionsPsWithAuthResponse(const GetPartitionsPsWithAuthResponse& other1738) {
-  partitions = other1738.partitions;
-}
-GetPartitionsPsWithAuthResponse& GetPartitionsPsWithAuthResponse::operator=(const GetPartitionsPsWithAuthResponse& other1739) {
-  partitions = other1739.partitions;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetPartitionsPsWithAuthResponse::GetPartitionsPsWithAuthResponse(const GetPartitionsPsWithAuthResponse& other1744) {
-  partitions = other1744.partitions;
-}
-GetPartitionsPsWithAuthResponse& GetPartitionsPsWithAuthResponse::operator=(const GetPartitionsPsWithAuthResponse& other1745) {
-  partitions = other1745.partitions;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPartitionsPsWithAuthResponse::printTo(std::ostream& out) const {
@@ -55234,10 +49533,6 @@ void swap(ReplicationMetrics &a, ReplicationMetrics &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 ReplicationMetrics::ReplicationMetrics(const ReplicationMetrics& other1746) {
   scheduledExecutionId = other1746.scheduledExecutionId;
   policy = other1746.policy;
@@ -55246,7 +49541,6 @@ ReplicationMetrics::ReplicationMetrics(const ReplicationMetrics& other1746) {
   progress = other1746.progress;
   messageFormat = other1746.messageFormat;
   __isset = other1746.__isset;
-<<<<<<< HEAD
 }
 ReplicationMetrics& ReplicationMetrics::operator=(const ReplicationMetrics& other1747) {
   scheduledExecutionId = other1747.scheduledExecutionId;
@@ -55256,36 +49550,6 @@ ReplicationMetrics& ReplicationMetrics::operator=(const ReplicationMetrics& othe
   progress = other1747.progress;
   messageFormat = other1747.messageFormat;
   __isset = other1747.__isset;
-=======
-ReplicationMetrics::ReplicationMetrics(const ReplicationMetrics& other1740) {
-  scheduledExecutionId = other1740.scheduledExecutionId;
-  policy = other1740.policy;
-  dumpExecutionId = other1740.dumpExecutionId;
-  metadata = other1740.metadata;
-  progress = other1740.progress;
-  messageFormat = other1740.messageFormat;
-  __isset = other1740.__isset;
-}
-ReplicationMetrics& ReplicationMetrics::operator=(const ReplicationMetrics& other1741) {
-  scheduledExecutionId = other1741.scheduledExecutionId;
-  policy = other1741.policy;
-  dumpExecutionId = other1741.dumpExecutionId;
-  metadata = other1741.metadata;
-  progress = other1741.progress;
-  messageFormat = other1741.messageFormat;
-  __isset = other1741.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-ReplicationMetrics& ReplicationMetrics::operator=(const ReplicationMetrics& other1747) {
-  scheduledExecutionId = other1747.scheduledExecutionId;
-  policy = other1747.policy;
-  dumpExecutionId = other1747.dumpExecutionId;
-  metadata = other1747.metadata;
-  progress = other1747.progress;
-  messageFormat = other1747.messageFormat;
-  __isset = other1747.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ReplicationMetrics::printTo(std::ostream& out) const {
@@ -55341,33 +49605,14 @@ uint32_t ReplicationMetricList::read(::apache::thrift::protocol::TProtocol* ipro
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->replicationMetricList.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1748;
             ::apache::thrift::protocol::TType _etype1751;
             xfer += iprot->readListBegin(_etype1751, _size1748);
             this->replicationMetricList.resize(_size1748);
             uint32_t _i1752;
             for (_i1752 = 0; _i1752 < _size1748; ++_i1752)
-<<<<<<< HEAD
             {
               xfer += this->replicationMetricList[_i1752].read(iprot);
-=======
-            uint32_t _size1742;
-            ::apache::thrift::protocol::TType _etype1745;
-            xfer += iprot->readListBegin(_etype1745, _size1742);
-            this->replicationMetricList.resize(_size1742);
-            uint32_t _i1746;
-            for (_i1746 = 0; _i1746 < _size1742; ++_i1746)
-            {
-              xfer += this->replicationMetricList[_i1746].read(iprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += this->replicationMetricList[_i1752].read(iprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -55398,24 +49643,10 @@ uint32_t ReplicationMetricList::write(::apache::thrift::protocol::TProtocol* opr
   xfer += oprot->writeFieldBegin("replicationMetricList", ::apache::thrift::protocol::T_LIST, 1);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->replicationMetricList.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::vector<ReplicationMetrics> ::const_iterator _iter1753;
     for (_iter1753 = this->replicationMetricList.begin(); _iter1753 != this->replicationMetricList.end(); ++_iter1753)
     {
       xfer += (*_iter1753).write(oprot);
-=======
-    std::vector<ReplicationMetrics> ::const_iterator _iter1747;
-    for (_iter1747 = this->replicationMetricList.begin(); _iter1747 != this->replicationMetricList.end(); ++_iter1747)
-    {
-      xfer += (*_iter1747).write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::vector<ReplicationMetrics> ::const_iterator _iter1753;
-    for (_iter1753 = this->replicationMetricList.begin(); _iter1753 != this->replicationMetricList.end(); ++_iter1753)
-    {
-      xfer += (*_iter1753).write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeListEnd();
   }
@@ -55431,27 +49662,11 @@ void swap(ReplicationMetricList &a, ReplicationMetricList &b) {
   swap(a.replicationMetricList, b.replicationMetricList);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ReplicationMetricList::ReplicationMetricList(const ReplicationMetricList& other1754) {
   replicationMetricList = other1754.replicationMetricList;
 }
 ReplicationMetricList& ReplicationMetricList::operator=(const ReplicationMetricList& other1755) {
   replicationMetricList = other1755.replicationMetricList;
-=======
-ReplicationMetricList::ReplicationMetricList(const ReplicationMetricList& other1748) {
-  replicationMetricList = other1748.replicationMetricList;
-}
-ReplicationMetricList& ReplicationMetricList::operator=(const ReplicationMetricList& other1749) {
-  replicationMetricList = other1749.replicationMetricList;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-ReplicationMetricList::ReplicationMetricList(const ReplicationMetricList& other1754) {
-  replicationMetricList = other1754.replicationMetricList;
-}
-ReplicationMetricList& ReplicationMetricList::operator=(const ReplicationMetricList& other1755) {
-  replicationMetricList = other1755.replicationMetricList;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ReplicationMetricList::printTo(std::ostream& out) const {
@@ -55577,43 +49792,17 @@ void swap(GetReplicationMetricsRequest &a, GetReplicationMetricsRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetReplicationMetricsRequest::GetReplicationMetricsRequest(const GetReplicationMetricsRequest& other1756) {
   scheduledExecutionId = other1756.scheduledExecutionId;
   policy = other1756.policy;
   dumpExecutionId = other1756.dumpExecutionId;
   __isset = other1756.__isset;
-<<<<<<< HEAD
 }
 GetReplicationMetricsRequest& GetReplicationMetricsRequest::operator=(const GetReplicationMetricsRequest& other1757) {
   scheduledExecutionId = other1757.scheduledExecutionId;
   policy = other1757.policy;
   dumpExecutionId = other1757.dumpExecutionId;
   __isset = other1757.__isset;
-=======
-GetReplicationMetricsRequest::GetReplicationMetricsRequest(const GetReplicationMetricsRequest& other1750) {
-  scheduledExecutionId = other1750.scheduledExecutionId;
-  policy = other1750.policy;
-  dumpExecutionId = other1750.dumpExecutionId;
-  __isset = other1750.__isset;
-}
-GetReplicationMetricsRequest& GetReplicationMetricsRequest::operator=(const GetReplicationMetricsRequest& other1751) {
-  scheduledExecutionId = other1751.scheduledExecutionId;
-  policy = other1751.policy;
-  dumpExecutionId = other1751.dumpExecutionId;
-  __isset = other1751.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetReplicationMetricsRequest& GetReplicationMetricsRequest::operator=(const GetReplicationMetricsRequest& other1757) {
-  scheduledExecutionId = other1757.scheduledExecutionId;
-  policy = other1757.policy;
-  dumpExecutionId = other1757.dumpExecutionId;
-  __isset = other1757.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetReplicationMetricsRequest::printTo(std::ostream& out) const {
@@ -55666,39 +49855,16 @@ uint32_t GetOpenTxnsRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->excludeTxnTypes.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1758;
             ::apache::thrift::protocol::TType _etype1761;
             xfer += iprot->readListBegin(_etype1761, _size1758);
             this->excludeTxnTypes.resize(_size1758);
             uint32_t _i1762;
             for (_i1762 = 0; _i1762 < _size1758; ++_i1762)
-<<<<<<< HEAD
             {
               int32_t ecast1763;
               xfer += iprot->readI32(ecast1763);
               this->excludeTxnTypes[_i1762] = static_cast<TxnType::type>(ecast1763);
-=======
-            uint32_t _size1752;
-            ::apache::thrift::protocol::TType _etype1755;
-            xfer += iprot->readListBegin(_etype1755, _size1752);
-            this->excludeTxnTypes.resize(_size1752);
-            uint32_t _i1756;
-            for (_i1756 = 0; _i1756 < _size1752; ++_i1756)
-            {
-              int32_t ecast1757;
-              xfer += iprot->readI32(ecast1757);
-              this->excludeTxnTypes[_i1756] = static_cast<TxnType::type>(ecast1757);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              int32_t ecast1763;
-              xfer += iprot->readI32(ecast1763);
-              this->excludeTxnTypes[_i1762] = static_cast<TxnType::type>(ecast1763);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -55728,24 +49894,10 @@ uint32_t GetOpenTxnsRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("excludeTxnTypes", ::apache::thrift::protocol::T_LIST, 1);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I32, static_cast<uint32_t>(this->excludeTxnTypes.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<TxnType::type> ::const_iterator _iter1764;
       for (_iter1764 = this->excludeTxnTypes.begin(); _iter1764 != this->excludeTxnTypes.end(); ++_iter1764)
       {
         xfer += oprot->writeI32(static_cast<int32_t>((*_iter1764)));
-=======
-      std::vector<TxnType::type> ::const_iterator _iter1758;
-      for (_iter1758 = this->excludeTxnTypes.begin(); _iter1758 != this->excludeTxnTypes.end(); ++_iter1758)
-      {
-        xfer += oprot->writeI32(static_cast<int32_t>((*_iter1758)));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<TxnType::type> ::const_iterator _iter1764;
-      for (_iter1764 = this->excludeTxnTypes.begin(); _iter1764 != this->excludeTxnTypes.end(); ++_iter1764)
-      {
-        xfer += oprot->writeI32(static_cast<int32_t>((*_iter1764)));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -55762,8 +49914,6 @@ void swap(GetOpenTxnsRequest &a, GetOpenTxnsRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 GetOpenTxnsRequest::GetOpenTxnsRequest(const GetOpenTxnsRequest& other1765) {
   excludeTxnTypes = other1765.excludeTxnTypes;
   __isset = other1765.__isset;
@@ -55771,24 +49921,6 @@ GetOpenTxnsRequest::GetOpenTxnsRequest(const GetOpenTxnsRequest& other1765) {
 GetOpenTxnsRequest& GetOpenTxnsRequest::operator=(const GetOpenTxnsRequest& other1766) {
   excludeTxnTypes = other1766.excludeTxnTypes;
   __isset = other1766.__isset;
-=======
-GetOpenTxnsRequest::GetOpenTxnsRequest(const GetOpenTxnsRequest& other1759) {
-  excludeTxnTypes = other1759.excludeTxnTypes;
-  __isset = other1759.__isset;
-}
-GetOpenTxnsRequest& GetOpenTxnsRequest::operator=(const GetOpenTxnsRequest& other1760) {
-  excludeTxnTypes = other1760.excludeTxnTypes;
-  __isset = other1760.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-GetOpenTxnsRequest::GetOpenTxnsRequest(const GetOpenTxnsRequest& other1765) {
-  excludeTxnTypes = other1765.excludeTxnTypes;
-  __isset = other1765.__isset;
-}
-GetOpenTxnsRequest& GetOpenTxnsRequest::operator=(const GetOpenTxnsRequest& other1766) {
-  excludeTxnTypes = other1766.excludeTxnTypes;
-  __isset = other1766.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetOpenTxnsRequest::printTo(std::ostream& out) const {
@@ -55916,38 +50048,15 @@ void swap(StoredProcedureRequest &a, StoredProcedureRequest &b) {
   swap(a.procName, b.procName);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 StoredProcedureRequest::StoredProcedureRequest(const StoredProcedureRequest& other1767) {
   catName = other1767.catName;
   dbName = other1767.dbName;
   procName = other1767.procName;
-<<<<<<< HEAD
 }
 StoredProcedureRequest& StoredProcedureRequest::operator=(const StoredProcedureRequest& other1768) {
   catName = other1768.catName;
   dbName = other1768.dbName;
   procName = other1768.procName;
-=======
-StoredProcedureRequest::StoredProcedureRequest(const StoredProcedureRequest& other1761) {
-  catName = other1761.catName;
-  dbName = other1761.dbName;
-  procName = other1761.procName;
-}
-StoredProcedureRequest& StoredProcedureRequest::operator=(const StoredProcedureRequest& other1762) {
-  catName = other1762.catName;
-  dbName = other1762.dbName;
-  procName = other1762.procName;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-StoredProcedureRequest& StoredProcedureRequest::operator=(const StoredProcedureRequest& other1768) {
-  catName = other1768.catName;
-  dbName = other1768.dbName;
-  procName = other1768.procName;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void StoredProcedureRequest::printTo(std::ostream& out) const {
@@ -56057,38 +50166,15 @@ void swap(ListStoredProcedureRequest &a, ListStoredProcedureRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 ListStoredProcedureRequest::ListStoredProcedureRequest(const ListStoredProcedureRequest& other1769) {
   catName = other1769.catName;
   dbName = other1769.dbName;
   __isset = other1769.__isset;
-<<<<<<< HEAD
 }
 ListStoredProcedureRequest& ListStoredProcedureRequest::operator=(const ListStoredProcedureRequest& other1770) {
   catName = other1770.catName;
   dbName = other1770.dbName;
   __isset = other1770.__isset;
-=======
-ListStoredProcedureRequest::ListStoredProcedureRequest(const ListStoredProcedureRequest& other1763) {
-  catName = other1763.catName;
-  dbName = other1763.dbName;
-  __isset = other1763.__isset;
-}
-ListStoredProcedureRequest& ListStoredProcedureRequest::operator=(const ListStoredProcedureRequest& other1764) {
-  catName = other1764.catName;
-  dbName = other1764.dbName;
-  __isset = other1764.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-ListStoredProcedureRequest& ListStoredProcedureRequest::operator=(const ListStoredProcedureRequest& other1770) {
-  catName = other1770.catName;
-  dbName = other1770.dbName;
-  __isset = other1770.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ListStoredProcedureRequest::printTo(std::ostream& out) const {
@@ -56243,10 +50329,6 @@ void swap(StoredProcedure &a, StoredProcedure &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 StoredProcedure::StoredProcedure(const StoredProcedure& other1771) {
   name = other1771.name;
   dbName = other1771.dbName;
@@ -56254,7 +50336,6 @@ StoredProcedure::StoredProcedure(const StoredProcedure& other1771) {
   ownerName = other1771.ownerName;
   source = other1771.source;
   __isset = other1771.__isset;
-<<<<<<< HEAD
 }
 StoredProcedure& StoredProcedure::operator=(const StoredProcedure& other1772) {
   name = other1772.name;
@@ -56263,33 +50344,6 @@ StoredProcedure& StoredProcedure::operator=(const StoredProcedure& other1772) {
   ownerName = other1772.ownerName;
   source = other1772.source;
   __isset = other1772.__isset;
-=======
-StoredProcedure::StoredProcedure(const StoredProcedure& other1765) {
-  name = other1765.name;
-  dbName = other1765.dbName;
-  catName = other1765.catName;
-  ownerName = other1765.ownerName;
-  source = other1765.source;
-  __isset = other1765.__isset;
-}
-StoredProcedure& StoredProcedure::operator=(const StoredProcedure& other1766) {
-  name = other1766.name;
-  dbName = other1766.dbName;
-  catName = other1766.catName;
-  ownerName = other1766.ownerName;
-  source = other1766.source;
-  __isset = other1766.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-StoredProcedure& StoredProcedure::operator=(const StoredProcedure& other1772) {
-  name = other1772.name;
-  dbName = other1772.dbName;
-  catName = other1772.catName;
-  ownerName = other1772.ownerName;
-  source = other1772.source;
-  __isset = other1772.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void StoredProcedure::printTo(std::ostream& out) const {
@@ -56464,10 +50518,6 @@ void swap(AddPackageRequest &a, AddPackageRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 AddPackageRequest::AddPackageRequest(const AddPackageRequest& other1773) {
   catName = other1773.catName;
   dbName = other1773.dbName;
@@ -56476,7 +50526,6 @@ AddPackageRequest::AddPackageRequest(const AddPackageRequest& other1773) {
   header = other1773.header;
   body = other1773.body;
   __isset = other1773.__isset;
-<<<<<<< HEAD
 }
 AddPackageRequest& AddPackageRequest::operator=(const AddPackageRequest& other1774) {
   catName = other1774.catName;
@@ -56486,36 +50535,6 @@ AddPackageRequest& AddPackageRequest::operator=(const AddPackageRequest& other17
   header = other1774.header;
   body = other1774.body;
   __isset = other1774.__isset;
-=======
-AddPackageRequest::AddPackageRequest(const AddPackageRequest& other1767) {
-  catName = other1767.catName;
-  dbName = other1767.dbName;
-  packageName = other1767.packageName;
-  ownerName = other1767.ownerName;
-  header = other1767.header;
-  body = other1767.body;
-  __isset = other1767.__isset;
-}
-AddPackageRequest& AddPackageRequest::operator=(const AddPackageRequest& other1768) {
-  catName = other1768.catName;
-  dbName = other1768.dbName;
-  packageName = other1768.packageName;
-  ownerName = other1768.ownerName;
-  header = other1768.header;
-  body = other1768.body;
-  __isset = other1768.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-AddPackageRequest& AddPackageRequest::operator=(const AddPackageRequest& other1774) {
-  catName = other1774.catName;
-  dbName = other1774.dbName;
-  packageName = other1774.packageName;
-  ownerName = other1774.ownerName;
-  header = other1774.header;
-  body = other1774.body;
-  __isset = other1774.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void AddPackageRequest::printTo(std::ostream& out) const {
@@ -56648,38 +50667,15 @@ void swap(GetPackageRequest &a, GetPackageRequest &b) {
   swap(a.packageName, b.packageName);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetPackageRequest::GetPackageRequest(const GetPackageRequest& other1775) {
   catName = other1775.catName;
   dbName = other1775.dbName;
   packageName = other1775.packageName;
-<<<<<<< HEAD
 }
 GetPackageRequest& GetPackageRequest::operator=(const GetPackageRequest& other1776) {
   catName = other1776.catName;
   dbName = other1776.dbName;
   packageName = other1776.packageName;
-=======
-GetPackageRequest::GetPackageRequest(const GetPackageRequest& other1769) {
-  catName = other1769.catName;
-  dbName = other1769.dbName;
-  packageName = other1769.packageName;
-}
-GetPackageRequest& GetPackageRequest::operator=(const GetPackageRequest& other1770) {
-  catName = other1770.catName;
-  dbName = other1770.dbName;
-  packageName = other1770.packageName;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetPackageRequest& GetPackageRequest::operator=(const GetPackageRequest& other1776) {
-  catName = other1776.catName;
-  dbName = other1776.dbName;
-  packageName = other1776.packageName;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetPackageRequest::printTo(std::ostream& out) const {
@@ -56809,38 +50805,15 @@ void swap(DropPackageRequest &a, DropPackageRequest &b) {
   swap(a.packageName, b.packageName);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 DropPackageRequest::DropPackageRequest(const DropPackageRequest& other1777) {
   catName = other1777.catName;
   dbName = other1777.dbName;
   packageName = other1777.packageName;
-<<<<<<< HEAD
 }
 DropPackageRequest& DropPackageRequest::operator=(const DropPackageRequest& other1778) {
   catName = other1778.catName;
   dbName = other1778.dbName;
   packageName = other1778.packageName;
-=======
-DropPackageRequest::DropPackageRequest(const DropPackageRequest& other1771) {
-  catName = other1771.catName;
-  dbName = other1771.dbName;
-  packageName = other1771.packageName;
-}
-DropPackageRequest& DropPackageRequest::operator=(const DropPackageRequest& other1772) {
-  catName = other1772.catName;
-  dbName = other1772.dbName;
-  packageName = other1772.packageName;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-DropPackageRequest& DropPackageRequest::operator=(const DropPackageRequest& other1778) {
-  catName = other1778.catName;
-  dbName = other1778.dbName;
-  packageName = other1778.packageName;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void DropPackageRequest::printTo(std::ostream& out) const {
@@ -56950,38 +50923,15 @@ void swap(ListPackageRequest &a, ListPackageRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 ListPackageRequest::ListPackageRequest(const ListPackageRequest& other1779) {
   catName = other1779.catName;
   dbName = other1779.dbName;
   __isset = other1779.__isset;
-<<<<<<< HEAD
 }
 ListPackageRequest& ListPackageRequest::operator=(const ListPackageRequest& other1780) {
   catName = other1780.catName;
   dbName = other1780.dbName;
   __isset = other1780.__isset;
-=======
-ListPackageRequest::ListPackageRequest(const ListPackageRequest& other1773) {
-  catName = other1773.catName;
-  dbName = other1773.dbName;
-  __isset = other1773.__isset;
-}
-ListPackageRequest& ListPackageRequest::operator=(const ListPackageRequest& other1774) {
-  catName = other1774.catName;
-  dbName = other1774.dbName;
-  __isset = other1774.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-ListPackageRequest& ListPackageRequest::operator=(const ListPackageRequest& other1780) {
-  catName = other1780.catName;
-  dbName = other1780.dbName;
-  __isset = other1780.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ListPackageRequest::printTo(std::ostream& out) const {
@@ -57153,10 +51103,6 @@ void swap(Package &a, Package &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 Package::Package(const Package& other1781) {
   catName = other1781.catName;
   dbName = other1781.dbName;
@@ -57165,7 +51111,6 @@ Package::Package(const Package& other1781) {
   header = other1781.header;
   body = other1781.body;
   __isset = other1781.__isset;
-<<<<<<< HEAD
 }
 Package& Package::operator=(const Package& other1782) {
   catName = other1782.catName;
@@ -57175,36 +51120,6 @@ Package& Package::operator=(const Package& other1782) {
   header = other1782.header;
   body = other1782.body;
   __isset = other1782.__isset;
-=======
-Package::Package(const Package& other1775) {
-  catName = other1775.catName;
-  dbName = other1775.dbName;
-  packageName = other1775.packageName;
-  ownerName = other1775.ownerName;
-  header = other1775.header;
-  body = other1775.body;
-  __isset = other1775.__isset;
-}
-Package& Package::operator=(const Package& other1776) {
-  catName = other1776.catName;
-  dbName = other1776.dbName;
-  packageName = other1776.packageName;
-  ownerName = other1776.ownerName;
-  header = other1776.header;
-  body = other1776.body;
-  __isset = other1776.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-Package& Package::operator=(const Package& other1782) {
-  catName = other1782.catName;
-  dbName = other1782.dbName;
-  packageName = other1782.packageName;
-  ownerName = other1782.ownerName;
-  header = other1782.header;
-  body = other1782.body;
-  __isset = other1782.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void Package::printTo(std::ostream& out) const {
@@ -57336,43 +51251,17 @@ void swap(GetAllWriteEventInfoRequest &a, GetAllWriteEventInfoRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 GetAllWriteEventInfoRequest::GetAllWriteEventInfoRequest(const GetAllWriteEventInfoRequest& other1783) {
   txnId = other1783.txnId;
   dbName = other1783.dbName;
   tableName = other1783.tableName;
   __isset = other1783.__isset;
-<<<<<<< HEAD
 }
 GetAllWriteEventInfoRequest& GetAllWriteEventInfoRequest::operator=(const GetAllWriteEventInfoRequest& other1784) {
   txnId = other1784.txnId;
   dbName = other1784.dbName;
   tableName = other1784.tableName;
   __isset = other1784.__isset;
-=======
-GetAllWriteEventInfoRequest::GetAllWriteEventInfoRequest(const GetAllWriteEventInfoRequest& other1777) {
-  txnId = other1777.txnId;
-  dbName = other1777.dbName;
-  tableName = other1777.tableName;
-  __isset = other1777.__isset;
-}
-GetAllWriteEventInfoRequest& GetAllWriteEventInfoRequest::operator=(const GetAllWriteEventInfoRequest& other1778) {
-  txnId = other1778.txnId;
-  dbName = other1778.dbName;
-  tableName = other1778.tableName;
-  __isset = other1778.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-GetAllWriteEventInfoRequest& GetAllWriteEventInfoRequest::operator=(const GetAllWriteEventInfoRequest& other1784) {
-  txnId = other1784.txnId;
-  dbName = other1784.dbName;
-  tableName = other1784.tableName;
-  __isset = other1784.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void GetAllWriteEventInfoRequest::printTo(std::ostream& out) const {
@@ -57437,42 +51326,17 @@ uint32_t PropertySetRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->propertyMap.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1785;
             ::apache::thrift::protocol::TType _ktype1786;
             ::apache::thrift::protocol::TType _vtype1787;
             xfer += iprot->readMapBegin(_ktype1786, _vtype1787, _size1785);
             uint32_t _i1789;
             for (_i1789 = 0; _i1789 < _size1785; ++_i1789)
-<<<<<<< HEAD
             {
               std::string _key1790;
               xfer += iprot->readString(_key1790);
               std::string& _val1791 = this->propertyMap[_key1790];
               xfer += iprot->readString(_val1791);
-=======
-            uint32_t _size1779;
-            ::apache::thrift::protocol::TType _ktype1780;
-            ::apache::thrift::protocol::TType _vtype1781;
-            xfer += iprot->readMapBegin(_ktype1780, _vtype1781, _size1779);
-            uint32_t _i1783;
-            for (_i1783 = 0; _i1783 < _size1779; ++_i1783)
-            {
-              std::string _key1784;
-              xfer += iprot->readString(_key1784);
-              std::string& _val1785 = this->propertyMap[_key1784];
-              xfer += iprot->readString(_val1785);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              std::string _key1790;
-              xfer += iprot->readString(_key1790);
-              std::string& _val1791 = this->propertyMap[_key1790];
-              xfer += iprot->readString(_val1791);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readMapEnd();
           }
@@ -57507,27 +51371,11 @@ uint32_t PropertySetRequest::write(::apache::thrift::protocol::TProtocol* oprot)
   xfer += oprot->writeFieldBegin("propertyMap", ::apache::thrift::protocol::T_MAP, 2);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->propertyMap.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::map<std::string, std::string> ::const_iterator _iter1792;
     for (_iter1792 = this->propertyMap.begin(); _iter1792 != this->propertyMap.end(); ++_iter1792)
     {
       xfer += oprot->writeString(_iter1792->first);
       xfer += oprot->writeString(_iter1792->second);
-=======
-    std::map<std::string, std::string> ::const_iterator _iter1786;
-    for (_iter1786 = this->propertyMap.begin(); _iter1786 != this->propertyMap.end(); ++_iter1786)
-    {
-      xfer += oprot->writeString(_iter1786->first);
-      xfer += oprot->writeString(_iter1786->second);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-    std::map<std::string, std::string> ::const_iterator _iter1792;
-    for (_iter1792 = this->propertyMap.begin(); _iter1792 != this->propertyMap.end(); ++_iter1792)
-    {
-      xfer += oprot->writeString(_iter1792->first);
-      xfer += oprot->writeString(_iter1792->second);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
     }
     xfer += oprot->writeMapEnd();
   }
@@ -57545,38 +51393,15 @@ void swap(PropertySetRequest &a, PropertySetRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 PropertySetRequest::PropertySetRequest(const PropertySetRequest& other1793) {
   nameSpace = other1793.nameSpace;
   propertyMap = other1793.propertyMap;
   __isset = other1793.__isset;
-<<<<<<< HEAD
 }
 PropertySetRequest& PropertySetRequest::operator=(const PropertySetRequest& other1794) {
   nameSpace = other1794.nameSpace;
   propertyMap = other1794.propertyMap;
   __isset = other1794.__isset;
-=======
-PropertySetRequest::PropertySetRequest(const PropertySetRequest& other1787) {
-  nameSpace = other1787.nameSpace;
-  propertyMap = other1787.propertyMap;
-  __isset = other1787.__isset;
-}
-PropertySetRequest& PropertySetRequest::operator=(const PropertySetRequest& other1788) {
-  nameSpace = other1788.nameSpace;
-  propertyMap = other1788.propertyMap;
-  __isset = other1788.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-PropertySetRequest& PropertySetRequest::operator=(const PropertySetRequest& other1794) {
-  nameSpace = other1794.nameSpace;
-  propertyMap = other1794.propertyMap;
-  __isset = other1794.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void PropertySetRequest::printTo(std::ostream& out) const {
@@ -57666,33 +51491,14 @@ uint32_t PropertyGetRequest::read(::apache::thrift::protocol::TProtocol* iprot) 
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->mapSelection.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1795;
             ::apache::thrift::protocol::TType _etype1798;
             xfer += iprot->readListBegin(_etype1798, _size1795);
             this->mapSelection.resize(_size1795);
             uint32_t _i1799;
             for (_i1799 = 0; _i1799 < _size1795; ++_i1799)
-<<<<<<< HEAD
             {
               xfer += iprot->readString(this->mapSelection[_i1799]);
-=======
-            uint32_t _size1789;
-            ::apache::thrift::protocol::TType _etype1792;
-            xfer += iprot->readListBegin(_etype1792, _size1789);
-            this->mapSelection.resize(_size1789);
-            uint32_t _i1793;
-            for (_i1793 = 0; _i1793 < _size1789; ++_i1793)
-            {
-              xfer += iprot->readString(this->mapSelection[_i1793]);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            {
-              xfer += iprot->readString(this->mapSelection[_i1799]);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             xfer += iprot->readListEnd();
           }
@@ -57737,24 +51543,10 @@ uint32_t PropertyGetRequest::write(::apache::thrift::protocol::TProtocol* oprot)
     xfer += oprot->writeFieldBegin("mapSelection", ::apache::thrift::protocol::T_LIST, 4);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->mapSelection.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
       std::vector<std::string> ::const_iterator _iter1800;
       for (_iter1800 = this->mapSelection.begin(); _iter1800 != this->mapSelection.end(); ++_iter1800)
       {
         xfer += oprot->writeString((*_iter1800));
-=======
-      std::vector<std::string> ::const_iterator _iter1794;
-      for (_iter1794 = this->mapSelection.begin(); _iter1794 != this->mapSelection.end(); ++_iter1794)
-      {
-        xfer += oprot->writeString((*_iter1794));
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-      std::vector<std::string> ::const_iterator _iter1800;
-      for (_iter1800 = this->mapSelection.begin(); _iter1800 != this->mapSelection.end(); ++_iter1800)
-      {
-        xfer += oprot->writeString((*_iter1800));
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
       }
       xfer += oprot->writeListEnd();
     }
@@ -57774,17 +51566,12 @@ void swap(PropertyGetRequest &a, PropertyGetRequest &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
 PropertyGetRequest::PropertyGetRequest(const PropertyGetRequest& other1801) {
   nameSpace = other1801.nameSpace;
   mapPrefix = other1801.mapPrefix;
   mapPredicate = other1801.mapPredicate;
   mapSelection = other1801.mapSelection;
   __isset = other1801.__isset;
-<<<<<<< HEAD
 }
 PropertyGetRequest& PropertyGetRequest::operator=(const PropertyGetRequest& other1802) {
   nameSpace = other1802.nameSpace;
@@ -57792,30 +51579,6 @@ PropertyGetRequest& PropertyGetRequest::operator=(const PropertyGetRequest& othe
   mapPredicate = other1802.mapPredicate;
   mapSelection = other1802.mapSelection;
   __isset = other1802.__isset;
-=======
-PropertyGetRequest::PropertyGetRequest(const PropertyGetRequest& other1795) {
-  nameSpace = other1795.nameSpace;
-  mapPrefix = other1795.mapPrefix;
-  mapPredicate = other1795.mapPredicate;
-  mapSelection = other1795.mapSelection;
-  __isset = other1795.__isset;
-}
-PropertyGetRequest& PropertyGetRequest::operator=(const PropertyGetRequest& other1796) {
-  nameSpace = other1796.nameSpace;
-  mapPrefix = other1796.mapPrefix;
-  mapPredicate = other1796.mapPredicate;
-  mapSelection = other1796.mapSelection;
-  __isset = other1796.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-}
-PropertyGetRequest& PropertyGetRequest::operator=(const PropertyGetRequest& other1802) {
-  nameSpace = other1802.nameSpace;
-  mapPrefix = other1802.mapPrefix;
-  mapPredicate = other1802.mapPredicate;
-  mapSelection = other1802.mapSelection;
-  __isset = other1802.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void PropertyGetRequest::printTo(std::ostream& out) const {
@@ -57868,17 +51631,12 @@ uint32_t PropertyGetResponse::read(::apache::thrift::protocol::TProtocol* iprot)
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->properties.clear();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             uint32_t _size1803;
             ::apache::thrift::protocol::TType _ktype1804;
             ::apache::thrift::protocol::TType _vtype1805;
             xfer += iprot->readMapBegin(_ktype1804, _vtype1805, _size1803);
             uint32_t _i1807;
             for (_i1807 = 0; _i1807 < _size1803; ++_i1807)
-<<<<<<< HEAD
             {
               std::string _key1808;
               xfer += iprot->readString(_key1808);
@@ -57896,40 +51654,6 @@ uint32_t PropertyGetResponse::read(::apache::thrift::protocol::TProtocol* iprot)
                   xfer += iprot->readString(_key1815);
                   std::string& _val1816 = _val1809[_key1815];
                   xfer += iprot->readString(_val1816);
-=======
-            uint32_t _size1797;
-            ::apache::thrift::protocol::TType _ktype1798;
-            ::apache::thrift::protocol::TType _vtype1799;
-            xfer += iprot->readMapBegin(_ktype1798, _vtype1799, _size1797);
-            uint32_t _i1801;
-            for (_i1801 = 0; _i1801 < _size1797; ++_i1801)
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
-            {
-              std::string _key1808;
-              xfer += iprot->readString(_key1808);
-              std::map<std::string, std::string> & _val1809 = this->properties[_key1808];
-              {
-                _val1809.clear();
-                uint32_t _size1810;
-                ::apache::thrift::protocol::TType _ktype1811;
-                ::apache::thrift::protocol::TType _vtype1812;
-                xfer += iprot->readMapBegin(_ktype1811, _vtype1812, _size1810);
-                uint32_t _i1814;
-                for (_i1814 = 0; _i1814 < _size1810; ++_i1814)
-                {
-<<<<<<< HEAD
-                  std::string _key1809;
-                  xfer += iprot->readString(_key1809);
-                  std::string& _val1810 = _val1803[_key1809];
-                  xfer += iprot->readString(_val1810);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-                  std::string _key1815;
-                  xfer += iprot->readString(_key1815);
-                  std::string& _val1816 = _val1809[_key1815];
-                  xfer += iprot->readString(_val1816);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 xfer += iprot->readMapEnd();
               }
@@ -57961,8 +51685,6 @@ uint32_t PropertyGetResponse::write(::apache::thrift::protocol::TProtocol* oprot
   xfer += oprot->writeFieldBegin("properties", ::apache::thrift::protocol::T_MAP, 1);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_MAP, static_cast<uint32_t>(this->properties.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
     std::map<std::string, std::map<std::string, std::string> > ::const_iterator _iter1817;
     for (_iter1817 = this->properties.begin(); _iter1817 != this->properties.end(); ++_iter1817)
     {
@@ -57974,28 +51696,6 @@ uint32_t PropertyGetResponse::write(::apache::thrift::protocol::TProtocol* oprot
         {
           xfer += oprot->writeString(_iter1818->first);
           xfer += oprot->writeString(_iter1818->second);
-=======
-    std::map<std::string, std::map<std::string, std::string> > ::const_iterator _iter1811;
-    for (_iter1811 = this->properties.begin(); _iter1811 != this->properties.end(); ++_iter1811)
-=======
-    std::map<std::string, std::map<std::string, std::string> > ::const_iterator _iter1817;
-    for (_iter1817 = this->properties.begin(); _iter1817 != this->properties.end(); ++_iter1817)
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
-    {
-      xfer += oprot->writeString(_iter1817->first);
-      {
-        xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(_iter1817->second.size()));
-        std::map<std::string, std::string> ::const_iterator _iter1818;
-        for (_iter1818 = _iter1817->second.begin(); _iter1818 != _iter1817->second.end(); ++_iter1818)
-        {
-<<<<<<< HEAD
-          xfer += oprot->writeString(_iter1812->first);
-          xfer += oprot->writeString(_iter1812->second);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          xfer += oprot->writeString(_iter1818->first);
-          xfer += oprot->writeString(_iter1818->second);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
         xfer += oprot->writeMapEnd();
       }
@@ -58015,8 +51715,6 @@ void swap(PropertyGetResponse &a, PropertyGetResponse &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 PropertyGetResponse::PropertyGetResponse(const PropertyGetResponse& other1819) {
   properties = other1819.properties;
   __isset = other1819.__isset;
@@ -58024,24 +51722,6 @@ PropertyGetResponse::PropertyGetResponse(const PropertyGetResponse& other1819) {
 PropertyGetResponse& PropertyGetResponse::operator=(const PropertyGetResponse& other1820) {
   properties = other1820.properties;
   __isset = other1820.__isset;
-=======
-PropertyGetResponse::PropertyGetResponse(const PropertyGetResponse& other1813) {
-  properties = other1813.properties;
-  __isset = other1813.__isset;
-}
-PropertyGetResponse& PropertyGetResponse::operator=(const PropertyGetResponse& other1814) {
-  properties = other1814.properties;
-  __isset = other1814.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-PropertyGetResponse::PropertyGetResponse(const PropertyGetResponse& other1819) {
-  properties = other1819.properties;
-  __isset = other1819.__isset;
-}
-PropertyGetResponse& PropertyGetResponse::operator=(const PropertyGetResponse& other1820) {
-  properties = other1820.properties;
-  __isset = other1820.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void PropertyGetResponse::printTo(std::ostream& out) const {
@@ -58127,8 +51807,6 @@ void swap(MetaException &a, MetaException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 MetaException::MetaException(const MetaException& other1821) : TException() {
   message = other1821.message;
   __isset = other1821.__isset;
@@ -58136,24 +51814,6 @@ MetaException::MetaException(const MetaException& other1821) : TException() {
 MetaException& MetaException::operator=(const MetaException& other1822) {
   message = other1822.message;
   __isset = other1822.__isset;
-=======
-MetaException::MetaException(const MetaException& other1815) : TException() {
-  message = other1815.message;
-  __isset = other1815.__isset;
-}
-MetaException& MetaException::operator=(const MetaException& other1816) {
-  message = other1816.message;
-  __isset = other1816.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-MetaException::MetaException(const MetaException& other1821) : TException() {
-  message = other1821.message;
-  __isset = other1821.__isset;
-}
-MetaException& MetaException::operator=(const MetaException& other1822) {
-  message = other1822.message;
-  __isset = other1822.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void MetaException::printTo(std::ostream& out) const {
@@ -58250,8 +51910,6 @@ void swap(UnknownTableException &a, UnknownTableException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 UnknownTableException::UnknownTableException(const UnknownTableException& other1823) : TException() {
   message = other1823.message;
   __isset = other1823.__isset;
@@ -58259,24 +51917,6 @@ UnknownTableException::UnknownTableException(const UnknownTableException& other1
 UnknownTableException& UnknownTableException::operator=(const UnknownTableException& other1824) {
   message = other1824.message;
   __isset = other1824.__isset;
-=======
-UnknownTableException::UnknownTableException(const UnknownTableException& other1817) : TException() {
-  message = other1817.message;
-  __isset = other1817.__isset;
-}
-UnknownTableException& UnknownTableException::operator=(const UnknownTableException& other1818) {
-  message = other1818.message;
-  __isset = other1818.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-UnknownTableException::UnknownTableException(const UnknownTableException& other1823) : TException() {
-  message = other1823.message;
-  __isset = other1823.__isset;
-}
-UnknownTableException& UnknownTableException::operator=(const UnknownTableException& other1824) {
-  message = other1824.message;
-  __isset = other1824.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void UnknownTableException::printTo(std::ostream& out) const {
@@ -58373,8 +52013,6 @@ void swap(UnknownDBException &a, UnknownDBException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 UnknownDBException::UnknownDBException(const UnknownDBException& other1825) : TException() {
   message = other1825.message;
   __isset = other1825.__isset;
@@ -58382,24 +52020,6 @@ UnknownDBException::UnknownDBException(const UnknownDBException& other1825) : TE
 UnknownDBException& UnknownDBException::operator=(const UnknownDBException& other1826) {
   message = other1826.message;
   __isset = other1826.__isset;
-=======
-UnknownDBException::UnknownDBException(const UnknownDBException& other1819) : TException() {
-  message = other1819.message;
-  __isset = other1819.__isset;
-}
-UnknownDBException& UnknownDBException::operator=(const UnknownDBException& other1820) {
-  message = other1820.message;
-  __isset = other1820.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-UnknownDBException::UnknownDBException(const UnknownDBException& other1825) : TException() {
-  message = other1825.message;
-  __isset = other1825.__isset;
-}
-UnknownDBException& UnknownDBException::operator=(const UnknownDBException& other1826) {
-  message = other1826.message;
-  __isset = other1826.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void UnknownDBException::printTo(std::ostream& out) const {
@@ -58496,8 +52116,6 @@ void swap(AlreadyExistsException &a, AlreadyExistsException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 AlreadyExistsException::AlreadyExistsException(const AlreadyExistsException& other1827) : TException() {
   message = other1827.message;
   __isset = other1827.__isset;
@@ -58505,24 +52123,6 @@ AlreadyExistsException::AlreadyExistsException(const AlreadyExistsException& oth
 AlreadyExistsException& AlreadyExistsException::operator=(const AlreadyExistsException& other1828) {
   message = other1828.message;
   __isset = other1828.__isset;
-=======
-AlreadyExistsException::AlreadyExistsException(const AlreadyExistsException& other1821) : TException() {
-  message = other1821.message;
-  __isset = other1821.__isset;
-}
-AlreadyExistsException& AlreadyExistsException::operator=(const AlreadyExistsException& other1822) {
-  message = other1822.message;
-  __isset = other1822.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-AlreadyExistsException::AlreadyExistsException(const AlreadyExistsException& other1827) : TException() {
-  message = other1827.message;
-  __isset = other1827.__isset;
-}
-AlreadyExistsException& AlreadyExistsException::operator=(const AlreadyExistsException& other1828) {
-  message = other1828.message;
-  __isset = other1828.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void AlreadyExistsException::printTo(std::ostream& out) const {
@@ -58619,8 +52219,6 @@ void swap(InvalidPartitionException &a, InvalidPartitionException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 InvalidPartitionException::InvalidPartitionException(const InvalidPartitionException& other1829) : TException() {
   message = other1829.message;
   __isset = other1829.__isset;
@@ -58628,24 +52226,6 @@ InvalidPartitionException::InvalidPartitionException(const InvalidPartitionExcep
 InvalidPartitionException& InvalidPartitionException::operator=(const InvalidPartitionException& other1830) {
   message = other1830.message;
   __isset = other1830.__isset;
-=======
-InvalidPartitionException::InvalidPartitionException(const InvalidPartitionException& other1823) : TException() {
-  message = other1823.message;
-  __isset = other1823.__isset;
-}
-InvalidPartitionException& InvalidPartitionException::operator=(const InvalidPartitionException& other1824) {
-  message = other1824.message;
-  __isset = other1824.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-InvalidPartitionException::InvalidPartitionException(const InvalidPartitionException& other1829) : TException() {
-  message = other1829.message;
-  __isset = other1829.__isset;
-}
-InvalidPartitionException& InvalidPartitionException::operator=(const InvalidPartitionException& other1830) {
-  message = other1830.message;
-  __isset = other1830.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void InvalidPartitionException::printTo(std::ostream& out) const {
@@ -58742,8 +52322,6 @@ void swap(UnknownPartitionException &a, UnknownPartitionException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 UnknownPartitionException::UnknownPartitionException(const UnknownPartitionException& other1831) : TException() {
   message = other1831.message;
   __isset = other1831.__isset;
@@ -58751,24 +52329,6 @@ UnknownPartitionException::UnknownPartitionException(const UnknownPartitionExcep
 UnknownPartitionException& UnknownPartitionException::operator=(const UnknownPartitionException& other1832) {
   message = other1832.message;
   __isset = other1832.__isset;
-=======
-UnknownPartitionException::UnknownPartitionException(const UnknownPartitionException& other1825) : TException() {
-  message = other1825.message;
-  __isset = other1825.__isset;
-}
-UnknownPartitionException& UnknownPartitionException::operator=(const UnknownPartitionException& other1826) {
-  message = other1826.message;
-  __isset = other1826.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-UnknownPartitionException::UnknownPartitionException(const UnknownPartitionException& other1831) : TException() {
-  message = other1831.message;
-  __isset = other1831.__isset;
-}
-UnknownPartitionException& UnknownPartitionException::operator=(const UnknownPartitionException& other1832) {
-  message = other1832.message;
-  __isset = other1832.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void UnknownPartitionException::printTo(std::ostream& out) const {
@@ -58865,8 +52425,6 @@ void swap(InvalidObjectException &a, InvalidObjectException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 InvalidObjectException::InvalidObjectException(const InvalidObjectException& other1833) : TException() {
   message = other1833.message;
   __isset = other1833.__isset;
@@ -58874,24 +52432,6 @@ InvalidObjectException::InvalidObjectException(const InvalidObjectException& oth
 InvalidObjectException& InvalidObjectException::operator=(const InvalidObjectException& other1834) {
   message = other1834.message;
   __isset = other1834.__isset;
-=======
-InvalidObjectException::InvalidObjectException(const InvalidObjectException& other1827) : TException() {
-  message = other1827.message;
-  __isset = other1827.__isset;
-}
-InvalidObjectException& InvalidObjectException::operator=(const InvalidObjectException& other1828) {
-  message = other1828.message;
-  __isset = other1828.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-InvalidObjectException::InvalidObjectException(const InvalidObjectException& other1833) : TException() {
-  message = other1833.message;
-  __isset = other1833.__isset;
-}
-InvalidObjectException& InvalidObjectException::operator=(const InvalidObjectException& other1834) {
-  message = other1834.message;
-  __isset = other1834.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void InvalidObjectException::printTo(std::ostream& out) const {
@@ -58988,8 +52528,6 @@ void swap(NoSuchObjectException &a, NoSuchObjectException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 NoSuchObjectException::NoSuchObjectException(const NoSuchObjectException& other1835) : TException() {
   message = other1835.message;
   __isset = other1835.__isset;
@@ -58997,24 +52535,6 @@ NoSuchObjectException::NoSuchObjectException(const NoSuchObjectException& other1
 NoSuchObjectException& NoSuchObjectException::operator=(const NoSuchObjectException& other1836) {
   message = other1836.message;
   __isset = other1836.__isset;
-=======
-NoSuchObjectException::NoSuchObjectException(const NoSuchObjectException& other1829) : TException() {
-  message = other1829.message;
-  __isset = other1829.__isset;
-}
-NoSuchObjectException& NoSuchObjectException::operator=(const NoSuchObjectException& other1830) {
-  message = other1830.message;
-  __isset = other1830.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-NoSuchObjectException::NoSuchObjectException(const NoSuchObjectException& other1835) : TException() {
-  message = other1835.message;
-  __isset = other1835.__isset;
-}
-NoSuchObjectException& NoSuchObjectException::operator=(const NoSuchObjectException& other1836) {
-  message = other1836.message;
-  __isset = other1836.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void NoSuchObjectException::printTo(std::ostream& out) const {
@@ -59111,8 +52631,6 @@ void swap(InvalidOperationException &a, InvalidOperationException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 InvalidOperationException::InvalidOperationException(const InvalidOperationException& other1837) : TException() {
   message = other1837.message;
   __isset = other1837.__isset;
@@ -59120,24 +52638,6 @@ InvalidOperationException::InvalidOperationException(const InvalidOperationExcep
 InvalidOperationException& InvalidOperationException::operator=(const InvalidOperationException& other1838) {
   message = other1838.message;
   __isset = other1838.__isset;
-=======
-InvalidOperationException::InvalidOperationException(const InvalidOperationException& other1831) : TException() {
-  message = other1831.message;
-  __isset = other1831.__isset;
-}
-InvalidOperationException& InvalidOperationException::operator=(const InvalidOperationException& other1832) {
-  message = other1832.message;
-  __isset = other1832.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-InvalidOperationException::InvalidOperationException(const InvalidOperationException& other1837) : TException() {
-  message = other1837.message;
-  __isset = other1837.__isset;
-}
-InvalidOperationException& InvalidOperationException::operator=(const InvalidOperationException& other1838) {
-  message = other1838.message;
-  __isset = other1838.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void InvalidOperationException::printTo(std::ostream& out) const {
@@ -59234,8 +52734,6 @@ void swap(ConfigValSecurityException &a, ConfigValSecurityException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ConfigValSecurityException::ConfigValSecurityException(const ConfigValSecurityException& other1839) : TException() {
   message = other1839.message;
   __isset = other1839.__isset;
@@ -59243,24 +52741,6 @@ ConfigValSecurityException::ConfigValSecurityException(const ConfigValSecurityEx
 ConfigValSecurityException& ConfigValSecurityException::operator=(const ConfigValSecurityException& other1840) {
   message = other1840.message;
   __isset = other1840.__isset;
-=======
-ConfigValSecurityException::ConfigValSecurityException(const ConfigValSecurityException& other1833) : TException() {
-  message = other1833.message;
-  __isset = other1833.__isset;
-}
-ConfigValSecurityException& ConfigValSecurityException::operator=(const ConfigValSecurityException& other1834) {
-  message = other1834.message;
-  __isset = other1834.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-ConfigValSecurityException::ConfigValSecurityException(const ConfigValSecurityException& other1839) : TException() {
-  message = other1839.message;
-  __isset = other1839.__isset;
-}
-ConfigValSecurityException& ConfigValSecurityException::operator=(const ConfigValSecurityException& other1840) {
-  message = other1840.message;
-  __isset = other1840.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void ConfigValSecurityException::printTo(std::ostream& out) const {
@@ -59357,8 +52837,6 @@ void swap(InvalidInputException &a, InvalidInputException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 InvalidInputException::InvalidInputException(const InvalidInputException& other1841) : TException() {
   message = other1841.message;
   __isset = other1841.__isset;
@@ -59366,24 +52844,6 @@ InvalidInputException::InvalidInputException(const InvalidInputException& other1
 InvalidInputException& InvalidInputException::operator=(const InvalidInputException& other1842) {
   message = other1842.message;
   __isset = other1842.__isset;
-=======
-InvalidInputException::InvalidInputException(const InvalidInputException& other1835) : TException() {
-  message = other1835.message;
-  __isset = other1835.__isset;
-}
-InvalidInputException& InvalidInputException::operator=(const InvalidInputException& other1836) {
-  message = other1836.message;
-  __isset = other1836.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-InvalidInputException::InvalidInputException(const InvalidInputException& other1841) : TException() {
-  message = other1841.message;
-  __isset = other1841.__isset;
-}
-InvalidInputException& InvalidInputException::operator=(const InvalidInputException& other1842) {
-  message = other1842.message;
-  __isset = other1842.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void InvalidInputException::printTo(std::ostream& out) const {
@@ -59480,8 +52940,6 @@ void swap(NoSuchTxnException &a, NoSuchTxnException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 NoSuchTxnException::NoSuchTxnException(const NoSuchTxnException& other1843) : TException() {
   message = other1843.message;
   __isset = other1843.__isset;
@@ -59489,24 +52947,6 @@ NoSuchTxnException::NoSuchTxnException(const NoSuchTxnException& other1843) : TE
 NoSuchTxnException& NoSuchTxnException::operator=(const NoSuchTxnException& other1844) {
   message = other1844.message;
   __isset = other1844.__isset;
-=======
-NoSuchTxnException::NoSuchTxnException(const NoSuchTxnException& other1837) : TException() {
-  message = other1837.message;
-  __isset = other1837.__isset;
-}
-NoSuchTxnException& NoSuchTxnException::operator=(const NoSuchTxnException& other1838) {
-  message = other1838.message;
-  __isset = other1838.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-NoSuchTxnException::NoSuchTxnException(const NoSuchTxnException& other1843) : TException() {
-  message = other1843.message;
-  __isset = other1843.__isset;
-}
-NoSuchTxnException& NoSuchTxnException::operator=(const NoSuchTxnException& other1844) {
-  message = other1844.message;
-  __isset = other1844.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void NoSuchTxnException::printTo(std::ostream& out) const {
@@ -59603,8 +53043,6 @@ void swap(TxnAbortedException &a, TxnAbortedException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 TxnAbortedException::TxnAbortedException(const TxnAbortedException& other1845) : TException() {
   message = other1845.message;
   __isset = other1845.__isset;
@@ -59612,24 +53050,6 @@ TxnAbortedException::TxnAbortedException(const TxnAbortedException& other1845) :
 TxnAbortedException& TxnAbortedException::operator=(const TxnAbortedException& other1846) {
   message = other1846.message;
   __isset = other1846.__isset;
-=======
-TxnAbortedException::TxnAbortedException(const TxnAbortedException& other1839) : TException() {
-  message = other1839.message;
-  __isset = other1839.__isset;
-}
-TxnAbortedException& TxnAbortedException::operator=(const TxnAbortedException& other1840) {
-  message = other1840.message;
-  __isset = other1840.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-TxnAbortedException::TxnAbortedException(const TxnAbortedException& other1845) : TException() {
-  message = other1845.message;
-  __isset = other1845.__isset;
-}
-TxnAbortedException& TxnAbortedException::operator=(const TxnAbortedException& other1846) {
-  message = other1846.message;
-  __isset = other1846.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void TxnAbortedException::printTo(std::ostream& out) const {
@@ -59726,8 +53146,6 @@ void swap(TxnOpenException &a, TxnOpenException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 TxnOpenException::TxnOpenException(const TxnOpenException& other1847) : TException() {
   message = other1847.message;
   __isset = other1847.__isset;
@@ -59735,24 +53153,6 @@ TxnOpenException::TxnOpenException(const TxnOpenException& other1847) : TExcepti
 TxnOpenException& TxnOpenException::operator=(const TxnOpenException& other1848) {
   message = other1848.message;
   __isset = other1848.__isset;
-=======
-TxnOpenException::TxnOpenException(const TxnOpenException& other1841) : TException() {
-  message = other1841.message;
-  __isset = other1841.__isset;
-}
-TxnOpenException& TxnOpenException::operator=(const TxnOpenException& other1842) {
-  message = other1842.message;
-  __isset = other1842.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-TxnOpenException::TxnOpenException(const TxnOpenException& other1847) : TException() {
-  message = other1847.message;
-  __isset = other1847.__isset;
-}
-TxnOpenException& TxnOpenException::operator=(const TxnOpenException& other1848) {
-  message = other1848.message;
-  __isset = other1848.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void TxnOpenException::printTo(std::ostream& out) const {
@@ -59849,8 +53249,6 @@ void swap(NoSuchLockException &a, NoSuchLockException &b) {
   swap(a.__isset, b.__isset);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 NoSuchLockException::NoSuchLockException(const NoSuchLockException& other1849) : TException() {
   message = other1849.message;
   __isset = other1849.__isset;
@@ -59858,24 +53256,6 @@ NoSuchLockException::NoSuchLockException(const NoSuchLockException& other1849) :
 NoSuchLockException& NoSuchLockException::operator=(const NoSuchLockException& other1850) {
   message = other1850.message;
   __isset = other1850.__isset;
-=======
-NoSuchLockException::NoSuchLockException(const NoSuchLockException& other1843) : TException() {
-  message = other1843.message;
-  __isset = other1843.__isset;
-}
-NoSuchLockException& NoSuchLockException::operator=(const NoSuchLockException& other1844) {
-  message = other1844.message;
-  __isset = other1844.__isset;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-NoSuchLockException::NoSuchLockException(const NoSuchLockException& other1849) : TException() {
-  message = other1849.message;
-  __isset = other1849.__isset;
-}
-NoSuchLockException& NoSuchLockException::operator=(const NoSuchLockException& other1850) {
-  message = other1850.message;
-  __isset = other1850.__isset;
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
   return *this;
 }
 void NoSuchLockException::printTo(std::ostream& out) const {

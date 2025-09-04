@@ -329,35 +329,14 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // REPLICATION_METRIC_LIST
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TList _list1480 = iprot.readListBegin();
                 struct.replicationMetricList = new java.util.ArrayList<ReplicationMetrics>(_list1480.size);
                 @org.apache.thrift.annotation.Nullable ReplicationMetrics _elem1481;
                 for (int _i1482 = 0; _i1482 < _list1480.size; ++_i1482)
-<<<<<<< HEAD
                 {
                   _elem1481 = new ReplicationMetrics();
                   _elem1481.read(iprot);
                   struct.replicationMetricList.add(_elem1481);
-=======
-                org.apache.thrift.protocol.TList _list1472 = iprot.readListBegin();
-                struct.replicationMetricList = new java.util.ArrayList<ReplicationMetrics>(_list1472.size);
-                @org.apache.thrift.annotation.Nullable ReplicationMetrics _elem1473;
-                for (int _i1474 = 0; _i1474 < _list1472.size; ++_i1474)
-                {
-                  _elem1473 = new ReplicationMetrics();
-                  _elem1473.read(iprot);
-                  struct.replicationMetricList.add(_elem1473);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-                {
-                  _elem1481 = new ReplicationMetrics();
-                  _elem1481.read(iprot);
-                  struct.replicationMetricList.add(_elem1481);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 iprot.readListEnd();
               }
@@ -383,21 +362,9 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(REPLICATION_METRIC_LIST_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.replicationMetricList.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (ReplicationMetrics _iter1483 : struct.replicationMetricList)
           {
             _iter1483.write(oprot);
-=======
-          for (ReplicationMetrics _iter1475 : struct.replicationMetricList)
-          {
-            _iter1475.write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (ReplicationMetrics _iter1483 : struct.replicationMetricList)
-          {
-            _iter1483.write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
           oprot.writeListEnd();
         }
@@ -422,21 +389,9 @@ package org.apache.hadoop.hive.metastore.api;
       org.apache.thrift.protocol.TTupleProtocol oprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       {
         oprot.writeI32(struct.replicationMetricList.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
         for (ReplicationMetrics _iter1484 : struct.replicationMetricList)
         {
           _iter1484.write(oprot);
-=======
-        for (ReplicationMetrics _iter1476 : struct.replicationMetricList)
-        {
-          _iter1476.write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-        for (ReplicationMetrics _iter1484 : struct.replicationMetricList)
-        {
-          _iter1484.write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
       }
     }
@@ -445,35 +400,14 @@ package org.apache.hadoop.hive.metastore.api;
     public void read(org.apache.thrift.protocol.TProtocol prot, ReplicationMetricList struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         org.apache.thrift.protocol.TList _list1485 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
         struct.replicationMetricList = new java.util.ArrayList<ReplicationMetrics>(_list1485.size);
         @org.apache.thrift.annotation.Nullable ReplicationMetrics _elem1486;
         for (int _i1487 = 0; _i1487 < _list1485.size; ++_i1487)
-<<<<<<< HEAD
         {
           _elem1486 = new ReplicationMetrics();
           _elem1486.read(iprot);
           struct.replicationMetricList.add(_elem1486);
-=======
-        org.apache.thrift.protocol.TList _list1477 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-        struct.replicationMetricList = new java.util.ArrayList<ReplicationMetrics>(_list1477.size);
-        @org.apache.thrift.annotation.Nullable ReplicationMetrics _elem1478;
-        for (int _i1479 = 0; _i1479 < _list1477.size; ++_i1479)
-        {
-          _elem1478 = new ReplicationMetrics();
-          _elem1478.read(iprot);
-          struct.replicationMetricList.add(_elem1478);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-        {
-          _elem1486 = new ReplicationMetrics();
-          _elem1486.read(iprot);
-          struct.replicationMetricList.add(_elem1486);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
       }
       struct.setReplicationMetricListIsSet(true);

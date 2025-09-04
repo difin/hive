@@ -1028,35 +1028,14 @@ package org.apache.hadoop.hive.metastore.api;
           case 4: // PARTITIONS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TList _list1344 = iprot.readListBegin();
                 struct.partitions = new java.util.ArrayList<Partition>(_list1344.size);
                 @org.apache.thrift.annotation.Nullable Partition _elem1345;
                 for (int _i1346 = 0; _i1346 < _list1344.size; ++_i1346)
-<<<<<<< HEAD
                 {
                   _elem1345 = new Partition();
                   _elem1345.read(iprot);
                   struct.partitions.add(_elem1345);
-=======
-                org.apache.thrift.protocol.TList _list1336 = iprot.readListBegin();
-                struct.partitions = new java.util.ArrayList<Partition>(_list1336.size);
-                @org.apache.thrift.annotation.Nullable Partition _elem1337;
-                for (int _i1338 = 0; _i1338 < _list1336.size; ++_i1338)
-                {
-                  _elem1337 = new Partition();
-                  _elem1337.read(iprot);
-                  struct.partitions.add(_elem1337);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-                {
-                  _elem1345 = new Partition();
-                  _elem1345.read(iprot);
-                  struct.partitions.add(_elem1345);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 iprot.readListEnd();
               }
@@ -1101,35 +1080,14 @@ package org.apache.hadoop.hive.metastore.api;
           case 9: // PARTITION_COL_SCHEMA
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TList _list1347 = iprot.readListBegin();
                 struct.partitionColSchema = new java.util.ArrayList<FieldSchema>(_list1347.size);
                 @org.apache.thrift.annotation.Nullable FieldSchema _elem1348;
                 for (int _i1349 = 0; _i1349 < _list1347.size; ++_i1349)
-<<<<<<< HEAD
                 {
                   _elem1348 = new FieldSchema();
                   _elem1348.read(iprot);
                   struct.partitionColSchema.add(_elem1348);
-=======
-                org.apache.thrift.protocol.TList _list1339 = iprot.readListBegin();
-                struct.partitionColSchema = new java.util.ArrayList<FieldSchema>(_list1339.size);
-                @org.apache.thrift.annotation.Nullable FieldSchema _elem1340;
-                for (int _i1341 = 0; _i1341 < _list1339.size; ++_i1341)
-                {
-                  _elem1340 = new FieldSchema();
-                  _elem1340.read(iprot);
-                  struct.partitionColSchema.add(_elem1340);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-                {
-                  _elem1348 = new FieldSchema();
-                  _elem1348.read(iprot);
-                  struct.partitionColSchema.add(_elem1348);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 iprot.readListEnd();
               }
@@ -1172,21 +1130,9 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(PARTITIONS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.partitions.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (Partition _iter1350 : struct.partitions)
           {
             _iter1350.write(oprot);
-=======
-          for (Partition _iter1342 : struct.partitions)
-          {
-            _iter1342.write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (Partition _iter1350 : struct.partitions)
-          {
-            _iter1350.write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
           oprot.writeListEnd();
         }
@@ -1221,21 +1167,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(PARTITION_COL_SCHEMA_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.partitionColSchema.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
             for (FieldSchema _iter1351 : struct.partitionColSchema)
             {
               _iter1351.write(oprot);
-=======
-            for (FieldSchema _iter1343 : struct.partitionColSchema)
-            {
-              _iter1343.write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            for (FieldSchema _iter1351 : struct.partitionColSchema)
-            {
-              _iter1351.write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             oprot.writeListEnd();
           }
@@ -1263,21 +1197,9 @@ package org.apache.hadoop.hive.metastore.api;
       oprot.writeString(struct.tableName);
       {
         oprot.writeI32(struct.partitions.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
         for (Partition _iter1352 : struct.partitions)
         {
           _iter1352.write(oprot);
-=======
-        for (Partition _iter1344 : struct.partitions)
-        {
-          _iter1344.write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-        for (Partition _iter1352 : struct.partitions)
-        {
-          _iter1352.write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
       }
       java.util.BitSet optionals = new java.util.BitSet();
@@ -1318,21 +1240,9 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetPartitionColSchema()) {
         {
           oprot.writeI32(struct.partitionColSchema.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (FieldSchema _iter1353 : struct.partitionColSchema)
           {
             _iter1353.write(oprot);
-=======
-          for (FieldSchema _iter1345 : struct.partitionColSchema)
-          {
-            _iter1345.write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (FieldSchema _iter1353 : struct.partitionColSchema)
-          {
-            _iter1353.write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
       }
@@ -1346,35 +1256,14 @@ package org.apache.hadoop.hive.metastore.api;
       struct.tableName = iprot.readString();
       struct.setTableNameIsSet(true);
       {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         org.apache.thrift.protocol.TList _list1354 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
         struct.partitions = new java.util.ArrayList<Partition>(_list1354.size);
         @org.apache.thrift.annotation.Nullable Partition _elem1355;
         for (int _i1356 = 0; _i1356 < _list1354.size; ++_i1356)
-<<<<<<< HEAD
         {
           _elem1355 = new Partition();
           _elem1355.read(iprot);
           struct.partitions.add(_elem1355);
-=======
-        org.apache.thrift.protocol.TList _list1346 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-        struct.partitions = new java.util.ArrayList<Partition>(_list1346.size);
-        @org.apache.thrift.annotation.Nullable Partition _elem1347;
-        for (int _i1348 = 0; _i1348 < _list1346.size; ++_i1348)
-        {
-          _elem1347 = new Partition();
-          _elem1347.read(iprot);
-          struct.partitions.add(_elem1347);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-        {
-          _elem1355 = new Partition();
-          _elem1355.read(iprot);
-          struct.partitions.add(_elem1355);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
       }
       struct.setPartitionsIsSet(true);
@@ -1402,35 +1291,14 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(5)) {
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           org.apache.thrift.protocol.TList _list1357 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
           struct.partitionColSchema = new java.util.ArrayList<FieldSchema>(_list1357.size);
           @org.apache.thrift.annotation.Nullable FieldSchema _elem1358;
           for (int _i1359 = 0; _i1359 < _list1357.size; ++_i1359)
-<<<<<<< HEAD
           {
             _elem1358 = new FieldSchema();
             _elem1358.read(iprot);
             struct.partitionColSchema.add(_elem1358);
-=======
-          org.apache.thrift.protocol.TList _list1349 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-          struct.partitionColSchema = new java.util.ArrayList<FieldSchema>(_list1349.size);
-          @org.apache.thrift.annotation.Nullable FieldSchema _elem1350;
-          for (int _i1351 = 0; _i1351 < _list1349.size; ++_i1351)
-          {
-            _elem1350 = new FieldSchema();
-            _elem1350.read(iprot);
-            struct.partitionColSchema.add(_elem1350);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          {
-            _elem1358 = new FieldSchema();
-            _elem1358.read(iprot);
-            struct.partitionColSchema.add(_elem1358);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
         struct.setPartitionColSchemaIsSet(true);

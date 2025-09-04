@@ -125,10 +125,6 @@ class PropertyGetRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->mapSelection = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1326 = 0;
                         $_etype1329 = 0;
                         $xfer += $input->readListBegin($_etype1329, $_size1326);
@@ -136,18 +132,6 @@ class PropertyGetRequest
                             $elem1331 = null;
                             $xfer += $input->readString($elem1331);
                             $this->mapSelection []= $elem1331;
-<<<<<<< HEAD
-=======
-                        $_size1319 = 0;
-                        $_etype1322 = 0;
-                        $xfer += $input->readListBegin($_etype1322, $_size1319);
-                        for ($_i1323 = 0; $_i1323 < $_size1319; ++$_i1323) {
-                            $elem1324 = null;
-                            $xfer += $input->readString($elem1324);
-                            $this->mapSelection []= $elem1324;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -189,18 +173,8 @@ class PropertyGetRequest
             }
             $xfer += $output->writeFieldBegin('mapSelection', TType::LST, 4);
             $output->writeListBegin(TType::STRING, count($this->mapSelection));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->mapSelection as $iter1332) {
                 $xfer += $output->writeString($iter1332);
-=======
-            foreach ($this->mapSelection as $iter1325) {
-                $xfer += $output->writeString($iter1325);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->mapSelection as $iter1332) {
-                $xfer += $output->writeString($iter1332);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

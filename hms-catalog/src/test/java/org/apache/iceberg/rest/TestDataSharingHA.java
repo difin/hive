@@ -14,7 +14,7 @@ import java.util.Map;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.Assert.*;
 
-public class TestDataSharing {
+public class TestDataSharingHA {
 
   @Rule
   public WireMockRule broker0 = new WireMockRule(18080);

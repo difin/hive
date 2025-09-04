@@ -91,10 +91,6 @@ class PropertySetRequest
                 case 2:
                     if ($ftype == TType::MAP) {
                         $this->propertyMap = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1317 = 0;
                         $_ktype1318 = 0;
                         $_vtype1319 = 0;
@@ -105,21 +101,6 @@ class PropertySetRequest
                             $xfer += $input->readString($key1322);
                             $xfer += $input->readString($val1323);
                             $this->propertyMap[$key1322] = $val1323;
-<<<<<<< HEAD
-=======
-                        $_size1310 = 0;
-                        $_ktype1311 = 0;
-                        $_vtype1312 = 0;
-                        $xfer += $input->readMapBegin($_ktype1311, $_vtype1312, $_size1310);
-                        for ($_i1314 = 0; $_i1314 < $_size1310; ++$_i1314) {
-                            $key1315 = '';
-                            $val1316 = '';
-                            $xfer += $input->readString($key1315);
-                            $xfer += $input->readString($val1316);
-                            $this->propertyMap[$key1315] = $val1316;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -151,21 +132,9 @@ class PropertySetRequest
             }
             $xfer += $output->writeFieldBegin('propertyMap', TType::MAP, 2);
             $output->writeMapBegin(TType::STRING, TType::STRING, count($this->propertyMap));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->propertyMap as $kiter1324 => $viter1325) {
                 $xfer += $output->writeString($kiter1324);
                 $xfer += $output->writeString($viter1325);
-=======
-            foreach ($this->propertyMap as $kiter1317 => $viter1318) {
-                $xfer += $output->writeString($kiter1317);
-                $xfer += $output->writeString($viter1318);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->propertyMap as $kiter1324 => $viter1325) {
-                $xfer += $output->writeString($kiter1324);
-                $xfer += $output->writeString($viter1325);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();

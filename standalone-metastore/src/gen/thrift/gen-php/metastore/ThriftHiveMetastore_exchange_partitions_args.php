@@ -120,10 +120,6 @@ class ThriftHiveMetastore_exchange_partitions_args
                 case 1:
                     if ($ftype == TType::MAP) {
                         $this->partitionSpecs = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1593 = 0;
                         $_ktype1594 = 0;
                         $_vtype1595 = 0;
@@ -134,21 +130,6 @@ class ThriftHiveMetastore_exchange_partitions_args
                             $xfer += $input->readString($key1598);
                             $xfer += $input->readString($val1599);
                             $this->partitionSpecs[$key1598] = $val1599;
-<<<<<<< HEAD
-=======
-                        $_size1586 = 0;
-                        $_ktype1587 = 0;
-                        $_vtype1588 = 0;
-                        $xfer += $input->readMapBegin($_ktype1587, $_vtype1588, $_size1586);
-                        for ($_i1590 = 0; $_i1590 < $_size1586; ++$_i1590) {
-                            $key1591 = '';
-                            $val1592 = '';
-                            $xfer += $input->readString($key1591);
-                            $xfer += $input->readString($val1592);
-                            $this->partitionSpecs[$key1591] = $val1592;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -203,21 +184,9 @@ class ThriftHiveMetastore_exchange_partitions_args
             }
             $xfer += $output->writeFieldBegin('partitionSpecs', TType::MAP, 1);
             $output->writeMapBegin(TType::STRING, TType::STRING, count($this->partitionSpecs));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->partitionSpecs as $kiter1600 => $viter1601) {
                 $xfer += $output->writeString($kiter1600);
                 $xfer += $output->writeString($viter1601);
-=======
-            foreach ($this->partitionSpecs as $kiter1593 => $viter1594) {
-                $xfer += $output->writeString($kiter1593);
-                $xfer += $output->writeString($viter1594);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->partitionSpecs as $kiter1600 => $viter1601) {
-                $xfer += $output->writeString($kiter1600);
-                $xfer += $output->writeString($viter1601);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();

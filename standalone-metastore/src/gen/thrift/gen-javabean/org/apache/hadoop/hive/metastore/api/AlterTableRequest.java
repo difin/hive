@@ -1209,32 +1209,13 @@ package org.apache.hadoop.hive.metastore.api;
           case 8: // PROCESSOR_CAPABILITIES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TList _list1368 = iprot.readListBegin();
                 struct.processorCapabilities = new java.util.ArrayList<java.lang.String>(_list1368.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _elem1369;
                 for (int _i1370 = 0; _i1370 < _list1368.size; ++_i1370)
-<<<<<<< HEAD
                 {
                   _elem1369 = iprot.readString();
                   struct.processorCapabilities.add(_elem1369);
-=======
-                org.apache.thrift.protocol.TList _list1360 = iprot.readListBegin();
-                struct.processorCapabilities = new java.util.ArrayList<java.lang.String>(_list1360.size);
-                @org.apache.thrift.annotation.Nullable java.lang.String _elem1361;
-                for (int _i1362 = 0; _i1362 < _list1360.size; ++_i1362)
-                {
-                  _elem1361 = iprot.readString();
-                  struct.processorCapabilities.add(_elem1361);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-                {
-                  _elem1369 = iprot.readString();
-                  struct.processorCapabilities.add(_elem1369);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 iprot.readListEnd();
               }
@@ -1326,21 +1307,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(PROCESSOR_CAPABILITIES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.processorCapabilities.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
             for (java.lang.String _iter1371 : struct.processorCapabilities)
             {
               oprot.writeString(_iter1371);
-=======
-            for (java.lang.String _iter1363 : struct.processorCapabilities)
-            {
-              oprot.writeString(_iter1363);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            for (java.lang.String _iter1371 : struct.processorCapabilities)
-            {
-              oprot.writeString(_iter1371);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             oprot.writeListEnd();
           }
@@ -1429,21 +1398,9 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetProcessorCapabilities()) {
         {
           oprot.writeI32(struct.processorCapabilities.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (java.lang.String _iter1372 : struct.processorCapabilities)
           {
             oprot.writeString(_iter1372);
-=======
-          for (java.lang.String _iter1364 : struct.processorCapabilities)
-          {
-            oprot.writeString(_iter1364);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (java.lang.String _iter1372 : struct.processorCapabilities)
-          {
-            oprot.writeString(_iter1372);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
       }
@@ -1488,32 +1445,13 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(4)) {
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           org.apache.thrift.protocol.TList _list1373 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.processorCapabilities = new java.util.ArrayList<java.lang.String>(_list1373.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem1374;
           for (int _i1375 = 0; _i1375 < _list1373.size; ++_i1375)
-<<<<<<< HEAD
           {
             _elem1374 = iprot.readString();
             struct.processorCapabilities.add(_elem1374);
-=======
-          org.apache.thrift.protocol.TList _list1365 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
-          struct.processorCapabilities = new java.util.ArrayList<java.lang.String>(_list1365.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _elem1366;
-          for (int _i1367 = 0; _i1367 < _list1365.size; ++_i1367)
-          {
-            _elem1366 = iprot.readString();
-            struct.processorCapabilities.add(_elem1366);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          {
-            _elem1374 = iprot.readString();
-            struct.processorCapabilities.add(_elem1374);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
         struct.setProcessorCapabilitiesIsSet(true);

@@ -411,37 +411,15 @@ package org.apache.hadoop.hive.metastore.api;
           case 2: // PROPERTY_MAP
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TMap _map1496 = iprot.readMapBegin();
                 struct.propertyMap = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1496.size);
                 @org.apache.thrift.annotation.Nullable java.lang.String _key1497;
                 @org.apache.thrift.annotation.Nullable java.lang.String _val1498;
                 for (int _i1499 = 0; _i1499 < _map1496.size; ++_i1499)
-<<<<<<< HEAD
                 {
                   _key1497 = iprot.readString();
                   _val1498 = iprot.readString();
                   struct.propertyMap.put(_key1497, _val1498);
-=======
-                org.apache.thrift.protocol.TMap _map1488 = iprot.readMapBegin();
-                struct.propertyMap = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1488.size);
-                @org.apache.thrift.annotation.Nullable java.lang.String _key1489;
-                @org.apache.thrift.annotation.Nullable java.lang.String _val1490;
-                for (int _i1491 = 0; _i1491 < _map1488.size; ++_i1491)
-                {
-                  _key1489 = iprot.readString();
-                  _val1490 = iprot.readString();
-                  struct.propertyMap.put(_key1489, _val1490);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-                {
-                  _key1497 = iprot.readString();
-                  _val1498 = iprot.readString();
-                  struct.propertyMap.put(_key1497, _val1498);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 iprot.readMapEnd();
               }
@@ -472,24 +450,10 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(PROPERTY_MAP_FIELD_DESC);
         {
           oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, struct.propertyMap.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1500 : struct.propertyMap.entrySet())
           {
             oprot.writeString(_iter1500.getKey());
             oprot.writeString(_iter1500.getValue());
-=======
-          for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1492 : struct.propertyMap.entrySet())
-          {
-            oprot.writeString(_iter1492.getKey());
-            oprot.writeString(_iter1492.getValue());
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1500 : struct.propertyMap.entrySet())
-          {
-            oprot.writeString(_iter1500.getKey());
-            oprot.writeString(_iter1500.getValue());
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
           oprot.writeMapEnd();
         }
@@ -521,24 +485,10 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetPropertyMap()) {
         {
           oprot.writeI32(struct.propertyMap.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1501 : struct.propertyMap.entrySet())
           {
             oprot.writeString(_iter1501.getKey());
             oprot.writeString(_iter1501.getValue());
-=======
-          for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1493 : struct.propertyMap.entrySet())
-          {
-            oprot.writeString(_iter1493.getKey());
-            oprot.writeString(_iter1493.getValue());
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (java.util.Map.Entry<java.lang.String, java.lang.String> _iter1501 : struct.propertyMap.entrySet())
-          {
-            oprot.writeString(_iter1501.getKey());
-            oprot.writeString(_iter1501.getValue());
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
       }
@@ -552,37 +502,15 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           org.apache.thrift.protocol.TMap _map1502 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING); 
           struct.propertyMap = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1502.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _key1503;
           @org.apache.thrift.annotation.Nullable java.lang.String _val1504;
           for (int _i1505 = 0; _i1505 < _map1502.size; ++_i1505)
-<<<<<<< HEAD
           {
             _key1503 = iprot.readString();
             _val1504 = iprot.readString();
             struct.propertyMap.put(_key1503, _val1504);
-=======
-          org.apache.thrift.protocol.TMap _map1494 = iprot.readMapBegin(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING); 
-          struct.propertyMap = new java.util.HashMap<java.lang.String,java.lang.String>(2*_map1494.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _key1495;
-          @org.apache.thrift.annotation.Nullable java.lang.String _val1496;
-          for (int _i1497 = 0; _i1497 < _map1494.size; ++_i1497)
-          {
-            _key1495 = iprot.readString();
-            _val1496 = iprot.readString();
-            struct.propertyMap.put(_key1495, _val1496);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          {
-            _key1503 = iprot.readString();
-            _val1504 = iprot.readString();
-            struct.propertyMap.put(_key1503, _val1504);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
         struct.setPropertyMapIsSet(true);

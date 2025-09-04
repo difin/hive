@@ -224,10 +224,6 @@ class CreateTableRequest
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->primaryKeys = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1126 = 0;
                         $_etype1129 = 0;
                         $xfer += $input->readListBegin($_etype1129, $_size1126);
@@ -236,19 +232,6 @@ class CreateTableRequest
                             $elem1131 = new \metastore\SQLPrimaryKey();
                             $xfer += $elem1131->read($input);
                             $this->primaryKeys []= $elem1131;
-<<<<<<< HEAD
-=======
-                        $_size1119 = 0;
-                        $_etype1122 = 0;
-                        $xfer += $input->readListBegin($_etype1122, $_size1119);
-                        for ($_i1123 = 0; $_i1123 < $_size1119; ++$_i1123) {
-                            $elem1124 = null;
-                            $elem1124 = new \metastore\SQLPrimaryKey();
-                            $xfer += $elem1124->read($input);
-                            $this->primaryKeys []= $elem1124;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -258,10 +241,6 @@ class CreateTableRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->foreignKeys = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1132 = 0;
                         $_etype1135 = 0;
                         $xfer += $input->readListBegin($_etype1135, $_size1132);
@@ -270,19 +249,6 @@ class CreateTableRequest
                             $elem1137 = new \metastore\SQLForeignKey();
                             $xfer += $elem1137->read($input);
                             $this->foreignKeys []= $elem1137;
-<<<<<<< HEAD
-=======
-                        $_size1125 = 0;
-                        $_etype1128 = 0;
-                        $xfer += $input->readListBegin($_etype1128, $_size1125);
-                        for ($_i1129 = 0; $_i1129 < $_size1125; ++$_i1129) {
-                            $elem1130 = null;
-                            $elem1130 = new \metastore\SQLForeignKey();
-                            $xfer += $elem1130->read($input);
-                            $this->foreignKeys []= $elem1130;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -292,10 +258,6 @@ class CreateTableRequest
                 case 5:
                     if ($ftype == TType::LST) {
                         $this->uniqueConstraints = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1138 = 0;
                         $_etype1141 = 0;
                         $xfer += $input->readListBegin($_etype1141, $_size1138);
@@ -304,19 +266,6 @@ class CreateTableRequest
                             $elem1143 = new \metastore\SQLUniqueConstraint();
                             $xfer += $elem1143->read($input);
                             $this->uniqueConstraints []= $elem1143;
-<<<<<<< HEAD
-=======
-                        $_size1131 = 0;
-                        $_etype1134 = 0;
-                        $xfer += $input->readListBegin($_etype1134, $_size1131);
-                        for ($_i1135 = 0; $_i1135 < $_size1131; ++$_i1135) {
-                            $elem1136 = null;
-                            $elem1136 = new \metastore\SQLUniqueConstraint();
-                            $xfer += $elem1136->read($input);
-                            $this->uniqueConstraints []= $elem1136;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -326,10 +275,6 @@ class CreateTableRequest
                 case 6:
                     if ($ftype == TType::LST) {
                         $this->notNullConstraints = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1144 = 0;
                         $_etype1147 = 0;
                         $xfer += $input->readListBegin($_etype1147, $_size1144);
@@ -338,19 +283,6 @@ class CreateTableRequest
                             $elem1149 = new \metastore\SQLNotNullConstraint();
                             $xfer += $elem1149->read($input);
                             $this->notNullConstraints []= $elem1149;
-<<<<<<< HEAD
-=======
-                        $_size1137 = 0;
-                        $_etype1140 = 0;
-                        $xfer += $input->readListBegin($_etype1140, $_size1137);
-                        for ($_i1141 = 0; $_i1141 < $_size1137; ++$_i1141) {
-                            $elem1142 = null;
-                            $elem1142 = new \metastore\SQLNotNullConstraint();
-                            $xfer += $elem1142->read($input);
-                            $this->notNullConstraints []= $elem1142;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -360,10 +292,6 @@ class CreateTableRequest
                 case 7:
                     if ($ftype == TType::LST) {
                         $this->defaultConstraints = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1150 = 0;
                         $_etype1153 = 0;
                         $xfer += $input->readListBegin($_etype1153, $_size1150);
@@ -372,19 +300,6 @@ class CreateTableRequest
                             $elem1155 = new \metastore\SQLDefaultConstraint();
                             $xfer += $elem1155->read($input);
                             $this->defaultConstraints []= $elem1155;
-<<<<<<< HEAD
-=======
-                        $_size1143 = 0;
-                        $_etype1146 = 0;
-                        $xfer += $input->readListBegin($_etype1146, $_size1143);
-                        for ($_i1147 = 0; $_i1147 < $_size1143; ++$_i1147) {
-                            $elem1148 = null;
-                            $elem1148 = new \metastore\SQLDefaultConstraint();
-                            $xfer += $elem1148->read($input);
-                            $this->defaultConstraints []= $elem1148;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -394,10 +309,6 @@ class CreateTableRequest
                 case 8:
                     if ($ftype == TType::LST) {
                         $this->checkConstraints = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1156 = 0;
                         $_etype1159 = 0;
                         $xfer += $input->readListBegin($_etype1159, $_size1156);
@@ -406,19 +317,6 @@ class CreateTableRequest
                             $elem1161 = new \metastore\SQLCheckConstraint();
                             $xfer += $elem1161->read($input);
                             $this->checkConstraints []= $elem1161;
-<<<<<<< HEAD
-=======
-                        $_size1149 = 0;
-                        $_etype1152 = 0;
-                        $xfer += $input->readListBegin($_etype1152, $_size1149);
-                        for ($_i1153 = 0; $_i1153 < $_size1149; ++$_i1153) {
-                            $elem1154 = null;
-                            $elem1154 = new \metastore\SQLCheckConstraint();
-                            $xfer += $elem1154->read($input);
-                            $this->checkConstraints []= $elem1154;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -428,10 +326,6 @@ class CreateTableRequest
                 case 9:
                     if ($ftype == TType::LST) {
                         $this->processorCapabilities = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1162 = 0;
                         $_etype1165 = 0;
                         $xfer += $input->readListBegin($_etype1165, $_size1162);
@@ -439,18 +333,6 @@ class CreateTableRequest
                             $elem1167 = null;
                             $xfer += $input->readString($elem1167);
                             $this->processorCapabilities []= $elem1167;
-<<<<<<< HEAD
-=======
-                        $_size1155 = 0;
-                        $_etype1158 = 0;
-                        $xfer += $input->readListBegin($_etype1158, $_size1155);
-                        for ($_i1159 = 0; $_i1159 < $_size1155; ++$_i1159) {
-                            $elem1160 = null;
-                            $xfer += $input->readString($elem1160);
-                            $this->processorCapabilities []= $elem1160;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -500,18 +382,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('primaryKeys', TType::LST, 3);
             $output->writeListBegin(TType::STRUCT, count($this->primaryKeys));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->primaryKeys as $iter1168) {
                 $xfer += $iter1168->write($output);
-=======
-            foreach ($this->primaryKeys as $iter1161) {
-                $xfer += $iter1161->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->primaryKeys as $iter1168) {
-                $xfer += $iter1168->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -522,18 +394,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('foreignKeys', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->foreignKeys));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->foreignKeys as $iter1169) {
                 $xfer += $iter1169->write($output);
-=======
-            foreach ($this->foreignKeys as $iter1162) {
-                $xfer += $iter1162->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->foreignKeys as $iter1169) {
-                $xfer += $iter1169->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -544,18 +406,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('uniqueConstraints', TType::LST, 5);
             $output->writeListBegin(TType::STRUCT, count($this->uniqueConstraints));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->uniqueConstraints as $iter1170) {
                 $xfer += $iter1170->write($output);
-=======
-            foreach ($this->uniqueConstraints as $iter1163) {
-                $xfer += $iter1163->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->uniqueConstraints as $iter1170) {
-                $xfer += $iter1170->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -566,18 +418,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('notNullConstraints', TType::LST, 6);
             $output->writeListBegin(TType::STRUCT, count($this->notNullConstraints));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->notNullConstraints as $iter1171) {
                 $xfer += $iter1171->write($output);
-=======
-            foreach ($this->notNullConstraints as $iter1164) {
-                $xfer += $iter1164->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->notNullConstraints as $iter1171) {
-                $xfer += $iter1171->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -588,18 +430,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('defaultConstraints', TType::LST, 7);
             $output->writeListBegin(TType::STRUCT, count($this->defaultConstraints));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->defaultConstraints as $iter1172) {
                 $xfer += $iter1172->write($output);
-=======
-            foreach ($this->defaultConstraints as $iter1165) {
-                $xfer += $iter1165->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->defaultConstraints as $iter1172) {
-                $xfer += $iter1172->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -610,18 +442,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('checkConstraints', TType::LST, 8);
             $output->writeListBegin(TType::STRUCT, count($this->checkConstraints));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->checkConstraints as $iter1173) {
                 $xfer += $iter1173->write($output);
-=======
-            foreach ($this->checkConstraints as $iter1166) {
-                $xfer += $iter1166->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->checkConstraints as $iter1173) {
-                $xfer += $iter1173->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -632,18 +454,8 @@ class CreateTableRequest
             }
             $xfer += $output->writeFieldBegin('processorCapabilities', TType::LST, 9);
             $output->writeListBegin(TType::STRING, count($this->processorCapabilities));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->processorCapabilities as $iter1174) {
                 $xfer += $output->writeString($iter1174);
-=======
-            foreach ($this->processorCapabilities as $iter1167) {
-                $xfer += $output->writeString($iter1167);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->processorCapabilities as $iter1174) {
-                $xfer += $output->writeString($iter1174);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

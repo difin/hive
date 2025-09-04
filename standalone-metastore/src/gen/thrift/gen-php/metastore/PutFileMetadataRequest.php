@@ -97,10 +97,6 @@ class PutFileMetadataRequest
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->fileIds = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size944 = 0;
                         $_etype947 = 0;
                         $xfer += $input->readListBegin($_etype947, $_size944);
@@ -108,18 +104,6 @@ class PutFileMetadataRequest
                             $elem949 = null;
                             $xfer += $input->readI64($elem949);
                             $this->fileIds []= $elem949;
-<<<<<<< HEAD
-=======
-                        $_size937 = 0;
-                        $_etype940 = 0;
-                        $xfer += $input->readListBegin($_etype940, $_size937);
-                        for ($_i941 = 0; $_i941 < $_size937; ++$_i941) {
-                            $elem942 = null;
-                            $xfer += $input->readI64($elem942);
-                            $this->fileIds []= $elem942;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -129,10 +113,6 @@ class PutFileMetadataRequest
                 case 2:
                     if ($ftype == TType::LST) {
                         $this->metadata = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size950 = 0;
                         $_etype953 = 0;
                         $xfer += $input->readListBegin($_etype953, $_size950);
@@ -140,18 +120,6 @@ class PutFileMetadataRequest
                             $elem955 = null;
                             $xfer += $input->readString($elem955);
                             $this->metadata []= $elem955;
-<<<<<<< HEAD
-=======
-                        $_size943 = 0;
-                        $_etype946 = 0;
-                        $xfer += $input->readListBegin($_etype946, $_size943);
-                        for ($_i947 = 0; $_i947 < $_size943; ++$_i947) {
-                            $elem948 = null;
-                            $xfer += $input->readString($elem948);
-                            $this->metadata []= $elem948;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -185,18 +153,8 @@ class PutFileMetadataRequest
             }
             $xfer += $output->writeFieldBegin('fileIds', TType::LST, 1);
             $output->writeListBegin(TType::I64, count($this->fileIds));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->fileIds as $iter956) {
                 $xfer += $output->writeI64($iter956);
-=======
-            foreach ($this->fileIds as $iter949) {
-                $xfer += $output->writeI64($iter949);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->fileIds as $iter956) {
-                $xfer += $output->writeI64($iter956);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -207,18 +165,8 @@ class PutFileMetadataRequest
             }
             $xfer += $output->writeFieldBegin('metadata', TType::LST, 2);
             $output->writeListBegin(TType::STRING, count($this->metadata));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->metadata as $iter957) {
                 $xfer += $output->writeString($iter957);
-=======
-            foreach ($this->metadata as $iter950) {
-                $xfer += $output->writeString($iter950);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->metadata as $iter957) {
-                $xfer += $output->writeString($iter957);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

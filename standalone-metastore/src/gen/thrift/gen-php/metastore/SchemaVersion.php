@@ -202,10 +202,6 @@ class SchemaVersion
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->cols = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1112 = 0;
                         $_etype1115 = 0;
                         $xfer += $input->readListBegin($_etype1115, $_size1112);
@@ -214,19 +210,6 @@ class SchemaVersion
                             $elem1117 = new \metastore\FieldSchema();
                             $xfer += $elem1117->read($input);
                             $this->cols []= $elem1117;
-<<<<<<< HEAD
-=======
-                        $_size1105 = 0;
-                        $_etype1108 = 0;
-                        $xfer += $input->readListBegin($_etype1108, $_size1105);
-                        for ($_i1109 = 0; $_i1109 < $_size1105; ++$_i1109) {
-                            $elem1110 = null;
-                            $elem1110 = new \metastore\FieldSchema();
-                            $xfer += $elem1110->read($input);
-                            $this->cols []= $elem1110;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -314,18 +297,8 @@ class SchemaVersion
             }
             $xfer += $output->writeFieldBegin('cols', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->cols));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->cols as $iter1118) {
                 $xfer += $iter1118->write($output);
-=======
-            foreach ($this->cols as $iter1111) {
-                $xfer += $iter1111->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->cols as $iter1118) {
-                $xfer += $iter1118->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

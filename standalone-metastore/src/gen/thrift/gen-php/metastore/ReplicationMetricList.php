@@ -69,10 +69,6 @@ class ReplicationMetricList
                 case 1:
                     if ($ftype == TType::LST) {
                         $this->replicationMetricList = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1303 = 0;
                         $_etype1306 = 0;
                         $xfer += $input->readListBegin($_etype1306, $_size1303);
@@ -81,19 +77,6 @@ class ReplicationMetricList
                             $elem1308 = new \metastore\ReplicationMetrics();
                             $xfer += $elem1308->read($input);
                             $this->replicationMetricList []= $elem1308;
-<<<<<<< HEAD
-=======
-                        $_size1296 = 0;
-                        $_etype1299 = 0;
-                        $xfer += $input->readListBegin($_etype1299, $_size1296);
-                        for ($_i1300 = 0; $_i1300 < $_size1296; ++$_i1300) {
-                            $elem1301 = null;
-                            $elem1301 = new \metastore\ReplicationMetrics();
-                            $xfer += $elem1301->read($input);
-                            $this->replicationMetricList []= $elem1301;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -120,18 +103,8 @@ class ReplicationMetricList
             }
             $xfer += $output->writeFieldBegin('replicationMetricList', TType::LST, 1);
             $output->writeListBegin(TType::STRUCT, count($this->replicationMetricList));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->replicationMetricList as $iter1309) {
                 $xfer += $iter1309->write($output);
-=======
-            foreach ($this->replicationMetricList as $iter1302) {
-                $xfer += $iter1302->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->replicationMetricList as $iter1309) {
-                $xfer += $iter1309->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

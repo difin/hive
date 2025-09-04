@@ -325,35 +325,14 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // SCHEMA_VERSIONS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TList _list1270 = iprot.readListBegin();
                 struct.schemaVersions = new java.util.ArrayList<SchemaVersionDescriptor>(_list1270.size);
                 @org.apache.thrift.annotation.Nullable SchemaVersionDescriptor _elem1271;
                 for (int _i1272 = 0; _i1272 < _list1270.size; ++_i1272)
-<<<<<<< HEAD
                 {
                   _elem1271 = new SchemaVersionDescriptor();
                   _elem1271.read(iprot);
                   struct.schemaVersions.add(_elem1271);
-=======
-                org.apache.thrift.protocol.TList _list1262 = iprot.readListBegin();
-                struct.schemaVersions = new java.util.ArrayList<SchemaVersionDescriptor>(_list1262.size);
-                @org.apache.thrift.annotation.Nullable SchemaVersionDescriptor _elem1263;
-                for (int _i1264 = 0; _i1264 < _list1262.size; ++_i1264)
-                {
-                  _elem1263 = new SchemaVersionDescriptor();
-                  _elem1263.read(iprot);
-                  struct.schemaVersions.add(_elem1263);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-                {
-                  _elem1271 = new SchemaVersionDescriptor();
-                  _elem1271.read(iprot);
-                  struct.schemaVersions.add(_elem1271);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 iprot.readListEnd();
               }
@@ -379,21 +358,9 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(SCHEMA_VERSIONS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.schemaVersions.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (SchemaVersionDescriptor _iter1273 : struct.schemaVersions)
           {
             _iter1273.write(oprot);
-=======
-          for (SchemaVersionDescriptor _iter1265 : struct.schemaVersions)
-          {
-            _iter1265.write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (SchemaVersionDescriptor _iter1273 : struct.schemaVersions)
-          {
-            _iter1273.write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
           oprot.writeListEnd();
         }
@@ -424,21 +391,9 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetSchemaVersions()) {
         {
           oprot.writeI32(struct.schemaVersions.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (SchemaVersionDescriptor _iter1274 : struct.schemaVersions)
           {
             _iter1274.write(oprot);
-=======
-          for (SchemaVersionDescriptor _iter1266 : struct.schemaVersions)
-          {
-            _iter1266.write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (SchemaVersionDescriptor _iter1274 : struct.schemaVersions)
-          {
-            _iter1274.write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
       }
@@ -450,35 +405,14 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           org.apache.thrift.protocol.TList _list1275 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
           struct.schemaVersions = new java.util.ArrayList<SchemaVersionDescriptor>(_list1275.size);
           @org.apache.thrift.annotation.Nullable SchemaVersionDescriptor _elem1276;
           for (int _i1277 = 0; _i1277 < _list1275.size; ++_i1277)
-<<<<<<< HEAD
           {
             _elem1276 = new SchemaVersionDescriptor();
             _elem1276.read(iprot);
             struct.schemaVersions.add(_elem1276);
-=======
-          org.apache.thrift.protocol.TList _list1267 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRUCT);
-          struct.schemaVersions = new java.util.ArrayList<SchemaVersionDescriptor>(_list1267.size);
-          @org.apache.thrift.annotation.Nullable SchemaVersionDescriptor _elem1268;
-          for (int _i1269 = 0; _i1269 < _list1267.size; ++_i1269)
-          {
-            _elem1268 = new SchemaVersionDescriptor();
-            _elem1268.read(iprot);
-            struct.schemaVersions.add(_elem1268);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          {
-            _elem1276 = new SchemaVersionDescriptor();
-            _elem1276.read(iprot);
-            struct.schemaVersions.add(_elem1276);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
         struct.setSchemaVersionsIsSet(true);

@@ -141,10 +141,6 @@ class WMFullResourcePlan
                 case 2:
                     if ($ftype == TType::LST) {
                         $this->pools = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1056 = 0;
                         $_etype1059 = 0;
                         $xfer += $input->readListBegin($_etype1059, $_size1056);
@@ -153,19 +149,6 @@ class WMFullResourcePlan
                             $elem1061 = new \metastore\WMPool();
                             $xfer += $elem1061->read($input);
                             $this->pools []= $elem1061;
-<<<<<<< HEAD
-=======
-                        $_size1049 = 0;
-                        $_etype1052 = 0;
-                        $xfer += $input->readListBegin($_etype1052, $_size1049);
-                        for ($_i1053 = 0; $_i1053 < $_size1049; ++$_i1053) {
-                            $elem1054 = null;
-                            $elem1054 = new \metastore\WMPool();
-                            $xfer += $elem1054->read($input);
-                            $this->pools []= $elem1054;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -175,10 +158,6 @@ class WMFullResourcePlan
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->mappings = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1062 = 0;
                         $_etype1065 = 0;
                         $xfer += $input->readListBegin($_etype1065, $_size1062);
@@ -187,19 +166,6 @@ class WMFullResourcePlan
                             $elem1067 = new \metastore\WMMapping();
                             $xfer += $elem1067->read($input);
                             $this->mappings []= $elem1067;
-<<<<<<< HEAD
-=======
-                        $_size1055 = 0;
-                        $_etype1058 = 0;
-                        $xfer += $input->readListBegin($_etype1058, $_size1055);
-                        for ($_i1059 = 0; $_i1059 < $_size1055; ++$_i1059) {
-                            $elem1060 = null;
-                            $elem1060 = new \metastore\WMMapping();
-                            $xfer += $elem1060->read($input);
-                            $this->mappings []= $elem1060;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -209,10 +175,6 @@ class WMFullResourcePlan
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->triggers = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1068 = 0;
                         $_etype1071 = 0;
                         $xfer += $input->readListBegin($_etype1071, $_size1068);
@@ -221,19 +183,6 @@ class WMFullResourcePlan
                             $elem1073 = new \metastore\WMTrigger();
                             $xfer += $elem1073->read($input);
                             $this->triggers []= $elem1073;
-<<<<<<< HEAD
-=======
-                        $_size1061 = 0;
-                        $_etype1064 = 0;
-                        $xfer += $input->readListBegin($_etype1064, $_size1061);
-                        for ($_i1065 = 0; $_i1065 < $_size1061; ++$_i1065) {
-                            $elem1066 = null;
-                            $elem1066 = new \metastore\WMTrigger();
-                            $xfer += $elem1066->read($input);
-                            $this->triggers []= $elem1066;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -243,10 +192,6 @@ class WMFullResourcePlan
                 case 5:
                     if ($ftype == TType::LST) {
                         $this->poolTriggers = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1074 = 0;
                         $_etype1077 = 0;
                         $xfer += $input->readListBegin($_etype1077, $_size1074);
@@ -255,19 +200,6 @@ class WMFullResourcePlan
                             $elem1079 = new \metastore\WMPoolTrigger();
                             $xfer += $elem1079->read($input);
                             $this->poolTriggers []= $elem1079;
-<<<<<<< HEAD
-=======
-                        $_size1067 = 0;
-                        $_etype1070 = 0;
-                        $xfer += $input->readListBegin($_etype1070, $_size1067);
-                        for ($_i1071 = 0; $_i1071 < $_size1067; ++$_i1071) {
-                            $elem1072 = null;
-                            $elem1072 = new \metastore\WMPoolTrigger();
-                            $xfer += $elem1072->read($input);
-                            $this->poolTriggers []= $elem1072;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -302,18 +234,8 @@ class WMFullResourcePlan
             }
             $xfer += $output->writeFieldBegin('pools', TType::LST, 2);
             $output->writeListBegin(TType::STRUCT, count($this->pools));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->pools as $iter1080) {
                 $xfer += $iter1080->write($output);
-=======
-            foreach ($this->pools as $iter1073) {
-                $xfer += $iter1073->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->pools as $iter1080) {
-                $xfer += $iter1080->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -324,18 +246,8 @@ class WMFullResourcePlan
             }
             $xfer += $output->writeFieldBegin('mappings', TType::LST, 3);
             $output->writeListBegin(TType::STRUCT, count($this->mappings));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->mappings as $iter1081) {
                 $xfer += $iter1081->write($output);
-=======
-            foreach ($this->mappings as $iter1074) {
-                $xfer += $iter1074->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->mappings as $iter1081) {
-                $xfer += $iter1081->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -346,18 +258,8 @@ class WMFullResourcePlan
             }
             $xfer += $output->writeFieldBegin('triggers', TType::LST, 4);
             $output->writeListBegin(TType::STRUCT, count($this->triggers));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->triggers as $iter1082) {
                 $xfer += $iter1082->write($output);
-=======
-            foreach ($this->triggers as $iter1075) {
-                $xfer += $iter1075->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->triggers as $iter1082) {
-                $xfer += $iter1082->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
@@ -368,18 +270,8 @@ class WMFullResourcePlan
             }
             $xfer += $output->writeFieldBegin('poolTriggers', TType::LST, 5);
             $output->writeListBegin(TType::STRUCT, count($this->poolTriggers));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->poolTriggers as $iter1083) {
                 $xfer += $iter1083->write($output);
-=======
-            foreach ($this->poolTriggers as $iter1076) {
-                $xfer += $iter1076->write($output);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->poolTriggers as $iter1083) {
-                $xfer += $iter1083->write($output);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

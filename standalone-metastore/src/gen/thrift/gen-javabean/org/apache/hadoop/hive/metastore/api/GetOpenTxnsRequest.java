@@ -321,37 +321,15 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // EXCLUDE_TXN_TYPES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TList _list1488 = iprot.readListBegin();
                 struct.excludeTxnTypes = new java.util.ArrayList<TxnType>(_list1488.size);
                 @org.apache.thrift.annotation.Nullable TxnType _elem1489;
                 for (int _i1490 = 0; _i1490 < _list1488.size; ++_i1490)
-<<<<<<< HEAD
                 {
                   _elem1489 = org.apache.hadoop.hive.metastore.api.TxnType.findByValue(iprot.readI32());
                   if (_elem1489 != null)
                   {
                     struct.excludeTxnTypes.add(_elem1489);
-=======
-                org.apache.thrift.protocol.TList _list1480 = iprot.readListBegin();
-                struct.excludeTxnTypes = new java.util.ArrayList<TxnType>(_list1480.size);
-                @org.apache.thrift.annotation.Nullable TxnType _elem1481;
-                for (int _i1482 = 0; _i1482 < _list1480.size; ++_i1482)
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
-                {
-                  _elem1489 = org.apache.hadoop.hive.metastore.api.TxnType.findByValue(iprot.readI32());
-                  if (_elem1489 != null)
-                  {
-<<<<<<< HEAD
-                    struct.excludeTxnTypes.add(_elem1481);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-                    struct.excludeTxnTypes.add(_elem1489);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                   }
                 }
                 iprot.readListEnd();
@@ -379,21 +357,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(EXCLUDE_TXN_TYPES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I32, struct.excludeTxnTypes.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
             for (TxnType _iter1491 : struct.excludeTxnTypes)
             {
               oprot.writeI32(_iter1491.getValue());
-=======
-            for (TxnType _iter1483 : struct.excludeTxnTypes)
-            {
-              oprot.writeI32(_iter1483.getValue());
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            for (TxnType _iter1491 : struct.excludeTxnTypes)
-            {
-              oprot.writeI32(_iter1491.getValue());
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             oprot.writeListEnd();
           }
@@ -425,21 +391,9 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetExcludeTxnTypes()) {
         {
           oprot.writeI32(struct.excludeTxnTypes.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (TxnType _iter1492 : struct.excludeTxnTypes)
           {
             oprot.writeI32(_iter1492.getValue());
-=======
-          for (TxnType _iter1484 : struct.excludeTxnTypes)
-          {
-            oprot.writeI32(_iter1484.getValue());
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (TxnType _iter1492 : struct.excludeTxnTypes)
-          {
-            oprot.writeI32(_iter1492.getValue());
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
       }
@@ -451,37 +405,15 @@ package org.apache.hadoop.hive.metastore.api;
       java.util.BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           org.apache.thrift.protocol.TList _list1493 = iprot.readListBegin(org.apache.thrift.protocol.TType.I32);
           struct.excludeTxnTypes = new java.util.ArrayList<TxnType>(_list1493.size);
           @org.apache.thrift.annotation.Nullable TxnType _elem1494;
           for (int _i1495 = 0; _i1495 < _list1493.size; ++_i1495)
-<<<<<<< HEAD
           {
             _elem1494 = org.apache.hadoop.hive.metastore.api.TxnType.findByValue(iprot.readI32());
             if (_elem1494 != null)
             {
               struct.excludeTxnTypes.add(_elem1494);
-=======
-          org.apache.thrift.protocol.TList _list1485 = iprot.readListBegin(org.apache.thrift.protocol.TType.I32);
-          struct.excludeTxnTypes = new java.util.ArrayList<TxnType>(_list1485.size);
-          @org.apache.thrift.annotation.Nullable TxnType _elem1486;
-          for (int _i1487 = 0; _i1487 < _list1485.size; ++_i1487)
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
-          {
-            _elem1494 = org.apache.hadoop.hive.metastore.api.TxnType.findByValue(iprot.readI32());
-            if (_elem1494 != null)
-            {
-<<<<<<< HEAD
-              struct.excludeTxnTypes.add(_elem1486);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-              struct.excludeTxnTypes.add(_elem1494);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
           }
         }

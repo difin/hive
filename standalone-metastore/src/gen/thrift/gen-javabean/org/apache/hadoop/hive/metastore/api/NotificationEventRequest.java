@@ -949,21 +949,9 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(EVENT_TYPE_SKIP_LIST_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.eventTypeSkipList.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
             for (java.lang.String _iter921 : struct.eventTypeSkipList)
             {
               oprot.writeString(_iter921);
-=======
-            for (java.lang.String _iter918 : struct.eventTypeSkipList)
-            {
-              oprot.writeString(_iter918);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            for (java.lang.String _iter921 : struct.eventTypeSkipList)
-            {
-              oprot.writeString(_iter921);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             oprot.writeListEnd();
           }
@@ -989,8 +977,6 @@ package org.apache.hadoop.hive.metastore.api;
           oprot.writeFieldBegin(TABLE_NAMES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.tableNames.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
             for (java.lang.String _iter922 : struct.tableNames)
             {
               oprot.writeString(_iter922);
@@ -1008,30 +994,6 @@ package org.apache.hadoop.hive.metastore.api;
             for (java.lang.String _iter923 : struct.eventTypeList)
             {
               oprot.writeString(_iter923);
-=======
-            for (java.lang.String _iter919 : struct.tableNames)
-            {
-              oprot.writeString(_iter919);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            for (java.lang.String _iter922 : struct.tableNames)
-            {
-              oprot.writeString(_iter922);
-            }
-            oprot.writeListEnd();
-          }
-          oprot.writeFieldEnd();
-        }
-      }
-      if (struct.eventTypeList != null) {
-        if (struct.isSetEventTypeList()) {
-          oprot.writeFieldBegin(EVENT_TYPE_LIST_FIELD_DESC);
-          {
-            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.eventTypeList.size()));
-            for (java.lang.String _iter923 : struct.eventTypeList)
-            {
-              oprot.writeString(_iter923);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             oprot.writeListEnd();
           }
@@ -1082,21 +1044,9 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetEventTypeSkipList()) {
         {
           oprot.writeI32(struct.eventTypeSkipList.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (java.lang.String _iter924 : struct.eventTypeSkipList)
           {
             oprot.writeString(_iter924);
-=======
-          for (java.lang.String _iter920 : struct.eventTypeSkipList)
-          {
-            oprot.writeString(_iter920);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (java.lang.String _iter924 : struct.eventTypeSkipList)
-          {
-            oprot.writeString(_iter924);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
       }
@@ -1109,8 +1059,6 @@ package org.apache.hadoop.hive.metastore.api;
       if (struct.isSetTableNames()) {
         {
           oprot.writeI32(struct.tableNames.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (java.lang.String _iter925 : struct.tableNames)
           {
             oprot.writeString(_iter925);
@@ -1123,25 +1071,6 @@ package org.apache.hadoop.hive.metastore.api;
           for (java.lang.String _iter926 : struct.eventTypeList)
           {
             oprot.writeString(_iter926);
-=======
-          for (java.lang.String _iter921 : struct.tableNames)
-          {
-            oprot.writeString(_iter921);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (java.lang.String _iter925 : struct.tableNames)
-          {
-            oprot.writeString(_iter925);
-          }
-        }
-      }
-      if (struct.isSetEventTypeList()) {
-        {
-          oprot.writeI32(struct.eventTypeList.size());
-          for (java.lang.String _iter926 : struct.eventTypeList)
-          {
-            oprot.writeString(_iter926);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
       }
@@ -1159,32 +1088,13 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(1)) {
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           org.apache.thrift.protocol.TList _list927 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.eventTypeSkipList = new java.util.ArrayList<java.lang.String>(_list927.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem928;
           for (int _i929 = 0; _i929 < _list927.size; ++_i929)
-<<<<<<< HEAD
           {
             _elem928 = iprot.readString();
             struct.eventTypeSkipList.add(_elem928);
-=======
-          org.apache.thrift.protocol.TList _list922 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
-          struct.eventTypeSkipList = new java.util.ArrayList<java.lang.String>(_list922.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _elem923;
-          for (int _i924 = 0; _i924 < _list922.size; ++_i924)
-          {
-            _elem923 = iprot.readString();
-            struct.eventTypeSkipList.add(_elem923);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          {
-            _elem928 = iprot.readString();
-            struct.eventTypeSkipList.add(_elem928);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
         struct.setEventTypeSkipListIsSet(true);
@@ -1199,32 +1109,13 @@ package org.apache.hadoop.hive.metastore.api;
       }
       if (incoming.get(4)) {
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           org.apache.thrift.protocol.TList _list930 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
           struct.tableNames = new java.util.ArrayList<java.lang.String>(_list930.size);
           @org.apache.thrift.annotation.Nullable java.lang.String _elem931;
           for (int _i932 = 0; _i932 < _list930.size; ++_i932)
-<<<<<<< HEAD
           {
             _elem931 = iprot.readString();
             struct.tableNames.add(_elem931);
-=======
-          org.apache.thrift.protocol.TList _list925 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
-          struct.tableNames = new java.util.ArrayList<java.lang.String>(_list925.size);
-          @org.apache.thrift.annotation.Nullable java.lang.String _elem926;
-          for (int _i927 = 0; _i927 < _list925.size; ++_i927)
-          {
-            _elem926 = iprot.readString();
-            struct.tableNames.add(_elem926);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          {
-            _elem931 = iprot.readString();
-            struct.tableNames.add(_elem931);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
         }
         struct.setTableNamesIsSet(true);

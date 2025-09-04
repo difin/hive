@@ -118,10 +118,6 @@ class ThriftHiveMetastore_drop_partition_args
                 case 3:
                     if ($ftype == TType::LST) {
                         $this->part_vals = array();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         $_size1563 = 0;
                         $_etype1566 = 0;
                         $xfer += $input->readListBegin($_etype1566, $_size1563);
@@ -129,18 +125,6 @@ class ThriftHiveMetastore_drop_partition_args
                             $elem1568 = null;
                             $xfer += $input->readString($elem1568);
                             $this->part_vals []= $elem1568;
-<<<<<<< HEAD
-=======
-                        $_size1556 = 0;
-                        $_etype1559 = 0;
-                        $xfer += $input->readListBegin($_etype1559, $_size1556);
-                        for ($_i1560 = 0; $_i1560 < $_size1556; ++$_i1560) {
-                            $elem1561 = null;
-                            $xfer += $input->readString($elem1561);
-                            $this->part_vals []= $elem1561;
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -184,18 +168,8 @@ class ThriftHiveMetastore_drop_partition_args
             }
             $xfer += $output->writeFieldBegin('part_vals', TType::LST, 3);
             $output->writeListBegin(TType::STRING, count($this->part_vals));
-<<<<<<< HEAD
-<<<<<<< HEAD
             foreach ($this->part_vals as $iter1569) {
                 $xfer += $output->writeString($iter1569);
-=======
-            foreach ($this->part_vals as $iter1562) {
-                $xfer += $output->writeString($iter1562);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-            foreach ($this->part_vals as $iter1569) {
-                $xfer += $output->writeString($iter1569);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

@@ -415,40 +415,16 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // METADATA
             if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
               {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 org.apache.thrift.protocol.TMap _map1034 = iprot.readMapBegin();
                 struct.metadata = new java.util.HashMap<java.lang.Long,MetadataPpdResult>(2*_map1034.size);
                 long _key1035;
                 @org.apache.thrift.annotation.Nullable MetadataPpdResult _val1036;
                 for (int _i1037 = 0; _i1037 < _map1034.size; ++_i1037)
-<<<<<<< HEAD
                 {
                   _key1035 = iprot.readI64();
                   _val1036 = new MetadataPpdResult();
                   _val1036.read(iprot);
                   struct.metadata.put(_key1035, _val1036);
-=======
-                org.apache.thrift.protocol.TMap _map1026 = iprot.readMapBegin();
-                struct.metadata = new java.util.HashMap<java.lang.Long,MetadataPpdResult>(2*_map1026.size);
-                long _key1027;
-                @org.apache.thrift.annotation.Nullable MetadataPpdResult _val1028;
-                for (int _i1029 = 0; _i1029 < _map1026.size; ++_i1029)
-                {
-                  _key1027 = iprot.readI64();
-                  _val1028 = new MetadataPpdResult();
-                  _val1028.read(iprot);
-                  struct.metadata.put(_key1027, _val1028);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-                {
-                  _key1035 = iprot.readI64();
-                  _val1036 = new MetadataPpdResult();
-                  _val1036.read(iprot);
-                  struct.metadata.put(_key1035, _val1036);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
                 }
                 iprot.readMapEnd();
               }
@@ -482,24 +458,10 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(METADATA_FIELD_DESC);
         {
           oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.I64, org.apache.thrift.protocol.TType.STRUCT, struct.metadata.size()));
-<<<<<<< HEAD
-<<<<<<< HEAD
           for (java.util.Map.Entry<java.lang.Long, MetadataPpdResult> _iter1038 : struct.metadata.entrySet())
           {
             oprot.writeI64(_iter1038.getKey());
             _iter1038.getValue().write(oprot);
-=======
-          for (java.util.Map.Entry<java.lang.Long, MetadataPpdResult> _iter1030 : struct.metadata.entrySet())
-          {
-            oprot.writeI64(_iter1030.getKey());
-            _iter1030.getValue().write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-          for (java.util.Map.Entry<java.lang.Long, MetadataPpdResult> _iter1038 : struct.metadata.entrySet())
-          {
-            oprot.writeI64(_iter1038.getKey());
-            _iter1038.getValue().write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
           }
           oprot.writeMapEnd();
         }
@@ -527,24 +489,10 @@ package org.apache.hadoop.hive.metastore.api;
       org.apache.thrift.protocol.TTupleProtocol oprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       {
         oprot.writeI32(struct.metadata.size());
-<<<<<<< HEAD
-<<<<<<< HEAD
         for (java.util.Map.Entry<java.lang.Long, MetadataPpdResult> _iter1039 : struct.metadata.entrySet())
         {
           oprot.writeI64(_iter1039.getKey());
           _iter1039.getValue().write(oprot);
-=======
-        for (java.util.Map.Entry<java.lang.Long, MetadataPpdResult> _iter1031 : struct.metadata.entrySet())
-        {
-          oprot.writeI64(_iter1031.getKey());
-          _iter1031.getValue().write(oprot);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-        for (java.util.Map.Entry<java.lang.Long, MetadataPpdResult> _iter1039 : struct.metadata.entrySet())
-        {
-          oprot.writeI64(_iter1039.getKey());
-          _iter1039.getValue().write(oprot);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
       }
       oprot.writeBool(struct.isSupported);
@@ -554,40 +502,16 @@ package org.apache.hadoop.hive.metastore.api;
     public void read(org.apache.thrift.protocol.TProtocol prot, GetFileMetadataByExprResult struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         org.apache.thrift.protocol.TMap _map1040 = iprot.readMapBegin(org.apache.thrift.protocol.TType.I64, org.apache.thrift.protocol.TType.STRUCT); 
         struct.metadata = new java.util.HashMap<java.lang.Long,MetadataPpdResult>(2*_map1040.size);
         long _key1041;
         @org.apache.thrift.annotation.Nullable MetadataPpdResult _val1042;
         for (int _i1043 = 0; _i1043 < _map1040.size; ++_i1043)
-<<<<<<< HEAD
         {
           _key1041 = iprot.readI64();
           _val1042 = new MetadataPpdResult();
           _val1042.read(iprot);
           struct.metadata.put(_key1041, _val1042);
-=======
-        org.apache.thrift.protocol.TMap _map1032 = iprot.readMapBegin(org.apache.thrift.protocol.TType.I64, org.apache.thrift.protocol.TType.STRUCT); 
-        struct.metadata = new java.util.HashMap<java.lang.Long,MetadataPpdResult>(2*_map1032.size);
-        long _key1033;
-        @org.apache.thrift.annotation.Nullable MetadataPpdResult _val1034;
-        for (int _i1035 = 0; _i1035 < _map1032.size; ++_i1035)
-        {
-          _key1033 = iprot.readI64();
-          _val1034 = new MetadataPpdResult();
-          _val1034.read(iprot);
-          struct.metadata.put(_key1033, _val1034);
->>>>>>> 36509d7056c (CDPD-81032: HIVE-28921: Add API and implementation for retrieving database object (#1025))
-=======
-        {
-          _key1041 = iprot.readI64();
-          _val1042 = new MetadataPpdResult();
-          _val1042.read(iprot);
-          struct.metadata.put(_key1041, _val1042);
->>>>>>> 69db3986099 (CDPD-84193: HIVE-28146: Add positive event type filter to the HMS notification fe… (#5694) (Sai Hemanth Gantasala, Reviewed by Zhihua Deng) (#1529))
         }
       }
       struct.setMetadataIsSet(true);
