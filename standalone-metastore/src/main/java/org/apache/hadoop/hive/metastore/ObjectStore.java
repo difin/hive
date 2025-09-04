@@ -2366,7 +2366,7 @@ public class ObjectStore implements RawStore, Configurable {
     return mkeys;
   }
 
-  private List<FieldSchema> convertToFieldSchemas(List<MFieldSchema> mkeys) {
+  protected List<FieldSchema> convertToFieldSchemas(List<MFieldSchema> mkeys) {
     List<FieldSchema> keys = null;
     if (mkeys != null) {
       keys = new ArrayList<>();
@@ -4301,6 +4301,7 @@ public class ObjectStore implements RawStore, Configurable {
         }
         throw new MetaException(ex.getMessage());
       }
+
       if (!isInTxn) {
         JDOException rollbackEx = null;
         try {
@@ -5091,9 +5092,9 @@ public class ObjectStore implements RawStore, Configurable {
 
   @Override
   public List<Partition> alterPartitions(String catName, String dbName, String tblName,
-                              List<List<String>> part_vals, List<Partition> newParts,
-                              long writeId, String queryWriteIdList)
-                                  throws InvalidObjectException, MetaException {
+      List<List<String>> part_vals, List<Partition> newParts,
+      long writeId, String queryWriteIdList)
+      throws InvalidObjectException, MetaException {
     List<Partition> results = new ArrayList<>(newParts.size());
     if (newParts.isEmpty()) {
       return results;
@@ -5105,50 +5106,16 @@ public class ObjectStore implements RawStore, Configurable {
     boolean success = false;
     try {
       openTransaction();
-
       MTable table = ensureGetMTable(catName, dbName, tblName);
-      // Validate new parts: StorageDescriptor and SerDeInfo must be set in Partition.
-      if (!TableType.VIRTUAL_VIEW.name().equals(table.getTableType())) {
-        for (Partition newPart : newParts) {
-          if (!newPart.isSetSd() || !newPart.getSd().isSetSerdeInfo()) {
-            throw new InvalidObjectException("Partition does not set storageDescriptor or serdeInfo.");
-          }
-        }
-      }
       if (writeId > 0) {
         newParts.forEach(newPart -> newPart.setWriteId(writeId));
       }
-
       List<FieldSchema> partCols = convertToFieldSchemas(table.getPartitionKeys());
       List<String> partNames = new ArrayList<>();
       for (List<String> partVal : part_vals) {
         partNames.add(Warehouse.makePartName(partCols, partVal));
       }
-
-      for (Partition tmpPart : newParts) {
-        if (!tmpPart.getDbName().equalsIgnoreCase(table.getDatabase().getName())) {
-          throw new MetaException("Invalid DB name : " + tmpPart.getDbName());
-        }
-
-        if (!tmpPart.getTableName().equalsIgnoreCase(table.getTableName())) {
-          throw new MetaException("Invalid table name : " + tmpPart.getDbName());
-        }
-      }
-
-      results = new GetListHelper<Partition>(catName, dbName, tblName, true, true) {
-        @Override
-        protected List<Partition> getSqlResult(GetHelper<List<Partition>> ctx)
-            throws MetaException {
-          return directSql.alterPartitions(table, partNames, newParts, queryWriteIdList);
-        }
-
-        @Override
-        protected List<Partition> getJdoResult(GetHelper<List<Partition>> ctx)
-            throws MetaException, InvalidObjectException {
-          return alterPartitionsViaJdo(table, partNames, newParts, queryWriteIdList);
-        }
-      }.run(false);
-
+      results = alterPartitionsInternal(table, partNames, newParts, queryWriteIdList, true, true);
       // commit the changes
       success = commitTransaction();
     } catch (Exception exception) {
@@ -5160,6 +5127,44 @@ public class ObjectStore implements RawStore, Configurable {
       }
     }
     return results;
+  }
+
+  protected List<Partition> alterPartitionsInternal(MTable table,
+      List<String> partNames, List<Partition> newParts, String queryWriteIdList,
+      boolean allowSql, boolean allowJdo)
+      throws InvalidObjectException, MetaException, NoSuchObjectException {
+    // Validate new parts: StorageDescriptor and SerDeInfo must be set in Partition.
+    if (!TableType.VIRTUAL_VIEW.name().equals(table.getTableType())) {
+      for (Partition newPart : newParts) {
+        if (!newPart.isSetSd() || !newPart.getSd().isSetSerdeInfo()) {
+          throw new InvalidObjectException("Partition does not set storageDescriptor or serdeInfo.");
+        }
+      }
+    }
+    String catName = table.getDatabase().getCatalogName();
+    String dbName = table.getDatabase().getName();
+    String tblName = table.getTableName();
+    for (Partition tmpPart : newParts) {
+      if (!tmpPart.getDbName().equalsIgnoreCase(dbName)) {
+        throw new MetaException("Invalid DB name : " + tmpPart.getDbName());
+      }
+      if (!tmpPart.getTableName().equalsIgnoreCase(tblName)) {
+        throw new MetaException("Invalid table name : " + tmpPart.getDbName());
+      }
+    }
+    return new GetListHelper<Partition>(catName, dbName, tblName, allowSql, allowJdo) {
+      @Override
+      protected List<Partition> getSqlResult(GetHelper<List<Partition>> ctx)
+          throws MetaException {
+        return directSql.alterPartitions(table, partNames, newParts, queryWriteIdList);
+      }
+
+      @Override
+      protected List<Partition> getJdoResult(GetHelper<List<Partition>> ctx)
+          throws MetaException, InvalidObjectException {
+        return alterPartitionsViaJdo(table, partNames, newParts, queryWriteIdList);
+      }
+    }.run(false);
   }
 
   private List<Partition> alterPartitionsViaJdo(MTable table, List<String> partNames,
@@ -9464,6 +9469,34 @@ public class ObjectStore implements RawStore, Configurable {
     return updatePartitionColumnStatistics(table, mTable, colStats, partVals, validWriteIds, writeId);
   }
 
+  @Override
+  public Map<String, Map<String, String>> updatePartitionColumnStatisticsInBatch(
+                                                      Map<String, ColumnStatistics> partColStatsMap,
+                                                      Table tbl,
+                                                      List<TransactionalMetaStoreEventListener> listeners,
+                                                      String validWriteIds, long writeId)
+          throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
+
+    return new GetHelper<Map<String, Map<String, String>>>(tbl.getCatName(),
+        tbl.getDbName(), tbl.getTableName(), true, false) {
+      @Override
+      protected String describeResult() {
+        return "Map of partition key to column stats if successful";
+      }
+      @Override
+      protected Map<String, Map<String, String>> getSqlResult(GetHelper<Map<String, Map<String, String>>> ctx)
+          throws MetaException {
+        return directSql.updatePartitionColumnStatisticsBatch(partColStatsMap, tbl,
+            listeners, validWriteIds, writeId);
+      }
+      @Override
+      protected Map<String, Map<String, String>> getJdoResult(GetHelper<Map<String, Map<String, String>>> ctx)
+          throws MetaException, NoSuchObjectException, InvalidObjectException {
+        throw new UnsupportedOperationException("Cannot update partition column statistics with JDO, make sure direct SQL is enabled");
+      }
+    }.run(false);
+  }
+
   private List<MTableColumnStatistics> getMTableColumnStatistics(Table table, List<String> colNames, String engine)
       throws MetaException {
     Preconditions.checkState(this.currentTransaction.isActive());
@@ -10199,17 +10232,6 @@ public class ObjectStore implements RawStore, Configurable {
       rollbackAndCleanup(ret, query);
     }
     return ret;
-  }
-
-  @Override
-  public Map<String, Map<String, String>> updatePartitionColumnStatisticsInBatch(
-          Map<String, ColumnStatistics> partColStatsMap,
-          Table tbl,
-          List<TransactionalMetaStoreEventListener> listeners,
-          String validWriteIds, long writeId)
-          throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
-    return directSql.updatePartitionColumnStatisticsBatch(partColStatsMap, tbl,
-            listeners, validWriteIds, writeId);
   }
 
   @Override
