@@ -1682,7 +1682,8 @@ public class MetastoreConf {
                     "alias."),
     METASTORE_CLIENT_IMPL("metastore.client.impl", "hive.metastore.client.impl",
         "org.apache.hadoop.hive.ql.metadata.SessionHiveMetaStoreClient",
-        "Fully qualified class name of the IMetaStoreClient implementation to use. "
+        "Fully qualified class name of the IMetaStoreClient implementation to use "
+            + "(e.g. SessionHiveMetaStoreClient or a REST-backed catalog client). "
             + "The class must provide a constructor "
             + "(org.apache.hadoop.conf.Configuration, "
             + "org.apache.hadoop.hive.metastore.HiveMetaHookLoader, java.lang.Boolean)."),

@@ -675,23 +675,27 @@ public class TestHiveIcebergStorageHandlerNoScan {
 
     if (!testTables.locationForCreateTableSQL(identifier).isEmpty()) {
       // Only test this if the location is required
-      Assertions.assertThatThrownBy(
-          () ->
-                  shell.executeStatement(
-                          "CREATE EXTERNAL TABLE withShell2 " +
-                                  "STORED BY 'org.apache.iceberg.mr.hive.HiveIcebergStorageHandler' " +
-                                  "TBLPROPERTIES ('" +
-                                  InputFormatConfig.TABLE_SCHEMA +
-                                  "'='" +
-                                  SchemaParser.toJson(HiveIcebergStorageHandlerTestUtils.CUSTOMER_SCHEMA) +
-                                  "','" +
-                                  InputFormatConfig.CATALOG_NAME +
-                                  "'='" +
-                                  testTables.catalogName() +
-                                  "')"))
-          .isInstanceOf(IllegalArgumentException.class)
-          .hasMessageStartingWith("Failed to execute Hive query")
-          .hasMessageContaining("Table location not set");
+      String createNoLocation = "CREATE EXTERNAL TABLE withShell2 " +
+          "STORED BY 'org.apache.iceberg.mr.hive.HiveIcebergStorageHandler' " +
+          "TBLPROPERTIES ('" +
+          InputFormatConfig.TABLE_SCHEMA +
+          "'='" +
+          SchemaParser.toJson(HiveIcebergStorageHandlerTestUtils.CUSTOMER_SCHEMA) +
+          "','" +
+          InputFormatConfig.CATALOG_NAME +
+          "'='" +
+          testTables.catalogName() +
+          "')";
+      if (testTableType != TestTables.TestTableType.HADOOP_CATALOG &&
+          testTableType != TestTables.TestTableType.CUSTOM_CATALOG) {
+        Assertions.assertThatThrownBy(() -> shell.executeStatement(createNoLocation))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageStartingWith("Failed to execute Hive query")
+            .hasMessageContaining("Table location not set");
+      } else {
+        Assertions.assertThatCode(() -> shell.executeStatement(createNoLocation))
+            .doesNotThrowAnyException();
+      }
     }
   }
 

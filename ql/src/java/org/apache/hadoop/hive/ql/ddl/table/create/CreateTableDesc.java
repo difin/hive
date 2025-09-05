@@ -692,6 +692,9 @@ public class CreateTableDesc extends DDLDescWithTableProperties implements Seria
   public Table toTable(HiveConf conf) throws HiveException {
 
     Table tbl = new Table(tableName.getDb(), tableName.getTable());
+    if (tableName.getCat() != null) {
+      tbl.getTTable().setCatName(tableName.getCat());
+    }
 
     if (getTblProps() != null) {
       tbl.getTTable().getParameters().putAll(getTblProps());
