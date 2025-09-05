@@ -40,7 +40,6 @@ import org.apache.hadoop.hive.common.type.TimestampTZUtil;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
-import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.ql.Context;
@@ -78,7 +77,7 @@ import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.expressions.Expression;
 import org.apache.iceberg.expressions.Expressions;
 import org.apache.iceberg.expressions.ResidualEvaluator;
-import org.apache.iceberg.hive.HiveSchemaUtil;
+import org.apache.iceberg.hive.CatalogUtils;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.mr.Catalogs;
 import org.apache.iceberg.mr.InputFormatConfig;
@@ -500,20 +499,6 @@ public class IcebergTableUtil {
     return finalExp;
   }
 
-  public static List<FieldSchema> getPartitionKeys(Table table, int specId) {
-    Schema schema = table.specs().get(specId).schema();
-    List<FieldSchema> hiveSchema = HiveSchemaUtil.convert(schema);
-    Map<String, String> colNameToColType = hiveSchema.stream()
-        .collect(Collectors.toMap(FieldSchema::getName, FieldSchema::getType));
-    return table.specs().get(specId).fields().stream()
-        .map(partField -> new FieldSchema(
-            schema.findColumnName(partField.sourceId()),
-            colNameToColType.get(schema.findColumnName(partField.sourceId())),
-            String.format("Transform: %s", partField.transform().toString()))
-        )
-        .collect(Collectors.toList());
-  }
-
   public static List<PartitionField> getPartitionFields(Table table, boolean latestSpecOnly) {
     return latestSpecOnly ? table.spec().fields() :
       table.specs().values().stream()
@@ -606,5 +591,20 @@ public class IcebergTableUtil {
     return Optional.ofNullable(tableProperties).filter(
         properties -> IcebergTableUtil.formatVersion(tableProperties) >= 3 &&
             FileFormat.PARQUET == IcebergTableUtil.defaultFileFormat(properties::getOrDefault)).isPresent();
+  }
+
+  public static String defaultWarehouseLocation(TableIdentifier tableIdentifier,
+      Configuration conf, Properties catalogProperties) {
+    StringBuilder sb = new StringBuilder();
+    String warehouseLocation = conf.get(String.format(
+        CatalogUtils.CATALOG_WAREHOUSE_TEMPLATE,
+        catalogProperties.getProperty(InputFormatConfig.CATALOG_NAME))
+    );
+    sb.append(warehouseLocation).append('/');
+    for (String level : tableIdentifier.namespace().levels()) {
+      sb.append(level).append('/');
+    }
+    sb.append(tableIdentifier.name());
+    return sb.toString();
   }
 }
