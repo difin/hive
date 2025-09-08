@@ -92,7 +92,7 @@
     <libthrift.version>0.16.0</libthrift.version>
     <log4j2.version>2.24.3</log4j2.version>
     <mockito-core.version>3.4.4</mockito-core.version>
-    <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
+    <nimbus-jose-jwt.version>10.4.2</nimbus-jose-jwt.version>
     <orc.version>1.8.3.2025.0.20.0-SNAPSHOT</orc.version>
     <protobuf.version>2.5.0</protobuf.version>
     <sqlline.version>1.9.0</sqlline.version>
