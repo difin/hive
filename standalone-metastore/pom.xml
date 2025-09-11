@@ -90,7 +90,7 @@
     <jwt.provider.api.version>0.10.0.0.1.0-b8</jwt.provider.api.version>
     <libfb303.version>0.9.3</libfb303.version>
     <libthrift.version>0.16.0</libthrift.version>
-    <log4j2.version>2.24.3</log4j2.version>
+    <log4j2.version>2.18.0</log4j2.version>
     <mockito-core.version>3.4.4</mockito-core.version>
     <nimbus-jose-jwt.version>10.4.2</nimbus-jose-jwt.version>
     <orc.version>1.8.3.2025.0.20.0-SNAPSHOT</orc.version>
@@ -726,11 +726,11 @@
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core-test</artifactId>
+      <artifactId>log4j-core</artifactId>
       <version>${log4j2.version}</version>
+      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <profiles>
