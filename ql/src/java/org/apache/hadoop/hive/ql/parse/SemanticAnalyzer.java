@@ -15673,7 +15673,11 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     String queryString = getQueryStringForCache(astNode);
     if (queryString != null) {
       ValidTxnWriteIdList writeIdList = getQueryValidTxnWriteIdList();
-      lookupInfo = new QueryResultsCache.LookupInfo(queryString, () -> { return writeIdList; });
+      Set<Long> involvedTables = tablesFromReadEntities(inputs).stream()
+          .map(Table::getTTable)
+          .map(org.apache.hadoop.hive.metastore.api.Table::getId)
+          .collect(Collectors.toSet());
+      lookupInfo = new QueryResultsCache.LookupInfo(queryString, () -> writeIdList, involvedTables);
     }
     return lookupInfo;
   }
