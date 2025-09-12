@@ -47,7 +47,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.sun.jersey.api.client.ClientResponse.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 /**
  * Implementation of RESTClient, encapsulates Atlas' REST APIs.

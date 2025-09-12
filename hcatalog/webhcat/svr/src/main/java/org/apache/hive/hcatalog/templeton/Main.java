@@ -18,9 +18,6 @@
  */
 package org.apache.hive.hcatalog.templeton;
 
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,11 +25,12 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.hadoop.hive.common.IPStackUtils;
 import org.apache.hadoop.hive.common.classification.InterfaceAudience;
 import org.apache.hadoop.hive.common.classification.InterfaceStability;
 import org.apache.hadoop.hdfs.web.AuthFilter;
@@ -305,16 +303,15 @@ public class Main {
     }
   }
 
-  public PackagesResourceConfig makeJerseyConfig() {
-    PackagesResourceConfig rc
-      = new PackagesResourceConfig("org.apache.hive.hcatalog.templeton");
+  public ResourceConfig makeJerseyConfig() {
+  ResourceConfig resourceConfig = new ResourceConfig().packages("org.apache.hive.hcatalog.templeton");
     HashMap<String, Object> props = new HashMap<String, Object>();
     props.put("com.sun.jersey.api.json.POJOMappingFeature", "true");
     props.put("com.sun.jersey.config.property.WadlGeneratorConfig",
       "org.apache.hive.hcatalog.templeton.WadlConfig");
-    rc.setPropertiesAndFeatures(props);
+    resourceConfig.addProperties(props);
 
-    return rc;
+    return resourceConfig;
   }
 
   public void addRedirects(Server server) {

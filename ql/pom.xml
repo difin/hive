@@ -72,8 +72,8 @@
           <artifactId>jul-to-slf4j</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-client</artifactId>
+          <groupId>jakarta.ws.rs</groupId>
+          <artifactId>jakarta.ws.rs-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -97,6 +97,10 @@
         <exclusion>
           <groupId>org.springframework</groupId>
           <artifactId>spring-context</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>jakarta.ws.rs</groupId>
+          <artifactId>jakarta.ws.rs-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -791,8 +795,8 @@
           <version>${avro.version}</version>
       </dependency>
     <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-servlet</artifactId>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -834,8 +838,13 @@
       <version>${re2j.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-multipart</artifactId>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-multipart</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-client</artifactId>
       <version>${jersey.version}</version>
     </dependency>
     <dependency>
