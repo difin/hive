@@ -1615,9 +1615,6 @@
                     <bannedImport>jersey.repackaged.com.google.**</bannedImport>
                     <bannedImport>org.codehaus.jackson.**</bannedImport>
                   </bannedImports>
-                  <allowedImports>
-                    <allowedImport>org.apache.atlas.shaded.**</allowedImport>
-                  </allowedImports>
                   <includeTestCode>true</includeTestCode>
                 </restrictImports>
                 <!-- To prevent unintentional usage of HTTP Components 5, e.g., via transitive dependencies -->
