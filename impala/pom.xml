@@ -56,6 +56,10 @@
       <version>${impala.version}</version>
       <exclusions>
         <exclusion>
+          <groupId>org.apache.datasketches</groupId>
+          <artifactId>datasketches-java</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>org.apache.hive</groupId>
           <artifactId>*</artifactId>
         </exclusion>
