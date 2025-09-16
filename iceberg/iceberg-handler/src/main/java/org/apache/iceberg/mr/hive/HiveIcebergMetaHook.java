@@ -163,9 +163,10 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
       BaseMetastoreTableOperations.PREVIOUS_METADATA_LOCATION_PROP);
   static final EnumSet<AlterTableType> SUPPORTED_ALTER_OPS = EnumSet.of(
       AlterTableType.ADDCOLS, AlterTableType.REPLACE_COLUMNS, AlterTableType.RENAME_COLUMN, AlterTableType.DROP_COLUMN,
-          AlterTableType.ADDPROPS, AlterTableType.DROPPROPS, AlterTableType.SETPARTITIONSPEC,
-          AlterTableType.UPDATE_COLUMNS, AlterTableType.RENAME, AlterTableType.EXECUTE, AlterTableType.CREATE_BRANCH,
-          AlterTableType.CREATE_TAG);
+      AlterTableType.ADDPROPS, AlterTableType.DROPPROPS, AlterTableType.SETPARTITIONSPEC,
+      AlterTableType.UPDATE_COLUMNS, AlterTableType.RENAME, AlterTableType.EXECUTE, AlterTableType.CREATE_BRANCH,
+      AlterTableType.CREATE_TAG, AlterTableType.DROP_BRANCH, AlterTableType.RENAME_BRANCH, AlterTableType.DROPPARTITION,
+      AlterTableType.DROP_TAG, AlterTableType.COMPACT, AlterTableType.REPLACE_SNAPSHOTREF);
   private static final List<String> MIGRATION_ALLOWED_SOURCE_FORMATS = ImmutableList.of(
       FileFormat.PARQUET.name().toLowerCase(),
       FileFormat.ORC.name().toLowerCase(),
