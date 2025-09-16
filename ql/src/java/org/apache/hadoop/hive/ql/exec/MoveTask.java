@@ -408,6 +408,11 @@ public class MoveTask extends Task<MoveWork> implements Serializable {
     }
 
     try (LocalTableLock lock = acquireLockForFileMove(work.getLoadTableWork())) {
+
+      if (checkAndCommitNatively(work, conf)) {
+        return 0;
+      }
+
       Hive db = getHive();
 
       // Do any hive related operations like moving tables and files
