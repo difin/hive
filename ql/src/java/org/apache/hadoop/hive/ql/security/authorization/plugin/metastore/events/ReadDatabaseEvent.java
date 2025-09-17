@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.events.PreEventContext;
 import org.apache.hadoop.hive.metastore.events.PreReadDatabaseEvent;
+import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveAuthzContext;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveOperationType;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.HiveMetaStoreAuthorizableEvent;
@@ -44,7 +45,12 @@ public class ReadDatabaseEvent extends HiveMetaStoreAuthorizableEvent {
 
     @Override
     public HiveMetaStoreAuthzInfo getAuthzContext() {
-        HiveMetaStoreAuthzInfo ret = new HiveMetaStoreAuthzInfo(preEventContext, HiveOperationType.SHOWDATABASES, getInputHObjs(), getOutputHObjs(), COMMAND_STR);
+        HiveAuthzContext authzContext = buildAuthzContext();
+        HiveMetaStoreAuthzInfo ret = new HiveMetaStoreAuthzInfo(preEventContext, HiveOperationType.SHOWDATABASES, getInputHObjs(), getOutputHObjs(), COMMAND_STR, authzContext);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("ReadDatabaseEvent.getAuthzContext(): authzContext=" + authzContext);
+        }
 
         return ret;
     }
