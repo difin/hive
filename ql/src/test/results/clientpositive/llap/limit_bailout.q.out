@@ -34,9 +34,9 @@ POSTHOOK: Lineage: limit_bailout.c SIMPLE [(limit_bailout_src_text)limit_bailout
 PREHOOK: query: select 1 from limit_bailout join limit_bailout t1 on limit_bailout.c=t1.c limit 1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@limit_bailout
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 POSTHOOK: query: select 1 from limit_bailout join limit_bailout t1 on limit_bailout.c=t1.c limit 1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@limit_bailout
-POSTHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 1

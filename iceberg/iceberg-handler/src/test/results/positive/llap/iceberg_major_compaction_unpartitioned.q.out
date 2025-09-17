@@ -215,8 +215,12 @@ Compressed:         	No
 Sort Columns:       	[]                  	 
 PREHOOK: query: explain alter table ice_orc COMPACT 'major' and wait pool 'iceberg'
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@ice_orc
+PREHOOK: Output: default@ice_orc
 POSTHOOK: query: explain alter table ice_orc COMPACT 'major' and wait pool 'iceberg'
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@ice_orc
+POSTHOOK: Output: default@ice_orc
 STAGE DEPENDENCIES:
   Stage-0 is a root stage
 
@@ -224,6 +228,7 @@ STAGE PLANS:
   Stage: Stage-0
     Compact
       compaction type: major
+      table name: default.ice_orc
       numberOfBuckets: 0
       pool: iceberg
       table name: default.ice_orc
@@ -231,8 +236,12 @@ STAGE PLANS:
 
 PREHOOK: query: explain optimize table ice_orc rewrite data pool 'iceberg'
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@ice_orc
+PREHOOK: Output: default@ice_orc
 POSTHOOK: query: explain optimize table ice_orc rewrite data pool 'iceberg'
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@ice_orc
+POSTHOOK: Output: default@ice_orc
 STAGE DEPENDENCIES:
   Stage-0 is a root stage
 
@@ -240,14 +249,19 @@ STAGE PLANS:
   Stage: Stage-0
     Compact
       compaction type: smart_optimize
+      table name: default.ice_orc
       numberOfBuckets: 0
       pool: iceberg
       table name: default.ice_orc
 
 PREHOOK: query: alter table ice_orc COMPACT 'major' and wait pool 'iceberg'
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@ice_orc
+PREHOOK: Output: default@ice_orc
 POSTHOOK: query: alter table ice_orc COMPACT 'major' and wait pool 'iceberg'
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@ice_orc
+POSTHOOK: Output: default@ice_orc
 PREHOOK: query: select * from ice_orc
 PREHOOK: type: QUERY
 PREHOOK: Input: default@ice_orc

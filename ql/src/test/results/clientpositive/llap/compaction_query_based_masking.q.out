@@ -90,8 +90,12 @@ POSTHOOK: Output: default@check_real_data
 POSTHOOK: Output: default@masking_test_n_compact
 PREHOOK: query: alter table masking_test_n_compact compact 'MAJOR' and wait
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@masking_test_n_compact
+PREHOOK: Output: default@masking_test_n_compact
 POSTHOOK: query: alter table masking_test_n_compact compact 'MAJOR' and wait
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@masking_test_n_compact
+POSTHOOK: Output: default@masking_test_n_compact
 PREHOOK: query: select * from masking_test_n_compact
 PREHOOK: type: QUERY
 PREHOOK: Input: default@masking_test_n_compact

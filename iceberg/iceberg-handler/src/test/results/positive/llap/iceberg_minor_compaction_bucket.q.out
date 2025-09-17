@@ -153,8 +153,12 @@ POSTHOOK: Input: default@srcbucket_big
 {"key_bucket":null,"key_bucket_8":null}	1	4
 PREHOOK: query: alter table srcbucket_big compact 'minor' and wait
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@srcbucket_big
+PREHOOK: Output: default@srcbucket_big
 POSTHOOK: query: alter table srcbucket_big compact 'minor' and wait
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@srcbucket_big
+POSTHOOK: Output: default@srcbucket_big
 PREHOOK: query: show compactions order by 'partition'
 PREHOOK: type: SHOW COMPACTIONS
 POSTHOOK: query: show compactions order by 'partition'

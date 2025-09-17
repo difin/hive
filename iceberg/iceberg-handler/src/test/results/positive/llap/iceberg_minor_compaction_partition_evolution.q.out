@@ -156,8 +156,12 @@ POSTHOOK: Input: ice_comp@ice_orc
 POSTHOOK: Output: ice_comp@ice_orc
 PREHOOK: query: alter table ice_orc COMPACT 'minor' and wait pool 'iceberg'
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: ice_comp@ice_orc
+PREHOOK: Output: ice_comp@ice_orc
 POSTHOOK: query: alter table ice_orc COMPACT 'minor' and wait pool 'iceberg'
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: ice_comp@ice_orc
+POSTHOOK: Output: ice_comp@ice_orc
 PREHOOK: query: describe formatted ice_orc
 PREHOOK: type: DESCTABLE
 PREHOOK: Input: ice_comp@ice_orc
@@ -233,8 +237,12 @@ POSTHOOK: Input: ice_comp@ice_orc
 POSTHOOK: Output: ice_comp@ice_orc
 PREHOOK: query: alter table ice_orc COMPACT 'minor' and wait pool 'iceberg' where fist_name in ('fn1','fn2','fn5','fn6') order by first_name
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: ice_comp@ice_orc
+PREHOOK: Output: ice_comp@ice_orc
 POSTHOOK: query: alter table ice_orc COMPACT 'minor' and wait pool 'iceberg' where fist_name in ('fn1','fn2','fn5','fn6') order by first_name
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: ice_comp@ice_orc
+POSTHOOK: Output: ice_comp@ice_orc
 PREHOOK: query: select * from ice_orc where dept_id=1
 PREHOOK: type: QUERY
 PREHOOK: Input: ice_comp@ice_orc

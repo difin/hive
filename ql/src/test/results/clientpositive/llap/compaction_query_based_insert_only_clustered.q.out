@@ -122,8 +122,12 @@ b                   	string
 #### A masked pattern was here ####
 PREHOOK: query: alter table orc_bucketed compact 'MAJOR' and wait
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@orc_bucketed
+PREHOOK: Output: default@orc_bucketed
 POSTHOOK: query: alter table orc_bucketed compact 'MAJOR' and wait
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@orc_bucketed
+POSTHOOK: Output: default@orc_bucketed
 PREHOOK: query: analyze table orc_bucketed compute statistics
 PREHOOK: type: ANALYZE_TABLE
 PREHOOK: Input: default@orc_bucketed

@@ -59,8 +59,12 @@ POSTHOOK: Input: default@x
 2
 PREHOOK: query: alter table x compact 'major' and wait
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@x
+PREHOOK: Output: default@x
 POSTHOOK: query: alter table x compact 'major' and wait
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@x
+POSTHOOK: Output: default@x
 PREHOOK: query: show compactions
 PREHOOK: type: SHOW COMPACTIONS
 POSTHOOK: query: show compactions

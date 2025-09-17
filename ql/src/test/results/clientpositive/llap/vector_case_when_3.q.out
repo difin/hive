@@ -49,7 +49,7 @@ STAGE PLANS:
                       native: true
                       vectorizationSchemaColumns: [0:rattag:string, 1:newclt_all:decimal(15,2)/DECIMAL_64, 2:ROW__ID:struct<writeid:bigint,bucketid:int,rowid:bigint>, 3:ROW__IS__DELETED:boolean]
                   Select Operator
-                    expressions: CASE WHEN ((rattag = 'a')) THEN ((newclt_all * 0.3)) ELSE (newclt_all) END (type: decimal(17,3))
+                    expressions: if((rattag = 'a'), (newclt_all * 0.3), newclt_all) (type: decimal(17,3))
                     outputColumnNames: _col0
                     Select Vectorization:
                         className: VectorSelectOperator
@@ -184,7 +184,7 @@ STAGE PLANS:
                       native: true
                       vectorizationSchemaColumns: [0:rattag:string, 1:newclt_all:decimal(15,2)/DECIMAL_64, 2:ROW__ID:struct<writeid:bigint,bucketid:int,rowid:bigint>, 3:ROW__IS__DELETED:boolean]
                   Select Operator
-                    expressions: CASE WHEN ((rattag = 'Y')) THEN ((newclt_all * 0.3)) ELSE (newclt_all) END (type: decimal(17,3))
+                    expressions: if((rattag = 'Y'), (newclt_all * 0.3), newclt_all) (type: decimal(17,3))
                     outputColumnNames: _col0
                     Select Vectorization:
                         className: VectorSelectOperator

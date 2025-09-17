@@ -279,10 +279,14 @@ PREHOOK: query: alter table ice_orc COMPACT 'major' and wait
 where (event_src in ('BBB_1', 'BBB_2') and event_time < '2024-09-01 00:00:00') or
       (event_src in ('AAA_1', 'AAA_2') and event_time > '2024-08-01 00:00:00')
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@ice_orc
+PREHOOK: Output: default@ice_orc
 POSTHOOK: query: alter table ice_orc COMPACT 'major' and wait 
 where (event_src in ('BBB_1', 'BBB_2') and event_time < '2024-09-01 00:00:00') or
       (event_src in ('AAA_1', 'AAA_2') and event_time > '2024-08-01 00:00:00')
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@ice_orc
+POSTHOOK: Output: default@ice_orc
 PREHOOK: query: select * from ice_orc
 PREHOOK: type: QUERY
 PREHOOK: Input: default@ice_orc

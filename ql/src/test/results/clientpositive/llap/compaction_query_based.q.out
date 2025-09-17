@@ -42,8 +42,12 @@ POSTHOOK: Lineage: orc_table.a SCRIPT []
 POSTHOOK: Lineage: orc_table.b SCRIPT []
 PREHOOK: query: alter table orc_table compact 'MAJOR' and wait
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@orc_table
+PREHOOK: Output: default@orc_table
 POSTHOOK: query: alter table orc_table compact 'MAJOR' and wait
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@orc_table
+POSTHOOK: Output: default@orc_table
 PREHOOK: query: analyze table orc_table compute statistics
 PREHOOK: type: ANALYZE_TABLE
 PREHOOK: Input: default@orc_table

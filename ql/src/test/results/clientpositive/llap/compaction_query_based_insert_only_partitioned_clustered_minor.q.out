@@ -145,24 +145,44 @@ c                   	string
 #### A masked pattern was here ####
 PREHOOK: query: alter table orc_partition_clustered PARTITION (c='part1') compact 'MINOR' and wait
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@orc_partition_clustered
+PREHOOK: Output: default@orc_partition_clustered@c=part1
 POSTHOOK: query: alter table orc_partition_clustered PARTITION (c='part1') compact 'MINOR' and wait
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@orc_partition_clustered
+POSTHOOK: Output: default@orc_partition_clustered@c=part1
 PREHOOK: query: alter table orc_partition_clustered PARTITION (c='part2') compact 'MINOR' and wait
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@orc_partition_clustered
+PREHOOK: Output: default@orc_partition_clustered@c=part2
 POSTHOOK: query: alter table orc_partition_clustered PARTITION (c='part2') compact 'MINOR' and wait
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@orc_partition_clustered
+POSTHOOK: Output: default@orc_partition_clustered@c=part2
 PREHOOK: query: alter table orc_partition_clustered PARTITION (c='part3') compact 'MINOR' and wait
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@orc_partition_clustered
+PREHOOK: Output: default@orc_partition_clustered@c=part3
 POSTHOOK: query: alter table orc_partition_clustered PARTITION (c='part3') compact 'MINOR' and wait
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@orc_partition_clustered
+POSTHOOK: Output: default@orc_partition_clustered@c=part3
 PREHOOK: query: alter table orc_partition_clustered PARTITION (c='part4') compact 'MINOR' and wait
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@orc_partition_clustered
+PREHOOK: Output: default@orc_partition_clustered@c=part4
 POSTHOOK: query: alter table orc_partition_clustered PARTITION (c='part4') compact 'MINOR' and wait
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@orc_partition_clustered
+POSTHOOK: Output: default@orc_partition_clustered@c=part4
 PREHOOK: query: alter table orc_partition_clustered PARTITION (c='part5') compact 'MINOR' and wait
 PREHOOK: type: ALTERTABLE_COMPACT
+PREHOOK: Input: default@orc_partition_clustered
+PREHOOK: Output: default@orc_partition_clustered@c=part5
 POSTHOOK: query: alter table orc_partition_clustered PARTITION (c='part5') compact 'MINOR' and wait
 POSTHOOK: type: ALTERTABLE_COMPACT
+POSTHOOK: Input: default@orc_partition_clustered
+POSTHOOK: Output: default@orc_partition_clustered@c=part5
 PREHOOK: query: analyze table orc_partition_clustered compute statistics
 PREHOOK: type: ANALYZE_TABLE
 PREHOOK: Input: default@orc_partition_clustered

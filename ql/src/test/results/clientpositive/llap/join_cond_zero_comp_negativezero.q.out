@@ -36,7 +36,6 @@ POSTHOOK: query: SELECT * FROM selfjoin1 sj1, selfjoin1 sj2 WHERE sj1.c1 = sj2.c
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@selfjoin1
 #### A masked pattern was here ####
-0	-0.0	0	-0.0
 PREHOOK: query: CREATE TABLE t0(c0 int)
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
@@ -81,4 +80,3 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@t0
 POSTHOOK: Input: default@t1
 #### A masked pattern was here ####
-0	-0.0
