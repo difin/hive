@@ -38,6 +38,7 @@ public class IncrementalLoadEvent extends ReplState {
   private String eventsLoadProgress;
 
   @JsonProperty
+  @JsonSerialize(using = ReplUtils.TimeSerializer.class)
   private Long loadTime;
 
   @JsonProperty

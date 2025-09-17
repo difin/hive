@@ -44,6 +44,7 @@ public class RangerLoadBegin extends ReplState {
 
   @SuppressFBWarnings("URF_UNREAD_FIELD")
   @JsonProperty
+  @JsonSerialize(using = ReplUtils.TimeSerializer.class)
   private Long loadStartTime;
 
   public RangerLoadBegin(String sourceDbName, String targetDbName, long estimatedNumPolicies) {

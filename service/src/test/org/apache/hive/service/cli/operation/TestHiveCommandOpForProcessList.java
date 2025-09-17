@@ -20,6 +20,7 @@ package org.apache.hive.service.cli.operation;
 import com.google.common.collect.ImmutableMap;
 import org.apache.hadoop.hive.common.io.SessionStream;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.ql.processors.ShowProcessListProcessor;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hive.service.cli.HiveSQLException;
@@ -46,7 +47,7 @@ public class TestHiveCommandOpForProcessList {
 
   @Before
   public void setupTest() throws Exception {
-    hiveConf = new HiveConf(getClass());
+    hiveConf = new HiveConfForTest(getClass());
     hiveConf.setBoolVar(HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY, false);
     hiveConf.setVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
         "org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory");

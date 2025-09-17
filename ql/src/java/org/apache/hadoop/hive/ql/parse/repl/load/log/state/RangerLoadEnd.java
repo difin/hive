@@ -44,6 +44,7 @@ public class RangerLoadEnd extends ReplState {
 
   @SuppressFBWarnings("URF_UNREAD_FIELD")
   @JsonProperty
+  @JsonSerialize(using = ReplUtils.TimeSerializer.class)
   private Long loadEndTime;
 
   @SuppressFBWarnings("URF_UNREAD_FIELD")
