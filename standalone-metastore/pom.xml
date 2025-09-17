@@ -54,6 +54,7 @@
     <checkstyle.conf.dir>${basedir}/checkstyle/</checkstyle.conf.dir>
     <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
     <maven.surefire.plugin.version>3.5.1</maven.surefire.plugin.version>
+    <maven.test.jvm.args>-Xmx3080m -Dio.netty.tryReflectionSetAccessible=true -Djava.locale.providers=COMPAT,CLDR --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens java.base/java.util.regex=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.sql/java.sql=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED</maven.test.jvm.args>
     <!-- Dependency versions -->
     <aircompressor.version>0.27</aircompressor.version>
     <antlr.version>4.9.3</antlr.version>
@@ -1070,7 +1071,7 @@
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <reuseForks>false</reuseForks>
           <forkCount>${test.forkcount}</forkCount>
-          <argLine>-Xmx2048m</argLine>
+          <argLine>-Xmx2048m ${maven.test.jvm.args}</argLine>
           <failIfNoTests>false</failIfNoTests>
           <systemPropertyVariables>
             <build.dir>${project.build.directory}</build.dir>
