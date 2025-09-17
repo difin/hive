@@ -23,6 +23,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Collection;
@@ -54,7 +57,7 @@ import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-
+import java.util.stream.Collectors;
 
 public class TestLlapZookeeperRegistryImpl {
 
@@ -174,12 +177,20 @@ public class TestLlapZookeeperRegistryImpl {
         registry.getPersistentNodePath());
   }
 
+  private static String getAllThreadStacksAsString() {
+    // dump stack traces with info about locks
+    ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+    ThreadInfo[] infos = bean.dumpAllThreads(true, true);
+    return Arrays.stream(infos).map(Object::toString).collect(Collectors.joining());
+  }
+
   static <T> void assertEventually(Callable<Boolean> matcher, String message) throws Exception {
     long started = System.currentTimeMillis();
     while (!matcher.call()) {
       Thread.sleep(100);
       if (System.currentTimeMillis() - started > TIMEOUT_MS) {
-        fail(message + " was not satisfied withing " + TIMEOUT_MS + "ms");
+        final String dump = getAllThreadStacksAsString();
+        fail(message + " was not satisfied withing " + TIMEOUT_MS + "ms. Stack traces:\n\n" + dump);
       }
     }
   }
