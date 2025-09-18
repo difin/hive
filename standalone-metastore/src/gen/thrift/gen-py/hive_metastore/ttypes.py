@@ -29285,6 +29285,149 @@ class GetAllWriteEventInfoRequest(object):
         return not (self == other)
 
 
+class DeleteColumnStatisticsRequest(object):
+    """
+    Attributes:
+     - cat_name
+     - db_name
+     - tbl_name
+     - part_names
+     - col_names
+     - engine
+     - tableLevel
+
+    """
+
+
+    def __init__(self, cat_name=None, db_name=None, tbl_name=None, part_names=None, col_names=None, engine="hive", tableLevel=False,):
+        self.cat_name = cat_name
+        self.db_name = db_name
+        self.tbl_name = tbl_name
+        self.part_names = part_names
+        self.col_names = col_names
+        self.engine = engine
+        self.tableLevel = tableLevel
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRING:
+                    self.cat_name = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.STRING:
+                    self.db_name = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.STRING:
+                    self.tbl_name = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 4:
+                if ftype == TType.LIST:
+                    self.part_names = []
+                    (_etype1317, _size1314) = iprot.readListBegin()
+                    for _i1318 in range(_size1314):
+                        _elem1319 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        self.part_names.append(_elem1319)
+                    iprot.readListEnd()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 5:
+                if ftype == TType.LIST:
+                    self.col_names = []
+                    (_etype1323, _size1320) = iprot.readListBegin()
+                    for _i1324 in range(_size1320):
+                        _elem1325 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        self.col_names.append(_elem1325)
+                    iprot.readListEnd()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 6:
+                if ftype == TType.STRING:
+                    self.engine = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 7:
+                if ftype == TType.BOOL:
+                    self.tableLevel = iprot.readBool()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('DeleteColumnStatisticsRequest')
+        if self.cat_name is not None:
+            oprot.writeFieldBegin('cat_name', TType.STRING, 1)
+            oprot.writeString(self.cat_name.encode('utf-8') if sys.version_info[0] == 2 else self.cat_name)
+            oprot.writeFieldEnd()
+        if self.db_name is not None:
+            oprot.writeFieldBegin('db_name', TType.STRING, 2)
+            oprot.writeString(self.db_name.encode('utf-8') if sys.version_info[0] == 2 else self.db_name)
+            oprot.writeFieldEnd()
+        if self.tbl_name is not None:
+            oprot.writeFieldBegin('tbl_name', TType.STRING, 3)
+            oprot.writeString(self.tbl_name.encode('utf-8') if sys.version_info[0] == 2 else self.tbl_name)
+            oprot.writeFieldEnd()
+        if self.part_names is not None:
+            oprot.writeFieldBegin('part_names', TType.LIST, 4)
+            oprot.writeListBegin(TType.STRING, len(self.part_names))
+            for iter1326 in self.part_names:
+                oprot.writeString(iter1326.encode('utf-8') if sys.version_info[0] == 2 else iter1326)
+            oprot.writeListEnd()
+            oprot.writeFieldEnd()
+        if self.col_names is not None:
+            oprot.writeFieldBegin('col_names', TType.LIST, 5)
+            oprot.writeListBegin(TType.STRING, len(self.col_names))
+            for iter1327 in self.col_names:
+                oprot.writeString(iter1327.encode('utf-8') if sys.version_info[0] == 2 else iter1327)
+            oprot.writeListEnd()
+            oprot.writeFieldEnd()
+        if self.engine is not None:
+            oprot.writeFieldBegin('engine', TType.STRING, 6)
+            oprot.writeString(self.engine.encode('utf-8') if sys.version_info[0] == 2 else self.engine)
+            oprot.writeFieldEnd()
+        if self.tableLevel is not None:
+            oprot.writeFieldBegin('tableLevel', TType.BOOL, 7)
+            oprot.writeBool(self.tableLevel)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        if self.db_name is None:
+            raise TProtocolException(message='Required field db_name is unset!')
+        if self.tbl_name is None:
+            raise TProtocolException(message='Required field tbl_name is unset!')
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
 class PropertySetRequest(object):
     """
     Attributes:
@@ -29315,11 +29458,11 @@ class PropertySetRequest(object):
             elif fid == 2:
                 if ftype == TType.MAP:
                     self.propertyMap = {}
-                    (_ktype1315, _vtype1316, _size1314) = iprot.readMapBegin()
-                    for _i1318 in range(_size1314):
-                        _key1319 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                        _val1320 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                        self.propertyMap[_key1319] = _val1320
+                    (_ktype1329, _vtype1330, _size1328) = iprot.readMapBegin()
+                    for _i1332 in range(_size1328):
+                        _key1333 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        _val1334 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        self.propertyMap[_key1333] = _val1334
                     iprot.readMapEnd()
                 else:
                     iprot.skip(ftype)
@@ -29340,9 +29483,9 @@ class PropertySetRequest(object):
         if self.propertyMap is not None:
             oprot.writeFieldBegin('propertyMap', TType.MAP, 2)
             oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.propertyMap))
-            for kiter1321, viter1322 in self.propertyMap.items():
-                oprot.writeString(kiter1321.encode('utf-8') if sys.version_info[0] == 2 else kiter1321)
-                oprot.writeString(viter1322.encode('utf-8') if sys.version_info[0] == 2 else viter1322)
+            for kiter1335, viter1336 in self.propertyMap.items():
+                oprot.writeString(kiter1335.encode('utf-8') if sys.version_info[0] == 2 else kiter1335)
+                oprot.writeString(viter1336.encode('utf-8') if sys.version_info[0] == 2 else viter1336)
             oprot.writeMapEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -29409,10 +29552,10 @@ class PropertyGetRequest(object):
             elif fid == 4:
                 if ftype == TType.LIST:
                     self.mapSelection = []
-                    (_etype1326, _size1323) = iprot.readListBegin()
-                    for _i1327 in range(_size1323):
-                        _elem1328 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                        self.mapSelection.append(_elem1328)
+                    (_etype1340, _size1337) = iprot.readListBegin()
+                    for _i1341 in range(_size1337):
+                        _elem1342 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        self.mapSelection.append(_elem1342)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -29441,8 +29584,8 @@ class PropertyGetRequest(object):
         if self.mapSelection is not None:
             oprot.writeFieldBegin('mapSelection', TType.LIST, 4)
             oprot.writeListBegin(TType.STRING, len(self.mapSelection))
-            for iter1329 in self.mapSelection:
-                oprot.writeString(iter1329.encode('utf-8') if sys.version_info[0] == 2 else iter1329)
+            for iter1343 in self.mapSelection:
+                oprot.writeString(iter1343.encode('utf-8') if sys.version_info[0] == 2 else iter1343)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -29488,17 +29631,17 @@ class PropertyGetResponse(object):
             if fid == 1:
                 if ftype == TType.MAP:
                     self.properties = {}
-                    (_ktype1331, _vtype1332, _size1330) = iprot.readMapBegin()
-                    for _i1334 in range(_size1330):
-                        _key1335 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                        _val1336 = {}
-                        (_ktype1338, _vtype1339, _size1337) = iprot.readMapBegin()
-                        for _i1341 in range(_size1337):
-                            _key1342 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                            _val1343 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                            _val1336[_key1342] = _val1343
+                    (_ktype1345, _vtype1346, _size1344) = iprot.readMapBegin()
+                    for _i1348 in range(_size1344):
+                        _key1349 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        _val1350 = {}
+                        (_ktype1352, _vtype1353, _size1351) = iprot.readMapBegin()
+                        for _i1355 in range(_size1351):
+                            _key1356 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                            _val1357 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                            _val1350[_key1356] = _val1357
                         iprot.readMapEnd()
-                        self.properties[_key1335] = _val1336
+                        self.properties[_key1349] = _val1350
                     iprot.readMapEnd()
                 else:
                     iprot.skip(ftype)
@@ -29515,12 +29658,12 @@ class PropertyGetResponse(object):
         if self.properties is not None:
             oprot.writeFieldBegin('properties', TType.MAP, 1)
             oprot.writeMapBegin(TType.STRING, TType.MAP, len(self.properties))
-            for kiter1344, viter1345 in self.properties.items():
-                oprot.writeString(kiter1344.encode('utf-8') if sys.version_info[0] == 2 else kiter1344)
-                oprot.writeMapBegin(TType.STRING, TType.STRING, len(viter1345))
-                for kiter1346, viter1347 in viter1345.items():
-                    oprot.writeString(kiter1346.encode('utf-8') if sys.version_info[0] == 2 else kiter1346)
-                    oprot.writeString(viter1347.encode('utf-8') if sys.version_info[0] == 2 else viter1347)
+            for kiter1358, viter1359 in self.properties.items():
+                oprot.writeString(kiter1358.encode('utf-8') if sys.version_info[0] == 2 else kiter1358)
+                oprot.writeMapBegin(TType.STRING, TType.STRING, len(viter1359))
+                for kiter1360, viter1361 in viter1359.items():
+                    oprot.writeString(kiter1360.encode('utf-8') if sys.version_info[0] == 2 else kiter1360)
+                    oprot.writeString(viter1361.encode('utf-8') if sys.version_info[0] == 2 else viter1361)
                 oprot.writeMapEnd()
             oprot.writeMapEnd()
             oprot.writeFieldEnd()
@@ -32976,6 +33119,17 @@ GetAllWriteEventInfoRequest.thrift_spec = (
     (1, TType.I64, 'txnId', None, None, ),  # 1
     (2, TType.STRING, 'dbName', 'UTF8', None, ),  # 2
     (3, TType.STRING, 'tableName', 'UTF8', None, ),  # 3
+)
+all_structs.append(DeleteColumnStatisticsRequest)
+DeleteColumnStatisticsRequest.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'cat_name', 'UTF8', None, ),  # 1
+    (2, TType.STRING, 'db_name', 'UTF8', None, ),  # 2
+    (3, TType.STRING, 'tbl_name', 'UTF8', None, ),  # 3
+    (4, TType.LIST, 'part_names', (TType.STRING, 'UTF8', False), None, ),  # 4
+    (5, TType.LIST, 'col_names', (TType.STRING, 'UTF8', False), None, ),  # 5
+    (6, TType.STRING, 'engine', 'UTF8', "hive", ),  # 6
+    (7, TType.BOOL, 'tableLevel', None, False, ),  # 7
 )
 all_structs.append(PropertySetRequest)
 PropertySetRequest.thrift_spec = (

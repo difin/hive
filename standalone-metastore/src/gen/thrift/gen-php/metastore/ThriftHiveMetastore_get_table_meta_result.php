@@ -82,14 +82,14 @@ class ThriftHiveMetastore_get_table_meta_result
                 case 0:
                     if ($ftype == TType::LST) {
                         $this->success = array();
-                        $_size1493 = 0;
-                        $_etype1496 = 0;
-                        $xfer += $input->readListBegin($_etype1496, $_size1493);
-                        for ($_i1497 = 0; $_i1497 < $_size1493; ++$_i1497) {
-                            $elem1498 = null;
-                            $elem1498 = new \metastore\TableMeta();
-                            $xfer += $elem1498->read($input);
-                            $this->success []= $elem1498;
+                        $_size1507 = 0;
+                        $_etype1510 = 0;
+                        $xfer += $input->readListBegin($_etype1510, $_size1507);
+                        for ($_i1511 = 0; $_i1511 < $_size1507; ++$_i1511) {
+                            $elem1512 = null;
+                            $elem1512 = new \metastore\TableMeta();
+                            $xfer += $elem1512->read($input);
+                            $this->success []= $elem1512;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -124,8 +124,8 @@ class ThriftHiveMetastore_get_table_meta_result
             }
             $xfer += $output->writeFieldBegin('success', TType::LST, 0);
             $output->writeListBegin(TType::STRUCT, count($this->success));
-            foreach ($this->success as $iter1499) {
-                $xfer += $iter1499->write($output);
+            foreach ($this->success as $iter1513) {
+                $xfer += $iter1513->write($output);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();
