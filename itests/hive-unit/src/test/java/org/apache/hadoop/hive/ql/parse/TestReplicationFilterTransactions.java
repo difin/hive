@@ -264,12 +264,15 @@ public class TestReplicationFilterTransactions {
 
     Map<String, String> conf = setupConf(miniDFSCluster.getFileSystem().getUri().toString(),
             PrimaryEventListenerTestImpl.class.getName());
+    //TODO: HIVE-28044: Replication tests to run on Tez
+    conf.put(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "mr");
     primary = new WarehouseInstance(LOG, miniDFSCluster, conf);
 
     conf = setupConf(miniDFSCluster.getFileSystem().getUri().toString(),
             ReplicaEventListenerTestImpl.class.getName());
     conf.put(MetastoreConf.ConfVars.REPLDIR.getHiveName(), primary.repldDir);
-
+    //TODO: HIVE-28044: Replication tests to run on Tez
+    conf.put(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "mr");
     replica = new WarehouseInstance(LOG, miniDFSCluster, conf);
 
     primaryDbName = testName.getMethodName() + "_" + System.currentTimeMillis();
