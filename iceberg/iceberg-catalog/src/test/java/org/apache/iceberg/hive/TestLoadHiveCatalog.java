@@ -109,6 +109,6 @@ public class TestLoadHiveCatalog {
                             ImmutableMap.of(CatalogProperties.CLIENT_POOL_CACHE_KEYS, "conf:any.key"),
                             conf2);
     clientPool2 = getPool(hiveCatalog2.getActor());
-    assertThat(clientPool2.clientPool()).isSameAs(clientPool1.clientPool());
+    assertThat(clientPool2.clientPool()).isNotSameAs(clientPool1.clientPool());
   }
 }
