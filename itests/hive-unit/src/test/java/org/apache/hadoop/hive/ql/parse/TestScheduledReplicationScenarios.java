@@ -95,6 +95,8 @@ public class TestScheduledReplicationScenarios extends BaseReplicationScenariosA
       put("hive.support.concurrency", "true");
       put("hive.txn.manager", "org.apache.hadoop.hive.ql.lockmgr.DbTxnManager");
       put("hive.metastore.client.capability.check", "false");
+      //TODO: HIVE-28044: Replication tests to run on Tez
+      put(HiveConf.ConfVars.HIVE_EXECUTION_ENGINE.varname, "mr");
       put("hive.repl.bootstrap.dump.open.txn.timeout", "1s");
       put("hive.strict.checks.bucketing", "false");
       put("hive.mapred.mode", "nonstrict");
