@@ -729,7 +729,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
     if (snapshotRef != null) {
       delete.toBranch(HiveUtils.getTableSnapshotRef(snapshotRef));
     }
-    delete.deleteFromRowFilter(Expressions.alwaysTrue());
+    delete.deleteFromRowFilter(finalExp);
     delete.commit();
     context.putToProperties("truncateSkipDataDeletion", "true");
   }
