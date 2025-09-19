@@ -125,13 +125,13 @@ class PropertyGetRequest
                 case 4:
                     if ($ftype == TType::LST) {
                         $this->mapSelection = array();
-                        $_size1340 = 0;
-                        $_etype1343 = 0;
-                        $xfer += $input->readListBegin($_etype1343, $_size1340);
-                        for ($_i1344 = 0; $_i1344 < $_size1340; ++$_i1344) {
-                            $elem1345 = null;
-                            $xfer += $input->readString($elem1345);
-                            $this->mapSelection []= $elem1345;
+                        $_size1326 = 0;
+                        $_etype1329 = 0;
+                        $xfer += $input->readListBegin($_etype1329, $_size1326);
+                        for ($_i1330 = 0; $_i1330 < $_size1326; ++$_i1330) {
+                            $elem1331 = null;
+                            $xfer += $input->readString($elem1331);
+                            $this->mapSelection []= $elem1331;
                         }
                         $xfer += $input->readListEnd();
                     } else {
@@ -173,8 +173,8 @@ class PropertyGetRequest
             }
             $xfer += $output->writeFieldBegin('mapSelection', TType::LST, 4);
             $output->writeListBegin(TType::STRING, count($this->mapSelection));
-            foreach ($this->mapSelection as $iter1346) {
-                $xfer += $output->writeString($iter1346);
+            foreach ($this->mapSelection as $iter1332) {
+                $xfer += $output->writeString($iter1332);
             }
             $output->writeListEnd();
             $xfer += $output->writeFieldEnd();

@@ -2347,34 +2347,6 @@ public class CachedStore implements RawStore, Configurable {
     return succ;
   }
 
-  @Override public boolean deleteTableColumnStatistics(String catName, String dbName, String tblName, List<String> colNames, String engine)
-          throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
-    if (!CacheUtils.HIVE_ENGINE.equals(engine)) {
-      throw new RuntimeException("CachedStore can only be enabled for Hive engine");
-    }
-    boolean succ = rawStore.deleteTableColumnStatistics(catName, dbName, tblName, colNames, engine);
-    // in case of event based cache update, cache is updated during commit txn
-    if (succ && !canUseEvents) {
-      catName = normalizeIdentifier(catName);
-      dbName = normalizeIdentifier(dbName);
-      tblName = normalizeIdentifier(tblName);
-      if (!shouldCacheTable(catName, dbName, tblName)) {
-        return succ;
-      }
-
-      if (colNames == null || colNames.isEmpty()) {
-        colNames = getTable(catName, dbName, tblName)
-                .getSd().getCols().stream().map(FieldSchema::getName)
-                .collect(Collectors.toList());
-      }
-      for (String colName : colNames) {
-        sharedCache.removeTableColStatsFromCache(catName, dbName, tblName, colName);
-      }
-    }
-    return succ;
-  }
-
-
   @Override public Map<String, String> updatePartitionColumnStatistics(ColumnStatistics colStats, List<String> partVals,
                                                                        String validWriteIds, long writeId)
           throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
@@ -2459,37 +2431,6 @@ public class CachedStore implements RawStore, Configurable {
     }
     return succ;
   }
-
-  @Override public boolean deletePartitionColumnStatistics(String catName, String dbName, String tblName,
-                                                           List<String> partNames, List<String> colNames, String engine)
-          throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
-    if (!CacheUtils.HIVE_ENGINE.equals(engine)) {
-      throw new RuntimeException("CachedStore can only be enabled for Hive engine");
-    }
-    boolean succ = rawStore.deletePartitionColumnStatistics(catName, dbName, tblName, partNames, colNames, engine);
-    // in case of event based cache update, cache is updated during commit txn.
-    if (succ && !canUseEvents) {
-      catName = normalizeIdentifier(catName);
-      dbName = normalizeIdentifier(dbName);
-      tblName = normalizeIdentifier(tblName);
-      if (!shouldCacheTable(catName, dbName, tblName)) {
-        return succ;
-      }
-      Table table = rawStore.getTable(catName, dbName, tblName);
-      if (colNames == null || colNames.isEmpty()) {
-        colNames = table.getSd().getCols().stream().map(FieldSchema::getName)
-                .collect(Collectors.toList());
-      }
-      for (String partName : partNames) {
-        List<String> partVals = getPartValsFromName(table, partName);
-        for (String colName : colNames) {
-          sharedCache.removePartitionColStatsFromCache(catName, dbName, tblName, partVals, colName);
-        }
-      }
-    }
-    return succ;
-  }
-
 
   @Override public AggrStats get_aggr_stats_for(String catName, String dbName, String tblName, List<String> partNames,
       List<String> colNames, String engine) throws MetaException, NoSuchObjectException {

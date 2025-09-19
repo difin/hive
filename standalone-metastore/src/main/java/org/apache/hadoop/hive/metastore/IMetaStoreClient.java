@@ -2701,23 +2701,10 @@ public interface IMetaStoreClient {
    * @throws MetaException error accessing the RDBMS
    * @throws TException thrift transport error
    * @throws InvalidInputException input is invalid or null.
-   * @deprecated Use
-   * {@link IMetaStoreClient#deleteColumnStatistics(org.apache.hadoop.hive.metastore.api.DeleteColumnStatisticsRequest)} instead
    */
-  @Deprecated
-  default boolean deletePartitionColumnStatistics(String dbName, String tableName,
-                                                  String partName, String colName, String engine) throws NoSuchObjectException, MetaException,
-          InvalidObjectException, TException, InvalidInputException {
-    DeleteColumnStatisticsRequest request = new DeleteColumnStatisticsRequest(dbName, tableName);
-    request.setEngine(engine);
-    if (colName != null) {
-      request.addToCol_names(colName);
-    }
-    if (partName != null) {
-      request.addToPart_names(partName);
-    }
-    return deleteColumnStatistics(request);
-  }
+  boolean deletePartitionColumnStatistics(String dbName, String tableName,
+      String partName, String colName, String engine) throws NoSuchObjectException, MetaException,
+      InvalidObjectException, TException, InvalidInputException;
 
   /**
    * Delete partition level column statistics given dbName, tableName, partName and colName, or
@@ -2734,24 +2721,10 @@ public interface IMetaStoreClient {
    * @throws MetaException error accessing the RDBMS
    * @throws TException thrift transport error
    * @throws InvalidInputException input is invalid or null.
-   * @deprecated Use
-   *    {@link IMetaStoreClient#deleteColumnStatistics(org.apache.hadoop.hive.metastore.api.DeleteColumnStatisticsRequest)} instead
    */
-  @Deprecated
-  default boolean deletePartitionColumnStatistics(String catName, String dbName, String tableName,
-                                                  String partName, String colName, String engine)
-          throws NoSuchObjectException, MetaException, InvalidObjectException, TException, InvalidInputException {
-    DeleteColumnStatisticsRequest request = new DeleteColumnStatisticsRequest(dbName, tableName);
-    request.setCat_name(catName);
-    request.setEngine(engine);
-    if (colName != null) {
-      request.addToCol_names(colName);
-    }
-    if (partName != null) {
-      request.addToPart_names(partName);
-    }
-    return deleteColumnStatistics(request);
-  }
+  boolean deletePartitionColumnStatistics(String catName, String dbName, String tableName,
+      String partName, String colName, String engine)
+      throws NoSuchObjectException, MetaException, InvalidObjectException, TException, InvalidInputException;
 
   /**
    * Delete table level column statistics given dbName, tableName and colName, or all columns in
@@ -2766,20 +2739,9 @@ public interface IMetaStoreClient {
    * @throws InvalidObjectException error dropping the stats
    * @throws TException thrift transport error
    * @throws InvalidInputException bad input, like a null table name.
-   * @deprecated Use
-   *    {@link IMetaStoreClient#deleteColumnStatistics(org.apache.hadoop.hive.metastore.api.DeleteColumnStatisticsRequest)} instead
    */
-  @Deprecated
-  default boolean deleteTableColumnStatistics(String dbName, String tableName, String colName, String engine) throws
-          NoSuchObjectException, MetaException, InvalidObjectException, TException, InvalidInputException {
-    DeleteColumnStatisticsRequest request = new DeleteColumnStatisticsRequest(dbName, tableName);
-    request.setEngine(engine);
-    if (colName != null) {
-      request.addToCol_names(colName);
-    }
-    request.setTableLevel(true);
-    return deleteColumnStatistics(request);
-  }
+  boolean deleteTableColumnStatistics(String dbName, String tableName, String colName, String engine) throws
+      NoSuchObjectException, MetaException, InvalidObjectException, TException, InvalidInputException;
 
   /**
    * Delete table level column statistics given dbName, tableName and colName, or all columns in
@@ -2795,33 +2757,10 @@ public interface IMetaStoreClient {
    * @throws InvalidObjectException error dropping the stats
    * @throws TException thrift transport error
    * @throws InvalidInputException bad input, like a null table name.
-   * @deprecated Use
-   *    {@link IMetaStoreClient#deleteColumnStatistics(org.apache.hadoop.hive.metastore.api.DeleteColumnStatisticsRequest)} instead
    */
-  @Deprecated
-  default boolean deleteTableColumnStatistics(String catName, String dbName, String tableName, String colName, String engine)
-          throws NoSuchObjectException, MetaException, InvalidObjectException, TException, InvalidInputException {
-    DeleteColumnStatisticsRequest request = new DeleteColumnStatisticsRequest(dbName, tableName);
-    request.setCat_name(catName);
-    request.setEngine(engine);
-    if (colName != null) {
-      request.addToCol_names(colName);
-    }
-    request.setTableLevel(true);
-    return deleteColumnStatistics(request);
-  }
+  boolean deleteTableColumnStatistics(String catName, String dbName, String tableName, String colName, String engine)
+      throws NoSuchObjectException, MetaException, InvalidObjectException, TException, InvalidInputException;
 
-  /**
-   * Delete table or partition level column statistics given catName, dbName, tableName, partName and colNames,
-   * or all columns in a table or partition.
-   * This should be used for tables or partitions
-   * @param req the DeleteColumnStatisticsRequest which including
-   *            catalog name, database name, table name, partition name(optional),
-   *            a list column names(optional), and engine name
-   * @return boolean indicating the outcome of the operation
-   * @throws TException thrift transport error
-   */
-  public boolean deleteColumnStatistics(DeleteColumnStatisticsRequest req) throws TException;
   void updateTransactionalStatistics(UpdateTransactionalStatsRequest req) throws TException;
 
   /**
