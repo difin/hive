@@ -42,20 +42,20 @@ STAGE PLANS:
                           minReductionHashAggr: 0.99
                           mode: hash
                           outputColumnNames: _col0, _col1, _col2
-                          Statistics: Num rows: 15840066266 Data size: 2012360891584 Basic stats: COMPLETE Column stats: COMPLETE
+                          Statistics: Num rows: 7920033133 Data size: 1006180445792 Basic stats: COMPLETE Column stats: COMPLETE
                           Reduce Output Operator
                             key expressions: _col0 (type: bigint), _col1 (type: bigint)
                             null sort order: zz
                             sort order: ++
                             Map-reduce partition columns: _col0 (type: bigint), _col1 (type: bigint)
-                            Statistics: Num rows: 15840066266 Data size: 2012360891584 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 7920033133 Data size: 1006180445792 Basic stats: COMPLETE Column stats: COMPLETE
                             value expressions: _col2 (type: decimal(17,2))
                           Reduce Output Operator
                             key expressions: _col0 (type: bigint), _col1 (type: bigint)
                             null sort order: zz
                             sort order: ++
                             Map-reduce partition columns: _col0 (type: bigint)
-                            Statistics: Num rows: 15840066266 Data size: 2012360891584 Basic stats: COMPLETE Column stats: COMPLETE
+                            Statistics: Num rows: 7920033133 Data size: 1006180445792 Basic stats: COMPLETE Column stats: COMPLETE
                             value expressions: _col2 (type: decimal(17,2))
             Execution mode: vectorized, llap
             LLAP IO: may be used (ACID table)
