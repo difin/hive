@@ -22,7 +22,7 @@
 
   <groupId>org.apache.hive</groupId>
   <artifactId>hive-standalone-metastore</artifactId>
-  <version>3.1.3000.2025.0.20.0-SNAPSHOT</version>
+  <version>3.1.3000.7.3.2.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Hive Standalone Metastore</name>
 
@@ -57,7 +57,7 @@
     <!-- Dependency versions -->
     <aircompressor.version>0.27</aircompressor.version>
     <antlr.version>4.9.3</antlr.version>
-    <avro.version>1.11.3.2025.0.20.0-SNAPSHOT</avro.version>
+    <avro.version>1.11.1.7.3.2.0-SNAPSHOT</avro.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
     <apache-directory-server.version>1.5.7</apache-directory-server.version>
     <caffeine.version>2.8.4</caffeine.version>
@@ -80,27 +80,27 @@
     <guava.version>32.1.2-jre</guava.version>
     <hadoop.version>3.4.1.7.3.2.0-SNAPSHOT</hadoop.version>
     <hikaricp.version>2.6.1</hikaricp.version>
-    <jackson.version>2.15.0</jackson.version>
+    <jackson.version>2.15.3</jackson.version>
     <javolution.version>5.5.1</javolution.version>
     <jetty.version>9.4.57.v20241219</jetty.version>
     <jexl.version>3.3</jexl.version>
     <junit.version>4.13.2</junit.version>
     <junit.jupiter.version>5.6.2</junit.jupiter.version>
     <junit.vintage.version>5.6.3</junit.vintage.version>
-    <jwt.provider.api.version>0.10.0.0.1.0-b8</jwt.provider.api.version>
+    <jwt.provider.api.version>0.10.0.0.1.0-b14</jwt.provider.api.version>
     <libfb303.version>0.9.3</libfb303.version>
     <libthrift.version>0.16.0</libthrift.version>
     <log4j2.version>2.18.0</log4j2.version>
     <mockito-core.version>3.4.4</mockito-core.version>
     <nimbus-jose-jwt.version>10.4.2</nimbus-jose-jwt.version>
-    <orc.version>1.8.3.2025.0.20.0-SNAPSHOT</orc.version>
+    <orc.version>1.8.3.7.3.2.0-SNAPSHOT</orc.version>
     <protobuf.version>2.5.0</protobuf.version>
     <sqlline.version>1.9.0</sqlline.version>
     <jline.version>2.14.6</jline.version>
-    <storage-api.version>3.1.3000.2025.0.20.0-SNAPSHOT</storage-api.version>
+    <storage-api.version>3.1.3000.7.3.2.0-SNAPSHOT</storage-api.version>
     <ST4.version>4.0.8</ST4.version>
-    <zookeeper.version>3.8.1.7.3.1.200-90</zookeeper.version>
-    <curator.version>5.4.0.7.3.1.200-90</curator.version>
+    <zookeeper.version>3.8.1.7.3.2.0-SNAPSHOT</zookeeper.version>
+    <curator.version>5.4.0.7.3.2.0-SNAPSHOT</curator.version>
     <cron-utils.version>9.1.6</cron-utils.version>
     <httpcomponents.core.version>4.4.13</httpcomponents.core.version>
     <spring.version>5.3.39-cloudera-5.3.44</spring.version>    <!-- Thrift properties -->
