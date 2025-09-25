@@ -6037,7 +6037,7 @@ WHERE "r_reason_sk" IS NOT NULL) AS "t4" ON "t1"."wr_reason_sk" = "t4"."r_reason
 INNER JOIN (SELECT "ca_address_sk", "ca_state" IN ('IN', 'NJ', 'OH') AS "EXPR$0", "ca_state" IN ('CT', 'KY', 'WI') AS "EXPR$1", "ca_state" IN ('AR', 'IA', 'LA') AS "EXPR$2"
 FROM (SELECT "ca_address_sk", "ca_state", "ca_country"
 FROM "CUSTOMER_ADDRESS") AS "t5"
-WHERE "ca_country" = 'United States' AND "ca_state" IN ('AR', 'CT', 'IA', 'IN', 'KY', 'LA', 'NJ', 'OH', 'WI') AND "ca_address_sk" IS NOT NULL) AS "t7" ON "t1"."wr_refunded_addr_sk" = "t7"."ca_address_sk"
+WHERE "ca_state" IN ('AR', 'CT', 'IA', 'IN', 'KY', 'LA', 'NJ', 'OH', 'WI') AND "ca_country" = 'United States' AND "ca_address_sk" IS NOT NULL) AS "t7" ON "t1"."wr_refunded_addr_sk" = "t7"."ca_address_sk"
 INNER JOIN (SELECT "cd_demo_sk", "cd_marital_status", "cd_education_status", "cd_marital_status" = 'M' AS "EXPR$0", "cd_education_status" = 'Advanced Degree' AS "EXPR$1", "cd_marital_status" = 'S' AS "EXPR$2", "cd_education_status" = 'College' AS "EXPR$3", "cd_marital_status" = 'W' AS "EXPR$4", "cd_education_status" = '2 yr Degree' AS "EXPR$5"
 FROM (SELECT "cd_demo_sk", "cd_marital_status", "cd_education_status"
 FROM "CUSTOMER_DEMOGRAPHICS") AS "t8"
