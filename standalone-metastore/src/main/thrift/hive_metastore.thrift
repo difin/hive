@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.53"
+const string HMS_API = "1.2.54"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -2402,6 +2402,16 @@ struct GetAllWriteEventInfoRequest {
   3: optional string tableName
 }
 
+struct DeleteColumnStatisticsRequest {
+  1: optional string cat_name,
+  2: required string db_name,
+  3: required string tbl_name,
+  4: optional list<string> part_names,
+  5: optional list<string> col_names,
+  6: optional string engine = "hive",
+  7: optional bool tableLevel = false
+}
+
 struct PropertySetRequest {
     1: required string nameSpace;
     2: map<string, string> propertyMap;
@@ -2905,6 +2915,9 @@ service ThriftHiveMetastore extends fb303.FacebookService
               (1:NoSuchObjectException o1, 2:MetaException o2, 3:InvalidObjectException o3,
                4:InvalidInputException o4)
 
+  bool delete_column_statistics_req(1: DeleteColumnStatisticsRequest req) throws
+              (1:NoSuchObjectException o1, 2:MetaException o2, 3:InvalidObjectException o3,
+               4:InvalidInputException o4)
   //
   // user-defined functions
   //
