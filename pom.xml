@@ -121,7 +121,7 @@
     <!-- httpcomponents are not always in version sync -->
     <httpcomponents.client.version>4.5.13</httpcomponents.client.version>
     <httpcomponents.core.version>4.4.13</httpcomponents.core.version>
-    <impala.version>4.4.0.7.3.2.0-SNAPSHOT</impala.version>
+    <impala.version>4.5.0.7.3.2.0-SNAPSHOT</impala.version>
     <immutables.version>2.9.2</immutables.version>
     <ivy.version>2.5.2</ivy.version>
     <jackson.version>2.15.3</jackson.version>
