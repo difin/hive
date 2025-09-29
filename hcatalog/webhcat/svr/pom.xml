@@ -122,9 +122,12 @@
       <version>${jersey-wadl-doclet.version}</version>
     </dependency>
     <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
-      <version>${jaxb-runtime.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -286,7 +289,6 @@
                 <docletArtifact>
                   <groupId>org.glassfish.jaxb</groupId>
                   <artifactId>jaxb-runtime</artifactId>
-                  <version>${jaxb-runtime.version}</version>
                 </docletArtifact>
               </docletArtifacts>
               <additionalOptions>
