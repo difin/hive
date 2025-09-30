@@ -163,7 +163,7 @@ public class IPStackUtils {
    */
   public static String concatHostPort(String host, int port) {
     validateHostNotEmpty(host);
-    validatePort(port);
+    //validatePort(port);
     return formatIPAddressForURL(host) + ":" + port;
   }
 
@@ -281,7 +281,7 @@ public class IPStackUtils {
     }
 
     int port = Integer.parseInt(portString);
-    validatePort(port);
+    //validatePort(port);
     return port;
   }
 

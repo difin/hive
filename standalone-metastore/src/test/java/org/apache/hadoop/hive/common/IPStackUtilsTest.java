@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.common;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -179,6 +180,7 @@ public class IPStackUtilsTest {
     assertEquals(80, result.getPort());
   }
 
+  @Ignore("CDPD-90935: validate port needs to be disabled")
   @Test
   public void testGetHostPortWithInvalidAndPort() {
     // Test case: port number out of range
@@ -215,6 +217,7 @@ public class IPStackUtilsTest {
     assertEquals(0, IPStackUtils.getPort("0"));
   }
 
+  @Ignore("CDPD-90935: validate port needs to be disabled")
   @Test
   public void testGetPortWithInvalidPort() {
     // Test case: port number too high
