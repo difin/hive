@@ -85,7 +85,6 @@ public class TestLlapZookeeperRegistryImpl {
     curatorFramework = CuratorFrameworkFactory.
             builder().
             connectString(server.getConnectString()).
-            sessionTimeoutMs(1000).
             retryPolicy(new RetryOneTime(1000)).
             build();
     curatorFramework.start();

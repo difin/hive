@@ -761,16 +761,19 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
         .setDaemon(true).setNameFormat("StateChangeNotificationHandler").build());
     long startTimeNs = System.nanoTime(), deltaNs = clusterReadyTimeoutMs * 1_000_000L;
     long sleepTimeMs = Math.min(16, clusterReadyTimeoutMs);
-    instancesCache = TreeCache.newBuilder(zooKeeperClient, registryPrefix)
-                              .setCacheData(true)
-                              .setCreateParentNodes(true)
-                              .build();
+
     // This latch signals the end of initialization of the cache.
     CountDownLatch initiationLatch = new CountDownLatch(1);
-    instancesCache.getListenable().addListener(new InstanceStateChangeListener(initiationLatch), tp);
     // start the cache
     while (true) {
       try {
+        instancesCache = TreeCache.newBuilder(zooKeeperClient, registryPrefix)
+                .setCacheData(true)
+                .setCreateParentNodes(true)
+                .build();
+
+        instancesCache.getListenable().addListener(new InstanceStateChangeListener(initiationLatch), tp);
+
         instancesCache.start();
         this.instancesCache = instancesCache;
         int timeout = zooKeeperClient.getZookeeperClient().getConnectionTimeoutMs();
