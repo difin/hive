@@ -664,7 +664,7 @@ public class HiveCalciteUtil {
                                                               }
                                                             };
 
-  public static ImmutableList<RexNode> getPredsNotPushedAlready(RelNode inp, List<RexNode> predsToPushDown) {   
+  public static ImmutableList<RexNode> getPredsNotPushedAlready(RelNode inp, List<RexNode> predsToPushDown) {
     return getPredsNotPushedAlready(Sets.<String>newHashSet(), inp, predsToPushDown);
   }
 
@@ -1291,6 +1291,22 @@ public class HiveCalciteUtil {
         return super.visitCall(call);
       }
     }
+  }
+
+  public static boolean hasAllExpressionsFromRightSide(RelNode joinRel, List<RexNode> expressions) {
+    List<RelDataTypeField> joinFields = joinRel.getRowType().getFieldList();
+    int nTotalFields = joinFields.size();
+    List<RelDataTypeField> leftFields = (joinRel.getInputs().get(0)).getRowType().getFieldList();
+    int nFieldsLeft = leftFields.size();
+    ImmutableBitSet rightBitmap = ImmutableBitSet.range(nFieldsLeft, nTotalFields);
+
+    for (RexNode node : expressions) {
+      ImmutableBitSet inputBits = RelOptUtil.InputFinder.bits(node);
+      if (!rightBitmap.contains(inputBits)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
