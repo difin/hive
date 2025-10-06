@@ -1850,6 +1850,7 @@
         <module>llap-server</module>
         <module>kudu-handler</module>
         <module>testutils</module>
+        <module>upgrade-acid</module>
         <module>kafka-handler</module>
         <module>packaging</module>
       </modules>
