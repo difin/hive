@@ -239,7 +239,7 @@ class SchemaToolTaskValidate extends SchemaToolTask {
     // need to consider the case that db version might be larger than current Hive Version
     String hiveVersion = schemaTool.getMetaStoreSchemaInfo().getHiveSchemaVersion();
     String schemaFile = new File(schemaTool.getMetaStoreSchemaInfo().getMetaStoreScriptDir(),
-        schemaTool.getMetaStoreSchemaInfo().generateInitFileName(hiveVersion)).getPath();
+        schemaTool.getMetaStoreSchemaInfo().generateInitFileName(hiveVersion, false)).getPath();
 
     try {
       LOG.debug("Parsing schema script " + schemaFile);

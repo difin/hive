@@ -49,10 +49,11 @@ public interface IMetaStoreSchemaInfo {
    * Get the name of the script to initialize the schema for given version
    *
    * @param toVersion Target version. If it's null, then the current server version is used
+   * @param validateTestPath flag to control the file validation check either for test use case or schema tool
    * @return
    * @throws HiveMetaException
    */
-  String generateInitFileName(String toVersion) throws HiveMetaException;
+  String generateInitFileName(String toVersion, boolean validateTestPath) throws HiveMetaException;
 
   /**
    * Get SQL script that will create the user and database for Metastore to use.
@@ -67,6 +68,13 @@ public interface IMetaStoreSchemaInfo {
    * @return the path of directory where the sql scripts are
    */
   String getMetaStoreScriptDir();
+
+  /**
+   * Find the directory of metastore scripts when being fetched from test class path
+   *
+   * @return the path of directory where the sql scripts are located inside test class path
+   */
+  String getMetaStoreScriptDirFromTestClasspath();
 
   /**
    * Get the pre-upgrade script for a given script name. Schema tool runs the pre-upgrade scripts

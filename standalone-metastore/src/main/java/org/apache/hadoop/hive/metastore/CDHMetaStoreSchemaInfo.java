@@ -163,13 +163,13 @@ public class CDHMetaStoreSchemaInfo extends MetaStoreSchemaInfo {
    * @throws HiveMetaException
    */
   @Override
-  public String generateInitFileName(String toVersion) throws HiveMetaException {
+  public String generateInitFileName(String toVersion, boolean validateTestPath) throws HiveMetaException {
     if (toVersion == null) {
       toVersion = getHiveSchemaVersion();
     }
 
     toVersion = getMajorVersion(toVersion);
-    return super.generateInitFileName(toVersion);
+    return super.generateInitFileName(toVersion, validateTestPath);
   }
 
   // format the upgrade script name eg upgrade-x-y-dbType.sql

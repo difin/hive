@@ -122,6 +122,11 @@ public abstract class HMSTestBase {
           "scripts" + File.separatorChar + "metastore" +
           File.separatorChar + "upgrade" + File.separatorChar + dbType;
     }
+    @Override
+    public String getMetaStoreScriptDirFromTestClasspath() {
+      return "scripts" + File.separatorChar + "metastore" + File.separatorChar + 
+              "upgrade" + File.separatorChar + dbType;
+    }
   }
 
   @Rule

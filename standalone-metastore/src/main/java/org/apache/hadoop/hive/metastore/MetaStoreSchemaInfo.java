@@ -127,14 +127,17 @@ public class MetaStoreSchemaInfo implements IMetaStoreSchemaInfo {
    * @throws HiveMetaException
    */
   @Override
-  public String generateInitFileName(String toVersion) throws HiveMetaException {
+  public String generateInitFileName(String toVersion, boolean validateTestPath) throws HiveMetaException {
     if (toVersion == null) {
       toVersion = getHiveSchemaVersion();
     }
     String initScriptName = INIT_FILE_PREFIX + toVersion + "." +
         dbType + SQL_FILE_EXTENSION;
     // check if the file exists
-    if (!(new File(getMetaStoreScriptDir() + File.separatorChar +
+    if (validateTestPath && (MetaStoreSchemaInfo.class.getClassLoader().getResourceAsStream(
+            getMetaStoreScriptDirFromTestClasspath() + File.separatorChar + initScriptName) == null)) {
+      throw new HiveMetaException("Metastore schema script file not found on test classpath of version: " + toVersion);
+    } else if (!validateTestPath && !(new File(getMetaStoreScriptDir() + File.separatorChar +
           initScriptName).exists())) {
       throw new HiveMetaException("Unknown version specified for initialization: " + toVersion);
     }
@@ -161,6 +164,11 @@ public class MetaStoreSchemaInfo implements IMetaStoreSchemaInfo {
     return  metastoreHome + File.separatorChar +
      "scripts" + File.separatorChar + "metastore" +
     File.separatorChar + "upgrade" + File.separatorChar + dbType;
+  }
+  
+  @Override
+  public String getMetaStoreScriptDirFromTestClasspath() {
+    return "sql" + File.separatorChar + dbType;
   }
 
   // format the upgrade script name eg upgrade-x-y-dbType.sql

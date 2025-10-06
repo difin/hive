@@ -171,9 +171,9 @@ public final class TestTxnDbUtil {
       String schemaRootPath = getSchemaRootPath();
       IMetaStoreSchemaInfo metaStoreSchemaInfo =
           MetaStoreSchemaInfoFactory.get(conf, schemaRootPath, getHiveSchemaPostfix(dbProduct));
-      String initFile = metaStoreSchemaInfo.generateInitFileName(null);
-      try (InputStream is = new FileInputStream(
-          metaStoreSchemaInfo.getMetaStoreScriptDir() + File.separator + initFile)) {
+      String initFile = metaStoreSchemaInfo.generateInitFileName(null, true);
+      try (InputStream is = TestTxnDbUtil.class.getClassLoader().getResourceAsStream(
+              metaStoreSchemaInfo.getMetaStoreScriptDirFromTestClasspath() + File.separatorChar + initFile)) {
         LOG.info("Reinitializing the metastore db with {} on the database {}", initFile,
             MetastoreConf.getVar(conf, ConfVars.CONNECT_URL_KEY));
         importSQL(stmt, is);

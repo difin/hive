@@ -54,7 +54,7 @@ class SchemaToolTaskInit extends SchemaToolTask {
     System.out.println("Starting metastore schema initialization to " + toVersion);
 
     String initScriptDir = schemaTool.getMetaStoreSchemaInfo().getMetaStoreScriptDir();
-    String initScriptFile = schemaTool.getMetaStoreSchemaInfo().generateInitFileName(toVersion);
+    String initScriptFile = schemaTool.getMetaStoreSchemaInfo().generateInitFileName(toVersion, false);
 
     try {
       System.out.println("Initialization script " + initScriptFile);
