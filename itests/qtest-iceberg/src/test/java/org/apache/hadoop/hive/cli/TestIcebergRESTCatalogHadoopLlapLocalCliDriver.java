@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,19 +47,23 @@ import java.util.stream.Stream;
 
 /**
  * LLAP CLI qtests with {@code HiveRESTCatalogClient}; REST catalog is
- * {@link org.apache.hive.iceberg.it.NativeIcebergRESTCatalogServer} (no {@code hive-hms-catalog}).
+ * {@link org.apache.hive.iceberg.it.NativeIcebergRESTCatalogServer} (Jetty + {@code HadoopCatalog}).
+ *
+ * <p>Downstream uses this in place of upstream tests that run against an HMS-backed Iceberg REST
+ * catalog ({@code hive-hms-catalog}).
  */
 @RunWith(Parameterized.class)
-public class TestIcebergRESTCatalogLlapLocalCliDriver {
+public class TestIcebergRESTCatalogHadoopLlapLocalCliDriver {
 
   private static final Logger LOG = LoggerFactory.getLogger(
-      org.apache.hadoop.hive.cli.TestIcebergRESTCatalogLlapLocalCliDriver.class);
+      TestIcebergRESTCatalogHadoopLlapLocalCliDriver.class);
   private static final String CATALOG_NAME = "ice01";
-  private static final CliAdapter adapter = new CliConfigs.TestIcebergRESTCatalogLlapLocalCliDriver().getCliAdapter();
-  
+  private static final CliAdapter CLI_ADAPTER =
+      new CliConfigs.TestIcebergRESTCatalogHadoopLlapLocalCliDriver().getCliAdapter();
+
   private final String name;
   private final File qfile;
-  
+
   public static final HiveRESTCatalogServerExtension REST_CATALOG_EXTENSION =
       HiveRESTCatalogServerExtension.builder(HiveRESTCatalogServerExtension.AuthType.NONE).build();
 
@@ -67,17 +71,17 @@ public class TestIcebergRESTCatalogLlapLocalCliDriver {
   @ClassRule
   public static final TestRule cliClassRule = RuleChain
       .outerRule(REST_CATALOG_EXTENSION)
-      .around(adapter.buildClassRule());
+      .around(CLI_ADAPTER.buildClassRule());
 
   @Rule
-  public final TestRule cliTestRule = adapter.buildTestRule();
+  public final TestRule cliTestRule = CLI_ADAPTER.buildTestRule();
 
   @Parameters(name = "{0}")
   public static List<Object[]> getParameters() throws Exception {
-    return adapter.getParameters();
+    return CLI_ADAPTER.getParameters();
   }
 
-  public TestIcebergRESTCatalogLlapLocalCliDriver(String name, File qfile) {
+  public TestIcebergRESTCatalogHadoopLlapLocalCliDriver(String name, File qfile) {
     this.name = name;
     this.qfile = qfile;
   }
@@ -117,6 +121,6 @@ public class TestIcebergRESTCatalogLlapLocalCliDriver {
 
   @Test
   public void testCliDriver() throws Exception {
-    adapter.runTest(name, qfile);
+    CLI_ADAPTER.runTest(name, qfile);
   }
 }
