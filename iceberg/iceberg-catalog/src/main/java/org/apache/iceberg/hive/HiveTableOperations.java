@@ -314,7 +314,7 @@ public class HiveTableOperations extends BaseMetastoreTableOperations
       throw new CommitFailedException(e);
 
     } finally {
-      cleanupMetadataAndUnlock(commitStatus, newMetadataLocation, lock);
+      HiveOperationsBase.cleanupMetadataAndUnlock(io(), commitStatus.name(), newMetadataLocation, lock);
     }
 
     LOG.info("Committed to table {} with the new metadata location {}", fullName, newMetadataLocation);
@@ -502,25 +502,6 @@ public class HiveTableOperations extends BaseMetastoreTableOperations
       return hiveActor.clientPool();
     }
     return null;
-  }
-
-  private void cleanupMetadataAndUnlock(CommitStatus commitStatus, String metadataLocation,
-                                        HiveLock lock) {
-    try {
-      HiveOperationsBase.cleanupMetadata(io(), commitStatus.name(), metadataLocation);
-    } finally {
-      doUnlock(lock);
-    }
-  }
-
-  void doUnlock(HiveLock lock) {
-    if (lock != null) {
-      try {
-        lock.unlock();
-      } catch (Exception e) {
-        LOG.warn("Failed to unlock {}.{}", database, tableName, e);
-      }
-    }
   }
 
   /**

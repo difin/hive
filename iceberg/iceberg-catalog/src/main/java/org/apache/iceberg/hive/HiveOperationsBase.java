@@ -149,6 +149,18 @@ public interface HiveOperationsBase {
     }
   }
 
+  static void cleanupMetadataAndUnlock(
+          FileIO io,
+          String commitStatus,
+          String metadataLocation,
+          HiveLock lock) {
+    try {
+      cleanupMetadata(io, commitStatus, metadataLocation);
+    } finally {
+      lock.unlock();
+    }
+  }
+
   default Table newHmsTable(String hmsTableOwner) {
     Preconditions.checkNotNull(hmsTableOwner, "'hmsOwner' parameter can't be null");
     final long currentTimeMillis = System.currentTimeMillis();
