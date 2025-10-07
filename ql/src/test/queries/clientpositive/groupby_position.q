@@ -1,7 +1,6 @@
 --! qt:dataset:src1
 --! qt:dataset:src
 set hive.mapred.mode=nonstrict;
-set hive.runtime.dialect.enable=false;
 set hive.groupby.orderby.position.alias=true;
 
 CREATE TABLE testTable1(key INT, value STRING) STORED AS TEXTFILE;

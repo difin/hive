@@ -1,5 +1,4 @@
 --! qt:dataset:src
-set hive.runtime.dialect.enable=false;
 set hive.groupby.orderby.position.alias=true;
 
 -- invalid position alias in group by

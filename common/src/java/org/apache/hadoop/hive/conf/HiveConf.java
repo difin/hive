@@ -1923,7 +1923,7 @@ public class HiveConf extends Configuration {
         "Whether to collect cache statistics in PTFValueCache. On extremely hot codepaths, this can be expensive, "
             + "so it's disabled by default. It's only for development/debugging purposes, "
             + "execution engine doesn't take advantage of statistics stored in the cache."),
-    HIVE_USE_RUNTIME_DIALECT("hive.runtime.dialect.enable", true,
+    HIVE_USE_RUNTIME_DIALECT("hive.runtime.dialect.enable", false,
         "Flag to use SQL dialect specific to the runtime that is currently being selected."),
 
     // CBO related
