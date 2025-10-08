@@ -1,6 +1,6 @@
 --! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
 
---! qt:database:postgres:q_test_country_table_with_schema.postgres.sql
+--! qt:database:postgres:qdb:q_test_country_table_with_schema.postgres.sql
 -- Postgres allows multiple schemas per database so to disambiguate between tables in different schemas it
 -- is necessary to set the hive.sql.schema property properly.
 
@@ -13,9 +13,9 @@ STORED BY 'org.apache.hive.storage.jdbc.JdbcStorageHandler'
 TBLPROPERTIES (
     "hive.sql.database.type" = "POSTGRES",
     "hive.sql.jdbc.driver" = "org.postgresql.Driver",
-    "hive.sql.jdbc.url" = "jdbc:postgresql://localhost:5432/qtestDB",
-    "hive.sql.dbcp.username" = "qtestuser",
-    "hive.sql.dbcp.password" = "qtestpassword",
+    "hive.sql.jdbc.url" = "${system:hive.test.database.qdb.jdbc.url}",
+    "hive.sql.dbcp.username" = "${system:hive.test.database.qdb.jdbc.username}",
+    "hive.sql.dbcp.password" = "${system:hive.test.database.qdb.jdbc.password}",
     "hive.sql.schema" = "bob",
     "hive.sql.table" = "country");
 
@@ -27,9 +27,9 @@ CREATE EXTERNAL TABLE country_1 (id int, name varchar(20))
     TBLPROPERTIES (
         "hive.sql.database.type" = "POSTGRES",
         "hive.sql.jdbc.driver" = "org.postgresql.Driver",
-        "hive.sql.jdbc.url" = "jdbc:postgresql://localhost:5432/qtestDB",
-        "hive.sql.dbcp.username" = "qtestuser",
-        "hive.sql.dbcp.password" = "qtestpassword",
+        "hive.sql.jdbc.url" = "${system:hive.test.database.qdb.jdbc.url}",
+        "hive.sql.dbcp.username" = "${system:hive.test.database.qdb.jdbc.username}",
+        "hive.sql.dbcp.password" = "${system:hive.test.database.qdb.jdbc.password}",
         "hive.sql.schema" = "alice",
         "hive.sql.table" = "country");
 
@@ -43,7 +43,7 @@ CREATE EXTERNAL TABLE country_2 (id int, name varchar(20))
     TBLPROPERTIES (
         "hive.sql.database.type" = "POSTGRES",
         "hive.sql.jdbc.driver" = "org.postgresql.Driver",
-        "hive.sql.jdbc.url" = "jdbc:postgresql://localhost:5432/qtestDB",
+        "hive.sql.jdbc.url" = "${system:hive.test.database.qdb.jdbc.url}",
         "hive.sql.dbcp.username" = "greg",
         "hive.sql.dbcp.password" = "GregPass123!$",
         "hive.sql.table" = "country");

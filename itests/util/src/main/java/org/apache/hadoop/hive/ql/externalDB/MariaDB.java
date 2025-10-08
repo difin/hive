@@ -29,11 +29,16 @@ public class MariaDB extends AbstractExternalDB {
 
   @Override
   public String getJdbcUrl() {
-    return "jdbc:mariadb://" + getContainerHostAddress() + ":3309/" + dbName;
+    return "jdbc:mariadb://" + getContainerHostAddress() + ":" + getPort() + "/" + dbName;
   }
   
   public String getJdbcDriver() {
     return "org.mariadb.jdbc.Driver";
+  }
+
+  @Override
+  protected int getPort() {
+    return 3309;
   }
 
   public String getDockerImageName() {
@@ -41,7 +46,7 @@ public class MariaDB extends AbstractExternalDB {
   }
 
   public String[] getDockerAdditionalArgs() {
-    return new String[] {"-p", "3309:3306",
+    return new String[] { "-p", getPort() + ":3306",
         "-e", "MARIADB_ROOT_PASSWORD=" + getRootPassword(),
         "-e", "MARIADB_DATABASE=" + dbName,
         "-d"
