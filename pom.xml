@@ -212,6 +212,8 @@
     <!-- this property will be overwritten by Jacoco when the profile for code coverage is active -->
     <jacoco.agent.args />
     <jacoco.reportName>jacoco</jacoco.reportName>
+    <keycloak.version>26.0.6</keycloak.version>
+    <nimbus-oauth.version>11.28</nimbus-oauth.version>
   </properties>
 
   <repositories>

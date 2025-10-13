@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.metastore.RetryingMetaStoreClient;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.GetTableRequest;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.PrincipalType;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;
@@ -36,9 +37,7 @@ import org.apache.hadoop.hive.ql.metadata.Hive;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
-import org.apache.hadoop.hive.ql.stats.StatsUtils;
 import org.apache.hadoop.mapred.TextInputFormat;
-import org.apache.hadoop.util.StringUtils;
 import org.apache.iceberg.CatalogUtil;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.PartitionSpecParser;
@@ -46,19 +45,16 @@ import org.apache.iceberg.Schema;
 import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.hive.CatalogUtils;
 import org.apache.iceberg.hive.HiveSchemaUtil;
-import org.apache.hive.iceberg.it.HiveRESTCatalogServerExtension;
-import org.junit.jupiter.api.AfterAll;
+import org.apache.iceberg.rest.extension.HiveRESTCatalogServerExtension;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.RegisterExtension;
-
-import java.util.Collections;
-import java.util.Map;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -66,46 +62,45 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Integration test for {@code HiveRESTCatalogClient} against {@link org.apache.hive.iceberg.it.NativeIcebergRESTCatalogServer}
  * (Jetty + Iceberg {@code RESTCatalogAdapter} + {@code HadoopCatalog}; no {@code hive-hms-catalog}).
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class TestHiveRESTCatalogClientIT {
+public abstract class TestHiveRESTCatalogClientITBase {
 
-  private static final String DB_NAME = "ice_db";
-  private static final String TABLE_NAME = "ice_tbl";
-  private static final String CATALOG_NAME = "ice01";
-  private static final String HIVE_ICEBERG_STORAGE_HANDLER = "org.apache.iceberg.mr.hive.HiveIcebergStorageHandler";
-  
-  private Configuration conf;
-  private HiveConf hiveConf;
-  private Hive hive;
+  static final String DB_NAME = "ice_db";
+  static final String TABLE_NAME = "ice_tbl";
+  static final String CATALOG_NAME = "ice01";
+  static final String HIVE_ICEBERG_STORAGE_HANDLER = "org.apache.iceberg.mr.hive.HiveIcebergStorageHandler";
+  static final String REST_CATALOG_PREFIX = String.format("%s%s.", CatalogUtils.CATALOG_CONFIG_PREFIX, CATALOG_NAME);
 
-  private IMetaStoreClient msClient;
+  HiveConf hiveConf;
+  Configuration conf;
+  Hive hive;
+  IMetaStoreClient msClient;
 
-  @RegisterExtension
-  private static final HiveRESTCatalogServerExtension REST_CATALOG_EXTENSION =
-      HiveRESTCatalogServerExtension.builder(HiveRESTCatalogServerExtension.AuthType.NONE).build();
+  abstract HiveRESTCatalogServerExtension getHiveRESTCatalogServerExtension();
 
-  @BeforeAll
-  public void setup() throws Exception {
-    // Starting msClient with Iceberg REST Catalog client underneath
-    String restCatalogPrefix = String.format("%s%s.", CatalogUtils.CATALOG_CONFIG_PREFIX, CATALOG_NAME);
+  public void setupConf() {
+    HiveRESTCatalogServerExtension restCatalogExtension = getHiveRESTCatalogServerExtension();
 
-    conf = REST_CATALOG_EXTENSION.getConf();
+    conf = restCatalogExtension.getConf();
 
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.METASTORE_CLIENT_IMPL,
         "org.apache.iceberg.hive.client.HiveRESTCatalogClient");
     conf.set(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), CATALOG_NAME);
-    conf.set(restCatalogPrefix + "uri", REST_CATALOG_EXTENSION.getRestEndpoint());
-    conf.set(restCatalogPrefix + "type", CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
-    conf.set(restCatalogPrefix + "header.x-actor-username", System.getProperty("user.name", "anonymous"));
+    conf.set(REST_CATALOG_PREFIX + "uri", restCatalogExtension.getRestEndpoint());
+    conf.set(REST_CATALOG_PREFIX + "type", CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
+    conf.set(REST_CATALOG_PREFIX + "header.x-actor-username", System.getProperty("user.name", "anonymous"));
+  }
+
+  @BeforeEach
+  public void setup() throws Exception {
+    setupConf();
 
     HiveMetaHookLoader hookLoader = tbl -> {
-      HiveStorageHandler storageHandler;
       try {
-        storageHandler = HiveUtils.getStorageHandler(conf, HIVE_ICEBERG_STORAGE_HANDLER);
+        HiveStorageHandler storageHandler = HiveUtils.getStorageHandler(conf, HIVE_ICEBERG_STORAGE_HANDLER);
+        return storageHandler == null ? null : storageHandler.getMetaHook();
       } catch (HiveException e) {
         throw new MetaException(e.getMessage());
       }
-      return storageHandler == null ? null : storageHandler.getMetaHook();
     };
     // Use RetryingMetaStoreClient.getProxy so msClient delegates to HiveRESTCatalogClient
     // (same path as Hive.getMSC()). Raw HiveMetaStoreClient would use Thrift.
@@ -115,7 +110,8 @@ public class TestHiveRESTCatalogClientIT {
     hive = Hive.get(hiveConf);
   }
 
-  @AfterAll public void tearDown() {
+  @AfterEach
+  public void tearDown() {
     if (msClient != null) {
       msClient.close();
     }
@@ -150,7 +146,7 @@ public class TestHiveRESTCatalogClientIT {
     Assertions.assertTrue(allDbs.contains(DB_NAME));
 
     // --- Create Table ---
-    org.apache.hadoop.hive.metastore.api.Table tTable = createPartitionedTable(msClient,
+    Table tTable = createPartitionedTable(msClient,
         CATALOG_NAME, DB_NAME, TABLE_NAME, new java.util.HashMap<>());
     Assertions.assertNotNull(tTable);
     Assertions.assertEquals(HiveMetaHook.ICEBERG, tTable.getParameters().get(HiveMetaHook.TABLE_TYPE));
@@ -158,14 +154,19 @@ public class TestHiveRESTCatalogClientIT {
     // --- Create Table --- with an invalid catalog name in table parameters (should fail)
     Map<String, String> tableParameters = new java.util.HashMap<>();
     tableParameters.put(CatalogUtils.CATALOG_NAME, "some_missing_catalog");
-    assertThrows(IllegalArgumentException.class, () -> 
+    assertThrows(IllegalArgumentException.class, () ->
         createPartitionedTable(msClient, CATALOG_NAME, DB_NAME, TABLE_NAME + "_2", tableParameters));
 
     // --- tableExists ---
     Assertions.assertTrue(msClient.tableExists(CATALOG_NAME, DB_NAME, TABLE_NAME));
 
     // --- Get Table ---
-    org.apache.hadoop.hive.metastore.api.Table table = msClient.getTable(CATALOG_NAME, DB_NAME, TABLE_NAME);
+    GetTableRequest getTableRequest = new GetTableRequest();
+    getTableRequest.setCatName(CATALOG_NAME);
+    getTableRequest.setDbName(DB_NAME);
+    getTableRequest.setTblName(TABLE_NAME);
+
+    Table table = msClient.getTable(getTableRequest).getTable();
     Assertions.assertEquals(DB_NAME, table.getDbName());
     Assertions.assertEquals(TABLE_NAME, table.getTableName());
     Assertions.assertEquals(HIVE_ICEBERG_STORAGE_HANDLER, table.getParameters().get("storage_handler"));
@@ -193,18 +194,18 @@ public class TestHiveRESTCatalogClientIT {
   }
 
   private static Table createPartitionedTable(IMetaStoreClient db, String catName, String dbName, String tableName,
-    Map<String, String> tableParameters) throws Exception {
+      Map<String, String> tableParameters) throws Exception {
     db.dropTable(catName, dbName, tableName);
     Table table = new Table();
     table.setCatName(catName);
     table.setDbName(dbName);
     table.setTableName(tableName);
-    
+
     FieldSchema col1 = new FieldSchema("key", "string", "");
     FieldSchema col2 = new FieldSchema("value", "int", "");
     FieldSchema col3 = new FieldSchema("city", "string", "");
     List<FieldSchema> cols = Arrays.asList(col1, col2, col3);
-    
+
     StorageDescriptor sd = new StorageDescriptor();
     sd.setSerdeInfo(new SerDeInfo());
     sd.setInputFormat(TextInputFormat.class.getCanonicalName());
@@ -212,15 +213,21 @@ public class TestHiveRESTCatalogClientIT {
     sd.setCols(cols);
     sd.getSerdeInfo().setParameters(new java.util.HashMap<>());
     table.setSd(sd);
-    
-    Schema schema = HiveSchemaUtil.convert(cols, Collections.emptyMap(),false);
+
+    Schema schema = HiveSchemaUtil.convert(cols, Collections.emptyMap(), false);
     PartitionSpec spec = PartitionSpec.builderFor(schema).identity("city").build();
     String specString = PartitionSpecParser.toJson(spec);
     table.setParameters(new java.util.HashMap<>());
     table.getParameters().putAll(tableParameters);
     table.getParameters().put(TableProperties.DEFAULT_PARTITION_SPEC, specString);
-    
+
     db.createTable(table);
-    return db.getTable(catName, dbName, tableName);
+
+    GetTableRequest getTableRequest = new GetTableRequest();
+    getTableRequest.setCatName(catName);
+    getTableRequest.setDbName(dbName);
+    getTableRequest.setTblName(tableName);
+
+    return db.getTable(getTableRequest).getTable();
   }
 }

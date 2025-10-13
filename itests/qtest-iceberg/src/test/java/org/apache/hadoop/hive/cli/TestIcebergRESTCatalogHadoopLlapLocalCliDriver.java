@@ -18,14 +18,15 @@
 
 package org.apache.hadoop.hive.cli;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.cli.control.CliAdapter;
 import org.apache.hadoop.hive.cli.control.CliConfigs;
+import org.apache.hadoop.hive.common.FileUtils;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.iceberg.CatalogUtil;
 import org.apache.iceberg.hive.CatalogUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -40,10 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * LLAP CLI qtests with {@code HiveRESTCatalogClient}; REST catalog is
@@ -65,7 +63,7 @@ public class TestIcebergRESTCatalogHadoopLlapLocalCliDriver {
   private final File qfile;
 
   public static final HiveRESTCatalogServerExtension REST_CATALOG_EXTENSION =
-      HiveRESTCatalogServerExtension.builder(HiveRESTCatalogServerExtension.AuthType.NONE).build();
+      HiveRESTCatalogServerExtension.builder(HiveRESTCatalogServerExtension.AuthType.OAUTH2).build();
 
   /** REST catalog must start before CLI setup so the endpoint is available when Hive connects. */
   @ClassRule
@@ -87,7 +85,7 @@ public class TestIcebergRESTCatalogHadoopLlapLocalCliDriver {
   }
 
   @Before
-  public void setupHiveConfig() {
+  public void setupHiveConfig() throws IOException {
     String restCatalogPrefix = String.format("%s%s.", CatalogUtils.CATALOG_CONFIG_PREFIX, CATALOG_NAME);
 
     Configuration conf = SessionState.get().getConf();
@@ -97,26 +95,16 @@ public class TestIcebergRESTCatalogHadoopLlapLocalCliDriver {
     conf.set(restCatalogPrefix + "uri", REST_CATALOG_EXTENSION.getRestEndpoint());
     conf.set(restCatalogPrefix + "type", CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
     conf.set(restCatalogPrefix + "header.x-actor-username", System.getProperty("user.name", "anonymous"));
-  }
 
-  @Before
-  public void cleanUpRestCatalogServerTmpDir() throws IOException {
-    try (Stream<Path> children = Files.list(REST_CATALOG_EXTENSION.getRestCatalogServer().getWarehouseDir())) {
-      children
-          .filter(path -> !path.getFileName().toString().equals("derby.log"))
-          .filter(path -> !path.getFileName().toString().equals("metastore_db"))
-          .forEach(path -> {
-            try {
-              if (Files.isDirectory(path)) {
-                FileUtils.deleteDirectory(path.toFile());
-              } else {
-                Files.delete(path);
-              }
-            } catch (IOException e) {
-              LOG.error("Failed to delete path: {}", path, e);
-            }
-          });
-    }
+    // auth configs
+    conf.set(restCatalogPrefix + "rest.auth.type", "oauth2");
+    conf.set(restCatalogPrefix + "oauth2-server-uri", REST_CATALOG_EXTENSION.getOAuth2TokenEndpoint());
+    conf.set(restCatalogPrefix + "credential", REST_CATALOG_EXTENSION.getOAuth2ClientCredential());
+  }
+  
+  @After
+  public void tearDown() throws IOException {
+    FileUtils.deleteDirectory(REST_CATALOG_EXTENSION.getRestCatalogServer().getWarehouseDir().toFile());
   }
 
   @Test
