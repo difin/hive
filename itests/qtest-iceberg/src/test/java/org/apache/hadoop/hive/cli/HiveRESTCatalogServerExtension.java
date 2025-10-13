@@ -24,43 +24,61 @@ import org.apache.hadoop.hive.metastore.MetaStoreSchemaInfo;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.apache.hive.iceberg.it.NativeIcebergRESTCatalogServer;
+import org.apache.iceberg.rest.extension.OAuth2AuthorizationServer;
 import org.junit.rules.ExternalResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HiveRESTCatalogServerExtension extends ExternalResource {
 
   /** Matches {@code hive.metastore.catalog.servlet.auth}. */
   public enum AuthType {
     NONE,
-    JWT
+    JWT,
+    OAUTH2
   }
 
   private final Configuration conf;
+  private final OAuth2AuthorizationServer authorizationServer;
   private final NativeIcebergRESTCatalogServer restCatalogServer;
 
-  private HiveRESTCatalogServerExtension(AuthType authType, Class<? extends MetaStoreSchemaInfo> schemaInfoClass) {
-    if (authType == AuthType.JWT) {
-      throw new IllegalArgumentException(
-          "AuthType.JWT is not supported by NativeIcebergRESTCatalogServer; use hive-hms-catalog tests if needed.");
-    }
+  private static final Logger LOG = LoggerFactory.getLogger(HiveRESTCatalogServerExtension.class);
+
+  private HiveRESTCatalogServerExtension(AuthType authType, Class<? extends MetaStoreSchemaInfo> schemaInfoClass,
+      Map<String, String> configurations) {
     this.conf = MetastoreConf.newMetastoreConf();
-    MetastoreConf.setVar(conf, ConfVars.CATALOG_SERVLET_AUTH, authType.name());
+    if (authType == AuthType.OAUTH2) {
+      authorizationServer = new OAuth2AuthorizationServer();
+      MetastoreConf.setVar(conf, ConfVars.CATALOG_SERVLET_AUTH, "oauth2");
+    } else {
+      authorizationServer = null;
+      MetastoreConf.setVar(conf, ConfVars.CATALOG_SERVLET_AUTH,
+          authType == AuthType.NONE ? "simple" : authType.name().toLowerCase(java.util.Locale.ROOT));
+    }
+    configurations.forEach(conf::set);
     restCatalogServer = new NativeIcebergRESTCatalogServer();
     if (schemaInfoClass != null) {
       restCatalogServer.setSchemaInfoClass(schemaInfoClass);
     }
   }
 
-  public Configuration getConf() {
-    return conf;
-  }
-
   @Override
   protected void before() throws Throwable {
+    if (authorizationServer != null) {
+      authorizationServer.start();
+      LOG.info("An authorization server {} started", authorizationServer.getIssuer());
+    }
     restCatalogServer.start(conf);
   }
 
   @Override
   protected void after() {
+    if (authorizationServer != null) {
+      authorizationServer.stop();
+    }
     restCatalogServer.stop();
   }
 
@@ -68,9 +86,18 @@ public class HiveRESTCatalogServerExtension extends ExternalResource {
     return restCatalogServer.getRestEndpoint();
   }
 
+  public String getOAuth2TokenEndpoint() {
+    return authorizationServer.getTokenEndpoint();
+  }
+
+  public String getOAuth2ClientCredential() {
+    return authorizationServer.getClientCredential();
+  }
+
   public static class Builder {
     private final AuthType authType;
     private Class<? extends MetaStoreSchemaInfo> metaStoreSchemaClass;
+    private final Map<String, String> configurations = new HashMap<>();
 
     private Builder(AuthType authType) {
       this.authType = authType;
@@ -82,7 +109,7 @@ public class HiveRESTCatalogServerExtension extends ExternalResource {
     }
 
     public HiveRESTCatalogServerExtension build() {
-      return new HiveRESTCatalogServerExtension(authType, metaStoreSchemaClass);
+      return new HiveRESTCatalogServerExtension(authType, metaStoreSchemaClass, configurations);
     }
   }
 
