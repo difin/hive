@@ -67,7 +67,6 @@ public class TestHivePrivilegeObjectOwnerNameAndType {
 
   @BeforeClass
   public static void beforeTest() throws Exception {
-    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser("hive"));
     conf = new HiveConfForTest(TestHivePrivilegeObjectOwnerNameAndType.class);
     TestTxnDbUtil.prepDb(conf);
 
