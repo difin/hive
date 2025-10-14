@@ -1,5 +1,6 @@
 --! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
 --! qt:disabled:hive-test-kube
+--!qt:database:derby:qdb
 --! qt:dataset:
 
 set hive.test.authz.sstd.hs2.mode=true;
@@ -18,7 +19,7 @@ STORED BY 'org.apache.hive.storage.jdbc.JdbcStorageHandler'
 TBLPROPERTIES (
                 "hive.sql.database.type" = "DERBY",
                 "hive.sql.jdbc.driver" = "org.apache.derby.jdbc.EmbeddedDriver",
-                "hive.sql.jdbc.url" = "jdbc:derby:;databaseName=${system:test.tmp.dir}/test_derby_auth1;collation=TERRITORY_BASED:PRIMARY",
+                "hive.sql.jdbc.url" = "${system:hive.test.database.qdb.jdbc.url};collation=TERRITORY_BASED:PRIMARY",
                 "hive.sql.dbcp.username" = "user1",
                 "hive.sql.dbcp.password.keystore" = "jceks://file/${system:test.tmp.dir}/../../../data/files/test.jceks",
                 "hive.sql.dbcp.password.key" = "test_derby_auth1.password",
