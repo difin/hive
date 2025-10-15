@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.metastore;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -38,6 +39,8 @@ public class CheckResult {
   private long maxWriteId;
   private long maxTxnId;
   private Set<PartitionResult> correctPartitions = new TreeSet<>();
+
+  private Map<String, String> smallFilesStats = new HashMap<>();
 
   /**
    * @return a list of tables not found on the filesystem.
@@ -130,6 +133,14 @@ public class CheckResult {
 
   public void setCorrectPartitions(final Set<PartitionResult> correctPartitions) {
     this.correctPartitions = correctPartitions;
+  }
+
+  public Map<String, String> getSmallFilesStats() {
+    return this.smallFilesStats;
+  }
+
+  public void setSmallFilesStats(Map<String, String> smallFilesStats) {
+    this.smallFilesStats = smallFilesStats;
   }
 
   /**

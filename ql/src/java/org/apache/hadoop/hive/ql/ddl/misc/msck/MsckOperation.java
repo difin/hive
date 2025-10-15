@@ -25,6 +25,9 @@ import org.apache.hadoop.hive.metastore.utils.MetastoreException;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.Msck;
@@ -39,6 +42,7 @@ import org.apache.hadoop.hive.ql.ddl.DDLOperation;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.HiveTableName;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.thrift.TException;
 
 /**
@@ -76,7 +80,27 @@ public class MsckOperation extends DDLOperation<MsckDesc> {
       // SessionState.get().getCurrentCatalog() does not exists, so using "hive" for now
       MsckInfo msckInfo = new MsckInfo("hive", tableName.getDb(), tableName.getTable(), desc.getFilterExp(), desc.getResFile(),
           desc.isRepairPartitions(), desc.isAddPartitions(), desc.isDropPartitions(), partitionExpirySeconds);
-      return msck.repair(msckInfo);
+      int result = msck.repair(msckInfo);
+      Map<String, String> smallFilesStats = msckInfo.getSmallFilesStats();
+      if (smallFilesStats != null && !smallFilesStats.isEmpty()) {
+        // keep the small files information in logInfo
+        List<String> logInfo = smallFilesStats.entrySet().stream()
+                .map(entry -> String.format(
+                        "Average file size is too small, small files exist. %n Partition name: %s. %s",
+                        entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+        // print out the small files information on console to end users
+        SessionState ss = SessionState.get();
+        if (ss != null && ss.getConsole() != null) {
+          ss.getConsole().printInfo("[MSCK] Small files detected.");
+          ss.getConsole().printInfo(""); // add a blank line for separation
+          logInfo.forEach(line -> ss.getConsole().printInfo("[MSCK] " + line));
+        } else {
+          // if there is no console to print out, keep the small files info in logs
+          LOG.info("There are small files exist.\n{}", String.join("\n", logInfo));
+        }
+      }
+      return result;
     } catch (MetaException | MetastoreException e) {
       LOG.error("Unable to create msck instance.", e);
       throw e;

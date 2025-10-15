@@ -2215,6 +2215,10 @@ public class HiveConf extends Configuration {
         "The threshold for the input file size of the small tables; if the file size is smaller \n" +
         "than this threshold, it will try to convert the common join into map join"),
 
+    HIVE_MERGE_MAP_FILES_AVG_SIZE("hive.merge.smallfiles.avgsize", (long) (16 * 1000 * 1000),
+            "When the average output file size of a job is less than this number, Hive will start an additional \n" +
+                    "map-reduce job to merge the output files into bigger files. This is only done for map-only jobs \n" +
+                    "if hive.merge.mapfiles is true, and for map-reduce jobs if hive.merge.mapredfiles is true."),
 
     HIVE_SCHEMA_EVOLUTION("hive.exec.schema.evolution", true,
         "Use schema evolution to convert self-describing file format's data to the schema desired by the reader."),
