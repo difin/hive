@@ -66,12 +66,14 @@ import org.junit.experimental.categories.Category;
 public class TestFilterHooks {
   public static class DummyMetaStoreFilterHookImpl implements MetaStoreFilterHook {
     private static boolean blockResults = false;
+    private final Configuration conf;
 
     public DummyMetaStoreFilterHookImpl(Configuration conf) {
+      this.conf = conf;
     }
 
     @Override
-    public List<String> filterDatabases(List<String> dbList) throws MetaException {
+    public List<String> filterDatabases(String catName, List<String> dbList) throws MetaException  {
       if (blockResults) {
         return new ArrayList<>();
       }

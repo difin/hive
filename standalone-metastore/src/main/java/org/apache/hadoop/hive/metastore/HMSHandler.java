@@ -5642,7 +5642,7 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
       throw new NoSuchObjectException("dbName is not valid");
     }
 
-    List<String> filteredDb = FilterUtils.filterDbNamesIfEnabled(isServerFilterEnabled, filterHook,
+    List<String> filteredDb = FilterUtils.filterDbNamesIfEnabled(isServerFilterEnabled, filterHook, catName,
         Collections.singletonList(dbName));
 
     if (filteredDb.isEmpty()) {

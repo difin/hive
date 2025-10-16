@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.DataConnector;
 import org.apache.hadoop.hive.metastore.api.Database;
@@ -271,47 +270,52 @@ final class CommandAuthorizerV2 {
     switch(privObject.getType()){
     case DATABASE:
       Database database = privObject.getDatabase();
-      hivePrivObject = new HivePrivilegeObject(privObjType, database.getName(), null, null, null, actionType, null,
-          null, database.getOwnerName(), database.getOwnerType());
+      hivePrivObject = new HivePrivilegeObject(privObjType, database.getCatalogName(), database.getName(),
+          null, null, null, actionType, null, null, database.getOwnerName(), database.getOwnerType());
       break;
     case TABLE:
       Table table = privObject.getTable();
       List<String> columns = tableName2Cols == null ? null :
           tableName2Cols.get(Table.getCompleteName(table.getDbName(), table.getTableName()));
-      hivePrivObject = new HivePrivilegeObject(privObjType, table.getDbName(), table.getTableName(),
+      hivePrivObject = new HivePrivilegeObject(privObjType, table.getCatalogName(), table.getDbName(), table.getTableName(),
           null, columns, actionType, null, null, table.getOwner(), table.getOwnerType());
       if (table.getStorageHandler() != null && HiveConf.getBoolVar(SessionState.getSessionConf(),
-              HiveConf.ConfVars.HIVE_AUTHORIZATION_TABLES_ON_STORAGEHANDLERS, false)) {
-          //TODO: add hive privilege object for storage based handlers for create and alter table commands.
-          if (privObject instanceof WriteEntity && (hiveOpType == HiveOperationType.CREATETABLE ||
-                  hiveOpType == HiveOperationType.ALTERTABLE_PROPERTIES ||
-                  hiveOpType == HiveOperationType.CREATETABLE_AS_SELECT ||
-                  hiveOpType == HiveOperationType.DROPTABLE)) {
-            try {
-              String storageUri = table.getStorageHandler().getURIForAuth(table.getTTable()).toString();
-              hivePrivObjs.add(new HivePrivilegeObject(HivePrivilegeObjectType.STORAGEHANDLER_URI, null, storageUri, null, null,
-                      actionType, null, table.getStorageHandler().getClass().getName(), table.getOwner(), table.getOwnerType()));
-            } catch (Exception ex) {
-              LOG.error("Exception occurred while getting the URI from storage handler: " + ex.getMessage(), ex);
-              throw new HiveException("Exception occurred while getting the URI from storage handler: " + ex.getMessage());
-            }
+          HiveConf.ConfVars.HIVE_AUTHORIZATION_TABLES_ON_STORAGEHANDLERS)) {
+        //TODO: add hive privilege object for storage based handlers for create and alter table commands.
+        if (privObject instanceof WriteEntity && (hiveOpType == HiveOperationType.CREATETABLE ||
+            hiveOpType == HiveOperationType.ALTERTABLE_PROPERTIES ||
+            hiveOpType == HiveOperationType.CREATETABLE_AS_SELECT ||
+            hiveOpType == HiveOperationType.DROPTABLE)) {
+          try {
+            String storageUri = table.getStorageHandler().getURIForAuth(table.getTTable()).toString();
+            hivePrivObjs.add(new HivePrivilegeObject(HivePrivilegeObjectType.STORAGEHANDLER_URI, null, null, storageUri, null, null,
+                actionType, null, table.getStorageHandler().getClass().getName(), table.getOwner(), table.getOwnerType()));
+          } catch (Exception ex) {
+            LOG.error("Exception occurred while getting the URI from storage handler: " + ex.getMessage(), ex);
+            throw new HiveException("Exception occurred while getting the URI from storage handler: " + ex.getMessage());
           }
+        }
       }
       break;
     case DFS_DIR:
     case LOCAL_DIR:
-      hivePrivObject = new HivePrivilegeObject(privObjType, null, privObject.getD().toString(), null, null,
-          actionType, null, null, null, null);
+      hivePrivObject = new HivePrivilegeObject(privObjType, null, null, privObject.getD().toString(),
+          null, null, actionType, null);
       break;
     case FUNCTION:
       if (privObject.getFunction() != null) {
         Function function = privObject.getFunction();
-        hivePrivObject = new HivePrivilegeObject(privObjType, function.getDbName(), function.getFunctionName(),
+        hivePrivObject = new HivePrivilegeObject(privObjType, function.getCatName(), function.getDbName(), function.getFunctionName(),
                 null, null, actionType, null, function.getClassName(), function.getOwnerName(), function.getOwnerType());
       } else {
-        String dbName = privObject.getDatabase() != null ? privObject.getDatabase().getName() : null;
-        hivePrivObject = new HivePrivilegeObject(privObjType, dbName, privObject.getFunctionName(),
-                null, null, actionType, null, privObject.getClassName(), null, null);
+        String catName = null;
+        String dbName = null;
+        if (privObject.getDatabase() != null) {
+          catName = privObject.getDatabase().getCatalogName();
+          dbName = privObject.getDatabase().getName();
+        }
+        hivePrivObject = new HivePrivilegeObject(privObjType, catName, dbName, privObject.getFunctionName(),
+            null, null, actionType, null, privObject.getClassName(), null, null);
       }
       break;
     case STREAMING:
@@ -320,12 +324,12 @@ final class CommandAuthorizerV2 {
       Table tbl = privObject.getTable();
       List<String> col = tableName2Cols == null ? null :
               tableName2Cols.get(Table.getCompleteName(tbl.getDbName(), tbl.getTableName()));
-      hivePrivObject = new HivePrivilegeObject(privObjType, tbl.getDbName(), tbl.getTableName(),
+      hivePrivObject = new HivePrivilegeObject(privObjType, tbl.getCatName(), tbl.getDbName(), tbl.getTableName(),
               null, col, actionType, null, null, tbl.getOwner(), tbl.getOwnerType());
       break;
     case SERVICE_NAME:
-      hivePrivObject = new HivePrivilegeObject(privObjType, null, privObject.getServiceName(), null,
-          null, actionType, null, null, null, null);
+      hivePrivObject = new HivePrivilegeObject(privObjType, null, null, privObject.getServiceName(), null,
+          null, actionType, null);
       break;
     case DATACONNECTOR:
       if (!HiveConf.getBoolVar(SessionState.getSessionConf(), HiveConf.ConfVars.HIVE_SECURITY_AUTHORIZATION_FOR_DATACONNECTORS, false)) {
@@ -335,8 +339,8 @@ final class CommandAuthorizerV2 {
                 "to use Data Connectors in Hive.");
       }
       DataConnector connector = privObject.getDataConnector();
-      hivePrivObject = new HivePrivilegeObject(privObjType, null, connector.getName(), null, null, actionType, null,
-          null, connector.getOwnerName(), connector.getOwnerType());
+      hivePrivObject = new HivePrivilegeObject(privObjType, null, null, connector.getName(), null, null,
+          actionType, null, null, connector.getOwnerName(), connector.getOwnerType());
       break;
     default:
       throw new AssertionError("Unexpected object type");

@@ -63,7 +63,7 @@ public class LoadPartitionDoneEvent extends HiveMetaStoreAuthorizableEvent {
     List<HivePrivilegeObject> ret   = new ArrayList<>();
     PreLoadPartitionDoneEvent event = (PreLoadPartitionDoneEvent) preEventContext;
 
-    ret.add(new HivePrivilegeObject(HivePrivilegeObjectType.TABLE_OR_VIEW, event.getDbName(), event.getTableName()));
+    ret.add(new HivePrivilegeObject(HivePrivilegeObjectType.TABLE_OR_VIEW, event.getCatName(), event.getDbName(), event.getTableName()));
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("<== DropTableEvent.getOutputHObjs(): ret=" + ret);
