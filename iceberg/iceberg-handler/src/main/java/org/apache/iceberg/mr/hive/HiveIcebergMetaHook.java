@@ -116,6 +116,7 @@ import org.apache.iceberg.exceptions.NoSuchTableException;
 import org.apache.iceberg.exceptions.NotFoundException;
 import org.apache.iceberg.expressions.Expression;
 import org.apache.iceberg.expressions.Expressions;
+import org.apache.iceberg.expressions.Literal;
 import org.apache.iceberg.expressions.ResidualEvaluator;
 import org.apache.iceberg.expressions.UnboundPredicate;
 import org.apache.iceberg.expressions.UnboundTerm;
@@ -197,6 +198,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
   private AlterTableType currentAlterTableOp;
   private boolean createHMSTableInHook = false;
   private HiveLock commitLock;
+  private List<SQLDefaultConstraint> sqlDefaultConstraints;
 
   private enum FileFormat {
     ORC("orc"), PARQUET("parquet"), AVRO("avro");
@@ -650,6 +652,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
           if (transaction != null) {
             transaction.commitTransaction();
           }
+          setSqlDefaultConstraints();
           break;
         case ADDPROPS:
         case DROPPROPS:
@@ -663,6 +666,16 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
               hmsTable.getTableName()));
           break;
       }
+    }
+  }
+
+  private void setSqlDefaultConstraints() {
+    try {
+      if (sqlDefaultConstraints != null && !sqlDefaultConstraints.isEmpty()) {
+        SessionState.get().getHiveDb().addDefaultConstraint(sqlDefaultConstraints);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -875,9 +888,9 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
   }
 
   private Schema schema(Properties properties, org.apache.hadoop.hive.metastore.api.Table hmsTable,
-                        Set<String> identifierFields, List<SQLDefaultConstraint> sqlDefaultConstraints) {
+                        Set<String> identifierFields, List<SQLDefaultConstraint> defaultSqlConstraints) {
 
-    Map<String, String> defaultValues = Stream.ofNullable(sqlDefaultConstraints).flatMap(Collection::stream)
+    Map<String, String> defaultValues = Stream.ofNullable(defaultSqlConstraints).flatMap(Collection::stream)
         .collect(Collectors.toMap(SQLDefaultConstraint::getColumn_name, SQLDefaultConstraint::getDefault_value));
     boolean autoConversion = conf.getBoolean(InputFormatConfig.SCHEMA_AUTO_CONVERSION, false);
 
@@ -937,15 +950,24 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
 
   private void handleAddColumns(org.apache.hadoop.hive.metastore.api.Table hmsTable) {
     Collection<FieldSchema> addedCols =
-        HiveSchemaUtil.getSchemaDiff(hmsTable.getSd().getCols(), HiveSchemaUtil.convert(icebergTable.schema()), false)
+        HiveSchemaUtil.getSchemaDiff(hmsTable.getSd().getCols(), HiveSchemaUtil.convert(icebergTable.schema()), null,
+                null, false)
             .getMissingFromSecond();
     if (!addedCols.isEmpty()) {
       transaction = icebergTable.newTransaction();
       updateSchema = transaction.updateSchema();
     }
+    this.sqlDefaultConstraints =
+        (List<SQLDefaultConstraint>) SessionStateUtil.getResource(conf, SessionStateUtil.COLUMN_DEFAULTS).orElse(null);
+    Map<String, String> defaultValues = Stream.ofNullable(sqlDefaultConstraints).flatMap(Collection::stream)
+        .collect(Collectors.toMap(SQLDefaultConstraint::getColumn_name, SQLDefaultConstraint::getDefault_value));
     for (FieldSchema addedCol : addedCols) {
-      updateSchema.addColumn(addedCol.getName(),
-          HiveSchemaUtil.convert(TypeInfoUtils.getTypeInfoFromTypeString(addedCol.getType())), addedCol.getComment());
+      String defaultValue = defaultValues.get(addedCol.getName());
+      Type type = HiveSchemaUtil.convert(TypeInfoUtils.getTypeInfoFromTypeString(addedCol.getType()), defaultValue);
+      Literal<Object> defaultVal = Optional.ofNullable(defaultValue).filter(v -> !type.isStructType())
+          .map(v -> Expressions.lit(HiveSchemaUtil.getDefaultValue(v, type))).orElse(null);
+
+      updateSchema.addColumn(addedCol.getName(), type, addedCol.getComment(), defaultVal);
     }
     updateSchema.commit();
   }
@@ -954,7 +976,8 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
     List<FieldSchema> hmsCols = hmsTable.getSd().getCols();
     List<FieldSchema> icebergCols = HiveSchemaUtil.convert(icebergTable.schema());
 
-    List<FieldSchema> removedCols = HiveSchemaUtil.getSchemaDiff(icebergCols, hmsCols, false).getMissingFromSecond();
+    List<FieldSchema> removedCols =
+        HiveSchemaUtil.getSchemaDiff(icebergCols, hmsCols, null, null, false).getMissingFromSecond();
     if (removedCols.isEmpty()) {
       return;
     }
@@ -968,7 +991,14 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
   private void handleReplaceColumns(org.apache.hadoop.hive.metastore.api.Table hmsTable) throws MetaException {
     List<FieldSchema> hmsCols = hmsTable.getSd().getCols();
     List<FieldSchema> icebergCols = HiveSchemaUtil.convert(icebergTable.schema());
-    HiveSchemaUtil.SchemaDifference schemaDifference = HiveSchemaUtil.getSchemaDiff(hmsCols, icebergCols, true);
+
+    List<SQLDefaultConstraint> defaultConstraints =
+        (List<SQLDefaultConstraint>) SessionStateUtil.getResource(conf, SessionStateUtil.COLUMN_DEFAULTS).orElse(null);
+    Map<String, String> defaultValues = Optional.ofNullable(defaultConstraints).orElse(Collections.emptyList()).stream()
+        .collect(Collectors.toMap(SQLDefaultConstraint::getColumn_name, SQLDefaultConstraint::getDefault_value));
+
+    HiveSchemaUtil.SchemaDifference schemaDifference =
+        HiveSchemaUtil.getSchemaDiff(hmsCols, icebergCols, icebergTable.schema(), defaultValues, true);
 
     // if there are columns dropped, let's remove them from the iceberg schema as well so we can compare the order
     if (!schemaDifference.getMissingFromFirst().isEmpty()) {
@@ -980,9 +1010,11 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
 
     // limit the scope of this operation to only dropping columns
     if (!schemaDifference.getMissingFromSecond().isEmpty() || !schemaDifference.getTypeChanged().isEmpty() ||
-        !schemaDifference.getCommentChanged().isEmpty() || outOfOrder != null) {
+        !schemaDifference.getCommentChanged().isEmpty() || outOfOrder != null ||
+        !schemaDifference.getDefaultChanged().isEmpty()) {
       throw new MetaException("Unsupported operation to use REPLACE COLUMNS for adding a column, changing a " +
-          "column type, column comment or reordering columns. Only use REPLACE COLUMNS for dropping columns. " +
+          "column type, column comment, column default or reordering columns. " +
+          "Only use REPLACE COLUMNS for dropping columns. " +
           "For the other operations, consider using the ADD COLUMNS or CHANGE COLUMN commands.");
     }
 
@@ -1005,7 +1037,12 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
     List<FieldSchema> hmsCols = hmsTable.getSd().getCols();
     List<FieldSchema> icebergCols = HiveSchemaUtil.convert(icebergTable.schema());
     // compute schema difference for renames, type/comment changes
-    HiveSchemaUtil.SchemaDifference schemaDifference = HiveSchemaUtil.getSchemaDiff(hmsCols, icebergCols, true);
+    List<SQLDefaultConstraint> defaultConstraints =
+        (List<SQLDefaultConstraint>) SessionStateUtil.getResource(conf, SessionStateUtil.COLUMN_DEFAULTS).orElse(null);
+    Map<String, String> defaultValues = Optional.ofNullable(defaultConstraints).orElse(Collections.emptyList()).stream()
+        .collect(Collectors.toMap(SQLDefaultConstraint::getColumn_name, SQLDefaultConstraint::getDefault_value));
+    HiveSchemaUtil.SchemaDifference schemaDifference =
+        HiveSchemaUtil.getSchemaDiff(hmsCols, icebergCols, null, null, true);
     // check column reorder (which could happen even in the absence of any rename, type or comment change)
     Map<String, String> renameMapping = ImmutableMap.of();
     if (!schemaDifference.getMissingFromSecond().isEmpty()) {
@@ -1015,12 +1052,12 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
     }
     Pair<String, Optional<String>> outOfOrder = HiveSchemaUtil.getReorderedColumn(hmsCols, icebergCols, renameMapping);
 
-    if (!schemaDifference.isEmpty() || outOfOrder != null) {
+    if (!schemaDifference.isEmpty() || outOfOrder != null || !defaultValues.isEmpty()) {
       transaction = icebergTable.newTransaction();
       updateSchema = transaction.updateSchema();
     } else {
       // we should get here if the user didn't change anything about the column
-      // i.e. no changes to the name, type, comment or order
+      // i.e. no changes to the name, type, comment, default or order
       LOG.info("Found no difference between new and old schema for ALTER TABLE CHANGE COLUMN for" +
           " table: {}. There will be no Iceberg commit.", hmsTable.getTableName());
       return;
@@ -1059,9 +1096,39 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
         updateSchema.moveFirst(outOfOrder.first());
       }
     }
+
+    // case 5: handle change of default values
+    handleDefaultValues(defaultValues, renameMapping, icebergTable.schema().columns(), "");
     updateSchema.commit();
 
     handlePartitionRename(schemaDifference);
+  }
+
+  /**
+   * Updates the default values of the fields.
+   * @param defaultValues the map containing the default values.
+   * @param renameMapping the rename mapping of the columns
+   * @param columns the columns of the table
+   * @param prefix the prefix of the columns, empty unless a filed of struct.
+   */
+  private void handleDefaultValues(Map<String, String> defaultValues, Map<String, String> renameMapping,
+      List<Types.NestedField> columns, String prefix) {
+    if (!defaultValues.isEmpty()) {
+      for (Map.Entry<String, String> field : defaultValues.entrySet()) {
+        String simpleName =
+            renameMapping.containsKey(field.getKey()) ? renameMapping.get(field.getKey()) : field.getKey();
+        String qualifiedName = prefix + simpleName;
+        Type fieldType =
+            columns.stream().filter(col -> col.name().equalsIgnoreCase(simpleName)).findFirst().get().type();
+        if (fieldType.isStructType()) {
+          Map<String, String> structDefaults = HiveSchemaUtil.getDefaultValuesMap(field.getValue());
+          handleDefaultValues(structDefaults, renameMapping, fieldType.asStructType().fields(), qualifiedName + ".");
+        } else {
+          updateSchema.updateColumnDefault(qualifiedName,
+              Expressions.lit(HiveSchemaUtil.getDefaultValue(field.getValue(), fieldType)));
+        }
+      }
+    }
   }
 
   private void handlePartitionRename(HiveSchemaUtil.SchemaDifference schemaDifference) {
@@ -1078,7 +1145,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
   }
 
   private Type.PrimitiveType getPrimitiveTypeOrThrow(FieldSchema field) throws MetaException {
-    Type newType = HiveSchemaUtil.convert(TypeInfoUtils.getTypeInfoFromTypeString(field.getType()));
+    Type newType = HiveSchemaUtil.convert(TypeInfoUtils.getTypeInfoFromTypeString(field.getType()), null);
     if (!(newType instanceof Type.PrimitiveType)) {
       throw new MetaException(String.format("Cannot promote type of column: '%s' to a non-primitive type: %s.",
           field.getName(), newType));
