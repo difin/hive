@@ -220,16 +220,40 @@ public abstract class BaseSemanticAnalyzer {
     return ctx.getCboInfo();
   }
 
-  class RowFormatParams {
-    String fieldDelim = null;
-    String fieldEscape = null;
-    String collItemDelim = null;
-    String mapKeyDelim = null;
-    String lineDelim = null;
-    String nullFormat = null;
+  public class RowFormatParams {
+    private String fieldDelim;
+    private String fieldEscape;
+    private String collItemDelim;
+    private String mapKeyDelim;
+    private String lineDelim;
+    private String nullFormat;
 
-    protected void analyzeRowFormat(ASTNode child) throws SemanticException {
-      child = (ASTNode) child.getChild(0);
+    public String getFieldDelim() {
+      return fieldDelim;
+    }
+
+    public String getFieldEscape() {
+      return fieldEscape;
+    }
+
+    public String getCollItemDelim() {
+      return collItemDelim;
+    }
+
+    public String getMapKeyDelim() {
+      return mapKeyDelim;
+    }
+
+    public String getNullFormat() {
+      return nullFormat;
+    }
+
+    public String getLineDelim() {
+      return lineDelim;
+    }
+
+    public void analyzeRowFormat(ASTNode child) throws SemanticException {
+    child = (ASTNode) child.getChild(0);
       int numChildRowFormat = child.getChildCount();
       for (int numC = 0; numC < numChildRowFormat; numC++) {
         ASTNode rowChild = (ASTNode) child.getChild(numC);
