@@ -160,13 +160,13 @@ public class TestMetaStoreUtils {
     FieldSchema col1a = new FieldSchema("col1", "string", "col1 but with a different comment");
     FieldSchema col2 = new FieldSchema("col2", "string", "col2 comment");
     FieldSchema col3 = new FieldSchema("col3", "string", "col3 comment");
-    assertTrue(org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.columnsIncludedByNameType(Arrays.asList(col1), Arrays.asList(col1)));
-    assertTrue(org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.columnsIncludedByNameType(Arrays.asList(col1), Arrays.asList(col1a)));
-    assertTrue(org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.columnsIncludedByNameType(Arrays.asList(col1, col2), Arrays.asList(col1, col2)));
-    assertTrue(org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.columnsIncludedByNameType(Arrays.asList(col1, col2), Arrays.asList(col2, col1)));
-    assertTrue(org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.columnsIncludedByNameType(Arrays.asList(col1, col2), Arrays.asList(col1, col2, col3)));
-    assertTrue(org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.columnsIncludedByNameType(Arrays.asList(col1, col2), Arrays.asList(col3, col2, col1)));
-    Assert.assertFalse(org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.columnsIncludedByNameType(Arrays.asList(col1, col2), Arrays.asList(col1)));
+    Assert.assertTrue(MetaStoreUtils.findStaleColumns(Arrays.asList(col1), Arrays.asList(col1)).isEmpty());
+    Assert.assertTrue(MetaStoreUtils.findStaleColumns(Arrays.asList(col1), Arrays.asList(col1a)).isEmpty());
+    Assert.assertTrue(MetaStoreUtils.findStaleColumns(Arrays.asList(col1, col2), Arrays.asList(col1, col2)).isEmpty());
+    Assert.assertTrue(MetaStoreUtils.findStaleColumns(Arrays.asList(col1, col2), Arrays.asList(col2, col1)).isEmpty());
+    Assert.assertTrue(MetaStoreUtils.findStaleColumns(Arrays.asList(col1, col2), Arrays.asList(col1, col2, col3)).isEmpty());
+    Assert.assertTrue(MetaStoreUtils.findStaleColumns(Arrays.asList(col1, col2), Arrays.asList(col3, col2, col1)).isEmpty());
+    Assert.assertFalse(MetaStoreUtils.findStaleColumns(Arrays.asList(col1, col2), Arrays.asList(col1)).isEmpty());
   }
 
   /**
