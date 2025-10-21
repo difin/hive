@@ -103,7 +103,7 @@
     <curator.version>5.4.0.7.3.2.0-SNAPSHOT</curator.version>
     <cron-utils.version>9.1.6</cron-utils.version>
     <httpcomponents.core.version>4.4.13</httpcomponents.core.version>
-    <spring.version>5.3.39-cloudera-5.3.44</spring.version>    <!-- Thrift properties -->
+    <spring.version>5.3.44.cldr-b1</spring.version>    <!-- Thrift properties -->
     <spring.ldap.version>2.4.4</spring.ldap.version>
     <beanutils.version>1.11.0</beanutils.version>
     <!-- Thrift properties -->
