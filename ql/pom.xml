@@ -618,6 +618,10 @@
       <optional>true</optional>
       <exclusions>
         <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-common</artifactId>
         </exclusion>

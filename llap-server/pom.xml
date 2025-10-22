@@ -237,7 +237,7 @@
         </exclusion>
         <exclusion>
           <groupId>io.netty</groupId>
-          <artifactId>netty-all</artifactId>
+          <artifactId>*</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.apache.hadoop</groupId>
