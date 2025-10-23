@@ -258,6 +258,10 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
       if (serviceDiscoveryMode == null || serviceDiscoveryMode.trim().isEmpty()) {
         metastoreUrisString = Arrays.asList(thriftUris.split(","));
       } else if (serviceDiscoveryMode.equalsIgnoreCase("zookeeper")) {
+        if (MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.USE_THRIFT_SASL) &&
+            MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.THRIFT_ZOOKEEPER_USE_KERBEROS)) {
+          SecurityUtils.setZookeeperClientKerberosJaasConfig(null, null);
+        }
         metastoreUrisString = new ArrayList<String>();
         // Add scheme to the bare URI we get.
         for (String s : MetastoreConf.getZKConfig(conf).getServerUris()) {
@@ -5379,5 +5383,10 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
     }
     PropertyGetResponse response = client.get_properties(request);
     return response.getProperties();
+  }
+
+  @VisibleForTesting
+  public URI[] getMetastoreUris() {
+    return metastoreUris;
   }
 }
