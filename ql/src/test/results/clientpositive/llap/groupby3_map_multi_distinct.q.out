@@ -186,9 +186,9 @@ POSTHOOK: Lineage: dest1_n68.c9 EXPRESSION [(src)src.FieldSchema(name:value, typ
 PREHOOK: query: SELECT dest1_n68.* FROM dest1_n68
 PREHOOK: type: QUERY
 PREHOOK: Input: default@dest1_n68
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 POSTHOOK: query: SELECT dest1_n68.* FROM dest1_n68
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@dest1_n68
-POSTHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 130091.0	260.182	256.10355987055016	98.0	0.0	142.9268095075238	143.06995106518906	20428.072876000002	20469.010897795593	79136.0	309.0

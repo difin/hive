@@ -65,14 +65,13 @@ POSTHOOK: Lineage: orcfile_merge1_n2.subtype SIMPLE [(orc_split_elim_n0)orc_spli
 POSTHOOK: Lineage: orcfile_merge1_n2.ts SIMPLE [(orc_split_elim_n0)orc_split_elim_n0.FieldSchema(name:ts, type:timestamp, comment:null), ]
 POSTHOOK: Lineage: orcfile_merge1_n2.userid SIMPLE [(orc_split_elim_n0)orc_split_elim_n0.FieldSchema(name:userid, type:bigint, comment:null), ]
 Found 2 items
--rw-rw-rw-   3 ### USER ### ### GROUP ###       ### SIZE ### ### HDFS DATE ### hdfs://### HDFS PATH ###
--rw-rw-rw-   3 ### USER ### ### GROUP ###       ### SIZE ### ### HDFS DATE ### hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 PREHOOK: query: select * from orcfile_merge1_n2 limit 1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@orcfile_merge1_n2
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 -- BEGIN ORC FILE DUMP --
-Structure for hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 File Version: 0.12 with ORC_14
 Rows: 50000
 Compression: ZLIB
@@ -158,13 +157,14 @@ Stripes:
       Entry 4: count: 10000 hasNull: false min: 1969-12-31 16:04:10.0 max: 1969-12-31 16:04:10.0 positions: 0,666,54,0,312,64
 
 File length: #Masked# bytes
+File raw data size: #Masked#
 Padding length: 0 bytes
 Padding ratio: 0%
 ________________________________________________________________________________________________________________________
 
 -- END ORC FILE DUMP --
 -- BEGIN ORC FILE DUMP --
-Structure for hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 File Version: 0.12 with ORC_14
 Rows: 50000
 Compression: ZLIB
@@ -250,6 +250,7 @@ Stripes:
       Entry 4: count: 10000 hasNull: false min: 1969-12-31 16:04:10.0 max: 1969-12-31 16:04:10.0 positions: 0,666,54,0,312,64
 
 File length: #Masked# bytes
+File raw data size: #Masked#
 Padding length: 0 bytes
 Padding ratio: 0%
 ________________________________________________________________________________________________________________________
@@ -261,23 +262,23 @@ PREHOOK: type: ALTER_TABLE_MERGE
 PREHOOK: Input: default@orcfile_merge1_n2
 PREHOOK: Output: default@orcfile_merge1_n2
 Found 1 items
--rw-rw-rw-   3 ### USER ### ### GROUP ###      ### SIZE ### ### HDFS DATE ### hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 PREHOOK: query: select count(*) from orc_split_elim_n0
 PREHOOK: type: QUERY
 PREHOOK: Input: default@orc_split_elim_n0
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 50000
 PREHOOK: query: select count(*) from orcfile_merge1_n2
 PREHOOK: type: QUERY
 PREHOOK: Input: default@orcfile_merge1_n2
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 100000
 PREHOOK: query: select * from orcfile_merge1_n2 limit 1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@orcfile_merge1_n2
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 -- BEGIN ORC FILE DUMP --
-Structure for hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 File Version: 0.12 with ORC_14
 Rows: 100000
 Compression: ZLIB
@@ -428,6 +429,7 @@ Stripes:
       Entry 4: count: 10000 hasNull: false min: 1969-12-31 16:04:10.0 max: 1969-12-31 16:04:10.0 positions: 0,666,54,0,312,64
 
 File length: #Masked# bytes
+File raw data size: #Masked#
 Padding length: 0 bytes
 Padding ratio: 0%
 ________________________________________________________________________________________________________________________
@@ -437,7 +439,7 @@ ________________________________________________________________________________
 PREHOOK: query: INSERT OVERWRITE DIRECTORY 'output' stored as orcfile select * from orc_split_elim_n0
 PREHOOK: type: QUERY
 PREHOOK: Input: default@orc_split_elim_n0
-PREHOOK: Output: hdfs://### HDFS PATH ###
+#### A masked pattern was here ####
 PREHOOK: query: DROP TABLE orc_split_elim_n0
 PREHOOK: type: DROPTABLE
 PREHOOK: Input: default@orc_split_elim_n0
