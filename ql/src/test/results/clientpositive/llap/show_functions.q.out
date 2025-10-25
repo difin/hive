@@ -207,6 +207,7 @@ iceberg_hour
 iceberg_month
 iceberg_truncate
 iceberg_year
+iceberg_zorder
 if
 in
 in_bloom_filter
@@ -821,6 +822,7 @@ iceberg_hour
 iceberg_month
 iceberg_truncate
 iceberg_year
+iceberg_zorder
 if
 in
 in_bloom_filter
