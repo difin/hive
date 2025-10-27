@@ -377,6 +377,7 @@ public interface TxnStore extends Configurable {
    * @throws TxnAbortedException
    * @throws MetaException
    */
+  @SqlRetry(lockInternally = true)
   @Transactional(POOL_TX)
   @RetrySemantics.SafeToRetry
   LockResponse checkLock(CheckLockRequest rqst)
@@ -414,7 +415,7 @@ public interface TxnStore extends Configurable {
    * @throws TxnAbortedException
    * @throws MetaException
    */
-  @SqlRetry
+  @SqlRetry(lockInternally = true)
   @Transactional(POOL_TX)
   @RetrySemantics.SafeToRetry
   void heartbeat(HeartbeatRequest ids)
