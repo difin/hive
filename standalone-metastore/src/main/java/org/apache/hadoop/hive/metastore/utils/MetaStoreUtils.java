@@ -100,8 +100,8 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
 import java.util.ArrayList;
@@ -188,7 +188,7 @@ public class MetaStoreUtils {
    * @return Timestamp in string format.
    */
   public static String convertTimestampToString(Timestamp timestamp) {
-    return TIMESTAMP_FORMATTER.format(timestamp.toLocalDateTime());
+    return TIMESTAMP_FORMATTER.format(timestamp.toInstant());
   }
 
   /**
@@ -197,8 +197,8 @@ public class MetaStoreUtils {
    * @return java.sql.Timestamp object.
    */
   public static Timestamp convertStringToTimestamp(String timestamp) {
-    LocalDateTime val = LocalDateTime.from(TIMESTAMP_FORMATTER.parse(timestamp));
-    return Timestamp.valueOf(val);
+    Instant instant = Instant.from(TIMESTAMP_FORMATTER.parse(timestamp));
+    return Timestamp.from(instant);
   }
 
   // Indicates a type was derived from the deserializer rather than Hive's metadata.

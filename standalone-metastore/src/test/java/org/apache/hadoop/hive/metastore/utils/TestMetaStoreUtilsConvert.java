@@ -51,16 +51,18 @@ public class TestMetaStoreUtilsConvert {
   private static final TimeZone DEFAULT = TimeZone.getDefault();
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
   private final TimeZone timezone;
+  private final Timestamp timestamp;
   private final String date;
-  private final String timestamp;
+  private final String timestampString;
 
-  public TestMetaStoreUtilsConvert(String zoneId, LocalDateTime timestamp) {
+  public TestMetaStoreUtilsConvert(String zoneId, LocalDateTime localDateTime) {
     this.timezone = TimeZone.getTimeZone(zoneId);
-    this.timestamp = timestamp.format(FORMATTER);
-    this.date = timestamp.toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+    this.timestamp = Timestamp.from(localDateTime.toInstant(ZoneOffset.UTC));
+    this.timestampString = localDateTime.format(FORMATTER);
+    this.date = timestamp.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE);
   }
 
-  @Parameterized.Parameters(name = "zoneId={0}, timestamp={1}")
+  @Parameterized.Parameters(name = "zoneId={0}, localDateTime={1}")
   public static Collection<Object[]> generateZoneTimestampPairs() {
     List<Object[]> params = new ArrayList<>();
     long minDate = LocalDate.of(0, 1, 1).atStartOfDay().toEpochSecond(ZoneOffset.UTC);
@@ -71,7 +73,25 @@ public class TestMetaStoreUtilsConvert {
         params.add(new Object[] { zone, datetime });
       }
     });
+    // Timestamp and Date do not have the year 0000. So, the year 0000 gets converted to year 0001.
+    // This is one such test case with year as 0000: 0000-01-07 22:44:36
+    params.add(new Object[] {"Asia/Kolkata", LocalDateTime.of(0, 1, 7,22,44,36)});
+    generateDaylightSavingTimestampPairs(params);
     return params;
+  }
+
+  public static void generateDaylightSavingTimestampPairs(List<Object[]> params) {
+    params.add(new Object[] {"America/Anchorage", LocalDateTime.of(2024, 3, 10, 2,1,0)});
+    params.add(new Object[] {"America/St_Johns", LocalDateTime.of(2024, 3, 10, 2,1,0)});
+    params.add(new Object[] {"America/Chicago", LocalDateTime.of(2024, 3, 10, 2,1,0)});
+    params.add(new Object[] {"America/Indiana/Indianapolis", LocalDateTime.of(2024, 3, 10, 2,1,0)});
+    params.add(new Object[] {"America/Los_Angeles", LocalDateTime.of(2024, 3, 10, 2,1,0)});
+
+    params.add(new Object[] {"Europe/Paris", LocalDateTime.of(2024,3,31,2,2,2)});
+
+    params.add(new Object[] {"Pacific/Auckland", LocalDateTime.of(2024,9,29,2,3,4)});
+
+    params.add(new Object[] {"Australia/Sydney", LocalDateTime.of(2024,10,6,2,4,6)});
   }
 
   @Before
@@ -86,7 +106,7 @@ public class TestMetaStoreUtilsConvert {
 
   @Test
   public void testTimestampToString() {
-    assertEquals(timestamp, convertTimestampToString(Timestamp.valueOf(timestamp)));
+    assertEquals(timestampString, convertTimestampToString(timestamp));
   }
 
   @Test
@@ -96,7 +116,7 @@ public class TestMetaStoreUtilsConvert {
 
   @Test
   public void testStringToTimestamp() {
-    assertEquals(Timestamp.valueOf(timestamp), convertStringToTimestamp(timestamp));
+    assertEquals(timestamp, convertStringToTimestamp(timestampString));
   }
 
   @AfterClass
