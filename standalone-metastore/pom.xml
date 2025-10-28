@@ -1072,7 +1072,8 @@
           <reuseForks>false</reuseForks>
           <forkCount>${test.forkcount}</forkCount>
           <argLine>-Xmx2048m ${maven.test.jvm.args}</argLine>
-          <failIfNoTests>false</failIfNoTests>
+          <enableOutErrElements>false</enableOutErrElements>
+          <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
           <systemPropertyVariables>
             <build.dir>${project.build.directory}</build.dir>
             <datanucleus.schema.autoCreateAll>true</datanucleus.schema.autoCreateAll>
