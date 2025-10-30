@@ -40,7 +40,7 @@
 
 <property>
   <name>hive.tez.container.size</name>
-  <value>256</value>
+  <value>512</value>
   <description></description>
 </property>
 
