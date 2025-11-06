@@ -20,7 +20,6 @@
 package org.apache.hadoop.hive.ql.stats;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -136,6 +135,7 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
     public BasicStatsProcessor(Partish partish, BasicStatsWork work, HiveConf conf, boolean followedColStats2) {
       this.partish = partish;
       this.work = work;
+      this.conf = conf;
       followedColStats1 = followedColStats2;
       Table table = partish.getTable();
       if (table.isNonNative() && table.getStorageHandler().canProvideBasicStatistics()) {
@@ -193,9 +193,7 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
         parameters.putAll(providedBasicStats);
       }
 
-      final long threshold = (conf != null)
-              ? conf.getLongVar(HiveConf.ConfVars.HIVE_MERGE_MAP_FILES_AVG_SIZE)
-              : HiveConf.ConfVars.HIVE_MERGE_MAP_FILES_AVG_SIZE.defaultLongVal;
+      final long threshold = conf.getLongVar(HiveConf.ConfVars.HIVEMERGEMAPFILESAVGSIZE);
       final String who = (p.getPartition() == null)
               ? "table " + p.getTable().getFullyQualifiedName()
               : "partition " + p.getPartition().getName();
@@ -207,9 +205,6 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
                   ss.getConsole().printInfo(msg);
                 }
               });
-
-
-
       return p.getOutput();
     }
 

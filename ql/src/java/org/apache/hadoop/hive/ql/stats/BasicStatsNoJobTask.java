@@ -187,7 +187,7 @@ public class BasicStatsNoJobTask implements IStatsProcessor {
         StatsSetupConst.setBasicStatsState(parameters, StatsSetupConst.TRUE);
         String who = (partish.getPartition() == null) ? ("table " + partish.getTable().getFullyQualifiedName())
                 : ("partition " + partish.getPartition().getName());
-        long threshold = conf.getLongVar(HiveConf.ConfVars.HIVE_MERGE_MAP_FILES_AVG_SIZE);
+        long threshold = conf.getLongVar(HiveConf.ConfVars.HIVEMERGEMAPFILESAVGSIZE);
         SmallFilesWarningUtil.smallFilesWarnings(parameters, 100L, threshold, who, "[ANALYZE][NOSCAN]")
                 .ifPresent(msg -> {
                   LOG.warn(msg);
@@ -312,7 +312,7 @@ public class BasicStatsNoJobTask implements IStatsProcessor {
 
         String who = (partish.getPartition() == null) ? ("table " + partish.getTable().getFullyQualifiedName())
                 : ("partition " + partish.getPartition().getName());
-        long threshold = conf.getLongVar(HiveConf.ConfVars.HIVE_MERGE_MAP_FILES_AVG_SIZE);
+        long threshold = conf.getLongVar(HiveConf.ConfVars.HIVEMERGEMAPFILESAVGSIZE);
         SmallFilesWarningUtil.smallFilesWarnings(parameters, 100L, threshold, who, "[ANALYZE][NOSCAN]")
                 .ifPresent(msg -> {
                   LOG.warn(msg);
