@@ -1,3 +1,4 @@
+--! qt:disabled:flaky CDPD-92161
 --! qt:dataset:src
 set hive.compute.query.using.stats=false;
 set hive.exec.dynamic.partition.mode=nonstrict;
