@@ -21,7 +21,6 @@ import com.codahale.metrics.Counter;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.apache.hadoop.hive.metastore.ObjectStore.RetryingExecutor;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.annotation.MetastoreUnitTest;
 import org.apache.hadoop.hive.metastore.api.Catalog;
@@ -78,6 +77,7 @@ import org.apache.hadoop.hive.metastore.metrics.MetricsConstants;
 import org.apache.hadoop.hive.metastore.model.MNotificationLog;
 import org.apache.hadoop.hive.metastore.model.MNotificationNextId;
 import org.apache.hadoop.hive.metastore.model.MTable;
+import org.apache.hadoop.hive.metastore.utils.RetryingExecutor;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -978,7 +978,12 @@ public class TestObjectStore {
 
   @Test
   public void testRetryingExecutorSleep() throws Exception {
-    RetryingExecutor re = new ObjectStore.RetryingExecutor(MetastoreConf.newMetastoreConf(), null);
+    int maxRetries =
+        MetastoreConf.getIntVar(conf, MetastoreConf.ConfVars.NOTIFICATION_SEQUENCE_LOCK_MAX_RETRIES);
+    long sleepInterval = MetastoreConf.getTimeVar(conf,
+        MetastoreConf.ConfVars.NOTIFICATION_SEQUENCE_LOCK_RETRY_SLEEP_INTERVAL, TimeUnit.MILLISECONDS);
+    RetryingExecutor<Void> re = new RetryingExecutor<Void>(maxRetries, null)
+        .sleepInterval(sleepInterval);
     Assert.assertTrue("invalid sleep value", re.getSleepInterval() >= 0);
   }
 
@@ -1556,6 +1561,18 @@ public class TestObjectStore {
     objectStore.updateCreationMetadata(matView1.getCatName(), matView1.getDbName(), matView1.getTableName(), newCreationMetadata);
 
     assertThat(creationMetadata.getMaterializationTime(), is(not(0)));
+  }
+
+  AutoCloseable deadline() throws Exception {
+    Deadline.registerIfNot(100_000);
+    Deadline.startTimer("some method");
+    return new AutoCloseable() {
+
+      @Override
+      public void close() throws Exception {
+        Deadline.stopTimer();
+      }
+    };
   }
 }
 

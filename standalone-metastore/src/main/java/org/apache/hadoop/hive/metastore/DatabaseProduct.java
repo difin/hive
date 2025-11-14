@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.metastore;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,35 +41,56 @@ public enum DatabaseProduct {
   public static final String ORACLE_NAME = "oracle";
   public static final String UNDEFINED_NAME = "other";
 
+  private String productName;
+
+  private String dbVersion;
+
+  private Pair<Integer, Integer> versionNums;
+
   /**
    * Determine the database product type
    * @param productName string to defer database connection
    * @return database product type
    */
   public static DatabaseProduct determineDatabaseProduct(String productName) {
+    return determineDatabaseProduct(productName, null, null);
+  }
+
+  public static DatabaseProduct determineDatabaseProduct(String productName,
+      String version, Pair<Integer, Integer> versionNums) {
+    DatabaseProduct databaseProduct = OTHER;
     if (productName == null) {
-      return OTHER;
+      return databaseProduct;
     }
     productName = productName.toLowerCase();
     if (productName.contains(DERBY_NAME)) {
-      return DERBY;
+      databaseProduct = DERBY;
     } else if (productName.contains(SQL_SERVER_NAME)) {
-      return SQLSERVER;
+      databaseProduct = SQLSERVER;
     } else if (productName.contains(MYSQL_NAME) || productName.contains(MARIADB_NAME)) {
-      return MYSQL;
+      databaseProduct = MYSQL;
     } else if (productName.contains(ORACLE_NAME)) {
-      return ORACLE;
+      databaseProduct = ORACLE;
     } else if (productName.contains(POSTGRESQL_NAME)) {
-      return POSTGRES;
-    } else {
-      return OTHER;
+      databaseProduct = POSTGRES;
     }
+    databaseProduct.productName = productName;
+    if (databaseProduct.dbVersion == null && version != null) {
+      databaseProduct.dbVersion = version;
+    }
+    if (databaseProduct.versionNums == null && versionNums != null) {
+      databaseProduct.versionNums = versionNums;
+    }
+    return databaseProduct;
   }
 
   public static DatabaseProduct determineDatabaseProduct(DataSource connPool) {
     try (Connection conn = connPool.getConnection()) {
       String s = conn.getMetaData().getDatabaseProductName();
-      return determineDatabaseProduct(s);
+      String version = conn.getMetaData().getDatabaseProductVersion();
+      int majorVersion = conn.getMetaData().getDatabaseMajorVersion();
+      int minorVersion = conn.getMetaData().getDatabaseMinorVersion();
+      return determineDatabaseProduct(s, version, Pair.of(majorVersion, minorVersion));
     } catch (SQLException e) {
       // Legacy code, should we throw the IllegalStateException instead?
       LOG.warn("Cannot determine database product; assuming OTHER", e);
@@ -233,6 +255,27 @@ public enum DatabaseProduct {
       return Math.min(batch, maxAllowedRows);
     }
     return batch;
+  }
+
+  public boolean canMySQLSupportNoWait() {
+    if (versionNums == null) {
+      // Cannot determine the real version of back db
+      return false;
+    }
+    // Prior to MySQL 8.0.1, the NOWAIT clause for row locking was not supported directly in the s4u syntax.
+    // Use the MAX_EXECUTION_TIME to ensure the s4u does not run indefinitely.
+    String dbName = productName.replaceAll("\\s+", "").toLowerCase();
+    boolean isMariaDB = dbName.contains(MARIADB_NAME) ||
+        (dbVersion != null && dbVersion.toLowerCase().contains(MARIADB_NAME));
+    if (isMariaDB) {
+      // https://mariadb.com/docs/release-notes/community-server/old-releases/release-notes-mariadb-10-3-series/mariadb-1030-release-notes
+      return (versionNums.getLeft() >= 10 && versionNums.getRight() > 2);
+    } else {
+      // https://dev.mysql.com/blog-archive/mysql-8-0-1-using-skip-locked-and-nowait-to-handle-hot-rows/
+      return versionNums.getLeft() > 8 ||
+          (versionNums.getLeft() == 8 && dbVersion != null && dbVersion.compareToIgnoreCase("8.0.1") >= 0);
+    }
+
   }
 
 }

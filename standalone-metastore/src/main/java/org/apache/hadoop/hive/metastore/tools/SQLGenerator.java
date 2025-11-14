@@ -190,22 +190,41 @@ public final class SQLGenerator {
    * construct.  If the DB doesn't support, return original select.
    */
   public String addForUpdateClause(String selectStatement) throws MetaException {
+    return addForUpdateClause(selectStatement, false);
+  }
+
+  public String addForUpdateNoWait(String selectStatement) throws MetaException {
+    return addForUpdateClause(selectStatement, true);
+  }
+
+  public String addForUpdateClause(String selectStatement, boolean noWait) throws MetaException {
     switch (dbProduct) {
     case DERBY:
       //https://db.apache.org/derby/docs/10.1/ref/rrefsqlj31783.html
       //sadly in Derby, FOR UPDATE doesn't meant what it should
       return selectStatement;
-    case MYSQL:
-      //http://dev.mysql.com/doc/refman/5.7/en/select.html
     case ORACLE:
       //https://docs.oracle.com/cd/E17952_01/refman-5.6-en/select.html
     case POSTGRES:
       //http://www.postgresql.org/docs/9.0/static/sql-select.html
+      return selectStatement + " for update" + (noWait ? " NOWAIT" : "");
+    case MYSQL:
+      //http://dev.mysql.com/doc/refman/5.7/en/select.html
+      //http://dev.mysql.com/doc/refman/5.7/en/select.html
+      if (noWait) {
+        if (dbProduct.canMySQLSupportNoWait()) {
+          return selectStatement + " for update NOWAIT";
+        } else {
+          int selectLength = "select".length();
+          return selectStatement.trim().substring(0, selectLength) + " /*+ MAX_EXECUTION_TIME(300) */ " +
+              selectStatement.trim().substring(selectLength) + " for update";
+        }
+      }
       return selectStatement + " for update";
     case SQLSERVER:
       //https://msdn.microsoft.com/en-us/library/ms189499.aspx
       //https://msdn.microsoft.com/en-us/library/ms187373.aspx
-      String modifier = " with (updlock)";
+      String modifier = " with (updlock" + (noWait ? ",NOWAIT" : "") + ")";
       int wherePos = selectStatement.toUpperCase().indexOf(" WHERE ");
       if (wherePos < 0) {
         return selectStatement + modifier;
