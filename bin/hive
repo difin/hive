@@ -140,6 +140,19 @@ fi
 # Ex: HIVE_CP_EXCLUDE_LIST="javax.ws.rs-api\|jersey-multipart"
 HIVE_CP_EXCLUDE_LIST="javax.ws.rs-api"
 
+# Multiple components have moved to using slf4j-api v2 jars which are now present on the global classpath along with v1 
+# jars. Due to the same, whenever v2 jars are loaded first, Hive runs into logging issues
+# Upgrading to v2 in hive is not the solution due to the issue occurring in vice-versa scenario
+# So, the version of slf4j-api hive is compiled with is being forced here to be loaded first.
+PARCEL_JARS_DIR="${HIVE_HOME}/../../jars"
+HIVE_SLF4J_API_JAR="$PARCEL_JARS_DIR/slf4j-api-1.7.30.jar"
+
+if [ -f "$HIVE_SLF4J_API_JAR" ]; then
+    CLASSPATH="${HIVE_SLF4J_API_JAR}:${CLASSPATH}"
+else
+    echo "WARNING: Could not find SLF4j required jar on classpath: $HIVE_SLF4J_API_JAR"
+fi
+
 for f in $(find "${HIVE_LIB}" -name  "*.jar" | grep -v "$HIVE_CP_EXCLUDE_LIST"); do
     CLASSPATH="${CLASSPATH}:$f"
 done
