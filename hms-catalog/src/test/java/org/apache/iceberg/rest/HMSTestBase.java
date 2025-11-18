@@ -207,12 +207,12 @@ public abstract class HMSTestBase {
       Thread.sleep(100);
       iceServer = HiveMetaStore.getIcebergServer();
     }
-    Catalog ice = HMSCatalogServer.getLastCatalog();
+    Catalog ice = HMSCatalogServer.getRESTCatalog();
     if (iceServer != null) {
       while (iceServer.isStarting()) {
         Thread.sleep(100);
       }
-      catalog =  ice != null? ice : HMSCatalogServer.getLastCatalog();
+      catalog =  ice != null? ice : HMSCatalogServer.getRESTCatalog();
       if (catalog instanceof HiveCatalog) {
         Map<String, String> properties;
         String curi = conf.get(MetastoreConf.ConfVars.THRIFT_URIS.getVarname());

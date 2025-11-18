@@ -55,9 +55,9 @@ import java.util.TreeMap;
 public class HMSCatalogServer {
   private static final String CACHE_EXPIRY = "hive.metastore.catalog.cache.expiry";
   private static final String CACHE_AUTHORIZATION = "hive.metastore.catalog.cache.authorization";
-  private static final String JETTY_THREADPOOL_MIN = "hive.metastore.catalog.jetty.threadpool.min";
-  private static final String JETTY_THREADPOOL_MAX = "hive.metastore.catalog.jetty.threadpool.max";
-  private static final String JETTY_THREADPOOL_IDLE = "hive.metastore.catalog.jetty.threadpool.idle";
+  static final String JETTY_THREADPOOL_MIN = "hive.metastore.catalog.jetty.threadpool.min";
+  static final String JETTY_THREADPOOL_MAX = "hive.metastore.catalog.jetty.threadpool.max";
+  static final String JETTY_THREADPOOL_IDLE = "hive.metastore.catalog.jetty.threadpool.idle";
   /**
    * The metric names prefix.
    */
@@ -66,7 +66,7 @@ public class HMSCatalogServer {
   private static Reference<Catalog> catalogRef;
   private static volatile DataSharing dataSharing;
 
-  static Catalog getLastCatalog() {
+  public static Catalog getRESTCatalog() {
     return catalogRef != null ? catalogRef.get() :  null;
   }
 
@@ -171,8 +171,8 @@ public class HMSCatalogServer {
   }
 
   private static @NotNull Server createHttpServer(Configuration conf, int port) throws IOException {
-    final int maxThreads = conf.getInt(JETTY_THREADPOOL_MAX, 256);
-    final int minThreads = conf.getInt(JETTY_THREADPOOL_MIN, 8);
+    final int maxThreads = Math.max(8, conf.getInt(JETTY_THREADPOOL_MAX, 256));
+    final int minThreads = Math.max(2, conf.getInt(JETTY_THREADPOOL_MIN, 8));
     final int idleTimeout = conf.getInt(JETTY_THREADPOOL_IDLE, 60_000);
     final QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
     final Server httpServer = new Server(threadPool);

@@ -24,6 +24,7 @@ import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.HMSServletSecurity;
 import org.apache.hadoop.hive.metastore.HiveMetaStore;
@@ -58,6 +59,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.apache.iceberg.rest.HMSCatalogServer.JETTY_THREADPOOL_IDLE;
+import static org.apache.iceberg.rest.HMSCatalogServer.JETTY_THREADPOOL_MAX;
+import static org.apache.iceberg.rest.HMSCatalogServer.JETTY_THREADPOOL_MIN;
+
 public class HMSCatalogActor implements HiveActor {
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogActor.class);
   /** The actor name (catalog). */
@@ -67,6 +72,12 @@ public class HMSCatalogActor implements HiveActor {
   /** The client pool. */
   private final ObjectPool<IHMSHandler> handlers;
 
+  /**
+   * Create a new IHMSHandler.
+   * @param configuration the configuration
+   * @return a (retrying) IHMSHandler
+   * @throws MetaException when things go wrong
+   */
   private static IHMSHandler getHandler(Configuration configuration) throws MetaException {
     HiveMetaStore.HMSHandler hmsHandler = new HiveMetaStore.HMSHandler("HMSHandler", configuration);
     try {
@@ -76,20 +87,35 @@ public class HMSCatalogActor implements HiveActor {
     }
   }
 
+  /** IHMSHandler pool factory. */
+  private class HandlerFactory extends BasePooledObjectFactory<IHMSHandler> {
+    @Override
+    public IHMSHandler create() throws Exception {
+      return getHandler(new Configuration(conf));
+    }
+
+    @Override
+    public PooledObject<IHMSHandler> wrap(IHMSHandler ihmsHandler) {
+      return new DefaultPooledObject<>(ihmsHandler);
+    }
+  }
+
+  /** IMSHandler pool configuration. */
+  private static class PoolConfig extends GenericObjectPoolConfig<IHMSHandler> {
+    PoolConfig(Configuration conf) {
+      final int maxThreads = Math.max(8, conf.getInt(JETTY_THREADPOOL_MAX, 256));
+      final int minThreads = Math.max(2, conf.getInt(JETTY_THREADPOOL_MIN, 8));
+      this.setMaxTotal(maxThreads);
+      this.setMinIdle(minThreads / 2);
+      this.setMaxIdle(minThreads);
+      this.setJmxEnabled(false);
+    }
+  }
+
   public HMSCatalogActor(String name, Configuration configuration) {
     this.name = name;
     this.conf = configuration;
-    this.handlers = new GenericObjectPool<>(new BasePooledObjectFactory<IHMSHandler>() {
-      @Override
-      public IHMSHandler create() throws Exception {
-        return getHandler(new Configuration(conf));
-      }
-
-      @Override
-      public PooledObject<IHMSHandler> wrap(IHMSHandler ihmsHandler) {
-        return new DefaultPooledObject<>(ihmsHandler);
-      }
-    });
+    this.handlers = new GenericObjectPool<>(new HandlerFactory(), new PoolConfig(configuration));
   }
 
   @FunctionalInterface

@@ -20,6 +20,8 @@
 package org.apache.iceberg.mr.hive;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
@@ -69,6 +71,7 @@ import org.apache.iceberg.StructLike;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.UpdatePartitionSpec;
+import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.expressions.Expression;
 import org.apache.iceberg.expressions.Expressions;
@@ -126,6 +129,49 @@ public class IcebergTableUtil {
     return getTable(configuration, hmsTable, false);
   }
 
+  // Reflection methods to get the Catalog instance from HMSCatalogServer when running in HMS Catalog mode
+  private static final String HMS_SERVER_CLAZZ = "org.apache.iceberg.rest.HMSCatalogServer";
+
+  private static final String HMS_GET_REST_CATALOG = "getRESTCatalog";
+
+  private static Method hmsGetRESTCatalogMethod = null;
+
+  private static Method getGetRESTCatalogMethod() {
+    try {
+      Class<?> serverClass = Class.forName(HMS_SERVER_CLAZZ);
+      return serverClass.getDeclaredMethod(HMS_GET_REST_CATALOG);
+    } catch (ClassNotFoundException | NoSuchMethodException e) {
+      LOG.warn("Failed to find {}.{} method", HMS_SERVER_CLAZZ, HMS_GET_REST_CATALOG, e);
+    }
+    try {
+      return IcebergTableUtil.class.getMethod("noRESTCatalog");
+    } catch (NoSuchMethodException e) {
+      LOG.error("Failed to find noCatalog method", e);
+    }
+    return null;
+  }
+
+  public static Catalog noRESTCatalog() {
+    return null;
+  }
+
+  private static Catalog getRESTCatalog() {
+    try {
+      Method method = hmsGetRESTCatalogMethod;
+      if (method == null) {
+        method = getGetRESTCatalogMethod();
+        hmsGetRESTCatalogMethod = method;
+      }
+      if (method != null) {
+        Object result = method.invoke(null);
+        return (Catalog) result;
+      }
+    } catch (InvocationTargetException | IllegalAccessException e) {
+      LOG.error("getRESTCatalog failed", e.getCause());
+    }
+    return null;
+  }
+
   /**
    * Load the iceberg table either from the {@link QueryState} or through the configured catalog. Look for the table
    * object stored in the query state. If it's null, it means the table was not loaded yet within the same query
@@ -147,12 +193,18 @@ public class IcebergTableUtil {
     }
 
     String tableIdentifier = properties.getProperty(Catalogs.NAME);
-    Function<Void, Table> tableLoadFunc =
-        unused -> {
-          Table tab = Catalogs.loadTable(configuration, properties);
-          SessionStateUtil.addResource(configuration, tableIdentifier, tab);
-          return tab;
-        };
+    Function<Void, Table> tableLoadFunc = unused -> {
+      Table tab;
+      Catalog hmsCatalog = getRESTCatalog();
+      if (hmsCatalog != null) {
+        LOG.debug("Loading Iceberg table {} using HMSCatalogServer::getRESTCatalog", tableIdentifier);
+        tab = hmsCatalog.loadTable(TableIdentifier.parse(tableIdentifier));
+      } else {
+        tab = Catalogs.loadTable(configuration, properties);
+      }
+      SessionStateUtil.addResource(configuration, tableIdentifier, tab);
+      return tab;
+    };
 
     if (skipCache) {
       return tableLoadFunc.apply(null);
