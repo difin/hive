@@ -21,8 +21,10 @@ package org.apache.hadoop.hive.ql.optimizer.calcite.rules;
 import org.apache.calcite.jdbc.JavaTypeFactoryImpl;
 import org.apache.calcite.plan.AbstractRelOptPlanner;
 import org.apache.calcite.plan.RelOptCluster;
+import org.apache.calcite.plan.RelOptPlanner;
 import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.plan.RelOptSchema;
+import org.apache.calcite.plan.RelOptTable;
 import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.plan.hep.HepPlanner;
 import org.apache.calcite.plan.hep.HepProgramBuilder;
@@ -40,13 +42,20 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.RelOptHiveTable;
 import org.apache.hadoop.hive.ql.parse.type.HiveFunctionHelper;
 import org.mockito.ArgumentMatchers;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestRuleHelper {
 
@@ -72,7 +81,100 @@ public class TestRuleHelper {
         new HivePlannerContext(null, null, null, null, null, new HiveFunctionHelper(rexBuilder), null));
   }
 
-  public static RelBuilder buildRelBuilder(AbstractRelOptPlanner planner,
+  public static class HiveTableMock {
+    final Class<?> recordClass;
+    final RelOptHiveTable tableMock;
+    final Table hiveTableMock;
+    final List<String> name;
+
+    public HiveTableMock(List<String> name, Class<?> recordClass, PlanFixture mockBuilder) {
+      this.name = new ArrayList<>(name);
+      this.recordClass = recordClass;
+      tableMock = mock(RelOptHiveTable.class);
+      hiveTableMock = mock(Table.class);
+
+      RelDataType rowTypeMock = JAVA_TYPE_FACTORY.createStructType(recordClass);
+      doReturn(rowTypeMock).when(tableMock).getRowType();
+
+      LogicalTableScan tableScan = LogicalTableScan.create(mockBuilder.optCluster, tableMock, Collections.emptyList());
+      doReturn(tableScan).when(tableMock).toRel(ArgumentMatchers.any());
+
+      doReturn(this.name).when(tableMock).getQualifiedName();
+
+      lenient().doReturn(hiveTableMock).when(tableMock).getHiveTableMD();
+    }
+  }
+
+  /**
+   * A fixture for creating plans with <code>HiveRelNode</code>s.
+   */
+  public static class PlanFixture {
+    final RelOptCluster optCluster;
+
+    final Map<List<String>, HiveTableMock> tables = new HashMap<>();
+
+    Class<?> defaultRecordClass;
+
+    public PlanFixture(RelOptPlanner planner) {
+      RexBuilder rexBuilder = new RexBuilder(JAVA_TYPE_FACTORY);
+      optCluster = RelOptCluster.create(planner, rexBuilder);
+    }
+
+    /**
+     * Register a table in the schema, using the attributes of the class as columns.
+     */
+    public PlanFixture registerTable(String name, Class<?> recordClass) {
+      return registerTable(Collections.singletonList(name), recordClass);
+    }
+
+    /**
+     * Similar to {@link #registerTable(String, Class)}, but with a qualified name.
+     * <p>
+     * See {@link RelOptTable#getQualifiedName()}.
+     */
+    public PlanFixture registerTable(List<String> name, Class<?> recordClass) {
+      name = new ArrayList<>(name);
+      tables.put(name, new HiveTableMock(name, recordClass, this));
+      return this;
+    }
+
+    /**
+     * Allows to use any table names when scanning.
+     * <p>
+     * The scanned table will provide the attributes of the class as columns.
+     */
+    public PlanFixture setDefaultRecordClass(Class<?> recordClass) {
+      this.defaultRecordClass = recordClass;
+      return this;
+    }
+
+    public RelOptPlanner getPlanner() {
+      return optCluster.getPlanner();
+    }
+
+    public RelBuilder createRelBuilder() {
+      final RelOptSchema schemaMock;
+      schemaMock = mock(RelOptSchema.class);
+      // create a copy that we can modify in our method
+      Map<List<String>, HiveTableMock> tableMap = new HashMap<>(tables);
+
+      when(schemaMock.getTableForMember(any())).thenAnswer(i -> {
+        List<String> tableName = i.getArgument(0);
+        HiveTableMock hiveTableMock = tableMap.get(tableName);
+        if (hiveTableMock == null) {
+          Objects.requireNonNull(defaultRecordClass,
+              "Table " + tableName + " was not registered with the mock, and no default table provided");
+          hiveTableMock = new HiveTableMock(tableName, defaultRecordClass, this);
+          tableMap.put(tableName, hiveTableMock);
+        }
+        return hiveTableMock.tableMock;
+      });
+
+      return HiveRelFactories.HIVE_BUILDER.create(optCluster, schemaMock);
+    }
+  }
+
+  public static RelBuilder buildRelBuilder(RelOptPlanner planner,
       RelOptSchema schemaMock, RelOptHiveTable tableMock, Table hiveTableMock, Class<?> clazz) {
     RexBuilder rexBuilder = new RexBuilder(JAVA_TYPE_FACTORY);
     final RelOptCluster optCluster = RelOptCluster.create(planner, rexBuilder);
@@ -99,7 +201,7 @@ public class TestRuleHelper {
     return relBuilder.call(SqlStdOperatorTable.AND, args);
   }
 
-  static void assertPlans(AbstractRelOptPlanner planner, RelNode plan, String expectedPrePlan, String expectedPostPlan) {
+  static void assertPlans(RelOptPlanner planner, RelNode plan, String expectedPrePlan, String expectedPostPlan) {
     planner.setRoot(plan);
     RelNode optimizedRelNode = planner.findBestExp();
     assertEquals("Original plans do not match", expectedPrePlan, RelOptUtil.toString(plan));
