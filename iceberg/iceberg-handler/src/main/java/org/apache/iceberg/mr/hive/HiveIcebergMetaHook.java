@@ -961,13 +961,18 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
         (List<SQLDefaultConstraint>) SessionStateUtil.getResource(conf, SessionStateUtil.COLUMN_DEFAULTS).orElse(null);
     Map<String, String> defaultValues = Stream.ofNullable(sqlDefaultConstraints).flatMap(Collection::stream)
         .collect(Collectors.toMap(SQLDefaultConstraint::getColumn_name, SQLDefaultConstraint::getDefault_value));
+    boolean isORc = isOrcFileFormat(hmsTable);
     for (FieldSchema addedCol : addedCols) {
       String defaultValue = defaultValues.get(addedCol.getName());
       Type type = HiveSchemaUtil.convert(TypeInfoUtils.getTypeInfoFromTypeString(addedCol.getType()), defaultValue);
       Literal<Object> defaultVal = Optional.ofNullable(defaultValue).filter(v -> !type.isStructType())
           .map(v -> Expressions.lit(HiveSchemaUtil.getDefaultValue(v, type))).orElse(null);
 
-      updateSchema.addColumn(addedCol.getName(), type, addedCol.getComment(), defaultVal);
+      // ORC doesn't have support for initialDefault from iceberg layer, we only need to set default for writeDefault.
+      updateSchema.addColumn(addedCol.getName(), type, addedCol.getComment(), isORc ? null : defaultVal);
+      if (isORc && defaultVal != null) {
+        updateSchema.updateColumnDefault(addedCol.getName(), defaultVal);
+      }
     }
     updateSchema.commit();
   }
@@ -1162,13 +1167,15 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
   }
 
   private boolean isOrcOnlyFiles(org.apache.hadoop.hive.metastore.api.Table hmsTable) {
-    return !"FALSE".equalsIgnoreCase(hmsTable.getParameters().get(ORC_FILES_ONLY)) &&
-        (hmsTable.getSd().getInputFormat() != null &&
-            hmsTable.getSd().getInputFormat().toUpperCase().contains(org.apache.iceberg.FileFormat.ORC.name()) ||
-            org.apache.iceberg.FileFormat.ORC.name()
-                .equalsIgnoreCase(hmsTable.getSd().getSerdeInfo().getParameters().get("write.format.default")) ||
-            org.apache.iceberg.FileFormat.ORC.name()
-                .equalsIgnoreCase(hmsTable.getParameters().get("write.format.default")));
+    return !"FALSE".equalsIgnoreCase(hmsTable.getParameters().get(ORC_FILES_ONLY)) && isOrcFileFormat(hmsTable);
+  }
+
+  static boolean isOrcFileFormat(org.apache.hadoop.hive.metastore.api.Table hmsTable) {
+    return hmsTable.getSd().getInputFormat() != null && hmsTable.getSd().getInputFormat().toUpperCase()
+        .contains(org.apache.iceberg.FileFormat.ORC.name()) || org.apache.iceberg.FileFormat.ORC.name()
+        .equalsIgnoreCase(hmsTable.getSd().getSerdeInfo().getParameters().get(TableProperties.DEFAULT_FILE_FORMAT)) ||
+        org.apache.iceberg.FileFormat.ORC.name()
+        .equalsIgnoreCase(hmsTable.getParameters().get(TableProperties.DEFAULT_FILE_FORMAT));
   }
 
   private void setWriteModeDefaults(Table icebergTbl, Map<String, String> newProps, EnvironmentContext context) {
