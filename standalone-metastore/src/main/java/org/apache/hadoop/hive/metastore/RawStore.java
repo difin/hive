@@ -1205,6 +1205,7 @@ public interface RawStore extends Configurable {
       throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException;
 
   /** Persists the given column statistics object to the metastore
+   * @deprecated Use {@link #updatePartitionColumnStatistics(Table, MTable, ColumnStatistics, List, String, long)} instead
    * @param statsObj object to persist
    * @param partVals partition values to persist the stats for
    * @return Boolean indicating the outcome of the operation
@@ -1214,6 +1215,7 @@ public interface RawStore extends Configurable {
    * @throws InvalidInputException unable to record the stats for the table
    * @throws TException
    */
+  @Deprecated
   Map<String, String> updatePartitionColumnStatistics(ColumnStatistics statsObj,
       List<String> partVals, String validWriteIds, long writeId)
       throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException;
