@@ -21,8 +21,12 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -123,6 +127,18 @@ public class JavaUtils {
       LOG.error("Unable to invoke the underlying method: {} of the instance: {}, message: {}",
           methodName, req, e.getMessage());
       throw new RuntimeException(e);
+    }
+  }
+
+  public static void setStaticFinalFieldsModifiable(Field field) {
+    try {
+      field.setAccessible(true);
+      VarHandle modifiersHandle = MethodHandles.privateLookupIn(Field.class, MethodHandles.lookup())
+              .findVarHandle(Field.class, "modifiers", int.class);
+      int modifiers = field.getModifiers();
+      modifiersHandle.set(field, modifiers & ~Modifier.FINAL);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      throw new RuntimeException("Cannot make static final field %s modifiable".formatted(field));
     }
   }
 

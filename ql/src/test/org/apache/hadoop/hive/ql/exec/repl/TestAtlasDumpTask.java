@@ -51,9 +51,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.atlas.shaded.javax.ws.rs.HttpMethod;
-import org.apache.atlas.shaded.javax.ws.rs.core.Response;
-
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

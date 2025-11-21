@@ -93,7 +93,13 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>5.10.0</version>
+      <version>${junit.jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>${junit.vintage.version}</version>
       <scope>test</scope>
     </dependency>
       <dependency>
@@ -278,7 +284,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>${surefire.version}</version>
+        <version>${maven.surefire.plugin.version}</version>
         <configuration>
           <includes>
             <include>TestHMSCatalog.java</include>

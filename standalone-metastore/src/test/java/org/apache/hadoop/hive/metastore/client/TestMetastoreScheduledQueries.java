@@ -78,7 +78,7 @@ import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 
 /**
  * Tests handling of scheduled queries related calls to the metastore.
@@ -643,7 +643,7 @@ public class TestMetastoreScheduledQueries extends MetaStoreClientTest {
       ObjectStore objStore = new ObjectStore();
       objStore.setConf(metaStore.getConf());
       thrown.expect(MetaException.class);
-      thrown.expectMessage(Matchers.contains(ConfVars.SCHEDULED_QUERIES_ENABLED.getVarname()));
+      thrown.expectMessage(ArgumentMatchers.contains(ConfVars.SCHEDULED_QUERIES_ENABLED.getVarname()));
       objStore.scheduledQueryMaintenance(new ScheduledQueryMaintenanceRequest());
     } finally {
       MetastoreConf.setBoolVar(metaStore.getConf(), ConfVars.SCHEDULED_QUERIES_ENABLED, true);
@@ -657,7 +657,7 @@ public class TestMetastoreScheduledQueries extends MetaStoreClientTest {
       ObjectStore objStore = new ObjectStore();
       objStore.setConf(metaStore.getConf());
       thrown.expect(MetaException.class);
-      thrown.expectMessage(Matchers.contains(ConfVars.SCHEDULED_QUERIES_ENABLED.getVarname()));
+      thrown.expectMessage(ArgumentMatchers.contains(ConfVars.SCHEDULED_QUERIES_ENABLED.getVarname()));
       objStore.scheduledQueryPoll(new ScheduledQueryPollRequest());
     } finally {
       MetastoreConf.setBoolVar(metaStore.getConf(), ConfVars.SCHEDULED_QUERIES_ENABLED, true);
@@ -671,7 +671,7 @@ public class TestMetastoreScheduledQueries extends MetaStoreClientTest {
       ObjectStore objStore = new ObjectStore();
       objStore.setConf(metaStore.getConf());
       thrown.expect(MetaException.class);
-      thrown.expectMessage(Matchers.contains(ConfVars.SCHEDULED_QUERIES_ENABLED.getVarname()));
+      thrown.expectMessage(ArgumentMatchers.contains(ConfVars.SCHEDULED_QUERIES_ENABLED.getVarname()));
       objStore.scheduledQueryProgress(new ScheduledQueryProgressInfo());
     } finally {
       MetastoreConf.setBoolVar(metaStore.getConf(), ConfVars.SCHEDULED_QUERIES_ENABLED, true);

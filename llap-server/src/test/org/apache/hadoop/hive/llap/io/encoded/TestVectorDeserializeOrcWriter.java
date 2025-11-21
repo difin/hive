@@ -33,7 +33,6 @@ import org.apache.hive.common.util.FixedSizedObjectPool;
 import org.apache.orc.impl.SchemaEvolution;
 
 import org.junit.Test;
-import org.mockito.internal.util.reflection.FieldSetter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;

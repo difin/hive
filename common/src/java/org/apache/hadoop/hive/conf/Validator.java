@@ -356,15 +356,15 @@ public interface Validator {
     public String validate(String value) {
       final Path path = FileSystems.getDefault().getPath(value);
       if (path == null && value != null) {
-        return String.format("Path '%s' provided could not be located.", value);
+        return "Path '%s' provided could not be located.".formatted(value);
       }
       final boolean isDir = Files.isDirectory(path);
       final boolean isWritable = Files.isWritable(path);
       if (!isDir) {
-        return String.format("Path '%s' provided is not a directory.", value);
+        return "Path '%s' provided is not a directory.".formatted(value);
       }
       if (!isWritable) {
-        return String.format("Path '%s' provided is not writable.", value);
+        return "Path '%s' provided is not writable.".formatted(value);
       }
       return null;
     }

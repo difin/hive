@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.ql.security.authorization.plugin;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil;
 import org.apache.hadoop.hive.ql.Driver;
@@ -66,8 +67,7 @@ public class TestHivePrivilegeObjectOwnerNameAndType {
 
   @BeforeClass
   public static void beforeTest() throws Exception {
-    UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser("hive"));
-    conf = new HiveConf();
+    conf = new HiveConfForTest(TestHivePrivilegeObjectOwnerNameAndType.class);
     TestTxnDbUtil.prepDb(conf);
 
     // Turn on mocked authorization

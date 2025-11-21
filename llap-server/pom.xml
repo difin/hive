@@ -47,10 +47,6 @@
           <groupId>org.apache.log4j</groupId>
           <artifactId>log4j-1.2.17-cloudera6</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>org.glassfish.jersey.media</groupId>
-          <artifactId>jersey-media-multipart</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -252,6 +248,12 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>javax.servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -355,16 +357,18 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.jupiter.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
+      <version>${junit.vintage.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-servlet</artifactId>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
       <scope>test</scope>
     </dependency>
 <!-- HBase dependencies to call the API to localize the JARs -->
@@ -390,6 +394,10 @@
         <exclusion>
           <groupId>commmons-logging</groupId>
           <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>javax.servlet-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -458,7 +466,6 @@
             </goals>
             <configuration>
               <sources>
-                <source>src/gen/protobuf/gen-java</source>
                 <source>src/gen/thrift/gen-javabean</source>
               </sources>
             </configuration>

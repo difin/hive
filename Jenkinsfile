@@ -112,8 +112,9 @@ set -x
 . /etc/profile.d/confs.sh
 function retry() { n=$1;shift;for((i=0;i<n;i++));do r=0;"$@" || r=$?; [ "$r" == "0" ] && break;echo "@@@ try#$[ $i + 1 ]/$n failed with $r";done ; return $r;}
 export USER="`whoami`"
-export MAVEN_OPTS="-Xmx2g"
+export MAVEN_OPTS="-Xmx4G"
 export -n HIVE_CONF_DIR
+sw java 17 && . /etc/profile.d/java.sh
 cp $SETTINGS .git/settings.xml
 OPTS=" -s $PWD/.git/settings.xml  -Dtest.groups= "
 OPTS+=" -Pitests,qsplits,dist"
@@ -322,12 +323,14 @@ if(false)
         stage('init-metastore') {
            withEnv(["dbType=$dbType"]) {
              sh '''#!/bin/bash -e
+             sw java 17 && . /etc/profile.d/java.sh
 set -x
 echo 127.0.0.1 dev_$dbType | sudo tee -a /etc/hosts
 . /etc/profile.d/confs.sh
 sw hive-dev $PWD
 ping -c2 dev_$dbType
 export DOCKER_NETWORK=host
+export HADOOP_CLIENT_OPTS="--add-opens java.base/java.net=ALL-UNNAMED"
 reinit_metastore $dbType
 '''
           }

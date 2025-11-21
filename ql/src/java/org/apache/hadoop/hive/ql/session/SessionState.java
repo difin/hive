@@ -722,6 +722,10 @@ public class SessionState {
   }
 
   private static void start(SessionState startSs, boolean isAsync, LogHelper console) {
+    // Starting from ORC 2.x, ZSTD is the default compression codec and is implemented using the zstd-jni library.
+    // To fallback to the pure Java implementation (Aircompressor), set the appropriate configuration property.
+    // TODO: ZSTD with zstd-jni is currently not yet supported in Hive.
+    System.setProperty("orc.compression.zstd.impl", "java");
     setCurrentSessionState(startSs);
 
     synchronized(SessionState.class) {

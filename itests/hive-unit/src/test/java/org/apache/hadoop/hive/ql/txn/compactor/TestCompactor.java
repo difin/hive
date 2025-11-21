@@ -69,7 +69,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.FieldSetter;
+import org.apache.hive.common.util.ReflectionUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -161,7 +161,7 @@ public class TestCompactor extends TestCompactorBase {
     worker.setThreadId((int) worker.getId());
     worker.setConf(conf);
     worker.init(new AtomicBoolean(true));
-    FieldSetter.setField(worker, RemoteCompactorThread.class.getDeclaredField("msc"), mockedClient);
+    ReflectionUtil.setField(worker, RemoteCompactorThread.class.getDeclaredField("msc"), mockedClient);
 
     worker.run();
 

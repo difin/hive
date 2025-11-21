@@ -521,7 +521,9 @@ public class VectorizationContext {
     udfsNeedingImplicitDecimalCast.add(UDFLog2.class);
     udfsNeedingImplicitDecimalCast.add(UDFSin.class);
     udfsNeedingImplicitDecimalCast.add(UDFAsin.class);
+    udfsNeedingImplicitDecimalCast.add(UDFSinh.class);
     udfsNeedingImplicitDecimalCast.add(UDFCos.class);
+    udfsNeedingImplicitDecimalCast.add(UDFCosh.class);
     udfsNeedingImplicitDecimalCast.add(UDFAcos.class);
     udfsNeedingImplicitDecimalCast.add(UDFLog10.class);
     udfsNeedingImplicitDecimalCast.add(UDFLog.class);
@@ -530,6 +532,7 @@ public class VectorizationContext {
     udfsNeedingImplicitDecimalCast.add(UDFRadians.class);
     udfsNeedingImplicitDecimalCast.add(UDFAtan.class);
     udfsNeedingImplicitDecimalCast.add(UDFTan.class);
+    udfsNeedingImplicitDecimalCast.add(UDFTanh.class);
     udfsNeedingImplicitDecimalCast.add(UDFOPLongDivide.class);
   }
 

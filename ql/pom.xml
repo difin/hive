@@ -36,8 +36,31 @@
     <!-- intra-project -->
     <!-- used for vector code-gen -->
     <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js-scriptengine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.atlas</groupId>
-      <artifactId>atlas-client-v2-shaded</artifactId>
+      <artifactId>atlas-client-v2</artifactId>
+      <version>${atlas.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jul-to-slf4j</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.atlas</groupId>
+      <artifactId>atlas-client-common</artifactId>
       <version>${atlas.version}</version>
       <exclusions>
         <exclusion>
@@ -49,12 +72,8 @@
           <artifactId>jul-to-slf4j</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.glassfish.jersey.media</groupId>
-          <artifactId>jersey-media-multipart</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-client</artifactId>
+          <groupId>jakarta.ws.rs</groupId>
+          <artifactId>jakarta.ws.rs-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -78,6 +97,10 @@
         <exclusion>
           <groupId>org.springframework</groupId>
           <artifactId>spring-context</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>jakarta.ws.rs</groupId>
+          <artifactId>jakarta.ws.rs-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -206,6 +229,10 @@
       <version>${commons-lang.version}</version>
     </dependency>
     <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+    </dependency>
+      <dependency>
       <groupId>com.github.luben</groupId>
       <artifactId>zstd-jni</artifactId>
       <version>${zstd-jni.version}</version>
@@ -521,11 +548,6 @@
       <groupId>stax</groupId>
       <artifactId>stax-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>net.sf.opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <version>${opencsv.version}</version>
-    </dependency>
     <!-- test intra-project -->
     <dependency>
       <groupId>org.apache.hive</groupId>
@@ -723,6 +745,17 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>com.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>${opencsv.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-beanutils</groupId>
+          <artifactId>commons-beanutils</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
       <groupId>org.apache.tez</groupId>
       <artifactId>tez-dag</artifactId>
       <optional>true</optional>
@@ -768,8 +801,8 @@
           <version>${avro.version}</version>
       </dependency>
     <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-servlet</artifactId>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-servlet</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -811,8 +844,13 @@
       <version>${re2j.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-multipart</artifactId>
+      <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-multipart</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-client</artifactId>
       <version>${jersey.version}</version>
     </dependency>
     <dependency>
@@ -867,59 +905,6 @@
           </plugins>
        </build>
     </profile>
-    <profile>
-      <id>protobuf</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>generate-protobuf-sources</id>
-                <phase>generate-sources</phase>
-                <configuration>
-                  <target>
-                    <property location="${basedir}/src/protobuf/java" name="protobuf.src.dir" />
-                    <property location="${basedir}/src/gen/protobuf/gen-java" name="protobuf.build.dir" />
-                    <echo>Building ql Protobuf</echo>
-                    <mkdir dir="${protobuf.build.dir}" />
-                    <exec executable="protoc" failonerror="true">
-                      <arg value="--java_out=${protobuf.build.dir}" />
-                      <arg value="-I=${protobuf.src.dir}" />
-                      <arg value="${protobuf.src.dir}/HiveEvents.proto" />
-                    </exec>
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>generate-protobuf-test-sources</id>
-                <phase>generate-test-sources</phase>
-                <configuration>
-                  <target>
-                    <property location="${basedir}/src/protobuf/test" name="protobuf.src.dir" />
-                    <property location="${basedir}/src/gen/protobuf/gen-test" name="protobuf.build.dir" />
-                    <echo>Building ql test Protobuf</echo>
-                    <mkdir dir="${protobuf.build.dir}" />
-                    <exec executable="protoc" failonerror="true">
-                      <arg value="--java_out=${protobuf.build.dir}" />
-                      <arg value="-I=${protobuf.src.dir}" />
-                      <arg value="${protobuf.src.dir}/SampleProtos.proto" />
-                    </exec>
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
 
   <build>
@@ -927,6 +912,32 @@
     <testSourceDirectory>${basedir}/src/test</testSourceDirectory>
     <plugins>
       <!-- plugins are always listed in sorted order by groupId, artifectId -->
+      <plugin>
+        <groupId>com.github.os72</groupId>
+        <artifactId>protoc-jar-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <protocArtifact>com.google.protobuf:protoc:${protobuf.version}</protocArtifact>
+              <protocCommand>${protoc.path}</protocCommand>
+              <addSources>none</addSources>
+              <inputDirectories>
+                <include>${basedir}/src/protobuf/java</include>
+                <include>${basedir}/src/protobuf/test</include>
+              </inputDirectories>
+              <outputTargets>
+                <outputTarget>
+                  <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
+                </outputTarget>
+              </outputTargets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -967,6 +978,21 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>${maven.test.jvm.args}</argLine>
+          <environmentVariables>
+            <HIVE_CLUSTER_ID>hive-test-cluster-id-env</HIVE_CLUSTER_ID>
+            <TZ>US/Pacific</TZ>
+            <LANG>en_US.UTF-8</LANG>
+            <HADOOP_CLASSPATH>${test.conf.dir}:${basedir}/${hive.path.to.root}/conf</HADOOP_CLASSPATH>
+            <HIVE_HADOOP_TEST_CLASSPATH>${test.hive.hadoop.classpath}</HIVE_HADOOP_TEST_CLASSPATH>
+            <PATH>${env.PATH}${test.extra.path}</PATH>
+          </environmentVariables>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1098,12 +1124,13 @@
                   <include>com.fasterxml.jackson.core:jackson-annotations</include>
                   <include>com.fasterxml.jackson.core:jackson-databind</include>
                   <include>com.google.guava:guava</include>
-                  <include>net.sf.opencsv:opencsv</include>
+                  <include>com.opencsv:opencsv</include>
                   <include>org.apache.hive:hive-storage-api</include>
                   <include>org.threeten:threeten-extra</include>
                   <include>org.apache.orc:orc-core</include>
                   <include>org.apache.orc:orc-shims</include>
                   <include>org.apache.orc:orc-tools</include>
+                  <include>org.apache.orc:orc-format</include>
                   <include>joda-time:joda-time</include>
                   <include>com.google.re2j:re2j</include>
                   <include>io.netty:*</include>
@@ -1180,7 +1207,6 @@
               <sources>
                 <source>src/gen/thrift/gen-javabean</source>
                 <source>${project.build.directory}/generated-sources/java</source>
-                <source>src/gen/protobuf/gen-java</source>
               </sources>
             </configuration>
           </execution>
@@ -1193,7 +1219,6 @@
             <configuration>
               <sources>
                 <source>${project.build.directory}/generated-test-sources/java</source>
-                <source>src/gen/protobuf/gen-test</source>
               </sources>
             </configuration>
           </execution>
