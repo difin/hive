@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
@@ -142,7 +143,7 @@ class VectorizedKafkaRecordReader implements RecordReader<NullWritable, Vectoriz
     LOG.trace("total read bytes [{}]", readBytes);
     if (consumer != null) {
       consumer.wakeup();
-      consumer.close();
+      consumer.close(Duration.ZERO);
     }
   }
 
