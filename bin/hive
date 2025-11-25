@@ -149,8 +149,6 @@ HIVE_SLF4J_API_JAR="$PARCEL_JARS_DIR/slf4j-api-1.7.30.jar"
 
 if [ -f "$HIVE_SLF4J_API_JAR" ]; then
     CLASSPATH="${HIVE_SLF4J_API_JAR}:${CLASSPATH}"
-else
-    echo "WARNING: Could not find SLF4j required jar on classpath: $HIVE_SLF4J_API_JAR"
 fi
 
 for f in $(find "${HIVE_LIB}" -name  "*.jar" | grep -v "$HIVE_CP_EXCLUDE_LIST"); do
