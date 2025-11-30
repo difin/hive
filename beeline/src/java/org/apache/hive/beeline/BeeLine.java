@@ -66,11 +66,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -292,12 +292,6 @@ public class BeeLine implements Closeable {
   };
 
   private final Completer beeLineCommandCompleter = new BeeLineCommandCompleter(Arrays.asList(commandHandlers));
-
-  static final SortedSet<String> KNOWN_DRIVERS = new TreeSet<String>(Arrays.asList(
-      new String[] {
-          "org.apache.hive.jdbc.HiveDriver",
-          "org.apache.hadoop.hive.jdbc.HiveDriver",
-      }));
 
   static {
     try {
@@ -2252,22 +2246,15 @@ public class BeeLine implements Closeable {
     return null;
   }
 
-  public Driver findLocalDriver(String url) throws Exception {
-    if(drivers == null){
-      return null;
-    }
+  public Driver findLocalDriver(String url) throws SQLException {
+    Objects.requireNonNull(url);
 
-    for (Driver d : drivers) {
-      try {
-        String clazzName = d.getClass().getName();
-        Driver driver = (Driver) Class.forName(clazzName, true,
-          Thread.currentThread().getContextClassLoader()).newInstance();
-        if (driver.acceptsURL(url) && isSupportedLocalDriver(driver)) {
-          return driver;
-        }
-      } catch (SQLException e) {
-        error(e);
-        throw new Exception(e);
+    Collection<Driver> currentDrivers = drivers == null ? Collections.emptyList() : drivers;
+    for (Driver driver : currentDrivers) {
+      // The 'driver' is already an instance from the ServiceLoader.
+      // We can use it directly without creating a new one via reflection.
+      if (driver.acceptsURL(url) && isSupportedLocalDriver(driver)) {
+        return driver;
       }
     }
     return null;

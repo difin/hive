@@ -50,7 +50,6 @@ public class TestHs2HooksWithMiniKdc {
 
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
-    Class.forName(MiniHS2.getJdbcDriverName());
     confOverlay.put(ConfVars.POSTEXECHOOKS.varname, PostExecHook.class.getName());
     confOverlay.put(ConfVars.PREEXECHOOKS.varname, PreExecHook.class.getName());
     confOverlay.put(ConfVars.SEMANTIC_ANALYZER_HOOK.varname,

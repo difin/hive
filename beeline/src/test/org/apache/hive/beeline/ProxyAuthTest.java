@@ -47,7 +47,6 @@ import org.apache.hadoop.hive.shims.Utils;
  *      <HS2host> <HS2Port> <HS2-Server-principal> <client-principal>
  */
 public class ProxyAuthTest {
-  private static final String driverName = "org.apache.hive.jdbc.HiveDriver";
   private static final String BEELINE_EXIT = "beeline.system.exit";
   private static Connection con = null;
   private static boolean noClose = false;
@@ -71,7 +70,6 @@ public class ProxyAuthTest {
     File currentResultFile = null;
     String [] beeLineArgs = {};
 
-    Class.forName(driverName);
     String host = args[0];
     String port = args[1];
     String serverPrincipal = args[2];
