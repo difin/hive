@@ -17,7 +17,6 @@
 package org.apache.hadoop.hive.ql.optimizer.calcite.rules;
 
 import org.apache.calcite.adapter.jdbc.JdbcConvention;
-import org.apache.calcite.adapter.jdbc.JdbcRel;
 import org.apache.calcite.adapter.jdbc.JdbcRules.JdbcAggregate;
 import org.apache.calcite.adapter.jdbc.JdbcRules.JdbcAggregateRule;
 import org.apache.calcite.adapter.jdbc.JdbcRules.JdbcFilter;
@@ -26,6 +25,7 @@ import org.apache.calcite.adapter.jdbc.JdbcRules.JdbcJoin;
 import org.apache.calcite.adapter.jdbc.JdbcRules.JdbcJoinRule;
 import org.apache.calcite.adapter.jdbc.JdbcRules.JdbcProject;
 import org.apache.calcite.adapter.jdbc.JdbcRules.JdbcProjectRule;
+import org.apache.calcite.adapter.jdbc.JdbcRules.JdbcSort;
 import org.apache.calcite.linq4j.Ord;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptUtil;
@@ -364,17 +364,6 @@ public class RelFieldTrimmer implements ReflectiveVisitor {
     return result(rel,
         Mappings.createIdentity(rel.getRowType().getFieldCount()));
   }
-
-  public TrimResult trimFields(
-      JdbcRel rel,
-      ImmutableBitSet fieldsUsed,
-      Set<RelDataTypeField> extraFields) {
-    // We don't know how to trim this kind of relational expression, so give
-    // it back intact.
-    Util.discard(fieldsUsed);
-    return result(rel,
-        Mappings.createIdentity(rel.getRowType().getFieldCount()));
-  }
   
   public TrimResult trimFields(
       HiveJdbcConverter converter,
@@ -588,6 +577,13 @@ public class RelFieldTrimmer implements ReflectiveVisitor {
     // return fields that the consumer didn't ask for, because the filter
     // needs them for its condition.
     return result(relBuilder.build(), inputMapping);
+  }
+
+  public TrimResult trimFields(
+      JdbcSort rel,
+      ImmutableBitSet fieldsUsed,
+      Set<RelDataTypeField> extraFields) {
+    return result(rel, Mappings.createIdentity(rel.getRowType().getFieldCount()));
   }
 
   /**
