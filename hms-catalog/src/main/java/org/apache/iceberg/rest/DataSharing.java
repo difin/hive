@@ -258,10 +258,29 @@ public class DataSharing {
       // derive the root location for the table, hack until we find a better way
       tableRoot = table.substring(0, table.lastIndexOf("/metadata"));
     }
+    // Strip the URI scheme (s3a://, s3://, ofs://, etc.)  [bucket]/[prefix]
+    tableRoot = stripScheme(tableRoot);
     int idx = lastKnownGood.get();
-    URL accessTokenUrl = resolve(idx, accessTokenPath + "?path=" + urlEncodeUTF8(tableRoot) + "&permissions=read-only").toURL();
+    URL accessTokenUrl = resolve(idx, accessTokenPath + "?path=" + urlEncodeUTF8(tableRoot) + "&policy=read-only").toURL();
     LOG.debug("==> DataSharing.accessTokenUrl() returning : {} ", accessTokenUrl);
     return accessTokenUrl;
+  }
+
+  /**
+   * Strip the URI scheme from a path, returning bucket/prefix.
+   *
+   * @param path the path potentially containing a URI scheme
+   * @return the path without the scheme
+   */
+  private static String stripScheme(String path) {
+    if (path == null) {
+      return null;
+    }
+    int schemeEnd = path.indexOf("://");
+    if (schemeEnd > 0) {
+      return path.substring(schemeEnd + 3);
+    }
+    return path;
   }
 
   /**
