@@ -66,6 +66,8 @@ public class CatalogMeteringEventPublisher implements AutoCloseable {
       return thread;
     });
     try {
+      publishMeteringEventAtFixedRate();
+      addMeteringShutdownHook();
       initialize();
     } catch (Exception ex) {
       logger.error("Error while configuring metering, so the metering events cannot be published", ex);
@@ -76,8 +78,6 @@ public class CatalogMeteringEventPublisher implements AutoCloseable {
     initializeDirectory();
     initializeFileState();
     rotateFileIfNeeded();
-    publishMeteringEventAtFixedRate();
-    addMeteringShutdownHook();
   }
 
   public void updateAPICount() {
@@ -139,11 +139,10 @@ public class CatalogMeteringEventPublisher implements AutoCloseable {
         Files.createFile(filePath);
         setFilePermissions(filePath);
         logger.info("Created new metering file: {}", filePath);
-        return null;
       } catch (IOException ex) {
         logger.error("Error performing Failed to create new metering file {}", filePath, ex);
-        throw new RuntimeException("Failed to create new metering file: " + filePath, ex);
       }
+      return null;
     });
     return filePath;
   }
@@ -155,11 +154,10 @@ public class CatalogMeteringEventPublisher implements AutoCloseable {
         Files.createDirectories(dirPath);
         setFilePermissions(dirPath);
         logger.info("Created metering directory at {}", dirPath);
-        return null;
       } catch (IOException ex) {
         logger.error("Error Failed to create new metering file {}", dirPath, ex);
-        throw new RuntimeException("Failed to create new metering file", ex);
       }
+      return null;
     });
   }
 
