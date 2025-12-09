@@ -56,7 +56,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -169,7 +169,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -208,7 +208,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -235,7 +235,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -285,7 +285,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -312,7 +312,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -340,7 +340,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -460,7 +460,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -501,7 +501,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -529,7 +529,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -582,7 +582,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -610,7 +610,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -637,7 +637,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -750,7 +750,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -790,7 +790,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -818,7 +818,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -871,7 +871,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file
@@ -899,7 +899,7 @@ key_metadata        	binary              	Encryption key metadata blob
 split_offsets       	array<bigint>       	Splittable offsets  
 equality_ids        	array<int>          	Equality comparison field IDs
 sort_order_id       	int                 	Sort order ID       
-first_row_id        	bigint              	Starting row ID to assign to new rows
+first_row_id        	bigint              	The first row ID assigned to the first row in the data file
 referenced_data_file	string              	Fully qualified location (URI with FS scheme) of a data file that all deletes reference
 content_offset      	bigint              	The offset in the file where the content starts
 content_size_in_bytes	bigint              	The length of referenced content stored in the file

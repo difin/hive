@@ -94,9 +94,6 @@
                                     <outputDirectory>${project.build.directory}/classes</outputDirectory>
                                     <excludes>
                                         **/HadoopInputFile.class
-                                        **/StructLikeMap.class
-                                        **/StructLikeWrapper.class
-                                        org.apache.iceberg.PartitionsTable.class
                                     </excludes>
                                 </artifactItem>
                             </artifactItems>
