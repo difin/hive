@@ -4684,15 +4684,32 @@ class ShowCompactRequest
   include ::Thrift::Struct, ::Thrift::Struct_Union
   POOLNAME = 1
   ORDER = 2
+  ID = 3
+  DBNAME = 4
+  TBNAME = 5
+  PARTNAME = 6
+  TYPE = 7
+  STATE = 8
+  LIMIT = 9
 
   FIELDS = {
     POOLNAME => {:type => ::Thrift::Types::STRING, :name => 'poolName', :optional => true},
-    ORDER => {:type => ::Thrift::Types::STRING, :name => 'order', :optional => true}
+    ORDER => {:type => ::Thrift::Types::STRING, :name => 'order', :optional => true},
+    ID => {:type => ::Thrift::Types::I64, :name => 'id', :optional => true},
+    DBNAME => {:type => ::Thrift::Types::STRING, :name => 'dbName', :optional => true},
+    TBNAME => {:type => ::Thrift::Types::STRING, :name => 'tbName', :optional => true},
+    PARTNAME => {:type => ::Thrift::Types::STRING, :name => 'partName', :optional => true},
+    TYPE => {:type => ::Thrift::Types::I32, :name => 'type', :optional => true, :enum_class => ::CompactionType},
+    STATE => {:type => ::Thrift::Types::STRING, :name => 'state', :optional => true},
+    LIMIT => {:type => ::Thrift::Types::I64, :name => 'limit', :optional => true}
   }
 
   def struct_fields; FIELDS; end
 
   def validate
+    unless @type.nil? || ::CompactionType::VALID_VALUES.include?(@type)
+      raise ::Thrift::ProtocolException.new(::Thrift::ProtocolException::UNKNOWN, 'Invalid value of field type!')
+    end
   end
 
   ::Thrift::Struct.generate_accessors self

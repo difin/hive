@@ -29,17 +29,18 @@ import org.apache.hadoop.hive.ql.ddl.DDLOperation;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
 import org.apache.hadoop.hive.ql.ddl.ShowUtils;
 import org.apache.hadoop.hive.ql.exec.Utilities;
+import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
-
+import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.session.SessionState;
+import static org.apache.commons.collections.MapUtils.isNotEmpty;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.NO_VAL;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getHostFromId;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getThreadIdFromId;
-
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-import org.apache.hadoop.hive.ql.parse.SemanticException;
-import org.apache.hadoop.hive.ql.session.SessionState;
-
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.hadoop.hive.ql.io.AcidUtils.compactionStateStr2Enum;
+import static org.apache.hadoop.hive.ql.io.AcidUtils.compactionTypeStr2ThriftType;
 
 /**
  * Operation process of showing compactions.
@@ -55,7 +56,6 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
     // Call the metastore to get the status of all known compactions (completed get purged eventually)
     ShowCompactRequest request = getShowCompactioRequest(desc);
     ShowCompactResponse rsp = context.getDb().showCompactions(request);
-
     // Write the results into the file
     try (DataOutputStream os = ShowUtils.getOutputStream(new Path(desc.getResFile()), context)) {
       // Write a header
@@ -77,8 +77,31 @@ public class ShowCompactionsOperation extends DDLOperation<ShowCompactionsDesc> 
 
   private ShowCompactRequest getShowCompactioRequest(ShowCompactionsDesc desc) throws SemanticException {
     ShowCompactRequest request = new ShowCompactRequest();
+    if (isBlank(desc.getDbName()) && isNotBlank(desc.getTbName())) {
+      request.setDbName(SessionState.get().getCurrentDatabase());
+    } else {
+      request.setDbName(desc.getDbName());
+    }
+    if (isNotBlank(desc.getTbName())) {
+      request.setTbName(desc.getTbName());
+    }
     if (isNotBlank(desc.getPoolName())) {
       request.setPoolName(desc.getPoolName());
+    }
+    if (isNotBlank(desc.getCompactionType())) {
+      request.setType(compactionTypeStr2ThriftType(desc.getCompactionType()));
+    }
+    if (isNotBlank(desc.getCompactionStatus())) {
+      request.setState(compactionStateStr2Enum(desc.getCompactionStatus()).getSqlConst());
+    }
+    if (isNotEmpty(desc.getPartSpec())) {
+      request.setPartName(AcidUtils.getPartitionName(desc.getPartSpec()));
+    }
+    if(desc.getCompactionId()>0){
+     request.setId(desc.getCompactionId());
+    }
+    if (desc.getLimit()>0) {
+      request.setLimit(desc.getLimit());
     }
     if (isNotBlank(desc.getOrderBy())) {
       request.setOrder(desc.getOrderBy());

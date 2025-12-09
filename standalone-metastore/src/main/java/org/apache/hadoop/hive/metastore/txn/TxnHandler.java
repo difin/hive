@@ -839,7 +839,7 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
 
   @Override
   public ShowCompactResponse showCompact(ShowCompactRequest rqst) throws MetaException {
-    return jdbcResource.execute(new ShowCompactHandler(rqst));
+    return jdbcResource.execute(new ShowCompactHandler(rqst, sqlGenerator));
   }
 
   /**

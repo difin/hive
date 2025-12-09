@@ -1007,6 +1007,7 @@ nonReserved
     | KW_OPTIMIZE
     | KW_ORDERED
     | KW_LOCALLY
+    | KW_COMPACT_ID
 ;
 
 //The following SQL2011 reserved keywords are used as function name only, but not as identifiers.

@@ -31,6 +31,42 @@ class ShowCompactRequest
             'isRequired' => false,
             'type' => TType::STRING,
         ),
+        3 => array(
+            'var' => 'id',
+            'isRequired' => false,
+            'type' => TType::I64,
+        ),
+        4 => array(
+            'var' => 'dbName',
+            'isRequired' => false,
+            'type' => TType::STRING,
+        ),
+        5 => array(
+            'var' => 'tbName',
+            'isRequired' => false,
+            'type' => TType::STRING,
+        ),
+        6 => array(
+            'var' => 'partName',
+            'isRequired' => false,
+            'type' => TType::STRING,
+        ),
+        7 => array(
+            'var' => 'type',
+            'isRequired' => false,
+            'type' => TType::I32,
+            'class' => '\metastore\CompactionType',
+        ),
+        8 => array(
+            'var' => 'state',
+            'isRequired' => false,
+            'type' => TType::STRING,
+        ),
+        9 => array(
+            'var' => 'limit',
+            'isRequired' => false,
+            'type' => TType::I64,
+        ),
     );
 
     /**
@@ -41,6 +77,34 @@ class ShowCompactRequest
      * @var string
      */
     public $order = null;
+    /**
+     * @var int
+     */
+    public $id = null;
+    /**
+     * @var string
+     */
+    public $dbName = null;
+    /**
+     * @var string
+     */
+    public $tbName = null;
+    /**
+     * @var string
+     */
+    public $partName = null;
+    /**
+     * @var int
+     */
+    public $type = null;
+    /**
+     * @var string
+     */
+    public $state = null;
+    /**
+     * @var int
+     */
+    public $limit = null;
 
     public function __construct($vals = null)
     {
@@ -50,6 +114,27 @@ class ShowCompactRequest
             }
             if (isset($vals['order'])) {
                 $this->order = $vals['order'];
+            }
+            if (isset($vals['id'])) {
+                $this->id = $vals['id'];
+            }
+            if (isset($vals['dbName'])) {
+                $this->dbName = $vals['dbName'];
+            }
+            if (isset($vals['tbName'])) {
+                $this->tbName = $vals['tbName'];
+            }
+            if (isset($vals['partName'])) {
+                $this->partName = $vals['partName'];
+            }
+            if (isset($vals['type'])) {
+                $this->type = $vals['type'];
+            }
+            if (isset($vals['state'])) {
+                $this->state = $vals['state'];
+            }
+            if (isset($vals['limit'])) {
+                $this->limit = $vals['limit'];
             }
         }
     }
@@ -87,6 +172,55 @@ class ShowCompactRequest
                         $xfer += $input->skip($ftype);
                     }
                     break;
+                case 3:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->id);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 4:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->dbName);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 5:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->tbName);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 6:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->partName);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 7:
+                    if ($ftype == TType::I32) {
+                        $xfer += $input->readI32($this->type);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 8:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->state);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
+                case 9:
+                    if ($ftype == TType::I64) {
+                        $xfer += $input->readI64($this->limit);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
                 default:
                     $xfer += $input->skip($ftype);
                     break;
@@ -109,6 +243,41 @@ class ShowCompactRequest
         if ($this->order !== null) {
             $xfer += $output->writeFieldBegin('order', TType::STRING, 2);
             $xfer += $output->writeString($this->order);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->id !== null) {
+            $xfer += $output->writeFieldBegin('id', TType::I64, 3);
+            $xfer += $output->writeI64($this->id);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->dbName !== null) {
+            $xfer += $output->writeFieldBegin('dbName', TType::STRING, 4);
+            $xfer += $output->writeString($this->dbName);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->tbName !== null) {
+            $xfer += $output->writeFieldBegin('tbName', TType::STRING, 5);
+            $xfer += $output->writeString($this->tbName);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->partName !== null) {
+            $xfer += $output->writeFieldBegin('partName', TType::STRING, 6);
+            $xfer += $output->writeString($this->partName);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->type !== null) {
+            $xfer += $output->writeFieldBegin('type', TType::I32, 7);
+            $xfer += $output->writeI32($this->type);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->state !== null) {
+            $xfer += $output->writeFieldBegin('state', TType::STRING, 8);
+            $xfer += $output->writeString($this->state);
+            $xfer += $output->writeFieldEnd();
+        }
+        if ($this->limit !== null) {
+            $xfer += $output->writeFieldBegin('limit', TType::I64, 9);
+            $xfer += $output->writeI64($this->limit);
             $xfer += $output->writeFieldEnd();
         }
         $xfer += $output->writeFieldStop();

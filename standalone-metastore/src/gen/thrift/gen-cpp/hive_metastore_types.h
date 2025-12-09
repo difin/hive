@@ -11306,9 +11306,16 @@ void swap(CompactionResponse &a, CompactionResponse &b);
 std::ostream& operator<<(std::ostream& out, const CompactionResponse& obj);
 
 typedef struct _ShowCompactRequest__isset {
-  _ShowCompactRequest__isset() : poolName(false), order(false) {}
+  _ShowCompactRequest__isset() : poolName(false), order(false), id(false), dbName(false), tbName(false), partName(false), type(false), state(false), limit(false) {}
   bool poolName :1;
   bool order :1;
+  bool id :1;
+  bool dbName :1;
+  bool tbName :1;
+  bool partName :1;
+  bool type :1;
+  bool state :1;
+  bool limit :1;
 } _ShowCompactRequest__isset;
 
 class ShowCompactRequest : public virtual ::apache::thrift::TBase {
@@ -11318,18 +11325,50 @@ class ShowCompactRequest : public virtual ::apache::thrift::TBase {
   ShowCompactRequest& operator=(const ShowCompactRequest&);
   ShowCompactRequest() noexcept
                      : poolName(),
-                       order() {
+                       order(),
+                       id(0),
+                       dbName(),
+                       tbName(),
+                       partName(),
+                       type(static_cast<CompactionType::type>(0)),
+                       state(),
+                       limit(0) {
   }
 
   virtual ~ShowCompactRequest() noexcept;
   std::string poolName;
   std::string order;
+  int64_t id;
+  std::string dbName;
+  std::string tbName;
+  std::string partName;
+  /**
+   * 
+   * @see CompactionType
+   */
+  CompactionType::type type;
+  std::string state;
+  int64_t limit;
 
   _ShowCompactRequest__isset __isset;
 
   void __set_poolName(const std::string& val);
 
   void __set_order(const std::string& val);
+
+  void __set_id(const int64_t val);
+
+  void __set_dbName(const std::string& val);
+
+  void __set_tbName(const std::string& val);
+
+  void __set_partName(const std::string& val);
+
+  void __set_type(const CompactionType::type val);
+
+  void __set_state(const std::string& val);
+
+  void __set_limit(const int64_t val);
 
   bool operator == (const ShowCompactRequest & rhs) const
   {
@@ -11340,6 +11379,34 @@ class ShowCompactRequest : public virtual ::apache::thrift::TBase {
     if (__isset.order != rhs.__isset.order)
       return false;
     else if (__isset.order && !(order == rhs.order))
+      return false;
+    if (__isset.id != rhs.__isset.id)
+      return false;
+    else if (__isset.id && !(id == rhs.id))
+      return false;
+    if (__isset.dbName != rhs.__isset.dbName)
+      return false;
+    else if (__isset.dbName && !(dbName == rhs.dbName))
+      return false;
+    if (__isset.tbName != rhs.__isset.tbName)
+      return false;
+    else if (__isset.tbName && !(tbName == rhs.tbName))
+      return false;
+    if (__isset.partName != rhs.__isset.partName)
+      return false;
+    else if (__isset.partName && !(partName == rhs.partName))
+      return false;
+    if (__isset.type != rhs.__isset.type)
+      return false;
+    else if (__isset.type && !(type == rhs.type))
+      return false;
+    if (__isset.state != rhs.__isset.state)
+      return false;
+    else if (__isset.state && !(state == rhs.state))
+      return false;
+    if (__isset.limit != rhs.__isset.limit)
+      return false;
+    else if (__isset.limit && !(limit == rhs.limit))
       return false;
     return true;
   }

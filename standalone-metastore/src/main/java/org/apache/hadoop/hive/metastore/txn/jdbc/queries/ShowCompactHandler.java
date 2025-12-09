@@ -23,6 +23,7 @@ import org.apache.hadoop.hive.metastore.api.ShowCompactRequest;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponse;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponseElement;
 import org.apache.hadoop.hive.metastore.tools.SQLGenerator;
+import org.apache.hadoop.hive.metastore.txn.MetaWrapperException;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.metastore.txn.entities.CompactionState;
 import org.apache.hadoop.hive.metastore.txn.jdbc.QueryHandler;
@@ -66,6 +67,13 @@ public class ShowCompactHandler implements QueryHandler<ShowCompactResponse> {
           "FROM " +
           "  \"COMPLETED_COMPACTIONS\" ) XX " +
           "WHERE " +
+          "  (\"CC_ID\" = :id OR :id IS NULL) AND " +
+          "  (\"CC_POOL_NAME\" = :poolName OR :poolName IS NULL) AND " +
+          "  (\"CC_DATABASE\" = :dbName OR :dbName IS NULL) AND " +
+          "  (\"CC_TABLE\" = :tableName OR :tableName IS NULL) AND " +
+          "  (\"CC_PARTITION\" = :partition OR :partition IS NULL) AND " +
+          "  (\"CC_STATE\" = :state OR :state IS NULL) AND " +
+          "  (\"CC_TYPE\" = :type OR :type IS NULL) AND " +
           "  (\"CC_POOL_NAME\" = :poolName OR :poolName IS NULL)";
 
   //language=SQL
@@ -80,22 +88,39 @@ public class ShowCompactHandler implements QueryHandler<ShowCompactResponse> {
           "\"CC_ENQUEUE_TIME\" asc";
 
   private final ShowCompactRequest request;
+  private final SQLGenerator sqlGenerator;
 
-
-  public ShowCompactHandler(ShowCompactRequest request) {
+  public ShowCompactHandler(ShowCompactRequest request, SQLGenerator sqlGenerator) {
     this.request = request;
+    this.sqlGenerator = sqlGenerator;
   }
 
   @Override
   public String getParameterizedQueryString(DatabaseProduct databaseProduct) throws MetaException {
     String noSelectQuery = SHOW_COMPACTION_QUERY + getShowCompactSortingOrderClause(request);
+    int rowLimit = (int) request.getLimit();
+    if (rowLimit > 0) {
+      return sqlGenerator.addLimitClause(rowLimit, noSelectQuery);
+    } else {
+    }
     return "SELECT " + noSelectQuery;
   }
 
   @Override
   public SqlParameterSource getQueryParameters() {
-    return new MapSqlParameterSource()
-        .addValue("poolName", request.getPoolName(), Types.VARCHAR);
+    Long id = request.getId() > 0 ? request.getId() : null;
+    try {
+      return new MapSqlParameterSource()
+          .addValue("id", id, Types.BIGINT)
+          .addValue("dbName", request.getDbName(), Types.VARCHAR)
+          .addValue("tableName", request.getTbName(), Types.VARCHAR)
+          .addValue("partition", request.getPartName(), Types.VARCHAR)
+          .addValue("state", request.getState(), Types.CHAR)
+          .addValue("type", request.getType() == null ? null : Character.toString(TxnUtils.thriftCompactionType2DbType(request.getType())), Types.CHAR)
+          .addValue("poolName", request.getPoolName(), Types.VARCHAR);
+    } catch (MetaException e) {
+      throw new MetaWrapperException(e);
+    }
   }
 
   @Override

@@ -206,6 +206,7 @@ TOK_ALTERPARTITION_BUCKETS;
 TOK_ALTERTABLE_CLUSTER_SORT;
 TOK_ALTERTABLE_COMPACT;
 TOK_COMPACT_POOL;
+TOK_COMPACT_ID;
 TOK_ALTERTABLE_DROPCONSTRAINT;
 TOK_ALTERTABLE_ADDCONSTRAINT;
 TOK_ALTERTABLE_UPDATECOLUMNS;
@@ -413,6 +414,8 @@ TOK_RESOURCE_URI;
 TOK_RESOURCE_LIST;
 TOK_SHOW_COMPACTIONS;
 TOK_SHOW_TRANSACTIONS;
+TOK_COMPACTION_TYPE;
+TOK_COMPACTION_STATUS;
 TOK_DELETE_FROM;
 TOK_UPDATE_TABLE;
 TOK_SET_COLUMNS_CLAUSE;
@@ -699,6 +702,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
     xlateMap.put("KW_DEFAULT", "DEFAULT");
     xlateMap.put("KW_CHECK", "CHECK");
     xlateMap.put("KW_POOL", "POOL");
+    xlateMap.put("KW_COMPACT_ID", "COMPACTIONID");
     xlateMap.put("KW_MOVE", "MOVE");
     xlateMap.put("KW_DO", "DO");
     xlateMap.put("KW_ALLOC_FRACTION", "ALLOC_FRACTION");
@@ -1343,7 +1347,14 @@ showStatement
       |
       (parttype=partTypeExpr)? (isExtended=KW_EXTENDED)? -> ^(TOK_SHOWLOCKS $parttype? $isExtended?)
       )
-    | KW_SHOW KW_COMPACTIONS compactPool? orderByClause? -> ^(TOK_SHOW_COMPACTIONS compactPool? orderByClause?)
+    | KW_SHOW KW_COMPACTIONS
+      (
+      (KW_COMPACT_ID) => compactionId -> ^(TOK_SHOW_COMPACTIONS compactionId)
+      |
+      (KW_DATABASE|KW_SCHEMA) => (KW_DATABASE|KW_SCHEMA) (dbName=identifier) compactionPool? compactionType? compactionStatus? orderByClause? limitClause? -> ^(TOK_SHOW_COMPACTIONS $dbName compactionPool? compactionType? compactionStatus? orderByClause? limitClause?)
+      |
+      (parttype=partTypeExpr)? compactionPool? compactionType? compactionStatus? orderByClause? limitClause? -> ^(TOK_SHOW_COMPACTIONS $parttype? compactionPool? compactionType? compactionStatus? orderByClause? limitClause?)
+      )
     | KW_SHOW KW_TRANSACTIONS -> ^(TOK_SHOW_TRANSACTIONS)
     | KW_SHOW KW_CONF StringLiteral -> ^(TOK_SHOWCONF StringLiteral)
     | KW_SHOW KW_RESOURCE
@@ -2903,9 +2914,21 @@ killQueryStatement
   KW_KILL KW_QUERY ( StringLiteral )+ -> ^(TOK_KILL_QUERY ( StringLiteral )+)
   ;
 
-compactPool
-@init { pushMsg("POOL clause", state); }
-@after { popMsg(state); }
-  : KW_POOL poolName=StringLiteral
-  -> ^(TOK_COMPACT_POOL $poolName)
+/*
+BEGIN SHOW COMPACTIONS statement
+*/
+compactionId
+  : KW_COMPACT_ID EQUAL compactId=Number -> ^(TOK_COMPACT_ID $compactId)
   ;
+compactionPool
+  : KW_POOL poolName=StringLiteral -> ^(TOK_COMPACT_POOL $poolName)
+  ;
+compactionType
+  : KW_TYPE compactType=StringLiteral -> ^(TOK_COMPACTION_TYPE $compactType)
+  ;
+compactionStatus
+  : KW_STATUS status=StringLiteral -> ^(TOK_COMPACTION_STATUS $status)
+  ;
+/*
+END SHOW COMPACTIONS statement
+*/
