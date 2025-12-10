@@ -19,7 +19,7 @@ usage() {
   echo "    - Token"
   echo
   echo "Example:"
-  echo "  ./run-coverage.sh -n Hive -u https://sonarqube.infra.cloudera.com/ -k org.apache.hive:hive -t SONAR_TOKEN -s ~/work/downstream/.m2/settings.xml"
+  echo "  ./run-coverage.sh -n Hive -u https://sonarqube.eng.cloudera.com/ -k org.apache.hive:hive -t SONAR_TOKEN -s ~/work/downstream/.m2/settings.xml"
 }
 
 execute() {

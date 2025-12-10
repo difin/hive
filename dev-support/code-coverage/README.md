@@ -52,10 +52,10 @@ Here is an example command for running code coverage analysis and publishing the
 
 ```
 cd dev-tools/code-coverage
-./run-coverage.sh -n Hive -u https://sonarqube.infra.cloudera.com/ -k hive-cdh-main -t <SONAR_TOKEN> -s ~/work/downstream/.m2/settings.xml
+./run-coverage.sh -n Hive -u https://sonarqube.eng.cloudera.com/ -k hive-cdh-main -t <SONAR_TOKEN> -s ~/work/downstream/.m2/settings.xml
 ```
 
-The token can be generated at https://sonarqube.infra.cloudera.com/account/security
+The token can be generated at https://sonarqube.eng.cloudera.com/account/security
 
 - select **generate token**
 - enter a token name: e.g. hive-cdw-coverage-report
@@ -87,7 +87,7 @@ Set the repo, git branch and sonar parameters in the script. See the configs for
 def REPO_URL="https://github.infra.cloudera.com/CDH/hive.git"
 
 def GIT_BRANCH="cdw-master"
-def SONAR_URL="https://sonarqube.infra.cloudera.com/"
+def SONAR_URL="https://sonarqube.eng.cloudera.com/"
 def SONAR_PROJECT_KEY="hive-cdw-master"
 def SONAR_TOKEN="sqp_0d5969037235068019e973bcdc1973a440dcf637"
 ```
@@ -96,7 +96,7 @@ def SONAR_TOKEN="sqp_0d5969037235068019e973bcdc1973a440dcf637"
 def REPO_URL="https://github.infra.cloudera.com/CDH/hive.git"
 
 def GIT_BRANCH="cdh_main"
-def SONAR_URL="https://sonarqube.infra.cloudera.com/"
+def SONAR_URL="https://sonarqube.eng.cloudera.com/"
 def SONAR_PROJECT_KEY="hive-cdh-main"
 def SONAR_TOKEN="sqp_a8ec6a22144fae77a36b502009d4244a241b0420"
 ```
@@ -104,8 +104,8 @@ def SONAR_TOKEN="sqp_a8ec6a22144fae77a36b502009d4244a241b0420"
 Run the build
 
 Find the Sonar reports at:
-* https://sonarqube.infra.cloudera.com/dashboard?id=hive-cdw-master
-* https://sonarqube.infra.cloudera.com/dashboard?id=hive-cdh-main
+* https://sonarqube.eng.cloudera.com/dashboard?id=hive-cdw-master
+* https://sonarqube.eng.cloudera.com/dashboard?id=hive-cdh-main
 
 **Don't forget to restore the build script to the original one!**
 You can do it right after your build is started.
