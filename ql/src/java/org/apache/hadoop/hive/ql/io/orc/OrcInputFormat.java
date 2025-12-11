@@ -20,7 +20,6 @@ package org.apache.hadoop.hive.ql.io.orc;
 
 import org.apache.hadoop.hdfs.protocol.HdfsLocatedFileStatus;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Equator;
 import org.apache.hadoop.hive.common.BlobStorageUtils;
 import org.apache.hadoop.hive.common.NoDynamicValuesException;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
@@ -385,7 +384,7 @@ public class OrcInputFormat implements InputFormat<NullWritable, OrcStruct>,
    * @return <code>false</code> if an ACID file, <code>true</code> if a simple orc file
    */
   public static boolean isOriginal(Reader file) {
-    return !checkIfAcidRowNamesFilled(file.getSchema().getFieldNames());
+    return !containsAllAcidRows(file.getSchema().getFieldNames());
   }
 
   /**
@@ -394,24 +393,15 @@ public class OrcInputFormat implements InputFormat<NullWritable, OrcStruct>,
    * @return <code>false</code> if an ACID file, <code>true</code> if a simple orc file
    */
   public static boolean isOriginal(Footer footer) {
-    return !checkIfAcidRowNamesFilled(footer.getTypesList().get(0).getFieldNamesList());
+    return !containsAllAcidRows(footer.getTypesList().get(0).getFieldNamesList());
   }
 
-  private static boolean checkIfAcidRowNamesFilled(Collection<String> fieldNames) {
-    return CollectionUtils.isEqualCollection(OrcRecordUpdater.ALL_ACID_ROW_NAMES, fieldNames, new IgnoreCaseEquator());
-  }
+  private static boolean containsAllAcidRows(Collection<String> fieldNames) {
+    Collection<String> lowerCaseFieldNames = fieldNames.stream()
+            .map(String::toLowerCase)
+            .collect(Collectors.toCollection(HashSet::new));
 
-  private static class IgnoreCaseEquator implements Equator<String> {
-
-    @Override
-    public boolean equate(String s, String t1) {
-      return s.equalsIgnoreCase(t1);
-    }
-
-    @Override
-    public int hash(String t) {
-      return 0;
-    }
+    return CollectionUtils.isEqualCollection(OrcRecordUpdater.ALL_ACID_ROW_NAMES, lowerCaseFieldNames);
   }
 
   public static boolean[] genIncludedColumns(TypeDescription readerSchema,
