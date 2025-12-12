@@ -224,9 +224,6 @@ import static org.apache.iceberg.SnapshotSummary.TOTAL_EQ_DELETES_PROP;
 import static org.apache.iceberg.SnapshotSummary.TOTAL_FILE_SIZE_PROP;
 import static org.apache.iceberg.SnapshotSummary.TOTAL_POS_DELETES_PROP;
 import static org.apache.iceberg.SnapshotSummary.TOTAL_RECORDS_PROP;
-import static org.apache.iceberg.mr.InputFormatConfig.SORT_COLUMNS;
-import static org.apache.iceberg.mr.InputFormatConfig.SORT_ORDER;
-import static org.apache.iceberg.mr.InputFormatConfig.ZORDER;
 
 public class HiveIcebergStorageHandler extends DefaultStorageHandler implements HiveStoragePredicateHandler {
   private static final Logger LOG = LoggerFactory.getLogger(HiveIcebergStorageHandler.class);
@@ -957,7 +954,8 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
 
     // Even if table has no explicit sort order, honor z-order if configured
     Map<String, String> props = table.properties();
-    if (ZORDER.equalsIgnoreCase(props.getOrDefault(SORT_ORDER, ""))) {
+    if (InputFormatConfig.ZORDER.equalsIgnoreCase(
+            props.getOrDefault(InputFormatConfig.SORT_ORDER, ""))) {
       addZOrderCustomExpr(props, dpCtx, table, hmsTable, writeOperation);
     }
 
@@ -974,7 +972,7 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
    */
   private void addZOrderCustomExpr(Map<String, String> props, DynamicPartitionCtx dpCtx, Table table,
       org.apache.hadoop.hive.ql.metadata.Table hmsTable, Operation writeOperation) {
-    String colsProp = props.get(SORT_COLUMNS);
+    String colsProp = props.get(InputFormatConfig.SORT_COLUMNS);
     if (StringUtils.isNotBlank(colsProp)) {
       List<String> zCols = Arrays.stream(colsProp.split(","))
           .map(String::trim)

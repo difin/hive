@@ -79,9 +79,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.apache.iceberg.RowLevelOperationMode.MERGE_ON_READ;
-import static org.apache.iceberg.mr.InputFormatConfig.SORT_COLUMNS;
-import static org.apache.iceberg.mr.InputFormatConfig.SORT_ORDER;
-import static org.apache.iceberg.mr.InputFormatConfig.ZORDER;
 
 public class BaseHiveIcebergMetaHook implements HiveMetaHook {
   private static final Logger LOG = LoggerFactory.getLogger(BaseHiveIcebergMetaHook.class);
@@ -311,8 +308,8 @@ public class BaseHiveIcebergMetaHook implements HiveMetaHook {
             .map(ZOrderFieldDesc::getColumnName)
             .collect(Collectors.toList());
 
-        properties.put(SORT_ORDER, ZORDER);
-        properties.put(SORT_COLUMNS, String.join(",", columnNames));
+        properties.put(InputFormatConfig.SORT_ORDER, InputFormatConfig.ZORDER);
+        properties.put(InputFormatConfig.SORT_COLUMNS, String.join(",", columnNames));
 
         LOG.debug("Applying Z-ordering for Iceberg Table {} with Columns: {}", tableName, columnNames);
       }
