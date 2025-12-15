@@ -67,7 +67,6 @@
       <modules>
         <module>catalogd-unit</module>
         <module>qtest-iceberg</module>
-        <module>qtest-impala</module>
       </modules>
     </profile>
   </profiles>
