@@ -116,7 +116,8 @@ public class TezSessionState implements TezSession {
   private static final String LLAP_TASK_COMMUNICATOR = LlapTaskCommunicator.class.getName();
 
   protected final HiveConf conf;
-  private Path tezScratchDir;
+  @VisibleForTesting
+  Path tezScratchDir;
   protected LocalResource appJarLr;
   private TezClient session;
   private Future<TezClient> sessionFuture;
@@ -347,14 +348,37 @@ public class TezSessionState implements TezSession {
       LOG.info("Created new resources: " + this.resources);
     }
 
+    try {
+      openInternalUnsafe(isAsync, console);
+    } catch (Exception e) {
+      LOG.warn("Failed to open session, deleting scratch dir to prevent resource leak...", e);
+      cleanupScratchDir();
+      throw e;
+    }
+  }
 
-    // configuration for the application master
+  /**
+   * Opens a Tez session without performing a complete rollback/cleanup on failure.
+   *
+   * <p><strong>Callers MUST guard this method with try/catch and perform cleanup</strong>
+   * of partially initialized state (such as localized files in the scratch directory).
+   * This method is not safe on its own.</p>
+   *
+   * @param isAsync whether to open the Tez session asynchronously in a separate thread
+   * @param console a {@link LogHelper} used to log session startup events
+   *
+   * @throws TezException if the session fails to start (including failures during
+   *                      container launch or session initialization)
+   * @throws IOException if local resource localization or I/O setup fails
+   */
+  @VisibleForTesting
+  void openInternalUnsafe(boolean isAsync, LogHelper console) throws TezException, IOException, LoginException {
     final Map<String, LocalResource> commonLocalResources = addExecJarAndLocalResources();
-    final boolean llapMode = addLlapJarsIfNeeded(commonLocalResources);
+    final boolean llapMode = "llap".equalsIgnoreCase(HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_EXECUTION_MODE));
 
     // Create environment for AM.
     // TODO: this is unused since AMConfiguration was replaced with TezConfiguration.
-    Map<String, String> amEnv = new HashMap<String, String>();
+    Map<String, String> amEnv = new HashMap<>();
     MRHelpers.updateEnvBasedOnMRAMEnv(conf, amEnv);
 
     // and finally we're ready to create and start the session
@@ -425,7 +449,7 @@ public class TezSessionState implements TezSession {
   }
 
   private Map<String, LocalResource> addExecJarAndLocalResources()
-      throws IOException, LoginException, URISyntaxException {
+      throws IOException, LoginException {
     final Map<String, LocalResource> commonLocalResources = new HashMap<String, LocalResource>();
     appJarLr = createJarLocalResource(utils.getExecJarPathLocal(conf));
     commonLocalResources.put(DagUtils.getBaseName(appJarLr), appJarLr);
