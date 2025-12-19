@@ -104,6 +104,7 @@ import org.apache.iceberg.Table;
 import org.apache.iceberg.TableMetadata;
 import org.apache.iceberg.TableMetadataParser;
 import org.apache.iceberg.TableProperties;
+import org.apache.iceberg.TableUtil;
 import org.apache.iceberg.Transaction;
 import org.apache.iceberg.UpdatePartitionSpec;
 import org.apache.iceberg.UpdateProperties;
@@ -684,7 +685,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
       }
 
       // we want to keep the data files but get rid of the metadata directory
-      String metadataLocation = ((BaseTable) this.icebergTable).operations().current().metadataFileLocation();
+      String metadataLocation = TableUtil.metadataFileLocation(this.icebergTable);
       try {
         Path path = new Path(metadataLocation).getParent();
         FileSystem.get(path.toUri(), conf).delete(path, true);
@@ -1109,7 +1110,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
       EnvironmentContext context) {
     // Hive only supports merge-on-read delete mode, it will actually throw an error if DML operations are attempted on
     // tables that don't have this (the default is copy-on-write). We set this at table creation and v1->v2 conversion.
-    if ((icebergTbl == null || ((BaseTable) icebergTbl).operations().current().formatVersion() == 1) &&
+    if ((icebergTbl == null || TableUtil.formatVersion(icebergTbl) == 1) &&
         IcebergTableUtil.isV2Table(newProps)) {
       List<String> writeModeList = ImmutableList.of(DELETE_MODE, UPDATE_MODE, MERGE_MODE);
       writeModeList.stream()
@@ -1139,7 +1140,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
     if (hmsTable != null) {
       try {
         Table tbl = IcebergTableUtil.getTable(conf, hmsTable);
-        String formatVersion = String.valueOf(((BaseTable) tbl).operations().current().formatVersion());
+        String formatVersion = String.valueOf(TableUtil.formatVersion(tbl));
         // If it is not the default format version, then set it in the table properties.
         if (!"1".equals(formatVersion)) {
           hmsTable.getParameters().put(TableProperties.FORMAT_VERSION, formatVersion);

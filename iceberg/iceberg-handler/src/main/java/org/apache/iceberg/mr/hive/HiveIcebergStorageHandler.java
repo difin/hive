@@ -85,7 +85,6 @@ import org.apache.hadoop.hive.ql.exec.ColumnInfo;
 import org.apache.hadoop.hive.ql.exec.FetchOperator;
 import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.hooks.WriteEntity;
-import org.apache.hadoop.hive.ql.io.IOConstants;
 import org.apache.hadoop.hive.ql.io.StorageFormatDescriptor;
 import org.apache.hadoop.hive.ql.io.parquet.vector.VectorizedParquetRecordReader;
 import org.apache.hadoop.hive.ql.io.sarg.ConvertAstToSearchArg;
@@ -157,6 +156,7 @@ import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.PartitionSpecParser;
 import org.apache.iceberg.PartitionStatisticsFile;
 import org.apache.iceberg.PartitionStats;
+import org.apache.iceberg.PartitionStatsHandler;
 import org.apache.iceberg.Partitioning;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.SchemaParser;
@@ -170,8 +170,9 @@ import org.apache.iceberg.Table;
 import org.apache.iceberg.TableMetadata;
 import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.TableScan;
+import org.apache.iceberg.TableUtil;
+import org.apache.iceberg.Transaction;
 import org.apache.iceberg.actions.DeleteOrphanFiles;
-import org.apache.iceberg.data.PartitionStatsHandler;
 import org.apache.iceberg.exceptions.NoSuchTableException;
 import org.apache.iceberg.exceptions.ValidationException;
 import org.apache.iceberg.expressions.Evaluator;
@@ -458,8 +459,8 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   public StorageFormatDescriptor getStorageFormatDescriptor(org.apache.hadoop.hive.metastore.api.Table table)
       throws SemanticException {
     if (table.getParameters() != null) {
-      String format = table.getParameters().getOrDefault(TableProperties.DEFAULT_FILE_FORMAT, IOConstants.PARQUET);
-      return StorageFormat.getDescriptor(format, TableProperties.DEFAULT_FILE_FORMAT);
+      FileFormat format = IcebergTableUtil.defaultFileFormat(table.getParameters()::getOrDefault);
+      return StorageFormat.getDescriptor(format.name(), TableProperties.DEFAULT_FILE_FORMAT);
     }
     return null;
   }
@@ -485,8 +486,8 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
       Map<String, String> partitionSpec)
       throws SemanticException {
     Table icebergTbl = IcebergTableUtil.getTable(conf, table);
-    String format = table.getParameters().get(TableProperties.DEFAULT_FILE_FORMAT);
-    HiveTableUtil.appendFiles(fromURI, format, icebergTbl, isOverwrite, partitionSpec, conf);
+    FileFormat format = IcebergTableUtil.defaultFileFormat(icebergTbl);
+    HiveTableUtil.appendFiles(fromURI, format.name(), icebergTbl, isOverwrite, partitionSpec, conf);
   }
 
   @Override
@@ -547,7 +548,19 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
       PartitionStatisticsFile statsFile = IcebergTableUtil.getPartitionStatsFile(table, snapshot.snapshotId());
       if (statsFile == null) {
         try {
-          statsFile = PartitionStatsHandler.computeAndWriteStatsFile(table);
+          Table statsTable = table;
+          if (FileFormat.ORC == IcebergTableUtil.defaultFileFormat(table)) {
+            // PartitionStatsHandler uses the table default file format for writing the stats file.
+            // ORC is not supported by InternalData writers, so we create an uncommitted transaction
+            // view of the table without DEFAULT_FILE_FORMAT to fall back to DEFAULT_FILE_FORMAT_DEFAULT.
+            // NOTE: we intentionally do not call commitTransaction(), so this property change is never published.
+            Transaction tx = table.newTransaction();
+            tx.updateProperties()
+                .remove(TableProperties.DEFAULT_FILE_FORMAT)
+                .commit();
+            statsTable = tx.table();
+          }
+          statsFile = PartitionStatsHandler.computeAndWriteStatsFile(statsTable);
         } catch (IOException e) {
           throw new UncheckedIOException(e);
         }
@@ -565,7 +578,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
       PartitionStatisticsFile statsFile = IcebergTableUtil.getPartitionStatsFile(table, snapshot.snapshotId());
       if (statsFile != null) {
         Types.StructType partitionType = Partitioning.partitionType(table);
-        Schema schema = PartitionStatsHandler.schema(partitionType);
+        Schema schema = PartitionStatsHandler.schema(partitionType, TableUtil.formatVersion(table));
 
         CloseableIterable<PartitionStats> partitionStatsRecords = PartitionStatsHandler.readPartitionStatsFile(
             schema, table.io().newInputFile(statsFile.path()));
@@ -1004,7 +1017,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
               "try altering the metadata location to the current metadata location by executing the following query:" +
               "ALTER TABLE {}.{} SET TBLPROPERTIES('metadata_location'='{}'). This operation is supported for Hive " +
               "Catalog tables.", hmsTable.getDbName(), hmsTable.getTableName(),
-            ((BaseTable) icebergTable).operations().current().metadataFileLocation());
+            TableUtil.metadataFileLocation(icebergTable));
         AlterTableExecuteSpec.RollbackSpec rollbackSpec =
             (AlterTableExecuteSpec.RollbackSpec) executeSpec.getOperationParams();
         IcebergTableUtil.rollback(icebergTable, rollbackSpec.getRollbackType(), rollbackSpec.getParam());
@@ -1263,8 +1276,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
             .append(encodeString("/metadata/dummy.metadata.json"));
       } else {
         Table table = IcebergTableUtil.getTable(conf, hmsTable);
-        authURI.append(getPathForAuth(((BaseTable) table).operations().current().metadataFileLocation(),
-            hmsTable.getSd().getLocation()));
+        authURI.append(getPathForAuth(TableUtil.metadataFileLocation(table), hmsTable.getSd().getLocation()));
       }
     }
     LOG.debug("Iceberg storage handler authorization URI {}", authURI);
@@ -1726,7 +1738,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
   private void fallbackToNonVectorizedModeBasedOnProperties(Properties tableProps) {
     Schema tableSchema = SchemaParser.fromJson(tableProps.getProperty(InputFormatConfig.TABLE_SCHEMA));
 
-    if (FileFormat.AVRO.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT)) ||
+    if (FileFormat.AVRO == IcebergTableUtil.defaultFileFormat(tableProps::getProperty) ||
         isValidMetadataTable(tableProps.getProperty(IcebergAcidUtil.META_TABLE_PROPERTY)) ||
         hasOrcTimeInSchema(tableProps, tableSchema) ||
         !hasParquetNestedTypeWithinListOrMap(tableProps, tableSchema)) {
@@ -1745,10 +1757,11 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
    * @return true if having time type column
    */
   private static boolean hasOrcTimeInSchema(Properties tableProps, Schema tableSchema) {
-    if (!FileFormat.ORC.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT))) {
+    if (FileFormat.ORC != IcebergTableUtil.defaultFileFormat(tableProps::getProperty)) {
       return false;
     }
-    return tableSchema.columns().stream().anyMatch(f -> Types.TimeType.get().typeId() == f.type().typeId());
+    return tableSchema.columns().stream()
+        .anyMatch(f -> Types.TimeType.get().typeId() == f.type().typeId());
   }
 
   /**
@@ -1760,7 +1773,7 @@ public class HiveIcebergStorageHandler implements HiveStoragePredicateHandler, H
    * @return true if having nested types
    */
   private static boolean hasParquetNestedTypeWithinListOrMap(Properties tableProps, Schema tableSchema) {
-    if (!FileFormat.PARQUET.name().equalsIgnoreCase(tableProps.getProperty(TableProperties.DEFAULT_FILE_FORMAT))) {
+    if (FileFormat.PARQUET != IcebergTableUtil.defaultFileFormat(tableProps::getProperty)) {
       return true;
     }
 
