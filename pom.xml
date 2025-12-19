@@ -20,7 +20,7 @@
   </parent>
   <groupId>org.apache.hive</groupId>
   <artifactId>hive</artifactId>
-  <version>3.1.3000.7.3.2.0-SNAPSHOT</version>
+  <version>3.1.3000.7.3.2.100-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hive</name>
@@ -77,11 +77,11 @@
     <!-- Make sure to sync it with standalone-metastore/pom.xml -->
     <antlr4.version>4.9.3</antlr4.version>
     <apache-directory-server.version>2.0.0-M24</apache-directory-server.version>
-    <avatica.version>1.26.0.7.3.2.0-SNAPSHOT</avatica.version>
-    <avro.version>1.11.3.7.3.2.0-SNAPSHOT</avro.version>
+    <avatica.version>1.26.0.7.3.2.100-SNAPSHOT</avatica.version>
+    <avro.version>1.11.3.7.3.2.100-SNAPSHOT</avro.version>
     <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
-    <calcite.version>1.33.0.7.3.2.0-SNAPSHOT</calcite.version>
+    <calcite.version>1.33.0.7.3.2.100-SNAPSHOT</calcite.version>
     <datanucleus-api-jdo.version>6.0.3</datanucleus-api-jdo.version>
     <datanucleus-core.version>6.0.10</datanucleus-core.version>
     <datanucleus-jdo.version>3.2.0-release</datanucleus-jdo.version>
@@ -108,11 +108,11 @@
     <guava.version>32.1.2-jre</guava.version>
     <groovy.version>2.4.21</groovy.version>
     <h2database.version>2.1.214</h2database.version>
-    <hadoop.version>3.4.2.7.3.2.0-SNAPSHOT</hadoop.version>
+    <hadoop.version>3.4.2.7.3.2.100-SNAPSHOT</hadoop.version>
     <hadoop2.version>2.7.3.2.6.5.0-292</hadoop2.version>
     <hadoop.bin.path>${basedir}/${hive.path.to.root}/testutils/hadoop</hadoop.bin.path>
     <hamcrest.version>1.3</hamcrest.version>
-    <hbase.version>2.6.3.7.3.2.0-SNAPSHOT</hbase.version>
+    <hbase.version>2.6.3.7.3.2.100-SNAPSHOT</hbase.version>
     <hppc.version>0.7.2</hppc.version>
     <graalvm.version>23.0.8</graalvm.version>
     <!-- required for logging test to avoid including hbase which pulls disruptor transitively -->
@@ -140,9 +140,9 @@
     <junit.version>4.13.2</junit.version>
     <junit.jupiter.version>5.11.2</junit.jupiter.version>
     <junit.vintage.version>5.11.2</junit.vintage.version>
-    <kafka.version>3.9.1.7.3.2.0-SNAPSHOT</kafka.version>
+    <kafka.version>3.9.1.7.3.2.100-SNAPSHOT</kafka.version>
     <kryo.version>4.0.2</kryo.version>
-    <kudu.version>1.18.0.7.3.2.0-SNAPSHOT</kudu.version>
+    <kudu.version>1.18.0.7.3.2.100-SNAPSHOT</kudu.version>
     <!-- Leaving libfb303 at 0.9.3 regardless of libthrift: As per THRIFT-4613 The Apache Thrift project does not publish items related to fb303 at this point -->
     <libfb303.version>0.9.3</libfb303.version>
     <libthrift.version>0.16.0</libthrift.version>
@@ -153,7 +153,7 @@
     <postgres.version>42.7.3</postgres.version>
     <oracle.version>21.3.0.0</oracle.version>
     <opencsv.version>5.9</opencsv.version>
-    <orc.version>1.8.3.7.3.2.0-SNAPSHOT</orc.version>
+    <orc.version>1.8.3.7.3.2.100-SNAPSHOT</orc.version>
     <otel.version>1.42.0</otel.version>
     <mockito-core.version>5.17.0</mockito-core.version>
     <mockito-inline.version>5.2.0</mockito-inline.version>
@@ -162,7 +162,7 @@
     <netty.hadoop.version>4.0.52.Final</netty.hadoop.version>
     <pac4j-saml.version>4.5.5</pac4j-saml.version>
     <paranamer.version>2.8</paranamer.version>
-    <parquet.version>1.15.2.7.3.2.0-SNAPSHOT</parquet.version>
+    <parquet.version>1.15.2.7.3.2.100-SNAPSHOT</parquet.version>
     <pig.version> 0.16.0</pig.version>
     <plexus.version>1.5.6</plexus.version>
     <protobuf.version>3.25.5</protobuf.version>
@@ -172,8 +172,8 @@
     <!-- In case of updating slf4j version here, make sure to update the same in bin/hive script -->
     <slf4j.version>1.7.30</slf4j.version>
     <ST4.version>4.0.4</ST4.version>
-    <storage-api.version>3.1.3000.7.3.2.0-SNAPSHOT</storage-api.version>
-    <tez.version>0.9.1.7.3.2.0-SNAPSHOT</tez.version>
+    <storage-api.version>3.1.3000.7.3.2.100-SNAPSHOT</storage-api.version>
+    <tez.version>0.9.1.7.3.2.100-SNAPSHOT</tez.version>
     <super-csv.version>2.2.0</super-csv.version>
     <tempus-fugit.version>1.1</tempus-fugit.version>
     <snappy.version>1.1.10.8</snappy.version>
@@ -183,10 +183,10 @@
     <jaxb-runtime.version>2.3.9</jaxb-runtime.version>
     <xerces.version>2.12.2</xerces.version>
     <xmlsec.version>2.3.4</xmlsec.version>
-    <zookeeper.version>3.8.5.7.3.2.0-SNAPSHOT</zookeeper.version>
+    <zookeeper.version>3.8.5.7.3.2.100-SNAPSHOT</zookeeper.version>
     <jpam.version>1.1</jpam.version>
     <felix.version>2.4.0</felix.version>
-    <curator.version>5.4.0.7.3.2.0-SNAPSHOT</curator.version>
+    <curator.version>5.4.0.7.3.2.100-SNAPSHOT</curator.version>
     <jsr305.version>3.0.2</jsr305.version>
     <tephra.version>0.6.0</tephra.version>
     <gson.version>2.9.0</gson.version>

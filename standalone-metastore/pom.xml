@@ -22,7 +22,7 @@
 
   <groupId>org.apache.hive</groupId>
   <artifactId>hive-standalone-metastore</artifactId>
-  <version>3.1.3000.7.3.2.0-SNAPSHOT</version>
+  <version>3.1.3000.7.3.2.100-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Hive Standalone Metastore</name>
 
@@ -58,7 +58,7 @@
     <!-- Dependency versions -->
     <aircompressor.version>0.27</aircompressor.version>
     <antlr.version>4.9.3</antlr.version>
-    <avro.version>1.11.3.7.3.2.0-SNAPSHOT</avro.version>
+    <avro.version>1.11.3.7.3.2.100-SNAPSHOT</avro.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
     <apache-directory-server.version>2.0.0-M24</apache-directory-server.version>
     <caffeine.version>2.8.4</caffeine.version>
@@ -79,7 +79,7 @@
     <dropwizard-metrics-hadoop-metrics2-reporter.version>0.1.2</dropwizard-metrics-hadoop-metrics2-reporter.version>
     <dropwizard.version>3.1.0</dropwizard.version>
     <guava.version>32.1.2-jre</guava.version>
-    <hadoop.version>3.4.2.7.3.2.0-SNAPSHOT</hadoop.version>
+    <hadoop.version>3.4.2.7.3.2.100-SNAPSHOT</hadoop.version>
     <hikaricp.version>2.6.1</hikaricp.version>
     <jackson.version>2.15.3</jackson.version>
     <javolution.version>5.5.1</javolution.version>
@@ -94,7 +94,7 @@
     <log4j2.version>2.18.0</log4j2.version>
     <mockito-core.version>5.17.0</mockito-core.version>
     <nimbus-jose-jwt.version>10.4.2</nimbus-jose-jwt.version>
-    <orc.version>1.8.3.7.3.2.0-SNAPSHOT</orc.version>
+    <orc.version>1.8.3.7.3.2.100-SNAPSHOT</orc.version>
     <protobuf.version>3.25.5</protobuf.version>
     <protoc-jar-maven-plugin.version>3.11.4</protoc-jar-maven-plugin.version>
     <protoc.path>${env.PROTOC_PATH}</protoc.path>
@@ -102,10 +102,10 @@
     <sqlline.version>1.9.0</sqlline.version>
     <netty.version>4.1.128.Final</netty.version>
     <jline.version>2.14.6</jline.version>
-    <storage-api.version>3.1.3000.7.3.2.0-SNAPSHOT</storage-api.version>
+    <storage-api.version>3.1.3000.7.3.2.100-SNAPSHOT</storage-api.version>
     <ST4.version>4.0.8</ST4.version>
-    <zookeeper.version>3.8.5.7.3.2.0-SNAPSHOT</zookeeper.version>
-    <curator.version>5.4.0.7.3.2.0-SNAPSHOT</curator.version>
+    <zookeeper.version>3.8.5.7.3.2.100-SNAPSHOT</zookeeper.version>
+    <curator.version>5.4.0.7.3.2.100-SNAPSHOT</curator.version>
     <cron-utils.version>9.1.6</cron-utils.version>
     <httpcomponents.core.version>4.4.13</httpcomponents.core.version>
     <spring.version>5.3.44.cldr-b1</spring.version>    <!-- Thrift properties -->
