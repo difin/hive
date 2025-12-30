@@ -11622,7 +11622,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         } catch (Exception e) {
           LOG.error("Error removing znode for this metastore instance from ZooKeeper.", e);
         }
-        ThreadPool.shutdown();
       }, 10);
 
       //Start Metrics for Standalone (Remote) Mode
