@@ -284,6 +284,7 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.views.*;
 import org.apache.hadoop.hive.ql.optimizer.calcite.stats.HiveRelMetadataQuery;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.ASTBuilder;
 import org.apache.hadoop.hive.ql.optimizer.calcite.translator.ASTConverter;
+import org.apache.hadoop.hive.ql.optimizer.calcite.translator.PlanModifierForASTConv;
 import org.apache.hadoop.hive.ql.parse.type.FunctionHelper;
 import org.apache.hadoop.hive.ql.parse.type.FunctionHelper.AggregateInfo;
 import org.apache.hadoop.hive.ql.parse.type.JoinTypeCheckCtx;
@@ -587,7 +588,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
         try {
           // 0. Generate Calcite plan from query
           perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.GENERATE_LOGICAL_PLAN);
-          final CalcitePlan newPlan = plan(true);
+          CalcitePlan newPlan = plan(true);
           perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.GENERATE_LOGICAL_PLAN);
 
           perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.GENERATE_OPERATOR_TREE);
@@ -623,7 +624,10 @@ public class CalcitePlanner extends SemanticAnalyzer {
             this.ctx.setCboSucceeded(true);
           } else {
             // 1. Convert Plan to AST
-            ASTNode newAST = getOptimizedAST(newPlan.optimizedPlan);
+            RelNode modifierPlan = PlanModifierForASTConv.convertOpTree(newPlan.optimizedPlan, resultSchema,
+                HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_COLUMN_ALIGNMENT));
+            newPlan = CalcitePlan.of(modifierPlan, newPlan.enginePlan);
+            ASTNode newAST = ASTConverter.convert(newPlan.optimizedPlan);
 
             // 1.1. Fix up the query for insert/ctas/materialized views
             newAST = fixUpAfterCbo(ast, newAST, cboCtx);
@@ -1396,28 +1400,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
       LOG.warn("Rel2SQL Rewrite threw error", e);
     }
     return null;
-  }
-
-  /**
-   * Get Optimized AST for the given QB tree in the semAnalyzer.
-   *
-   * @return Optimized operator tree translated in to Hive AST
-   * @throws SemanticException
-   */
-  ASTNode getOptimizedAST() throws SemanticException {
-    return getOptimizedAST(logicalPlan());
-  }
-
-  /**
-   * Get Optimized AST for the given QB tree in the semAnalyzer.
-   *
-   * @return Optimized operator tree translated in to Hive AST
-   * @throws SemanticException
-   */
-  ASTNode getOptimizedAST(RelNode optimizedPlan) throws SemanticException {
-    ASTNode optimizedAST = ASTConverter.convert(optimizedPlan, resultSchema,
-        HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_COLUMN_ALIGNMENT));
-    return optimizedAST;
   }
 
   /**

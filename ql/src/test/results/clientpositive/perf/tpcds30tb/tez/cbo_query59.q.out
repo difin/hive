@@ -5,8 +5,8 @@ HiveProject(d_date_sk=[$0], d_week_seq=[$4], EXPR$0=[=($14, _UTF-16LE'Sunday   '
 
 CBO PLAN:
 HiveSortLimit(sort0=[$0], sort1=[$1], sort2=[$2], dir0=[ASC], dir1=[ASC], dir2=[ASC], fetch=[100])
-  HiveProject(s_store_name1=[$12], s_store_id1=[$11], d_week_seq1=[$0], _o__c3=[/($2, $17)], _o__c4=[/($3, $18)], _o__c5=[/($4, $4)], _o__c6=[/($5, $19)], _o__c7=[/($6, $20)], _o__c8=[/($7, $21)], _o__c9=[/($8, $22)])
-    HiveJoin(condition=[AND(=($0, -($15, 52)), =($16, $13))], joinType=[inner])
+  HiveProject(s_store_name1=[$12], s_store_id1=[$11], d_week_seq1=[$0], _c3=[/($2, $17)], _c4=[/($3, $18)], _c5=[/($4, $4)], _c6=[/($5, $19)], _c7=[/($6, $20)], _c8=[/($7, $21)], _c9=[/($8, $22)])
+    HiveJoin(condition=[AND(=($16, $13), =($0, -($15, 52)))], joinType=[inner])
       HiveJoin(condition=[=($1, $10)], joinType=[inner])
         HiveJoin(condition=[=($9, $0)], joinType=[inner])
           HiveProject($f0=[$0], $f1=[$1], $f2=[$2], $f3=[$3], $f4=[$4], $f5=[$5], $f6=[$6], $f7=[$7], $f8=[$8])

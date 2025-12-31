@@ -73,7 +73,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@windowing_distinct
 #### A masked pattern was here ####
 CBO PLAN:
-HiveProject(_o__c0=[count(DISTINCT $1) OVER (PARTITION BY $0)], _o__c1=[count(DISTINCT $6) OVER (PARTITION BY $0)], _o__c2=[count(DISTINCT $7) OVER (PARTITION BY $0)], _o__c3=[count(DISTINCT $8) OVER (PARTITION BY $0)], _o__c4=[count(DISTINCT ||(_UTF-16LE'Mr.':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", $8)) OVER (PARTITION BY $0)], _o__c5=[count(DISTINCT $9) OVER (PARTITION BY $0)], _o__c6=[count(DISTINCT $10) OVER (PARTITION BY $0)], _o__c7=[count(DISTINCT $11) OVER (PARTITION BY $0)])
+HiveProject(_c0=[count(DISTINCT $1) OVER (PARTITION BY $0)], _c1=[count(DISTINCT $6) OVER (PARTITION BY $0)], _c2=[count(DISTINCT $7) OVER (PARTITION BY $0)], _c3=[count(DISTINCT $8) OVER (PARTITION BY $0)], _c4=[count(DISTINCT ||(_UTF-16LE'Mr.':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", $8)) OVER (PARTITION BY $0)], _c5=[count(DISTINCT $9) OVER (PARTITION BY $0)], _c6=[count(DISTINCT $10) OVER (PARTITION BY $0)], _c7=[count(DISTINCT $11) OVER (PARTITION BY $0)])
   HiveTableScan(table=[[default, windowing_distinct]], table:alias=[windowing_distinct])
 
 PREHOOK: query: EXPLAIN VECTORIZATION
@@ -295,7 +295,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@windowing_distinct
 #### A masked pattern was here ####
 CBO PLAN:
-HiveProject(_o__c0=[sum(DISTINCT $1) OVER (PARTITION BY $0)], _o__c1=[sum(DISTINCT $6) OVER (PARTITION BY $0)], _o__c2=[sum(DISTINCT $8) OVER (PARTITION BY $0)], _o__c3=[sum(DISTINCT ||(_UTF-16LE'Mr.':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", $8)) OVER (PARTITION BY $0)], _o__c4=[sum(DISTINCT $9) OVER (PARTITION BY $0)], _o__c5=[sum(DISTINCT $10) OVER (PARTITION BY $0)])
+HiveProject(_c0=[sum(DISTINCT $1) OVER (PARTITION BY $0)], _c1=[sum(DISTINCT $6) OVER (PARTITION BY $0)], _c2=[sum(DISTINCT $8) OVER (PARTITION BY $0)], _c3=[sum(DISTINCT ||(_UTF-16LE'Mr.':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", $8)) OVER (PARTITION BY $0)], _c4=[sum(DISTINCT $9) OVER (PARTITION BY $0)], _c5=[sum(DISTINCT $10) OVER (PARTITION BY $0)])
   HiveTableScan(table=[[default, windowing_distinct]], table:alias=[windowing_distinct])
 
 PREHOOK: query: EXPLAIN VECTORIZATION
@@ -494,7 +494,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@windowing_distinct
 #### A masked pattern was here ####
 CBO PLAN:
-HiveProject(_o__c0=[avg(DISTINCT $1) OVER (PARTITION BY $0)], _o__c1=[avg(DISTINCT $6) OVER (PARTITION BY $0)], _o__c2=[avg(DISTINCT $8) OVER (PARTITION BY $0)], _o__c3=[avg(DISTINCT ||(_UTF-16LE'Mr.':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", $8)) OVER (PARTITION BY $0)], _o__c4=[avg(DISTINCT $9) OVER (PARTITION BY $0)], _o__c5=[avg(DISTINCT $10) OVER (PARTITION BY $0)])
+HiveProject(_c0=[avg(DISTINCT $1) OVER (PARTITION BY $0)], _c1=[avg(DISTINCT $6) OVER (PARTITION BY $0)], _c2=[avg(DISTINCT $8) OVER (PARTITION BY $0)], _c3=[avg(DISTINCT ||(_UTF-16LE'Mr.':VARCHAR(2147483647) CHARACTER SET "UTF-16LE", $8)) OVER (PARTITION BY $0)], _c4=[avg(DISTINCT $9) OVER (PARTITION BY $0)], _c5=[avg(DISTINCT $10) OVER (PARTITION BY $0)])
   HiveTableScan(table=[[default, windowing_distinct]], table:alias=[windowing_distinct])
 
 PREHOOK: query: EXPLAIN VECTORIZATION

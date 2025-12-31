@@ -157,7 +157,7 @@ POSTHOOK: Input: default@mv1
 POSTHOOK: Input: default@person
 #### A masked pattern was here ####
 CBO PLAN:
-HiveProject(id1=[$0], name0=[$1], jid=[$2], cid=[$3], jid0=[$2], title=[$5], cid0=[$3], name=[$7])
+HiveProject(person.id=[$0], person.name=[$1], person.jid=[$2], person.cid=[$3], job.id=[$2], job.title=[$5], country.id=[$3], country.name=[$7])
   HiveJoin(condition=[=($3, $6)], joinType=[inner])
     HiveJoin(condition=[=($2, $4)], joinType=[inner])
       HiveProject(id=[$0], name=[$1], jid=[$2], cid=[$3])

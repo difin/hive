@@ -3898,7 +3898,7 @@ POSTHOOK: Input: default@dst_union22_delta_n0@ds=1
 POSTHOOK: Input: default@dst_union22_n0
 POSTHOOK: Input: default@dst_union22_n0@ds=1
 POSTHOOK: Output: default@dst_union22_n0@ds=2
-OPTIMIZED SQL: SELECT `k1`, `k2`, `k3`, `k4`
+OPTIMIZED SQL: SELECT `k1` AS `subq.k1`, `k2` AS `subq.k2`, `k3` AS `subq.k3`, `k4` AS `subq.k4`
 FROM (SELECT `k1`, `k2`, `k3`, `k4`
 FROM `default`.`dst_union22_delta_n0`
 WHERE `k0` <= 50 AND `ds` = '1'
@@ -5196,7 +5196,7 @@ POSTHOOK: Input: default@src3
 POSTHOOK: Input: default@src4
 POSTHOOK: Input: default@src5_n1
 POSTHOOK: Output: hdfs://### HDFS PATH ###
-OPTIMIZED SQL: SELECT `key`, `count`
+OPTIMIZED SQL: SELECT `key` AS `s.key`, `count` AS `s.count`
 FROM (SELECT `key`, `count`
 FROM (SELECT `key`, `count`
 FROM (SELECT `key`, `count`
@@ -5706,7 +5706,7 @@ POSTHOOK: Input: default@src3
 POSTHOOK: Input: default@src4
 POSTHOOK: Input: default@src5_n1
 POSTHOOK: Output: hdfs://### HDFS PATH ###
-OPTIMIZED SQL: SELECT `key`, `count`
+OPTIMIZED SQL: SELECT `key` AS `s.key`, `count` AS `s.count`
 FROM (SELECT `key`, `count`
 FROM (SELECT `key`, `count`
 FROM `default`.`src2_n2`
@@ -6165,7 +6165,7 @@ POSTHOOK: Input: default@src3
 POSTHOOK: Input: default@src4
 POSTHOOK: Input: default@src5_n1
 POSTHOOK: Output: hdfs://### HDFS PATH ###
-OPTIMIZED SQL: SELECT `key`, `count`
+OPTIMIZED SQL: SELECT `key` AS `s.key`, `count` AS `s.count`
 FROM (SELECT `key`, `count`
 FROM (SELECT `key`, `count`
 FROM `default`.`src2_n2`

@@ -5,7 +5,7 @@ HiveProject(d_date_sk=[$0])
 
 CBO PLAN:
 HiveSortLimit(fetch=[100])
-  HiveProject($f0=[$0])
+  HiveProject(excess discount amount=[$0])
     HiveAggregate(group=[{}], agg#0=[sum($1)])
       HiveJoin(condition=[AND(=($5, $3), >($1, $6))], joinType=[inner])
         HiveJoin(condition=[=($4, $2)], joinType=[inner])

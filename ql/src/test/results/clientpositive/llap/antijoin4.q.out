@@ -115,11 +115,12 @@ POSTHOOK: Input: default@antijoin3_t1
 POSTHOOK: Input: default@antijoin3_t2
 #### A masked pattern was here ####
 CBO PLAN:
-HiveAntiJoin(condition=[=($0, $3)], joinType=[anti])
-  HiveProject(t1id=[$0], t1notnull=[$1], t1nullable=[$2])
-    HiveTableScan(table=[[default, antijoin3_t1]], table:alias=[t1])
-  HiveProject(t2id=[$0], t2notnull=[$1])
-    HiveTableScan(table=[[default, antijoin3_t2]], table:alias=[t2])
+HiveProject(t1id=[$0], t1notnull=[$1], t1nullable=[$2])
+  HiveAntiJoin(condition=[=($0, $3)], joinType=[anti])
+    HiveProject(t1id=[$0], t1notnull=[$1], t1nullable=[$2])
+      HiveTableScan(table=[[default, antijoin3_t1]], table:alias=[t1])
+    HiveProject(t2id=[$0], t2notnull=[$1])
+      HiveTableScan(table=[[default, antijoin3_t2]], table:alias=[t2])
 
 PREHOOK: query: select t1id, t1notnull, t1nullable from antijoin3_t1 t1 left join antijoin3_t2 t2 on t1id=t2id where t2notnull is null
 PREHOOK: type: QUERY
@@ -167,7 +168,7 @@ POSTHOOK: Input: default@antijoin3_t1
 POSTHOOK: Input: default@antijoin3_t2
 #### A masked pattern was here ####
 CBO PLAN:
-HiveProject(t1id=[$0], t1notnull=[$1], t1nullable=[$2], _o__c3=[_UTF-16LE'foo':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"])
+HiveProject(t1id=[$0], t1notnull=[$1], t1nullable=[$2], _c3=[_UTF-16LE'foo':VARCHAR(2147483647) CHARACTER SET "UTF-16LE"])
   HiveAntiJoin(condition=[=($0, $3)], joinType=[anti])
     HiveProject(t1id=[$0], t1notnull=[$1], t1nullable=[$2])
       HiveTableScan(table=[[default, antijoin3_t1]], table:alias=[t1])
@@ -205,15 +206,16 @@ POSTHOOK: Input: default@antijoin3_t2
 POSTHOOK: Input: default@antijoin3_t3
 #### A masked pattern was here ####
 CBO PLAN:
-HiveAntiJoin(condition=[=($0, $3)], joinType=[anti])
-  HiveProject(t1id=[$0], t1notnull=[$1], t1nullable=[$2])
-    HiveTableScan(table=[[default, antijoin3_t1]], table:alias=[t1])
-  HiveProject(t2id=[$0], t2notnull=[$1], t3id=[$2])
-    HiveJoin(condition=[=($0, $2)], joinType=[left])
-      HiveProject(t2id=[$0], t2notnull=[$1])
-        HiveTableScan(table=[[default, antijoin3_t2]], table:alias=[antijoin3_t2])
-      HiveProject(t3id=[$0])
-        HiveTableScan(table=[[default, antijoin3_t3]], table:alias=[antijoin3_t3])
+HiveProject(t1id=[$0], t1notnull=[$1], t1nullable=[$2])
+  HiveAntiJoin(condition=[=($0, $3)], joinType=[anti])
+    HiveProject(t1id=[$0], t1notnull=[$1], t1nullable=[$2])
+      HiveTableScan(table=[[default, antijoin3_t1]], table:alias=[t1])
+    HiveProject(t2id=[$0], t2notnull=[$1], t3id=[$2])
+      HiveJoin(condition=[=($0, $2)], joinType=[left])
+        HiveProject(t2id=[$0], t2notnull=[$1])
+          HiveTableScan(table=[[default, antijoin3_t2]], table:alias=[antijoin3_t2])
+        HiveProject(t3id=[$0])
+          HiveTableScan(table=[[default, antijoin3_t3]], table:alias=[antijoin3_t3])
 
 PREHOOK: query: select t1id, t1notnull, t1nullable from antijoin3_t1 t1
 left join (select * from antijoin3_t2 left join antijoin3_t3 on t2id=t3id) sq

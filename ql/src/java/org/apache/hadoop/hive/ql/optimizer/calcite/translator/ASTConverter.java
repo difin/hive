@@ -66,7 +66,6 @@ import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.ImmutableBitSet;
-import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteSemanticException;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveAggregate;
@@ -83,7 +82,6 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.translator.SqlFunctionConvert
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.HiveParser;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
-import org.apache.hadoop.hive.ql.parse.type.RexNodeExprFactory;
 import org.apache.hadoop.hive.ql.util.DirectionUtils;
 import org.apache.hadoop.hive.ql.util.NullOrdering;
 import org.slf4j.Logger;
@@ -117,10 +115,9 @@ public class ASTConverter {
     this.ctes = ctes;
   }
 
-  public static ASTNode convert(final RelNode relNode, List<FieldSchema> resultSchema, boolean alignColumns)
+  public static ASTNode convert(final RelNode relNode)
       throws CalciteSemanticException {
-    RelNode root = PlanModifierForASTConv.convertOpTree(relNode, resultSchema, alignColumns);
-    ASTConverter c = new ASTConverter(root, 0, new ArrayList<>());
+    ASTConverter c = new ASTConverter(relNode, 0, new ArrayList<>());
     ASTNode r = c.convert();
     for (ASTNode cte : c.ctes) {
       r.insertChild(0, cte);

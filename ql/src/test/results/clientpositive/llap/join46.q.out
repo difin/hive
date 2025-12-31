@@ -2541,7 +2541,7 @@ POSTHOOK: type: QUERY
 POSTHOOK: Input: default@table1
 #### A masked pattern was here ####
 CBO PLAN:
-HiveProject(r=[$0])
+HiveProject(sub1.r=[$0])
   HiveJoin(condition=[=($0, $1)], joinType=[left])
     HiveProject(r=[RANK() OVER (ORDER BY $1 DESC NULLS FIRST RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)])
       HiveJoin(condition=[=($0, $2)], joinType=[inner])
