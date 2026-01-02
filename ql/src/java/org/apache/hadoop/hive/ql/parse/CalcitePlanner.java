@@ -219,7 +219,6 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFieldTrimmerRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterAggregateTransposeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterJoinRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterMergeRule;
-import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterProjectTSTransposeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterProjectTransposeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterSetOpTransposeRule;
 import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveFilterSortPredicates;
@@ -2103,7 +2102,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       // matches FIL-PROJ-TS
       // Also merge, remove and reduce Project if possible
       generatePartialProgram(program, true, HepMatchOrder.TOP_DOWN,
-          HiveFilterProjectTSTransposeRule.INSTANCE, HiveFilterProjectTSTransposeRule.INSTANCE_DRUID,
+          HiveFilterProjectTransposeRule.SCAN, HiveFilterProjectTransposeRule.DRUID,
           HiveProjectFilterPullUpConstantsRule.INSTANCE, HiveProjectMergeRule.INSTANCE,
           ProjectRemoveRule.Config.DEFAULT.toRule(), HiveSortMergeRule.INSTANCE);
 
@@ -2300,7 +2299,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       // Unboxing rule
       planner.addRule(HiveMaterializedViewBoxing.INSTANCE_UNBOXING);
       // Partition pruner rule
-      planner.addRule(HiveFilterProjectTSTransposeRule.INSTANCE);
+      planner.addRule(HiveFilterProjectTransposeRule.SCAN);
       HivePartitionPruneRule.addRules(planner, conf);
 
       // Optimize plan
@@ -2510,7 +2509,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
         // Rerun PPD through Project as column pruning would have introduced
         // DT above scans (similar to pre-join ordering transform)
         generatePartialProgram(program, true, HepMatchOrder.TOP_DOWN,
-            HiveFilterProjectTSTransposeRule.INSTANCE, HiveFilterProjectTSTransposeRule.INSTANCE_DRUID,
+            HiveFilterProjectTransposeRule.SCAN, HiveFilterProjectTransposeRule.DRUID,
             HiveProjectFilterPullUpConstantsRule.INSTANCE, HiveProjectMergeRule.INSTANCE,
             ProjectRemoveRule.Config.DEFAULT.toRule());
       }
@@ -2619,7 +2618,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
         generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
             ProjectRemoveRule.Config.DEFAULT.toRule(), new ProjectMergeRule(false, HiveRelFactories.HIVE_BUILDER));
         generatePartialProgram(program, true, HepMatchOrder.TOP_DOWN,
-            HiveFilterProjectTSTransposeRule.INSTANCE, HiveFilterProjectTSTransposeRule.INSTANCE_DRUID,
+            HiveFilterProjectTransposeRule.SCAN, HiveFilterProjectTransposeRule.DRUID,
             HiveProjectFilterPullUpConstantsRule.INSTANCE);
 
         // 9.2.  Introduce exchange operators below join/multijoin operators
@@ -2681,7 +2680,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
           generatePartialProgram(program, false, HepMatchOrder.DEPTH_FIRST,
               ProjectRemoveRule.Config.DEFAULT.toRule(), new ProjectMergeRule(false, HiveRelFactories.HIVE_BUILDER));
           generatePartialProgram(program, true, HepMatchOrder.TOP_DOWN,
-              HiveFilterProjectTSTransposeRule.INSTANCE, HiveFilterProjectTSTransposeRule.INSTANCE_DRUID,
+              HiveFilterProjectTransposeRule.SCAN, HiveFilterProjectTransposeRule.DRUID,
               HiveProjectFilterPullUpConstantsRule.INSTANCE);
 
           // Introduce exchange operators below join/multijoin operators
