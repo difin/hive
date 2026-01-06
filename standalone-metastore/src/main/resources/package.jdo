@@ -127,7 +127,7 @@
         <column name="TYPE_NAME" length="32672" jdbc-type="VARCHAR" allows-null="false"/>
       </field>
       <field name="comment">
-        <column name="COMMENT" length="256" jdbc-type="VARCHAR" allows-null="true"/>
+        <column name="COMMENT" length="4000" jdbc-type="VARCHAR" allows-null="true"/>
       </field>
     </class>
 
