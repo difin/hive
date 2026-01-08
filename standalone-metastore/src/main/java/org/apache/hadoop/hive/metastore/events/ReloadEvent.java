@@ -4,8 +4,10 @@ import com.google.common.collect.Lists;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.hive.metastore.IHMSHandler;
+import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.ClientCapabilities;
 import org.apache.hadoop.hive.metastore.api.ClientCapability;
+import org.apache.hadoop.hive.metastore.api.GetPartitionsByNamesRequest;
 import org.apache.hadoop.hive.metastore.api.GetTableRequest;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
@@ -14,6 +16,7 @@ import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.thrift.TException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +24,8 @@ import java.util.Map;
 @InterfaceStability.Stable
 public class ReloadEvent extends ListenerEvent {
     private final Table tableObj;
-    private final Partition ptnObj;
+    private final Partition ptnObj; // for backward compatibility
+    private final List<Partition> ptns;
     private final boolean refreshEvent;
 
     /**
@@ -33,8 +37,8 @@ public class ReloadEvent extends ListenerEvent {
      * @param refreshEvent status of insert,
      * @param handler handler that is firing the event
      */
-    public ReloadEvent(String catName, String db, String table, List<String> partVals, boolean status,
-                       boolean refreshEvent, Map<String, String> tblParams, IHMSHandler handler) throws MetaException,
+    public ReloadEvent(String catName, String db, String table, List<List<String>> partVals, boolean status,
+            boolean refreshEvent, Map<String, String> tblParams, IHMSHandler handler) throws MetaException,
             NoSuchObjectException {
         super(status, handler);
 
@@ -48,10 +52,26 @@ public class ReloadEvent extends ListenerEvent {
                 this.tableObj.getParameters().putAll(tblParams);
             }
             if (partVals != null) {
-                this.ptnObj = handler.get_partition(MetaStoreUtils.prependNotNullCatToDbName(catName, db),
-                        table, partVals);
+                if (partVals.size() == 1) {
+                    this.ptnObj = handler.get_partition(MetaStoreUtils.prependNotNullCatToDbName(catName, db),
+                        table, partVals.get(0));
+                    this.ptns = null;
+                } else {
+                    this.ptnObj = null;
+                    this.ptns = new ArrayList<>();
+                    List<String> part_names = new ArrayList<>();
+                    for (List<String> partVal : partVals) {
+                        part_names.add(Warehouse.makePartName(this.tableObj.getPartitionKeys(), partVal));
+                    }
+                    GetPartitionsByNamesRequest partitionsReq = new GetPartitionsByNamesRequest(
+                        MetaStoreUtils.prependNotNullCatToDbName(catName, db), table);
+                    partitionsReq.setNames(part_names);
+                    partitionsReq.setGet_col_stats(false);
+                    this.ptns.addAll(handler.get_partitions_by_names_req(partitionsReq).getPartitions());
+                }
             } else {
                 this.ptnObj = null;
+                this.ptns = null;
             }
         } catch (NoSuchObjectException e) {
             // This is to mimic previous behavior where NoSuchObjectException was thrown through this
@@ -76,6 +96,13 @@ public class ReloadEvent extends ListenerEvent {
      */
     public Partition getPartitionObj() {
         return ptnObj;
+    }
+
+    /**
+     * @return List of Partition objects
+     */
+    public List<Partition> getPartitions() {
+        return ptns;
     }
 
     /**

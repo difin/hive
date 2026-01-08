@@ -335,9 +335,9 @@ public class MessageBuilder {
   }
 
   public ReloadMessage buildReloadMessage(Table tableObj, Partition partObj,
-                                          boolean refreshEvent) {
+      List<Partition> parts, boolean refreshEvent) {
     return new JSONReloadMessage(MS_SERVER_URL, MS_SERVICE_PRINCIPAL,
-            tableObj, partObj, refreshEvent, now());
+            tableObj, partObj, parts, refreshEvent, now());
   }
 
   private long now() {

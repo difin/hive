@@ -10029,7 +10029,12 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           catName = rqst.isSetCatName() ? rqst.getCatName() : getDefaultCatalog(conf);
           dbName = rqst.getDbName();
           tblName = rqst.getTableName();
-          List<String> partitionVals = rqst.getPartitionVals();
+          List<List<String>> partitionVals;
+          if (rqst.getPartitionVals() != null && !rqst.getPartitionVals().isEmpty()) {
+            partitionVals = Arrays.asList(rqst.getPartitionVals());
+          } else {
+            partitionVals = rqst.getBatchPartitionValsForRefresh();
+          }
           Map<String, String> tableParams = rqst.getTblParams();
           ReloadEvent event = new ReloadEvent(catName, dbName, tblName, partitionVals, rqst.isSuccessful(),
                   rqst.getData().getRefreshEvent(), tableParams, this);
@@ -10043,9 +10048,9 @@ public class HiveMetaStore extends ThriftHiveMetastore {
                     .get(MetaStoreEventListenerConstants.DB_NOTIFICATION_EVENT_ID_KEY_NAME)));
           } else {
             String msg = "Reload event id not generated for ";
-            if (event.getPartitionObj() != null) {
-              msg += "partition " + Arrays
-                      .toString(event.getPartitionObj().getValues().toArray()) + " of ";
+            if (event.getPartitions() != null) {
+              msg += "partition(s) " + Arrays
+                      .toString(event.getPartitions().toArray()) + " of ";
             }
             msg +=
                     " of table " + event.getTableObj().getDbName() + "." + event.getTableObj()

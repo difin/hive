@@ -29,7 +29,7 @@ namespace php metastore
 namespace cpp Apache.Hadoop.Hive
 
 const string DDL_TIME = "transient_lastDdlTime"
-const string HMS_API = "1.2.55"
+const string HMS_API = "1.2.56"
 const byte ACCESSTYPE_NONE       = 1;
 const byte ACCESSTYPE_READONLY   = 2;
 const byte ACCESSTYPE_WRITEONLY  = 4;
@@ -1514,6 +1514,8 @@ struct FireEventRequest {
     5: optional list<string> partitionVals,
     6: optional string catName,
     7: optional map<string, string> tblParams,
+    // To keep the backward compatibility, batch partition vals for reload event is used
+    8: optional list<list<string>> batchPartitionValsForRefresh
 }
 
 struct FireEventResponse {

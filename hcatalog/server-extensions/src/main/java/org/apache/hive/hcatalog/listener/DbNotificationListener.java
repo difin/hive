@@ -961,7 +961,7 @@ public class DbNotificationListener extends TransactionalMetaStoreEventListener 
   public void onReload(ReloadEvent reloadEvent) throws MetaException {
     Table tableObj = reloadEvent.getTableObj();
     ReloadMessage msg = MessageBuilder.getInstance().buildReloadMessage(tableObj,
-            reloadEvent.getPartitionObj(), reloadEvent.isRefreshEvent());
+        reloadEvent.getPartitionObj(), reloadEvent.getPartitions(), reloadEvent.isRefreshEvent());
     NotificationEvent event =
             new NotificationEvent(0, now(), EventType.RELOAD.toString(),
                     msgEncoder.getSerializer().serialize(msg));

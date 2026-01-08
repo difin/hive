@@ -523,13 +523,13 @@ package org.apache.hadoop.hive.metastore.api;
           case 1: // FILE_IDS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list1070 = iprot.readListBegin();
-                struct.fileIds = new java.util.ArrayList<java.lang.Long>(_list1070.size);
-                long _elem1071;
-                for (int _i1072 = 0; _i1072 < _list1070.size; ++_i1072)
+                org.apache.thrift.protocol.TList _list1086 = iprot.readListBegin();
+                struct.fileIds = new java.util.ArrayList<java.lang.Long>(_list1086.size);
+                long _elem1087;
+                for (int _i1088 = 0; _i1088 < _list1086.size; ++_i1088)
                 {
-                  _elem1071 = iprot.readI64();
-                  struct.fileIds.add(_elem1071);
+                  _elem1087 = iprot.readI64();
+                  struct.fileIds.add(_elem1087);
                 }
                 iprot.readListEnd();
               }
@@ -541,13 +541,13 @@ package org.apache.hadoop.hive.metastore.api;
           case 2: // METADATA
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list1073 = iprot.readListBegin();
-                struct.metadata = new java.util.ArrayList<java.nio.ByteBuffer>(_list1073.size);
-                @org.apache.thrift.annotation.Nullable java.nio.ByteBuffer _elem1074;
-                for (int _i1075 = 0; _i1075 < _list1073.size; ++_i1075)
+                org.apache.thrift.protocol.TList _list1089 = iprot.readListBegin();
+                struct.metadata = new java.util.ArrayList<java.nio.ByteBuffer>(_list1089.size);
+                @org.apache.thrift.annotation.Nullable java.nio.ByteBuffer _elem1090;
+                for (int _i1091 = 0; _i1091 < _list1089.size; ++_i1091)
                 {
-                  _elem1074 = iprot.readBinary();
-                  struct.metadata.add(_elem1074);
+                  _elem1090 = iprot.readBinary();
+                  struct.metadata.add(_elem1090);
                 }
                 iprot.readListEnd();
               }
@@ -581,9 +581,9 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(FILE_IDS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I64, struct.fileIds.size()));
-          for (long _iter1076 : struct.fileIds)
+          for (long _iter1092 : struct.fileIds)
           {
-            oprot.writeI64(_iter1076);
+            oprot.writeI64(_iter1092);
           }
           oprot.writeListEnd();
         }
@@ -593,9 +593,9 @@ package org.apache.hadoop.hive.metastore.api;
         oprot.writeFieldBegin(METADATA_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.metadata.size()));
-          for (java.nio.ByteBuffer _iter1077 : struct.metadata)
+          for (java.nio.ByteBuffer _iter1093 : struct.metadata)
           {
-            oprot.writeBinary(_iter1077);
+            oprot.writeBinary(_iter1093);
           }
           oprot.writeListEnd();
         }
@@ -627,16 +627,16 @@ package org.apache.hadoop.hive.metastore.api;
       org.apache.thrift.protocol.TTupleProtocol oprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       {
         oprot.writeI32(struct.fileIds.size());
-        for (long _iter1078 : struct.fileIds)
+        for (long _iter1094 : struct.fileIds)
         {
-          oprot.writeI64(_iter1078);
+          oprot.writeI64(_iter1094);
         }
       }
       {
         oprot.writeI32(struct.metadata.size());
-        for (java.nio.ByteBuffer _iter1079 : struct.metadata)
+        for (java.nio.ByteBuffer _iter1095 : struct.metadata)
         {
-          oprot.writeBinary(_iter1079);
+          oprot.writeBinary(_iter1095);
         }
       }
       java.util.BitSet optionals = new java.util.BitSet();
@@ -653,24 +653,24 @@ package org.apache.hadoop.hive.metastore.api;
     public void read(org.apache.thrift.protocol.TProtocol prot, PutFileMetadataRequest struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list1080 = iprot.readListBegin(org.apache.thrift.protocol.TType.I64);
-        struct.fileIds = new java.util.ArrayList<java.lang.Long>(_list1080.size);
-        long _elem1081;
-        for (int _i1082 = 0; _i1082 < _list1080.size; ++_i1082)
+        org.apache.thrift.protocol.TList _list1096 = iprot.readListBegin(org.apache.thrift.protocol.TType.I64);
+        struct.fileIds = new java.util.ArrayList<java.lang.Long>(_list1096.size);
+        long _elem1097;
+        for (int _i1098 = 0; _i1098 < _list1096.size; ++_i1098)
         {
-          _elem1081 = iprot.readI64();
-          struct.fileIds.add(_elem1081);
+          _elem1097 = iprot.readI64();
+          struct.fileIds.add(_elem1097);
         }
       }
       struct.setFileIdsIsSet(true);
       {
-        org.apache.thrift.protocol.TList _list1083 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
-        struct.metadata = new java.util.ArrayList<java.nio.ByteBuffer>(_list1083.size);
-        @org.apache.thrift.annotation.Nullable java.nio.ByteBuffer _elem1084;
-        for (int _i1085 = 0; _i1085 < _list1083.size; ++_i1085)
+        org.apache.thrift.protocol.TList _list1099 = iprot.readListBegin(org.apache.thrift.protocol.TType.STRING);
+        struct.metadata = new java.util.ArrayList<java.nio.ByteBuffer>(_list1099.size);
+        @org.apache.thrift.annotation.Nullable java.nio.ByteBuffer _elem1100;
+        for (int _i1101 = 0; _i1101 < _list1099.size; ++_i1101)
         {
-          _elem1084 = iprot.readBinary();
-          struct.metadata.add(_elem1084);
+          _elem1100 = iprot.readBinary();
+          struct.metadata.add(_elem1100);
         }
       }
       struct.setMetadataIsSet(true);
