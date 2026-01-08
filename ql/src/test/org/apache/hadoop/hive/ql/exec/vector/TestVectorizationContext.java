@@ -437,7 +437,7 @@ public class TestVectorizationContext {
   @Test
   public void testFloatInExpressions() throws HiveException {
     ExprNodeColumnDesc col1Expr = new ExprNodeColumnDesc(Float.class, "col1", "table", false);
-    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(new Integer(10));
+    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(Integer.valueOf(10));
 
     GenericUDFOPPlus udf = new GenericUDFOPPlus();
 
@@ -459,7 +459,7 @@ public class TestVectorizationContext {
   @Test
   public void testVectorizeFilterAndOrExpression() throws HiveException {
     ExprNodeColumnDesc col1Expr = new ExprNodeColumnDesc(Integer.class, "col1", "table", false);
-    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(new Integer(10));
+    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(Integer.valueOf(10));
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
@@ -520,7 +520,7 @@ public class TestVectorizationContext {
   @Test
   public void testVectorizeFilterMultiAndOrExpression() throws HiveException {
     ExprNodeColumnDesc col1Expr = new ExprNodeColumnDesc(Integer.class, "col1", "table", false);
-    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(new Integer(10));
+    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(Integer.valueOf(10));
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
@@ -544,7 +544,7 @@ public class TestVectorizationContext {
     lessExprDesc.setChildren(children2);
 
     ExprNodeColumnDesc col3Expr = new ExprNodeColumnDesc(Integer.class, "col3", "table", false);
-    ExprNodeConstantDesc const3Desc = new ExprNodeConstantDesc(new Integer(10));
+    ExprNodeConstantDesc const3Desc = new ExprNodeConstantDesc(Integer.valueOf(10));
 
     GenericUDFOPGreaterThan udf3 = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc3 = new ExprNodeGenericFuncDesc();
@@ -598,7 +598,7 @@ public class TestVectorizationContext {
   @Test
   public void testVectorizeAndOrProjectionExpression() throws HiveException {
     ExprNodeColumnDesc col1Expr = new ExprNodeColumnDesc(Integer.class, "col1", "table", false);
-    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(new Integer(10));
+    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(Integer.valueOf(10));
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
@@ -662,7 +662,7 @@ public class TestVectorizationContext {
   @Test
   public void testNotExpression() throws HiveException {
     ExprNodeColumnDesc col1Expr = new ExprNodeColumnDesc(Integer.class, "col1", "table", false);
-    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(new Integer(10));
+    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(Integer.valueOf(10));
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
@@ -700,7 +700,7 @@ public class TestVectorizationContext {
   @Test
   public void testNullExpressions() throws HiveException {
     ExprNodeColumnDesc col1Expr = new ExprNodeColumnDesc(Integer.class, "col1", "table", false);
-    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(new Integer(10));
+    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(Integer.valueOf(10));
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
@@ -741,7 +741,7 @@ public class TestVectorizationContext {
   @Test
   public void testNotNullExpressions() throws HiveException {
     ExprNodeColumnDesc col1Expr = new ExprNodeColumnDesc(Integer.class, "col1", "table", false);
-    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(new Integer(10));
+    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(Integer.valueOf(10));
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc greaterExprDesc = new ExprNodeGenericFuncDesc();
@@ -799,7 +799,7 @@ public class TestVectorizationContext {
   @Test
   public void testFilterWithNegativeScalar() throws HiveException {
     ExprNodeColumnDesc col1Expr = new  ExprNodeColumnDesc(Integer.class, "col1", "table", false);
-    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(new Integer(-10));
+    ExprNodeConstantDesc constDesc = new ExprNodeConstantDesc(Integer.valueOf(-10));
 
     GenericUDFOPGreaterThan udf = new GenericUDFOPGreaterThan();
     ExprNodeGenericFuncDesc exprDesc = new ExprNodeGenericFuncDesc();
@@ -1283,8 +1283,8 @@ public class TestVectorizationContext {
     ExprNodeColumnDesc col2Expr = new  ExprNodeColumnDesc(Long.class, "col2", "table", false);
     ExprNodeColumnDesc col3Expr = new  ExprNodeColumnDesc(Long.class, "col3", "table", false);
 
-    ExprNodeConstantDesc constDesc2 = new ExprNodeConstantDesc(new Integer(1));
-    ExprNodeConstantDesc constDesc3 = new ExprNodeConstantDesc(new Integer(2));
+    ExprNodeConstantDesc constDesc2 = new ExprNodeConstantDesc(Integer.valueOf(1));
+    ExprNodeConstantDesc constDesc3 = new ExprNodeConstantDesc(Integer.valueOf(2));
 
     // long column/column IF
     GenericUDFIf udf = new GenericUDFIf();

@@ -314,7 +314,7 @@ abstract public class AbstractBucketJoinProc implements SemanticNodeProcessor {
         }
         List<String> fileNames =
             getBucketFilePathsOfPartition(tbl.getDataLocation(), pGraphContext);
-        Integer num = new Integer(tbl.getNumBuckets());
+        int num = tbl.getNumBuckets();
 
         // The number of files for the table should be same as number of buckets.
         if (fileNames.size() != 0 && fileNames.size() != num) {
@@ -330,7 +330,7 @@ abstract public class AbstractBucketJoinProc implements SemanticNodeProcessor {
           bigTblPartsToBucketNumber.put(null, tbl.getNumBuckets());
           bigTablePartitioned = false;
         } else {
-          tblAliasToNumberOfBucketsInEachPartition.put(alias, Arrays.asList(num));
+          tblAliasToNumberOfBucketsInEachPartition.put(alias, Arrays.asList(Integer.valueOf(num)));
           tblAliasToBucketedFilePathsInEachPartition.put(alias, Arrays.asList(fileNames));
         }
       }

@@ -1072,7 +1072,7 @@ public class ASTConverter {
     }
 
     Schema(DruidQuery dq) {
-      HiveTableScan hts = (HiveTableScan) ((DruidQuery)dq).getTableScan();
+      HiveTableScan hts = (HiveTableScan) dq.getTableScan();
       String tabName = hts.getTableAlias();
       for (RelDataTypeField field : dq.getRowType().getFieldList()) {
         add(new ColumnInfo(tabName, field.getName()));

@@ -4355,7 +4355,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
         SqlCall sc = null;
 
         if (amt != null) {
-          amtLiteral = cluster.getRexBuilder().makeLiteral(new Integer(bs.getAmt()),
+          amtLiteral = cluster.getRexBuilder().makeLiteral(Integer.valueOf(bs.getAmt()),
               cluster.getTypeFactory().createSqlType(SqlTypeName.INTEGER), true);
         }
 
