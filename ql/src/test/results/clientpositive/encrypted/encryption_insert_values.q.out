@@ -34,3 +34,4 @@ POSTHOOK: Input: default@encrypted_table_n3
 POSTHOOK: Output: hdfs://### HDFS PATH ###
 1	foo
 2	bar
+Encryption key deleted: 'key_128'

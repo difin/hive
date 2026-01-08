@@ -153,3 +153,4 @@ PREHOOK: query: DROP TABLE IF EXISTS encrypted_ext_table_n0 PURGE
 PREHOOK: type: DROPTABLE
 POSTHOOK: query: DROP TABLE IF EXISTS encrypted_ext_table_n0 PURGE
 POSTHOOK: type: DROPTABLE
+Encryption key deleted: 'key_128'
