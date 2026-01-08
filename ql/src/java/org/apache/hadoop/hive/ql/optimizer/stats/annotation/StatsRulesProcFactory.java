@@ -675,7 +675,7 @@ public class StatsRulesProcFactory {
           String boundValue = stringVal;
           switch (colType) {
           case serdeConstants.TINYINT_TYPE_NAME: {
-            byte value = new Byte(stringVal);
+            byte value = Byte.parseByte(stringVal);
             byte maxValue = range.maxValue.byteValue();
             byte minValue = range.minValue.byteValue();
             return RangeResult.of(value < minValue, value < maxValue, value == minValue, value == maxValue);
@@ -1064,7 +1064,7 @@ public class StatsRulesProcFactory {
           cs.getRange().maxValue != null && cs.getRange().minValue != null) {
         try {
           if (colTypeLowerCase.equals(serdeConstants.TINYINT_TYPE_NAME)) {
-            byte value = new Byte(boundValue);
+            byte value = Byte.parseByte(boundValue);
             byte maxValue = cs.getRange().maxValue.byteValue();
             byte minValue = cs.getRange().minValue.byteValue();
             if (upperBound) {
