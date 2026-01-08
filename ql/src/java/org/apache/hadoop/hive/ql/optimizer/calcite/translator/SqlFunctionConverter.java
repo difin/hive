@@ -27,6 +27,7 @@ import org.apache.calcite.sql.SqlFunction;
 import org.apache.calcite.sql.SqlFunctionCategory;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlOperator;
+import org.apache.calcite.sql.fun.SqlBasicAggFunction;
 import org.apache.calcite.sql.fun.SqlMonotonicBinaryOperator;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.type.OperandTypes;
@@ -41,7 +42,6 @@ import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.optimizer.calcite.CalciteSemanticException;
 import org.apache.hadoop.hive.ql.optimizer.calcite.functions.CalciteUDFInfo;
-import org.apache.hadoop.hive.ql.optimizer.calcite.functions.CanAggregateDistinct;
 import org.apache.hadoop.hive.ql.optimizer.calcite.functions.HiveSqlAverageAggFunction;
 import org.apache.hadoop.hive.ql.optimizer.calcite.functions.HiveSqlCountAggFunction;
 import org.apache.hadoop.hive.ql.optimizer.calcite.functions.HiveSqlMinMaxAggFunction;
@@ -269,21 +269,6 @@ public class SqlFunctionConverter {
         } else if (op.kind == SqlKind.PLUS_PREFIX) {
           node = (ASTNode) ParseDriver.adaptor.create(HiveParser.PLUS, "PLUS");
         } else {
-          // Handle COUNT/SUM/AVG function for the case of COUNT(*) and COUNT(DISTINCT)
-          if (op instanceof HiveSqlCountAggFunction ||
-              op instanceof HiveSqlSumAggFunction ||
-              op instanceof HiveSqlAverageAggFunction) {
-            if (children.size() == 0) {
-              node = (ASTNode) ParseDriver.adaptor.create(HiveParser.TOK_FUNCTIONSTAR,
-                "TOK_FUNCTIONSTAR");
-            } else {
-              CanAggregateDistinct distinctFunction = (CanAggregateDistinct) op;
-              if (distinctFunction.isDistinct()) {
-                node = (ASTNode) ParseDriver.adaptor.create(HiveParser.TOK_FUNCTIONDI,
-                    "TOK_FUNCTIONDI");
-              }
-            }
-          }
           node.addChild((ASTNode) ParseDriver.adaptor.create(HiveParser.Identifier, op.getName()));
         }
       }
@@ -525,22 +510,6 @@ public class SqlFunctionConverter {
     return new HiveToken(type, text);
   }
 
-  // UDAF is assumed to be deterministic
-  public static class CalciteUDAF extends SqlAggFunction implements CanAggregateDistinct {
-    private final boolean isDistinct;
-    public CalciteUDAF(boolean isDistinct, String opName, SqlReturnTypeInference returnTypeInference,
-        SqlOperandTypeInference operandTypeInference, SqlOperandTypeChecker operandTypeChecker) {
-      super(opName, SqlKind.OTHER_FUNCTION, returnTypeInference, operandTypeInference,
-          operandTypeChecker, SqlFunctionCategory.USER_DEFINED_FUNCTION);
-      this.isDistinct = isDistinct;
-    }
-
-    @Override
-    public boolean isDistinct() {
-      return isDistinct;
-    }
-  }
-
   public static SqlOperator getCalciteFn(String hiveUdfName,
       List<RelDataType> calciteArgTypes, RelDataType calciteRetType,
       boolean deterministic, boolean runtimeConstant)
@@ -572,8 +541,8 @@ public class SqlFunctionConverter {
     return calciteOp;
   }
 
-  public static SqlAggFunction getCalciteAggFn(String hiveUdfName, boolean isDistinct,
-      List<RelDataType> calciteArgTypes, RelDataType calciteRetType) {
+  public static SqlAggFunction getCalciteAggFn(String hiveUdfName, List<RelDataType> calciteArgTypes,
+      RelDataType calciteRetType) {
     SqlAggFunction calciteAggFn = (SqlAggFunction) hiveToCalcite.get(hiveUdfName);
 
     if (calciteAggFn == null) {
@@ -583,21 +552,18 @@ public class SqlFunctionConverter {
       switch (hiveUdfName.toLowerCase()) {
       case "sum":
         calciteAggFn = new HiveSqlSumAggFunction(
-            isDistinct,
             udfInfo.returnTypeInference,
             udfInfo.operandTypeInference,
             udfInfo.operandTypeChecker);
         break;
       case "$sum0":
         calciteAggFn = new HiveSqlSumEmptyIsZeroAggFunction(
-            isDistinct,
             udfInfo.returnTypeInference,
             udfInfo.operandTypeInference,
             udfInfo.operandTypeChecker);
         break;
       case "count":
         calciteAggFn = new HiveSqlCountAggFunction(
-            isDistinct,
             udfInfo.returnTypeInference,
             udfInfo.operandTypeInference,
             udfInfo.operandTypeChecker);
@@ -616,7 +582,6 @@ public class SqlFunctionConverter {
         break;
       case "avg":
         calciteAggFn = new HiveSqlAverageAggFunction(
-            isDistinct,
             udfInfo.returnTypeInference,
             udfInfo.operandTypeInference,
             udfInfo.operandTypeChecker);
@@ -657,11 +622,10 @@ public class SqlFunctionConverter {
             udfInfo.operandTypeChecker);
         break;
       default:
-        calciteAggFn = new CalciteUDAF(
-            isDistinct,
+        calciteAggFn = SqlBasicAggFunction.create(
             udfInfo.udfName,
+            SqlKind.OTHER_FUNCTION,
             udfInfo.returnTypeInference,
-            udfInfo.operandTypeInference,
             udfInfo.operandTypeChecker);
         break;
       }

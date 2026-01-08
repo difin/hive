@@ -235,7 +235,7 @@ public final class HiveRewriteToDataSketchesRules {
           AggregateInfo aggregateInfo = functionHelper.getAggregateFunctionInfo(
               false, false, fn.getFunctionName(), inputs, Collections.emptyList());
           return functionHelper.getCalciteAggregateFunction(
-              fn.getFunctionName(), false, inputs.stream().map(RexNode::getType).collect(Collectors.toList()),
+              fn.getFunctionName(), inputs.stream().map(RexNode::getType).collect(Collectors.toList()),
               TypeConverter.convert(aggregateInfo.getReturnType(), aggregate.getCluster().getTypeFactory()));
         } catch (SemanticException e) {
           throw new RuntimeException("Could not load Calcite data sketch aggregate function: " + fn.getFunctionName());
@@ -530,7 +530,7 @@ public final class HiveRewriteToDataSketchesRules {
           AggregateInfo aggregateInfo = functionHelper.getAggregateFunctionInfo(
               false, false, fn.getFunctionName(), inputs, Collections.emptyList());
           return functionHelper.getCalciteAggregateFunction(
-              fn.getFunctionName(), false, inputs.stream().map(RexNode::getType).collect(Collectors.toList()),
+              fn.getFunctionName(), inputs.stream().map(RexNode::getType).collect(Collectors.toList()),
               TypeConverter.convert(aggregateInfo.getReturnType(), relBuilder.getCluster().getTypeFactory()));
         } catch (SemanticException e) {
           throw new RuntimeException("Could not load Calcite data sketch aggregate function: " + fn.getFunctionName());

@@ -404,9 +404,8 @@ public class HiveFunctionHelper implements FunctionHelper {
    * {@inheritDoc}
    */
   @Override
-  public SqlAggFunction getCalciteAggregateFunction(String functionName, boolean isDistinct,
-      List<RelDataType> argTypes, RelDataType retType) {
-    return SqlFunctionConverter.getCalciteAggFn(functionName, isDistinct, argTypes, retType);
+  public SqlAggFunction getCalciteAggregateFunction(String functionName, List<RelDataType> argTypes, RelDataType retType) {
+    return SqlFunctionConverter.getCalciteAggFn(functionName, argTypes, retType);
   }
 
   /**

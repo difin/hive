@@ -980,8 +980,8 @@ public class HiveCalciteUtil {
     aggArgRelDTBldr.add(TypeConverter.convert(typeInfo, cluster.getTypeFactory()));
     final FunctionHelper functionHelper =
         cluster.getPlanner().getContext().unwrap(FunctionHelper.class);
-    SqlAggFunction aggFunction = functionHelper.getCalciteAggregateFunction(
-        funcName, false, aggArgRelDTBldr.build(), aggFnRetType);
+    SqlAggFunction aggFunction = functionHelper.getCalciteAggregateFunction(funcName,
+            aggArgRelDTBldr.build(), aggFnRetType);
     List<Integer> argList = new ArrayList<>();
     argList.add(pos);
     return AggregateCall.create(aggFunction, false, argList, -1, aggFnRetType, null);

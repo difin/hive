@@ -3832,7 +3832,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       // 3. Get Aggregation FN from Calcite given name, ret type and input arg
       // type
       final SqlAggFunction aggregation = functionHelper.getCalciteAggregateFunction(
-          agg.getAggregateName(), agg.isDistinct(),
+          agg.getAggregateName(),
           aggArgRelDTBldr.build(), aggFnRetType);
 
       List<RelFieldCollation> collationList = new ArrayList<>(agg.getCollation().size());
@@ -4418,7 +4418,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
         // 5. Get Calcite Agg Fn
         final SqlAggFunction calciteAggFn = functionHelper.getCalciteAggregateFunction(
-            hiveAggInfo.getAggregateName(), hiveAggInfo.isDistinct(), calciteAggFnArgsType, calciteAggFnRetType);
+            hiveAggInfo.getAggregateName(), calciteAggFnArgsType, calciteAggFnRetType);
 
         // 6. Translate Window spec
         RowResolver inputRR = relToHiveRR.get(srcRel);

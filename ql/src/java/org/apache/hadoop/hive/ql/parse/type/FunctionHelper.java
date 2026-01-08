@@ -102,8 +102,7 @@ public interface FunctionHelper {
    * Given the aggregate function name and multiple parameters, it will return the
    * corresponding SQL aggregate operator.
    */
-  SqlAggFunction getCalciteAggregateFunction(String functionName, boolean isDistinct,
-      List<RelDataType> argTypes, RelDataType retType);
+  SqlAggFunction getCalciteAggregateFunction(String functionName, List<RelDataType> argTypes, RelDataType retType);
 
   /**
    * Given a builder, a SQL operator, and the inputs to a function, it will

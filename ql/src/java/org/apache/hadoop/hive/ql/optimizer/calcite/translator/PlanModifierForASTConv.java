@@ -455,8 +455,7 @@ public class PlanModifierForASTConv {
     // Create the dummy aggregation.
     FunctionHelper functionHelper =
         rel.getCluster().getPlanner().getContext().unwrap(FunctionHelper.class);
-    SqlAggFunction countFn = SqlFunctionConverter.getCalciteAggFn("count", false,
-        ImmutableList.of(intType), longType);
+    SqlAggFunction countFn = SqlFunctionConverter.getCalciteAggFn("count", ImmutableList.of(intType), longType);
     // TODO: Using 0 might be wrong; might need to walk down to find the
     // proper index of a dummy.
     List<Integer> argList = ImmutableList.of(0);
