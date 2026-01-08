@@ -21,8 +21,10 @@ package org.apache.hadoop.hive.metastore.columnstats.merge;
 
 import org.apache.hadoop.hive.common.histogram.KllHistogramEstimator;
 import org.apache.hadoop.hive.common.ndv.NumDistinctValueEstimator;
+import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.Decimal;
+import org.apache.hadoop.hive.metastore.api.utils.DecimalUtils;
 import org.apache.hadoop.hive.metastore.columnstats.cache.DecimalColumnStatsDataInspector;
 
 import static org.apache.hadoop.hive.metastore.columnstats.ColumnsStatsUtils.decimalInspectorFromStats;
@@ -73,7 +75,7 @@ public class DecimalColumnStatsMerger extends ColumnStatsMerger {
 
     Decimal mergedLowValue = null;
     if (aggregateData.isSetLowValue() && newData.isSetLowValue()) {
-      mergedLowValue = aggregateLowValue.compareTo(newLowValue) > 0 ? newLowValue : aggregateLowValue;
+      mergedLowValue = compareDecimals(aggregateLowValue, newLowValue) > 0 ? newLowValue : aggregateLowValue;
     } else {
       mergedLowValue = aggregateLowValue == null ? newLowValue : aggregateLowValue;
     }
@@ -91,11 +93,23 @@ public class DecimalColumnStatsMerger extends ColumnStatsMerger {
 
     Decimal mergedHighValue = null;
     if (aggregateData.isSetHighValue() && newData.isSetHighValue()) {
-      mergedHighValue = aggregateHighValue.compareTo(newHighValue) > 0 ? aggregateHighValue : newHighValue;
+      mergedHighValue = compareDecimals(aggregateHighValue, newHighValue) > 0 ? aggregateHighValue : newHighValue;
     } else {
       mergedHighValue = aggregateHighValue == null ? newHighValue : aggregateHighValue;
     }
 
     aggregateData.setHighValue(mergedHighValue);
+  }
+
+  /**
+   * Compare two decimals.
+   * @param decimal1 a non-null decimal
+   * @param decimal2 a non-null decimal
+   * @return see {@link java.util.Comparator#compare(Object, Object)}
+   */
+  private int compareDecimals(Decimal decimal1, Decimal decimal2) {
+    HiveDecimal d1 = DecimalUtils.getHiveDecimal(decimal1);
+    HiveDecimal d2 = DecimalUtils.getHiveDecimal(decimal2);
+    return d1.compareTo(d2);
   }
 }

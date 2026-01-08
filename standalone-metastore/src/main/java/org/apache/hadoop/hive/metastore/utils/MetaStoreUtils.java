@@ -43,6 +43,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.StatsSetupConst;
+import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.metastore.ColumnType;
 import org.apache.hadoop.hive.metastore.HiveMetaHook;
 import org.apache.hadoop.hive.metastore.HiveMetaStore;
@@ -439,6 +440,15 @@ public class MetaStoreUtils {
 
   public static double decimalToDouble(Decimal decimal) {
     return new BigDecimal(new BigInteger(decimal.getUnscaled()), decimal.getScale()).doubleValue();
+  }
+
+  public static String decimalToString(Decimal val) {
+    if (val == null) {
+      return "";
+    }
+
+    HiveDecimal result = HiveDecimal.create(new BigInteger(val.getUnscaled()), val.getScale());
+    return (result != null) ? result.toString() : "";
   }
 
   public static void validatePartitionNameCharacters(List<String> partVals,

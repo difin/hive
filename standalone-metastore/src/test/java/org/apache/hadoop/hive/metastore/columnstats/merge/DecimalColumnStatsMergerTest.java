@@ -23,33 +23,48 @@ import org.apache.hadoop.hive.metastore.annotation.MetastoreUnitTest;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsData;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.Decimal;
-import org.apache.hadoop.hive.metastore.api.utils.DecimalUtils;
 import org.apache.hadoop.hive.metastore.columnstats.cache.DecimalColumnStatsDataInspector;
+import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.nio.ByteBuffer;
+import java.util.Objects;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 @Category(MetastoreUnitTest.class)
 public class DecimalColumnStatsMergerTest {
-
-  private static final Decimal DECIMAL_3 = DecimalUtils.getDecimal(3, 0);
-  private static final Decimal DECIMAL_5 = DecimalUtils.getDecimal(5, 0);
-  private static final Decimal DECIMAL_20 = DecimalUtils.getDecimal(2, 1);
+  private static final Decimal DECIMAL_1 = getDecimal("1", 1, 0);
+  private static final Decimal DECIMAL_3 = getDecimal("3", 3, 0);
+  private static final Decimal DECIMAL_5 = getDecimal("5", 5, 0);
+  private static final Decimal DECIMAL_20 = getDecimal("20", 2, -1);
 
   private static final DecimalColumnStatsDataInspector DATA_3 = new DecimalColumnStatsDataInspector();
   private static final DecimalColumnStatsDataInspector DATA_5 = new DecimalColumnStatsDataInspector();
-  private static final DecimalColumnStatsDataInspector DATA_20 = new DecimalColumnStatsDataInspector();
 
   static {
     DATA_3.setLowValue(DECIMAL_3);
     DATA_3.setHighValue(DECIMAL_3);
     DATA_5.setLowValue(DECIMAL_5);
     DATA_5.setHighValue(DECIMAL_5);
-    DATA_20.setLowValue(DECIMAL_20);
-    DATA_20.setHighValue(DECIMAL_20);
   }
 
-  private DecimalColumnStatsMerger merger = new DecimalColumnStatsMerger();
+  private final DecimalColumnStatsMerger merger = new DecimalColumnStatsMerger();
+
+  /**
+   * Creates a decimal and checks its string representation.
+   */
+  private static Decimal getDecimal(String expected, int number, int scale) {
+    ByteBuffer bb = ByteBuffer.allocate(4);
+    bb.asIntBuffer().put(number);
+    Decimal d = new Decimal((short) scale, bb);
+    assertEquals(expected, MetaStoreUtils.decimalToString(d));
+    return d;
+  }
 
   @Test
   public void testMergeNullMinMaxValues() {
@@ -168,52 +183,62 @@ public class DecimalColumnStatsMergerTest {
 
   @Test
   public void testDecimalCompareEqual() {
-    Assert.assertTrue(DECIMAL_3.equals(DECIMAL_3));
+    assertTrue(DECIMAL_3.equals(getDecimal("3", 3, 0)));
+    // the equals method does not check for numerical equality,
+    // e.g., DECIMAL_3 is not equal to getDecimal("3", 30, 1)
   }
 
   @Test
   public void testDecimalCompareDoesntEqual() {
-    Assert.assertTrue(!DECIMAL_3.equals(DECIMAL_5));
+    assertFalse(DECIMAL_3.equals(DECIMAL_5));
+    assertFalse(DECIMAL_3.equals(getDecimal("30", 3, -1)));
+  }
+
+  private void checkMergedValue(Decimal low, Decimal high) {
+    Objects.requireNonNull(low);
+    Objects.requireNonNull(high);
+    assertTrue(MetaStoreUtils.decimalToDouble(low) < MetaStoreUtils.decimalToDouble(high));
+
+    {
+      ColumnStatisticsObj aggData = new ColumnStatisticsObj();
+      createData(aggData, low, low);
+      ColumnStatisticsObj otherData = new ColumnStatisticsObj();
+      createData(otherData, high, high);
+      merger.merge(aggData, otherData);
+
+      assertEquals(low, aggData.getStatsData().getDecimalStats().getLowValue());
+      assertEquals(high, aggData.getStatsData().getDecimalStats().getHighValue());
+    }
+
+    {
+      ColumnStatisticsObj aggData = new ColumnStatisticsObj();
+      createData(aggData, high, high);
+      ColumnStatisticsObj otherData = new ColumnStatisticsObj();
+      createData(otherData, low, low);
+      merger.merge(aggData, otherData);
+
+      assertEquals(low, aggData.getStatsData().getDecimalStats().getLowValue());
+      assertEquals(high, aggData.getStatsData().getDecimalStats().getHighValue());
+    }
   }
 
   @Test
   public void testCompareSimple() {
-    DecimalColumnStatsDataInspector data1 = new DecimalColumnStatsDataInspector(DATA_3);
-    DecimalColumnStatsDataInspector data2 = new DecimalColumnStatsDataInspector(DATA_5);
-    merger.setHighValue(data1, data2);
-    Assert.assertEquals(DECIMAL_5, data1.getHighValue());
-  }
-
-  @Test
-  public void testCompareSimpleFlipped() {
-    DecimalColumnStatsDataInspector data1 = new DecimalColumnStatsDataInspector(DATA_5);
-    DecimalColumnStatsDataInspector data2 = new DecimalColumnStatsDataInspector(DATA_3);
-    merger.setHighValue(data1, data2);
-    Assert.assertEquals(DECIMAL_5, data1.getHighValue());
-  }
-
-  @Test
-  public void testCompareSimpleReversed() {
-    DecimalColumnStatsDataInspector data1 = new DecimalColumnStatsDataInspector(DATA_3);
-    DecimalColumnStatsDataInspector data2 = new DecimalColumnStatsDataInspector(DATA_5);
-    merger.setLowValue(data1, data2);
-    Assert.assertEquals(DECIMAL_3, data1.getLowValue());
-  }
-
-  @Test
-  public void testCompareSimpleFlippedReversed() {
-    DecimalColumnStatsDataInspector data1 = new DecimalColumnStatsDataInspector(DATA_5);
-    DecimalColumnStatsDataInspector data2 = new DecimalColumnStatsDataInspector(DATA_3);
-    merger.setLowValue(data1, data2);
-    Assert.assertEquals(DECIMAL_3, data1.getLowValue());
+    checkMergedValue(DECIMAL_3, DECIMAL_5);
   }
 
   @Test
   public void testCompareUnscaledValue() {
-    DecimalColumnStatsDataInspector data1 = new DecimalColumnStatsDataInspector(DATA_3);
-    DecimalColumnStatsDataInspector data2 = new DecimalColumnStatsDataInspector(DATA_20);
-    merger.setHighValue(data1, data2);
-    Assert.assertEquals(DECIMAL_20, data1.getHighValue());
+    checkMergedValue(DECIMAL_3, DECIMAL_20);
+  }
+
+  @Test
+  public void testCompareScaledValue() {
+    checkMergedValue(getDecimal("-123.2", -1232, 1), getDecimal("-10.2", -102, 1));
+
+    checkMergedValue(getDecimal("1.02", 102, 2), getDecimal("123.2", 1232, 1));
+
+    checkMergedValue(getDecimal("1.02", 102, 2), getDecimal("1232000", 1232, -3));
   }
 
   @Test
