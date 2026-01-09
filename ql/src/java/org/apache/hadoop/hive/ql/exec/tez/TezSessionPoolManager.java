@@ -297,7 +297,7 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
      */
     if (nonDefaultUser || !hasInitialSessions || hasQueue || jobNameSet) {
       LOG.info("QueueName: {} nonDefaultUser: {} defaultQueuePool: {} hasInitialSessions: {}" +
-                      " jobNameSet: ", queueName, nonDefaultUser, defaultSessionPool,
+                      " jobNameSet: {}", queueName, nonDefaultUser, defaultSessionPool,
               hasInitialSessions, jobNameSet);
       return getNewSessionState(conf, queueName, doOpen);
     }
