@@ -2006,4 +2006,10 @@ interface ThriftHiveMetastoreIf extends \FacebookServiceIf
      * @throws \metastore\NoSuchObjectException
      */
     public function set_properties(\metastore\PropertySetRequest $req);
+    /**
+     * @param string $policyName
+     * @return \metastore\ReplayedTxnsForPolicyResult
+     * @throws \metastore\MetaException
+     */
+    public function get_replayed_txns_for_policy($policyName);
 }

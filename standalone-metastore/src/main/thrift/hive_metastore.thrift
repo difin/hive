@@ -2437,6 +2437,10 @@ struct PropertyGetResponse {
     1: map<string, map<string , string>> properties;
 }
 
+struct ReplayedTxnsForPolicyResult {
+    1: map<string, string> replTxnMapEntry
+}
+
 // Exceptions.
 
 exception MetaException {
@@ -3215,6 +3219,7 @@ service ThriftHiveMetastore extends fb303.FacebookService
   // set properties
   bool set_properties(1:PropertySetRequest req) throws(1:MetaException e1, 2:NoSuchObjectException e2);
 
+  ReplayedTxnsForPolicyResult get_replayed_txns_for_policy(1: string policyName) throws (1: MetaException o1);
   }
 
 // * Note about the DDL_TIME: When creating or altering a table or a partition,

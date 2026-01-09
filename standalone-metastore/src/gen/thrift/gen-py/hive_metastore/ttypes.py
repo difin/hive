@@ -29789,6 +29789,73 @@ class PropertyGetResponse(object):
         return not (self == other)
 
 
+class ReplayedTxnsForPolicyResult(object):
+    """
+    Attributes:
+     - replTxnMapEntry
+
+    """
+
+
+    def __init__(self, replTxnMapEntry=None,):
+        self.replTxnMapEntry = replTxnMapEntry
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.MAP:
+                    self.replTxnMapEntry = {}
+                    (_ktype1377, _vtype1378, _size1376) = iprot.readMapBegin()
+                    for _i1380 in range(_size1376):
+                        _key1381 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        _val1382 = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                        self.replTxnMapEntry[_key1381] = _val1382
+                    iprot.readMapEnd()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('ReplayedTxnsForPolicyResult')
+        if self.replTxnMapEntry is not None:
+            oprot.writeFieldBegin('replTxnMapEntry', TType.MAP, 1)
+            oprot.writeMapBegin(TType.STRING, TType.STRING, len(self.replTxnMapEntry))
+            for kiter1383, viter1384 in self.replTxnMapEntry.items():
+                oprot.writeString(kiter1383.encode('utf-8') if sys.version_info[0] == 2 else kiter1383)
+                oprot.writeString(viter1384.encode('utf-8') if sys.version_info[0] == 2 else viter1384)
+            oprot.writeMapEnd()
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
 class MetaException(TException):
     """
     Attributes:
@@ -33261,6 +33328,11 @@ all_structs.append(PropertyGetResponse)
 PropertyGetResponse.thrift_spec = (
     None,  # 0
     (1, TType.MAP, 'properties', (TType.STRING, 'UTF8', TType.MAP, (TType.STRING, 'UTF8', TType.STRING, 'UTF8', False), False), None, ),  # 1
+)
+all_structs.append(ReplayedTxnsForPolicyResult)
+ReplayedTxnsForPolicyResult.thrift_spec = (
+    None,  # 0
+    (1, TType.MAP, 'replTxnMapEntry', (TType.STRING, 'UTF8', TType.STRING, 'UTF8', False), None, ),  # 1
 )
 all_structs.append(MetaException)
 MetaException.thrift_spec = (

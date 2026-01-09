@@ -33,6 +33,8 @@ import org.apache.hadoop.hive.ql.exec.repl.AtlasLoadTask;
 import org.apache.hadoop.hive.ql.exec.repl.AtlasLoadWork;
 import org.apache.hadoop.hive.ql.exec.repl.DirCopyTask;
 import org.apache.hadoop.hive.ql.exec.repl.DirCopyWork;
+import org.apache.hadoop.hive.ql.exec.repl.ClearDanglingTxnTask;
+import org.apache.hadoop.hive.ql.exec.repl.ClearDanglingTxnWork;
 import org.apache.hadoop.hive.ql.exec.repl.ReplDumpTask;
 import org.apache.hadoop.hive.ql.exec.repl.ReplDumpWork;
 import org.apache.hadoop.hive.ql.exec.repl.ReplLoadTask;
@@ -132,6 +134,8 @@ public final class TaskFactory {
     taskvec.add(new TaskTuple<DirCopyWork>(DirCopyWork.class, DirCopyTask.class));
     taskvec.add(new TaskTuple<ScheduledQueryMaintenanceWork>(ScheduledQueryMaintenanceWork.class,
             ScheduledQueryMaintenanceTask.class));
+    taskvec.add(new TaskTuple<>(ClearDanglingTxnWork.class,
+            ClearDanglingTxnTask.class));
   }
 
   private static ThreadLocal<Integer> tid = new ThreadLocal<Integer>() {

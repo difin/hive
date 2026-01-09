@@ -4075,6 +4075,11 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
   }
 
   @Override
+  public ReplayedTxnsForPolicyResult getReplayedTxnsForPolicy(String replPolicy) throws TException{
+    return client.get_replayed_txns_for_policy(replPolicy);
+  }
+
+  @Override
   public void commitTxn(long txnid)
           throws NoSuchTxnException, TxnAbortedException, TException {
     client.commit_txn(new CommitTxnRequest(txnid));

@@ -120,6 +120,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+
 import static org.apache.hadoop.hive.conf.Constants.SCHEDULED_QUERY_SCHEDULENAME;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.REPL_BOOTSTRAP_DUMP_ABORT_WRITE_TXN_AFTER_TIMEOUT;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.REPL_DUMP_METADATA_ONLY;
@@ -130,6 +132,7 @@ import static org.apache.hadoop.hive.metastore.ReplChangeManager.SOURCE_OF_REPLI
 import static org.apache.hadoop.hive.metastore.ReplChangeManager.getReplPolicyIdString;
 import static org.apache.hadoop.hive.ql.exec.repl.ReplAck.LOAD_ACKNOWLEDGEMENT;
 import static org.apache.hadoop.hive.ql.exec.repl.ReplAck.NON_RECOVERABLE_MARKER;
+import static org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils.OPEN_TXNS;
 import static org.apache.hadoop.hive.ql.exec.repl.util.ReplUtils.RANGER_AUTHORIZER;
 import static org.apache.hadoop.hive.ql.exec.repl.util.SnapshotUtils.cleanupSnapshots;
 import static org.apache.hadoop.hive.ql.exec.repl.util.SnapshotUtils.getDFS;
@@ -715,6 +718,8 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
     } else {
       work.overrideLastEventToDump(hiveDb, bootDumpBeginReplId, -1);
     }
+
+    List<Long> txnsForDb = getOpenTxns(getTxnMgr().getValidTxns(excludedTxns));
     IMetaStoreClient.NotificationFilter evFilter = new AndFilter(
         new ReplEventFilter(work.replScope),
         new CatalogFilter(MetaStoreUtils.getDefaultCatalog(conf)),
@@ -812,6 +817,18 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
         Path eventDir = new Path(eventRootDir, String.valueOf(lastReplId));
         dumpEvent(ev, eventDir, dumpRoot, cmRoot, hiveDb);
         Utils.writeOutput(String.valueOf(lastReplId), ackFile, conf);
+      }
+      //Adding all open txns which belongs to database under replication and it's not readonly and repl created.
+      // If dfs.namenode.fs-limits.max-directory-items is set then it may affect the how many events will be dumped
+      // In that case we don't want to create a _open_txn file and load will skip the cleaning process
+      if (conf.getBoolVar(HiveConf.ConfVars.HIVE_REPL_CLEAR_DANGLING_TXNS_ON_TARGET)
+         && getMaxEventAllowed(work.maxEventLimit()) == work.maxEventLimit()) {
+        Path openTxnsDumpPath = new Path(dumpRoot, OPEN_TXNS);
+        txnsForDb.addAll(getOpenTxns(getTxnMgr().getValidTxns(excludedTxns)));
+        String openTxnsString = new HashSet<>(txnsForDb).stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        Utils.writeOutput(openTxnsString, openTxnsDumpPath, conf);
       }
       replLogger.endLog(lastReplId.toString());
       LOG.info("Done dumping events, preparing to return {},{}", dumpRoot.toUri(), lastReplId);

@@ -301,6 +301,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('   get_all_write_event_info(GetAllWriteEventInfoRequest request)')
     print('  PropertyGetResponse get_properties(PropertyGetRequest req)')
     print('  bool set_properties(PropertySetRequest req)')
+    print('  ReplayedTxnsForPolicyResult get_replayed_txns_for_policy(string policyName)')
     print('  string getName()')
     print('  string getVersion()')
     print('  fb_status getStatus()')
@@ -2054,6 +2055,12 @@ elif cmd == 'set_properties':
         print('set_properties requires 1 args')
         sys.exit(1)
     pp.pprint(client.set_properties(eval(args[0]),))
+
+elif cmd == 'get_replayed_txns_for_policy':
+    if len(args) != 1:
+        print('get_replayed_txns_for_policy requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.get_replayed_txns_for_policy(args[0],))
 
 elif cmd == 'getName':
     if len(args) != 0:

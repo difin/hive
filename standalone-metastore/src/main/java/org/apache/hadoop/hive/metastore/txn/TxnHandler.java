@@ -60,6 +60,7 @@ import org.apache.hadoop.hive.metastore.api.OpenTxnRequest;
 import org.apache.hadoop.hive.metastore.api.OpenTxnsResponse;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.ReplTblWriteIdStateRequest;
+import org.apache.hadoop.hive.metastore.api.ReplayedTxnsForPolicyResult;
 import org.apache.hadoop.hive.metastore.api.SeedTableWriteIdsRequest;
 import org.apache.hadoop.hive.metastore.api.SeedTxnIdRequest;
 import org.apache.hadoop.hive.metastore.api.ShowCompactRequest;
@@ -464,19 +465,21 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     TxnType txnType = new AbortTxnFunction(rqst).execute(jdbcResource);
     if (txnType != null) {
       if (transactionalListeners != null && (!rqst.isSetReplPolicy() || !TxnType.DEFAULT.equals(rqst.getTxn_type()))) {
-        notifyCommitOrAbortEvent(rqst.getTxnid(),EventMessage.EventType.ABORT_TXN, txnType, jdbcResource.getConnection(), txnWriteDetails, transactionalListeners);
+        notifyCommitOrAbortEvent(rqst.getTxnid(), EventMessage.EventType.ABORT_TXN,
+            txnType, jdbcResource.getConnection(), txnWriteDetails, transactionalListeners);
       }
     }
   }
 
-  public static void notifyCommitOrAbortEvent(long txnId, EventMessage.EventType eventType, TxnType txnType, Connection dbConn,
-                                       List<TxnWriteDetails> txnWriteDetails, List<TransactionalMetaStoreEventListener> transactionalListeners) throws MetaException {
+  public static void notifyCommitOrAbortEvent(long txnId, EventMessage.EventType eventType, TxnType txnType,
+        Connection dbConn, List<TxnWriteDetails> txnWriteDetails,
+        List<TransactionalMetaStoreEventListener> transactionalListeners) throws MetaException {
     List<Long> writeIds = txnWriteDetails.stream()
-            .map(TxnWriteDetails::getWriteId)
-            .toList();
+        .map(TxnWriteDetails::getWriteId)
+        .toList();
     List<String> databases = txnWriteDetails.stream()
-            .map(TxnWriteDetails::getDbName)
-            .toList();
+        .map(TxnWriteDetails::getDbName)
+        .toList();
     ListenerEvent txnEvent;
     if (eventType.equals(EventMessage.EventType.ABORT_TXN)) {
       txnEvent = new AbortTxnEvent(txnId, txnType, null, databases, writeIds);
@@ -484,7 +487,7 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       txnEvent = new CommitTxnEvent(txnId, txnType, null, databases, writeIds);
     }
     MetaStoreListenerNotifier.notifyEventWithDirectSql(transactionalListeners,
-            eventType, txnEvent, dbConn, sqlGenerator);
+        eventType, txnEvent, dbConn, sqlGenerator);
   }
 
 
@@ -537,7 +540,8 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
       if (transactionalListeners != null) {
         for (Long txnId : txnIds) {
           notifyCommitOrAbortEvent(txnId, EventMessage.EventType.ABORT_TXN,
-                  nonReadOnlyTxns.getOrDefault(txnId, TxnType.READ_ONLY), dbConn, txnWriteDetailsMap.getOrDefault(txnId, new ArrayList<>()), transactionalListeners);
+                  nonReadOnlyTxns.getOrDefault(txnId, TxnType.READ_ONLY), dbConn, 
+		  txnWriteDetailsMap.getOrDefault(txnId, new ArrayList<>()), transactionalListeners);
         }
       }
     } catch (SQLException e) {
@@ -598,6 +602,22 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
     new ReplTableWriteIdStateFunction(rqst, mutexAPI, transactionalListeners).execute(jdbcResource);
   }
 
+  /**
+   *
+    * @param replPolicy replication policy for which we want to get the replayed transactions
+   * @return Map of source and target transaction ids for the given replication policy.
+   */
+  @Override
+  public ReplayedTxnsForPolicyResult getReplayedTxnsForPolicy(String replPolicy) throws MetaException {
+    try {
+      return sqlRetryHandler.executeWithRetry(
+          new SqlRetryCallProperties().withCallerId("GetReplayedTxnsForPolicyHandler"),
+          () -> jdbcResource.execute(new GetReplayedTxnsForPolicyHandler(replPolicy)));
+    } catch (TException e) {
+      throw new MetaException(e.getMessage());
+    }
+  }
+
   @Override
   public GetValidWriteIdsResponse getValidWriteIds(GetValidWriteIdsRequest rqst) throws MetaException {
     return new GetValidWriteIdsFunction(rqst).execute(jdbcResource);
@@ -647,7 +667,7 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
         long highWaterMark = rs.getLong(1);
         if (highWaterMark >= rqst.getSeedTxnId()) {
           throw new MetaException(MessageFormat
-              .format("Invalid txnId seed {}, the highWaterMark is {}", rqst.getSeedTxnId(), highWaterMark));
+              .format("Invalid txnId seed {0}, the highWaterMark is {1}", rqst.getSeedTxnId(), highWaterMark));
         } else {
           TxnUtils.seedTxnSequence(con, stmt, rqst.getSeedTxnId());
           return null;
@@ -697,7 +717,7 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
    */
   @Override
   public Materialization getMaterializationInvalidationInfo(
-          CreationMetadata creationMetadata, String validTxnListStr) throws MetaException {
+        CreationMetadata creationMetadata, String validTxnListStr) throws MetaException {
     return new GetMaterializationInvalidationInfoFunction(creationMetadata, validTxnListStr).execute(jdbcResource);
   }
 
@@ -1131,8 +1151,8 @@ public abstract class TxnHandler implements TxnStore, TxnStore.MutexAPI {
   private List<TxnWriteDetails> getWriteIdsMappingForTxns(Set<Long> txnIds) throws MetaException {
     try {
       return sqlRetryHandler.executeWithRetry(
-              new SqlRetryCallProperties().withCallerId("GetWriteIdsMappingForTxnIdsHandler"),
-              () -> jdbcResource.execute(new GetWriteIdsMappingForTxnIdsHandler(txnIds)));
+          new SqlRetryCallProperties().withCallerId("GetWriteIdsMappingForTxnIdsHandler"),
+          () -> jdbcResource.execute(new GetWriteIdsMappingForTxnIdsHandler(txnIds)));
     } catch (MetaException e) {
       throw e;
     } catch (TException e) {

@@ -59,16 +59,21 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -458,6 +463,30 @@ public class EximUtil {
       }
       return new String(sb.toByteArray(), "UTF-8");
     }
+  }
+
+  public static Set<Long> readAsLong(final FileSystem fs, final Path fromMetadataPath, String delimiter) throws IOException {
+    Set<Long> longValues = new HashSet<>();
+    try (FSDataInputStream stream = fs.open(fromMetadataPath);
+         InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+         Scanner scanner = new Scanner(reader)) {
+
+      scanner.useDelimiter(Pattern.compile(Pattern.quote(delimiter)));
+
+      while (scanner.hasNext()) {
+        String token = scanner.next().trim();
+        if (!token.isEmpty()) {
+          try {
+            longValues.add(Long.parseLong(token));
+          } catch (NumberFormatException e) {
+              LOG.warn("Skipping invalid number format in file '{}'. Found: '{}'", fromMetadataPath, token);
+          }
+        }
+      }
+    }
+
+    LOG.debug("read {} long values from file '{}'", longValues.size(), fromMetadataPath);
+    return longValues;
   }
 
   /* check the forward and backward compatibility */

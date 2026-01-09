@@ -858,6 +858,8 @@ class PropertyGetRequest; end
 
 class PropertyGetResponse; end
 
+class ReplayedTxnsForPolicyResult; end
+
 class MetaException < ::Thrift::Exception; end
 
 class UnknownTableException < ::Thrift::Exception; end
@@ -8064,6 +8066,22 @@ class PropertyGetResponse
 
   FIELDS = {
     PROPERTIES => {:type => ::Thrift::Types::MAP, :name => 'properties', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::MAP, :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}}}
+  }
+
+  def struct_fields; FIELDS; end
+
+  def validate
+  end
+
+  ::Thrift::Struct.generate_accessors self
+end
+
+class ReplayedTxnsForPolicyResult
+  include ::Thrift::Struct, ::Thrift::Struct_Union
+  REPLTXNMAPENTRY = 1
+
+  FIELDS = {
+    REPLTXNMAPENTRY => {:type => ::Thrift::Types::MAP, :name => 'replTxnMapEntry', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::STRING}}
   }
 
   def struct_fields; FIELDS; end

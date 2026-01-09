@@ -1082,6 +1082,12 @@ public class AbstractThriftHiveMetastore implements Iface {
         throw new UnsupportedOperationException("this method is not supported");
     }
 
+
+    @Override
+    public ReplayedTxnsForPolicyResult get_replayed_txns_for_policy(String policyName) throws TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
     @Override
     public GetValidWriteIdsResponse get_valid_write_ids(GetValidWriteIdsRequest rqst)
             throws NoSuchTxnException, MetaException, TException {
