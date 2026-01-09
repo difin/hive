@@ -1,3 +1,5 @@
+--! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
+
 CREATE EXTERNAL TABLE IF NOT EXISTS `COLUMNS_V2` (
   `CD_ID` bigint,
   `COMMENT` string,

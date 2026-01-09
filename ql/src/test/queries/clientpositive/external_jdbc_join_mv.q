@@ -1,3 +1,5 @@
+--! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
+
 set hive.support.concurrency=true;
 set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 

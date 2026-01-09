@@ -1,3 +1,5 @@
+--! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
+
 --! qt:database:postgres:q_test_country_table_with_schema.postgres.sql
 -- Postgres allows multiple schemas per database so to disambiguate between tables in different schemas it
 -- is necessary to set the hive.sql.schema property properly.

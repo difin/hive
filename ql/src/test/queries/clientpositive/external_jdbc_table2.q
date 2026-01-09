@@ -1,3 +1,4 @@
+--! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
 --! qt:dataset:src
 
 -- SORT_QUERY_RESULTS

@@ -1,3 +1,5 @@
+--! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
+
 -- Tests the copying over of Table Parameters according to a HiveConf setting
 -- when doing a CREATE TABLE LIKE.
 

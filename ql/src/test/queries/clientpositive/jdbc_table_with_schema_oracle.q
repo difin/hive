@@ -1,3 +1,4 @@
+--! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
 --! qt:database:oracle:q_test_country_table_with_schema.oracle.sql
 -- Oracle does not allow explicitly the creation of different namespaces/schemas in the same database. This can be
 -- achieved by creating different users where each user is associated with a schema having the same name.

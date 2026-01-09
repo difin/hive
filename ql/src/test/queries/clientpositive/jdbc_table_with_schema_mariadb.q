@@ -1,3 +1,4 @@
+--! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
 --! qt:database:mariadb:q_test_country_table_with_schema.mariadb.sql
 
 -- In MariaDB (and MySQL) CREATE SCHEMA is a synonym to CREATE DATABASE so the use of hive.sql.schema is not required.

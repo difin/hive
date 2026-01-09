@@ -1,3 +1,4 @@
+--! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
 --! qt:database:postgres:q_test_book_table.sql
 
 CREATE EXTERNAL TABLE book (id int, title varchar(100), author int)

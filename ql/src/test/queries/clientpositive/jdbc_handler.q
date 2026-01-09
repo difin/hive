@@ -1,3 +1,4 @@
+--! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
 --! qt:disabled:hive-test-kube migration
 --! qt:dataset:src
 set hive.strict.checks.cartesian.product= false;

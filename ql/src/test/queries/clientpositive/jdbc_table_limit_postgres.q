@@ -1,3 +1,4 @@
+--! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
 --! qt:database:postgres:q_test_country_table.sql
 
 CREATE EXTERNAL TABLE country (id int, name varchar(20))
