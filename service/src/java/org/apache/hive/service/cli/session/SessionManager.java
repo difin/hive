@@ -491,6 +491,7 @@ public class SessionManager extends CompositeService {
           hiveSessionUgi = (HiveSessionImplwithUGI) constructor.newInstance(sessionHandle,
               protocol, username, password, hiveConf, ipAddress, delegationToken, forwardedAddresses);
         } catch (Exception e) {
+          decrementConnectionsCount(username, ipAddress, forwardedAddresses);
           throw new HiveSQLException("Cannot initialize session class:" + sessionImplWithUGIclassName);
         }
       }
@@ -508,6 +509,7 @@ public class SessionManager extends CompositeService {
         session = (HiveSession) constructor.newInstance(sessionHandle, protocol, username, password,
           hiveConf, ipAddress, forwardedAddresses);
         } catch (Exception e) {
+          decrementConnectionsCount(username, ipAddress, forwardedAddresses);
           throw new HiveSQLException("Cannot initialize session class:" + sessionImplclassName, e);
         }
       }
@@ -520,6 +522,7 @@ public class SessionManager extends CompositeService {
       LOG.warn("Failed to open session", e);
       try {
         session.close();
+        decrementConnections(session);
       } catch (Throwable t) {
         LOG.warn("Error closing session", t);
       }
@@ -535,6 +538,7 @@ public class SessionManager extends CompositeService {
       LOG.warn("Failed to execute session hooks", e);
       try {
         session.close();
+        decrementConnections(session);
       } catch (Throwable t) {
         LOG.warn("Error closing session", t);
       }
@@ -595,7 +599,11 @@ public class SessionManager extends CompositeService {
 
   private void decrementConnections(final HiveSession session) {
     final String username = session.getUserName();
-    final String clientIpAddress = getOriginClientIpAddress(session.getIpAddress(), session.getForwardedAddresses());
+    decrementConnectionsCount(username, session.getIpAddress(), session.getForwardedAddresses());
+  }
+
+  private void decrementConnectionsCount(String username, String ipAddress, List<String> forwardedAddresses) {
+    final String clientIpAddress = getOriginClientIpAddress(ipAddress, forwardedAddresses);
     if (trackConnectionsPerUser(username)) {
       connectionsCount.computeIfPresent(username, (k, v) -> v).decrement();
     }
