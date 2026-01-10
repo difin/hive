@@ -1,4 +1,3 @@
---! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
 --!qt:database:derby:qdb
 --!qt:database:derby:qdb2
 --! qt:dataset:src

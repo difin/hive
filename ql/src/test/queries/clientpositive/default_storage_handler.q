@@ -1,4 +1,3 @@
---! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
 -- Set a default storage handler class
 SET hive.default.storage.handler.class=org.apache.hadoop.hive.ql.log.syslog.SyslogStorageHandler;
 

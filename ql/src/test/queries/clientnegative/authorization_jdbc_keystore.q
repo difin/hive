@@ -1,5 +1,3 @@
---! qt:disabled:CDPD-95783:Disable all jdbc qtests on cdh_main until they are stabilized fully
---! qt:disabled:hive-test-kube
 --!qt:database:derby:qdb
 --! qt:dataset:
 
