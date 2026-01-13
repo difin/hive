@@ -5640,7 +5640,7 @@ Warning: Map Join MAPJOIN[1462][bigTable=?] in task 'Reducer 41' is a cross prod
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "DECIMAL",
@@ -7829,7 +7829,7 @@ Warning: Map Join MAPJOIN[1462][bigTable=?] in task 'Reducer 41' is a cross prod
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "DECIMAL",
@@ -10001,7 +10001,7 @@ Warning: Map Join MAPJOIN[1462][bigTable=?] in task 'Reducer 41' is a cross prod
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "DECIMAL",
@@ -10587,7 +10587,7 @@ Warning: Map Join MAPJOIN[1462][bigTable=?] in task 'Reducer 41' is a cross prod
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "DECIMAL",
@@ -12759,7 +12759,7 @@ Warning: Map Join MAPJOIN[1462][bigTable=?] in task 'Reducer 41' is a cross prod
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "DECIMAL",
@@ -13345,7 +13345,7 @@ Warning: Map Join MAPJOIN[1462][bigTable=?] in task 'Reducer 41' is a cross prod
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "DECIMAL",
@@ -13640,7 +13640,7 @@ Warning: Map Join MAPJOIN[1462][bigTable=?] in task 'Reducer 41' is a cross prod
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "DECIMAL",
@@ -13658,7 +13658,7 @@ Warning: Map Join MAPJOIN[1462][bigTable=?] in task 'Reducer 41' is a cross prod
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "BIGINT",

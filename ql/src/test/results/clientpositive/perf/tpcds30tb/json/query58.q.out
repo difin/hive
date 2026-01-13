@@ -2285,7 +2285,7 @@ Warning: Map Join MAPJOIN[385][bigTable=?] in task 'Map 10' is a cross product
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "DECIMAL",
@@ -3313,7 +3313,7 @@ Warning: Map Join MAPJOIN[385][bigTable=?] in task 'Map 10' is a cross product
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "DECIMAL",
@@ -4168,7 +4168,7 @@ Warning: Map Join MAPJOIN[385][bigTable=?] in task 'Map 10' is a cross product
             "agg": {
               "name": "sum",
               "kind": "SUM",
-              "syntax": "FUNCTION_STAR"
+              "syntax": "FUNCTION"
             },
             "type": {
               "type": "DECIMAL",
