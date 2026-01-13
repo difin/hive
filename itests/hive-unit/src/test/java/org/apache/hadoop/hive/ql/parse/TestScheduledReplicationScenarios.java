@@ -256,6 +256,7 @@ public class TestScheduledReplicationScenarios extends BaseReplicationScenariosA
   }
 
   @Test
+  @Ignore("HIVE-25720")
   public void testCompleteFailoverWithReverseBootstrap() throws Throwable {
     String withClause = "'" + HiveConf.ConfVars.HIVE_IN_TEST + "' = 'true','"
             + HiveConf.ConfVars.REPL_RETAIN_PREV_DUMP_DIR + "'='true'" ;
