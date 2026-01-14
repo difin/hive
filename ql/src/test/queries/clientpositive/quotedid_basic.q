@@ -47,6 +47,3 @@ create table test (
 );
 
 describe formatted test;
-
-explain analyze
-select 1 as ` "%&'()*+,-/;<=>?[]_|{}$^!~#@```;

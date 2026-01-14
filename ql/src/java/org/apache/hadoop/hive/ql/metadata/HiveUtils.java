@@ -28,9 +28,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import org.antlr.runtime.TokenRewriteStream;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.lib.CostLessRuleDispatcher;
 import org.apache.hadoop.hive.ql.lib.ExpressionWalker;
 import org.apache.hadoop.hive.ql.lib.Node;
@@ -319,21 +317,14 @@ public final class HiveUtils {
     return unparseIdentifier(identifier, Quotation.BACKTICKS);
   }
 
-  public static String getSqlTextWithQuotedIdentifiers(
-          ASTNode node, TokenRewriteStream tokenRewriteStream, String rewriteProgram)
-          throws SemanticException {
-    UnparseTranslator unparseTranslator = HiveUtils.collectUnescapeIdentifierTranslations(node);
-    unparseTranslator.applyTranslations(tokenRewriteStream, rewriteProgram);
-    return tokenRewriteStream.toString(rewriteProgram, node.getTokenStartIndex(), node.getTokenStopIndex());
-  }
-
   public static UnparseTranslator collectUnescapeIdentifierTranslations(ASTNode node)
       throws SemanticException {
     UnparseTranslator unparseTranslator = new UnparseTranslator(Quotation.BACKTICKS);
     unparseTranslator.enable();
 
     SetMultimap<Integer, SemanticNodeProcessor> astNodeToProcessor = HashMultimap.create();
-    astNodeToProcessor.put(HiveParser.Identifier, new IdentifierProcessor());
+    astNodeToProcessor.put(HiveParser.TOK_TABLE_OR_COL, new ColumnExprProcessor());
+    astNodeToProcessor.put(HiveParser.DOT, new ColumnExprProcessor());
     NodeProcessorCtx nodeProcessorCtx = new QuotedIdExpressionContext(unparseTranslator);
 
     CostLessRuleDispatcher costLessRuleDispatcher = new CostLessRuleDispatcher(
@@ -343,19 +334,19 @@ public final class HiveUtils {
     return unparseTranslator;
   }
 
-  static class IdentifierProcessor implements SemanticNodeProcessor {
+  static class ColumnExprProcessor implements SemanticNodeProcessor {
 
     @Override
     public Object process(Node nd, Stack<Node> stack, NodeProcessorCtx procCtx, Object... nodeOutputs)
-            throws SemanticException {
+        throws SemanticException {
       UnparseTranslator unparseTranslator = ((QuotedIdExpressionContext)procCtx).getUnparseTranslator();
-      ASTNode identifier = (ASTNode) nd;
-      String id = identifier.getText();
-      if (FunctionRegistry.getFunctionInfo(id) != null){
-        return null;
+      ASTNode tokTableOrColNode = (ASTNode) nd;
+      for (int i = 0; i < tokTableOrColNode.getChildCount(); ++i) {
+        ASTNode child = (ASTNode) tokTableOrColNode.getChild(i);
+        if (child.getType() == HiveParser.Identifier) {
+          unparseTranslator.addIdentifierTranslation(child);
+        }
       }
-
-      unparseTranslator.addIdentifierTranslation(identifier);
       return null;
     }
   }

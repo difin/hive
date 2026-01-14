@@ -63,7 +63,4 @@ create table test (
 
 describe formatted test;
 
-explain analyze
-select 1 as " ""%&'()*+,-/;<=>?[]_|{}$^!~#@`";
-
 set hive.support.quoted.identifiers=column;

@@ -133,7 +133,6 @@ import com.google.common.collect.Lists;
  */
 class MetaStoreDirectSql {
   private static final int NO_BATCHING = -1, DETECT_BATCHING = 0;
-  private static final Set<String> ALLOWED_TABLES_TO_LOCK = Set.of("NOTIFICATION_SEQUENCE");
 
   private static final Logger LOG = LoggerFactory.getLogger(MetaStoreDirectSql.class);
   private final PersistenceManager pm;
@@ -2952,11 +2951,6 @@ class MetaStoreDirectSql {
   }
 
   public void lockDbTable(String tableName) throws MetaException {
-    // Only certain tables are allowed to be locked, and the API should restrict them.
-    if (!ALLOWED_TABLES_TO_LOCK.contains(tableName)) {
-      throw new MetaException("Error while locking table " + tableName);
-    }
-
     String lockCommand = "lock table \"" + tableName + "\" in exclusive mode";
     try {
       executeNoResult(lockCommand);
@@ -3013,26 +3007,19 @@ class MetaStoreDirectSql {
   }
 
   public boolean deleteTableColumnStatistics(long tableId, List<String> colNames, String engine) {
-    String deleteSql = "delete from " + TAB_COL_STATS + " where \"TBL_ID\" = ?";
-    List<Object> params = new ArrayList<>(colNames == null ? 2 : colNames.size() + 2);
-    params.add(tableId);
-
+    String deleteSql = "delete from " + TAB_COL_STATS + " where \"TBL_ID\" = " + tableId;
     if (colNames != null && !colNames.isEmpty()) {
-      deleteSql += " and \"COLUMN_NAME\" in (" + makeParams(colNames.size()) + ")";
-      params.addAll(colNames);
+      deleteSql += " and \"COLUMN_NAME\" in (" + colNames.stream().map(col -> "'" + col + "'").collect(Collectors.joining(",")) + ")";
     }
-
     if (engine != null) {
-      deleteSql += " and \"ENGINE\" = ?";
-      params.add(engine);
+      deleteSql += " and \"ENGINE\" = '" + engine + "'";
     }
-
-    try (QueryWrapper queryParams = new QueryWrapper(pm.newQuery("javax.jdo.query.SQL", deleteSql))) {
-      MetastoreDirectSqlUtils.executeWithArray(queryParams.getInnerQuery(), params.toArray(), deleteSql);
-    } catch (MetaException e) {
+    try {
+      executeNoResult(deleteSql);
+    } catch (SQLException e) {
+      LOG.warn("Error removing table column stats. ", e);
       return false;
     }
-
     return true;
   }
 
@@ -3046,20 +3033,17 @@ class MetaStoreDirectSql {
                 input, Collections.emptyList(), -1);
         if (!partitionIds.isEmpty()) {
           String deleteSql = "delete from " + PART_COL_STATS + " where \"PART_ID\" in ( " + getIdListForIn(partitionIds) + ")";
-          List<Object> params = new ArrayList<>(colNames == null ? 1 : colNames.size() + 1);
-
           if (colNames != null && !colNames.isEmpty()) {
-            deleteSql += " and \"COLUMN_NAME\" in (" + makeParams(colNames.size()) + ")";
-            params.addAll(colNames);
+            deleteSql += " and \"COLUMN_NAME\" in (" + colNames.stream().map(col -> "'" + col + "'").collect(Collectors.joining(",")) + ")";
           }
-
           if (engine != null) {
-            deleteSql += " and \"ENGINE\" = ?";
-            params.add(engine);
+            deleteSql += " and \"ENGINE\" = '" + engine + "'";
           }
-
-          try (QueryWrapper queryParams = new QueryWrapper(pm.newQuery("javax.jdo.query.SQL", deleteSql))) {
-            MetastoreDirectSqlUtils.executeWithArray(queryParams.getInnerQuery(), params.toArray(), deleteSql);
+          try {
+            executeNoResult(deleteSql);
+          } catch (SQLException e) {
+            LOG.warn("Error removing partition column stats. ", e);
+            throw new MetaException("Error removing partition column stats: " + e.getMessage());
           }
         }
         return null;

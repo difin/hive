@@ -14080,7 +14080,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
   public void validate() throws SemanticException {
     boolean wasAcidChecked = false;
     // Validate inputs and outputs have right protectmode to execute the query
-    for (ReadEntity readEntity : getAllInputs()) {
+    for (ReadEntity readEntity : getInputs()) {
       ReadEntity.Type type = readEntity.getType();
 
       if (type != ReadEntity.Type.TABLE &&
@@ -14105,7 +14105,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       }
     }
 
-    for (WriteEntity writeEntity : getAllOutputs()) {
+    for (WriteEntity writeEntity : getOutputs()) {
       WriteEntity.Type type = writeEntity.getType();
 
       if (type == WriteEntity.Type.PARTITION || type == WriteEntity.Type.DUMMYPARTITION) {
