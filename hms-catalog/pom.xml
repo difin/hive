@@ -250,6 +250,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.apache.hive</groupId>
+      <artifactId>hive-standalone-metastore</artifactId>
+      <version>${revision}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -314,35 +321,6 @@
                 </systemProperty>
               </systemProperties>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>3.1.0</version>
-        <executions>
-          <execution>
-            <phase>generate-test-sources</phase>
-            <configuration>
-              <target>
-                <copy todir="${project.basedir}/src/test/java/org/apache/hadoop/hive/metastore/utils" overwrite="true" verbose="true">
-                  <fileset dir="${project.basedir}/../standalone-metastore/src/test/java/org/apache/hadoop/hive/metastore/utils">
-                    <include name="TestTxnDbUtil.java" />
-                  </fileset>
-                </copy>
-                <copy todir="${project.basedir}/src/test/java/org/apache/hadoop/hive/metastore" overwrite="true" verbose="true">
-                  <fileset dir="${project.basedir}/../standalone-metastore/src/test/java/org/apache/hadoop/hive/metastore">
-                    <include name="MetaStoreTestUtils.java" />
-                  </fileset>
-                </copy>
-              </target>
-            </configuration>
-            <id>copy</id>
-            <goals>
-              <goal>run</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
