@@ -10,11 +10,11 @@ POSTHOOK: query: create table analyze_acid_table (id int) stored as orc tblprope
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@analyze_acid_table
-PREHOOK: query: insert into analyze_acid_table values (1),(2),(3),(4)
+PREHOOK: query: insert into `analyze_acid_table` values (1),(2),(3),(4)
 PREHOOK: type: QUERY
 PREHOOK: Input: _dummy_database@_dummy_table
 PREHOOK: Output: default@analyze_acid_table
-POSTHOOK: query: insert into analyze_acid_table values (1),(2),(3),(4)
+POSTHOOK: query: insert into `analyze_acid_table` values (1),(2),(3),(4)
 POSTHOOK: type: QUERY
 POSTHOOK: Input: _dummy_database@_dummy_table
 POSTHOOK: Output: default@analyze_acid_table
@@ -154,12 +154,12 @@ POSTHOOK: Output: hdfs://### HDFS PATH ###
 2
 3
 4
-PREHOOK: query: update analyze_acid_table set id=11 where id=1
+PREHOOK: query: update `analyze_acid_table` set `id`=11 where `id`=1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@analyze_acid_table
 PREHOOK: Output: default@analyze_acid_table
 PREHOOK: Output: default@analyze_acid_table
-POSTHOOK: query: update analyze_acid_table set id=11 where id=1
+POSTHOOK: query: update `analyze_acid_table` set `id`=11 where `id`=1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@analyze_acid_table
 POSTHOOK: Output: default@analyze_acid_table
@@ -309,11 +309,11 @@ POSTHOOK: Output: hdfs://### HDFS PATH ###
 22
 3
 4
-PREHOOK: query: delete from analyze_acid_table where id=3
+PREHOOK: query: delete from `analyze_acid_table` where `id`=3
 PREHOOK: type: QUERY
 PREHOOK: Input: default@analyze_acid_table
 PREHOOK: Output: default@analyze_acid_table
-POSTHOOK: query: delete from analyze_acid_table where id=3
+POSTHOOK: query: delete from `analyze_acid_table` where `id`=3
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@analyze_acid_table
 POSTHOOK: Output: default@analyze_acid_table
@@ -464,11 +464,11 @@ POSTHOOK: query: create table analyze_part_table (a int) partitioned by (b int) 
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@analyze_part_table
-PREHOOK: query: insert into analyze_part_table select * from tmp_table
+PREHOOK: query: insert into `analyze_part_table` select * from `tmp_table`
 PREHOOK: type: QUERY
 PREHOOK: Input: default@tmp_table
 PREHOOK: Output: default@analyze_part_table
-POSTHOOK: query: insert into analyze_part_table select * from tmp_table
+POSTHOOK: query: insert into `analyze_part_table` select * from `tmp_table`
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@tmp_table
 POSTHOOK: Output: default@analyze_part_table
@@ -634,13 +634,13 @@ POSTHOOK: Input: default@analyze_part_table
 b=1
 b=2
 b=3
-PREHOOK: query: update analyze_part_table set a=11 where b=3
+PREHOOK: query: update `analyze_part_table` set `a`=11 where `b`=3
 PREHOOK: type: QUERY
 PREHOOK: Input: default@analyze_part_table
 PREHOOK: Input: default@analyze_part_table@b=3
 PREHOOK: Output: default@analyze_part_table
 PREHOOK: Output: default@analyze_part_table@b=3
-POSTHOOK: query: update analyze_part_table set a=11 where b=3
+POSTHOOK: query: update `analyze_part_table` set `a`=11 where `b`=3
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@analyze_part_table
 POSTHOOK: Input: default@analyze_part_table@b=3
@@ -780,12 +780,12 @@ POSTHOOK: Output: hdfs://### HDFS PATH ###
 4	3
 5	3
 6	3
-PREHOOK: query: delete from analyze_part_table where b=1
+PREHOOK: query: delete from `analyze_part_table` where `b`=1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@analyze_part_table
 PREHOOK: Input: default@analyze_part_table@b=1
 PREHOOK: Output: default@analyze_part_table@b=1
-POSTHOOK: query: delete from analyze_part_table where b=1
+POSTHOOK: query: delete from `analyze_part_table` where `b`=1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@analyze_part_table
 POSTHOOK: Input: default@analyze_part_table@b=1
@@ -990,11 +990,11 @@ POSTHOOK: query: create table analyze_acid_table (id int) stored as orc tblprope
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@analyze_acid_table
-PREHOOK: query: insert into analyze_acid_table values (1),(2),(3),(4)
+PREHOOK: query: insert into `analyze_acid_table` values (1),(2),(3),(4)
 PREHOOK: type: QUERY
 PREHOOK: Input: _dummy_database@_dummy_table
 PREHOOK: Output: default@analyze_acid_table
-POSTHOOK: query: insert into analyze_acid_table values (1),(2),(3),(4)
+POSTHOOK: query: insert into `analyze_acid_table` values (1),(2),(3),(4)
 POSTHOOK: type: QUERY
 POSTHOOK: Input: _dummy_database@_dummy_table
 POSTHOOK: Output: default@analyze_acid_table
@@ -1134,12 +1134,12 @@ POSTHOOK: Output: hdfs://### HDFS PATH ###
 2
 3
 4
-PREHOOK: query: update analyze_acid_table set id=11 where id=1
+PREHOOK: query: update `analyze_acid_table` set `id`=11 where `id`=1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@analyze_acid_table
 PREHOOK: Output: default@analyze_acid_table
 PREHOOK: Output: default@analyze_acid_table
-POSTHOOK: query: update analyze_acid_table set id=11 where id=1
+POSTHOOK: query: update `analyze_acid_table` set `id`=11 where `id`=1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@analyze_acid_table
 POSTHOOK: Output: default@analyze_acid_table
@@ -1289,11 +1289,11 @@ POSTHOOK: Output: hdfs://### HDFS PATH ###
 22
 3
 4
-PREHOOK: query: delete from analyze_acid_table where id=3
+PREHOOK: query: delete from `analyze_acid_table` where `id`=3
 PREHOOK: type: QUERY
 PREHOOK: Input: default@analyze_acid_table
 PREHOOK: Output: default@analyze_acid_table
-POSTHOOK: query: delete from analyze_acid_table where id=3
+POSTHOOK: query: delete from `analyze_acid_table` where `id`=3
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@analyze_acid_table
 POSTHOOK: Output: default@analyze_acid_table
@@ -1426,11 +1426,11 @@ POSTHOOK: query: create table analyze_part_table (a int) partitioned by (b int) 
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@analyze_part_table
-PREHOOK: query: insert into analyze_part_table select * from tmp_table
+PREHOOK: query: insert into `analyze_part_table` select * from `tmp_table`
 PREHOOK: type: QUERY
 PREHOOK: Input: default@tmp_table
 PREHOOK: Output: default@analyze_part_table
-POSTHOOK: query: insert into analyze_part_table select * from tmp_table
+POSTHOOK: query: insert into `analyze_part_table` select * from `tmp_table`
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@tmp_table
 POSTHOOK: Output: default@analyze_part_table
@@ -1596,13 +1596,13 @@ POSTHOOK: Input: default@analyze_part_table
 b=1
 b=2
 b=3
-PREHOOK: query: update analyze_part_table set a=11 where b=3
+PREHOOK: query: update `analyze_part_table` set `a`=11 where `b`=3
 PREHOOK: type: QUERY
 PREHOOK: Input: default@analyze_part_table
 PREHOOK: Input: default@analyze_part_table@b=3
 PREHOOK: Output: default@analyze_part_table
 PREHOOK: Output: default@analyze_part_table@b=3
-POSTHOOK: query: update analyze_part_table set a=11 where b=3
+POSTHOOK: query: update `analyze_part_table` set `a`=11 where `b`=3
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@analyze_part_table
 POSTHOOK: Input: default@analyze_part_table@b=3
@@ -1742,12 +1742,12 @@ POSTHOOK: Output: hdfs://### HDFS PATH ###
 4	3
 5	3
 6	3
-PREHOOK: query: delete from analyze_part_table where b=1
+PREHOOK: query: delete from `analyze_part_table` where `b`=1
 PREHOOK: type: QUERY
 PREHOOK: Input: default@analyze_part_table
 PREHOOK: Input: default@analyze_part_table@b=1
 PREHOOK: Output: default@analyze_part_table@b=1
-POSTHOOK: query: delete from analyze_part_table where b=1
+POSTHOOK: query: delete from `analyze_part_table` where `b`=1
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@analyze_part_table
 POSTHOOK: Input: default@analyze_part_table@b=1
