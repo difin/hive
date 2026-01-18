@@ -219,7 +219,6 @@ public class MetastoreConf {
    */
   private static final MetastoreConf.ConfVars[] metaConfVars = {
       ConfVars.TRY_DIRECT_SQL,
-      ConfVars.TRY_DIRECT_SQL_DDL,
       ConfVars.CLIENT_SOCKET_TIMEOUT,
       ConfVars.PARTITION_NAME_WHITELIST_PATTERN,
       ConfVars.CAPABILITY_CHECK,
@@ -1607,12 +1606,6 @@ public class MetastoreConf {
             "work for all queries on your datastore. If all SQL queries fail (for example, your\n" +
             "metastore is backed by MongoDB), you might want to disable this to save the\n" +
             "try-and-fall-back cost."),
-    TRY_DIRECT_SQL_DDL("metastore.try.direct.sql.ddl", "hive.metastore.try.direct.sql.ddl", true,
-        "Same as hive.metastore.try.direct.sql, for read statements within a transaction that\n" +
-            "modifies metastore data. Due to non-standard behavior in Postgres, if a direct SQL\n" +
-            "select query has incorrect syntax or something similar inside a transaction, the\n" +
-            "entire transaction will fail and fall-back to DataNucleus will not be possible. You\n" +
-            "should disable the usage of direct SQL inside transactions if that happens in your case."),
     TXN_MAX_OPEN_BATCH("metastore.txn.max.open.batch", "hive.txn.max.open.batch", 1000,
         "Maximum number of transactions that can be fetched in one call to open_txns().\n" +
             "This controls how many transactions streaming agents such as Flume or Storm open\n" +
