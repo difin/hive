@@ -443,18 +443,22 @@ timeUnitQualifiers
     | KW_MINUTE -> Identifier["minutes"]
     ;
 
+unsignedNumericLiterals
+    : Number
+    | IntegralLiteral
+    | NumberLiteral
+    ;
+
 constant
 @init { gParent.pushMsg("constant", state); }
 @after { gParent.popMsg(state); }
     : 
     (intervalLiteral) => intervalLiteral
-    | Number
+    | unsignedNumericLiterals
     | dateLiteral
     | timestampLiteral
     | timestampLocalTZLiteral
     | StringLiteral
-    | IntegralLiteral
-    | NumberLiteral
     | charSetStringLiteral
     | booleanValue
     | KW_NULL -> TOK_NULL

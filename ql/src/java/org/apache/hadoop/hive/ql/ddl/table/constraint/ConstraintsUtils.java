@@ -294,7 +294,7 @@ public final class ConstraintsUtils {
    * @return retrieve the default value and return it as string
    */
   private static String getDefaultValue(ASTNode node, ASTNode typeChild, TokenRewriteStream tokenStream)
-      throws SemanticException{
+      throws SemanticException {
     // first create expression from defaultValueAST
     TypeCheckCtx typeCheckCtx = new TypeCheckCtx(null);
     ExprNodeDesc defaultValExpr = ExprNodeTypeCheck.genExprNode(node, typeCheckCtx).get(node);
