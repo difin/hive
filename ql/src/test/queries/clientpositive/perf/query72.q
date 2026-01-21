@@ -1,5 +1,3 @@
---! qt:disabled:CDPD-31739
-
 set hive.mapred.mode=nonstrict;
 -- start query 1 in stream 0 using template query72.tpl and seed 2031708268
 explain
