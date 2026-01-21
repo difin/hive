@@ -94,10 +94,10 @@ public class CatalogMeteringEventPublisher implements AutoCloseable {
     }
     try {
       int currentAPICount = apiCount.getAndSet(0);
-      if (currentAPICount == 0) {
-        logger.debug("No API calls to meter. Skipping event publication.");
-        return;
-      }
+//      if (currentAPICount == 0) {
+//        logger.debug("No API calls to meter. Skipping event publication.");
+//        return;
+//      }
       CatalogMeteringPayload.CatalogMeteredValue catalogMeteredValue =
           new CatalogMeteringPayload.CatalogMeteredValue(currentAPICount, "IRC_READ_API_COUNT", "API_CALL_COUNT");
       CatalogMeteringEvent event = createMeteringEvent(Collections.singletonList(catalogMeteredValue));
