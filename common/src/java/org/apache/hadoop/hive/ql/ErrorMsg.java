@@ -497,6 +497,7 @@ public enum ErrorMsg {
   ICEBERG_COMPACTION_WITH_PART_SPEC_AND_FILTER_NOT_SUPPORTED(10441, "Compaction command with both partition spec and filter is not supported on Iceberg table {0}.{1}", true),
   COMPACTION_THREAD_INITIALIZATION(10442, "Compaction thread failed during initialization", false),
   ALTER_TABLE_COMPACTION_NON_PARTITIONED_COLUMN_NOT_ALLOWED(10443, "Filter expression can contain only partition columns."),
+  UNSUPPORTED_TIMESTAMP_PRECISION(10447, "Unsupported value for precision: {0}", true),
 
   //========================== 20000 range starts here ========================//
 

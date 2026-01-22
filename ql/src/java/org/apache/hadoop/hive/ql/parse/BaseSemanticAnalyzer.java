@@ -1064,20 +1064,23 @@ public abstract class BaseSemanticAnalyzer {
       typeName = varcharTypeInfo.getQualifiedName();
       break;
     case HiveParser.TOK_TIMESTAMPLOCALTZ:
-      HiveConf conf;
-      try {
-        conf = Hive.get().getConf();
-      } catch (HiveException e) {
-        throw new SemanticException(e);
+      int precision = 6;
+      if (node.getChildCount() > 0) {
+        precision = Integer.parseInt(node.getChild(0).getText());
       }
-      TimestampLocalTZTypeInfo timestampLocalTZTypeInfo = TypeInfoFactory.getTimestampTZTypeInfo(
-          conf.getLocalTimeZone());
+      TimestampLocalTZTypeInfo timestampLocalTZTypeInfo = TypeInfoFactory.getTimestampTZTypeInfo(null, precision);
       typeName = timestampLocalTZTypeInfo.getQualifiedName();
       break;
     case HiveParser.TOK_DECIMAL:
       DecimalTypeInfo decTypeInfo = ParseUtils.getDecimalTypeTypeInfo(node);
       typeName = decTypeInfo.getQualifiedName();
       break;
+    case HiveParser.TOK_TIMESTAMP:
+      int prec = 6;
+      if (node.getChildCount() > 0) {
+        prec = Integer.parseInt(node.getChild(0).getText());
+      }
+      return TypeInfoFactory.getTimestampTypeInfo(prec).getQualifiedName();
     default:
       typeName = TOKEN_TO_TYPE.get(token);
     }

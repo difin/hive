@@ -1176,6 +1176,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
         .equalsIgnoreCase(hmsTable.getSd().getSerdeInfo().getParameters().get(TableProperties.DEFAULT_FILE_FORMAT)) ||
         org.apache.iceberg.FileFormat.ORC.name()
         .equalsIgnoreCase(hmsTable.getParameters().get(TableProperties.DEFAULT_FILE_FORMAT));
+
   }
 
   private void setWriteModeDefaults(Table icebergTbl, Map<String, String> newProps, EnvironmentContext context) {
