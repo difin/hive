@@ -292,6 +292,14 @@
               <groupId>org.apache.iceberg</groupId>
               <artifactId>*</artifactId>
             </exclusion>
+            <exclusion>
+              <groupId>com.mysql</groupId>
+              <artifactId>*</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.postgresql</groupId>
+              <artifactId>*</artifactId>
+            </exclusion>
           </exclusions>
         </dependency>
       </dependencies>
