@@ -48,15 +48,10 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.security.PrivilegedExceptionAction;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -105,7 +100,6 @@ import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.apache.hadoop.hive.metastore.dataconnector.DataConnectorProviderFactory;
 import org.apache.hadoop.hive.metastore.events.*;
-import org.apache.hadoop.hive.metastore.conf.MetastoreConf.StatsUpdateMode;
 import org.apache.hadoop.hive.metastore.leader.CMClearer;
 import org.apache.hadoop.hive.metastore.leader.CompactorPMF;
 import org.apache.hadoop.hive.metastore.leader.CompactorTasks;
@@ -126,7 +120,6 @@ import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
 import org.apache.hadoop.hive.metastore.security.MetastoreDelegationTokenManager;
 import org.apache.hadoop.hive.metastore.txn.entities.CompactionInfo;
 import org.apache.hadoop.hive.metastore.txn.CompactionMetricsDataConverter;
-import org.apache.hadoop.hive.metastore.txn.entities.TxnStatus;
 import org.apache.hadoop.hive.metastore.txn.TxnStore;
 import org.apache.hadoop.hive.metastore.txn.TxnUtils;
 import org.apache.hadoop.hive.metastore.utils.FilterUtils;
@@ -183,7 +176,6 @@ import com.google.common.util.concurrent.Striped;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
@@ -12241,82 +12233,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     t.setDaemon(true);
     t.setName("Metastore threads starter thread");
     t.start();
-  }
-
-  protected static void startStatsUpdater(Configuration conf) throws Exception {
-    StatsUpdateMode mode = StatsUpdateMode.valueOf(
-        MetastoreConf.getVar(conf, ConfVars.STATS_AUTO_UPDATE).toUpperCase());
-    if (mode == StatsUpdateMode.NONE) {
-      return;
-    }
-    MetaStoreThread t = instantiateThread("org.apache.hadoop.hive.ql.stats.StatsUpdaterThread");
-    initializeAndStartThread(t, conf);
-  }
-
-  private static void startCompactorInitiator(Configuration conf) throws Exception {
-    if (MetastoreConf.getBoolVar(conf, ConfVars.COMPACTOR_INITIATOR_ON)) {
-      MetaStoreThread initiator =
-          instantiateThread("org.apache.hadoop.hive.ql.txn.compactor.Initiator");
-      initializeAndStartThread(initiator, conf);
-    }
-  }
-
-  private static void startCompactorWorkers(Configuration conf) throws Exception {
-    int numWorkers = MetastoreConf.getIntVar(conf, ConfVars.COMPACTOR_WORKER_THREADS);
-    for (int i = 0; i < numWorkers; i++) {
-      MetaStoreThread worker =
-          instantiateThread("org.apache.hadoop.hive.ql.txn.compactor.Worker");
-      initializeAndStartThread(worker, conf);
-    }
-  }
-
-  private static void startCompactorCleaner(Configuration conf) throws Exception {
-    if (MetastoreConf.getBoolVar(conf, ConfVars.COMPACTOR_INITIATOR_ON)) {
-      MetaStoreThread cleaner =
-          instantiateThread("org.apache.hadoop.hive.ql.txn.compactor.Cleaner");
-      initializeAndStartThread(cleaner, conf);
-    }
-  }
-
-  private static MetaStoreThread instantiateThread(String classname) throws Exception {
-    Class<?> c = Class.forName(classname);
-    Object o = c.newInstance();
-    if (MetaStoreThread.class.isAssignableFrom(o.getClass())) {
-      return (MetaStoreThread)o;
-    } else {
-      String s = classname + " is not an instance of MetaStoreThread.";
-      LOG.error(s);
-      throw new IOException(s);
-    }
-  }
-
-  private static int nextThreadId = 1000000;
-
-  private static void initializeAndStartThread(MetaStoreThread thread, Configuration conf) throws
-      Exception {
-    LOG.info("Starting metastore thread of type " + thread.getClass().getName());
-    thread.setConf(conf);
-    thread.setThreadId(nextThreadId++);
-    thread.init(new AtomicBoolean());
-    thread.start();
-  }
-
-  private static void startRemoteOnlyTasks(Configuration conf) throws Exception {
-    if(!MetastoreConf.getBoolVar(conf, ConfVars.METASTORE_HOUSEKEEPING_THREADS_ON)) {
-      return;
-    }
-
-    ThreadPool.initialize(conf);
-    Collection<String> taskNames =
-        MetastoreConf.getStringCollection(conf, ConfVars.TASK_THREADS_REMOTE_ONLY);
-    for (String taskName : taskNames) {
-      MetastoreTaskThread task =
-          JavaUtils.newInstance(JavaUtils.getClass(taskName, MetastoreTaskThread.class));
-      task.setConf(conf);
-      long freq = task.runFrequency(TimeUnit.MILLISECONDS);
-      LOG.info("Scheduling for " + task.getClass().getCanonicalName() + " service.");
-      ThreadPool.getPool().scheduleAtFixedRate(task, freq, freq, TimeUnit.MILLISECONDS);
-    }
   }
 
   /**
