@@ -22,6 +22,7 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.metastore.api.AggrStats;
 import org.apache.hadoop.hive.metastore.annotation.MetastoreUnitTest;
 import org.apache.hadoop.hive.metastore.api.Catalog;
 import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
@@ -50,8 +51,6 @@ import org.apache.hadoop.hive.metastore.api.NotificationEventRequest;
 import org.apache.hadoop.hive.metastore.api.NotificationEventResponse;
 import org.apache.hadoop.hive.metastore.api.Package;
 import org.apache.hadoop.hive.metastore.api.Partition;
-import org.apache.hadoop.hive.metastore.api.PartitionListComposingSpec;
-import org.apache.hadoop.hive.metastore.api.PartitionSpec;
 import org.apache.hadoop.hive.metastore.api.PrincipalType;
 import org.apache.hadoop.hive.metastore.api.PrivilegeBag;
 import org.apache.hadoop.hive.metastore.api.PrivilegeGrantInfo;
@@ -104,9 +103,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CyclicBarrier;
@@ -413,10 +412,13 @@ public class TestObjectStore {
 
   @Test
   public void testTableStatisticsOps() throws Exception {
-    createPartitionedTable(true, true);
+    createPartitionedTable(true, true, new HashSet<>());
 
-    List<ColumnStatistics> tabColStats = objectStore.getTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
-        Arrays.asList("test_col1", "test_col' 2"));
+    List<ColumnStatistics> tabColStats;
+    try (AutoCloseable c = deadline()) {
+      tabColStats = objectStore.getTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
+          Arrays.asList("test_col1", "test_col' 2"));
+    }
     Assert.assertEquals(0, tabColStats.size());
 
     ColumnStatisticsDesc statsDesc = new ColumnStatisticsDesc(true, DB1, TABLE1);
@@ -428,34 +430,124 @@ public class TestObjectStore {
     colStats.setEngine(ENGINE);
     objectStore.updateTableColumnStatistics(colStats, null, 0);
 
-    tabColStats = objectStore.getTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
-        Arrays.asList("test_col1", "test_col' 2"));
+    try (AutoCloseable c = deadline()) {
+      tabColStats = objectStore.getTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
+          Arrays.asList("test_col1", "test_col' 2"));
+    }
     Assert.assertEquals(1, tabColStats.size());
     Assert.assertEquals(2, tabColStats.get(0).getStatsObjSize());
 
     objectStore.deleteTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1, Arrays.asList("test_col1"), ENGINE);
-    tabColStats = objectStore.getTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
-        Arrays.asList("test_col1", "test_col' 2"));
+    try (AutoCloseable c = deadline()) {
+      tabColStats = objectStore.getTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
+          Arrays.asList("test_col1", "test_col' 2"));
+    }
     Assert.assertEquals(1, tabColStats.size());
     Assert.assertEquals(1, tabColStats.get(0).getStatsObjSize());
 
     objectStore.deleteTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1, Arrays.asList("test_col' 2"), ENGINE);
-    tabColStats = objectStore.getTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
-        Arrays.asList("test_col1", "test_col' 2"));
+    try (AutoCloseable c = deadline()) {
+      tabColStats = objectStore.getTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
+          Arrays.asList("test_col1", "test_col' 2"));
+    }
     Assert.assertEquals(0, tabColStats.size());
   }
 
   @Test
   public void testDeleteTableColumnStatisticsWhenEngineHasSpecialCharacter() throws Exception {
-    createPartitionedTable(true, true);
+    createPartitionedTable(true, true, new HashSet<>());
     objectStore.deleteTableColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1, Arrays.asList("test_col1"), "special '");
   }
 
   @Test
   public void testDeletePartitionColumnStatisticsWhenEngineHasSpecialCharacter() throws Exception {
-    createPartitionedTable(true, true);
+    createPartitionedTable(true, true, new HashSet<>());
     objectStore.deletePartitionColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
         List.of("test_part_col=a2"), null, "special '");
+  }
+
+  private void setAggrConf(boolean enableBitVector, boolean enableKll, int batchSize) {
+    Configuration conf2 = MetastoreConf.newMetastoreConf(conf);
+    MetastoreConf.setBoolVar(conf2, MetastoreConf.ConfVars.STATS_FETCH_BITVECTOR, enableBitVector);
+    MetastoreConf.setBoolVar(conf2, MetastoreConf.ConfVars.STATS_FETCH_KLL, enableKll);
+    MetastoreConf.setLongVar(conf2, MetastoreConf.ConfVars.DIRECT_SQL_PARTITION_BATCH_SIZE, batchSize);
+    objectStore.setConf(conf2);
+  }
+
+  private AggrStats runStatsAggregation() throws Exception {
+    try (AutoCloseable c = deadline()) {
+      return objectStore.get_aggr_stats_for(DEFAULT_CATALOG_NAME, DB1, TABLE1,
+          Arrays.asList("test_part_col=a0", "test_part_col=a1", "test_part_col=a2"),
+          Collections.singletonList("test_part_col"), ENGINE);
+    }
+  }
+
+  private void assertAggrStats(AggrStats aggrStats, ColumnStatisticsData computedStats) {
+    Assert.assertEquals(1, aggrStats.getColStats().size());
+    Assert.assertEquals(3, aggrStats.getPartsFound());
+    ColumnStatisticsData expectedStats = new ColStatsBuilder<>(long.class).numNulls(3).numDVs(2)
+        .low(3L).high(4L).build();
+    assertEqualStatistics(expectedStats, computedStats);
+  }
+
+  private void statsAggrResourceCleanup()
+      throws Exception {
+    try (AutoCloseable c = deadline()) {
+      objectStore.dropPartitionsInternal(DEFAULT_CATALOG_NAME, DB1, TABLE1,
+          Arrays.asList("test_part_col=a0", "test_part_col=a1", "test_part_col=a2"), true, true);
+      objectStore.dropTable(DEFAULT_CATALOG_NAME, DB1, TABLE1);
+      objectStore.dropDatabase(DEFAULT_CATALOG_NAME, DB1);
+    }
+  }
+
+  @Test
+  public void testStatsAggrWithKll() throws Exception {
+    setAggrConf(false, true, 2);
+    createPartitionedTable(true, true, new HashSet<>());
+    AggrStats aggrStats = runStatsAggregation();
+    ColumnStatisticsData computedStats = aggrStats.getColStats().get(0).getStatsData();
+    computedStats = new ColStatsBuilder<>(long.class)
+        .numNulls(computedStats.getLongStats().getNumNulls()).numDVs(computedStats.getLongStats().getNumDVs())
+        .low(computedStats.getLongStats().getLowValue()).high(computedStats.getLongStats().getHighValue()).build();
+    assertAggrStats(aggrStats, computedStats);
+    statsAggrResourceCleanup();
+  }
+
+  @Test
+  public void testStatsAggrWithBitVector() throws Exception {
+    setAggrConf(true, false, 2);
+    createPartitionedTable(true, true, new HashSet<>());
+    AggrStats aggrStats = runStatsAggregation();
+    ColumnStatisticsData computedStats = aggrStats.getColStats().get(0).getStatsData();
+    computedStats = new ColStatsBuilder<>(long.class)
+        .numNulls(computedStats.getLongStats().getNumNulls()).numDVs(computedStats.getLongStats().getNumDVs())
+        .low(computedStats.getLongStats().getLowValue()).high(computedStats.getLongStats().getHighValue()).build();
+    assertAggrStats(aggrStats, computedStats);
+    statsAggrResourceCleanup();
+  }
+
+  @Test
+  public void testStatsAggrWithBackendDB() throws Exception {
+    setAggrConf(false, false, 2);
+    createPartitionedTable(true, true, new HashSet<>());
+    AggrStats aggrStats = runStatsAggregation();
+    ColumnStatisticsData computedStats = aggrStats.getColStats().get(0).getStatsData();
+    assertAggrStats(aggrStats, computedStats);
+    statsAggrResourceCleanup();
+  }
+
+  @Test
+  public void testMissingPartsStatsAggrWithBackendDB() throws Exception {
+    setAggrConf(false, false, 2);
+    createPartitionedTable(true, true, new HashSet<>(Collections.singletonList(1)));
+    AggrStats aggrStats = runStatsAggregation();
+    ColumnStatisticsData computedStats = aggrStats.getColStats().get(0).getStatsData();
+    Assert.assertEquals(1, aggrStats.getColStats().size());
+    Assert.assertEquals(2, aggrStats.getPartsFound());
+    ColumnStatisticsData expectedStats = new ColStatsBuilder<>(long.class).numNulls(3).numDVs(2)
+        .low(3L).high(4L).build();
+    assertEqualStatistics(expectedStats, computedStats);
+    statsAggrResourceCleanup();
   }
 
   /**
@@ -602,7 +694,7 @@ public class TestObjectStore {
   @Test
   public void testDirectSQLDropPartitionsCacheInSession()
       throws MetaException, InvalidObjectException, NoSuchObjectException, InvalidInputException {
-    createPartitionedTable(false, false);
+    createPartitionedTable(false, false, new HashSet<>());
     // query the partitions with JDO
     Deadline.startTimer("getPartition");
     GetPartitionsArgs args = new GetPartitionsArgs.GetPartitionsArgsBuilder().max(10).build();
@@ -633,7 +725,7 @@ public class TestObjectStore {
     ObjectStore objectStore2 = new ObjectStore();
     objectStore2.setConf(conf);
 
-    createPartitionedTable(false, false);
+    createPartitionedTable(false, false, new HashSet<>());
     // query the partitions with JDO in the 1st session
     Deadline.startTimer("getPartition");
     GetPartitionsArgs args = new GetPartitionsArgs.GetPartitionsArgsBuilder().max(10).build();
@@ -668,7 +760,7 @@ public class TestObjectStore {
   public void testDirectSQLDropPartitionsCleanup() throws MetaException, InvalidObjectException,
       NoSuchObjectException, SQLException, InvalidInputException {
 
-    createPartitionedTable(true, true);
+    createPartitionedTable(true, true, new HashSet<>());
 
     // Check, that every table in the expected state before the drop
     checkBackendTableSize("PARTITIONS", 3);
@@ -708,7 +800,7 @@ public class TestObjectStore {
 
   @Test
   public void testDirectSQLCDsCleanup() throws Exception {
-    createPartitionedTable(true, true);
+    createPartitionedTable(true, true, new HashSet<>());
     // Checks there is only one CD before altering partition
     checkBackendTableSize("PARTITIONS", 3);
     checkBackendTableSize("CDS", 1);
@@ -738,7 +830,7 @@ public class TestObjectStore {
   }
   @Test
   public void testGetPartitionStatistics() throws Exception {
-    createPartitionedTable(true, true);
+    createPartitionedTable(true, true, new HashSet<>());
 
     List<List<ColumnStatistics>> stat;
     stat = objectStore.getPartitionColumnStatistics(DEFAULT_CATALOG_NAME, DB1, TABLE1,
@@ -763,7 +855,7 @@ public class TestObjectStore {
    * @throws MetaException
    * @throws InvalidObjectException
    */
-  private void createPartitionedTable(boolean withPrivileges, boolean withStatistics)
+  private void createPartitionedTable(boolean withPrivileges, boolean withStatistics, Set<Integer> statsMissingIndices)
       throws MetaException, InvalidObjectException, NoSuchObjectException, InvalidInputException {
     Database db1 = new DatabaseBuilder()
                        .setName(DB1)
@@ -822,6 +914,9 @@ public class TestObjectStore {
       }
 
       if (withStatistics) {
+        if (statsMissingIndices.contains(i)) {
+          continue;
+        }
         ColumnStatistics stats = new ColumnStatistics();
         ColumnStatisticsDesc desc = new ColumnStatisticsDesc();
         desc.setCatName(tbl1.getCatName());
@@ -1452,7 +1547,7 @@ public class TestObjectStore {
   @Test
   public void testSavePoint() throws Exception {
     List<String> partNames = Arrays.asList("test_part_col=a0", "test_part_col=a1", "test_part_col=a2");
-    createPartitionedTable(true, false);
+    createPartitionedTable(true, false, new HashSet<>());
     Assert.assertEquals(3, objectStore.getPartitionCount());
 
     objectStore.openTransaction();

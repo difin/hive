@@ -341,6 +341,7 @@ public class ObjectStore implements RawStore, Configurable {
   protected PersistenceManager pm = null;
   protected SQLGenerator sqlGenerator = null;
   private MetaStoreDirectSql directSql = null;
+  private DirectSqlAggrStats directSqlAggrStats;
   protected DatabaseProduct dbType = null;
   private PartitionExpressionProxy expressionProxy = null;
   protected Configuration conf;
@@ -380,6 +381,7 @@ public class ObjectStore implements RawStore, Configurable {
     // most recent instance of the pmf
     pm = null;
     directSql = null;
+    directSqlAggrStats = null;
     expressionProxy = null;
     openTrasactionCalls = 0;
     currentTransaction = null;
@@ -430,6 +432,7 @@ public class ObjectStore implements RawStore, Configurable {
         String schema = PersistenceManagerProvider.getProperty("javax.jdo.mapping.Schema");
         schema = org.apache.commons.lang.StringUtils.defaultIfBlank(schema, null);
         directSql = new MetaStoreDirectSql(pm, conf, schema);
+        directSqlAggrStats = new DirectSqlAggrStats(pm,conf,schema);
       }
     }
     if (propertyStore == null) {
@@ -9676,7 +9679,7 @@ public class ObjectStore implements RawStore, Configurable {
         normalizeIdentifier(tableName), allowSql, allowJdo, null) {
       @Override
       protected ColumnStatistics getSqlResult(GetHelper<ColumnStatistics> ctx) throws MetaException {
-        return directSql.getTableStats(catName, dbName, tblName, colNames, engine, enableBitVector, enableKll);
+        return directSqlAggrStats.getTableStats(catName, dbName, tblName, colNames, engine, enableBitVector, enableKll);
       }
       @Override
       protected ColumnStatistics getJdoResult(GetHelper<ColumnStatistics> ctx) throws MetaException {
@@ -9798,7 +9801,7 @@ public class ObjectStore implements RawStore, Configurable {
       @Override
       protected List<ColumnStatistics> getSqlResult(
           GetHelper<List<ColumnStatistics>> ctx) throws MetaException {
-        return directSql.getPartitionStats(
+        return directSqlAggrStats.getPartitionStats(
             catName, dbName, tblName, partNames, colNames, engine, enableBitVector, enableKll);
       }
       @Override
@@ -9909,7 +9912,7 @@ public class ObjectStore implements RawStore, Configurable {
       @Override
       protected List<MetaStoreUtils.ColStatsObjWithSourceInfo> getSqlResult(
           GetHelper<List<MetaStoreUtils.ColStatsObjWithSourceInfo>> ctx) throws MetaException {
-        return directSql.getColStatsForAllTablePartitions(catName, dbName, enableBitVector, enableKll);
+        return directSqlAggrStats.getColStatsForAllTablePartitions(catName, dbName, enableBitVector, enableKll);
       }
 
       @Override
