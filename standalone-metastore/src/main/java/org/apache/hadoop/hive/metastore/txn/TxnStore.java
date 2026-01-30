@@ -334,7 +334,7 @@ public interface TxnStore extends Configurable {
    */
   @SqlRetry
   @Transactional(POOL_TX)
-  MaxAllocatedTableWriteIdResponse getMaxAllocatedTableWrited(MaxAllocatedTableWriteIdRequest rqst)
+  MaxAllocatedTableWriteIdResponse getMaxAllocatedTableWriteId(MaxAllocatedTableWriteIdRequest rqst)
       throws MetaException;
 
   /**
