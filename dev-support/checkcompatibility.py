@@ -147,7 +147,7 @@ def build_tree(java_path, verbose, isC6):
     	mvn_cmd.append("-Phadoop-2")
     if isC6:
 	# Setup gb-m2-settings.xml for C6 build
-	cdh_gbn = urllib2.urlopen('http://builddb.infra.cloudera.com:8080/query?product=cdh&user=jenkins&version=6.x&tag=official').read()
+	cdh_gbn = urllib2.urlopen('http://builddb.eng.cloudera.com:8080/query?product=cdh&user=jenkins&version=6.x&tag=official').read()
 	urllib.urlretrieve('http://github.mtv.cloudera.com/raw/CDH/cdh/cdh6.x/gbn-m2-settings.xml', '/tmp/gbn-m2-settings.xml')
 
 	with open('/tmp/gbn-m2-settings.xml', 'r') as file:
