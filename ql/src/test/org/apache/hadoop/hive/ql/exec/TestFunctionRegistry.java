@@ -26,7 +26,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.hadoop.hive.common.type.HiveVarchar;
-import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConfForTest;
 import org.apache.hadoop.hive.ql.exec.FunctionInfo.FunctionResource;
 import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
@@ -51,6 +50,7 @@ import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.junit.Assert;
+import org.junit.Test;
 
 public class TestFunctionRegistry extends TestCase {
 
@@ -85,8 +85,6 @@ public class TestFunctionRegistry extends TestCase {
     varchar5 = TypeInfoFactory.getPrimitiveTypeInfo("varchar(5)");
     char10 = TypeInfoFactory.getPrimitiveTypeInfo("char(10)");
     char5 = TypeInfoFactory.getPrimitiveTypeInfo("char(5)");
-    HiveConf conf = new HiveConfForTest(getClass());
-    SessionState.start(conf);
   }
 
   private void implicit(TypeInfo a, TypeInfo b, boolean convertible) {
@@ -417,6 +415,7 @@ public class TestFunctionRegistry extends TestCase {
   }
 
   public void testRegisterTemporaryFunctions() throws Exception {
+    SessionState state = SessionState.start(new HiveConfForTest(TestFunctionRegistry.class));
     FunctionResource[] emptyResources = new FunctionResource[] {};
 
     // UDF
@@ -440,9 +439,11 @@ public class TestFunctionRegistry extends TestCase {
     FunctionRegistry.registerTemporaryUDF("tmp_explode", GenericUDTFExplode.class, emptyResources);
     functionInfo = FunctionRegistry.getFunctionInfo("tmp_explode");
     assertFalse(functionInfo.isNative());
+    state.close();
   }
 
   public void testRegisterPermanentFunction() throws Exception {
+    SessionState state = SessionState.start(new HiveConfForTest(TestFunctionRegistry.class));
     FunctionResource[] emptyResources = new FunctionResource[] {};
 
     // UDF
@@ -481,6 +482,7 @@ public class TestFunctionRegistry extends TestCase {
     assertTrue(functionInfo.isPersistent());
     assertTrue(functionInfo.isNative());
     assertFalse(functionInfo.isBuiltIn());
+    state.close();
   }
 
   public void testBuiltInFunction() throws Exception {
@@ -490,6 +492,7 @@ public class TestFunctionRegistry extends TestCase {
   }
 
   public void testIsPermanentFunction() throws Exception {
+    SessionState state = SessionState.start(new HiveConfForTest(TestFunctionRegistry.class));
     // Setup exprNode
     GenericUDF udf = new GenericUDFCurrentTimestamp();
     List<ExprNodeDesc> children = new ArrayList<ExprNodeDesc>();
@@ -504,6 +507,32 @@ public class TestFunctionRegistry extends TestCase {
         GenericUDFCurrentTimestamp.class.getName(), true, emptyResources);
 
     assertTrue("Function should now be recognized as permanent function", FunctionRegistry.isPermanentFunction(fnExpr));
+    state.close();
+  }
+
+  @Test
+  public void testGetFunctionInfoNoSessionValidName() throws Exception {
+    assertNotNull(FunctionRegistry.getFunctionInfo("concat"));
+  }
+
+  @Test
+  public void testGetFunctionInfoNoSessionMissingName() throws Exception {
+    assertNull(FunctionRegistry.getFunctionInfo("nofn"));
+  }
+
+  @Test
+  public void testGetWindowFunctionInfoNoSessionValidName() throws Exception {
+    assertNotNull(FunctionRegistry.getWindowFunctionInfo("max"));
+  }
+
+  @Test
+  public void testGetWindowFunctionInfoNoSessionMissingName() throws Exception {
+    assertNull(FunctionRegistry.getWindowFunctionInfo("nofn"));
+  }
+
+  @Test
+  public void testGetWindowFunctionInfoNoSessionInvalidName() throws Exception {
+    assertNull(FunctionRegistry.getWindowFunctionInfo("concat"));
   }
 
   private GenericUDF getUDF(String udfName) throws Exception {
