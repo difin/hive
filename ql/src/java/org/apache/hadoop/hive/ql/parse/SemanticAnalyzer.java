@@ -36,6 +36,9 @@ import static org.apache.hadoop.hive.conf.HiveConf.shouldComputeLineage;
 import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.*;
 import static org.apache.hadoop.hive.ql.plan.HiveOperation.*;
 import static org.apache.hadoop.hive.ql.plan.HiveOperation.ALTERVIEW_PROPERTIES;
+import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.META_TABLE_STORAGE;
+import static org.apache.hadoop.hive.metastore.api.hive_metastoreConstants.TABLE_IS_CTAS;
+import static org.apache.hadoop.hive.ql.metadata.RowLineageUtils.isRowLineageInsert;
 import static org.apache.hadoop.hive.ql.session.SessionStateUtil.MISSING_COLUMNS;
 
 import java.io.IOException;
@@ -193,6 +196,7 @@ import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.HiveUtils;
 import org.apache.hadoop.hive.ql.metadata.InvalidTableException;
 import org.apache.hadoop.hive.ql.metadata.Partition;
+import org.apache.hadoop.hive.ql.metadata.RowLineageUtils;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.metadata.VirtualColumn;
 import org.apache.hadoop.hive.ql.optimizer.Optimizer;
@@ -5149,7 +5153,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       //no insert schema was specified
       return outputRR;
     }
-    if(targetTableSchema.size() != col_list.size()) {
+    if(targetTableSchema.size() != col_list.size() && !RowLineageUtils.isRowLineageInsert(conf)) {
       Table target = qb.getMetaData().getDestTableForAlias(dest);
       Partition partition = target == null ? qb.getMetaData().getDestPartitionForAlias(dest) : null;
       throw new SemanticException(generateErrorMessage(selExprList,
@@ -9184,7 +9188,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     // The numbers of input columns and output columns should match for regular query
     // Impala partial width inserts are handled later by ImpalaPlanner
     if (inColumnCnt != outColumnCnt &&
-        !updating(dest) && !deleting(dest) && !merging(dest) &&
+        !updating(dest) && !deleting(dest) && !merging(dest) && !isRowLineageInsert(conf) &&
         !(isImpalaPlan(conf) && inserting(dest) &&
              getQB().getParseInfo().getDestSchemaForClause(dest) != null)) {
       String reason = "Table " + dest + " has " + outColumnCnt

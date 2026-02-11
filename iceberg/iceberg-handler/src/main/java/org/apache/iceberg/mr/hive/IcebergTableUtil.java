@@ -601,4 +601,10 @@ public class IcebergTableUtil {
       return thread;
     });
   }
+
+  public static boolean supportsRowLineage(Map<String, String> tableProperties) {
+    return Optional.ofNullable(tableProperties).filter(
+        properties -> IcebergTableUtil.formatVersion(tableProperties) >= 3 &&
+            FileFormat.PARQUET == IcebergTableUtil.defaultFileFormat(properties::getOrDefault)).isPresent();
+  }
 }

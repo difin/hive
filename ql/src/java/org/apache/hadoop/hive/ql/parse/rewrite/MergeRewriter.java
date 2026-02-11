@@ -45,12 +45,16 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.hadoop.hive.ql.metadata.RowLineageUtils.addRowLineageValuesForAppendWhenNotMatchedClause;
+import static org.apache.hadoop.hive.ql.metadata.RowLineageUtils.addSourceColumnsForRowLineage;
+import static org.apache.hadoop.hive.ql.metadata.RowLineageUtils.shouldAddRowLineageColumnsForMerge;
 
 public class MergeRewriter implements Rewriter<MergeStatement>, MergeStatement.DestClausePrefixSetter {
 
   private final Hive db;
   protected final HiveConf conf;
   protected final SqlGeneratorFactory sqlGeneratorFactory;
+  protected boolean isRowLineageSupported;
 
   public MergeRewriter(Hive db, HiveConf conf, SqlGeneratorFactory sqlGeneratorFactory) {
     this.db = db;
@@ -63,6 +67,7 @@ public class MergeRewriter implements Rewriter<MergeStatement>, MergeStatement.D
 
     setOperation(ctx);
     MultiInsertSqlGenerator sqlGenerator = sqlGeneratorFactory.createSqlGenerator();
+    isRowLineageSupported = shouldAddRowLineageColumnsForMerge(mergeStatement, conf);
     handleSource(mergeStatement.hasWhenNotMatchedInsertClause(), mergeStatement.getSourceAlias(),
         mergeStatement.getOnClauseAsText(), sqlGenerator);
 
@@ -97,7 +102,7 @@ public class MergeRewriter implements Rewriter<MergeStatement>, MergeStatement.D
 
   protected MergeWhenClauseSqlGenerator createMergeSqlGenerator(
       MergeStatement mergeStatement, MultiInsertSqlGenerator sqlGenerator) {
-    return new MergeWhenClauseSqlGenerator(conf, sqlGenerator, mergeStatement);
+    return new MergeWhenClauseSqlGenerator(conf, sqlGenerator, mergeStatement, isRowLineageSupported);
   }
 
   private void handleSource(boolean hasWhenNotMatchedClause, String sourceAlias, String onClauseAsText,
@@ -106,6 +111,7 @@ public class MergeRewriter implements Rewriter<MergeStatement>, MergeStatement.D
     sqlGenerator.append("(SELECT ");
     sqlGenerator.appendAcidSelectColumns(Operation.MERGE);
     sqlGenerator.appendAllColsOfTargetTable();
+    addSourceColumnsForRowLineage(isRowLineageSupported, sqlGenerator, "", conf);
     sqlGenerator.append(" FROM ").appendTargetTableName().append(") ");
     sqlGenerator.appendSubQueryAlias();
     sqlGenerator.append('\n');
@@ -168,12 +174,15 @@ public class MergeRewriter implements Rewriter<MergeStatement>, MergeStatement.D
     protected final MultiInsertSqlGenerator sqlGenerator;
     protected final MergeStatement mergeStatement;
     protected String hintStr;
+    protected final boolean isRowLineageSupported;
 
-    MergeWhenClauseSqlGenerator(HiveConf conf, MultiInsertSqlGenerator sqlGenerator, MergeStatement mergeStatement) {
+    MergeWhenClauseSqlGenerator(HiveConf conf, MultiInsertSqlGenerator sqlGenerator, MergeStatement mergeStatement,
+        boolean isRowLineageSupported) {
       this.conf = conf;
       this.sqlGenerator = sqlGenerator;
       this.mergeStatement = mergeStatement;
       this.hintStr = mergeStatement.getHintStr();
+      this.isRowLineageSupported = isRowLineageSupported;
     }
 
     @Override
@@ -191,7 +200,10 @@ public class MergeRewriter implements Rewriter<MergeStatement>, MergeStatement.D
         hintStr = null;
       }
 
-      sqlGenerator.append(String.join(", ", insertClause.getValuesClause()));
+      List<String> selectValues =
+          addRowLineageValuesForAppendWhenNotMatchedClause(isRowLineageSupported, insertClause.getValuesClause());
+
+      sqlGenerator.append(String.join(", ", selectValues));
       sqlGenerator.append("\n   WHERE ").append(insertClause.getPredicate());
 
       if (insertClause.getExtraPredicate() != null) {
