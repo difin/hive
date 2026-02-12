@@ -41,6 +41,8 @@ public class StageMapper {
 
   private long endTimeOnTgt = 0;
 
+  private long lastSuccessfulDumpId = 0;
+
   private List<Metric> metrics = new ArrayList<>();
 
   private String errorLogPath;
@@ -82,6 +84,14 @@ public class StageMapper {
 
   public void setEndTimeOnTgt(long endTimeOnTgt) {
     this.endTimeOnTgt = endTimeOnTgt;
+  }
+
+  public long getLastSuccessfulDumpId() {
+    return lastSuccessfulDumpId;
+  }
+
+  public void setLastSuccessfulDumpId(long lastSuccessfulDumpId) {
+    this.lastSuccessfulDumpId = lastSuccessfulDumpId;
   }
 
   public List<Metric> getMetrics() {

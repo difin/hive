@@ -549,4 +549,13 @@ public class ReplUtils {
     metricCollector.reportStageStart(stageName, new HashMap<>());
     metricCollector.reportStageEnd(stageName, status, errorLogPath);
   }
+
+  public static void reportStatusInReplicationMetricsWithLastExecutionId(String stageName, Status status, long lastDumpId,
+                                                            String errorLogPath, HiveConf conf)
+          throws SemanticException {
+    ReplicationMetricCollector metricCollector =
+            new ReplicationMetricCollector(null, null, null, 0, conf) {};
+    metricCollector.reportStageStart(stageName, new HashMap<>());
+    metricCollector.reportStageEndWithLastExecutionId(stageName, status, errorLogPath, lastDumpId);
+  }
 }
