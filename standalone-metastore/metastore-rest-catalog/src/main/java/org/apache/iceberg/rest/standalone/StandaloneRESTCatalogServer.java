@@ -28,8 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 
 /**
  * Standalone REST Catalog Server with Spring Boot.
@@ -44,7 +47,7 @@ import org.springframework.context.annotation.Bean;
  * 
  * <p>Multiple instances can run behind a Kubernetes Service for load balancing.
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 public class StandaloneRESTCatalogServer {
   private static final Logger LOG = LoggerFactory.getLogger(StandaloneRESTCatalogServer.class);
   
@@ -102,7 +105,14 @@ public class StandaloneRESTCatalogServer {
     LOG.info("  Port: {}", port);
     
     // Create servlet using factory
-    HttpServlet catalogServlet = HMSCatalogFactory.createServlet(conf).getServlet();
+    org.apache.hadoop.hive.metastore.ServletServerBuilder.Descriptor descriptor =
+        HMSCatalogFactory.createServlet(conf);
+    if (descriptor == null) {
+      throw new IllegalStateException(
+          "HMSCatalogFactory.createServlet returned null. Ensure metastore.catalog.servlet.port " +
+          "is set to 0 or a positive value (negative disables the servlet).");
+    }
+    HttpServlet catalogServlet = descriptor.getServlet();
     if (catalogServlet == null) {
       throw new IllegalStateException("Failed to create REST Catalog servlet. " +
           "Check that metastore.catalog.servlet.port and metastore.iceberg.catalog.servlet.path are configured.");
@@ -121,6 +131,24 @@ public class StandaloneRESTCatalogServer {
     LOG.info("  REST Catalog endpoint: {}", restEndpoint);
     
     return registration;
+  }
+
+  /**
+   * Updates port and restEndpoint with the actual server port once the web server has started.
+   * Handles RANDOM_PORT (tests) and server.port=0 where the real port differs from config.
+   */
+  @EventListener
+  public void onWebServerInitialized(WebServerInitializedEvent event) {
+    int actualPort = event.getWebServer().getPort();
+    if (actualPort > 0) {
+      this.port = actualPort;
+      String servletPath = MetastoreConf.getVar(conf, ConfVars.ICEBERG_CATALOG_SERVLET_PATH);
+      if (servletPath == null || servletPath.isEmpty()) {
+        servletPath = "iceberg";
+      }
+      this.restEndpoint = "http://localhost:" + actualPort + "/" + servletPath;
+      LOG.info("REST endpoint set to actual server port: {}", restEndpoint);
+    }
   }
 
   /**
@@ -156,6 +184,12 @@ public class StandaloneRESTCatalogServer {
           conf.set(kv[0], kv[1]);
         }
       }
+    }
+    
+    // Sync port from MetastoreConf to Spring's Environment so server.port uses it
+    int port = MetastoreConf.getIntVar(conf, ConfVars.CATALOG_SERVLET_PORT);
+    if (port > 0) {
+      System.setProperty(ConfVars.CATALOG_SERVLET_PORT.getVarname(), String.valueOf(port));
     }
     
     StandaloneRESTCatalogServer server = new StandaloneRESTCatalogServer(conf);

@@ -18,6 +18,7 @@
 package org.apache.iceberg.rest.standalone;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Custom health indicator for HMS connectivity.
+ * Verifies that HMS is reachable via Thrift, not just that configuration is present.
  * Used by Kubernetes readiness probes to determine if the server is ready to accept traffic.
  */
 @Component
@@ -42,23 +44,24 @@ public class HMSReadinessHealthIndicator implements HealthIndicator {
   
   @Override
   public Health health() {
-    try {
-      // Check if HMS Thrift URIs are configured
-      String hmsThriftUris = MetastoreConf.getVar(conf, ConfVars.THRIFT_URIS);
-      if (hmsThriftUris == null || hmsThriftUris.isEmpty()) {
-        return Health.down()
-            .withDetail("reason", "HMS Thrift URIs not configured")
-            .build();
-      }
-      
-      // Basic health check - configuration is valid
+    String hmsThriftUris = MetastoreConf.getVar(conf, ConfVars.THRIFT_URIS);
+    if (hmsThriftUris == null || hmsThriftUris.isEmpty()) {
+      return Health.down()
+          .withDetail("reason", "HMS Thrift URIs not configured")
+          .build();
+    }
+    
+    try (HiveMetaStoreClient client = new HiveMetaStoreClient(conf)) {
+      // Lightweight call to verify HMS is reachable
+      client.getAllDatabases();
       return Health.up()
           .withDetail("hmsThriftUris", hmsThriftUris)
           .withDetail("warehouse", MetastoreConf.getVar(conf, ConfVars.WAREHOUSE))
           .build();
     } catch (Exception e) {
-      LOG.error("Health check failed", e);
+      LOG.warn("HMS connectivity check failed: {}", e.getMessage());
       return Health.down()
+          .withDetail("hmsThriftUris", hmsThriftUris)
           .withDetail("error", e.getMessage())
           .build();
     }
