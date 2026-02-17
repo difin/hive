@@ -41,7 +41,7 @@ public abstract class DatabaseRule extends ExternalResource {
   // used in most of the RDBMS configs, except MSSQL
   protected static final String HIVE_PASSWORD = "hivepassword";
   protected static final String HIVE_DB = "hivedb";
-  private static final int MAX_STARTUP_WAIT = 5 * 60 * 1000;
+  private static final int MAX_STARTUP_WAIT = 15 * 60 * 1000;
   protected static final String EXTERNAL_DB_DOCKER_PREFIX = "harbor.rke-us-west-04.kc.cloudera.com/docker_private_cache/cloudera_thirdparty/";
 
   public abstract String getHivePassword();
