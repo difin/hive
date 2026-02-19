@@ -7,6 +7,9 @@ set hive.txn.manager=org.apache.hadoop.hive.ql.lockmgr.DbTxnManager;
 
 set hive.stats.autogather=false;
 
+-- disabled stats estimation to have consistent results and address flakiness
+set hive.stats.estimate=false;
+
 create table t1 (a int, b int) stored as orc TBLPROPERTIES ('transactional'='true');
 
 insert into t1 values (1,1), (2,1), (3,3);
