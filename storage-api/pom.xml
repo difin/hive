@@ -396,7 +396,6 @@
           <reuseForks>false</reuseForks>
           <argLine>
             -Xmx3g
-            ${maven.test.jvm.args}
             @{jacoco.agent.args}
           </argLine>
           <enableOutErrElements>false</enableOutErrElements>
