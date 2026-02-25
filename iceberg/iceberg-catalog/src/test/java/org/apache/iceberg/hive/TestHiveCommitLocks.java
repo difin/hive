@@ -556,7 +556,6 @@ public class TestHiveCommitLocks {
         return spyCachedClientPool;
       }
     };
-    actor.initialize(Collections.emptyMap());
     HiveTableOperations noLockSpyOps =
             spy(
                     new HiveTableOperations(
