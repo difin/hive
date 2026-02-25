@@ -57,7 +57,7 @@ public class TestCachedClientPool {
     HiveClientPool clientPool1 = clientPool.clientPool();
     assertThat(clientPool1)
         .isSameAs(
-                    CachedClientPool.clientPoolCache()
+            CachedClientPool.clientPoolCache()
                 .getIfPresent(
                     CachedClientPool.extractKey(null, HIVE_METASTORE_EXTENSION.hiveConf())));
     TimeUnit.MILLISECONDS.sleep(EVICTION_INTERVAL - TimeUnit.SECONDS.toMillis(2));
@@ -65,7 +65,7 @@ public class TestCachedClientPool {
     assertThat(clientPool2).isSameAs(clientPool1);
     TimeUnit.MILLISECONDS.sleep(EVICTION_INTERVAL + TimeUnit.SECONDS.toMillis(5));
     assertThat(
-            CachedClientPool.clientPoolCache()
+        CachedClientPool.clientPoolCache()
             .getIfPresent(CachedClientPool.extractKey(null, HIVE_METASTORE_EXTENSION.hiveConf())))
         .isNull();
 
@@ -135,33 +135,26 @@ public class TestCachedClientPool {
     assertThat(key2).as("Config with same key/value should be equivalent").isEqualTo(key1);
 
     assertThatThrownBy(
-      () -> CachedClientPool.extractKey("ugi,ugi", hiveConf),
-  "Duplicate key elements should result in an error")
-            .isInstanceOf(ValidationException.class)
-            .hasMessageContaining("UGI key element already specified");
+        () -> CachedClientPool.extractKey("ugi,ugi", hiveConf),
+        "Duplicate key elements should result in an error")
+        .isInstanceOf(ValidationException.class)
+        .hasMessageContaining("UGI key element already specified");
 
     assertThatThrownBy(
-      () -> CachedClientPool.extractKey("conf:k1,conf:k2,CONF:k1", hiveConf),
-  "Duplicate conf key elements should result in an error")
-            .isInstanceOf(ValidationException.class)
-            .hasMessageContaining("Conf key element k1 already specified");
+        () -> CachedClientPool.extractKey("conf:k1,conf:k2,CONF:k1", hiveConf),
+        "Duplicate conf key elements should result in an error")
+        .isInstanceOf(ValidationException.class)
+        .hasMessageContaining("Conf key element k1 already specified");
   }
 
-  private static HiveClientPool getPool(HiveActor actor) {
-    if (actor instanceof HiveCatalogActor) {
-      return ((CachedClientPool) ((HiveCatalogActor) actor).clientPool()).clientPool();
-    }
-    return null;
-  }
-
-  @org.junit.jupiter.api.Test
+  @Test
   public void testHmsCatalog() {
     Map<String, String> properties =
-            ImmutableMap.of(
-                    String.valueOf(EVICTION_INTERVAL),
-                    String.valueOf(Integer.MAX_VALUE),
-                    ICEBERG_CATALOG_TYPE,
-                    ICEBERG_CATALOG_TYPE_HIVE);
+        ImmutableMap.of(
+            String.valueOf(EVICTION_INTERVAL),
+            String.valueOf(Integer.MAX_VALUE),
+            ICEBERG_CATALOG_TYPE,
+            ICEBERG_CATALOG_TYPE_HIVE);
 
     Configuration conf1 = new Configuration();
     conf1.set(HiveCatalog.HIVE_CONF_CATALOG, "foo");
@@ -176,12 +169,12 @@ public class TestCachedClientPool {
     HiveCatalog catalog2 = (HiveCatalog) CatalogUtil.buildIcebergCatalog("2", properties, conf2);
     HiveCatalog catalog3 = (HiveCatalog) CatalogUtil.buildIcebergCatalog("3", properties, conf3);
     HiveCatalog catalog4 =
-            (HiveCatalog) CatalogUtil.buildIcebergCatalog("4", properties, new Configuration());
+        (HiveCatalog) CatalogUtil.buildIcebergCatalog("4", properties, new Configuration());
 
-    HiveClientPool pool1 = getPool(catalog1.getActor());
-    HiveClientPool pool2 = getPool(catalog2.getActor());
-    HiveClientPool pool3 = getPool(catalog3.getActor());
-    HiveClientPool pool4 = getPool(catalog4.getActor());
+    HiveClientPool pool1 = ((CachedClientPool) catalog1.clientPool()).clientPool();
+    HiveClientPool pool2 = ((CachedClientPool) catalog2.clientPool()).clientPool();
+    HiveClientPool pool3 = ((CachedClientPool) catalog3.clientPool()).clientPool();
+    HiveClientPool pool4 = ((CachedClientPool) catalog4.clientPool()).clientPool();
 
     assertThat(pool2).isSameAs(pool1);
     assertThat(pool1).isNotSameAs(pool3);

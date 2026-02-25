@@ -114,8 +114,7 @@ import org.apache.iceberg.expressions.Expressions;
 import org.apache.iceberg.expressions.ResidualEvaluator;
 import org.apache.iceberg.expressions.UnboundPredicate;
 import org.apache.iceberg.expressions.UnboundTerm;
-import org.apache.iceberg.hive.HiveActor;
-import org.apache.iceberg.hive.HiveActorFactory;
+import org.apache.iceberg.hive.CachedClientPool;
 import org.apache.iceberg.hive.HiveSchemaUtil;
 import org.apache.iceberg.hive.HiveTableOperations;
 import org.apache.iceberg.hive.MetastoreLock;
@@ -408,11 +407,8 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
           context.getProperties().get(OLD_TABLE_NAME)).toString());
     }
     if (commitLock == null) {
-      HiveActor actor = HiveActorFactory
-              .createActor(hmsTable.getDbName(), conf)
-              .initialize(Maps.fromProperties(catalogProperties));
-      commitLock = new MetastoreLock(conf, actor,
-              catalogProperties.getProperty(Catalogs.NAME), hmsTable.getDbName(), hmsTable.getTableName());
+      commitLock = new MetastoreLock(conf, new CachedClientPool(conf, Maps.fromProperties(catalogProperties)),
+          catalogProperties.getProperty(Catalogs.NAME), hmsTable.getDbName(), hmsTable.getTableName());
     }
 
     try {
@@ -683,7 +679,7 @@ public class HiveIcebergMetaHook implements HiveMetaHook {
   @Override
   public void preTruncateTable(org.apache.hadoop.hive.metastore.api.Table table, EnvironmentContext context,
       List<String> partNames)
-          throws MetaException {
+      throws MetaException {
     this.catalogProperties = getCatalogProperties(table);
     this.icebergTable = Catalogs.loadTable(conf, catalogProperties);
     Map<String, PartitionField> partitionFieldMap = icebergTable.spec().fields().stream()
