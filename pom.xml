@@ -1864,7 +1864,7 @@
       <modules>
         <module>iceberg</module>
         <module>impala</module>
-        <module>hms-catalog</module>
+<!--        <module>hms-catalog</module>-->
       </modules>
     </profile>
 
