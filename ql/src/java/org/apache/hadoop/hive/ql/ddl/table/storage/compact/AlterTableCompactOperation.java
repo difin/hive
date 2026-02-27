@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.ql.ddl.table.storage.compact;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
@@ -29,7 +30,6 @@ import org.apache.hadoop.hive.ql.io.AcidUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.hadoop.hive.metastore.api.CompactionResponse;
 import org.apache.hadoop.hive.metastore.api.ShowCompactResponse;
@@ -40,6 +40,7 @@ import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.DDLOperation;
 import org.apache.hadoop.hive.ql.ddl.DDLUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
 import org.apache.hadoop.hive.ql.metadata.Partition;
 import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.txn.compactor.CompactorUtil;
@@ -137,16 +138,18 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
 
   private List<Partition> getPartitions(Table table) throws HiveException {
     List<Partition> partitions = new ArrayList<>();
-    if (desc.getPartitionSpec() == null) {
-      if (table.isPartitioned()) { // Compaction can only be done on the whole table if the table is non-partitioned.
-        throw new HiveException(ErrorMsg.COMPACTION_NO_PARTITION);
-      }
-      if (desc.getFilterExpr() != null && DDLUtils.isIcebergTable(table) && table.getStorageHandler().isPartitioned(table)) {
-        partitions = table.getStorageHandler().getPartitionsByExpr(table, desc.getFilterExpr(), true);
-      } else if ((DDLUtils.isIcebergTable(table) && table.getStorageHandler().isPartitioned(table))) {
+
+   if (desc.getPartitionSpec() == null && table.isPartitioned()) {
+      if (DDLUtils.isIcebergTable(table)) {
+        HiveStorageHandler sh = table.getStorageHandler();
+
+        partitions = (desc.getFilterExpr() != null) ?
+            sh.getPartitionsByExpr(table, desc.getFilterExpr(), true) :
+            sh.getPartitions(table, Maps.newHashMap(), true);
+      } else {
         partitions = context.getDb().getPartitions(table);
       }
-    } else {
+    } else if (desc.getPartitionSpec() != null) {
       Map<String, String> partitionSpec = desc.getPartitionSpec();
       partitions = context.getDb().getPartitions(table, partitionSpec);
       if (partitions.isEmpty()) {
@@ -154,7 +157,8 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
       }
       // This validates that the partition spec given in the compaction command matches exactly one partition 
       // in the table, not a partial partition spec.
-      partitions = partitions.stream().filter(part -> part.getSpec().size() == partitionSpec.size()).collect(Collectors.toList());
+      partitions = partitions.stream().filter(part -> part.getSpec().size() == partitionSpec.size())
+          .collect(Collectors.toList());
       if (partitions.size() != 1) {
         throw new HiveException(ErrorMsg.TOO_MANY_COMPACTION_PARTITIONS);
       }
