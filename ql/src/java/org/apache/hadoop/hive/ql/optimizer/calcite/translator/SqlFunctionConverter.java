@@ -55,12 +55,14 @@ import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveDateSubSqlOp
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveExtractDate;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveFloorDate;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveFromUnixTimeSqlOperator;
+import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveGroupingID;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveIn;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveSqlFunction;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveToDateSqlOperator;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveTruncSqlOperator;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveToUnixTimestampSqlOperator;
 import org.apache.hadoop.hive.ql.optimizer.calcite.reloperators.HiveUnixTimestampSqlOperator;
+import org.apache.hadoop.hive.ql.optimizer.calcite.rules.HiveSubQueryRemoveRule;
 import org.apache.hadoop.hive.ql.parse.ASTNode;
 import org.apache.hadoop.hive.ql.parse.HiveParser;
 import org.apache.hadoop.hive.ql.parse.ParseDriver;
@@ -433,6 +435,9 @@ public class SqlFunctionConverter {
       registerFunction("concat", HiveConcat.INSTANCE,
           hToken(HiveParser.Identifier, "concat")
       );
+      registerDuplicateFunction("||", HiveConcat.INSTANCE,
+          hToken(HiveParser.Identifier, "concat")
+      );
       registerFunction("substring", SqlStdOperatorTable.SUBSTRING,
           hToken(HiveParser.Identifier, "substring")
       );
@@ -464,7 +469,9 @@ public class SqlFunctionConverter {
           hToken(HiveParser.Identifier, "from_unixtime"));
       registerFunction("date_add", HiveDateAddSqlOperator.INSTANCE, hToken(HiveParser.Identifier, "date_add"));
       registerFunction("date_sub", HiveDateSubSqlOperator.INSTANCE, hToken(HiveParser.Identifier, "date_sub"));
-
+      registerFunction("sq_count_check", HiveSubQueryRemoveRule.SQ_COUNT_CHECK,
+          hToken(HiveParser.Identifier, "sq_count_check"));
+      hiveToCalcite.put("grouping__id", HiveGroupingID.INSTANCE);
       registerPlugin(DataSketchesFunctions.INSTANCE);
     }
 

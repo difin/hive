@@ -27,6 +27,7 @@ import org.apache.calcite.sql.type.SqlOperandTypeChecker;
 import org.apache.calcite.sql.type.SqlOperandTypeInference;
 import org.apache.calcite.sql.type.SqlReturnTypeInference;
 import org.apache.calcite.sql.type.SqlTypeFamily;
+import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.util.Util;
 
 /**
@@ -49,10 +50,16 @@ public class CalciteUDFInfo {
   public static CalciteUDFInfo createUDFInfo(String udfName,
       List<RelDataType> calciteArgTypes, RelDataType calciteRetType) {
     ImmutableList.Builder<SqlTypeFamily> typeFamilyBuilder = new ImmutableList.Builder<SqlTypeFamily>();
+    final SqlReturnTypeInference returnTypeInference;
+    if (calciteRetType == null) {
+      returnTypeInference = opBinding -> opBinding.getTypeFactory().createSqlType(SqlTypeName.UNKNOWN);
+    } else {
+      returnTypeInference = ReturnTypes.explicit(calciteRetType);
+    }
     for (RelDataType at : calciteArgTypes) {
       typeFamilyBuilder.add(Util.first(at.getSqlTypeName().getFamily(), SqlTypeFamily.ANY));
     }
-    return new CalciteUDFInfo(udfName, ReturnTypes.explicit(calciteRetType),
+    return new CalciteUDFInfo(udfName, returnTypeInference,
         InferTypes.explicit(calciteArgTypes), OperandTypes.family(typeFamilyBuilder.build()));
   }
 }

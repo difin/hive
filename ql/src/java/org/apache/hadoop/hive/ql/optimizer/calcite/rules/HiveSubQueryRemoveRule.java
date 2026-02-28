@@ -82,6 +82,10 @@ import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_CONVERT_ANTI_JO
  */
 public class HiveSubQueryRemoveRule extends RelOptRule {
 
+  public static final SqlFunction SQ_COUNT_CHECK =
+      new SqlFunction("sq_count_check", SqlKind.OTHER_FUNCTION, ReturnTypes.BOOLEAN, InferTypes.RETURN_TYPE,
+          OperandTypes.NUMERIC, SqlFunctionCategory.USER_DEFINED_FUNCTION);
+
   public static RelOptRule forProject(HiveConf conf) {
     return new HiveSubQueryRemoveRule(
         RelOptRule.operandJ(HiveProject.class, null, RexUtil.SubQueryFinder::containsSubQuery, any()),
@@ -184,15 +188,10 @@ public class HiveSubQueryRemoveRule extends RelOptRule {
       // returns single row/column
       builder.aggregate(builder.groupKey(), builder.count(false, "cnt"));
 
-      SqlFunction countCheck =
-          new SqlFunction("sq_count_check", SqlKind.OTHER_FUNCTION, ReturnTypes.BOOLEAN,
-              InferTypes.RETURN_TYPE, OperandTypes.NUMERIC,
-              SqlFunctionCategory.USER_DEFINED_FUNCTION);
-
       //we create FILTER (sq_count_check(count())) instead of PROJECT because RelFieldTrimmer
       // ends up getting rid of Project since it is not used further up the tree
       //sq_count_check returns true when subquery returns single row, else it fails
-      builder.filter(builder.call(countCheck, builder.field("cnt")));
+      builder.filter(builder.call(SQ_COUNT_CHECK, builder.field("cnt")));
       if (!variablesSet.isEmpty()) {
         builder.join(JoinRelType.LEFT, builder.literal(true), variablesSet);
       } else {

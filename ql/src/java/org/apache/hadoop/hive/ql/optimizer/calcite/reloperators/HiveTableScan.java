@@ -27,6 +27,7 @@ import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptCost;
 import org.apache.calcite.plan.RelOptPlanner;
 import org.apache.calcite.plan.RelTraitSet;
+import org.apache.calcite.rel.RelInput;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.RelShuttle;
 import org.apache.calcite.rel.RelWriter;
@@ -67,6 +68,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  */
 public class HiveTableScan extends TableScan implements HiveRelNode {
 
+  private static final String QBID_TAG = "qbid:alias";
   public enum HiveTableScanTrait {
     /**
      * If this is a fully acid table scan fetch the deleted rows too.
@@ -143,6 +145,18 @@ public class HiveTableScan extends TableScan implements HiveRelNode {
     this(cluster, traitSet, table, alias, concatQbIDAlias, table.getRowType(), useQBIdInDigest, insideView, null);
   }
 
+  public HiveTableScan(RelInput input) {
+    this(
+        input.getCluster(),
+        input.getTraitSet(),
+        (RelOptHiveTable) input.getTable("table"),
+        input.getString("table:alias"),
+        input.getString(QBID_TAG),
+        input.get(QBID_TAG) != null,
+        input.getBoolean("insideView", false),
+        createTableScanTrait(input));
+  }
+
   public HiveTableScan(RelOptCluster cluster, RelTraitSet traitSet, RelOptHiveTable table,
       String alias, String concatQbIDAlias, boolean useQBIdInDigest, boolean insideView,
       HiveTableScanTrait tableScanTrait) {
@@ -209,7 +223,7 @@ public class HiveTableScan extends TableScan implements HiveRelNode {
   // expression was already generated.
   @Override public RelWriter explainTerms(RelWriter pw) {
     return super.explainTerms(pw)
-      .itemIf("qbid:alias", concatQbIDAlias, this.useQBIdInDigest)
+      .itemIf(QBID_TAG, concatQbIDAlias, this.useQBIdInDigest)
       .itemIf("htColumns", this.neededColIndxsFrmReloptHT, pw.getDetailLevel() == SqlExplainLevel.DIGEST_ATTRIBUTES)
       .itemIf("insideView", this.isInsideView(), pw.getDetailLevel() == SqlExplainLevel.DIGEST_ATTRIBUTES)
       .itemIf("plKey", ((RelOptHiveTable) table).getPartitionListKey(), pw.getDetailLevel() == SqlExplainLevel.DIGEST_ATTRIBUTES)
@@ -329,6 +343,14 @@ public class HiveTableScan extends TableScan implements HiveRelNode {
 
   public HiveTableScanTrait getTableScanTrait() {
     return tableScanTrait;
+  }
+
+  private static HiveTableScanTrait createTableScanTrait(RelInput input) {
+    String enumName = input.getString("tableScanTrait");
+    if (enumName == null) {
+      return null;
+    }
+    return HiveTableScanTrait.valueOf(enumName);
   }
 
   @Override
