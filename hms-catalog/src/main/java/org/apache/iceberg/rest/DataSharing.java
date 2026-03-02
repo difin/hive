@@ -171,8 +171,7 @@ public class DataSharing {
       } else {
         token = fetchAccessToken(idt, table);
         if (token.isEmpty()) {
-          throw new NotAuthorizedException(
-              "Unable to obtain S3 access token for table " + table);
+          LOG.warn("Access token not found in response for table " + table);
         }
       }
     } catch (NotAuthorizedException e) {
