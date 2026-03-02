@@ -276,7 +276,7 @@ Table Parameters:
 #### A masked pattern was here ####
 	numFiles            	17                  
 	numRows             	17                  
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 #### A masked pattern was here ####
 	rawDataSize         	0                   
 	serialization.format	1                   
@@ -419,7 +419,7 @@ Table Parameters:
 #### A masked pattern was here ####
 	numFiles            	4                   
 	numRows             	9                   
-	parquet.compression 	zstd                
+	parquet.compression 	snappy              
 #### A masked pattern was here ####
 	rawDataSize         	0                   
 	serialization.format	1                   

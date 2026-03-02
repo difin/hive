@@ -16,7 +16,7 @@
 -- Mask total data files
 --! qt:replace:/(\S\"total-data-files\\\":\\\")(\d+)(\\\")/$1#Masked#$3/
 -- Mask iceberg version
---! qt:replace:/(\S\"iceberg-version\\\":\\\")(\w+\s\w+\s\d+\.\d+\.\d+\s\(\w+\s\w+\))(\\\")/$1#Masked#$3/
+--! qt:replace:/(\S\"iceberg-version\\\":\\\")(\w+\s\w+\s[\d.\-]+\s\(\w+\s\w+\))(\\\")/$1#Masked#$3/
 
 set hive.explain.user=false;
 create table testice1000 (a int, b string) stored by iceberg stored as orc;

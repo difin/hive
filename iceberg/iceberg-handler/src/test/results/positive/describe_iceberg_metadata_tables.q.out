@@ -41,7 +41,7 @@ POSTHOOK: query: describe default.ice_meta_desc.files
 POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -154,7 +154,7 @@ POSTHOOK: query: describe default.ice_meta_desc.all_data_files
 POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -193,7 +193,7 @@ POSTHOOK: query: describe default.ice_meta_desc.data_files
 POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -220,7 +220,7 @@ POSTHOOK: query: describe default.ice_meta_desc.delete_files
 POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -270,7 +270,7 @@ POSTHOOK: query: describe default.ice_meta_desc.all_delete_files
 POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -297,7 +297,7 @@ POSTHOOK: query: describe default.ice_meta_desc.all_files
 POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -325,7 +325,7 @@ POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 # col_name            	data_type           	comment             
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -445,7 +445,7 @@ POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 # col_name            	data_type           	comment             
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -486,7 +486,7 @@ POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 # col_name            	data_type           	comment             
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -514,7 +514,7 @@ POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 # col_name            	data_type           	comment             
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -567,7 +567,7 @@ POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 # col_name            	data_type           	comment             
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -595,7 +595,7 @@ POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 # col_name            	data_type           	comment             
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -622,7 +622,7 @@ POSTHOOK: query: describe extended default.ice_meta_desc.files
 POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -735,7 +735,7 @@ POSTHOOK: query: describe extended default.ice_meta_desc.all_data_files
 POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -775,7 +775,7 @@ POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 # col_name            	data_type           	comment             
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -803,7 +803,7 @@ POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 # col_name            	data_type           	comment             
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -856,7 +856,7 @@ POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 # col_name            	data_type           	comment             
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file
@@ -884,7 +884,7 @@ POSTHOOK: type: DESCTABLE
 POSTHOOK: Input: default@ice_meta_desc
 # col_name            	data_type           	comment             
 content             	int                 	Contents of the file: 0=data, 1=position deletes, 2=equality deletes
-file_path           	string              	URI with FS scheme
+#### A masked pattern was here ####
 file_format         	string              	File format name: avro, orc, or parquet
 spec_id             	int                 	Partition spec ID   
 record_count        	bigint              	Number of records in the file

@@ -9,7 +9,7 @@
 -- Mask current-snapshot-timestamp-ms
 --! qt:replace:/(\s+current-snapshot-timestamp-ms\s+)\S+(\s*)/$1#Masked#$2/
 -- Mask iceberg version
---! qt:replace:/(\S\"iceberg-version\\\":\\\")(\w+\s\w+\s\d+\.\d+\.\d+\s\(\w+\s\w+\))(\\\")/$1#Masked#$3/
+--! qt:replace:/(\S\"iceberg-version\\\":\\\")(\w+\s\w+\s[\d.\-]+\s\(\w+\s\w+\))(\\\")/$1#Masked#$3/
 
 set hive.vectorized.execution.enabled=false;
 

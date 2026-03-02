@@ -5,7 +5,7 @@
 --! qt:replace:/("total-files-size":")\d+/$1#FileSize#/
 --! qt:replace:/("removed-files-size":")\d+/$1#FileSize#/
 -- Mask iceberg version
---! qt:replace:/("iceberg-version":")(\w+\s\w+\s\d+\.\d+\.\d+\s\(\w+\s\w+\))/$1#Masked#/
+--! qt:replace:/("iceberg-version":")(\w+\s\w+\s[\d.\-]+\s\(\w+\s\w+\))/$1#Masked#/
 
 -- create an unpartitioned table with skip delete data set to false
 

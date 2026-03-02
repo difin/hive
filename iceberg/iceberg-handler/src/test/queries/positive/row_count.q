@@ -11,7 +11,7 @@
 -- Mask width
 --! qt:replace:/(width=[15])\d+/$1###/
 -- Mask iceberg version
---! qt:replace:/(\S\"iceberg-version\\\":\\\")(\w+\s\w+\s\d+\.\d+\.\d+\s\(\w+\s\w+\))(\\\")/$1#Masked#$3/
+--! qt:replace:/(\S\"iceberg-version\\\":\\\")(\w+\s\w+\s[\d.\-]+\s\(\w+\s\w+\))(\\\")/$1#Masked#$3/
 
 drop table if exists llap_orders;
 

@@ -9,7 +9,7 @@
 -- Mask current-snapshot-timestamp-ms
 --! qt:replace:/(\s\'current-snapshot-timestamp-ms\'=\')(\d+)(\')/$1#Masked#$3/
 -- Mask iceberg version
---! qt:replace:/("iceberg-version":")(\w+\s\w+\s\d+\.\d+\.\d+\s\(\w+\s\w+\))/$1#Masked#/
+--! qt:replace:/("iceberg-version":")(\w+\s\w+\s[\d.\-]+\s\(\w+\s\w+\))/$1#Masked#/
 
 -- create an unpartitioned table with skip delete data set to false
  create table ice01 (id int) Stored by Iceberg stored as ORC
