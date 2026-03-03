@@ -78,7 +78,7 @@
     <antlr4.version>4.9.3</antlr4.version>
     <apache-directory-server.version>2.0.0-M24</apache-directory-server.version>
     <avatica.version>1.26.0.7.3.2.100-SNAPSHOT</avatica.version>
-    <avro.version>1.12.0</avro.version>
+    <avro.version>1.11.3.7.3.2.100-SNAPSHOT</avro.version>
     <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
     <calcite.version>1.33.0.7.3.2.100-SNAPSHOT</calcite.version>
@@ -162,7 +162,7 @@
     <netty.hadoop.version>4.0.52.Final</netty.hadoop.version>
     <pac4j-saml.version>4.5.5</pac4j-saml.version>
     <paranamer.version>2.8</paranamer.version>
-    <parquet.version>1.16.0</parquet.version>
+    <parquet.version>1.15.2.7.3.2.100-SNAPSHOT</parquet.version>
     <pig.version>0.16.0</pig.version>
     <plexus.version>1.5.6</plexus.version>
     <protobuf.version>3.25.5</protobuf.version>
@@ -200,7 +200,7 @@
     <validation-api.version>1.1.0.Final</validation-api.version>
     <aws-secretsmanager-caching.version>1.0.1</aws-secretsmanager-caching.version>
     <aws-java-sdk.version>1.12.791</aws-java-sdk.version>
-    <iceberg.version>1.10.1</iceberg.version>
+    <iceberg.version>1.10.1.7.3.2.100-SNAPSHOT</iceberg.version>
     <spring.version>5.3.44.cldr-b1</spring.version>
     <spring.ldap.version>2.4.4</spring.ldap.version>
     <!-- Static code analysis, code coverage -->
@@ -284,16 +284,6 @@
       <dependency>
         <groupId>org.apache.parquet</groupId>
         <artifactId>parquet</artifactId>
-        <version>${parquet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.parquet</groupId>
-        <artifactId>parquet-avro</artifactId>
-        <version>${parquet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.parquet</groupId>
-        <artifactId>parquet-common</artifactId>
         <version>${parquet.version}</version>
       </dependency>
       <dependency>

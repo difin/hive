@@ -43,6 +43,8 @@ import org.apache.hadoop.mapred.RecordReader;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hive.iceberg.org.apache.orc.OrcConf;
+import org.apache.hive.iceberg.org.apache.parquet.schema.MessageType;
+import org.apache.hive.iceberg.org.apache.parquet.schema.MessageTypeParser;
 import org.apache.iceberg.FileContent;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.FileScanTask;
@@ -67,7 +69,6 @@ import org.apache.orc.impl.OrcTail;
 import org.apache.parquet.format.converter.ParquetMetadataConverter;
 import org.apache.parquet.hadoop.ParquetFileReader;
 import org.apache.parquet.hadoop.metadata.ParquetMetadata;
-import org.apache.parquet.schema.MessageType;
 
 /**
  * Utility class to create vectorized readers for Hive.
@@ -234,7 +235,7 @@ public class HiveVectorizedReader {
         ParquetFileReader.readFooter(job, path);
     inputFormat.setMetadata(parquetMetadata);
 
-    MessageType fileSchema = parquetMetadata.getFileMetaData().getSchema();
+    MessageType fileSchema = toShadedSchema(parquetMetadata.getFileMetaData().getSchema());
     MessageType typeWithIds = null;
     Schema expectedSchema = task.spec().schema();
 
@@ -271,6 +272,13 @@ public class HiveVectorizedReader {
         iterator.close();
       }
     };
+  }
+
+  /**
+   * Converts the file schema from Hive's Parquet metadata to Iceberg's shaded Parquet MessageType.
+   */
+  private static MessageType toShadedSchema(org.apache.parquet.schema.MessageType fileSchema) {
+    return MessageTypeParser.parseMessageType(fileSchema.toString());
   }
 
   /**
