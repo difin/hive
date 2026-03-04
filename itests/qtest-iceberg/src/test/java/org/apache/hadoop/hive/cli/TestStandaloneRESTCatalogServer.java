@@ -17,50 +17,33 @@
  */
 package org.apache.hadoop.hive.cli;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.common.FileUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
-import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
-import org.apache.iceberg.rest.standalone.IcebergCatalogConfiguration;
 import org.apache.iceberg.rest.standalone.StandaloneRESTCatalogServer;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.test.context.TestContext;
-import org.springframework.test.context.TestExecutionListener;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Integration test for Standalone REST Catalog Server with Spring Boot.
+ * Integration test for Standalone REST Catalog Server with Spring Boot (no auth).
  *
  * Tests that the standalone server can:
  * 1. Start independently of HMS using Spring Boot
@@ -71,7 +54,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-    classes = TestStandaloneRESTCatalogServer.TestRestCatalogApplication.class,
+    classes = BaseStandaloneRESTCatalogServerTest.TestRestCatalogApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {
         "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"
@@ -79,68 +62,20 @@ import static org.junit.Assert.assertTrue;
 )
 @ContextConfiguration(initializers = TestStandaloneRESTCatalogServer.RestCatalogTestContextInitializer.class)
 @TestExecutionListeners(
-    listeners = TestStandaloneRESTCatalogServer.HmsStartupListener.class,
+    listeners = BaseStandaloneRESTCatalogServerTest.HmsStartupListener.class,
     mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS
 )
-public class TestStandaloneRESTCatalogServer {
-  private static final Logger LOG = LoggerFactory.getLogger(TestStandaloneRESTCatalogServer.class);
-  private static final String URL_TEMPLATE = "http://localhost:%d%s";
-
+public class TestStandaloneRESTCatalogServer extends BaseStandaloneRESTCatalogServerTest {
   @LocalServerPort
   private int port;
 
   @Autowired
   private StandaloneRESTCatalogServer server;
 
-  private String url(String path) {
-    return String.format(URL_TEMPLATE, port, path);
+  @Override
+  protected int getPort() {
+    return port;
   }
-
-  private static Configuration hmsConf;
-  private static int hmsPort;
-  private static File warehouseDir;
-  private static File hmsTempDir;
-
-  /**
-   * Starts HMS before the Spring ApplicationContext loads.
-   * Spring loads the context before @BeforeClass, so we use a TestExecutionListener
-   * which runs before context initialization.
-   * @Order ensures this runs before other listeners that might trigger context load.
-   */
-  @Order(Ordered.HIGHEST_PRECEDENCE)
-  public static class HmsStartupListener implements TestExecutionListener {
-    @Override
-    public void beforeTestClass(TestContext testContext) throws Exception {
-      if (hmsPort > 0) {
-        return; // Already started
-      }
-      hmsTempDir = new File(System.getProperty("java.io.tmpdir"), "test-hms-" + System.currentTimeMillis());
-      hmsTempDir.mkdirs();
-      warehouseDir = new File(hmsTempDir, "warehouse");
-      warehouseDir.mkdirs();
-
-      hmsConf = MetastoreConf.newMetastoreConf();
-      MetaStoreTestUtils.setConfForStandloneMode(hmsConf);
-
-      String jdbcUrl = String.format("jdbc:derby:memory:%s;create=true",
-          new File(hmsTempDir, "metastore_db").getAbsolutePath());
-      MetastoreConf.setVar(hmsConf, ConfVars.CONNECT_URL_KEY, jdbcUrl);
-      MetastoreConf.setVar(hmsConf, ConfVars.WAREHOUSE, warehouseDir.getAbsolutePath());
-      MetastoreConf.setVar(hmsConf, ConfVars.WAREHOUSE_EXTERNAL, warehouseDir.getAbsolutePath());
-
-      hmsPort = MetaStoreTestUtils.startMetaStoreWithRetry(
-          HadoopThriftAuthBridge.getBridge(), hmsConf, true, false, false, false);
-      LOG.info("Started embedded HMS on port: {} (before Spring context)", hmsPort);
-    }
-  }
-
-  /**
-   * Minimal Spring Boot application for tests. Excludes StandaloneRESTCatalogServer
-   * so we provide it via RestCatalogTestContextInitializer (with HMS-backed Configuration).
-   */
-  @SpringBootApplication
-  @Import(IcebergCatalogConfiguration.class)
-  public static class TestRestCatalogApplication {}
 
   /**
    * Registers Configuration and StandaloneRESTCatalogServer before the context loads.
@@ -167,68 +102,37 @@ public class TestStandaloneRESTCatalogServer {
 
   @AfterClass
   public static void teardownClass() throws IOException {
-    if (hmsPort > 0) {
-      MetaStoreTestUtils.close(hmsPort);
-    }
-    if (hmsTempDir != null && hmsTempDir.exists()) {
-      FileUtils.deleteDirectory(hmsTempDir);
-    }
+    teardownBase();
   }
 
   @Test(timeout = 60000)
   public void testLivenessProbe() throws Exception {
     LOG.info("=== Test: Liveness Probe (Kubernetes) ===");
-
-    HttpGet request = new HttpGet(url("/actuator/health/liveness"));
-    try (CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(request)) {
-      assertEquals("Liveness probe should return 200", 200, response.getStatusLine().getStatusCode());
-      String body = EntityUtils.toString(response.getEntity());
-      assertTrue("Liveness should be UP", body.contains("UP"));
-      LOG.info("Liveness probe passed: {}", body);
-    }
+    super.testLivenessProbe();
   }
 
   @Test(timeout = 60000)
   public void testReadinessProbe() throws Exception {
     LOG.info("=== Test: Readiness Probe (Kubernetes) ===");
-
-    HttpGet request = new HttpGet(url("/actuator/health/readiness"));
-    try (CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(request)) {
-      assertEquals("Readiness probe should return 200", 200, response.getStatusLine().getStatusCode());
-      String body = EntityUtils.toString(response.getEntity());
-      assertTrue("Readiness should be UP", body.contains("UP"));
-      LOG.info("Readiness probe passed: {}", body);
-    }
+    super.testReadinessProbe();
   }
 
   @Test(timeout = 60000)
   public void testPrometheusMetrics() throws Exception {
     LOG.info("=== Test: Prometheus Metrics (for K8s HPA) ===");
-
-    HttpGet request = new HttpGet(url("/actuator/prometheus"));
-    try (CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(request)) {
-      assertEquals("Metrics endpoint should return 200", 200, response.getStatusLine().getStatusCode());
-      String body = EntityUtils.toString(response.getEntity());
-      assertTrue("Should contain JVM metrics", body.contains("jvm_memory"));
-      LOG.info("Prometheus metrics available");
-    }
+    super.testPrometheusMetrics();
   }
 
   @Test(timeout = 60000)
   public void testRESTCatalogConfig() throws Exception {
     LOG.info("=== Test: REST Catalog Config Endpoint ===");
 
-    HttpGet request = new HttpGet(url("/iceberg/v1/config"));
     try (CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(request)) {
+        CloseableHttpResponse response = httpClient.execute(get("/iceberg/v1/config"))) {
       assertEquals("Config endpoint should return 200", 200, response.getStatusLine().getStatusCode());
 
       String responseBody = EntityUtils.toString(response.getEntity());
       LOG.info("Config response: {}", responseBody);
-      // ConfigResponse should contain endpoints, defaults, and overrides
       assertTrue("Response should contain endpoints", responseBody.contains("endpoints"));
       assertTrue("Response should be valid JSON", responseBody.startsWith("{") && responseBody.endsWith("}"));
     }
@@ -238,48 +142,35 @@ public class TestStandaloneRESTCatalogServer {
   public void testRESTCatalogNamespaceOperations() throws Exception {
     LOG.info("=== Test: REST Catalog Namespace Operations ===");
 
-    String namespacesUrl = url("/iceberg/v1/namespaces");
+    String namespacePath = "/iceberg/v1/namespaces";
     String namespaceName = "testdb";
 
-    // List namespaces (before creation)
-    HttpGet listRequest = new HttpGet(namespacesUrl);
-    listRequest.setHeader("Content-Type", "application/json");
-    try (CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(listRequest)) {
-      assertEquals("List namespaces should return 200", 200, response.getStatusLine().getStatusCode());
-    }
+    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+      try (CloseableHttpResponse response = httpClient.execute(get(namespacePath))) {
+        assertEquals("List namespaces should return 200", 200, response.getStatusLine().getStatusCode());
+      }
 
-    // Create namespace - REST Catalog API requires JSON body with namespace array
-    HttpPost createRequest = new HttpPost(namespacesUrl);
-    createRequest.setHeader("Content-Type", "application/json");
-    createRequest.setEntity(new StringEntity("{\"namespace\":[\"" + namespaceName + "\"]}", "UTF-8"));
-    try (CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(createRequest)) {
-      assertEquals("Create namespace should return 200", 200, response.getStatusLine().getStatusCode());
-    }
+      try (CloseableHttpResponse response = httpClient.execute(
+          post(namespacePath, "{\"namespace\":[\"" + namespaceName + "\"]}"))) {
+        assertEquals("Create namespace should return 200", 200, response.getStatusLine().getStatusCode());
+      }
 
-    // Verify namespace exists by checking it in the list
-    HttpGet listAfterRequest = new HttpGet(namespacesUrl);
-    listAfterRequest.setHeader("Content-Type", "application/json");
-    try (CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(listAfterRequest)) {
-      assertEquals("List namespaces after creation should return 200",
-          200, response.getStatusLine().getStatusCode());
-      String responseBody = EntityUtils.toString(response.getEntity());
-      LOG.info("Namespaces list response: {}", responseBody);
-      assertTrue("Response should contain created namespace", responseBody.contains(namespaceName));
-    }
+      try (CloseableHttpResponse response = httpClient.execute(get(namespacePath))) {
+        assertEquals("List namespaces after creation should return 200",
+            200, response.getStatusLine().getStatusCode());
+        String responseBody = EntityUtils.toString(response.getEntity());
+        LOG.info("Namespaces list response: {}", responseBody);
+        assertTrue("Response should contain created namespace", responseBody.contains(namespaceName));
+      }
 
-    // Verify namespace exists by getting it directly
-    HttpGet getRequest = new HttpGet(url("/iceberg/v1/namespaces/" + namespaceName));
-    getRequest.setHeader("Content-Type", "application/json");
-    try (CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(getRequest)) {
-      assertEquals("Get namespace should return 200",
-          200, response.getStatusLine().getStatusCode());
-      String responseBody = EntityUtils.toString(response.getEntity());
-      LOG.info("Get namespace response: {}", responseBody);
-      assertTrue("Response should contain namespace", responseBody.contains(namespaceName));
+      try (CloseableHttpResponse response = httpClient.execute(
+          get("/iceberg/v1/namespaces/" + namespaceName))) {
+        assertEquals("Get namespace should return 200",
+            200, response.getStatusLine().getStatusCode());
+        String responseBody = EntityUtils.toString(response.getEntity());
+        LOG.info("Get namespace response: {}", responseBody);
+        assertTrue("Response should contain namespace", responseBody.contains(namespaceName));
+      }
     }
 
     LOG.info("Namespace operations passed");
@@ -288,8 +179,6 @@ public class TestStandaloneRESTCatalogServer {
   @Test(timeout = 60000)
   public void testServerPort() {
     LOG.info("=== Test: Server Port ===");
-    assertTrue("Server port should be > 0", port > 0);
-    assertNotNull("REST endpoint should not be null", server.getRestEndpoint());
-    LOG.info("Server port: {}, Endpoint: {}", port, server.getRestEndpoint());
+    super.testServerPort(server);
   }
 }
