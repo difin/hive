@@ -171,6 +171,12 @@ public class TezSessionState implements TezSession {
     this.sessionId = sessionId;
   }
 
+  public static TezSessionState create(String sessionId, HiveConf conf, boolean useExternalSessions) {
+    return useExternalSessions ? new TezExternalSessionState(sessionId, conf) :
+        new TezSessionState(sessionId, conf);
+  }
+
+  @Override
   public boolean isOpening() {
     if (session != null || sessionFuture == null) {
       return false;
@@ -194,6 +200,7 @@ public class TezSessionState implements TezSession {
     return false;
   }
 
+  @Override
   public boolean isOpen() {
     if (session != null) {
       return true;
@@ -229,7 +236,8 @@ public class TezSessionState implements TezSession {
 
   @Override
   public void open() throws IOException, LoginException, URISyntaxException, TezException {
-    open(false);
+    String[] noFiles = null;
+    open(noFiles);
   }
 
   public boolean reconnect(String applicationId, long amAgeMs)
@@ -308,31 +316,24 @@ public class TezSessionState implements TezSession {
   @Override
   public void open(String[] additionalFilesNotFromConf)
       throws IOException, LoginException, URISyntaxException, TezException {
-    openInternal(additionalFilesNotFromConf, false, null, null, false);
+    openInternal(additionalFilesNotFromConf, false, null, null);
   }
 
 
   @Override
   public void open(HiveResources resources)
       throws LoginException, IOException, URISyntaxException, TezException {
-    openInternal(null, false, null, resources, false);
-  }
-
-  @Override
-  public void open(boolean isPoolInit)
-      throws LoginException, IOException, URISyntaxException, TezException {
-    String[] noFiles = null;
-    openInternal(noFiles, false, null, null, isPoolInit);
+    openInternal(null, false, null, resources);
   }
 
   @Override
   public void beginOpen(String[] additionalFiles, LogHelper console)
       throws IOException, LoginException, URISyntaxException, TezException {
-    openInternal(additionalFiles, true, console, null, false);
+    openInternal(additionalFiles, true, console, null);
   }
 
   protected void openInternal(String[] additionalFilesNotFromConf,
-      boolean isAsync, LogHelper console, HiveResources resources, boolean isPoolInit)
+      boolean isAsync, LogHelper console, HiveResources resources)
           throws IOException, LoginException, URISyntaxException, TezException {
     initQueueAndUser();
 
@@ -919,6 +920,7 @@ public class TezSessionState implements TezSession {
     return session;
   }
 
+  @Override
   public LocalResource getAppJarLr() {
     return appJarLr;
   }
@@ -1078,11 +1080,13 @@ public class TezSessionState implements TezSession {
     return conf;
   }
 
+  @Override
   public List<LocalResource> getLocalizedResources() {
     if (resources == null) return new ArrayList<>();
     return new ArrayList<>(resources.localizedResources);
   }
 
+  @Override
   public String getUser() {
     return user;
   }
@@ -1146,14 +1150,17 @@ public class TezSessionState implements TezSession {
     return wmContext;
   }
 
+  @Override
   public void setWmContext(final WmContext wmContext) {
     this.wmContext = wmContext;
   }
 
+  @Override
   public void setKillQuery(final KillQuery killQuery) {
     this.killQuery = killQuery;
   }
 
+  @Override
   public HiveResources extractHiveResources() {
     HiveResources result = resources;
     resources = null;
@@ -1191,9 +1198,8 @@ public class TezSessionState implements TezSession {
 
   @Override
   public String getAppMasterUri() {
-    return Optional.of(session).map(
-            tezClient -> tezClient.getAmHost() + ":" + tezClient.getAmPort())
-        .get();
+    return Optional.ofNullable(session).map(
+            tezClient -> tezClient.getAmHost() + ":" + tezClient.getAmPort()).orElse(null);
   }
 
   /**

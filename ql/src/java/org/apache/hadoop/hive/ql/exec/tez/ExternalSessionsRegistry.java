@@ -18,11 +18,6 @@ package org.apache.hadoop.hive.ql.exec.tez;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.api.MetaException;
-import org.apache.hadoop.hive.metastore.utils.JavaUtils;
-import org.apache.tez.dag.api.TezConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +47,7 @@ public interface ExternalSessionsRegistry {
   void returnSession(String appId);
 
   /**
-   * Closes the external session registry
+   * Closes the external session registry.
    */
   void close();
 
@@ -61,28 +56,5 @@ public interface ExternalSessionsRegistry {
    */
   default Map<String, Double> getMetrics(String appId){
     return new HashMap<>();
-  }
-
-  Map<String, ExternalSessionsRegistry> INSTANCES = new HashMap<>();
-
-  static ExternalSessionsRegistry getClient(final Configuration conf) throws MetaException {
-    ExternalSessionsRegistry registry;
-    synchronized (INSTANCES) {
-      String namespace = conf.get(TezConfiguration.TEZ_AM_REGISTRY_NAMESPACE);
-      // HS2 would need to know about all coordinators running on all compute groups for a given compute (namespace)
-      // Setting this config to false in client, will make registry client listen on paths under @compute instead of
-      // @compute/compute-group
-      conf.setBoolean(TezConfiguration.TEZ_AM_REGISTRY_ENABLE_COMPUTE_GROUPS, false);
-      registry = INSTANCES.get(namespace);
-      String clazz = HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_SERVER2_TEZ_EXTERNAL_SESSIONS_REGISTRY_CLASS);
-      if (registry == null) {
-        registry = JavaUtils.newInstance(JavaUtils.getClass(clazz, ExternalSessionsRegistry.class),
-          new Class<?>[]{Configuration.class}, new Object[]{conf});
-        INSTANCES.put(namespace, registry);
-      }
-      LOG.info("Returning tez external AM registry ({}) for namespace '{}'", System.identityHashCode(registry),
-        namespace);
-    }
-    return registry;
   }
 }

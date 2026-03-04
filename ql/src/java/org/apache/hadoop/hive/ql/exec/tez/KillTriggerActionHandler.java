@@ -41,6 +41,7 @@ public class KillTriggerActionHandler implements TriggerActionHandler<TezSession
       switch (entry.getValue().getAction().getType()) {
         case KILL_QUERY:
           TezSession sessionState = entry.getKey();
+          String queryId = sessionState.getWmContext().getQueryId();
           try {
             UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
             SessionState ss = new SessionState(new HiveConf(), ugi.getShortUserName());
@@ -49,11 +50,10 @@ public class KillTriggerActionHandler implements TriggerActionHandler<TezSession
             // then session might have been released to pool or closed already
             boolean wasKilled =  sessionState.killQuery(entry.getValue().getViolationMsg());
             if (!wasKilled) {
-              LOG.info("Didn't kill the query {}", sessionState.getWmContext().getQueryId());
+              LOG.info("Didn't kill the query {}", queryId);
             }
           } catch (HiveException|IOException e) {
-            LOG.warn("Unable to kill query {} for trigger violation",
-                sessionState.getWmContext().getQueryId());
+            LOG.warn("Unable to kill query {} for trigger violation", queryId, e);
           }
           break;
         default:

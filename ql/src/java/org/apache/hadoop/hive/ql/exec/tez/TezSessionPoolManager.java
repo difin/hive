@@ -89,7 +89,7 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
   private TriggerValidatorRunnable triggerValidatorRunnable;
   private YarnQueueHelper yarnQueueChecker;
 
-  private ExternalSessionsRegistry externalSessions = null;
+  private boolean useExternalSessions;
 
   private TezSessionPoolManagerMetrics metrics = null;
 
@@ -200,9 +200,7 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
       this.yarnQueueChecker = new YarnQueueHelper(conf);
     }
 
-    if (HiveConf.getBoolVar(conf, ConfVars.HIVE_SERVER2_TEZ_USE_EXTERNAL_SESSIONS)) {
-      externalSessions = ExternalSessionsRegistry.getClient(conf);
-    }
+    useExternalSessions = HiveConf.getBoolVar(conf, ConfVars.HIVE_SERVER2_TEZ_USE_EXTERNAL_SESSIONS);
 
     restrictedConfig = new RestrictedConfigChecker(conf);
   }
@@ -352,7 +350,7 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
         defaultSessionPool.returnSession((TezSessionPoolSession)tezSessionState);
       }
 
-      if (externalSessions != null) {
+      if (useExternalSessions) {
         if (tezSessionState.getTezClient() != null && tezSessionState.getTezClient().getAppMasterApplicationId() != null) {
           tezSessionState.close(false);
         } else {
@@ -426,12 +424,7 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
   }
 
   protected TezSessionPoolSession createSession(String sessionId, HiveConf conf) {
-    TezSessionState base = null;
-    if (externalSessions != null) {
-      base = new TezExternalSessionState(sessionId, conf, externalSessions);
-    } else {
-      base = new TezSessionState(sessionId, conf);
-    }
+    TezSessionState base = TezSessionState.create(sessionId, conf, useExternalSessions);
     return new TezSessionPoolSession(this, expirationTracker, base);
   }
 
@@ -495,7 +488,7 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
       llapQueue.acquire(); // blocks if no more llap queries can be submitted.
     }
 
-    if (externalSessions == null && canWorkWithSameSession(session, conf)) {
+    if (canWorkWithSameSession(session, conf)) {
       session.setLegacyLlapMode(llap);
       return session;
     }
@@ -532,9 +525,9 @@ public class TezSessionPoolManager extends AbstractTriggerValidator
 
 
   public void closeNonDefaultSessions() throws Exception {
-    List<TezSession> sessionsToClose = null;
+    List<TezSession> sessionsToClose;
     synchronized (openSessions) {
-      sessionsToClose = new ArrayList<TezSession>(openSessions);
+      sessionsToClose = new ArrayList<>(openSessions);
     }
     for (TezSession sessionState : sessionsToClose) {
       System.err.println("Shutting down tez session.");

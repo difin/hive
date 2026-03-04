@@ -87,7 +87,6 @@ import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.engine.EngineCompileHelper;
 import org.apache.hadoop.hive.ql.engine.EngineLoader;
 import org.apache.hadoop.hive.ql.engine.EngineSession;
-import org.apache.hadoop.hive.ql.exec.tez.ExternalSessionsRegistry;
 import org.apache.hadoop.hive.ql.exec.tez.TezExternalSessionState;
 import org.apache.hadoop.hive.ql.exec.tez.TezSessionPoolManager;
 import org.apache.hadoop.hive.ql.exec.tez.TezSession;
@@ -330,8 +329,6 @@ public class SessionState {
    * and is later used for function usage authorization.
    */
   private final Map<String, FunctionInfo> currentFunctionsInUse = new HashMap<>();
-
-  private static ExternalSessionsRegistry externalSessions = null;
 
   /**
    * CURRENT_TIMESTAMP value for query
@@ -784,20 +781,13 @@ public class SessionState {
       return;
     }
 
-    if (HiveConf.getBoolVar(startSs.getConf(), ConfVars.HIVE_SERVER2_TEZ_USE_EXTERNAL_SESSIONS)) {
-      try {
-        externalSessions = ExternalSessionsRegistry.getClient(startSs.getConf());
-      } catch (MetaException e) {
-        throw new RuntimeException(e);
-      }
-    } else {
-      externalSessions = null;
-    }
+    boolean useExternalSessions = HiveConf.getBoolVar(startSs.getConf(),
+         ConfVars.HIVE_SERVER2_TEZ_USE_EXTERNAL_SESSIONS);
 
     try {
       if (startSs.tezSessionState == null) {
-        if (externalSessions != null) {
-          startSs.setTezSession(new TezExternalSessionState(startSs.getSessionId(), startSs.sessionConf, externalSessions));
+        if (useExternalSessions) {
+          startSs.setTezSession(new TezExternalSessionState(startSs.getSessionId(), startSs.sessionConf));
         } else {
           startSs.setTezSession(new TezSessionState(startSs.getSessionId(), startSs.sessionConf));
         }

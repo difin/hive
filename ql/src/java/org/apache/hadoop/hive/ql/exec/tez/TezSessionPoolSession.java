@@ -115,12 +115,6 @@ class TezSessionPoolSession implements TezSession {
     afterOpen();
   }
 
-  @Override
-  public void open(boolean isPoolInit) throws IOException, LoginException, URISyntaxException, TezException {
-    baseSession.open(isPoolInit);
-    afterOpen();
-  }
-
   private void afterOpen() {
     manager.registerOpenSession(this);
     if (expirationTracker != null) {

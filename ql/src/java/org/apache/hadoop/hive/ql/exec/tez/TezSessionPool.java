@@ -356,7 +356,7 @@ class TezSessionPool<SessionType extends TezSessionPoolSession> {
     if (!isUsable) throw new IOException(session + " is not usable at pool startup");
     session.getConf().set(TezConfiguration.TEZ_QUEUE_NAME, session.getQueueName());
     configureAmRegistry(session);
-    session.open(true);
+    session.open();
     if (session.stopUsing()) {
       if (!putSessionBack(session, false, false)) {
         LOG.warn("Couldn't add a session during initialization");

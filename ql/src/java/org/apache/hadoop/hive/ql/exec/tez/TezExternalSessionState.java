@@ -39,7 +39,6 @@ import org.apache.tez.client.TezClient;
 import org.apache.tez.dag.api.TezConfiguration;
 import org.apache.tez.dag.api.TezException;
 import org.apache.tez.dag.api.client.DAGClient;
-import org.apache.tez.mapreduce.hadoop.MRHelpers;
 import org.apache.tez.serviceplugins.api.ServicePluginsDescriptor;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
 import org.slf4j.Logger;
@@ -48,26 +47,15 @@ import org.slf4j.LoggerFactory;
 public class TezExternalSessionState extends TezSessionState {
   private static final Logger LOG = LoggerFactory.getLogger(TezExternalSessionState.class.getName());
   private String externalAppId;
-  private boolean isDestroying = false;
+  private volatile boolean isOpen = false;
+  private volatile boolean isDestroying = false;
   private final ExternalSessionsRegistry registry;
   private static final Object defaultConfCreatelock = new Object();
-  private static TezConfiguration defaultTezConfiguration;
+  private static volatile TezConfiguration defaultTezConfiguration;
 
-  public TezExternalSessionState(
-      DagUtils utils, HiveConf conf, ExternalSessionsRegistry registry) {
-    super(utils, conf);
-    this.registry = registry;
-    synchronized (defaultConfCreatelock) {
-      if (defaultTezConfiguration == null) {
-        defaultTezConfiguration = createDefaultTezConfig();
-      }
-    }
-  }
-
-  public TezExternalSessionState(String sessionId, HiveConf conf,
-    ExternalSessionsRegistry registry) {
+  public TezExternalSessionState(String sessionId, HiveConf conf) {
     super(sessionId, conf);
-    this.registry = registry;
+    this.registry = ExternalSessionsRegistryFactory.getClient(conf);
     synchronized (defaultConfCreatelock) {
       if (defaultTezConfiguration == null) {
         defaultTezConfiguration = createDefaultTezConfig();
@@ -84,21 +72,23 @@ public class TezExternalSessionState extends TezSessionState {
 
   @Override
   protected void openInternal(String[] additionalFilesNotFromConf,
-      boolean isAsync, LogHelper console, HiveResources resources, boolean isPoolInit)
+      boolean isAsync, LogHelper console, HiveResources resources)
           throws IOException, LoginException, URISyntaxException, TezException {
+    if (isOpen) {
+      LOG.info("External Tez session {} is already open, skipping duplicate openInternal call", getSessionId());
+      return;
+    }
+
     initQueueAndUser();
 
     boolean llapMode = isLlapMode();
-
-    Map<String, String> amEnv = new HashMap<String, String>();
-    MRHelpers.updateEnvBasedOnMRAMEnv(conf, amEnv);
 
     TezConfiguration tezConfig = new TezConfiguration(defaultTezConfiguration);
     setupSessionAcls(tezConfig, conf);
     ServicePluginsDescriptor spd = createServicePluginDescriptor(llapMode, tezConfig);
     Credentials llapCredentials = createLlapCredentials(llapMode, tezConfig);
 
-    final TezClient session = TezClient.newBuilder("HIVE-" + getSessionId(), tezConfig)
+    final TezClient sessionTezClient = TezClient.newBuilder("HIVE-" + getSessionId(), tezConfig)
         .setIsSession(true)
         .setCredentials(llapCredentials).setServicePluginDescriptor(spd)
         .build();
@@ -126,10 +116,10 @@ public class TezExternalSessionState extends TezSessionState {
       throw new IOException(e);
     }
 
-    session.getClient(ApplicationId.fromString(externalAppId));
+    sessionTezClient.getClient(ApplicationId.fromString(externalAppId));
     LOG.info("Started an external session; client name {}, app ID {}, perQuerySession: {} hiveQueryId: {}",
-        session.getClientName(), externalAppId, perQuerySession, hiveQueryId);
-    setTezClient(session);
+      sessionTezClient.getClientName(), externalAppId, perQuerySession, hiveQueryId);
+    setTezClient(sessionTezClient);
 
     // If we are picking up this external session for the first time, check whether the AM is
     // currently running anything. This could be the case if the last HiveServer2 instance died
@@ -138,22 +128,31 @@ public class TezExternalSessionState extends TezSessionState {
     // In this situation, we cannot currently do anything with the already running DAG that the
     // external AM may be running - there is nothing tracking this DAG.
     // So just kill the DAG execution if possible.
-    tryKillRunningDAGs(session);
+    tryKillRunningDAGs(sessionTezClient);
+
+    isOpen = true;
   }
 
   @Override
   public void close(boolean keepDagFilesDir) throws Exception {
-    // We never close external sessions that don't have errors.
-    if (externalAppId != null) {
-      LOG.info("Returning external session with appID: {}", externalAppId);
-      // Make sure that if the session is returned to the pool, it doesn't live in the global.
-      SessionState sessionState = SessionState.get();
-      if (sessionState != null) {
-        sessionState.setTezSession(null);
+    try {
+      // We never close external sessions that don't have errors.
+      if (externalAppId != null) {
+        LOG.info("Returning external session with appID: {}", externalAppId);
+        // Make sure that if the session is returned to the pool, it doesn't live in the global.
+        SessionState sessionState = SessionState.get();
+        if (sessionState != null) {
+          sessionState.setTezSession(null);
+        }
+        registry.returnSession(externalAppId);
       }
-      registry.returnSession(externalAppId);
+    } catch (Exception e) {
+      LOG.warn("Caught exception while trying to return external session {}, moving on with session state closure",
+          externalAppId, e);
     }
+
     externalAppId = null;
+    isOpen = false;
     if (isDestroying) {
       super.close(keepDagFilesDir);
     }
@@ -173,6 +172,11 @@ public class TezExternalSessionState extends TezSessionState {
     // This will actually close the session. We assume the external manager will restart it.
     // It could instead somehow communicate to the external manager that the session is bad.
     super.destroy();
+  }
+
+  @Override
+  public boolean isOpen(){
+    return isOpen;
   }
 
   @Override

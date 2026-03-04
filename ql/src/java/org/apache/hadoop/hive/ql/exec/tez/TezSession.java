@@ -71,7 +71,6 @@ public interface TezSession {
 
   // Core session operations.
   void open() throws IOException, LoginException, URISyntaxException, TezException;
-  void open(boolean isPoolInit) throws IOException, LoginException, URISyntaxException, TezException;
   void open(HiveResources resources) throws LoginException, IOException, URISyntaxException, TezException;
   void open(String[] additionalFilesNotFromConf) throws IOException, LoginException, URISyntaxException, TezException;
   void beginOpen(String[] additionalFiles, LogHelper console)

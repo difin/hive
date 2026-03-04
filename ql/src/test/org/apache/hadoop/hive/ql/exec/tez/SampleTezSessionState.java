@@ -81,12 +81,6 @@ public class SampleTezSessionState extends WmTezSession {
   }
 
   @Override
-  public void open(boolean isPoolInit) throws IOException, LoginException,
-      URISyntaxException, TezException {
-    open();
-  }
-
-  @Override
   public void open(HiveResources resources) throws LoginException, IOException {
     open();
   }
