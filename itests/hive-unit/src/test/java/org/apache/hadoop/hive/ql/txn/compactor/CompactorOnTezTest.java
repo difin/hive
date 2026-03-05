@@ -110,7 +110,8 @@ public abstract class CompactorOnTezTest {
     // Use tez as execution engine for this test class
     setupTez(hiveConf);
     msClient = new HiveMetaStoreClient(conf);
-    driver = DriverFactory.newDriver(new QueryState.Builder().withHiveConf(conf).build(), null, null);
+    QueryState queryState = new QueryState.Builder().withHiveConf(conf).withGenerateNewQueryId(true).build();
+    driver = DriverFactory.newDriver(queryState, null, null);
     SessionState.start(new CliSessionState(conf));
   }
 

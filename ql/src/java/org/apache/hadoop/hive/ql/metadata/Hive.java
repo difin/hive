@@ -53,6 +53,7 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.BitSet;
 import java.util.Collections;
@@ -2334,7 +2335,7 @@ public class Hive implements AutoCloseable {
         // It passed the test, load
         HiveRelOptMaterialization relOptMaterialization =
             HiveMaterializedViewsRegistry.get().getRewritingMaterializedView(
-                materializedViewTable.getDbName(), materializedViewTable.getTableName(), scope);
+                materializedViewTable.getFullTableName(), scope);
         if (relOptMaterialization != null) {
           Table cachedMaterializedViewTable = extractTable(relOptMaterialization);
           if (cachedMaterializedViewTable.equals(materializedViewTable)) {
@@ -2419,7 +2420,7 @@ public class Hive implements AutoCloseable {
   public List<HiveRelOptMaterialization> getMaterializedViewsByAST(
       ASTNode astNode, Set<TableName> tablesUsed, HiveTxnManager txnMgr) throws HiveException {
 
-    List<HiveRelOptMaterialization> materializedViews =
+    Collection<HiveRelOptMaterialization> materializedViews =
             HiveMaterializedViewsRegistry.get().getRewritingMaterializedViews(astNode);
     if (materializedViews.isEmpty()) {
       return Collections.emptyList();

@@ -2312,7 +2312,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
       for (RelOptMaterialization materialization : materializations) {
         if (LOG.isDebugEnabled()) {
           LOG.debug("Adding materialization {} to the planner; the plan is:\n{}", materialization.qualifiedTableName,
-              RelOptUtil.toString(materialization.queryRel));
+                  RelOptUtil.toString(materialization.queryRel));
         }
         planner.addMaterialization(materialization);
       }
@@ -2336,15 +2336,19 @@ public class CalcitePlanner extends SemanticAnalyzer {
         planner.setRuleDescExclusionFilter(Pattern.compile(ruleExclusionRegex));
       }
       planner.setRoot(basePlan);
-      basePlan = planner.findBestExp();
-      // Remove view-based rewriting rules from planner
-      planner.clear();
+      try {
+        return planner.findBestExp();
+      } catch (Exception ex) {
+        LOG.warn("Error while performing materialized view based query rewrite", ex);
+        return basePlan;
+      } finally {
+        // Remove view-based rewriting rules from planner
+        planner.clear();
 
-      // Restore default cost model
-      optCluster.invalidateMetadataQuery();
-      RelMetadataQuery.THREAD_PROVIDERS.set(JaninoRelMetadataProvider.of(mdProvider));
-
-      return basePlan;
+        // Restore default cost model
+        optCluster.invalidateMetadataQuery();
+        RelMetadataQuery.THREAD_PROVIDERS.set(JaninoRelMetadataProvider.of(mdProvider));
+      }
     }
 
     private RelNode applyCteRewriting(RelOptPlanner planner, RelNode basePlan, RelMetadataProvider mdProvider,
