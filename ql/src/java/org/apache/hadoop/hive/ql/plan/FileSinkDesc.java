@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
@@ -394,8 +393,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
     if (getTable() != null) {
       return DDLUtils.isIcebergTable(table);
     } else {
-      return MetaStoreUtils.isIcebergTable(
-          Maps.fromProperties(getTableInfo().getProperties()));
+      return MetaStoreUtils.isIcebergTable(getTableInfo().getProperties());
     }
   }
 

@@ -58,7 +58,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
@@ -491,7 +490,8 @@ public class AcidUtils {
    * @return true, if the tblProperties contains {@link AcidUtils#COMPACTOR_TABLE_PROPERTY}
    */
   public static boolean isCompactionTable(Properties tblProperties) {
-    return tblProperties != null && isCompactionTable(Maps.fromProperties(tblProperties));
+    return tblProperties != null &&
+        StringUtils.isNotBlank((String) tblProperties.get(COMPACTOR_TABLE_PROPERTY));
   }
 
   /**
@@ -1932,7 +1932,11 @@ public class AcidUtils {
   }
 
   public static boolean isTablePropertyTransactional(Properties props) {
-    return isTablePropertyTransactional(Maps.fromProperties(props));
+    String resultStr = (String) props.get(hive_metastoreConstants.TABLE_IS_TRANSACTIONAL);
+    if (resultStr == null) {
+      resultStr = (String) props.get(hive_metastoreConstants.TABLE_IS_TRANSACTIONAL.toUpperCase());
+    }
+    return Boolean.parseBoolean(resultStr);
   }
 
   public static boolean isTablePropertyTransactional(Map<String, String> parameters) {
@@ -2198,7 +2202,8 @@ public class AcidUtils {
   }
 
   public static boolean isInsertOnlyTable(Properties params) {
-    return isInsertOnlyTable(Maps.fromProperties(params));
+    String transactionalProp = (String) params.get(hive_metastoreConstants.TABLE_TRANSACTIONAL_PROPERTIES);
+    return INSERTONLY_TRANSACTIONAL_PROPERTY.equalsIgnoreCase(transactionalProp);
   }
 
    /**

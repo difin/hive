@@ -682,6 +682,10 @@ public class MetaStoreUtils {
     return isExternal(params);
   }
 
+  public static boolean isIcebergTable(Properties params) {
+    return HiveMetaHook.ICEBERG.equalsIgnoreCase((String) params.get(HiveMetaHook.TABLE_TYPE));
+  }
+
   public static boolean isIcebergTable(Map<String, String> params) {
     return HiveMetaHook.ICEBERG.equalsIgnoreCase(params.get(HiveMetaHook.TABLE_TYPE));
   }
