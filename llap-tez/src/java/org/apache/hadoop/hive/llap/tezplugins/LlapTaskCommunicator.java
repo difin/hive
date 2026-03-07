@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -145,7 +146,6 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
   public LlapTaskCommunicator(
       TaskCommunicatorContext taskCommunicatorContext) {
     super(taskCommunicatorContext);
-    Credentials credentials = taskCommunicatorContext.getAMCredentials();
 
     // Not closing this at the moment at shutdown, since this could be a shared instance.
     serviceRegistry = LlapRegistryService.getClient(conf);
@@ -153,7 +153,9 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
     umbilical = new LlapTaskUmbilicalProtocolImpl(getUmbilical());
 
     // TODO Avoid reading this from the environment
-    user = System.getenv(ApplicationConstants.Environment.USER.name());
+    user = Optional.ofNullable(
+            System.getenv(ApplicationConstants.Environment.USER.name()))
+        .orElseGet(() -> System.getProperty("user.name"));
 
     credentialMap = new ConcurrentHashMap<>();
     sourceStateTracker = new SourceStateTracker(getContext(), this);
@@ -317,7 +319,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
    * @return if it was possible to attemp the registration. Sometimes it's
    * not possible because is a dag is not running
    */
-  public boolean registerDag(NodeInfo node, final OperationCallback<QueryIdentifierProto, Void> callback) {
+  boolean registerDag(NodeInfo node, final OperationCallback<QueryIdentifierProto, Void> callback) {
     RegisterDagRequestProto.Builder builder = RegisterDagRequestProto.newBuilder();
     if (currentQueryIdentifierProto == null) {
       return false;
@@ -330,7 +332,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
               getCredentials(getContext()
                   .getCurrentDagInfo().getCredentials())).build();
       communicator.registerDag(request, node.getHost(), node.getRpcPort(),
-          new LlapProtocolClientProxy.ExecuteRequestCallback<RegisterDagResponseProto>() {
+          new LlapProtocolClientProxy.ExecuteRequestCallback<>() {
             @Override
             public void setResponse(RegisterDagResponseProto response) {
               callback.setDone(null, currentQueryIdentifierProto);
@@ -352,7 +354,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
     return true;
   }
 
-  public <T> void startUpdateGuaranteed(TezTaskAttemptID attemptId, NodeInfo assignedNode,
+  <T> void startUpdateGuaranteed(TezTaskAttemptID attemptId, NodeInfo assignedNode,
       boolean newState, final OperationCallback<Boolean, T> callback, final T ctx) {
     LlapNodeId nodeId = entityTracker.getNodeIdForTaskAttempt(attemptId);
     if (nodeId == null) {
@@ -371,7 +373,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
             attemptId.getDAGID().getId())).build();
 
     communicator.sendUpdateFragment(request, nodeId.getHostname(), nodeId.getPort(),
-        new LlapProtocolClientProxy.ExecuteRequestCallback<UpdateFragmentResponseProto>() {
+        new LlapProtocolClientProxy.ExecuteRequestCallback<>() {
           @Override
           public void setResponse(UpdateFragmentResponseProto response) {
             callback.setDone(ctx, response.getResult());
@@ -379,7 +381,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
 
           @Override
           public void indicateError(Throwable t) {
-            LOG.warn("Failed to send update fragment request for {}", attemptId.toString());
+            LOG.warn("Failed to send update fragment request for {}", attemptId);
             processSendError(t);
             callback.setError(ctx, t);
           }
@@ -432,16 +434,12 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
       fragmentRuntimeInfo = sourceStateTracker.getFragmentRuntimeInfo(
           taskSpec.getVertexName(),
           taskSpec.getTaskAttemptID().getTaskID().getId(), priority);
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       LOG.error(
           "Error while trying to get runtimeFragmentInfo for fragmentId={}, containerId={}, currentQI={}, currentQueryId={}",
           taskSpec.getTaskAttemptID(), containerId, currentQueryIdentifierProto,
           currentHiveQueryId, e);
-      if (e instanceof RuntimeException) {
-        throw (RuntimeException) e;
-      } else {
-        throw new RuntimeException(e);
-      }
+      throw e;
     }
     SubmitWorkRequestProto requestProto;
 
@@ -455,7 +453,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
     // sending out status/DONE/KILLED/FAILED messages before TAImpl knows how to handle them.
     getContext().taskStartedRemotely(taskSpec.getTaskAttemptID(), containerId);
     communicator.sendSubmitWork(requestProto, host, port,
-        new LlapProtocolClientProxy.ExecuteRequestCallback<SubmitWorkResponseProto>() {
+        new LlapProtocolClientProxy.ExecuteRequestCallback<>() {
           @Override
           public void setResponse(SubmitWorkResponseProto response) {
             if (response.hasSubmissionState()) {
@@ -483,9 +481,8 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
 
           @Override
           public void indicateError(Throwable t) {
-             Throwable originalError = t;
-            if (t instanceof ServiceException) {
-              ServiceException se = (ServiceException) t;
+            Throwable originalError = t;
+            if (t instanceof ServiceException se) {
               t = se.getCause();
             }
 
@@ -563,7 +560,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
                   taskAttemptId.getDAGID().getId()))
               .setFragmentIdentifierString(taskAttemptId.toString()).build();
       communicator.sendTerminateFragment(request, nodeId.getHostname(), nodeId.getPort(),
-          new LlapProtocolClientProxy.ExecuteRequestCallback<TerminateFragmentResponseProto>() {
+          new LlapProtocolClientProxy.ExecuteRequestCallback<>() {
             @Override
             public void setResponse(TerminateFragmentResponseProto response) {
             }
@@ -571,14 +568,14 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
             @Override
             public void indicateError(Throwable t) {
               LOG.warn("Failed to send terminate fragment request for {}",
-                  taskAttemptId.toString());
+                  taskAttemptId);
               processSendError(t);
             }
           });
     } else {
       LOG.info(
           "Not sending terminate request for fragment {} since it's node is not known. Already unregistered",
-          taskAttemptId.toString());
+          taskAttemptId);
     }
   }
 
@@ -593,7 +590,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
     for (final LlapNodeId llapNodeId : nodesForQuery) {
       LOG.info("Sending dagComplete message for {}, to {}", dagIdentifier, llapNodeId);
       communicator.sendQueryComplete(request, llapNodeId.getHostname(), llapNodeId.getPort(),
-          new LlapProtocolClientProxy.ExecuteRequestCallback<LlapDaemonProtocolProtos.QueryCompleteResponseProto>() {
+          new LlapProtocolClientProxy.ExecuteRequestCallback<>() {
             @Override
             public void setResponse(LlapDaemonProtocolProtos.QueryCompleteResponseProto response) {
             }
@@ -623,7 +620,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
   public void sendStateUpdate(final LlapNodeId nodeId,
                               final SourceStateUpdatedRequestProto request) {
     communicator.sendSourceStateUpdate(request, nodeId,
-        new LlapProtocolClientProxy.ExecuteRequestCallback<SourceStateUpdatedResponseProto>() {
+        new LlapProtocolClientProxy.ExecuteRequestCallback<>() {
           @Override
           public void setResponse(SourceStateUpdatedResponseProto response) {
           }
@@ -750,7 +747,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
         LOG.warn("Received ping from unknownNode: [{}], count={}", nodeId, ni.pingCount.get());
       } else {
         // Pinged before. Log only occasionally.
-        if (currentTs > old.logTimestamp.get() + 5000l) { // 5 seconds elapsed. Log again.
+        if (currentTs > old.logTimestamp.get() + 5000L) { // 5 seconds elapsed. Log again.
           LOG.warn("Received ping from unknownNode: [{}], count={}", nodeId, old.pingCount.get());
           old.logTimestamp.set(currentTs);
         }
@@ -805,7 +802,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
       }
     } else {
       long currentTs = TimeUnit.MILLISECONDS.convert(System.nanoTime(), TimeUnit.NANOSECONDS);
-      if (currentTs > nodeNotFoundLogTime.get() + 5000l) {
+      if (currentTs > nodeNotFoundLogTime.get() + 5000L) {
         LOG.warn("Received ping from node without any registered tasks or containers: " + hostname +
             ":" + port +
             ". Could be caused by pre-emption by the AM," +
@@ -839,7 +836,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
     //TODO: Remove following instance of check, When TEZ-2672 exposes getConf from DagInfo
     DagInfo dagInfo = getContext().getCurrentDagInfo();
     if (dagInfo instanceof DAG) {
-      return ((DAG)dagInfo).getConf().get(ConfVars.HIVEQUERYID.varname);
+      return dagInfo.getConf().get(ConfVars.HIVEQUERYID.varname);
     }
     return null;
   }
@@ -902,7 +899,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
 
     @Override
     public void nodeHeartbeat(Text hostname, Text uniqueId, int port,
-        TezAttemptArray aw, BooleanArray guaranteed) throws IOException {
+        TezAttemptArray aw, BooleanArray guaranteed) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Received heartbeat from [" + hostname + ":" + port +" (" + uniqueId +")]");
       }
@@ -910,7 +907,7 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
     }
 
     @Override
-    public void taskKilled(TezTaskAttemptID taskAttemptId) throws IOException {
+    public void taskKilled(TezTaskAttemptID taskAttemptId) {
       // TODO Unregister the task for state updates, which could in turn unregister the node.
       getContext().taskKilled(taskAttemptId,
           TaskAttemptEndReason.EXTERNAL_PREEMPTION, "Attempt preempted");
@@ -957,11 +954,9 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
       registerContainer(containerId, host, port);
 
       // nodeMap registration.
-      BiMap<ContainerId, TezTaskAttemptID> tmpMap = HashBiMap.create();
-      BiMap<ContainerId, TezTaskAttemptID> old = nodeMap.putIfAbsent(llapNodeId, tmpMap);
-      BiMap<ContainerId, TezTaskAttemptID> usedInstance;
-      usedInstance = old == null ? tmpMap : old;
-      synchronized(usedInstance) {
+      BiMap<ContainerId, TezTaskAttemptID> usedInstance =
+          nodeMap.computeIfAbsent(llapNodeId, k -> HashBiMap.create());
+      synchronized (usedInstance) {
         usedInstance.put(containerId, taskAttemptId);
       }
       // Make sure to put the instance back again, in case it was removed as part of a
@@ -1031,22 +1026,6 @@ public class LlapTaskCommunicator extends TezTaskCommunicatorImpl {
 
     LlapNodeId getNodeIdForTaskAttempt(TezTaskAttemptID taskAttemptId) {
       return attemptToNodeMap.get(taskAttemptId);
-    }
-
-    ContainerId getContainerIdForAttempt(TezTaskAttemptID taskAttemptId) {
-      LlapNodeId llapNodeId = getNodeIdForTaskAttempt(taskAttemptId);
-      if (llapNodeId != null) {
-        BiMap<TezTaskAttemptID, ContainerId> bMap = nodeMap.get(llapNodeId).inverse();
-        if (bMap != null) {
-          synchronized (bMap) {
-            return bMap.get(taskAttemptId);
-          }
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
     }
 
     TezTaskAttemptID getTaskAttemptIdForContainer(ContainerId containerId) {
