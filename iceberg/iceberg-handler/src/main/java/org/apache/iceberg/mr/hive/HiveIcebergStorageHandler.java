@@ -118,6 +118,7 @@ import org.apache.hadoop.hive.ql.security.authorization.HiveCustomStorageHandler
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.session.SessionStateUtil;
 import org.apache.hadoop.hive.ql.stats.Partish;
+import org.apache.hadoop.hive.ql.util.NullOrdering;
 import org.apache.hadoop.hive.serde2.AbstractSerDe;
 import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hadoop.hive.serde2.SerDeException;
@@ -942,7 +943,12 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
           if (sortField.sourceId() == field.fieldId()) {
             customSortPositions.add(pos);
             customSortOrder.add(sortField.direction() == SortDirection.ASC ? 1 : 0);
-            customSortNullOrder.add(sortField.nullOrder() == NullOrder.NULLS_FIRST ? 0 : 1);
+
+            NullOrdering nullOrdering = NullOrdering.NULLS_LAST;
+            if (sortField.nullOrder() == NullOrder.NULLS_FIRST) {
+              nullOrdering = NullOrdering.NULLS_FIRST;
+            }
+            customSortNullOrder.add(nullOrdering.getCode());
             break;
           }
           pos++;
