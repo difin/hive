@@ -752,6 +752,7 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
       replLogger.startLog();
       Map<String, Long> metricMap = new HashMap<>();
       metricMap.put(ReplUtils.MetricName.EVENTS.name(), estimatedNumEvents);
+      metricMap.put(ReplUtils.MetricName.TABLES.name(), 0L);
 
       if (conf.getBoolVar(HiveConf.ConfVars.HIVE_REPL_FAILOVER_START)) {
         work.getMetricCollector().reportFailoverStart(getName(), metricMap, work.getFailoverMetadata());
@@ -1086,6 +1087,9 @@ public class ReplDumpTask extends Task<ReplDumpWork> implements Serializable {
     eventHandler.handle(context);
     if (context.isDmdCreated()) {
       work.getMetricCollector().reportStageProgress(getName(), ReplUtils.MetricName.EVENTS.name(), 1);
+      if (eventHandler.dumpType() == DumpType.EVENT_CREATE_TABLE) {
+        work.getMetricCollector().reportStageProgress(getName(), ReplUtils.MetricName.TABLES.name(), 1);
+      }
     }
     work.getReplLogger().eventLog(String.valueOf(ev.getEventId()), eventHandler.dumpType().toString());
   }
