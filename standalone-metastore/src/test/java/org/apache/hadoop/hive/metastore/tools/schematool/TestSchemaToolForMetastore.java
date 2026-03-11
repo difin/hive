@@ -21,11 +21,15 @@ package org.apache.hadoop.hive.metastore.tools.schematool;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -34,6 +38,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import org.apache.commons.dbcp2.DelegatingConnection;
@@ -89,7 +94,7 @@ public class TestSchemaToolForMetastore {
     dbs.add(new Object[] { new Mssql() });
     return dbs;
   }
-  
+
   @Before
   public void setUp() throws Exception {
     dbms.before();
@@ -677,4 +682,94 @@ public class TestSchemaToolForMetastore {
     }
     return sb.toString();
   }
+
+  @Test
+  public void testCdhSchemaUpgradeOrderFilesConsistency() throws IOException {
+    // List out all database types, find the locations of upgrade order files
+    String dbType = dbms.getDbType();
+
+    String basedir = System.getProperty("basedir");
+    Path rootPath;
+    if (basedir != null) {
+      rootPath = Paths.get(basedir, "src/main/sql");
+    }
+    else {
+      rootPath = Paths.get("standalone-metastore/src/main/sql");
+    }
+    Assert.assertTrue("SQL root path does not exist: " + rootPath, Files.exists(rootPath));
+
+    // For example, standalone-metastore/src/main/sql/derby/cdh.upgrade.order.derby
+    Path filePath = Paths.get(rootPath.toString(), dbType, "cdh.upgrade.order." + dbType);
+    List<String> upgradeLines = Files.readAllLines(filePath);
+
+    // Test: check if all the specific schema files in all lines exist under this file directory
+    // Ensure the entries in the cdh.upgrade.order file are backed by the existence of the physical upgrade scripts.
+    for (String scriptName : upgradeLines) {
+      Path scriptPath = Paths.get(rootPath.toString(), dbType, "upgrade-" + scriptName + "." + dbType + ".sql");
+      Assert.assertTrue("Schema mismatch error found. \n" +
+                      "Missing upgrade script for dbType " + dbType + " at path: " + scriptPath,
+              Files.exists(scriptPath));
+    }
+
+    // Ensure that the SCHEMA_VERSION set in hive-schema-3.1.3000.xxx.sql is the same for all database types
+    String latestUpdateScript = upgradeLines.get(upgradeLines.size()-1).trim().split("-to-")[1];
+    Path schemaPath = Paths.get(rootPath.toString(), dbType, "hive-schema-3.1.3000." + dbType + ".sql");
+    if (!Files.exists(schemaPath)) {
+      System.err.println("Missing file: " + schemaPath);
+      throw new FileNotFoundException("Missing schema file: " + schemaPath);
+    }
+    List<String> schemaLines = Files.readAllLines(schemaPath);
+    AtomicInteger totalCount = new AtomicInteger(0);
+    schemaLines.forEach(line -> {
+      String lowerLine = line.toLowerCase();
+      if (lowerLine.contains("insert into") && lowerLine.contains("cdh_version")) {
+        totalCount.addAndGet(countOccurrences(line, latestUpdateScript));
+      }
+    });
+    Assert.assertTrue("Expected latest version string should appear at least once in the file: " + schemaPath +
+            " Actual appearance count: " + totalCount.get(), totalCount.get() >= 1);
+
+    // Test: compare if all the upgrade scripts are the same for all database types
+    // This comparison only needs to run once, using derby as the trigger
+    if (!"derby".equalsIgnoreCase(dbType)) {
+      return;
+    }
+
+    String[] allDbTypes = {"derby", "mssql", "mysql", "oracle", "postgres"};
+    Map<String, List<String>> fileContents = new HashMap<>();
+    for (String db : allDbTypes) {
+      Path orderFilePath = Paths.get(rootPath.toString(), db, "cdh.upgrade.order." + db);
+      fileContents.put(db, Files.readAllLines(orderFilePath));
+    }
+
+    // Step 1: Check if all database types have the same number of lines
+    int expectedLineCount = fileContents.get("derby").size();
+    for (Map.Entry<String, List<String>> entry : fileContents.entrySet()) {
+      Assert.assertEquals("The total lines counts are different in cdh upgrade order file between DBType derby and DBType="
+                      + entry.getKey(), expectedLineCount, entry.getValue().size());
+    }
+    // Step 2: Compare line by line across all DB types using derby as reference
+    for (int i = 0; i < expectedLineCount; i++) {
+      String lineInDerbyUpgradeScript = fileContents.get("derby").get(i).trim();
+      for (String db : allDbTypes) {
+        String currentLine = fileContents.get(db).get(i).trim();
+        Assert.assertEquals("Schema mismatch found in cdh upgrade order file. \n" +
+                        "Content mismatch in dbType derby order file at line " + (i + 1) + " and dbType " + db,
+                lineInDerbyUpgradeScript, currentLine);
+      }
+    }
+  }
+      private static int countOccurrences(String text, String keyword) {
+        if (text == null || keyword == null || keyword.isEmpty()) {
+          return 0;
+        }
+        int count = 0;
+        int index = 0;
+        while ((index = text.indexOf(keyword, index)) != -1) {
+          count++;
+          index += keyword.length();
+        }
+        return count;
+      }
+
 }
