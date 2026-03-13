@@ -124,7 +124,6 @@ public class TestReExecuteKilledTezAMQueryPlugin {
     return conn;
   }
 
-  @Ignore("CDPD-16276 Ignore TestReExecuteKilledTezAMQueryPlugin.testKillQueryById as they are flaky")
   @Test
   public void testKillQueryById() throws Exception {
     String user = System.getProperty("user.name");
