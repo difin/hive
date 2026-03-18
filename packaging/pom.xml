@@ -226,11 +226,11 @@
           <artifactId>hive-impala</artifactId>
           <version>${project.version}</version>
         </dependency>
-        <dependency>
-          <groupId>org.apache.hive</groupId>
-          <artifactId>hive-hms-catalog</artifactId>
-          <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--          <groupId>org.apache.hive</groupId>-->
+<!--          <artifactId>hive-hms-catalog</artifactId>-->
+<!--          <version>${project.version}</version>-->
+<!--        </dependency>-->
       </dependencies>
     </profile>
     <profile>
