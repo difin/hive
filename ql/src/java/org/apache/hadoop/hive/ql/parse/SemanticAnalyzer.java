@@ -12216,14 +12216,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     }
   }
 
-  private List<VirtualColumn> getTableVirtualColumns(Table tab) {
-    if (tab.isNonNative()) {
-      return new ArrayList<>(
-          AcidUtils.isNonNativeAcidTable(tab) ? tab.getStorageHandler().acidVirtualColumns() : emptyList());
-    }
-    return VirtualColumn.getRegistry(conf);
-  }
-
   protected RowResolver getRowResolver(String alias, QB qb, Table tab) {
     // Determine row schema for TSOP.
     // Include column names from SerDe, the partition and virtual columns.
@@ -12269,7 +12261,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
   }
 
   protected TableScanDesc createTableScanDesc(String alias, Table tab) {
-    return new TableScanDesc(alias, getTableVirtualColumns(tab), tab);
+    return new TableScanDesc(alias, tab.getVirtualColumns(conf), tab);
   }
 
 
