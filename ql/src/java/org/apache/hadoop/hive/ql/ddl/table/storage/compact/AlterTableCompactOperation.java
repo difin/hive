@@ -174,7 +174,7 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
     String poolName;
     try {
       poolName = ObjectUtils.defaultIfNull(desc.getPoolName(),
-          CompactorUtil.getPoolName(context.getConf(), table.getTTable(), metadataCache));
+          CompactorUtil.getPoolName(context.getConf(), context.getDb(), table.getTTable(), metadataCache));
     } catch (Exception e) {
       throw new HiveException(e);
     }

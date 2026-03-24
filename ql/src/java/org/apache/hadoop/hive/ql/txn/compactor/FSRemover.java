@@ -101,7 +101,7 @@ public class FSRemover {
     boolean needCmRecycle;
     try {
       Database db = metadataCache.computeIfAbsent(cr.getDbName(),
-              () -> CompactorUtil.resolveDatabase(conf, cr.getDbName()));
+              () -> CompactorUtil.resolveDatabase(conf, null, cr.getDbName()));
       needCmRecycle = ReplChangeManager.isSourceOfReplication(db);
     } catch (NoSuchObjectException ex) {
       // can not drop a database which is a source of replication

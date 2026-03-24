@@ -55,6 +55,7 @@ import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.ql.io.AcidDirectory;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.io.AcidUtils.ParsedDirectory;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.shims.HadoopShims.HdfsFileStatusWithId;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hive.common.util.Ref;
@@ -175,7 +176,7 @@ public class Initiator extends MetaStoreCompactorThread {
               }
 
               Table t = metadataCache.computeIfAbsent(ci.getFullTableName(), () -> resolveTable(ci));
-              String poolName = CompactorUtil.getPoolName(conf, t, metadataCache);
+              String poolName = CompactorUtil.getPoolName(conf, null, t, metadataCache);
               Partition p = resolvePartition(ci);
               if (p == null && ci.partName != null) {
                 LOG.info("Can't find partition " + ci.getFullPartitionName() +
@@ -274,8 +275,8 @@ public class Initiator extends MetaStoreCompactorThread {
     }
   }
 
-  private Database resolveDatabase(CompactionInfo ci) throws MetaException, NoSuchObjectException {
-    return CompactorUtil.resolveDatabase(conf, ci.dbname);
+  private Database resolveDatabase(CompactionInfo ci) throws NoSuchObjectException, MetaException, HiveException {
+    return CompactorUtil.resolveDatabase(conf,null, ci.dbname);
   }
 
   private ValidWriteIdList resolveValidWriteIds(Table t) throws NoSuchTxnException, MetaException {

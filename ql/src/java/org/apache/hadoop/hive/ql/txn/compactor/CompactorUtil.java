@@ -44,6 +44,8 @@ import org.apache.hadoop.hive.metastore.utils.StringableMap;
 import org.apache.hadoop.hive.ql.io.AcidDirectory;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.apache.hadoop.hive.ql.io.AcidUtils.ParsedDelta;
+import org.apache.hadoop.hive.ql.metadata.Hive;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,9 +158,13 @@ public class CompactorUtil {
     }
   }
 
-  public static Database resolveDatabase(HiveConf conf, String dbName) throws MetaException, NoSuchObjectException {
+  public static Database resolveDatabase(HiveConf conf, Hive hive, String dbName) throws MetaException, NoSuchObjectException, HiveException {
     try {
-      return getMSForConf(conf).getDatabase(MetaStoreUtils.getDefaultCatalog(conf), dbName);
+      if (hive == null) {
+        return getMSForConf(conf).getDatabase(MetaStoreUtils.getDefaultCatalog(conf), dbName);
+      } else {
+        return hive.getDatabase(MetaStoreUtils.getDefaultCatalog(conf), dbName);
+      }
     } catch (NoSuchObjectException e) {
       LOG.error("Unable to find database {}, {}", dbName, e.getMessage());
       throw e;
@@ -317,12 +323,12 @@ public class CompactorUtil {
     return poolConf;
   }
 
-  public static String getPoolName(HiveConf conf, Table t, MetadataCache metadataCache) throws Exception {
+  public static String getPoolName(HiveConf conf, Hive hive, Table t, MetadataCache metadataCache) throws Exception {
     Map<String, String> params = ObjectUtils.defaultIfNull(t.getParameters(), Collections.emptyMap());
     String poolName = params.get(Constants.HIVE_COMPACTOR_WORKER_POOL);
     if (StringUtils.isBlank(poolName)) {
       params = ObjectUtils.defaultIfNull(metadataCache.computeIfAbsent(t.getDbName(),
-          () -> resolveDatabase(conf, t.getDbName())).getParameters(), Collections.emptyMap());
+          () -> resolveDatabase(conf, hive, t.getDbName())).getParameters(), Collections.emptyMap());
       poolName = params.get(Constants.HIVE_COMPACTOR_WORKER_POOL);
     }
     return poolName;
