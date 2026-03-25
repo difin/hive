@@ -281,42 +281,6 @@ public class CliConfigs {
     }
   }
 
-  public static class ImpalaCliConfig extends AbstractCliConfig {
-    public ImpalaCliConfig() {
-      super(CoreImpalaCliDriver.class);
-      try {
-        setQueryDir("ql/src/test/queries/clientpositive/impala");
-
-        setResultsDir("ql/src/test/results/clientpositive/impala");
-        setLogDir("itests/qtest/target/qfile-results/clientpositive/impala");
-
-        setHiveConfDir("data/conf/impala");
-        setClusterType(MiniClusterType.MR);
-        setFsType(QTestMiniClusters.FsType.HDFS);
-      } catch (Exception e) {
-        throw new RuntimeException("can't construct cliconfig", e);
-      }
-    }
-  }
-
-  public static class ImpalaNegativeCliConfig extends AbstractCliConfig {
-    public ImpalaNegativeCliConfig() {
-      super(CoreImpalaNegativeCliDriver.class);
-      try {
-        setQueryDir("ql/src/test/queries/clientnegative/impala");
-
-        setResultsDir("ql/src/test/results/clientnegative/impala");
-        setLogDir("itests/qtest/target/qfile-results/clientnegative/impala");
-
-        setHiveConfDir("data/conf/impala");
-        setClusterType(MiniClusterType.MR);
-        setFsType(QTestMiniClusters.FsType.HDFS);
-      } catch (Exception e) {
-        throw new RuntimeException("can't construct cliconfig", e);
-      }
-    }
-  }
-
   public static class TezTPCDS30TBCliConfig extends AbstractCliConfig {
     public TezTPCDS30TBCliConfig() {
       super(CorePerfCliDriver.class);

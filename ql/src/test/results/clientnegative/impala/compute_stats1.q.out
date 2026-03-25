@@ -1,2 +1,0 @@
-HMS CALL get_table_req FOR impala_tpch_lineitem
-FAILED: SemanticException ANALYZE TABLE NOSCAN is not supported for Impala

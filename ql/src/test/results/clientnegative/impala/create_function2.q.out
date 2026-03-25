@@ -1,7 +1,0 @@
-FAILED: ImpalaParseException Syntax error in line 4:
-illegal syntax here
-        ^
-Encountered: IDENTIFIER
-Expected: FROM, LOCATION, TO
-
-
