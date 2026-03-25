@@ -678,8 +678,6 @@ public class Driver implements IDriver {
 
       if (!alreadyCompiled) {
         compileInternal(command, true);
-      } else {
-        driverContext.getPlan().setQueryStartTime(driverContext.getQueryDisplay().getQueryStartTime());
       }
 
       DriverUtils.checkInterrupted(driverState, driverContext, "at acquiring the lock.", null, null);
@@ -687,9 +685,8 @@ public class Driver implements IDriver {
       lockAndRespond();
       validateCurrentSnapshot();
 
-      // Reset the PerfLogger so that it doesn't retain any previous values.
-      // Any value from compilation phase can be obtained through the map set in queryDisplay during compilation.
-      PerfLogger perfLogger = SessionState.getPerfLogger(true);
+      // Re-fetch PerfLogger: compileInternal/validateCurrentSnapshot may have reset it via new Compiler().
+      PerfLogger perfLogger = SessionState.getPerfLogger();
 
       // the reason that we set the txn manager for the cxt here is because each query has its own ctx object.
       // The txn mgr is shared across the same instance of Driver, which can run multiple queries.
@@ -784,14 +781,12 @@ public class Driver implements IDriver {
           driverContext.setRetrial(true);
 
           compileInternal(context.getCmd(), true);
+          driverContext.setRetrial(false);
 
           if (driverContext.getPlan().hasAcidResourcesInQuery()) {
             validTxnManager.recordValidWriteIds();
             setWriteIdForAcidFileSinks();
           }
-          // Since we're reusing the compiled plan, we need to update its start time for current run
-          driverContext.getPlan().setQueryStartTime(driverContext.getQueryDisplay().getQueryStartTime());
-          driverContext.setRetrial(false);
         }
         // Re-check snapshot only in case we had to release locks and open a new transaction,
         // otherwise exclusive locks should protect output tables/partitions in snapshot from concurrent writes.
