@@ -108,8 +108,6 @@ public final class SemanticAnalyzerFactory {
 
       case HiveParser.TOK_ANALYZE:
         return new ColumnStatsSemanticAnalyzer(queryState);
-      case HiveParser.TOK_DROP_STATS:
-        return new DropStatsSemanticAnalyzer(queryState);
 
       case HiveParser.TOK_UPDATE_TABLE:
         return new UpdateSemanticAnalyzer(queryState, new UpdateRewriterFactory(queryState.getConf()));
