@@ -440,7 +440,7 @@ public class ExplainTask extends Task<ExplainWork> implements Serializable {
   public void addCreateTableStatement(Table table, List<String> tableCreateStmt , DDLPlanUtils ddlPlanUtils) {
     tableCreateStmt.add(ddlPlanUtils.getCreateTableCommand(table, false) + ";");
   }
-  
+
   public void addPKandBasicStats(Table tbl, List<String> basicDef, DDLPlanUtils ddlPlanUtils){
     String primaryKeyStmt = ddlPlanUtils.getAlterTableStmtPrimaryKeyConstraint(tbl.getPrimaryKeyInfo());
     if (primaryKeyStmt != null) {
@@ -772,7 +772,7 @@ public class ExplainTask extends Task<ExplainWork> implements Serializable {
   /**
    * Retruns a map which have either primitive or string keys.
    *
-   * This is neccessary to discard object level comparators which may sort the objects based on some non-trivial logic.
+   * This is necessary to discard object level comparators which may sort the objects based on some non-trivial logic.
    *
    * @param mp
    * @return

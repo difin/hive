@@ -88,7 +88,7 @@ public class WmTezSession extends TezSessionPoolSession implements AmPluginNode 
       }
       if (amRegistryFuture != null) {
         // We don't need this for now, so do not support it.
-        future.setException(new RuntimeException("Multiple waits are not suported"));
+        future.setException(new RuntimeException("Multiple waits are not supported"));
         return future;
       }
       amRegistryFuture = future;
