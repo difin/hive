@@ -41,12 +41,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.hive</groupId>
-            <artifactId>hive-standalone-metastore</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hive</groupId>
             <artifactId>hive-it-custom-serde</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -80,6 +74,24 @@
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-iceberg-handler</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>${httpcomponents5.client.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5</artifactId>
+            <version>${httpcomponents5.core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5-h2</artifactId>
+            <version>${httpcomponents5.core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -353,6 +365,45 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-it-iceberg-integration</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <!-- Same as hive-it-iceberg-integration test deps (test scope is not transitive). -->
+        <dependency>
+            <groupId>org.apache.iceberg</groupId>
+            <artifactId>iceberg-core</artifactId>
+            <version>${iceberg.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.iceberg</groupId>
+                    <artifactId>iceberg-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>${jetty.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

@@ -42,6 +42,8 @@ public final class QTestArguments {
 
   private Map<HiveConf.ConfVars,String> customConfigValueMap;
 
+  private boolean skipMetastoreDatabaseRules;
+
   private QTestArguments() {
   }
 
@@ -125,6 +127,14 @@ public final class QTestArguments {
     return this.customConfigValueMap;
   }
 
+  public boolean isSkipMetastoreDatabaseRules() {
+    return skipMetastoreDatabaseRules;
+  }
+
+  private void setSkipMetastoreDatabaseRules(boolean skipMetastoreDatabaseRules) {
+    this.skipMetastoreDatabaseRules = skipMetastoreDatabaseRules;
+  }
+
   /**
    * QTestArgumentsBuilder used for QTestArguments construction.
    */
@@ -141,6 +151,8 @@ public final class QTestArguments {
     private QTestSetup qtestSetup;
 
     private Map<HiveConf.ConfVars, String> customConfigValueMap;
+
+    private boolean skipMetastoreDatabaseRules;
 
     private QTestArgumentsBuilder() {
     }
@@ -199,6 +211,11 @@ public final class QTestArguments {
       return this;
     }
 
+    public QTestArgumentsBuilder withSkipMetastoreDatabaseRules(boolean skipMetastoreDatabaseRules) {
+      this.skipMetastoreDatabaseRules = skipMetastoreDatabaseRules;
+      return this;
+    }
+
     public QTestArguments build() {
       QTestArguments testArguments = new QTestArguments();
       testArguments.setOutDir(outDir);
@@ -216,6 +233,7 @@ public final class QTestArguments {
           qtestSetup != null ? qtestSetup : new QTestSetup());
 
       testArguments.setCustomConfigValueMap(customConfigValueMap != null ? customConfigValueMap : new HashMap<>());
+      testArguments.setSkipMetastoreDatabaseRules(skipMetastoreDatabaseRules);
       return testArguments;
     }
   }

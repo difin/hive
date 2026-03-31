@@ -91,16 +91,22 @@ public abstract class CliAdapter {
         return new Statement() {
           @Override
           public void evaluate() throws Throwable {
-            metaStoreHandler.setSystemProperties(); // for QTestUtil pre-initialization
+            if (!cliConfig.isSkipMetastoreDatabaseRules()) {
+              metaStoreHandler.setSystemProperties(); // for QTestUtil pre-initialization
+            }
             CliAdapter.this.beforeClass(); // instantiating QTestUtil
 
-            LOG.debug("will initialize metastore database in class rule");
-            metaStoreHandler.getRule().before();
-            metaStoreHandler.getRule().install();
-            metaStoreHandler.getRule().upgradeToLatest();
+            if (!cliConfig.isSkipMetastoreDatabaseRules()) {
+              LOG.debug("will initialize metastore database in class rule");
+              metaStoreHandler.getRule().before();
+              metaStoreHandler.getRule().install();
+              metaStoreHandler.getRule().upgradeToLatest();
+            }
 
             if (getQt() != null) {
-              metaStoreHandler.setMetaStoreConfiguration(getQt().getConf());
+              if (!cliConfig.isSkipMetastoreDatabaseRules()) {
+                metaStoreHandler.setMetaStoreConfiguration(getQt().getConf());
+              }
               getQt().postInit();
               getQt().newSession();
               getQt().createSources();
@@ -111,7 +117,7 @@ public abstract class CliAdapter {
               base.evaluate();
             } finally {
               CliAdapter.this.shutdown();
-              if (getQt() != null && firstTestNotYetRun) {
+              if (getQt() != null && firstTestNotYetRun && !cliConfig.isSkipMetastoreDatabaseRules()) {
                 LOG.debug("will destroy metastore database in class rule (if not derby)");
                 metaStoreHandler.afterTest(getQt());
               }
@@ -151,7 +157,7 @@ public abstract class CliAdapter {
               base.evaluate();
             } finally {
               CliAdapter.this.tearDown();
-              if (getQt() != null) {
+              if (getQt() != null && !cliConfig.isSkipMetastoreDatabaseRules()) {
                 LOG.debug("will destroy metastore database in test rule (if not derby)");
                 metaStoreHandler.afterTest(getQt());
               }
