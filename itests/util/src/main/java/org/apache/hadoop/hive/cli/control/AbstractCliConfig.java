@@ -66,6 +66,11 @@ public abstract class AbstractCliConfig {
   private MiniClusterType clusterType;
   private FsType fsType;
   private String metastoreType;
+  /**
+   * When true, qtests skip Derby/schematool metastore DB setup and txn-table cleanup. Use for
+   * drivers where metadata goes only through a non-HMS client (e.g. Iceberg REST catalog).
+   */
+  private boolean skipMetastoreDatabaseRules;
 
   // FIXME: null value is treated differently on the other end..when those filter will be
   // moved...this may change
@@ -416,6 +421,14 @@ public abstract class AbstractCliConfig {
 
   protected void setMetastoreType(String metastoreType) {
     this.metastoreType = metastoreType;
+  }
+
+  public boolean isSkipMetastoreDatabaseRules() {
+    return skipMetastoreDatabaseRules;
+  }
+
+  protected void setSkipMetastoreDatabaseRules(boolean skipMetastoreDatabaseRules) {
+    this.skipMetastoreDatabaseRules = skipMetastoreDatabaseRules;
   }
 
   protected void setCustomConfigValueMap(Map<HiveConf.ConfVars, String> customConfigValueMap) {

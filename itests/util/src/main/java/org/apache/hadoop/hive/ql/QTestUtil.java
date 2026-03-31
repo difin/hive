@@ -148,6 +148,7 @@ public class QTestUtil {
   protected QTestDatasetHandler datasetHandler;
   private final String initScript;
   private final String cleanupScript;
+  private final boolean skipMetastoreDatabaseRules;
   QTestOptionDispatcher dispatcher = new QTestOptionDispatcher();
 
   private boolean isSessionStateStarted = false;
@@ -264,6 +265,7 @@ public class QTestUtil {
 
     this.initScript = scriptsDir + File.separator + testArgs.getInitScript();
     this.cleanupScript = scriptsDir + File.separator + testArgs.getCleanupScript();
+    this.skipMetastoreDatabaseRules = testArgs.isSkipMetastoreDatabaseRules();
 
     savedConf = new HiveConf(conf);
   }
@@ -610,8 +612,10 @@ public class QTestUtil {
     clearUDFsCreatedDuringTests();
     clearKeysCreatedInTests();
     StatsSources.clearGlobalStats();
-    TestTxnDbUtil.cleanDb(conf);
-    TestTxnDbUtil.prepDb(conf);
+    if (!skipMetastoreDatabaseRules) {
+      TestTxnDbUtil.cleanDb(conf);
+      TestTxnDbUtil.prepDb(conf);
+    }
     dispatcher.afterTest(this);
   }
 

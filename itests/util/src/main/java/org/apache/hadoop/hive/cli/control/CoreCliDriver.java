@@ -76,6 +76,7 @@ public class CoreCliDriver extends CliAdapter {
                 .withLlapIo(true)
                 .withFsType(cliConfig.getFsType())
                 .withCustomConfigValueMap(cliConfig.getCustomConfigValueMap())
+                .withSkipMetastoreDatabaseRules(cliConfig.isSkipMetastoreDatabaseRules())
                 .build());
         }
       }.invoke("QtestUtil instance created", LOG, true);
