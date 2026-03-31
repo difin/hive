@@ -37,6 +37,7 @@ import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,9 +82,9 @@ public class TimestampTZUtil {
         optionalEnd().optionalEnd();
     // Zone part
     builder.optionalStart().appendLiteral(" ").optionalEnd();
-    builder.optionalStart().appendZoneText(TextStyle.NARROW).optionalEnd();
-
-    FORMATTER = builder.toFormatter();
+    builder.optionalStart().appendZoneOrOffsetId().optionalEnd();
+    // Hardcode Locale.US to ensure consistent parsing behavior regardless of the system's default locale.
+    FORMATTER = builder.toFormatter(Locale.US);
   }
 
   public static TimestampTZ parse(String s) {
