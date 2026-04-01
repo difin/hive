@@ -446,20 +446,6 @@
                     </assembly>
                   </build>
                 </image>
-                <image>
-                  <alias>feng</alias>
-                  <name>feng</name>
-                  <build>
-                    <contextDir>${project.basedir}/src/docker-feng</contextDir>
-                    <args>
-                      <HIVE_VERSION>${project.version}</HIVE_VERSION>
-                      <IMPALA_VERSION>${impala.version}</IMPALA_VERSION>
-                    </args>
-                    <tags>
-                      <tag>${hive.tag}</tag>
-                    </tags>
-                  </build>
-                </image>
               </images>
             </configuration>
           </plugin>

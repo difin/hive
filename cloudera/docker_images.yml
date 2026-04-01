@@ -4,7 +4,6 @@ docker_images:
     image: hive-arm
     multi_arch: intermediate
   hive: hive
-  feng: feng
 
 registry: docker-private.infra.cloudera.com/cloudera
 docker_image_tag:
