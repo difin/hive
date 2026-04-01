@@ -112,7 +112,7 @@ public class SQLOperation extends ExecuteStatementOperation {
   public SQLOperation(HiveSession parentSession, String statement, Map<String, String> confOverlay,
       boolean runInBackground, long queryTimeout, boolean embedded) {
     // TODO: call setRemoteUser in ExecuteStatementOperation or higher.
-    super(parentSession, statement, confOverlay, runInBackground, embedded);
+    super(parentSession, statement, confOverlay, embedded);
     this.runAsync = runInBackground;
     this.queryTimeout = queryTimeout;
     long timeout = HiveConf.getTimeVar(queryState.getConf(),

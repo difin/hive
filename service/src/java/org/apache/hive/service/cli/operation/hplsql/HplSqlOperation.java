@@ -58,7 +58,7 @@ public class HplSqlOperation extends ExecuteStatementOperation implements Result
   private TableSchema schema;
 
   public HplSqlOperation(HiveSession parentSession, String statement, Map<String, String> confOverlay, boolean runInBackground, Exec exec) {
-    super(parentSession, statement, confOverlay, runInBackground, false);
+    super(parentSession, statement, confOverlay, false);
     this.exec = exec;
     this.runInBackground = runInBackground;
     this.exec.setResultListener(this);
