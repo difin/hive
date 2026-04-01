@@ -108,8 +108,9 @@ public class RetryingMetaStoreClient implements InvocationHandler {
 
   public static IMetaStoreClient getProxy(
       Configuration hiveConf, boolean allowEmbedded) throws MetaException {
+    String mscClassName = MetastoreConf.getVar(hiveConf, ConfVars.METASTORE_CLIENT_IMPL);
     return getProxy(hiveConf, new Class[]{Configuration.class, HiveMetaHookLoader.class, Boolean.class},
-        new Object[]{hiveConf, null, allowEmbedded}, null, HiveMetaStoreClient.class.getName()
+        new Object[]{hiveConf, null, allowEmbedded}, null, mscClassName
     );
   }
 
