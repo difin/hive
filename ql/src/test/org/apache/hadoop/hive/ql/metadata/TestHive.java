@@ -38,6 +38,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.MetaStoreEventListener;
 import org.apache.hadoop.hive.metastore.PartitionDropOptions;
 import org.apache.hadoop.hive.metastore.Warehouse;
@@ -854,6 +856,32 @@ public class TestHive extends TestCase {
     for (int i = 0; i < 3; i++) {
       Path insertedPath = new Path(insertEvent.getFiles().get(i));
       Assert.assertEquals(expectedCheckSums.get(insertedPath.getName()), checkSums.get(i));
+    }
+  }
+
+  public void testLoadingIMetaStoreClient() throws Throwable {
+    String clientClassName = HiveMetaStoreClient.class.getName();
+    HiveConf conf = getNewConf(hiveConf);
+    MetastoreConf.setVar(conf, MetastoreConf.ConfVars.METASTORE_CLIENT_IMPL, clientClassName);
+    Hive.closeCurrent();
+    Hive hive = Hive.get(conf);
+    IMetaStoreClient tmp = hive.getMSC();
+    assertNotNull("getMSC() failed.", tmp);
+  }
+
+  public void testLoadingInvalidIMetaStoreClient() throws Throwable {
+    String clientClassName = String.class.getName();
+    HiveConf conf = getNewConf(hiveConf);
+    MetastoreConf.setVar(conf, MetastoreConf.ConfVars.METASTORE_CLIENT_IMPL, clientClassName);
+    Hive.closeCurrent();
+    Hive hive = Hive.get(conf);
+    try {
+      hive.getMSC();
+      fail("getMSC() was expected to throw.");
+    } catch (MetaException e) {
+      // expected on some paths (e.g. class load / validation)
+    } catch (RuntimeException e) {
+      // expected when RetryingMetaStoreClient fails to construct the client (e.g. no matching ctor)
     }
   }
 

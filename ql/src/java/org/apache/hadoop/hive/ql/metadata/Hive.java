@@ -209,6 +209,8 @@ import org.apache.hadoop.hive.metastore.api.WMValidateResourcePlanResponse;
 import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.metastore.api.WriteNotificationLogRequest;
 import org.apache.hadoop.hive.metastore.api.WriteNotificationLogBatchRequest;
+import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
+import org.apache.hadoop.hive.metastore.utils.JavaUtils;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.hadoop.hive.ql.ErrorMsg;
 import org.apache.hadoop.hive.ql.ddl.table.partition.add.AlterTableAddPartitionDesc;
@@ -5870,11 +5872,25 @@ private void constructOneLBLocationMap(FileStatus fSta,
       }
     };
 
+    String clientClassName = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.METASTORE_CLIENT_IMPL);
+
     if (conf.getBoolVar(ConfVars.METASTORE_FASTPATH)) {
-      return new SessionHiveMetaStoreClient(conf, hookLoader, allowEmbedded);
+      try {
+        Class<? extends IMetaStoreClient> clientClass =
+            JavaUtils.getClass(clientClassName, IMetaStoreClient.class);
+        return JavaUtils.newInstance(clientClass,
+            new Class[]{Configuration.class, HiveMetaHookLoader.class, Boolean.class},
+            new Object[]{conf, hookLoader, allowEmbedded});
+      } catch (MetaException e) {
+        throw e;
+      } catch (RuntimeException e) {
+        Throwable cause = e.getCause() != null ? e.getCause() : e;
+        throw new MetaException("Unable to instantiate metastore client " + clientClassName + ": "
+            + cause.getMessage());
+      }
     } else {
       return RetryingMetaStoreClient.getProxy(conf, hookLoader, metaCallTimeMap,
-          SessionHiveMetaStoreClient.class.getName(), allowEmbedded);
+          clientClassName, allowEmbedded);
     }
   }
 

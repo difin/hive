@@ -155,6 +155,7 @@ public class MetastoreConf {
       ConfVars.USE_THRIFT_SASL,
       ConfVars.METASTORE_CLIENT_AUTH_MODE,
       ConfVars.METASTORE_CLIENT_PLAIN_USERNAME,
+      ConfVars.METASTORE_CLIENT_IMPL,
       ConfVars.TOKEN_SIGNATURE,
       ConfVars.CACHE_PINOBJTYPES,
       ConfVars.CONNECTION_POOLING_TYPE,
@@ -1679,6 +1680,12 @@ public class MetastoreConf {
                 METASTORE_CLIENT_AUTH_MODE + " is true. The password is obtained from " +
                     CredentialProviderFactory.CREDENTIAL_PROVIDER_PATH + " using username as the " +
                     "alias."),
+    METASTORE_CLIENT_IMPL("metastore.client.impl", "hive.metastore.client.impl",
+        "org.apache.hadoop.hive.ql.metadata.SessionHiveMetaStoreClient",
+        "Fully qualified class name of the IMetaStoreClient implementation to use. "
+            + "The class must provide a constructor "
+            + "(org.apache.hadoop.conf.Configuration, "
+            + "org.apache.hadoop.hive.metastore.HiveMetaHookLoader, java.lang.Boolean)."),
     THRIFT_AUTH_CONFIG_USERNAME("metastore.authentication.config.username",
             "hive.metastore.authentication.config.username", "",
             "If " + THRIFT_METASTORE_AUTHENTICATION + " is set to CONFIG, username provided by " +
