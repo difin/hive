@@ -645,8 +645,7 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
 
   @Override
   public boolean canSetColStatistics(org.apache.hadoop.hive.ql.metadata.Table hmsTable) {
-    Table table = IcebergTableUtil.getTable(conf, hmsTable.getTTable());
-    return table.currentSnapshot() != null && getStatsSource().equals(HiveMetaHook.ICEBERG);
+    return HiveMetaHook.ICEBERG.equals(getStatsSource());
   }
 
   @Override
