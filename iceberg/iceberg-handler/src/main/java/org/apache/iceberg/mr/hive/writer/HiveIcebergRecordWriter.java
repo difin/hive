@@ -37,23 +37,22 @@ import org.apache.iceberg.types.Types;
 class HiveIcebergRecordWriter extends HiveIcebergWriterBase {
 
   private final int currentSpecId;
-  private final Set<String> missingColumns;
-  private final List<Types.NestedField> missingOrStructFields;
+  private final List<Types.NestedField> missingFields;
 
   HiveIcebergRecordWriter(Table table, HiveFileWriterFactory fileWriterFactory,
       OutputFileFactory dataFileFactory, Context context) {
     super(table, newDataWriter(table, fileWriterFactory, dataFileFactory, context));
 
     this.currentSpecId = table.spec().specId();
-    this.missingColumns = context.missingColumns();
-    this.missingOrStructFields = specs.get(currentSpecId).schema().asStruct().fields().stream()
-        .filter(field -> missingColumns.contains(field.name()) || field.type().isStructType()).toList();
+    Set<String> missingColumns = context.missingColumns();
+    this.missingFields = specs.get(currentSpecId).schema().asStruct().fields().stream()
+        .filter(field -> missingColumns.contains(field.name())).toList();
   }
 
   @Override
   public void write(Writable row) throws IOException {
     Record record = ((Container<Record>) row).get();
-    HiveSchemaUtil.setDefaultValues(record, missingOrStructFields, missingColumns);
+    HiveSchemaUtil.setDefaultValues(record, missingFields);
 
     writer.write(record, specs.get(currentSpecId), partition(record, currentSpecId));
   }
