@@ -74,6 +74,7 @@ public class GroupByDesc extends AbstractOperatorDesc {
   private float groupByMemoryUsage;
   private float memoryThreshold;
   private float minReductionHashAggr;
+  private float hashAggrFlushPercent;
   transient private boolean isDistinct;
   private boolean dontResetAggrsDistinct;
 
@@ -88,12 +89,13 @@ public class GroupByDesc extends AbstractOperatorDesc {
       final float groupByMemoryUsage,
       final float memoryThreshold,
       final float minReductionHashAggr,
+      final float hashAggrFlushPercent,
       final List<Long> listGroupingSets,
       final boolean groupingSetsPresent,
       final int groupingSetsPosition,
       final boolean isDistinct) {
     this(mode, outputColumnNames, keys, aggregators,
-        false, groupByMemoryUsage, memoryThreshold, minReductionHashAggr, listGroupingSets,
+        false, groupByMemoryUsage, memoryThreshold, minReductionHashAggr, hashAggrFlushPercent, listGroupingSets,
         groupingSetsPresent, groupingSetsPosition, isDistinct);
   }
 
@@ -106,6 +108,7 @@ public class GroupByDesc extends AbstractOperatorDesc {
       final float groupByMemoryUsage,
       final float memoryThreshold,
       final float minReductionHashAggr,
+      final float hashAggrFlushPercent,
       final List<Long> listGroupingSets,
       final boolean groupingSetsPresent,
       final int groupingSetsPosition,
@@ -118,6 +121,7 @@ public class GroupByDesc extends AbstractOperatorDesc {
     this.groupByMemoryUsage = groupByMemoryUsage;
     this.memoryThreshold = memoryThreshold;
     this.minReductionHashAggr = minReductionHashAggr;
+    this.hashAggrFlushPercent = hashAggrFlushPercent;
     this.listGroupingSets = listGroupingSets;
     this.groupingSetsPresent = groupingSetsPresent;
     this.groupingSetPosition = groupingSetsPosition;
@@ -329,6 +333,14 @@ public class GroupByDesc extends AbstractOperatorDesc {
     this.isDistinct = isDistinct;
   }
 
+  public float getHashAggrFlushPercent() {
+    return hashAggrFlushPercent;
+  }
+
+  public void setHashAggrFlushPercent(float hashAggrFlushPercent) {
+    this.hashAggrFlushPercent = hashAggrFlushPercent;
+  }
+
   @Override
   public Object clone() {
     List<String> outputColumnNames = new ArrayList<>();
@@ -340,7 +352,7 @@ public class GroupByDesc extends AbstractOperatorDesc {
     List<Long> listGroupingSets = new ArrayList<>();
     listGroupingSets.addAll(this.listGroupingSets);
     return new GroupByDesc(this.mode, outputColumnNames, keys, aggregators,
-        this.groupByMemoryUsage, this.memoryThreshold, this.minReductionHashAggr,
+        this.groupByMemoryUsage, this.memoryThreshold, this.minReductionHashAggr, this.hashAggrFlushPercent,
         listGroupingSets, this.groupingSetsPresent,
         this.groupingSetPosition, this.isDistinct);
   }
