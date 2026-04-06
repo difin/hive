@@ -117,13 +117,12 @@ final class MmMinorQueryCompactor extends QueryCompactor {
 
   private String getCreateQuery(String newTableName, Table t, StorageDescriptor sd,
       String location, boolean isPartitioned) {
-    return new CompactionQueryBuilder(
-        CompactionType.MINOR,
-        CompactionQueryBuilder.Operation.CREATE,
-        true,
-        newTableName)
-        .setSourceTab(t)
+    return new CompactionQueryBuilderFactory().getCompactionQueryBuilder(
+        CompactionType.MINOR, true)
+        .setOperation(CompactionQueryBuilder.Operation.CREATE)
+        .setResultTableName(newTableName)
         .setStorageDescriptor(sd)
+        .setSourceTab(t)
         .setLocation(location)
         .setPartitioned(isPartitioned)
         .build();
@@ -139,11 +138,10 @@ final class MmMinorQueryCompactor extends QueryCompactor {
    */
   private String buildAlterTableQuery(String tableName, AcidDirectory dir,
       ValidWriteIdList validWriteIdList) {
-    return new CompactionQueryBuilder(
-        CompactionType.MINOR,
-        CompactionQueryBuilder.Operation.ALTER,
-        true,
-        tableName)
+    return new CompactionQueryBuilderFactory().getCompactionQueryBuilder(
+        CompactionType.MINOR, true)
+        .setOperation(CompactionQueryBuilder.Operation.ALTER)
+        .setResultTableName(tableName)
         .setDir(dir)
         .setValidWriteIdList(validWriteIdList)
         .build();
@@ -163,14 +161,13 @@ final class MmMinorQueryCompactor extends QueryCompactor {
   private List<String> getCompactionQueries(String sourceTmpTableName, String resultTmpTableName,
       Table sourceTable) {
     return Lists.newArrayList(
-        new CompactionQueryBuilder(
-            CompactionType.MINOR,
-            CompactionQueryBuilder.Operation.INSERT,
-            true,
-            resultTmpTableName)
-        .setSourceTabForInsert(sourceTmpTableName)
-        .setSourceTab(sourceTable)
-        .build()
+        new CompactionQueryBuilderFactory().getCompactionQueryBuilder(
+            CompactionType.MINOR, true)
+            .setOperation(CompactionQueryBuilder.Operation.INSERT)
+            .setResultTableName(resultTmpTableName)
+            .setSourceTabForInsert(sourceTmpTableName)
+            .setSourceTab(sourceTable)
+            .build()
     );
   }
 
@@ -187,10 +184,10 @@ final class MmMinorQueryCompactor extends QueryCompactor {
   }
 
   private String getDropQuery(String tableToDrop) {
-    return new CompactionQueryBuilder(
-        CompactionType.MINOR,
-        CompactionQueryBuilder.Operation.DROP,
-        true,
-        tableToDrop).build();
+    return new CompactionQueryBuilderFactory().getCompactionQueryBuilder(
+        CompactionType.MINOR, true)
+        .setOperation(CompactionQueryBuilder.Operation.DROP)
+        .setResultTableName(tableToDrop)
+        .build();
   }
 }
