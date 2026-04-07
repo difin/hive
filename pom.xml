@@ -158,7 +158,7 @@
     <mockito-core.version>5.17.0</mockito-core.version>
     <mockito-inline.version>5.2.0</mockito-inline.version>
     <mina.version>2.0.0-M5</mina.version>
-    <netty.version>4.1.128.Final</netty.version>
+    <netty.version>4.1.132.Final</netty.version>
     <netty.hadoop.version>4.0.52.Final</netty.hadoop.version>
     <pac4j-saml.version>4.5.5</pac4j-saml.version>
     <paranamer.version>2.8</paranamer.version>
