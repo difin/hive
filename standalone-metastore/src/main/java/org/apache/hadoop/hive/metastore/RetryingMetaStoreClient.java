@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.classification.RetrySemantics;
+import org.apache.hadoop.hive.metastore.client.HookEnabledMetaStoreClient;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
 import org.apache.hadoop.hive.metastore.utils.JavaUtils;
@@ -95,9 +96,12 @@ public class RetryingMetaStoreClient implements InvocationHandler {
 
     SecurityUtils.reloginExpiringKeytabUser();
 
-    this.base = JavaUtils.newInstance(msClientClass, constructorArgTypes, constructorArgs);
+    // TODO: Revert this change after HIVE-27473 backport (Rewrite MetaStoreClients to be composable)
+    IMetaStoreClient instance =
+        JavaUtils.newInstance(msClientClass, constructorArgTypes, constructorArgs);
+    this.base = HookEnabledMetaStoreClient.wrapAfterMsClientConstruction(instance, constructorArgs);
 
-    LOG.info("RetryingMetaStoreClient proxy=" + msClientClass + " ugi=" + this.ugi
+    LOG.info("RetryingMetaStoreClient proxy=" + this.base.getClass() + " ugi=" + this.ugi
         + " retries=" + this.retryLimit + " delay=" + this.retryDelaySeconds
         + " lifetime=" + this.connectionLifeTimeInMillis);
   }
@@ -151,8 +155,20 @@ public class RetryingMetaStoreClient implements InvocationHandler {
     RetryingMetaStoreClient handler =
         new RetryingMetaStoreClient(hiveConf, constructorArgTypes, constructorArgs,
             metaCallTimeMap, baseClass);
+
+    // Class.getInterfaces() returns only interfaces declared on this class, not those inherited
+    // from a superclass. Implementations such as HiveRESTCatalogClient extend BaseMetaStoreClient
+    // (which implements IMetaStoreClient) without re-declaring "implements IMetaStoreClient", so
+    // getInterfaces() is empty and Proxy.newProxyInstance would receive zero interfaces.
+    // Fall back to IMetaStoreClient so the retrying proxy is still a valid metastore client.
+    //
+    // TODO: Revert this change after HIVE-27473 backport (Rewrite MetaStoreClients to be composable)
+    Class<?>[] interfaces = baseClass.getInterfaces();
+    if (interfaces.length == 0) {
+      interfaces = new Class<?>[] {IMetaStoreClient.class};
+    }
     return (IMetaStoreClient) Proxy.newProxyInstance(
-        RetryingMetaStoreClient.class.getClassLoader(), baseClass.getInterfaces(), handler);
+        RetryingMetaStoreClient.class.getClassLoader(), interfaces, handler);
   }
 
   @Override
