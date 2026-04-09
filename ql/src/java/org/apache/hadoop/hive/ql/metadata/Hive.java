@@ -4142,7 +4142,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
     }
   }
 
-  private void fireInsertEvent(Table tbl, Map<String, String> partitionSpec, boolean replace, List<FileStatus> newFiles)
+  void fireInsertEvent(Table tbl, Map<String, String> partitionSpec, boolean replace, List<FileStatus> newFiles)
       throws HiveException {
     if (conf.getBoolVar(ConfVars.FIRE_EVENTS_FOR_DML)) {
       LOG.debug("Firing dml insert event");
@@ -4155,11 +4155,10 @@ private void constructOneLBLocationMap(FileStatus fSta,
         FireEventRequestData data = new FireEventRequestData();
         InsertEventRequestData insertData = new InsertEventRequestData();
         insertData.setReplace(replace);
+        insertData.setFilesAdded(new ArrayList());
         data.setInsertData(insertData);
         if (newFiles != null && !newFiles.isEmpty()) {
           addInsertFileInformation(newFiles, fileSystem, insertData);
-        } else {
-          insertData.setFilesAdded(new ArrayList<String>());
         }
         FireEventRequest rqst = new FireEventRequest(true, data);
         rqst.setDbName(tbl.getDbName());
