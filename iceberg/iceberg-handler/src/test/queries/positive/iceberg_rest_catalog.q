@@ -3,6 +3,8 @@
 --! qt:replace:/(\s+neededVirtualColumns:\s)(.*)/$1#Masked#/
 -- Mask random uuid
 --! qt:replace:/(\s+'uuid'=')\S+('\s*)/$1#Masked#$2/
+-- Mask random uuid
+--! qt:replace:/(\s+uuid\s+)\S+(\s*)/$1#Masked#$2/
 -- Mask a random snapshot id
 --! qt:replace:/(\s+current-snapshot-id\s+)\S+(\s*)/$1#Masked#/
 -- Mask added file size
@@ -18,8 +20,9 @@
 -- Mask removed file size
 --! qt:replace:/(\S\"removed-files-size\\\":\\\")(\d+)(\\\")/$1#Masked#$3/
 -- Mask iceberg version
---! qt:replace:/(\S\"iceberg-version\\\":\\\")(\w+\s\w+\s\d+\.\d+\.\d+\s\(\w+\s\w+\))(\\\")/$1#Masked#$3/
+--! qt:replace:/(\S\"iceberg-version\\\":\\\")[^\\\"]+(\\\")/$1#Masked#$2/
 
+set hive.stats.autogather=false;
 set metastore.client.impl=org.apache.iceberg.hive.client.HiveRESTCatalogClient;
 set metastore.catalog.default=ice01;
 set iceberg.catalog.ice01.type=rest;
@@ -29,7 +32,10 @@ set iceberg.catalog.ice01.type=rest;
 create database ice_rest;
 use ice_rest;
 
---! Creating table without catalog name in table properties
+-----------------------------------------------------------------------------
+--! Creating a table without a catalog name in table properties
+-----------------------------------------------------------------------------
+
 create table ice_orc1 (
     first_name string, 
     last_name string,
@@ -39,7 +45,10 @@ create table ice_orc1 (
 partitioned by (company_id bigint)
 stored by iceberg stored as orc;
 
---! Creating table with a valid catalog name in table properties
+-----------------------------------------------------------------------------
+--! Creating  table with a valid catalog name in table properties
+-----------------------------------------------------------------------------
+
 create table ice_orc2 (
     first_name string, 
     last_name string,
@@ -52,6 +61,14 @@ TBLPROPERTIES('format-version'='2', 'iceberg.catalog'='ice01');
 
 --! Output should contain: 'type' = 'rest'
 show create table ice_orc2;
+
+insert into ice_orc2 partition (company_id=100) 
+VALUES ('fn1','ln1', 1, 10), ('fn2','ln2', 2, 20), ('fn3','ln3', 3, 30);
+
+describe formatted ice_orc2;
+select * from ice_orc2;
+
+-----------------------------------------------------------------------------
 
 show tables;
 drop table ice_orc1;
