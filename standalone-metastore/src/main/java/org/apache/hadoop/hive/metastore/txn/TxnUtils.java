@@ -94,10 +94,12 @@ public class TxnUtils {
       }};
 
   /**
-   * Returns a valid txn list for cleaner.
-   * @param txns Response containing open txns list.
-   * @param minOpenTxn Minimum open txn which is min open write txn on the table in the case of abort cleanup.
-   * @param isAbortCleanup Whether the request is for abort cleanup.
+   * Returns a valid txn list for the cleaner. The high watermark is set to {@code minOpenTxn - 1}
+   * so the cleaner only sees transactions that committed before the oldest open write txn on the table.
+   *
+   * @param txns response containing the currently open txns list
+   * @param minOpenTxn minimum open write txn id on the table being cleaned
+   * @param isAbortCleanup whether the request is for abort cleanup
    * @return a valid txn list
    */
   public static ValidTxnList createValidTxnListForCleaner(GetOpenTxnsResponse txns, long minOpenTxn, boolean isAbortCleanup) {
@@ -133,6 +135,18 @@ public class TxnUtils {
   }
 
   /**
+   * Returns a valid txn list for the compaction worker. The high watermark is capped at {@code compactionTxnId}
+   * and the compaction transaction itself is kept in the exceptions list as OPEN.
+   *
+   * @param txns open txns response from the metastore
+   * @param compactionTxnId the transaction ID of the compaction
+   * @return a valid txn list
+   */
+  public static ValidTxnList createValidTxnListForCompactor(GetOpenTxnsResponse txns, long compactionTxnId) {
+    return createValidReadTxnList(txns, compactionTxnId, false);
+  }
+
+  /**
    * Transform a {@link org.apache.hadoop.hive.metastore.api.GetOpenTxnsResponse} to a
    * {@link org.apache.hadoop.hive.common.ValidTxnList}.  This assumes that the caller intends to
    * read the files, and thus treats both open and aborted transactions as invalid.
@@ -143,6 +157,11 @@ public class TxnUtils {
    * @return a valid txn list.
    */
   public static ValidTxnList createValidReadTxnList(GetOpenTxnsResponse txns, long currentTxn) {
+    return createValidReadTxnList(txns, currentTxn, true);
+  }
+
+  private static ValidTxnList createValidReadTxnList(GetOpenTxnsResponse txns, long currentTxn,
+      boolean excludeCurrentTxn) {
     /*
      * The highWaterMark should be min(currentTxn,txns.getTxn_high_water_mark()) assuming currentTxn>0
      * otherwise if currentTxn=7 and 8 commits before 7, then 7 will see result of 8 which
@@ -162,7 +181,13 @@ public class TxnUtils {
     // txn is read-only or aborted by AcidHouseKeeperService and compactor actually cleans up the aborted txns.
     // So, for such cases, we get negative value for sizeToHwm with found position for currentTxn, and so,
     // we just negate it to get the size.
-    int sizeToHwm = (currentTxn > 0) ? Math.abs(Collections.binarySearch(openTxns, currentTxn)) : openTxns.size();
+    int sizeToHwm;
+    if (currentTxn > 0) {
+      int pos = Collections.binarySearch(openTxns, currentTxn);
+      sizeToHwm = (pos >= 0 && !excludeCurrentTxn) ? pos + 1 : Math.abs(pos);
+    } else {
+      sizeToHwm = openTxns.size();
+    }
     sizeToHwm = Math.min(sizeToHwm, openTxns.size());
     long[] exceptions = new long[sizeToHwm];
     BitSet inAbortedBits = BitSet.valueOf(txns.getAbortedBits());
@@ -171,8 +196,9 @@ public class TxnUtils {
     int i = 0;
     for (long txn : openTxns) {
       // For snapshot isolation, we don't care about txns greater than current txn and so stop here.
-      // Also, we need not include current txn to exceptions list.
-      if ((currentTxn > 0) && (txn >= currentTxn)) {
+      // When excludeCurrentTxn is true, we also exclude current txn from the exceptions list
+      // (own-txn exclusion for regular reads). When false, we include it (compaction worker).
+      if ((currentTxn > 0) && (excludeCurrentTxn ? txn >= currentTxn : txn > currentTxn)) {
         break;
       }
       if (inAbortedBits.get(i)) {
