@@ -18,7 +18,6 @@
 package org.apache.hadoop.hive.metastore;
 
 import com.codahale.metrics.Counter;
-import com.facebook.fb303.FacebookBase;
 import com.facebook.fb303.fb_status;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -138,7 +137,7 @@ import static org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdenti
 /**
  * Default handler for all Hive Metastore methods. Implements methods defined in hive_metastore.thrift.
  */
-public class HMSHandler extends FacebookBase implements IHMSHandler {
+public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler {
   public static final Logger LOG = LoggerFactory.getLogger(HMSHandler.class);
   private final Configuration conf; // stores datastore (jpox) properties,
   // right now they come from jpox.properties
@@ -4882,75 +4881,6 @@ public class HMSHandler extends FacebookBase implements IHMSHandler {
     }
   }
 
-  private Partition add_partition_core(final RawStore ms,
-      final Partition part, final EnvironmentContext envContext)
-      throws TException {
-    boolean success = false;
-    Table tbl = null;
-    Map<String, String> transactionalListenerResponses = Collections.emptyMap();
-    if (!part.isSetCatName()) {
-      part.setCatName(getDefaultCatalog(conf));
-    }
-    try {
-      ms.openTransaction();
-      tbl = ms.getTable(part.getCatName(), part.getDbName(), part.getTableName(), null);
-      if (tbl == null) {
-        throw new InvalidObjectException(
-            "Unable to add partition because table or database do not exist");
-      }
-
-      firePreEvent(new PreAddPartitionEvent(tbl, part, this));
-
-      if (part.getValues() == null || part.getValues().isEmpty()) {
-        throw new MetaException("The partition values cannot be null or empty.");
-      }
-      boolean shouldAdd = startAddPartition(ms, part, tbl.getPartitionKeys(), false);
-      assert shouldAdd; // start would throw if it already existed here
-      boolean madeDir = createLocationForAddedPartition(tbl, part);
-      try {
-        initializeAddedPartition(tbl, part, madeDir, envContext);
-        initializePartitionParameters(tbl, part);
-        success = ms.addPartition(part);
-      } finally {
-        if (!success && madeDir) {
-          wh.deleteDir(new Path(part.getSd().getLocation()), true, false,
-              ReplChangeManager.shouldEnableCm(ms.getDatabase(part.getCatName(),
-                  part.getDbName()), tbl));
-        }
-      }
-
-      // Setting success to false to make sure that if the listener fails, rollback happens.
-      success = false;
-
-      if (!transactionalListeners.isEmpty()) {
-        transactionalListenerResponses =
-            MetaStoreListenerNotifier.notifyEvent(transactionalListeners,
-                EventType.ADD_PARTITION,
-                new AddPartitionEvent(tbl, Arrays.asList(part), true, this),
-                envContext);
-
-      }
-
-      // we proceed only if we'd actually succeeded anyway, otherwise,
-      // we'd have thrown an exception
-      success = ms.commitTransaction();
-    } finally {
-      if (!success) {
-        ms.rollbackTransaction();
-      }
-
-      if (!listeners.isEmpty()) {
-        MetaStoreListenerNotifier.notifyEvent(listeners,
-            EventType.ADD_PARTITION,
-            new AddPartitionEvent(tbl, Arrays.asList(part), success, this),
-            envContext,
-            transactionalListenerResponses, ms);
-
-      }
-    }
-    return part;
-  }
-
   @Deprecated
   @Override
   public Partition add_partition(final Partition part)
@@ -6853,21 +6783,6 @@ public class HMSHandler extends FacebookBase implements IHMSHandler {
       endFunction("append_partition_by_name", ret != null, ex, tbl_name);
     }
     return ret;
-  }
-
-  private boolean drop_partition_by_name_core(final RawStore ms, final String catName,
-      final String db_name, final String tbl_name, final String part_name,
-      final boolean deleteData, final EnvironmentContext envContext)
-      throws TException, IOException {
-
-    List<String> partVals;
-    try {
-      partVals = getPartValsFromName(ms, catName, db_name, tbl_name, part_name);
-    } catch (InvalidObjectException e) {
-      throw new NoSuchObjectException(e.getMessage());
-    }
-
-    return drop_partition_common(ms, catName, db_name, tbl_name, partVals, deleteData, envContext);
   }
 
   @Deprecated

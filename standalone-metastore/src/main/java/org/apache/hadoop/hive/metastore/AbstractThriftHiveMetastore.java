@@ -24,6 +24,7 @@ import org.apache.hadoop.hive.metastore.api.Package;
 import org.apache.hadoop.hive.metastore.api.ThriftHiveMetastore.Iface;
 import org.apache.thrift.TException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -129,13 +130,31 @@ public class AbstractThriftHiveMetastore implements Iface {
     }
 
     @Override
+    public void create_dataconnector(DataConnector connector)
+            throws AlreadyExistsException, InvalidObjectException, MetaException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public DataConnector get_dataconnector_req(GetDataConnectorRequest request)
             throws NoSuchObjectException, MetaException, TException {
         throw new UnsupportedOperationException("this method is not supported");
     }
 
     @Override
+    public void drop_dataconnector(String name, boolean ifNotExists, boolean checkReferences)
+            throws NoSuchObjectException, InvalidOperationException, MetaException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
     public List<String> get_dataconnectors() throws MetaException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
+    public void alter_dataconnector(String name, DataConnector connector)
+            throws MetaException, NoSuchObjectException, TException {
         throw new UnsupportedOperationException("this method is not supported");
     }
 
@@ -325,6 +344,17 @@ public class AbstractThriftHiveMetastore implements Iface {
 
     @Override
     public List<String> get_all_tables(String db_name) throws MetaException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
+    public Table get_table(String dbname, String tbl_name)
+            throws MetaException, NoSuchObjectException, TException {
+        throw new UnsupportedOperationException("this method is not supported");
+    }
+
+    @Override
+    public List<Table> get_table_objects_by_name(String dbname, List<String> tbl_names) throws TException {
         throw new UnsupportedOperationException("this method is not supported");
     }
 
