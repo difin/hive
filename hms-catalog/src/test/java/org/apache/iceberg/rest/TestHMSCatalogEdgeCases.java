@@ -23,7 +23,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.iceberg.HiveCachingCatalog;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.junit.Assert;
@@ -46,7 +45,7 @@ import javax.servlet.http.HttpServletResponse;
  * Comprehensive tests for edge cases, unsupported operations, and error scenarios.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestHMSCatalogEdgeCases extends TestHiveCatalog {
+public class TestHMSCatalogEdgeCases extends TestHMSCatalog {
   private static final Logger LOG = LoggerFactory.getLogger(TestHMSCatalogEdgeCases.class);
 
   /**
@@ -121,7 +120,7 @@ public class TestHMSCatalogEdgeCases extends TestHiveCatalog {
       }
 
       // Clean up any test-specific tables that might hold stale connections
-      if (catalog instanceof HiveCachingCatalog) {
+      if (catalog instanceof HMSCachingCatalog) {
         try {
           // Invalidate known test tables to clear any cached connections
           catalog.invalidateTable(TableIdentifier.of(DB_NAME, "tbl"));
@@ -147,21 +146,24 @@ public class TestHMSCatalogEdgeCases extends TestHiveCatalog {
   @Test
   public void testUnsupportedHttpMethods() throws Exception {
     String jwt = generateJWT();
+    Object arg = Map.of(
+        "namespace", List.of("yans"),
+        "properties", Map.of("owner", "apache", "group", "iceberg"));
     URL url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath + "/v1/namespaces");
 
     // Test different categories of HTTP methods with appropriate expectations
-    testOptionsMethod(jwt, url);
-    testBusinessLogicUnsupportedMethods(jwt, url);
-    testSecuritySensitiveMethods(jwt, url);
+    testOptionsMethod(jwt, url, arg);
+    testBusinessLogicUnsupportedMethods(jwt, url, arg);
+    testSecuritySensitiveMethods(jwt, url, arg);
   }
 
   /**
    * Tests the OPTIONS method, which is a standard HTTP method that should be handled gracefully.
    * OPTIONS is used for CORS preflight requests and should typically return success.
    */
-  private void testOptionsMethod(String jwt, URL url) throws Exception {
+  private void testOptionsMethod(String jwt, URL url, Object args) throws Exception {
     try {
-      Object response = clientCall(jwt, url, "OPTIONS", null);
+      Object response = clientCall(jwt, url, "OPTIONS", args);
 
       if (response instanceof HMSTestBase.ServerResponse) {
         HMSTestBase.ServerResponse serverResponse = (HMSTestBase.ServerResponse) response;
@@ -193,12 +195,12 @@ public class TestHMSCatalogEdgeCases extends TestHiveCatalog {
    * Tests HTTP methods that are valid HTTP methods but not supported by our business logic.
    * These should return proper HTTP error responses (4xx status codes).
    */
-  private void testBusinessLogicUnsupportedMethods(String jwt, URL url) throws Exception {
+  private void testBusinessLogicUnsupportedMethods(String jwt, URL url, Object arg) throws Exception {
     String[] businessLogicUnsupportedMethods = {"PATCH", "PUT"};
 
     for (String method : businessLogicUnsupportedMethods) {
       try {
-        Object response = clientCall(jwt, url, method, null);
+        Object response = clientCall(jwt, url, method, arg);
 
         if (response instanceof HMSTestBase.ServerResponse) {
           HMSTestBase.ServerResponse serverResponse = (HMSTestBase.ServerResponse) response;
@@ -247,12 +249,12 @@ public class TestHMSCatalogEdgeCases extends TestHiveCatalog {
    * Tests HTTP methods that are often disabled for security reasons.
    * These methods (TRACE, CONNECT) are frequently blocked by web servers and proxies.
    */
-  private void testSecuritySensitiveMethods(String jwt, URL url) throws Exception {
+  private void testSecuritySensitiveMethods(String jwt, URL url, Object arg) throws Exception {
     String[] securitySensitiveMethods = {"TRACE", "CONNECT"};
 
     for (String method : securitySensitiveMethods) {
       try {
-        Object response = clientCall(jwt, url, method, null);
+        Object response = clientCall(jwt, url, method, arg);
 
         if (response instanceof HMSTestBase.ServerResponse) {
           HMSTestBase.ServerResponse serverResponse = (HMSTestBase.ServerResponse) response;
@@ -497,10 +499,13 @@ public class TestHMSCatalogEdgeCases extends TestHiveCatalog {
     Assert.assertTrue((nslist.contains(Arrays.asList("hivedb"))));
 
     // Create namespace via HTTP
-    response = clientCall(jwt, url, "POST", false, "{ \"namespace\" : [ \"" + ns + "\" ], " +
-        "\"properties\":{ \"owner\": \"apache\", \"group\" : \"iceberg\" }"
-        + "}");
+    Object arg = Map.of(
+        "namespace", List.of(ns),
+        "properties", Map.of("owner", "apache", "group", "iceberg"));
+    response = clientCall(jwt, url, "POST", true, arg);
     Assert.assertNotNull(response);
+    Assert.assertEquals(200, eval(response, "r -> r.status"));
+    Assert.assertEquals(ns, eval(response, "r -> r.namespace[0]"));
 
     // Verify namespace creation (direct HMS call - usually works)
     Database database1 = metastoreClient.getDatabase(ns);

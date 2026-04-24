@@ -37,12 +37,12 @@ import javax.servlet.http.HttpServletResponse;
  * Tests for REST-level security functionality that doesn't require access to package-private classes.
  * This focuses on authentication, authorization, and error handling at the REST API level.
  */
-public class TestHMSCatalogRESTSecurity extends TestHiveCatalog {
+public class TestHMSCatalogRESTSecurity extends TestHMSCatalog {
 
   @Test
   public void testUnauthorizedJWTToken() throws Exception {
     // Test with unauthorized JWT token
-    String jwt = generateJWT(jwtUnauthorizedKeyFile.toPath());
+    String jwt = generateJWT(JWT_NOAUTHKEY_FILE.toPath());
     URL url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath + "/v1/namespaces");
 
     Object response = clientCall(jwt, url, "GET", null);

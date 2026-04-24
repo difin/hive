@@ -17,25 +17,25 @@
  * under the License.
  */
 
-package org.apache.iceberg.hive;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.metastore.IMetaStoreClient;
-import org.apache.iceberg.ClientPool;
-import org.apache.thrift.TException;
+package org.apache.iceberg.rest;
 
 import java.util.Map;
+import org.apache.hadoop.hive.metastore.ServletSecurity.AuthType;
+import org.apache.hadoop.hive.metastore.annotation.MetastoreCheckinTest;
+import org.apache.iceberg.rest.extension.HiveRESTCatalogServerExtension;
+import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-/**
- * A Multi-tenant / Kerberos-compatible thrift-client-based catalog actor.
- */
-public class HiveCatalogActorMT extends HiveCatalogActor {
-  public HiveCatalogActorMT(String name, Configuration configuration) {
-    super(name, configuration);
-  }
+@Category(MetastoreCheckinTest.class)
+class TestRESTCatalogNoneAuth extends BaseRESTCatalogTests {
+  @RegisterExtension
+  private static final HiveRESTCatalogServerExtension REST_CATALOG_EXTENSION =
+      HiveRESTCatalogServerExtension.builder(AuthType.NONE).build();
 
   @Override
-  protected ClientPool<IMetaStoreClient, TException> createPool(Map<String, String> properties) {
-    return new MultiTenancyClientPool(getConf(), properties);
+  protected Map<String, String> getDefaultClientConfiguration() {
+    return Map.of(
+        "uri", REST_CATALOG_EXTENSION.getRestEndpoint()
+    );
   }
 }

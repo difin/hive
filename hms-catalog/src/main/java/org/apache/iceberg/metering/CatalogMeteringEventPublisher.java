@@ -136,11 +136,16 @@ public class CatalogMeteringEventPublisher implements AutoCloseable {
     Path filePath = Paths.get(METERING_FILE_LOC_DIR, FILE_PREFIX + sequence);
     UGI.doAs((PrivilegedAction<Object>) () -> {
       try {
-        Files.createFile(filePath);
-        setFilePermissions(filePath);
-        logger.info("Created new metering file: {}", filePath);
+        if (Files.exists(filePath)) {
+          // File already exists from previous run, reuse it
+          logger.info("Reusing existing metering file: {}", filePath);
+        } else {
+          Files.createFile(filePath);
+          setFilePermissions(filePath);
+          logger.info("Created new metering file: {}", filePath);
+        }
       } catch (IOException ex) {
-        logger.error("Error performing Failed to create new metering file {}", filePath, ex);
+        logger.error("Failed to create metering file {}", filePath, ex);
       }
       return null;
     });

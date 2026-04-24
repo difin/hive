@@ -23,7 +23,6 @@ import com.google.gson.Gson;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.SecurityFriend;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
-import org.apache.hadoop.security.UserGroupInformation;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +36,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -150,8 +146,20 @@ public class DataSharing {
    */
 
   public Map<String, String> getAccessToken(String table) {
+    return getAccessTokenWithPolicy(table, "read-only");
+  }
+
+  /**
+   * Gets a data sharing access token with a specific policy.
+   *
+   * @param table  the table's manifest location
+   * @param policy the policy string (e.g. "read-only" or "read-write")
+   * @return an access token or null if no token could be obtained
+   * @throws NotAuthorizedException if the access token could not be fetched due to authorization issues
+   */
+  public Map<String, String> getAccessTokenWithPolicy(String table, String policy) {
     if (LOG.isDebugEnabled()) {
-      LOG.debug("==> DataSharing.getAccessToken()");
+      LOG.debug("==> DataSharing.getAccessTokenWithPolicy(policy={})", policy);
     }
     Map<String, String> token = null;
     try {
@@ -169,21 +177,21 @@ public class DataSharing {
         throw new NotAuthorizedException(
           "Unable to obtain IdBroker delegation token for current user");
       } else {
-        token = fetchAccessToken(idt, table);
+        token = fetchAccessTokenWithPolicy(idt, table, policy);
         if (token.isEmpty()) {
           LOG.warn("Access token not found in response for table " + table);
         }
       }
     } catch (NotAuthorizedException e) {
       // Rethrow NotAuthorizedException to indicate authorization failure
-      LOG.error("<== DataSharing.getAccessToken() : Authorization failure", e);
+      LOG.error("<== DataSharing.getAccessTokenWithPolicy() : Authorization failure", e);
       throw e;
     } catch (Exception e) {
-      LOG.error("<== DataSharing.getAccessToken() : Failed to fetch access token", e);
+      LOG.error("<== DataSharing.getAccessTokenWithPolicy() : Failed to fetch access token", e);
       throw new NotAuthorizedException("Failed to fetch access token: " + e.getMessage());
     }
     if (LOG.isDebugEnabled()) {
-      LOG.debug("<== DataSharing.getAccessToken() : {}", "successful");
+      LOG.debug("<== DataSharing.getAccessTokenWithPolicy() : {}", "successful");
     }
     return token;
   }
@@ -252,6 +260,18 @@ public class DataSharing {
    * @throws IOException if url composition fails
    */
   URL accessTokenUrl(final String table) throws IOException {
+    return accessTokenUrlWithPolicy(table, "read-only");
+  }
+
+  /**
+   * Compose the Data Sharing access-token URL with a specific policy.
+   *
+   * @param table  the table's manifest location
+   * @param policy the policy string (e.g. "read-only" or "read-write")
+   * @return the URL
+   * @throws IOException if url composition fails
+   */
+  URL accessTokenUrlWithPolicy(final String table, String policy) throws IOException {
     String tableRoot = table;
     if (table.endsWith(".json")) {
       // derive the root location for the table, hack until we find a better way
@@ -260,8 +280,8 @@ public class DataSharing {
     // Strip the URI scheme (s3a://, s3://, ofs://, etc.)  [bucket]/[prefix]
     tableRoot = stripScheme(tableRoot);
     int idx = lastKnownGood.get();
-    URL accessTokenUrl = resolve(idx, accessTokenPath + "?path=" + urlEncodeUTF8(tableRoot) + "&policy=read-only").toURL();
-    LOG.debug("==> DataSharing.accessTokenUrl() returning : {} ", accessTokenUrl);
+    URL accessTokenUrl = resolve(idx, accessTokenPath + "?path=" + urlEncodeUTF8(tableRoot) + "&policy=" + policy).toURL();
+    LOG.debug("==> DataSharing.accessTokenUrlWithPolicy(policy={}) returning : {} ", policy, accessTokenUrl);
     return accessTokenUrl;
   }
 
@@ -290,16 +310,29 @@ public class DataSharing {
    * @throws IOException if url composition fails
    */
   private Map<String, String> fetchAccessToken(IdBrokerDelegationToken idt, String table) throws IOException {
-    LOG.info("==> DataSharing.fetchAccessToken(), using bearer token {}", idt.getDelegationToken());
+    return fetchAccessTokenWithPolicy(idt, table, "read-only");
+  }
+
+  /**
+   * Fetches the Data Sharing access-token with a specific policy.
+   *
+   * @param idt    the delegation token
+   * @param table  the table's manifest location
+   * @param policy the policy string (e.g. "read-only" or "read-write")
+   * @return the map containing information including the access token
+   * @throws IOException if url composition fails
+   */
+  private Map<String, String> fetchAccessTokenWithPolicy(IdBrokerDelegationToken idt, String table, String policy) throws IOException {
+    LOG.info("==> DataSharing.fetchAccessTokenWithPolicy(policy={}), using bearer token {}", policy, idt.getDelegationToken());
     Map<String, String> tokenRes = new HashMap<>();
     try {
-      Object result = clientCall(idt.getDelegationToken(), accessTokenUrl(table), HTTP_GET, null);
+      Object result = clientCall(idt.getDelegationToken(), accessTokenUrlWithPolicy(table, policy), HTTP_GET, null);
       if (result instanceof Map) {
         Map<?, ?> resultMap = (Map<?, ?>) result;
         Map<?, ?> assumedRoleUser = (Map<?, ?>) resultMap.get("AssumedRoleUser");
         String assumedRole = assumedRoleUser != null ? (String) assumedRoleUser.get("AssumedRole") : "N/A";
         String arn = assumedRoleUser != null ? (String) assumedRoleUser.get("Arn") : "N/A";
-        LOG.info("==> DataSharing.fetchAccessToken(), broker response (non-sensitive): AssumedRole={}, Arn={}", assumedRole, arn);
+        LOG.info("==> DataSharing.fetchAccessTokenWithPolicy(), broker response (non-sensitive): AssumedRole={}, Arn={}", assumedRole, arn);
         Object sessionToken = null;
         Object accessKeyId = null;
         Object secretKey = null;
@@ -312,17 +345,17 @@ public class DataSharing {
         if (sessionToken != null) {
           tokenRes.put(S3_SESSION_TOKEN, sessionToken.toString());
         } else {
-          LOG.info("<== DataSharing.fetchAccessToken(): returned null token value");
+          LOG.info("<== DataSharing.fetchAccessTokenWithPolicy(): returned null token value");
         }
         if (accessKeyId != null) {
           tokenRes.put(S3_ACCESS_KEY_ID, accessKeyId.toString());
         } else {
-          LOG.info("<== DataSharing.fetchAccessToken(): returned null accessKey value");
+          LOG.info("<== DataSharing.fetchAccessTokenWithPolicy(): returned null accessKey value");
         }
         if (secretKey != null) {
           tokenRes.put(S3_SECRET_ACCESS_KEY, secretKey.toString());
         } else {
-          LOG.info("<== DataSharing.fetchAccessToken(): returned null secret value");
+          LOG.info("<== DataSharing.fetchAccessTokenWithPolicy(): returned null secret value");
         }
         // add those pseudo-constants if we are returning something
         if (!tokenRes.isEmpty()) {
@@ -333,7 +366,7 @@ public class DataSharing {
     } catch (IOException e) {
       LOG.error("Exception fetching the access token", e);
     }
-    LOG.info("<== DataSharing.fetchAccessToken(): {}", (tokenRes == null ? " failed" : "successful"));
+    LOG.info("<== DataSharing.fetchAccessTokenWithPolicy(): {}", (tokenRes == null ? " failed" : "successful"));
     return tokenRes;
   }
 

@@ -17,6 +17,10 @@
 
 package org.apache.hadoop.hive.metastore;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+import com.github.benmanes.caffeine.cache.Ticker;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hive.metastore.api.TableMeta;
@@ -27,24 +31,17 @@ import org.apache.hadoop.security.authorize.ProxyUsers;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalListener;
-import com.github.benmanes.caffeine.cache.Ticker;
 
-import java.time.Duration;
-
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.PrivilegedExceptionAction;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.Duration;
+import java.util.*;
 
 /**
  * Secures servlet processing for HMS-catalog.
@@ -56,15 +53,50 @@ public class HMSServletSecurity extends ServletSecurity {
   private static final String CLIENT_TYPE_KEY = "client_type";
   private static final String REST_CATALOG_VALUE = "rest_catalog";
 
+  private static volatile RangerPrivilegeHelper privilegeHelper;
+
   private final Cache<UgiKey, UserGroupInformation> ugiCache;
+  private final Configuration conf;
+  private AuthType authType;
+  private final boolean useJwt;
+
 
   public HMSServletSecurity(Configuration conf, boolean jwt) {
-    super(conf, jwt);
+    super(jwt ? AuthType.JWT : AuthType.SIMPLE, conf);
+    this.conf = conf;
+    this.useJwt = jwt;
     ProxyUsers.refreshSuperUserGroupsConfiguration(conf);
     long ugiCacheExpiryMs = getCacheExpiryMs(conf);
     int ugiCacheMaxSize = getCacheMaxSize(conf);
-
+    this.authType = jwt ? AuthType.JWT : AuthType.SIMPLE;
     this.ugiCache = createCacheWithConfig(ugiCacheExpiryMs, ugiCacheMaxSize);
+  }
+
+  /**
+   * Override init() to be lenient with JWT initialization.
+   * If JWT authenticator cannot be created (e.g., JWKS URL not configured),
+   * log a warning but don't fail - Knox trusted proxy may be the actual auth mechanism.
+   */
+  @Override
+  public void init() throws javax.servlet.ServletException {
+    if (useJwt) {
+      try {
+        super.init();
+      } catch (javax.servlet.ServletException e) {
+        // Check if Knox trusted proxy is configured as a fallback
+        String proxyHeader = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.METASTORE_TRUSTED_PROXY_TRUSTHEADER);
+        if (proxyHeader != null && !proxyHeader.trim().isEmpty()) {
+          LOG.warn("JWT authenticator initialization failed, but Knox trusted proxy is configured. " +
+              "JWT authentication will not be available, requests must use trusted proxy. Error: {}",
+              e.getMessage());
+        } else {
+          // No fallback available, rethrow
+          throw e;
+        }
+      }
+    } else {
+      super.init();
+    }
   }
 
   /**
@@ -161,6 +193,23 @@ public class HMSServletSecurity extends ServletSecurity {
 
   Cache<UgiKey, UserGroupInformation> getUgiCache() {
     return ugiCache;
+  }
+
+  /**
+   * Returns the singleton RangerPrivilegeHelper, creating it on first access.
+   *
+   * @param conf the configuration
+   * @return the RangerPrivilegeHelper instance
+   */
+  public static RangerPrivilegeHelper getPrivilegeHelper(Configuration conf) {
+    if (privilegeHelper == null) {
+      synchronized (HMSServletSecurity.class) {
+        if (privilegeHelper == null) {
+          privilegeHelper = new RangerPrivilegeHelper(conf);
+        }
+      }
+    }
+    return privilegeHelper;
   }
 
   static class UgiKey {
@@ -265,7 +314,9 @@ public class HMSServletSecurity extends ServletSecurity {
       clientUgi = getUgi(userFromHeader, UserGroupInformation.getLoginUser());
       String groupsHeader = request.getHeader(X_USER_GROUPS);
       if (groupsHeader != null && !groupsHeader.isEmpty() && !"$primary_group".equals(groupsHeader)) {
-        HMSGroup.set(userFromHeader, groupsHeader);
+        // Split comma-separated groups from Knox header
+        String[] groups = groupsHeader.split(",");
+        HMSGroup.set(userFromHeader, groups);
         LOG.info("Groups are set for user {} in the request header:{}", userFromHeader, groupsHeader);
       } else if (null != getDoAsQueryParam(request)) {
         // FIXME: remove after Knox has support for Knox-Groups
@@ -308,15 +359,9 @@ public class HMSServletSecurity extends ServletSecurity {
     }
   }
 
-  public static boolean isTableAccessible(IHMSHandler handler, String databaseName, String tableName) {
-    try {
+  public static boolean isTableAccessible(IHMSHandler handler, String databaseName, String tableName) throws TException {
       List<TableMeta> list = handler.get_table_meta(databaseName, tableName, null);
       return list != null && !list.isEmpty();
-    } catch (TException e) {
-      LOG.info("checking table access failed, database {}, table {}", databaseName, tableName, e);
-      // any error, especially security means no-access
-      return false;
-    }
   }
 
   private static final String AUTH_CLAZZ = "org.apache.hadoop.hive.ql.security.authorization.plugin.metastore.HiveMetaStoreAuthorizer";
@@ -341,5 +386,20 @@ public class HMSServletSecurity extends ServletSecurity {
       }
     }
   }
+
+  public HttpServlet proxy(HttpServlet servlet) {
+    if (authType == AuthType.NONE) {
+      LOG.warn("Servlet security is disabled for {}", servlet);
+      return servlet;
+    }
+    try {
+      init();
+    } catch (ServletException e) {
+      LOG.error("Unable to proxy security for servlet {}", servlet, e);
+      return null;
+    }
+    return new ProxyServlet(servlet);
+  }
+
 
 }

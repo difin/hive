@@ -17,42 +17,30 @@
  */
 package org.apache.hadoop.hive.metastore.conf;
 
-import org.apache.hadoop.hive.metastore.DefaultStorageSchemaReader;
-import org.apache.hadoop.hive.metastore.HiveAlterHandler;
-import org.apache.hadoop.hive.metastore.MaterializationsRebuildLockCleanerTask;
-import org.apache.hadoop.hive.metastore.MetastoreTaskThread;
-import org.apache.hadoop.hive.metastore.PartitionManagementTask;
-import org.apache.hadoop.hive.metastore.RuntimeStatsCleanerTask;
+import com.google.common.annotations.VisibleForTesting;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.common.ZooKeeperHiveHelper;
+import org.apache.hadoop.hive.metastore.*;
 import org.apache.hadoop.hive.metastore.events.EventCleanerTask;
 import org.apache.hadoop.hive.metastore.security.MetastoreDelegationTokenManager;
 import org.apache.hadoop.hive.metastore.txn.service.AcidHouseKeeperService;
 import org.apache.hadoop.hive.metastore.txn.service.AcidOpenTxnsCounterService;
 import org.apache.hadoop.hive.metastore.txn.service.AcidTxnCleanerService;
 import org.apache.hadoop.hive.metastore.txn.service.CompactionHouseKeeperService;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.common.ZooKeeperHiveHelper;
 import org.apache.hadoop.hive.metastore.utils.StringUtils;
 import org.apache.hadoop.security.alias.CredentialProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A set of definitions of config values used by the Metastore.  One of the key aims of this
@@ -937,8 +925,9 @@ public class MetastoreConf {
                 "  NOSASL:  Raw transport" +
                 "  JWT:  JSON Web Token authentication via JWT token. Only supported in Http/Https mode"),
     THRIFT_METASTORE_AUTHENTICATION_JWT_JWKS_URL("metastore.authentication.jwt.jwks.url",
-        "hive.metastore.authentication.jwt.jwks.url", "", "File URL from where URLBasedJWKSProvider "
-        + "will try to load JWKS to match a JWT sent in HTTP request header"),
+        "hive.metastore.authentication.jwt.jwks.url", "", "File URL from where "
+        + "metastore server will try to load JWKS to match a JWT sent in HTTP request header. Used only when "
+        + "Hive metastore server is running in JWT auth mode"),
     METASTORE_CUSTOM_AUTHENTICATION_CLASS("metastore.custom.authentication.class",
             "hive.metastore.custom.authentication.class",
             "",
@@ -1801,22 +1790,83 @@ public class MetastoreConf {
     ),
     PROPERTIES_SERVLET_AUTH("hive.metastore.properties.servlet.auth",
         "hive.metastore.properties.servlet.auth", "jwt",
+        new StringSetValidator("simple", "jwt"),
         "Property-maps servlet authentication method (simple or jwt)."
     ),
-    CATALOG_SERVLET_PATH("hive.metastore.catalog.servlet.path",
-        "hive.metastore.catalog.servlet.path", "icecli",
-        "Catalog servlet path component of URL endpoint."),
+    CATALOG_SERVLET_FACTORY("hive.metastore.catalog.servlet.factory",
+        "hive.metastore.catalog.servlet.factory",
+        "org.apache.iceberg.rest.HMSCatalogFactory",
+        "HMS Catalog servlet factory class name. The default serves Iceberg REST API."
+            + "The factory needs to expose a method: "
+            + "public static HttpServlet createServlet(Configuration configuration);"
+    ),
     CATALOG_SERVLET_PORT("hive.metastore.catalog.servlet.port",
-        "hive.metastore.catalog.servlet.port", -1L,
-        "Catalog servlet server port. Negative value disables the servlet," +
+        "hive.metastore.catalog.servlet.port", -1,
+        "HMS Catalog servlet server port. Negative value disables the servlet," +
             " 0 will let the system determine the catalog server port," +
-            " positive value will be used as-is."),
+            " positive value will be used as-is."
+    ),
     CATALOG_SERVLET_AUTH("hive.metastore.catalog.servlet.auth",
-        "hive.metastore.catalog.servlet.auth", "jwt",
-        "Catalog servlet authentication method (simple or jwt)."),
-    CATALOG_CLASS("hive.metastore.catalog.class",
-        "hive.metastore.catalog.class", "HiveCatalog",
-        "Catalog implementation class. (HiveCatalog or HMSCatalog)"),
+        "hive.metastore.catalog.servlet.auth", "jwt", new StringSetValidator("none", "simple", "jwt", "oauth2"),
+        "HMS Catalog servlet authentication method (none, simple, jwt, or oauth2)."
+    ),
+    CATALOG_SERVLET_AUTH_OAUTH2_ISSUER("metastore.catalog.servlet.auth.oauth2.issuer",
+        "hive.metastore.catalog.servlet.auth.oauth2.issuer", "",
+        "OAuth2 token issuer URL."
+    ),
+    CATALOG_SERVLET_AUTH_OAUTH2_AUDIENCE("metastore.catalog.servlet.auth.oauth2.audience",
+        "hive.metastore.catalog.servlet.auth.oauth2.audience", "",
+        "OAuth2 expected audience."
+    ),
+    CATALOG_SERVLET_AUTH_OAUTH2_VALIDATION_METHOD("metastore.catalog.servlet.auth.oauth2.validation.method",
+        "hive.metastore.catalog.servlet.auth.oauth2.validation.method", "jwt",
+        new StringSetValidator("jwt", "introspection"),
+        "OAuth2 token validation method (jwt or introspection)."
+    ),
+    CATALOG_SERVLET_AUTH_OAUTH2_CLIENT_ID("metastore.catalog.servlet.auth.oauth2.client.id",
+        "hive.metastore.catalog.servlet.auth.oauth2.client.id", "",
+        "OAuth2 client ID for token introspection."
+    ),
+    CATALOG_SERVLET_AUTH_OAUTH2_CLIENT_SECRET("metastore.catalog.servlet.auth.oauth2.client.secret",
+        "hive.metastore.catalog.servlet.auth.oauth2.client.secret", "",
+        "OAuth2 client secret for token introspection."
+    ),
+    CATALOG_SERVLET_AUTH_OAUTH2_INTROSPECTION_CACHE_EXPIRY("metastore.catalog.servlet.auth.oauth2.introspection.cache.expiry",
+        "hive.metastore.catalog.servlet.auth.oauth2.introspection.cache.expiry", 300000L,
+        "OAuth2 token introspection cache expiry time in milliseconds."
+    ),
+    CATALOG_SERVLET_AUTH_OAUTH2_INTROSPECTION_CACHE_SIZE("metastore.catalog.servlet.auth.oauth2.introspection.cache.size",
+        "hive.metastore.catalog.servlet.auth.oauth2.introspection.cache.size", 1000L,
+        "OAuth2 token introspection cache size."
+    ),
+    CATALOG_SERVLET_AUTH_OAUTH2_PRINCIPAL_MAPPER_REGEX_FIELD("metastore.catalog.servlet.auth.oauth2.principal.mapper.regex.field",
+        "hive.metastore.catalog.servlet.auth.oauth2.principal.mapper.regex.field", "sub",
+        "OAuth2 JWT claim field to use for principal mapping."
+    ),
+    CATALOG_SERVLET_AUTH_OAUTH2_PRINCIPAL_MAPPER_REGEX_PATTERN("metastore.catalog.servlet.auth.oauth2.principal.mapper.regex.pattern",
+        "hive.metastore.catalog.servlet.auth.oauth2.principal.mapper.regex.pattern", "(.*)",
+        "OAuth2 regex pattern to extract principal from the claim field."
+    ),
+    ICEBERG_CATALOG_SERVLET_PATH("hive.metastore.catalog.servlet.path",
+        "hive.metastore.catalog.servlet.path", "icecli",
+        "HMS Iceberg Catalog servlet path component of URL endpoint."
+    ),
+    ICEBERG_CATALOG_CACHE_EXPIRY("hive.metastore.catalog.cache.expiry",
+        "hive.metastore.catalog.cache.expiry", 60_000L,
+        "HMS Iceberg Catalog cache expiry."
+    ),
+    HTTPSERVER_THREADPOOL_MIN("hive.metastore.httpserver.threadpool.min",
+        "hive.metastore.httpserver.threadpool.min", 8,
+        "HMS embedded HTTP server minimum number of threads."
+    ),
+    HTTPSERVER_THREADPOOL_MAX("hive.metastore.httpserver.threadpool.max",
+        "hive.metastore.httpserver.threadpool.max", 256,
+        "HMS embedded HTTP server maximum number of threads."
+    ),
+    HTTPSERVER_THREADPOOL_IDLE("hive.metastore.httpserver.threadpool.idle",
+        "hive.metastore.httpserver.threadpool.idle", 60_000L,
+        "HMS embedded HTTP server thread idle time."
+    ),
     // Deprecated Hive values that we are keeping for backwards compatibility.
     @Deprecated
     HIVE_CODAHALE_METRICS_REPORTER_CLASSES("hive.service.metrics.codahale.reporter.classes",
@@ -1877,6 +1927,7 @@ public class MetastoreConf {
     BOOLEAN_TEST_ENTRY("test.bool", "hive.test.bool", true, "comment"),
     CLASS_TEST_ENTRY("test.class", "hive.test.class", "", "comment");
 
+    public static ConfVars CATALOG_SERVLET_PATH;
     private final String varname;
     private final String hiveName;
     private final Object defaultVal;

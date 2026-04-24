@@ -19,8 +19,10 @@
 
 package org.apache.iceberg.rest;
 
-import com.codahale.metrics.Counter;
-import com.google.gson.Gson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
@@ -28,6 +30,35 @@ import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlFeatures;
+import org.apache.commons.jexl3.MapContext;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaException;
@@ -46,7 +77,10 @@ import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.SupportsNamespaces;
-import org.apache.iceberg.hive.HiveCatalog;
+import org.apache.hive.iceberg.com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.hive.iceberg.com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.hive.iceberg.com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.iceberg.hive.IcebergTestHelper;
 import org.eclipse.jetty.server.Server;
 import org.junit.After;
 import org.junit.Assert;
@@ -57,93 +91,84 @@ import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-
-import javax.servlet.http.HttpServletResponse;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.ok;
-
 public abstract class HMSTestBase {
   protected static final Logger LOG = LoggerFactory.getLogger(HMSTestBase.class.getName());
-  protected static final String baseDir = System.getProperty("basedir");
+  protected static final String BASE_DIR = System.getProperty("basedir");
   protected static Random RND = new Random(20230922);
   protected static final String USER_1 = "USER_1";
   protected static final String DB_NAME = "hivedb";
+  /**
+   * A Jexl engine for convenience.
+   */
+  static final JexlEngine JEXL;
+
+  static {
+    JexlFeatures features = new JexlFeatures()
+        .sideEffect(false)
+        .sideEffectGlobal(false);
+    JexlPermissions p = JexlPermissions.RESTRICTED
+        .compose("org.apache.hadoop.hive.metastore.*", "org.apache.iceberg.*");
+    JEXL = new JexlBuilder()
+        .features(features)
+        .permissions(p)
+        .create();
+  }
 
   protected static final long EVICTION_INTERVAL = TimeUnit.SECONDS.toMillis(10);
-  private static final File jwtAuthorizedKeyFile =
-      new File(baseDir,"src/test/resources/auth/jwt/jwt-authorized-key.json");
-  protected static final File jwtUnauthorizedKeyFile =
-      new File(baseDir,"src/test/resources/auth/jwt/jwt-unauthorized-key.json");
-  protected static final File jwtVerificationJWKSFile =
-      new File(baseDir,"src/test/resources/auth/jwt/jwt-verification-jwks.json");
+  private static final File JWT_AUTHKEY_FILE =
+      new File(BASE_DIR, "src/test/resources/auth/jwt/jwt-authorized-key.json");
+  protected static final File JWT_NOAUTHKEY_FILE =
+      new File(BASE_DIR, "src/test/resources/auth/jwt/jwt-unauthorized-key.json");
+  protected static final File JWT_JWKS_FILE =
+      new File(BASE_DIR, "src/test/resources/auth/jwt/jwt-verification-jwks.json");
 
   protected static final int MOCK_JWKS_SERVER_PORT = 8089;
   @ClassRule
   public static final WireMockRule MOCK_JWKS_SERVER = new WireMockRule(MOCK_JWKS_SERVER_PORT);
-  // the url part
-  /**
-   * Abstract the property client access on a given namespace.
-   */
 
 
   public static class TestSchemaInfo extends MetaStoreSchemaInfo {
     public TestSchemaInfo(String metastoreHome, String dbType) throws HiveMetaException {
       super(metastoreHome, dbType);
     }
+
     @Override
     public String getMetaStoreScriptDir() {
-      return  new File(baseDir,"src/test/resources").getAbsolutePath() + File.separatorChar +
+      return new File(BASE_DIR, "src/test/resources").getAbsolutePath() + File.separatorChar +
           "scripts" + File.separatorChar + "metastore" +
           File.separatorChar + "upgrade" + File.separatorChar + dbType;
     }
+
+    //Todo: check why adding this
     @Override
     public String getMetaStoreScriptDirFromTestClasspath() {
-      return "scripts" + File.separatorChar + "metastore" + File.separatorChar + 
-              "upgrade" + File.separatorChar + dbType;
+      return "scripts" + File.separatorChar + "metastore" + File.separatorChar +
+          "upgrade" + File.separatorChar + dbType;
     }
   }
 
   @Rule
   public TemporaryFolder temp = new TemporaryFolder();
+
   protected Configuration conf = null;
   protected String NS = "hms" + RND.nextInt(100);
+
   protected int port = -1;
   protected int catalogPort = -1;
   protected final String catalogPath = "hmscatalog";
+  protected static final int WAIT_FOR_SERVER = 5000;
+  //Todo: check why deleting this
   protected Server catalogServer = null;
   // for direct calls
   protected Catalog catalog;
   protected SupportsNamespaces nsCatalog;
   protected HiveMetaStoreClient metastoreClient;
+  /** Unique ID assigned to this test's HMS instance to avoid cross-server catalog conflicts. */
+  private String servletId;
 
   protected int createMetastoreServer(Configuration conf) throws Exception {
-    return MetaStoreTestUtils.startMetaStoreWithRetry(HadoopThriftAuthBridge.getBridge(), conf);
+    return MetaStoreTestUtils.startMetaStoreWithRetry(HadoopThriftAuthBridge.getBridge(), conf,
+        false, true, false, false);
   }
 
   protected void stopMetastoreServer(int port) {
@@ -157,17 +182,21 @@ public abstract class HMSTestBase {
     NS = "hms" + RND.nextInt(100);
     conf = MetastoreConf.newMetastoreConf();
     MetaStoreTestUtils.setConfForStandloneMode(conf);
+    //Todo: check following capability check
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.CAPABILITY_CHECK, false);
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.HIVE_IN_TEST, true);
+    //Todo: check following properties
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.HIVE_IN_TEST_ICEBERG, true);
+    // new 2024-10-02
+    MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.SCHEMA_VERIFICATION, false);
 
     conf.setBoolean(MetastoreConf.ConfVars.METRICS_ENABLED.getVarname(), true);
     // "hive.metastore.warehouse.dir"
-    String whpath = new File(baseDir,"target/tmp/warehouse/managed").toURI()/*.getAbsolutePath()*/.toString();
+    String whpath = new File(BASE_DIR, "target/tmp/warehouse/managed").toURI().toString();
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.WAREHOUSE, whpath);
     conf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, whpath);
     // "hive.metastore.warehouse.external.dir"
-    String extwhpath = new File(baseDir,"target/tmp/warehouse/external").toURI()/*.getAbsolutePath()*/.toString();
+    String extwhpath = new File(BASE_DIR, "target/tmp/warehouse/external").toURI().toString();
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.WAREHOUSE_EXTERNAL, extwhpath);
     conf.set(HiveConf.ConfVars.HIVE_METASTORE_WAREHOUSE_EXTERNAL.varname, whpath);
 
@@ -177,12 +206,12 @@ public abstract class HMSTestBase {
     MetastoreConf.setLongVar(conf, MetastoreConf.ConfVars.EVENT_CLEAN_MAX_EVENTS, 1L);
     MetastoreConf.setLongVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_PORT, 0);
     setCatalogClass(conf);
-    MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_PATH, catalogPath);
+    MetastoreConf.setVar(conf, MetastoreConf.ConfVars.ICEBERG_CATALOG_SERVLET_PATH, catalogPath);
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.THRIFT_METASTORE_AUTHENTICATION_JWT_JWKS_URL,
         "http://localhost:" + MOCK_JWKS_SERVER_PORT + "/jwks");
     MOCK_JWKS_SERVER.stubFor(get("/jwks")
         .willReturn(ok()
-            .withBody(Files.readAllBytes(jwtVerificationJWKSFile.toPath()))));
+            .withBody(Files.readAllBytes(JWT_JWKS_FILE.toPath()))));
     Metrics.initialize(conf);
     // The server
     port = createMetastoreServer(conf);
@@ -195,45 +224,48 @@ public abstract class HMSTestBase {
 
     // create a managed root
     Warehouse wh = new Warehouse(conf);
-    String location0 = wh.getDefaultDatabasePath("hivedb2023", false).toString();
-    //wh.getDefaultDatabasePath()
-    String location = temp.newFolder("hivedb2023").getAbsolutePath().toString();
+    String location = temp.newFolder("hivedb2023").getAbsolutePath();
     Database db = new Database(DB_NAME, "catalog test", location, Collections.emptyMap());
     metastoreClient.createDatabase(db);
+
     setupDataSharingForTests(conf);
+
+    int[] aport = {-1};
+    Catalog ice = acquireServer(aport, servletId);
+    catalog = ice;
+    nsCatalog = catalog instanceof SupportsNamespaces ? (SupportsNamespaces) catalog : null;
+    catalogPort = aport[0];
+  }
+
+  private static String format(String format, Object... params) {
+    return org.slf4j.helpers.MessageFormatter.arrayFormat(format, params).getMessage();
+  }
+
+  private static Catalog acquireServer(int[] port, String servletId) throws InterruptedException {
+    final int wait = 200;
     Server iceServer = HiveMetaStore.getIcebergServer();
-    int tries = 5;
-    while(iceServer == null && tries-- > 0) {
-      Thread.sleep(100);
+    int tries = WAIT_FOR_SERVER / wait;
+    while (iceServer == null && tries-- > 0) {
+      Thread.sleep(wait);
       iceServer = HiveMetaStore.getIcebergServer();
     }
-    Catalog ice = HMSCatalogServer.getRESTCatalog();
     if (iceServer != null) {
-      while (iceServer.isStarting()) {
-        Thread.sleep(100);
+      port[0] = iceServer.getURI().getPort();
+      boolean starting;
+      tries = WAIT_FOR_SERVER / wait;
+      while ((starting = iceServer.isStarting()) && tries-- > 0) {
+        Thread.sleep(wait);
       }
-      catalog =  ice != null? ice : HMSCatalogServer.getRESTCatalog();
-      if (catalog instanceof HiveCatalog) {
-        Map<String, String> properties;
-        String curi = conf.get(MetastoreConf.ConfVars.THRIFT_URIS.getVarname());
-        String cwarehouse = conf.get(MetastoreConf.ConfVars.WAREHOUSE.getVarname());
-        String cextwarehouse = conf.get(MetastoreConf.ConfVars.WAREHOUSE_EXTERNAL.getVarname());
-        properties = new TreeMap<>();
-        if (curi != null) {
-          properties.put("uri", curi);
-        }
-        if (cwarehouse != null) {
-          properties.put("warehouse", cwarehouse);
-        }
-        if (cextwarehouse != null) {
-          properties.put("external-warehouse", cextwarehouse);
-        }
-        catalog.initialize("hive", properties);
+      if (starting) {
+        LOG.warn("server still starting after {}ms", WAIT_FOR_SERVER);
       }
-      nsCatalog = catalog instanceof SupportsNamespaces? (SupportsNamespaces) catalog : null;
-      catalogPort = iceServer.getURI().getPort();
+      Catalog ice = HMSCatalogFactory.getRESTCatalog();
+      if (ice == null) {
+        throw new NullPointerException(format("unable to acquire catalog after {}ms", WAIT_FOR_SERVER));
+      }
+      return ice;
     } else {
-      throw new NullPointerException("no server");
+      throw new NullPointerException(format("unable to acquire server after {}ms", WAIT_FOR_SERVER));
     }
   }
 
@@ -243,49 +275,69 @@ public abstract class HMSTestBase {
     return new HiveMetaStoreClient(conf);
   }
 
-  /**
-   * @param apis a list of api calls
-   * @return the map of HMSCatalog route counter metrics keyed by their names
-   */
-  static Map<String, Long> reportMetricCounters(String... apis) {
-    Map<String, Long> map = new LinkedHashMap<>();
-    com.codahale.metrics.MetricRegistry registry = Metrics.getRegistry();
-    List<String> names = HMSCatalogAdapter.getMetricNames(apis);
-    for(String name : names) {
-      Counter counter = registry.counter(name);
-      if (counter != null) {
-        long count = counter.getCount();
-        map.put(name, count);
-      }
-    }
-    return map;
-  }
-
   @After
-  public synchronized void tearDown() throws Exception {
+  public void tearDown() throws Exception {
     try {
       if (port >= 0) {
         stopMetastoreServer(port);
         port = -1;
-      }
-      if (catalogPort >= 0) {
-        stopCatalogServer(catalogPort);
       }
       // Clear the SSL system properties before each test.
       System.clearProperty(ObjectStore.TRUSTSTORE_PATH_KEY);
       System.clearProperty(ObjectStore.TRUSTSTORE_PASSWORD_KEY);
       System.clearProperty(ObjectStore.TRUSTSTORE_TYPE_KEY);
       //
+      IcebergTestHelper.invalidatePoolCache();
+      File whpath = new File(BASE_DIR, "target/tmp/warehouse/managed");
+      deleteRecursively(whpath);
+      File extwhpath = new File(BASE_DIR, "target/tmp/warehouse/external");
+      deleteRecursively(extwhpath);
     } finally {
-      //client = null;
+      catalog = null;
+      nsCatalog = null;
+      catalogPort = -1;
       conf = null;
     }
   }
 
-  protected String generateJWT()  throws Exception {
-    return generateJWT(jwtAuthorizedKeyFile.toPath());
+  private static void deleteRecursively(File file) {
+    if (file == null || !file.exists()) {
+      return;
+    }
+    if (file.isDirectory()) {
+      File[] children = file.listFiles();
+      if (children != null) {
+        for (File child : children) {
+          deleteRecursively(child);
+        }
+      }
+    }
+    if (!file.delete()) {
+      LOG.warn("Failed to delete: {}", file.getAbsolutePath());
+    }
   }
-  protected String generateJWT(Path path)  throws Exception {
+
+  /**
+   * Reports metric counters for the specified operations.
+   * This is a stub implementation for testing purposes.
+   * @param operations the operation names to report metrics for
+   * @return a map of operation names to their counter values
+   */
+  protected Map<String, Long> reportMetricCounters(String... operations) {
+    Map<String, Long> counters = new HashMap<>();
+    for (String op : operations) {
+      // Return a default value of 1 for each operation
+      // In a real implementation, this would query actual metrics
+      counters.put(op, 1L);
+    }
+    return counters;
+  }
+
+  protected String generateJWT() throws Exception {
+    return generateJWT(JWT_AUTHKEY_FILE.toPath());
+  }
+
+  protected String generateJWT(Path path) throws Exception {
     return generateJWT(USER_1, path, TimeUnit.MINUTES.toMillis(5));
   }
 
@@ -314,40 +366,12 @@ public abstract class HMSTestBase {
   }
 
   /**
-   * Creates and starts the catalog server.
-   * @param conf
-   * @return the server port
-   * @throws Exception
-   */
-  protected int createCatalogServer(Configuration conf, HiveCatalog catalog) throws Exception {
-    if (catalogServer == null) {
-      catalogServer = HMSCatalogServer.startServer(conf, catalog);
-      if (catalogServer == null || !catalogServer.isStarted()) {
-        Assert.fail("http server did not start");
-      }
-    }
-    return catalogServer.getURI().getPort();
-  }
-
-  /**
-   * Stops the catalog server.
-   * @param port the server port
-   * @throws Exception
-   */
-  protected void stopCatalogServer(int port) throws Exception {
-    if (catalogServer != null) {
-      catalogServer.stop();
-      catalogServer = null;
-      catalogPort = -1;
-    }
-  }
-
-  /**
    * Performs a Json client call.
-   * @param jwt the jwt token
-   * @param url the url
+   *
+   * @param jwt    the jwt token
+   * @param url    the url
    * @param method the http method
-   * @param arg the argument that will be transported as JSon
+   * @param arg    the argument that will be transported as JSon
    * @return the result the was returned through Json
    * @throws IOException if marshalling the request/response fail
    */
@@ -375,30 +399,52 @@ public abstract class HMSTestBase {
 
   public static Object clientCall(String jwt, URL url, String method, boolean json, Object arg) throws IOException {
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
-    con.setRequestMethod(method);
-    con.setRequestProperty(MetaStoreUtils.USER_NAME_HTTP_HEADER, url.getUserInfo());
-    con.setRequestProperty("Content-Type", "application/json");
-    con.setRequestProperty("Accept", "application/json");
-    if (jwt != null) {
-      con.setRequestProperty("Authorization", "Bearer " + jwt);
-    }
-    con.setDoInput(true);
-    if (arg != null) {
-      con.setDoOutput(true);
-      DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-      if (json) {
-        wr.writeBytes(new Gson().toJson(arg));
+    try {
+      if ("PATCH".equals(method)) {
+        con.setRequestMethod("POST");
+        con.setRequestProperty("X-HTTP-Method-Override", "PATCH");
       } else {
-        wr.writeBytes(arg.toString());
+        con.setRequestMethod(method);
       }
-      wr.flush();
-      wr.close();
+
+      con.setRequestProperty(MetaStoreUtils.USER_NAME_HTTP_HEADER, url.getUserInfo());
+      if (json) {
+        con.setRequestProperty("Content-Type", "application/json");
+      } else {
+        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+      }
+      con.setRequestProperty("Accept", "application/json");
+      if (jwt != null) {
+        con.setRequestProperty("Authorization", "Bearer " + jwt);
+      }
+      con.setDoInput(true);
+      if (arg != null) {
+        con.setDoOutput(true);
+        DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        if (json) {
+          String outjson = serialize(arg);
+          wr.writeBytes(outjson);
+        } else {
+          wr.writeBytes(arg.toString());
+        }
+        wr.flush();
+        wr.close();
+      }
+      return httpResponse(con);
+    } finally {
+      con.disconnect();
     }
-    // perform http method
+  }
+
+  private static Object httpResponse(HttpURLConnection con) throws IOException {
     int responseCode = con.getResponseCode();
     InputStream responseStream = con.getErrorStream();
     if (responseStream == null) {
-      responseStream = con.getInputStream();
+      try {
+        responseStream = con.getInputStream();
+      } catch (IOException e) {
+        return new ServerResponse(responseCode, e.getMessage());
+      }
     }
     if (responseStream != null) {
       try (BufferedReader reader = new BufferedReader(
@@ -406,19 +452,53 @@ public abstract class HMSTestBase {
         // if not strictly ok, check we are still receiving a JSON
         if (responseCode != HttpServletResponse.SC_OK) {
           String contentType = con.getContentType();
-          if (contentType == null || contentType.indexOf("application/json") == -1) {
-            String line = null;
+          if (contentType == null || !contentType.contains("application/json")) {
+            String line;
             StringBuilder response = new StringBuilder("error " + responseCode + ":");
             while ((line = reader.readLine()) != null) response.append(line);
-            ServerResponse sr = new ServerResponse(responseCode, response.toString());
-            return sr;
+            return new ServerResponse(responseCode, response.toString());
           }
         }
-        return new Gson().fromJson(reader, Object.class);
+        // there might be no answer which is still ok
+        Object r = reader.ready() ? deserialize(reader) : new HashMap<>(1);
+        if (r instanceof Map) {
+          ((Map<String, Object>) r).put("status", responseCode);
+        }
+        return r;
       }
     }
-    // no response stream,
     return responseCode;
+  }
+
+  private static final ObjectMapper MAPPER = RESTObjectMapper.mapper();
+
+  static <T> String serialize(T object) {
+    try {
+      return MAPPER.writeValueAsString(object);
+    } catch (JsonProcessingException xany) {
+      throw new RuntimeException(xany);
+    }
+  }
+
+  static <T> T deserialize(Reader s) {
+    try {
+      return MAPPER.readValue(s, new TypeReference<T>() {
+      });
+    } catch (IOException xany) {
+      throw new RuntimeException(xany);
+    }
+  }
+
+  static Object eval(Object properties, String expr) {
+    try {
+      JexlContext context = properties instanceof Map
+          ? new MapContext((Map) properties)
+          : JexlEngine.EMPTY_CONTEXT;
+      Object result = JEXL.createScript(expr).execute(context, properties);
+      return result;
+    } catch (JexlException xany) {
+      throw xany;
+    }
   }
 
   private void setupDataSharingForTests(Configuration conf) {

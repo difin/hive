@@ -408,8 +408,8 @@ public class HiveIcebergMetaHook extends BaseHiveIcebergMetaHook {
         // metadata_location set by a user. To protect the interim commit we need to refresh the metadata file location.
         tblParams.put(BaseMetastoreTableOperations.METADATA_LOCATION_PROP, currentMetadata.metadataFileLocation());
         LOG.warn("Detected an alter table operation attempting to do alterations on an Iceberg table with a stale " +
-            "metadata_location. Considered base metadata_location: {}, Actual metadata_location: {}. Will override " +
-            "this request with the refreshed metadata_location in order to preserve the concurrent commit.",
+                "metadata_location. Considered base metadata_location: {}, Actual : {}. Will override " +
+                "this request with the refreshed metadata_location in order to preserve the concurrent commit.",
             newMetadataLocation, currentMetadata.metadataFileLocation());
       }
     }
@@ -463,7 +463,7 @@ public class HiveIcebergMetaHook extends BaseHiveIcebergMetaHook {
             PrimitiveObjectInspector.PrimitiveCategory.VARCHAR)) {
           throw new MetaException(String.format(
               "Cannot convert hive table to iceberg that contains column type %s. " + "Use string type columns instead",
-             primitiveCategory));
+              primitiveCategory));
         }
         break;
       case STRUCT:
@@ -585,10 +585,10 @@ public class HiveIcebergMetaHook extends BaseHiveIcebergMetaHook {
           if (partitionFieldMap.containsKey(entry.getKey())) {
             PartitionField partitionField = partitionFieldMap.get(entry.getKey());
             Type resultType = partitionField.transform().getResultType(icebergTable.schema()
-                    .findField(partitionField.sourceId()).type());
+                .findField(partitionField.sourceId()).type());
             TransformSpec.TransformType transformType = TransformSpec.fromString(partitionField.transform().toString());
             Object value = Conversions.fromPartitionString(resultType, partColValue);
-            Iterable iterable = () -> Collections.singletonList(value).iterator();
+            Iterable<Object> iterable = () -> Collections.singletonList(value).iterator();
             if (TransformSpec.TransformType.IDENTITY.equals(transformType)) {
               Expression boundPredicate = Expressions.in(partitionField.name(), iterable);
               subExp = Expressions.and(subExp, boundPredicate);
@@ -621,7 +621,7 @@ public class HiveIcebergMetaHook extends BaseHiveIcebergMetaHook {
   }
 
   private void alterTableProperties(org.apache.hadoop.hive.metastore.api.Table hmsTable,
-      Map<String, String> contextProperties) {
+                                    Map<String, String> contextProperties) {
     Map<String, String> hmsTableParameters = hmsTable.getParameters();
     Splitter splitter = Splitter.on(PROPERTIES_SEPARATOR).omitEmptyStrings();
     UpdateProperties icebergUpdateProperties = icebergTable.updateProperties();
@@ -635,7 +635,7 @@ public class HiveIcebergMetaHook extends BaseHiveIcebergMetaHook {
   }
 
   private void setupAlterOperationType(org.apache.hadoop.hive.metastore.api.Table hmsTable,
-      EnvironmentContext context) throws MetaException {
+                                       EnvironmentContext context) throws MetaException {
     TableName tableName = new TableName(hmsTable.getCatName(), hmsTable.getDbName(), hmsTable.getTableName());
     if (context == null || context.getProperties() == null) {
       throw new MetaException("ALTER TABLE operation type on Iceberg table " + tableName +
@@ -805,13 +805,13 @@ public class HiveIcebergMetaHook extends BaseHiveIcebergMetaHook {
         updateSchema.updateColumnDoc(oldField.getName(), updatedField.getComment());
       }
 
-    // case 2: only column type and/or comment changed
+      // case 2: only column type and/or comment changed
     } else if (!schemaDifference.getTypeChanged().isEmpty()) {
       FieldSchema updatedField = schemaDifference.getTypeChanged().get(0);
       updateSchema.updateColumn(updatedField.getName(), getPrimitiveTypeOrThrow(updatedField),
           updatedField.getComment());
 
-    // case 3: only comment changed
+      // case 3: only comment changed
     } else if (!schemaDifference.getCommentChanged().isEmpty()) {
       FieldSchema updatedField = schemaDifference.getCommentChanged().get(0);
       updateSchema.updateColumnDoc(updatedField.getName(), updatedField.getComment());
@@ -895,8 +895,8 @@ public class HiveIcebergMetaHook extends BaseHiveIcebergMetaHook {
 
   @Override
   public void preDropPartitions(org.apache.hadoop.hive.metastore.api.Table hmsTable,
-      EnvironmentContext context,
-      List<org.apache.commons.lang3.tuple.Pair<Integer, byte[]>> partExprs)
+                                EnvironmentContext context,
+                                List<org.apache.commons.lang3.tuple.Pair<Integer, byte[]>> partExprs)
       throws MetaException {
     Table icebergTbl = IcebergTableUtil.getTable(conf, hmsTable);
     DeleteFiles deleteFiles = icebergTbl.newDelete();
@@ -984,7 +984,7 @@ public class HiveIcebergMetaHook extends BaseHiveIcebergMetaHook {
   }
 
   private static UnboundPredicate<Object> getPartitionPredicate(PartitionData partitionData, PartitionField field,
-      int index, Schema schema) {
+                                                                int index, Schema schema) {
     String columName = schema.findField(field.sourceId()).name();
     TransformSpec transformSpec = TransformSpec.fromString(field.transform().toString(), columName);
 

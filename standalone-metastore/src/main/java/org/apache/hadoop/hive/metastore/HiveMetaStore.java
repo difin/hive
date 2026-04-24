@@ -90,6 +90,7 @@ import org.apache.hadoop.hive.common.ValidReaderWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
 import org.apache.hadoop.hive.common.ZKDeRegisterWatcher;
 import org.apache.hadoop.hive.common.ZooKeeperHiveHelper;
+import org.apache.hadoop.hive.metastore.ServletSecurity.AuthType;
 import org.apache.hadoop.hive.common.repl.ReplConst;
 import org.apache.hadoop.hive.metastore.api.*;
 import org.apache.hadoop.hive.metastore.api.Package;
@@ -177,6 +178,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 
@@ -215,13 +217,27 @@ public class HiveMetaStore extends ThriftHiveMetastore {
   private static ZooKeeperHiveHelper zooKeeperHelper = null;
   private static String msHost = null;
   private static ThriftServer thriftServer;
-  private static Server propertyServer = null;
-  private static Server icebergServer = null;
+  /** the servlet server. */
+  private static Server servletServer = null;
+  /** the port and path of the property servlet. */
+  private static int propertyServletPort = -1;
 
-  public static Server getPropertyServer() {
-    return propertyServer;
+  /**
+   * Gets the embedded servlet server.
+   * @return the server instance or null
+   */
+  public static Server getServletServer() {
+    return servletServer;
   }
 
+  /**
+   * Gets the property servlet connector port.
+   * <p>If configuration is 0, this port is allocated by the system.</p>
+   * @return the connector port or -1 if not configured
+   */
+  public static int getPropertyServletPort() {
+    return propertyServletPort;
+  }
 
   public static boolean isRenameAllowed(Database srcDB, Database destDB) {
     if (!srcDB.getName().equalsIgnoreCase(destDB.getName())) {
@@ -11605,6 +11621,14 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         if (isCliVerbose) {
           System.err.println(shutdownMsg);
         }
+        // servlet server
+        if (servletServer != null) {
+          try {
+            servletServer.stop();
+          } catch (Exception e) {
+            LOG.error("Error stopping Property Map server.", e);
+          }
+        }
         if (MetastoreConf.getBoolVar(conf, ConfVars.METRICS_ENABLED)) {
           try {
             Metrics.shutdown();
@@ -11771,7 +11795,10 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     IHMSHandler handler = newRetryingHMSHandler(baseHandler, conf);
     processor = new ThriftHiveMetastore.Processor<>(handler);
     LOG.info("Starting DB backed MetaStore Server with generic processor");
-    TServlet thriftHttpServlet = new HmsThriftHttpServlet(processor, protocolFactory, conf);
+    boolean jwt = MetastoreConf.getVar(conf, ConfVars.THRIFT_METASTORE_AUTHENTICATION).equalsIgnoreCase("jwt");
+    AuthType authType = jwt ? AuthType.JWT : AuthType.SIMPLE;
+    ServletSecurity security = new ServletSecurity(authType, conf);
+    Servlet thriftHttpServlet = security.proxy(new TServlet(processor, protocolFactory));
 
     boolean directSqlEnabled = MetastoreConf.getBoolVar(conf, ConfVars.TRY_DIRECT_SQL);
     HMSHandler.LOG.info("Direct SQL optimization = {}",  directSqlEnabled);
@@ -12061,11 +12088,14 @@ public class HiveMetaStore extends ThriftHiveMetastore {
           throw e;
         }
       }
-      // optionally create and start the property server and servlet
-      propertyServer = PropertyServlet.startServer(conf);
-      // optionally create and start the Iceberg REST server and servlet
-      icebergServer = startIcebergCatalog(conf);
-
+      // optionally create and start the property and Iceberg REST server
+      ServletServerBuilder builder = new ServletServerBuilder(conf);
+      ServletServerBuilder.Descriptor properties = builder.addServlet(PropertyServlet.createServlet(conf));
+      builder.addServlet(createCatalogServlet(conf));
+      servletServer = builder.start(LOG);
+      if (servletServer != null && properties != null) {
+        propertyServletPort = properties.getPort();
+      }
       thriftServer.start();
     } catch (Throwable x) {
       x.printStackTrace();
@@ -12074,33 +12104,34 @@ public class HiveMetaStore extends ThriftHiveMetastore {
     }
   }
 
-  static Server startIcebergCatalog(Configuration source) {
-    Configuration configuration = new Configuration(source);
-    String curi = configuration.get(MetastoreConf.ConfVars.THRIFT_URIS.getVarname());
-    String cwarehouse = configuration.get(MetastoreConf.ConfVars.WAREHOUSE.getVarname());
-    String cextwarehouse = configuration.get(MetastoreConf.ConfVars.WAREHOUSE_EXTERNAL.getVarname());
+  /**
+   * Creates the HMS catalog servlet descriptor.
+   * @param configuration the configuration
+   * @return the servlet descriptor (can be null)
+   */
+  static ServletServerBuilder.Descriptor createCatalogServlet(Configuration configuration) {
     try {
-      Class<?> iceClazz = Class.forName("org.apache.iceberg.rest.HMSCatalogServer");
-      Method iceStart = iceClazz.getMethod("startServer", Configuration.class);
-      return (Server) iceStart.invoke(null, configuration);
+      String className = MetastoreConf.getVar(configuration, ConfVars.CATALOG_SERVLET_FACTORY);
+      Class<?> iceClazz = Class.forName(className);
+      Method iceStart = iceClazz.getMethod("createServlet", Configuration.class);
+      return (ServletServerBuilder.Descriptor) iceStart.invoke(null, configuration);
     } catch (ClassNotFoundException xnf) {
-      LOG.warn("Class org.apache.iceberg.rest.HMSCatalogServer not found in classpath, " +
-              "REST service not started. Ensure hms catalog jar is in $HIVE_HOME/lib");
+      LOG.warn("Unable to start the Catalog server, missing jar?", xnf);
       return null;
-    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-      LOG.error("error starting Iceberg REST server {}", e);
+    } catch (Exception e) {
+      LOG.error("Unable to start the Catalog server", e);
       return null;
     }
   }
 
   public static Server getIcebergServer() {
-    return icebergServer;
+    return servletServer;
   }
 
   /**
    * @param port where metastore server is running
    * @return metastore server instance URL. If the metastore server was bound to a configured
-   * host, return that appended by port. Otherwise return the externally visible URL of the local
+   * host, return that appended by port. Otherwise, return the externally visible URL of the local
    * host with the given port
    * @throws Exception
    */

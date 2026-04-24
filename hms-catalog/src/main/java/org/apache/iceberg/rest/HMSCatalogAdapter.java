@@ -19,19 +19,23 @@
 
 package org.apache.iceberg.rest;
 
-import com.codahale.metrics.Counter;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.metastore.metrics.Metrics;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.hive.metastore.HMSServletSecurity;
+import org.apache.hadoop.hive.metastore.RangerPrivilegeHelper;
+import org.apache.hadoop.hive.metastore.RangerPrivilegeHelper.AccessLevel;
 import org.apache.iceberg.BaseMetadataTable;
 import org.apache.iceberg.BaseTable;
+import org.apache.iceberg.BaseTransaction;
 import org.apache.iceberg.Table;
-import org.apache.iceberg.TableAccess;
 import org.apache.iceberg.TableMetadata;
+import org.apache.iceberg.Transaction;
+import org.apache.iceberg.Transactions;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.SupportsNamespaces;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.catalog.ViewCatalog;
 import org.apache.iceberg.exceptions.AlreadyExistsException;
 import org.apache.iceberg.exceptions.CommitFailedException;
 import org.apache.iceberg.exceptions.CommitStateUnknownException;
@@ -47,12 +51,17 @@ import org.apache.iceberg.exceptions.ValidationException;
 import org.apache.iceberg.metering.CatalogMeteringEventPublisher;
 import org.apache.iceberg.relocated.com.google.common.base.Splitter;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
+import org.apache.iceberg.relocated.com.google.common.collect.Lists;
+import org.apache.iceberg.rest.requests.CommitTransactionRequest;
 import org.apache.iceberg.rest.requests.CreateNamespaceRequest;
 import org.apache.iceberg.rest.requests.CreateTableRequest;
+import org.apache.iceberg.rest.requests.CreateViewRequest;
+import org.apache.iceberg.rest.requests.RegisterTableRequest;
 import org.apache.iceberg.rest.requests.RenameTableRequest;
 import org.apache.iceberg.rest.requests.ReportMetricsRequest;
 import org.apache.iceberg.rest.requests.UpdateNamespacePropertiesRequest;
 import org.apache.iceberg.rest.requests.UpdateTableRequest;
+import org.apache.iceberg.rest.credentials.Credential;
 import org.apache.iceberg.rest.responses.ConfigResponse;
 import org.apache.iceberg.rest.responses.CreateNamespaceResponse;
 import org.apache.iceberg.rest.responses.ErrorResponse;
@@ -60,6 +69,8 @@ import org.apache.iceberg.rest.responses.GetNamespaceResponse;
 import org.apache.iceberg.rest.responses.ListNamespacesResponse;
 import org.apache.iceberg.rest.responses.ListTablesResponse;
 import org.apache.iceberg.rest.responses.LoadTableResponse;
+import org.apache.iceberg.rest.responses.LoadViewResponse;
+import org.apache.iceberg.rest.responses.HMSLoadCredentialsResponse;
 import org.apache.iceberg.rest.responses.OAuthTokenResponse;
 import org.apache.iceberg.rest.responses.UpdateNamespacePropertiesResponse;
 import org.apache.iceberg.util.Pair;
@@ -67,28 +78,21 @@ import org.apache.iceberg.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.codahale.metrics.Counter;
 
 /**
- * Original @ https://github.com/apache/iceberg/blob/main/core/src/test/java/org/apache/iceberg/rest/RESTCatalogAdapter.java
+ * Original @ <a href="https://github.com/apache/iceberg/blob/1.6.x/core/src/test/java/org/apache/iceberg/rest/RESTCatalogAdapter.java">...</a>
+ * Adaptor class to translate REST requests into {@link Catalog} API calls.
  */
-
-/** Adaptor class to translate REST requests into {@link Catalog} API calls. */
 public class HMSCatalogAdapter implements RESTClient {
-  /**  The metric names prefix. */
-  static final String HMS_METRIC_PREFIX = "hmscatalog.";
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogAdapter.class);
   private static final Splitter SLASH = Splitter.on('/');
   private static final AtomicInteger REQUEST_ID_COUNTER = new AtomicInteger(0);
@@ -97,7 +101,7 @@ public class HMSCatalogAdapter implements RESTClient {
       ImmutableMap.<Class<? extends Exception>, Integer>builder()
           .put(IllegalArgumentException.class, 400)
           .put(ValidationException.class, 400)
-          .put(NamespaceNotEmptyException.class, 400) // TODO: should this be more specific?
+          .put(NamespaceNotEmptyException.class, 409)
           .put(NotAuthorizedException.class, 401)
           .put(ForbiddenException.class, 403)
           .put(NoSuchNamespaceException.class, 404)
@@ -110,8 +114,12 @@ public class HMSCatalogAdapter implements RESTClient {
           .put(CommitStateUnknownException.class, 500)
           .buildOrThrow();
 
+  private static final String VIEWS_PATH = "v1/namespaces/{namespace}/views/{name}";
+  private static final String TABLES_PATH = "v1/namespaces/{namespace}/tables/{table}";
+
   private final Catalog catalog;
   private final SupportsNamespaces asNamespaceCatalog;
+  private final ViewCatalog asViewCatalog;
 
   private final CatalogMeteringEventPublisher catalogMeteringEventPublisher;
 
@@ -123,6 +131,7 @@ public class HMSCatalogAdapter implements RESTClient {
     this.catalogMeteringEventPublisher = new CatalogMeteringEventPublisher(configuration);
     this.asNamespaceCatalog =
         catalog instanceof SupportsNamespaces ? (SupportsNamespaces) catalog : null;
+    this.asViewCatalog = catalog instanceof ViewCatalog ? (ViewCatalog) catalog : null;
   }
 
   enum HTTPMethod {
@@ -133,52 +142,52 @@ public class HMSCatalogAdapter implements RESTClient {
   }
 
   enum Route {
-    TOKENS(HTTPMethod.POST, "v1/oauth/tokens", null, OAuthTokenResponse.class),
-    CONFIG(HTTPMethod.GET, "v1/config", null, ConfigResponse.class),
-    LIST_NAMESPACES(HTTPMethod.GET, "v1/namespaces", null, ListNamespacesResponse.class),
-    CREATE_NAMESPACE(
-        HTTPMethod.POST,
-        "v1/namespaces",
-        CreateNamespaceRequest.class,
-        CreateNamespaceResponse.class),
-    LOAD_NAMESPACE(HTTPMethod.GET, "v1/namespaces/{namespace}", null, GetNamespaceResponse.class),
+    TOKENS(HTTPMethod.POST, "v1/oauth/tokens",
+        null, OAuthTokenResponse.class),
+    CONFIG(HTTPMethod.GET, "v1/config",
+        null, ConfigResponse.class),
+    LIST_NAMESPACES(HTTPMethod.GET, "v1/namespaces",
+        null, ListNamespacesResponse.class),
+    CREATE_NAMESPACE(HTTPMethod.POST, "v1/namespaces",
+        CreateNamespaceRequest.class, CreateNamespaceResponse.class),
+    LOAD_NAMESPACE(HTTPMethod.GET, "v1/namespaces/{namespace}",
+        null, GetNamespaceResponse.class),
+    NAMESPACE_EXISTS(HTTPMethod.HEAD, "v1/namespaces/{namespace}"),
     DROP_NAMESPACE(HTTPMethod.DELETE, "v1/namespaces/{namespace}"),
-    UPDATE_NAMESPACE(
-        HTTPMethod.POST,
-        "v1/namespaces/{namespace}/properties",
-        UpdateNamespacePropertiesRequest.class,
-        UpdateNamespacePropertiesResponse.class),
-    LIST_TABLES(HTTPMethod.GET, "v1/namespaces/{namespace}/tables", null, ListTablesResponse.class),
-    CREATE_TABLE(
-        HTTPMethod.POST,
-        "v1/namespaces/{namespace}/tables",
-        CreateTableRequest.class,
-        LoadTableResponse.class),
-    LOAD_TABLE(
-        HTTPMethod.GET, "v1/namespaces/{namespace}/tables/{table}", null, LoadTableResponse.class),
-
-    REGISTER_TABLE(
-        HTTPMethod.POST,
-        "v1/namespaces/{namespace}/register",
-        RegisterTableRequest.class,
-        LoadTableResponse.class),
-
-    UPDATE_TABLE(
-        HTTPMethod.POST,
-        "v1/namespaces/{namespace}/tables/{table}",
-        UpdateTableRequest.class,
-        LoadTableResponse.class),
-    DROP_TABLE(HTTPMethod.DELETE, "v1/namespaces/{namespace}/tables/{table}"),
-    RENAME_TABLE(HTTPMethod.POST, "v1/tables/rename", RenameTableRequest.class, null),
-    REPORT_METRICS(
-        HTTPMethod.POST,
-        "v1/namespaces/{namespace}/tables/{table}/metrics",
-        ReportMetricsRequest.class,
-        null),
-    /**
-    COMMIT_TRANSACTION(
-        HTTPMethod.POST, "v1/transactions/commit", CommitTransactionRequest.class, null)
-     */;
+    UPDATE_NAMESPACE(HTTPMethod.POST, "v1/namespaces/{namespace}/properties",
+        UpdateNamespacePropertiesRequest.class, UpdateNamespacePropertiesResponse.class),
+    LIST_TABLES(HTTPMethod.GET, "v1/namespaces/{namespace}/tables",
+        null, ListTablesResponse.class),
+    CREATE_TABLE(HTTPMethod.POST, "v1/namespaces/{namespace}/tables",
+        CreateTableRequest.class, LoadTableResponse.class),
+    LOAD_TABLE(HTTPMethod.GET, TABLES_PATH,
+        null, LoadTableResponse.class),
+    TABLE_EXISTS(HTTPMethod.HEAD, TABLES_PATH),
+    REGISTER_TABLE(HTTPMethod.POST, "v1/namespaces/{namespace}/register",
+        RegisterTableRequest.class, LoadTableResponse.class),
+    UPDATE_TABLE(HTTPMethod.POST, TABLES_PATH,
+        UpdateTableRequest.class, LoadTableResponse.class),
+    DROP_TABLE(HTTPMethod.DELETE, TABLES_PATH),
+    LOAD_CREDENTIALS(HTTPMethod.GET, "v1/namespaces/{namespace}/tables/{table}/credentials",
+        null, HMSLoadCredentialsResponse.class),
+    RENAME_TABLE(HTTPMethod.POST, "v1/tables/rename",
+        RenameTableRequest.class, null),
+    REPORT_METRICS(HTTPMethod.POST, "v1/namespaces/{namespace}/tables/{table}/metrics",
+        ReportMetricsRequest.class, null),
+    COMMIT_TRANSACTION(HTTPMethod.POST, "v1/transactions/commit",
+        CommitTransactionRequest.class, null),
+    LIST_VIEWS(HTTPMethod.GET, "v1/namespaces/{namespace}/views",
+        null, ListTablesResponse.class),
+    LOAD_VIEW(HTTPMethod.GET, VIEWS_PATH,
+        null, LoadViewResponse.class),
+    VIEW_EXISTS(HTTPMethod.HEAD, VIEWS_PATH),
+    CREATE_VIEW(HTTPMethod.POST, "v1/namespaces/{namespace}/views",
+        CreateViewRequest.class, LoadViewResponse.class),
+    UPDATE_VIEW(HTTPMethod.POST, VIEWS_PATH,
+        UpdateTableRequest.class, LoadViewResponse.class),
+    RENAME_VIEW(HTTPMethod.POST, "v1/views/rename",
+        RenameTableRequest.class, null),
+    DROP_VIEW(HTTPMethod.DELETE, VIEWS_PATH);
 
     private final HTTPMethod method;
     private final int requiredLength;
@@ -189,6 +198,7 @@ public class HMSCatalogAdapter implements RESTClient {
 
     /**
      * An exception safe way of getting a route by name.
+     *
      * @param name the route name
      * @return the route instance or null if it could not be found
      */
@@ -226,7 +236,6 @@ public class HMSCatalogAdapter implements RESTClient {
 
       this.requestClass = requestClass;
       this.responseClass = responseClass;
-
       this.requiredLength = parts.size();
       this.requirements = requirementsBuilder.build();
       this.variables = variablesBuilder.build();
@@ -269,47 +278,245 @@ public class HMSCatalogAdapter implements RESTClient {
     }
   }
 
-  /**
-   * @param route a route/api-call name
-   * @return the metric counter name for the api-call
-   */
-  static String hmsCatalogMetricCount(String route) {
-    return HMS_METRIC_PREFIX + route.toLowerCase() + ".count";
+
+  private ConfigResponse config() {
+    return castResponse(ConfigResponse.class, ConfigResponse.builder().build());
   }
 
-  /**
-   * @param apis an optional list of known api call names
-   * @return the list of metric names for the HMSCatalog class
-   */
-  public static List<String> getMetricNames(String... apis) {
-    final List<Route> routes;
-    if (apis != null && apis.length > 0) {
-      routes = Arrays.stream(apis)
-          .map(Route::byName)
-          .filter(Objects::nonNull)
-          .collect(Collectors.toList());
+  private ListNamespacesResponse listNamespaces(Map<String, String> vars) {
+    if (asNamespaceCatalog != null) {
+      Namespace namespace;
+      if (vars.containsKey("parent")) {
+        namespace = Namespace.of(RESTUtil.NAMESPACE_SPLITTER.splitToStream(vars.get("parent")).toArray(String[]::new));
+      } else {
+        namespace = Namespace.empty();
+      }
+      return castResponse(ListNamespacesResponse.class, CatalogHandlers.listNamespaces(asNamespaceCatalog, namespace));
+    }
+    throw new NamespaceNotSupported(catalog.toString());
+  }
+
+  private CreateNamespaceResponse createNamespace(Object body) {
+    if (asNamespaceCatalog != null) {
+      CreateNamespaceRequest request = castRequest(CreateNamespaceRequest.class, body);
+      return castResponse(
+          CreateNamespaceResponse.class, CatalogHandlers.createNamespace(asNamespaceCatalog, request));
+    }
+    throw new NamespaceNotSupported(catalog.toString());
+  }
+
+  private GetNamespaceResponse loadNamespace(Map<String, String> vars) {
+    if (asNamespaceCatalog != null) {
+      Namespace namespace = namespaceFromPathVars(vars);
+      return castResponse(
+          GetNamespaceResponse.class, CatalogHandlers.loadNamespace(asNamespaceCatalog, namespace));
+    }
+    throw new NamespaceNotSupported(catalog.toString());
+  }
+
+  private RESTResponse namespaceExists(Map<String, String> vars) {
+    if (asNamespaceCatalog != null) {
+      Namespace namespace = namespaceFromPathVars(vars);
+      if (!asNamespaceCatalog.namespaceExists(namespace)) {
+        throw new NoSuchNamespaceException("Namespace does not exist: %s", namespace);
+      }
+      return null;
+    }
+    throw new NamespaceNotSupported(catalog.toString());
+  }
+
+  private RESTResponse dropNamespace(Map<String, String> vars) {
+    if (asNamespaceCatalog != null) {
+      CatalogHandlers.dropNamespace(asNamespaceCatalog, namespaceFromPathVars(vars));
+      return null;
+    }
+    throw new NamespaceNotSupported(catalog.toString());
+  }
+
+  private UpdateNamespacePropertiesResponse updateNamespace(Map<String, String> vars, Object body) {
+    if (asNamespaceCatalog != null) {
+      Namespace namespace = namespaceFromPathVars(vars);
+      UpdateNamespacePropertiesRequest request =
+          castRequest(UpdateNamespacePropertiesRequest.class, body);
+      return castResponse(
+          UpdateNamespacePropertiesResponse.class,
+          CatalogHandlers.updateNamespaceProperties(asNamespaceCatalog, namespace, request));
+    }
+    throw new NamespaceNotSupported(catalog.toString());
+  }
+
+  private ListTablesResponse listTables(Map<String, String> vars) {
+    Namespace namespace = namespaceFromPathVars(vars);
+    return castResponse(ListTablesResponse.class, CatalogHandlers.listTables(catalog, namespace));
+  }
+
+  private LoadTableResponse createTable(Map<String, String> vars, Object body) {
+    final Class<LoadTableResponse> responseType = LoadTableResponse.class;
+    Namespace namespace = namespaceFromPathVars(vars);
+    CreateTableRequest request = castRequest(CreateTableRequest.class, body);
+    request.validate();
+    if (request.stageCreate()) {
+      return castResponse(
+          responseType, CatalogHandlers.stageTableCreate(catalog, namespace, request));
     } else {
-      routes = Arrays.asList(Route.values());
+      return castResponse(
+          responseType, CatalogHandlers.createTable(catalog, namespace, request));
     }
-    final List<String> metricNames = new ArrayList<>(routes.size());
-    for (Route route : routes) {
-      metricNames.add(hmsCatalogMetricCount(route.name()));
-    }
-    return metricNames;
   }
 
-
-
-  @SuppressWarnings("MethodLength")
-  public <T extends RESTResponse> T handleRequest(
-      Route route, Map<String, String> vars, Object body, Class<T> responseType, String requestId) {
-    // update HMS catalog route counter metric
-    LOG.debug("API_HANDLER [{}] Processing route: {}", requestId, route);
-    final String metricName = hmsCatalogMetricCount(route.name());
-    Counter counter = Metrics.getOrCreateCounter(metricName);
-    if (counter != null) {
-      counter.inc();
+  private RESTResponse dropTable(Map<String, String> vars) {
+    if (PropertyUtil.propertyAsBoolean(vars, "purgeRequested", false)) {
+      CatalogHandlers.purgeTable(catalog, identFromPathVars(vars));
+    } else {
+      CatalogHandlers.dropTable(catalog, identFromPathVars(vars));
     }
+    return null;
+  }
+
+  private LoadTableResponse loadTable(Map<String, String> vars) {
+    TableIdentifier ident = identFromPathVars(vars);
+    return castResponse(LoadTableResponse.class, CatalogHandlers.loadTable(catalog, ident));
+  }
+
+  private RESTResponse tableExists(Map<String, String> vars) {
+    TableIdentifier ident = identFromPathVars(vars);
+    if (!catalog.tableExists(ident)) {
+      throw new NoSuchTableException("Table does not exist: %s", ident);
+    }
+    return null;
+  }
+
+  private LoadTableResponse registerTable(Map<String, String> vars, Object body) {
+    Namespace namespace = namespaceFromPathVars(vars);
+    RegisterTableRequest request = castRequest(RegisterTableRequest.class, body);
+    return castResponse(LoadTableResponse.class, CatalogHandlers.registerTable(catalog, namespace, request));
+  }
+
+  private LoadTableResponse updateTable(Map<String, String> vars, Object body) {
+    TableIdentifier ident = identFromPathVars(vars);
+    UpdateTableRequest request = castRequest(UpdateTableRequest.class, body);
+    return castResponse(LoadTableResponse.class, CatalogHandlers.updateTable(catalog, ident, request));
+  }
+
+  private RESTResponse renameTable(Object body) {
+    RenameTableRequest request = castRequest(RenameTableRequest.class, body);
+    CatalogHandlers.renameTable(catalog, request);
+    return null;
+  }
+
+  private RESTResponse reportMetrics(Object body) {
+    // nothing to do here other than checking that we're getting the correct request
+    castRequest(ReportMetricsRequest.class, body);
+    return null;
+  }
+
+  private RESTResponse commitTransaction(Object body) {
+    CommitTransactionRequest request = castRequest(CommitTransactionRequest.class, body);
+    commitTransaction(catalog, request);
+    return null;
+  }
+
+  private ListTablesResponse listViews(Map<String, String> vars) {
+    if (null != asViewCatalog) {
+      Namespace namespace = namespaceFromPathVars(vars);
+      // TODO: Add pagination support when Iceberg is upgraded to 1.7.0+
+      // String pageToken = PropertyUtil.propertyAsString(vars, "pageToken", null);
+      // String pageSize = PropertyUtil.propertyAsString(vars, "pageSize", null);
+      return castResponse(
+          ListTablesResponse.class,
+          CatalogHandlers.listViews(asViewCatalog, namespace));
+    }
+    throw new ViewNotSupported(catalog.toString());
+  }
+
+  private LoadViewResponse createView(Map<String, String> vars, Object body) {
+    if (null != asViewCatalog) {
+      Namespace namespace = namespaceFromPathVars(vars);
+      CreateViewRequest request = castRequest(CreateViewRequest.class, body);
+      return castResponse(
+          LoadViewResponse.class, CatalogHandlers.createView(asViewCatalog, namespace, request));
+    }
+    throw new ViewNotSupported(catalog.toString());
+  }
+
+  private LoadViewResponse loadView(Map<String, String> vars) {
+    if (null != asViewCatalog) {
+      TableIdentifier ident = identFromPathVars(vars);
+      return castResponse(LoadViewResponse.class, CatalogHandlers.loadView(asViewCatalog, ident));
+    }
+    throw new ViewNotSupported(catalog.toString());
+  }
+
+  private RESTResponse viewExists(Map<String, String> vars) {
+    if (null != asViewCatalog) {
+      TableIdentifier ident = viewIdentFromPathVars(vars);
+      if (!asViewCatalog.viewExists(ident)) {
+        throw new NoSuchTableException("View does not exist: %s", ident);
+      }
+      return null;
+    }
+    throw new ViewNotSupported(catalog.toString());
+  }
+
+  private LoadViewResponse updateView(Map<String, String> vars, Object body) {
+    if (null != asViewCatalog) {
+      TableIdentifier ident = identFromPathVars(vars);
+      UpdateTableRequest request = castRequest(UpdateTableRequest.class, body);
+      return castResponse(
+          LoadViewResponse.class, CatalogHandlers.updateView(asViewCatalog, ident, request));
+    }
+    throw new ViewNotSupported(catalog.toString());
+  }
+
+  private RESTResponse renameView(Object body) {
+    if (null != asViewCatalog) {
+      RenameTableRequest request = castRequest(RenameTableRequest.class, body);
+      CatalogHandlers.renameView(asViewCatalog, request);
+      return null;
+    }
+    throw new ViewNotSupported(catalog.toString());
+  }
+
+  private RESTResponse dropView(Map<String, String> vars) {
+    if (null != asViewCatalog) {
+      CatalogHandlers.dropView(asViewCatalog, identFromPathVars(vars));
+      return null;
+    }
+    throw new ViewNotSupported(catalog.toString());
+  }
+
+  /**
+   * This is a very simplistic approach that only validates the requirements for each table and does
+   * not do any other conflict detection. Therefore, it does not guarantee true transactional
+   * atomicity, which is left to the implementation details of a REST server.
+   */
+  private static void commitTransaction(Catalog catalog, CommitTransactionRequest request) {
+    List<Transaction> transactions = Lists.newArrayList();
+
+    for (UpdateTableRequest tableChange : request.tableChanges()) {
+      Table table = catalog.loadTable(tableChange.identifier());
+      if (table instanceof BaseTable) {
+        Transaction transaction =
+            Transactions.newTransaction(
+                tableChange.identifier().toString(), ((BaseTable) table).operations());
+        transactions.add(transaction);
+
+        BaseTransaction.TransactionTable txTable =
+            (BaseTransaction.TransactionTable) transaction.table();
+
+        // this performs validations and makes temporary commits that are in-memory
+        CatalogHandlers.commit(txTable.operations(), tableChange);
+      } else {
+        throw new IllegalStateException("Cannot wrap catalog that does not produce BaseTable");
+      }
+    }
+    // only commit if validations passed previously
+    transactions.forEach(Transaction::commitTransaction);
+  }
+
+  @SuppressWarnings({"MethodLength", "unchecked"})
+  private <T extends RESTResponse> T handleRequest(
+      Route route, Map<String, String> vars, Object body, String requestId) {
     catalogMeteringEventPublisher.updateAPICount();
     switch (route) {
       case TOKENS: {
@@ -319,13 +526,11 @@ public class HMSCatalogAdapter implements RESTClient {
         String grantType = request.get("grant_type");
         switch (grantType) {
           case "client_credentials":
-            return castResponse(
-                responseType,
-                OAuthTokenResponse.builder()
-                    .withToken("client-credentials-token:sub=" + request.get("client_id"))
-                    .withIssuedTokenType("urn:ietf:params:oauth:token-type:access_token")
-                    .withTokenType("Bearer")
-                    .build());
+            return (T) OAuthTokenResponse.builder()
+                .withToken("client-credentials-token:sub=" + request.get("client_id"))
+                .withIssuedTokenType("urn:ietf:params:oauth:token-type:access_token")
+                .withTokenType("Bearer")
+                .build();
 
           case "urn:ietf:params:oauth:grant-type:token-exchange":
             String actor = request.get("actor_token");
@@ -333,13 +538,11 @@ public class HMSCatalogAdapter implements RESTClient {
                 String.format(
                     "token-exchange-token:sub=%s%s",
                     request.get("subject_token"), actor != null ? ",act=" + actor : "");
-            return castResponse(
-                responseType,
-                OAuthTokenResponse.builder()
-                    .withToken(token)
-                    .withIssuedTokenType("urn:ietf:params:oauth:token-type:access_token")
-                    .withTokenType("Bearer")
-                    .build());
+            return (T) OAuthTokenResponse.builder()
+                .withToken(token)
+                .withIssuedTokenType("urn:ietf:params:oauth:token-type:access_token")
+                .withTokenType("Bearer")
+                .build();
 
           default:
             throw new UnsupportedOperationException("Unsupported grant_type: " + grantType);
@@ -348,138 +551,107 @@ public class HMSCatalogAdapter implements RESTClient {
 
       case CONFIG:
         LOG.debug("API_OPERATION [{}] Retrieving catalog configuration", requestId);
-        return castResponse(responseType, ConfigResponse.builder().build());
+        return (T) config();
 
       case LIST_NAMESPACES:
         LOG.debug("API_OPERATION [{}] Listing namespaces", requestId);
-        if (asNamespaceCatalog != null) {
-          Namespace ns;
-          if (vars.containsKey("parent")) {
-            ns =
-                Namespace.of(
-                    RESTUtil.NAMESPACE_SPLITTER
-                        .splitToStream(vars.get("parent"))
-                        .toArray(String[]::new));
-          } else {
-            ns = Namespace.empty();
-          }
-
-          return castResponse(responseType, CatalogHandlers.listNamespaces(asNamespaceCatalog, ns));
-        }
-        break;
+        return (T) listNamespaces(vars);
 
       case CREATE_NAMESPACE:
         LOG.debug("API_OPERATION [{}] Creating namespace", requestId);
-        if (asNamespaceCatalog != null) {
-          CreateNamespaceRequest request = castRequest(CreateNamespaceRequest.class, body);
-          LOG.debug("API_OPERATION [{}] Creating namespace: {}", requestId, request.namespace());
-          return castResponse(
-              responseType, CatalogHandlers.createNamespace(asNamespaceCatalog, request));
-        }
-        break;
+        return (T) createNamespace(body);
 
       case LOAD_NAMESPACE:
         LOG.debug("API_OPERATION [{}] Loading namespace", requestId);
-        if (asNamespaceCatalog != null) {
-          Namespace namespace = namespaceFromPathVars(vars);
-          LOG.debug("API_OPERATION [{}] Loading namespace: {}", requestId, namespace);
-          return castResponse(
-              responseType, CatalogHandlers.loadNamespace(asNamespaceCatalog, namespace));
-        }
-        break;
+        return (T) loadNamespace(vars);
+
+      case NAMESPACE_EXISTS:
+        LOG.debug("API_OPERATION [{}] Checking namespace exists", requestId);
+        return (T) namespaceExists(vars);
 
       case DROP_NAMESPACE:
         LOG.debug("API_OPERATION [{}] Dropping namespace", requestId);
-        if (asNamespaceCatalog != null) {
-          Namespace namespace = namespaceFromPathVars(vars);
-          LOG.debug("API_OPERATION [{}] Dropping namespace: {}", requestId, namespace);
-          CatalogHandlers.dropNamespace(asNamespaceCatalog, namespace);
-          return null;
-        }
-        break;
+        return (T) dropNamespace(vars);
 
       case UPDATE_NAMESPACE:
         LOG.debug("API_OPERATION [{}] Updating namespace properties", requestId);
-        if (asNamespaceCatalog != null) {
-          Namespace namespace = namespaceFromPathVars(vars);
-          LOG.debug("API_OPERATION [{}] Updating namespace properties: {}", requestId, namespace);
-          UpdateNamespacePropertiesRequest request =
-              castRequest(UpdateNamespacePropertiesRequest.class, body);
-          return castResponse(
-              responseType,
-              CatalogHandlers.updateNamespaceProperties(asNamespaceCatalog, namespace, request));
-        }
-        break;
+        return (T) updateNamespace(vars, body);
 
-      case LIST_TABLES: {
-        Namespace namespace = namespaceFromPathVars(vars);
-        LOG.debug("API_OPERATION [{}] Listing tables in namespace: {}", requestId, namespace);
-        return castResponse(responseType, CatalogHandlers.listTables(catalog, namespace));
-      }
+      case LIST_TABLES:
+        LOG.debug("API_OPERATION [{}] Listing tables", requestId);
+        return (T) listTables(vars);
 
-      case CREATE_TABLE: {
-        Namespace namespace = namespaceFromPathVars(vars);
-        CreateTableRequest request = castRequest(CreateTableRequest.class, body);
-        request.validate();
-        LOG.debug("API_OPERATION [{}] Creating table '{}' in namespace: {}", requestId, request.name(), namespace);
-        if (request.stageCreate()) {
-          LOG.debug("API_OPERATION [{}] Staging table creation", requestId);
-          return castResponse(
-              responseType, CatalogHandlers.stageTableCreate(catalog, namespace, request));
-        } else {
-          LOG.debug("API_OPERATION [{}] Direct table creation", requestId);
-          return castResponse(
-              responseType, CatalogHandlers.createTable(catalog, namespace, request));
-        }
-      }
+      case CREATE_TABLE:
+        LOG.debug("API_OPERATION [{}] Creating table", requestId);
+        return (T) createTable(vars, body);
 
-      case DROP_TABLE: {
-        TableIdentifier ident = identFromPathVars(vars);
-        boolean purgeRequested = PropertyUtil.propertyAsBoolean(vars, "purgeRequested", false);
-        LOG.debug("API_OPERATION [{}] Dropping table: {} (purge: {})", requestId, ident, purgeRequested);
-        if (purgeRequested) {
-          CatalogHandlers.purgeTable(catalog, ident);
-        } else {
-          CatalogHandlers.dropTable(catalog, ident);
-        }
-        return null;
-      }
+      case DROP_TABLE:
+        LOG.debug("API_OPERATION [{}] Dropping table", requestId);
+        return (T) dropTable(vars);
 
       case LOAD_TABLE: {
         TableIdentifier ident = identFromPathVars(vars);
         LOG.debug("API_OPERATION [{}] Loading table: {}", requestId, ident);
-        return castResponse(responseType, loadTable(catalog, ident));
+        return (T) loadTable(catalog, ident);
       }
 
-      case REGISTER_TABLE: {
-        Namespace namespace = namespaceFromPathVars(vars);
-        RegisterTableRequest request = castRequest(RegisterTableRequest.class, body);
-        LOG.debug("API_OPERATION [{}] Registering table '{}' in namespace: {}", requestId, request.name(), namespace);
-        return castResponse(
-            responseType, registerTable(catalog, namespace, request));
+      case TABLE_EXISTS:
+        LOG.debug("API_OPERATION [{}] Checking table exists", requestId);
+        return (T) tableExists(vars);
+
+      case LOAD_CREDENTIALS: {
+        TableIdentifier credIdent = identFromPathVars(vars);
+        LOG.debug("API_OPERATION [{}] Loading credentials for table: {}", requestId, credIdent);
+        return (T) loadCredentials(credIdent);
       }
 
-      case UPDATE_TABLE: {
-        TableIdentifier ident = identFromPathVars(vars);
-        UpdateTableRequest request = castRequest(UpdateTableRequest.class, body);
-        LOG.debug("API_OPERATION [{}] Updating table: {}", requestId, ident);
-        return castResponse(responseType, CatalogHandlers.updateTable(catalog, ident, request));
-      }
+      case REGISTER_TABLE:
+        LOG.debug("API_OPERATION [{}] Registering table", requestId);
+        return (T) registerTable(vars, body);
 
-      case RENAME_TABLE: {
-        RenameTableRequest request = castRequest(RenameTableRequest.class, body);
-        LOG.debug("API_OPERATION [{}] Renaming table from '{}' to '{}'",
-            requestId, request.source(), request.destination());
-        CatalogHandlers.renameTable(catalog, request);
-        return null;
-      }
+      case UPDATE_TABLE:
+        LOG.debug("API_OPERATION [{}] Updating table", requestId);
+        return (T) updateTable(vars, body);
 
-      case REPORT_METRICS: {
-        // nothing to do here other than checking that we're getting the correct request
+      case RENAME_TABLE:
+        LOG.debug("API_OPERATION [{}] Renaming table", requestId);
+        return (T) renameTable(body);
+
+      case REPORT_METRICS:
         LOG.debug("API_OPERATION [{}] Reporting metrics", requestId);
-        castRequest(ReportMetricsRequest.class, body);
-        return null;
-      }
+        return (T) reportMetrics(body);
+
+      case COMMIT_TRANSACTION:
+        LOG.debug("API_OPERATION [{}] Committing transaction", requestId);
+        return (T) commitTransaction(body);
+
+      case LIST_VIEWS:
+        LOG.debug("API_OPERATION [{}] Listing views", requestId);
+        return (T) listViews(vars);
+
+      case CREATE_VIEW:
+        LOG.debug("API_OPERATION [{}] Creating view", requestId);
+        return (T) createView(vars, body);
+
+      case LOAD_VIEW:
+        LOG.debug("API_OPERATION [{}] Loading view", requestId);
+        return (T) loadView(vars);
+
+      case VIEW_EXISTS:
+        LOG.debug("API_OPERATION [{}] Checking view exists", requestId);
+        return (T) viewExists(vars);
+
+      case UPDATE_VIEW:
+        LOG.debug("API_OPERATION [{}] Updating view", requestId);
+        return (T) updateView(vars, body);
+
+      case RENAME_VIEW:
+        LOG.debug("API_OPERATION [{}] Renaming view", requestId);
+        return (T) renameView(vars);
+
+      case DROP_VIEW:
+        LOG.debug("API_OPERATION [{}] Dropping view", requestId);
+        return (T) dropView(vars);
 
       default:
         LOG.error("API_UNHANDLED_ROUTE [{}] Route matched but no handler found: {}", requestId, route);
@@ -522,22 +694,53 @@ public class HMSCatalogAdapter implements RESTClient {
   }
 
   /**
+   * Gets the access level for the current user on a table, using RangerPrivilegeHelper
+   * directly or via the HMSCachingCatalog cache.
+   *
+   * @param catalog the catalog
+   * @param ident   the table identifier
+   * @param conf    the configuration
+   * @return the access level
+   */
+  private static AccessLevel getAccessLevel(Catalog catalog, TableIdentifier ident, Configuration conf) {
+    try {
+      String userName = UserGroupInformation.getCurrentUser().getUserName();
+      if (catalog instanceof HMSCachingCatalog) {
+        return ((HMSCachingCatalog) catalog).getAccessLevel(ident, userName);
+      }
+      // Fallback: use RangerPrivilegeHelper directly
+      RangerPrivilegeHelper helper = HMSServletSecurity.getPrivilegeHelper(conf);
+      if (helper != null && helper.isAvailable()) {
+        String dbName = ident.namespace().level(0);
+        String tableName = ident.name();
+        return helper.getAccessLevel(dbName, tableName, userName);
+      }
+    } catch (IOException e) {
+      LOG.error("Unable to get current user for access check on {}", ident, e);
+    }
+    return AccessLevel.NONE;
+  }
+
+  /**
    * Creates a load table response builder embedding a data sharing token if required.
-   * @param table the table instance (can not be null)
+   *
+   * @param table       the table instance (can not be null)
+   * @param accessLevel the access level for the current user
    * @return the load table response
    */
-  static LoadTableResponse.Builder dataSharingBuilder(BaseTable table) {
+  static LoadTableResponse.Builder dataSharingBuilder(BaseTable table, AccessLevel accessLevel) {
     // This must be performed as Hive user: reading (file) metadata and fetching (url) knox
     return runAsHive(() -> {
       TableMetadata metaData = table.operations().current();
       LoadTableResponse.Builder builder = LoadTableResponse.builder().withTableMetadata(metaData);
-      DataSharing dataSharing = HMSCatalogServer.getDataSharing();
+      DataSharing dataSharing = HMSCatalogFactory.getDataSharing();
       if (dataSharing != null) {
         try {
-          Map<String, String> token = dataSharing.getAccessToken(table.location());
+          String policy = (accessLevel == AccessLevel.READ_WRITE) ? "read-write" : "read-only";
+          Map<String, String> token = dataSharing.getAccessTokenWithPolicy(table.location(), policy);
           if (token != null && !token.isEmpty()) {
             token.forEach(builder::addConfig);
-            LOG.debug("Added data sharing credentials for table at location: {}", table.location());
+            LOG.debug("Added data sharing credentials (policy={}) for table at location: {}", policy, table.location());
           }
         } catch (Exception e) {
           // Log warning but don't fail the entire operation
@@ -554,25 +757,21 @@ public class HMSCatalogAdapter implements RESTClient {
   /**
    * Ensures that the current user has access to the table it is trying to load.
    * <p>If configured for data sharing, response will carry access token allowing reading table files.</p>
+   *
    * @param catalog the catalog
-   * @param ident the table identifier
-   * @param table the table instance (can be null)
+   * @param ident   the table identifier
+   * @param table   the table instance (can be null)
+   * @param conf    the configuration
    * @return the load table response
    */
-  private static LoadTableResponse accessTable(Catalog catalog, TableIdentifier ident, Table table) {
+  private static LoadTableResponse accessTable(Catalog catalog, TableIdentifier ident, Table table, Configuration conf) {
     if (table instanceof BaseTable) {
-      LoadTableResponse.Builder builder = dataSharingBuilder((BaseTable) table);
+      AccessLevel accessLevel = getAccessLevel(catalog, ident, conf);
+      if (accessLevel == AccessLevel.NONE) {
+        throw new NoSuchTableException("Table is not accessible %s", ident.toString());
+      }
+      LoadTableResponse.Builder builder = dataSharingBuilder((BaseTable) table, accessLevel);
       if (builder != null) {
-        boolean accessible;
-        // perform get_table_meta on behalf of current user to let Ranger check user auth for table
-        if (catalog instanceof TableAccess) {
-          accessible = ((TableAccess) catalog).isReadAllowed(ident);
-        } else {
-          accessible = TableAccess.isReadAllowed(catalog, ident);
-        }
-        if (!accessible) {
-          throw new NoSuchTableException("Table is not accessible %s", ident.toString());
-        }
         return builder.build();
       }
     }
@@ -583,63 +782,51 @@ public class HMSCatalogAdapter implements RESTClient {
   }
 
   /**
-   * Loads a table.
-   * @param catalog the catalog
+   * Loads credentials for a table based on the user's access level.
+   *
    * @param ident the table identifier
+   * @return the load credentials response
+   */
+  private HMSLoadCredentialsResponse loadCredentials(TableIdentifier ident) {
+    AccessLevel accessLevel = getAccessLevel(catalog, ident, configuration);
+    if (accessLevel == AccessLevel.NONE) {
+      throw new NoSuchTableException("Table is not accessible %s", ident.toString());
+    }
+    Table table = runAsHive(() -> catalog.loadTable(ident));
+    if (!(table instanceof BaseTable)) {
+      throw new NoSuchTableException("Table does not exist: %s", ident.toString());
+    }
+    BaseTable baseTable = (BaseTable) table;
+    return runAsHive(() -> {
+      HMSLoadCredentialsResponse.Builder responseBuilder = HMSLoadCredentialsResponse.builder();
+      DataSharing dataSharing = HMSCatalogFactory.getDataSharing();
+      if (dataSharing != null) {
+        String policy = (accessLevel == AccessLevel.READ_WRITE) ? "read-write" : "read-only";
+        Map<String, String> token = dataSharing.getAccessTokenWithPolicy(baseTable.location(), policy);
+        if (token != null && !token.isEmpty()) {
+          Credential credential = Credential.builder()
+              .prefix(baseTable.location())
+              .config(token)
+              .build();
+          responseBuilder.addCredential(credential);
+        }
+      }
+      return responseBuilder.build();
+    });
+  }
+
+  /**
+   * Loads a table.
+   *
+   * @param catalog the catalog
+   * @param ident   the table identifier
    * @return the load table response
    */
-  static LoadTableResponse loadTable(Catalog catalog, TableIdentifier ident) {
-    return accessTable(catalog, ident, runAsHive(() -> catalog.loadTable(ident)));
+  LoadTableResponse loadTable(Catalog catalog, TableIdentifier ident) {
+    return accessTable(catalog, ident, runAsHive(() -> catalog.loadTable(ident)), configuration);
   }
 
-  /**
-   * Registers a table.
-   * @param catalog the catalog
-   * @param namespace the namespace
-   * @param request the register table request
-   * @return the load table reponse
-   */
-  private static LoadTableResponse registerTable(Catalog catalog, Namespace namespace, RegisterTableRequest request) {
-    request.validate();
-    TableIdentifier ident = TableIdentifier.of(namespace, request.name());
-    String location = request.metadataLocation();
-    Table table = runAsHive(() -> catalog.registerTable(ident, location));
-    return accessTable(catalog, ident, table);
-  }
-
-  /**
-   * This is a very simplistic approach that only validates the requirements for each table and does
-   * not do any other conflict detection. Therefore, it does not guarantee true transactional
-   * atomicity, which is left to the implementation details of a REST server.
-   */
-  /**
-  private static void commitTransaction(Catalog catalog, CommitTransactionRequest request) {
-    List<Transaction> transactions = Lists.newArrayList();
-
-    for (UpdateTableRequest tableChange : request.tableChanges()) {
-      Table table = catalog.loadTable(tableChange.identifier());
-      if (table instanceof BaseTable) {
-        Transaction transaction =
-            Transactions.newTransaction(
-                tableChange.identifier().toString(), ((BaseTable) table).operations());
-        transactions.add(transaction);
-
-        BaseTransaction.TransactionTable txTable =
-            (BaseTransaction.TransactionTable) transaction.table();
-
-        // this performs validations and makes temporary commits that are in-memory
-        CatalogHandlers.commit(txTable.operations(), tableChange);
-      } else {
-        throw new IllegalStateException("Cannot wrap catalog that does not produce BaseTable");
-      }
-    }
-
-    // only commit if validations passed previously
-    transactions.forEach(Transaction::commitTransaction);
-  }
-   */
-
-  public <T extends RESTResponse> T execute(
+  <T extends RESTResponse> T execute(
       HTTPMethod method,
       String path,
       Map<String, String> queryParams,
@@ -648,6 +835,21 @@ public class HMSCatalogAdapter implements RESTClient {
       Map<String, String> headers,
       Consumer<ErrorResponse> errorHandler) {
     String requestId = generateRequestId();
+    // X-HTTP-Method-Override is used by some clients that send certain HTTP verbs
+    // (e.g. DELETE/PATCH via POST) to override the effective method.
+    if (headers != null) {
+      String methodOverride = headers.get("X-HTTP-Method-Override");
+      if (methodOverride != null && !methodOverride.isBlank()) {
+        try {
+          HTTPMethod overridden = HTTPMethod.valueOf(methodOverride.trim().toUpperCase());
+          LOG.debug("API_METHOD_OVERRIDE [{}] Overriding HTTP method {} -> {} for path {}",
+              requestId, method, overridden, path);
+          method = overridden;
+        } catch (IllegalArgumentException e) {
+          throw new RESTException("Unhandled http method override: %s", methodOverride);
+        }
+      }
+    }
     String clientInfo = extractClientInfo(headers);
     LOG.info("API_CALL [{}] {} {} from client [{}]", requestId, method, path, clientInfo);
     ErrorResponse.Builder errorBuilder = ErrorResponse.builder();
@@ -660,13 +862,7 @@ public class HMSCatalogAdapter implements RESTClient {
           vars.putAll(queryParams);
         }
         vars.putAll(routeAndVars.second());
-        if (headers != null) {
-          String bearer = headers.get(HttpHeaders.AUTHORIZATION);
-          if (bearer != null) {
-            vars.put(HttpHeaders.AUTHORIZATION, bearer);
-          }
-        }
-        T result = handleRequest(routeAndVars.first(), vars.build(), body, responseType, requestId);
+        T result = handleRequest(routeAndVars.first(), vars.build(), body, requestId);
         LOG.info("API_SUCCESS [{}] {} {} completed successfully", requestId, method, path);
         return result;
       } catch (RuntimeException e) {
@@ -724,11 +920,11 @@ public class HMSCatalogAdapter implements RESTClient {
 
     String forwarded = headers.get("X-Forwarded-For");
     if (forwarded != null) {
-      if (clientInfo.length() > 0) clientInfo.append(" from ");
+      if (!clientInfo.isEmpty()) clientInfo.append(" from ");
       clientInfo.append(forwarded);
     }
 
-    return clientInfo.length() > 0 ? clientInfo.toString() : "unknown";
+    return !clientInfo.isEmpty() ? clientInfo.toString() : "unknown";
   }
 
   /**
@@ -795,11 +991,22 @@ public class HMSCatalogAdapter implements RESTClient {
   }
 
   @Override
-  public void close() throws IOException {
-    // The calling test is responsible for closing the underlying catalog backing this REST catalog
-    // so that the underlying backend catalog is not closed and reopened during the REST catalog's
-    // initialize method when fetching the server configuration.
+  public void close() {
+    // The caller is responsible for closing the underlying catalog backing this REST catalog.
   }
+
+  private static class NamespaceNotSupported extends RuntimeException {
+    NamespaceNotSupported(String catalog) {
+      super("catalog " + catalog + " does not support namespace");
+    }
+  }
+
+  private static class ViewNotSupported extends RuntimeException {
+    ViewNotSupported(String catalog) {
+      super("catalog " + catalog + " does not support views");
+    }
+  }
+
 
   private static class BadResponseType extends RuntimeException {
     private BadResponseType(Class<?> responseType, Object response) {
@@ -848,5 +1055,8 @@ public class HMSCatalogAdapter implements RESTClient {
         namespaceFromPathVars(pathVars), RESTUtil.decodeString(pathVars.get("table")));
   }
 
-
+  private static TableIdentifier viewIdentFromPathVars(Map<String, String> pathVars) {
+    return TableIdentifier.of(
+        namespaceFromPathVars(pathVars), RESTUtil.decodeString(pathVars.get("name")));
+  }
 }

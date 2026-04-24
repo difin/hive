@@ -16,188 +16,209 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.iceberg.rest;
 
+import java.util.Map;
+import java.util.TreeMap;
+import javax.servlet.http.HttpServlet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.HMSServletSecurity;
-import org.apache.hadoop.hive.metastore.SecureServletCaller;
+import org.apache.hadoop.hive.metastore.ServletServerBuilder;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
-import org.apache.iceberg.HiveCachingCatalog;
+import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
+import org.apache.hadoop.security.SecurityUtil;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.iceberg.catalog.Catalog;
-import org.apache.iceberg.hive.HiveActor;
 import org.apache.iceberg.hive.HiveCatalog;
-import org.apache.iceberg.hive.HiveCatalogActor;
-import org.apache.iceberg.hive.HiveCatalogFriend;
-import org.eclipse.jetty.server.ConnectionFactory;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.gzip.GzipHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServlet;
-import java.io.IOException;
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
-
-
+/**
+ * Standalone REST Catalog server that connects to a remote Hive Metastore via Thrift.
+ */
 public class HMSCatalogServer {
-  private static final String CACHE_EXPIRY = "hive.metastore.catalog.cache.expiry";
-  private static final String CACHE_AUTHORIZATION = "hive.metastore.catalog.cache.authorization";
-  static final String JETTY_THREADPOOL_MIN = "hive.metastore.catalog.jetty.threadpool.min";
-  static final String JETTY_THREADPOOL_MAX = "hive.metastore.catalog.jetty.threadpool.max";
-  static final String JETTY_THREADPOOL_IDLE = "hive.metastore.catalog.jetty.threadpool.idle";
-  /**
-   * The metric names prefix.
-   */
-  static final String HMS_METRIC_PREFIX = "hmscatalog.";
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogServer.class);
-  private static Reference<Catalog> catalogRef;
-  private static volatile DataSharing dataSharing;
+  private static final String CACHE_AUTHORIZATION = "hive.metastore.catalog.cache.authorization";
 
-  public static Catalog getRESTCatalog() {
-    return catalogRef != null ? catalogRef.get() :  null;
+  private final Configuration configuration;
+  private final int port;
+  private final String path;
+  private Server server;
+
+  /**
+   * Constructs the server, reading port and path from configuration.
+   *
+   * @param conf the Hadoop/Metastore configuration
+   */
+  public HMSCatalogServer(Configuration conf) {
+    this.configuration = conf;
+    this.port = MetastoreConf.getIntVar(conf, ConfVars.CATALOG_SERVLET_PORT);
+    this.path = MetastoreConf.getVar(conf, ConfVars.ICEBERG_CATALOG_SERVLET_PATH);
   }
 
-  private static boolean isDataSharingEnabled(Configuration conf) {
-    String idBrokerUrl = conf.get(DataSharing.CONFVAR_IDBROKER_URL, "");
-    return !idBrokerUrl.trim().isEmpty();
-  }
-
-  static DataSharing getDataSharing() {
-    return dataSharing;
-  }
-
-  private static synchronized DataSharing initializeDataSharing(Configuration conf) {
-    if (dataSharing == null && isDataSharingEnabled(conf)) {
-      try {
-        dataSharing = new DataSharing(conf);
-        LOG.info("Data sharing initialized successfully");
-      } catch (Exception e) {
-        LOG.warn("Failed to initialize data sharing, continuing without it: {}", e.getMessage());
-        // leave dataSharing null to indicate unavailable
-      }
-    }
-    return dataSharing;
-  }
-
-  private HMSCatalogServer() {
-    // nothing
-  }
-
-  public static HttpServlet createServlet(SecureServletCaller security, Catalog catalog, Configuration configuration) throws IOException {
-    try (HMSCatalogAdapter adapter = new HMSCatalogAdapter(catalog, configuration)) {
-      return new HMSCatalogServlet(security, adapter);
-    }
-  }
-
-  public static Catalog createCatalog(Configuration configuration) {
-    final String curi = configuration.get(MetastoreConf.ConfVars.THRIFT_URIS.getVarname());
-    final String cwarehouse = configuration.get(MetastoreConf.ConfVars.WAREHOUSE.getVarname());
-    final String cextwarehouse = configuration.get(MetastoreConf.ConfVars.WAREHOUSE_EXTERNAL.getVarname());
-    final HiveCatalog catalog = new HiveCatalog();
-    catalog.setConf(configuration);
+  /**
+   * Creates the Iceberg catalog.
+   * @return the catalog instance, optionally wrapped in {@link HMSCachingCatalog}
+   */
+  private Catalog createCatalog() {
     Map<String, String> properties = new TreeMap<>();
-    if (curi != null) {
-      properties.put("uri", curi);
+    // NOTE: Unlike HMSCatalogFactory, we do NOT clear THRIFT_URIS.
+    final String configUri = MetastoreConf.getVar(configuration, ConfVars.THRIFT_URIS);
+    if (configUri != null) {
+      properties.put("uri", configUri);
     }
-    if (cwarehouse != null) {
-      properties.put("warehouse", cwarehouse);
+    final String configWarehouse = MetastoreConf.getVar(configuration, ConfVars.WAREHOUSE);
+    if (configWarehouse != null) {
+      properties.put("warehouse", configWarehouse);
     }
-    if (cextwarehouse != null) {
-      properties.put("external-warehouse", cextwarehouse);
+    final String configExtWarehouse = MetastoreConf.getVar(configuration, ConfVars.WAREHOUSE_EXTERNAL);
+    if (configExtWarehouse != null) {
+      properties.put("external-warehouse", configExtWarehouse);
     }
-    catalog.initialize("hive", properties);
-    HiveActor actor = HiveCatalogFriend.getActorOf(catalog);
-    if (actor instanceof HiveCatalogActor) {
-      HiveCatalogActor hiveActor = (HiveCatalogActor) actor;
-      hiveActor.setTableAccessAuthorizer(HMSServletSecurity::isTableAccessible);
-    }
-    long expiry = configuration.getLong(CACHE_EXPIRY, 60_000L);
+    final HiveCatalog hiveCatalog = new HiveCatalog();
+    hiveCatalog.setConf(configuration);
+    final String catalogName = MetastoreConf.getVar(configuration, ConfVars.CATALOG_DEFAULT);
+    hiveCatalog.initialize(catalogName, properties);
+    long expiry = MetastoreConf.getLongVar(configuration, ConfVars.ICEBERG_CATALOG_CACHE_EXPIRY);
     boolean cacheAuthorization = configuration.getBoolean(CACHE_AUTHORIZATION, true);
-    return HiveCachingCatalog.wrap(catalog, expiry, cacheAuthorization);
-  }
-
-  public static HttpServlet createServlet(Configuration configuration, Catalog catalog) throws IOException {
-    String auth = MetastoreConf.getVar(configuration, MetastoreConf.ConfVars.CATALOG_SERVLET_AUTH);
-    boolean jwt = "jwt".equalsIgnoreCase(auth);
-    SecureServletCaller security = new HMSServletSecurity(configuration, jwt);
-    Catalog actualCatalog = catalog;
-    if (actualCatalog == null) {
-      actualCatalog = createCatalog(configuration);
-      actualCatalog.initialize("hive", Collections.emptyMap());
+    if (expiry <= 0) {
+      return hiveCatalog;
     }
-    catalogRef = new SoftReference<>(actualCatalog);
-    return createServlet(security, actualCatalog, configuration);
+    boolean caseSensitive = true;
+    return new HMSCachingCatalog(hiveCatalog, expiry, cacheAuthorization, caseSensitive, configuration);
   }
 
   /**
-   * Convenience method to start a http server that only serves this servlet.
-   * @param conf the configuration
-   * @return the server instance
-   * @throws Exception if servlet initialization fails
+   * Creates the REST catalog servlet with security wrapper.
+   *
+   * @param catalog the Iceberg catalog
+   * @return the secured servlet
    */
-  public static Server startServer(Configuration conf, HiveCatalog catalog) throws Exception {
-    initializeDataSharing(conf);
-    int port = MetastoreConf.getIntVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_PORT);
-    if (port < 0) {
-      return null;
-    }
-    final HttpServlet servlet = createServlet(conf, catalog);
-    final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-    context.setContextPath("/");
-    final ServletHolder servletHolder = new ServletHolder(servlet);
-    servletHolder.setInitParameter("javax.ws.rs.Application", "ServiceListPublic");
-    final String cli = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.CATALOG_SERVLET_PATH);
-    context.addServlet(servletHolder, "/" + cli + "/*");
-    context.setVirtualHosts(null);
-    context.setGzipHandler(new GzipHandler());
-    final Server httpServer = createHttpServer(conf, port);
-    httpServer.setHandler(context);
-    LOG.info("Starting HMS REST Catalog Server with context path:/{}/ on port:{}", cli, port);
-    httpServer.start();
-    return httpServer;
+  private HttpServlet createServlet(Catalog catalog) {
+    String authType = MetastoreConf.getVar(configuration, ConfVars.CATALOG_SERVLET_AUTH);
+    boolean jwt = "jwt".equalsIgnoreCase(authType);
+    HMSServletSecurity security = new HMSServletSecurity(configuration, jwt);
+    return security.proxy(new HMSCatalogServlet(new HMSCatalogAdapter(catalog, configuration)));
   }
 
-  private static @NotNull Server createHttpServer(Configuration conf, int port) throws IOException {
-    final int maxThreads = Math.max(8, conf.getInt(JETTY_THREADPOOL_MAX, 256));
-    final int minThreads = Math.max(2, conf.getInt(JETTY_THREADPOOL_MIN, 8));
-    final int idleTimeout = conf.getInt(JETTY_THREADPOOL_IDLE, 60_000);
-    final QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
-    final Server httpServer = new Server(threadPool);
-    final ServerConnector connector = new ServerConnector(httpServer);
-    connector.setPort(port);
-    httpServer.setConnectors(new Connector[] {connector});
-    for (ConnectionFactory factory : connector.getConnectionFactories()) {
-      if (factory instanceof HttpConnectionFactory) {
-        HttpConnectionFactory httpFactory = (HttpConnectionFactory) factory;
-        HttpConfiguration httpConf = httpFactory.getHttpConfiguration();
-        httpConf.setSendServerVersion(false);
-        httpConf.setSendXPoweredBy(false);
+  /**
+   * Starts the Jetty server with the REST catalog servlet.
+   *
+   * @throws Exception if the server fails to start
+   */
+  public void start() throws Exception {
+    Catalog catalog = createCatalog();
+    HttpServlet servlet = createServlet(catalog);
+    ServletServerBuilder builder = new ServletServerBuilder(configuration);
+    builder.addServlet(port, path, servlet);
+    this.server = builder.start(LOG);
+    if (this.server == null) {
+      throw new IllegalStateException("Failed to start HMSCatalogServer");
+    }
+    LOG.info("HMSCatalogServer started on port {} with path {}", port, path);
+  }
+
+  /**
+   * Stops the Jetty server.
+   *
+   * @throws Exception if the server fails to stop
+   */
+  public void stop() throws Exception {
+    if (server != null) {
+      server.stop();
+      LOG.info("HMSCatalogServer stopped");
+    }
+  }
+
+  /**
+   * Returns the underlying Jetty server (for join/testing).
+   *
+   * @return the server, or null if not started
+   */
+  public Server getServer() {
+    return server;
+  }
+
+  /**
+   * Initializes DataSharing if IDBroker is configured.
+   * @param conf the configuration
+   */
+  private static synchronized void initializeDataSharing(Configuration conf) {
+    String idBrokerUrl = conf.get(DataSharing.CONFVAR_IDBROKER_URL, "");
+    if (idBrokerUrl.trim().isEmpty()) {
+      LOG.info("IDBroker not configured, data sharing disabled");
+      return;
+    }
+    try {
+      DataSharing ds = new DataSharing(conf);
+      HMSCatalogFactory.setDataSharing(ds);
+      LOG.info("Data sharing initialized successfully");
+    } catch (Exception e) {
+      LOG.warn("Failed to initialize data sharing, continuing without it: {}", e.getMessage());
+    }
+  }
+
+  /**
+   * Main entry point for the standalone HMSCatalogServer.
+   * <p>Kerberos login uses the same config properties as embedded HMS:
+   * {@code hive.metastore.kerberos.principal} and {@code hive.metastore.kerberos.keytab.file}.
+   * When security is not enabled, defaults the login user to "hive".</p>
+   *
+   * @param args command-line arguments: [--port port]
+   * @throws Exception if startup fails
+   */
+  public static void main(String[] args) throws Exception {
+    // 1. Load configuration (same sources as embedded HMS)
+    Configuration conf = MetastoreConf.newMetastoreConf();
+    conf.addResource("hms-catalog-site.xml");
+
+    // 2. Parse CLI arguments
+    for (int i = 0; i < args.length; i++) {
+      switch (args[i]) {
+        case "--port":
+          if (i + 1 < args.length) {
+            int cliPort = Integer.parseInt(args[++i]);
+            MetastoreConf.setLongVar(conf, ConfVars.CATALOG_SERVLET_PORT, cliPort);
+          }
+          break;
+        default:
+          LOG.warn("Unknown argument: {}", args[i]);
+          break;
       }
     }
-    return httpServer;
-  }
 
-  /**
-   * Convenience method to start a http server that only serves this servlet.
-   * <p>This one is looked up through reflection to start from HMS.</p>
-   * @param conf the configuration
-   * @return the server instance
-   * @throws Exception if servlet initialization fails
-   */
-  public static Server startServer(Configuration conf) throws Exception {
-    return startServer(conf, null);
+    // 3. Kerberos login - same logic as HiveMetaStore (HiveMetaStore.java:11692-11701)
+    if (UserGroupInformation.isSecurityEnabled()) {
+      String kerberosName = SecurityUtil.getServerPrincipal(
+          MetastoreConf.getVar(conf, ConfVars.KERBEROS_PRINCIPAL), "0.0.0.0");
+      String keyTabFile = MetastoreConf.getVar(conf, ConfVars.KERBEROS_KEYTAB_FILE);
+      LOG.info("Logging in via keytab as {}", kerberosName);
+      UserGroupInformation.loginUserFromKeytab(kerberosName, keyTabFile);
+    } else {
+      LOG.info("Security is not enabled, defaulting login user to 'hive'");
+      UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser("hive"));
+    }
+
+    // 4. Initialize DataSharing and inject into HMSCatalogFactory
+    initializeDataSharing(conf);
+
+    // 5. Create and start server
+    HMSCatalogServer catalogServer = new HMSCatalogServer(conf);
+
+    // 6. Add shutdown hook
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      try {
+        LOG.info("Shutdown hook triggered, stopping HMSCatalogServer...");
+        catalogServer.stop();
+      } catch (Exception e) {
+        LOG.error("Error stopping HMSCatalogServer", e);
+      }
+    }));
+
+    catalogServer.start();
+
+    // 7. Block main thread until server is stopped
+    catalogServer.getServer().join();
   }
 }

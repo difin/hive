@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.TableType;
@@ -705,18 +704,28 @@ public class HiveCatalog extends BaseMetastoreViewCatalog
   }
 
   private String databaseLocation(String databaseName) {
-    String warehouseLocation = conf.get(HiveConf.ConfVars.METASTOREWAREHOUSE.varname);
-    Preconditions.checkNotNull(
-            warehouseLocation, "Warehouse location is not set: hive.metastore.warehouse.dir=null");
+    // METASTOREWAREHOUSE  is deprecated and documentation states use MetastoreConf.WAREHOUSE
+    // but not at the cost of MetastoreConf new dependency
+    String warehouseLocation = conf.get("metastore.warehouse.dir");
+    if (warehouseLocation == null) {
+      warehouseLocation = conf.get(HiveConf.ConfVars.METASTOREWAREHOUSE.varname);
+    }
+    Preconditions.checkNotNull(warehouseLocation,
+        "Warehouse location is not set: hive.metastore.warehouse.dir=null");
     warehouseLocation = LocationUtil.stripTrailingSlash(warehouseLocation);
-    return String.format("%s/%s.db", warehouseLocation, databaseName);
+    return String.format("%s/%s.db", warehouseLocation, databaseName.toLowerCase());
   }
 
-  private String getExternalWarehouseLocation() {
-    String warehouseLocation = conf.get(HiveConf.ConfVars.HIVE_METASTORE_WAREHOUSE_EXTERNAL.varname);
+  private String databaseLocationInExternalWarehouse(String databaseName) {
+    // MetastoreConf.WAREHOUSE_EXTERNAL should be checked first but the dependency is not there
+    String warehouseLocation = conf.get("metastore.warehouse.external.dir");
+    if (warehouseLocation == null) {
+      warehouseLocation = conf.get(HiveConf.ConfVars.HIVE_METASTORE_WAREHOUSE_EXTERNAL.varname);
+    }
     Preconditions.checkNotNull(warehouseLocation,
         "Warehouse location is not set: hive.metastore.warehouse.external.dir=null");
-    return warehouseLocation;
+    warehouseLocation = LocationUtil.stripTrailingSlash(warehouseLocation);
+    return String.format("%s/%s.db", warehouseLocation, databaseName);
   }
 
   private Map<String, String> convertToMetadata(Database database) {
@@ -746,9 +755,10 @@ public class HiveCatalog extends BaseMetastoreViewCatalog
     Database database = new Database();
     Map<String, String> parameter = Maps.newHashMap();
 
-    database.setName(namespace.level(0));
-    database.setLocationUri(new Path(getExternalWarehouseLocation(), namespace.level(0)).toString() + ".db");
-    database.setManagedLocationUri(databaseLocation(namespace.level(0)));
+    final String dbname = namespace.level(0);
+    database.setName(dbname);
+    database.setLocationUri(databaseLocationInExternalWarehouse(dbname));
+    database.setManagedLocationUri(databaseLocation(dbname));
 
     meta.forEach((key, value) -> {
       if (key.equals("comment")) {
@@ -772,9 +782,9 @@ public class HiveCatalog extends BaseMetastoreViewCatalog
     }
 
     database.setParameters(parameter);
-
     return database;
   }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)

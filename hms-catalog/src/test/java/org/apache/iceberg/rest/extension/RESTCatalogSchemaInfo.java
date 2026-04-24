@@ -17,21 +17,21 @@
  * under the License.
  */
 
-package org.apache.iceberg.rest;
+package org.apache.iceberg.rest.extension;
 
-import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
+import java.io.File;
+import org.apache.hadoop.hive.metastore.HiveMetaException;
+import org.apache.hadoop.hive.metastore.MetaStoreSchemaInfo;
 
-public class LocationUtil {
-  private LocationUtil() {
+public class RESTCatalogSchemaInfo extends MetaStoreSchemaInfo {
+  private static final String BASE_DIR = System.getProperty("basedir");
+
+  public RESTCatalogSchemaInfo(String metastoreHome, String dbType) throws HiveMetaException {
+    super(metastoreHome, dbType);
   }
 
-  public static String stripTrailingSlash(String path) {
-    Preconditions.checkArgument(path != null && path.length() > 0, "path must not be null or empty");
-
-    String result;
-    for(result = path; result.endsWith("/"); result = result.substring(0, result.length() - 1)) {
-    }
-
-    return result;
+  @Override
+  public String getMetaStoreScriptDir() {
+    return new File(BASE_DIR, "../metastore-server/src/main/sql/derby").getAbsolutePath();
   }
 }

@@ -19,22 +19,7 @@
 
 package org.apache.iceberg.rest;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.io.CharStreams;
-import org.apache.hadoop.hive.metastore.SecureServletCaller;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpHeaders;
-import org.apache.iceberg.rest.HMSCatalogAdapter.HTTPMethod;
-import org.apache.iceberg.rest.HMSCatalogAdapter.Route;
-import org.apache.iceberg.rest.responses.ErrorResponse;
-import org.apache.iceberg.util.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.apache.hive.iceberg.com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -45,12 +30,21 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
+import org.apache.iceberg.relocated.com.google.common.io.CharStreams;
+import org.apache.iceberg.rest.HMSCatalogAdapter.HTTPMethod;
+import org.apache.iceberg.rest.HMSCatalogAdapter.Route;
+import org.apache.iceberg.rest.responses.ErrorResponse;
+import org.apache.iceberg.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Original @ https://github.com/apache/iceberg/blob/main/core/src/test/java/org/apache/iceberg/rest/RESTCatalogServlet.java
- */
-
-/**
+ * Original @ <a href="https://github.com/apache/iceberg/blob/1.6.x/core/src/test/java/org/apache/iceberg/rest/RESTCatalogServlet.java">...</a>
  * The RESTCatalogServlet provides a servlet implementation used in combination with a
  * RESTCatalogAdaptor to proxy the REST Spec to any Catalog implementation.
  */
@@ -58,81 +52,52 @@ public class HMSCatalogServlet extends HttpServlet {
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogServlet.class);
   private static final String CONTENT_TYPE = "Content-Type";
   private static final String APPLICATION_JSON = "application/json";
-  /**
-   * The security.
-   */
-  private final SecureServletCaller security;
 
   private final HMSCatalogAdapter restCatalogAdapter;
   private final Map<String, String> responseHeaders =
-      ImmutableMap.of(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+      ImmutableMap.of(CONTENT_TYPE, APPLICATION_JSON);
 
-  public HMSCatalogServlet(SecureServletCaller security, HMSCatalogAdapter restCatalogAdapter) {
-    this.security = security;
+  public HMSCatalogServlet(HMSCatalogAdapter restCatalogAdapter) {
     this.restCatalogAdapter = restCatalogAdapter;
   }
 
   @Override
-  public void init() throws ServletException {
-    super.init();
-    security.init();
+  public String getServletName() {
+    return "Iceberg REST Catalog";
   }
+
+  // TODO: check upstream - Handle OPTIONS for CORS preflight requests
   @Override
-  protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    String method = req.getMethod();
-    if (!"PATCH".equals(method)) {
-      super.service(req, resp);
-    } else {
-      this.doPatch(req, resp);
-    }
-  }
-
-  protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    security.execute(request, response, this::execute);
-  }
-
-  @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    security.execute(request, response, this::execute);
-  }
-
-  @Override
-  protected void doPut(HttpServletRequest request,
-                       HttpServletResponse response) throws IOException {
-    security.execute(request, response, this::execute);
-  }
-
-  @Override
-  protected void doHead(HttpServletRequest request, HttpServletResponse response)
-      throws IOException {
-    security.execute(request, response, this::execute);
-  }
-
-  @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws IOException {
-    security.execute(request, response, this::execute);
-  }
-
-  @Override
-  protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-      throws IOException {
-    security.execute(request, response, this::execute);
-  }
-
-  private void execute(HttpServletRequest request, HttpServletResponse response)
-      throws IOException {
-    ServletRequestContext context = ServletRequestContext.from(request);
+  protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
     response.setStatus(HttpServletResponse.SC_OK);
     responseHeaders.forEach(response::setHeader);
+  }
 
-    if (context.error().isPresent()) {
-      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-      RESTObjectMapper.mapper().writeValue(response.getWriter(), context.error().get());
+  @Override
+  protected void service(HttpServletRequest request, HttpServletResponse response) {
+    // TODO: check upstream - Handle OPTIONS for CORS preflight requests
+    String method = request.getMethod();
+    if ("OPTIONS".equalsIgnoreCase(method)) {
+      response.setStatus(HttpServletResponse.SC_OK);
+      responseHeaders.forEach(response::setHeader);
       return;
     }
-
+    // TODO: check upstream - Block security-sensitive HTTP methods
+    if ("TRACE".equalsIgnoreCase(method) || "CONNECT".equalsIgnoreCase(method)) {
+      response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+      return;
+    }
     try {
+      ServletRequestContext context = ServletRequestContext.from(request);
+      response.setStatus(HttpServletResponse.SC_OK);
+      responseHeaders.forEach(response::setHeader);
+
+      final Optional<ErrorResponse> error = context.error();
+      if (error.isPresent()) {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        RESTObjectMapper.mapper().writeValue(response.getWriter(), error.get());
+        return;
+      }
       Object responseBody =
           restCatalogAdapter.execute(
               context.method(),
@@ -146,12 +111,23 @@ public class HMSCatalogServlet extends HttpServlet {
       if (responseBody != null) {
         RESTObjectMapper.mapper().writeValue(response.getWriter(), responseBody);
       }
-    } catch (RuntimeException e) {
+    } catch (JsonProcessingException e) {
+      // TODO: check upstream - Malformed JSON should return 400 Bad Request
+      LOG.warn("Malformed JSON in request", e);
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      try {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .responseCode(400)
+            .withType("BadRequestException")
+            .withMessage("Malformed JSON: " + e.getOriginalMessage())
+            .build();
+        RESTObjectMapper.mapper().writeValue(response.getWriter(), errorResponse);
+      } catch (IOException writeError) {
+        LOG.error("Failed to write error response", writeError);
+      }
+    } catch (RuntimeException | IOException e) {
       // should be a RESTException but not able to see them through dependencies
       LOG.error("Error processing REST request", e);
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    } catch (Exception e) {
-      LOG.error("Unexpected exception when processing REST request", e);
       response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
   }
@@ -219,13 +195,22 @@ public class HMSCatalogServlet extends HttpServlet {
 
       Route route = routeContext.first();
       Object requestBody = null;
-      if (route.requestClass() != null) {
-        requestBody =
-            RESTObjectMapper.mapper().readValue(request.getReader(), route.requestClass());
-      } else if (route == Route.TOKENS) {
-        try (Reader reader = new InputStreamReader(request.getInputStream())) {
-          requestBody = RESTUtil.decodeFormData(CharStreams.toString(reader));
+      try {
+        if (route.requestClass() != null) {
+          requestBody = RESTObjectMapper.mapper().readValue(request.getInputStream(), route.requestClass());
+        } else if (route == Route.TOKENS) {
+          try (Reader reader = new InputStreamReader(request.getInputStream())) {
+            requestBody = RESTUtil.decodeFormData(CharStreams.toString(reader));
+          }
         }
+      } catch (IOException e) {
+        LOG.warn("Failed to read request body", e);
+        return new ServletRequestContext(
+            ErrorResponse.builder()
+                .responseCode(500)
+                .withType("BadRequestException")
+                .withMessage(String.format("Unreadable request body request: %s %s", method, path))
+                .build());
       }
 
       Map<String, String> queryParams =
@@ -238,11 +223,11 @@ public class HMSCatalogServlet extends HttpServlet {
       return new ServletRequestContext(method, route, path, headers, queryParams, requestBody);
     }
 
-    public HTTPMethod method() {
+    HTTPMethod method() {
       return method;
     }
 
-    public Route route() {
+    Route route() {
       return route;
     }
 
