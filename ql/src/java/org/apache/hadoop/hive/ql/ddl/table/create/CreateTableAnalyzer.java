@@ -60,7 +60,6 @@ import org.apache.hadoop.hive.ql.ddl.table.convert.AlterTableConvertOperation;
 import org.apache.hadoop.hive.ql.ddl.table.create.like.CreateTableLikeDesc;
 import org.apache.hadoop.hive.ql.ddl.table.storage.skewed.SkewedTableUtils;
 import org.apache.hadoop.hive.ql.exec.TaskFactory;
-import org.apache.hadoop.hive.ql.io.KuduStorageFormatDescriptor;
 import org.apache.hadoop.hive.ql.io.SchemaInferenceUtils;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
@@ -288,29 +287,6 @@ public class CreateTableAnalyzer extends CalcitePlanner {
       addDbAndTabToOutputs(qualifiedTabName, TableType.MANAGED_TABLE, isTemporaryTable, retValue, storageFormat);
     } else {
       addDbAndTabToOutputs(qualifiedTabName, TableType.EXTERNAL_TABLE, isTemporaryTable, retValue, storageFormat);
-    }
-
-
-    // set default table properties for kudu tables if they aren't supplied using TBLPROPERTIES()
-    if (conf.getEngine() == HiveConf.Engine.IMPALA
-        && storageFormat != null && storageFormat.getSerde() != null
-        && storageFormat.getSerde().contains(KuduStorageFormatDescriptor.KUDU_SERDE)) {
-      if (!retValue.containsKey("kudu.table_name")) {
-        if (isExt) {
-          throw new SemanticException("Table property kudu.table_name must be specified when creating an external " +
-              "Kudu table.");
-        } else {
-          retValue.put("kudu.table_name", qualifiedTableName);
-        }
-      }
-      if (!retValue.containsKey("kudu.master_addresses")) {
-        String masterAddresses = HiveConf.getVar(conf,
-            HiveConf.ConfVars.HIVE_KUDU_MASTER_ADDRESSES_DEFAULT);
-        retValue.put("kudu.master_addresses", masterAddresses);
-      }
-      if (!retValue.containsKey("storage_handler")) {
-        retValue.put("storage_handler", KuduStorageFormatDescriptor.KUDU_STORAGE_HANDLER);
-      }
     }
 
     if (isIcebergTable(retValue)) {

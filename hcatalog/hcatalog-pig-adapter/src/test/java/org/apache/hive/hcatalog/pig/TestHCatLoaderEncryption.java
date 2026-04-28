@@ -29,7 +29,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.common.collect.ImmutableSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -50,7 +48,6 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.ql.DriverFactory;
 import org.apache.hadoop.hive.ql.IDriver;
-import org.apache.hadoop.hive.ql.io.IOConstants;
 import org.apache.hadoop.hive.ql.io.StorageFormats;
 import org.apache.hadoop.hive.ql.processors.CommandProcessor;
 import org.apache.hadoop.hive.ql.processors.CommandProcessorException;
@@ -101,21 +98,8 @@ public class TestHCatLoaderEncryption {
   private Map<Integer, Pair<Integer, String>> basicInputData;
   private static List<HCatRecord> readRecords = new ArrayList<HCatRecord>();
 
-  private static final Set<String> allTests = new HashSet<String>() {
-    {
-      add("setup");
-      add("teardown");
-      add("testReadDataFromEncryptedHiveTableByPig");
-      add("testReadDataFromEncryptedHiveTableByHCatMR");
-    }
-  };
-
   private static final Map<String, Set<String>> DISABLED_STORAGE_FORMATS =
-      new HashMap<String, Set<String>>() {
-        {
-          put(IOConstants.KUDU, allTests);
-        }
-      };
+      new HashMap<String, Set<String>>();
 
   private String storageFormat;
 
@@ -166,7 +150,6 @@ public class TestHCatLoaderEncryption {
 
   @Before
   public void setup() throws Exception {
-    assumeTrue(!TestUtil.shouldSkip(storageFormat, DISABLED_STORAGE_FORMATS));
     File f = new File(TEST_WAREHOUSE_DIR);
     if (f.exists()) {
       FileUtil.fullyDelete(f);
@@ -399,7 +382,6 @@ public class TestHCatLoaderEncryption {
 
   @After
   public void tearDown() throws Exception {
-    assumeTrue(!TestUtil.shouldSkip(storageFormat, DISABLED_STORAGE_FORMATS));
     try {
       if (driver != null) {
         dropTable(BASIC_TABLE);

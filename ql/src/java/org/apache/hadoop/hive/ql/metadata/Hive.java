@@ -718,15 +718,6 @@ public class Hive implements AutoCloseable {
     req.setTxnId(txnId);
     
     try {
-      // drop managed kudu data here
-      if (conf.getEngine() == HiveConf.Engine.IMPALA) {
-        // fetch table list here and use drop kudu table
-        List<String> tableNameList = getAllTables(req.getName());
-        List<org.apache.hadoop.hive.metastore.api.Table> tables =
-            getMSC().getTableObjectsByName(getDefaultCatalog(conf), req.getName(), tableNameList);
-        EngineLoader.getExternalInstance().getRuntimeHelper().dropDatabase(tableNameList, tables);
-      }
-
       getMSC().dropDatabase(req);
     } catch (NoSuchObjectException e) {
       throw e;

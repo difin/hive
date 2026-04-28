@@ -80,7 +80,6 @@ public class TestHCatStorer extends AbstractHCatStorerTest {
       new HashMap<String, Set<String>>() {
         {
           put(IOConstants.AVRO, allTests);
-          put(IOConstants.KUDU, allTests);
           put(IOConstants.ORCFILE, allTests);
           put(IOConstants.PARQUETFILE, allTests);
           put(IOConstants.RCFILE, allTests);
