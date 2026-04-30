@@ -99,11 +99,27 @@ public class ColumnStatsSemanticAnalyzer extends SemanticAnalyzer {
     return rwt;
   }
 
+  /**
+   * Get the names of the columns that support column statistics.
+   */
+  private static List<String> getColumnNamesSupportingStats(Table tbl) {
+    List<String> colNames = new ArrayList<>();
+    for (FieldSchema col : tbl.getCols()) {
+      String type = col.getType();
+      TypeInfo typeInfo = TypeInfoUtils.getTypeInfoFromTypeString(type);
+      boolean isSupported = ColumnStatsAutoGatherContext.isColumnSupported(typeInfo.getCategory(), () -> typeInfo);
+      if (isSupported) {
+        colNames.add(col.getName());
+      }
+    }
+    return colNames;
+  }
+
   private List<String> getColumnName(ASTNode tree) throws SemanticException {
 
     switch (tree.getChildCount()) {
     case 2:
-      return Utilities.getColumnNamesFromFieldSchema(tbl.getCols());
+      return getColumnNamesSupportingStats(tbl);
     case 3:
       int numCols = tree.getChild(2).getChildCount();
       List<String> colName = new ArrayList<String>(numCols);
@@ -210,7 +226,8 @@ public class ColumnStatsSemanticAnalyzer extends SemanticAnalyzer {
         if (colName.equalsIgnoreCase(col.getName())) {
           String type = col.getType();
           TypeInfo typeInfo = TypeInfoUtils.getTypeInfoFromTypeString(type);
-          if (typeInfo.getCategory() != ObjectInspector.Category.PRIMITIVE) {
+          boolean isSupported = ColumnStatsAutoGatherContext.isColumnSupported(typeInfo.getCategory(), () -> typeInfo);
+          if (!isSupported) {
             logTypeWarning(colName, type);
             colNames.remove(colName);
           } else {
@@ -237,7 +254,7 @@ public class ColumnStatsSemanticAnalyzer extends SemanticAnalyzer {
   protected static String genRewrittenQuery(Table tbl,
       HiveConf conf, Map<String, String> partSpec, boolean isPartitionStats,
       boolean useTableValues) throws SemanticException {
-    List<String> colNames = Utilities.getColumnNamesFromFieldSchema(tbl.getCols());
+    List<String> colNames = getColumnNamesSupportingStats(tbl);
     List<String> colTypes = ColumnStatsSemanticAnalyzer.getColumnTypes(tbl, colNames);
     return ColumnStatsSemanticAnalyzer.genRewrittenQuery(
         tbl, colNames, colTypes, conf, partSpec, isPartitionStats, useTableValues);
@@ -714,7 +731,7 @@ public class ColumnStatsSemanticAnalyzer extends SemanticAnalyzer {
     AnalyzeRewriteContext analyzeRewrite = new AnalyzeRewriteContext();
     analyzeRewrite.setTableName(tbl.getFullyQualifiedName());
     analyzeRewrite.setTblLvl(!(conf.getBoolVar(ConfVars.HIVE_STATS_COLLECT_PART_LEVEL_STATS) && tbl.isPartitioned()));
-    List<String> colNames = Utilities.getColumnNamesFromFieldSchema(tbl.getCols());
+    List<String> colNames = getColumnNamesSupportingStats(tbl);
     List<String> colTypes = getColumnTypes(tbl, colNames);
     analyzeRewrite.setColName(colNames);
     analyzeRewrite.setColType(colTypes);
