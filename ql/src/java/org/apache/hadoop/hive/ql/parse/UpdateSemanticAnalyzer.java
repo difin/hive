@@ -52,8 +52,6 @@ public class UpdateSemanticAnalyzer extends RewriteSemanticAnalyzer<UpdateStatem
   protected void analyze(ASTNode tree, Table table, ASTNode tableName) throws SemanticException {
     List<? extends Node> children = tree.getChildren();
 
-    checkUpdateDeleteMergeSupported(Context.Operation.UPDATE, table);
-
     ASTNode where = null;
     int whereIndex = 2;
     if (children.size() > whereIndex) {

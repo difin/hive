@@ -19,7 +19,7 @@
 package org.apache.hadoop.hive.ql.metadata.formatting;
 
 /**
- * This class is used by FENG Impala.
+ * This class is used by Impala.
  * https://github.infra.cloudera.com/CDH/Impala/blob/0e36ec8ecbce59dde81e11449f3eebd1fc0a3a36/fe/src/compat-hive-3/java/org/apache/impala/compat/MetastoreShim.java#L88
  * https://github.infra.cloudera.com/CDH/Impala/blob/0e36ec8ecbce59dde81e11449f3eebd1fc0a3a36/fe/src/compat-hive-3/java/org/apache/impala/compat/MetastoreShim.java#L934
  *

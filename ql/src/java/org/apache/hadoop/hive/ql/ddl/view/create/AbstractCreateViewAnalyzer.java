@@ -66,10 +66,8 @@ public abstract class AbstractCreateViewAnalyzer extends BaseSemanticAnalyzer {
     analyzer.executeUnparseTranlations();
 
     addInputs(analyzer);
-    if (conf.getEngine() != HiveConf.Engine.IMPALA) {
-      queryState.setLineageState(innerQueryState.getLineageState());
-      queryState.getLineageState().mapDirToOp(new Path(fqViewName), analyzer.getSinkOp());
-    }
+    queryState.setLineageState(innerQueryState.getLineageState());
+    queryState.getLineageState().mapDirToOp(new Path(fqViewName), analyzer.getSinkOp());
 
     return analyzer;
   }

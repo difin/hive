@@ -62,8 +62,6 @@ public class DeleteSemanticAnalyzer extends RewriteSemanticAnalyzer<DeleteStatem
   protected void analyze(ASTNode tree, Table table, ASTNode tableName) throws SemanticException {
     List<? extends Node> children = tree.getChildren();
 
-    checkUpdateDeleteMergeSupported(Context.Operation.DELETE, table);
-
     ASTNode where = null;
     if (children.size() > 1) {
       where = (ASTNode) children.get(1);

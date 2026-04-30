@@ -108,10 +108,6 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   private int maxStmtId = -1;
 
   private transient Table table;
-  // This is used by Impala planner to determine various partition paths.
-  // It is marked as transient so Kyro doesn't serialize it for other
-  // engine types.
-  private transient Partition partition;
   private Path destPath;
   private boolean isHiveServerQuery;
   private boolean isMerge;
@@ -147,15 +143,13 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   /**
    * @param destPath - the final destination for data
    */
-  public FileSinkDesc(final Path dirName, final TableDesc tableInfo, final Partition partition,
-      final boolean compressed, final int destTableId, final boolean multiFileSpray,
-      final boolean canBeMerged, final int numFiles, final int totalFiles,
+  public FileSinkDesc(final Path dirName, final TableDesc tableInfo, final boolean compressed, final int destTableId,
+      final boolean multiFileSpray, final boolean canBeMerged, final int numFiles, final int totalFiles,
       final List<ExprNodeDesc> partitionCols, final DynamicPartitionCtx dpCtx, Path destPath,
       boolean isMmCtas, boolean isInsertOverwrite, boolean isQuery, boolean isCTASorCM, boolean isDirectInsert,
       AcidUtils.Operation acidOperation, boolean deleteOfSplitUpdate) {
     this.dirName = dirName;
     setTableInfo(tableInfo);
-    this.partition = partition;
     this.compressed = compressed;
     this.destTableId = destTableId;
     this.multiFileSpray = multiFileSpray;
@@ -191,7 +185,7 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   }
 
   public FileSinkDesc(FileSinkDesc other) {
-    this(other.dirName, other.tableInfo, other.partition, other.compressed, other.destTableId, other.multiFileSpray,
+    this(other.dirName, other.tableInfo, other.compressed, other.destTableId, other.multiFileSpray,
         other.canBeMerged, other.numFiles, other.totalFiles, other.partitionCols, other.dpCtx,
         other.destPath, other.isMmCtas, other.isInsertOverwrite, other.isQuery,
         other.isCTASorCM, other.isDirectInsert, other.acidOperation, other.deleteOfSplitUpdate);
@@ -199,9 +193,8 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
 
   @Override
   public Object clone() throws CloneNotSupportedException {
-    FileSinkDesc ret = new FileSinkDesc(dirName, tableInfo, partition, compressed,
-        destTableId, multiFileSpray, canBeMerged, numFiles, totalFiles,
-        partitionCols, dpCtx, destPath, isMmCtas, isInsertOverwrite, isQuery,
+    FileSinkDesc ret = new FileSinkDesc(dirName, tableInfo, compressed, destTableId, multiFileSpray, canBeMerged,
+        numFiles, totalFiles, partitionCols, dpCtx, destPath, isMmCtas, isInsertOverwrite, isQuery,
         isCTASorCM, isDirectInsert, acidOperation, deleteOfSplitUpdate);
     ret.setCompressCodec(compressCodec);
     ret.setCompressType(compressType);
@@ -313,10 +306,6 @@ public class FileSinkDesc extends AbstractOperatorDesc implements IStatsGatherDe
   @Explain(displayName = "table", explainLevels = { Level.USER, Level.DEFAULT, Level.EXTENDED })
   public TableDesc getTableInfo() {
     return tableInfo;
-  }
-
-  public Partition getPartition() {
-    return partition;
   }
 
   public void setTableInfo(final TableDesc tableInfo) {

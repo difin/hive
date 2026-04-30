@@ -100,31 +100,14 @@ public class HiveConf extends Configuration {
   private final List<String> rscList = new ArrayList<>();
 
   private Pattern modWhiteListPattern = null;
-  private volatile boolean isImpalaConfigUpdated = false;
   private static final int LOG_PREFIX_LENGTH = 64;
 
   private Map<String, String> lowercaseProperties =
       Collections.synchronizedMap(new HashMap<>());
 
-  public Map<String, String> getLowercaseProperties() {
-    // As a long term goal, we should work to isolate the Impala properties but before
-    // this is done, we would like to make sure that 'lowercaseProperties' can only be
-    // retrieved in the Unified Analytics mode.
-    return getEngine() == Engine.IMPALA ? lowercaseProperties : null;
-  }
-
-  //XXX: CDPD-20696: need to get rid of Impala reference
-  public boolean getImpalaConfigUpdated() {
-    return isImpalaConfigUpdated;
-  }
-
-  public void setImpalaConfigUpdated(boolean isImpalaConfigUpdated) {
-    this.isImpalaConfigUpdated = isImpalaConfigUpdated;
-  }
-
   /**
-   * Supported execution engines for FENG.
-   * HIVE, IMPALA
+   * Supported execution engines for Hive.
+   * HIVE
    */
   public enum Engine {
     INVALID_ENGINE {
@@ -138,30 +121,21 @@ public class HiveConf extends Configuration {
       public String toString() {
         return "hive";
       }
-    },
-    IMPALA {
-      @Override
-      public String toString() {
-        return "impala";
-      }
     };
 
     public boolean ordinalNotationGroupBy() {
       switch (this) {
       case HIVE:
         return false;
-      case IMPALA:
-        return true;
       }
       throw new RuntimeException("Cannot obtain dialect information for " + toString());
     }
   }
 
   /**
-   * Supported runtimes for engines in FENG.
+   * Supported runtimes for engines in Hive.
    * Currently, they are compatible as follows:
    * HIVE -> MR, TEZ
-   * IMPALA -> IMPALA
    */
   public enum Runtime {
     INVALID_RUNTIME {
@@ -180,12 +154,6 @@ public class HiveConf extends Configuration {
       @Override
       public String toString() {
         return "tez";
-      }
-    },
-    IMPALA {
-      @Override
-      public String toString() {
-        return "impala";
       }
     }
   }
@@ -4592,8 +4560,7 @@ public class HiveConf extends Configuration {
         "Whether to show the unquoted partition names in query results."),
 
     HIVE_EXECUTION_ENGINE("hive.execution.engine", Runtime.TEZ.toString(),
-            new StringSet(true,  Runtime.TEZ.toString(), Runtime.MR.toString(),
-                Runtime.IMPALA.toString()),
+            new StringSet(true,  Runtime.TEZ.toString(), Runtime.MR.toString()),
         "Chooses execution engine. Options are: 'tez' (Tez, default), 'mr' (MapReduce, deprecated). "+
         "MR is a historical engine and is deprecated in Hive 2 line. It may be removed without further warning.",
         "execution.engine"),
@@ -4603,51 +4570,19 @@ public class HiveConf extends Configuration {
             "is used for all the queries if empty."),
 
     HIVE_FETCH_STATS_ENGINE("hive.fetch.stats.engine", "default",
-            new StringSet(false,  "default", Engine.HIVE.toString(), Engine.IMPALA.toString()),
+            new StringSet(false,  "default", Engine.HIVE.toString()),
         "Chooses engine used to fetch stats. If set to 'default', the stats will be fetched from " +
         "the value set in 'hive.execution.engine' or 'tez' if set to MR. This is only meant for test " +
         "purposes since the stats engine should match the runtime engine."),
 
     HIVE_FUNCTION_RESOLVER_ENGINE("hive.function.resolver.engine", "default",
-        new StringSet("default", Runtime.TEZ.toString(), Runtime.IMPALA.toString()),
+        new StringSet("default", Runtime.TEZ.toString()),
         "Modify this parameter to set a different execution engine for function resolving. If " +
             "set to default, it will use the hive.etl.execution.engine parameter."),
 
     HIVE_EXECUTION_MODE("hive.execution.mode", "container", new StringSet("container", "llap"),
         "Chooses whether query fragments will run in container or in llap"),
 
-    //XXX: CDPD-20696: Need to get rid of Impala references
-    // Impala specific configuration properties
-    HIVE_RESULT_METHOD("hive.impala.result.method", ResultMethod.STREAMING.toString(),
-        new StringSet(true, ResultMethod.FILE.toString(), ResultMethod.STREAMING.toString()),
-        "Chooses method used to convey results. File mode writes the result set to a " +
-        "file determined during planning, streaming mode sends the results over the network. " +
-        "Supported engines do not necessarily support all result methods." ),
-
-    HIVE_IMPALA_ADDRESS("hive.impala.address", "localhost:21150", "Address for Impala execution engine."),
-    HIVE_IMPALA_HTTP_PATH("hive.impala.http.path", "uainternalcliservice", "Path component of impala URL endpoint when in HTTP mode."),
-    HIVE_IMPALA_USE_HTTP("hive.impala.use.http", false, "If set to true, use Thrift HTTP for transport otherwise " +
-        "use binary. Used in conjunction with hive.impala.address and hive.impala.http.path"),
-    HIVE_IMPALA_REQUEST_POOL("hive.impala.request.pool", "default-pool",
-             new StringSet(true, "default-pool", "root.default"), "Admission pool used for Impala queries"),
-    HIVE_IMPALA_FETCH_SIZE("hive.impala.fetch.size", 1024L,
-        new RangeValidator(1L, (long)Long.MAX_VALUE),
-        "Determines the number of rows per fetch when streaming results from an Impala coordinator"),
-    HIVE_IMPALA_MAX_TIMER_ERROR("hive.impala.max.timer.error", 8000000L, "Maximum timer " +
-            "error on the Impala server in nanoseconds"),
-    HIVE_IMPALA_ROW_FETCH_EARLY_CLOSE("hive.impala.fetch.early.close", false,
-        "Controls whether the Impala backend operation handle is closed at " +
-        "the end of fetch. Leaving the operation handle open allows the Impala " +
-        "profile to capture statement timing after row fetch has completed."),
-    HIVE_IMPALA_CONNECT_TIMEOUT("hive.impala.connect.timeout", 300000,
-        "Timeout for Impala RPCs in milliseconds"),
-    IMPALA_RUNTIME_HIVE_HPLSQL_JAR_LOCATION("hive.impala.hive.hplsql.jar.location",
-        "hdfs:///test-warehouse/hive-hplsql.jar", "Location of the hive-hplsql jar. Used in order " +
-        "to run hplsql queries in the Impala runtime environment"),
-    HIVE_IMPALA_SHOW_IMPALA_PARSING_ERROR("hive.impala.show.impala.parsing.error", true,
-        "If the execution engine is Impala, when there is a parsing error and the type of command " +
-        "exists in both Hive and Impala, a 'true' setting will display the parsing error returned " +
-        "by the Impala engine."),
     HIVE_JAR_DIRECTORY("hive.jar.directory", null,
         "This is the location hive in tez mode will look for to find a site wide \n" +
         "installed hive instance."),
@@ -6138,76 +6073,16 @@ public class HiveConf extends Configuration {
             + "It is not in list of params that are allowed to be modified at runtime");
       }
     }
-    // Make a reference to 'name' because local variables referenced from a lambda
-    // expression must be final or effectively final and 'name' is modified later in the
-    // method.
-    String nameReference = name;
     if (Iterables.any(restrictList,
-        restrictedVar -> nameReference != null && nameReference.startsWith(restrictedVar))) {
+        restrictedVar -> name != null && name.startsWith(restrictedVar))) {
       throw new IllegalArgumentException("Cannot modify " + name + " at runtime. It is in the list"
           + " of parameters that can't be modified at runtime or is prefixed by a restricted variable");
     }
-
-    // When 'name' is null, isImpalaRelatedConfig() will throw a NullPointerException.
-    // When 'value' is null, value.equals() will throw a NullPointerException.
-    if (name != null && value != null) {
-      if (isImpalaRelatedConfig(name)) {
-        // Insert key with the impala namespace.
-        // We convert the portion of the key following Constants.IMPALA_PREFIX to
-        // lowercase letters to make sure there will not be conflicting key-value pairs
-        // for keys that start with Constants.IMPALA_PREFIX. For instance, we will not
-        // have both "impala.explain_level=VERBOSE" and "impala.EXPLAIN_LEVEL=MINIMAL"
-        // added to this HiveConf. Depending on the order of the SET statements, only
-        // one key-value pair could exist.
-        // Moreover, we remove the double quotation marks surrounding the value so that
-        // we won't send such values to the Impala server when establishing the session.
-        // This also aligns HiveServer2 with the classic Impala in that the classic
-        // Impala is able to parse a value surrounded by the double quotation marks if
-        // the SET statement is sent as a query to the Impala server (v.s. configuration
-        // overlay).
-        set(name.toLowerCase(), value.replaceAll("^\"|\"$", ""));
-        setImpalaConfigUpdated(true);
-        // Now set the name to not have the impala namespace.
-        name = name.substring(Constants.IMPALA_PREFIX.length());
-      }
-      // After CDPD-13549, we allow a user to set up Impala's query options without
-      // having to prepend Impala's namespace, and since the class of TQueryOptions is
-      // not available here, we are not able to tell whether 'name' corresponds to an
-      // Impala query option here. Instead, we will determine this later in
-      // ImpalaHelper#updateImpalaQueryOptions() where the class of TQueryOptions is
-      // available.
-      // Thus for a key-value pair where the key does not start with
-      // Constants.IMPALA_PREFIX, conflicting key-value pairs corresponding to Impala's
-      // query options, e.g., explain_level=VERBOSE and EXPLAIN_LEVEL=MINIMAL, could be
-      // added in the 'properties' field in the parent class Configuration, which is ok
-      // since in ImpalaQueryHelperImpl#updateImpalaQueryOptions() to prepare Impala's
-      // query options we rely on key-value pairs added to 'lowercaseProperties' and
-      // the key of each added pair in 'lowercaseProperties' is always converted to
-      // lowercase letters. That is, a query option added earlier to
-      // 'lowercaseProperties' will be overridden by the same query option added later.
-      String oldValue = get(name);
-      boolean shouldSet = !value.equals(oldValue);
-      if (shouldSet) {
-        set(name, value);
-      }
-      // Remove the double quotation marks surrounding the value. This won't interfere
-      // with the values of non-Impala properties because 'lowercaseProperties' is
-      // only used in ImpalaQueryHelperImpl#updateImpalaQueryOptions() to update the
-      // values of Impala's query options prefixed with Impala's namespace.
-      lowercaseProperties.put(name.toLowerCase(), value.replaceAll("^\"|\"$", ""));
-    }
-
-    // We also need to update the value associated with 'execution.engine' when
-    // 'hive.execution.engine' is updated so that the SET statement would return the same
-    // value for both 'hive.execution.engine' and 'execution.engine'.
-    // Recall that for a SET statement, we prepend "hive" to the key of the updated
-    // configuration if the key is "execution.engine" in SetProcessor#setConf().
-    // Therefore, for a "SET execution.engine=<value>" statement, this method can only be
-    // invoked with 'name' equal to "hive.execution.engine". In this case, the body of
-    // the if-statement above will not be executed, and thus set() will not be called to
-    // update the value associated with 'execution.engine'.
-    if (ConfVars.HIVE_EXECUTION_ENGINE.varname.equalsIgnoreCase(name)) {
-      set(ConfVars.HIVE_EXECUTION_ENGINE.altName, value);
+    String oldValue = name != null ? get(name) : null;
+    if (name == null || value == null || !value.equals(oldValue)) {
+      // When either name or value is null, the set method below will fail,
+      // and throw IllegalArgumentException
+      set(name, value);
     }
   }
 
@@ -6223,16 +6098,6 @@ public class HiveConf extends Configuration {
       }
     }
     return false;
-  }
-
-  /**
-   * check whether impala related property is updated
-   * @param name
-   * @return
-   */
-  //XXX: CDPD-20696: Need to get rid of Impala references
-  private boolean isImpalaRelatedConfig(String name) {
-    return name.startsWith(Constants.IMPALA_PREFIX);
   }
 
   public static int getIntVar(Configuration conf, ConfVars var) {
@@ -6637,7 +6502,6 @@ public class HiveConf extends Configuration {
     super(other);
     hiveJar = other.hiveJar;
     auxJars = other.auxJars;
-    isImpalaConfigUpdated = other.isImpalaConfigUpdated;
     origProp = (Properties)other.origProp.clone();
     lowercaseProperties.putAll(other.lowercaseProperties);
     restrictList.addAll(other.restrictList);
@@ -6820,9 +6684,6 @@ public class HiveConf extends Configuration {
       case TEZ:
         engine = Engine.HIVE;
         break;
-      case IMPALA:
-        engine = Engine.IMPALA;
-        break;
       case INVALID_RUNTIME:
         throw new RuntimeException(Runtime.INVALID_RUNTIME.toString());
     }
@@ -6855,49 +6716,22 @@ public class HiveConf extends Configuration {
     String fetchStatsEngine = this.getVar(ConfVars.HIVE_FETCH_STATS_ENGINE).toUpperCase();
     if (fetchStatsEngine.equalsIgnoreCase("DEFAULT")) {
       switch (getEngine()) {
-        case IMPALA:
-          return Constants.IMPALA_ENGINE;
         default:
           return Constants.HIVE_ENGINE;
       }
-    } else if (fetchStatsEngine.equalsIgnoreCase(Runtime.IMPALA.toString())) {
-        return Constants.IMPALA_ENGINE;
     }
     return Constants.HIVE_ENGINE;
   }
 
-  /**
-   * @return Currently configured Impala result method.
-   */
-  public ResultMethod getResultMethod() {
-    try {
-      return ResultMethod.valueOf(this.getVar(ConfVars.HIVE_RESULT_METHOD).toUpperCase());
-    } catch (Exception e) {
-      return ResultMethod.INVALID_METHOD;
-    }
-  }
-
   public boolean isAutogatherStatsEnabled() {
-    if (getEngine() == Engine.IMPALA) {
-      // Impala currently doesn't support StatsTasks
-      return false;
-    }
     return getBoolVar(ConfVars.HIVESTATSAUTOGATHER);
   }
 
   public boolean isAutogatherColumnStatsEnabled() {
-    if (getEngine() == Engine.IMPALA) {
-      // Impala currently doesn't support StatsTasks
-      return false;
-    }
     return getBoolVar(ConfVars.HIVESTATSCOLAUTOGATHER);
   }
 
   public boolean isFileSystemStatsEnabled() {
-    if (getEngine() == Engine.IMPALA) {
-      // Currently we do not use filesystem-based stats during Impala planning
-      return false;
-    }
     return getBoolVar(ConfVars.HIVE_STATS_FILE_BASED_ESTIMATE_STATS);
   }
 

@@ -122,8 +122,6 @@ public class MergeSemanticAnalyzer extends RewriteSemanticAnalyzer<MergeStatemen
           "MergeSemanticAnalyzer");
     }
 
-    checkUpdateDeleteMergeSupported(Context.Operation.MERGE, targetTable);
-
     setETLEngine();
 
     ASTNode source = (ASTNode)tree.getChild(1);

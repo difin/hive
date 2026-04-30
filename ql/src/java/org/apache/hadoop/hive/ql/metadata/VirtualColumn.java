@@ -117,11 +117,6 @@ public enum VirtualColumn {
   public static List<VirtualColumn> getRegistry(HiveConf conf) {
     // Virtual columns are dependent on the engine too
     ArrayList<VirtualColumn> l = new ArrayList<>();
-    // TODO: CDPD-11988: if the function resolver engine is Impala, then it is
-    // using Impala semantics and cannot handle the virtual columns.
-    if (conf.getFunctionResolverEngine().equals(Engine.IMPALA)) {
-      return l;
-    }
     switch (conf.getEngine()) {
     case HIVE:
       l.add(BLOCKOFFSET);
@@ -131,11 +126,6 @@ public enum VirtualColumn {
       }
       l.add(ROWID);
       l.add(ROWISDELETED);
-      break;
-    //XXX: CDPD-20696 Remove reference to Impala
-    case IMPALA:
-      // TODO: CDPD-11988: Add ROW_ID to virtual columns for Impala engine
-      //       once IMPALA-9515 has been fixed
       break;
     default:
       // Nothing to do

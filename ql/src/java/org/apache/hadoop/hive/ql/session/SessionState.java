@@ -1975,7 +1975,6 @@ public class SessionState {
     }
 
     try {
-      closeExternalSession();
       registry.closeCUDFLoaders();
       dropSessionPaths(sessionConf);
       unCacheDataNucleusClassLoaders();
@@ -2044,7 +2043,6 @@ public class SessionState {
     // XXX: CDPD-20696 This needs to work for all generic plugins.
     if (engineSession != null) {
       try {
-        EngineLoader.getExternalInstance().getSessionHelper().closeSession(engineSession);
       } catch (Exception ex) {
         LOG.error("Error closing external session.", ex);
       } finally {

@@ -269,10 +269,6 @@ public class SetProcessor implements CommandProcessor {
         result = HiveConf.generateMrDeprecationWarning();
         LOG.warn(result);
       }
-      //XXX: CDPD-20696 Remove reference to Impala
-      if (!"impala".equals(value)) {
-        ss.closeExternalSession();
-      }
     }
     if (HiveConf.ConfVars.CREATE_TABLE_AS_EXTERNAL.varname.equals(key)) {
       result = HiveConf.generateDeprecationWarning();

@@ -372,7 +372,6 @@ public abstract class BaseSemanticAnalyzer {
 
   protected void reset(boolean clearPartsCache) {
     rootTasks = new ArrayList<>();
-    //TODO: clean up Impala reference, make it more generic.
     try {
       if (queryHelper != null) {
         queryHelper = EngineCompileHelper.getInstance(conf).resetQueryHelper(queryHelper);
@@ -2085,11 +2084,6 @@ public abstract class BaseSemanticAnalyzer {
           CacheTableHelper.getUniqueNames(ctx.getParsedTables()));
     }
     setQueryType(tree); // at this point we know the query type for sure
-  }
-
-  //XXX: CDPD-20696 Remove reference to Impala
-  public static boolean isImpalaPlan(HiveConf conf) {
-    return conf.getEngine() == Engine.IMPALA;
   }
 
   public ParseContext getParseContext() {

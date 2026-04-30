@@ -634,10 +634,6 @@ public class ColumnStatsSemanticAnalyzer extends SemanticAnalyzer {
       Map<Integer, List<TransformSpec>> partTransformSpecs = Collections.singletonMap(-1, null);
       Map<String, String> partSpec = (isPartitionStats) ?
           AnalyzeCommandUtils.getPartKeyValuePairsFromAST(tbl, ast, conf) : null;
-      if (isImpalaPlan(conf) && isPartitionStats) {
-        throw new SemanticException(
-            "Partitions cannot be statically specified in ANALYZE TABLE in Impala without INCREMENTAL");
-      }
       checkForPartitionColumns(
           colNames, Utilities.getColumnNamesFromFieldSchema(tbl.getPartitionKeys()));
       validateSpecifiedColumnNames(colNames);
@@ -689,12 +685,6 @@ public class ColumnStatsSemanticAnalyzer extends SemanticAnalyzer {
     // After analyzeInternal() Hiveop get set as Query
     // since we are passing in AST for select query, so reset it.
     this.queryState.setCommandType(HiveOperation.ANALYZE_TABLE);
-    if (isImpalaPlan(conf)) {
-      // Special handling for Impala. The query result will contain
-      // a single row with a 'summary' string column.
-      this.resultSchema = new ArrayList<>();
-      this.resultSchema.add(new FieldSchema("summary", "string", ""));
-    }
   }
 
   /**

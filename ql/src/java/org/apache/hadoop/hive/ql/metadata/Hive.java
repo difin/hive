@@ -399,14 +399,6 @@ public class Hive implements AutoCloseable {
             functionName + "on reload. Ignore and continue.");
       }
     }
-
-    // Allow third party engines to reload their functions.
-    try {
-      EngineLoader.getExternalInstance().getRuntimeHelper().reloadFunctions(allFunctions, conf,
-          getMSC());
-    } catch (Exception e) {
-      LOG.warn("Failed to register udf functions in external driver.");
-    }
   }
 
   public static Hive get(Configuration c, Class<?> clazz) throws HiveException {
@@ -2292,11 +2284,7 @@ public class Hive implements AutoCloseable {
         if (outdated) {
           // The MV is outdated, see whether we should consider it for rewriting or not
           boolean ignore;
-          //XXX: CDPD-20696 Remove reference to Impala
-          if (conf.getEngine() == Engine.IMPALA) {
-            // IMPALA currently does not support incremental rebuilds or rewriting
-            ignore = true;
-          } else if (forceMVContentsUpToDate && !tryIncrementalRebuild) {
+          if (forceMVContentsUpToDate && !tryIncrementalRebuild) {
             // We will not try partial rewriting for rebuild if incremental rebuild is disabled
             ignore = true;
           } else if (!forceMVContentsUpToDate && !tryIncrementalRewriting) {

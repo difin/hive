@@ -264,10 +264,7 @@ public class SQLOperation extends ExecuteStatementOperation {
     boolean runAsync = shouldRunAsync();
     HiveConf conf = queryState.getConf();
     final boolean asyncPrepare = runAsync
-        && HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_SERVER2_ASYNC_EXEC_ASYNC_COMPILE)
-        // Impala tools generally expect hasResultSet to be set in the response from ExecuteStatement.
-        // When compilation is async this does not get filled in.
-        && conf.getEngine() != Engine.IMPALA;
+        && HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_SERVER2_ASYNC_EXEC_ASYNC_COMPILE);
     if (!asyncPrepare) {
       prepare(queryState);
     }

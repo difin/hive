@@ -860,9 +860,7 @@ public class HiveServer2 extends CompositeService {
       }
     }
 
-    if (hiveConf.getRuntime() == Runtime.TEZ ||
-        // Impala Unified Analytics with ETL isolation requires setting up tez session pools
-        (hiveConf.getRuntime() == Runtime.IMPALA && hiveConf.getVar(ConfVars.HIVE_ETL_EXECUTION_ENGINE).equals("tez"))) {
+    if (hiveConf.getRuntime() == Runtime.TEZ) {
       if (!activePassiveHA) {
         LOG.info("HS2 interactive HA not enabled. Starting tez sessions..");
         try {
@@ -1145,16 +1143,6 @@ public class HiveServer2 extends CompositeService {
     }
 
     stopOrDisconnectTezSessions(true);
-
-    if (hiveConf != null) {
-      if (hiveConf.getVar(ConfVars.HIVE_EXECUTION_ENGINE).equals("impala")) {
-        try {
-          EngineLoader.getExternalInstance().getSessionHelper().shutdown();
-        } catch(Exception ex) {
-          LOG.error("Impala session pool manager failed to stop during HiveServer2 shutdown.", ex);
-        }
-      }
-    }
 
     if (zKClientForPrivSync != null) {
       zKClientForPrivSync.close();

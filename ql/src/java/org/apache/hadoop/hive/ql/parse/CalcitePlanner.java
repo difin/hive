@@ -581,7 +581,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
         profilesCBO = obtainCBOProfiles(queryProperties);
 
         disableJoinMerge = true;
-        boolean isImpalaPlan = isImpalaPlan(conf);
         final boolean materializedView = getQB().isMaterializedView();
 
         try {
@@ -591,24 +590,7 @@ public class CalcitePlanner extends SemanticAnalyzer {
           perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.GENERATE_LOGICAL_PLAN);
 
           perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.GENERATE_OPERATOR_TREE);
-          if (isImpalaPlan) {
-            // 2. If we are creating a view, populate the definition
-            if (cboCtx.type == PreCboCtx.Type.VIEW) {
-              saveViewDefinition();
-            }
-
-            markEvent("Calcite - Optimized plan generated");
-            // 3. Create Impala operator
-            sinkOp = getImpalaSinkOperator(newPlan.enginePlan, cboCtx);
-
-            // 4. Generate explain plan
-            if (this.ctx.isExplainPlan()) {
-              doExplainPlan(newPlan);
-            }
-            this.ctx.setCboInfo("Plan optimized by CBO.");
-            this.ctx.setCboSucceeded(true);
-            LOG.info("CBO Succeeded; optimized logical plan.");
-          } else if (this.conf.getBoolVar(HiveConf.ConfVars.HIVE_CBO_RETPATH_HIVEOP)) {
+          if (this.conf.getBoolVar(HiveConf.ConfVars.HIVE_CBO_RETPATH_HIVEOP)) {
             if (cboCtx.type == PreCboCtx.Type.VIEW && !materializedView) {
               throw new SemanticException("Create view is not supported in cbo return path.");
             }
@@ -692,11 +674,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
 
           // Determine if we should re-throw the exception OR if we try to mark plan as reAnayzeAST to retry
           // planning as non-CBO.
-
-          if (isImpalaPlan) {
-            // Non-CBO Impala plans are not supported, so propagate Impala exeception.
-            throw e;
-          }
 
           // Determine if we should re-throw the exception OR if we try to mark the query to retry as non-CBO.
           if (fallbackStrategy.isFatal(e)) {
@@ -1425,57 +1402,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
     }
   }
 
-  /**
-   * Get Impala Sink Operator containing an Impala Compiled Plan
-   *
-   * @return Operator
-   * @throws SemanticException
-   */
-  Operator getImpalaSinkOperator(RelNode impalaRel, PreCboCtx cboCtx) throws SemanticException {
-    try {
-      Preconditions.checkNotNull(this.queryHelper);
-      final String dbname = SessionState.get().getCurrentDatabase();
-      final String username = StringUtils.defaultString(SessionState.get().getUserName());
-
-      // The purpose for this loop is to setup DummyTableScan operations with a valid
-      // TableScanDesc so later points of code that rely on them can examine them to
-      // information about tables scanned. (The immediate need was for CREATE MATERIALIZED
-      // VIEW)
-      for (String alias : getQB().getTabAliases()) {
-        if (alias.equals(DUMMY_TABLE)) {
-          continue;
-        }
-
-        Table tab = getQB().getMetaData().getSrcForAlias(alias);
-        RowResolver rowResolver = getRowResolver(alias, getQB(), tab);
-        TableScanDesc tableScanDesc = createTableScanDesc(alias, tab);
-        TableScanOperator tableScanOp = new DummyScanOperator(getOpContext(),
-            rowResolver.getRowSchema(), tableScanDesc);
-        // topOps needs to have a TableScanOperator for a plan to compile.
-        topOps.put(alias, tableScanOp);
-      }
-
-      // CDPD-8391: Refactor and get rid of this at some point, the DummyScanOperator
-      // isn't really needed.
-      TableScanOperator tableScanOp = new DummyScanOperator(getOpContext(),
-          new RowSchema(sinkRowResolver.getRowSchema()));
-      // topOps needs to have a TableScanOperator for a plan to compile.
-      topOps.put(DUMMY_TABLE, tableScanOp);
-      // opParseCtx needs to have the input inside or else genFileSinkPlan crashes
-      opParseCtx.put(tableScanOp, new OpParseContext(sinkRowResolver));
-
-      String dest = getQB().getParseInfo().getClauseNames().iterator().next();
-      FileSinkOperator fso = (FileSinkOperator) genFileSinkPlan(dest, getQB(), tableScanOp);
-      FileSinkDesc impalaQueryDesc = this.queryHelper.compilePlan(
-          getDb(), impalaRel, fso.getConf(), ctx.isExplainPlan(), getQB(), cboCtx.type,
-          queryState::getValidTxnList, getTxnMgr(), resultSchema);
-      markEvent("Impala plan generated");
-      return OperatorFactory.getAndMakeChild(impalaQueryDesc, fso);
-    } catch (HiveException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   // This function serves as the wrapper of handleInsertStatementSpec in
   // SemanticAnalyzer
   Operator<?> handleInsertStatement(String dest, Operator<?> input, RowResolver inputRR, QB qb)
@@ -2153,17 +2079,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
       return basePlan;
     }
 
-    private RelNode getAdjustedEnginePlan(RelNode relNode,
-        RelMetadataProvider metadataProvider, RexExecutor executorProvider) {
-      HepProgram program =
-          EngineCompileHelper.getInstance(conf).adjustPlanForEngine();
-      if (program == null) {
-        return relNode;
-      }
-      return executeProgram(relNode, program, metadataProvider, executorProvider,
-          null, false, null);
-    }
-
     /**
      * Returns true if MV is being loaded, constructed or being rebuilt.
      */
@@ -2648,22 +2563,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
       RelNode calciteEnginePlan = calciteOptimizedPlan;
       PerfLogger perfLogger = SessionState.getPerfLogger();
       switch (conf.getEngine()) {
-      case IMPALA:
-        perfLogger.PerfLogBegin(this.getClass().getName(), PerfLogger.OPTIMIZER);
-        HepProgram hepProgram = queryHelper.getHepProgram(getDb());
-        // The last parameter here (noDag="true") allows for the creation of separate nodes
-        // even if they are equivalent.
-        // While this does have the potential to have a bigger memory footprint, the nodes being
-        // replaced in these rules are 1:1, so it should be ok here.
-        calciteEnginePlan =
-            executeProgram(calciteOptimizedPlan, hepProgram, metadataProvider,
-                executorProvider, null, true, null);
-        perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.OPTIMIZER, "Calcite: Impala transformation rules");
-
-        if (LOG.isDebugEnabled() && !conf.getBoolVar(ConfVars.HIVE_IN_TEST)) {
-          LOG.debug("Impala plan:\n{}", RelOptUtil.toString(calciteEnginePlan));
-        }
-        break;
       case HIVE:
         if (HiveConf.getBoolVar(conf, ConfVars.HIVE_CBO_RETPATH_HIVEOP)) {
           final HepProgramBuilder program = new HepProgramBuilder();
@@ -2699,13 +2598,6 @@ public class CalcitePlanner extends SemanticAnalyzer {
             LOG.debug("Hive plan:\n{}", RelOptUtil.toString(calciteEnginePlan));
           }
         }
-
-        // Call the compiler helper to make adjustments in the Calcite plan for
-        // an engine. For a typical Hive query, this is a nop. A case where we
-        // need adjustment is if we are running through the Tez engine, but used
-        // the Impala Function Resolver to resolve functions.
-        calciteEnginePlan =
-            getAdjustedEnginePlan(calciteEnginePlan, metadataProvider, executorProvider);
       default:
         // Nothing to do for other engines for the time being
       }

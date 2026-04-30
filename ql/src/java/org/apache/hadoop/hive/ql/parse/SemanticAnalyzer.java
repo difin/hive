@@ -2138,8 +2138,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     }
 
     // Identify ETL queries as early as possible so various engine specific code paths
-    // are respected. (Such as function resolution, which is different between impala
-    // and hive)
+    // are respected.
     if (qb.isCTAS() || qb.getParseInfo().hasInsertTables() || qb.isMaterializedView()) {
       setETLEngine();
     }
@@ -2713,15 +2712,9 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
           } else {
             // This is the only place where isQuery is set to true; it defaults to false.
             qb.setIsQuery(true);
-            if (conf.getEngine() == Engine.IMPALA &&
-                conf.getResultMethod() == ResultMethod.STREAMING) {
-              // Streaming mode does not use a staging directory for results
-              fname = null;
-            } else {
-              Path stagingPath = getStagingDirectoryPathname(qb, conf, ctx);
-              ctx.setResDir(stagingPath);
-              fname = stagingPath.toString();
-            }
+            Path stagingPath = getStagingDirectoryPathname(qb, conf, ctx);
+            ctx.setResDir(stagingPath);
+            fname = stagingPath.toString();
           }
         }
 
@@ -7669,12 +7662,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       // Is the user trying to insert into a external tables
       checkExternalTable(destinationTable);
 
-      // Check if the execution engine supports write into full acid table if
-      // such an operation is being performed
-      checkWriteIntoFullAcidTable(destTableIsFullAcid, dest, destinationTable);
-
-      checkInsertDestinationTableFormat(dest, destinationTable);
-
       partSpec = qbm.getPartSpecForAlias(dest);
       destinationPath = destinationTable.getPath();
 
@@ -8137,15 +8124,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
               // write out formatted thrift objects to SequenceFile
               conf.set(SerDeUtils.LIST_SINK_OUTPUT_FORMATTER, NoOpFetchFormatter.class.getName());
             } else {
-              if (conf.getEngine() == Engine.IMPALA) {
-                // IMPALA execution currently only supports writing results as TextFile
-                fileFormat = "TextFile";
-                // Setting this here may affect queries if a session changes execution engines
-                // or runtimes. See HIVE-23699.
-                HiveConf.setVar(conf, HiveConf.ConfVars.HIVEQUERYRESULTFILEFORMAT, fileFormat);
-              } else {
-                fileFormat = HiveConf.getVar(conf, HiveConf.ConfVars.HIVEQUERYRESULTFILEFORMAT);
-              }
+              fileFormat = HiveConf.getVar(conf, HiveConf.ConfVars.HIVEQUERYRESULTFILEFORMAT);
               Class<? extends Deserializer> serdeClass = LazySimpleSerDe.class;
               if (fileFormat.equals(PlanUtils.LLAP_OUTPUT_FORMAT_KEY)) {
                 serdeClass = LazyBinarySerDe2.class;
@@ -8715,7 +8694,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     default:
       throw new IllegalStateException("Unexpected dest_type=" + dest_tab);
     }
-    FileSinkDesc fileSinkDesc = new FileSinkDesc(queryTmpdir, table_desc, dest_part,
+    FileSinkDesc fileSinkDesc = new FileSinkDesc(queryTmpdir, table_desc,
         conf.getBoolVar(HiveConf.ConfVars.COMPRESSRESULT), currentTableId, rsCtx.isMultiFileSpray(),
         canBeMerged, rsCtx.getNumFiles(), rsCtx.getTotalFiles(), rsCtx.getPartnCols(), dpCtx,
         dest_path, isMmCtas, isInsertOverwrite, qb.getIsQuery(),
@@ -8911,58 +8890,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         (dest_tab.getTableType().equals(TableType.EXTERNAL_TABLE))) {
       throw new SemanticException(
           ErrorMsg.INSERT_EXTERNAL_TABLE.getMsg(dest_tab.getTableName()));
-    }
-  }
-
-  // Check if the underlying query engine supports writes (insert/update/delete) to
-  // a full acid table. Currently, this check is done only for Impala engine since
-  // it has restrictions on the types of writes supported.
-  protected void checkWriteIntoFullAcidTable(boolean destTableIsFullAcid,
-      String dest, Table destTable) throws SemanticException {
-    if (isImpalaPlan(conf) && !isETLEngineSet() && destTableIsFullAcid) {
-      // Note that although updates and deletes are going through the
-      // UpdateDeleteSemanticAnalyzer, here we check for all 3: insert, update, delete
-      // since there could be some code path where one of these is invoked.
-      String op = inserting(dest) ? "INSERT" :
-          (updating(dest) ? "UPDATE" : (deleting(dest) ? "DELETE" : null));
-      if (op != null) {
-        throw new SemanticException(
-            op + " operation not " + "supported on full transactional (ACID) table " +
-            destTable.getFullyQualifiedName() + " by Impala");
-      }
-    }
-  }
-
-  protected void checkInsertDestinationTableFormat(String dest, Table destTable)
-      throws SemanticException {
-
-    if (!isImpalaPlan(conf) || !inserting(dest)) return;
-
-    String inputFormat = destTable.getSd().getInputFormat();
-
-    if (!(
-        inputFormat.equalsIgnoreCase("org.apache.hadoop.mapred.TextInputFormat") ||
-        inputFormat.equalsIgnoreCase("org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"))) {
-      throw new SemanticException("Insert operation against " + inputFormat +
-          " is not supported by Impala. Only the text or Parquet tables are supported.");
-    }
-  }
-
-  // Check if the underlying query engine supports update/delete/merge operation
-  // on the target table. Currently, this check is done only for Impala engine
-  // since it has restrictions on the types of writes supported.
-  protected void checkUpdateDeleteMergeSupported(Context.Operation operation,
-      Table destTable) throws SemanticException {
-    Preconditions.checkArgument(operation == Context.Operation.UPDATE ||
-        operation == Context.Operation.DELETE || operation == Context.Operation.MERGE);
-    // Only check for transactional tables here since external tables are
-    // disallowed anyways through a different code path
-    if (isImpalaPlan(conf) && !isETLEngineSet()) {
-      if(AcidUtils.isTransactionalTable(destTable)) {
-        throw new SemanticException(
-            operation + " operation not supported on transactional table " +
-            destTable.getFullyQualifiedName() + " by Impala");
-      }
     }
   }
 
@@ -9193,11 +9120,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     }
 
     // The numbers of input columns and output columns should match for regular query
-    // Impala partial width inserts are handled later by ImpalaPlanner
     if (inColumnCnt != outColumnCnt &&
-        !updating(dest) && !deleting(dest) && !merging(dest) && !isRowLineageInsert(conf) &&
-        !(isImpalaPlan(conf) && inserting(dest) &&
-             getQB().getParseInfo().getDestSchemaForClause(dest) != null)) {
+        !updating(dest) && !deleting(dest) && !merging(dest) && !isRowLineageInsert(conf)) {
       String reason = "Table " + dest + " has " + outColumnCnt
           + " columns, but query has " + inColumnCnt + " columns.";
       throw new SemanticException(ASTErrorUtils.getMsg(
@@ -9228,9 +9152,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       // here only deals with non-partition columns. We deal with partition columns next
       int rowFieldsOffset = expressions.size();
       for (int i = 0; i < columnNumber; i++) {
-        if (rowFieldsOffset + i >= rowFields.size() && isImpalaPlan(conf) && inserting(dest)) {
-          continue;
-        }
         ExprNodeDesc column = handleConversion(tableFields.get(i), rowFields.get(rowFieldsOffset + i), converted, dest, i);
         expressions.add(column);
       }
@@ -12568,11 +12489,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       } else {
         throw new SemanticException(ErrorMsg.NEED_PARTITION_SPECIFICATION.getMsg());
       }
-      if (isImpalaPlan(conf) && qbp.getTableSpec().specType == SpecType.STATIC_PARTITION
-          && !qbp.isIncrementalStats()) {
-        throw new SemanticException(
-            "Partitions cannot be statically specified in ANALYZE TABLE in Impala without INCREMENTAL");
-      }
       List<Partition> partitions = qbp.getTableSpec().partitions;
       if (partitions != null) {
         for (Partition partn : partitions) {
@@ -13589,9 +13505,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     pCtx.setDisableMapJoin(disableMapJoinWithHint(getQB().getParseInfo().getHintList()));
 
     if (forViewCreation) {
-      if (conf.getEngine() == Engine.IMPALA) {
-        return;
-      }
       if (shouldComputeLineage(conf)) {
         // Generate lineage info if LineageLogger hook is configured.
         // Add the transformation that computes the lineage information.
@@ -13633,33 +13546,31 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
         TableAccessAnalyzer tableAccessAnalyzer = new TableAccessAnalyzer(pCtx);
         setTableAccessInfo(tableAccessAnalyzer.analyzeTableAccess());
       }
-      if (conf.getEngine() != Engine.IMPALA) {
-        // 7. Perform Logical optimization
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Before logical optimization\n" + Operator.toString(pCtx.getTopOps().values()));
-        }
-        Optimizer optm = new Optimizer();
-        optm.setPctx(pCtx);
-        optm.initialize(conf);
-        pCtx = optm.optimize();
-        if (pCtx.getColumnAccessInfo() != null) {
-          // set ColumnAccessInfo for view column authorization
-          setColumnAccessInfo(pCtx.getColumnAccessInfo());
-        }
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("After logical optimization\n" + Operator.toString(pCtx.getTopOps().values()));
-        }
+      // 7. Perform Logical optimization
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Before logical optimization\n" + Operator.toString(pCtx.getTopOps().values()));
+      }
+      Optimizer optm = new Optimizer();
+      optm.setPctx(pCtx);
+      optm.initialize(conf);
+      pCtx = optm.optimize();
+      if (pCtx.getColumnAccessInfo() != null) {
+        // set ColumnAccessInfo for view column authorization
+        setColumnAccessInfo(pCtx.getColumnAccessInfo());
+      }
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("After logical optimization\n" + Operator.toString(pCtx.getTopOps().values()));
+      }
 
-        // 8. Generate column access stats if required - wait until column pruning
-        // takes place during optimization
-        boolean isColumnInfoNeedForAuth = SessionState.get().isAuthorizationModeV2()
-                && HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_AUTHORIZATION_ENABLED);
-        if (isColumnInfoNeedForAuth
-                || HiveConf.getBoolVar(this.conf, HiveConf.ConfVars.HIVE_STATS_COLLECT_SCANCOLS)) {
-          ColumnAccessAnalyzer columnAccessAnalyzer = new ColumnAccessAnalyzer(pCtx);
-          // view column access info is carried by this.getColumnAccessInfo().
-          setColumnAccessInfo(columnAccessAnalyzer.analyzeColumnAccess(this.getColumnAccessInfo()));
-        }
+      // 8. Generate column access stats if required - wait until column pruning
+      // takes place during optimization
+      boolean isColumnInfoNeedForAuth = SessionState.get().isAuthorizationModeV2()
+              && HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_AUTHORIZATION_ENABLED);
+      if (isColumnInfoNeedForAuth
+              || HiveConf.getBoolVar(this.conf, HiveConf.ConfVars.HIVE_STATS_COLLECT_SCANCOLS)) {
+        ColumnAccessAnalyzer columnAccessAnalyzer = new ColumnAccessAnalyzer(pCtx);
+        // view column access info is carried by this.getColumnAccessInfo().
+        setColumnAccessInfo(columnAccessAnalyzer.analyzeColumnAccess(this.getColumnAccessInfo()));
       }
     }
     perfLogger.PerfLogEnd(this.getClass().getName(), PerfLogger.LOGICAL_OPTIMIZATION);
@@ -14614,10 +14525,6 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
     if (tbl.isNonNative()) {
       throw new SemanticException(ErrorMsg.ANALYZE_TABLE_NOSCAN_NON_NATIVE.getMsg(tbl
           .getTableName()));
-    }
-
-    if (isImpalaPlan(conf)) {
-      throw new SemanticException("ANALYZE TABLE NOSCAN is not supported for Impala");
     }
   }
 
@@ -15734,19 +15641,7 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
       return false;
     }
 
-    if (isImpalaPlan(conf)) {
-      if (conf.getResultMethod() != ResultMethod.FILE) {
-        LOG.info("Not eligible for results caching - " + ConfVars.HIVE_RESULT_METHOD.varname + " is not 'file'");
-        return false;
-      }
-
-      if (qb.isSimpleSelectQuery()) {
-        LOG.info("Not eligible for results caching - query is not complex enough");
-        return false;
-      }
-    // 0 cluster jobs for hive plans typically means hive.fetch.task.conversion has kicked in. This is not
-    // applicable to Impala plans since they always have 0 cluster jobs.
-    } else if (Utilities.getNumClusterJobs(getRootTasks()) == 0) {
+    if (Utilities.getNumClusterJobs(getRootTasks()) == 0) {
       LOG.info("Not eligible for results caching - no mr or tez jobs");
       return false;
     }

@@ -1170,14 +1170,6 @@ public class Context {
    * Today this translates into running hadoop jobs locally
    */
   public boolean isLocalOnlyExecutionMode() {
-    if (conf instanceof HiveConf) {
-      HiveConf hconf = (HiveConf) conf;
-
-      if (hconf.getRuntime() == Runtime.IMPALA) {
-        return false;
-      }
-    }
-
     return ShimLoader.getHadoopShims().isLocalMode(conf);
   }
 
