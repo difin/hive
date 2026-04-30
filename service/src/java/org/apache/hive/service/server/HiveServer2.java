@@ -506,6 +506,8 @@ public class HiveServer2 extends CompositeService {
       builder.setKeyStoreType(hiveConf.getVar(ConfVars.HIVE_SERVER2_WEBUI_SSL_KEYSTORE_TYPE));
       builder.setKeyManagerFactoryAlgorithm(
           hiveConf.getVar(ConfVars.HIVE_SERVER2_WEBUI_SSL_KEYMANAGERFACTORY_ALGORITHM));
+      builder.setIncludeCiphersuites(
+          hiveConf.getVar(ConfVars.HIVE_SERVER2_WEBUI_SSL_INCLUDE_CIPHERSUITES));
       builder.setExcludeCiphersuites(
           hiveConf.getVar(ConfVars.HIVE_SERVER2_WEBUI_SSL_EXCLUDE_CIPHERSUITES));
       builder.setUseSSL(true);
