@@ -65,7 +65,6 @@
         </file>
       </activation>
       <modules>
-        <module>catalogd-unit</module>
         <module>hive-iceberg</module>
         <module>qtest-iceberg</module>
       </modules>
