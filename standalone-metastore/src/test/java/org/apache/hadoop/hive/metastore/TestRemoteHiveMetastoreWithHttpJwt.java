@@ -188,9 +188,11 @@ public class TestRemoteHiveMetastoreWithHttpJwt {
 
   @Test(expected = TTransportException.class)
   public void testExpiredJWT() throws Exception {
-    String validJwtToken = generateJWT(USER_1, jwtAuthorizedKeyFile.toPath(),
-        TimeUnit.MILLISECONDS.toMillis(2));
-    System.getenv().put("HMS_JWT", validJwtToken);
+    // JWT exp/iat are whole seconds; a 2ms lifetime does not change the second boundary, so the
+    // token often still looks valid. Use an exp time in the past instead.
+    String expiredJwtToken = generateJWT(USER_1, jwtAuthorizedKeyFile.toPath(),
+        -TimeUnit.MINUTES.toMillis(1));
+    System.getenv().put("HMS_JWT", expiredJwtToken);
     String dbName = ("expired_jwt_" + TEST_DB_NAME_PREFIX + "_" + UUID.randomUUID()).toLowerCase();
     HiveMetaStoreClient client = new HiveMetaStoreClient(conf);
     try {

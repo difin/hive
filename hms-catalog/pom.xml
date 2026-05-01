@@ -17,7 +17,6 @@
     <!-- Required for maven-surefire-plugin: @{argLine} late substitution (SUREFIRE-1431) -->
     <argLine/>
     <hive.path.to.root>..</hive.path.to.root>
-    <iceberg.version>1.10.1</iceberg.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -92,6 +92,7 @@
     <hikaricp.version>2.6.1</hikaricp.version>
     <jackson.version>2.15.3</jackson.version>
     <javolution.version>5.5.1</javolution.version>
+    <jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
     <jetty.version>9.4.58.v20250814</jetty.version>
     <jexl.version>3.3</jexl.version>
     <junit.version>4.13.2</junit.version>
@@ -811,6 +812,13 @@
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
             <version>3.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- RESTEasy (Keycloak admin client) expects jakarta.annotation.Priority at runtime -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>${jakarta.annotation-api.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
