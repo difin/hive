@@ -22,7 +22,6 @@ if [ -n "$ZSH_VERSION" ]; then
 else
    SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 fi
-DOCKER_FENG_DIR="$SCRIPT_DIR/../docker-feng"
 CDWH_YEAR="${CDWH_PREFIX%%\.*}"
 
 BUILD_INFO_URL="https://release.eng.cloudera.com/hwre-api/latestcompiledbuild?stack=CDH&release=${CDH_PREFIX}&os{PLATFORM}"
@@ -57,7 +56,6 @@ HADOOP_VERSION=$(get_component_version "hadoop" $CDH_VERSION, "CDH")
 SOLR_VERSION=$(get_component_version "solr" $CDH_VERSION, "CDH")
 RANGER_VERSION=$(get_component_version "ranger" $CDH_VERSION, "CDH")
 ATLAS_VERSION=$(get_component_version "atlas" $CDH_VERSION, "CDH")
-IMPALA_VERSION=$(get_component_version "impala" $CDH_VERSION, "CDH")
 
 HADOOP_TAR_FILE=hadoop-$HADOOP_VERSION.tar.gz
 HADOOP_TAR_URL="$CDH_TARS_URL/hadoop/$HADOOP_TAR_FILE"
@@ -94,14 +92,7 @@ if [ ! -f "$SCRIPT_DIR/$TEZ_TAR_FILE" ]; then
     curl ${TEZ_TAR_URL} --output $SCRIPT_DIR/$TEZ_TAR_FILE
 fi
 
-IMPALA_TAR_FILE=impala-fesupport-${IMPALA_VERSION}.tar.gz
-IMPALA_TAR_URL="$CDWH_TARS_URL/impala/$IMPALA_TAR_FILE"
-if [ ! -f "$DOCKER_FENG_DIR/$IMPALA_TAR_FILE" ]; then
-    echo "IMPALA_TAR_URL=${IMPALA_TAR_URL}"
-    curl ${IMPALA_TAR_URL} --output $DOCKER_FENG_DIR/$IMPALA_TAR_FILE
-fi
-
 
 echo "\n*** YOU CAN BUILD HIVE IMAGE AS DESCRIBED BELOW ***\n"
 echo "unset CDH_VERSION # it should be picked up from packaging/pom.xml as the project.version"
-echo "mvn docker:build -Pdocker -pl packaging -DskipTests -Dmaven.javadoc.skip=true -Denforcer.skip=true -Dtez.version=$TEZ_VERSION -Dhadoop.version=$HADOOP_VERSION -Dsolr.version=$SOLR_VERSION -Dranger.version=$RANGER_VERSION -Datlas.version=$ATLAS_VERSION -Dimpala.version=$IMPALA_VERSION -Ddocker.verbose"
+echo "mvn docker:build -Pdocker -pl packaging -DskipTests -Dmaven.javadoc.skip=true -Denforcer.skip=true -Dtez.version=$TEZ_VERSION -Dhadoop.version=$HADOOP_VERSION -Dsolr.version=$SOLR_VERSION -Dranger.version=$RANGER_VERSION -Datlas.version=$ATLAS_VERSION -Ddocker.verbose"
