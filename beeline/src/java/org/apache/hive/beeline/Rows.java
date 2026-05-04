@@ -66,6 +66,7 @@ abstract class Rows implements Iterator {
     primaryKeyColumns = new boolean[count];
   }
 
+  @Override
   public void remove() {
     throw new UnsupportedOperationException();
   }

@@ -154,7 +154,7 @@ public class CorrelationOptimizer extends Transform {
           aliasTotalKnownInputSize += size;
           Long es = aliasToSize.get(alias);
           if(es == null) {
-            es = new Long(0);
+            es = Long.valueOf(0);
           }
           es += size;
           aliasToSize.put(alias, es);
@@ -207,6 +207,7 @@ public class CorrelationOptimizer extends Transform {
    *          current parse context
    * @throws SemanticException
    */
+  @Override
   public ParseContext transform(ParseContext pctx) throws SemanticException {
 
     pCtx = pctx;
@@ -570,6 +571,7 @@ public class CorrelationOptimizer extends Transform {
       return reduceSinkOperators;
     }
 
+    @Override
     public Object process(Node nd, Stack<Node> stack, NodeProcessorCtx ctx,
         Object... nodeOutputs) throws SemanticException {
       CorrelationNodeProcCtx corrCtx = (CorrelationNodeProcCtx) ctx;

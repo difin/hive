@@ -515,7 +515,7 @@ public class GenericUDAFSum extends AbstractGenericUDAFResolver {
           SumDoubleAgg myagg = (SumDoubleAgg) ss.wrappedBuf;
           return myagg.nonNullCount == 0
               ? null 
-              : new Object[] { new Double(myagg.sum), myagg.nonNullCount};
+              : new Object[] { myagg.sum, myagg.nonNullCount};
         }
 
       };
@@ -652,7 +652,7 @@ public class GenericUDAFSum extends AbstractGenericUDAFResolver {
           SumLongAgg myagg = (SumLongAgg) ss.wrappedBuf;
           return myagg.nonNullCount == 0 
               ? null 
-              : new Object[] { new Long(myagg.sum), myagg.nonNullCount};
+              : new Object[] { myagg.sum, myagg.nonNullCount};
         }
       };
     }

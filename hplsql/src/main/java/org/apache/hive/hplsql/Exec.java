@@ -710,7 +710,7 @@ public class Exec extends HplsqlBaseVisitor<Integer> implements Closeable {
    * Set SQLCODE
    */
   public void setSqlCode(int sqlcode) {
-    Long code = (long) sqlcode;
+    Long code = Long.valueOf(sqlcode);
     Var var = findVariable(SQLCODE);
     if (var != null) {
       var.setValue(code);
@@ -2626,7 +2626,7 @@ public class Exec extends HplsqlBaseVisitor<Integer> implements Closeable {
     if (ctx.T_FALSE() != null) {
       val = false;
     }
-    stackPush(new Var(val));
+    stackPush(new Var(Boolean.valueOf(val)));
     return 0; 
   }
 

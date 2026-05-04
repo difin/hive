@@ -138,7 +138,7 @@ public abstract class AbstractJoinTaskDispatcher implements SemanticDispatcher {
             aliasTotalKnownInputSize += size;
             Long es = aliasToSize.get(alias);
             if (es == null) {
-              es = new Long(0);
+              es = Long.valueOf(0);
             }
             es += size;
             aliasToSize.put(alias, es);
