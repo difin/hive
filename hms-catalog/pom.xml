@@ -1,6 +1,4 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0">
     <parent>
         <artifactId>hive</artifactId>
         <groupId>org.apache.hive</groupId>
@@ -15,7 +13,7 @@
 
   <properties>
     <!-- Required for maven-surefire-plugin: @{argLine} late substitution (SUREFIRE-1431) -->
-    <argLine/>
+    <argLine />
     <hive.path.to.root>..</hive.path.to.root>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
@@ -375,7 +373,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
-                    <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
+                    <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
                     <!-- Java 21+ compatibility: allow deprecated security manager operations -->
                     <argLine>@{argLine} -Djava.security.manager=allow ${jacoco.agent.argLine}</argLine>
                     <includes>
