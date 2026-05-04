@@ -11,15 +11,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
         <version>21</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
   <groupId>org.apache.hive</groupId>
@@ -837,20 +835,19 @@
                                 <phase>generate-sources</phase>
                                 <configuration>
                                     <target>
-                                        <taskdef classname="net.sf.antcontrib.logic.ForTask"
-                                                 classpathref="maven.plugin.classpath" name="for"/>
-                                        <property name="thrift.args" value="${thrift.args}"/>
-                                        <property name="thrift.gen.dir" value="${thrift.gen.dir}"/>
-                                        <delete dir="${thrift.gen.dir}"/>
-                                        <mkdir dir="${thrift.gen.dir}"/>
+                                        <taskdef classname="net.sf.antcontrib.logic.ForTask" classpathref="maven.plugin.classpath" name="for" />
+                                        <property name="thrift.args" value="${thrift.args}" />
+                                        <property name="thrift.gen.dir" value="${thrift.gen.dir}" />
+                                        <delete dir="${thrift.gen.dir}" />
+                                        <mkdir dir="${thrift.gen.dir}" />
                                         <for param="thrift.file">
                                             <path>
-                                                <fileset dir="." includes="src/main/thrift/*.thrift"/>
+                                                <fileset dir="." includes="src/main/thrift/*.thrift" />
                                             </path>
                                             <sequential>
-                                                <echo message="Generating Thrift code for @{thrift.file}"/>
+                                                <echo message="Generating Thrift code for @{thrift.file}" />
                                                 <exec dir="." executable="${thrift.home}/bin/thrift" failonerror="true">
-                                                    <arg line="${thrift.args} -I ${basedir}/include -I ${basedir}/.. -o ${thrift.gen.dir} @{thrift.file} "/>
+                                                    <arg line="${thrift.args} -I ${basedir}/include -I ${basedir}/.. -o ${thrift.gen.dir} @{thrift.file} " />
                                                 </exec>
                                             </sequential>
                                         </for>
@@ -1033,12 +1030,12 @@
                         </goals>
                         <configuration>
                             <target>
-                                <delete dir="${test.tmp.dir}"/>
-                                <delete dir="${test.warehouse.dir}"/>
-                                <delete dir="${test.warehouse.external.dir}"/>
-                                <mkdir dir="${test.tmp.dir}"/>
-                                <mkdir dir="${test.warehouse.dir}"/>
-                                <mkdir dir="${test.warehouse.external.dir}"/>
+                                <delete dir="${test.tmp.dir}" />
+                                <delete dir="${test.warehouse.dir}" />
+                                <delete dir="${test.warehouse.external.dir}" />
+                                <mkdir dir="${test.tmp.dir}" />
+                                <mkdir dir="${test.warehouse.dir}" />
+                                <mkdir dir="${test.warehouse.external.dir}" />
                             </target>
                         </configuration>
                     </execution>
@@ -1048,10 +1045,10 @@
                         <configuration>
                             <target>
                                 <exec executable="bash" failonerror="true">
-                                    <arg value="${basedir}/src/main/resources/saveVersion.sh"/>
-                                    <arg value="${project.version}"/>
-                                    <arg value="${hive.version.shortname}"/>
-                                    <arg value="${basedir}/src"/>
+                                    <arg value="${basedir}/src/main/resources/saveVersion.sh" />
+                                    <arg value="${project.version}" />
+                                    <arg value="${hive.version.shortname}" />
+                                    <arg value="${basedir}/src" />
                                 </exec>
                             </target>
                         </configuration>
@@ -1067,9 +1064,9 @@
                         </goals>
                         <configuration>
                             <target>
-                                <mkdir dir="${test.tmp.dir}/scripts/metastore/upgrade"/>
+                                <mkdir dir="${test.tmp.dir}/scripts/metastore/upgrade" />
                                 <copy todir="${test.tmp.dir}/scripts/metastore/upgrade">
-                                    <fileset dir="${basedir}/src/main/sql/"/>
+                                    <fileset dir="${basedir}/src/main/sql/" />
                                 </copy>
                             </target>
                         </configuration>
@@ -1270,7 +1267,7 @@
                     <executable>${java.home}/bin/java</executable>
                     <arguments>
                         <argument>-classpath</argument>
-                        <classpath/>
+                        <classpath />
                         <argument>org.apache.hadoop.hive.metastore.conf.ConfTemplatePrinter</argument>
                         <argument>${project.build.directory}/generated-sources/conf/metastore-site.xml.template
                         </argument>
