@@ -14,6 +14,8 @@
   <properties>
     <!-- Required for maven-surefire-plugin: @{argLine} late substitution (SUREFIRE-1431) -->
     <argLine />
+    <jacoco.agent.argLine />
+
     <hive.path.to.root>..</hive.path.to.root>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
@@ -375,7 +377,7 @@
                 <configuration>
                     <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
                     <!-- Java 21+ compatibility: allow deprecated security manager operations -->
-                    <argLine>@{argLine} -Djava.security.manager=allow ${jacoco.agent.argLine}</argLine>
+                    <argLine>@{argLine} -Djava.security.manager=allow @{jacoco.agent.argLine}</argLine>
                     <includes>
                         <!-- Downstream-specific tests -->
                         <include>TestHMSCatalog.java</include>
