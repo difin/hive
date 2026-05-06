@@ -48,6 +48,7 @@
         <exclude>commons-configuration:commons-configuration</exclude>
         <exclude>org.apache.hive:hive-jdbc:*:standalone</exclude>
         <exclude>ch.qos.reload4j:* </exclude>
+        <exclude>*:*:tests</exclude>
       </excludes>
     </dependencySet>
     <dependencySet>
