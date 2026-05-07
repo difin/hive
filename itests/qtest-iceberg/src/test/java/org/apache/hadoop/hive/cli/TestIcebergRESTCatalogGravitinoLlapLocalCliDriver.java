@@ -34,6 +34,7 @@ import org.apache.iceberg.rest.extension.OAuth2AuthorizationServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -321,6 +322,7 @@ public class TestIcebergRESTCatalogGravitinoLlapLocalCliDriver {
         .replaceFirst(":[0-9]+", ":" + internalPort);
   }
 
+  @Ignore("This test is ignored since Docker-in-Docker v18.05 in CI fails to pull testcontainers/ryuk image.")
   @Test
   public void testCliDriver() throws Exception {
     CLI_ADAPTER.runTest(name, qfile);

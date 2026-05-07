@@ -18,9 +18,11 @@
 package org.apache.hive;
 
 import org.apache.iceberg.rest.extension.HiveRESTCatalogServerExtension;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+@Disabled("This test is ignored since Docker-in-Docker v18.05 in CI fails to pull testcontainers/ryuk image.")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TestHiveRESTCatalogClientITOauth2 extends TestHiveRESTCatalogClientITBase {
 

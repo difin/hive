@@ -29,6 +29,7 @@ import org.apache.iceberg.hive.CatalogUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -51,6 +52,7 @@ import java.util.List;
  * catalog ({@code hive-hms-catalog}).
  */
 @RunWith(Parameterized.class)
+@Ignore("This test is ignored since Docker-in-Docker v18.05 in CI fails to pull testcontainers/ryuk image.")
 public class TestIcebergRESTCatalogHadoopLlapLocalCliDriver {
 
   private static final Logger LOG = LoggerFactory.getLogger(
