@@ -1063,7 +1063,7 @@ public class SessionState {
             : CLIENT_TYPE.HIVECLI);
         authzContextBuilder.setSessionString(getSessionId());
 
-        authorizerV2 = authorizerFactory.createHiveAuthorizer(new HiveMetastoreClientFactoryImpl(),
+        authorizerV2 = authorizerFactory.createHiveAuthorizer(new HiveMetastoreClientFactoryImpl(getSessionConf()),
             sessionConf, authenticator, authzContextBuilder.build());
         setAuthorizerV2Config();
 
