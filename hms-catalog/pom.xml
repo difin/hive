@@ -378,25 +378,6 @@
                     <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
                     <!-- Java 21+ compatibility: allow deprecated security manager operations -->
                     <argLine>@{argLine} -Djava.security.manager=allow @{jacoco.agent.argLine}</argLine>
-                    <includes>
-                        <!-- Downstream-specific tests -->
-                        <include>TestHMSCatalog.java</include>
-                        <include>TestHiveCatalog.java</include>
-                        <include>TestDataSharing.java</include>
-                        <include>TestHMSGroup.java</include>
-                        <include>TestHMSServletSecurityIntegration.java</include>
-                        <include>TestHMSCatalogEdgeCases.java</include>
-                        <include>TestHMSCatalogRESTSecurity.java</include>
-                        <include>TestCatalogMetering.java</include>
-                        <!-- Upstream REST Catalog tests - skipped due to compatibility issues -->
-                        <!-- These tests inherit from iceberg CatalogTests which requires -->
-                        <!-- Hadoop config propagation not compatible with HiveActor pattern -->
-                        <!-- <include>TestRESTCatalogJwtAuth.java</include> -->
-                        <!-- <include>TestRESTCatalogNoneAuth.java</include> -->
-                        <!-- <include>TestRESTCatalogOAuth2Jwt.java</include> -->
-                        <!-- <include>TestRESTCatalogOAuth2TokenIntrospection.java</include> -->
-                        <!-- <include>TestRESTCatalogSimpleAuth.java</include> -->
-                    </includes>
                 </configuration>
             </plugin>
 
