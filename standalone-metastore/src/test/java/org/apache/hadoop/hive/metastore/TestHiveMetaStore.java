@@ -142,7 +142,7 @@ public abstract class TestHiveMetaStore {
     MetaStoreTestUtils.setConfForStandloneMode(conf);
     MetastoreConf.setLongVar(conf, ConfVars.BATCH_RETRIEVE_MAX, 2);
     MetastoreConf.setLongVar(conf, ConfVars.LIMIT_PARTITION_REQUEST, DEFAULT_LIMIT_PARTITION_REQUEST);
-    MetastoreConf.setVar(conf, ConfVars.STORAGE_SCHEMA_READER_IMPL, "no.such.class");
+    MetastoreConf.setVar(conf, ConfVars.STORAGE_SCHEMA_READER_IMPL, "org.apache.hadoop.hive.metastore.DefaultStorageSchemaReader");
     MetastoreConf.setBoolVar(conf, ConfVars.INTEGER_JDO_PUSHDOWN, true);
   }
 
@@ -3683,5 +3683,73 @@ public abstract class TestHiveMetaStore {
     List<String> versions = Files.readAllLines(versionMapTxtPath);
     String version = versions.get(versions.size() - 1).split(",")[1].trim();
     assertEquals("API version mismatch. Please make sure that the version specified in hive_metastore.thrift/HMS_API and in the last line of versionmap.txt are the same.", version, client.getHMSAPIVersion());
+  }
+  
+  @Test
+  public void testGetFieldsForAvroSerDe() throws Exception {
+    String dbName = "test_avro_serde_db";
+    String avroTbl = "avro_tbl";
+
+    client.dropTable(dbName, avroTbl, true, true);
+    silentDropDatabase(dbName);
+
+    new DatabaseBuilder()
+        .setName(dbName)
+        .create(client, conf);
+
+    new TableBuilder()
+        .setDbName(dbName)
+        .setTableName(avroTbl)
+        .setSerdeLib("org.apache.hadoop.hive.serde2.avro.AvroSerDe")
+        .setInputFormat("org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat")
+        .setOutputFormat("org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat")
+        .addCol("foo", "int", "")
+        .addCol("bar", "string", "")
+        .addCol("baz", "bigint", "")
+        .create(client, conf);
+
+    List<FieldSchema> fields = client.getFields(dbName, avroTbl);
+    assertEquals("AvroSerDe table should return 3 fields from metastore", 3, fields.size());
+    assertEquals("foo", fields.get(0).getName());
+    assertEquals("bar", fields.get(1).getName());
+    assertEquals("baz", fields.get(2).getName());
+
+    List<FieldSchema> schema = client.getSchema(dbName, avroTbl);
+    assertEquals("AvroSerDe getSchema should return 3 columns", 3, schema.size());
+
+    client.dropTable(dbName, avroTbl, true, true);
+    client.dropDatabase(dbName);
+  }
+  
+  @Test
+  public void testGetFieldsForHBaseSerDe() throws Exception {
+    String dbName = "test_hbase_serde_db";
+    String hbaseTbl = "hbase_tbl";
+
+    client.dropTable(dbName, hbaseTbl, true, true);
+    silentDropDatabase(dbName);
+
+    new DatabaseBuilder()
+        .setName(dbName)
+        .create(client, conf);
+
+    new TableBuilder()
+        .setDbName(dbName)
+        .setTableName(hbaseTbl)
+        .setSerdeLib("org.apache.hadoop.hive.hbase.HBaseSerDe")
+        .addCol("key", "string", "")
+        .addCol("value", "string", "")
+        .create(client, conf);
+
+    List<FieldSchema> fields = client.getFields(dbName, hbaseTbl);
+    assertEquals("HBaseSerDe table should return 2 fields from metastore", 2, fields.size());
+    assertEquals("key", fields.get(0).getName());
+    assertEquals("value", fields.get(1).getName());
+
+    List<FieldSchema> schema = client.getSchema(dbName, hbaseTbl);
+    assertEquals("HBaseSerDe getSchema should return 2 columns", 2, schema.size());
+
+    client.dropTable(dbName, hbaseTbl, true, true);
+    client.dropDatabase(dbName);
   }
 }

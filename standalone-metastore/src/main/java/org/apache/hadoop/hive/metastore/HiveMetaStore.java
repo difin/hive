@@ -221,6 +221,7 @@ public class HiveMetaStore extends ThriftHiveMetastore {
   private static Server servletServer = null;
   /** the port and path of the property servlet. */
   private static int propertyServletPort = -1;
+  private static final String AVRO_SERDE_CLASS = "org.apache.hadoop.hive.serde2.avro.AvroSerDe";
 
   /**
    * Gets the embedded servlet server.
@@ -6646,14 +6647,13 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         } catch (NoSuchObjectException e) {
           throw new UnknownTableException(e.getMessage());
         }
-        if (null == tbl.getSd().getSerdeInfo().getSerializationLib() ||
-          MetastoreConf.getStringCollection(conf,
-              ConfVars.SERDES_USING_METASTORE_FOR_SCHEMA).contains(
-                  tbl.getSd().getSerdeInfo().getSerializationLib())) {
+        String serdeLib = tbl.getSd().getSerdeInfo().getSerializationLib();
+        if (serdeLib == null ||
+            MetastoreConf.getStringCollection(conf,
+                ConfVars.SERDES_USING_METASTORE_FOR_SCHEMA).contains(serdeLib)) {
           ret = tbl.getSd().getCols();
         } else {
-          StorageSchemaReader schemaReader = getStorageSchemaReader();
-          ret = schemaReader.readSchema(tbl, envContext, getConf());
+          ret = getFieldsUsingSchemaReader(tbl, db, tableName, serdeLib, envContext);
         }
       } catch (Exception e) {
         ex = e;
@@ -6672,6 +6672,23 @@ public class HiveMetaStore extends ThriftHiveMetastore {
       }
 
       return ret;
+    }
+    private List<FieldSchema> getFieldsUsingSchemaReader(Table tbl, String db, String tableName, String serdeLib,
+        EnvironmentContext envContext) throws MetaException {
+      try {
+        StorageSchemaReader schemaReader = getStorageSchemaReader();
+        return schemaReader.readSchema(tbl, envContext, getConf());
+      } catch (UnsupportedOperationException e) {
+        // Fallback to metastore for Avro Schema
+        if (AVRO_SERDE_CLASS.equals(serdeLib)) {
+          LOG.warn(
+              "Unable to read schema from storage for AvroSerDe table '{}.{}'. Returning metastore SD columns " +
+                  "as fallback; schema may be stale.",
+              db, tableName, e);
+          return tbl.getSd().getCols();
+        }
+        throw e;
+      }
     }
 
     @Override
