@@ -68,6 +68,8 @@ public class RESTCatalogServer {
     conf.set(HiveConf.ConfVars.HIVE_METASTORE_WAREHOUSE_EXTERNAL.varname, externalPath);
 
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.SCHEMA_INFO_CLASS, schemaInfoClass.getCanonicalName());
+    // no caching to avoid ttl side effects
+    conf.setLong("hive.metastore.catalog.cache.expiry", -1);
 
     // Set the servlet path to match the endpoint returned by getRestEndpoint()
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.ICEBERG_CATALOG_SERVLET_PATH, "iceberg");

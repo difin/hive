@@ -54,7 +54,7 @@ class TestRESTCatalogJwtAuth extends BaseRESTCatalogTests {
     NotAuthorizedException error = Assertions.assertThrows(NotAuthorizedException.class,
         () -> RCKUtils.initCatalogClient(properties));
     Assertions.assertEquals(
-        "Not authorized: Authentication error: Failed to validate JWT from Bearer token in Authentication header",
+        "Not authorized: Authentication error: Failed to validate JWT from Bearer token in Authentication header\n",
         error.getMessage());
   }
 
@@ -66,7 +66,7 @@ class TestRESTCatalogJwtAuth extends BaseRESTCatalogTests {
     NotAuthorizedException error = Assertions.assertThrows(NotAuthorizedException.class,
         () -> RCKUtils.initCatalogClient(properties));
     Assertions.assertEquals(
-        "Not authorized: Authentication error: Couldn't find bearer token in the auth header in the request",
+        "Not authorized: Authentication error: Couldn't find bearer token in the auth header in the request\n",
         error.getMessage());
   }
 }

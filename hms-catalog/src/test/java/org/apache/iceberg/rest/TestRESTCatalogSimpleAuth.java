@@ -50,7 +50,7 @@ class TestRESTCatalogSimpleAuth extends BaseRESTCatalogTests {
     );
     NotAuthorizedException error = Assertions.assertThrows(NotAuthorizedException.class,
         () -> RCKUtils.initCatalogClient(properties));
-    Assertions.assertEquals("Not authorized: Authentication error: User header x-actor-username missing in request",
+    Assertions.assertEquals("Not authorized: Authentication error: User header x-actor-username missing in request\n",
         error.getMessage());
   }
 }

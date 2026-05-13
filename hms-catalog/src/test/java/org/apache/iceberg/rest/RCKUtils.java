@@ -32,6 +32,7 @@ import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.SupportsNamespaces;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.rest.extension.RESTCatalogServer;
+import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 
 /**
  * Utility class for REST Catalog testing.
@@ -84,8 +85,25 @@ public final class RCKUtils {
     catalogConfig.putIfAbsent(CatalogProperties.TABLE_DEFAULT_PREFIX + "write.format.default", "parquet");
     // Note: Views are not supported in this catalog version
 
+    Map<String, String> additionalProperties =
+      ImmutableMap.of(
+        CatalogProperties.TABLE_DEFAULT_PREFIX + "default-key1",
+        "catalog-default-key1",
+        CatalogProperties.TABLE_DEFAULT_PREFIX + "default-key2",
+        "catalog-default-key2",
+        CatalogProperties.TABLE_DEFAULT_PREFIX + "override-key3",
+        "catalog-default-key3",
+        CatalogProperties.TABLE_OVERRIDE_PREFIX + "override-key3",
+        "catalog-override-key3",
+        CatalogProperties.TABLE_OVERRIDE_PREFIX + "override-key4",
+        "catalog-override-key4");
+
     RESTCatalog catalog = new RESTCatalog();
-    catalog.initialize("rest_catalog", catalogConfig);
+    catalog.initialize("rest_catalog",
+      ImmutableMap.<String, String>builder()
+        .putAll(catalogConfig)
+        .putAll(additionalProperties)
+        .build());
     return catalog;
   }
 

@@ -35,7 +35,8 @@ class TestRESTCatalogNoneAuth extends BaseRESTCatalogTests {
   @Override
   protected Map<String, String> getDefaultClientConfiguration() {
     return Map.of(
-        "uri", REST_CATALOG_EXTENSION.getRestEndpoint()
+        "uri", REST_CATALOG_EXTENSION.getRestEndpoint(),
+      "header.x-actor-username", "USER_1"
     );
   }
 }

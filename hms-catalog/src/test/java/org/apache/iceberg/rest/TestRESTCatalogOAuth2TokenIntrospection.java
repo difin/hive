@@ -27,9 +27,11 @@ import org.apache.iceberg.exceptions.NotAuthorizedException;
 import org.apache.iceberg.rest.extension.HiveRESTCatalogServerExtension;
 import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+@Disabled("This test is ignored since the OAuth2 server requires dockerized testcontainers.")
 @Category(MetastoreCheckinTest.class)
 class TestRESTCatalogOAuth2TokenIntrospection extends BaseRESTCatalogTests {
   @RegisterExtension

@@ -45,11 +45,15 @@ abstract class BaseRESTCatalogTests extends CatalogTests<RESTCatalog> {
   @BeforeEach
   void setup() {
     RCKUtils.purgeCatalogTestEntries(catalog);
+    super.mockPrivilegeHelper();
   }
 
   @AfterAll
   void teardownAll() throws Exception {
-    catalog.close();
+    super.restorePrivilegeHelper();
+    if (catalog != null) {
+      catalog.close();
+    }
   }
 
   @Override
