@@ -38,6 +38,7 @@ import org.awaitility.Awaitility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.keycloak.OAuth2Constants;
@@ -51,6 +52,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
 
+@Ignore("This test is ignored since the OAuth2 server requires dockerized testcontainers.")
 @Category(MetastoreUnitTest.class)
 public class TestTokenIntrospectionAuthenticator {
   private static final String AUDIENCE = "http://localhost:8081/hive";
