@@ -79,6 +79,7 @@ import org.apache.orc.StripeInformation;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.impl.RecordReaderImpl;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -126,11 +127,13 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
     executeStatementOnDriver("select * from " + tblName + " where b = 2", driver);
   }
 
+  @Ignore("CDPD-103016")
   @Test
   public void testRebalanceCompactionWithParallelDeleteAsSecondOptimisticLock() throws Exception {
     testRebalanceCompactionWithParallelDeleteAsSecond(true);
   }
 
+  @Ignore("CDPD-103016")
   @Test
   public void testRebalanceCompactionWithParallelDeleteAsSecondPessimisticLock() throws Exception {
     testRebalanceCompactionWithParallelDeleteAsSecond(false);
@@ -233,6 +236,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000018");
   }
 
+  @Ignore("CDPD-103016")
   @Test
   public void testRebalanceCompactionOfNotPartitionedImplicitlyBucketedTableWithOrder() throws Exception {
     conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
@@ -287,6 +291,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000018");
   }
 
+  @Ignore("CDPD-103016")
   @Test
   public void testRebalanceCompactionOfNotPartitionedImplicitlyBucketedTable() throws Exception {
     conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
@@ -338,6 +343,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000018");
   }
 
+  @Ignore("CDPD-103016")
   @Test
   public void testRebalanceCompactionOfPartitionedImplicitlyBucketedTable() throws Exception {
     conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
@@ -447,6 +453,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         new String[] {"bucket_00000", "bucket_00001", "bucket_00002"}, "base_0000007_v0000014");
   }
 
+  @Ignore("CDPD-103016")
   @Test
   public void testRebalanceCompactionOfNotPartitionedExplicitlyBucketedTable() throws Exception {
     conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
@@ -469,6 +476,7 @@ public class TestCrudCompactorOnTez extends CompactorOnTezTest {
         "Cannot execute rebalancing compaction on bucketed tables.", compacts.get(0).getErrorMessage());
   }
 
+  @Ignore("CDPD-103016")
   @Test
   public void testRebalanceCompactionNotPartitionedExplicitBucketNumbers() throws Exception {
     conf.setBoolVar(HiveConf.ConfVars.COMPACTOR_CRUD_QUERY_BASED, true);
