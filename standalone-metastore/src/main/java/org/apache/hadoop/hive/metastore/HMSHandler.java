@@ -171,6 +171,7 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
   static long TEST_TIMEOUT_VALUE = -1;
   private Warehouse wh; // hdfs warehouse
   private static Striped<Lock> tablelocks;
+  private static final String AVRO_SERDE_CLASS = "org.apache.hadoop.hive.serde2.avro.AvroSerDe";
 
   public static RawStore getRawStore() {
     return HMSHandlerContext.getRawStore().orElse(null);
@@ -6493,14 +6494,13 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
       } catch (NoSuchObjectException e) {
         throw new UnknownTableException(e.getMessage());
       }
-      if (null == tbl.getSd().getSerdeInfo().getSerializationLib() ||
-              MetastoreConf.getStringCollection(conf,
-                      ConfVars.SERDES_USING_METASTORE_FOR_SCHEMA).contains(
-                      tbl.getSd().getSerdeInfo().getSerializationLib())) {
+      String serdeLib = tbl.getSd().getSerdeInfo().getSerializationLib();
+      if (serdeLib == null ||
+          MetastoreConf.getStringCollection(conf,
+              ConfVars.SERDES_USING_METASTORE_FOR_SCHEMA).contains(serdeLib)) {
         ret = tbl.getSd().getCols();
       } else {
-        StorageSchemaReader schemaReader = getStorageSchemaReader();
-        ret = schemaReader.readSchema(tbl, envContext, getConf());
+        ret = getFieldsUsingSchemaReader(tbl, db, tableName, serdeLib, envContext);
       }
     } catch (Exception e) {
       ex = e;
@@ -6509,6 +6509,24 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
       endFunction("get_fields_with_environment_context_core", ret != null, ex, tableName);
     }
     return ret;
+  }
+
+  private List<FieldSchema> getFieldsUsingSchemaReader(Table tbl, String db, String tableName, String serdeLib,
+      EnvironmentContext envContext) throws MetaException {
+    try {
+      StorageSchemaReader schemaReader = getStorageSchemaReader();
+      return schemaReader.readSchema(tbl, envContext, getConf());
+    } catch (UnsupportedOperationException e) {
+      // Fallback to metastore for Avro Schema
+      if (AVRO_SERDE_CLASS.equals(serdeLib)) {
+        LOG.warn(
+            "Unable to read schema from storage for AvroSerDe table '{}.{}'. Returning metastore SD columns " +
+                "as fallback; schema may be stale.",
+            db, tableName, e);
+        return tbl.getSd().getCols();
+      }
+      throw e;
+    }
   }
 
   @Override

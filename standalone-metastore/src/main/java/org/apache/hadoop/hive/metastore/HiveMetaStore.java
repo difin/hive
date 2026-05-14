@@ -128,7 +128,6 @@ public class HiveMetaStore extends ThriftHiveMetastore {
   private static Server servletServer = null;
   /** the port and path of the property servlet. */
   private static int propertyServletPort = -1;
-  private static final String AVRO_SERDE_CLASS = "org.apache.hadoop.hive.serde2.avro.AvroSerDe";
 
   /**
    * Gets the embedded servlet server.
