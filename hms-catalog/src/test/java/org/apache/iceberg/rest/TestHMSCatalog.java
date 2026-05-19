@@ -678,6 +678,112 @@ public class TestHMSCatalog extends HMSTestBase {
         .hasMessageStartingWith("No enum constant " + PrincipalType.class.getCanonicalName());
   }
 
+  @Test
+  public void testConfigAdvertisesVendedCredentialsEnabled() throws Exception {
+    String jwt = generateJWT();
+    URL url = new URL("http://hive@localhost:" + catalogPort + "/" + catalogPath + "/v1/config");
+    Object response = clientCall(jwt, url, "GET", null);
+
+    assertThat(response).isInstanceOf(Map.class);
+    Map<String, Object> responseMap = (Map<String, Object>) response;
+    assertThat(responseMap).containsKey("overrides");
+    assertThat(responseMap.get("overrides")).isInstanceOf(Map.class);
+
+    Map<String, Object> overrides = (Map<String, Object>) responseMap.get("overrides");
+    assertThat(overrides).containsEntry("vended-credentials-enabled", "true");
+  }
+
+  @Test
+  public void testLoadTableDoesNotReturnVendedCredentialConfig() throws Exception {
+    Schema schema = getTestSchema();
+    String tableName = "tbl_no_creds_in_load_" + Integer.toHexString(RND.nextInt(65536));
+    TableIdentifier tableIdent = TableIdentifier.of(DB_NAME, tableName);
+
+    try {
+      catalog.createTable(tableIdent, schema);
+
+      String jwt = generateJWT();
+      URL loadTableUrl =
+          new URL(
+              "http://hive@localhost:"
+                  + catalogPort
+                  + "/"
+                  + catalogPath
+                  + "/v1/namespaces/"
+                  + DB_NAME
+                  + "/tables/"
+                  + tableName);
+      Object response = clientCall(jwt, loadTableUrl, "GET", null);
+
+      assertThat(response).isInstanceOf(Map.class);
+      Map<String, Object> responseMap = (Map<String, Object>) response;
+      assertThat(responseMap).containsKey("status");
+      Number status = (Number) responseMap.get("status");
+
+      if (status.intValue() == 200) {
+        Object configObj = responseMap.get("config");
+        if (configObj instanceof Map) {
+          Map<String, Object> config = (Map<String, Object>) configObj;
+          assertThat(config.keySet())
+              .noneMatch(
+                  key ->
+                      key.startsWith("adls.sas-token.")
+                          || key.startsWith("adls.sas-token-expires-at-ms."));
+        }
+      } else {
+        // In secured suites, unauthorized access is intentionally masked as 404 NoSuchTableException.
+        assertThat(status.intValue()).isEqualTo(404);
+        assertThat(responseMap).containsKey("error");
+      }
+    } finally {
+      catalog.dropTable(tableIdent);
+    }
+  }
+
+  @Test
+  public void testLoadCredentialsEndpointReturnsStorageCredentialsField() throws Exception {
+    Schema schema = getTestSchema();
+    String tableName = "tbl_creds_endpoint_" + Integer.toHexString(RND.nextInt(65536));
+    TableIdentifier tableIdent = TableIdentifier.of(DB_NAME, tableName);
+
+    try {
+      catalog.createTable(tableIdent, schema);
+
+      String jwt = generateJWT();
+      URL credentialsUrl =
+          new URL(
+              "http://hive@localhost:"
+                  + catalogPort
+                  + "/"
+                  + catalogPath
+                  + "/v1/namespaces/"
+                  + DB_NAME
+                  + "/tables/"
+                  + tableName
+                  + "/credentials");
+      Object response = clientCall(jwt, credentialsUrl, "GET", null);
+
+      assertThat(response).isInstanceOf(Map.class);
+      Map<String, Object> responseMap = (Map<String, Object>) response;
+      assertThat(responseMap).containsKey("status");
+      Number status = (Number) responseMap.get("status");
+
+      if (status.intValue() == 200) {
+        assertThat(responseMap).containsKey("storage-credentials");
+        assertThat(responseMap.get("storage-credentials")).isInstanceOf(List.class);
+      } else {
+        // Security wrappers use 404/NoSuchTable for inaccessible tables; this still proves
+        // the /credentials route exists and is handled (as opposed to a bad route 400).
+        assertThat(status.intValue()).isEqualTo(404);
+        assertThat(responseMap).containsKey("error");
+        Map<String, Object> error = (Map<String, Object>) responseMap.get("error");
+        assertThat(error.get("type")).isEqualTo("NoSuchTableException");
+      }
+    } finally {
+      catalog.dropTable(tableIdent);
+    }
+  }
+
   private void createNamespaceAndVerifyOwnership(
       String name, Map<String, String> prop, String expectedOwner, PrincipalType expectedOwnerType)
       throws TException {

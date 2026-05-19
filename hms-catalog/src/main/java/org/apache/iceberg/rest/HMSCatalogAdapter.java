@@ -20,10 +20,10 @@
 package org.apache.iceberg.rest;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.hive.metastore.HMSServletSecurity;
 import org.apache.hadoop.hive.metastore.RangerPrivilegeHelper;
 import org.apache.hadoop.hive.metastore.RangerPrivilegeHelper.AccessLevel;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.iceberg.BaseMetadataTable;
 import org.apache.iceberg.BaseTable;
 import org.apache.iceberg.BaseTransaction;
@@ -52,6 +52,7 @@ import org.apache.iceberg.metering.CatalogMeteringEventPublisher;
 import org.apache.iceberg.relocated.com.google.common.base.Splitter;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
+import org.apache.iceberg.rest.credentials.ImmutableCredential;
 import org.apache.iceberg.rest.requests.CommitTransactionRequest;
 import org.apache.iceberg.rest.requests.CreateNamespaceRequest;
 import org.apache.iceberg.rest.requests.CreateTableRequest;
@@ -61,16 +62,16 @@ import org.apache.iceberg.rest.requests.RenameTableRequest;
 import org.apache.iceberg.rest.requests.ReportMetricsRequest;
 import org.apache.iceberg.rest.requests.UpdateNamespacePropertiesRequest;
 import org.apache.iceberg.rest.requests.UpdateTableRequest;
-import org.apache.iceberg.rest.credentials.Credential;
 import org.apache.iceberg.rest.responses.ConfigResponse;
 import org.apache.iceberg.rest.responses.CreateNamespaceResponse;
 import org.apache.iceberg.rest.responses.ErrorResponse;
 import org.apache.iceberg.rest.responses.GetNamespaceResponse;
+import org.apache.iceberg.rest.responses.ImmutableLoadCredentialsResponse;
 import org.apache.iceberg.rest.responses.ListNamespacesResponse;
 import org.apache.iceberg.rest.responses.ListTablesResponse;
+import org.apache.iceberg.rest.responses.LoadCredentialsResponse;
 import org.apache.iceberg.rest.responses.LoadTableResponse;
 import org.apache.iceberg.rest.responses.LoadViewResponse;
-import org.apache.iceberg.rest.responses.HMSLoadCredentialsResponse;
 import org.apache.iceberg.rest.responses.OAuthTokenResponse;
 import org.apache.iceberg.rest.responses.UpdateNamespacePropertiesResponse;
 import org.apache.iceberg.util.Pair;
@@ -81,9 +82,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -96,6 +97,8 @@ public class HMSCatalogAdapter implements RESTClient {
   private static final Logger LOG = LoggerFactory.getLogger(HMSCatalogAdapter.class);
   private static final Splitter SLASH = Splitter.on('/');
   private static final AtomicInteger REQUEST_ID_COUNTER = new AtomicInteger(0);
+
+  private static final String VENDED_CREDENTIALS_ENABLED = "vended-credentials-enabled";
 
   private static final Map<Class<? extends Exception>, Integer> EXCEPTION_ERROR_CODES =
       ImmutableMap.<Class<? extends Exception>, Integer>builder()
@@ -169,7 +172,7 @@ public class HMSCatalogAdapter implements RESTClient {
         UpdateTableRequest.class, LoadTableResponse.class),
     DROP_TABLE(HTTPMethod.DELETE, TABLES_PATH),
     LOAD_CREDENTIALS(HTTPMethod.GET, "v1/namespaces/{namespace}/tables/{table}/credentials",
-        null, HMSLoadCredentialsResponse.class),
+        null, LoadCredentialsResponse.class),
     RENAME_TABLE(HTTPMethod.POST, "v1/tables/rename",
         RenameTableRequest.class, null),
     REPORT_METRICS(HTTPMethod.POST, "v1/namespaces/{namespace}/tables/{table}/metrics",
@@ -280,7 +283,9 @@ public class HMSCatalogAdapter implements RESTClient {
 
 
   private ConfigResponse config() {
-    return castResponse(ConfigResponse.class, ConfigResponse.builder().build());
+    return castResponse(ConfigResponse.class, ConfigResponse.builder()
+        .withOverride(VENDED_CREDENTIALS_ENABLED, "true")
+        .build());
   }
 
   private ListNamespacesResponse listNamespaces(Map<String, String> vars) {
@@ -592,7 +597,7 @@ public class HMSCatalogAdapter implements RESTClient {
       case LOAD_TABLE: {
         TableIdentifier ident = identFromPathVars(vars);
         LOG.debug("API_OPERATION [{}] Loading table: {}", requestId, ident);
-        return (T) loadTable(catalog, ident);
+        return (T) loadTable(catalog, ident, configuration);
       }
 
       case TABLE_EXISTS:
@@ -604,6 +609,7 @@ public class HMSCatalogAdapter implements RESTClient {
         LOG.debug("API_OPERATION [{}] Loading credentials for table: {}", requestId, credIdent);
         return (T) loadCredentials(credIdent);
       }
+
 
       case REGISTER_TABLE:
         LOG.debug("API_OPERATION [{}] Registering table", requestId);
@@ -706,51 +712,54 @@ public class HMSCatalogAdapter implements RESTClient {
     try {
       String userName = UserGroupInformation.getCurrentUser().getUserName();
       if (catalog instanceof HMSCachingCatalog) {
-        return ((HMSCachingCatalog) catalog).getAccessLevel(ident, userName);
+        AccessLevel level = ((HMSCachingCatalog) catalog).getAccessLevel(ident, userName);
+        LOG.info(
+            "ACCESS_CHECK source=cache user={} table={} access={}",
+            userName,
+            ident,
+            level);
+        return level;
       }
       // Fallback: use RangerPrivilegeHelper directly
       RangerPrivilegeHelper helper = HMSServletSecurity.getPrivilegeHelper(conf);
       if (helper != null && helper.isAvailable()) {
         String dbName = ident.namespace().level(0);
         String tableName = ident.name();
-        return helper.getAccessLevel(dbName, tableName, userName);
+        AccessLevel level = helper.getAccessLevel(dbName, tableName, userName);
+        LOG.info(
+            "ACCESS_CHECK source=ranger user={} db={} table={} access={}",
+            userName,
+            dbName,
+            tableName,
+            level);
+        return level;
       }
+      LOG.warn(
+          "ACCESS_CHECK source=none user={} table={} reason=helper-unavailable returning={}",
+          userName,
+          ident,
+          AccessLevel.NONE);
     } catch (IOException e) {
       LOG.error("Unable to get current user for access check on {}", ident, e);
     }
+    LOG.warn(
+        "ACCESS_CHECK source=none user=unknown table={} reason=exception-or-missing-context returning={}",
+        ident,
+        AccessLevel.NONE);
     return AccessLevel.NONE;
   }
 
   /**
-   * Creates a load table response builder embedding a data sharing token if required.
+   * Creates a load table response builder with table metadata only.
    *
    * @param table       the table instance (can not be null)
-   * @param accessLevel the access level for the current user
    * @return the load table response
    */
-  static LoadTableResponse.Builder dataSharingBuilder(BaseTable table, AccessLevel accessLevel) {
-    // This must be performed as Hive user: reading (file) metadata and fetching (url) knox
+  static LoadTableResponse.Builder dataSharingBuilder(BaseTable table) {
+    // Credentials are NOT injected into loadTable config: since vended-credentials-enabled=true
     return runAsHive(() -> {
       TableMetadata metaData = table.operations().current();
-      LoadTableResponse.Builder builder = LoadTableResponse.builder().withTableMetadata(metaData);
-      DataSharing dataSharing = HMSCatalogFactory.getDataSharing();
-      if (dataSharing != null) {
-        try {
-          String policy = (accessLevel == AccessLevel.READ_WRITE) ? "read-write" : "read-only";
-          Map<String, String> token = dataSharing.getAccessTokenWithPolicy(table.location(), policy);
-          if (token != null && !token.isEmpty()) {
-            token.forEach(builder::addConfig);
-            LOG.debug("Added data sharing credentials (policy={}) for table at location: {}", policy, table.location());
-          }
-        } catch (Exception e) {
-          // Log warning but don't fail the entire operation
-          LOG.warn("Failed to obtain data sharing token for table {}, continuing without credentials: {}",
-              table.location(), e.getMessage());
-        }
-      } else {
-        LOG.debug("Data sharing not configured, skipping credential injection for table: {}", table.location());
-      }
-      return builder;
+      return LoadTableResponse.builder().withTableMetadata(metaData);
     });
   }
 
@@ -770,7 +779,7 @@ public class HMSCatalogAdapter implements RESTClient {
       if (accessLevel == AccessLevel.NONE) {
         throw new NoSuchTableException("Table is not accessible %s", ident.toString());
       }
-      LoadTableResponse.Builder builder = dataSharingBuilder((BaseTable) table, accessLevel);
+      LoadTableResponse.Builder builder = dataSharingBuilder((BaseTable) table);
       if (builder != null) {
         return builder.build();
       }
@@ -787,7 +796,7 @@ public class HMSCatalogAdapter implements RESTClient {
    * @param ident the table identifier
    * @return the load credentials response
    */
-  private HMSLoadCredentialsResponse loadCredentials(TableIdentifier ident) {
+  private LoadCredentialsResponse loadCredentials(TableIdentifier ident) {
     AccessLevel accessLevel = getAccessLevel(catalog, ident, configuration);
     if (accessLevel == AccessLevel.NONE) {
       throw new NoSuchTableException("Table is not accessible %s", ident.toString());
@@ -798,17 +807,17 @@ public class HMSCatalogAdapter implements RESTClient {
     }
     BaseTable baseTable = (BaseTable) table;
     return runAsHive(() -> {
-      HMSLoadCredentialsResponse.Builder responseBuilder = HMSLoadCredentialsResponse.builder();
+      ImmutableLoadCredentialsResponse.Builder responseBuilder = ImmutableLoadCredentialsResponse.builder();
       DataSharing dataSharing = HMSCatalogFactory.getDataSharing();
       if (dataSharing != null) {
         String policy = (accessLevel == AccessLevel.READ_WRITE) ? "read-write" : "read-only";
         Map<String, String> token = dataSharing.getAccessTokenWithPolicy(baseTable.location(), policy);
         if (token != null && !token.isEmpty()) {
-          Credential credential = Credential.builder()
-              .prefix(baseTable.location())
-              .config(token)
-              .build();
-          responseBuilder.addCredential(credential);
+          responseBuilder.addCredentials(
+              ImmutableCredential.builder()
+                  .prefix(baseTable.location())
+                  .config(token)
+                  .build());
         }
       }
       return responseBuilder.build();
@@ -822,8 +831,8 @@ public class HMSCatalogAdapter implements RESTClient {
    * @param ident   the table identifier
    * @return the load table response
    */
-  LoadTableResponse loadTable(Catalog catalog, TableIdentifier ident) {
-    return accessTable(catalog, ident, runAsHive(() -> catalog.loadTable(ident)), configuration);
+  LoadTableResponse loadTable(Catalog catalog, TableIdentifier ident, Configuration conf) {
+    return accessTable(catalog, ident, runAsHive(() -> catalog.loadTable(ident)), conf);
   }
 
   <T extends RESTResponse> T execute(

@@ -44,13 +44,13 @@ public class TestDataSharingHA {
     conf.set("hive.metastore.catalog.idbroker.url",
         "http://localhost:18080/gateway,http://localhost:18081/gateway");
 
-    DataSharing ds = new DataSharing(conf);
+    DataSharing ds = new AwsCredentialProvider(conf);
     System.out.println("Broker URLs: " + String.join(", ", conf.get("hive.metastore.catalog.idbroker.url").split(",")));
 
     /* should transparently fall over to broker-1 */
     Map<String, String> creds = ds.getAccessToken("s3a://bucket/table/metadata/v1.metadata.json");
     assertNotNull("access token fetched", creds);
-    assertEquals("tok", creds.get(DataSharing.S3_SESSION_TOKEN));
+    assertEquals("tok", creds.get(AwsCredentialProvider.S3_SESSION_TOKEN));
   }
 
   @Test
@@ -73,12 +73,12 @@ public class TestDataSharingHA {
     conf.set("hive.metastore.catalog.idbroker.url",
         "http://localhost:18080/gateway,http://localhost:18081/gateway");
 
-    DataSharing ds = new DataSharing(conf);
+    DataSharing ds = new AwsCredentialProvider(conf);
 
     /* First call should fall over to broker-1 */
     Map<String, String> creds = ds.getAccessToken("s3a://bucket/table/metadata/v1.metadata.json");
     assertNotNull("access token fetched", creds);
-    assertEquals("tok1", creds.get(DataSharing.S3_SESSION_TOKEN));
+    assertEquals("tok1", creds.get(AwsCredentialProvider.S3_SESSION_TOKEN));
 
     /* Change the responses - now broker0 works and broker1 fails */
     broker0.stubFor(
@@ -95,7 +95,7 @@ public class TestDataSharingHA {
     /* Second call should use broker-1 first (lastKnownGood) and then fall back to broker-0 */
     creds = ds.getAccessToken("s3a://bucket/table/metadata/v1.metadata.json");
     assertNotNull("access token fetched", creds);
-    assertEquals("tok2", creds.get(DataSharing.S3_SESSION_TOKEN));
+    assertEquals("tok2", creds.get(AwsCredentialProvider.S3_SESSION_TOKEN));
   }
 
   @Test(expected = NotAuthorizedException.class)
@@ -117,7 +117,7 @@ public class TestDataSharingHA {
     conf.set("hive.metastore.catalog.idbroker.url",
         "http://localhost:18080/gateway,http://localhost:18081/gateway,http://localhost:18082/gateway");
 
-    DataSharing ds = new DataSharing(conf);
+    DataSharing ds = new AwsCredentialProvider(conf);
     /* Should throw NotAuthorizedException since all endpoints fail */
     ds.getAccessToken("s3a://bucket/table/metadata/v1.metadata.json");
     fail("Should have thrown NotAuthorizedException");
@@ -147,7 +147,7 @@ public class TestDataSharingHA {
     conf.set("hive.metastore.catalog.idbroker.url", brokerUrlsStr);
 
     try {
-      DataSharing ds = new DataSharing(conf);
+      DataSharing ds = new AwsCredentialProvider(conf);
       Assert.assertNotNull(ds);
     } catch (Exception e) {
       Assert.fail("DataSharing should initialize successfully with multiple broker URLs: " + e.getMessage());
@@ -173,7 +173,7 @@ public class TestDataSharingHA {
   public void testWhitespaceOnlyBrokerConfiguration() throws IOException {
     Configuration conf = new Configuration();
     conf.set(DataSharing.CONFVAR_IDBROKER_URL, "   ,  ,   ");
-    new DataSharing(conf); // Should throw IllegalArgumentException
+    new AwsCredentialProvider(conf); // Should throw IllegalArgumentException
   }
 
   @Test
@@ -183,7 +183,7 @@ public class TestDataSharingHA {
         "https://valid-broker:8444/gateway,,invalid-url,https://another-valid:8444/gateway");
 
     try {
-      DataSharing ds = new DataSharing(conf);
+      DataSharing ds = new AwsCredentialProvider(conf);
       assertNotNull("DataSharing should initialize filtering out malformed URLs", ds);
     } catch (Exception e) {
       fail("Should handle malformed URLs gracefully: " + e.getMessage());

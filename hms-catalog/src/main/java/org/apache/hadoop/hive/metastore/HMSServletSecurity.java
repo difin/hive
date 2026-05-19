@@ -205,7 +205,12 @@ public class HMSServletSecurity extends ServletSecurity {
     if (privilegeHelper == null) {
       synchronized (HMSServletSecurity.class) {
         if (privilegeHelper == null) {
-          privilegeHelper = new RangerPrivilegeHelper(conf);
+          try {
+            privilegeHelper = new RangerPrivilegeHelper(conf);
+            LOG.info("RangerPrivilegeHelper initialized successfully");
+          } catch (Exception e) {
+            LOG.warn("Failed to create RangerPrivilegeHelper, read/write privilege checking will be disabled", e);
+          }
         }
       }
     }
@@ -400,6 +405,5 @@ public class HMSServletSecurity extends ServletSecurity {
     }
     return new ProxyServlet(servlet);
   }
-
 
 }

@@ -94,7 +94,7 @@ public class HMSCatalogFactory {
   private static synchronized void initializeDataSharing(Configuration conf) {
     if (dataSharing == null && isDataSharingEnabled(conf)) {
       try {
-        dataSharing = new DataSharing(conf);
+        dataSharing = DataSharing.create(conf);
         LOG.info("Data sharing initialized successfully");
       } catch (Exception e) {
         LOG.warn("Failed to initialize data sharing, continuing without it: {}", e.getMessage());

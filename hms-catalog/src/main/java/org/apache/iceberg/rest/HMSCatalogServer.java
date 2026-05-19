@@ -45,6 +45,7 @@ public class HMSCatalogServer {
   private final int port;
   private final String path;
   private Server server;
+  private static volatile DataSharing dataSharing;
 
   /**
    * Constructs the server, reading port and path from configuration.
@@ -140,23 +141,25 @@ public class HMSCatalogServer {
     return server;
   }
 
+  private static boolean isDataSharingEnabled(Configuration conf) {
+    String idBrokerUrl = conf.get(DataSharing.CONFVAR_IDBROKER_URL, "");
+    return !idBrokerUrl.trim().isEmpty();
+  }
+
   /**
    * Initializes DataSharing if IDBroker is configured.
    * @param conf the configuration
    */
-  private static synchronized void initializeDataSharing(Configuration conf) {
-    String idBrokerUrl = conf.get(DataSharing.CONFVAR_IDBROKER_URL, "");
-    if (idBrokerUrl.trim().isEmpty()) {
-      LOG.info("IDBroker not configured, data sharing disabled");
-      return;
+  private static synchronized DataSharing initializeDataSharing(Configuration conf) {
+    if (dataSharing == null && isDataSharingEnabled(conf)) {
+      try {
+        dataSharing = DataSharing.create(conf);
+        LOG.info("Data sharing initialized successfully");
+      } catch (Exception e) {
+        LOG.warn("Failed to initialize data sharing, continuing without it: {}", e.getMessage());
+      }
     }
-    try {
-      DataSharing ds = new DataSharing(conf);
-      HMSCatalogFactory.setDataSharing(ds);
-      LOG.info("Data sharing initialized successfully");
-    } catch (Exception e) {
-      LOG.warn("Failed to initialize data sharing, continuing without it: {}", e.getMessage());
-    }
+    return dataSharing;
   }
 
   /**
