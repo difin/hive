@@ -666,8 +666,10 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
             MetastoreConf.getVar(conf, ConfVars.SSL_TRUSTSTORE_TYPE).trim();
         String trustStoreAlgorithm =
             MetastoreConf.getVar(conf, ConfVars.SSL_TRUSTMANAGERFACTORY_ALGORITHM).trim();
+        String includeProtocols = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_INCLUDE_PROTOCOLS);
+        String includeCipherSuites = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_INCLUDE_CIPHERSUITES);
         tHttpClient = SecurityUtils.getThriftHttpsClient(httpUrl, trustStorePath, trustStorePassword,
-            trustStoreAlgorithm, trustStoreType, httpClientBuilder);
+            trustStoreAlgorithm, trustStoreType, includeProtocols, includeCipherSuites, httpClientBuilder);
       }  else {
         tHttpClient = new THttpClient(httpUrl, httpClientBuilder.build());
       }
@@ -702,9 +704,12 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
             MetastoreConf.getVar(conf, ConfVars.SSL_TRUSTSTORE_TYPE).trim();
         String trustStoreAlgorithm =
             MetastoreConf.getVar(conf, ConfVars.SSL_TRUSTMANAGERFACTORY_ALGORITHM).trim();
+        String includeProtocols = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_INCLUDE_PROTOCOLS);
+        String includeCipherSuites = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_INCLUDE_CIPHERSUITES);
         // Create an SSL socket and connect
         binaryTransport = SecurityUtils.getSSLSocket(store.getHost(), store.getPort(), clientSocketTimeout,
-            trustStorePath, trustStorePassword, trustStoreType, trustStoreAlgorithm );
+            trustStorePath, trustStorePassword, trustStoreType, trustStoreAlgorithm,
+            includeProtocols, includeCipherSuites);
         LOG.info("Opened an SSL connection to metastore, current connections: " + connCount.incrementAndGet());
         if (LOG.isTraceEnabled()) {
           LOG.trace("", new LogUtils.StackTraceLogger("METASTORE SSL CONNECTION TRACE - open - " +
