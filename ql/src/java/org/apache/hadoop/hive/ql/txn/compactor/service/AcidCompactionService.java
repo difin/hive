@@ -199,6 +199,7 @@ public class AcidCompactionService extends CompactionService {
       txnWriteIds.addTableValidWriteIdList(tblValidWriteIds);
       conf.set(ValidTxnWriteIdList.VALID_TABLES_WRITEIDS_KEY, txnWriteIds.toString());
 
+      // Register in MIN_HISTORY_WRITE_ID so the per-table cleaner admission blocks while open.
       msc.addWriteIdsToMinHistory(compactionTxn.getTxnId(),
           ImmutableMap.of(fullTableName, txnWriteIds.getMinOpenWriteId(fullTableName)));
 

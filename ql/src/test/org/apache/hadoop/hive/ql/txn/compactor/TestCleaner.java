@@ -68,6 +68,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doAnswer;
@@ -93,6 +94,7 @@ public class TestCleaner extends CompactorTest {
 
   @Test
   public void testRetryAfterFailedCleanupDelayDisabled() throws Exception {
+    assumeFalse(useMinHistoryWriteId());
     testRetryAfterFailedCleanup(false);
   }
 
