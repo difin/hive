@@ -88,7 +88,7 @@
     <guava.version>32.1.2-jre</guava.version>
     <hadoop.version>3.4.2.7.3.2.10000-SNAPSHOT</hadoop.version>
     <hikaricp.version>2.6.1</hikaricp.version>
-    <jackson.version>2.15.3</jackson.version>
+    <jackson.version>2.18.6</jackson.version>
     <javolution.version>5.5.1</javolution.version>
     <jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
     <jetty.version>9.4.58.v20250814</jetty.version>
