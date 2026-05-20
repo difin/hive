@@ -52,6 +52,8 @@ public class RESTCatalogServer {
 
   public void start(Configuration conf) throws Exception {
     MetaStoreTestUtils.setConfForStandloneMode(conf);
+    MetastoreConf.setBoolVar(conf, ConfVars.HIVE_IN_TEST, true);
+    MetastoreConf.setBoolVar(conf, ConfVars.HIVE_IN_TEST_ICEBERG, true);
 
     // Avoid reusing the JVM-level caching across Hive Metastore servers
     conf.set("metastore.in.test.iceberg.catalog.servlet.id", UUID.randomUUID().toString());

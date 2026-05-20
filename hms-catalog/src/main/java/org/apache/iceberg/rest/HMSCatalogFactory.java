@@ -25,6 +25,7 @@ import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.iceberg.CatalogProperties;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.hive.HiveCatalog;
+import org.apache.iceberg.metering.MeteringHealthWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,7 @@ public class HMSCatalogFactory {
   private static final String SERVLET_ID_KEY = "metastore.in.test.iceberg.catalog.servlet.id";
   private static volatile DataSharing dataSharing;
   private static volatile SoftReference<Catalog> restCatalog;
+  private static volatile MeteringHealthWatcher meteringWatcher;
 
   private final Configuration configuration;
   private final int port;
@@ -146,21 +148,23 @@ public class HMSCatalogFactory {
    * @return the servlet
    */
   private HttpServlet createServlet(Catalog catalog) {
-    String authType = MetastoreConf.getVar(configuration, MetastoreConf.ConfVars.CATALOG_SERVLET_AUTH);
-    boolean jwt = "jwt".equalsIgnoreCase(authType);
-
     try {
-      // Construct the adapter with configuration (backport detail)
       HMSCatalogAdapter adapter = new HMSCatalogAdapter(catalog, configuration);
-      HMSCatalogServlet servlet = new HMSCatalogServlet(adapter);
-
-      // HMSServletSecurity extends ServletSecurity and provides proxy() to wrap the servlet
-      // so that all requests go through auth/UGI handling.
-      HMSServletSecurity security = new HMSServletSecurity(configuration, jwt);
-      HttpServlet proxied = security.proxy(servlet);
-      return proxied != null ? proxied : servlet;
+      return wrapWithSecurity(new HMSCatalogServlet(adapter, meteringWatcher));
     } catch (Exception e) {
       throw new RuntimeException("Failed to create HMSCatalogServlet", e);
+    }
+  }
+
+  private HttpServlet wrapWithSecurity(HttpServlet inner) {
+    try {
+      String authType = MetastoreConf.getVar(configuration, MetastoreConf.ConfVars.CATALOG_SERVLET_AUTH);
+      boolean jwt = "jwt".equalsIgnoreCase(authType);
+      HMSServletSecurity security = new HMSServletSecurity(configuration, jwt);
+      HttpServlet proxied = security.proxy(inner);
+      return proxied != null ? proxied : inner;
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to create secured servlet", e);
     }
   }
 
@@ -170,6 +174,8 @@ public class HMSCatalogFactory {
    */
   private HttpServlet createServlet() {
     if (port >= 0 && path != null && !path.isEmpty()) {
+      meteringWatcher = new MeteringHealthWatcher(configuration);
+      meteringWatcher.start();
       Catalog catalog = createCatalog();
       restCatalog = new SoftReference<>(catalog);
       return createServlet(catalog);

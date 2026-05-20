@@ -30,6 +30,7 @@ import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.hive.HiveCatalog;
+import org.apache.iceberg.metering.MeteringHealthWatcher;
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ public class HMSCatalogServer {
   private final String path;
   private Server server;
   private static volatile DataSharing dataSharing;
+  private MeteringHealthWatcher meteringWatcher;
 
   /**
    * Constructs the server, reading port and path from configuration.
@@ -97,10 +99,15 @@ public class HMSCatalogServer {
    * @return the secured servlet
    */
   private HttpServlet createServlet(Catalog catalog) {
+    return wrapWithSecurity(new HMSCatalogServlet(new HMSCatalogAdapter(catalog, configuration), meteringWatcher));
+  }
+
+  private HttpServlet wrapWithSecurity(HttpServlet inner) {
     String authType = MetastoreConf.getVar(configuration, ConfVars.CATALOG_SERVLET_AUTH);
     boolean jwt = "jwt".equalsIgnoreCase(authType);
     HMSServletSecurity security = new HMSServletSecurity(configuration, jwt);
-    return security.proxy(new HMSCatalogServlet(new HMSCatalogAdapter(catalog, configuration)));
+    HttpServlet proxied = security.proxy(inner);
+    return proxied != null ? proxied : inner;
   }
 
   /**
@@ -109,6 +116,8 @@ public class HMSCatalogServer {
    * @throws Exception if the server fails to start
    */
   public void start() throws Exception {
+    meteringWatcher = new MeteringHealthWatcher(configuration);
+    meteringWatcher.start();
     Catalog catalog = createCatalog();
     HttpServlet servlet = createServlet(catalog);
     ServletServerBuilder builder = new ServletServerBuilder(configuration);
@@ -126,6 +135,9 @@ public class HMSCatalogServer {
    * @throws Exception if the server fails to stop
    */
   public void stop() throws Exception {
+    if (meteringWatcher != null) {
+      meteringWatcher.stop();
+    }
     if (server != null) {
       server.stop();
       LOG.info("HMSCatalogServer stopped");

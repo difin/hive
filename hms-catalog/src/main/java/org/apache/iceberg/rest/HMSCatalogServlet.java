@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.iceberg.metering.MeteringHealthWatcher;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.relocated.com.google.common.io.CharStreams;
 import org.apache.iceberg.rest.HMSCatalogAdapter.HTTPMethod;
@@ -54,11 +55,24 @@ public class HMSCatalogServlet extends HttpServlet {
   private static final String APPLICATION_JSON = "application/json";
 
   private final HMSCatalogAdapter restCatalogAdapter;
+  private final MeteringHealthWatcher meteringWatcher;
   private final Map<String, String> responseHeaders =
       ImmutableMap.of(CONTENT_TYPE, APPLICATION_JSON);
 
+  /**
+   * Creates a servlet without metering health gating (used by existing embedded tests).
+   */
   public HMSCatalogServlet(HMSCatalogAdapter restCatalogAdapter) {
+    this(restCatalogAdapter, null);
+  }
+
+  /**
+   * Creates a servlet that gates requests on the given {@link MeteringHealthWatcher}.
+   * When {@code meteringWatcher} is {@code null} all requests are served unconditionally.
+   */
+  public HMSCatalogServlet(HMSCatalogAdapter restCatalogAdapter, MeteringHealthWatcher meteringWatcher) {
     this.restCatalogAdapter = restCatalogAdapter;
+    this.meteringWatcher = meteringWatcher;
   }
 
   @Override
@@ -85,6 +99,21 @@ public class HMSCatalogServlet extends HttpServlet {
     // TODO: check upstream - Block security-sensitive HTTP methods
     if ("TRACE".equalsIgnoreCase(method) || "CONNECT".equalsIgnoreCase(method)) {
       response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+      return;
+    }
+    if (meteringWatcher != null && !meteringWatcher.isHealthy()) {
+      response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+      responseHeaders.forEach(response::setHeader);
+      try {
+        ErrorResponse err = ErrorResponse.builder()
+            .responseCode(HttpServletResponse.SC_SERVICE_UNAVAILABLE)
+            .withType("ServiceUnavailableException")
+            .withMessage("Metering service is not healthy; REST catalog is temporarily unavailable.")
+            .build();
+        RESTObjectMapper.mapper().writeValue(response.getWriter(), err);
+      } catch (IOException writeError) {
+        LOG.error("Failed to write 503 error response", writeError);
+      }
       return;
     }
     try {
