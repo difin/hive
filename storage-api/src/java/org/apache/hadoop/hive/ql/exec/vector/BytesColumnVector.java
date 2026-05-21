@@ -501,6 +501,13 @@ public class BytesColumnVector extends ColumnVector {
   }
 
   @Override
+  protected void clearSlotValue(int elementNum) {
+    vector[elementNum] = null;
+    start[elementNum] = 0;
+    length[elementNum] = 0;
+  }
+
+  @Override
   public void init() {
     initBuffer(0);
   }
