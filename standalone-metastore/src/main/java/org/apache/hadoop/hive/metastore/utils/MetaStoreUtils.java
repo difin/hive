@@ -40,7 +40,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.fs.CommonConfigurationKeysPublic;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.StatsSetupConst;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
@@ -72,7 +71,6 @@ import org.apache.hadoop.hive.metastore.columnstats.merge.ColumnStatsMergerFacto
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.partition.spec.PartitionSpecProxy;
 import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
-import org.apache.hadoop.security.SaslRpcServer;
 import org.apache.hadoop.security.authorize.DefaultImpersonationProvider;
 import org.apache.hadoop.security.authorize.ProxyUsers;
 import org.apache.hadoop.util.MachineList;
@@ -1363,30 +1361,6 @@ public class MetaStoreUtils {
     }
     // in all the other cases, we can not merge
     csNew.setStatsObj(list);
-  }
-
-  /**
-   * Read and return the meta store Sasl configuration. Currently it uses the default
-   * Hadoop SASL configuration and can be configured using "hadoop.rpc.protection"
-   * HADOOP-10211, made a backward incompatible change due to which this call doesn't
-   * work with Hadoop 2.4.0 and later.
-   * @param conf
-   * @return The SASL configuration
-   */
-  public static Map<String, String> getMetaStoreSaslProperties(Configuration conf, boolean useSSL) {
-    // As of now Hive Meta Store uses the same configuration as Hadoop SASL configuration
-
-    // If SSL is enabled, override the given value of "hadoop.rpc.protection" and set it to "authentication"
-    // This disables any encryption provided by SASL, since SSL already provides it
-    String hadoopRpcProtectionVal = conf.get(CommonConfigurationKeysPublic.HADOOP_RPC_PROTECTION);
-    String hadoopRpcProtectionAuth = SaslRpcServer.QualityOfProtection.AUTHENTICATION.toString();
-
-    if (useSSL && hadoopRpcProtectionVal != null && !hadoopRpcProtectionVal.equals(hadoopRpcProtectionAuth)) {
-      LOG.warn("Overriding value of " + CommonConfigurationKeysPublic.HADOOP_RPC_PROTECTION + " setting it from "
-          + hadoopRpcProtectionVal + " to " + hadoopRpcProtectionAuth + " because SSL is enabled");
-      conf.set(CommonConfigurationKeysPublic.HADOOP_RPC_PROTECTION, hadoopRpcProtectionAuth);
-    }
-    return HadoopThriftAuthBridge.getBridge().getHadoopSaslProperties(conf);
   }
 
   /**
