@@ -814,6 +814,18 @@ public class TestHive extends TestCase {
         HiveIgnoreKeyTextOutputFormat.class);
     Table table = hiveDb.getTable(tableName);
     Path tablePath = table.getDataLocation();
+
+    // Fire the InsertEvent with empty folder
+    hiveDb.fireInsertEvent(table, null, false,
+        Lists.newArrayList(new FileStatus(5, true, 1, 64, 100, tablePath)));
+    // Get the last Metastore event
+    InsertEvent insertEvent1 = DummyFireInsertListener.getLastEvent();
+    // Check the event
+    Assert.assertNotNull(insertEvent1);
+    // getFiles should be empty and not null
+    Assert.assertNotNull(insertEvent1.getFiles());
+    Assert.assertTrue(insertEvent1.getFiles().isEmpty());
+
     // Create some files that "inserted"
     FileSystem fileSystem = tablePath.getFileSystem(hiveConf);
     fileSystem.deleteOnExit(tablePath);
@@ -857,17 +869,6 @@ public class TestHive extends TestCase {
       Path insertedPath = new Path(insertEvent.getFiles().get(i));
       Assert.assertEquals(expectedCheckSums.get(insertedPath.getName()), checkSums.get(i));
     }
-
-    // Fire the InsertEvent with empty folder
-    hiveDb.fireInsertEvent(table, null, false,
-            Lists.newArrayList(new FileStatus(5, true, 1, 64, 100, tablePath)));
-    // Get the last Metastore event
-    InsertEvent insertEvent1 = DummyFireInsertListener.getLastEvent();
-    // Check the event
-    Assert.assertNotNull(insertEvent1);
-    // getFiles should be empty and not null
-    Assert.assertNotNull(insertEvent1.getFiles());
-    Assert.assertTrue(insertEvent1.getFiles().isEmpty());
   }
 
   public void testLoadingIMetaStoreClient() throws Throwable {
