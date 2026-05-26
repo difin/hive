@@ -16,7 +16,7 @@
 --! qt:replace:/(\s+current-snapshot-timestamp-ms\s+)\S+(\s*)/$1#Masked#$2/
 --! qt:replace:/(MAJOR\s+succeeded\s+)[a-zA-Z0-9\-\.\s+]+(\s+manual)/$1#Masked#$2/
 -- Mask iceberg version
---! qt:replace:/(\S\"iceberg-version\\\":\\\")(\w+\s\w+\s\d+\.\d+\.\d+\s\(\w+\s\w+\))(\\\")/$1#Masked#$3/
+--! qt:replace:/(\S\"iceberg-version\\\":\\\")(\w+\s\w+\s[\d.\-]+\s\(\w+\s\w+\))(\\\")/$1#Masked#$3/
 set hive.llap.io.enabled=true;
 set hive.vectorized.execution.enabled=true;
 set hive.optimize.shared.work.merge.ts.schema=true;
