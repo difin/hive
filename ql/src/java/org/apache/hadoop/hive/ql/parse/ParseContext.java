@@ -659,7 +659,7 @@ public class ParseContext {
 
   public Collection<Operator> getAllOps() {
     List<Operator> ops = new ArrayList<>();
-    Set<Operator> visited = new HashSet<Operator>();
+    Set<Operator> visited = new HashSet<>();
     for (Operator<?> op : getTopOps().values()) {
       getAllOps(ops, visited, op);
     }

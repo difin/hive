@@ -186,12 +186,8 @@ public class PartitionPruner extends Transform {
       LOG.trace("prune Expression = " + (prunerExpr == null ? "" : prunerExpr));
     }
 
-    String key = PrunerUtils.getTableKey(tab);
-    if (tab.getMetaTable() != null) {
-      key = tab.getFullyQualifiedName() + "." + tab.getMetaTable() + ";";
-    } else if (tab.getSnapshotRef() != null) {
-      key = tab.getFullyQualifiedName() + "." + tab.getSnapshotRef() + ";";
-    }
+    String qualifier = tab.getQualifier();
+    String key = tab.getFullyQualifiedName() + (qualifier.isEmpty() ? "" : "." + qualifier) + ";";
 
     if (!tab.isPartitioned()) {
       // If the table is not partitioned, return empty list.
