@@ -56,12 +56,14 @@
   <description>A base for other temporary directories.</description>
 </property>
 
-<!-- in LLAP mode hive.tez.container.size isn't used to actually determine container size, however while -->
-<!-- calculating available slots (in split generation) in it's used through -->
-<!-- the Vertex resource, so this has to be defined in order to get consistent test results -->
+<!-- 
+In LLAP mode hive.tez.container.size does not set the container size directly.
+However, we need to define it here, for the following reasons:
+* while calculating available slots (in split generation) it's used through the Vertex resource, so this has to be defined in order to get consistent test results
+* it limits the the memory of the TezChild processes, created during the execution of, e.g., TestMiniLlapCliDriver. If the value is too small, it might lead to a "java.lang.OutOfMemoryError: Java heap space" -->
 <property>
   <name>hive.tez.container.size</name>
-  <value>256</value>
+  <value>512</value>
 </property>
 
 <property>
