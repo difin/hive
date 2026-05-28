@@ -101,6 +101,8 @@ public class LateralViewPlan {
     this.functionHelper = functionHelper;
     this.queryHelper = queryHelper;
 
+    boolean isOuter = lateralView.getToken().getType() == HiveParser.TOK_LATERAL_VIEW_OUTER;
+
     // AST should have form of LATERAL_VIEW -> SELECT -> SELEXPR -> FUNCTION -> function info tree
     ASTNode selExprAST = (ASTNode) lateralView.getChild(0).getChild(0);
     ASTNode functionAST = (ASTNode) selExprAST.getChild(0);
@@ -120,7 +122,7 @@ public class LateralViewPlan {
 
     this.lateralViewRel = HiveTableFunctionScan.create(cluster,
         TraitsUtil.getDefaultTraitSet(cluster), ImmutableList.of(inputRel), udtfCall,
-        null, retType, createColumnMappings(inputRel));
+        null, retType, createColumnMappings(inputRel), isOuter);
   }
 
   public static void validateLateralView(ASTNode lateralView) throws SemanticException {
@@ -129,9 +131,9 @@ public class LateralViewPlan {
           " children.");
     }
     ASTNode next = (ASTNode) lateralView.getChild(1);
-    if (!TABLE_ALIAS_TOKEN_TYPES.contains(next.getToken().getType()) &&
-          HiveParser.TOK_LATERAL_VIEW != next.getToken().getType()) {
-        throw new SemanticException(ASTErrorUtils.getMsg(
+    if (!TABLE_ALIAS_TOKEN_TYPES.contains(next.getToken().getType()) && 
+        !SemanticAnalyzer.isASTNodeLateralView(next)) {
+      throw new SemanticException(ASTErrorUtils.getMsg(
             ErrorMsg.LATERAL_VIEW_INVALID_CHILD.getMsg(), lateralView));
     }
   }
