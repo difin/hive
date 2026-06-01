@@ -388,7 +388,7 @@ POSTHOOK: Input: default@acid_cmv_part@k=100
         ],
         "table:alias": "acid_cmv_part",
         "inputs": [],
-        "rowCount": 277,
+        "rowCount": ###Masked###,
         "avgRowSize": 200,
         "rowType": {
           "fields": [
@@ -475,7 +475,7 @@ POSTHOOK: Input: default@acid_cmv_part@k=100
             "name": "$0"
           }
         ],
-        "rowCount": 277
+        "rowCount": ###Masked###
       }
     ]
   },
