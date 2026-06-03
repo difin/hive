@@ -162,6 +162,12 @@ registration_date   	date
 dept_id             	bigint              	                    
 city                	string              	                    
 	 	 
+# Partition Information	 	 
+# col_name            	data_type           	comment             
+dept_id             	bigint              	Transform: identity 
+city                	string              	Transform: identity 
+registration_date   	date                	Transform: identity 
+	 	 
 # Partition Transform Information	 	 
 # col_name            	transform_type      	 
 dept_id             	IDENTITY            	 
@@ -271,6 +277,12 @@ last_name           	string
 registration_date   	date                	                    
 dept_id             	bigint              	                    
 city                	string              	                    
+	 	 
+# Partition Information	 	 
+# col_name            	data_type           	comment             
+dept_id             	bigint              	Transform: identity 
+city                	string              	Transform: identity 
+registration_date   	date                	Transform: identity 
 	 	 
 # Partition Transform Information	 	 
 # col_name            	transform_type      	 
@@ -382,6 +394,12 @@ registration_date   	date
 dept_id             	bigint              	                    
 city                	string              	                    
 	 	 
+# Partition Information	 	 
+# col_name            	data_type           	comment             
+dept_id             	bigint              	Transform: identity 
+city                	string              	Transform: identity 
+registration_date   	date                	Transform: identity 
+	 	 
 # Partition Transform Information	 	 
 # col_name            	transform_type      	 
 dept_id             	IDENTITY            	 
@@ -491,6 +509,12 @@ registration_date   	date
 dept_id             	bigint              	                    
 city                	string              	                    
 	 	 
+# Partition Information	 	 
+# col_name            	data_type           	comment             
+dept_id             	bigint              	Transform: identity 
+city                	string              	Transform: identity 
+registration_date   	date                	Transform: identity 
+	 	 
 # Partition Transform Information	 	 
 # col_name            	transform_type      	 
 dept_id             	IDENTITY            	 
@@ -599,6 +623,12 @@ last_name           	string
 registration_date   	date                	                    
 dept_id             	bigint              	                    
 city                	string              	                    
+	 	 
+# Partition Information	 	 
+# col_name            	data_type           	comment             
+dept_id             	bigint              	Transform: identity 
+city                	string              	Transform: identity 
+registration_date   	date                	Transform: identity 
 	 	 
 # Partition Transform Information	 	 
 # col_name            	transform_type      	 

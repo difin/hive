@@ -109,6 +109,10 @@ POSTHOOK: Input: default@ice_orc
 a                   	string              	                    
 b                   	bigint              	                    
 	 	 
+# Partition Information	 	 
+# col_name            	data_type           	comment             
+a                   	string              	Transform: identity 
+	 	 
 # Partition Transform Information	 	 
 # col_name            	transform_type      	 
 a                   	IDENTITY            	 
@@ -197,6 +201,10 @@ POSTHOOK: Input: default@ice_orc
 # col_name            	data_type           	comment             
 a                   	string              	                    
 b                   	bigint              	                    
+	 	 
+# Partition Information	 	 
+# col_name            	data_type           	comment             
+a                   	string              	Transform: identity 
 	 	 
 # Partition Transform Information	 	 
 # col_name            	transform_type      	 
@@ -301,6 +309,10 @@ POSTHOOK: Input: default@ice_orc
 a                   	string              	                    
 b                   	bigint              	                    
 	 	 
+# Partition Information	 	 
+# col_name            	data_type           	comment             
+a                   	string              	Transform: identity 
+	 	 
 # Partition Transform Information	 	 
 # col_name            	transform_type      	 
 a                   	IDENTITY            	 
@@ -403,6 +415,10 @@ POSTHOOK: Input: default@ice_orc
 # col_name            	data_type           	comment             
 a                   	string              	                    
 b                   	bigint              	                    
+	 	 
+# Partition Information	 	 
+# col_name            	data_type           	comment             
+a                   	string              	Transform: identity 
 	 	 
 # Partition Transform Information	 	 
 # col_name            	transform_type      	 

@@ -860,8 +860,7 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
     return table.spec().fields().stream()
       .filter(f -> !f.transform().isVoid())
       .map(f -> {
-        TransformSpec spec = IcebergTableUtil.getTransformSpec(
-            table, f.transform().toString(), f.sourceId());
+        TransformSpec spec = IcebergTableUtil.getTransformSpec(table, f.transform().toString(), f.sourceId());
         spec.setFieldName(f.name());
         return spec;
       })
@@ -876,8 +875,7 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
       e.getValue().fields().stream()
         .filter(f -> !f.transform().isVoid())
         .map(f -> {
-          TransformSpec spec = IcebergTableUtil.getTransformSpec(
-              table, f.transform().toString(), f.sourceId());
+          TransformSpec spec = IcebergTableUtil.getTransformSpec(table, f.transform().toString(), f.sourceId());
           spec.setFieldName(f.name());
           return Pair.of(e.getKey(), spec);
         }))
@@ -887,9 +885,8 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
 
   private List<TransformSpec> getSortTransformSpec(Table table) {
     return table.sortOrder().fields().stream().map(s ->
-        IcebergTableUtil.getTransformSpec(table, s.transform().toString(), s.sourceId())
-      )
-      .collect(Collectors.toList());
+            IcebergTableUtil.getTransformSpec(table, s.transform().toString(), s.sourceId()))
+        .toList();
   }
 
   @Override
@@ -1987,8 +1984,7 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
    * @param hmsTable A Hive table instance.
    * @param partitionSpec Map containing partition specification given by user.
    * @return true if we can perform metadata delete, otherwise false.
-   * @throws SemanticException Exception raised when a partition transform is being used
-   * or when partition column is not present in the table.
+   * @throws SemanticException Exception raised when partition column is not present in the table.
    */
   @Override
   public boolean canUseTruncate(org.apache.hadoop.hive.ql.metadata.Table hmsTable, Map<String, String> partitionSpec)
@@ -2000,13 +1996,16 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
       return false;
     }
 
-    Expression finalExp = IcebergTableUtil.generateExpressionFromPartitionSpec(table, partitionSpec, true);
-    FindFiles.Builder builder = new FindFiles.Builder(table).withRecordsMatching(finalExp);
+    Expression partitionExpr = IcebergTableUtil.generateExprForIdentityPartition(
+        table, partitionSpec, true);
+
+    FindFiles.Builder builder = new FindFiles.Builder(table).withRecordsMatching(partitionExpr);
     Set<DataFile> dataFiles = Sets.newHashSet(builder.collect());
+
     boolean result = true;
     for (DataFile dataFile : dataFiles) {
       PartitionData partitionData = (PartitionData) dataFile.partition();
-      Expression residual = ResidualEvaluator.of(table.spec(), finalExp, false)
+      Expression residual = ResidualEvaluator.of(table.spec(), partitionExpr, false)
           .residualFor(partitionData);
       if (!residual.isEquivalentTo(Expressions.alwaysTrue())) {
         result = false;
@@ -2028,8 +2027,7 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
   @Override
   public List<Partition> getPartitions(org.apache.hadoop.hive.ql.metadata.Table hmsTable,
       Map<String, String> partitionSpec, boolean latestSpecOnly) throws SemanticException {
-    Table table = IcebergTableUtil.getTable(conf, hmsTable.getTTable());
-    return IcebergTableUtil.getPartitionNames(table, partitionSpec, latestSpecOnly).stream()
+    return IcebergTableUtil.getPartitionNames(conf, hmsTable, partitionSpec, latestSpecOnly).stream()
         .map(partName -> {
           Map<String, String> partSpecMap = Maps.newLinkedHashMap();
           Warehouse.makeSpecFromName(partSpecMap, new Path(partName), null);
@@ -2054,12 +2052,39 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
   @Override
   public Partition getPartition(org.apache.hadoop.hive.ql.metadata.Table table,
       Map<String, String> partitionSpec, RewritePolicy policy) throws SemanticException {
+
     validatePartSpec(table, partitionSpec, policy);
+
+    boolean isDescTable = SessionStateUtil.getQueryState(conf)
+        .map(QueryState::getHiveOperation)
+        .filter(op -> op == HiveOperation.DESCTABLE)
+        .isPresent();
+
+    if (!isDescTable) {
+      return createDummyPartitionHandle(table, partitionSpec);
+    }
+
+    Partition partition = IcebergTableUtil.getPartition(conf, table, partitionSpec);
+
+    // Populate basic statistics
+    if (partition != null) {
+      Map<String, String> stats = getBasicStatistics(Partish.buildFor(table, partition));
+      if (stats != null && !stats.isEmpty()) {
+        partition.getTPartition().setParameters(stats);
+      }
+    }
+
+    return partition;
+  }
+
+  private static DummyPartition createDummyPartitionHandle(
+      org.apache.hadoop.hive.ql.metadata.Table table, Map<String, String> partitionSpec)
+      throws SemanticException {
     try {
-      String partName = Warehouse.makePartName(partitionSpec, false);
-      return new DummyPartition(table, partName, partitionSpec);
+      String partitionName = Warehouse.makePartName(partitionSpec, false);
+      return new DummyPartition(table, partitionName, partitionSpec);
     } catch (MetaException e) {
-      throw new SemanticException("Unable to construct name for dummy partition due to: ", e);
+      throw new SemanticException("Unable to construct partition name", e);
     }
   }
 
@@ -2072,8 +2097,7 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
    */
   public List<String> getPartitionNames(org.apache.hadoop.hive.ql.metadata.Table hmsTable,
       Map<String, String> partitionSpec) throws SemanticException {
-    Table icebergTable = IcebergTableUtil.getTable(conf, hmsTable.getTTable());
-    return IcebergTableUtil.getPartitionNames(icebergTable, partitionSpec, false);
+    return IcebergTableUtil.getPartitionNames(conf, hmsTable, partitionSpec, false);
   }
 
   /**
