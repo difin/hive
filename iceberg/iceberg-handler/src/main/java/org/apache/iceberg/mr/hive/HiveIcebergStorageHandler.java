@@ -2317,6 +2317,8 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
     TableScan scan = table.newScan().filter(exp)
         .caseSensitive(false).includeColumnStats().ignoreResiduals();
 
+    String defaultPartitionName = HiveConf.getVar(conf, ConfVars.DEFAULTPARTITIONNAME);
+
     try (CloseableIterable<FileScanTask> tasks = scan.planFiles()) {
       FluentIterable.from(tasks).filter(task -> task.spec().isPartitioned()).forEach(task -> {
         DataFile file = task.file();
@@ -2328,8 +2330,8 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
           PartitionData partitionData = IcebergTableUtil.toPartitionData(task.partition(), spec.partitionType());
           String partName = spec.partitionToPath(partitionData);
 
-          Map<String, String> partSpecMap = Maps.newLinkedHashMap();
-          Warehouse.makeSpecFromName(partSpecMap, new Path(partName), null);
+          Map<String, String> partSpecMap =
+              IcebergTableUtil.makeSpecFromName(partName, spec, partitionData, defaultPartitionName);
 
           DummyPartition partition = new DummyPartition(hmsTable, partName, partSpecMap);
           partitions.add(partition);
