@@ -62,6 +62,11 @@ public class CompactorTasks implements LeaderElection.LeadershipStateListener {
 
   public List<MetaStoreThread> getCompactorThreads() throws Exception {
     List<MetaStoreThread> compactors = new ArrayList<>();
+    if (!MetastoreConf.getBoolVar(configuration, MetastoreConf.ConfVars.METASTORE_SUPPORT_ACID)) {
+      HiveMetaStore.LOG.warn("Compactor threads do not run when the {} property is set to false.",
+          MetastoreConf.ConfVars.METASTORE_SUPPORT_ACID.getHiveName());
+      return compactors;
+    }
     if (!runOnlyWorker) {
       if (MetastoreConf.getBoolVar(configuration, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON)) {
         MetaStoreThread initiator = instantiateThread("org.apache.hadoop.hive.ql.txn.compactor.Initiator");

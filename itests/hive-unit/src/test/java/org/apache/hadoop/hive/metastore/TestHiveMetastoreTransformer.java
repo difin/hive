@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient.GetTablesRequestBuilder;
 import org.apache.hadoop.hive.metastore.api.Catalog;
@@ -822,6 +823,7 @@ public class TestHiveMetastoreTransformer {
       count = 300;
       tProps.put("TBLNAME", "test_limit");
       tProps.put("TABLECOUNT", count);
+      tProps.remove("CAPABILITIES"); // CAPABILITIES are already appended to PROPERTIES
       tables = createTables(tProps);
       assertEquals("Unexpected number of tables created", count, tables.size());
 
@@ -931,7 +933,8 @@ public class TestHiveMetastoreTransformer {
       properties.append("transactional_properties=insert_only");
       tProps.put("TBLNAME", tblName);
       tProps.put("PROPERTIES", properties.toString());
-      setHMSClient("createTable", new String[] {"HIVEMANAGEDINSERTWRITE,HIVEFULLACIDWRITE"});
+      tProps.put("TBLTYPE", type);
+      setHMSClient("createTable", new String[] {"HIVEMANAGEDINSERTWRITE", "HIVEFULLACIDWRITE"});
       table = createTableWithCapabilities(tProps);
       resetHMSClient();
 
@@ -1768,7 +1771,7 @@ public class TestHiveMetastoreTransformer {
     String tblName  = (String)props.get("TBLNAME");
     List<String> caps = (List<String>)props.get("CAPABILITIES");
     StringBuilder table_params = new StringBuilder();
-    table_params.append((String)props.get("PROPERTIES"));
+    Optional.ofNullable(props.get("PROPERTIES")).ifPresent(table_params::append);
     if (caps != null)
       table_params.append(CAPABILITIES_KEY).append("=").append(String.join(",", caps));
     props.put("PROPERTIES", table_params.toString());
