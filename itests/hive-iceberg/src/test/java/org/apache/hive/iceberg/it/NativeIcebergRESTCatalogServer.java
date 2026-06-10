@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Map;
 import java.util.UUID;
 import javax.servlet.http.HttpServlet;
 import org.apache.hadoop.conf.Configuration;
@@ -33,10 +31,12 @@ import org.apache.hadoop.hive.metastore.MetaStoreSchemaInfo;
 import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
-import org.apache.iceberg.catalog.Namespace;
-import org.apache.iceberg.hadoop.HadoopCatalog;
+import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
+import org.apache.iceberg.CatalogProperties;
+import org.apache.iceberg.hive.HiveCatalog;
 import org.apache.iceberg.rest.JavaxIcebergRESTCatalogServlet;
 import org.apache.iceberg.rest.RESTCatalogAdapter;
+import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -50,30 +50,17 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Iceberg REST catalog test server: Jetty + {@link RESTCatalogAdapter} + {@link HadoopCatalog}. */
+/** Iceberg REST catalog test server: Jetty + {@link RESTCatalogAdapter} + {@link HiveCatalog}. */
 public class NativeIcebergRESTCatalogServer {
 
-  /**
-   * {@link HadoopCatalog} rejects namespace metadata, but {@link org.apache.iceberg.hive.client.HiveRESTCatalogClient}
-   * sends LOCATION / owner fields when creating a database. Strip metadata so namespaces still create.
-   */
-  private static final class HadoopCatalogIgnoringNamespaceMetadata extends HadoopCatalog {
-    HadoopCatalogIgnoringNamespaceMetadata(Configuration conf, String warehouseLocation) {
-      super(conf, warehouseLocation);
-    }
-
-    @Override
-    public void createNamespace(Namespace namespace, Map<String, String> metadata) {
-      super.createNamespace(namespace, Collections.emptyMap());
-    }
-  }
   private static final Logger LOG = LoggerFactory.getLogger(NativeIcebergRESTCatalogServer.class);
 
   private Path warehouseDir;
   private int restPort = -1;
+  private int hmsPort = -1;
   private Server httpServer;
   private RESTCatalogAdapter catalogAdapter;
-  private HadoopCatalog hadoopCatalog;
+  private HiveCatalog hiveCatalog;
 
   /** No-op: kept for callers that passed a metastore schema class for the old HMS fixture. */
   @SuppressWarnings("unused")
@@ -95,12 +82,18 @@ public class NativeIcebergRESTCatalogServer {
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.WAREHOUSE_EXTERNAL, externalPath);
     conf.set(HiveConf.ConfVars.HIVE_METASTORE_WAREHOUSE_EXTERNAL.varname, externalPath);
 
-    String icebergWarehouse = warehouseDir.resolve("iceberg-rest").toAbsolutePath().toString();
-    Files.createDirectories(Paths.get(icebergWarehouse));
+    hmsPort = MetaStoreTestUtils.startMetaStoreWithRetry(
+        HadoopThriftAuthBridge.getBridge(), conf, false, true, false, false);
 
-    Configuration hadoopConf = new Configuration(conf);
-    hadoopCatalog = new HadoopCatalogIgnoringNamespaceMetadata(hadoopConf, icebergWarehouse);
-    catalogAdapter = new RESTCatalogAdapter(hadoopCatalog);
+    Configuration catalogConf = new Configuration(conf);
+    hiveCatalog = new HiveCatalog();
+    hiveCatalog.setConf(catalogConf);
+    hiveCatalog.initialize(
+        "rest",
+        ImmutableMap.of(
+            CatalogProperties.URI, MetastoreConf.getVar(conf, ConfVars.THRIFT_URIS),
+            CatalogProperties.WAREHOUSE_LOCATION, MetastoreConf.getVar(conf, ConfVars.WAREHOUSE)));
+    catalogAdapter = new RESTCatalogAdapter(hiveCatalog);
     HttpServlet servlet = new JavaxIcebergRESTCatalogServlet(catalogAdapter);
 
     restPort = MetaStoreTestUtils.findFreePort();
@@ -116,9 +109,10 @@ public class NativeIcebergRESTCatalogServer {
     httpServer.start();
 
     LOG.info(
-        "Started native Iceberg REST catalog on port {} (warehouse {})",
+        "Started native Iceberg REST catalog on port {} (HMS port {}, warehouse {})",
         restPort,
-        icebergWarehouse);
+        hmsPort,
+        managedPath);
   }
 
   private static Server createHttpServer(int port) throws IOException {
@@ -149,13 +143,17 @@ public class NativeIcebergRESTCatalogServer {
       httpServer = null;
     }
     catalogAdapter = null;
-    if (hadoopCatalog != null) {
+    if (hiveCatalog != null) {
       try {
-        hadoopCatalog.close();
+        hiveCatalog.close();
       } catch (Exception e) {
-        LOG.warn("Error closing HadoopCatalog", e);
+        LOG.warn("Error closing HiveCatalog", e);
       }
-      hadoopCatalog = null;
+      hiveCatalog = null;
+    }
+    if (hmsPort > 0) {
+      MetaStoreTestUtils.close(hmsPort);
+      hmsPort = -1;
     }
   }
 

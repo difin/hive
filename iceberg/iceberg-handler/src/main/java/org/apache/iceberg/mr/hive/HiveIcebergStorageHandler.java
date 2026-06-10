@@ -377,6 +377,11 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
     return true;
   }
 
+  @Override
+  public boolean supportsExternalViewCatalog() {
+    return true;
+  }
+
   /**
    * @param jobConf Job configuration for InputFormat to access
    * @param deserializer Deserializer
@@ -420,6 +425,9 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
   @Override
   public boolean canProvidePartitionStatistics(org.apache.hadoop.hive.ql.metadata.Table hmsTable) {
     if (!getStatsSource().equals(HiveMetaHook.ICEBERG)) {
+      return false;
+    }
+    if (BaseHiveIcebergMetaHook.isIcebergView(hmsTable.getTTable())) {
       return false;
     }
     Table table = IcebergTableUtil.getTable(conf, hmsTable.getTTable());
@@ -858,6 +866,9 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
 
   @Override
   public List<TransformSpec> getPartitionTransformSpec(org.apache.hadoop.hive.ql.metadata.Table hmsTable) {
+    if (BaseHiveIcebergMetaHook.isIcebergView(hmsTable.getTTable())) {
+      return Collections.emptyList();
+    }
     Table table = IcebergTableUtil.getTable(conf, hmsTable.getTTable());
     return table.spec().fields().stream()
       .filter(f -> !f.transform().isVoid())
@@ -872,6 +883,9 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
   @Override
   public Map<Integer, List<TransformSpec>> getPartitionTransformSpecs(
       org.apache.hadoop.hive.ql.metadata.Table hmsTable) {
+    if (BaseHiveIcebergMetaHook.isIcebergView(hmsTable.getTTable())) {
+      return Collections.emptyMap();
+    }
     Table table = IcebergTableUtil.getTable(conf, hmsTable.getTTable());
     return table.specs().entrySet().stream().flatMap(e ->
       e.getValue().fields().stream()
@@ -1455,6 +1469,9 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
 
   @Override
   public List<FieldSchema> sortColumns(org.apache.hadoop.hive.ql.metadata.Table hmsTable) {
+    if (BaseHiveIcebergMetaHook.isIcebergView(hmsTable.getTTable())) {
+      return Collections.emptyList();
+    }
     TableDesc tableDesc = Utilities.getTableDesc(hmsTable);
     Table table = IcebergTableUtil.getTable(conf, tableDesc.getProperties());
     if (table.sortOrder().isUnsorted()) {
@@ -2038,6 +2055,10 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
   }
 
   public boolean isPartitioned(org.apache.hadoop.hive.ql.metadata.Table hmsTable) {
+    if (BaseHiveIcebergMetaHook.isIcebergView(hmsTable.getTTable())) {
+      List<FieldSchema> partCols = hmsTable.getPartCols();
+      return partCols != null && !partCols.isEmpty();
+    }
     if (!hmsTable.getTTable().isSetId()) {
       return false;
     }
@@ -2183,6 +2204,10 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
 
   @Override
   public List<FieldSchema> getPartitionKeys(org.apache.hadoop.hive.ql.metadata.Table hmsTable) {
+    if (BaseHiveIcebergMetaHook.isIcebergView(hmsTable.getTTable())) {
+      List<FieldSchema> partCols = hmsTable.getPartCols();
+      return partCols != null ? partCols : Collections.emptyList();
+    }
     if (!hmsTable.getTTable().isSetId()) {
       return Collections.emptyList();
     }

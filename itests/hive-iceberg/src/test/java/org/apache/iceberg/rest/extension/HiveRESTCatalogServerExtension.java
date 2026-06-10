@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * JUnit 5 extension: {@link NativeIcebergRESTCatalogServer} (HadoopCatalog REST) with optional OAuth2
+ * JUnit 5 extension: {@link NativeIcebergRESTCatalogServer} (HiveCatalog REST) with optional OAuth2
  * (Keycloak via {@link OAuth2AuthorizationServer}). Lives under {@code org.apache.iceberg.rest.extension}
  * for parity with upstream Iceberg/HMS REST ITs when {@code metastore-rest-catalog} is not a module.
  *

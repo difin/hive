@@ -30,6 +30,7 @@ import org.apache.hadoop.hive.metastore.HiveMetaHook;
 import org.apache.hadoop.hive.metastore.HiveMetaHookLoader;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.CreateTableRequest;
+import org.apache.hadoop.hive.metastore.api.GetTableResult;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.SQLCheckConstraint;
 import org.apache.hadoop.hive.metastore.api.SQLDefaultConstraint;
@@ -43,13 +44,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Applies {@link HiveMetaHook} around table creation for alternate {@link IMetaStoreClient}
- * implementations (such as {@code HiveRESTCatalogClient}) that do not embed hook logic.
+ * Applies {@link HiveMetaHook} around table creation and {@code postGetTable} for alternate
+ * {@link IMetaStoreClient} implementations (such as {@code HiveRESTCatalogClient}) that do not
+ * embed hook logic.
  *
  * <p>Upstream Hive does this via {@code HiveMetaStoreClientBuilder.withHooks} wrapping the
  * delegate in {@code HookEnabledMetaStoreClient} (see apache/hive {@code metastore-client}).
  * This tree uses a JDK proxy with the same {@code createTable} / {@code createTableWithConstraints}
- * contract as {@link org.apache.hadoop.hive.metastore.HiveMetaStoreClient#createTable}.
+ * and {@code getTable} / batch table-fetch contract as
+ * {@link org.apache.hadoop.hive.metastore.HiveMetaStoreClient}.
  *
  * <p>Delegate calls use {@link Method#invoke}; checked exceptions from the delegate are wrapped in
  * {@link InvocationTargetException}. Those must be unwrapped and rethrown so callers (e.g.
@@ -99,7 +102,7 @@ public final class HookEnabledMetaStoreClient {
     return (IMetaStoreClient) Proxy.newProxyInstance(
         IMetaStoreClient.class.getClassLoader(),
         new Class<?>[] {IMetaStoreClient.class},
-        new CreateTableHookHandler(conf, hookLoader, delegate));
+        new MetaStoreHookHandler(conf, hookLoader, delegate));
   }
 
   /**
@@ -125,12 +128,12 @@ public final class HookEnabledMetaStoreClient {
     return newClient(cfg, hl, delegate);
   }
 
-  private static final class CreateTableHookHandler implements InvocationHandler {
+  private static final class MetaStoreHookHandler implements InvocationHandler {
     private final Configuration conf;
     private final HiveMetaHookLoader hookLoader;
     private final IMetaStoreClient delegate;
 
-    CreateTableHookHandler(Configuration conf, HiveMetaHookLoader hookLoader, IMetaStoreClient delegate) {
+    MetaStoreHookHandler(Configuration conf, HiveMetaHookLoader hookLoader, IMetaStoreClient delegate) {
       this.conf = conf;
       this.hookLoader = hookLoader;
       this.delegate = delegate;
@@ -183,6 +186,42 @@ public final class HookEnabledMetaStoreClient {
         return null;
       }
 
+      if (isGetTableMethod(method) || isGetTableBatchMethod(method)) {
+        Object result = invokeDelegate(method, args);
+        applyPostGetTableHook(result);
+        return result;
+      }
+
+      return invokeDelegate(method, args);
+    }
+
+    private static boolean isGetTableMethod(Method method) {
+      return "getTable".equals(method.getName());
+    }
+
+    /**
+     * Matches batch table fetches ({@code getTableObjectsByName}, {@code getTables} with a name
+     * list) but not {@code getTables} with a name pattern, which returns {@code List<String>}.
+     */
+    private static boolean isGetTableBatchMethod(Method method) {
+      if (!List.class.isAssignableFrom(method.getReturnType())) {
+        return false;
+      }
+      if ("getTableObjectsByName".equals(method.getName())) {
+        return true;
+      }
+      if (!"getTables".equals(method.getName())) {
+        return false;
+      }
+      for (Class<?> paramType : method.getParameterTypes()) {
+        if (List.class.isAssignableFrom(paramType)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private Object invokeDelegate(Method method, Object[] args) throws Throwable {
       try {
         return method.invoke(delegate, args);
       } catch (InvocationTargetException e) {
@@ -191,6 +230,31 @@ public final class HookEnabledMetaStoreClient {
           throw cause;
         }
         throw e;
+      }
+    }
+
+    private void applyPostGetTableHook(Object result) throws MetaException {
+      if (result instanceof GetTableResult) {
+        Table table = ((GetTableResult) result).getTable();
+        if (table != null) {
+          executePostGetTableHook(table);
+        }
+      } else if (result instanceof Table) {
+        executePostGetTableHook((Table) result);
+      } else if (result instanceof List) {
+        List<?> tables = (List<?>) result;
+        for (Object item : tables) {
+          if (item instanceof Table) {
+            executePostGetTableHook((Table) item);
+          }
+        }
+      }
+    }
+
+    private void executePostGetTableHook(Table table) throws MetaException {
+      HiveMetaHook hook = getHook(table);
+      if (hook != null) {
+        hook.postGetTable(table);
       }
     }
 
