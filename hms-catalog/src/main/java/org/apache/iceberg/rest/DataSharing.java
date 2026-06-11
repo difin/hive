@@ -68,7 +68,7 @@ public abstract class DataSharing {
   public static final String CONFVAR_IDBROKER_ACCESS_PATH = "hive.metastore.catalog.idbroker.access_path";
 
   // Cloud provider selection
-  public static final String CONFVAR_CLOUD_PROVIDER = "hive.metastore.catalog.cloud.provider";
+  public static final String CONFVAR_CLOUD_PROVIDER = "rest.catalog.env.cloud.provider";
   public static final String CLOUD_PROVIDER_AWS = "aws";
   public static final String CLOUD_PROVIDER_AZURE = "azure";
 
