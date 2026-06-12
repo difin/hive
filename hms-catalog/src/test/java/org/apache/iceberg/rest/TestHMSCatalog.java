@@ -741,6 +741,21 @@ public class TestHMSCatalog extends HMSTestBase {
   }
 
   @Test
+  public void testBuildLoadCredentialsPathUsesRestEncoding() {
+    TableIdentifier ident = TableIdentifier.of(Namespace.of("parent", "child"), "tbl with spaces");
+
+    String path = HMSCatalogAdapter.buildLoadCredentialsPath(ident);
+
+    assertThat(path)
+        .isEqualTo(
+            "v1/namespaces/"
+                + RESTUtil.encodeNamespace(ident.namespace())
+                + "/tables/"
+                + RESTUtil.encodeString(ident.name())
+                + "/credentials");
+  }
+
+  @Test
   public void testLoadCredentialsEndpointReturnsStorageCredentialsField() throws Exception {
     Schema schema = getTestSchema();
     String tableName = "tbl_creds_endpoint_" + Integer.toHexString(RND.nextInt(65536));

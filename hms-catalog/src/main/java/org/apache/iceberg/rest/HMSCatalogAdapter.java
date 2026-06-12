@@ -99,6 +99,9 @@ public class HMSCatalogAdapter implements RESTClient {
   private static final AtomicInteger REQUEST_ID_COUNTER = new AtomicInteger(0);
 
   private static final String VENDED_CREDENTIALS_ENABLED = "vended-credentials-enabled";
+  private static final String ADLS_REFRESH_CREDENTIALS_ENDPOINT = "adls.refresh-credentials-endpoint";
+  private static final String ADLS_REFRESH_CREDENTIALS_ENABLED = "adls.refresh-credentials-enabled";
+  private static final String LOAD_CREDENTIALS_PATH_TEMPLATE = "v1/namespaces/%s/tables/%s/credentials";
 
   private static final Map<Class<? extends Exception>, Integer> EXCEPTION_ERROR_CODES =
       ImmutableMap.<Class<? extends Exception>, Integer>builder()
@@ -750,17 +753,32 @@ public class HMSCatalogAdapter implements RESTClient {
   }
 
   /**
-   * Creates a load table response builder with table metadata only.
+   * Creates a load table response builder with table metadata.
+   * If Azure data-sharing is active, include ADLS credential refresh config for ADLSFileIO.
    *
    * @param table       the table instance (can not be null)
+   * @param ident       the table identifier
    * @return the load table response
    */
-  static LoadTableResponse.Builder dataSharingBuilder(BaseTable table) {
-    // Credentials are NOT injected into loadTable config: since vended-credentials-enabled=true
+  static LoadTableResponse.Builder dataSharingBuilder(BaseTable table, TableIdentifier ident) {
     return runAsHive(() -> {
       TableMetadata metaData = table.operations().current();
-      return LoadTableResponse.builder().withTableMetadata(metaData);
+      LoadTableResponse.Builder builder = LoadTableResponse.builder().withTableMetadata(metaData);
+      DataSharing dataSharing = HMSCatalogFactory.getDataSharing();
+      if (dataSharing instanceof AzureCredentialProvider) {
+        builder
+            .addConfig(ADLS_REFRESH_CREDENTIALS_ENDPOINT, buildLoadCredentialsPath(ident))
+            .addConfig(ADLS_REFRESH_CREDENTIALS_ENABLED, "true");
+      }
+      return builder;
     });
+  }
+
+  static String buildLoadCredentialsPath(TableIdentifier ident) {
+    return String.format(
+        LOAD_CREDENTIALS_PATH_TEMPLATE,
+        RESTUtil.encodeNamespace(ident.namespace()),
+        RESTUtil.encodeString(ident.name()));
   }
 
   /**
@@ -779,7 +797,7 @@ public class HMSCatalogAdapter implements RESTClient {
       if (accessLevel == AccessLevel.NONE) {
         throw new NoSuchTableException("Table is not accessible %s", ident.toString());
       }
-      LoadTableResponse.Builder builder = dataSharingBuilder((BaseTable) table);
+      LoadTableResponse.Builder builder = dataSharingBuilder((BaseTable) table, ident);
       if (builder != null) {
         return builder.build();
       }
