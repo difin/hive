@@ -18,18 +18,26 @@
 
 package org.apache.hadoop.hive.ql.stats;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.ql.exec.ColumnInfo;
+import org.apache.hadoop.hive.ql.plan.ColStatistics;
 import org.apache.hadoop.hive.ql.plan.ColStatistics.Range;
 import org.apache.hadoop.hive.serde.serdeConstants;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -103,4 +111,66 @@ public class TestStatsUtils {
     }
   }
 
+  @Test
+  public void testEstimateStatsForMissingColsHandlesEmptyList() {
+    HiveConf conf = new HiveConf();
+
+    ColumnInfo columnInfoA = new ColumnInfo("a", TypeInfoFactory.intTypeInfo, "t", false);
+
+    List<ColStatistics> allColumnStats = StatsUtils.estimateStatsForMissingCols(
+        List.of("a"), Collections.emptyList(), conf, 0, List.of(columnInfoA));
+
+    assertEquals(1, allColumnStats.size());
+  }
+
+  @Test
+  public void testEstimateStatsForMissingColsCombinesExistingStatsAndEstimations() {
+    HiveConf conf = new HiveConf();
+
+    ColumnInfo colNeededButNotExists = new ColumnInfo("neededButNotExists", TypeInfoFactory.intTypeInfo, "t", false);
+    ColumnInfo colNeededAndExists = new ColumnInfo("neededAndExists", TypeInfoFactory.intTypeInfo, "t", false);
+    ColumnInfo colNotNeededButExists = new ColumnInfo("notNeededButExists", TypeInfoFactory.intTypeInfo, "t", false);
+    ColumnInfo colNotNeededNotExists = new ColumnInfo("notNeededNotExists", TypeInfoFactory.intTypeInfo, "t", false);
+
+    ColStatistics colStatNeededAndExists = new ColStatistics();
+    colStatNeededAndExists.setColumnName(colNeededAndExists.getInternalName());
+    ColStatistics colStatNotNeededButExists = new ColStatistics();
+    colStatNotNeededButExists.setColumnName(colNotNeededButExists.getInternalName());
+
+    List<ColStatistics> allColumnStats = StatsUtils.estimateStatsForMissingCols(
+        List.of(colNeededAndExists.getInternalName(), colNeededButNotExists.getInternalName()),
+        List.of(colStatNeededAndExists, colStatNotNeededButExists),
+        conf,
+        0,
+        List.of(colNeededButNotExists, colNeededAndExists, colNotNeededButExists, colNotNeededNotExists));
+
+    assertEquals(3, allColumnStats.size());
+    assertEquals(colStatNeededAndExists, allColumnStats.get(0));
+    assertFalse(allColumnStats.get(0).isEstimated());
+    assertEquals(colStatNotNeededButExists, allColumnStats.get(1));
+    assertFalse(allColumnStats.get(1).isEstimated());
+    assertEquals(colNeededButNotExists.getInternalName(), allColumnStats.get(2).getColumnName());
+    assertTrue(allColumnStats.get(2).isEstimated());
+  }
+
+  @Test
+  public void testEstimateStatsForMissingColsReturnOnlyColumnsWithExistingStatsWhenNoNeededColumn() {
+    HiveConf conf = new HiveConf();
+
+    ColumnInfo colNotNeededButExists = new ColumnInfo("notNeededButExists", TypeInfoFactory.intTypeInfo, "t", false);
+    ColumnInfo colNotNeededNotExists = new ColumnInfo("notNeededNotExists", TypeInfoFactory.intTypeInfo, "t", false);
+
+    ColStatistics colStatNotNeededButExists = new ColStatistics();
+    colStatNotNeededButExists.setColumnName(colNotNeededButExists.getInternalName());
+
+    List<ColStatistics> allColumnStats = StatsUtils.estimateStatsForMissingCols(
+        Collections.emptyList(),
+        List.of(colStatNotNeededButExists),
+        conf,
+        0,
+        List.of(colNotNeededButExists, colNotNeededNotExists));
+
+    assertEquals(1, allColumnStats.size());
+    assertEquals(allColumnStats.get(0), colStatNotNeededButExists);
+  }
 }
