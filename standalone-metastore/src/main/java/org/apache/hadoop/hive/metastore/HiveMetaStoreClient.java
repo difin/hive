@@ -709,11 +709,6 @@ public class HiveMetaStoreClient implements IMetaStoreClient, AutoCloseable {
         binaryTransport = SecurityUtils.getSSLSocket(store.getHost(), store.getPort(), clientSocketTimeout,
             trustStorePath, trustStorePassword, trustStoreType, trustStoreAlgorithm,
             includeProtocols, includeCipherSuites);
-        LOG.info("Opened an SSL connection to metastore, current connections: " + connCount.incrementAndGet());
-        if (LOG.isTraceEnabled()) {
-          LOG.trace("", new LogUtils.StackTraceLogger("METASTORE SSL CONNECTION TRACE - open - " +
-              System.identityHashCode(this)));
-        }
       } else {
         try {
           binaryTransport = new TSocket(new TConfiguration(), store.getHost(), store.getPort(), clientSocketTimeout);
