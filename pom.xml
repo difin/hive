@@ -200,7 +200,7 @@
     <datasketches.version>2.0.0</datasketches.version>
     <validation-api.version>1.1.0.Final</validation-api.version>
     <aws-secretsmanager-caching.version>1.0.1</aws-secretsmanager-caching.version>
-    <aws-java-sdk.version>1.12.791</aws-java-sdk.version>
+    <aws-java-sdk.version>1.12.797</aws-java-sdk.version>
     <iceberg.version>1.10.1.7.3.2.20000-SNAPSHOT</iceberg.version>
     <spring.version>5.3.46.cldr-b1</spring.version>
     <spring.ldap.version>2.4.4</spring.ldap.version>
