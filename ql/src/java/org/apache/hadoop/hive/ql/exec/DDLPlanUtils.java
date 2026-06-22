@@ -22,6 +22,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.common.StatsSetupConst;
 import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.Warehouse;
@@ -510,13 +511,14 @@ public class DDLPlanUtils {
    * Parses the ColumnStatistics for all the columns in a given table and adds the alter table update
    * statistics command for each column.
    *
+   * @param conf
    * @param tbl
    */
-  public List<String> getAlterTableStmtTableStatsColsAll(Table tbl)
+  public List<String> getAlterTableStmtTableStatsColsAll(HiveConf conf, Table tbl)
     throws HiveException {
     List<String> alterTblStmt = new ArrayList<>();
     List<String> accessedColumns = getTableColumnNames(tbl);
-    List<ColumnStatisticsObj> tableColumnStatistics = Hive.get().getTableColumnStatistics(
+    List<ColumnStatisticsObj> tableColumnStatistics = Hive.get(conf).getTableColumnStatistics(
         tbl, accessedColumns, true);
     
     ColumnStatisticsObj[] columnStatisticsObj = tableColumnStatistics.toArray(new ColumnStatisticsObj[0]);
@@ -640,21 +642,24 @@ public class DDLPlanUtils {
     return command.render();
   }
 
-  public List<String> getDDLPlanForPartitionWithStats(Table table, Map<String, List<Partition>> tableToPartitionList)
-    throws MetaException, HiveException {
-    List<String> alterTableStmt = new ArrayList<String>();
+  public List<String> getDDLPlanForPartitionWithStats(HiveConf conf, Table table,
+                                                      Map<String, List<Partition>> tableToPartitionList
+  ) throws HiveException {
+    List<String> alterTableStmt = new ArrayList<>();
     String tableName = table.getTableName();
     for (Partition pt : tableToPartitionList.get(tableName)) {
       alterTableStmt.add(getAlterTableAddPartition(pt));
       alterTableStmt.add(getAlterTableStmtPartitionStatsBasic(pt));
     }
     String databaseName = table.getDbName();
-    List<String> partNames = new ArrayList<String>();
+    List<String> partNames = new ArrayList<>();
     //TODO : Check if only Accessed Column Statistics Can be Retrieved From the HMS.
     List<String> columnNames = getTableColumnNames(table);
     tableToPartitionList.get(tableName).stream().forEach(p -> partNames.add(p.getName()));
     Map<String, List<ColumnStatisticsObj>> partitionColStats =
-      Hive.get().getPartitionColumnStatistics(databaseName, tableName, partNames, columnNames, true);
+        Hive.get(conf).getPartitionColumnStatistics(databaseName,
+            tableName, partNames, columnNames,
+            true);
     Map<String, String> partitionToActualName = new HashMap<>();
     tableToPartitionList.get(tableName).stream().forEach(p -> partitionToActualName.put(p.getName(),
       getPartitionActualName(p)));
