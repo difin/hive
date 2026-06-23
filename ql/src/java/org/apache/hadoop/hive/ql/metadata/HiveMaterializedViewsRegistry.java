@@ -174,6 +174,9 @@ public final class HiveMaterializedViewsRegistry {
 
     @Override
     public void run() {
+      SessionState ss = new SessionState(db.getConf());
+      ss.setIsHiveServerQuery(true); // All is served from HS2, we do not need e.g. Tez sessions
+      SessionState.start(ss);
       refresh(db);
     }
   }
