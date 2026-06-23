@@ -24,11 +24,11 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.SecurityFriend;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
 import org.apache.iceberg.exceptions.NotAuthorizedException;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public abstract class DataSharing {
 
   private final String delegationTokenPath;
   private final URI[] idBrokerUris;
-  private final SslContextFactory sslFactory;
+  private final SSLContext clientSslContext;
   private volatile IdBrokerDelegationToken delegationToken = null;
   protected final AtomicInteger lastKnownGood = new AtomicInteger(0);
 
@@ -121,8 +121,8 @@ public abstract class DataSharing {
           + CONFVAR_IDBROKER_URL + "' with value: " + urls);
     }
 
-    this.sslFactory = "https".equalsIgnoreCase(idBrokerUris[0].getScheme())
-        ? SecurityFriend.createSslContextFactory(conf) : null;
+    this.clientSslContext = "https".equalsIgnoreCase(idBrokerUris[0].getScheme())
+        ? SecurityFriend.createClientSslContext(conf) : null;
     LOG.info("DataSharing agent initialized with IdBroker endpoints: {}", Arrays.toString(idBrokerUris));
   }
 
@@ -324,9 +324,9 @@ public abstract class DataSharing {
 
   public Object clientCall(String jwt, URL url, String method, boolean json, Object arg) throws IOException {
     HttpURLConnection con;
-    if (sslFactory != null) {
+    if (clientSslContext != null) {
       HttpsURLConnection sslcon = (HttpsURLConnection) url.openConnection();
-      sslcon.setSSLSocketFactory(sslFactory.getSslContext().getSocketFactory());
+      sslcon.setSSLSocketFactory(clientSslContext.getSocketFactory());
       con = sslcon;
     } else {
       con = (HttpURLConnection) url.openConnection();

@@ -35,12 +35,17 @@ import org.pac4j.core.credentials.extractor.BearerAuthExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
@@ -398,5 +403,94 @@ public class ServletSecurity {
       factory.setIncludeCipherSuites(includeCipherSuites);
     }
     return factory;
+  }
+
+  /**
+   * Creates a client-side SSLContext for outbound HTTPS calls made by the metastore
+   * (e.g. the Iceberg REST catalog data-sharing calls to Knox IdBroker).
+   * @param conf the configuration
+   * @return null if SSL is disabled in config, an initialized {@link SSLContext} otherwise
+   * @throws IOException if reading the truststore/keystore or password fails
+   */
+  static SSLContext createClientSslContext(Configuration conf) throws IOException {
+    final boolean useSsl = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.USE_SSL);
+    if (!useSsl) {
+      return null;
+    }
+    final String trustStorePath =
+        MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_TRUSTSTORE_PATH).trim();
+    if (trustStorePath.isEmpty()) {
+      throw new IllegalArgumentException(MetastoreConf.ConfVars.SSL_TRUSTSTORE_PATH
+          + " Not configured for SSL client connection");
+    }
+    final String trustStorePassword =
+        MetastoreConf.getPassword(conf, MetastoreConf.ConfVars.SSL_TRUSTSTORE_PASSWORD);
+    String trustStoreType =
+        MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_TRUSTSTORE_TYPE).trim();
+    String trustStoreAlgorithm =
+        MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_TRUSTMANAGERFACTORY_ALGORITHM).trim();
+    if (trustStoreType.isEmpty()) {
+      trustStoreType = KeyStore.getDefaultType();
+    }
+    if (trustStoreAlgorithm.isEmpty()) {
+      trustStoreAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+    }
+    try {
+      KeyStore trustStore = KeyStore.getInstance(trustStoreType);
+      try (FileInputStream fis = new FileInputStream(trustStorePath)) {
+        trustStore.load(fis, trustStorePassword == null ? null : trustStorePassword.toCharArray());
+      }
+      TrustManagerFactory tmf = TrustManagerFactory.getInstance(trustStoreAlgorithm);
+      tmf.init(trustStore);
+
+      // Optional client identity for mutual TLS (mTLS): only when a keystore is configured.
+      KeyManager[] keyManagers = createClientKeyManagers(conf);
+
+      SSLContext sslContext = SSLContext.getInstance("TLS");
+      sslContext.init(keyManagers, tmf.getTrustManagers(), null);
+      return sslContext;
+    } catch (GeneralSecurityException e) {
+      throw new IOException("Failed to build client SSLContext for outbound HTTPS", e);
+    }
+  }
+
+  /**
+   * Builds the client-side {@link KeyManager}s (local identity) for mutual TLS from the configured
+   * keystore. Returns {@code null} when no keystore is configured, in which case the client performs
+   * one-way TLS .
+   *
+   * @param conf the configuration
+   * @return the key managers for mTLS, or null if no keystore is configured
+   * @throws IOException if reading the keystore or password fails
+   * @throws GeneralSecurityException if the key material cannot be initialized
+   */
+  private static KeyManager[] createClientKeyManagers(Configuration conf)
+      throws IOException, GeneralSecurityException {
+    final String keyStorePath =
+        MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_KEYSTORE_PATH).trim();
+    if (keyStorePath.isEmpty()) {
+      // No client identity configured: one-way TLS.
+      return null;
+    }
+    final String keyStorePassword =
+        MetastoreConf.getPassword(conf, MetastoreConf.ConfVars.SSL_KEYSTORE_PASSWORD);
+    String keyStoreType =
+        MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_KEYSTORE_TYPE).trim();
+    String keyStoreAlgorithm =
+        MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_KEYMANAGERFACTORY_ALGORITHM).trim();
+    if (keyStoreType.isEmpty()) {
+      keyStoreType = KeyStore.getDefaultType();
+    }
+    if (keyStoreAlgorithm.isEmpty()) {
+      keyStoreAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+    }
+    char[] password = keyStorePassword == null ? null : keyStorePassword.toCharArray();
+    KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+    try (FileInputStream fis = new FileInputStream(keyStorePath)) {
+      keyStore.load(fis, password);
+    }
+    KeyManagerFactory kmf = KeyManagerFactory.getInstance(keyStoreAlgorithm);
+    kmf.init(keyStore, password);
+    return kmf.getKeyManagers();
   }
 }

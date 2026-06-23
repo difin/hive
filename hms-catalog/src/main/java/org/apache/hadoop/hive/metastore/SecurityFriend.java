@@ -18,12 +18,13 @@
 package org.apache.hadoop.hive.metastore;
 
 import org.apache.hadoop.conf.Configuration;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 
 public class SecurityFriend {
-  public static SslContextFactory createSslContextFactory(Configuration conf) throws IOException {
-    return ServletSecurity.createSslContextFactory(conf);
+  /** Client-side, truststore-based SSL context for outbound metastore HTTPS calls (e.g. IdBroker). */
+  public static SSLContext createClientSslContext(Configuration conf) throws IOException {
+    return ServletSecurity.createClientSslContext(conf);
   }
 }
