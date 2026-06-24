@@ -73,6 +73,7 @@ import static org.apache.hadoop.hive.metastore.MetastoreDirectSqlUtils.extractSq
 import static org.apache.hadoop.hive.metastore.MetastoreDirectSqlUtils.extractSqlInt;
 import static org.apache.hadoop.hive.metastore.MetastoreDirectSqlUtils.extractSqlLong;
 import static org.apache.hadoop.hive.metastore.MetastoreDirectSqlUtils.getModelIdentity;
+import static org.apache.hadoop.hive.metastore.MetastoreDirectSqlUtils.makeParams;
 
 /**
  * This class contains the optimizations for MetaStore that rely on direct SQL access to
@@ -145,10 +146,6 @@ class DirectSqlUpdatePart {
     catch(SQLException ex) {
       LOG.warn("Failed to close statement ", ex);
     }
-  }
-
-  static String quoteString(String input) {
-    return "'" + input + "'";
   }
 
   void close(ResultSet rs, Statement stmt, JDOConnection dbConn) {
@@ -486,39 +483,39 @@ class DirectSqlUpdatePart {
 
   private Map<PartitionInfo, ColumnStatistics> getPartitionInfo(Connection dbConn, long tblId,
                                                                  Map<String, ColumnStatistics> partColStatsMap)
-          throws SQLException, MetaException {
-    List<String> queries = new ArrayList<>();
-    StringBuilder prefix = new StringBuilder();
-    StringBuilder suffix = new StringBuilder();
-    Statement statement = null;
-    ResultSet rs = null;
+          throws MetaException {
     Map<PartitionInfo, ColumnStatistics> partitionInfoMap = new HashMap<>();
-
-    List<String> partKeys = partColStatsMap.keySet().stream().map(
-            e -> quoteString(e)).collect(Collectors.toList()
-    );
-
-    prefix.append("select \"PART_ID\", \"WRITE_ID\", \"PART_NAME\"  from \"PARTITIONS\" where ");
-    suffix.append(" and  \"TBL_ID\" = " + tblId);
-    TxnUtils.buildQueryWithINClauseStrings(conf, queries, prefix, suffix,
-            partKeys, "\"PART_NAME\"", true, false);
-
-    for (String query : queries) {
-      // Select for update makes sure that the partitions are not modified while the stats are getting updated.
-      query = sqlGenerator.addForUpdateClause(query);
-      try {
-        statement = dbConn.createStatement();
-        LOG.debug("Going to execute query <" + query + ">");
-        rs = statement.executeQuery(query);
-        while (rs.next()) {
-          PartitionInfo partitionInfo = new PartitionInfo(rs.getLong(1),
-                  rs.getLong(2), rs.getString(3));
-          partitionInfoMap.put(partitionInfo, partColStatsMap.get(rs.getString(3)));
-        }
-      } finally {
-        close(rs, statement, null);
-      }
+    List<String> partNames = new ArrayList<>(partColStatsMap.keySet());
+    if (partNames.isEmpty()) {
+      return partitionInfoMap;
     }
+
+    Batchable.runBatched(maxBatchSize, partNames, new Batchable<String, Void>() {
+      @Override
+      public List<Void> run(List<String> input) throws Exception {
+        String placeholders = makeParams(input.size());
+        String query = "select \"PART_ID\", \"WRITE_ID\", \"PART_NAME\" from \"PARTITIONS\" where "
+            + "\"PART_NAME\" in (" + placeholders + ") and \"TBL_ID\" = ?";
+        // Select for update makes sure that the partitions are not modified while the stats are getting updated.
+        query = sqlGenerator.addForUpdateClause(query);
+        LOG.debug("Execute query: " + query);
+        try (PreparedStatement ps = dbConn.prepareStatement(query)) {
+          int paramIndex = 1;
+          for (String partName : input) {
+            ps.setString(paramIndex++, partName);
+          }
+          ps.setLong(paramIndex, tblId);
+          try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+              String partName = rs.getString(3);
+              PartitionInfo partitionInfo = new PartitionInfo(rs.getLong(1), rs.getLong(2), partName);
+              partitionInfoMap.put(partitionInfo, partColStatsMap.get(partName));
+            }
+          }
+        }
+        return Collections.emptyList();
+      }
+    });
     return partitionInfoMap;
   }
 
@@ -550,6 +547,10 @@ class DirectSqlUpdatePart {
         setAnsiQuotes(dbConn);
 
         Map<PartitionInfo, ColumnStatistics> partitionInfoMap = getPartitionInfo(dbConn, tbl.getId(), partColStatsMap);
+
+        if (partitionInfoMap.isEmpty()) {
+          return Collections.emptyMap();
+        }
 
         result = updatePartitionParamTable(dbConn, partitionInfoMap, validWriteIds,
             writeId, TxnUtils.isAcidTable(tbl));
