@@ -24,12 +24,12 @@ else
 fi
 CDWH_YEAR="${CDWH_PREFIX%%\.*}"
 
-BUILD_INFO_URL="https://release.eng.cloudera.com/hwre-api/latestcompiledbuild?stack=CDH&release=${CDH_PREFIX}&os{PLATFORM}"
+BUILD_INFO_URL="https://release.eng.cloudera.com/hwre-api/latestcompiledbuild?stack=CDH&release=${CDH_PREFIX}&os=${PLATFORM}"
 
 if [ -z $CDH_VERSION ]; then
     CDH_VERSION=$(curl -s $BUILD_INFO_URL | jq '.build' | tr -d '"')
 else #CDH_VERSION can be forced from ENV, in this case version specific latestcompiledbuild can be called
-    BUILD_INFO_URL="https://release.eng.cloudera.com/hwre-api/latestcompiledbuild?stack=CDH&release=${CDH_VERSION}&os{PLATFORM}"
+    BUILD_INFO_URL="https://release.eng.cloudera.com/hwre-api/latestcompiledbuild?stack=CDH&release=${CDH_VERSION}&os=${PLATFORM}"
 fi
 
 echo "CDH_VERSION=${CDH_VERSION}"
@@ -51,11 +51,11 @@ CDWH_GBN=$(curl -s $CDWH_REPO_DETAILS_URL | jq '.["'${CDWH_VERSION}'"]'.gbn | tr
 CDWH_TARS_URL=https://cloudera-build-us-west-1.vpc.cloudera.com/s3/build/${CDWH_GBN}/cdwh/${CDWH_YEAR}.x/$PLATFORM/yum/tars/
 echo "CDWH_TARS_URL=${CDWH_TARS_URL}"
 
-TEZ_VERSION=$(get_component_version "tez" $CDWH_VERSION, "CDWH")
-HADOOP_VERSION=$(get_component_version "hadoop" $CDH_VERSION, "CDH")
-SOLR_VERSION=$(get_component_version "solr" $CDH_VERSION, "CDH")
-RANGER_VERSION=$(get_component_version "ranger" $CDH_VERSION, "CDH")
-ATLAS_VERSION=$(get_component_version "atlas" $CDH_VERSION, "CDH")
+TEZ_VERSION=$(get_component_version "tez" $CDWH_VERSION "CDWH")
+HADOOP_VERSION=$(get_component_version "hadoop" $CDH_VERSION "CDH")
+SOLR_VERSION=$(get_component_version "solr" $CDH_VERSION "CDH")
+RANGER_VERSION=$(get_component_version "ranger" $CDH_VERSION "CDH")
+ATLAS_VERSION=$(get_component_version "atlas" $CDH_VERSION "CDH")
 
 HADOOP_TAR_FILE=hadoop-$HADOOP_VERSION.tar.gz
 HADOOP_TAR_URL="$CDH_TARS_URL/hadoop/$HADOOP_TAR_FILE"
