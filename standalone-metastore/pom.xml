@@ -65,7 +65,7 @@
     <!-- Dependency versions -->
     <aircompressor.version>2.0.3</aircompressor.version>
     <antlr.version>4.9.3</antlr.version>
-    <avro.version>1.11.3.7.3.2.20000-SNAPSHOT</avro.version>
+    <avro.version>1.12.0.7.3.2.20000-SNAPSHOT</avro.version>
     <bonecp.version>0.8.0.RELEASE</bonecp.version>
     <apache-directory-server.version>2.0.0-M24</apache-directory-server.version>
     <caffeine.version>2.8.4</caffeine.version>
