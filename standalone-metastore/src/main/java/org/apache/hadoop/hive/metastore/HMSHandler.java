@@ -5819,8 +5819,7 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
       fireReadTablePreEvent(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tableName);
       Table table = get_table_core(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tableName);
       // get_partitions will parse out the catalog and db names itself
-      List<Partition> partitions = get_partitions(db_name, tableName,
-          new GetPartitionsArgs.GetPartitionsArgsBuilder().max(max_parts).build());
+      List<Partition> partitions = get_partitions(db_name, tableName, (short) max_parts);
 
       if (is_partition_spec_grouping_enabled(table)) {
         partitionSpecs = MetaStoreUtils
