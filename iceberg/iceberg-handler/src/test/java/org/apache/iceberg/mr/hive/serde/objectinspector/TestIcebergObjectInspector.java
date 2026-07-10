@@ -23,6 +23,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.UnknownObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
@@ -33,6 +34,7 @@ import org.apache.iceberg.types.Types;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.iceberg.types.Types.NestedField.optional;
 import static org.apache.iceberg.types.Types.NestedField.required;
 
 
@@ -61,7 +63,8 @@ public class TestIcebergObjectInspector {
                   Types.NestedField.required(20, "nested_field", Types.StringType.get(), "nested field comment")),
                   "struct comment"
           ),
-          required(21, "time_field", Types.TimeType.get(), "time comment")
+          required(21, "time_field", Types.TimeType.get(), "time comment"),
+          optional(22, "unknown_field", Types.UnknownType.get(), "unknown comment")
   );
 
   @Test
@@ -201,6 +204,13 @@ public class TestIcebergObjectInspector {
     Assert.assertEquals("time_field", timeField.getFieldName());
     Assert.assertEquals("time comment", timeField.getFieldComment());
     Assert.assertEquals(IcebergTimeObjectInspector.get(), timeField.getFieldObjectInspector());
+
+    // unknown
+    StructField unknownField = soi.getStructFieldRef("unknown_field");
+    Assert.assertEquals(22, unknownField.getFieldID());
+    Assert.assertEquals("unknown_field", unknownField.getFieldName());
+    Assert.assertEquals("unknown comment", unknownField.getFieldComment());
+    Assert.assertEquals(UnknownObjectInspector.get(), unknownField.getFieldObjectInspector());
   }
 
   private static ObjectInspector getPrimitiveObjectInspector(Class<?> clazz) {

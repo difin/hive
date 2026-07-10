@@ -397,6 +397,7 @@ public final class TypeInfoUtils {
             && !serdeConstants.STRUCT_TYPE_NAME.equals(t.text)
             && !serdeConstants.UNION_TYPE_NAME.equals(t.text)
             && !serdeConstants.VARIANT_TYPE_NAME.equals(t.text)
+            && !serdeConstants.UNKNOWN_TYPE_NAME.equals(t.text)
             && null == PrimitiveObjectInspectorUtils
             .getTypeEntryFromTypeName(t.text)
             && !t.text.equals(alternative)) {
@@ -576,6 +577,11 @@ public final class TypeInfoUtils {
         return TypeInfoFactory.getVariantTypeInfo();
       }
 
+      // Is this an unknown type?
+      if (serdeConstants.UNKNOWN_TYPE_NAME.equals(t.text)) {
+        return TypeInfoFactory.getUnknownTypeInfo();
+      }
+
       throw new RuntimeException("Internal error parsing position "
           + t.position + " of '" + typeInfoString + "'");
     }
@@ -680,6 +686,14 @@ public final class TypeInfoUtils {
             fieldObjectInspectors);
         break;
       }
+      case VARIANT: {
+        result = ObjectInspectorFactory.getVariantObjectInspector();
+        break;
+      }
+      case UNKNOWN: {
+        result = ObjectInspectorFactory.getUnknownObjectInspector();
+        break;
+      }
 
       default: {
         result = null;
@@ -762,6 +776,14 @@ public final class TypeInfoUtils {
             fieldObjectInspectors);
         break;
       }
+      case VARIANT: {
+        result = ObjectInspectorFactory.getVariantObjectInspector();
+        break;
+      }
+      case UNKNOWN: {
+        result = ObjectInspectorFactory.getUnknownObjectInspector();
+        break;
+      }
      default: {
         result = null;
       }
@@ -832,6 +854,14 @@ public final class TypeInfoUtils {
         objectTypeInfos.add(getTypeInfoFromObjectInspector(eoi));
       }
       result = TypeInfoFactory.getUnionTypeInfo(objectTypeInfos);
+      break;
+    }
+    case VARIANT: {
+      result = TypeInfoFactory.getVariantTypeInfo();
+      break;
+    }
+    case UNKNOWN: {
+      result = TypeInfoFactory.getUnknownTypeInfo();
       break;
     }
     default: {
@@ -984,11 +1014,25 @@ public final class TypeInfoUtils {
   }
 
   /**
+   * Returns whether a NULL literal (void) can be assigned to the target type.
+   * Iceberg unknown columns only accept NULL values.
+   */
+  public static boolean isVoidCompatibleTarget(TypeInfo from, TypeInfo to) {
+    return from.getCategory() == Category.PRIMITIVE
+        && ((PrimitiveTypeInfo) from).getPrimitiveCategory() == PrimitiveCategory.VOID
+        && to.getCategory() == Category.UNKNOWN;
+  }
+
+  /**
    * Returns whether it is possible to implicitly convert an object of Class
    * from to Class to.
    */
   public static boolean implicitConvertible(TypeInfo from, TypeInfo to) {
     if (from.equals(to)) {
+      return true;
+    }
+
+    if (isVoidCompatibleTarget(from, to)) {
       return true;
     }
 

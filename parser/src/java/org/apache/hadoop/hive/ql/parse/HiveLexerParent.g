@@ -20,6 +20,7 @@ lexer grammar HiveLexerParent;
 
 KW_TRUE : 'TRUE';
 KW_FALSE : 'FALSE';
+KW_UNKNOWN : 'UNKNOWN';
 KW_ALL : 'ALL';
 KW_SOME : 'SOME';
 KW_NONE: 'NONE';

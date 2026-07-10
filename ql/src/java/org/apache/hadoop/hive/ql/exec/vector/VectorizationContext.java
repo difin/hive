@@ -4441,6 +4441,8 @@ public class VectorizationContext {
           throw new HiveException("Unexpected primitive type category " + primitiveCategory);
         }
       }
+      case UNKNOWN:
+        return ColumnVector.Type.VOID;
       default:
         throw new HiveException("Unexpected type category " +
             typeInfo.getCategory());

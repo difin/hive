@@ -152,6 +152,7 @@ TOK_STRUCT;
 TOK_MAP;
 TOK_UNIONTYPE;
 TOK_VARIANT;
+TOK_UNKNOWN;
 TOK_COLTYPELIST;
 TOK_CREATEDATABASE;
 TOK_CREATEDATACONNECTOR;
@@ -546,6 +547,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
     // Keywords
     xlateMap.put("KW_TRUE", "TRUE");
     xlateMap.put("KW_FALSE", "FALSE");
+    xlateMap.put("KW_UNKNOWN", "UNKNOWN");
     xlateMap.put("KW_ALL", "ALL");
     xlateMap.put("KW_NONE", "NONE");
     xlateMap.put("KW_AND", "AND");
@@ -2465,7 +2467,8 @@ type
     | structType
     | mapType
     | unionType
-    | variantType;
+    | variantType
+    | unknownType;
 
 primitiveType
 @init { pushMsg("primitive type specification", state); }
@@ -2528,6 +2531,12 @@ variantType
 @init { pushMsg("variant type", state); }
 @after { popMsg(state); }
     : KW_VARIANT -> TOK_VARIANT
+    ;
+
+unknownType
+@init { pushMsg("unknown type", state); }
+@after { popMsg(state); }
+    : KW_UNKNOWN -> TOK_UNKNOWN
     ;
 
 setOperator
