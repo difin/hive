@@ -17,6 +17,9 @@
  */
 package org.apache.hadoop.hive.ql.security.authorization.plugin;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * Abstract class that extends HiveAuthorizer. This will help to shield
  * Hive authorization implementations from some of the changes to HiveAuthorizer
@@ -47,6 +50,12 @@ public abstract class AbstractHiveAuthorizer implements HiveAuthorizer {
   @Override
   public HivePolicyProvider getHivePolicyProvider() throws HiveAuthzPluginException {
     return null;
+  }
+
+  @Override
+  public Set<HiveResourceACLs.Privilege> getAllowedPrivileges(HivePrivilegeObject hiveObject,
+      HivePrincipal principal, Set<HiveResourceACLs.Privilege> privileges, HiveAuthzContext ctx) {
+    return Collections.emptySet();
   }
 
 }

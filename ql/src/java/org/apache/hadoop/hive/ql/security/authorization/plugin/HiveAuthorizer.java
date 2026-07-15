@@ -17,7 +17,9 @@
  */
 package org.apache.hadoop.hive.ql.security.authorization.plugin;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.hadoop.hive.common.classification.InterfaceAudience.LimitedPrivate;
 import org.apache.hadoop.hive.common.classification.InterfaceStability.Evolving;
@@ -280,4 +282,18 @@ public interface HiveAuthorizer {
    * @throws HiveAuthzPluginException
    */
   HivePolicyProvider getHivePolicyProvider() throws HiveAuthzPluginException;
+
+  /**
+   * Returns the set of allowed privileges for the given principal on the given object.
+   * Authorization plugins (e.g. Ranger) can override this to provide the actual privileges.
+   * The default implementation returns an empty set.
+   *
+   * @param hiveObject the object to check privileges on
+   * @param principal the principal to check privileges for
+   * @param privileges the privileges to check
+   * @param ctx the hive authz context
+   * @return set of allowed privileges
+   */
+  Set<HiveResourceACLs.Privilege> getAllowedPrivileges(HivePrivilegeObject hiveObject,
+      HivePrincipal principal, Set<HiveResourceACLs.Privilege> privileges, HiveAuthzContext ctx);
 }
