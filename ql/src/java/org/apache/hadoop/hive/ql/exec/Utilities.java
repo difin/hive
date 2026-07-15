@@ -2599,7 +2599,7 @@ public final class Utilities {
         String[] comps = keyString.split(TableDesc.SECRET_DELIMIT);
         String tblName = comps[1];
         String keyName = comps[2];
-        if (tbl.getTableName().equalsIgnoreCase(tblName)) {
+        if (tblName.equalsIgnoreCase(tbl.getTableName())) {
           tbl.getProperties().put(keyName, new String(credentials.getSecretKey(key)));
         }
       }
@@ -3987,8 +3987,10 @@ public final class Utilities {
 
       if (op instanceof FileSinkOperator) {
         FileSinkDesc fdesc = ((FileSinkOperator) op).getConf();
-        if (fdesc.isMmTable() || fdesc.isDirectInsert()) {
-          // No need to create for MM tables, or ACID insert
+        if (fdesc.isMmTable() || fdesc.isDirectInsert() ||
+            (fdesc.getTableInfo() != null && fdesc.getTableInfo().isNonNative())) {
+          // No need to create for MM tables or ACID insert; storage-handler tables manage
+          // their own output locations and commit
           continue;
         }
         Path tempDir = fdesc.getDirName();

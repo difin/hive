@@ -5600,6 +5600,11 @@ public class HiveConf extends Configuration {
         METASTOREPWD.varname + "," + HIVE_SERVER2_SSL_KEYSTORE_PASSWORD.varname
         + "," + DRUID_METADATA_DB_PASSWORD.varname
         + ",hive.driver.parallel.compilation.global.limit"
+        + ",iceberg.vended.storage.credentials"
+        // Iceberg FileIO vended credential keys (S3FileIOProperties)
+        + ",s3.access-key-id"
+        + ",s3.secret-access-key"
+        + ",s3.session-token"
         + ",hive.zookeeper.ssl.keystore.location"
         + ",hive.zookeeper.ssl.keystore.password"
         + ",hive.zookeeper.ssl.truststore.location"

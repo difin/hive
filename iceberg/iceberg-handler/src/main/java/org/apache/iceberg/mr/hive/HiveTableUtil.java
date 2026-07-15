@@ -51,11 +51,13 @@ import org.apache.hadoop.hive.metastore.utils.FileUtils;
 import org.apache.hadoop.hive.ql.io.IOConstants;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.iceberg.AppendFiles;
+import org.apache.iceberg.BaseTable;
 import org.apache.iceberg.DataFile;
 import org.apache.iceberg.DeleteFiles;
 import org.apache.iceberg.MetricsConfig;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.SerializableTable;
+import org.apache.iceberg.StaticTableOperations;
 import org.apache.iceberg.StructLike;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.TableProperties;
@@ -260,6 +262,16 @@ public class HiveTableUtil {
       table = readTableObjectFromFile(location, config);
     }
     checkAndSetIoConfig(config, table);
+    IcebergVendedCredentialUtil.applyFromJobConf(table, config);
+
+    // For intra-txn read-after-write: if a metadata file was written for uncommitted in-txn state,
+    // reconstruct a BaseTable from it so the Tez side sees changes from prior statements.
+    String metadataLocation = config.get(InputFormatConfig.TABLE_METADATA_LOCATION);
+    if (metadataLocation != null && table != null) {
+      StaticTableOperations ops = new StaticTableOperations(metadataLocation, table.io(), table.locationProvider());
+      table = new BaseTable(ops, table.name());
+    }
+
     return table;
   }
 
@@ -335,8 +347,10 @@ public class HiveTableUtil {
     try {
       FileSystem fs = Util.getFs(toDelete, configuration);
       fs.delete(toDelete, true);
-    } catch (IOException ex) {
-      throw new UncheckedIOException(ex);
+    } catch (IOException e) {
+      // best effort: never fail the commit over the temp table-object file; with catalog-vended
+      // credentials the Hadoop filesystem has no keys and the query-scoped file is left behind
+      LOG.warn("Could not remove temp table object file: {}", filePath, e);
     }
   }
 

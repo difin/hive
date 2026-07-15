@@ -48,6 +48,7 @@ public class InputFormatConfig {
   public static final String SCHEMA_AUTO_CONVERSION = "iceberg.mr.schema.auto.conversion";
   public static final String TABLE_IDENTIFIER = "iceberg.mr.table.identifier";
   public static final String TABLE_LOCATION = "iceberg.mr.table.location";
+  public static final String TABLE_METADATA_LOCATION = "iceberg.mr.table.metadata.location";
   public static final String TABLE_SCHEMA = "iceberg.mr.table.schema";
   public static final String PARTITION_SPEC = "iceberg.mr.table.partition.spec";
   public static final String SERIALIZED_TABLE_PREFIX = "iceberg.mr.serialized.table.";
@@ -77,6 +78,18 @@ public class InputFormatConfig {
   public static final String HIVE_CATALOG = "hive.catalog";
 
   public static final String CATALOG_CONFIG_PREFIX = "iceberg.catalog.";
+
+  /**
+   * Base64-serialized list of {@link org.apache.iceberg.io.StorageCredential} for Tez/LLAP executors.
+   * Stored in {@code TableDesc#jobSecrets} (HIVE-20651), not in job properties. REST catalogs mint
+   * credentials per table, so entries are keyed via {@link #vendedCredentialsKey(String)}; this
+   * constant is the key prefix (and the {@code hive.conf.hidden.list} entry, matched by prefix).
+   */
+  public static final String VENDED_STORAGE_CREDENTIALS = "iceberg.vended.storage.credentials";
+
+  public static String vendedCredentialsKey(String tableName) {
+    return VENDED_STORAGE_CREDENTIALS + "." + tableName;
+  }
 
   public static final String SORT_ORDER = "sort.order";
   public static final String SORT_COLUMNS = "sort.columns";

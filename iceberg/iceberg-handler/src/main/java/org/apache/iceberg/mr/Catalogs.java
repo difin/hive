@@ -229,14 +229,25 @@ public final class Catalogs {
   }
 
   static Optional<Catalog> loadCatalog(Configuration conf, String catalogName) {
-    String catalogType = CatalogUtils.getCatalogType(conf, catalogName);
+    String resolvedName = catalogName != null ? catalogName : configuredDefaultCatalogName(conf);
+    String catalogType = CatalogUtils.getCatalogType(conf, resolvedName);
     if (NO_CATALOG_TYPE.equalsIgnoreCase(catalogType)) {
       return Optional.empty();
     } else {
-      String name = catalogName == null ? ICEBERG_DEFAULT_CATALOG_NAME : catalogName;
+      String name = resolvedName == null ? ICEBERG_DEFAULT_CATALOG_NAME : resolvedName;
       return Optional.of(CatalogUtil.buildIcebergCatalog(name,
           CatalogUtils.getCatalogProperties(conf, name), conf));
     }
+  }
+
+  /**
+   * Tables created without an explicit catalog in their properties belong to the session default
+   * catalog when the configuration defines one (e.g. a REST catalog); returns {@code null}
+   * otherwise, preserving the legacy default-catalog behavior.
+   */
+  private static String configuredDefaultCatalogName(Configuration conf) {
+    String defaultCatalogName = CatalogUtils.getCatalogName(conf);
+    return CatalogUtils.getCatalogType(conf, defaultCatalogName) != null ? defaultCatalogName : null;
   }
 
   /**
