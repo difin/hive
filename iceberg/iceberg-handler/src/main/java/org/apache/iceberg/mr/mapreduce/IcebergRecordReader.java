@@ -54,6 +54,7 @@ import org.apache.iceberg.data.orc.GenericOrcReader;
 import org.apache.iceberg.data.parquet.GenericParquetReaders;
 import org.apache.iceberg.encryption.EncryptedFiles;
 import org.apache.iceberg.expressions.Expression;
+import org.apache.iceberg.hive.HiveSchemaUtil;
 import org.apache.iceberg.hive.HiveVersion;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.CloseableIterator;
@@ -65,6 +66,7 @@ import org.apache.iceberg.orc.ORC;
 import org.apache.iceberg.parquet.Parquet;
 import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
 import org.apache.iceberg.relocated.com.google.common.collect.Iterables;
+import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 import org.apache.iceberg.types.Type;
 import org.apache.iceberg.types.TypeUtil;
 import org.apache.iceberg.types.Types;
@@ -194,7 +196,29 @@ public final class IcebergRecordReader<T> extends AbstractIcebergRecordReader<T>
       default -> throw new UnsupportedOperationException(
           String.format("Cannot read %s file: %s", file.format().name(), file.location()));
     };
-    return applyResidualFiltering(iterable, residual, readSchema);
+    return applyResidualFiltering(withStructInitialDefaultsBackfill(iterable, readSchema), residual, readSchema);
+  }
+
+  private CloseableIterable<T> withStructInitialDefaultsBackfill(CloseableIterable<T> iterable, Schema readSchema) {
+    Map<String, Record> initialDefaultStructsByColumn = Maps.newHashMap();
+    for (Types.NestedField column : readSchema.columns()) {
+      if (column.type().isStructType()) {
+        Record initialDefaultStruct = HiveSchemaUtil
+            .buildStructFromDefaults(column.type().asStructType(), Types.NestedField::initialDefault);
+        if (initialDefaultStruct != null) {
+          initialDefaultStructsByColumn.put(column.name(), initialDefaultStruct);
+        }
+      }
+    }
+    if (initialDefaultStructsByColumn.isEmpty()) {
+      return iterable;
+    }
+    return CloseableIterable.transform(iterable, row -> {
+      if (row instanceof Record curIceRecord) {
+        HiveSchemaUtil.backfillStructInitialDefaults(curIceRecord, initialDefaultStructsByColumn);
+      }
+      return row;
+    });
   }
 
   private CloseableIterable<T> newAvroIterable(
