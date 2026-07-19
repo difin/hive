@@ -18,8 +18,8 @@
 
 package org.apache.hadoop.hive.metastore;
 
-import static org.apache.commons.lang.StringUtils.join;
-import static org.apache.commons.lang.StringUtils.normalizeSpace;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.normalizeSpace;
 import static org.apache.hadoop.hive.metastore.ColumnType.BIGINT_TYPE_NAME;
 import static org.apache.hadoop.hive.metastore.ColumnType.CHAR_TYPE_NAME;
 import static org.apache.hadoop.hive.metastore.ColumnType.DATE_TYPE_NAME;

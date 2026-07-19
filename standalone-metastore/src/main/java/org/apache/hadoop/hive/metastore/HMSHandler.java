@@ -6043,7 +6043,7 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
     // Adds the missing scheme/authority for the new partition location
     if (new_part.getSd() != null) {
       String newLocation = new_part.getSd().getLocation();
-      if (org.apache.commons.lang.StringUtils.isNotEmpty(newLocation)) {
+      if (org.apache.commons.lang3.StringUtils.isNotEmpty(newLocation)) {
         Path tblPath = wh.getDnsPath(new Path(newLocation));
         new_part.getSd().setLocation(tblPath.toString());
       }
@@ -6288,7 +6288,7 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
     // Adds the missing scheme/authority for the new table location
     if (newTable.getSd() != null) {
       String newLocation = newTable.getSd().getLocation();
-      if (org.apache.commons.lang.StringUtils.isNotEmpty(newLocation)) {
+      if (org.apache.commons.lang3.StringUtils.isNotEmpty(newLocation)) {
         Path tblPath = wh.getDnsPath(new Path(newLocation));
         newTable.getSd().setLocation(tblPath.toString());
       }

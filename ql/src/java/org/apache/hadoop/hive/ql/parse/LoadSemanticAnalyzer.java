@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.antlr.runtime.tree.Tree;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -214,7 +214,7 @@ public class LoadSemanticAnalyzer extends SemanticAnalyzer {
       }
     } catch (IOException e) {
       // Has to use full name to make sure it does not conflict with
-      // org.apache.commons.lang.StringUtils
+      // org.apache.commons.lang3.StringUtils
       throw new SemanticException(ASTErrorUtils.getMsg(
           ErrorMsg.INVALID_PATH.getMsg(), fromTree), e);
     }

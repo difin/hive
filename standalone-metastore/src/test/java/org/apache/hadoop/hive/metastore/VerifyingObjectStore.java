@@ -18,7 +18,7 @@
 
 package org.apache.hadoop.hive.metastore;
 
-import static org.apache.commons.lang.StringUtils.repeat;
+import static org.apache.commons.lang3.StringUtils.repeat;
 import static org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdentifier;
 
 import java.lang.reflect.AccessibleObject;

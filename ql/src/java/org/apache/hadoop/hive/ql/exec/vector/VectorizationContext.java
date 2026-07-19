@@ -33,7 +33,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hadoop.hive.common.type.Date;
 import org.apache.hadoop.hive.ql.optimizer.SortedDynPartitionOptimizer;
 import org.apache.hadoop.hive.serde.serdeConstants;

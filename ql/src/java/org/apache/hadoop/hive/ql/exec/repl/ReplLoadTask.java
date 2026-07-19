@@ -31,7 +31,7 @@ import org.apache.hadoop.hive.ql.parse.repl.load.log.IncrementalLoadLogger;
 import org.apache.thrift.TException;
 import com.google.common.collect.Collections2;
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.repl.ReplScope;

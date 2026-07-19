@@ -329,7 +329,7 @@ public class ObjectStore implements RawStore, Configurable {
     }
     HOSTNAME = hostname;
     String user = System.getenv("USER");
-    USER = org.apache.commons.lang.StringUtils.defaultString(user, "UNKNOWN");
+    USER = org.apache.commons.lang3.StringUtils.defaultString(user, "UNKNOWN");
   }
 
   /** Constant declaring a query parameter of type string and name key. */
@@ -431,7 +431,7 @@ public class ObjectStore implements RawStore, Configurable {
       expressionProxy = PartFilterExprUtil.createExpressionProxy(conf);
       if (MetastoreConf.getBoolVar(getConf(), ConfVars.TRY_DIRECT_SQL)) {
         String schema = PersistenceManagerProvider.getProperty("javax.jdo.mapping.Schema");
-        schema = org.apache.commons.lang.StringUtils.defaultIfBlank(schema, null);
+        schema = org.apache.commons.lang3.StringUtils.defaultIfBlank(schema, null);
         directSql = new MetaStoreDirectSql(pm, conf, schema);
         directSqlAggrStats = new DirectSqlAggrStats(pm,conf,schema);
       }
@@ -511,7 +511,7 @@ public class ObjectStore implements RawStore, Configurable {
   private static void configureSSLDeprecated(Configuration conf) {
     // SSL support
     String sslPropString = MetastoreConf.getVar(conf, ConfVars.DBACCESS_SSL_PROPS);
-    if (org.apache.commons.lang.StringUtils.isNotEmpty(sslPropString)) {
+    if (org.apache.commons.lang3.StringUtils.isNotEmpty(sslPropString)) {
       LOG.warn("Configuring SSL using a deprecated key " + ConfVars.DBACCESS_SSL_PROPS.toString() +
               ". This may be removed in the future. See HIVE-20992 for more details.");
       LOG.info("Metastore setting SSL properties of the connection to backend DB");
@@ -697,10 +697,10 @@ public class ObjectStore implements RawStore, Configurable {
     boolean committed = false;
     try {
       MCatalog mCat = getMCatalog(catName);
-      if (org.apache.commons.lang.StringUtils.isNotBlank(cat.getLocationUri())) {
+      if (org.apache.commons.lang3.StringUtils.isNotBlank(cat.getLocationUri())) {
         mCat.setLocationUri(cat.getLocationUri());
       }
-      if (org.apache.commons.lang.StringUtils.isNotBlank(cat.getDescription())) {
+      if (org.apache.commons.lang3.StringUtils.isNotBlank(cat.getDescription())) {
         mCat.setDescription(cat.getDescription());
       }
       openTransaction();
@@ -906,7 +906,7 @@ public class ObjectStore implements RawStore, Configurable {
     db.setDescription(mdb.getDescription());
     db.setParameters(convertMap(mdb.getParameters()));
     db.setOwnerName(mdb.getOwnerName());
-    String type = org.apache.commons.lang.StringUtils.defaultIfBlank(mdb.getOwnerType(), null);
+    String type = org.apache.commons.lang3.StringUtils.defaultIfBlank(mdb.getOwnerType(), null);
     PrincipalType principalType = (type == null) ? null : PrincipalType.valueOf(type);
     db.setOwnerType(principalType);
     if (mdb.getType().equalsIgnoreCase(DatabaseType.NATIVE.name())) {
@@ -942,10 +942,10 @@ public class ObjectStore implements RawStore, Configurable {
       if (db.getOwnerType() != null) {
         mdb.setOwnerType(db.getOwnerType().name());
       }
-      if (org.apache.commons.lang.StringUtils.isNotBlank(db.getDescription())) {
+      if (org.apache.commons.lang3.StringUtils.isNotBlank(db.getDescription())) {
         mdb.setDescription(db.getDescription());
       }
-      if (org.apache.commons.lang.StringUtils.isNotBlank(db.getLocationUri())) {
+      if (org.apache.commons.lang3.StringUtils.isNotBlank(db.getLocationUri())) {
         mdb.setLocationUri(db.getLocationUri());
       }
       if (org.apache.commons.lang3.StringUtils.isNotBlank(db.getManagedLocationUri())) {
@@ -4506,7 +4506,7 @@ public class ObjectStore implements RawStore, Configurable {
   @Override
   public int getNumPartitionsByFilter(String catName, String dbName, String tblName,
                                       String filter) throws MetaException, NoSuchObjectException {
-    final ExpressionTree exprTree = org.apache.commons.lang.StringUtils.isNotEmpty(filter)
+    final ExpressionTree exprTree = org.apache.commons.lang3.StringUtils.isNotEmpty(filter)
         ? PartFilterExprUtil.parseFilterTree(filter) : ExpressionTree.EMPTY_TREE;
 
     catName = normalizeIdentifier(catName);
@@ -10139,7 +10139,7 @@ public class ObjectStore implements RawStore, Configurable {
       throw new InvalidInputException("No partition specified for dropping the statistics");
     }
 
-    dbName = org.apache.commons.lang.StringUtils.defaultString(dbName, Warehouse.DEFAULT_DATABASE_NAME);
+    dbName = org.apache.commons.lang3.StringUtils.defaultString(dbName, Warehouse.DEFAULT_DATABASE_NAME);
     catName = normalizeIdentifier(catName);
 
     return new GetHelper<Boolean>(catName, dbName, tableName, true, true) {
@@ -10167,7 +10167,7 @@ public class ObjectStore implements RawStore, Configurable {
           throws MetaException, InvalidObjectException, InvalidInputException {
 
     boolean ret = false;
-    String database = org.apache.commons.lang.StringUtils.defaultString(dbName, Warehouse.DEFAULT_DATABASE_NAME);
+    String database = org.apache.commons.lang3.StringUtils.defaultString(dbName, Warehouse.DEFAULT_DATABASE_NAME);
     String catalog = normalizeIdentifier(catName);
 
     try {
@@ -10234,7 +10234,7 @@ public class ObjectStore implements RawStore, Configurable {
                                              List<String> colNames, String engine)
           throws NoSuchObjectException, MetaException, InvalidObjectException, InvalidInputException {
 
-    dbName = org.apache.commons.lang.StringUtils.defaultString(dbName, Warehouse.DEFAULT_DATABASE_NAME);
+    dbName = org.apache.commons.lang3.StringUtils.defaultString(dbName, Warehouse.DEFAULT_DATABASE_NAME);
     if (tableName == null) {
       throw new InvalidInputException("Table name is null.");
     }

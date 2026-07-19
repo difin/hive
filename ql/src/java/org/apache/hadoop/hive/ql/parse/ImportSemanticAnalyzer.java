@@ -19,8 +19,8 @@
 package org.apache.hadoop.hive.ql.parse;
 
 import org.antlr.runtime.tree.Tree;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -1206,7 +1206,7 @@ public class ImportSemanticAnalyzer extends BaseSemanticAnalyzer {
     }
 
     if (tblDesc.getLocation() == null) {
-      if (parentDb != null && !tblDesc.isExternal() && org.apache.commons.lang.StringUtils.isNotBlank(parentDb.getManagedLocationUri())) {
+      if (parentDb != null && !tblDesc.isExternal() && org.apache.commons.lang3.StringUtils.isNotBlank(parentDb.getManagedLocationUri())) {
         tblDesc.setLocation(new Path(parentDb.getManagedLocationUri(), tblDesc.getTableName()).toString());
         LOG.info("Setting the location for table {} as {}", tblDesc.getTableName(), tblDesc.getLocation());
       } else if (!waitOnPrecursor) {

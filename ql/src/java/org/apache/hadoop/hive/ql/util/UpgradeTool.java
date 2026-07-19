@@ -459,7 +459,7 @@ public class UpgradeTool {
    */
   public static String stripCopySuffix(String fileName) {
     //0000_0_copy_N -> 0000_0
-    if (org.apache.commons.lang.StringUtils.countMatches(fileName, "_") > 2) {
+    if (org.apache.commons.lang3.StringUtils.countMatches(fileName, "_") > 2) {
       return fileName.substring(0, fileName.indexOf('_', 1 + fileName.indexOf('_', 0)));
     }
     return fileName;

@@ -32,7 +32,7 @@ import org.apache.hadoop.hive.common.IPStackUtils;
 import org.apache.hive.service.rpc.thrift.TSetClientInfoResp;
 
 import org.apache.hive.service.rpc.thrift.TSetClientInfoReq;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.common.auth.HiveAuthUtils;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
