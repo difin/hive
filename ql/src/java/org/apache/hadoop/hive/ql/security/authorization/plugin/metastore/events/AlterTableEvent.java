@@ -28,6 +28,7 @@ import org.apache.hadoop.hive.metastore.api.hive_metastoreConstants;
 import org.apache.hadoop.hive.metastore.events.PreAlterTableEvent;
 import org.apache.hadoop.hive.metastore.events.PreEventContext;
 import org.apache.hadoop.hive.ql.metadata.HiveStorageHandler;
+import org.apache.hadoop.hive.ql.security.authorization.AuthorizationUtils;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HiveOperationType;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject.HivePrivObjectActionType;
@@ -80,6 +81,8 @@ public class AlterTableEvent extends HiveMetaStoreAuthorizableEvent {
 
     ret.add(getHivePrivilegeObject(oldTable));
 
+    addAvroSchemaUrlInputAuth(ret, event);
+
     COMMAND_STR = buildCommandString(COMMAND_STR, oldTable);
 
     if (LOG.isDebugEnabled()) {
@@ -129,6 +132,23 @@ public class AlterTableEvent extends HiveMetaStoreAuthorizableEvent {
     }
 
     return ret;
+  }
+
+  private void addAvroSchemaUrlInputAuth(List<HivePrivilegeObject> ret, PreAlterTableEvent event) {
+    Table newTable = event.getNewTable();
+    Table oldTable = event.getOldTable();
+    String newSchemaUrl = AuthorizationUtils.getFilesystemAvroSchemaUrlToAuthorize(
+        new org.apache.hadoop.hive.ql.metadata.Table(newTable));
+    if (newSchemaUrl == null) {
+      return;
+    }
+    String oldSchemaUrl = oldTable == null ? null
+        : AuthorizationUtils.getFilesystemAvroSchemaUrlToAuthorize(
+            new org.apache.hadoop.hive.ql.metadata.Table(oldTable));
+    if (StringUtils.equals(oldSchemaUrl, newSchemaUrl)) {
+      return;
+    }
+    ret.add(getHivePrivilegeObjectDfsUri(newSchemaUrl));
   }
 
   private String buildCommandString(String cmdStr, Table tbl) {

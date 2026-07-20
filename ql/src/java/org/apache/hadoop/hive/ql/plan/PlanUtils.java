@@ -69,6 +69,7 @@ import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.hive.ql.parse.ParseContext;
 import org.apache.hadoop.hive.ql.parse.SemanticAnalyzer;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
+import org.apache.hadoop.hive.ql.security.authorization.AuthorizationUtils;
 import org.apache.hadoop.hive.ql.parse.type.ExprNodeTypeCheck;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.util.NullOrdering;
@@ -1084,6 +1085,7 @@ public final class PlanUtils {
       assert false;
     } else {
       inputs.add(newInput);
+      AuthorizationUtils.addAvroSchemaUrlInputForReadEntity(inputs, newInput);
       return newInput;
     }
     // make compile happy
