@@ -62,6 +62,8 @@ import org.apache.iceberg.rest.requests.RenameTableRequest;
 import org.apache.iceberg.rest.requests.ReportMetricsRequest;
 import org.apache.iceberg.rest.requests.UpdateNamespacePropertiesRequest;
 import org.apache.iceberg.rest.requests.UpdateTableRequest;
+import org.apache.iceberg.rest.credentials.Credential;
+import org.apache.iceberg.rest.credentials.ImmutableCredential;
 import org.apache.iceberg.rest.responses.ConfigResponse;
 import org.apache.iceberg.rest.responses.CreateNamespaceResponse;
 import org.apache.iceberg.rest.responses.ErrorResponse;
@@ -363,6 +365,7 @@ public class HMSCatalogAdapter implements RESTClient {
     Namespace namespace = namespaceFromPathVars(vars);
     CreateTableRequest request = castRequest(CreateTableRequest.class, body);
     request.validate();
+    requireNamespaceWriteAccess(namespace);
     if (request.stageCreate()) {
       return castResponse(
           responseType, CatalogHandlers.stageTableCreate(catalog, namespace, request));
@@ -373,11 +376,14 @@ public class HMSCatalogAdapter implements RESTClient {
   }
 
   private RESTResponse dropTable(Map<String, String> vars) {
+    TableIdentifier ident = identFromPathVars(vars);
+    requireWriteAccess(ident);
     if (PropertyUtil.propertyAsBoolean(vars, "purgeRequested", false)) {
-      CatalogHandlers.purgeTable(catalog, identFromPathVars(vars));
+      CatalogHandlers.purgeTable(catalog, ident);
     } else {
-      CatalogHandlers.dropTable(catalog, identFromPathVars(vars));
+      CatalogHandlers.dropTable(catalog, ident);
     }
+    catalog.invalidateTable(ident);
     return null;
   }
 
@@ -402,13 +408,23 @@ public class HMSCatalogAdapter implements RESTClient {
 
   private LoadTableResponse updateTable(Map<String, String> vars, Object body) {
     TableIdentifier ident = identFromPathVars(vars);
+    requireWriteAccess(ident);
     UpdateTableRequest request = castRequest(UpdateTableRequest.class, body);
-    return castResponse(LoadTableResponse.class, CatalogHandlers.updateTable(catalog, ident, request));
+    LoadTableResponse response = castResponse(LoadTableResponse.class,
+        runAsHive(() -> CatalogHandlers.updateTable(catalog, ident, request)));
+    catalog.invalidateTable(ident);
+    return response;
   }
 
   private RESTResponse renameTable(Object body) {
     RenameTableRequest request = castRequest(RenameTableRequest.class, body);
+    TableIdentifier from = request.source();
+    TableIdentifier to = request.destination();
+    requireWriteAccess(from);
+    requireWriteAccess(to);
     CatalogHandlers.renameTable(catalog, request);
+    catalog.invalidateTable(from);
+    catalog.invalidateTable(to);
     return null;
   }
 
@@ -420,7 +436,15 @@ public class HMSCatalogAdapter implements RESTClient {
 
   private RESTResponse commitTransaction(Object body) {
     CommitTransactionRequest request = castRequest(CommitTransactionRequest.class, body);
+    // Enforce write access for every table involved before attempting any commit.
+    for (UpdateTableRequest tableChange : request.tableChanges()) {
+      requireWriteAccess(tableChange.identifier());
+    }
     commitTransaction(catalog, request);
+    // Invalidate cached metadata for each committed table.
+    for (UpdateTableRequest tableChange : request.tableChanges()) {
+      catalog.invalidateTable(tableChange.identifier());
+    }
     return null;
   }
 
@@ -502,7 +526,7 @@ public class HMSCatalogAdapter implements RESTClient {
     List<Transaction> transactions = Lists.newArrayList();
 
     for (UpdateTableRequest tableChange : request.tableChanges()) {
-      Table table = catalog.loadTable(tableChange.identifier());
+      Table table = runAsHive(() -> catalog.loadTable(tableChange.identifier()));
       if (table instanceof BaseTable) {
         Transaction transaction =
             Transactions.newTransaction(
@@ -519,7 +543,7 @@ public class HMSCatalogAdapter implements RESTClient {
       }
     }
     // only commit if validations passed previously
-    transactions.forEach(Transaction::commitTransaction);
+    runAsHive(() -> { transactions.forEach(Transaction::commitTransaction); return null; });
   }
 
   @SuppressWarnings({"MethodLength", "unchecked"})
@@ -750,6 +774,46 @@ public class HMSCatalogAdapter implements RESTClient {
         ident,
         AccessLevel.NONE);
     return AccessLevel.NONE;
+  }
+
+  /**
+   * Throws ForbiddenException when the current user does not have written (READ_WRITE)
+   * access on the given table according to Ranger.
+   */
+  private void requireWriteAccess(TableIdentifier ident) {
+    AccessLevel level = getAccessLevel(catalog, ident, configuration);
+    if (level != AccessLevel.READ_WRITE) {
+      try {
+        String user = UserGroupInformation.getCurrentUser().getUserName();
+        LOG.warn("Write access denied for user {} on table {}", user, ident);
+      } catch (IOException ignored) {
+        // best-effort logging only
+      }
+      throw new ForbiddenException("Write access denied on table %s", ident);
+    }
+  }
+
+  /**
+   * Throws ForbiddenException when the current user does not have write access
+   * on any table in the given namespace (used for DDL operations like CREATE TABLE).
+   *
+   * The check uses a synthetic table identifier <namespace>.* to let Ranger
+   * evaluate namespace-level policies. If no such policy exists, the check falls back to
+   * requiring at least READ_WRITE on the namespace itself.
+   */
+  private void requireNamespaceWriteAccess(Namespace namespace) {
+    // Use a wildcard table name so Ranger evaluates namespace-level "CREATE" policies.
+    TableIdentifier nsIdent = TableIdentifier.of(namespace, "*");
+    AccessLevel level = getAccessLevel(catalog, nsIdent, configuration);
+    if (level != AccessLevel.READ_WRITE) {
+      try {
+        String user = UserGroupInformation.getCurrentUser().getUserName();
+        LOG.warn("Write access denied for user {} on namespace {}", user, namespace);
+      } catch (IOException ignored) {
+        // best-effort logging only
+      }
+      throw new ForbiddenException("Write access denied on namespace %s", namespace);
+    }
   }
 
   /**
