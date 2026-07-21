@@ -272,7 +272,7 @@ public class TezSessionState implements TezSession {
     // TODO: perhaps we could improve this method to share some fields when multiple
     //       sessions are being reconnected at the same time.
 
-    final Map<String, LocalResource> commonLocalResources = addExecJarAndLocalResources();
+    final Map<String, LocalResource> commonLocalResources = buildCommonLocalResources();
 
     final boolean llapMode = addLlapJarsIfNeeded(commonLocalResources);
 
@@ -359,6 +359,21 @@ public class TezSessionState implements TezSession {
   }
 
   /**
+   * Builds the map of common local resources (app jar + localized resources) for the Tez session.
+   * Extracted for testability to ensure resources are properly registered.
+   */
+  @VisibleForTesting
+  Map<String, LocalResource> buildCommonLocalResources() throws IOException, LoginException{
+    final Map<String, LocalResource> commonLocalResources = new HashMap<>();
+    appJarLr = createJarLocalResource(utils.getExecJarPathLocal(conf));
+    commonLocalResources.put(DagUtils.getBaseName(appJarLr), appJarLr);
+    for (LocalResource lr : this.resources.localizedResources) {
+      commonLocalResources.put(DagUtils.getBaseName(lr), lr);
+    }
+    return commonLocalResources;
+  }
+
+  /**
    * Opens a Tez session without performing a complete rollback/cleanup on failure.
    *
    * <p><strong>Callers MUST guard this method with try/catch and perform cleanup</strong>
@@ -373,8 +388,8 @@ public class TezSessionState implements TezSession {
    * @throws IOException if local resource localization or I/O setup fails
    */
   @VisibleForTesting
-  void openInternalUnsafe(boolean isAsync, LogHelper console) throws TezException, IOException, LoginException {
-    final Map<String, LocalResource> commonLocalResources = addExecJarAndLocalResources();
+  void openInternalUnsafe(boolean isAsync, LogHelper console) throws TezException, IOException, LoginException{
+    final Map<String, LocalResource> commonLocalResources = buildCommonLocalResources();
     final boolean llapMode = "llap".equalsIgnoreCase(HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_EXECUTION_MODE));
 
     // Create environment for AM.
@@ -449,16 +464,6 @@ public class TezSessionState implements TezSession {
     }
   }
 
-  private Map<String, LocalResource> addExecJarAndLocalResources()
-      throws IOException, LoginException {
-    final Map<String, LocalResource> commonLocalResources = new HashMap<String, LocalResource>();
-    appJarLr = createJarLocalResource(utils.getExecJarPathLocal(conf));
-    commonLocalResources.put(DagUtils.getBaseName(appJarLr), appJarLr);
-    for (LocalResource lr : this.resources.localizedResources) {
-      commonLocalResources.put(DagUtils.getBaseName(lr), lr);
-    }
-    return commonLocalResources;
-  }
 
   protected static ServicePluginsDescriptor createServicePluginDescriptor(boolean llapMode,
       TezConfiguration tezConfig) throws IOException {
