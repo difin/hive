@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTransactionRollbackException;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Database product infered via JDBC. */
 public enum DatabaseProduct {
@@ -278,4 +280,37 @@ public enum DatabaseProduct {
 
   }
 
+  /**
+   * Returns db-specific logic to be executed at the beginning of a transaction.
+   * Used in pooled connections.
+   */
+  public String getPrepareTxnStmt(DatabaseProduct dbType) {
+    if (isMYSQL(dbType)) {
+      return "SET @@session.sql_mode=ANSI_QUOTES";
+    }
+    else {
+      return null;
+    }
+  }
+
+  /**
+   * Get datasource properties for connection pools
+   *
+   */
+  public Map<String, String> getDataSourceProperties(DatabaseProduct dbType) {
+    Map<String, String> map = new HashMap<>();
+
+    switch (dbType){
+    case MYSQL:
+      map.put("allowMultiQueries", "true");
+      map.put("rewriteBatchedStatements", "true");
+      break;
+    case POSTGRES:
+      map.put("reWriteBatchedInserts", "true");
+      break;
+    default:
+      break;
+    }
+    return map;
+  }
 }

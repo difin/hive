@@ -21,7 +21,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.metastore.DatabaseProduct;
 import org.apache.hadoop.hive.metastore.metrics.Metrics;
 import org.apache.hadoop.hive.metastore.utils.StringUtils;
 import org.slf4j.Logger;
@@ -30,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Properties;
-
-import static org.apache.hadoop.hive.metastore.DatabaseProduct.determineDatabaseProduct;
 
 /**
  * DataSourceProvider for the HikariCP connection pool.
@@ -45,7 +42,7 @@ public class HikariCPDataSourceProvider implements DataSourceProvider {
   private static final String LEAK_DETECTION_THRESHOLD = HIKARI + ".leakDetectionThreshold";
 
   @Override
-  public DataSource create(Configuration hdpConfig, int maxPoolSize) throws SQLException {
+  public DataSource createPool(Configuration hdpConfig, int maxPoolSize) throws SQLException {
     String poolName = DataSourceProvider.getDataSourceName(hdpConfig);
     LOG.info("Creating Hikari connection pool for the MetaStore, maxPoolSize: {}, name: {}", maxPoolSize, poolName);
 
@@ -86,18 +83,8 @@ public class HikariCPDataSourceProvider implements DataSourceProvider {
 
     //https://github.com/brettwooldridge/HikariCP
     config.setConnectionTimeout(connectionTimeout);
-
-    DatabaseProduct dbProduct =  determineDatabaseProduct(driverUrl);
-    switch (dbProduct){
-      case MYSQL:
-        config.setConnectionInitSql("SET @@session.sql_mode=ANSI_QUOTES");
-        config.addDataSourceProperty("allowMultiQueries", true);
-        config.addDataSourceProperty("rewriteBatchedStatements", true);
-        break;
-      case POSTGRES:
-        config.addDataSourceProperty("reWriteBatchedInserts", true);
-        break;
-    }
+    DataSourceProvider.preparePool(hdpConfig, s -> config.setConnectionInitSql(s),
+        entry ->  config.addDataSourceProperty(entry.getKey(), entry.getValue()));
     return new HikariDataSource(initMetrics(config));
   }
 

@@ -17,11 +17,9 @@
  */
 package org.apache.hadoop.hive.metastore.datasource;
 
-import static org.apache.hadoop.hive.metastore.DatabaseProduct.MYSQL;
-import static org.apache.hadoop.hive.metastore.DatabaseProduct.determineDatabaseProduct;
-
 import java.sql.SQLException;
 import java.time.Duration;
+import java.util.Collections;
 
 import javax.sql.DataSource;
 
@@ -33,7 +31,6 @@ import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.pool2.impl.BaseObjectPoolConfig;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.metastore.DatabaseProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +56,7 @@ public class DbCPDataSourceProvider implements DataSourceProvider {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  public DataSource create(Configuration hdpConfig, int maxPoolSize) throws SQLException {
+  public DataSource createPool(Configuration hdpConfig, int maxPoolSize) throws SQLException {
     String poolName = DataSourceProvider.getDataSourceName(hdpConfig);
     LOG.info("Creating dbcp connection pool for the MetaStore, maxPoolSize: {}, name: {}", maxPoolSize, poolName);
 
@@ -73,19 +70,6 @@ public class DbCPDataSourceProvider implements DataSourceProvider {
     dbcpDs.setPassword(passwd);
     dbcpDs.setDefaultReadOnly(false);
     dbcpDs.setDefaultAutoCommit(true);
-
-    DatabaseProduct dbProduct =  determineDatabaseProduct(driverUrl);
-    switch (dbProduct){
-      case MYSQL:
-        dbcpDs.setConnectionProperties("allowMultiQueries=true");
-        dbcpDs.setConnectionProperties("rewriteBatchedStatements=true");
-        break;
-      case POSTGRES:
-        dbcpDs.setConnectionProperties("reWriteBatchedInserts=true");
-        break;
-    default:
-      break;
-    }
 
     long connectionTimeout = hdpConfig.getLong(CONNECTION_TIMEOUT_PROPERTY, 30000L);
     int connectionMaxIlde = hdpConfig.getInt(CONNECTION_MAX_IDLE_PROPERTY, 8);
@@ -135,9 +119,17 @@ public class DbCPDataSourceProvider implements DataSourceProvider {
         objectPool.setSoftMinEvictableIdleDuration(Duration.ofMillis(600 * 1000));
       }
     }
-
-    if (dbProduct == MYSQL) {
-      poolableConnFactory.setValidationQuery("SET @@session.sql_mode=ANSI_QUOTES");
+    StringBuilder connectionProperties = new StringBuilder();
+    DataSourceProvider.preparePool(hdpConfig,
+        stmt -> poolableConnFactory.setConnectionInitSql(Collections.singletonList(stmt)),
+        kv -> {
+          if (!connectionProperties.isEmpty()) {
+            connectionProperties.append(';');
+          }
+          connectionProperties.append(kv.getKey()).append('=').append(kv.getValue());
+        });
+    if (!connectionProperties.isEmpty()) {
+      dbcpDs.setConnectionProperties(connectionProperties.toString());
     }
     return new PoolingDataSource(objectPool);
   }

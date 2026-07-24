@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -55,7 +56,7 @@ public class RetryingHMSHandler implements InvocationHandler {
       this.numRetries = numRetries;
     }
   }
-
+  private final boolean local;
   private final IHMSHandler baseHandler;
   private final MetaStoreInit.MetaStoreInitData metaStoreInitData =
     new MetaStoreInit.MetaStoreInitData();
@@ -66,6 +67,7 @@ public class RetryingHMSHandler implements InvocationHandler {
   private RetryingHMSHandler(Configuration origConf, IHMSHandler baseHandler, boolean local) throws MetaException {
     this.origConf = origConf;
     this.baseHandler = baseHandler;
+    this.local = local;
     if (local) {
       baseHandler.setConf(origConf); // tests expect configuration changes applied directly to metastore
     }
@@ -156,9 +158,22 @@ public class RetryingHMSHandler implements InvocationHandler {
         }
         Object object = null;
         boolean isStarted = Deadline.startTimer(method.getName());
+        boolean clearCtxCall = false;
         try {
+          if (!local) {
+            Optional<HMSHandlerContext.CallCtx> callCtx = HMSHandlerContext.getCallCtx();
+            if (callCtx.isEmpty()) {
+              HMSHandlerContext.setCallCtx(new HMSHandlerContext.CallCtx(method.getName()));
+              clearCtxCall = true;
+            }
+          }
           object = method.invoke(baseHandler, args);
         } finally {
+          if (clearCtxCall) {
+            HMSHandlerContext.getCallCtx()
+                .ifPresent(ctx -> ctx.logJdbcSummary(LOG, getActiveConf()));
+            HMSHandlerContext.setCallCtx(null);
+          }
           if (isStarted) {
             Deadline.stopTimer();
           }

@@ -31,16 +31,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import com.jolbox.bonecp.BoneCPConfig;
 import com.jolbox.bonecp.BoneCPDataSource;
-import com.jolbox.bonecp.StatisticsMBean;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.metastore.DatabaseProduct;
-import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.metrics.Metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.hadoop.hive.metastore.DatabaseProduct.MYSQL;
-import static org.apache.hadoop.hive.metastore.DatabaseProduct.determineDatabaseProduct;
 
 /**
  * DataSourceProvider for the BoneCP connection pool.
@@ -54,7 +48,7 @@ public class BoneCPDataSourceProvider implements DataSourceProvider {
   private static final String PARTITION_COUNT_PROPERTY= BONECP + ".partitionCount";
 
   @Override
-  public DataSource create(Configuration hdpConfig, int maxPoolSize) throws SQLException {
+  public DataSource createPool(Configuration hdpConfig, int maxPoolSize) throws SQLException {
     LOG.debug("Creating BoneCP connection pool for the MetaStore");
 
     String driverUrl = DataSourceProvider.getMetastoreJdbcDriverUrl(hdpConfig);
@@ -83,21 +77,10 @@ public class BoneCPDataSourceProvider implements DataSourceProvider {
 
     Properties connProperties = new Properties();
 
-    DatabaseProduct dbProduct =  determineDatabaseProduct(driverUrl);
-    switch (dbProduct){
-      case MYSQL:
-        connProperties.put("allowMultiQueries", true);
-        connProperties.put("rewriteBatchedStatements", true);
-        break;
-      case POSTGRES:
-        connProperties.put("reWriteBatchedInserts", true);
-        break;
-    }
+    DataSourceProvider.preparePool(hdpConfig, config::setInitSQL,
+        entry -> connProperties.put(entry.getKey(), entry.getValue()));
     config.setDriverProperties(connProperties);
 
-    if (dbProduct == MYSQL) {
-      config.setInitSQL("SET @@session.sql_mode=ANSI_QUOTES");
-    }
     return initMetrics(new BoneCPDataSource(config));
   }
 
