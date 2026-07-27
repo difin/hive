@@ -17,9 +17,10 @@
  *  limitations under the License.
  */
 
-package org.apache.hadoop.hive.metastore;
+package org.apache.hadoop.hive.metastore.directsql;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.hadoop.hive.metastore.Deadline;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Order;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.datastore.JDOConnection;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.sql.Blob;
@@ -62,7 +64,7 @@ public class MetastoreDirectSqlUtils {
   }
 
   @SuppressWarnings("unchecked")
-  static <T> T executeWithArray(Query query, Object[] params, String sql) throws MetaException {
+  public static <T> T executeWithArray(Query query, Object[] params, String sql) throws MetaException {
     return executeWithArray(query, params, sql, -1);
   }
 
@@ -95,7 +97,7 @@ public class MetastoreDirectSqlUtils {
     return (List<Object[]>)result;
   }
 
-  static Long extractSqlLong(Object obj) throws MetaException {
+  public static Long extractSqlLong(Object obj) throws MetaException {
     if (obj == null) return null;
     if (!(obj instanceof Number)) {
       throw new MetaException("Expected numeric type but got " + obj.getClass().getName());
@@ -103,7 +105,7 @@ public class MetastoreDirectSqlUtils {
     return ((Number)obj).longValue();
   }
 
-  static void timingTrace(boolean doTrace, String queryText, long start, long queryTime) {
+  public static void timingTrace(boolean doTrace, String queryText, long start, long queryTime) {
     if (!doTrace) return;
     LOG.debug("Direct SQL query in " + (queryTime - start) / 1000000.0 + "ms + " +
         (System.nanoTime() - queryTime) / 1000000.0 + "ms, the query is [" + queryText + "]");
@@ -172,9 +174,9 @@ public class MetastoreDirectSqlUtils {
     return rv;
   }
 
-  static void setPartitionParametersWithFilter(String PARTITION_PARAMS,
-      boolean convertMapNullsToEmptyStrings, PersistenceManager pm, String partIds,
-      TreeMap<Long, Partition> partitions, String includeParamKeyPattern, String excludeParamKeyPattern)
+  public static void setPartitionParametersWithFilter(String PARTITION_PARAMS,
+                                                      boolean convertMapNullsToEmptyStrings, PersistenceManager pm, String partIds,
+                                                      TreeMap<Long, Partition> partitions, String includeParamKeyPattern, String excludeParamKeyPattern)
       throws MetaException {
     StringBuilder queryTextBuilder = new StringBuilder("select \"PART_ID\", \"PARAM_KEY\", \"PARAM_VALUE\" from ")
         .append(PARTITION_PARAMS)
@@ -205,8 +207,8 @@ public class MetastoreDirectSqlUtils {
     }
   }
 
-  static void setPartitionValues(String PARTITION_KEY_VALS, PersistenceManager pm, String partIds,
-      TreeMap<Long, Partition> partitions)
+  public static void setPartitionValues(String PARTITION_KEY_VALS, PersistenceManager pm, String partIds,
+                                        TreeMap<Long, Partition> partitions)
       throws MetaException {
     String queryText;
     queryText = "select \"PART_ID\", \"PART_KEY_VAL\" from " + PARTITION_KEY_VALS + ""
@@ -234,8 +236,8 @@ public class MetastoreDirectSqlUtils {
     }
   }
 
-  static void setSDParameters(String SD_PARAMS, boolean convertMapNullsToEmptyStrings,
-      PersistenceManager pm, TreeMap<Long, StorageDescriptor> sds, String sdIds)
+  public static void setSDParameters(String SD_PARAMS, boolean convertMapNullsToEmptyStrings,
+                                     PersistenceManager pm, TreeMap<Long, StorageDescriptor> sds, String sdIds)
       throws MetaException {
     String queryText;
     queryText = "select \"SD_ID\", \"PARAM_KEY\", \"PARAM_VALUE\" from " + SD_PARAMS + ""
@@ -252,12 +254,12 @@ public class MetastoreDirectSqlUtils {
     }
   }
 
-  static int extractSqlInt(Object field) {
+  public static int extractSqlInt(Object field) {
     return ((Number)field).intValue();
   }
 
-  static void setSDSortCols(String SORT_COLS, List<String> columnNames, PersistenceManager pm,
-      TreeMap<Long, StorageDescriptor> sds, String sdIds)
+  public static void setSDSortCols(String SORT_COLS, List<String> columnNames, PersistenceManager pm,
+                                   TreeMap<Long, StorageDescriptor> sds, String sdIds)
       throws MetaException {
     StringBuilder queryTextBuilder = new StringBuilder("select \"SD_ID\"");
     int counter = 0;
@@ -310,8 +312,8 @@ public class MetastoreDirectSqlUtils {
       }});
   }
 
-  static void setSDBucketCols(String BUCKETING_COLS, PersistenceManager pm,
-      TreeMap<Long, StorageDescriptor> sds, String sdIds)
+  public static void setSDBucketCols(String BUCKETING_COLS, PersistenceManager pm,
+                                     TreeMap<Long, StorageDescriptor> sds, String sdIds)
       throws MetaException {
     String queryText;
     queryText = "select \"SD_ID\", \"BUCKET_COL_NAME\" from " + BUCKETING_COLS + ""
@@ -324,8 +326,8 @@ public class MetastoreDirectSqlUtils {
       }});
   }
 
-  static boolean setSkewedColNames(String SKEWED_COL_NAMES, PersistenceManager pm,
-      TreeMap<Long, StorageDescriptor> sds, String sdIds)
+  public static boolean setSkewedColNames(String SKEWED_COL_NAMES, PersistenceManager pm,
+                                          TreeMap<Long, StorageDescriptor> sds, String sdIds)
       throws MetaException {
     String queryText;
     queryText = "select \"SD_ID\", \"SKEWED_COL_NAME\" from " + SKEWED_COL_NAMES + ""
@@ -339,8 +341,8 @@ public class MetastoreDirectSqlUtils {
       }}) > 0;
   }
 
-  static void setSkewedColValues(String SKEWED_STRING_LIST_VALUES, String SKEWED_VALUES,
-      PersistenceManager pm, TreeMap<Long, StorageDescriptor> sds, String sdIds)
+  public static void setSkewedColValues(String SKEWED_STRING_LIST_VALUES, String SKEWED_VALUES,
+                                        PersistenceManager pm, TreeMap<Long, StorageDescriptor> sds, String sdIds)
       throws MetaException {
     String queryText;
     queryText =
@@ -379,9 +381,9 @@ public class MetastoreDirectSqlUtils {
       }});
   }
 
-  static void setSkewedColLocationMaps(String SKEWED_COL_VALUE_LOC_MAP,
-      String SKEWED_STRING_LIST_VALUES, PersistenceManager pm, TreeMap<Long, StorageDescriptor> sds,
-      String sdIds)
+  public static void setSkewedColLocationMaps(String SKEWED_COL_VALUE_LOC_MAP,
+                                              String SKEWED_STRING_LIST_VALUES, PersistenceManager pm, TreeMap<Long, StorageDescriptor> sds,
+                                              String sdIds)
       throws MetaException {
     String queryText;
     queryText =
@@ -428,8 +430,8 @@ public class MetastoreDirectSqlUtils {
       }});
   }
 
-  static void setSDCols(String COLUMNS_V2, List<String> columnNames, PersistenceManager pm,
-      TreeMap<Long, List<FieldSchema>> colss, String colIds)
+  public static void setSDCols(String COLUMNS_V2, List<String> columnNames, PersistenceManager pm,
+                               TreeMap<Long, List<FieldSchema>> colss, String colIds)
       throws MetaException {
     StringBuilder queryTextBuilder = new StringBuilder("select \"CD_ID\"");
     int counter = 0;
@@ -484,8 +486,8 @@ public class MetastoreDirectSqlUtils {
       }});
   }
 
-  static void setSerdeParams(String SERDE_PARAMS, boolean convertMapNullsToEmptyStrings,
-      PersistenceManager pm, TreeMap<Long, SerDeInfo> serdes, String serdeIds) throws MetaException {
+  public static void setSerdeParams(String SERDE_PARAMS, boolean convertMapNullsToEmptyStrings,
+                                    PersistenceManager pm, TreeMap<Long, SerDeInfo> serdes, String serdeIds) throws MetaException {
     String queryText;
     queryText = "select \"SERDE_ID\", \"PARAM_KEY\", \"PARAM_VALUE\" from " + SERDE_PARAMS + ""
         + " where \"SERDE_ID\" in (" + serdeIds + ") and \"PARAM_KEY\" is not null"
@@ -561,7 +563,7 @@ public class MetastoreDirectSqlUtils {
     return value.toString();
   }
 
-  static Double extractSqlDouble(Object obj) throws MetaException {
+  public static Double extractSqlDouble(Object obj) throws MetaException {
     if (obj == null)
       return null;
     if (!(obj instanceof Number)) {
@@ -570,7 +572,7 @@ public class MetastoreDirectSqlUtils {
     return ((Number) obj).doubleValue();
   }
 
-  static byte[] extractSqlBlob(Object value) throws MetaException {
+  public static byte[] extractSqlBlob(Object value) throws MetaException {
     if (value == null)
       return null;
     if (value instanceof Blob) {
@@ -695,5 +697,15 @@ public class MetastoreDirectSqlUtils {
       return first;
     }
     return (new BigDecimal(first.toString())).max(new BigDecimal(second.toString()));
+  }
+
+  static void closeDbConn(JDOConnection jdoConn) {
+    try {
+      if (jdoConn != null) {
+        jdoConn.close();
+      }
+    } catch (Exception e) {
+      LOG.warn("Failed to close db connection", e);
+    }
   }
 }

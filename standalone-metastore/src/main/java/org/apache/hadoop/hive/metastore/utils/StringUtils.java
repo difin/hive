@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hive.metastore.utils;
 
+import org.apache.hadoop.hive.metastore.api.MetaException;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -93,6 +95,27 @@ public class StringUtils {
   public static String normalizeIdentifier(String identifier) {
     return identifier.trim().toLowerCase();
   }
+
+  /**
+   * Normalize all identifiers to make equality comparisons easier.
+   * @param identifiers the identifiers list
+   * @return a list of normalized versions, with white space removed and all lower case.
+   */
+  public static List<String> normalizeIdentifiers(List<String> identifiers)
+      throws MetaException {
+    if (identifiers != null && !identifiers.isEmpty()) {
+      List<String> normalizedIdents = new ArrayList<>();
+      for (String ident : identifiers) {
+        if (StringUtils.isEmpty(ident)) {
+          throw new MetaException("An unexpected empty identifier found in the list");
+        }
+        normalizedIdents.add(normalizeIdentifier(ident));
+      }
+      return normalizedIdents;
+    }
+    return Collections.emptyList();
+  }
+
 
   /**
    * Make a string representation of the exception.

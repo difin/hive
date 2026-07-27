@@ -7413,15 +7413,17 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
     dbName = dbName.toLowerCase();
     String[] parsedDbName = parseDbName(dbName, conf);
     tableName = tableName.toLowerCase();
+    DeleteColumnStatisticsRequest request = new DeleteColumnStatisticsRequest(parsedDbName[DB_NAME], tableName);
     if (colName != null) {
       colName = colName.toLowerCase();
+      request.addToCol_names(colName);
     }
     String convertedPartName = lowerCaseConvertPartName(partName);
-    DeleteColumnStatisticsRequest request = new DeleteColumnStatisticsRequest(parsedDbName[DB_NAME], tableName);
     request.setEngine(engine);
     request.setCat_name(parsedDbName[CAT_NAME]);
-    request.addToCol_names(colName);
-    request.addToPart_names(convertedPartName);
+    if (partName != null) {
+      request.addToPart_names(partName);
+    }
     return delete_column_statistics_req(request);
   }
 
@@ -7456,7 +7458,7 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
         if (ret) {
           eventType = EventType.DELETE_TABLE_COLUMN_STAT;
           for (String colName :
-              colNames == null ? table.getSd().getCols().stream().map(FieldSchema::getName).collect(Collectors.toList()) : colNames) {
+              colNames == null || colNames.isEmpty() ? table.getSd().getCols().stream().map(FieldSchema::getName).toList() : colNames) {
             if (transactionalListeners != null && !transactionalListeners.isEmpty()) {
               MetaStoreListenerNotifier.notifyEvent(transactionalListeners, eventType,
                   new DeleteTableColumnStatEvent(parsedDbName[CAT_NAME], parsedDbName[DB_NAME], tableName, colName, engine, this));
@@ -7479,8 +7481,7 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
             partNames, colNames, engine);
         if (ret) {
           eventType = EventType.DELETE_PARTITION_COLUMN_STAT;
-          for (String colName : colNames == null ? table.getSd().getCols().stream().map(FieldSchema::getName)
-              .collect(Collectors.toList()) : colNames) {
+          for (String colName : colNames == null || colNames.isEmpty() ? table.getSd().getCols().stream().map(FieldSchema::getName).toList() : colNames) {
             for (String partName : partNames) {
               List<String> partVals = getPartValsFromName(table, partName);
               if (transactionalListeners != null && !transactionalListeners.isEmpty()) {
@@ -7514,16 +7515,14 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
       throws TException {
     dbName = dbName.toLowerCase();
     tableName = tableName.toLowerCase();
-
     String[] parsedDbName = parseDbName(dbName, conf);
-
+    DeleteColumnStatisticsRequest request = new DeleteColumnStatisticsRequest(parsedDbName[DB_NAME], tableName);
     if (colName != null) {
       colName = colName.toLowerCase();
+      request.addToCol_names(colName);
     }
-    DeleteColumnStatisticsRequest request = new DeleteColumnStatisticsRequest(parsedDbName[DB_NAME], tableName);
     request.setEngine(engine);
     request.setCat_name(parsedDbName[CAT_NAME]);
-    request.addToCol_names(colName);
     request.setTableLevel(true);
     return delete_column_statistics_req(request);
   }

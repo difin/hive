@@ -24,6 +24,7 @@ import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.COMPA
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.PARTITION_REUSE_COLUMN_DESCRIPTORS;
 import static org.apache.hadoop.hive.metastore.utils.MetaStoreUtils.getDefaultCatalog;
 import static org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdentifier;
+import static org.apache.hadoop.hive.metastore.utils.StringUtils.normalizeIdentifiers;
 
 import com.google.common.base.Joiner;
 
@@ -86,7 +87,9 @@ import org.apache.hadoop.hive.common.StatsSetupConst;
 import org.apache.hadoop.hive.common.TableName;
 import org.apache.hadoop.hive.common.ValidReaderWriteIdList;
 import org.apache.hadoop.hive.common.ValidWriteIdList;
-import org.apache.hadoop.hive.metastore.MetaStoreDirectSql.SqlFilterForPushdown;
+import org.apache.hadoop.hive.metastore.directsql.DirectSqlDeleteStats;
+import org.apache.hadoop.hive.metastore.directsql.MetaStoreDirectSql;
+import org.apache.hadoop.hive.metastore.directsql.MetaStoreDirectSql.SqlFilterForPushdown;
 import org.apache.hadoop.hive.metastore.api.AggrStats;
 import org.apache.hadoop.hive.metastore.api.AllTableConstraintsRequest;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
@@ -197,6 +200,7 @@ import org.apache.hadoop.hive.metastore.api.WriteEventInfo;
 import org.apache.hadoop.hive.metastore.client.builder.GetPartitionsArgs;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
+import org.apache.hadoop.hive.metastore.directsql.DirectSqlAggrStats;
 import org.apache.hadoop.hive.metastore.metrics.Metrics;
 import org.apache.hadoop.hive.metastore.metrics.MetricsConstants;
 import org.apache.hadoop.hive.metastore.model.FetchGroups;
@@ -2138,13 +2142,7 @@ public class ObjectStore implements RawStore, Configurable {
       db = normalizeIdentifier(db);
       catName = normalizeIdentifier(catName);
 
-      List<String> lowered_tbl_names = new ArrayList<>();
-      if(tbl_names != null) {
-        lowered_tbl_names = new ArrayList<>(tbl_names.size());
-        for (String t : tbl_names) {
-          lowered_tbl_names.add(normalizeIdentifier(t));
-        }
-      }
+      List<String> lowered_tbl_names = normalizeIdentifiers(tbl_names);
 
       StringBuilder filterBuilder = new StringBuilder();
       List<String> parameterVals = new ArrayList<>();
@@ -10141,6 +10139,7 @@ public class ObjectStore implements RawStore, Configurable {
 
     dbName = org.apache.commons.lang.StringUtils.defaultString(dbName, Warehouse.DEFAULT_DATABASE_NAME);
     catName = normalizeIdentifier(catName);
+    List<String> cols = normalizeIdentifiers(colNames);
 
     return new GetHelper<Boolean>(catName, dbName, tableName, true, true) {
       @Override
@@ -10150,13 +10149,14 @@ public class ObjectStore implements RawStore, Configurable {
 
       @Override
       protected Boolean getSqlResult(GetHelper<Boolean> ctx) throws MetaException {
-        return directSql.deletePartitionColumnStats(catName, dbName, tableName, partNames, colNames, engine);
+        DirectSqlDeleteStats deleteStats = new DirectSqlDeleteStats(directSql, pm);
+        return deleteStats.deletePartitionColumnStats(catName, dbName, tableName, partNames, cols, engine);
       }
 
       @Override
       protected Boolean getJdoResult(GetHelper<Boolean> ctx)
               throws MetaException, InvalidObjectException, InvalidInputException {
-        return deletePartitionColumnStatisticsViaJdo(catName, dbName, tableName, partNames, colNames, engine);
+        return deletePartitionColumnStatisticsViaJdo(catName, dbName, tableName, partNames, cols, engine);
       }
     }.run(false);
   }
@@ -10197,12 +10197,7 @@ public class ObjectStore implements RawStore, Configurable {
           params.add(normalizeIdentifier(database));
           params.add(normalizeIdentifier(tableName));
           if (colNames != null && !colNames.isEmpty()) {
-            List<String> normalizedColNames = new ArrayList<>();
-            for (String colName : colNames){
-              // trim the extra spaces, and change to lowercase
-              normalizedColNames.add(normalizeIdentifier(colName));
-            }
-            params.add(normalizedColNames);
+            params.add(colNames);
           }
           params.add(catalog);
           if (engine != null) {
@@ -10222,6 +10217,30 @@ public class ObjectStore implements RawStore, Configurable {
       } finally {
         b.closeAllQueries();
       }
+      Batchable.runBatched(batchSize, partNames, new Batchable<String, Void>() {
+        @Override
+        public List<Void> run(List<String> input) throws MetaException {
+          Pair<Query, Map<String, String>> queryWithParams = getPartQueryWithParams(catalog, database, tableName,
+              input);
+          try (QueryWrapper qw = new QueryWrapper(queryWithParams.getLeft())) {
+            qw.setResultClass(MPartition.class);
+            qw.setClass(MPartition.class);
+            List<MPartition> mparts = (List<MPartition>) qw.executeWithMap(queryWithParams.getRight());
+            for (MPartition mPart : mparts) {
+              Map<String, String> params = mPart.getParameters();
+              if (params != null && params.containsKey(StatsSetupConst.COLUMN_STATS_ACCURATE)) {
+                if (colNames == null || colNames.isEmpty()) {
+                  StatsSetupConst.clearColumnStatsState(params);
+                } else {
+                  StatsSetupConst.removeColumnStatsState(params, colNames);
+                }
+                mPart.setParameters(params);
+              }
+            }
+          }
+          return Collections.emptyList();
+        }
+      });
       ret = commitTransaction();
     } finally {
       rollbackAndCleanup(ret, null);
@@ -10238,6 +10257,7 @@ public class ObjectStore implements RawStore, Configurable {
     if (tableName == null) {
       throw new InvalidInputException("Table name is null.");
     }
+    List<String> cols = normalizeIdentifiers(colNames);
 
     return new GetHelper<Boolean>(catName, dbName, tableName, true, true) {
       @Override
@@ -10247,13 +10267,14 @@ public class ObjectStore implements RawStore, Configurable {
 
       @Override
       protected Boolean getSqlResult(GetHelper<Boolean> ctx) throws MetaException {
-        return directSql.deleteTableColumnStatistics(getTable().getId(), colNames, engine);
+        DirectSqlDeleteStats deleteStats = new DirectSqlDeleteStats(directSql, pm);
+        return deleteStats.deleteTableColumnStatistics(getTable(), cols, engine);
       }
 
       @Override
       protected Boolean getJdoResult(GetHelper<Boolean> ctx)
               throws MetaException, InvalidObjectException, InvalidInputException {
-        return deleteTableColumnStatisticsViaJdo(catName, dbName, tableName, colNames, engine);
+        return deleteTableColumnStatisticsViaJdo(catName, dbName, tableName, cols, engine);
       }
     }.run(true);
   }
@@ -10285,14 +10306,9 @@ public class ObjectStore implements RawStore, Configurable {
       List<Object> params = new ArrayList<>();
       params.add(normalizeIdentifier(tableName));
       params.add(normalizeIdentifier(dbName));
-      params.add(normalizeIdentifier(catName));
+      params.add(catName == null ? null : normalizeIdentifier(catName));
       if (colNames != null && !colNames.isEmpty()) {
-        List<String> normalizedColNames = new ArrayList<>();
-        for (String colName : colNames){
-          // trim the extra spaces, and change to lowercase
-          normalizedColNames.add(colName == null ? null : normalizeIdentifier(colName));
-        }
-        params.add(normalizedColNames);
+        params.add(colNames);
       }
       if (engine != null) {
         params.add(engine);
@@ -10301,6 +10317,18 @@ public class ObjectStore implements RawStore, Configurable {
       pm.retrieveAll(mStatsObjColl);
       if (mStatsObjColl != null) {
         pm.deletePersistentAll(mStatsObjColl);
+      }
+      MTable mTable = getMTable(catName, dbName, tableName);
+      if (mTable != null) {
+        Map<String, String> tableParams = mTable.getParameters();
+        if (tableParams != null && tableParams.containsKey(StatsSetupConst.COLUMN_STATS_ACCURATE)) {
+          if (colNames == null || colNames.isEmpty()) {
+            StatsSetupConst.clearColumnStatsState(tableParams);
+          } else {
+            StatsSetupConst.removeColumnStatsState(tableParams, colNames);
+          }
+          mTable.setParameters(tableParams);
+        }
       }
       ret = commitTransaction();
     } finally {

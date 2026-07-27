@@ -309,7 +309,7 @@ public class StatsSetupConst {
       return;
     }
     ColumnStatsAccurate stats = parseStatsAcc(params.get(COLUMN_STATS_ACCURATE));
-    colNames.forEach(colName -> 
+    colNames.forEach(colName ->
         stats.columnStats.putIfAbsent(colName.toLowerCase(), true));
 
     try {
@@ -365,8 +365,12 @@ public class StatsSetupConst {
       return;
     }
     ColumnStatsAccurate stats = parseStatsAcc(params.get(COLUMN_STATS_ACCURATE));
-    colNames.forEach(colName ->
-        stats.columnStats.remove(colName.toLowerCase()));
+    colNames.forEach(colName -> {
+      // it is possible that colName could be null
+      if (colName != null) {
+        stats.columnStats.remove(colName.toLowerCase());
+      }
+    });
 
     try {      
       params.put(COLUMN_STATS_ACCURATE, ColumnStatsAccurate.objectWriter.writeValueAsString(stats));

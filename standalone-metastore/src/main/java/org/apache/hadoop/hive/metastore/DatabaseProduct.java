@@ -196,7 +196,7 @@ public enum DatabaseProduct {
     return false;
   }
 
-  protected static String toDate(String tableValue, DatabaseProduct dbType) {
+  public static String toDate(String tableValue, DatabaseProduct dbType) {
     if (ORACLE == dbType) {
       return "TO_DATE(" + tableValue + ", 'YYYY-MM-DD')";
     } else {
@@ -204,7 +204,7 @@ public enum DatabaseProduct {
     }
   }
 
-  protected static String toTimestamp(String tableValue, DatabaseProduct dbType) {
+  public static String toTimestamp(String tableValue, DatabaseProduct dbType) {
     if (ORACLE == dbType) {
       return "TO_TIMESTAMP(" + tableValue + ", 'YYYY-MM-DD HH24:mi:ss')";
     } else if (SQLSERVER == dbType) {

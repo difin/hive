@@ -36,6 +36,10 @@ public class GetPartitionsArgs {
 
   }
 
+  public static GetPartitionsArgs getAllPartitions() {
+    return new GetPartitionsArgsBuilder().max(-1).build();
+  }
+
   public String getFilter() {
     return filter;
   }
