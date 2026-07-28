@@ -22,14 +22,12 @@ public class HiveConfPlannerContext{
   private boolean isCorrelatedColumns;
   private boolean heuristicMaterializationStrategy;
   private boolean isExplainPlan;
-  private boolean legacyBetweenSelectivity;
 
 
   public HiveConfPlannerContext(boolean isCorrelatedColumns, boolean heuristicMaterializationStrategy,
-      boolean isExplainPlan, boolean legacyBetweenSelectivity) {
+      boolean isExplainPlan) {
     this.isCorrelatedColumns = isCorrelatedColumns;
     this.heuristicMaterializationStrategy = heuristicMaterializationStrategy;
-    this.legacyBetweenSelectivity = legacyBetweenSelectivity;
     this.isExplainPlan = isExplainPlan;
   }
 
@@ -39,10 +37,6 @@ public class HiveConfPlannerContext{
 
   public boolean isHeuristicMaterializationStrategy() {
     return heuristicMaterializationStrategy;
-  }
-
-  public boolean isLegacyBetweenSelectivity() {
-    return legacyBetweenSelectivity;
   }
   
   public boolean isExplainPlan() {

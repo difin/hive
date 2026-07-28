@@ -68,12 +68,12 @@ public class FilterSelectivityEstimator extends RexVisitorImpl<Double> {
   protected static final Logger LOG = LoggerFactory.getLogger(FilterSelectivityEstimator.class);
 
   private static final double DEFAULT_COMPARISON_SELECTIVITY = 1.0 / 3.0;
+  // Heuristic based on comparison operators and AND operation (selectivity op1 * selectivity op2)
+  private static final double DEFAULT_BETWEEN_SELECTIVITY = 1.0 / 9.0;
 
   private final RelNode childRel;
   private final double  childCardinality;
   private final RelMetadataQuery mq;
-  // For debugging purposes
-  private final boolean legacyBetweenSelectivity;
   private final RexBuilder rexBuilder;
 
   public FilterSelectivityEstimator(RelNode childRel, RelMetadataQuery mq) {
@@ -81,9 +81,6 @@ public class FilterSelectivityEstimator extends RexVisitorImpl<Double> {
     this.mq = mq;
     this.childRel = childRel;
     this.childCardinality = mq.getRowCount(childRel);
-    this.legacyBetweenSelectivity =
-        childRel.getCluster().getPlanner().getContext().unwrap(HiveConfPlannerContext.class)
-            .isLegacyBetweenSelectivity();
     this.rexBuilder = childRel.getCluster().getRexBuilder();
   }
 
@@ -174,15 +171,7 @@ public class FilterSelectivityEstimator extends RexVisitorImpl<Double> {
     }
 
     case BETWEEN: {
-      if (legacyBetweenSelectivity) {
-        // Legacy way of computing BETWEEN selectivity. It uses default function
-        // (similar to EQUALS).
-        selectivity = computeBetweenPredicateSelectivity(call);
-      } else {
-        // This heuristic is based on the heuristic for comparison operators
-        // (selectivity = 1/3) and AND operation (selectivity op1 * selectivity op2).
-        selectivity = ((double) 1 / (double) 9);
-      }
+      selectivity = computeBetweenPredicateSelectivity(call);
       break;
     }
 
@@ -567,7 +556,7 @@ public class FilterSelectivityEstimator extends RexVisitorImpl<Double> {
 
   private Double computeBetweenPredicateSelectivity(RexCall call) {
     if (!(childRel instanceof HiveTableScan)) {
-      return computeFunctionSelectivity(call);
+      return DEFAULT_BETWEEN_SELECTIVITY;
     }
 
     List<RexNode> operands = call.getOperands();
@@ -587,10 +576,9 @@ public class FilterSelectivityEstimator extends RexVisitorImpl<Double> {
 
       Range<Float> rangeBoundaries = makeRange(leftValue, rightValue, BoundType.CLOSED);
       RexNode expr = operands.get(1); // expr to be checked by the BETWEEN
-      return computeRangePredicateSelectivity(() -> computeFunctionSelectivity(call), expr, rangeBoundaries,
-          inverseBool);
+      return computeRangePredicateSelectivity(() -> DEFAULT_BETWEEN_SELECTIVITY, expr, rangeBoundaries, inverseBool);
     }
-    return computeFunctionSelectivity(call);
+    return DEFAULT_BETWEEN_SELECTIVITY;
   }
 
   private Optional<Float> extractLiteral(RexNode node) {
@@ -726,17 +714,9 @@ public class FilterSelectivityEstimator extends RexVisitorImpl<Double> {
         return;
       }
 
-      if (hasLower && hasUpper && lowerBoundType == BoundType.CLOSED && upperBoundType == BoundType.CLOSED
-          && !legacyBetweenSelectivity) {
-        // same behavior as BETWEEN case with no legacyBetweenSelectivity
-        rangeSelectivities.add((double) 1 / (double) 9);
-        return;
-      }
-
       // map the range to a selectivity
       final Supplier<Double> defaultSelectivity =
-          hasLower && hasUpper ? () -> computeFunctionSelectivity(List.of(ref, lowerRex, upperRex))
-              : () -> DEFAULT_COMPARISON_SELECTIVITY;
+          hasLower && hasUpper ? () -> DEFAULT_BETWEEN_SELECTIVITY : () -> DEFAULT_COMPARISON_SELECTIVITY;
 
       if (lowerLiteral.isEmpty() || upperLiteral.isEmpty()) {
         rangeSelectivities.add(defaultSelectivity.get());

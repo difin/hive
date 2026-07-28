@@ -2679,9 +2679,6 @@ public class HiveConf extends Configuration {
     HIVE_REMOVE_SQ_COUNT_CHECK("hive.optimize.remove.sq_count_check", true,
         "Whether to remove an extra join with sq_count_check for scalar subqueries "
             + "with constant group by keys."),
-    HIVE_BETWEEN_SELECTIVITY_LEGACY("hive.optimize.legacy.selectivity.between", false,
-        "Whether to infer BETWEEN selectivity in Calcite using legacy logic (similar to EQUALS). " +
-            "This is for debugging."),
     HIVE_INFER_NOT_NULL_EXPRESSIONS("hive.optimize.filter.infer.notnull", true,
         "Whether to infer IS NOT NULL filter expressions based on comparison operations."),
 

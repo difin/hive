@@ -196,7 +196,6 @@ public class TestFilterSelectivityEstimator {
     tableType = b.build();
 
     HiveConf conf = new HiveConf();
-    conf.setBoolVar(HiveConf.ConfVars.HIVE_BETWEEN_SELECTIVITY_LEGACY, true);
     RelOptPlanner planner = CalcitePlanner.createPlanner(conf, new HiveFunctionHelper(REX_BUILDER));
     relOptCluster = RelOptCluster.create(planner, REX_BUILDER);
   }
@@ -382,7 +381,7 @@ public class TestFilterSelectivityEstimator {
     filter = simplify(filter);
     Assert.assertEquals(SqlKind.SEARCH, filter.getKind());
     FilterSelectivityEstimator estimator = new FilterSelectivityEstimator(scan, mq);
-    Assert.assertEquals(0.8095238095238095, estimator.estimateSelectivity(filter), DELTA);
+    Assert.assertEquals(0.7777777777777777, estimator.estimateSelectivity(filter), DELTA);
   }
 
   @Test
