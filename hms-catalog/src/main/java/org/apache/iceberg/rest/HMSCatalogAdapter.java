@@ -394,7 +394,11 @@ public class HMSCatalogAdapter implements RESTClient {
 
   private RESTResponse tableExists(Map<String, String> vars) {
     TableIdentifier ident = identFromPathVars(vars);
-    if (!catalog.tableExists(ident)) {
+    AccessLevel accessLevel = getAccessLevel(catalog, ident, configuration);
+    if (accessLevel == AccessLevel.NONE) {
+      throw new NoSuchTableException("Table is not accessible %s", ident.toString());
+    }
+    if (!Boolean.TRUE.equals(runAsHive(() -> catalog.tableExists(ident)))) {
       throw new NoSuchTableException("Table does not exist: %s", ident);
     }
     return null;

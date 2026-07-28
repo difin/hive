@@ -22,7 +22,9 @@ package org.apache.iceberg.rest;
 import com.google.gson.Gson;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HMSServletSecurity;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.RangerPrivilegeHelper;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.PrincipalType;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
@@ -44,6 +46,7 @@ import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableSet;
 import org.apache.iceberg.relocated.com.google.common.collect.Maps;
+import org.apache.iceberg.rest.responses.ErrorResponse;
 import org.apache.iceberg.transforms.Transform;
 import org.apache.iceberg.transforms.Transforms;
 import org.apache.iceberg.types.Types;
@@ -57,6 +60,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
@@ -64,6 +68,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.iceberg.NullOrder.NULLS_FIRST;
 import static org.apache.iceberg.SortDirection.ASC;
@@ -84,12 +89,18 @@ import static org.apache.iceberg.types.Types.NestedField.required;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestHMSCatalog extends HMSTestBase {
+  private static final Field PRIVILEGE_HELPER_FIELD = privilegeHelperField();
+
   HiveMetaStoreClient metastoreClient;
 
   public TestHMSCatalog() {
@@ -124,6 +135,32 @@ public class TestHMSCatalog extends HMSTestBase {
       return IcebergTestHelper.convertToDatabase(catalog, ns, meta);
     }
     throw new ClassCastException("not a HiveCatalog");
+  }
+
+  private static Field privilegeHelperField() {
+    try {
+      Field field = HMSServletSecurity.class.getDeclaredField("privilegeHelper");
+      field.setAccessible(true);
+      return field;
+    } catch (ReflectiveOperationException e) {
+      throw new ExceptionInInitializerError(e);
+    }
+  }
+
+  private static RangerPrivilegeHelper currentPrivilegeHelper() {
+    try {
+      return (RangerPrivilegeHelper) PRIVILEGE_HELPER_FIELD.get(null);
+    } catch (IllegalAccessException e) {
+      throw new IllegalStateException("Unable to read HMSServletSecurity privilege helper", e);
+    }
+  }
+
+  private static void setPrivilegeHelper(RangerPrivilegeHelper privilegeHelper) {
+    try {
+      PRIVILEGE_HELPER_FIELD.set(null, privilegeHelper);
+    } catch (IllegalAccessException e) {
+      throw new IllegalStateException("Unable to set HMSServletSecurity privilege helper", e);
+    }
   }
 
   static void illegalArgumentException(String str) {
@@ -283,6 +320,53 @@ public class TestHMSCatalog extends HMSTestBase {
 //              PARQUET_COMPRESSION);
     } finally {
       cachingCatalog.dropTable(tableIdent);
+    }
+  }
+
+  @Test
+  public void testCachingCatalogTableExistsDelegatesWithoutLoadingTableMetadata() {
+    HiveCatalog hiveCatalog = mock(HiveCatalog.class);
+    HMSCachingCatalog cachingCatalog = new HMSCachingCatalog(hiveCatalog, 1000);
+    TableIdentifier ident = TableIdentifier.of("db", "tbl");
+
+    when(hiveCatalog.tableExists(ident)).thenReturn(true);
+    when(hiveCatalog.loadTable(ident)).thenThrow(new RuntimeException("should not load table metadata"));
+
+    Assert.assertTrue(cachingCatalog.tableExists(ident));
+
+    verify(hiveCatalog).tableExists(ident);
+    verify(hiveCatalog, never()).loadTable(ident);
+  }
+
+  @Test
+  public void testRestTableExistsMasksExistingTableWhenReadAccessIsDenied() {
+    RangerPrivilegeHelper originalPrivilegeHelper = currentPrivilegeHelper();
+    try {
+      RangerPrivilegeHelper privilegeHelper = mock(RangerPrivilegeHelper.class);
+      setPrivilegeHelper(privilegeHelper);
+
+      TableIdentifier ident = TableIdentifier.of("db", "tbl");
+      HiveCatalog hiveCatalog = mock(HiveCatalog.class);
+      HMSCachingCatalog cachingCatalog = new HMSCachingCatalog(
+          hiveCatalog, 1000, true, true, new Configuration(false));
+      HMSCatalogAdapter adapter = new HMSCatalogAdapter(cachingCatalog, new Configuration(false));
+      AtomicReference<ErrorResponse> errorResponse = new AtomicReference<>();
+
+      when(privilegeHelper.isAvailable()).thenReturn(true);
+      when(privilegeHelper.getAccessLevel(eq("db"), eq("tbl"), anyString()))
+          .thenReturn(RangerPrivilegeHelper.AccessLevel.NONE);
+      when(hiveCatalog.tableExists(ident)).thenReturn(true);
+
+      try {
+        adapter.head("v1/namespaces/db/tables/tbl", (java.util.Map<String, String>) null, errorResponse::set);
+        Assert.fail("Expected denied tableExists request to fail");
+      } catch (org.apache.iceberg.exceptions.RESTException expected) {
+        Assert.assertNotNull(errorResponse.get());
+        Assert.assertEquals(404, errorResponse.get().code().intValue());
+        Assert.assertEquals("NoSuchTableException", errorResponse.get().type());
+      }
+    } finally {
+      setPrivilegeHelper(originalPrivilegeHelper);
     }
   }
 

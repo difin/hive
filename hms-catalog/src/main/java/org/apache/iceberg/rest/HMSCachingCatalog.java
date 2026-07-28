@@ -167,6 +167,10 @@ public class HMSCachingCatalog extends CachingCatalog implements SupportsNamespa
     }
   }
 
+  @Override
+  public boolean tableExists(TableIdentifier identifier) {
+    return hiveCatalog.tableExists(identifier);
+  }
 
   @Override
   public Catalog.TableBuilder buildTable(TableIdentifier identifier, Schema schema) {
