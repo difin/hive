@@ -100,7 +100,7 @@
     <keycloak.version>26.0.6</keycloak.version>
     <libfb303.version>0.9.3</libfb303.version>
     <libthrift.version>0.16.0</libthrift.version>
-    <log4j2.version>2.18.0</log4j2.version>
+    <log4j2.version>2.25.4</log4j2.version>
     <mockito-core.version>5.17.0</mockito-core.version>
     <nimbus-jose-jwt.version>10.4.2</nimbus-jose-jwt.version>
     <nimbus-oauth.version>11.28</nimbus-oauth.version>
@@ -805,10 +805,9 @@
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
+            <artifactId>log4j-core-test</artifactId>
             <version>${log4j2.version}</version>
-            <classifier>tests</classifier>
-            <scope>test</scope>
+	        <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
@@ -829,6 +828,12 @@
             <version>${jakarta.annotation-api.version}</version>
             <scope>test</scope>
         </dependency>
+	<dependency>
+	    <groupId>org.junit.platform</groupId>
+	    <artifactId>junit-platform-commons</artifactId>
+	    <version>1.11.2</version>
+	    <scope>test</scope>
+	</dependency>
     </dependencies>
 
     <profiles>
