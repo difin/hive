@@ -309,7 +309,10 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
           threadPool = Executors.newFixedThreadPool(numThreads,
               new ThreadFactoryBuilder().setDaemon(true).setNameFormat("HMSHandler #%d").build());
           int numTableLocks = MetastoreConf.getIntVar(conf, ConfVars.METASTORE_NUM_STRIPED_TABLE_LOCKS);
-          tablelocks = Striped.lock(numTableLocks);
+          // lazyWeakLock: lock objects are allocated on first use and held via weak references,
+          // so unused stripes are GC'd. A large stripe count keeps hash collisions between
+          // unrelated (db, tbl) keys without paying permanent memory cost.
+          tablelocks = Striped.lazyWeakLock(numTableLocks);
         }
       }
     }
