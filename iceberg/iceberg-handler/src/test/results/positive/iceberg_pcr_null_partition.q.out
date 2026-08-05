@@ -56,18 +56,21 @@ STAGE PLANS:
                 TableScan
                   alias: ice_01
                   filterExpr: ds is null (type: boolean)
-                  Statistics: Num rows: 1 Data size: 171 Basic stats: COMPLETE Column stats: COMPLETE
-                  Select Operator
-                    expressions: key (type: string), value (type: string), null (type: string)
-                    outputColumnNames: _col0, _col1, _col2
-                    Statistics: Num rows: 1 Data size: 255 Basic stats: COMPLETE Column stats: COMPLETE
-                    File Output Operator
-                      compressed: false
+                  Statistics: Num rows: 3 Data size: 795 Basic stats: COMPLETE Column stats: COMPLETE
+                  Filter Operator
+                    predicate: ds is null (type: boolean)
+                    Statistics: Num rows: 1 Data size: 265 Basic stats: COMPLETE Column stats: COMPLETE
+                    Select Operator
+                      expressions: key (type: string), value (type: string), null (type: string)
+                      outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 1 Data size: 255 Basic stats: COMPLETE Column stats: COMPLETE
-                      table:
-                          input format: org.apache.hadoop.mapred.SequenceFileInputFormat
-                          output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
-                          serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+                      File Output Operator
+                        compressed: false
+                        Statistics: Num rows: 1 Data size: 255 Basic stats: COMPLETE Column stats: COMPLETE
+                        table:
+                            input format: org.apache.hadoop.mapred.SequenceFileInputFormat
+                            output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
+                            serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
             Execution mode: vectorized
 
   Stage: Stage-0
@@ -107,18 +110,21 @@ STAGE PLANS:
                 TableScan
                   alias: ice_01
                   filterExpr: ds is not null (type: boolean)
-                  Statistics: Num rows: 2 Data size: 530 Basic stats: COMPLETE Column stats: COMPLETE
-                  Select Operator
-                    expressions: key (type: string), value (type: string), ds (type: string)
-                    outputColumnNames: _col0, _col1, _col2
+                  Statistics: Num rows: 3 Data size: 795 Basic stats: COMPLETE Column stats: COMPLETE
+                  Filter Operator
+                    predicate: ds is not null (type: boolean)
                     Statistics: Num rows: 2 Data size: 530 Basic stats: COMPLETE Column stats: COMPLETE
-                    File Output Operator
-                      compressed: false
+                    Select Operator
+                      expressions: key (type: string), value (type: string), ds (type: string)
+                      outputColumnNames: _col0, _col1, _col2
                       Statistics: Num rows: 2 Data size: 530 Basic stats: COMPLETE Column stats: COMPLETE
-                      table:
-                          input format: org.apache.hadoop.mapred.SequenceFileInputFormat
-                          output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
-                          serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
+                      File Output Operator
+                        compressed: false
+                        Statistics: Num rows: 2 Data size: 530 Basic stats: COMPLETE Column stats: COMPLETE
+                        table:
+                            input format: org.apache.hadoop.mapred.SequenceFileInputFormat
+                            output format: org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat
+                            serde: org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe
             Execution mode: vectorized
 
   Stage: Stage-0

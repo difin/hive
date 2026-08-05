@@ -250,6 +250,14 @@ public final class DDLUtils {
             table.getStorageHandler().getType() == StorageHandlerTypes.ICEBERG;
   }
 
+  public static boolean isPartitioned(Table table) {
+    if (table.hasNonNativePartitionSupport()) {
+      return table.getStorageHandler().isPartitioned(table);
+    } else {
+      return table.isPartitioned();
+    }
+  }
+
   public static boolean isIcebergStatsSource(HiveConf conf) {
     return conf.get(HIVE_ICEBERG_STATS_SOURCE.varname, HiveMetaHook.ICEBERG)
             .equalsIgnoreCase(HiveMetaHook.ICEBERG);

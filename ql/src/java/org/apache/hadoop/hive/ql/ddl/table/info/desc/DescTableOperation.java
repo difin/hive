@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.ql.ddl.table.info.desc;
 import java.io.DataOutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.ql.ddl.DDLOperationContext;
+import org.apache.hadoop.hive.ql.ddl.DDLUtils;
 import org.apache.hadoop.hive.ql.ddl.ShowUtils;
 import org.apache.hadoop.hive.ql.ddl.table.info.desc.formatter.DescTableFormatter;
 import org.apache.hadoop.hive.ql.exec.ColumnInfo;
@@ -207,6 +209,8 @@ public class DescTableOperation extends DDLOperation<DescTableDesc> {
         cols.addAll(Hive.getFieldsFromDeserializer(desc.getColumnPath(), deserializer, context.getConf()));
         if (table.isNonNative() && table.getStorageHandler().canProvideColStatistics(table)) {
           colStats.addAll(table.getStorageHandler().getColStatistics(table));
+        } else if (table.isNonNative() && DDLUtils.isIcebergStatsSource(context.getConf())) {
+          colStats.addAll(Collections.emptyList());
         } else {
           colStats.addAll(
               context.getDb().getTableColumnStatistics(tableName.getDb().toLowerCase(),

@@ -139,7 +139,7 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
 
       Table table = partish.getTable();
       if (table.isNonNative() && table.getStorageHandler().canProvideBasicStatistics()) {
-        providedBasicStats = table.getStorageHandler().computeBasicStatistics(partish);
+        providedBasicStats = table.getStorageHandler().getBasicStatistics(partish);
       }
     }
 

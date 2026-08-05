@@ -658,6 +658,12 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
   private boolean writeColStats(ColumnStatistics tableColStats, Table tbl) {
     try {
       if (!shouldRewriteColStats(tbl)) {
+        Long parentId = tbl.currentSnapshot().parentId();
+        if (parentId != null && !canProvideColStats(tbl, parentId)) {
+          // skip the write: without the previous snapshot's stats these cover only the rows just
+          // written, so they cannot be accurate. An explicit ANALYZE recompute is required.
+          return false;
+        }
         checkAndMergeColStats(tableColStats, tbl);
       }
       // Currently, we are only serializing table level stats.

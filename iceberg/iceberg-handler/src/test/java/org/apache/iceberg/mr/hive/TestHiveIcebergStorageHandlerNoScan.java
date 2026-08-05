@@ -943,7 +943,9 @@ public class TestHiveIcebergStorageHandlerNoScan {
 
     List<Object[]> rows = shell.executeStatement("DESCRIBE default.partitioned_with_comment_table");
     List<Types.NestedField> columns = icebergTable.schema().columns();
-    // The partition transform information and partition information is 6 extra lines, and 4 more line for the columns
+    // Post HIVE-28811 revert: DESCRIBE emits BOTH the "# Partition Information" section and the
+    // "# Partition Transform Information" section for the 2 partition columns. Together with the
+    // section blank-line + header rows this adds 10 extra lines beyond the base column rows.
     Assert.assertEquals(columns.size() + 10, rows.size());
     for (int i = 0; i < columns.size(); i++) {
       Types.NestedField field = columns.get(i);
@@ -1312,6 +1314,11 @@ public class TestHiveIcebergStorageHandlerNoScan {
     shell.executeStatement("ALTER TABLE default.customers SET PARTITION SPEC (region, city)");
 
     List<Object[]> result = shell.executeStatement("DESCRIBE default.customers");
+    // Post HIVE-28811 revert: DESCRIBE emits BOTH a "# Partition Information" section (partition
+    // columns with "Transform: <t>" in the comment) AND a "# Partition Transform Information"
+    // section (partition columns with transform_type). After the partition-spec evolution the spec
+    // retains the old family_name field as VOID, so the transform_type rows are:
+    //   [14] family_name VOID, [15] region IDENTITY, [16] city IDENTITY.
     Assert.assertArrayEquals(new String[] {"region", "IDENTITY", null}, result.get(15));
     Assert.assertArrayEquals(new String[] {"city", "IDENTITY", null}, result.get(16));
   }

@@ -173,7 +173,11 @@ class TextDescTableFormatter extends DescTableFormatter {
     if (columnPath == null) {
       List<FieldSchema> partitionColumns = null;
       // TODO (HIVE-29413): Refactor to a generic getPartCols() implementation
-      if (table.isPartitioned()) {
+      // Note: Table.isPartitioned() only inspects the native HMS partition columns, which are
+      // empty for non-native (e.g. Iceberg) tables that carry their partitioning in the storage
+      // handler. Mirror ShowPartitionsOperation and also treat hasNonNativePartitionSupport()
+      // tables as partitioned so the "# Partition Information" section is still emitted.
+      if (table.isPartitioned() || table.hasNonNativePartitionSupport()) {
         partitionColumns = table.hasNonNativePartitionSupport() ?
             table.getStorageHandler().getPartitionKeys(table) :
             table.getPartCols();

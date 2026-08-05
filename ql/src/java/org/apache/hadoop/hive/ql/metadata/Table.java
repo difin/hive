@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -609,10 +608,8 @@ public class Table implements Serializable {
   }
 
   public List<String> getPartColNames() {
-    List<FieldSchema> partCols = hasNonNativePartitionSupport() ?
-        getStorageHandler().getPartitionKeys(this) : getPartCols();
-    return partCols.stream().map(FieldSchema::getName)
-      .collect(Collectors.toList());
+    return getPartCols().stream().map(FieldSchema::getName)
+        .toList();
   }
 
   public boolean hasNonNativePartitionSupport() {
@@ -811,8 +808,7 @@ public class Table implements Serializable {
   }
 
   public boolean isPartitioned() {
-    return hasNonNativePartitionSupport() ? getStorageHandler().isPartitioned(this) :
-        CollectionUtils.isNotEmpty(getPartCols());
+    return CollectionUtils.isNotEmpty(getPartCols());
   }
 
   public void setFields(List<FieldSchema> fields) {

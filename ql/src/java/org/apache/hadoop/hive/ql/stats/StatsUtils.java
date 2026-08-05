@@ -303,7 +303,7 @@ public class StatsUtils {
       long numErasureCodedFiles = getErasureCodedFiles(table);
 
       if (needColStats && !metaTable) {
-        colStats = getTableColumnStats(table, neededColumns, colStatsCache, fetchColStats);
+        colStats = getTableColumnStats(conf, table, neededColumns, colStatsCache, fetchColStats);
         colStats = estimateStatsForMissingCols(neededColumns, colStats, conf, nr, schema);
         // we should have stats for all columns (estimated or actual)
         assert (neededColumns.size() <= colStats.size());
@@ -367,7 +367,7 @@ public class StatsUtils {
 
         if (DDLUtils.isIcebergTable(table)) {
           // TODO: replace with partition column stats once implemented
-          List<ColStatistics> colStats = getTableColumnStats(table, neededColumns, colStatsCache, fetchColStats);
+          List<ColStatistics> colStats = getTableColumnStats(conf, table, neededColumns, colStatsCache, fetchColStats);
           colStats = estimateStatsForMissingCols(neededColumns, colStats, conf, nr, schema);
           // we should have stats for all columns (estimated or actual)
           assert (neededColumns.size() <= colStats.size());
@@ -1007,7 +1007,7 @@ public class StatsUtils {
    *          - list of needed columns
    * @return column statistics
    */
-  public static List<ColStatistics> getTableColumnStats(
+  public static List<ColStatistics> getTableColumnStats(HiveConf conf,
       Table table, List<String> neededColumns, ColumnStatsList colStatsCache, boolean fetchColStats) {
     List<ColStatistics> stats = new ArrayList<>();
     if (table.isMaterializedTable()) {
@@ -1039,6 +1039,8 @@ public class StatsUtils {
         List<ColumnStatisticsObj> colStat;
         if (table.isNonNative() && table.getStorageHandler().canProvideColStatistics(table)) {
           colStat = table.getStorageHandler().getColStatistics(table);
+        } else if (table.isNonNative() && DDLUtils.isIcebergStatsSource(conf)) {
+          colStat = Collections.emptyList();
         } else {
           colStat = Hive.get().getTableColumnStatistics(dbName, tabName, colStatsToRetrieve, false);
         }

@@ -140,7 +140,7 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
   private List<Partition> getPartitions(Table table) throws HiveException {
     List<Partition> partitions = new ArrayList<>();
 
-   if (desc.getPartitionSpec() == null && table.isPartitioned()) {
+   if (desc.getPartitionSpec() == null && DDLUtils.isPartitioned(table)) {
       if (DDLUtils.isIcebergTable(table)) {
         HiveStorageHandler sh = table.getStorageHandler();
 

@@ -35,6 +35,7 @@ import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.Warehouse;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.ql.ddl.DDLUtils;
 import org.apache.hadoop.hive.ql.exec.ExprNodeEvaluator;
 import org.apache.hadoop.hive.ql.exec.FunctionRegistry;
 import org.apache.hadoop.hive.ql.exec.TableScanOperator;
@@ -110,7 +111,7 @@ public class PartitionPruner extends Transform {
    *          the pruner expression for the table
    */
   public static boolean onlyContainsPartnCols(Table table, ExprNodeDesc expr) {
-    if (!table.isPartitioned() || (expr == null)) {
+    if (!DDLUtils.isPartitioned(table) || (expr == null)) {
       return true;
     }
 
@@ -138,9 +139,12 @@ public class PartitionPruner extends Transform {
 
     return true;
   }
-
+  
   private static boolean isPartitionKey(Table table, String columnName) {
-    return table.getPartColNames().stream().anyMatch(item -> item.equalsIgnoreCase(columnName));
+    List<String> partitionKeyNames = table.hasNonNativePartitionSupport() ?
+        table.getStorageHandler().getPartitionKeys(table).stream()
+        .map(FieldSchema::getName).toList() : table.getPartColNames();
+    return partitionKeyNames.stream().anyMatch(item->item.equalsIgnoreCase(columnName));
   }
 
   /**

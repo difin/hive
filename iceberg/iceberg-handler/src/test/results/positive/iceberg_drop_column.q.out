@@ -136,14 +136,14 @@ POSTHOOK: query: show partitions ice_tbl
 POSTHOOK: type: SHOWPARTITIONS
 POSTHOOK: Input: default@ice_tbl
 partition
-current-spec-id=0/pcol=a"ab/datecol=2019-02-07
-current-spec-id=0/pcol=a'ab/datecol=2019-02-07
-current-spec-id=0/pcol=abc/datecol=2019-02-07
-current-spec-id=0/pcol=xya/datecol=2027-01-20
-current-spec-id=0/pcol=xyb/datecol=2025-07-18
-current-spec-id=0/pcol=xyz/datecol=2026-07-19
-current-spec-id=0/pcol=yab/datecol=2023-07-26
-current-spec-id=0/pcol=yzb/datecol=2023-07-26
+pcol=a%22ab/datecol=2019-02-07
+pcol=a%27ab/datecol=2019-02-07
+pcol=abc/datecol=2019-02-07
+pcol=xya/datecol=2027-01-20
+pcol=xyb/datecol=2025-07-18
+pcol=xyz/datecol=2026-07-19
+pcol=yab/datecol=2023-07-26
+pcol=yzb/datecol=2023-07-26
 PREHOOK: query: show columns in ice_tbl
 PREHOOK: type: SHOWCOLUMNS
 PREHOOK: Input: default@ice_tbl

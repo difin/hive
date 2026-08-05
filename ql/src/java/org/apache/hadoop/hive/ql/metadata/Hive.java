@@ -4260,9 +4260,18 @@ private void constructOneLBLocationMap(FileStatus fSta,
 
   public List<String> getPartitionNames(String dbName, String tblName, short max)
       throws HiveException {
+    Table tbl = new Table(dbName, tblName);
+    return getPartitionNames(tbl, max);
+  }
+
+  public List<String> getPartitionNames(Table tbl, short max)
+      throws HiveException {
     List<String> names = null;
     try {
-      names = getMSC().listPartitionNames(dbName, tblName, max);
+      if (tbl.hasNonNativePartitionSupport()) {
+        return tbl.getStorageHandler().getPartitionNames(tbl, Collections.emptyMap());
+      }
+      names = getMSC().listPartitionNames(tbl.getDbName(), tbl.getTableName(), max);
     } catch (NoSuchObjectException nsoe) {
       // this means no partition exists for the given dbName and tblName
       // key value pairs - thrift cannot handle null return values, hence
@@ -4275,26 +4284,36 @@ private void constructOneLBLocationMap(FileStatus fSta,
     return names;
   }
 
-  public List<String> getPartitionNames(String dbName, String tblName,
-      Map<String, String> partSpec, short max) throws HiveException {
-    List<String> names = null;
-    Table t = getTable(dbName, tblName);
-    if (t.hasNonNativePartitionSupport()) {
-      return t.getStorageHandler().getPartitionNames(t, partSpec);
-    }
+  public List<String> getPartitionNames(String dbName, String tblName, Map<String, String> partSpec, short max)
+      throws HiveException {
+    Table tbl = getTable(dbName, tblName);
+    return getPartitionNames(tbl, partSpec, max);
+  }
 
-    List<String> pvals = MetaStoreUtils.getPvals(t.getPartCols(), partSpec);
+  public List<String> getPartitionNames(Table tbl, Map<String, String> partSpec, short max)
+      throws HiveException {
+    if (tbl.hasNonNativePartitionSupport()) {
+      return tbl.getStorageHandler().getPartitionNames(tbl, partSpec);
+    }
+    List<String> pvals = MetaStoreUtils.getPvals(tbl.getPartCols(), partSpec);
+    return getPartitionNamesByPartitionVals(tbl, pvals, max);
+  }
+
+  // get partition names from provided partition values
+  public List<String> getPartitionNamesByPartitionVals(Table tbl, List<String> pVals, short max)
+      throws HiveException {
+    List<String> names = null;
 
     try {
       GetPartitionNamesPsRequest req = new GetPartitionNamesPsRequest();
-      req.setTblName(tblName);
-      req.setDbName(dbName);
-      req.setPartValues(pvals);
+      req.setDbName(tbl.getDbName());
+      req.setTblName(tbl.getTableName());
+      req.setPartValues(pVals);
       req.setMaxParts(max);
-      if (AcidUtils.isTransactionalTable(t)) {
-        ValidWriteIdList validWriteIdList = getValidWriteIdList(dbName, tblName);
+      if (AcidUtils.isTransactionalTable(tbl)) {
+        ValidWriteIdList validWriteIdList = getValidWriteIdList(tbl.getDbName(), tbl.getTableName());
         req.setValidWriteIdList(validWriteIdList != null ? validWriteIdList.toString() : null);
-        req.setId(t.getTTable().getId());
+        req.setId(tbl.getTTable().getId());
       }
       GetPartitionNamesPsResponse res = getMSC().listPartitionNamesRequest(req);
       names = res.getNames();

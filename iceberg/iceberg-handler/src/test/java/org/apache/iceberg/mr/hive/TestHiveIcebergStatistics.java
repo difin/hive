@@ -368,27 +368,7 @@ public class TestHiveIcebergStatistics extends HiveIcebergStorageHandlerWithEngi
   private void checkColStatMinMaxDistinctValue(String tableName, String colName, int minValue, int maxValue,
       int distinct, int nulls) {
 
-    shell.executeStatement("set hive.iceberg.stats.source=metastore");
     List<Object[]> rows = shell.executeStatement("DESCRIBE FORMATTED " + tableName + " " + colName);
-
-    // Check min
-    Assert.assertEquals("min", rows.get(2)[0]);
-    Assert.assertEquals(String.valueOf(minValue), rows.get(2)[1]);
-
-    // Check max
-    Assert.assertEquals("max", rows.get(3)[0]);
-    Assert.assertEquals(String.valueOf(maxValue), rows.get(3)[1]);
-
-    // Check num of nulls
-    Assert.assertEquals("num_nulls", rows.get(4)[0]);
-    Assert.assertEquals(String.valueOf(nulls), rows.get(4)[1]);
-
-    // Check distinct
-    Assert.assertEquals("distinct_count", rows.get(5)[0]);
-    Assert.assertEquals(String.valueOf(distinct), rows.get(5)[1]);
-
-    shell.executeStatement("set hive.iceberg.stats.source=iceberg");
-    rows = shell.executeStatement("DESCRIBE FORMATTED " + tableName + " " + colName);
 
     // Check min
     Assert.assertEquals("min", rows.get(2)[0]);
