@@ -773,7 +773,9 @@ public class LlapTaskSchedulerService extends TaskScheduler {
         boolean isRemoved = removeFromRunningTaskMap(
             newStateAnyTask ? guaranteedTasks : speculativeTasks, ti.task, ti);
         if (!isRemoved) {
-          String error = "Couldn't find the task in the correct map after an update " + ti.task;
+          String error = String.format( "Couldn't find task in the correct map after an update. Task: %s, " +
+              "AttemptID: %s, isGuaranteed: %s, Priority: %s", ti.task, ti.attemptId, ti.isGuaranteed,
+            ti.priority != null ? ti.priority.getPriority() : "null");
           LOG.error(error);
           throw new AssertionError(error);
         }
@@ -911,7 +913,7 @@ public class LlapTaskSchedulerService extends TaskScheduler {
     }
   }
 
-  private void startTimeoutMonitor() {
+  protected void startTimeoutMonitor() {
     timeoutLock.lock();
     try {
       // If timer is null, start a new one.
@@ -2163,8 +2165,8 @@ public class LlapTaskSchedulerService extends TaskScheduler {
 
   // Note: this is called under the epic lock.
   private int distributeGuaranteed(int count, TaskInfo failedUpdate, List<TaskInfo> toUpdate) {
-    WM_LOG.info("Distributing " + count + " among " + speculativeTasks.size() + " levels"
-        + (failedUpdate == null ? "" : "; on failure"));
+    WM_LOG.debug("Distributing {} among {} levels {}", count, speculativeTasks.size(),
+      (failedUpdate == null ? "" : "; on failure"));
 
     Iterator<Entry<Integer, TreeSet<TaskInfo>>> iterator = speculativeTasks.entrySet().iterator();
     int remainingCount = count;
@@ -2545,7 +2547,7 @@ public class LlapTaskSchedulerService extends TaskScheduler {
 
     @Override
     public void run() {
-      LOG.info("Reporting SERVICE_UNAVAILABLE error as no instances are running");
+      LOG.warn("Reporting SERVICE_UNAVAILABLE error as no instances are running");
       try {
         getContext().reportError(ServicePluginErrorDefaults.SERVICE_UNAVAILABLE,
             "No LLAP Daemons are running", getContext().getCurrentDagInfo());
@@ -2797,7 +2799,7 @@ public class LlapTaskSchedulerService extends TaskScheduler {
       return hadCommFailure;
     }
 
-    boolean _canAccepInternal() {
+    boolean canAcceptInternal() {
       return !hadCommFailure && !disabled
           &&(numSchedulableTasks == -1 || ((numSchedulableTasks - numScheduledTasks) > 0));
     }
@@ -2806,7 +2808,7 @@ public class LlapTaskSchedulerService extends TaskScheduler {
     may be running in the system. Also depends upon the capacity usage configuration
      */
     boolean canAcceptTask() {
-      boolean result = _canAccepInternal();
+      boolean result = canAcceptInternal();
       if (LOG.isTraceEnabled()) {
         LOG.trace(constructCanAcceptLogResult(result));
       }
@@ -2843,7 +2845,7 @@ public class LlapTaskSchedulerService extends TaskScheduler {
     }
 
     private String setupShortStringBase() {
-      return "{" + serviceInstance.getHost() + ":" + serviceInstance.getRpcPort() + ", id=" + getNodeIdentity();
+      return "{" + serviceInstance.getHost() + ":" + serviceInstance.getRpcPort() + ", id=" + getNodeIdentity() + "}";
     }
 
     @Override
@@ -2861,7 +2863,7 @@ public class LlapTaskSchedulerService extends TaskScheduler {
 
     private String toShortString() {
       StringBuilder sb = new StringBuilder();
-      sb.append(", canAcceptTask=").append(_canAccepInternal());
+      sb.append(", canAcceptTask=").append(canAcceptInternal());
       sb.append(", st=").append(numScheduledTasks);
       sb.append(", ac=").append((numSchedulableTasks - numScheduledTasks));
       sb.append(", commF=").append(hadCommFailure);

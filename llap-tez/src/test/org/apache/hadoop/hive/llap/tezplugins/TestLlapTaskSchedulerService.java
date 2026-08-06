@@ -27,6 +27,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.timeout;
 
 import org.apache.tez.dag.records.TezDAGID;
 
@@ -35,7 +36,9 @@ import org.apache.tez.dag.records.TezVertexID;
 import org.apache.tez.dag.records.TezTaskID;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.TimeUnit;
@@ -341,6 +344,46 @@ public class TestLlapTaskSchedulerService {
     }
   }
 
+  @Test(timeout = 10000)
+  public void testTimeoutMonitorTriggersServiceUnavailableOnZeroNodes() throws Exception {
+    String[] configuredHosts = new String[]{HOST1};
+    String[] liveHosts = new String[]{HOST1};
+
+    TestTaskSchedulerServiceWrapper tsWrapper = new TestTaskSchedulerServiceWrapper(
+      2000L,              // nodeDisableTimeoutMillis
+      configuredHosts,     // hosts
+      1,                  // numExecutors
+      0,                  // waitQueueSize
+      0L,                 // localityDelayMs
+      false,              // controlledDelayedTaskQueue
+      liveHosts,          // liveHosts
+      true                // useMockRegistry
+    );
+
+    try {
+      // 1. Force the scheduler timeout to 0 ms so SchedulerTimeoutMonitor fires immediately
+      tsWrapper.ts.setTimeoutForTest(0L);
+
+      // 2. Reset mockAppCallback interactions to clear earlier nodesUpdated calls containing ExtendedNodeId
+      reset(tsWrapper.mockAppCallback);
+
+      // 3. Clear active instances in mock registry so activeInstances size returns 0
+      doReturn(Collections.emptyList()).when(tsWrapper.mockServiceInstanceSet).getAll();
+
+      // 4. Trigger startTimeoutMonitor on zero active instances
+      tsWrapper.ts.triggerStartTimeoutMonitorForTest();
+
+      // 5. Verify that reportError with SERVICE_UNAVAILABLE is invoked on application callback
+      verify(tsWrapper.mockAppCallback, timeout(5000).times(1)).reportError(
+        eq(org.apache.tez.serviceplugins.api.ServicePluginErrorDefaults.SERVICE_UNAVAILABLE),
+        eq("No LLAP Daemons are running"),
+        any()
+      );
+
+    } finally {
+      tsWrapper.shutdown();
+    }
+  }
 
   @Test(timeout = 10000)
   public void testUpdateOnFinishingTask() throws IOException, InterruptedException {
@@ -2339,6 +2382,20 @@ public class TestLlapTaskSchedulerService {
       } finally {
         testLock.unlock();
       }
+    }
+
+    void setTimeoutForTest(long timeoutMs) {
+      try {
+        Field field = LlapTaskSchedulerService.class.getDeclaredField("timeout");
+        field.setAccessible(true);
+        field.set(this, timeoutMs);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    void triggerStartTimeoutMonitorForTest() {
+      startTimeoutMonitor();
     }
 
   }
