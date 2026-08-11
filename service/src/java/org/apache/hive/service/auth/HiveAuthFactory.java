@@ -20,6 +20,9 @@ package org.apache.hive.service.auth;
 import static org.apache.hadoop.fs.CommonConfigurationKeys.HADOOP_SECURITY_AUTHENTICATION;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -264,7 +267,7 @@ public class HiveAuthFactory {
       delegationTokenManager.cancelDelegationToken(delegationToken);
     } catch (IOException e) {
       throw new HiveSQLException(
-          "Error canceling delegation token " + delegationToken, "08S01", e);
+          "Error canceling delegation token " + tokenFingerprint(delegationToken), "08S01", e);
     }
   }
 
@@ -277,7 +280,7 @@ public class HiveAuthFactory {
       delegationTokenManager.renewDelegationToken(delegationToken);
     } catch (IOException e) {
       throw new HiveSQLException(
-          "Error renewing delegation token " + delegationToken, "08S01", e);
+          "Error renewing delegation token " + tokenFingerprint(delegationToken), "08S01", e);
     }
   }
 
@@ -289,7 +292,7 @@ public class HiveAuthFactory {
     try {
       return delegationTokenManager.verifyDelegationToken(delegationToken);
     } catch (IOException e) {
-      String msg =  "Error verifying delegation token " + delegationToken;
+      String msg =  "Error verifying delegation token " + tokenFingerprint(delegationToken);
       LOG.error(msg, e);
       throw new HiveSQLException(msg, "08S01", e);
     }
@@ -304,7 +307,41 @@ public class HiveAuthFactory {
       return delegationTokenManager.getUserFromToken(delegationToken);
     } catch (IOException e) {
       throw new HiveSQLException(
-          "Error extracting user from delegation token " + delegationToken, "08S01", e);
+          "Error extracting user from delegation token " + tokenFingerprint(delegationToken),
+          "08S01", e);
+    }
+  }
+
+  /**
+   * Produces a short, non-reversible fingerprint of a delegation token that is safe to emit in
+   * logs and client-visible error messages. Hive delegation tokens are bearer credentials, so the
+   * raw token must never appear in cleartext in logs or error text. The fingerprint is stable for
+   * a given token, allowing operators to correlate repeated failures for the same token without
+   * disclosing reusable credential material.
+   *
+   * @param delegationToken the raw delegation token string (may be null)
+   * @return a non-sensitive identifier of the form token-sha256:<16 hex chars>
+   */
+  static String tokenFingerprint(String delegationToken) {
+    if (delegationToken == null) {
+      return "null";
+    }
+    if (delegationToken.isEmpty()) {
+      return "empty";
+    }
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+      byte[] digest = md.digest(delegationToken.getBytes(StandardCharsets.UTF_8));
+      StringBuilder sb = new StringBuilder("token-sha256:");
+      // 8 bytes (16 hex chars) is enough to correlate failures without aiding token recovery.
+      for (int i = 0; i < 8; i++) {
+        sb.append(Character.forDigit((digest[i] >> 4) & 0xF, 16));
+        sb.append(Character.forDigit(digest[i] & 0xF, 16));
+      }
+      return sb.toString();
+    } catch (NoSuchAlgorithmException e) {
+      // SHA-256 is a required algorithm on every JVM; fall back to a non-revealing placeholder.
+      return "token-redacted";
     }
   }
 
