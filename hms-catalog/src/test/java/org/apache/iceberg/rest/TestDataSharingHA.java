@@ -170,6 +170,14 @@ public class TestDataSharingHA {
   }
 
   @Test(expected = IllegalArgumentException.class)
+  public void testClientCallRejectsNullJwt() throws Exception {
+    Configuration conf = new Configuration();
+    conf.set("hive.metastore.catalog.idbroker.url", "http://localhost:18080/gateway");
+    DataSharing ds = new AwsCredentialProvider(conf);
+    ds.clientCall(null, new java.net.URL("http://localhost:18080/gateway/test"), "GET", null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
   public void testWhitespaceOnlyBrokerConfiguration() throws IOException {
     Configuration conf = new Configuration();
     conf.set(DataSharing.CONFVAR_IDBROKER_URL, "   ,  ,   ");

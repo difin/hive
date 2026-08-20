@@ -23,6 +23,9 @@ import com.google.gson.Gson;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.SecurityFriend;
 import org.apache.hadoop.hive.metastore.utils.MetaStoreUtils;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.authentication.client.AuthenticatedURL;
+import org.apache.hadoop.security.authentication.client.AuthenticationException;
 import org.apache.iceberg.exceptions.NotAuthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -218,7 +222,7 @@ public abstract class DataSharing {
         LOG.info("==> DataSharing.fetchDelegationToken(), trying broker url: {} (attempt {}/{})",
             brokerUrl, attempt, idBrokerUris.length);
 
-        Object result = clientCall(null, brokerUrl, HTTP_GET, null);
+        Object result = fetchDelegationTokenFromBroker(brokerUrl);
         LOG.info("==> DataSharing.fetchDelegationToken(), broker response: {} ", result);
         if (result instanceof Map) {
           Object sessionToken = ((Map<?, ?>) result).get(ACCESS_TOKEN);
@@ -309,40 +313,98 @@ public abstract class DataSharing {
   // --- HTTP client ---
 
   /**
-   * Performs a JSON client call to the given URL.
+   * Fetches a Knox delegation JWT from {@code /dt/knoxtoken/api/v1/token}.
+   * Uses SPNEGO as the HMS login user when Kerberos is enabled; plain HTTP otherwise (tests).
+   */
+  private Object fetchDelegationTokenFromBroker(URL url) throws IOException {
+    if (UserGroupInformation.isSecurityEnabled()) {
+      try {
+        return UserGroupInformation.getLoginUser().doAs(
+            (PrivilegedExceptionAction<Object>) () -> executeJsonGet(url, true));
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new IOException("Interrupted while fetching IdBroker delegation token", e);
+      }
+    }
+    return executeJsonGet(url, false);
+  }
+
+  private HttpURLConnection openSpnegoConnection(URL url) throws IOException {
+    AuthenticatedURL.Token spnegoToken = new AuthenticatedURL.Token();
+    HttpURLConnection con;
+    try {
+      con = new AuthenticatedURL().openConnection(url, spnegoToken);
+    } catch (AuthenticationException e) {
+      throw new IOException("SPNEGO authentication failed for " + url, e);
+    }
+    applyClientSslContext(con);
+    return con;
+  }
+
+  private HttpURLConnection openPlainConnection(URL url) throws IOException {
+    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    applyClientSslContext(con);
+    return con;
+  }
+
+  private void applyClientSslContext(HttpURLConnection con) {
+    if (clientSslContext != null && con instanceof HttpsURLConnection) {
+      ((HttpsURLConnection) con).setSSLSocketFactory(clientSslContext.getSocketFactory());
+    }
+  }
+
+  private Object executeJsonGet(URL url, boolean useSpnego) throws IOException {
+    HttpURLConnection con = useSpnego ? openSpnegoConnection(url) : openPlainConnection(url);
+    try {
+      con.setRequestMethod(HTTP_GET);
+      con.setRequestProperty(CONTENT_TYPE, APPLICATION_JSON);
+      con.setRequestProperty(ACCEPT, APPLICATION_JSON);
+      con.setDoInput(true);
+      return readHttpResponse(con);
+    } finally {
+      con.disconnect();
+    }
+  }
+
+  /**
+   * Performs a JSON client call to the given URL with a JWT bearer token.
    *
-   * @param jwt the JWT bearer token (or null for unauthenticated)
+   * @param jwt the JWT bearer token from {@link #fetchDelegationToken()}
    * @param url the url
    * @param method the HTTP method
    * @param arg the argument that will be transported as JSON
    * @return the parsed JSON result, a ServerResponse on error, or the HTTP response code
    * @throws IOException if the request fails
+   * @throws IllegalArgumentException if {@code jwt} is null or empty
    */
   public Object clientCall(String jwt, URL url, String method, Object arg) throws IOException {
     return clientCall(jwt, url, method, true, arg);
   }
 
   public Object clientCall(String jwt, URL url, String method, boolean json, Object arg) throws IOException {
-    HttpURLConnection con;
-    if (clientSslContext != null) {
-      HttpsURLConnection sslcon = (HttpsURLConnection) url.openConnection();
-      sslcon.setSSLSocketFactory(clientSslContext.getSocketFactory());
-      con = sslcon;
-    } else {
-      con = (HttpURLConnection) url.openConnection();
+    if (jwt == null || jwt.isEmpty()) {
+      throw new IllegalArgumentException(
+          "IdBroker client call requires a JWT bearer token; unauthenticated requests are not supported");
     }
-    con.setRequestMethod(method);
-    con.setRequestProperty(MetaStoreUtils.USER_NAME_HTTP_HEADER, url.getUserInfo());
-    if (jwt != null && !jwt.isEmpty()) {
+    HttpURLConnection con = openPlainConnection(url);
+    try {
+      con.setRequestMethod(method);
+      con.setRequestProperty(MetaStoreUtils.USER_NAME_HTTP_HEADER, url.getUserInfo());
       con.setRequestProperty("Authorization", "Bearer " + jwt);
+      if (json) {
+        con.setRequestProperty(CONTENT_TYPE, APPLICATION_JSON);
+        con.setRequestProperty(ACCEPT, APPLICATION_JSON);
+      } else {
+        con.setRequestProperty(CONTENT_TYPE, APPLICATION_WWW_FORM);
+      }
+      con.setDoInput(true);
+      return readHttpResponse(con);
+    } finally {
+      con.disconnect();
     }
-    if (json) {
-      con.setRequestProperty(CONTENT_TYPE, APPLICATION_JSON);
-      con.setRequestProperty(ACCEPT, APPLICATION_JSON);
-    } else {
-      con.setRequestProperty(CONTENT_TYPE, APPLICATION_WWW_FORM);
-    }
-    con.setDoInput(true);
+  }
+
+  private Object readHttpResponse(HttpURLConnection con) throws IOException {
     int responseCode = con.getResponseCode();
     InputStream responseStream = con.getErrorStream();
     if (responseStream == null) {
