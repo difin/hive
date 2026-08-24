@@ -338,6 +338,13 @@ public class TestHMSCatalogServer extends HMSTestBase {
     response = clientCall(jwt,
         standaloneUrl("/v1/namespaces/" + DB_NAME + "/tables/" + tblName), "DELETE", null);
     Assert.assertNotNull("Delete response should not be null", response);
+    if (response instanceof Map) {
+      Object deleteStatus = ((Map<?, ?>) response).get("status");
+      if (deleteStatus instanceof Number) {
+        int statusCode = ((Number) deleteStatus).intValue();
+        Assert.assertNotEquals("Delete should not be forbidden", 403, statusCode);
+      }
+    }
 
     response = clientCall(jwt, embeddedUrl(listApiPath), "GET", null);
     Assert.assertTrue("Response should be a Map", response instanceof Map);

@@ -21,6 +21,9 @@ package org.apache.iceberg.rest;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -49,6 +52,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletResponse;
 
@@ -61,8 +66,10 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HMSServletSecurity;
 import org.apache.hadoop.hive.metastore.HiveMetaException;
 import org.apache.hadoop.hive.metastore.HiveMetaStore;
+import org.apache.hadoop.hive.metastore.RangerPrivilegeHelper;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.MetaStoreSchemaInfo;
 import org.apache.hadoop.hive.metastore.MetaStoreTestUtils;
@@ -92,6 +99,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class HMSTestBase {
+  private static final VarHandle PRIVILEGE_HELPER_HANDLE = privilegeHelperHandle();
+
   protected static final Logger LOG = LoggerFactory.getLogger(HMSTestBase.class.getName());
   protected static final String BASE_DIR = System.getProperty("basedir");
   protected static Random RND = new Random(20230922);
@@ -165,6 +174,7 @@ public abstract class HMSTestBase {
   protected HiveMetaStoreClient metastoreClient;
   /** Unique ID assigned to this test's HMS instance to avoid cross-server catalog conflicts. */
   private String servletId;
+  private RangerPrivilegeHelper originalPrivilegeHelper;
 
   protected int createMetastoreServer(Configuration conf) throws Exception {
     return MetaStoreTestUtils.startMetaStoreWithRetry(HadoopThriftAuthBridge.getBridge(), conf,
@@ -235,6 +245,42 @@ public abstract class HMSTestBase {
     catalog = ice;
     nsCatalog = catalog instanceof SupportsNamespaces ? (SupportsNamespaces) catalog : null;
     catalogPort = aport[0];
+    mockPrivilegeHelperForTests();
+  }
+
+  private static VarHandle privilegeHelperHandle() {
+    try {
+      return MethodHandles.privateLookupIn(HMSServletSecurity.class, MethodHandles.lookup())
+          .findStaticVarHandle(HMSServletSecurity.class, "privilegeHelper", RangerPrivilegeHelper.class);
+    } catch (ReflectiveOperationException e) {
+      throw new ExceptionInInitializerError(e);
+    }
+  }
+
+  private static RangerPrivilegeHelper currentPrivilegeHelper() {
+    return (RangerPrivilegeHelper) PRIVILEGE_HELPER_HANDLE.get();
+  }
+
+  private static void setPrivilegeHelper(RangerPrivilegeHelper privilegeHelper) {
+    PRIVILEGE_HELPER_HANDLE.set(privilegeHelper);
+  }
+
+  /**
+   * write-access checks call Ranger during REST mutations. Tests run without a real
+   * Ranger deployment, so default to READ_WRITE unless a test overrides the helper explicitly.
+   */
+  private void mockPrivilegeHelperForTests() {
+    originalPrivilegeHelper = currentPrivilegeHelper();
+    RangerPrivilegeHelper privilegeHelper = mock(RangerPrivilegeHelper.class);
+    when(privilegeHelper.isAvailable()).thenReturn(true);
+    when(privilegeHelper.getAccessLevel(anyString(), anyString(), anyString()))
+        .thenReturn(RangerPrivilegeHelper.AccessLevel.READ_WRITE);
+    setPrivilegeHelper(privilegeHelper);
+  }
+
+  private void restorePrivilegeHelper() {
+    setPrivilegeHelper(originalPrivilegeHelper);
+    originalPrivilegeHelper = null;
   }
 
   private static String format(String format, Object... params) {
@@ -278,6 +324,7 @@ public abstract class HMSTestBase {
   @After
   public void tearDown() throws Exception {
     try {
+      restorePrivilegeHelper();
       if (port >= 0) {
         stopMetastoreServer(port);
         port = -1;
