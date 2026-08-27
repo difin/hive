@@ -132,7 +132,7 @@ public class DeleteSemanticAnalyzer extends RewriteSemanticAnalyzer<DeleteStatem
       return false;
     }
 
-    inputs = sem.getInputs();
+    inputs = sem.getAllInputs();
     outputs = sem.getOutputs();
     outputs.add(new WriteEntity(table, WriteEntity.WriteType.DELETE));
 
