@@ -1312,8 +1312,8 @@ public class TestHiveIcebergStorageHandlerNoScan {
     shell.executeStatement("ALTER TABLE default.customers SET PARTITION SPEC (region, city)");
 
     List<Object[]> result = shell.executeStatement("DESCRIBE default.customers");
-    Assert.assertArrayEquals(new String[] {"region", "IDENTITY", null}, result.get(14));
-    Assert.assertArrayEquals(new String[] {"city", "IDENTITY", null}, result.get(15));
+    Assert.assertArrayEquals(new String[] {"region", "IDENTITY", null}, result.get(15));
+    Assert.assertArrayEquals(new String[] {"city", "IDENTITY", null}, result.get(16));
   }
 
   @Test

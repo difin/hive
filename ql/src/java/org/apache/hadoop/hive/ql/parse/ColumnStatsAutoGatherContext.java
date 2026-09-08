@@ -20,13 +20,14 @@ package org.apache.hadoop.hive.ql.parse;
 
 import static org.apache.hadoop.hive.ql.metadata.HiveUtils.unparseIdentifier;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.ql.Context;
 import org.apache.hadoop.hive.ql.QueryState;
@@ -46,7 +47,6 @@ import org.apache.hadoop.hive.ql.plan.ExprNodeConstantDesc;
 import org.apache.hadoop.hive.ql.plan.LoadFileDesc;
 import org.apache.hadoop.hive.ql.plan.OperatorDesc;
 import org.apache.hadoop.hive.ql.plan.SelectDesc;
-import org.apache.hadoop.hive.ql.stats.StatsUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
@@ -67,7 +67,6 @@ public class ColumnStatsAutoGatherContext {
   private final List<FieldSchema> partitionColumns;
   private boolean isInsertInto;
   private Table tbl;
-  private List<TransformSpec> partTransformSpec;
   private Map<String, String> partSpec;
   private Context origCtx;
   
@@ -123,18 +122,16 @@ public class ColumnStatsAutoGatherContext {
    */
   public void insertTableValuesAnalyzePipeline() throws SemanticException {
     // Instead of starting from analyze statement, we just generate the Select plan
-    boolean isPartitionStats = StatsUtils.isPartitionStats(tbl, conf);
+    boolean isPartitionStats = conf.getBoolVar(ConfVars.HIVE_STATS_COLLECT_PART_LEVEL_STATS) && tbl.isPartitioned();
     if (isPartitionStats) {
       partSpec = new HashMap<>();
       List<String> partKeys = Utilities.getColumnNamesFromFieldSchema(tbl.getPartitionKeys());
-      partKeys.forEach(k -> partSpec.put(k, null));
-
-      if (tbl.hasNonNativePartitionSupport()) {
-        partTransformSpec = tbl.getStorageHandler().getPartitionTransformSpec(tbl);
+      for (String partKey : partKeys) {
+        partSpec.put(partKey, null);
       }
     }
     String command = ColumnStatsSemanticAnalyzer.genRewrittenQuery(
-        tbl, conf, partTransformSpec, partSpec, isPartitionStats);
+        tbl, conf, partSpec, isPartitionStats, true);
     insertAnalyzePipeline(command, true);
   }
 

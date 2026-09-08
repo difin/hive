@@ -37,11 +37,11 @@ import static org.apache.iceberg.types.Types.NestedField.optional;
 
 public class TestHiveIcebergUnknownType extends HiveIcebergStorageHandlerWithEngineBase {
 
-  @Parameters(name = "fileFormat={0}, catalog={1}, isVectorized={2}, formatVersion={3}")
+  @Parameters(name = "fileFormat={0}, engine={1}, catalog={2}, isVectorized={3}, formatVersion={4}")
   public static Collection<Object[]> parameters() {
     return Lists.newArrayList(
-        new Object[] { FileFormat.PARQUET, TestTableType.HIVE_CATALOG, false, 3 },
-        new Object[] { FileFormat.PARQUET, TestTableType.HIVE_CATALOG, true, 3 });
+        new Object[] { FileFormat.PARQUET, "tez", TestTableType.HIVE_CATALOG, false, 3 },
+        new Object[] { FileFormat.PARQUET, "tez", TestTableType.HIVE_CATALOG, true, 3 });
   }
 
   @Test

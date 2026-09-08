@@ -128,7 +128,6 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
     private BasicStatsWork work;
     private boolean followedColStats1;
     private Map<String, String> providedBasicStats;
-    private boolean skipStatsUpdate = false;
 
     private HiveConf conf;
 
@@ -140,9 +139,7 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
 
       Table table = partish.getTable();
       if (table.isNonNative() && table.getStorageHandler().canProvideBasicStatistics()) {
-        this.providedBasicStats = table.getStorageHandler().computeBasicStatistics(partish);
-        this.skipStatsUpdate = StatsSetupConst.STATS_REQUIRE_COMPUTE.stream()
-            .anyMatch(providedBasicStats::containsKey);
+        providedBasicStats = table.getStorageHandler().computeBasicStatistics(partish);
       }
     }
 
@@ -184,7 +181,7 @@ public class BasicStatsTask implements Serializable, IStatsProcessor {
       if (providedBasicStats == null) {
         MetaStoreUtils.populateQuickStats(partfileStatus, parameters);
 
-        if (statsAggregator != null && !skipStatsUpdate) {
+        if (statsAggregator != null) {
           // Update stats for transactional tables (MM, or full ACID with overwrite), even
           // though we are marking stats as not being accurate.
           if (StatsSetupConst.areBasicStatsUptoDate(parameters) || p.isTransactionalTable()) {

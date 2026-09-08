@@ -142,29 +142,14 @@ public class ColStatsProcessor implements IStatsProcessor {
 
       if (!statsObjs.isEmpty()) {
         if (!isTblLevel) {
-          List<FieldSchema> partColSchema = new ArrayList<>();
+          List<FieldSchema> partColSchema = tbl.getPartCols();
           List<String> partVals = new ArrayList<>();
-
-          if (tbl.hasNonNativePartitionSupport()) {
-            ObjectInspector inspector = fields.get(pos).getFieldObjectInspector();
-            if (inspector.getCategory() == ObjectInspector.Category.STRUCT) {
-              Object obj = values.get(pos);
-              StructObjectInspector oi = (StructObjectInspector) inspector;
-
-              for (StructField field : oi.getAllStructFieldRefs()) {
-                partColSchema.add(new FieldSchema(field.getFieldName(), null, ""));
-                partVals.add(String.valueOf(oi.getStructFieldData(obj, field)));
-              }
-            }
-          } else {
-            partColSchema.addAll(tbl.getPartCols());
-            // Iterate over partition columns to figure out partition name
-            for (int i = pos; i < pos + partColSchema.size(); i++) {
-              Object partVal = ((PrimitiveObjectInspector) fields.get(i).getFieldObjectInspector())
+          // Iterate over partition columns to figure out partition name
+          for (int i = pos; i < pos + partColSchema.size(); i++) {
+            Object partVal = ((PrimitiveObjectInspector) fields.get(i).getFieldObjectInspector())
                 .getPrimitiveJavaObject(values.get(i));
-              partVals.add(partVal == null ? // could be null for default partition
-                this.conf.getVar(ConfVars.DEFAULTPARTITIONNAME) : partVal.toString());
-            }
+            partVals.add(partVal == null ? // could be null for default partition
+              this.conf.getVar(ConfVars.DEFAULTPARTITIONNAME) : partVal.toString());
           }
           partName = Warehouse.makePartName(partColSchema, partVals);
         }
@@ -237,16 +222,16 @@ public class ColStatsProcessor implements IStatsProcessor {
           request.setValidWriteIdList(validWriteIdList.toString());
         }
       }
-
+      
       start = System. currentTimeMillis();
-      if (tbl.isNonNative() && tbl.getStorageHandler().canSetColStatistics(tbl)) {
+      if (tbl != null && tbl.isNonNative() && tbl.getStorageHandler().canSetColStatistics(tbl)) {
         boolean success = tbl.getStorageHandler().setColStatistics(tbl, colStats);
         if (!(tbl.isMaterializedView() || tbl.isView() || tbl.isTemporary())) {
           setOrRemoveColumnStatsAccurateProperty(db, tbl, colStatDesc.getColName(), success);
         }
-      } else {
-        db.setPartitionColumnStatistics(request);
       }
+      // TODO: Write stats for native tables only (See HIVE-27421)
+      db.setPartitionColumnStatistics(request);
       end = System.currentTimeMillis();
       LOG.info("Time taken to update " + colStats.size() + " stats : " + ((end - start)/1000F) + " seconds.");
     }

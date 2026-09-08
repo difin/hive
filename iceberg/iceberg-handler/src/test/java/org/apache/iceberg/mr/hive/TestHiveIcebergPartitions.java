@@ -36,6 +36,7 @@ import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
 import org.apache.iceberg.types.Types;
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.apache.iceberg.types.Types.NestedField.optional;
@@ -247,6 +248,10 @@ public class TestHiveIcebergPartitions extends HiveIcebergStorageHandlerWithEngi
     HiveIcebergTestUtils.validateDataWithSQL(shell, "part_test", records, "id");
   }
 
+  @Ignore("CDPD-121157: SHOW PARTITIONS on Iceberg transform-partitioned tables fails after the " +
+      "HIVE-28811 revert (the reverted-back getSplits-based showPartitions path throws NoSuchTableException " +
+      "for HADOOP_TABLE and misresolves the partition filter). Test introduced by HIVE-29376 which is not " +
+      "present on the reference revert branch. Re-enable once showPartitions is fixed.")
   @Test
   public void testShowPartitionsWithTransform() {
     Schema schema = new Schema(

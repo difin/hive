@@ -254,7 +254,6 @@ Table Parameters:
 	iceberg.orc.files.only	true                
 #### A masked pattern was here ####
 	numFiles            	2                   
-	numPartitions       	2                   
 	numRows             	4                   
 	parquet.compression 	snappy              
 #### A masked pattern was here ####

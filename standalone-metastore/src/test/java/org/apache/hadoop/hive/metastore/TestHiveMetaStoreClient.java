@@ -103,8 +103,6 @@ public class TestHiveMetaStoreClient extends HiveMetaStoreClient implements IMet
   public Table getTable(String dbName, String tableName, boolean getColumnStats, String engine)
       throws MetaException, TException, NoSuchObjectException {
     Table tTable = new Table();
-    tTable.setDbName(dbName);
-    tTable.setTableName(tableName);
     tTable.setId(Long.MAX_VALUE);
     Map<String, String> parameters = new HashMap<>();
     parameters.put(hive_metastoreConstants.TABLE_IS_TRANSACTIONAL, "true");

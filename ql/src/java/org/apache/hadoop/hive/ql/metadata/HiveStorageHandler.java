@@ -25,8 +25,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
-
-import com.google.common.collect.Maps;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.hive.common.classification.InterfaceAudience;
@@ -34,7 +32,6 @@ import org.apache.hadoop.hive.common.classification.InterfaceStability;
 import org.apache.hadoop.hive.common.type.SnapshotContext;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaHook;
-import org.apache.hadoop.hive.metastore.api.AggrStats;
 import org.apache.hadoop.hive.metastore.api.ColumnStatistics;
 import org.apache.hadoop.hive.metastore.api.ColumnStatisticsObj;
 import org.apache.hadoop.hive.metastore.api.EnvironmentContext;
@@ -249,10 +246,10 @@ public interface HiveStorageHandler extends Configurable {
   }
 
   /**
-   * Returns basic statistics (numRows, numFiles, totalSize) calculated by the underlying storage handler
+   * Return some basic statistics (numRows, numFiles, totalSize) calculated by the underlying storage handler
    * implementation.
-   * @param partish table/partition wrapper object
-   * @return map of basic statistics
+   * @param partish a partish wrapper class
+   * @return map of basic statistics, can be null
    */
   default Map<String, String> getBasicStatistics(Partish partish) {
     return null;
@@ -260,8 +257,8 @@ public interface HiveStorageHandler extends Configurable {
 
   /**
    * Compute basic statistics (numRows, numFiles, totalSize) for the given table/partition.
-   * @param partish table/partition wrapper object
-   * @return map of basic statistics
+   * @param partish a partish wrapper class
+   * @return map of basic statistics, can be null
    */
   default Map<String, String> computeBasicStatistics(Partish partish) {
     return null;
@@ -274,67 +271,50 @@ public interface HiveStorageHandler extends Configurable {
   default boolean canProvideBasicStatistics() {
     return false;
   }
-  
-  /**
-   * Check if the storage handler can provide partition statistics.
-   * @return true if the storage handler can supply the partition statistics
-   */
-  default boolean canProvidePartitionStatistics(org.apache.hadoop.hive.ql.metadata.Table table) {
+
+  default boolean canProvidePartitionStatistics(org.apache.hadoop.hive.ql.metadata.Table hmsTable) {
     return false;
   }
 
   /**
-   * Returns column statistics (upper/lower bounds, number of Null/NaN values, NDVs, histogram).
-   * @param table table object
-   * @return list of ColumnStatisticsObj objects
+   * Return some col statistics (Lower bounds, Upper bounds, Null value counts, NaN, total counts) calculated by
+   * the underlying storage handler implementation.
+   * @param table
+   * @return A List of Column Statistics Objects, can be null
    */
   default List<ColumnStatisticsObj> getColStatistics(org.apache.hadoop.hive.ql.metadata.Table table) {
     return null;
   }
 
   /**
-   * Returns an aggregated column statistics for the supplied partition list
-   * @param table table object
-   * @param colNames list of column names
-   * @param partNames list of partition names
-   * @return AggrStats object
-  */ 
-  default AggrStats getAggrColStatsFor(org.apache.hadoop.hive.ql.metadata.Table table, List<String> colNames, 
-        List<String> partNames) throws MetaException {
-    return null;
-  }
-
-  /**
    * Set column stats for non-native tables
-   * @param table table object
-   * @param colStats list of ColumnStatistics objects
-   * @return true if operation is successful                 
+   * @param table
+   * @param colStats
+   * @return boolean
    */
   default boolean setColStatistics(org.apache.hadoop.hive.ql.metadata.Table table, List<ColumnStatistics> colStats) {
     return false;
   }
 
   /**
-   * Check if the storage handler can provide column statistics.
-   * @param table table object
-   * @return true if the storage handler can supply the column statistics
+   * Check if the storage handler can provide col statistics.
+   * @param tbl
+   * @return true if the storage handler can supply the col statistics
    */
-  default boolean canProvideColStatistics(org.apache.hadoop.hive.ql.metadata.Table table) {
+  default boolean canProvideColStatistics(org.apache.hadoop.hive.ql.metadata.Table tbl) {
     return false;
   }
 
   /**
    * Check if the storage handler can set col statistics.
-   * @param table table object
    * @return true if the storage handler can set the col statistics
    */
-  default boolean canSetColStatistics(org.apache.hadoop.hive.ql.metadata.Table table) {
+  default boolean canSetColStatistics(org.apache.hadoop.hive.ql.metadata.Table tbl) {
     return false;
   }
 
   /**
-   * Check if the storage handler can answer a few queries like count(1) purely using statistics.
-   * @param partish table/partition wrapper object
+   * Check if the storage handler answer a few queries like count(1) purely using stats.
    * @return true if the storage handler can answer query using statistics
    */
   default boolean canComputeQueryUsingStats(Partish partish) {
@@ -342,8 +322,8 @@ public interface HiveStorageHandler extends Configurable {
   }
   
   @Deprecated
-  default boolean canComputeQueryUsingStats(org.apache.hadoop.hive.ql.metadata.Table table) {
-    return canComputeQueryUsingStats(Partish.buildFor(table));
+  default boolean canComputeQueryUsingStats(org.apache.hadoop.hive.ql.metadata.Table tbl) {
+    return canComputeQueryUsingStats(Partish.buildFor(tbl));
   }
   
   /**
@@ -570,10 +550,6 @@ public interface HiveStorageHandler extends Configurable {
    * @return partition transform specification, can be null.
    */
   default List<TransformSpec> getPartitionTransformSpec(org.apache.hadoop.hive.ql.metadata.Table table) {
-    return null;
-  }
-
-  default Map<Integer,List<TransformSpec>> getPartitionTransformSpecs(org.apache.hadoop.hive.ql.metadata.Table table) {
     return null;
   }
 
@@ -823,10 +799,15 @@ public interface HiveStorageHandler extends Configurable {
     return null;
   }
 
-  @Deprecated
+  /**
+   * Checks if storage handler supports Show Partitions and returns a list of partitions
+   * @return List of partitions
+   * @throws UnsupportedOperationException
+   * @throws HiveException
+   */
   default List<String> showPartitions(DDLOperationContext context,
       org.apache.hadoop.hive.ql.metadata.Table tbl) throws UnsupportedOperationException, HiveException {
-    return getPartitionNames(tbl);
+    throw new UnsupportedOperationException("Storage handler does not support show partitions command");
   }
 
   /**
@@ -857,19 +838,15 @@ public interface HiveStorageHandler extends Configurable {
 
   /**
    * Returns partitions names for the current table spec that correspond to the provided partition spec.
-   * @param table {@link org.apache.hadoop.hive.ql.metadata.Table} table metadata stored in Hive Metastore
+   * @param hmsTable {@link org.apache.hadoop.hive.ql.metadata.Table} table metadata stored in Hive Metastore
    * @param partitionSpec Map of Strings {@link java.util.Map} partition specification
    * @return List of partition names
    */
-  default List<String> getPartitionNames(org.apache.hadoop.hive.ql.metadata.Table table,
+  default List<String> getPartitionNames(org.apache.hadoop.hive.ql.metadata.Table hmsTable,
       Map<String, String> partitionSpec) throws SemanticException {
     throw new UnsupportedOperationException("Storage handler does not support getting partition names");
   }
 
-  default List<String> getPartitionNames(org.apache.hadoop.hive.ql.metadata.Table table) throws SemanticException {
-    return getPartitionNames(table, Maps.newHashMap());
-  }
-  
   default ColumnInfo getColumnInfo(org.apache.hadoop.hive.ql.metadata.Table hmsTable, String colName)
       throws SemanticException {
     throw new UnsupportedOperationException("Storage handler does not support getting column type " +
@@ -886,23 +863,29 @@ public interface HiveStorageHandler extends Configurable {
   }
 
   /**
-   * Returns a list of partitions which contain any files whose content falls under the provided filter condition.
-   * @param table {@link org.apache.hadoop.hive.ql.metadata.Table} table metadata stored in Hive Metastore
+   * Returns a list of partitions with the latest partition spec which contain any files whose content falls under 
+   * the provided filter condition.
+   * @param hmsTable {@link org.apache.hadoop.hive.ql.metadata.Table} table metadata stored in Hive Metastore
    * @param filter Iceberg filter expression
-   * @param latestSpecOnly when True, returns partitions with the current spec only; 
-   *                       False - older specs only; 
-   *                       Null - any spec
    * @return List of Partitions {@link org.apache.hadoop.hive.ql.metadata.Partition}
    */
-  default List<Partition> getPartitionsByExpr(org.apache.hadoop.hive.ql.metadata.Table table,
-        ExprNodeDesc filter, Boolean latestSpecOnly) throws SemanticException {
-    throw new UnsupportedOperationException("Storage handler does not support getting partitions " +
-        "by generic expressions");
+  default List<Partition> getPartitionsByExpr(org.apache.hadoop.hive.ql.metadata.Table hmsTable, ExprNodeDesc filter)
+          throws SemanticException {
+    throw new UnsupportedOperationException("Storage handler does not support getting partitions by expression " +
+            "for a table.");
   }
 
-  default List<Partition> getPartitionsByExpr(org.apache.hadoop.hive.ql.metadata.Table table, ExprNodeDesc filter)
-        throws SemanticException {
-    return getPartitionsByExpr(table, filter, null);
+  /**
+   * Returns a list of partitions which contain any files whose content falls under the provided filter condition.
+   * @param hmsTable {@link org.apache.hadoop.hive.ql.metadata.Table} table metadata stored in Hive Metastore
+   * @param filter Iceberg filter expression
+   * @param latestSpecOnly When true, returns partitions with the latest partition spec, else with the older specs only.
+   * @return List of Partitions {@link org.apache.hadoop.hive.ql.metadata.Partition}
+   */
+  default List<Partition> getPartitionsByExpr(org.apache.hadoop.hive.ql.metadata.Table hmsTable,
+                                              ExprNodeDesc filter, boolean latestSpecOnly) throws SemanticException {
+    throw new UnsupportedOperationException("Storage handler does not support getting partitions " +
+        "by generic expressions");
   }
 
   /**
@@ -913,7 +896,7 @@ public interface HiveStorageHandler extends Configurable {
    * @throws SemanticException {@link org.apache.hadoop.hive.ql.parse.SemanticException} 
    */
   default Partition getPartition(org.apache.hadoop.hive.ql.metadata.Table table, Map<String, String> partitionSpec)
-        throws SemanticException {
+      throws SemanticException {
     return getPartition(table, partitionSpec, Context.RewritePolicy.DEFAULT);
   }
 
@@ -926,30 +909,37 @@ public interface HiveStorageHandler extends Configurable {
    * @throws SemanticException {@link org.apache.hadoop.hive.ql.parse.SemanticException}
    */
   default Partition getPartition(org.apache.hadoop.hive.ql.metadata.Table table, Map<String, String> partitionSpec,
-        Context.RewritePolicy policy) throws SemanticException {
+      Context.RewritePolicy policy) throws SemanticException {
     throw new UnsupportedOperationException("Storage handler does not support getting partition for a table.");
+  }
+
+  /**
+   * Returns a list of partitions with the latest partition spec based on table and partial partition specification.
+   * @param table {@link org.apache.hadoop.hive.ql.metadata.Table} table metadata stored in Hive Metastore
+   * @param partitionSpec Map of Strings {@link java.util.Map} partition specification
+   * @return List of Partitions {@link org.apache.hadoop.hive.ql.metadata.Partition}
+   * @throws SemanticException {@link org.apache.hadoop.hive.ql.parse.SemanticException}
+   */
+  default List<Partition> getPartitions(org.apache.hadoop.hive.ql.metadata.Table table, 
+      Map<String, String> partitionSpec) throws SemanticException {
+    return getPartitions(table, partitionSpec, true);
+  }
+
+  default List<Partition> getPartitions(org.apache.hadoop.hive.ql.metadata.Table table) throws SemanticException {
+    return getPartitions(table, Collections.emptyMap());
   }
 
   /**
    * Returns a list of partitions based on table and partial partition specification.
    * @param table {@link org.apache.hadoop.hive.ql.metadata.Table} table metadata stored in Hive Metastore
    * @param partitionSpec Map of Strings {@link java.util.Map} partition specification
-   * @param latestSpecOnly when True, returns partitions with the current spec only, else - any spec
+   * @param latestSpecOnly When true, returns partitions with the latest partition spec, else with older specs
    * @return List of Partitions {@link org.apache.hadoop.hive.ql.metadata.Partition}
    * @throws SemanticException {@link org.apache.hadoop.hive.ql.parse.SemanticException}
    */
   default List<Partition> getPartitions(org.apache.hadoop.hive.ql.metadata.Table table,
-        Map<String, String> partitionSpec, boolean latestSpecOnly) throws SemanticException {
+      Map<String, String> partitionSpec, boolean latestSpecOnly) throws SemanticException {
     throw new UnsupportedOperationException("Storage handler does not support getting partitions for a table.");
-  }
-
-  default List<Partition> getPartitions(org.apache.hadoop.hive.ql.metadata.Table table,
-        Map<String, String> partitionSpec) throws SemanticException {
-    return getPartitions(table, partitionSpec, false);
-  }
-
-  default List<Partition> getPartitions(org.apache.hadoop.hive.ql.metadata.Table table) throws SemanticException {
-    return getPartitions(table, Collections.emptyMap());
   }
 
   default boolean isPartitioned(org.apache.hadoop.hive.ql.metadata.Table table) {

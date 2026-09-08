@@ -518,9 +518,10 @@ public class DDLPlanUtils {
     throws HiveException {
     List<String> alterTblStmt = new ArrayList<>();
     List<String> accessedColumns = getTableColumnNames(tbl);
-    List<ColumnStatisticsObj> tableColumnStatistics = Hive.get(conf).getTableColumnStatistics(
-        tbl, accessedColumns, true);
-    
+    List<ColumnStatisticsObj> tableColumnStatistics = Hive.get(conf).getTableColumnStatistics(tbl.getDbName(),
+      tbl.getTableName(),
+      accessedColumns,
+      true);
     ColumnStatisticsObj[] columnStatisticsObj = tableColumnStatistics.toArray(new ColumnStatisticsObj[0]);
     for (ColumnStatisticsObj statisticsObj : columnStatisticsObj) {
       alterTblStmt.add(getAlterTableStmtCol(

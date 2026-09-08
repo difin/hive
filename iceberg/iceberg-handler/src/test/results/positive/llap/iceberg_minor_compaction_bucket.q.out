@@ -96,7 +96,6 @@ Table Parameters:
 	iceberg.orc.files.only	false               
 #### A masked pattern was here ####
 	numFiles            	7                   
-	numPartitions       	6                   
 	numRows             	12                  
 	parquet.compression 	snappy              
 #### A masked pattern was here ####
@@ -213,7 +212,6 @@ Table Parameters:
 	iceberg.orc.files.only	false               
 #### A masked pattern was here ####
 	numFiles            	8                   
-	numPartitions       	4                   
 	numRows             	12                  
 	parquet.compression 	snappy              
 #### A masked pattern was here ####

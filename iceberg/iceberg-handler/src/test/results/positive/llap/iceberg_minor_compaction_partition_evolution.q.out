@@ -123,7 +123,6 @@ Table Parameters:
 	iceberg.orc.files.only	true                
 #### A masked pattern was here ####
 	numFiles            	4                   
-	numPartitions       	1                   
 	numRows             	6                   
 	parquet.compression 	snappy              
 #### A masked pattern was here ####
@@ -207,8 +206,7 @@ Table Parameters:
 	iceberg.orc.files.only	true                
 #### A masked pattern was here ####
 	numFiles            	4                   
-	numPartitions       	1                   
-	numRows             	6                   
+	numRows             	8                   
 	parquet.compression 	snappy              
 #### A masked pattern was here ####
 	rawDataSize         	0                   
@@ -301,7 +299,7 @@ Retention:          	0
 #### A masked pattern was here ####
 Table Type:         	EXTERNAL_TABLE      	 
 Table Parameters:	 	 
-	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\"}
+	COLUMN_STATS_ACCURATE	{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"dept_id\":\"true\",\"first_name\":\"true\",\"last_name\":\"true\"}}
 	EXTERNAL            	TRUE                
 	bucketing_version   	2                   
 	compactor.threshold.min.input.files	4                   
@@ -315,7 +313,6 @@ Table Parameters:
 	iceberg.orc.files.only	true                
 #### A masked pattern was here ####
 	numFiles            	2                   
-	numPartitions       	2                   
 	numRows             	6                   
 	parquet.compression 	snappy              
 #### A masked pattern was here ####

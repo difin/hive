@@ -164,9 +164,11 @@ public class PartitionIterable implements Iterable<Partition> {
     this.getColStats = getColStats;
 
     if (this.partialPartitionSpec == null){
-      partitionNames = db.getPartitionNames(table, (short) -1);
+      partitionNames = db.getPartitionNames(
+          table.getDbName(),table.getTableName(), (short) -1);
     } else {
-      partitionNames = db.getPartitionNames(table, partialPartitionSpec, (short) -1);
+      partitionNames = db.getPartitionNames(
+          table.getDbName(),table.getTableName(),partialPartitionSpec,(short)-1);
     }
   }
 

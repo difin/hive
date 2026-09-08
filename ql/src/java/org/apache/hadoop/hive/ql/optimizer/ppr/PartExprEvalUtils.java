@@ -57,10 +57,7 @@ public class PartExprEvalUtils {
     Properties partProps = p.getSchema();
 
     String[] partKeyTypes;
-    if (p.getTable().hasNonNativePartitionSupport()) {
-      if (!partSpec.keySet().containsAll(expr.getCols())) {
-        return null;
-      }
+    if (DDLUtils.isIcebergTable(p.getTable())) {
       partKeyTypes = p.getTable().getStorageHandler().getPartitionKeys(p.getTable()).stream()
           .map(FieldSchema::getType).toArray(String[]::new);
     } else {
@@ -69,11 +66,8 @@ public class PartExprEvalUtils {
     }
 
     if (partSpec.size() != partKeyTypes.length) {
-      if (DDLUtils.isIcebergTable(p.getTable())) {
-        return null;
-      }
-      throw new HiveException("Internal error : Partition Spec size, " + partSpec.size() +
-          " doesn't match partition key definition size, " + partKeyTypes.length);
+        throw new HiveException("Internal error : Partition Spec size, " + partSpec.size() +
+                " doesn't match partition key definition size, " + partKeyTypes.length);
     }
     String defaultPartitionName = HiveConf.getVar(SessionState.getSessionConf(),
         HiveConf.ConfVars.DEFAULTPARTITIONNAME);

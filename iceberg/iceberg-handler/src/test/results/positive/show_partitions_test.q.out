@@ -6,6 +6,26 @@ POSTHOOK: query: create table hiveT1 (a string, b int, c int) PARTITIONED BY (d_
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@hiveT1
+PREHOOK: query: insert into hiveT1 values ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4), ('aa', 1, 2, 2, 5), ('aa', 1, 2, 10, 5), ('aa', 1, 2, 10, 5)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@hivet1
+POSTHOOK: query: insert into hiveT1 values ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4), ('aa', 1, 2, 2, 5), ('aa', 1, 2, 10, 5), ('aa', 1, 2, 10, 5)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@hivet1
+POSTHOOK: Output: default@hivet1@d_part=10/e_part=5
+POSTHOOK: Output: default@hivet1@d_part=2/e_part=5
+POSTHOOK: Output: default@hivet1@d_part=3/e_part=4
+POSTHOOK: Lineage: hivet1 PARTITION(d_part=10,e_part=5).a SCRIPT []
+POSTHOOK: Lineage: hivet1 PARTITION(d_part=10,e_part=5).b SCRIPT []
+POSTHOOK: Lineage: hivet1 PARTITION(d_part=10,e_part=5).c SCRIPT []
+POSTHOOK: Lineage: hivet1 PARTITION(d_part=2,e_part=5).a SCRIPT []
+POSTHOOK: Lineage: hivet1 PARTITION(d_part=2,e_part=5).b SCRIPT []
+POSTHOOK: Lineage: hivet1 PARTITION(d_part=2,e_part=5).c SCRIPT []
+POSTHOOK: Lineage: hivet1 PARTITION(d_part=3,e_part=4).a SCRIPT []
+POSTHOOK: Lineage: hivet1 PARTITION(d_part=3,e_part=4).b SCRIPT []
+POSTHOOK: Lineage: hivet1 PARTITION(d_part=3,e_part=4).c SCRIPT []
 PREHOOK: query: create table ice1 (a string, b int, c int) PARTITIONED BY (d_part int, e_part int) stored by iceberg stored as orc TBLPROPERTIES("format-version"='2')
 PREHOOK: type: CREATETABLE
 PREHOOK: Output: database:default
@@ -14,12 +34,23 @@ POSTHOOK: query: create table ice1 (a string, b int, c int) PARTITIONED BY (d_pa
 POSTHOOK: type: CREATETABLE
 POSTHOOK: Output: database:default
 POSTHOOK: Output: default@ice1
+PREHOOK: query: insert into ice1 values  ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4), ('aa', 1, 2, 2, 5), ('aa', 1, 2, 10, 5), ('aa', 1, 2, 10, 5)
+PREHOOK: type: QUERY
+PREHOOK: Input: _dummy_database@_dummy_table
+PREHOOK: Output: default@ice1
+POSTHOOK: query: insert into ice1 values  ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4), ('aa', 1, 2, 2, 5), ('aa', 1, 2, 10, 5), ('aa', 1, 2, 10, 5)
+POSTHOOK: type: QUERY
+POSTHOOK: Input: _dummy_database@_dummy_table
+POSTHOOK: Output: default@ice1
 PREHOOK: query: show partitions hiveT1
 PREHOOK: type: SHOWPARTITIONS
 PREHOOK: Input: default@hivet1
 POSTHOOK: query: show partitions hiveT1
 POSTHOOK: type: SHOWPARTITIONS
 POSTHOOK: Input: default@hivet1
+d_part=10/e_part=5
+d_part=2/e_part=5
+d_part=3/e_part=4
 PREHOOK: query: describe default.ice1.partitions
 PREHOOK: type: DESCTABLE
 PREHOOK: Input: default@ice1
@@ -42,62 +73,11 @@ last_updated_snapshot_id	bigint              	Id of snapshot that last updated t
 # col_name            	data_type           	comment             
 d_part              	int                 	Transform: identity 
 e_part              	int                 	Transform: identity 
-PREHOOK: query: select * from default.ice1.partitions
+PREHOOK: query: select `partition` from default.ice1.partitions order by `partition`
 PREHOOK: type: QUERY
 PREHOOK: Input: default@ice1
 PREHOOK: Output: hdfs://### HDFS PATH ###
-POSTHOOK: query: select * from default.ice1.partitions
-POSTHOOK: type: QUERY
-POSTHOOK: Input: default@ice1
-POSTHOOK: Output: hdfs://### HDFS PATH ###
-PREHOOK: query: show partitions ice1
-PREHOOK: type: SHOWPARTITIONS
-PREHOOK: Input: default@ice1
-POSTHOOK: query: show partitions ice1
-POSTHOOK: type: SHOWPARTITIONS
-POSTHOOK: Input: default@ice1
-PREHOOK: query: insert into hiveT1 values ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4), ('aa', 1, 2, 2, 5), ('aa', 1, 2, 10, 5), ('aa', 1, 2, 10, 5)
-PREHOOK: type: QUERY
-PREHOOK: Input: _dummy_database@_dummy_table
-PREHOOK: Output: default@hivet1
-POSTHOOK: query: insert into hiveT1 values ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4), ('aa', 1, 2, 2, 5), ('aa', 1, 2, 10, 5), ('aa', 1, 2, 10, 5)
-POSTHOOK: type: QUERY
-POSTHOOK: Input: _dummy_database@_dummy_table
-POSTHOOK: Output: default@hivet1
-POSTHOOK: Output: default@hivet1@d_part=10/e_part=5
-POSTHOOK: Output: default@hivet1@d_part=2/e_part=5
-POSTHOOK: Output: default@hivet1@d_part=3/e_part=4
-POSTHOOK: Lineage: hivet1 PARTITION(d_part=10,e_part=5).a SCRIPT []
-POSTHOOK: Lineage: hivet1 PARTITION(d_part=10,e_part=5).b SCRIPT []
-POSTHOOK: Lineage: hivet1 PARTITION(d_part=10,e_part=5).c SCRIPT []
-POSTHOOK: Lineage: hivet1 PARTITION(d_part=2,e_part=5).a SCRIPT []
-POSTHOOK: Lineage: hivet1 PARTITION(d_part=2,e_part=5).b SCRIPT []
-POSTHOOK: Lineage: hivet1 PARTITION(d_part=2,e_part=5).c SCRIPT []
-POSTHOOK: Lineage: hivet1 PARTITION(d_part=3,e_part=4).a SCRIPT []
-POSTHOOK: Lineage: hivet1 PARTITION(d_part=3,e_part=4).b SCRIPT []
-POSTHOOK: Lineage: hivet1 PARTITION(d_part=3,e_part=4).c SCRIPT []
-PREHOOK: query: insert into ice1 values  ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4), ('aa', 1, 2, 2, 5), ('aa', 1, 2, 10, 5), ('aa', 1, 2, 10, 5)
-PREHOOK: type: QUERY
-PREHOOK: Input: _dummy_database@_dummy_table
-PREHOOK: Output: default@ice1
-POSTHOOK: query: insert into ice1 values  ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4), ('aa', 1, 2, 2, 5), ('aa', 1, 2, 10, 5), ('aa', 1, 2, 10, 5)
-POSTHOOK: type: QUERY
-POSTHOOK: Input: _dummy_database@_dummy_table
-POSTHOOK: Output: default@ice1
-PREHOOK: query: show partitions hiveT1
-PREHOOK: type: SHOWPARTITIONS
-PREHOOK: Input: default@hivet1
-POSTHOOK: query: show partitions hiveT1
-POSTHOOK: type: SHOWPARTITIONS
-POSTHOOK: Input: default@hivet1
-d_part=10/e_part=5
-d_part=2/e_part=5
-d_part=3/e_part=4
-PREHOOK: query: select `partition` from default.ice1.partitions
-PREHOOK: type: QUERY
-PREHOOK: Input: default@ice1
-PREHOOK: Output: hdfs://### HDFS PATH ###
-POSTHOOK: query: select `partition` from default.ice1.partitions
+POSTHOOK: query: select `partition` from default.ice1.partitions order by `partition`
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@ice1
 POSTHOOK: Output: hdfs://### HDFS PATH ###
@@ -110,9 +90,9 @@ PREHOOK: Input: default@ice1
 POSTHOOK: query: show partitions ice1
 POSTHOOK: type: SHOWPARTITIONS
 POSTHOOK: Input: default@ice1
-d_part=10/e_part=5
-d_part=2/e_part=5
-d_part=3/e_part=4
+current-spec-id=0/d_part=10/e_part=5
+current-spec-id=0/d_part=2/e_part=5
+current-spec-id=0/d_part=3/e_part=4
 PREHOOK: query: explain show partitions hiveT1
 PREHOOK: type: SHOWPARTITIONS
 PREHOOK: Input: default@hivet1
@@ -173,11 +153,11 @@ POSTHOOK: query: insert into ice2 values  ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4)
 POSTHOOK: type: QUERY
 POSTHOOK: Input: _dummy_database@_dummy_table
 POSTHOOK: Output: default@ice2
-PREHOOK: query: select `partition` from default.ice2.partitions
+PREHOOK: query: select `partition` from default.ice2.partitions order by `partition`
 PREHOOK: type: QUERY
 PREHOOK: Input: default@ice2
 PREHOOK: Output: hdfs://### HDFS PATH ###
-POSTHOOK: query: select `partition` from default.ice2.partitions
+POSTHOOK: query: select `partition` from default.ice2.partitions order by `partition`
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@ice2
 POSTHOOK: Output: hdfs://### HDFS PATH ###
@@ -190,9 +170,9 @@ PREHOOK: Input: default@ice2
 POSTHOOK: query: show partitions ice2
 POSTHOOK: type: SHOWPARTITIONS
 POSTHOOK: Input: default@ice2
-d_part=10/e_part=5
-d_part=2/e_part=5
-d_part=3/e_part=4
+current-spec-id=0/d_part=10/e_part=5
+current-spec-id=0/d_part=2/e_part=5
+current-spec-id=0/d_part=3/e_part=4
 PREHOOK: query: ALTER TABLE ice2 SET PARTITION SPEC (c)
 PREHOOK: type: ALTERTABLE_SETPARTSPEC
 PREHOOK: Input: default@ice2
@@ -200,11 +180,11 @@ POSTHOOK: query: ALTER TABLE ice2 SET PARTITION SPEC (c)
 POSTHOOK: type: ALTERTABLE_SETPARTSPEC
 POSTHOOK: Input: default@ice2
 POSTHOOK: Output: default@ice2
-PREHOOK: query: select `partition` from default.ice2.partitions
+PREHOOK: query: select `partition` from default.ice2.partitions order by `partition`
 PREHOOK: type: QUERY
 PREHOOK: Input: default@ice2
 PREHOOK: Output: hdfs://### HDFS PATH ###
-POSTHOOK: query: select `partition` from default.ice2.partitions
+POSTHOOK: query: select `partition` from default.ice2.partitions order by `partition`
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@ice2
 POSTHOOK: Output: hdfs://### HDFS PATH ###
@@ -217,9 +197,9 @@ PREHOOK: Input: default@ice2
 POSTHOOK: query: show partitions ice2
 POSTHOOK: type: SHOWPARTITIONS
 POSTHOOK: Input: default@ice2
-d_part=10/e_part=5
-d_part=2/e_part=5
-d_part=3/e_part=4
+spec-id=0/d_part=10/e_part=5
+spec-id=0/d_part=2/e_part=5
+spec-id=0/d_part=3/e_part=4
 PREHOOK: query: insert into ice2 values  ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4), ('aa', 1, 3, 2, 5), ('aa', 1, 4, 10, 5), ('aa', 1, 5,
 10, 5)
 PREHOOK: type: QUERY
@@ -230,11 +210,11 @@ POSTHOOK: query: insert into ice2 values  ('aa', 1, 2, 3, 4), ('aa', 1, 2, 3, 4)
 POSTHOOK: type: QUERY
 POSTHOOK: Input: _dummy_database@_dummy_table
 POSTHOOK: Output: default@ice2
-PREHOOK: query: select `partition` from default.ice2.partitions
+PREHOOK: query: select `partition` from default.ice2.partitions order by `partition`
 PREHOOK: type: QUERY
 PREHOOK: Input: default@ice2
 PREHOOK: Output: hdfs://### HDFS PATH ###
-POSTHOOK: query: select `partition` from default.ice2.partitions
+POSTHOOK: query: select `partition` from default.ice2.partitions order by `partition`
 POSTHOOK: type: QUERY
 POSTHOOK: Input: default@ice2
 POSTHOOK: Output: hdfs://### HDFS PATH ###
@@ -251,10 +231,10 @@ PREHOOK: Input: default@ice2
 POSTHOOK: query: show partitions ice2
 POSTHOOK: type: SHOWPARTITIONS
 POSTHOOK: Input: default@ice2
-c=2
-c=3
-c=4
-c=5
-d_part=10/e_part=5
-d_part=2/e_part=5
-d_part=3/e_part=4
+current-spec-id=1/c=2
+current-spec-id=1/c=3
+current-spec-id=1/c=4
+current-spec-id=1/c=5
+spec-id=0/d_part=10/e_part=5
+spec-id=0/d_part=2/e_part=5
+spec-id=0/d_part=3/e_part=4

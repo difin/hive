@@ -90,7 +90,7 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
         && !table.getStorageHandler().hasDataMatchingFilterExpr(table, desc.getFilterExpr())) {
       return 0;
     }
-
+    
     List<Partition> partitions = getPartitions(table);
 
     if (partitions.isEmpty()) {
@@ -103,7 +103,7 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
       }
       // If Iceberg table had partition evolution, it will create compaction request without partition specification,
       // and it will compact all files from old partition specs, besides compacting partitions of current spec in parallel.
-      if (desc.getPartitionSpec() == null &&
+      if (desc.getPartitionSpec() == null && 
           DDLUtils.isIcebergTable(table) && table.getStorageHandler().hasUndergonePartitionEvolution(table) &&
           (desc.getFilterExpr() == null || !table.getStorageHandler()
               .getPartitionsByExpr(table, desc.getFilterExpr(), false).isEmpty())) {
@@ -170,7 +170,7 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
   private CompactionResponse compact(Table table, String partitionName) throws HiveException {
     CompactionRequest req = new CompactionRequest(table.getDbName(), table.getTableName(),
         compactionTypeStr2ThriftType(desc.getCompactionType()));
-
+    
     String poolName;
     try {
       poolName = ObjectUtils.defaultIfNull(desc.getPoolName(),
