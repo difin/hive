@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.ql.Context;
+import org.apache.hadoop.hive.ql.Context.Operation;
 import org.apache.hadoop.hive.ql.metadata.RowLineageUtils;
 import org.apache.hadoop.hive.ql.security.authorization.HiveCustomStorageHandlerUtils;
 import org.apache.hadoop.hive.ql.session.SessionStateUtil;
@@ -167,7 +167,9 @@ public class HiveIcebergSerDe extends AbstractSerDe {
 
   private static Schema projectedSchema(Configuration conf, String tableName, Schema tableSchema,
       Map<String, String> jobConf) {
-    Context.Operation operation = HiveCustomStorageHandlerUtils.getWriteOperation(conf::get, tableName);
+    Operation operation = HiveCustomStorageHandlerUtils.getWriteOperation(conf::get, tableName);
+    boolean copyOnWrite = HiveCustomStorageHandlerUtils.isCopyOnWrite(conf::get, tableName);
+
     if (operation == null) {
       jobConf.put(InputFormatConfig.CASE_SENSITIVE, "false");
       String[] selectedColumns = ColumnProjectionUtils.getReadColumnNames(conf);
@@ -187,8 +189,7 @@ public class HiveIcebergSerDe extends AbstractSerDe {
         return projectedSchema;
       }
     }
-    boolean isCOW = IcebergTableUtil.isCopyOnWriteMode(operation, conf::get);
-    if (isCOW) {
+    if (copyOnWrite) {
       return getSchemaWithRowLineage(IcebergAcidUtil.createSerdeSchemaForDelete(tableSchema.columns()), conf);
     }
     switch (operation) {
