@@ -36,6 +36,14 @@ import org.mockito.MockedStatic;
 class TestMeteringHealthWatcher {
   private static final String METERING_PORT_PROP = "metering.service.port";
 
+  private static String meteringHost() {
+    return MeteringServiceMonitor.resolveMeteringServiceHost();
+  }
+
+  private static URI meteringUri(String scheme, int port) {
+    return URI.create(String.format("%s://%s:%d/health", scheme, meteringHost(), port));
+  }
+
   @AfterEach
   void clearMeteringProperties() {
     System.clearProperty(METERING_PORT_PROP);
@@ -133,8 +141,8 @@ class TestMeteringHealthWatcher {
     List<URI> uris = MeteringServiceMonitor.resolveMeteringServiceUris(conf);
 
     assertThat(uris).containsExactly(
-        URI.create("http://localhost:50051/health"),
-        URI.create("https://localhost:50052/health"));
+        meteringUri("http", 50051),
+        meteringUri("https", 50052));
   }
 
   @Test
@@ -146,9 +154,9 @@ class TestMeteringHealthWatcher {
     List<URI> uris = MeteringServiceMonitor.resolveMeteringServiceUris(conf);
 
     assertThat(uris).containsExactly(
-        URI.create("http://localhost:50099/health"),
-        URI.create("http://localhost:50051/health"),
-        URI.create("https://localhost:50052/health"));
+        meteringUri("http", 50099),
+        meteringUri("http", 50051),
+        meteringUri("https", 50052));
   }
 
   @Test
@@ -160,9 +168,9 @@ class TestMeteringHealthWatcher {
     List<URI> uris = MeteringServiceMonitor.resolveMeteringServiceUris(conf);
 
     assertThat(uris).containsExactly(
-        URI.create("https://localhost:50099/health"),
-        URI.create("http://localhost:50051/health"),
-        URI.create("https://localhost:50052/health"));
+        meteringUri("https", 50099),
+        meteringUri("http", 50051),
+        meteringUri("https", 50052));
   }
 
   @Test
@@ -174,8 +182,8 @@ class TestMeteringHealthWatcher {
     List<URI> uris = MeteringServiceMonitor.resolveMeteringServiceUris(conf);
 
     assertThat(uris).containsExactly(
-        URI.create("http://localhost:50051/health"),
-        URI.create("https://localhost:50052/health"));
+        meteringUri("http", 50051),
+        meteringUri("https", 50052));
   }
 
   @Test
@@ -187,7 +195,7 @@ class TestMeteringHealthWatcher {
     List<URI> uris = MeteringServiceMonitor.resolveMeteringServiceUris(conf);
 
     assertThat(uris).containsExactly(
-        URI.create("http://localhost:50051/health"),
-        URI.create("https://localhost:50052/health"));
+        meteringUri("http", 50051),
+        meteringUri("https", 50052));
   }
 }

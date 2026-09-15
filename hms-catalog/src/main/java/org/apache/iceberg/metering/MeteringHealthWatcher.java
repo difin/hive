@@ -32,7 +32,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Continuously monitors the metering service health in a background daemon thread, polling
- * <scheme>://localhost:<port>/health on a fixed interval clamped between #MIN_POLL_INTERVAL_MS
+ * <scheme>://&lt;local-hostname&gt;:&lt;port&gt;/health on a fixed interval clamped between
+ * #MIN_POLL_INTERVAL_MS
  * (30s) and #DEFAULT_POLL_INTERVAL_MS (5m). Configured value may be set via hive-site.xml
  * (#POLL_INTERVAL_HIVE_KEY) or JVM override (#POLL_INTERVAL_SYS_PROP,
  * e.g: -Dhive.metastore.metering.service.health.poll.interval=1m).
@@ -101,7 +102,7 @@ public class MeteringHealthWatcher {
     }
     int periodMs = meteringHealthPollPeriodMs(conf);
     LOG.info("MeteringHealthWatcher: starting — polling {}{} every {} ms",
-        MeteringServiceMonitor.METERING_SERVICE_HOST, "/health", periodMs);
+        MeteringServiceMonitor.resolveMeteringServiceHost(), "/health", periodMs);
     scheduler.scheduleAtFixedRate(this::checkHealth, 0, periodMs, TimeUnit.MILLISECONDS);
   }
 

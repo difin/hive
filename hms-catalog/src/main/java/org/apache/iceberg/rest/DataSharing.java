@@ -129,8 +129,29 @@ public abstract class DataSharing {
     }
 
     this.clientSslContext = "https".equalsIgnoreCase(idBrokerUris[0].getScheme())
-        ? SecurityFriend.createClientSslContext(conf) : null;
+        ? buildClientSslContext(conf) : null;
     LOG.info("DataSharing agent initialized with IdBroker endpoints: {}", Arrays.toString(idBrokerUris));
+  }
+
+  /**
+   * Builds the metastore outbound client {@link SSLContext} from hive-site SSL settings
+   * ({@code hive.metastore.use.SSL}, {@code hive.metastore.truststore.path}, etc.).
+   *
+   * @param conf metastore configuration
+   * @return client SSL context, or {@code null} when SSL is disabled in config
+   * @throws IOException if truststore/keystore initialization fails
+   */
+  public static SSLContext buildClientSslContext(Configuration conf) throws IOException {
+    return SecurityFriend.createClientSslContext(conf);
+  }
+
+  /**
+   * Applies a client {@link SSLContext} to an {@link HttpsURLConnection} when present.
+   */
+  public static void applyClientSslContext(HttpURLConnection connection, SSLContext sslContext) {
+    if (sslContext != null && connection instanceof HttpsURLConnection) {
+      ((HttpsURLConnection) connection).setSSLSocketFactory(sslContext.getSocketFactory());
+    }
   }
 
   /**
@@ -340,20 +361,14 @@ public abstract class DataSharing {
     } catch (AuthenticationException e) {
       throw new IOException("SPNEGO authentication failed for " + url, e);
     }
-    applyClientSslContext(con);
+    applyClientSslContext(con, clientSslContext);
     return con;
   }
 
   private HttpURLConnection openPlainConnection(URL url) throws IOException {
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
-    applyClientSslContext(con);
+    applyClientSslContext(con, clientSslContext);
     return con;
-  }
-
-  private void applyClientSslContext(HttpURLConnection con) {
-    if (clientSslContext != null && con instanceof HttpsURLConnection) {
-      ((HttpsURLConnection) con).setSSLSocketFactory(clientSslContext.getSocketFactory());
-    }
   }
 
   private Object executeJsonGet(URL url, boolean useSpnego) throws IOException {

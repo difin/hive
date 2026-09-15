@@ -5,34 +5,40 @@ import com.google.gson.JsonParser;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
+import org.apache.iceberg.rest.DataSharing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
 
 /**
  * Utility class to perform a single health check against the co-located metering service at
- * <scheme>://localhost:<port>/health. Threading and retry logic live in
+ * <scheme>://&lt;local-hostname&gt;:&lt;port&gt;/health. Threading and retry logic live in
  * MeteringHealthWatcher; this class is purely responsible for the HTTP call itself.
- * If TLS is enabled for the metering service, co-located services often present a certificate
- * whose SAN matches a cluster FQDN rather than localhost. For loopback-only connections we relax
- * hostname verification (certificate chain still uses the JVM trust store).
- * The host is intentionally fixed to localhost to prevent nefarious users from overriding
- * the metering service location.
+ * The local hostname is resolved once from {@link InetAddress#getLocalHost()} so TLS certificates
+ * whose SAN matches the node FQDN are validated normally. HTTPS probes reuse the metastore client
+ * {@link SSLContext} helpers in {@link DataSharing}. The host is not user-configurable to prevent
+ * nefarious users from overriding the co-located metering service location.
  */
 public class MeteringServiceMonitor {
   private static final Logger LOG = LoggerFactory.getLogger(MeteringServiceMonitor.class);
 
-  static final String METERING_SERVICE_HOST = "localhost";
+  private static final String FALLBACK_METERING_SERVICE_HOST = "localhost";
+  private static volatile String meteringServiceHost;
+  private static volatile SSLContext clientSslContext;
+  private static volatile Configuration clientSslContextConf;
   static final int METERING_SERVICE_NON_SSL_PORT = 50051;
   static final int METERING_SERVICE_SSL_PORT = 50052;
   private static final String METERING_SERVICE_PORT_SYS_PROP = "metering.service.port";
@@ -43,6 +49,27 @@ public class MeteringServiceMonitor {
    */
   private MeteringServiceMonitor() {
     throw new UnsupportedOperationException("Utility class");
+  }
+
+  static String resolveMeteringServiceHost() {
+    if (meteringServiceHost == null) {
+      synchronized (MeteringServiceMonitor.class) {
+        if (meteringServiceHost == null) {
+          meteringServiceHost = lookupLocalHostname();
+        }
+      }
+    }
+    return meteringServiceHost;
+  }
+
+  private static String lookupLocalHostname() {
+    try {
+      return InetAddress.getLocalHost().getHostName();
+    } catch (UnknownHostException e) {
+      LOG.warn("Unable to resolve local hostname for metering health check; falling back to {}",
+          FALLBACK_METERING_SERVICE_HOST, e);
+      return FALLBACK_METERING_SERVICE_HOST;
+    }
   }
 
   static Integer resolveMeteringServicePort() {
@@ -70,17 +97,33 @@ public class MeteringServiceMonitor {
     return sslEnabled ? "https" : "http";
   }
 
+  static SSLContext resolveClientSslContext(Configuration conf) throws IOException {
+    if (conf == null) {
+      return null;
+    }
+    if (clientSslContext == null || clientSslContextConf != conf) {
+      synchronized (MeteringServiceMonitor.class) {
+        if (clientSslContext == null || clientSslContextConf != conf) {
+          clientSslContext = DataSharing.buildClientSslContext(conf);
+          clientSslContextConf = conf;
+        }
+      }
+    }
+    return clientSslContext;
+  }
+
   static List<URI> resolveMeteringServiceUris(Configuration conf) {
     List<MeteringEndpoint> endpoints = new ArrayList<>();
+    String host = resolveMeteringServiceHost();
 
     Integer configuredPort = resolveMeteringServicePort();
     if (configuredPort != null) {
-      endpoints.add(new MeteringEndpoint(resolveMeteringServiceScheme(conf), configuredPort,
+      endpoints.add(new MeteringEndpoint(host, resolveMeteringServiceScheme(conf), configuredPort,
           "jvm-property"));
     }
 
-    endpoints.add(new MeteringEndpoint("http", METERING_SERVICE_NON_SSL_PORT, "default-non-ssl"));
-    endpoints.add(new MeteringEndpoint("https", METERING_SERVICE_SSL_PORT, "default-ssl"));
+    endpoints.add(new MeteringEndpoint(host, "http", METERING_SERVICE_NON_SSL_PORT, "default-non-ssl"));
+    endpoints.add(new MeteringEndpoint(host, "https", METERING_SERVICE_SSL_PORT, "default-ssl"));
 
     List<URI> uris = new ArrayList<>(endpoints.size());
     for (MeteringEndpoint endpoint : endpoints) {
@@ -96,26 +139,34 @@ public class MeteringServiceMonitor {
    * Check if the metering service is available and healthy.
    *
    * @param conf metastore configuration; SSL mode is derived from ConfVars.USE_SSL only for the
-   *             JVM-configured metering port.
+   *             JVM-configured metering port. HTTPS health checks use the metastore truststore when
+   *             hive.metastore.use.SSL is enabled.
    * @return true if the metering service health endpoint returns a 200 and a "Healthy" message
    */
   public static boolean isMeteringServiceHealthy(Configuration conf) {
+    SSLContext sslContext = null;
+    try {
+      sslContext = resolveClientSslContext(conf);
+    } catch (IOException e) {
+      LOG.warn("Unable to initialize metastore SSL context for metering health check", e);
+    }
     for (URI meteringUri : resolveMeteringServiceUris(conf)) {
-      if (isMeteringServiceHealthy(meteringUri)) {
+      if (isMeteringServiceHealthy(meteringUri, sslContext)) {
         return true;
       }
     }
     return false;
   }
 
-  private static boolean isMeteringServiceHealthy(URI meteringUri) {
+  private static boolean isMeteringServiceHealthy(URI meteringUri, SSLContext sslContext) {
     HttpURLConnection conn = null;
     try {
       URL url = meteringUri.toURL();
       conn = (HttpURLConnection) url.openConnection();
-      if (conn instanceof HttpsURLConnection) {
-        ((HttpsURLConnection) conn)
-            .setHostnameVerifier((hostname, session) -> isLoopbackHostname(hostname));
+      DataSharing.applyClientSslContext(conn, sslContext);
+      if ("https".equalsIgnoreCase(meteringUri.getScheme()) && sslContext == null) {
+        LOG.debug("Metering HTTPS health check at {} using JVM default truststore because "
+            + "metastore client SSL context is unavailable", meteringUri);
       }
       conn.setRequestMethod("GET");
 
@@ -147,23 +198,15 @@ public class MeteringServiceMonitor {
     return false;
   }
 
-  private static boolean isLoopbackHostname(String hostname) {
-    if (hostname == null) {
-      return false;
-    }
-    return "localhost".equalsIgnoreCase(hostname)
-        || "127.0.0.1".equals(hostname)
-        || "[::1]".equalsIgnoreCase(hostname)
-        || "::1".equalsIgnoreCase(hostname);
-  }
-
   private static class MeteringEndpoint {
+    private final String host;
     private final String scheme;
     private final int port;
     @SuppressWarnings("unused")
     private final String source;
 
-    MeteringEndpoint(String scheme, int port, String source) {
+    MeteringEndpoint(String host, String scheme, int port, String source) {
+      this.host = host;
       this.scheme = scheme;
       this.port = port;
       this.source = source;
@@ -171,7 +214,7 @@ public class MeteringServiceMonitor {
 
     URI uri() {
       return URI.create(String.format("%s://%s:%d%s",
-          scheme, METERING_SERVICE_HOST, port, HEALTH_ENDPOINT));
+          scheme, host, port, HEALTH_ENDPOINT));
     }
   }
 }
