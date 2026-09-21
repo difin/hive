@@ -48,7 +48,8 @@ public class AbortedTxnHandler implements QueryHandler<Set<CompactionInfo>> {
     return sqlGenerator.addLimitClause(fetchSize, " \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\", " +
         "MIN(\"TXN_STARTED\"), COUNT(*) FROM \"TXNS\", \"TXN_COMPONENTS\" " +
         " WHERE \"TXN_ID\" = \"TC_TXNID\" AND \"TXN_STATE\" = :state " +
-        "GROUP BY \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\" ");
+        "GROUP BY \"TC_DATABASE\", \"TC_TABLE\", \"TC_PARTITION\" " +
+        "ORDER BY MIN(\"TXN_STARTED\") ASC ");
   }
 
   @Override
