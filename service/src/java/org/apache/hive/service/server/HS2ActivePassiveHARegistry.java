@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.curator.framework.recipes.cache.TreeCache;
+import org.apache.curator.framework.recipes.cache.CuratorCacheAccessor;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.utils.CloseableUtils;
@@ -148,8 +148,8 @@ public class HS2ActivePassiveHARegistry extends ZkRegistryBase<HiveServer2Instan
   }
 
   private void populateCache() throws IOException {
-    TreeCache treeCache = ensureInstancesCache(0);
-    populateCache(treeCache, false);
+    CuratorCacheAccessor instancesCache = ensureInstancesCache(0);
+    populateCache(instancesCache, false);
   }
 
   @Override

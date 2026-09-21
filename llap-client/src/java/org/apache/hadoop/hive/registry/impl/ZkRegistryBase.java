@@ -14,15 +14,12 @@
 package org.apache.hadoop.hive.registry.impl;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +29,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 
@@ -40,9 +38,10 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.ACLProvider;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.recipes.cache.ChildData;
-import org.apache.curator.framework.recipes.cache.TreeCache;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
-import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+import org.apache.curator.framework.recipes.cache.CuratorCache;
+import org.apache.curator.framework.recipes.cache.CuratorCacheAccessor;
+import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
+import org.apache.curator.framework.recipes.cache.CuratorCacheListener.Type;
 import org.apache.curator.framework.recipes.nodes.PersistentNode;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
@@ -72,7 +71,6 @@ import org.apache.zookeeper.data.Id;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -129,7 +127,7 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
   private PersistentNode znode;
   private String znodePath; // unique identity for this instance
 
-  private volatile TreeCache instancesCache; // Created on demand.
+  private volatile CuratorCache instancesCache; // Created on demand.
 
   /** Local hostname. */
   protected static final String hostname = RegistryUtilities.getCanonicalHostName();
@@ -220,11 +218,7 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
       aclProvider = getACLProviderForZKPath(userScopePathPrefix);
     }
     this.zooKeeperClient = getZookeeperClient(conf, namespace, aclProvider);
-    this.zooKeeperClient.getConnectionStateListenable().addListener(new ZkConnectionStateListener());
-  }
-
-  private boolean hasComputeGroup() {
-    return this.computeGroup != null && !this.computeGroup.isEmpty();
+    this.zooKeeperClient.getConnectionStateListenable().addListener(new CacheConnectionStateListener());
   }
 
   public static String getRootNamespace(Configuration conf, String userProvidedNamespace,
@@ -343,7 +337,7 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
       // even under connection or session interruption (will automatically handle retries)
       znode = new PersistentNode(zooKeeperClient, CreateMode.EPHEMERAL_SEQUENTIAL, false,
           workersPath + "/" + workerNodePrefix, encoder.toBytes(srv));
-    
+
       // start the creation of znodes
       znode.start();
 
@@ -376,7 +370,7 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
   }
 
   protected final void updateServiceRecord(
-     ServiceRecord srv, boolean doCheckAcls, boolean closeOnFailure) throws IOException {
+      ServiceRecord srv, boolean doCheckAcls, boolean closeOnFailure) throws IOException {
     if (srv.get(UNIQUE_IDENTIFIER) == null) {
       srv.set(UNIQUE_IDENTIFIER, UNIQUE_ID.toString());
     }
@@ -468,7 +462,7 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
         continue; // Read permission/no permissions, or the expected user.
       }
       LOG.warn("The ACL " + acl + " is unnacceptable for " + pathToCheck
-        + "; setting up ACLs. " + disableMessage);
+          + "; setting up ACLs. " + disableMessage);
       setUpAcls(pathToCheck);
       return;
     }
@@ -497,8 +491,8 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
       addToNodeCache(host, instance);
       // to avoid stale size() value, logging it under the lock
       LOG.info("Added path={}, host={} instance={} to cache."
-          + " pathToInstanceCache:size={}, nodeToInstanceCache:size={}",
-        path, host, instance, pathToInstanceCache.size(), nodeToInstanceCache.size());
+              + " pathToInstanceCache:size={}, nodeToInstanceCache:size={}",
+          path, host, instance, pathToInstanceCache.size(), nodeToInstanceCache.size());
     } finally {
       instanceCacheLock.unlock();
     }
@@ -511,8 +505,8 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
       removeFromNodeCache(host, instance);
       // to avoid stale size() value, logging it under the lock
       LOG.info("Removed path={}, host={} from cache."
-          + " pathToInstanceCache:size={}, nodeToInstanceCache:size={}",
-        path, host, pathToInstanceCache.size(), nodeToInstanceCache.size());
+              + " pathToInstanceCache:size={}, nodeToInstanceCache:size={}",
+          path, host, pathToInstanceCache.size(), nodeToInstanceCache.size());
     } finally {
       instanceCacheLock.unlock();
     }
@@ -547,12 +541,11 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
     }
   }
 
-  protected final void populateCache(TreeCache instancesCache, boolean doInvokeListeners) {
-    final Collection<ChildData> currentChildren = BFSTreeCache(
-        instancesCache,
-        registryPrefix,
-        childData -> isLlapWorker(extractNodeName(childData), workerNodePrefix)
-    );
+  protected final void populateCache(CuratorCacheAccessor instancesCache, boolean doInvokeListeners) {
+    final Collection<ChildData> currentChildren = instancesCache
+        .stream()
+        .filter(childData -> isLlapWorker(extractNodeName(childData), workerNodePrefix))
+        .collect(Collectors.toCollection(ArrayList::new));
 
     for (ChildData childData : currentChildren) {
       byte[] data = getWorkerData(childData, workerNodePrefix);
@@ -576,41 +569,6 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
     }
   }
 
-  /**
-   * Helper function to list in BFS-ish order all the child node and collect the one of interest.
-   * It is BFS-ish because any child passing the predicate will be considered a terminal stage of exploration.
-   * This assumption is okay with the current Llap discovery protocol.
-   *
-   * @param treeCache an initialized tree cache to list paths.
-   * @param root root for listing.
-   * @param predicate predicate to filter nodes of interest
-   *
-   * @return list of childData nodes that satisfy the predicate
-   */
-  private static List<ChildData> BFSTreeCache(TreeCache treeCache, String root, Predicate<ChildData> predicate)
-  {
-    Preconditions.checkNotNull(treeCache);
-    Map<String, ChildData> children = treeCache.getCurrentChildren(root);
-    if (children == null) {
-      return Collections.emptyList();
-    }
-    Queue<ChildData> dataQueue = new ArrayDeque<>(children.values());
-    List<ChildData> leafLevel = new ArrayList<>();
-
-    while (!dataQueue.isEmpty()) {
-      ChildData current = dataQueue.poll();
-      if (predicate.test(current)) {
-        leafLevel.add(current);
-      } else {
-        Map<String, ChildData> currentChildren = treeCache.getCurrentChildren(current.getPath());
-        if (currentChildren != null) {
-          dataQueue.addAll(currentChildren.values());
-        }
-      }
-    }
-    return leafLevel;
-  }
-
   private static boolean isLlapWorker(String nodeName, String workerNodePrefix) {
     return nodeName.startsWith(workerNodePrefix) && nodeName.length() > workerNodePrefix.length();
   }
@@ -625,7 +583,7 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
     return data;
   }
 
-  private class InstanceStateChangeListener implements TreeCacheListener
+  private class InstanceStateChangeListener implements CuratorCacheListener
   {
     private final Logger LOG = LoggerFactory.getLogger(InstanceStateChangeListener.class);
 
@@ -637,59 +595,74 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
     private InstanceStateChangeListener(CountDownLatch initiationLatch) {this.initiationLatch = initiationLatch;}
 
     @Override
-    public void childEvent(final CuratorFramework client,
-        final TreeCacheEvent event) throws IOException {
-      Preconditions.checkArgument(client != null
-          && client.getState() == CuratorFrameworkState.STARTED, "client is not started");
+    public void initialized() {
+      CuratorCacheListener.super.initialized();
+
+      initiationLatch.countDown();
+    }
+
+
+    @Override
+    public void event(Type type, ChildData oldData, ChildData data) {
 
       synchronized (this) {
-        switch (event.getType()) {
-          case INITIALIZED:
-            initiationLatch.countDown();
-            break;
-          case CONNECTION_LOST:
-            LOG.warn("Connection Lost to zookeeper {}", client.getZookeeperClient().getCurrentConnectionString());
-            break;
-          case CONNECTION_RECONNECTED:
-            LOG.warn("RECONNECTED to zookeeper {}", client.getZookeeperClient().getCurrentConnectionString());
-            break;
-        }
-        ChildData childData = event.getData();
+        ChildData childData = type == Type.NODE_DELETED ? oldData : data;
         if (childData == null) return; // case is not leaf or empty node
         String nodeName = extractNodeName(childData);
         if (nodeName.equals(workerNodePrefix)) {
-          LOG.warn("Invalid LLAP worker node name: {} was {}", childData.getPath(), event.getType());
+          LOG.warn("Invalid LLAP worker node name: {} was {}", childData.getPath(), type);
         }
         if (!isLlapWorker(nodeName, workerNodePrefix)) return;
-        LOG.info("{} for zknode {}", event.getType(), childData.getPath());
-        // we have got llap worker do what ever needed on each event
-        InstanceType instance = extractServiceInstance(event, childData);
+        LOG.info("{} for zknode {}", type, childData.getPath());
+        // we have got llap worker do whatever needed on each event
+        InstanceType instance = extractServiceInstance(type, childData);
         if (instance != null) {
           int ephSeqVersion = extractSeqNum(nodeName);
-          switch (event.getType()) {
-            case NODE_ADDED:
-              addToCache(childData.getPath(), instance.getHost(), instance);
-              for (ServiceInstanceStateChangeListener<InstanceType> listener : stateChangeListeners) {
+          switch (type) {
+          case NODE_CREATED:
+            addToCache(childData.getPath(), instance.getHost(), instance);
+            for (ServiceInstanceStateChangeListener<InstanceType> listener : stateChangeListeners) {
+              try {
                 listener.onCreate(instance, ephSeqVersion);
+              } catch (IOException e) {
+                LOG.warn("Failed to call onCreate for instance: {}", instance, e);
               }
-              break;
-            case NODE_UPDATED:
-              addToCache(childData.getPath(), instance.getHost(), instance);
-              for (ServiceInstanceStateChangeListener<InstanceType> listener : stateChangeListeners) {
-                listener.onUpdate(instance, ephSeqVersion);
-              }
-              break;
-            case NODE_REMOVED:
-              removeFromCache(childData.getPath(), instance.getHost(), instance);
-              for (ServiceInstanceStateChangeListener<InstanceType> listener : stateChangeListeners) {
-                listener.onRemove(instance, ephSeqVersion);
-              }
-              break;
-            default:
-              // Ignore all the other events; logged above.
+            }
+            break;
+          case NODE_CHANGED:
+            addToCache(childData.getPath(), instance.getHost(), instance);
+            for (ServiceInstanceStateChangeListener<InstanceType> listener : stateChangeListeners) {
+              listener.onUpdate(instance, ephSeqVersion);
+            }
+            break;
+          case NODE_DELETED:
+            removeFromCache(childData.getPath(), instance.getHost(), instance);
+            for (ServiceInstanceStateChangeListener<InstanceType> listener : stateChangeListeners) {
+              listener.onRemove(instance, ephSeqVersion);
+            }
+            break;
+          default:
+            // Ignore all the other events; logged above.
           }
         } else {
-          LOG.info("instance is null for event: {} childData: {}", event.getType(), childData);
+          LOG.info("instance is null for event: {} childData: {}", type, childData);
+        }
+      }
+    }
+  }
+
+  private class CacheConnectionStateListener implements ConnectionStateListener {
+    @Override
+    public void stateChanged(CuratorFramework curatorFramework, ConnectionState connectionState) {
+      synchronized (this) {
+        switch (connectionState) {
+        case LOST:
+          LOG.warn("Connection Lost to zookeeper {}",
+              curatorFramework.getZookeeperClient().getCurrentConnectionString());
+          break;
+        case RECONNECTED:
+          LOG.warn("RECONNECTED to zookeeper {}", curatorFramework.getZookeeperClient().getCurrentConnectionString());
+          break;
         }
       }
     }
@@ -725,16 +698,15 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
     return nodeName;
   }
 
-  private InstanceType extractServiceInstance(
-      TreeCacheEvent event, ChildData childData) {
+  private InstanceType extractServiceInstance(Type type, ChildData childData) {
     byte[] data = childData.getData();
     if (data == null) return null;
     try {
-      ServiceRecord srv = encoder.fromBytes(event.getData().getPath(), data);
+      ServiceRecord srv = encoder.fromBytes(childData.getPath(), data);
       return createServiceInstance(srv);
     } catch (IOException e) {
       LOG.error("Unable to decode data for zknode: {}." +
-          " Dropping notification of type: {}", childData.getPath(), event.getType());
+          " Dropping notification of type: {}", childData.getPath(), type);
       return null;
     }
   }
@@ -746,14 +718,14 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
   }
 
   @SuppressWarnings("resource") // Bogus warnings despite closeQuietly.
-  protected final synchronized TreeCache ensureInstancesCache(
+  protected final synchronized CuratorCacheAccessor ensureInstancesCache(
       long clusterReadyTimeoutMs
   ) throws IOException
   {
     Preconditions.checkArgument(zooKeeperClient != null &&
-                                zooKeeperClient.getState() == CuratorFrameworkState.STARTED, "client is not started");
-    // lazily create TreeCache
-    TreeCache instancesCache = this.instancesCache;
+        zooKeeperClient.getState() == CuratorFrameworkState.STARTED, "client is not started");
+    // lazily create instance cache
+    CuratorCache instancesCache = this.instancesCache;
     if (instancesCache != null) {
       return instancesCache;
     }
@@ -767,12 +739,10 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
     // start the cache
     while (true) {
       try {
-        instancesCache = TreeCache.newBuilder(zooKeeperClient, registryPrefix)
-                .setCacheData(true)
-                .setCreateParentNodes(true)
-                .build();
+        instancesCache = CuratorCache.builder(zooKeeperClient, registryPrefix)
+            .build();
 
-        instancesCache.getListenable().addListener(new InstanceStateChangeListener(initiationLatch), tp);
+        instancesCache.listenable().addListener(new InstanceStateChangeListener(initiationLatch), tp);
 
         instancesCache.start();
         this.instancesCache = instancesCache;
@@ -784,24 +754,24 @@ public abstract class ZkRegistryBase<InstanceType extends ServiceInstance> {
         }
         return instancesCache;
       }
-      catch (InvalidACLException e) {
-        // Tree tried to mkdir when the znode wasn't there, and failed.
-        CloseableUtils.closeQuietly(instancesCache);
-        long elapsedNs = System.nanoTime() - startTimeNs;
-        if (deltaNs == 0 || deltaNs <= elapsedNs) {
-          LOG.error("Unable to start curator TreeCache", e);
-          throw new IOException(e);
-        }
-        LOG.warn("The cluster is not started yet (InvalidACL); will retry");
-        try {
-          Thread.sleep(Math.min(sleepTimeMs, (deltaNs - elapsedNs) / 1000000L));
-        }
-        catch (InterruptedException e1) {
-          LOG.error("Interrupted while retrying the TreeCache startup");
-          throw new IOException(e1);
-        }
-        sleepTimeMs = sleepTimeMs << 1;
-      }
+      //      catch (InvalidACLException e) {
+      //        // Tree tried to mkdir when the znode wasn't there, and failed.
+      //        CloseableUtils.closeQuietly(instancesCache);
+      //        long elapsedNs = System.nanoTime() - startTimeNs;
+      //        if (deltaNs == 0 || deltaNs <= elapsedNs) {
+      //          LOG.error("Unable to start curator TreeCache", e);
+      //          throw new IOException(e);
+      //        }
+      //        LOG.warn("The cluster is not started yet (InvalidACL); will retry");
+      //        try {
+      //          Thread.sleep(Math.min(sleepTimeMs, (deltaNs - elapsedNs) / 1000000L));
+      //        }
+      //        catch (InterruptedException e1) {
+      //          LOG.error("Interrupted while retrying the TreeCache startup");
+      //          throw new IOException(e1);
+      //        }
+      //        sleepTimeMs = sleepTimeMs << 1;
+      //      }
       catch (Exception e) {
         CloseableUtils.closeQuietly(instancesCache);
         LOG.error("Unable to start curator TreeCache", e);

@@ -19,13 +19,12 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 
-import org.apache.curator.framework.recipes.cache.TreeCache;
+import org.apache.curator.framework.recipes.cache.CuratorCacheAccessor;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.llap.registry.impl.LlapRegistryService;
 import org.apache.hadoop.registry.client.binding.RegistryTypeUtils;
-import org.apache.hadoop.registry.client.binding.RegistryUtils;
 import org.apache.hadoop.registry.client.types.Endpoint;
 import org.apache.hadoop.registry.client.types.ServiceRecord;
 import org.slf4j.Logger;
@@ -69,8 +68,8 @@ public class TezAmRegistryImpl extends ZkRegistryBase<TezAmInstance> {
   }
 
   public void populateCache(boolean doInvokeListeners) throws IOException {
-    TreeCache treeCache = ensureInstancesCache(0);
-    populateCache(treeCache, doInvokeListeners);
+    CuratorCacheAccessor instancesCache = ensureInstancesCache(0);
+    populateCache(instancesCache, doInvokeListeners);
   }
 
   public String register(int amPort, int pluginPort, String sessionId, String serializedToken,

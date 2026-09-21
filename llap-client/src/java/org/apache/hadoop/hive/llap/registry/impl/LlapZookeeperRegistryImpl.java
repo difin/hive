@@ -23,21 +23,27 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.curator.framework.recipes.atomic.AtomicValue;
 import org.apache.curator.framework.recipes.atomic.DistributedAtomicLong;
 import org.apache.curator.framework.recipes.cache.ChildData;
-import org.apache.curator.framework.recipes.cache.TreeCache;
+import org.apache.curator.framework.recipes.cache.CuratorCacheAccessor;
 import org.apache.curator.utils.CloseableUtils;
+import org.apache.curator.utils.ZKPaths;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
@@ -313,11 +319,11 @@ public class LlapZookeeperRegistryImpl
   // TODO: this class is completely unnecessary... 1-on-1 mapping with parent.
   //       Remains here as the legacy of the original higher-level interface (getInstance).
   private static class DynamicServiceInstanceSet implements LlapServiceInstanceSet {
-    private final TreeCache instancesCache;
+    private final CuratorCacheAccessor instancesCache;
     private final LlapZookeeperRegistryImpl parent;
     private final ServiceRecordMarshal encoder;
 
-    public DynamicServiceInstanceSet(TreeCache cache,
+    public DynamicServiceInstanceSet(CuratorCacheAccessor cache,
         LlapZookeeperRegistryImpl parent, ServiceRecordMarshal encoder) {
       this.instancesCache = cache;
       this.parent = parent;
@@ -365,12 +371,16 @@ public class LlapZookeeperRegistryImpl
     @Override
     public ApplicationId getApplicationId() {
       // using the workersPath since onPrem there is only one group and for cloud we do not care about application id
-      Map<String, ChildData> currentChildren = instancesCache.getCurrentChildren(parent.workersPath);
+      ArrayList<ChildData> currentChildren = instancesCache.stream()
+          .filter(CuratorCacheAccessor.parentPathFilter(parent.workersPath))
+          .collect(Collectors.toCollection(ArrayList::new));
+
       if (currentChildren == null) {
         LOG.error("Can not find application id zookeeper listing of path [{}] is null", parent.workersPath);
         return null;
       }
-      for (ChildData childData : currentChildren.values()) {
+
+      for (ChildData childData : currentChildren) {
         byte[] data = getWorkerData(childData, WORKER_PREFIX);
         if (data == null) continue;
         ServiceRecord sr = null;
@@ -393,15 +403,17 @@ public class LlapZookeeperRegistryImpl
     return new String(childData.getData(), SlotZnode.CHARSET);
   }
 
-  Collection<LlapServiceInstance> getAllInstancesUnordered(TreeCache instancesCache) {
-    Set<LlapServiceInstance> unsorted = Sets.newHashSet();
-    //using the workersPath to ensure that we see the llap instance from the same group
-    Map<String, ChildData> currentChildren = instancesCache.getCurrentChildren(workersPath);
-    if (currentChildren == null) {
+  Collection<LlapServiceInstance> getAllInstancesUnordered(CuratorCacheAccessor instancesCache) {
+    if (instancesCache == null) {
       LOG.warn("No zookeeper data for path [{}]", workersPath);
       return Collections.EMPTY_SET;
     }
-    for (ChildData childData : currentChildren.values()) {
+
+    Collection<LlapServiceInstance> unsorted = new HashSet<>();
+
+    //using the workersPath to ensure that we see the llap instance from the same group
+    for (ChildData childData : instancesCache.stream()
+        .filter(CuratorCacheAccessor.parentPathFilter(workersPath)).toList()) {
       if (childData != null && childData.getData() != null && extractNodeName(childData).startsWith(WORKER_PREFIX)) {
         LlapServiceInstance instances = getInstanceByPath(childData.getPath());
         if (instances != null) {
@@ -409,22 +421,27 @@ public class LlapZookeeperRegistryImpl
         }
       }
     }
+
     return unsorted;
   }
   // The real implementation for the instanceset... instanceset has its own copy of the
   // ZK cache yet completely depends on the parent in every other aspect and is thus unneeded.
 
   Collection<LlapServiceInstance> getAllInstancesOrdered(
-      boolean consistentIndexes, TreeCache instancesCache) {
+      boolean consistentIndexes, CuratorCacheAccessor instancesCache) {
     Map<String, Long> slotByWorker = new HashMap<>();
     Set<LlapServiceInstance> unsorted = Sets.newHashSet();
     //using the workersPath to ensure that we see the llap instance from the same group
-    Map<String, ChildData> currentChildren = instancesCache.getCurrentChildren(workersPath);
+    ArrayList<ChildData> currentChildren = instancesCache.stream()
+        .filter(CuratorCacheAccessor.parentPathFilter(workersPath))
+        .collect(Collectors.toCollection(ArrayList::new));
+
     if (currentChildren == null) {
       LOG.warn("No zookeeper data for path [{}]", workersPath);
       return Collections.EMPTY_SET;
     }
-    for (ChildData childData : currentChildren.values()) {
+
+    for (ChildData childData : currentChildren) {
       if (childData == null) continue;
       byte[] data = childData.getData();
       if (data == null) continue;
@@ -490,7 +507,7 @@ public class LlapZookeeperRegistryImpl
   @Override
   public LlapServiceInstanceSet getInstances(
       String component, long clusterReadyTimeoutMs) throws IOException {
-    TreeCache instancesCache = ensureInstancesCache(clusterReadyTimeoutMs);
+    CuratorCacheAccessor instancesCache = ensureInstancesCache(clusterReadyTimeoutMs);
 
     // lazily create instances
     if (instances == null) {
