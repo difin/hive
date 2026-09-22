@@ -138,7 +138,10 @@ public class HMSCatalogServlet extends HttpServlet {
               handle(response));
 
       if (responseBody != null) {
-        RESTObjectMapper.mapper().writeValue(response.getWriter(), responseBody);
+        // Normalize the client-facing metadata location for Ozone tables so it matches the
+        // translated s3a:// view returned inside the table metadata payload.
+        RESTObjectMapper.mapper().writeValue(
+            response.getWriter(), normalizeLoadTableResponse(context.route(), responseBody));
       }
     } catch (JsonProcessingException e) {
       // TODO: check upstream - Malformed JSON should return 400 Bad Request
@@ -170,6 +173,37 @@ public class HMSCatalogServlet extends HttpServlet {
         throw new UncheckedIOException(e);
       }
     };
+  }
+
+  @SuppressWarnings("unchecked")
+  private Object normalizeLoadTableResponse(Route route, Object responseBody) {
+    if (route != Route.LOAD_TABLE) {
+      return responseBody;
+    }
+
+    Map<String, Object> responseMap = RESTObjectMapper.mapper().convertValue(responseBody, Map.class);
+    Object metadataLocation = responseMap.get("metadata-location");
+    Object metadataObj = responseMap.get("metadata");
+    if (!(metadataLocation instanceof String) || !(metadataObj instanceof Map)) {
+      return responseBody;
+    }
+
+    Object tableLocation = ((Map<String, Object>) metadataObj).get("location");
+    String metadataLocationStr = (String) metadataLocation;
+    if (!(tableLocation instanceof String)
+        || !OzonePathUtils.isOfsScheme(metadataLocationStr)
+        || !((String) tableLocation).startsWith("s3a://")) {
+      return responseBody;
+    }
+
+    try {
+      responseMap.put("metadata-location", OzonePathUtils.translateOfsToS3a(metadataLocationStr));
+      return responseMap;
+    } catch (RuntimeException e) {
+      LOG.warn("Failed to translate load-table metadata-location {}, leaving original value",
+          metadataLocationStr, e);
+      return responseBody;
+    }
   }
 
   public static class ServletRequestContext {

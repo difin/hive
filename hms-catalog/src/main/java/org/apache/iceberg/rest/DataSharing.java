@@ -94,6 +94,9 @@ public abstract class DataSharing {
     if (CLOUD_PROVIDER_AZURE.equalsIgnoreCase(provider)) {
       return new AzureCredentialProvider(conf);
     }
+    if (OzoneCredentialProvider.CLOUD_PROVIDER_OZONE.equalsIgnoreCase(provider)) {
+      return new OzoneCredentialProvider(conf);
+    }
     return new AwsCredentialProvider(conf);
   }
 

@@ -295,6 +295,19 @@ public class HMSCatalogAdapter implements RESTClient {
         .build());
   }
 
+  /**
+   * Whether the given table is an Ozone table and in-line rewriting to s3a:// is disabled.
+   * In that case S3 vended credentials do not apply and must not be vended. This check is
+   * per-table so that  s3a:// tables in a mixed catalog are unaffected.
+   */
+  private boolean isServedAsNativeOfs(String tableLocation) {
+    if (!OzonePathUtils.isOfsScheme(tableLocation)) {
+      return false;
+    }
+    OzoneLinkBucketManager linkMgr = OzoneLinkBucketManager.getInstance(configuration);
+    return linkMgr != null && !linkMgr.isOzoneInlineRewriteEnabled();
+  }
+
   private ListNamespacesResponse listNamespaces(Map<String, String> vars) {
     if (asNamespaceCatalog != null) {
       Namespace namespace;
@@ -832,9 +845,16 @@ public class HMSCatalogAdapter implements RESTClient {
    * @param ident       the table identifier
    * @return the load table response
    */
-  static LoadTableResponse.Builder dataSharingBuilder(BaseTable table, TableIdentifier ident) {
+  static LoadTableResponse.Builder dataSharingBuilder(BaseTable table, TableIdentifier ident, Configuration conf) {
+    // Must be performed as Hive user: reading file metadata requires Hive privileges.
+    // In Iceberg 1.10, credentials are vended via the dedicated LOAD_CREDENTIALS endpoint —
+    // see loadCredentials(). Protocol translation for ofs:// tables is delegated to
+    // OzoneLinkBucketManager to keep Ozone-specific logic out of this class.
     return runAsHive(() -> {
-      TableMetadata metaData = table.operations().current();
+      OzoneLinkBucketManager linkMgr = OzoneLinkBucketManager.getInstance(conf);
+      TableMetadata metaData = linkMgr != null
+          ? linkMgr.translateMetadataForExternalClient(table)
+          : table.operations().current();
       LoadTableResponse.Builder builder = LoadTableResponse.builder().withTableMetadata(metaData);
       DataSharing dataSharing = HMSCatalogFactory.getDataSharing();
       if (dataSharing instanceof AzureCredentialProvider) {
@@ -927,7 +947,7 @@ public class HMSCatalogAdapter implements RESTClient {
       if (accessLevel == AccessLevel.NONE) {
         throw new NoSuchTableException("Table is not accessible %s", ident.toString());
       }
-      LoadTableResponse.Builder builder = dataSharingBuilder((BaseTable) table, ident);
+      LoadTableResponse.Builder builder = dataSharingBuilder((BaseTable) table, ident, conf);
       if (builder != null) {
         if (isVendedCredentialsRequested(headers)) {
           org.apache.iceberg.rest.credentials.Credential credential =
@@ -961,15 +981,51 @@ public class HMSCatalogAdapter implements RESTClient {
       throw new NoSuchTableException("Table does not exist: %s", ident.toString());
     }
     BaseTable baseTable = (BaseTable) table;
+    if (isServedAsNativeOfs(baseTable.location())) {
+      // This is ozone table and in-line rewrite is disabled, so S3 vended credentials does not apply. 
+      // No credentials are vended
+      LOG.info("In-line path rewrite disabled for ofs:// table {}; skipping S3 credential vending",
+          baseTable.location());
+      return ImmutableLoadCredentialsResponse.builder().build();
+    }
     return runAsHive(() -> {
       ImmutableLoadCredentialsResponse.Builder responseBuilder = ImmutableLoadCredentialsResponse.builder();
-      org.apache.iceberg.rest.credentials.Credential credential =
-          buildVendedCredential(baseTable, accessLevel);
-      if (credential != null) {
-        responseBuilder.addCredentials(credential);
+      String credentialPrefix = toClientCredentialPrefix(baseTable.location());
+      DataSharing dataSharing = HMSCatalogFactory.getDataSharing();
+      if (dataSharing == null) {
+        dataSharing = HMSCatalogServer.getDataSharing();
+      }
+      if (dataSharing != null) {
+        String policy = (accessLevel == AccessLevel.READ_WRITE) ? "read-write" : "read-only";
+        Map<String, String> token = dataSharing.getAccessTokenWithPolicy(baseTable.location(), policy);
+        if (token != null && !token.isEmpty()) {
+          responseBuilder.addCredentials(
+              ImmutableCredential.builder()
+                  .prefix(credentialPrefix)
+                  .config(token)
+                  .build());
+        }
       }
       return responseBuilder.build();
     });
+  }
+
+  /**
+   * Return the path prefix that external clients will actually use when applying vendored
+   * credentials. Ozone tables are exposed through rewritten {@code s3a://} metadata, so the
+   * credential prefix must also use the translated S3A location instead of the original
+   * {@code ofs://} table location.
+   */
+  private String toClientCredentialPrefix(String tableLocation) {
+    if (tableLocation != null && OzonePathUtils.isOfsScheme(tableLocation)) {
+      try {
+        return OzonePathUtils.translateOfsToS3a(tableLocation);
+      } catch (RuntimeException e) {
+        LOG.warn("Failed to translate Ozone credential prefix {}, falling back to original location",
+            tableLocation, e);
+      }
+    }
+    return tableLocation;
   }
 
   /**

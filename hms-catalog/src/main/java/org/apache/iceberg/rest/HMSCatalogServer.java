@@ -153,6 +153,10 @@ public class HMSCatalogServer {
     return server;
   }
 
+  static DataSharing getDataSharing() {
+    return dataSharing;
+  }
+
   private static boolean isDataSharingEnabled(Configuration conf) {
     String idBrokerUrl = conf.get(DataSharing.CONFVAR_IDBROKER_URL, "");
     return !idBrokerUrl.trim().isEmpty();
@@ -215,7 +219,7 @@ public class HMSCatalogServer {
       UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser("hive"));
     }
 
-    // 4. Initialize DataSharing and inject into HMSCatalogFactory
+    // 4. Initialize DataSharing (Ozone lazily initializes on first table load via OzoneLinkBucketManager) and inject into HMSCatalogFactory
     initializeDataSharing(conf);
 
     // 5. Create and start server
