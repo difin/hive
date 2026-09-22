@@ -910,8 +910,12 @@ public class HMSCatalogAdapter implements RESTClient {
     if (token == null || token.isEmpty()) {
       return null;
     }
+    // The credential prefix must be the address the client actually uses (the translated s3a://
+    // link bucket), not the raw ofs:// table location. Use the same translation as loadCredentials
+    // so this inline-on-loadTable path stays consistent with the dedicated credentials endpoint and
+    // with the vended token's scope.
     return ImmutableCredential.builder()
-        .prefix(table.location())
+        .prefix(toClientCredentialPrefix(table.location()))
         .config(token)
         .build();
   }
@@ -1016,7 +1020,7 @@ public class HMSCatalogAdapter implements RESTClient {
    * credential prefix must also use the translated S3A location instead of the original
    * {@code ofs://} table location.
    */
-  private String toClientCredentialPrefix(String tableLocation) {
+  private static String toClientCredentialPrefix(String tableLocation) {
     if (tableLocation != null && OzonePathUtils.isOfsScheme(tableLocation)) {
       try {
         return OzonePathUtils.translateOfsToS3a(tableLocation);

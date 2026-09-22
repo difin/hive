@@ -146,14 +146,16 @@ public class OzoneCredentialProvider extends DataSharing {
   /**
    * Normalize an {@code ofs://} table location to an IdBroker policy path.
    *
-   * <p>The IdBroker policy path for Ozone follows the format {@code volume/bucket[/prefix]},
-   * which is the path after the OM service ID in an {@code ofs://} URI.
+   * <p>The external client accesses table data through the Ozone S3 Gateway <em>link bucket</em>,
+   * whose S3 name is generated from the {@code volume/bucket} pair (the same address used for the
+   * vended credential {@code prefix}, i.e. {@link OzonePathUtils#translateOfsToS3a}).
    *
-   * <p>Examples:
+   * <p>Examples (link bucket = {@code volume-bucket}, lowercased):
    * <pre>
-   *   ofs://ozone1/hive/warehouse/db/table  ->  hive/warehouse/db/table
-   *   ofs://ozone1:9862/vol/bkt/key         ->  vol/bkt/key
-   *   s3a://bucket/prefix                   ->  bucket/prefix  (fallback: strip scheme)
+   *   ofs://ozone1/hive/warehouse/db/table  ->  hive-warehouse/db/table
+   *   ofs://ozone1:9862/s3v/iceberg/key     ->  s3v-iceberg/key
+   *   ofs://ozone1/vol/bkt                  ->  vol-bkt            (no key)
+   *   s3a://s3v-iceberg/prefix              ->  s3v-iceberg/prefix (fallback: strip scheme)
    * </pre>
    */
   static String normalizePolicyPath(String location) {
@@ -164,8 +166,9 @@ public class OzoneCredentialProvider extends DataSharing {
     if (OzonePathUtils.isOfsScheme(location)) {
       try {
         OzonePathUtils.OzonePath ozPath = OzonePathUtils.parseOfsPath(location);
-        // Policy path = volume/bucket[/key]
-        String path = ozPath.volume + "/" + ozPath.bucket;
+        // Policy path = <linkBucket>[/key] — the link bucket the client actually addresses through
+        // the S3 Gateway (must match the vended prefix, which uses the same generateS3BucketName).
+        String path = OzonePathUtils.generateS3BucketName(ozPath.volume, ozPath.bucket);
         if (ozPath.key != null && !ozPath.key.isEmpty()) {
           path = path + "/" + ozPath.key;
         }
@@ -174,7 +177,8 @@ public class OzoneCredentialProvider extends DataSharing {
         LOG.warn("Could not parse ofs:// path '{}', falling back to stripScheme: {}", location, e.getMessage());
       }
     }
-    // Fallback for s3a://, s3:// or unparseable ofs:// — strip scheme and use as-is
+    // Fallback for s3a://, s3:// or unparseable ofs:// — strip scheme and use as-is.
+    // An already-translated s3a://<linkBucket>/<key> location yields <linkBucket>/<key>
     return tableRoot(stripScheme(location));
   }
 
