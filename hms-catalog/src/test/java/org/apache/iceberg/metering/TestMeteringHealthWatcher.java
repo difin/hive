@@ -23,6 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 
+import java.net.URI;
+import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
@@ -120,18 +122,72 @@ class TestMeteringHealthWatcher {
   void meteringServicePortCanBeOverriddenByJvmProperty() {
     System.setProperty(METERING_PORT_PROP, "50099");
 
-    int port = MeteringServiceMonitor.resolveMeteringServicePort();
+    Integer port = MeteringServiceMonitor.resolveMeteringServicePort();
 
     assertThat(port).isEqualTo(50099);
   }
 
   @Test
-  void meteringServiceSchemeFollowsMetastoreUseSslConfig() {
+  void meteringServiceFallbackOrderWithoutJvmPort() {
     Configuration conf = MetastoreConf.newMetastoreConf();
-    MetastoreConf.setBoolVar(conf, ConfVars.USE_SSL, false);
-    assertThat(MeteringServiceMonitor.resolveMeteringServiceScheme(conf)).isEqualTo("http");
+    List<URI> uris = MeteringServiceMonitor.resolveMeteringServiceUris(conf);
 
+    assertThat(uris).containsExactly(
+        URI.create("http://localhost:50051/health"),
+        URI.create("https://localhost:50052/health"));
+  }
+
+  @Test
+  void meteringServiceFallbackOrderWithJvmPortAndSslDisabled() {
+    Configuration conf = MetastoreConf.newMetastoreConf();
+    System.setProperty(METERING_PORT_PROP, "50099");
+    MetastoreConf.setBoolVar(conf, ConfVars.USE_SSL, false);
+
+    List<URI> uris = MeteringServiceMonitor.resolveMeteringServiceUris(conf);
+
+    assertThat(uris).containsExactly(
+        URI.create("http://localhost:50099/health"),
+        URI.create("http://localhost:50051/health"),
+        URI.create("https://localhost:50052/health"));
+  }
+
+  @Test
+  void meteringServiceFallbackOrderWithJvmPortAndSslEnabled() {
+    Configuration conf = MetastoreConf.newMetastoreConf();
+    System.setProperty(METERING_PORT_PROP, "50099");
     MetastoreConf.setBoolVar(conf, ConfVars.USE_SSL, true);
-    assertThat(MeteringServiceMonitor.resolveMeteringServiceScheme(conf)).isEqualTo("https");
+
+    List<URI> uris = MeteringServiceMonitor.resolveMeteringServiceUris(conf);
+
+    assertThat(uris).containsExactly(
+        URI.create("https://localhost:50099/health"),
+        URI.create("http://localhost:50051/health"),
+        URI.create("https://localhost:50052/health"));
+  }
+
+  @Test
+  void invalidJvmPortIsIgnoredAndDefaultsAreUsed() {
+    Configuration conf = MetastoreConf.newMetastoreConf();
+    System.setProperty(METERING_PORT_PROP, "not-a-port");
+    MetastoreConf.setBoolVar(conf, ConfVars.USE_SSL, true);
+
+    List<URI> uris = MeteringServiceMonitor.resolveMeteringServiceUris(conf);
+
+    assertThat(uris).containsExactly(
+        URI.create("http://localhost:50051/health"),
+        URI.create("https://localhost:50052/health"));
+  }
+
+  @Test
+  void jvmPortDuplicateEndpointIsDeduplicated() {
+    Configuration conf = MetastoreConf.newMetastoreConf();
+    System.setProperty(METERING_PORT_PROP, "50051");
+    MetastoreConf.setBoolVar(conf, ConfVars.USE_SSL, false);
+
+    List<URI> uris = MeteringServiceMonitor.resolveMeteringServiceUris(conf);
+
+    assertThat(uris).containsExactly(
+        URI.create("http://localhost:50051/health"),
+        URI.create("https://localhost:50052/health"));
   }
 }

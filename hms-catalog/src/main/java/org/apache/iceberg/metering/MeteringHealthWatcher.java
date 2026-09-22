@@ -100,11 +100,8 @@ public class MeteringHealthWatcher {
       return;
     }
     int periodMs = meteringHealthPollPeriodMs(conf);
-    LOG.info("MeteringHealthWatcher: starting — polling {}:{}{} every {} ms",
-        MeteringServiceMonitor.METERING_SERVICE_HOST,
-        MeteringServiceMonitor.METERING_SERVICE_PORT,
-        "/health",
-        periodMs);
+    LOG.info("MeteringHealthWatcher: starting — polling {}{} every {} ms",
+        MeteringServiceMonitor.METERING_SERVICE_HOST, "/health", periodMs);
     scheduler.scheduleAtFixedRate(this::checkHealth, 0, periodMs, TimeUnit.MILLISECONDS);
   }
 
