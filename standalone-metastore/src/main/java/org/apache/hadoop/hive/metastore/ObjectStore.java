@@ -14090,7 +14090,7 @@ public class ObjectStore implements RawStore, Configurable {
 
       Query query = pm.newQuery(MScheduledExecution.class);
       query.setFilter("scheduledQuery == currentSchedule");
-      query.setOrdering("scheduledExecutionId descending");
+      query.setOrdering("endTime descending, scheduledExecutionId descending");
       query.declareParameters("MScheduledQuery currentSchedule");
       query.setRange(0, lastN);
       List<MScheduledExecution> list = (List<MScheduledExecution>) query.execute(schq);

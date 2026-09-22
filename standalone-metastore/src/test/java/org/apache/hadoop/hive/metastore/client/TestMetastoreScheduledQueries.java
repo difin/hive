@@ -22,6 +22,7 @@ import static org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil.getConnection
 import static org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil.prepDb;
 import static org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil.queryToString;
 import static org.apache.hadoop.hive.metastore.utils.TestTxnDbUtil.setConfValues;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
@@ -32,6 +33,7 @@ import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,17 +42,20 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.Transaction;
 
 import org.apache.curator.shaded.com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.IMetaStoreClient;
 import org.apache.hadoop.hive.metastore.ObjectStore;
 import org.apache.hadoop.hive.metastore.ObjectStoreTestHook;
+import org.apache.hadoop.hive.metastore.PersistenceManagerProvider;
 import org.apache.hadoop.hive.metastore.annotation.MetastoreUnitTest;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.InvalidInputException;
@@ -101,11 +106,7 @@ public class TestMetastoreScheduledQueries extends MetaStoreClientTest {
 
   @Before
   public void setUp() throws Exception {
-    metaStore.getConf().set(MetastoreConf.ConfVars.SCHEDULED_QUERIES_AUTODISABLE_COUNT.getVarname(), "-1");
-    metaStore.getConf().set(MetastoreConf.ConfVars.SCHEDULED_QUERIES_SKIP_OPPORTUNITIES_AFTER_FAILURES.getVarname(),
-        "0");
-    client = metaStore.getClient();
-
+    prepareMetastoreClientWithAutoDisable("-1", "0");
   }
 
   @After
@@ -344,28 +345,22 @@ public class TestMetastoreScheduledQueries extends MetaStoreClientTest {
 
   @Test
   public void testDisable1() throws Exception {
-    metaStore.getConf().set(MetastoreConf.ConfVars.SCHEDULED_QUERIES_AUTODISABLE_COUNT.getVarname(), "1");
-    client.close();
-    client = metaStore.getClient();
+    prepareMetastoreClientWithAutoDisable("1", null);
+
     testDisableInternal(2, 5, "dis1");
   }
 
   @Test
   public void testDisable2() throws Exception {
-    metaStore.getConf().set(MetastoreConf.ConfVars.SCHEDULED_QUERIES_AUTODISABLE_COUNT.getVarname(), "2");
-    client.close();
-    client = metaStore.getClient();
+    prepareMetastoreClientWithAutoDisable("2", null);
+
     testDisableInternal(3, 5, "dis2");
 
   }
 
   @Test
   public void testSkip2() throws Exception {
-    metaStore.getConf().set(MetastoreConf.ConfVars.SCHEDULED_QUERIES_AUTODISABLE_COUNT.getVarname(), "4");
-    metaStore.getConf().set(MetastoreConf.ConfVars.SCHEDULED_QUERIES_SKIP_OPPORTUNITIES_AFTER_FAILURES.getVarname(),
-        "2");
-    client.close();
-    client = metaStore.getClient();
+    prepareMetastoreClientWithAutoDisable("4", "2");
     testDisableInternal(5, 6, "skip2");
 
     try (PersistenceManager pm = getPersistenceManager()) {
@@ -394,6 +389,93 @@ public class TestMetastoreScheduledQueries extends MetaStoreClientTest {
     }
 
   }
+
+  /**
+   * This test stimulates DataNucleus' id pre-allocation feature and creates id gaps between executions
+   * The test checks if auto disabling still works assuming the execution id generation doesn't generate strictly
+   * monotonous growing values
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testAutoDisablePolicyUsesEndTime() throws Exception {
+    String testNamespace = "endTimeNamespace";
+    prepareMetastoreClientWithAutoDisable("2", "0");
+
+    ScheduledQueryKey key = new ScheduledQueryKey("q1", testNamespace);
+    createEverySecondSchq(key);
+
+    long exec1Id = pollAndGetExecutionId(testNamespace);
+    client.scheduledQueryProgress(
+        new ScheduledQueryProgressInfo(exec1Id, QueryState.FINISHED, "executor-query-id"));
+
+    long exec2Id = pollAndGetExecutionId(testNamespace);
+    ScheduledQueryProgressInfo exec2Info =
+        new ScheduledQueryProgressInfo(exec2Id, QueryState.FAILED, "executor-query-id");
+    exec2Info.setErrorMessage("some issue happened");
+    client.scheduledQueryProgress(exec2Info);
+
+    stimulateIdPreallocation(exec1Id, exec2Id);
+
+    long exec3Id = pollAndGetExecutionId(testNamespace);
+    ScheduledQueryProgressInfo exec3Info =
+        new ScheduledQueryProgressInfo(exec3Id, QueryState.FAILED, "executor-query-id");
+    exec2Info.setErrorMessage("some issue happened");
+    client.scheduledQueryProgress(exec3Info);
+
+    ScheduledQuery schq = client.getScheduledQuery(key);
+    assertTrue("Scheduled query should be enabled", schq.isEnabled());
+  }
+
+  private void stimulateIdPreallocation(long exec1Id, long exec2Id) {
+    int skewedRecentEndTime = getEpochSeconds();
+    try (PersistenceManager pm = PersistenceManagerProvider.getPersistenceManager()) {
+      Transaction tx = pm.currentTransaction();
+      tx.begin();
+      MScheduledExecution exec1 = pm.getObjectById(MScheduledExecution.class, exec1Id);
+      exec1.setEndTime(skewedRecentEndTime);
+      MScheduledExecution exec2 = pm.getObjectById(MScheduledExecution.class, exec2Id);
+      exec2.setEndTime(1);
+      tx.commit();
+    }
+  }
+
+  private void prepareMetastoreClientWithAutoDisable(String autoDisableCount, String skipOpportunitiesAfterFailures) throws MetaException {
+    if (autoDisableCount != null) {
+      metaStore.getConf().set(ConfVars.SCHEDULED_QUERIES_AUTODISABLE_COUNT.getVarname(), autoDisableCount);
+    }
+
+    if (skipOpportunitiesAfterFailures != null) {
+      metaStore.getConf().set(ConfVars.SCHEDULED_QUERIES_SKIP_OPPORTUNITIES_AFTER_FAILURES.getVarname(), skipOpportunitiesAfterFailures);
+    }
+
+    if (client != null) {
+      client.close();
+    }
+    client = metaStore.getClient();
+  }
+
+  private long pollAndGetExecutionId(String testNamespace) {
+    ScheduledQueryPollRequest request = new ScheduledQueryPollRequest(testNamespace);
+    AtomicReference<Long> executionId = new AtomicReference<>();
+
+    await()
+        .atMost(Duration.ofSeconds(3))
+        .pollInterval(Duration.ofMillis(100))
+        .until(() -> {
+          ScheduledQueryPollResponse response = client.scheduledQueryPoll(request);
+
+          if (response.isSetQuery()) {
+            executionId.set(response.getExecutionId());
+            return true;
+          }
+
+          return false;
+        });
+
+    return executionId.get();
+  }
+
   /**
    * Simulates some schq failure scenario.
    *
