@@ -20,16 +20,24 @@
 package org.apache.iceberg.metering;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /** Unit tests for MeteringHealthWatcher using a mocked MeteringServiceMonitor. */
 class TestMeteringHealthWatcher {
+  private static final String METERING_PORT_PROP = "metering.service.port";
+
+  @AfterEach
+  void clearMeteringProperties() {
+    System.clearProperty(METERING_PORT_PROP);
+  }
 
   @Test
   void hiveInTestModeAlwaysReportsHealthy() {
@@ -48,7 +56,7 @@ class TestMeteringHealthWatcher {
     MeteringHealthWatcher watcher = new MeteringHealthWatcher(conf);
     try {
       try (MockedStatic<MeteringServiceMonitor> mock = mockStatic(MeteringServiceMonitor.class)) {
-        mock.when(MeteringServiceMonitor::isMeteringServiceHealthy).thenReturn(false);
+        mock.when(() -> MeteringServiceMonitor.isMeteringServiceHealthy(any())).thenReturn(false);
         assertThat(watcher.isHealthy()).isTrue();
         watcher.runHealthCheckOnceForTests();
         assertThat(watcher.isHealthy()).isTrue();
@@ -69,7 +77,7 @@ class TestMeteringHealthWatcher {
     MeteringHealthWatcher watcher = new MeteringHealthWatcher(conf);
     try {
       try (MockedStatic<MeteringServiceMonitor> mock = mockStatic(MeteringServiceMonitor.class)) {
-        mock.when(MeteringServiceMonitor::isMeteringServiceHealthy)
+        mock.when(() -> MeteringServiceMonitor.isMeteringServiceHealthy(any()))
             .thenReturn(false, false, true, false, false, false);
         watcher.runHealthCheckOnceForTests();
         watcher.runHealthCheckOnceForTests();
@@ -93,18 +101,37 @@ class TestMeteringHealthWatcher {
     MeteringHealthWatcher watcher = new MeteringHealthWatcher(conf);
     try {
       try (MockedStatic<MeteringServiceMonitor> mock = mockStatic(MeteringServiceMonitor.class)) {
-        mock.when(MeteringServiceMonitor::isMeteringServiceHealthy).thenReturn(false);
+        mock.when(() -> MeteringServiceMonitor.isMeteringServiceHealthy(any())).thenReturn(false);
         watcher.runHealthCheckOnceForTests();
         watcher.runHealthCheckOnceForTests();
         watcher.runHealthCheckOnceForTests();
         assertThat(watcher.isHealthy()).isFalse();
 
-        mock.when(MeteringServiceMonitor::isMeteringServiceHealthy).thenReturn(true);
+        mock.when(() -> MeteringServiceMonitor.isMeteringServiceHealthy(any())).thenReturn(true);
         watcher.runHealthCheckOnceForTests();
         assertThat(watcher.isHealthy()).isTrue();
       }
     } finally {
       watcher.stop();
     }
+  }
+
+  @Test
+  void meteringServicePortCanBeOverriddenByJvmProperty() {
+    System.setProperty(METERING_PORT_PROP, "50099");
+
+    int port = MeteringServiceMonitor.resolveMeteringServicePort();
+
+    assertThat(port).isEqualTo(50099);
+  }
+
+  @Test
+  void meteringServiceSchemeFollowsMetastoreUseSslConfig() {
+    Configuration conf = MetastoreConf.newMetastoreConf();
+    MetastoreConf.setBoolVar(conf, ConfVars.USE_SSL, false);
+    assertThat(MeteringServiceMonitor.resolveMeteringServiceScheme(conf)).isEqualTo("http");
+
+    MetastoreConf.setBoolVar(conf, ConfVars.USE_SSL, true);
+    assertThat(MeteringServiceMonitor.resolveMeteringServiceScheme(conf)).isEqualTo("https");
   }
 }
