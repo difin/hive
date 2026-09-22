@@ -778,7 +778,7 @@ public class TestHMSCatalog extends HMSTestBase {
   }
 
   @Test
-  public void testLoadTableDoesNotReturnVendedCredentialConfig() throws Exception {
+  public void testLoadTableDoesNotReturnVendedCredentialsWithoutDelegationHeader() throws Exception {
     Schema schema = getTestSchema();
     String tableName = "tbl_no_creds_in_load_" + Integer.toHexString(RND.nextInt(65536));
     TableIdentifier tableIdent = TableIdentifier.of(DB_NAME, tableName);
@@ -805,6 +805,7 @@ public class TestHMSCatalog extends HMSTestBase {
       Number status = (Number) responseMap.get("status");
 
       if (status.intValue() == 200) {
+        assertThat(responseMap).doesNotContainKey("storage-credentials");
         Object configObj = responseMap.get("config");
         if (configObj instanceof Map) {
           Map<String, Object> config = (Map<String, Object>) configObj;
@@ -822,6 +823,74 @@ public class TestHMSCatalog extends HMSTestBase {
     } finally {
       catalog.dropTable(tableIdent);
     }
+  }
+
+  @Test
+  public void testLoadTableReturnsVendedCredentialsWithDelegationHeader() throws Exception {
+    Schema schema = getTestSchema();
+    String tableName = "tbl_creds_in_load_" + Integer.toHexString(RND.nextInt(65536));
+    TableIdentifier tableIdent = TableIdentifier.of(DB_NAME, tableName);
+
+    try {
+      catalog.createTable(tableIdent, schema);
+
+      String jwt = generateJWT();
+      URL loadTableUrl =
+          new URL(
+              "http://hive@localhost:"
+                  + catalogPort
+                  + "/"
+                  + catalogPath
+                  + "/v1/namespaces/"
+                  + DB_NAME
+                  + "/tables/"
+                  + tableName);
+      Object response =
+          clientCall(
+              jwt,
+              loadTableUrl,
+              "GET",
+              null,
+              ImmutableMap.of("X-Iceberg-Access-Delegation", "vended-credentials"));
+
+      assertThat(response).isInstanceOf(Map.class);
+      Map<String, Object> responseMap = (Map<String, Object>) response;
+      assertThat(responseMap).containsKey("status");
+      Number status = (Number) responseMap.get("status");
+
+      if (status.intValue() == 200) {
+        assertThat(responseMap).containsKey("storage-credentials");
+        assertThat(responseMap.get("storage-credentials")).isInstanceOf(List.class);
+      } else {
+        // Security wrappers use 404/NoSuchTable for inaccessible tables.
+        assertThat(status.intValue()).isEqualTo(404);
+        assertThat(responseMap).containsKey("error");
+      }
+    } finally {
+      catalog.dropTable(tableIdent);
+    }
+  }
+
+  @Test
+  public void testIsVendedCredentialsRequestedParsesAccessDelegationHeader() {
+    assertThat(HMSCatalogAdapter.isVendedCredentialsRequested(null)).isFalse();
+    assertThat(HMSCatalogAdapter.isVendedCredentialsRequested(ImmutableMap.of())).isFalse();
+    assertThat(
+            HMSCatalogAdapter.isVendedCredentialsRequested(
+                ImmutableMap.of("X-Iceberg-Access-Delegation", "vended-credentials")))
+        .isTrue();
+    assertThat(
+            HMSCatalogAdapter.isVendedCredentialsRequested(
+                ImmutableMap.of("X-Iceberg-Access-Delegation", "remote-signing")))
+        .isFalse();
+    assertThat(
+            HMSCatalogAdapter.isVendedCredentialsRequested(
+                ImmutableMap.of("X-Iceberg-Access-Delegation", "vended-credentials,remote-signing")))
+        .isTrue();
+    assertThat(
+            HMSCatalogAdapter.isVendedCredentialsRequested(
+                ImmutableMap.of("x-iceberg-access-delegation", "vended-credentials")))
+        .isTrue();
   }
 
   @Test

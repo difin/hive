@@ -423,7 +423,13 @@ public abstract class HMSTestBase {
    * @throws IOException if marshalling the request/response fail
    */
   public static Object clientCall(String jwt, URL url, String method, Object arg) throws IOException {
-    return clientCall(jwt, url, method, true, arg);
+    return clientCall(jwt, url, method, true, arg, Collections.emptyMap());
+  }
+
+  public static Object clientCall(
+      String jwt, URL url, String method, Object arg, Map<String, String> extraHeaders)
+      throws IOException {
+    return clientCall(jwt, url, method, true, arg, extraHeaders);
   }
 
   public static class ServerResponse {
@@ -445,6 +451,17 @@ public abstract class HMSTestBase {
   }
 
   public static Object clientCall(String jwt, URL url, String method, boolean json, Object arg) throws IOException {
+    return clientCall(jwt, url, method, json, arg, Collections.emptyMap());
+  }
+
+  public static Object clientCall(
+      String jwt,
+      URL url,
+      String method,
+      boolean json,
+      Object arg,
+      Map<String, String> extraHeaders)
+      throws IOException {
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     try {
       if ("PATCH".equals(method)) {
@@ -463,6 +480,11 @@ public abstract class HMSTestBase {
       con.setRequestProperty("Accept", "application/json");
       if (jwt != null) {
         con.setRequestProperty("Authorization", "Bearer " + jwt);
+      }
+      if (extraHeaders != null) {
+        for (Map.Entry<String, String> header : extraHeaders.entrySet()) {
+          con.setRequestProperty(header.getKey(), header.getValue());
+        }
       }
       con.setDoInput(true);
       if (arg != null) {

@@ -101,6 +101,8 @@ public class HMSCatalogAdapter implements RESTClient {
   private static final AtomicInteger REQUEST_ID_COUNTER = new AtomicInteger(0);
 
   private static final String VENDED_CREDENTIALS_ENABLED = "vended-credentials-enabled";
+  private static final String ICEBERG_ACCESS_DELEGATION_HEADER = "X-Iceberg-Access-Delegation";
+  private static final String ICEBERG_ACCESS_DELEGATION_VENDED_CREDENTIALS = "vended-credentials";
   private static final String ADLS_REFRESH_CREDENTIALS_ENDPOINT = "adls.refresh-credentials-endpoint";
   private static final String ADLS_REFRESH_CREDENTIALS_ENABLED = "adls.refresh-credentials-enabled";
   private static final String LOAD_CREDENTIALS_PATH_TEMPLATE = "v1/namespaces/%s/tables/%s/credentials";
@@ -552,7 +554,7 @@ public class HMSCatalogAdapter implements RESTClient {
 
   @SuppressWarnings({"MethodLength", "unchecked"})
   private <T extends RESTResponse> T handleRequest(
-      Route route, Map<String, String> vars, Object body, String requestId) {
+      Route route, Map<String, String> vars, Object body, String requestId, Map<String, String> headers) {
     catalogMeteringEventPublisher.updateAPICount();
     switch (route) {
       case TOKENS: {
@@ -628,7 +630,7 @@ public class HMSCatalogAdapter implements RESTClient {
       case LOAD_TABLE: {
         TableIdentifier ident = identFromPathVars(vars);
         LOG.debug("API_OPERATION [{}] Loading table: {}", requestId, ident);
-        return (T) loadTable(catalog, ident, configuration);
+        return (T) loadTable(catalog, ident, configuration, headers);
       }
 
       case TABLE_EXISTS:
@@ -823,6 +825,8 @@ public class HMSCatalogAdapter implements RESTClient {
   /**
    * Creates a load table response builder with table metadata.
    * If Azure data-sharing is active, include ADLS credential refresh config for ADLSFileIO.
+   * When the client requests vended credentials via {@code X-Iceberg-Access-Delegation},
+   * initial credentials are also included in the {@code storage-credentials} field.
    *
    * @param table       the table instance (can not be null)
    * @param ident       the table identifier
@@ -842,6 +846,56 @@ public class HMSCatalogAdapter implements RESTClient {
     });
   }
 
+  /**
+   * Returns whether the client requested vended storage credentials via the Iceberg REST
+   * {@code X-Iceberg-Access-Delegation} header.
+   */
+  static boolean isVendedCredentialsRequested(Map<String, String> headers) {
+    String delegation = getHeaderIgnoreCase(headers, ICEBERG_ACCESS_DELEGATION_HEADER);
+    if (delegation == null || delegation.isBlank()) {
+      return false;
+    }
+    return Arrays.stream(delegation.split(","))
+        .map(String::trim)
+        .anyMatch(ICEBERG_ACCESS_DELEGATION_VENDED_CREDENTIALS::equals);
+  }
+
+  /**
+   * Reads a request header using case-insensitive name matching.
+   */
+  private static String getHeaderIgnoreCase(Map<String, String> headers, String name) {
+    if (headers == null) {
+      return null;
+    }
+    String value = headers.get(name);
+    if (value != null) {
+      return value;
+    }
+    for (Map.Entry<String, String> entry : headers.entrySet()) {
+      if (name.equalsIgnoreCase(entry.getKey())) {
+        return entry.getValue();
+      }
+    }
+    return null;
+  }
+
+  static org.apache.iceberg.rest.credentials.Credential buildVendedCredential(
+      BaseTable table, AccessLevel accessLevel) {
+    DataSharing dataSharing = HMSCatalogFactory.getDataSharing();
+    if (dataSharing == null) {
+      return null;
+    }
+    String policy = (accessLevel == AccessLevel.READ_WRITE) ? "read-write" : "read-only";
+    Map<String, String> token = dataSharing.getAccessTokenWithPolicy(table.location(), policy);
+    if (token == null || token.isEmpty()) {
+      return null;
+    }
+    return ImmutableCredential.builder()
+        .prefix(table.location())
+        .config(token)
+        .build();
+  }
+
   static String buildLoadCredentialsPath(TableIdentifier ident) {
     return String.format(
         LOAD_CREDENTIALS_PATH_TEMPLATE,
@@ -851,15 +905,23 @@ public class HMSCatalogAdapter implements RESTClient {
 
   /**
    * Ensures that the current user has access to the table it is trying to load.
-   * <p>If configured for data sharing, response will carry access token allowing reading table files.</p>
+   * <p>If configured for data sharing and the client requests vended credentials, the response
+   * includes storage credentials for reading table files. Token refresh remains available via
+   * the dedicated LOAD_CREDENTIALS endpoint.</p>
    *
    * @param catalog the catalog
    * @param ident   the table identifier
    * @param table   the table instance (can be null)
    * @param conf    the configuration
+   * @param headers request headers
    * @return the load table response
    */
-  private static LoadTableResponse accessTable(Catalog catalog, TableIdentifier ident, Table table, Configuration conf) {
+  private static LoadTableResponse accessTable(
+      Catalog catalog,
+      TableIdentifier ident,
+      Table table,
+      Configuration conf,
+      Map<String, String> headers) {
     if (table instanceof BaseTable) {
       AccessLevel accessLevel = getAccessLevel(catalog, ident, conf);
       if (accessLevel == AccessLevel.NONE) {
@@ -867,6 +929,13 @@ public class HMSCatalogAdapter implements RESTClient {
       }
       LoadTableResponse.Builder builder = dataSharingBuilder((BaseTable) table, ident);
       if (builder != null) {
+        if (isVendedCredentialsRequested(headers)) {
+          org.apache.iceberg.rest.credentials.Credential credential =
+              buildVendedCredential((BaseTable) table, accessLevel);
+          if (credential != null) {
+            builder.addCredential(credential);
+          }
+        }
         return builder.build();
       }
     }
@@ -894,17 +963,10 @@ public class HMSCatalogAdapter implements RESTClient {
     BaseTable baseTable = (BaseTable) table;
     return runAsHive(() -> {
       ImmutableLoadCredentialsResponse.Builder responseBuilder = ImmutableLoadCredentialsResponse.builder();
-      DataSharing dataSharing = HMSCatalogFactory.getDataSharing();
-      if (dataSharing != null) {
-        String policy = (accessLevel == AccessLevel.READ_WRITE) ? "read-write" : "read-only";
-        Map<String, String> token = dataSharing.getAccessTokenWithPolicy(baseTable.location(), policy);
-        if (token != null && !token.isEmpty()) {
-          responseBuilder.addCredentials(
-              ImmutableCredential.builder()
-                  .prefix(baseTable.location())
-                  .config(token)
-                  .build());
-        }
+      org.apache.iceberg.rest.credentials.Credential credential =
+          buildVendedCredential(baseTable, accessLevel);
+      if (credential != null) {
+        responseBuilder.addCredentials(credential);
       }
       return responseBuilder.build();
     });
@@ -917,8 +979,9 @@ public class HMSCatalogAdapter implements RESTClient {
    * @param ident   the table identifier
    * @return the load table response
    */
-  LoadTableResponse loadTable(Catalog catalog, TableIdentifier ident, Configuration conf) {
-    return accessTable(catalog, ident, runAsHive(() -> catalog.loadTable(ident)), conf);
+  LoadTableResponse loadTable(
+      Catalog catalog, TableIdentifier ident, Configuration conf, Map<String, String> headers) {
+    return accessTable(catalog, ident, runAsHive(() -> catalog.loadTable(ident)), conf, headers);
   }
 
   <T extends RESTResponse> T execute(
@@ -957,7 +1020,7 @@ public class HMSCatalogAdapter implements RESTClient {
           vars.putAll(queryParams);
         }
         vars.putAll(routeAndVars.second());
-        T result = handleRequest(routeAndVars.first(), vars.build(), body, requestId);
+        T result = handleRequest(routeAndVars.first(), vars.build(), body, requestId, headers);
         LOG.info("API_SUCCESS [{}] {} {} completed successfully", requestId, method, path);
         return result;
       } catch (RuntimeException e) {
