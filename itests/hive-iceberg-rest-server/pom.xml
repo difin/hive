@@ -62,6 +62,11 @@
         <version>${iceberg.rest.test.jetty.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-security</artifactId>
+        <version>${iceberg.rest.test.jetty.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.eclipse.jetty.ee10</groupId>
         <artifactId>jetty-ee10-servlet</artifactId>
         <version>${iceberg.rest.test.jetty.version}</version>
@@ -157,6 +162,18 @@
     <dependency>
       <groupId>org.eclipse.jetty.ee10</groupId>
       <artifactId>jetty-ee10-servlet</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <!-- Avoid compile-scoped jetty-security 12 on the module classpath (breaks root javadoc:aggregate). -->
+        <exclusion>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-security</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-security</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
