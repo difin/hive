@@ -160,6 +160,19 @@ public class TestMetastoreExpr extends TestCase {
     } catch (IMetaStoreClient.IncompatibleMetastoreException ignore) {
     }
 
+    // Denied expression => throw the specific exception
+    try {
+      var expr = e.val("currentTimeMillis").val("java.lang.System").fn("reflect", TypeInfoFactory.intTypeInfo, 2).val(0)
+          .pred("=", 2).build();
+      checkExpr(-1, dbName, tblName, expr);
+      fail("Should have thrown");
+    } catch (IMetaStoreClient.IncompatibleMetastoreException ex) {
+      assertEquals(
+          "org.apache.hadoop.hive.ql.udf.generic.GenericUDFReflect is not allowed in partition expressions",
+          ex.getMessage()
+      );
+    }
+
     // Invalid expression => throw some exception, but not incompatible metastore.
     try {
       checkExpr(-1, dbName, tblName, e.val(31).intCol("p3").pred(">", 2).build());
