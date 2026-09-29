@@ -95,8 +95,7 @@ class TestHiveIcebergServerSideScanPlanning {
         CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
     if (serverMode) {
       RestCatalogScanPlanning.setScanPlanningMode(conf, CATALOG_NAME, "server");
-      HiveConf.setBoolVar(
-          conf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED, true);
+      RestCatalogScanPlanning.setHiveRestScanPlanningMode(conf, "server");
     }
     conf.set(
         InputFormatConfig.SERIALIZED_TABLE_PREFIX + table.name(),

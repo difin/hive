@@ -54,7 +54,7 @@ public class TestRestCatalogScanPlanning {
 
   /**
    * {@code scan-planning-mode=server} alone is not enough; {@link HiveConf.ConfVars
-   * #HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED} must also be true.
+   * #HIVE_ICEBERG_REST_SCAN_PLANNING_MODE} must also be {@code server}.
    */
   @Test
   void requestsServerSidePlanningFromConfiguration() {
@@ -138,7 +138,7 @@ public class TestRestCatalogScanPlanning {
             IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181")
         .containsEntry(RestCatalogScanPlanning.catalogPropertyKey("ice01"), "server")
         .containsEntry(
-            HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED.varname, "true")
+            HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE.varname, "server")
         .doesNotContainKey("unrelated.key");
   }
 
@@ -191,7 +191,6 @@ public class TestRestCatalogScanPlanning {
   }
 
   private static void enableHiveServerSideScanPlanning(Configuration conf) {
-    HiveConf.setBoolVar(
-        conf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED, true);
+    RestCatalogScanPlanning.setHiveRestScanPlanningMode(conf, "server");
   }
 }

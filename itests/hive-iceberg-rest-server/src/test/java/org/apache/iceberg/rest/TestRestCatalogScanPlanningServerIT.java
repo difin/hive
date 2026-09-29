@@ -127,7 +127,7 @@ class TestRestCatalogScanPlanningServerIT extends TestBaseWithRESTServer {
     Configuration conf = new Configuration();
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_DEFAULT, CATALOG_NAME);
     RestCatalogScanPlanning.setScanPlanningMode(conf, CATALOG_NAME, "server");
-    HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED, true);
+    RestCatalogScanPlanning.setHiveRestScanPlanningMode(conf, "server");
     assertThat(IcebergCatalogProperties.getCatalogProperties(conf, CATALOG_NAME))
         .containsEntry(RESTCatalogProperties.SCAN_PLANNING_MODE, "server");
     assertThat(RestCatalogScanPlanning.isServerMode(conf, CATALOG_NAME)).isTrue();

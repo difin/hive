@@ -37,7 +37,7 @@ import org.apache.iceberg.rest.RESTCatalogProperties;
  * {@code IcebergInputFormat} calls {@code scan.planTasks()} via
  * {@link org.apache.iceberg.mr.hive.HiveTableUtil#resolveTableForScanPlanning}, which reloads the
  * live REST catalog table (instead of a serialized metadata snapshot) when server mode is enabled and
- * {@link HiveConf.ConfVars#HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED} is true.
+ * {@link HiveConf.ConfVars#HIVE_ICEBERG_REST_SCAN_PLANNING_MODE} is {@code server}.
  * Operators can use this helper or set catalog {@code scan-planning-mode} directly in {@code hive-site.xml}.
  *
  * <p>Tests: {@code TestRestCatalogScanPlanning} in {@code iceberg-rest-catalog-client};
@@ -84,7 +84,22 @@ public final class RestCatalogScanPlanning {
     if (conf == null) {
       return false;
     }
-    return HiveConf.getBoolVar(conf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED);
+    return RESTCatalogProperties.ScanPlanningMode.SERVER
+        == RESTCatalogProperties.ScanPlanningMode.fromString(getHiveRestScanPlanningMode(conf));
+  }
+
+  public static String getHiveRestScanPlanningMode(Configuration conf) {
+    if (conf == null) {
+      return RESTCatalogProperties.SCAN_PLANNING_MODE_DEFAULT.modeName();
+    }
+    return HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE);
+  }
+
+  public static void setHiveRestScanPlanningMode(Configuration conf, String mode) {
+    HiveConf.setVar(
+        conf,
+        HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE,
+        RESTCatalogProperties.ScanPlanningMode.fromString(mode).modeName());
   }
 
   /**
@@ -176,8 +191,8 @@ public final class RestCatalogScanPlanning {
     }
 
     consumer.accept(
-        HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED.varname,
-        String.valueOf(isHiveServerSideScanPlanningEnabled(sessionConf)));
+        HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE.varname,
+        getHiveRestScanPlanningMode(sessionConf));
 
     String sessionDefaultCatalog =
         MetastoreConf.getVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT);
