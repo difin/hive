@@ -2008,7 +2008,7 @@ public class ObjectStore implements RawStore, Configurable {
     return metas;
   }
 
-  protected StringBuilder appendPatternCondition(StringBuilder builder,
+  public StringBuilder appendPatternCondition(StringBuilder builder,
       String fieldName, String elements, List<String> parameters) {
       elements = normalizeIdentifier(elements);
     return appendCondition(builder, fieldName, elements.split("\\|"), true, parameters);
@@ -2366,7 +2366,7 @@ public class ObjectStore implements RawStore, Configurable {
     return mkeys;
   }
 
-  protected List<FieldSchema> convertToFieldSchemas(List<MFieldSchema> mkeys) {
+  public List<FieldSchema> convertToFieldSchemas(List<MFieldSchema> mkeys) {
     List<FieldSchema> keys = null;
     if (mkeys != null) {
       keys = new ArrayList<>();
@@ -5348,8 +5348,21 @@ public class ObjectStore implements RawStore, Configurable {
    * @return true if has references
    */
   private boolean hasRemainingCDReference(MColumnDescriptor oldCD) {
+    return hasRemainingCDReference(pm, oldCD);
+  }
+
+  /**
+   * Checks if a column descriptor has any remaining references by storage descriptors
+   * in the db.
+   *
+   * @param pm persistence manager for the metastore
+   * @param oldCD the column descriptor to check if it has references or not
+   * @return true if has references
+   */
+  public static boolean hasRemainingCDReference(PersistenceManager pm, MColumnDescriptor oldCD) {
     assert oldCD != null;
     Query query = null;
+    DatabaseProduct dbType = PersistenceManagerProvider.getDatabaseProduct();
 
     /**
      * In order to workaround oracle not supporting limit statement caused performance issue, HIVE-9447 makes

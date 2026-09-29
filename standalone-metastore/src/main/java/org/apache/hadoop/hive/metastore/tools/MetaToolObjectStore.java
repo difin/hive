@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.hive.metastore.tools;
 
+import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import java.lang.reflect.Modifier;
 import java.net.URI;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -676,7 +678,8 @@ public class MetaToolObjectStore extends ObjectStore {
     return metadataTableSummaryList;
   }
 
-  private void collectPartitionSummary(Map<Long, MetadataTableSummary> summaries,  Set<Long> partedTabs,
+  private void collectPartitionSummary(Map<Long, MetadataTableSummary> summaries,
+      Set<Long> partedTabs,
       Set<Long> nonPartedTabs) throws MetaException {
     String queryText0 = "select \"TBL_ID\", count(1) from \"PARTITION_KEYS\" where \"TBL_ID\" in (";
     runBatched(batchSize, new ArrayList<>(summaries.keySet()), new Batchable<Long, Void>() {
@@ -728,7 +731,8 @@ public class MetaToolObjectStore extends ObjectStore {
   private void collectColumnSummary(Map<Long, MetadataTableSummary> summaries) throws MetaException {
     String queryText0 = "select \"TBL_ID\", count(*), sum(CASE WHEN \"TYPE_NAME\" like 'array%' THEN 1 ELSE 0 END)," +
         " sum(CASE WHEN \"TYPE_NAME\" like 'struct%' THEN 1 ELSE 0 END), sum(CASE WHEN \"TYPE_NAME\" like 'map%' THEN 1 ELSE 0 END)" +
-        " from \"TBLS\" t join \"SDS\" s on t.\"SD_ID\" = s.\"SD_ID\" join \"CDS\" c on s.\"CD_ID\" = c.\"CD_ID\" join \"COLUMNS_V2\" v on c.\"CD_ID\" = v.\"CD_ID\"" +
+        " from \"TBLS\" t join \"SDS\" s on t.\"SD_ID\" = s.\"SD_ID\" join \"CDS\" c" +
+        " on s.\"CD_ID\" = c.\"CD_ID\" join \"COLUMNS_V2\" v on c.\"CD_ID\" = v.\"CD_ID\"" +
         " where \"TBL_ID\" in (";
     runBatched(batchSize, new ArrayList<>(summaries.keySet()), new Batchable<Long, Void>() {
       @Override
@@ -754,7 +758,8 @@ public class MetaToolObjectStore extends ObjectStore {
   }
 
   private void collectTabFormatSummary(Map<Long, MetadataTableSummary> summaries) throws MetaException {
-    String queryText0 = "select t.\"TBL_ID\", d.\"SLIB\", s.\"IS_COMPRESSED\" from \"TBLS\" t left join \"SDS\" s on t.\"SD_ID\" = s.\"SD_ID\" left join \"SERDES\" d on d.\"SERDE_ID\" = s.\"SERDE_ID\"" +
+    String queryText0 = "select t.\"TBL_ID\", d.\"SLIB\", s.\"IS_COMPRESSED\" from \"TBLS\" t left join \"SDS\" s" +
+        " on t.\"SD_ID\" = s.\"SD_ID\" left join \"SERDES\" d on d.\"SERDE_ID\" = s.\"SERDE_ID\"" +
         " where t.\"TBL_ID\" in (";
     String queryText1 = "select p.\"TBL_ID\", " + toVarChar(dbType, "p.\"PARAM_VALUE\"") + " from \"TABLE_PARAMS\" p " +
         " where p.\"PARAM_KEY\" = 'transactional_properties' and p.\"TBL_ID\" in (";
@@ -853,8 +858,10 @@ public class MetaToolObjectStore extends ObjectStore {
 
   private void collectBasicStats(Map<Long, MetadataTableSummary> summaries, Set<Long> nonPartedTabs,
       Set<Long> partedTabs) throws MetaException {
-    String queryText0 = "select \"TBL_ID\", \"PARAM_KEY\", CAST(" + toVarChar(dbType, "\"PARAM_VALUE\"") + " AS decimal(21,0)) from \"TABLE_PARAMS\" where \"PARAM_KEY\" " +
-        "in ('" + StatsSetupConst.TOTAL_SIZE + "', '" + StatsSetupConst.NUM_FILES + "', '" + StatsSetupConst.ROW_COUNT + "') and \"TBL_ID\" in (";
+    String queryText0 = "select \"TBL_ID\", \"PARAM_KEY\", CAST(" + toVarChar(dbType, "\"PARAM_VALUE\"") +
+        " AS decimal(21,0)) from \"TABLE_PARAMS\" where \"PARAM_KEY\"" +
+        " in ('" + StatsSetupConst.TOTAL_SIZE + "', '" + StatsSetupConst.NUM_FILES + "', '" +
+        StatsSetupConst.ROW_COUNT + "') and \"TBL_ID\" in (";
     runBatched(batchSize, new ArrayList<>(nonPartedTabs), new Batchable<Long, Void>() {
       @Override
       public List<Void> run(List<Long> input) throws MetaException {
@@ -863,9 +870,11 @@ public class MetaToolObjectStore extends ObjectStore {
       }
     });
 
-   String queryText1 = "select \"TBL_ID\", \"PARAM_KEY\", sum(CAST(" + toVarChar(dbType, "\"PARAM_VALUE\"") + " AS decimal(21,0))) from \"PARTITIONS\" t " +
-       "join \"PARTITION_PARAMS\" p on p.\"PART_ID\" = t.\"PART_ID\" where \"PARAM_KEY\" " +
-       "in ('" + StatsSetupConst.TOTAL_SIZE + "', '" + StatsSetupConst.NUM_FILES + "', '" + StatsSetupConst.ROW_COUNT + "') and t.\"TBL_ID\" in (";
+   String queryText1 = "select \"TBL_ID\", \"PARAM_KEY\", sum(CAST(" + toVarChar(dbType, "\"PARAM_VALUE\"") +
+       " AS decimal(21,0))) from \"PARTITIONS\" t" +
+       " join \"PARTITION_PARAMS\" p on p.\"PART_ID\" = t.\"PART_ID\" where \"PARAM_KEY\"" +
+       " in ('" + StatsSetupConst.TOTAL_SIZE + "', '" + StatsSetupConst.NUM_FILES + "', '" +
+       StatsSetupConst.ROW_COUNT + "') and t.\"TBL_ID\" in (";
    runBatched(batchSize, new ArrayList<>(partedTabs), new Batchable<Long, Void>() {
       @Override
       public List<Void> run(List<Long> input) throws MetaException {
@@ -937,7 +946,8 @@ public class MetaToolObjectStore extends ObjectStore {
         int size = input.size();
         String queryText =
             "\"TBL_ID\" from \"TABLE_PARAMS\" where \"PARAM_KEY\" = 'current-snapshot-timestamp-ms' "
-                + (lastUpdatedDays != null ? (" and CAST(" + toVarChar(dbType, "\"PARAM_VALUE\"") + " AS decimal(21,0)) > " + (System.currentTimeMillis() - lastUpdatedDays * 24 * 3600000L)) : "")
+                + (lastUpdatedDays != null ? (" and CAST(" + toVarChar(dbType, "\"PARAM_VALUE\"") + " AS decimal(21,0)) > "
+                + (System.currentTimeMillis() - lastUpdatedDays * 24 * 3600000L)) : "")
                 + " and \"TBL_ID\" in (" +  (size == 0 ? "" : repeat(",?", size).substring(1)) + ") "
                 + " order by CAST(" + toVarChar(dbType, "\"PARAM_VALUE\"") + " AS decimal(21,0)) DESC";
         if (tablesLimit != null && tablesLimit >= 0) {
@@ -969,5 +979,71 @@ public class MetaToolObjectStore extends ObjectStore {
       }
     });
     return new HashSet<>(tables);
+  }
+
+  public static final class DedupColumnsResult {
+    private final int tablesScanned;
+    private int tablesWithDuplicates;
+    private int storageDescriptorsUpdated;
+    private int columnDescriptorsRemoved;
+    private final List<String> details = new ArrayList<>();
+    private Exception exception;
+    DedupColumnsResult(int tablesScanned) {
+      this.tablesScanned = tablesScanned;
+    }
+    public int getTablesScanned() {
+      return tablesScanned;
+    }
+
+    public int getTablesWithDuplicates() {
+      return tablesWithDuplicates;
+    }
+
+    void incrementTablesWithDuplicates() {
+      this.tablesWithDuplicates++;
+    }
+
+    public int getStorageDescriptorsUpdated() {
+      return storageDescriptorsUpdated;
+    }
+
+    void incrementStorageDescriptorsUpdated() {
+      this.storageDescriptorsUpdated++;
+    }
+
+    public int getColumnDescriptorsRemoved() {
+      return columnDescriptorsRemoved;
+    }
+
+    void addColumnDescriptorsRemoved(int count) {
+      this.columnDescriptorsRemoved += count;
+    }
+
+    public List<String> getDetails() {
+      return details;
+    }
+
+    void addDetail(String detail) {
+      details.add(detail);
+    }
+
+    void catchException(Exception exception) {
+      this.exception = exception;
+    }
+
+    public Exception getException() {
+      return exception;
+    }
+  }
+
+  public DedupColumnsResult dedupColumns(String catalogFilter, String dbFilter, String tableFilter,
+      AtomicReference<String> progress, boolean isDryRun, boolean isVerbose) {
+    return new ColumnDeduplicator(this, progress, isDryRun, isVerbose)
+        .run(catalogFilter, dbFilter, tableFilter);
+  }
+
+  @Override
+  public PersistenceManager getPersistenceManager() {
+    return pm;
   }
 }

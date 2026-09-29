@@ -1932,6 +1932,8 @@ public class MetastoreConf {
         "Number of threads to be allocated for MetaToolTaskMetadataSummary for collecting the non-native table's summary."),
     METASTORE_SUPPORT_ACID("metastore.support.acid", "hive.metastore.support.acid", true,
         "Whether to support acid functionality in Hive metastore server."),
+    DEDUP_COLUMNS_TIMEOUT("hive.metatool.dedupColumns.timeout", "hive.metatool.dedupColumns.timeout", 60, TimeUnit.MINUTES,
+        "The maximum time in minutes for the -dedupColumns metatool command to run before timing out."),
 
     // These are all values that we put here just for testing
     STR_TEST_ENTRY("test.str", "hive.test.str", "defaultval", "comment"),
