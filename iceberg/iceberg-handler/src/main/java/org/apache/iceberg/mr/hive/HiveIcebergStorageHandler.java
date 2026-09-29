@@ -178,7 +178,6 @@ import org.apache.iceberg.hive.HiveSchemaUtil;
 import org.apache.iceberg.hive.HiveTableOperations;
 import org.apache.iceberg.hive.IcebergCatalogProperties;
 import org.apache.iceberg.hive.MetastoreUtil;
-import org.apache.iceberg.hive.rest.catalog.RestCatalogScanPlanning;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.mr.Catalogs;
 import org.apache.iceberg.mr.InputFormatConfig;
@@ -345,7 +344,7 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
     setCommonJobConf(jobConf);
     configureOutputTableJobConf(tableDesc, jobConf);
     if (tableDesc != null && tableDesc.getProperties() != null) {
-      RestCatalogScanPlanning.propagateCatalogPropertiesToJob(
+      RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(
           conf, tableDesc.getProperty(InputFormatConfig.CATALOG_NAME), jobConf);
     }
     if (IcebergVendedCredentialUtil.requestsVendedCredentials(tableDesc.getProperties(), conf)) {
@@ -1778,7 +1777,7 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
     props.put(InputFormatConfig.PARTITION_SPEC, PartitionSpecParser.toJson(spec));
 
     String catalogName = props.getProperty(InputFormatConfig.CATALOG_NAME);
-    RestCatalogScanPlanning.propagateCatalogPropertiesToJob(configuration, catalogName, map);
+    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(configuration, catalogName, map);
 
     // We need to remove this otherwise the job.xml will be invalid as column comments are separated with '\0' and
     // the serialization utils fail to serialize this character

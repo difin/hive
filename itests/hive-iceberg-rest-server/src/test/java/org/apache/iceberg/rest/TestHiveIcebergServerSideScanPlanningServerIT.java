@@ -33,7 +33,7 @@ import org.apache.iceberg.SerializableTable;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.hive.IcebergCatalogProperties;
-import org.apache.iceberg.hive.rest.catalog.RestCatalogScanPlanning;
+import org.apache.iceberg.mr.hive.RestCatalogScanPlanningUtil;
 import org.apache.iceberg.mr.InputFormatConfig;
 import org.apache.iceberg.mr.hive.HiveTableUtil;
 import org.apache.iceberg.rest.responses.ErrorResponse;
@@ -99,8 +99,8 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
   protected Map<String, String> additionalCatalogProperties() {
     Configuration conf = new Configuration();
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_DEFAULT, CATALOG_NAME);
-    RestCatalogScanPlanning.setScanPlanningMode(conf, CATALOG_NAME, "server");
-    RestCatalogScanPlanning.setHiveRestScanPlanningMode(conf, "server");
+    RestCatalogScanPlanningUtil.setScanPlanningMode(conf, CATALOG_NAME, "server");
+    RestCatalogScanPlanningUtil.setHiveRestScanPlanningMode(conf, "server");
     return IcebergCatalogProperties.getCatalogProperties(conf, CATALOG_NAME);
   }
 
@@ -147,7 +147,7 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     Table table = createTableWithData();
     Configuration sessionConf = sessionConf();
     Configuration jobConf = executorJobConf(table);
-    RestCatalogScanPlanning.propagateCatalogPropertiesToJob(sessionConf, CATALOG_NAME, jobConf);
+    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, CATALOG_NAME, jobConf);
 
     ArgumentCaptor<HTTPRequest> requestCaptor = ArgumentCaptor.forClass(HTTPRequest.class);
     Table resolved = HiveTableUtil.resolveTableForScanPlanning(jobConf, TABLE_ID.toString());
@@ -185,8 +185,8 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     sessionConf.set(
         IcebergCatalogProperties.catalogPropertyConfigKey(CATALOG_NAME, CatalogProperties.URI),
         httpServer.getURI().toString());
-    RestCatalogScanPlanning.setScanPlanningMode(sessionConf, CATALOG_NAME, "server");
-    RestCatalogScanPlanning.setHiveRestScanPlanningMode(sessionConf, "server");
+    RestCatalogScanPlanningUtil.setScanPlanningMode(sessionConf, CATALOG_NAME, "server");
+    RestCatalogScanPlanningUtil.setHiveRestScanPlanningMode(sessionConf, "server");
     return sessionConf;
   }
 
