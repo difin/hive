@@ -40,16 +40,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestRestCatalogScanPlanningUtil {
 
   /**
-   * {@link RestCatalogScanPlanningUtil#catalogPropertyKey} must use the standard
+   * {@link RestCatalogScanPlanningUtil#setScanPlanningMode} must use the standard
    * {@code iceberg.catalog.<name>.*} prefix so {@code scan-planning-mode} is read/written consistently
    * with other Iceberg catalog properties in {@code hive-site.xml} and session {@code SET}.
    */
   @Test
-  void catalogPropertyKeyUsesIcebergPropertyName() {
-    assertThat(RestCatalogScanPlanningUtil.catalogPropertyKey("ice01"))
-        .isEqualTo(
+  void setScanPlanningModeUsesCatalogPropertyConfigKey() {
+    Configuration conf = new Configuration();
+    RestCatalogScanPlanningUtil.setScanPlanningMode(conf, "ice01", "server");
+    assertThat(conf.get(
             IcebergCatalogProperties.catalogPropertyConfigKey(
-                "ice01", RESTCatalogProperties.SCAN_PLANNING_MODE));
+                "ice01", RESTCatalogProperties.SCAN_PLANNING_MODE)))
+        .isEqualTo("server");
   }
 
   /**
@@ -136,7 +138,10 @@ public class TestRestCatalogScanPlanningUtil {
             CatalogUtil.ICEBERG_CATALOG_TYPE_REST)
         .containsEntry(
             IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181")
-        .containsEntry(RestCatalogScanPlanningUtil.catalogPropertyKey("ice01"), "server")
+        .containsEntry(
+            IcebergCatalogProperties.catalogPropertyConfigKey(
+                "ice01", RESTCatalogProperties.SCAN_PLANNING_MODE),
+            "server")
         .containsEntry(
             HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE.varname, "server")
         .doesNotContainKey("unrelated.key");
@@ -168,7 +173,10 @@ public class TestRestCatalogScanPlanningUtil {
     assertThat(jobConf.get(
         IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri")))
         .isEqualTo("http://localhost:8181");
-    assertThat(jobConf.get(RestCatalogScanPlanningUtil.catalogPropertyKey("ice01"))).isEqualTo("server");
+    assertThat(jobConf.get(
+            IcebergCatalogProperties.catalogPropertyConfigKey(
+                "ice01", RESTCatalogProperties.SCAN_PLANNING_MODE)))
+        .isEqualTo("server");
   }
 
   /**

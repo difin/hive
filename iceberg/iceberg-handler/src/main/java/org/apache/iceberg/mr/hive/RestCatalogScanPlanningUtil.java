@@ -53,14 +53,12 @@ public final class RestCatalogScanPlanningUtil {
   private RestCatalogScanPlanningUtil() {
   }
 
-  public static String catalogPropertyKey(String catalogName) {
-    return IcebergCatalogProperties.catalogPropertyConfigKey(
-        catalogName, RESTCatalogProperties.SCAN_PLANNING_MODE);
-  }
-
   public static void setScanPlanningMode(
       Configuration conf, String catalogName, RESTCatalogProperties.ScanPlanningMode mode) {
-    conf.set(catalogPropertyKey(catalogName), mode.modeName());
+    conf.set(
+        IcebergCatalogProperties.catalogPropertyConfigKey(
+            catalogName, RESTCatalogProperties.SCAN_PLANNING_MODE),
+        mode.modeName());
   }
 
   public static void setScanPlanningMode(Configuration conf, String catalogName, String mode) {
@@ -70,7 +68,9 @@ public final class RestCatalogScanPlanningUtil {
   public static RESTCatalogProperties.ScanPlanningMode getScanPlanningMode(
       Configuration conf, String catalogName) {
     String mode = conf.get(
-        catalogPropertyKey(catalogName), RESTCatalogProperties.SCAN_PLANNING_MODE_DEFAULT.modeName());
+        IcebergCatalogProperties.catalogPropertyConfigKey(
+            catalogName, RESTCatalogProperties.SCAN_PLANNING_MODE),
+        RESTCatalogProperties.SCAN_PLANNING_MODE_DEFAULT.modeName());
     return RESTCatalogProperties.ScanPlanningMode.fromString(mode);
   }
 
