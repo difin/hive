@@ -53,7 +53,7 @@ public final class RestCatalogScanPlanningUtil {
   private RestCatalogScanPlanningUtil() {
   }
 
-  public static void setScanPlanningMode(
+  public static void setMode(
       Configuration conf, String catalogName, RESTCatalogProperties.ScanPlanningMode mode) {
     conf.set(
         IcebergCatalogProperties.catalogPropertyConfigKey(
@@ -61,11 +61,11 @@ public final class RestCatalogScanPlanningUtil {
         mode.modeName());
   }
 
-  public static void setScanPlanningMode(Configuration conf, String catalogName, String mode) {
-    setScanPlanningMode(conf, catalogName, RESTCatalogProperties.ScanPlanningMode.fromString(mode));
+  public static void setMode(Configuration conf, String catalogName, String mode) {
+    setMode(conf, catalogName, RESTCatalogProperties.ScanPlanningMode.fromString(mode));
   }
 
-  public static RESTCatalogProperties.ScanPlanningMode getScanPlanningMode(
+  public static RESTCatalogProperties.ScanPlanningMode getMode(
       Configuration conf, String catalogName) {
     String mode = conf.get(
         IcebergCatalogProperties.catalogPropertyConfigKey(
@@ -75,28 +75,28 @@ public final class RestCatalogScanPlanningUtil {
   }
 
   public static boolean isServerMode(Configuration conf, String catalogName) {
-    return getScanPlanningMode(conf, catalogName) == RESTCatalogProperties.ScanPlanningMode.SERVER;
+    return getMode(conf, catalogName) == RESTCatalogProperties.ScanPlanningMode.SERVER;
   }
 
   /**
    * Returns true when Hive server-side REST scan planning is enabled in configuration.
    */
-  public static boolean isHiveServerSideScanPlanningEnabled(Configuration conf) {
+  public static boolean isHiveServerModeEnabled(Configuration conf) {
     if (conf == null) {
       return false;
     }
     return RESTCatalogProperties.ScanPlanningMode.SERVER ==
-        RESTCatalogProperties.ScanPlanningMode.fromString(getHiveRestScanPlanningMode(conf));
+        RESTCatalogProperties.ScanPlanningMode.fromString(getHiveMode(conf));
   }
 
-  public static String getHiveRestScanPlanningMode(Configuration conf) {
+  public static String getHiveMode(Configuration conf) {
     if (conf == null) {
       return RESTCatalogProperties.SCAN_PLANNING_MODE_DEFAULT.modeName();
     }
     return HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE);
   }
 
-  public static void setHiveRestScanPlanningMode(Configuration conf, String mode) {
+  public static void setHiveMode(Configuration conf, String mode) {
     HiveConf.setVar(
         conf,
         HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE,
@@ -110,7 +110,7 @@ public final class RestCatalogScanPlanningUtil {
     if (conf == null || StringUtils.isEmpty(catalogName)) {
       return false;
     }
-    return isHiveServerSideScanPlanningEnabled(conf) && isServerMode(conf, catalogName);
+    return isHiveServerModeEnabled(conf) && isServerMode(conf, catalogName);
   }
 
   /**
@@ -193,7 +193,7 @@ public final class RestCatalogScanPlanningUtil {
 
     consumer.accept(
         HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE.varname,
-        getHiveRestScanPlanningMode(sessionConf));
+        getHiveMode(sessionConf));
 
     String sessionDefaultCatalog =
         MetastoreConf.getVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT);

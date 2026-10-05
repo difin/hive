@@ -96,7 +96,7 @@ class TestRestCatalogScanPlanningServerIT extends TestBaseWithRESTServer {
   protected Map<String, String> additionalCatalogProperties() {
     Configuration conf = new Configuration();
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_DEFAULT, CATALOG_NAME);
-    RestCatalogScanPlanningUtil.setScanPlanningMode(conf, CATALOG_NAME, "server");
+    RestCatalogScanPlanningUtil.setMode(conf, CATALOG_NAME, "server");
     return IcebergCatalogProperties.getCatalogProperties(conf, CATALOG_NAME);
   }
 
@@ -126,8 +126,8 @@ class TestRestCatalogScanPlanningServerIT extends TestBaseWithRESTServer {
   void hiveCatalogConfigurationIssuesPlanTableScanRequest() throws IOException {
     Configuration conf = new Configuration();
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_DEFAULT, CATALOG_NAME);
-    RestCatalogScanPlanningUtil.setScanPlanningMode(conf, CATALOG_NAME, "server");
-    RestCatalogScanPlanningUtil.setHiveRestScanPlanningMode(conf, "server");
+    RestCatalogScanPlanningUtil.setMode(conf, CATALOG_NAME, "server");
+    RestCatalogScanPlanningUtil.setHiveMode(conf, "server");
     assertThat(IcebergCatalogProperties.getCatalogProperties(conf, CATALOG_NAME))
         .containsEntry(RESTCatalogProperties.SCAN_PLANNING_MODE, "server");
     assertThat(RestCatalogScanPlanningUtil.isServerMode(conf, CATALOG_NAME)).isTrue();

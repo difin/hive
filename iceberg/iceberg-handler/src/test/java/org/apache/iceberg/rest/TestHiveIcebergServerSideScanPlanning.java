@@ -93,8 +93,8 @@ class TestHiveIcebergServerSideScanPlanning {
         IcebergCatalogProperties.catalogPropertyConfigKey(CATALOG_NAME, CatalogUtil.ICEBERG_CATALOG_TYPE),
         CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
     if (serverMode) {
-      RestCatalogScanPlanningUtil.setScanPlanningMode(conf, CATALOG_NAME, "server");
-      RestCatalogScanPlanningUtil.setHiveRestScanPlanningMode(conf, "server");
+      RestCatalogScanPlanningUtil.setMode(conf, CATALOG_NAME, "server");
+      RestCatalogScanPlanningUtil.setHiveMode(conf, "server");
     }
     conf.set(
         InputFormatConfig.SERIALIZED_TABLE_PREFIX + table.name(),

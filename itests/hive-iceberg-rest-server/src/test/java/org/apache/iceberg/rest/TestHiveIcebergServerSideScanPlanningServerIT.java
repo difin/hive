@@ -99,8 +99,8 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
   protected Map<String, String> additionalCatalogProperties() {
     Configuration conf = new Configuration();
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_DEFAULT, CATALOG_NAME);
-    RestCatalogScanPlanningUtil.setScanPlanningMode(conf, CATALOG_NAME, "server");
-    RestCatalogScanPlanningUtil.setHiveRestScanPlanningMode(conf, "server");
+    RestCatalogScanPlanningUtil.setMode(conf, CATALOG_NAME, "server");
+    RestCatalogScanPlanningUtil.setHiveMode(conf, "server");
     return IcebergCatalogProperties.getCatalogProperties(conf, CATALOG_NAME);
   }
 
@@ -185,8 +185,8 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     sessionConf.set(
         IcebergCatalogProperties.catalogPropertyConfigKey(CATALOG_NAME, CatalogProperties.URI),
         httpServer.getURI().toString());
-    RestCatalogScanPlanningUtil.setScanPlanningMode(sessionConf, CATALOG_NAME, "server");
-    RestCatalogScanPlanningUtil.setHiveRestScanPlanningMode(sessionConf, "server");
+    RestCatalogScanPlanningUtil.setMode(sessionConf, CATALOG_NAME, "server");
+    RestCatalogScanPlanningUtil.setHiveMode(sessionConf, "server");
     return sessionConf;
   }
 
