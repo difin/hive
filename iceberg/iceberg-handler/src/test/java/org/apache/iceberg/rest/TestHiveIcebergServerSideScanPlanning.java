@@ -40,9 +40,9 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for Hive server-side REST catalog scan planning via
- * {@link HiveTableUtil#resolveTableForScanPlanning}. Embedded REST server coverage is in
- * {@code TestHiveIcebergServerSideScanPlanningServerIT} in {@code itests/hive-iceberg-rest-server}.
+ * Unit tests for reload <em>guards</em> on {@link HiveTableUtil#resolveTableForScanPlanning} (see
+ * method-level comments). End-to-end Hive server-side scan planning is documented on
+ * {@code TestHiveIcebergServerSideScanPlanningServerIT}.
  */
 class TestHiveIcebergServerSideScanPlanning {
 
