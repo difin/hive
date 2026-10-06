@@ -157,14 +157,14 @@ public class IcebergInputFormat<T> extends InputFormat<Void, T> {
     Configuration conf = context.getConfiguration();
     String tableIdentifier = conf.get(InputFormatConfig.TABLE_IDENTIFIER);
     Table table = HiveTableUtil.resolveTableForScanPlanning(conf, tableIdentifier);
-    String executorTableId = tableIdentifier != null ? tableIdentifier : table.name();
+    String tableId = tableIdentifier != null ? tableIdentifier : table.name();
     if (tableIdentifier == null) {
-      conf.set(InputFormatConfig.TABLE_IDENTIFIER, executorTableId);
+      conf.set(InputFormatConfig.TABLE_IDENTIFIER, tableId);
     }
-    if (conf.get(InputFormatConfig.SERIALIZED_TABLE_PREFIX + executorTableId) == null) {
+    if (conf.get(InputFormatConfig.SERIALIZED_TABLE_PREFIX + tableId) == null) {
       // planning-local conf only (never shipped): for credential-vending catalogs the loaded
       // table's FileIO carries secrets, which must not reach a serialized job configuration
-      conf.set(InputFormatConfig.SERIALIZED_TABLE_PREFIX + executorTableId,
+      conf.set(InputFormatConfig.SERIALIZED_TABLE_PREFIX + tableId,
           SerializationUtil.serializeToBase64(table));
     }
     final ExecutorService workerPool =
