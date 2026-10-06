@@ -26,6 +26,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.iceberg.CatalogUtil;
 import org.apache.iceberg.hive.IcebergCatalogProperties;
+import org.apache.iceberg.relocated.com.google.common.annotations.VisibleForTesting;
 import org.apache.iceberg.rest.RESTCatalogProperties;
 
 /**
@@ -53,7 +54,7 @@ public final class RestCatalogScanPlanningUtil {
   private RestCatalogScanPlanningUtil() {
   }
 
-  public static void setMode(
+  private static void setMode(
       Configuration conf, String catalogName, RESTCatalogProperties.ScanPlanningMode mode) {
     conf.set(
         IcebergCatalogProperties.catalogPropertyConfigKey(
@@ -61,11 +62,12 @@ public final class RestCatalogScanPlanningUtil {
         mode.modeName());
   }
 
+  @VisibleForTesting
   public static void setMode(Configuration conf, String catalogName, String mode) {
     setMode(conf, catalogName, RESTCatalogProperties.ScanPlanningMode.fromString(mode));
   }
 
-  public static RESTCatalogProperties.ScanPlanningMode getMode(
+  static RESTCatalogProperties.ScanPlanningMode getMode(
       Configuration conf, String catalogName) {
     String mode = conf.get(
         IcebergCatalogProperties.catalogPropertyConfigKey(
@@ -74,6 +76,7 @@ public final class RestCatalogScanPlanningUtil {
     return RESTCatalogProperties.ScanPlanningMode.fromString(mode);
   }
 
+  @VisibleForTesting
   public static boolean isServerMode(Configuration conf, String catalogName) {
     return getMode(conf, catalogName) == RESTCatalogProperties.ScanPlanningMode.SERVER;
   }
@@ -81,7 +84,7 @@ public final class RestCatalogScanPlanningUtil {
   /**
    * Returns true when Hive server-side REST scan planning is enabled in configuration.
    */
-  public static boolean isHiveServerModeEnabled(Configuration conf) {
+  static boolean isHiveServerModeEnabled(Configuration conf) {
     if (conf == null) {
       return false;
     }
@@ -89,13 +92,14 @@ public final class RestCatalogScanPlanningUtil {
         RESTCatalogProperties.ScanPlanningMode.fromString(getHiveMode(conf));
   }
 
-  public static String getHiveMode(Configuration conf) {
+  static String getHiveMode(Configuration conf) {
     if (conf == null) {
       return RESTCatalogProperties.SCAN_PLANNING_MODE_DEFAULT.modeName();
     }
     return HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE);
   }
 
+  @VisibleForTesting
   public static void setHiveMode(Configuration conf, String mode) {
     HiveConf.setVar(
         conf,
@@ -106,7 +110,7 @@ public final class RestCatalogScanPlanningUtil {
   /**
    * Returns true when the catalog is configured for server-side scan planning and the Hive feature flag is on.
    */
-  public static boolean requestsServerSidePlanning(String catalogName, Configuration conf) {
+  static boolean requestsServerSidePlanning(String catalogName, Configuration conf) {
     if (conf == null || StringUtils.isEmpty(catalogName)) {
       return false;
     }
@@ -117,7 +121,7 @@ public final class RestCatalogScanPlanningUtil {
    * Returns true when catalog properties should be copied into the Tez/MR job configuration so
    * executors can reload a live REST catalog table for server-side scan planning.
    */
-  public static boolean shouldPropagateCatalogPropertiesToJob(String catalogName, Configuration conf) {
+  static boolean shouldPropagateCatalogPropertiesToJob(String catalogName, Configuration conf) {
     String resolvedCatalogName = HiveTableUtil.resolveCatalogName(conf, catalogName);
     if (StringUtils.isEmpty(resolvedCatalogName) || conf == null) {
       return false;
