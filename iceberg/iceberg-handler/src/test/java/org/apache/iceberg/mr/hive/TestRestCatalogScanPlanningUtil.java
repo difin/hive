@@ -81,8 +81,8 @@ public class TestRestCatalogScanPlanningUtil {
   void resolveCatalogNameUsesSessionDefaultWhenTablePropertyMissing() {
     Configuration conf = new Configuration();
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_DEFAULT, "ice01");
-    assertThat(RestCatalogScanPlanningUtil.resolveCatalogName(conf, null)).isEqualTo("ice01");
-    assertThat(RestCatalogScanPlanningUtil.resolveCatalogName(conf, "ice02")).isEqualTo("ice02");
+    assertThat(HiveTableUtil.resolveCatalogName(conf, null)).isEqualTo("ice01");
+    assertThat(HiveTableUtil.resolveCatalogName(conf, "ice02")).isEqualTo("ice02");
   }
 
   /**

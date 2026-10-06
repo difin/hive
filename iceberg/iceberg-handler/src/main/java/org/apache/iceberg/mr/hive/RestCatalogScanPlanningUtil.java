@@ -118,7 +118,7 @@ public final class RestCatalogScanPlanningUtil {
    * executors can reload a live REST catalog table for server-side scan planning.
    */
   public static boolean shouldPropagateCatalogPropertiesToJob(String catalogName, Configuration conf) {
-    String resolvedCatalogName = resolveCatalogName(conf, catalogName);
+    String resolvedCatalogName = HiveTableUtil.resolveCatalogName(conf, catalogName);
     if (StringUtils.isEmpty(resolvedCatalogName) || conf == null) {
       return false;
     }
@@ -127,19 +127,6 @@ public final class RestCatalogScanPlanningUtil {
       return false;
     }
     return requestsServerSidePlanning(resolvedCatalogName, conf);
-  }
-
-  /**
-   * Resolves the catalog name from per-table {@code iceberg.catalog} or the session default catalog.
-   */
-  public static String resolveCatalogName(Configuration conf, String catalogNameFromTable) {
-    if (StringUtils.isNotBlank(catalogNameFromTable)) {
-      return catalogNameFromTable;
-    }
-    if (conf == null) {
-      return null;
-    }
-    return IcebergCatalogProperties.getCatalogName(conf);
   }
 
   /**
@@ -182,7 +169,7 @@ public final class RestCatalogScanPlanningUtil {
 
   private static void propagateCatalogProperties(
       Configuration sessionConf, String catalogName, PropertyConsumer consumer) {
-    String resolvedCatalogName = resolveCatalogName(sessionConf, catalogName);
+    String resolvedCatalogName = HiveTableUtil.resolveCatalogName(sessionConf, catalogName);
     if (StringUtils.isEmpty(resolvedCatalogName)) {
       return;
     }
