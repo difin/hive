@@ -26,7 +26,6 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.iceberg.CatalogUtil;
 import org.apache.iceberg.hive.IcebergCatalogProperties;
-import org.apache.iceberg.relocated.com.google.common.annotations.VisibleForTesting;
 import org.apache.iceberg.rest.RESTCatalogProperties;
 
 /**
@@ -47,6 +46,12 @@ import org.apache.iceberg.rest.RESTCatalogProperties;
  * tests {@code TestRestCatalogScanPlanningServerIT} and {@code TestHiveIcebergServerSideScanPlanningServerIT}
  * in {@code itests/hive-iceberg-rest-server}.
  *
+ * <p>{@link #setMode(Configuration, String, String)}, {@link #isServerMode(Configuration, String)},
+ * and {@link #setHiveMode(Configuration, String)} are public so tests in other Maven modules
+ * (for example {@code itests/hive-iceberg-rest-server}) can configure scan planning; those modules
+ * compile against this artifact as a JAR and cannot call package-private members. They are not
+ * intended as a general operator or application API.
+ *
  * @see <a href="https://iceberg.apache.org/docs/latest/catalog-properties/">REST catalog properties</a>
  */
 public final class RestCatalogScanPlanningUtil {
@@ -62,7 +67,6 @@ public final class RestCatalogScanPlanningUtil {
         mode.modeName());
   }
 
-  @VisibleForTesting
   public static void setMode(Configuration conf, String catalogName, String mode) {
     setMode(conf, catalogName, RESTCatalogProperties.ScanPlanningMode.fromString(mode));
   }
@@ -76,7 +80,6 @@ public final class RestCatalogScanPlanningUtil {
     return RESTCatalogProperties.ScanPlanningMode.fromString(mode);
   }
 
-  @VisibleForTesting
   public static boolean isServerMode(Configuration conf, String catalogName) {
     return getMode(conf, catalogName) == RESTCatalogProperties.ScanPlanningMode.SERVER;
   }
@@ -99,7 +102,6 @@ public final class RestCatalogScanPlanningUtil {
     return HiveConf.getVar(conf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE);
   }
 
-  @VisibleForTesting
   public static void setHiveMode(Configuration conf, String mode) {
     HiveConf.setVar(
         conf,
