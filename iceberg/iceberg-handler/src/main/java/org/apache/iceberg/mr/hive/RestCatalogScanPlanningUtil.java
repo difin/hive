@@ -20,6 +20,7 @@
 package org.apache.iceberg.mr.hive;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -137,7 +138,7 @@ public final class RestCatalogScanPlanningUtil {
   }
 
   /**
-   * Copies {@code iceberg.catalog.<catalog>.*} entries from the HS2 session configuration into Tez/MR
+   * Copies {@code iceberg.catalog.<catalog>.*} entries from the HS2 session configuration into Tez
    * job properties so executors can reload a live REST catalog table for server-side scan planning.
    *
    * <p>Session-level {@code SET} commands and {@code hive-site.xml} catalog settings are not
@@ -149,12 +150,7 @@ public final class RestCatalogScanPlanningUtil {
     if (sessionConf == null || jobProperties == null) {
       return;
     }
-
-    if (!shouldPropagateCatalogPropertiesToJob(catalogName, sessionConf)) {
-      return;
-    }
-
-    propagateCatalogProperties(sessionConf, catalogName, (key, value) -> jobProperties.putIfAbsent(key, value));
+    propagateCatalogPropertiesToJob(sessionConf, catalogName, jobProperties::putIfAbsent);
   }
 
   /**
@@ -167,32 +163,35 @@ public final class RestCatalogScanPlanningUtil {
     if (sessionConf == null || jobConf == null) {
       return;
     }
-    propagateCatalogProperties(sessionConf, catalogName, (key, value) -> {
-      if (jobConf.get(key) == null) {
-        jobConf.set(key, value);
-      }
-    });
+    propagateCatalogPropertiesToJob(
+        sessionConf,
+        catalogName,
+        (key, value) -> {
+          if (jobConf.get(key) == null) {
+            jobConf.set(key, value);
+          }
+        });
   }
 
-  private static void propagateCatalogProperties(
-      Configuration sessionConf, String catalogName, PropertyConsumer consumer) {
+  private static void propagateCatalogPropertiesToJob(
+      Configuration sessionConf, String catalogName, BiConsumer<String, String> jobPropertySink) {
+    if (!shouldPropagateCatalogPropertiesToJob(catalogName, sessionConf)) {
+      return;
+    }
+
     String resolvedCatalogName = HiveTableUtil.resolveCatalogName(sessionConf, catalogName);
     if (StringUtils.isEmpty(resolvedCatalogName)) {
       return;
     }
 
-    if (!shouldPropagateCatalogPropertiesToJob(resolvedCatalogName, sessionConf)) {
-      return;
-    }
-
-    consumer.accept(
+    jobPropertySink.accept(
         HiveConf.ConfVars.HIVE_ICEBERG_REST_SCAN_PLANNING_MODE.varname,
         getHiveMode(sessionConf));
 
     String sessionDefaultCatalog =
         MetastoreConf.getVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT);
     if (StringUtils.isNotBlank(sessionDefaultCatalog)) {
-      consumer.accept(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), sessionDefaultCatalog);
+      jobPropertySink.accept(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), sessionDefaultCatalog);
     }
 
     String catalogPrefix =
@@ -200,12 +199,8 @@ public final class RestCatalogScanPlanningUtil {
     sessionConf.forEach(
         entry -> {
           if (entry.getKey().startsWith(catalogPrefix)) {
-            consumer.accept(entry.getKey(), entry.getValue());
+            jobPropertySink.accept(entry.getKey(), entry.getValue());
           }
         });
-  }
-
-  private interface PropertyConsumer {
-    void accept(String key, String value);
   }
 }
