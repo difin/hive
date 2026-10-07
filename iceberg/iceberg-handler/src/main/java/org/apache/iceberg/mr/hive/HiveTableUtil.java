@@ -301,7 +301,7 @@ public class HiveTableUtil {
         IcebergCatalogProperties.getCatalogType(conf, catalogName))) {
       return false;
     }
-    return RestCatalogScanPlanningUtil.requestsServerSidePlanning(catalogName, conf);
+    return RestCatalogScanPlanningUtil.isServerSidePlanningEnabled(catalogName, conf);
   }
 
   /**

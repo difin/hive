@@ -46,8 +46,9 @@ import org.apache.iceberg.rest.RESTCatalogProperties;
  * tests {@code TestRestCatalogScanPlanningServerIT} and {@code TestHiveIcebergServerSideScanPlanningServerIT}
  * in {@code itests/hive-iceberg-rest-server}.
  *
- * <p>{@link #setMode(Configuration, String, String)}, {@link #isServerMode(Configuration, String)},
- * and {@link #setHiveMode(Configuration, String)} are public so tests in other Maven modules
+ * <p>{@link #setCatalogMode(Configuration, String, String)},
+ * {@link #isCatalogServerMode(Configuration, String)}, and
+ * {@link #setHiveMode(Configuration, String)} are public so tests in other Maven modules
  * (for example {@code itests/hive-iceberg-rest-server}) can configure scan planning; those modules
  * compile against this artifact as a JAR and cannot call package-private members. They are not
  * intended as a general operator or application API.
@@ -59,7 +60,7 @@ public final class RestCatalogScanPlanningUtil {
   private RestCatalogScanPlanningUtil() {
   }
 
-  private static void setMode(
+  private static void setCatalogMode(
       Configuration conf, String catalogName, RESTCatalogProperties.ScanPlanningMode mode) {
     conf.set(
         IcebergCatalogProperties.catalogPropertyConfigKey(
@@ -67,11 +68,11 @@ public final class RestCatalogScanPlanningUtil {
         mode.modeName());
   }
 
-  public static void setMode(Configuration conf, String catalogName, String mode) {
-    setMode(conf, catalogName, RESTCatalogProperties.ScanPlanningMode.fromString(mode));
+  public static void setCatalogMode(Configuration conf, String catalogName, String mode) {
+    setCatalogMode(conf, catalogName, RESTCatalogProperties.ScanPlanningMode.fromString(mode));
   }
 
-  static RESTCatalogProperties.ScanPlanningMode getMode(
+  static RESTCatalogProperties.ScanPlanningMode getCatalogMode(
       Configuration conf, String catalogName) {
     String mode = conf.get(
         IcebergCatalogProperties.catalogPropertyConfigKey(
@@ -80,14 +81,14 @@ public final class RestCatalogScanPlanningUtil {
     return RESTCatalogProperties.ScanPlanningMode.fromString(mode);
   }
 
-  public static boolean isServerMode(Configuration conf, String catalogName) {
-    return getMode(conf, catalogName) == RESTCatalogProperties.ScanPlanningMode.SERVER;
+  public static boolean isCatalogServerMode(Configuration conf, String catalogName) {
+    return getCatalogMode(conf, catalogName) == RESTCatalogProperties.ScanPlanningMode.SERVER;
   }
 
   /**
    * Returns true when Hive server-side REST scan planning is enabled in configuration.
    */
-  static boolean isHiveServerModeEnabled(Configuration conf) {
+  static boolean isHiveServerMode(Configuration conf) {
     if (conf == null) {
       return false;
     }
@@ -112,15 +113,15 @@ public final class RestCatalogScanPlanningUtil {
   /**
    * Returns true when the catalog is configured for server-side scan planning and the Hive feature flag is on.
    */
-  static boolean requestsServerSidePlanning(String catalogName, Configuration conf) {
+  static boolean isServerSidePlanningEnabled(String catalogName, Configuration conf) {
     if (conf == null || StringUtils.isEmpty(catalogName)) {
       return false;
     }
-    return isHiveServerModeEnabled(conf) && isServerMode(conf, catalogName);
+    return isHiveServerMode(conf) && isCatalogServerMode(conf, catalogName);
   }
 
   /**
-   * Returns true when catalog properties should be copied into the Tez/MR job configuration so
+   * Returns true when catalog properties should be copied into the Tez job configuration so
    * executors can reload a live REST catalog table for server-side scan planning.
    */
   static boolean shouldPropagateCatalogPropertiesToJob(String catalogName, Configuration conf) {
@@ -132,7 +133,7 @@ public final class RestCatalogScanPlanningUtil {
         IcebergCatalogProperties.getCatalogType(conf, resolvedCatalogName))) {
       return false;
     }
-    return requestsServerSidePlanning(resolvedCatalogName, conf);
+    return isServerSidePlanningEnabled(resolvedCatalogName, conf);
   }
 
   /**

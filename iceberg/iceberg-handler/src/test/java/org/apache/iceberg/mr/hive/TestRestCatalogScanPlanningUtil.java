@@ -40,14 +40,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestRestCatalogScanPlanningUtil {
 
   /**
-   * {@link RestCatalogScanPlanningUtil#setMode} must use the standard
+   * {@link RestCatalogScanPlanningUtil#setCatalogMode} must use the standard
    * {@code iceberg.catalog.<name>.*} prefix so {@code scan-planning-mode} is read/written consistently
    * with other Iceberg catalog properties in {@code hive-site.xml} and session {@code SET}.
    */
   @Test
-  void setModeUsesCatalogPropertyConfigKey() {
+  void setCatalogModeUsesCatalogPropertyConfigKey() {
     Configuration conf = new Configuration();
-    RestCatalogScanPlanningUtil.setMode(conf, "ice01", "server");
+    RestCatalogScanPlanningUtil.setCatalogMode(conf, "ice01", "server");
     assertThat(conf.get(
             IcebergCatalogProperties.catalogPropertyConfigKey(
                 "ice01", RESTCatalogProperties.SCAN_PLANNING_MODE)))
@@ -59,17 +59,17 @@ public class TestRestCatalogScanPlanningUtil {
    * #HIVE_ICEBERG_REST_SCAN_PLANNING_MODE} must also be {@code server}.
    */
   @Test
-  void requestsServerSidePlanningFromConfiguration() {
+  void isServerSidePlanningEnabledFromConfiguration() {
     Configuration conf = new Configuration();
-    assertThat(RestCatalogScanPlanningUtil.requestsServerSidePlanning("ice01", conf)).isFalse();
+    assertThat(RestCatalogScanPlanningUtil.isServerSidePlanningEnabled("ice01", conf)).isFalse();
 
-    RestCatalogScanPlanningUtil.setMode(conf, "ice01", "server");
-    assertThat(RestCatalogScanPlanningUtil.requestsServerSidePlanning("ice01", conf)).isFalse();
-    assertThat(RestCatalogScanPlanningUtil.isServerMode(conf, "ice01")).isTrue();
+    RestCatalogScanPlanningUtil.setCatalogMode(conf, "ice01", "server");
+    assertThat(RestCatalogScanPlanningUtil.isServerSidePlanningEnabled("ice01", conf)).isFalse();
+    assertThat(RestCatalogScanPlanningUtil.isCatalogServerMode(conf, "ice01")).isTrue();
 
     enableHiveServerMode(conf);
-    assertThat(RestCatalogScanPlanningUtil.requestsServerSidePlanning("ice01", conf)).isTrue();
-    assertThat(RestCatalogScanPlanningUtil.getMode(conf, "ice01").modeName())
+    assertThat(RestCatalogScanPlanningUtil.isServerSidePlanningEnabled("ice01", conf)).isTrue();
+    assertThat(RestCatalogScanPlanningUtil.getCatalogMode(conf, "ice01").modeName())
         .isEqualTo("server");
   }
 
@@ -97,7 +97,7 @@ public class TestRestCatalogScanPlanningUtil {
         CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
     assertThat(RestCatalogScanPlanningUtil.shouldPropagateCatalogPropertiesToJob("ice01", conf)).isFalse();
 
-    RestCatalogScanPlanningUtil.setMode(conf, "ice01", "server");
+    RestCatalogScanPlanningUtil.setCatalogMode(conf, "ice01", "server");
     assertThat(RestCatalogScanPlanningUtil.shouldPropagateCatalogPropertiesToJob("ice01", conf)).isFalse();
     enableHiveServerMode(conf);
     assertThat(RestCatalogScanPlanningUtil.shouldPropagateCatalogPropertiesToJob("ice01", conf)).isTrue();
@@ -106,7 +106,7 @@ public class TestRestCatalogScanPlanningUtil {
     hiveConf.set(
         IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE),
         CatalogUtil.ICEBERG_CATALOG_TYPE_HIVE);
-    RestCatalogScanPlanningUtil.setMode(hiveConf, "ice01", "server");
+    RestCatalogScanPlanningUtil.setCatalogMode(hiveConf, "ice01", "server");
     enableHiveServerMode(hiveConf);
     assertThat(RestCatalogScanPlanningUtil.shouldPropagateCatalogPropertiesToJob("ice01", hiveConf))
         .isFalse();
@@ -125,7 +125,7 @@ public class TestRestCatalogScanPlanningUtil {
         CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
     sessionConf.set(
         IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181");
-    RestCatalogScanPlanningUtil.setMode(sessionConf, "ice01", "server");
+    RestCatalogScanPlanningUtil.setCatalogMode(sessionConf, "ice01", "server");
     enableHiveServerMode(sessionConf);
     sessionConf.set("unrelated.key", "skip");
 
@@ -160,7 +160,7 @@ public class TestRestCatalogScanPlanningUtil {
         CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
     sessionConf.set(
         IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181");
-    RestCatalogScanPlanningUtil.setMode(sessionConf, "ice01", "server");
+    RestCatalogScanPlanningUtil.setCatalogMode(sessionConf, "ice01", "server");
     enableHiveServerMode(sessionConf);
 
     Configuration jobConf = new Configuration();
