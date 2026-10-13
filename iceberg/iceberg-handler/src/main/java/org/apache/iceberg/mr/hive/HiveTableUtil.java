@@ -59,9 +59,11 @@ import org.apache.iceberg.DeleteFiles;
 import org.apache.iceberg.MetricsConfig;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.SerializableTable;
+import org.apache.iceberg.Snapshot;
 import org.apache.iceberg.StaticTableOperations;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.TableProperties;
+import org.apache.iceberg.TableScan;
 import org.apache.iceberg.Transaction;
 import org.apache.iceberg.data.TableMigrationUtil;
 import org.apache.iceberg.exceptions.NotFoundException;
@@ -262,25 +264,10 @@ public class HiveTableUtil {
   }
 
   /**
-   * Resolves the Iceberg {@link Table} for split generation ({@code IcebergInputFormat#getSplits}).
-   *
-   * <p>Serialized tables ({@link SerializableTable}) only carry a metadata snapshot and produce
-   * {@link org.apache.iceberg.DataTableScan} (client-side manifest planning). When REST catalog
-   * server-side scan planning is enabled, reload the live table from the catalog so
-   * {@code table.newScan()} returns {@link org.apache.iceberg.rest.RESTTableScan} and issues
-   * {@code POST /plan} on the REST server.
-   *
-   * <p>Intra-transaction read-after-write ({@link InputFormatConfig#TABLE_METADATA_LOCATION}) still
-   * uses the deserialized snapshot so uncommitted metadata is visible.
+   * Returns the {@link Table} for split generation: deserialized from job conf when present,
+   * otherwise {@link Catalogs#loadTable}.
    */
   public static Table resolveTableForScanPlanning(Configuration conf, String tableIdentifier) {
-    if (shouldReloadForServerSideScanPlanning(conf)) {
-      Table table = Catalogs.loadTable(conf);
-      checkAndSetIoConfig(conf, table);
-      IcebergVendedCredentialUtil.applyFromJobConf(table, resolveCatalogName(conf), conf);
-      return table;
-    }
-
     Table table = deserializeTable(conf, tableIdentifier);
     if (table == null) {
       table = Catalogs.loadTable(conf);
@@ -289,7 +276,7 @@ public class HiveTableUtil {
     return table;
   }
 
-  private static boolean shouldReloadForServerSideScanPlanning(Configuration conf) {
+  public static boolean shouldReloadForServerSideScanPlanning(Configuration conf) {
     if (StringUtils.isNotBlank(conf.get(InputFormatConfig.TABLE_METADATA_LOCATION))) {
       return false;
     }
@@ -301,7 +288,48 @@ public class HiveTableUtil {
         IcebergCatalogProperties.getCatalogType(conf, catalogName))) {
       return false;
     }
-    return RestCatalogScanPlanningUtil.isServerSidePlanningEnabled(catalogName, conf);
+    return RestCatalogScanPlanningUtil.shouldUseServerSideScanPlanning(conf, catalogName);
+  }
+
+  /**
+   * Returns true when the job conf pins snapshot, ref, or as-of time (no compile-time snapshot pin).
+   */
+  public static boolean hasExplicitScanSnapshotBinding(Configuration conf) {
+    if (conf == null) {
+      return false;
+    }
+    if (conf.getLong(InputFormatConfig.SNAPSHOT_ID_INTERVAL_FROM, -1) != -1) {
+      return true;
+    }
+    if (conf.getLong(InputFormatConfig.AS_OF_TIMESTAMP, -1) != -1) {
+      return true;
+    }
+    if (StringUtils.isNotBlank(conf.get(InputFormatConfig.OUTPUT_TABLE_SNAPSHOT_REF))) {
+      return true;
+    }
+    try {
+      if (conf.getLong(InputFormatConfig.SNAPSHOT_ID, -1) != -1) {
+        return true;
+      }
+    } catch (NumberFormatException e) {
+      String version = conf.get(InputFormatConfig.SNAPSHOT_ID);
+      return StringUtils.isNotBlank(version) && !"-1".equals(version);
+    }
+    return false;
+  }
+
+  /**
+   * Pins a scan on a reloaded REST table to the snapshot of the compile-time table serialized into
+   * the job conf. {@link TableScan#useSnapshot} also switches the scan to that snapshot's schema; no
+   * explicit projection is set because Hive applies {@code select} afterwards.
+   */
+  public static TableScan pinServerSideScanToSerializedTable(
+      Configuration conf, Table serializedTable, TableScan scan) {
+    if (serializedTable == null || hasExplicitScanSnapshotBinding(conf)) {
+      return scan;
+    }
+    Snapshot snapshot = serializedTable.currentSnapshot();
+    return snapshot != null ? scan.useSnapshot(snapshot.snapshotId()) : scan;
   }
 
   /**
@@ -333,7 +361,7 @@ public class HiveTableUtil {
    * @param config Configuration to set for FileIO, if enabled
    * @param table The Iceberg table object
    */
-  private static void checkAndSetIoConfig(Configuration config, Table table) {
+  public static void checkAndSetIoConfig(Configuration config, Table table) {
     if (table != null && config.getBoolean(InputFormatConfig.CONFIG_SERIALIZATION_DISABLED,
             InputFormatConfig.CONFIG_SERIALIZATION_DISABLED_DEFAULT) &&
           table.io() instanceof HadoopConfigurable fileIO) {

@@ -23,18 +23,27 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.iceberg.CatalogProperties;
 import org.apache.iceberg.CatalogUtil;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.JobID;
+import org.apache.hadoop.mapreduce.task.JobContextImpl;
+import org.apache.iceberg.DataFile;
+import org.apache.iceberg.DataFiles;
 import org.apache.iceberg.FileScanTask;
 import org.apache.iceberg.Scan;
 import org.apache.iceberg.SerializableTable;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.hive.IcebergCatalogProperties;
+import org.apache.iceberg.mr.CloseableRestCatalog;
 import org.apache.iceberg.mr.hive.RestCatalogScanPlanningUtil;
 import org.apache.iceberg.mr.InputFormatConfig;
 import org.apache.iceberg.mr.hive.HiveTableUtil;
+import org.apache.iceberg.mr.mapreduce.IcebergInputFormat;
+import org.apache.iceberg.rest.requests.PlanTableScanRequest;
 import org.apache.iceberg.rest.responses.ErrorResponse;
 import org.apache.iceberg.rest.responses.LoadTableResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,9 +61,9 @@ import static org.mockito.Mockito.verify;
 
 /**
  * Integration tests for Hive server-side REST catalog scan planning via
- * {@link HiveTableUtil#resolveTableForScanPlanning}: with catalog settings propagated from HS2 into
- * the executor job conf, split generation reloads a live {@link RESTTable} from the embedded REST
- * server instead of the serialized metadata snapshot ({@link SerializableTable}).
+ * {@code IcebergInputFormat#getSplits}: with catalog settings propagated from HS2 into the executor
+ * job conf, split generation reloads a live {@link RESTTable} from the embedded REST server (then
+ * closes the catalog) instead of planning only from the serialized snapshot ({@link SerializableTable}).
  *
  * <p>Without propagation, or when reload guards apply, executors keep the snapshot; those cases are
  * unit-tested in {@code TestHiveIcebergServerSideScanPlanning} ({@code iceberg-handler}). Iceberg
@@ -64,11 +73,6 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
 
   private static final String CATALOG_NAME = "hive-iceberg-scan-planning";
   private static final TableIdentifier TABLE_ID = TableIdentifier.of(NS, "file_planning_table");
-
-  @Override
-  protected boolean useHttpCompression() {
-    return false;
-  }
 
   @Override
   protected RESTCatalogAdapter createAdapterForServer() {
@@ -83,7 +87,6 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
             Object body = roundTripSerialize(request.body(), "request");
             HTTPRequest req = ImmutableHTTPRequest.builder().from(request).body(body).build();
             T response = super.execute(req, responseType, errorHandler, responseHeaders);
-            response = roundTripSerialize(response, "response");
 
             if (response instanceof LoadTableResponse) {
               return RESTCatalogAdapter.castResponse(
@@ -93,7 +96,11 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
                       RESTCatalogProperties.ScanPlanningMode.SERVER.modeName()));
             }
 
-            return response;
+            if (req.body() instanceof PlanTableScanRequest) {
+              return response;
+            }
+
+            return roundTripSerialize(response, "response");
           }
         });
   }
@@ -107,8 +114,8 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
   protected Map<String, String> additionalCatalogProperties() {
     Configuration conf = new Configuration();
     MetastoreConf.setVar(conf, MetastoreConf.ConfVars.CATALOG_DEFAULT, CATALOG_NAME);
-    RestCatalogScanPlanningUtil.setCatalogMode(conf, CATALOG_NAME, "server");
-    RestCatalogScanPlanningUtil.setHiveMode(conf, "server");
+    RestCatalogScanPlanningUtil.setScanPlanningMode(conf, CATALOG_NAME, "server");
+    HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED, true);
     return IcebergCatalogProperties.getCatalogProperties(conf, CATALOG_NAME);
   }
 
@@ -158,10 +165,11 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, CATALOG_NAME, jobConf);
 
     ArgumentCaptor<HTTPRequest> requestCaptor = ArgumentCaptor.forClass(HTTPRequest.class);
-    Table resolved = HiveTableUtil.resolveTableForScanPlanning(jobConf, TABLE_ID.toString());
-
-    assertThat(resolved).isInstanceOf(RESTTable.class);
-    assertThat(resolved.newScan()).isInstanceOf(RESTTableScan.class);
+    try (CloseableRestCatalog catalog = CloseableRestCatalog.load(jobConf, CATALOG_NAME)) {
+      Table resolved = catalog.loadTable(TABLE_ID.toString());
+      assertThat(resolved).isInstanceOf(RESTTable.class);
+      assertThat(resolved.newScan()).isInstanceOf(RESTTableScan.class);
+    }
 
     verify(adapterForRESTServer, atLeastOnce())
         .execute(requestCaptor.capture(), any(), any(), any(), any());
@@ -170,6 +178,46 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
                 .anyMatch(req -> req.path().contains("/tables/")))
         .as("Expected Hive split planning to reload the table from the REST catalog")
         .isTrue();
+  }
+
+  /**
+   * Compile-time snapshot is serialized into the job conf; if the catalog advances before split
+   * generation, server-side planning must still plan the serialized snapshot, not {@code HEAD}.
+   */
+  @Test
+  void serverSidePlanningPinsSerializedSnapshotAfterCatalogAdvances() throws IOException {
+    Table table = createTableWithData();
+    long pinnedSnapshotId = table.currentSnapshot().snapshotId();
+
+    Configuration jobConf = executorJobConf(table);
+    jobConf.set(InputFormatConfig.TABLE_LOCATION, table.location());
+    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf(), CATALOG_NAME, jobConf);
+
+    DataFile fileB =
+        DataFiles.builder(SPEC)
+            .withPath("/path/to/data-b.parquet")
+            .withFileSizeInBytes(10)
+            .withRecordCount(1)
+            .build();
+    restCatalog.loadTable(TABLE_ID).newAppend().appendFile(fileB).commit();
+    assertThat(restCatalog.loadTable(TABLE_ID).currentSnapshot().snapshotId())
+        .isNotEqualTo(pinnedSnapshotId);
+
+    ArgumentCaptor<HTTPRequest> requestCaptor = ArgumentCaptor.forClass(HTTPRequest.class);
+    JobContext jobContext = new JobContextImpl(jobConf, new JobID("server_side_scan", 1));
+    new IcebergInputFormat<>().getSplits(jobContext);
+
+    verify(adapterForRESTServer, atLeastOnce())
+        .execute(requestCaptor.capture(), any(), any(), any(), any());
+
+    PlanTableScanRequest planRequest =
+        requestCaptor.getAllValues().stream()
+            .map(HTTPRequest::body)
+            .filter(PlanTableScanRequest.class::isInstance)
+            .map(PlanTableScanRequest.class::cast)
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("Expected POST /plan during getSplits"));
+    assertThat(planRequest.snapshotId()).isEqualTo(pinnedSnapshotId);
   }
 
   private Table createTableWithData() {
@@ -193,8 +241,8 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     sessionConf.set(
         IcebergCatalogProperties.catalogPropertyConfigKey(CATALOG_NAME, CatalogProperties.URI),
         httpServer.getURI().toString());
-    RestCatalogScanPlanningUtil.setCatalogMode(sessionConf, CATALOG_NAME, "server");
-    RestCatalogScanPlanningUtil.setHiveMode(sessionConf, "server");
+    RestCatalogScanPlanningUtil.setScanPlanningMode(sessionConf, CATALOG_NAME, "server");
+    HiveConf.setBoolVar(sessionConf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED, true);
     return sessionConf;
   }
 

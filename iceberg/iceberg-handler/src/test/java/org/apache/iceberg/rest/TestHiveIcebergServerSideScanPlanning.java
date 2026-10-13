@@ -21,6 +21,7 @@ package org.apache.iceberg.rest;
 
 import java.nio.file.Path;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.iceberg.BaseTable;
 import org.apache.iceberg.CatalogUtil;
@@ -93,8 +94,8 @@ class TestHiveIcebergServerSideScanPlanning {
         IcebergCatalogProperties.catalogPropertyConfigKey(CATALOG_NAME, CatalogUtil.ICEBERG_CATALOG_TYPE),
         CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
     if (serverMode) {
-      RestCatalogScanPlanningUtil.setCatalogMode(conf, CATALOG_NAME, "server");
-      RestCatalogScanPlanningUtil.setHiveMode(conf, "server");
+      RestCatalogScanPlanningUtil.setScanPlanningMode(conf, CATALOG_NAME, "server");
+      HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED, true);
     }
     conf.set(
         InputFormatConfig.SERIALIZED_TABLE_PREFIX + table.name(),
