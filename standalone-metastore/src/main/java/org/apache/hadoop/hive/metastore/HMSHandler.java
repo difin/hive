@@ -3606,6 +3606,27 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
             tableName, partNames);
       }
 
+      if (0 != tbl.getPartitionKeysSize()) {
+        for (Partition partition : partitionsList) {
+          Partition newPart = partition.deepCopy();
+          updateStatsForTruncate(newPart.getParameters(), new EnvironmentContext());
+          if (writeId > 0) {
+            newPart.setWriteId(writeId);
+          }
+          newPart.putToParameters(hive_metastoreConstants.DDL_TIME, Long.toString(System
+              .currentTimeMillis() / 1000));
+          firePreEvent(new PreAlterPartitionEvent(parsedDbName[DB_NAME], tableName, tbl,
+              partition.getValues(), newPart, this));
+        }
+      } else {
+        Table newTable = tbl.deepCopy();
+        updateStatsForTruncate(newTable.getParameters(), new EnvironmentContext());
+        if (writeId > 0) {
+          newTable.setWriteId(writeId);
+        }
+        firePreEvent(new PreAlterTableEvent(tbl, newTable, this));
+      }
+
       if (TxnUtils.isTransactionalTable(tbl) || !skipDataDeletion) {
         // This is not transactional
         for (Path location : getLocationsForTruncate(tbl, partitionsList)) {
@@ -5015,6 +5036,8 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
           TableName.getQualified(parsedSourceDbName[CAT_NAME],
               parsedSourceDbName[DB_NAME], sourceTableName) + " Dest db : " + destDbName);
     }
+    firePreEvent(new PreReadTableEvent(sourceTable, this));
+    firePreEvent(new PreReadTableEvent(destinationTable, this));
     try {
       for (Partition partition: partitionsToExchange) {
         Partition destPartition = new Partition(partition);
@@ -5023,6 +5046,8 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
         Path destPartitionPath = new Path(destinationTable.getSd().getLocation(),
             Warehouse.makePartName(destinationTable.getPartitionKeys(), partition.getValues()));
         destPartition.getSd().setLocation(destPartitionPath.toString());
+        firePreEvent(new PreAddPartitionEvent(destinationTable, destPartition, this));
+        firePreEvent(new PreDropPartitionEvent(sourceTable, partition, true, this));
         ms.addPartition(destPartition);
         destPartitions.add(destPartition);
         ms.dropPartition(parsedSourceDbName[CAT_NAME], partition.getDbName(), sourceTable.getTableName(),
@@ -5866,9 +5891,11 @@ public class HMSHandler extends DeprecatedThriftMetastore implements IHMSHandler
     Exception ex = null;
     try {
       Table table = get_table_core(catName, parsedDbName[DB_NAME], tableName);
+      firePreEvent(new PreReadTableEvent(table, this));
       List<Partition> partitions = getMS()
           .getPartitionSpecsByFilterAndProjection(table, request.getProjectionSpec(),
               request.getFilterSpec());
+      partitions = FilterUtils.filterPartitionsIfEnabled(isServerFilterEnabled, filterHook, partitions);
       List<PartitionSpec> partitionSpecs =
           MetaStoreUtils.getPartitionspecsGroupedByStorageDescriptor(table, partitions);
       response = new GetPartitionsResponse();
