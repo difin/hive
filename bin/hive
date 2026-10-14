@@ -132,7 +132,10 @@ fi
 
 # Multiple jars in HIVE_CP_EXCLUDE_LIST can be added using "\|" separator
 # Ex: HIVE_CP_EXCLUDE_LIST="javax.ws.rs-api\|jersey-multipart"
-HIVE_CP_EXCLUDE_LIST="javax.ws.rs-api"
+# plugin-impl: Ranger (and similar) plugin jars under lib/*-plugin-impl/ must not
+# be on the HS2 app classpath; they are loaded via RangerPluginClassLoader.
+HIVE_CP_EXCLUDE_LIST="${HIVE_CP_EXCLUDE_LIST:-javax.ws.rs-api}"
+HIVE_CP_EXCLUDE_LIST="${HIVE_CP_EXCLUDE_LIST}\|plugin-impl"
 
 # Multiple components have moved to using slf4j-api v2 jars which are now present on the global classpath along with v1 
 # jars. Due to the same, whenever v2 jars are loaded first, Hive runs into logging issues
