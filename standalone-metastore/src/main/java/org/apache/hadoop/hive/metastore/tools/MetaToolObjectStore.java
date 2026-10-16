@@ -986,6 +986,7 @@ public class MetaToolObjectStore extends ObjectStore {
     private int tablesWithDuplicates;
     private int storageDescriptorsUpdated;
     private int columnDescriptorsRemoved;
+    private int tablesValidated;
     private final List<String> details = new ArrayList<>();
     private Exception exception;
     DedupColumnsResult(int tablesScanned) {
@@ -1017,6 +1018,14 @@ public class MetaToolObjectStore extends ObjectStore {
 
     void addColumnDescriptorsRemoved(int count) {
       this.columnDescriptorsRemoved += count;
+    }
+
+    public int getTablesValidated() {
+      return tablesValidated;
+    }
+
+    void incrementTablesValidated() {
+      this.tablesValidated++;
     }
 
     public List<String> getDetails() {
