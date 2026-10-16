@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 
+import java.net.InetAddress;
 import java.net.URI;
 import java.util.List;
 import org.apache.hadoop.conf.Configuration;
@@ -197,5 +198,30 @@ class TestMeteringHealthWatcher {
     assertThat(uris).containsExactly(
         meteringUri("http", 50051),
         meteringUri("https", 50052));
+  }
+
+  @Test
+  void canonicalHostnameIsPreferredOverShortHostname() {
+    String host = MeteringServiceMonitor.selectHostname(
+        "gateway1.example.cldr.work", "gateway1", "10.0.0.5");
+
+    assertThat(host).isEqualTo("gateway1.example.cldr.work");
+  }
+
+  @Test
+  void hostnameIsUsedWhenCanonicalLookupReturnsIpAddress() {
+    String host = MeteringServiceMonitor.selectHostname("10.0.0.5", "gateway1", "10.0.0.5");
+
+    assertThat(host).isEqualTo("gateway1");
+  }
+
+  @Test
+  void resolvedHostMatchesLocalCanonicalHostname() throws Exception {
+    InetAddress localHost = InetAddress.getLocalHost();
+    String expected = localHost.getCanonicalHostName().equals(localHost.getHostAddress())
+        ? localHost.getHostName()
+        : localHost.getCanonicalHostName();
+
+    assertThat(meteringHost()).isEqualTo(expected);
   }
 }

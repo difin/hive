@@ -27,8 +27,8 @@ import javax.net.ssl.SSLContext;
  * Utility class to perform a single health check against the co-located metering service at
  * <scheme>://&lt;local-hostname&gt;:&lt;port&gt;/health. Threading and retry logic live in
  * MeteringHealthWatcher; this class is purely responsible for the HTTP call itself.
- * The local hostname is resolved once from {@link InetAddress#getLocalHost()} so TLS certificates
- * whose SAN matches the node FQDN are validated normally. HTTPS probes reuse the metastore client
+ * The local FQDN is resolved once via {@link InetAddress#getCanonicalHostName()} so TLS
+ * certificates whose SAN matches the node FQDN are validated normally. HTTPS probes reuse the metastore client
  * {@link SSLContext} helpers in {@link DataSharing}. The host is not user-configurable to prevent
  * nefarious users from overriding the co-located metering service location.
  */
@@ -56,6 +56,7 @@ public class MeteringServiceMonitor {
       synchronized (MeteringServiceMonitor.class) {
         if (meteringServiceHost == null) {
           meteringServiceHost = lookupLocalHostname();
+          LOG.info("Using host '{}' for metering service health checks", meteringServiceHost);
         }
       }
     }
@@ -64,12 +65,29 @@ public class MeteringServiceMonitor {
 
   private static String lookupLocalHostname() {
     try {
-      return InetAddress.getLocalHost().getHostName();
+      InetAddress localHost = InetAddress.getLocalHost();
+      return selectHostname(localHost.getCanonicalHostName(), localHost.getHostName(),
+          localHost.getHostAddress());
     } catch (UnknownHostException e) {
       LOG.warn("Unable to resolve local hostname for metering health check; falling back to {}",
           FALLBACK_METERING_SERVICE_HOST, e);
       return FALLBACK_METERING_SERVICE_HOST;
     }
+  }
+
+  /**
+   * Prefers the FQDN because metering TLS certificates carry only the FQDN as SAN, while the OS
+   * hostname may be the short name on cloud hosts. {@link InetAddress#getCanonicalHostName()}
+   * returns the IP literal when reverse lookup fails, in which case the OS hostname is used.
+   */
+  static String selectHostname(String canonicalHostName, String hostName, String hostAddress) {
+    if (canonicalHostName != null && !canonicalHostName.isEmpty()
+        && !canonicalHostName.equals(hostAddress)) {
+      return canonicalHostName;
+    }
+    LOG.info("Reverse DNS lookup did not return an FQDN (got '{}'); using local hostname '{}'",
+        canonicalHostName, hostName);
+    return hostName;
   }
 
   static Integer resolveMeteringServicePort() {
