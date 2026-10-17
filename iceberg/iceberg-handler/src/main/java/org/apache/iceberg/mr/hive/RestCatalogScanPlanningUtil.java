@@ -115,16 +115,17 @@ public final class RestCatalogScanPlanningUtil {
 
   /**
    * Copies non-secret {@code iceberg.catalog.<catalog>.*} entries from the HS2 session into Tez job
-   * properties. Sensitive catalog settings are copied via
+   * properties, together with the {@link InputFormatConfig#serverSideScanPlanningKey(String)} marker.
+   * Sensitive catalog settings are copied via
    * {@link #propagateInputJobCredentials(TableDesc, Map, Configuration)} (HIVE-20651 job secrets).
+   * Session values replace existing entries so a session {@code SET} wins.
    */
   public static void propagateCatalogPropertiesToJob(
       Configuration sessionConf, String catalogName, Map<String, String> jobProperties) {
     if (sessionConf == null || jobProperties == null) {
       return;
     }
-    propagateCatalogPropertiesToJob(
-        sessionConf, catalogName, jobProperties::putIfAbsent, null);
+    propagateCatalogPropertiesToJob(sessionConf, catalogName, jobProperties::put, null);
   }
 
   /**
@@ -140,7 +141,7 @@ public final class RestCatalogScanPlanningUtil {
         conf,
         tableDesc.getProperty(InputFormatConfig.CATALOG_NAME),
         null,
-        jobSecrets::putIfAbsent);
+        jobSecrets::put);
   }
 
   /**
@@ -153,15 +154,7 @@ public final class RestCatalogScanPlanningUtil {
     if (sessionConf == null || jobConf == null) {
       return;
     }
-    propagateCatalogPropertiesToJob(
-        sessionConf,
-        catalogName,
-        (key, value) -> {
-          if (jobConf.get(key) == null) {
-            jobConf.set(key, value);
-          }
-        },
-        null);
+    propagateCatalogPropertiesToJob(sessionConf, catalogName, jobConf::set, null);
   }
 
   private static void propagateCatalogPropertiesToJob(
@@ -180,8 +173,7 @@ public final class RestCatalogScanPlanningUtil {
 
     if (jobPropertySink != null) {
       jobPropertySink.accept(
-          HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED.varname,
-          String.valueOf(isServerSideScanPlanningEnabled(sessionConf)));
+          InputFormatConfig.serverSideScanPlanningKey(resolvedCatalogName), Boolean.TRUE.toString());
 
       String sessionDefaultCatalog =
           MetastoreConf.getVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT);

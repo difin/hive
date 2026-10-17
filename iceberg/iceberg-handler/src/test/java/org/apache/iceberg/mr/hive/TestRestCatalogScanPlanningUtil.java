@@ -148,9 +148,35 @@ public class TestRestCatalogScanPlanningUtil {
             IcebergCatalogProperties.catalogPropertyConfigKey(
                 "ice01", RESTCatalogProperties.SCAN_PLANNING_MODE),
             "server")
-        .containsEntry(
-            HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED.varname, "true")
+        .containsEntry(InputFormatConfig.serverSideScanPlanningKey("ice01"), "true")
+        .doesNotContainKey(HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED.varname)
         .doesNotContainKey("unrelated.key");
+  }
+
+  /**
+   * The HS2 session is authoritative: a session {@code SET} replaces an older value already present
+   * in job properties or the job conf.
+   */
+  @Test
+  void propagateCatalogPropertiesToJobOverwritesExistingValues() {
+    Configuration sessionConf = new Configuration();
+    sessionConf.set(
+        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE),
+        CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
+    String uriKey = IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri");
+    sessionConf.set(uriKey, "http://new:8181");
+    RestCatalogScanPlanningUtil.setScanPlanningMode(sessionConf, "ice01", "server");
+    enableHiveServerMode(sessionConf);
+
+    Map<String, String> jobProperties = Maps.newHashMap();
+    jobProperties.put(uriKey, "http://old:8181");
+    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, "ice01", jobProperties);
+    assertThat(jobProperties).containsEntry(uriKey, "http://new:8181");
+
+    Configuration jobConf = new Configuration(false);
+    jobConf.set(uriKey, "http://old:8181");
+    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, "ice01", jobConf);
+    assertThat(jobConf.get(uriKey)).isEqualTo("http://new:8181");
   }
 
   /**
@@ -183,6 +209,7 @@ public class TestRestCatalogScanPlanningUtil {
             IcebergCatalogProperties.catalogPropertyConfigKey(
                 "ice01", RESTCatalogProperties.SCAN_PLANNING_MODE)))
         .isEqualTo("server");
+    assertThat(jobConf.getBoolean(InputFormatConfig.serverSideScanPlanningKey("ice01"), false)).isTrue();
   }
 
   /**

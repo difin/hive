@@ -20,6 +20,7 @@
 package org.apache.iceberg.rest;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.apache.hadoop.conf.Configuration;
@@ -203,21 +204,94 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     assertThat(restCatalog.loadTable(TABLE_ID).currentSnapshot().snapshotId())
         .isNotEqualTo(pinnedSnapshotId);
 
-    ArgumentCaptor<HTTPRequest> requestCaptor = ArgumentCaptor.forClass(HTTPRequest.class);
+    assertThat(planRequestsDuringGetSplits(jobConf))
+        .singleElement()
+        .extracting(PlanTableScanRequest::snapshotId)
+        .isEqualTo(pinnedSnapshotId);
+  }
+
+  /** Time travel by snapshot id is sent to the REST server as the plan request snapshot. */
+  @Test
+  void serverSidePlanningUsesExplicitSnapshotId() throws IOException {
+    Table table = createTableWithData();
+    long firstSnapshotId = table.currentSnapshot().snapshotId();
+    appendFileB();
+
+    Configuration jobConf = propagatedJobConf(restCatalog.loadTable(TABLE_ID));
+    jobConf.setLong(InputFormatConfig.SNAPSHOT_ID, firstSnapshotId);
+
+    assertThat(planRequestsDuringGetSplits(jobConf))
+        .singleElement()
+        .extracting(PlanTableScanRequest::snapshotId)
+        .isEqualTo(firstSnapshotId);
+  }
+
+  /**
+   * Time travel by tag name resolves the ref against the compile-time table, so moving the ref in
+   * the catalog after compilation does not change what is planned.
+   */
+  @Test
+  void serverSidePlanningResolvesRefAgainstSerializedTable() throws IOException {
+    Table table = createTableWithData();
+    long taggedSnapshotId = table.currentSnapshot().snapshotId();
+    table.manageSnapshots().createTag("v1", taggedSnapshotId).commit();
+
+    Configuration jobConf = propagatedJobConf(restCatalog.loadTable(TABLE_ID));
+    jobConf.set(InputFormatConfig.SNAPSHOT_ID, "v1");
+
+    appendFileB();
+    Table live = restCatalog.loadTable(TABLE_ID);
+    live.manageSnapshots().replaceTag("v1", live.currentSnapshot().snapshotId()).commit();
+
+    assertThat(planRequestsDuringGetSplits(jobConf))
+        .singleElement()
+        .extracting(PlanTableScanRequest::snapshotId)
+        .isEqualTo(taggedSnapshotId);
+  }
+
+  /** Incremental append scans are planned locally from the serialized table, without POST /plan. */
+  @Test
+  void incrementalAppendScanDoesNotUseServerSidePlanning() throws IOException {
+    Table table = createTableWithData();
+    long firstSnapshotId = table.currentSnapshot().snapshotId();
+    appendFileB();
+
+    Configuration jobConf = propagatedJobConf(restCatalog.loadTable(TABLE_ID));
+    jobConf.setLong(InputFormatConfig.SNAPSHOT_ID_INTERVAL_FROM, firstSnapshotId);
+
+    assertThat(planRequestsDuringGetSplits(jobConf)).isEmpty();
+  }
+
+  private Configuration propagatedJobConf(Table table) throws IOException {
+    Configuration jobConf = executorJobConf(table);
+    jobConf.set(InputFormatConfig.TABLE_LOCATION, table.location());
+    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf(), CATALOG_NAME, jobConf);
+    return jobConf;
+  }
+
+  private void appendFileB() {
+    DataFile fileB =
+        DataFiles.builder(SPEC)
+            .withPath("/path/to/data-b.parquet")
+            .withFileSizeInBytes(10)
+            .withRecordCount(1)
+            .build();
+    restCatalog.loadTable(TABLE_ID).newAppend().appendFile(fileB).commit();
+  }
+
+  private List<PlanTableScanRequest> planRequestsDuringGetSplits(Configuration jobConf) {
+    Mockito.clearInvocations(adapterForRESTServer);
     JobContext jobContext = new JobContextImpl(jobConf, new JobID("server_side_scan", 1));
     new IcebergInputFormat<>().getSplits(jobContext);
 
-    verify(adapterForRESTServer, atLeastOnce())
+    ArgumentCaptor<HTTPRequest> requestCaptor = ArgumentCaptor.forClass(HTTPRequest.class);
+    verify(adapterForRESTServer, Mockito.atLeast(0))
         .execute(requestCaptor.capture(), any(), any(), any(), any());
-
-    PlanTableScanRequest planRequest =
-        requestCaptor.getAllValues().stream()
-            .map(HTTPRequest::body)
-            .filter(PlanTableScanRequest.class::isInstance)
-            .map(PlanTableScanRequest.class::cast)
-            .findFirst()
-            .orElseThrow(() -> new AssertionError("Expected POST /plan during getSplits"));
-    assertThat(planRequest.snapshotId()).isEqualTo(pinnedSnapshotId);
+    return requestCaptor.getAllValues().stream()
+        .map(HTTPRequest::body)
+        .filter(PlanTableScanRequest.class::isInstance)
+        .map(PlanTableScanRequest.class::cast)
+        .toList();
   }
 
   private Table createTableWithData() {

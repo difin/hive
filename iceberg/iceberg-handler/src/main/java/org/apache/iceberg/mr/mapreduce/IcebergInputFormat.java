@@ -58,7 +58,6 @@ import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.mr.CloseableRestCatalog;
 import org.apache.iceberg.mr.InputFormatConfig;
 import org.apache.iceberg.mr.hive.HiveTableUtil;
-import org.apache.iceberg.mr.hive.IcebergVendedCredentialUtil;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.types.Types.StructType;
 import org.apache.iceberg.util.SerializationUtil;
@@ -81,7 +80,8 @@ public class IcebergInputFormat<T> extends InputFormat<Void, T> {
         snapshotId = conf.getLong(InputFormatConfig.SNAPSHOT_ID, -1);
       } catch (NumberFormatException e) {
         String version = conf.get(InputFormatConfig.SNAPSHOT_ID);
-        SnapshotRef ref = table.refs().get(version);
+        Table refsTable = serverSidePinTable != null ? serverSidePinTable : table;
+        SnapshotRef ref = refsTable.refs().get(version);
         if (ref == null) {
           throw new RuntimeException("Cannot find matching snapshot ID or reference name for version " + version);
         }
@@ -168,12 +168,11 @@ public class IcebergInputFormat<T> extends InputFormat<Void, T> {
         ThreadPools.newFixedThreadPool("iceberg-plan-worker-pool",
             conf.getInt(SystemConfigs.WORKER_THREAD_POOL_SIZE.propertyKey(), ThreadPools.WORKER_THREAD_POOL_SIZE));
     try {
-      if (HiveTableUtil.shouldReloadForServerSideScanPlanning(conf)) {
+      if (HiveTableUtil.shouldReloadForServerSideScanPlanning(conf, serializedTable)) {
         String catalogName = HiveTableUtil.resolveCatalogName(conf);
         try (CloseableRestCatalog catalog = CloseableRestCatalog.load(conf, catalogName)) {
           Table planningTable = catalog.loadTable(tableIdentifier);
-          HiveTableUtil.checkAndSetIoConfig(conf, planningTable);
-          IcebergVendedCredentialUtil.applyFromJobConf(planningTable, catalogName, conf);
+          HiveTableUtil.configureLoadedTable(conf, planningTable, catalogName);
           return planInputSplits(planningTable, conf, workerPool, tableIdentifier, serializedTable);
         }
       }
