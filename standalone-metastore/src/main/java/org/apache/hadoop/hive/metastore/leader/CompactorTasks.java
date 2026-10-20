@@ -18,6 +18,8 @@
 
 package org.apache.hadoop.hive.metastore.leader;
 
+import com.cronutils.utils.VisibleForTesting;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.HiveMetaStore;
 import org.apache.hadoop.hive.metastore.MetaStoreThread;
@@ -41,6 +43,8 @@ public class CompactorTasks implements LeaderElection.LeadershipStateListener {
   // each MetaStoreThread runs as a thread
   private Map<MetaStoreThread, AtomicBoolean> metastoreThreadsMap;
 
+  private volatile boolean isDynamic;
+
   public CompactorTasks(Configuration configuration, boolean runOnlyWorker) {
     // recreate a new configuration
     this.configuration = new Configuration(requireNonNull(configuration,
@@ -60,6 +64,16 @@ public class CompactorTasks implements LeaderElection.LeadershipStateListener {
     }
   }
 
+  private boolean shouldScheduleInitiator() {
+    return isDynamic
+        || MetastoreConf.getBoolVar(configuration, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON);
+  }
+
+  private boolean shouldScheduleCleaner() {
+    return isDynamic
+        || MetastoreConf.getBoolVar(configuration, MetastoreConf.ConfVars.COMPACTOR_CLEANER_ON);
+  }
+
   public List<MetaStoreThread> getCompactorThreads() throws Exception {
     List<MetaStoreThread> compactors = new ArrayList<>();
     if (!MetastoreConf.getBoolVar(configuration, MetastoreConf.ConfVars.METASTORE_SUPPORT_ACID)) {
@@ -68,11 +82,11 @@ public class CompactorTasks implements LeaderElection.LeadershipStateListener {
       return compactors;
     }
     if (!runOnlyWorker) {
-      if (MetastoreConf.getBoolVar(configuration, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON)) {
+      if (shouldScheduleInitiator()) {
         MetaStoreThread initiator = instantiateThread("org.apache.hadoop.hive.ql.txn.compactor.Initiator");
         compactors.add(initiator);
       }
-      if (MetastoreConf.getBoolVar(configuration, MetastoreConf.ConfVars.COMPACTOR_CLEANER_ON)) {
+      if (shouldScheduleCleaner()) {
         MetaStoreThread cleaner = instantiateThread("org.apache.hadoop.hive.ql.txn.compactor.Cleaner");
         compactors.add(cleaner);
       }
@@ -114,10 +128,14 @@ public class CompactorTasks implements LeaderElection.LeadershipStateListener {
           MetastoreConf.getIntVar(configuration, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_FAILED_THRESHOLD));
 
       if (!MetastoreConf.getBoolVar(configuration, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON)) {
-        HiveMetaStore.LOG.warn("Compactor Initiator is turned Off. Automatic compaction will not be triggered.");
+        String message = isDynamic ? "metastore.compactor.initiator.on is ignored since current leader is dynamic." :
+            "Compactor Initiator is turned Off. Automatic compaction will not be triggered.";
+        HiveMetaStore.LOG.warn(message);
       }
       if (!MetastoreConf.getBoolVar(configuration, MetastoreConf.ConfVars.COMPACTOR_CLEANER_ON)) {
-        HiveMetaStore.LOG.warn("Compactor Cleaner is turned Off. Automatic compaction cleaner will not be triggered.");
+        String message = isDynamic ? "metastore.compactor.cleaner.on is ignored since current leader is dynamic." :
+            "Compactor Cleaner is turned Off. Automatic compaction cleaner will not be triggered.";
+        HiveMetaStore.LOG.warn(message);
       }
 
     } else {
@@ -134,6 +152,7 @@ public class CompactorTasks implements LeaderElection.LeadershipStateListener {
       throw new IllegalStateException("There should be no running tasks before taking the leadership!");
     }
 
+    isDynamic = election.isDynamic();
     logCompactionParameters();
     metastoreThreadsMap = new IdentityHashMap<>();
     List<MetaStoreThread> metaStoreThreads = getCompactorThreads();
@@ -162,4 +181,8 @@ public class CompactorTasks implements LeaderElection.LeadershipStateListener {
     }
   }
 
+  @VisibleForTesting
+  public Map<MetaStoreThread, AtomicBoolean> getMetastoreThreadsMap() {
+    return metastoreThreadsMap;
+  }
 }
