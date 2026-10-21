@@ -144,7 +144,7 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
   }
 
   /**
-   * Negative path: without the HS2 marker and catalog settings in the job conf, split generation
+   * Negative path: without the HS2 per-table marker and catalog settings in the job conf, split generation
    * plans from the serialized table snapshot and never sends {@code POST /plan}.
    */
   @Test
@@ -165,7 +165,7 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
   void propagatedJobConfReloadsRestTableFromCatalog() throws IOException {
     Table table = createTableWithData();
     Configuration jobConf = executorJobConf(table);
-    propagateFromHs2(jobConf);
+    propagateFromHs2(sessionConf(), table, jobConf);
 
     ArgumentCaptor<HTTPRequest> requestCaptor = ArgumentCaptor.forClass(HTTPRequest.class);
     try (CloseableRestCatalog catalog = CloseableRestCatalog.load(jobConf, CATALOG_NAME)) {
@@ -181,6 +181,36 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
                 .anyMatch(req -> req.path().contains("/tables/")))
         .as("Expected Hive split planning to reload the table from the REST catalog")
         .isTrue();
+  }
+
+  /**
+   * The REST server returns {@code scan-planning-mode=server} in {@code LoadTableResponse} while the
+   * client {@code scan-planning-mode} is unset: Iceberg loads a server-planning {@link RESTTable}, and
+   * Hive follows it instead of planning locally from manifests.
+   */
+  @Test
+  void serverDecidedPlanningModeIsFollowedWithoutClientProperty() throws IOException {
+    createTableWithData();
+    Configuration sessionConf = sessionConf();
+    sessionConf.unset(
+        IcebergCatalogProperties.catalogPropertyConfigKey(CATALOG_NAME, RESTCatalogProperties.SCAN_PLANNING_MODE));
+
+    try (CloseableRestCatalog catalog = CloseableRestCatalog.load(sessionConf, CATALOG_NAME)) {
+      Table table = catalog.loadTable(TABLE_ID.toString());
+      assertThat(table).isInstanceOf(RESTTable.class);
+      assertThat(planRequestsDuringGetSplits(propagatedJobConf(sessionConf, table))).hasSize(1);
+    }
+  }
+
+  /** With the Hive kill switch off, a table the server plans is still planned locally by Hive. */
+  @Test
+  void hiveSwitchOffKeepsLocalPlanningForServerPlannedTable() throws IOException {
+    Table table = createTableWithData();
+    Configuration sessionConf = sessionConf();
+    HiveConf.setBoolVar(sessionConf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED, false);
+
+    assertThat(table).isInstanceOf(RESTTable.class);
+    assertThat(planRequestsDuringGetSplits(propagatedJobConf(sessionConf, table))).isEmpty();
   }
 
   /**
@@ -308,19 +338,26 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
   }
 
   private Configuration propagatedJobConf(Table table) throws IOException {
+    return propagatedJobConf(sessionConf(), table);
+  }
+
+  private Configuration propagatedJobConf(Configuration sessionConf, Table table) throws IOException {
     Configuration jobConf = executorJobConf(table);
     jobConf.set(InputFormatConfig.TABLE_LOCATION, table.location());
-    propagateFromHs2(jobConf);
+    propagateFromHs2(sessionConf, table, jobConf);
     return jobConf;
   }
 
   /**
-   * Mimics what split generation in the AM sees: the marker from job properties, and the catalog
-   * properties from job secrets, which {@code HiveInputFormat#addSplitsForGroup} copies into the conf.
+   * Mimics what split generation in the AM sees: the per-table marker from the table's job
+   * properties, decided on the table HS2 loaded, and the catalog properties from job secrets; both are
+   * copied into the conf by {@code HiveInputFormat#addSplitsForGroup}.
    */
-  private void propagateFromHs2(Configuration jobConf) {
-    Configuration sessionConf = sessionConf();
-    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, CATALOG_NAME, jobConf);
+  private void propagateFromHs2(Configuration sessionConf, Table table, Configuration jobConf) {
+    Map<String, String> jobProperties = Maps.newHashMap();
+    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(
+        sessionConf, table, TABLE_ID.toString(), jobProperties);
+    jobProperties.forEach(jobConf::set);
 
     TableDesc tableDesc = new TableDesc();
     Properties tableProps = new Properties();

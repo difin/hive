@@ -265,7 +265,7 @@ public class HiveTableUtil {
   }
 
   /**
-   * Returns true when HS2 marked the table's catalog for server-side scan planning and the scan can
+   * Returns true when HS2 marked the table for server-side scan planning and the scan can
    * actually be planned by the REST server. Incremental append scans and metadata tables are planned
    * locally even on a {@code RESTTable}, and intra-transaction reads must see uncommitted metadata,
    * so these keep using the serialized table.
@@ -276,9 +276,9 @@ public class HiveTableUtil {
         serializedTable instanceof SerializableTable.SerializableMetadataTable) {
       return false;
     }
-    String catalogName = resolveCatalogName(conf);
-    return StringUtils.isNotBlank(catalogName) &&
-        conf.getBoolean(InputFormatConfig.serverSideScanPlanningKey(catalogName), false);
+    String tableIdentifier = conf.get(InputFormatConfig.TABLE_IDENTIFIER);
+    return StringUtils.isNotBlank(tableIdentifier) &&
+        conf.getBoolean(InputFormatConfig.serverSideScanPlanningKey(tableIdentifier), false);
   }
 
   /**

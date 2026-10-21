@@ -20,13 +20,13 @@
 package org.apache.iceberg.mr.hive;
 
 import java.util.Map;
-import java.util.function.BiConsumer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.iceberg.CatalogUtil;
+import org.apache.iceberg.Table;
 import org.apache.iceberg.hive.IcebergCatalogProperties;
 import org.apache.iceberg.mr.InputFormatConfig;
 import org.apache.iceberg.rest.RESTCatalogProperties;
@@ -60,6 +60,8 @@ import org.apache.iceberg.rest.RESTCatalogProperties;
  */
 public final class RestCatalogScanPlanningUtil {
 
+  private static final String REST_TABLE_CLASS_NAME = "org.apache.iceberg.rest.RESTTable";
+
   private RestCatalogScanPlanningUtil() {
   }
 
@@ -88,13 +90,12 @@ public final class RestCatalogScanPlanningUtil {
   }
 
   /**
-   * Returns true when the catalog's scan planning mode is {@code server} and the Hive kill switch is on.
+   * Returns true when Iceberg resolved the loaded table for server-side scan planning. Iceberg decides
+   * this per table, letting the mode in the server's {@code LoadTableResponse} take precedence over the
+   * client {@code scan-planning-mode}, and then returns a package-private {@code RESTTable}.
    */
-  static boolean shouldUseServerSideScanPlanning(Configuration conf, String catalogName) {
-    if (StringUtils.isEmpty(catalogName) || !isServerSideScanPlanningEnabled(conf)) {
-      return false;
-    }
-    return getScanPlanningMode(conf, catalogName) == RESTCatalogProperties.ScanPlanningMode.SERVER;
+  static boolean usesServerSideScanPlanning(Table table) {
+    return table != null && REST_TABLE_CLASS_NAME.equals(table.getClass().getName());
   }
 
   /**
@@ -106,37 +107,32 @@ public final class RestCatalogScanPlanningUtil {
     if (StringUtils.isEmpty(resolvedCatalogName) || conf == null) {
       return false;
     }
-    if (!CatalogUtil.ICEBERG_CATALOG_TYPE_REST.equals(
-        IcebergCatalogProperties.getCatalogType(conf, resolvedCatalogName))) {
-      return false;
-    }
-    return shouldUseServerSideScanPlanning(conf, resolvedCatalogName);
+    return CatalogUtil.ICEBERG_CATALOG_TYPE_REST.equals(
+        IcebergCatalogProperties.getCatalogType(conf, resolvedCatalogName)) &&
+        isServerSideScanPlanningEnabled(conf);
   }
 
   /**
-   * Writes the {@link InputFormatConfig#serverSideScanPlanningKey(String)} marker and the session default
-   * catalog into Tez job properties. The {@code iceberg.catalog.<catalog>.*} entries go through job
+   * Writes the per-table {@link InputFormatConfig#serverSideScanPlanningKey(String)} marker and the
+   * session default catalog into the table's job properties when the loaded table plans server-side
+   * and the Hive kill switch is on. The {@code iceberg.catalog.<catalog>.*} entries go through job
    * secrets instead, see {@link #propagateInputJobCredentials(TableDesc, Map, Configuration)}.
    * Session values replace existing entries so a session {@code SET} wins.
    */
   public static void propagateCatalogPropertiesToJob(
-      Configuration sessionConf, String catalogName, Map<String, String> jobProperties) {
+      Configuration sessionConf, Table table, String tableIdentifier, Map<String, String> jobProperties) {
     if (sessionConf == null || jobProperties == null) {
       return;
     }
-    propagateServerSideScanPlanningMarker(sessionConf, catalogName, jobProperties::put);
-  }
-
-  /**
-   * Same as {@link #propagateCatalogPropertiesToJob(Configuration, String, Map)} for the runtime job
-   * {@link Configuration} built in {@code configureJobConf}.
-   */
-  public static void propagateCatalogPropertiesToJob(
-      Configuration sessionConf, String catalogName, Configuration jobConf) {
-    if (sessionConf == null || jobConf == null) {
+    if (!isServerSideScanPlanningEnabled(sessionConf) || !usesServerSideScanPlanning(table)) {
       return;
     }
-    propagateServerSideScanPlanningMarker(sessionConf, catalogName, jobConf::set);
+    jobProperties.put(InputFormatConfig.serverSideScanPlanningKey(tableIdentifier), Boolean.TRUE.toString());
+
+    String sessionDefaultCatalog = MetastoreConf.getVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT);
+    if (StringUtils.isNotBlank(sessionDefaultCatalog)) {
+      jobProperties.put(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), sessionDefaultCatalog);
+    }
   }
 
   /**
@@ -161,20 +157,5 @@ public final class RestCatalogScanPlanningUtil {
         jobSecrets.put(entry.getKey(), entry.getValue());
       }
     });
-  }
-
-  private static void propagateServerSideScanPlanningMarker(
-      Configuration sessionConf, String catalogName, BiConsumer<String, String> jobPropertySink) {
-    if (!shouldPropagateCatalogPropertiesToJob(catalogName, sessionConf)) {
-      return;
-    }
-    jobPropertySink.accept(
-        InputFormatConfig.serverSideScanPlanningKey(HiveTableUtil.resolveCatalogName(sessionConf, catalogName)),
-        Boolean.TRUE.toString());
-
-    String sessionDefaultCatalog = MetastoreConf.getVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT);
-    if (StringUtils.isNotBlank(sessionDefaultCatalog)) {
-      jobPropertySink.accept(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), sessionDefaultCatalog);
-    }
   }
 }
