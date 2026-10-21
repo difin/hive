@@ -278,8 +278,8 @@ public class HiveIcebergStorageHandler extends DefaultStorageHandler implements 
 
   @Override
   public void configureInputJobCredentials(TableDesc tableDesc, Map<String, String> secrets) {
-    RestCatalogScanPlanningUtil.propagateInputJobCredentials(tableDesc, secrets, conf);
-    IcebergVendedCredentialUtil.propagateInputJobCredentials(tableDesc, secrets, conf);
+    RestCatalogScanPlanningUtil.propagateCatalogSecretsToJob(tableDesc, secrets, conf);
+    IcebergVendedCredentialUtil.propagateVendedCredentialsToJob(tableDesc, secrets, conf);
   }
 
   @Override

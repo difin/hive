@@ -364,7 +364,7 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     tableProps.setProperty(InputFormatConfig.CATALOG_NAME, CATALOG_NAME);
     tableDesc.setProperties(tableProps);
     Map<String, String> jobSecrets = Maps.newHashMap();
-    RestCatalogScanPlanningUtil.propagateInputJobCredentials(tableDesc, jobSecrets, sessionConf);
+    RestCatalogScanPlanningUtil.propagateCatalogSecretsToJob(tableDesc, jobSecrets, sessionConf);
     jobSecrets.forEach(jobConf::set);
   }
 

@@ -103,7 +103,7 @@ public final class IcebergVendedCredentialUtil {
    * Copies vended storage credentials into job secrets for
    * {@link HiveIcebergStorageHandler#configureInputJobCredentials} (HIVE-20651).
    */
-  public static void propagateInputJobCredentials(
+  public static void propagateVendedCredentialsToJob(
       TableDesc tableDesc, Map<String, String> jobSecrets, Configuration conf) {
     if (tableDesc == null || tableDesc.getProperties() == null ||
         !requestsVendedCredentials(tableDesc.getProperties(), conf)) {

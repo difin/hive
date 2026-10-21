@@ -51,7 +51,7 @@ import org.apache.iceberg.rest.RESTCatalogProperties;
  *
  * <p>{@link #setScanPlanningMode(Configuration, String, String)},
  * {@link #getScanPlanningMode(Configuration, String)} and
- * {@link #propagateInputJobCredentials(TableDesc, Map, Configuration)} are public so tests in other Maven modules
+ * {@link #propagateCatalogSecretsToJob(TableDesc, Map, Configuration)} are public so tests in other Maven modules
  * (for example {@code itests/hive-iceberg-rest-server}) can configure scan planning; those modules
  * compile against this artifact as a JAR and cannot call package-private members. They are not
  * intended as a general operator or application API.
@@ -116,7 +116,7 @@ public final class RestCatalogScanPlanningUtil {
    * Writes the per-table {@link InputFormatConfig#serverSideScanPlanningKey(String)} marker and the
    * session default catalog into the table's job properties when the loaded table plans server-side
    * and the Hive kill switch is on. The {@code iceberg.catalog.<catalog>.*} entries go through job
-   * secrets instead, see {@link #propagateInputJobCredentials(TableDesc, Map, Configuration)}.
+   * secrets instead, see {@link #propagateCatalogSecretsToJob(TableDesc, Map, Configuration)}.
    * Session values replace existing entries so a session {@code SET} wins.
    */
   public static void propagateCatalogPropertiesToJob(
@@ -141,7 +141,7 @@ public final class RestCatalogScanPlanningUtil {
    * the AM needs them to load the REST catalog; {@code HiveInputFormat#addSplitsForGroup} copies job
    * secrets into the job conf before {@code getSplits}.
    */
-  public static void propagateInputJobCredentials(
+  public static void propagateCatalogSecretsToJob(
       TableDesc tableDesc, Map<String, String> jobSecrets, Configuration sessionConf) {
     if (tableDesc == null || tableDesc.getProperties() == null || jobSecrets == null || sessionConf == null) {
       return;

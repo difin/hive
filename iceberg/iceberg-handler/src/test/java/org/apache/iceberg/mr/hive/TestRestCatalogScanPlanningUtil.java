@@ -123,7 +123,7 @@ public class TestRestCatalogScanPlanningUtil {
    * are never exposed in plain job properties. Other catalogs and unrelated keys are not copied.
    */
   @Test
-  void propagateInputJobCredentialsCopiesAllCatalogPropertiesToJobSecrets() {
+  void propagateCatalogSecretsToJobCopiesAllCatalogProperties() {
     Configuration sessionConf = restSessionConf();
     String headerKey = IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "header.Authorization");
     sessionConf.set(headerKey, "Bearer token");
@@ -136,7 +136,7 @@ public class TestRestCatalogScanPlanningUtil {
     tableDesc.setProperties(tableProps);
 
     Map<String, String> jobSecrets = Maps.newHashMap();
-    RestCatalogScanPlanningUtil.propagateInputJobCredentials(tableDesc, jobSecrets, sessionConf);
+    RestCatalogScanPlanningUtil.propagateCatalogSecretsToJob(tableDesc, jobSecrets, sessionConf);
 
     assertThat(jobSecrets)
         .containsEntry(headerKey, "Bearer token")
@@ -152,7 +152,7 @@ public class TestRestCatalogScanPlanningUtil {
   }
 
   @Test
-  void propagateInputJobCredentialsSkipsWhenHiveSwitchDisabled() {
+  void propagateCatalogSecretsToJobSkipsWhenHiveSwitchDisabled() {
     Configuration sessionConf = new Configuration();
     sessionConf.set(
         IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE),
@@ -165,7 +165,7 @@ public class TestRestCatalogScanPlanningUtil {
     tableProps.setProperty(InputFormatConfig.CATALOG_NAME, "ice01");
     tableDesc.setProperties(tableProps);
     Map<String, String> jobSecrets = Maps.newHashMap();
-    RestCatalogScanPlanningUtil.propagateInputJobCredentials(tableDesc, jobSecrets, sessionConf);
+    RestCatalogScanPlanningUtil.propagateCatalogSecretsToJob(tableDesc, jobSecrets, sessionConf);
     assertThat(jobSecrets).isEmpty();
   }
 
