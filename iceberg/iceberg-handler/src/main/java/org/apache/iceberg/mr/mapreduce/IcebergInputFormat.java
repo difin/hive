@@ -90,7 +90,10 @@ public class IcebergInputFormat<T> extends InputFormat<Void, T> {
       }
       String refName = conf.get(InputFormatConfig.OUTPUT_TABLE_SNAPSHOT_REF);
       if (StringUtils.isNotEmpty(refName)) {
-        scan = scan.useRef(HiveUtils.getTableSnapshotRef(refName));
+        String ref = HiveUtils.getTableSnapshotRef(refName);
+        scan = serverSidePinTable != null ?
+            HiveTableUtil.pinServerSideScanRefToSerializedTable(serverSidePinTable, ref, scan) :
+            scan.useRef(ref);
       }
       if (snapshotId != -1) {
         scan = scan.useSnapshot(snapshotId);

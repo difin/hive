@@ -36,6 +36,7 @@ import org.apache.iceberg.DataFiles;
 import org.apache.iceberg.FileScanTask;
 import org.apache.iceberg.Scan;
 import org.apache.iceberg.SerializableTable;
+import org.apache.iceberg.SnapshotRef;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.hive.IcebergCatalogProperties;
@@ -47,6 +48,7 @@ import org.apache.iceberg.mr.mapreduce.IcebergInputFormat;
 import org.apache.iceberg.rest.requests.PlanTableScanRequest;
 import org.apache.iceberg.rest.responses.ErrorResponse;
 import org.apache.iceberg.rest.responses.LoadTableResponse;
+import org.apache.iceberg.types.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -247,6 +249,51 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
         .isEqualTo(taggedSnapshotId);
   }
 
+  /**
+   * Reading {@code t.branch_b1} while another writer commits to {@code b1} between query compilation
+   * and split planning: the scan must use the {@code b1} head captured at compile time, not the new
+   * head the reloaded REST table sees.
+   */
+  @Test
+  void serverSidePlanningPinsBranchToSerializedTable() throws IOException {
+    Table table = createTableWithData();
+    long branchHeadId = table.currentSnapshot().snapshotId();
+    table.manageSnapshots().createBranch("b1", branchHeadId).commit();
+
+    Configuration jobConf = propagatedJobConf(restCatalog.loadTable(TABLE_ID));
+    jobConf.set(InputFormatConfig.OUTPUT_TABLE_SNAPSHOT_REF, "branch_b1");
+
+    appendFileB("b1");
+    assertThat(restCatalog.loadTable(TABLE_ID).refs().get("b1").snapshotId()).isNotEqualTo(branchHeadId);
+
+    assertThat(planRequestsDuringGetSplits(jobConf))
+        .singleElement()
+        .extracting(PlanTableScanRequest::snapshotId)
+        .isEqualTo(branchHeadId);
+  }
+
+  /**
+   * Reading {@code t.branch_b1} after a column was added to the table but no new data was written to
+   * {@code b1}: Iceberg reads branches with the current table schema, so {@code new_col} must still be
+   * selected. The scan therefore uses the ref instead of pinning the snapshot id, which would switch to
+   * the older snapshot schema without {@code new_col}.
+   */
+  @Test
+  void serverSidePlanningKeepsTableSchemaForBranchWithOlderSchema() throws IOException {
+    Table table = createTableWithData();
+    long branchHeadId = table.currentSnapshot().snapshotId();
+    table.manageSnapshots().createBranch("b1", branchHeadId).commit();
+    restCatalog.loadTable(TABLE_ID).updateSchema().addColumn("new_col", Types.StringType.get()).commit();
+
+    Configuration jobConf = propagatedJobConf(restCatalog.loadTable(TABLE_ID));
+    jobConf.set(InputFormatConfig.OUTPUT_TABLE_SNAPSHOT_REF, "branch_b1");
+
+    PlanTableScanRequest planRequest = planRequestsDuringGetSplits(jobConf).get(0);
+    assertThat(planRequest.snapshotId()).isEqualTo(branchHeadId);
+    assertThat(planRequest.useSnapshotSchema()).isFalse();
+    assertThat(planRequest.select()).contains("new_col");
+  }
+
   /** Incremental append scans are planned locally from the serialized table, without POST /plan. */
   @Test
   void incrementalAppendScanDoesNotUseServerSidePlanning() throws IOException {
@@ -268,13 +315,17 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
   }
 
   private void appendFileB() {
+    appendFileB(SnapshotRef.MAIN_BRANCH);
+  }
+
+  private void appendFileB(String branch) {
     DataFile fileB =
         DataFiles.builder(SPEC)
             .withPath("/path/to/data-b.parquet")
             .withFileSizeInBytes(10)
             .withRecordCount(1)
             .build();
-    restCatalog.loadTable(TABLE_ID).newAppend().appendFile(fileB).commit();
+    restCatalog.loadTable(TABLE_ID).newAppend().appendFile(fileB).toBranch(branch).commit();
   }
 
   private List<PlanTableScanRequest> planRequestsDuringGetSplits(Configuration jobConf) {
