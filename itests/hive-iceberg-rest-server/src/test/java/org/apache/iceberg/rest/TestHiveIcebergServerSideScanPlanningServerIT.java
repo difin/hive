@@ -42,7 +42,7 @@ import org.apache.iceberg.SnapshotRef;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.hive.IcebergCatalogProperties;
-import org.apache.iceberg.mr.CloseableRestCatalog;
+import org.apache.iceberg.mr.Catalogs;
 import org.apache.iceberg.mr.hive.RestCatalogScanPlanningUtil;
 import org.apache.iceberg.mr.InputFormatConfig;
 import org.apache.iceberg.mr.hive.HiveTableUtil;
@@ -168,8 +168,8 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     propagateFromHs2(sessionConf(), table, jobConf);
 
     ArgumentCaptor<HTTPRequest> requestCaptor = ArgumentCaptor.forClass(HTTPRequest.class);
-    try (CloseableRestCatalog catalog = CloseableRestCatalog.load(jobConf, CATALOG_NAME)) {
-      Table resolved = catalog.loadTable(TABLE_ID.toString());
+    try (RESTCatalog catalog = loadRestCatalog(jobConf)) {
+      Table resolved = catalog.loadTable(TABLE_ID);
       assertThat(resolved).isInstanceOf(RESTTable.class);
       assertThat(resolved.newScan()).isInstanceOf(RESTTableScan.class);
     }
@@ -195,8 +195,8 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     sessionConf.unset(
         IcebergCatalogProperties.catalogPropertyConfigKey(CATALOG_NAME, RESTCatalogProperties.SCAN_PLANNING_MODE));
 
-    try (CloseableRestCatalog catalog = CloseableRestCatalog.load(sessionConf, CATALOG_NAME)) {
-      Table table = catalog.loadTable(TABLE_ID.toString());
+    try (RESTCatalog catalog = loadRestCatalog(sessionConf)) {
+      Table table = catalog.loadTable(TABLE_ID);
       assertThat(table).isInstanceOf(RESTTable.class);
       assertThat(planRequestsDuringGetSplits(propagatedJobConf(sessionConf, table))).hasSize(1);
     }
@@ -335,6 +335,10 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     jobConf.setLong(InputFormatConfig.SNAPSHOT_ID_INTERVAL_FROM, firstSnapshotId);
 
     assertThat(planRequestsDuringGetSplits(jobConf)).isEmpty();
+  }
+
+  private static RESTCatalog loadRestCatalog(Configuration conf) {
+    return (RESTCatalog) Catalogs.loadCatalog(conf, CATALOG_NAME).orElseThrow();
   }
 
   private Configuration propagatedJobConf(Table table) throws IOException {
