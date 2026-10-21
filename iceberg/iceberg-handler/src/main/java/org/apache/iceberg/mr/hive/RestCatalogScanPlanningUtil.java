@@ -19,7 +19,6 @@
 
 package org.apache.iceberg.mr.hive;
 
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import org.apache.commons.lang3.StringUtils;
@@ -50,8 +49,9 @@ import org.apache.iceberg.rest.RESTCatalogProperties;
  * tests {@code TestRestCatalogScanPlanningServerIT} and {@code TestHiveIcebergServerSideScanPlanningServerIT}
  * in {@code itests/hive-iceberg-rest-server}.
  *
- * <p>{@link #setScanPlanningMode(Configuration, String, String)} and
- * {@link #getScanPlanningMode(Configuration, String)} are public so tests in other Maven modules
+ * <p>{@link #setScanPlanningMode(Configuration, String, String)},
+ * {@link #getScanPlanningMode(Configuration, String)} and
+ * {@link #propagateInputJobCredentials(TableDesc, Map, Configuration)} are public so tests in other Maven modules
  * (for example {@code itests/hive-iceberg-rest-server}) can configure scan planning; those modules
  * compile against this artifact as a JAR and cannot call package-private members. They are not
  * intended as a general operator or application API.
@@ -98,8 +98,8 @@ public final class RestCatalogScanPlanningUtil {
   }
 
   /**
-   * Returns true when catalog properties should be copied into the Tez job configuration so
-   * executors can reload a live REST catalog table for server-side scan planning.
+   * Returns true when catalog properties should be copied into the Tez job so split generation can
+   * reload a live REST catalog table for server-side scan planning.
    */
   static boolean shouldPropagateCatalogPropertiesToJob(String catalogName, Configuration conf) {
     String resolvedCatalogName = HiveTableUtil.resolveCatalogName(conf, catalogName);
@@ -114,10 +114,9 @@ public final class RestCatalogScanPlanningUtil {
   }
 
   /**
-   * Copies non-secret {@code iceberg.catalog.<catalog>.*} entries from the HS2 session into Tez job
-   * properties, together with the {@link InputFormatConfig#serverSideScanPlanningKey(String)} marker.
-   * Sensitive catalog settings are copied via
-   * {@link #propagateInputJobCredentials(TableDesc, Map, Configuration)} (HIVE-20651 job secrets).
+   * Writes the {@link InputFormatConfig#serverSideScanPlanningKey(String)} marker and the session default
+   * catalog into Tez job properties. The {@code iceberg.catalog.<catalog>.*} entries go through job
+   * secrets instead, see {@link #propagateInputJobCredentials(TableDesc, Map, Configuration)}.
    * Session values replace existing entries so a session {@code SET} wins.
    */
   public static void propagateCatalogPropertiesToJob(
@@ -125,95 +124,57 @@ public final class RestCatalogScanPlanningUtil {
     if (sessionConf == null || jobProperties == null) {
       return;
     }
-    propagateCatalogPropertiesToJob(sessionConf, catalogName, jobProperties::put, null);
+    propagateServerSideScanPlanningMarker(sessionConf, catalogName, jobProperties::put);
   }
 
   /**
-   * Copies sensitive {@code iceberg.catalog.<catalog>.*} entries into job secrets for
-   * {@link org.apache.hadoop.hive.ql.metadata.HiveStorageHandler#configureInputJobCredentials}.
-   */
-  static void propagateInputJobCredentials(
-      TableDesc tableDesc, Map<String, String> jobSecrets, Configuration conf) {
-    if (tableDesc == null || tableDesc.getProperties() == null || jobSecrets == null || conf == null) {
-      return;
-    }
-    propagateCatalogPropertiesToJob(
-        conf,
-        tableDesc.getProperty(InputFormatConfig.CATALOG_NAME),
-        null,
-        jobSecrets::put);
-  }
-
-  /**
-   * Copies REST catalog configuration from the HS2 session into a runtime job {@link Configuration}.
-   * Called from {@code configureJobConf} so split generation sees catalog URI/type/scan-planning-mode
-   * even when job properties were not copied yet. Secrets are not written to {@code jobConf}.
+   * Same as {@link #propagateCatalogPropertiesToJob(Configuration, String, Map)} for the runtime job
+   * {@link Configuration} built in {@code configureJobConf}.
    */
   public static void propagateCatalogPropertiesToJob(
       Configuration sessionConf, String catalogName, Configuration jobConf) {
     if (sessionConf == null || jobConf == null) {
       return;
     }
-    propagateCatalogPropertiesToJob(sessionConf, catalogName, jobConf::set, null);
+    propagateServerSideScanPlanningMarker(sessionConf, catalogName, jobConf::set);
   }
 
-  private static void propagateCatalogPropertiesToJob(
-      Configuration sessionConf,
-      String catalogName,
-      BiConsumer<String, String> jobPropertySink,
-      BiConsumer<String, String> jobSecretSink) {
+  /**
+   * Copies all {@code iceberg.catalog.<catalog>.*} entries from the HS2 session into job secrets
+   * (HIVE-20651), so catalog credentials never land in plain job properties. Only split generation in
+   * the AM needs them to load the REST catalog; {@code HiveInputFormat#addSplitsForGroup} copies job
+   * secrets into the job conf before {@code getSplits}.
+   */
+  public static void propagateInputJobCredentials(
+      TableDesc tableDesc, Map<String, String> jobSecrets, Configuration sessionConf) {
+    if (tableDesc == null || tableDesc.getProperties() == null || jobSecrets == null || sessionConf == null) {
+      return;
+    }
+    String catalogName = tableDesc.getProperty(InputFormatConfig.CATALOG_NAME);
     if (!shouldPropagateCatalogPropertiesToJob(catalogName, sessionConf)) {
       return;
     }
+    String catalogPrefix = IcebergCatalogProperties.CATALOG_CONFIG_PREFIX +
+        HiveTableUtil.resolveCatalogName(sessionConf, catalogName) + ".";
+    sessionConf.forEach(entry -> {
+      if (entry.getKey().startsWith(catalogPrefix)) {
+        jobSecrets.put(entry.getKey(), entry.getValue());
+      }
+    });
+  }
 
-    String resolvedCatalogName = HiveTableUtil.resolveCatalogName(sessionConf, catalogName);
-    if (StringUtils.isEmpty(resolvedCatalogName)) {
+  private static void propagateServerSideScanPlanningMarker(
+      Configuration sessionConf, String catalogName, BiConsumer<String, String> jobPropertySink) {
+    if (!shouldPropagateCatalogPropertiesToJob(catalogName, sessionConf)) {
       return;
     }
+    jobPropertySink.accept(
+        InputFormatConfig.serverSideScanPlanningKey(HiveTableUtil.resolveCatalogName(sessionConf, catalogName)),
+        Boolean.TRUE.toString());
 
-    if (jobPropertySink != null) {
-      jobPropertySink.accept(
-          InputFormatConfig.serverSideScanPlanningKey(resolvedCatalogName), Boolean.TRUE.toString());
-
-      String sessionDefaultCatalog =
-          MetastoreConf.getVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT);
-      if (StringUtils.isNotBlank(sessionDefaultCatalog)) {
-        jobPropertySink.accept(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), sessionDefaultCatalog);
-      }
+    String sessionDefaultCatalog = MetastoreConf.getVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT);
+    if (StringUtils.isNotBlank(sessionDefaultCatalog)) {
+      jobPropertySink.accept(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), sessionDefaultCatalog);
     }
-
-    String catalogPrefix =
-        IcebergCatalogProperties.CATALOG_CONFIG_PREFIX + resolvedCatalogName + ".";
-    sessionConf.forEach(
-        entry -> {
-          if (!entry.getKey().startsWith(catalogPrefix)) {
-            return;
-          }
-          String catalogPropertySuffix = entry.getKey().substring(catalogPrefix.length());
-          if (isSecretCatalogConfigKey(entry.getKey(), catalogPropertySuffix, sessionConf)) {
-            if (jobSecretSink != null) {
-              jobSecretSink.accept(entry.getKey(), entry.getValue());
-            }
-          } else if (jobPropertySink != null) {
-            jobPropertySink.accept(entry.getKey(), entry.getValue());
-          }
-        });
-  }
-
-  static boolean isSecretCatalogConfigKey(
-      String fullConfigKey, String catalogPropertySuffix, Configuration sessionConf) {
-    if (IcebergVendedCredentialUtil.isSecretKey(fullConfigKey, sessionConf)) {
-      return true;
-    }
-    return isSecretCatalogPropertySuffix(catalogPropertySuffix);
-  }
-
-  private static boolean isSecretCatalogPropertySuffix(String catalogPropertySuffix) {
-    if (StringUtils.isBlank(catalogPropertySuffix)) {
-      return false;
-    }
-    String lower = catalogPropertySuffix.toLowerCase(Locale.ROOT);
-    return lower.contains("secret") || lower.contains("token") || lower.contains("password") ||
-        lower.contains("credential") || lower.contains("oauth");
   }
 }

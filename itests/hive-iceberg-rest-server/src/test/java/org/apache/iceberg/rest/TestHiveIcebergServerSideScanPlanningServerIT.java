@@ -22,10 +22,12 @@ package org.apache.iceberg.rest;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.Consumer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
+import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.iceberg.CatalogProperties;
 import org.apache.iceberg.CatalogUtil;
 import org.apache.hadoop.mapreduce.JobContext;
@@ -45,6 +47,7 @@ import org.apache.iceberg.mr.hive.RestCatalogScanPlanningUtil;
 import org.apache.iceberg.mr.InputFormatConfig;
 import org.apache.iceberg.mr.hive.HiveTableUtil;
 import org.apache.iceberg.mr.mapreduce.IcebergInputFormat;
+import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 import org.apache.iceberg.rest.requests.PlanTableScanRequest;
 import org.apache.iceberg.rest.responses.ErrorResponse;
 import org.apache.iceberg.rest.responses.LoadTableResponse;
@@ -161,9 +164,8 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
   @Test
   void propagatedJobConfReloadsRestTableFromCatalog() throws IOException {
     Table table = createTableWithData();
-    Configuration sessionConf = sessionConf();
     Configuration jobConf = executorJobConf(table);
-    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, CATALOG_NAME, jobConf);
+    propagateFromHs2(jobConf);
 
     ArgumentCaptor<HTTPRequest> requestCaptor = ArgumentCaptor.forClass(HTTPRequest.class);
     try (CloseableRestCatalog catalog = CloseableRestCatalog.load(jobConf, CATALOG_NAME)) {
@@ -190,9 +192,7 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     Table table = createTableWithData();
     long pinnedSnapshotId = table.currentSnapshot().snapshotId();
 
-    Configuration jobConf = executorJobConf(table);
-    jobConf.set(InputFormatConfig.TABLE_LOCATION, table.location());
-    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf(), CATALOG_NAME, jobConf);
+    Configuration jobConf = propagatedJobConf(table);
 
     DataFile fileB =
         DataFiles.builder(SPEC)
@@ -310,8 +310,25 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
   private Configuration propagatedJobConf(Table table) throws IOException {
     Configuration jobConf = executorJobConf(table);
     jobConf.set(InputFormatConfig.TABLE_LOCATION, table.location());
-    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf(), CATALOG_NAME, jobConf);
+    propagateFromHs2(jobConf);
     return jobConf;
+  }
+
+  /**
+   * Mimics what split generation in the AM sees: the marker from job properties, and the catalog
+   * properties from job secrets, which {@code HiveInputFormat#addSplitsForGroup} copies into the conf.
+   */
+  private void propagateFromHs2(Configuration jobConf) {
+    Configuration sessionConf = sessionConf();
+    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, CATALOG_NAME, jobConf);
+
+    TableDesc tableDesc = new TableDesc();
+    Properties tableProps = new Properties();
+    tableProps.setProperty(InputFormatConfig.CATALOG_NAME, CATALOG_NAME);
+    tableDesc.setProperties(tableProps);
+    Map<String, String> jobSecrets = Maps.newHashMap();
+    RestCatalogScanPlanningUtil.propagateInputJobCredentials(tableDesc, jobSecrets, sessionConf);
+    jobSecrets.forEach(jobConf::set);
   }
 
   private void appendFileB() {

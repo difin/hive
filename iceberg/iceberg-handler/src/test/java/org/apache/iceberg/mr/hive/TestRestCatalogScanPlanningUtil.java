@@ -27,7 +27,6 @@ import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.hadoop.hive.ql.plan.TableDesc;
 import org.apache.iceberg.CatalogUtil;
 import org.apache.iceberg.hive.IcebergCatalogProperties;
-import org.apache.iceberg.hive.rest.catalog.RestCatalogAccessDelegation;
 import org.apache.iceberg.mr.InputFormatConfig;
 import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 import org.apache.iceberg.rest.RESTCatalogProperties;
@@ -120,37 +119,25 @@ public class TestRestCatalogScanPlanningUtil {
   }
 
   /**
-   * When propagation is enabled, non-secret {@code iceberg.catalog.<catalog>.*} entries from the HS2
-   * session are copied into Tez/MR job properties; unrelated conf keys are not.
+   * Plain job properties and the job conf only get the server-side planning marker and the session
+   * default catalog; no {@code iceberg.catalog.<catalog>.*} entry is copied there.
    */
   @Test
-  void propagateCatalogPropertiesToJobCopiesRestCatalogSettings() {
-    Configuration sessionConf = new Configuration();
-    sessionConf.set(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE),
-        CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
-    sessionConf.set(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181");
-    RestCatalogScanPlanningUtil.setScanPlanningMode(sessionConf, "ice01", "server");
-    enableHiveServerMode(sessionConf);
-    sessionConf.set("unrelated.key", "skip");
+  void propagateCatalogPropertiesToJobWritesOnlyMarkerAndDefaultCatalog() {
+    Configuration sessionConf = restSessionConf();
+    MetastoreConf.setVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT, "ice01");
 
     Map<String, String> jobProperties = Maps.newHashMap();
     RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, "ice01", jobProperties);
+    assertThat(jobProperties).containsOnly(
+        Map.entry(InputFormatConfig.serverSideScanPlanningKey("ice01"), "true"),
+        Map.entry(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname(), "ice01"));
 
-    assertThat(jobProperties)
-        .containsEntry(
-            IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE),
-            CatalogUtil.ICEBERG_CATALOG_TYPE_REST)
-        .containsEntry(
-            IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181")
-        .containsEntry(
-            IcebergCatalogProperties.catalogPropertyConfigKey(
-                "ice01", RESTCatalogProperties.SCAN_PLANNING_MODE),
-            "server")
-        .containsEntry(InputFormatConfig.serverSideScanPlanningKey("ice01"), "true")
-        .doesNotContainKey(HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED.varname)
-        .doesNotContainKey("unrelated.key");
+    Configuration jobConf = new Configuration(false);
+    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, null, jobConf);
+    assertThat(jobConf.getBoolean(InputFormatConfig.serverSideScanPlanningKey("ice01"), false)).isTrue();
+    assertThat(jobConf.get(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname())).isEqualTo("ice01");
+    assertThat(jobConf.getPropsWithPrefix(IcebergCatalogProperties.CATALOG_CONFIG_PREFIX)).isEmpty();
   }
 
   /**
@@ -159,117 +146,53 @@ public class TestRestCatalogScanPlanningUtil {
    */
   @Test
   void propagateCatalogPropertiesToJobOverwritesExistingValues() {
-    Configuration sessionConf = new Configuration();
-    sessionConf.set(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE),
-        CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
-    String uriKey = IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri");
-    sessionConf.set(uriKey, "http://new:8181");
-    RestCatalogScanPlanningUtil.setScanPlanningMode(sessionConf, "ice01", "server");
-    enableHiveServerMode(sessionConf);
+    Configuration sessionConf = restSessionConf();
+    MetastoreConf.setVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT, "ice01");
+    String defaultCatalogKey = MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname();
 
     Map<String, String> jobProperties = Maps.newHashMap();
-    jobProperties.put(uriKey, "http://old:8181");
+    jobProperties.put(defaultCatalogKey, "old");
     RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, "ice01", jobProperties);
-    assertThat(jobProperties).containsEntry(uriKey, "http://new:8181");
+    assertThat(jobProperties).containsEntry(defaultCatalogKey, "ice01");
 
     Configuration jobConf = new Configuration(false);
-    jobConf.set(uriKey, "http://old:8181");
+    jobConf.set(defaultCatalogKey, "old");
     RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, "ice01", jobConf);
-    assertThat(jobConf.get(uriKey)).isEqualTo("http://new:8181");
+    assertThat(jobConf.get(defaultCatalogKey)).isEqualTo("ice01");
   }
 
   /**
-   * Same as {@link #propagateCatalogPropertiesToJobCopiesRestCatalogSettings()} for the
-   * {@link Configuration} overload used by {@code HiveIcebergStorageHandler#configureJobConf}.
+   * Every {@code iceberg.catalog.<catalog>.*} entry of the table's catalog goes to job secrets
+   * (HIVE-20651), whatever its name, so custom auth properties such as {@code header.Authorization}
+   * are never exposed in plain job properties. Other catalogs and unrelated keys are not copied.
    */
   @Test
-  void propagateCatalogPropertiesToJobConfigurationCopiesRestCatalogSettings() {
-    Configuration sessionConf = new Configuration();
-    MetastoreConf.setVar(sessionConf, MetastoreConf.ConfVars.CATALOG_DEFAULT, "ice01");
-    sessionConf.set(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE),
-        CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
-    sessionConf.set(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181");
-    RestCatalogScanPlanningUtil.setScanPlanningMode(sessionConf, "ice01", "server");
-    enableHiveServerMode(sessionConf);
-
-    Configuration jobConf = new Configuration();
-    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, null, jobConf);
-
-    assertThat(jobConf.get(MetastoreConf.ConfVars.CATALOG_DEFAULT.getVarname())).isEqualTo("ice01");
-    assertThat(jobConf.get(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE)))
-        .isEqualTo(CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
-    assertThat(jobConf.get(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri")))
-        .isEqualTo("http://localhost:8181");
-    assertThat(jobConf.get(
-            IcebergCatalogProperties.catalogPropertyConfigKey(
-                "ice01", RESTCatalogProperties.SCAN_PLANNING_MODE)))
-        .isEqualTo("server");
-    assertThat(jobConf.getBoolean(InputFormatConfig.serverSideScanPlanningKey("ice01"), false)).isTrue();
-  }
-
-  /**
-   * Negative path: REST catalog settings are not copied when {@code scan-planning-mode} is not
-   * {@code server}, so executors keep using the serialized table snapshot for split generation.
-   */
-  /**
-   * OAuth / credential catalog settings go to job secrets ({@code configureInputJobCredentials}),
-   * not plain job properties — same channel as vended storage credentials (HIVE-20651).
-   */
-  @Test
-  void propagateInputJobCredentialsRoutesCredentialAndOAuthToJobSecrets() {
-    Configuration sessionConf = new Configuration();
-    sessionConf.set(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE),
-        CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
-    sessionConf.set(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181");
-    sessionConf.set(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "oauth2-client-secret"),
-        "oauth-secret");
-    sessionConf.set(
-        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "credential"),
-        "catalog-credential");
-    sessionConf.set(
-        IcebergCatalogProperties.catalogPropertyConfigKey(
-            "ice01", RestCatalogAccessDelegation.ACCESS_DELEGATION_PROPERTY),
-        "vended-credentials");
-    RestCatalogScanPlanningUtil.setScanPlanningMode(sessionConf, "ice01", "server");
-    enableHiveServerMode(sessionConf);
+  void propagateInputJobCredentialsCopiesAllCatalogPropertiesToJobSecrets() {
+    Configuration sessionConf = restSessionConf();
+    String headerKey = IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "header.Authorization");
+    sessionConf.set(headerKey, "Bearer token");
+    sessionConf.set(IcebergCatalogProperties.catalogPropertyConfigKey("ice02", "uri"), "http://other:8181");
+    sessionConf.set("unrelated.key", "skip");
 
     TableDesc tableDesc = new TableDesc();
     Properties tableProps = new Properties();
     tableProps.setProperty(InputFormatConfig.CATALOG_NAME, "ice01");
     tableDesc.setProperties(tableProps);
 
-    Map<String, String> jobProperties = Maps.newHashMap();
     Map<String, String> jobSecrets = Maps.newHashMap();
-    RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, "ice01", jobProperties);
     RestCatalogScanPlanningUtil.propagateInputJobCredentials(tableDesc, jobSecrets, sessionConf);
 
-    assertThat(jobProperties)
-        .containsEntry(
-            IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181")
-        .containsEntry(
-            IcebergCatalogProperties.catalogPropertyConfigKey(
-                "ice01", RestCatalogAccessDelegation.ACCESS_DELEGATION_PROPERTY),
-            "vended-credentials")
-        .doesNotContainKey(
-            IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "oauth2-client-secret"))
-        .doesNotContainKey(IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "credential"));
     assertThat(jobSecrets)
+        .containsEntry(headerKey, "Bearer token")
+        .containsEntry(IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181")
         .containsEntry(
-            IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "oauth2-client-secret"),
-            "oauth-secret")
+            IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE),
+            CatalogUtil.ICEBERG_CATALOG_TYPE_REST)
         .containsEntry(
-            IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "credential"),
-            "catalog-credential")
-        .doesNotContainKey(
-            IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"));
+            IcebergCatalogProperties.catalogPropertyConfigKey("ice01", RESTCatalogProperties.SCAN_PLANNING_MODE),
+            "server")
+        .doesNotContainKey(IcebergCatalogProperties.catalogPropertyConfigKey("ice02", "uri"))
+        .doesNotContainKey("unrelated.key");
   }
 
   @Test
@@ -283,8 +206,27 @@ public class TestRestCatalogScanPlanningUtil {
 
     Map<String, String> jobProperties = Maps.newHashMap();
     RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(sessionConf, "ice01", jobProperties);
-
     assertThat(jobProperties).isEmpty();
+
+    TableDesc tableDesc = new TableDesc();
+    Properties tableProps = new Properties();
+    tableProps.setProperty(InputFormatConfig.CATALOG_NAME, "ice01");
+    tableDesc.setProperties(tableProps);
+    Map<String, String> jobSecrets = Maps.newHashMap();
+    RestCatalogScanPlanningUtil.propagateInputJobCredentials(tableDesc, jobSecrets, sessionConf);
+    assertThat(jobSecrets).isEmpty();
+  }
+
+  private static Configuration restSessionConf() {
+    Configuration sessionConf = new Configuration(false);
+    sessionConf.set(
+        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", CatalogUtil.ICEBERG_CATALOG_TYPE),
+        CatalogUtil.ICEBERG_CATALOG_TYPE_REST);
+    sessionConf.set(
+        IcebergCatalogProperties.catalogPropertyConfigKey("ice01", "uri"), "http://localhost:8181");
+    RestCatalogScanPlanningUtil.setScanPlanningMode(sessionConf, "ice01", "server");
+    enableHiveServerMode(sessionConf);
+    return sessionConf;
   }
 
   private static void enableHiveServerMode(Configuration conf) {
