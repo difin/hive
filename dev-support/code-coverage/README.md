@@ -89,7 +89,7 @@ def REPO_URL="https://github.infra.cloudera.com/CDH/hive.git"
 def GIT_BRANCH="cdw-master"
 def SONAR_URL="https://sonarqube.eng.cloudera.com/"
 def SONAR_PROJECT_KEY="hive-cdw-master"
-def SONAR_TOKEN="sqp_0d5969037235068019e973bcdc1973a440dcf637"
+def SONAR_TOKEN="<INSERT_YOUR_PERSONAL_SONAR_TOKEN_HERE>"
 ```
 
 ```
@@ -98,7 +98,7 @@ def REPO_URL="https://github.infra.cloudera.com/CDH/hive.git"
 def GIT_BRANCH="cdh_main"
 def SONAR_URL="https://sonarqube.eng.cloudera.com/"
 def SONAR_PROJECT_KEY="hive-cdh-main"
-def SONAR_TOKEN="sqp_a8ec6a22144fae77a36b502009d4244a241b0420"
+def SONAR_TOKEN="<INSERT_YOUR_PERSONAL_SONAR_TOKEN_HERE>"
 ```
 
 Run the build
