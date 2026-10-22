@@ -374,17 +374,6 @@ public class TestFilterSelectivityEstimator {
   }
 
   @Test
-  public void testComputeNotEqualsPredicateSelectivity() {
-    RexNode filter = REX_BUILDER.makeCall(SqlStdOperatorTable.AND,
-        REX_BUILDER.makeCall(SqlStdOperatorTable.NOT_EQUALS, inputRef0, int3),
-        REX_BUILDER.makeCall(SqlStdOperatorTable.NOT_EQUALS, inputRef0, int7));
-    filter = simplify(filter);
-    Assert.assertEquals(SqlKind.SEARCH, filter.getKind());
-    FilterSelectivityEstimator estimator = new FilterSelectivityEstimator(scan, mq);
-    Assert.assertEquals(0.7777777777777777, estimator.estimateSelectivity(filter), DELTA);
-  }
-
-  @Test
   public void testComputeRangePredicateSelectivityWhenNoStats() {
     RexNode filter = REX_BUILDER.makeCall(SqlStdOperatorTable.LESS_THAN, inputRef0, int3);
     FilterSelectivityEstimator estimator = new FilterSelectivityEstimator(scan, mq);

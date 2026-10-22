@@ -63,7 +63,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 
 
 public class ExprNodeDescUtils {
@@ -243,21 +242,6 @@ public class ExprNodeDescUtils {
   }
 
   /**
-   * Creates a disjunction (OR) of the given expressions flattening nested disjunctions if possible.
-   * <pre>
-   * Input: AND(A, B), C, OR(D, OR(E, F))
-   * Output: OR(AND(A, B), C, D, E, F)
-   * </pre>
-   */
-  public static ExprNodeGenericFuncDesc or(List<ExprNodeDesc> exps) {
-    List<ExprNodeDesc> flatExps = new ArrayList<>();
-    for (ExprNodeDesc e : exps) {
-      split(e, flatExps, FunctionRegistry::isOpOr);
-    }
-    return new ExprNodeGenericFuncDesc(TypeInfoFactory.booleanTypeInfo, new GenericUDFOPOr(), "or", flatExps);
-  }
-
-  /**
    * bind two predicates by AND op
    */
   public static ExprNodeGenericFuncDesc mergePredicates(ExprNodeDesc prev, ExprNodeDesc next) {
@@ -302,17 +286,9 @@ public class ExprNodeDescUtils {
    * split predicates by AND op
    */
   public static List<ExprNodeDesc> split(ExprNodeDesc current, List<ExprNodeDesc> splitted) {
-    return split(current, splitted, FunctionRegistry::isOpAnd);
-  }
-
-  /**
-   * split predicates by a certain condition
-   */
-  private static List<ExprNodeDesc> split(ExprNodeDesc current, List<ExprNodeDesc> splitted,
-      Predicate<ExprNodeDesc> condition) {
-    if (condition.test(current)) {
+    if (FunctionRegistry.isOpAnd(current)) {
       for (ExprNodeDesc child : current.getChildren()) {
-        split(child, splitted, condition);
+        split(child, splitted);
       }
       return splitted;
     }
