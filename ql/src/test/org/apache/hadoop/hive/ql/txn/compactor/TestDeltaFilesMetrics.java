@@ -64,7 +64,6 @@ public class TestDeltaFilesMetrics extends CompactorTest  {
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.METRICS_ENABLED, true);
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.METASTORE_ACIDMETRICS_EXT_ON, true);
     MetastoreConf.setBoolVar(conf, MetastoreConf.ConfVars.COMPACTOR_INITIATOR_ON, true);
-    HiveConf.setBoolVar(conf, HiveConf.ConfVars.HIVE_COMPACTOR_GATHER_STATS, false);
   }
 
   @Override
