@@ -830,9 +830,14 @@ public class TestHMSCatalog extends HMSTestBase {
     Schema schema = getTestSchema();
     String tableName = "tbl_creds_in_load_" + Integer.toHexString(RND.nextInt(65536));
     TableIdentifier tableIdent = TableIdentifier.of(DB_NAME, tableName);
+    Map<String, String> token = ImmutableMap.of("s3.access-key-id", "test-access-key");
+    DataSharing dataSharing = mock(DataSharing.class);
+    when(dataSharing.getAccessTokenWithPolicy(anyString(), anyString())).thenReturn(token);
+    DataSharing previousDataSharing = HMSCatalogFactory.getDataSharing();
+    HMSCatalogFactory.setDataSharing(dataSharing);
 
     try {
-      catalog.createTable(tableIdent, schema);
+      Table table = catalog.createTable(tableIdent, schema);
 
       String jwt = generateJWT();
       URL loadTableUrl =
@@ -861,12 +866,18 @@ public class TestHMSCatalog extends HMSTestBase {
       if (status.intValue() == 200) {
         assertThat(responseMap).containsKey("storage-credentials");
         assertThat(responseMap.get("storage-credentials")).isInstanceOf(List.class);
+        List<Map<String, Object>> credentials =
+            (List<Map<String, Object>>) responseMap.get("storage-credentials");
+        assertThat(credentials).hasSize(1);
+        assertThat(credentials.get(0)).containsEntry("prefix", table.location());
+        assertThat(credentials.get(0)).containsEntry("config", token);
       } else {
         // Security wrappers use 404/NoSuchTable for inaccessible tables.
         assertThat(status.intValue()).isEqualTo(404);
         assertThat(responseMap).containsKey("error");
       }
     } finally {
+      HMSCatalogFactory.setDataSharing(previousDataSharing);
       catalog.dropTable(tableIdent);
     }
   }
