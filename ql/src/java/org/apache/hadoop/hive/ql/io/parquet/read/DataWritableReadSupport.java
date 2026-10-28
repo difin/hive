@@ -454,7 +454,7 @@ public class DataWritableReadSupport extends ReadSupport<ArrayWritable> {
     List<Integer> indexColumnsWanted = ColumnProjectionUtils.getReadColumnIDs(configuration);
     //TODO Duplicated code for init method since vectorization reader path doesn't support Nested
     // column pruning so far. See HIVE-15156
-    if (!ColumnProjectionUtils.isReadAllColumns(configuration) && !indexColumnsWanted.isEmpty()) {
+    if (!ColumnProjectionUtils.isReadAllColumns(configuration)) {
       return DataWritableReadSupport
         .getSchemaByIndex(tableSchema, columnNamesList, indexColumnsWanted);
     } else {
@@ -487,7 +487,7 @@ public class DataWritableReadSupport extends ReadSupport<ArrayWritable> {
     Configuration configuration) {
     Set<String> groupPaths = ColumnProjectionUtils.getNestedColumnPaths(configuration);
     List<Integer> indexColumnsWanted = ColumnProjectionUtils.getReadColumnIDs(configuration);
-    if (!ColumnProjectionUtils.isReadAllColumns(configuration) && !indexColumnsWanted.isEmpty()) {
+    if (!ColumnProjectionUtils.isReadAllColumns(configuration)) {
       return getProjectedSchema(fileSchema, columnNamesList, indexColumnsWanted, groupPaths);
     } else {
       return fileSchema;
