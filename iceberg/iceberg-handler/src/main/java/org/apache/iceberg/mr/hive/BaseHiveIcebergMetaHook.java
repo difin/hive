@@ -486,6 +486,7 @@ public class BaseHiveIcebergMetaHook implements HiveMetaHook {
         validateUnknownType(columnPath, mapType.valueType());
       }
       default -> {
+        // UNKNOWN and primitive types have no nested types to validate.
       }
     }
   }

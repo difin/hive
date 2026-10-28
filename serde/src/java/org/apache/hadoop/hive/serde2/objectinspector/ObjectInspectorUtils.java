@@ -502,11 +502,7 @@ public final class ObjectInspectorUtils {
       break;
     }
     case UNKNOWN: {
-      if (o != null) {
-        throw new IllegalArgumentException("UNKNOWN type columns only accept NULL values");
-      }
-      result = null;
-      break;
+      throw new IllegalArgumentException("UNKNOWN type columns only accept NULL values");
     }
     default: {
       throw new RuntimeException("Unknown ObjectInspector category!");
@@ -1510,10 +1506,10 @@ public final class ObjectInspectorUtils {
             fieldObjectInspectors,
             (List<?>)writableValue);
       case UNKNOWN:
-        if (value != null) {
-          throw new IllegalArgumentException("UNKNOWN type columns only accept NULL values");
-        }
-        return UnknownConstantObjectInspector.get();
+          if (value != null) {
+            throw new IllegalArgumentException("UNKNOWN type columns only accept NULL values");
+          }
+          return UnknownConstantObjectInspector.get();
       default:
        throw new IllegalArgumentException(
            writableOI.getCategory() + " not yet supported for constant OI");
