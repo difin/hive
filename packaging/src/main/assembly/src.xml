@@ -68,6 +68,7 @@
         <include>dev-support/**/*</include>
         <include>druid-handler/**/*</include>
         <include>iceberg-catalog/**/*</include>
+        <include>iceberg/iceberg-rest-catalog-client/**/*</include>
         <include>iceberg-handler/**/*</include>
         <include>jdbc-handler/**/*</include>
         <include>kafka-handler/**/*</include>
