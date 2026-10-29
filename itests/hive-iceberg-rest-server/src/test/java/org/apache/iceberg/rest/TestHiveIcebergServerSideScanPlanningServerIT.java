@@ -45,6 +45,7 @@ import org.apache.iceberg.hive.IcebergCatalogProperties;
 import org.apache.iceberg.mr.Catalogs;
 import org.apache.iceberg.mr.hive.RestCatalogScanPlanningUtil;
 import org.apache.iceberg.mr.InputFormatConfig;
+import org.apache.iceberg.mr.hive.HiveIcebergStorageHandler;
 import org.apache.iceberg.mr.hive.HiveTableUtil;
 import org.apache.iceberg.mr.mapreduce.IcebergInputFormat;
 import org.apache.iceberg.relocated.com.google.common.collect.Maps;
@@ -210,7 +211,7 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     HiveConf.setBoolVar(sessionConf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED, false);
 
     assertThat(table).isInstanceOf(RESTTable.class);
-    assertThat(catalogSecrets(sessionConf, table)).isEmpty();
+    assertThat(catalogSecrets(sessionConf)).isEmpty();
     assertThat(planRequestsDuringGetSplits(propagatedJobConf(sessionConf, table))).isEmpty();
   }
 
@@ -231,7 +232,7 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     sessionConf.set("unrelated.key", "skip");
 
     assertThat(table).isInstanceOf(RESTTable.class);
-    assertThat(catalogSecrets(sessionConf, table))
+    assertThat(catalogSecrets(sessionConf))
         .containsEntry(headerKey, "Bearer token")
         .containsEntry(
             IcebergCatalogProperties.catalogPropertyConfigKey(CATALOG_NAME, CatalogProperties.URI),
@@ -392,16 +393,20 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     RestCatalogScanPlanningUtil.propagateCatalogPropertiesToJob(
         sessionConf, table, TABLE_ID.toString(), jobProperties);
     jobProperties.forEach(jobConf::set);
-    catalogSecrets(sessionConf, table).forEach(jobConf::set);
+    catalogSecrets(sessionConf).forEach(jobConf::set);
   }
 
-  private static Map<String, String> catalogSecrets(Configuration sessionConf, Table table) {
+  /** Job secrets HS2 builds for the table in {@code HiveIcebergStorageHandler#configureInputJobCredentials}. */
+  private static Map<String, String> catalogSecrets(Configuration sessionConf) {
     TableDesc tableDesc = new TableDesc();
     Properties tableProps = new Properties();
     tableProps.setProperty(InputFormatConfig.CATALOG_NAME, CATALOG_NAME);
+    tableProps.setProperty(Catalogs.NAME, TABLE_ID.toString());
     tableDesc.setProperties(tableProps);
+    HiveIcebergStorageHandler storageHandler = new HiveIcebergStorageHandler();
+    storageHandler.setConf(sessionConf);
     Map<String, String> jobSecrets = Maps.newHashMap();
-    RestCatalogScanPlanningUtil.propagateCatalogSecretsToJob(table, tableDesc, jobSecrets, sessionConf);
+    storageHandler.configureInputJobCredentials(tableDesc, jobSecrets);
     return jobSecrets;
   }
 
