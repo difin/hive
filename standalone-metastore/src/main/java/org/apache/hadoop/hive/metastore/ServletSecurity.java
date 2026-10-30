@@ -29,9 +29,11 @@ import org.apache.hadoop.hive.metastore.utils.SecurityUtils;
 import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.pac4j.core.context.JEEContext;
+import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.TokenCredentials;
 import org.pac4j.core.credentials.extractor.BearerAuthExtractor;
+import org.pac4j.jee.context.JEEContext;
+import org.pac4j.jee.context.session.JEESessionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -327,9 +329,9 @@ public class ServletSecurity {
   private String extractBearerToken(HttpServletRequest request,
                                     HttpServletResponse response) {
     BearerAuthExtractor extractor = new BearerAuthExtractor();
-    Optional<TokenCredentials> tokenCredentials = extractor.extract(new JEEContext(
-        request, response));
-    return tokenCredentials.map(TokenCredentials::getToken).orElse(null);
+    Optional<Credentials> tokenCredentials = extractor.extract(new JEEContext(
+        request, response), JEESessionStore.INSTANCE);
+    return tokenCredentials.map(c -> ((TokenCredentials) c).getToken()).orElse(null);
   }
 
   /**

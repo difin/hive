@@ -221,7 +221,7 @@
     </dependency>
     <dependency>
       <groupId>org.pac4j</groupId>
-      <artifactId>pac4j-saml-opensamlv3</artifactId>
+      <artifactId>pac4j-saml</artifactId>
       <exclusions>
         <exclusion>
           <groupId>org.bouncycastle</groupId>
@@ -286,6 +286,11 @@
           <artifactId>xmlsec</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <!-- pac4j 5.x: JEEContext/JEESessionStore live in pac4j-javaee -->
+      <groupId>org.pac4j</groupId>
+      <artifactId>pac4j-javaee</artifactId>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
