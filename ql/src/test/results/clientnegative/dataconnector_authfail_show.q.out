@@ -1,0 +1,21 @@
+PREHOOK: query: CREATE CONNECTOR IF NOT EXISTS mysql_test
+TYPE 'mysql'
+
+URL 'jdbc:mysql://nightly7x-us-ja-1.nightly7x-us-ja.root.hwx.site:3306/hive1?useUnicode=true&amp;characterEncoding=UTF-8'
+COMMENT 'test connector'
+WITH DCPROPERTIES (
+"hive.sql.dbcp.username"="hive1",
+"hive.sql.dbcp.password"="hive1")
+PREHOOK: type: CREATEDATACONNECTOR
+PREHOOK: Output: connector:mysql_test
+POSTHOOK: query: CREATE CONNECTOR IF NOT EXISTS mysql_test
+TYPE 'mysql'
+
+URL 'jdbc:mysql://nightly7x-us-ja-1.nightly7x-us-ja.root.hwx.site:3306/hive1?useUnicode=true&amp;characterEncoding=UTF-8'
+COMMENT 'test connector'
+WITH DCPROPERTIES (
+"hive.sql.dbcp.username"="hive1",
+"hive.sql.dbcp.password"="hive1")
+POSTHOOK: type: CREATEDATACONNECTOR
+POSTHOOK: Output: connector:mysql_test
+FAILED: HiveAccessControlException Permission denied: Principal [name=hive_test_user, type=USER] does not have following privileges for operation SHOWDATACONNECTORS [ADMIN PRIVILEGE on INPUT, ADMIN PRIVILEGE on OUTPUT]
