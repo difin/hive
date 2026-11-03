@@ -641,7 +641,13 @@
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-core</artifactId>
-            <version>4.5.5</version>
+            <version>5.7.10</version>
+        </dependency>
+        <dependency>
+            <!-- pac4j 5.x: JEEContext moved from pac4j-core to pac4j-javaee -->
+            <groupId>org.pac4j</groupId>
+            <artifactId>pac4j-javaee</artifactId>
+            <version>5.7.10</version>
         </dependency>
         <dependency>
             <groupId>com.cloudera</groupId>
