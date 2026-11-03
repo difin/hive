@@ -68,6 +68,7 @@ public final class HiveMetaTool {
       task.setCommandLine(cl);
       task.execute();
     } catch (Exception e) {
+      e.printStackTrace(System.err);
       LOGGER.error("Exception occured", e);
     } finally {
       objectStore.shutdown();
