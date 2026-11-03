@@ -19,7 +19,7 @@
 package org.apache.hive.jdbc;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.common.classification.InterfaceAudience.LimitedPrivate;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hive.jdbc.logs.InPlaceUpdateStream;

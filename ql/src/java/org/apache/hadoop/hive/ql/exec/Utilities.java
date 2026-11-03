@@ -85,8 +85,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -879,8 +878,14 @@ public final class Utilities {
     suffixlength = Math.min(suffixlength, (max - 3) / 2);
     String rev = StringUtils.reverse(str);
 
-    // get the last few words
-    String suffix = WordUtils.abbreviate(rev, 0, suffixlength, StringUtils.EMPTY);
+    // get the last few words (word-boundary truncate; replaces lang2 WordUtils.abbreviate)
+    String suffix;
+    if (rev.length() <= suffixlength) {
+      suffix = rev;
+    } else {
+      int cut = rev.lastIndexOf(' ', suffixlength);
+      suffix = rev.substring(0, cut > 0 ? cut : suffixlength);
+    }
     suffix = StringUtils.reverse(suffix);
 
     // first few ..

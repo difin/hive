@@ -75,7 +75,7 @@ public class CacheUtils {
   }
 
   private static String buildKey(String... elements) {
-    return org.apache.commons.lang.StringUtils.join(elements, delimit);
+    return org.apache.commons.lang3.StringUtils.join(elements, delimit);
   }
 
   public static String[] splitDbName(String key) {

@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.common.JavaVersionUtils;
 import org.apache.hive.common.util.HiveStringUtils;
 import org.apache.tez.dag.api.OutputCommitterDescriptor;
