@@ -206,7 +206,7 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
 
   /** With the Hive kill switch off, a table the server plans is still planned locally by Hive. */
   @Test
-  void hiveSwitchOffKeepsLocalPlanningForServerPlannedTable() throws IOException {
+  void hiveSwitchOffKeepsLocalPlanningForServerPlannedTable() {
     Table table = createTableWithData();
     Configuration sessionConf = sessionConf();
     HiveConf.setBoolVar(sessionConf, HiveConf.ConfVars.HIVE_ICEBERG_REST_SERVER_SIDE_SCAN_PLANNING_ENABLED, false);
@@ -373,7 +373,7 @@ class TestHiveIcebergServerSideScanPlanningServerIT extends TestBaseWithRESTServ
     return (RESTCatalog) Catalogs.loadCatalog(conf, CATALOG_NAME).orElseThrow();
   }
 
-  private Configuration propagatedJobConf(Table table) throws IOException {
+  private Configuration propagatedJobConf(Table table) {
     return propagatedJobConf(sessionConf(), table);
   }
 
