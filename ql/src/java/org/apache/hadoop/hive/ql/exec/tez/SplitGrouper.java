@@ -29,8 +29,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.common.collect.Maps;
 import org.apache.hadoop.hive.ql.io.AcidUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,10 +64,15 @@ import com.google.common.collect.Multimap;
  * also enforces restrictions around schema, file format and bucketing.
  */
 public class SplitGrouper {
+
   private static final Logger LOG = LoggerFactory.getLogger(SplitGrouper.class);
 
+  // TODO This needs to be looked at. Map of Map to Map... Made concurrent for now since split generation
+  // can happen in parallel.
+  private static final Map<Map<Path, PartitionDesc>, Map<Path, PartitionDesc>> cache =
+      new ConcurrentHashMap<>();
+
   private final TezMapredSplitsGrouper tezGrouper = new TezMapredSplitsGrouper();
-  private final Map<Path, Path> cache = Maps.newHashMap();
 
   /**
    * group splits for each bucket separately - while evenly filling all the
@@ -84,7 +89,7 @@ public class SplitGrouper {
 
     // allocate map bucket id to grouped splits
     Multimap<Integer, InputSplit> bucketGroupedSplitMultimap =
-        ArrayListMultimap.create();
+        ArrayListMultimap.<Integer, InputSplit> create();
 
     // use the tez grouper to combine splits once per bucket
     for (int bucketId : bucketSplitMultimap.keySet()) {
@@ -124,8 +129,9 @@ public class SplitGrouper {
         String [] locations = split.getLocations();
         if (locations != null && locations.length > 0) {
           // Worthwhile only if more than 1 split, consistentGroupingEnabled and is a FileSplit
-          if (consistentLocations && locations.length > 1 && split instanceof FileSplit fileSplit) {
+          if (consistentLocations && locations.length > 1 && split instanceof FileSplit) {
             Arrays.sort(locations);
+            FileSplit fileSplit = (FileSplit) split;
             Path path = fileSplit.getPath();
             long startLocation = fileSplit.getStart();
             int hashCode = Objects.hash(path, startLocation);
@@ -139,8 +145,8 @@ public class SplitGrouper {
             locationHints.add(TaskLocationHint.createTaskLocationHint(locationSet, null));
           } else {
             locationHints.add(TaskLocationHint
-                .createTaskLocationHint(new LinkedHashSet<>(Arrays.asList(split
-                  .getLocations())), null));
+                .createTaskLocationHint(new LinkedHashSet<String>(Arrays.asList(split
+                    .getLocations())), null));
           }
         } else {
           locationHints.add(TaskLocationHint.createTaskLocationHint(null, null));
@@ -175,14 +181,15 @@ public class SplitGrouper {
     boolean isMinorCompaction = true;
     MapWork mapWork = populateMapWork(jobConf, inputName);
     // ArrayListMultimap is important here to retain the ordering for the splits.
-    Multimap<Integer, InputSplit> schemaGroupedSplitMultiMap = ArrayListMultimap.create();
+    Multimap<Integer, InputSplit> schemaGroupedSplitMultiMap = ArrayListMultimap.<Integer, InputSplit> create();
     if (HiveConf.getVar(jobConf, HiveConf.ConfVars.SPLIT_GROUPING_MODE).equalsIgnoreCase("compactor")) {
       List<Path> paths = Utilities.getInputPathsTez(jobConf, mapWork);
       for (Path path : paths) {
         List<String> aliases = mapWork.getPathToAliases().get(path);
         if ((aliases != null) && (aliases.size() == 1)) {
           Operator<? extends OperatorDesc> op = mapWork.getAliasToWork().get(aliases.get(0));
-          if (op instanceof TableScanOperator tableScan) {
+          if ((op != null) && (op instanceof TableScanOperator)) {
+            TableScanOperator tableScan = (TableScanOperator) op;
             PartitionDesc partitionDesc = mapWork.getAliasToPartnInfo().get(aliases.get(0));
             isMinorCompaction &= AcidUtils.isCompactionTable(partitionDesc.getTableDesc().getProperties());
             if (!tableScan.getConf().isTranscationalTable() && !isMinorCompaction) {
@@ -245,7 +252,7 @@ public class SplitGrouper {
   Multimap<Integer, InputSplit> getCompactorSplitGroups(InputSplit[] rawSplits, Configuration conf,
       boolean isMinorCompaction) {
     // Note: For our case, this multimap will essentially contain one value (one TezGroupedSplit) per key 
-    Multimap<Integer, InputSplit> bucketSplitMultiMap = ArrayListMultimap.create();
+    Multimap<Integer, InputSplit> bucketSplitMultiMap = ArrayListMultimap.<Integer, InputSplit> create();
     HiveInputFormat.HiveInputSplit[] splits = new HiveInputFormat.HiveInputSplit[rawSplits.length];
     int i = 0;
     for (InputSplit is : rawSplits) {
@@ -330,10 +337,10 @@ public class SplitGrouper {
                                                     Map<Integer, Collection<InputSplit>> bucketSplitMap) {
 
     // mapping of bucket id to size of all splits in bucket in bytes
-    Map<Integer, Long> bucketSizeMap = new HashMap<>();
+    Map<Integer, Long> bucketSizeMap = new HashMap<Integer, Long>();
 
     // mapping of bucket id to number of required tasks to run
-    Map<Integer, Integer> bucketTaskMap = new HashMap<>();
+    Map<Integer, Integer> bucketTaskMap = new HashMap<Integer, Integer>();
 
     // TODO HIVE-12255. Make use of SplitSizeEstimator.
     // The actual task computation needs to be looked at as well.
@@ -347,11 +354,12 @@ public class SplitGrouper {
         // the case of SMB join. So in this case, we can do an early exit by not doing the
         // calculation for bucketSizeMap. Each bucket will assume it can fill availableSlots * waves
         // (preset to 0.5) for SMB join.
-        if (!(s instanceof FileSplit fsplit)) {
+        if (!(s instanceof FileSplit)) {
           bucketTaskMap.put(bucketId, (int) (availableSlots * waves));
           earlyExit = true;
           continue;
         }
+        FileSplit fsplit = (FileSplit) s;
         size += fsplit.getLength();
         totalSize += fsplit.getLength();
       }
@@ -397,7 +405,7 @@ public class SplitGrouper {
   }
 
   private boolean schemaEvolved(InputSplit s, InputSplit prevSplit, boolean groupAcrossFiles,
-                                     MapWork work) throws IOException {
+                                       MapWork work) throws IOException {
     boolean retval = false;
     Path path = ((FileSplit) s).getPath();
     PartitionDesc pd = HiveFileFormatUtils.getFromPathRecursively(
@@ -418,6 +426,7 @@ public class SplitGrouper {
       previousDeserializerClass = prevPD.getDeserializerClassName();
       previousInputFormatClass = prevPD.getInputFileFormatClass();
     }
+
     if ((currentInputFormatClass != previousInputFormatClass)
         || (!currentDeserializerClass.equals(previousDeserializerClass))) {
       retval = true;
