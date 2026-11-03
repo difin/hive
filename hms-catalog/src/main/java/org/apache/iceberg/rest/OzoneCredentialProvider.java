@@ -61,10 +61,13 @@ public class OzoneCredentialProvider extends DataSharing {
   // Config key for the Ozone S3 Gateway endpoint
   public static final String CONFVAR_OZONE_S3_GATEWAY = "hive.metastore.catalog.ozone.s3.gateway";
   public static final String CONFVAR_OZONE_REMOTE_SIGNING = "hive.metastore.catalog.ozone.s3.remote.signing";
+  public static final String CONFVAR_OZONE_S3_PATH_STYLE_ACCESS =
+      "hive.metastore.catalog.ozone.s3.path.style.access";
 
   private final String accessTokenPath;
   private final String s3GatewayEndpoint;
   private final String remoteSigningEnabled;
+  private final boolean pathStyleAccess;
 
   public OzoneCredentialProvider(Configuration conf) throws IOException {
     super(conf);
@@ -72,6 +75,7 @@ public class OzoneCredentialProvider extends DataSharing {
     accessTokenPath = composable(apath);
     s3GatewayEndpoint = conf.get(CONFVAR_OZONE_S3_GATEWAY, "");
     remoteSigningEnabled = conf.get(CONFVAR_OZONE_REMOTE_SIGNING, "false");
+    pathStyleAccess = conf.getBoolean(CONFVAR_OZONE_S3_PATH_STYLE_ACCESS, true);
     LOG.info("OzoneCredentialProvider initialized. Access path: {}, S3 gateway: {}",
         accessTokenPath, s3GatewayEndpoint);
   }
@@ -109,8 +113,7 @@ public class OzoneCredentialProvider extends DataSharing {
           // Add Ozone S3 Gateway endpoint so client knows where to connect
           if (s3GatewayEndpoint != null && !s3GatewayEndpoint.isEmpty()) {
             tokenRes.put(S3_ENDPOINT, s3GatewayEndpoint);
-            // Ozone S3 Gateway requires path-style access (bucket in path, not subdomain)
-            tokenRes.put(S3_PATH_STYLE_ACCESS, "true");
+            tokenRes.put(S3_PATH_STYLE_ACCESS, Boolean.toString(pathStyleAccess));
           }
           tokenRes.put(S3_REMOTE_SIGNING_ENABLED, remoteSigningEnabled);
         }

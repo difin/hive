@@ -1462,6 +1462,18 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Force transitive org.eclipse.angus mail stack off the vulnerable 1.0.0
+           line. angus-mail and angus-activation release on independent tracks. -->
+      <dependency>
+        <groupId>org.eclipse.angus</groupId>
+        <artifactId>angus-mail</artifactId>
+        <version>2.0.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.angus</groupId>
+        <artifactId>angus-activation</artifactId>
+        <version>2.0.3</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
