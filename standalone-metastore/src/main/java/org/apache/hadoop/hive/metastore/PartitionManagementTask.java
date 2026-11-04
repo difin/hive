@@ -88,7 +88,6 @@ public class PartitionManagementTask implements MetastoreTaskThread {
   public void run() {
     if (lock.tryLock()) {
       skippedAttempts = 0;
-      String qualifiedTableName = null;
       IMetaStoreClient msc = null;
       try {
         msc = new HiveMetaStoreClient(conf);
@@ -124,12 +123,12 @@ public class PartitionManagementTask implements MetastoreTaskThread {
           // this always runs in 'sync' mode where partitions can be added and dropped
           MsckInfo msckInfo = new MsckInfo(table.getCat(), table.getDb(), table.getTable(),
               null, null, true, true, true, -1);
-          executorService.submit(new MsckThread(msckInfo, msckConf, qualifiedTableName, countDownLatch));
+          executorService.submit(new MsckThread(msckInfo, msckConf, table.toString(), countDownLatch));
         }
         countDownLatch.await();
         executorService.shutdownNow();
       } catch (Exception e) {
-        LOG.error("Exception while running partition discovery task for table: " + qualifiedTableName, e);
+        LOG.error("Exception while running partition discovery task", e);
       } finally {
         if (msc != null) {
           msc.close();
