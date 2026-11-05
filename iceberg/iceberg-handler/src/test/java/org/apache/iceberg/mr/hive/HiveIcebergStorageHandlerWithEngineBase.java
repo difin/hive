@@ -35,6 +35,7 @@ import org.apache.iceberg.Table;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.hive.HiveVersion;
 import org.apache.iceberg.mr.TestHelper;
+import org.apache.iceberg.mr.hive.test.concurrent.WithMockedStorageHandler;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
@@ -163,6 +164,9 @@ public abstract class HiveIcebergStorageHandlerWithEngineBase {
 
   @Rule
   public Timeout timeout = new Timeout(500_000, TimeUnit.MILLISECONDS);
+
+  @Rule
+  public WithMockedStorageHandler.Rule mockedStorageHandlerRule = new WithMockedStorageHandler.Rule();
 
   @BeforeClass
   public static void beforeClass() {
