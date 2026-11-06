@@ -26,4 +26,4 @@ PREHOOK: Output: default@ice_tbl
 POSTHOOK: query: grant select on table ice_tbl to user read_only_user
 POSTHOOK: type: GRANT_PRIVILEGE
 POSTHOOK: Output: default@ice_tbl
-FAILED: HiveAccessControlException Permission denied: Principal [name=read_only_user, type=USER] does not have following privileges for operation QUERY [[DELETE] on Object [type=TABLE_OR_VIEW, name=default.ice_tbl]]
+FAILED: HiveAccessControlException Permission denied: Principal [name=read_only_user, type=USER] does not have following privileges for operation QUERY [[DELETE] on Object [type=TABLE_OR_VIEW, name=hive.default.ice_tbl]]
