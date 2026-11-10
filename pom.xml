@@ -103,7 +103,7 @@
     <dropwizard-metrics-hadoop-metrics2-reporter.version>0.1.2</dropwizard-metrics-hadoop-metrics2-reporter.version>
     <esri.version>2.2.4</esri.version>
     <flatbuffers.version>1.9.0</flatbuffers.version>
-    <guava.version>32.1.2-jre</guava.version>
+    <guava.version>33.7.2-jre</guava.version>
     <groovy.version>2.4.21</groovy.version>
     <h2database.version>2.1.214</h2database.version>
     <hadoop.version>3.4.2.7.3.5.0-SNAPSHOT</hadoop.version>
@@ -137,7 +137,7 @@
     <joda.version>2.9.9</joda.version>
     <jodd.version>6.0.0</jodd.version>
     <json.version>1.8</json.version>
-    <junit.version>4.13.2</junit.version>
+    <junit.version>4.13.2.redhat-00001</junit.version>
     <junit.jupiter.version>5.11.2</junit.jupiter.version>
     <junit.vintage.version>5.11.2</junit.vintage.version>
     <kafka.version>3.9.2.7.3.5.0-SNAPSHOT</kafka.version>
@@ -200,7 +200,7 @@
     <validation-api.version>1.1.0.Final</validation-api.version>
     <aws-secretsmanager-caching.version>1.0.1</aws-secretsmanager-caching.version>
     <aws-java-sdk.version>1.12.797.cldr-b2</aws-java-sdk.version>
-    <iceberg.version>1.10.1.7.3.3.0-SNAPSHOT</iceberg.version>
+    <iceberg.version>1.10.1.7.3.5.0-SNAPSHOT</iceberg.version>
     <spring.version>5.3.46.cldr-b1</spring.version>
     <spring.ldap.version>3.3.8</spring.ldap.version>
     <!-- Static code analysis, code coverage -->
