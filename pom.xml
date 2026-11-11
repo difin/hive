@@ -202,6 +202,7 @@
     <iceberg.version>1.10.1.7.3.5.0-SNAPSHOT</iceberg.version>
     <spring.version>5.3.46.cldr-b1</spring.version>
     <spring.ldap.version>3.3.8</spring.ldap.version>
+    <micrometer.version>1.15.12</micrometer.version>
     <!-- Static code analysis, code coverage -->
     <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
     <sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
@@ -417,6 +418,13 @@
         <groupId>io.airlift</groupId>
         <artifactId>aircompressor</artifactId>
         <version>${aircompressor.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.micrometer</groupId>
+        <artifactId>micrometer-bom</artifactId>
+        <version>${micrometer.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>jakarta.jms</groupId>
