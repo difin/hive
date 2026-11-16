@@ -223,8 +223,27 @@
         </dependency>
         <dependency>
           <groupId>org.apache.hive</groupId>
+          <artifactId>hive-iceberg-rest-catalog-client</artifactId>
+          <version>${project.version}</version>
+          <exclusions>
+            <!-- shaded classes are already bundled inside hive-iceberg-handler -->
+            <exclusion>
+              <groupId>org.apache.hive</groupId>
+              <artifactId>hive-iceberg-shading</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.hive</groupId>
           <artifactId>hive-hms-catalog</artifactId>
           <version>${project.version}</version>
+          <exclusions>
+            <!-- shaded classes are already bundled inside hive-iceberg-handler -->
+            <exclusion>
+              <groupId>org.apache.hive</groupId>
+              <artifactId>hive-iceberg-shading</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
       </dependencies>
     </profile>
