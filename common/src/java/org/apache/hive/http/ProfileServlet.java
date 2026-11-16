@@ -150,7 +150,7 @@ public class ProfileServlet extends HttpServlet {
   private Lock profilerLock = new ReentrantLock();
   private Integer pid;
   private String asyncProfilerHome;
-  private Process process;
+  private transient Process process;
 
   public ProfileServlet() {
     this.asyncProfilerHome = getAsyncProfilerHome();

@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hive.common.type;
 
+import org.apache.hive.common.util.SuppressFBWarnings;
+
 import java.text.ParsePosition;
 import java.time.DateTimeException;
 import java.time.Instant;
@@ -191,7 +193,7 @@ public class Date implements Comparable<Date> {
           throw new DateTimeParseException("Text '" + trimedText + "' could not be parsed, unparsed text found at index " + pos.getIndex(), trimedText,
               pos.getIndex());
         }
-      }  
+      }
       return new Date(LocalDate.of(t.get(YEAR), t.get(MONTH_OF_YEAR), t.get(DAY_OF_MONTH)));
     } catch (DateTimeException e) {
       throw new IllegalArgumentException("Cannot create date, parsing error");
@@ -234,6 +236,8 @@ public class Date implements Comparable<Date> {
   /**
    * Return a copy of this object.
    */
+  @Override
+  @SuppressFBWarnings(value = "CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE", justification = "Intended")
   public Object clone() {
     // LocalDateTime is immutable.
     return new Date(this.localDate);

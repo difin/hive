@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hive.common.type;
 
+import org.apache.hive.common.util.SuppressFBWarnings;
+
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -270,6 +272,8 @@ public class Timestamp implements Comparable<Timestamp> {
   /**
    * Return a copy of this object.
    */
+  @Override
+  @SuppressFBWarnings(value = "CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE", justification = "Intended")
   public Object clone() {
     // LocalDateTime is immutable.
     return new Timestamp(this.localDateTime);

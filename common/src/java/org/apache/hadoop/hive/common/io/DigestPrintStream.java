@@ -21,6 +21,7 @@ package org.apache.hadoop.hive.common.io;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class DigestPrintStream extends FetchConverter {
@@ -34,7 +35,7 @@ public class DigestPrintStream extends FetchConverter {
 
   @Override
   protected void process(String out) {
-    digest.update(out.getBytes());
+    digest.update(out.getBytes(StandardCharsets.UTF_8));
   }
 
   @Override

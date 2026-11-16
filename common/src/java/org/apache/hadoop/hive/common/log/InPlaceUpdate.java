@@ -165,7 +165,7 @@ public class InPlaceUpdate {
     String progressStr = "" + (int) (monitor.progressedPercentage() * 100) + "%";
     float et = (float) (System.currentTimeMillis() - monitor.startTime()) / (float) 1000;
     String elapsedTime = "ELAPSED TIME: " + secondsFormatter.format(et) + " s";
-    String footer = 
+    String footer =
         FOOTER_FORMAT.formatted(
         monitor.footerSummary(),
         getInPlaceProgressBar(monitor.progressedPercentage()),

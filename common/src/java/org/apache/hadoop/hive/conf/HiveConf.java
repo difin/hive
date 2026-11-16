@@ -45,6 +45,7 @@ import org.apache.hadoop.mapreduce.lib.input.CombineFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hive.common.HiveCompat;
+import org.apache.hive.common.util.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -240,19 +241,18 @@ public class HiveConf extends Configuration {
         String nameInConf = "conf" + File.separator + name;
         result = checkConfigFile(new File(homePath, nameInConf));
         if (result == null) {
-          URI jarUri = null;
           try {
             // Handle both file:// and jar:<url>!{entry} in the case of shaded hive libs
             URL sourceUrl = HiveConf.class.getProtectionDomain().getCodeSource().getLocation();
-            jarUri = sourceUrl.getProtocol().equalsIgnoreCase("jar") ? new URI(sourceUrl.getPath()) : sourceUrl.toURI();
+            URI jarUri = sourceUrl.getProtocol().equalsIgnoreCase("jar") ? new URI(sourceUrl.getPath()) : sourceUrl.toURI();
+            // From the jar file, the parent is /lib folder
+            File parent = new File(jarUri).getParentFile();
+            if (parent != null) {
+              result = checkConfigFile(new File(parent.getParentFile(), nameInConf));
+            }
           } catch (Throwable e) {
             LOG.info("Cannot get jar URI", e);
             System.err.println("Cannot get jar URI: " + e.getMessage());
-          }
-          // From the jar file, the parent is /lib folder
-          File parent = new File(jarUri).getParentFile();
-          if (parent != null) {
-            result = checkConfigFile(new File(parent.getParentFile(), nameInConf));
           }
         }
       }
@@ -298,7 +298,7 @@ public class HiveConf extends Configuration {
   /**
    * encoded parameter values are ;-) encoded.  Use decoder to get ;-) decoded string
    */
-  public static final HiveConf.ConfVars[] ENCODED_CONF = {
+  static final HiveConf.ConfVars[] ENCODED_CONF = {
       ConfVars.HIVEQUERYSTRING
   };
 
@@ -1795,7 +1795,7 @@ public class HiveConf extends Configuration {
     HIVE_CBO_ENABLED("hive.cbo.enable", true, "Flag to control enabling Cost Based Optimizations using Calcite framework."),
     HIVE_CBO_FALLBACK_STRATEGY("hive.cbo.fallback.strategy", "NEVER",
         new StringSet(true, "NEVER", "CONSERVATIVE", "ALWAYS"),
-        "The strategy defines when Hive fallbacks to legacy optimizer when CBO fails:" 
+        "The strategy defines when Hive fallbacks to legacy optimizer when CBO fails:"
             + "NEVER, never use the legacy optimizer (all CBO errors are fatal);"
             + "ALWAYS, always use the legacy optimizer (CBO errors are not fatal);"
             + "CONSERVATIVE, use the legacy optimizer only when the CBO error is not related to subqueries and views."),
@@ -3820,8 +3820,8 @@ public class HiveConf extends Configuration {
         " * DATETIME: For using java.time.format.DateTimeFormatter\n" +
         " * SIMPLE: For using java.text.SimpleDateFormat (known bugs: HIVE-25458, HIVE-25403, HIVE-25268)\n" +
         "Currently the configuration only affects the behavior of the following SQL functions:\n" +
-        " * unix_timestamp(string,[string])\n" + 
-        " * from_unixtime\n" + 
+        " * unix_timestamp(string,[string])\n" +
+        " * from_unixtime\n" +
         " * date_format\n\n" +
         "The SIMPLE formatter exists purely for compatibility purposes with previous versions of Hive thus its use " +
         "is discouraged. It suffers from known bugs that are unlikely to be fixed in subsequent versions of the product." +
@@ -6080,6 +6080,7 @@ public class HiveConf extends Configuration {
     return new LoopingByteArrayInputStream(confVarByteArray);
   }
 
+  @SuppressFBWarnings(value = "NP_NULL_PARAM_DEREF", justification = "Exception before reaching NP")
   public void verifyAndSet(String name, String value) throws IllegalArgumentException {
     if (modWhiteListPattern != null) {
       Matcher wlMatcher = modWhiteListPattern.matcher(name);
@@ -7231,17 +7232,11 @@ public class HiveConf extends Configuration {
   }
 
   public static String getNonMrEngines() {
-    String result = StringUtils.EMPTY;
-    for (String s : ConfVars.HIVE_EXECUTION_ENGINE.getValidStringValues()) {
-      if ("mr".equals(s)) {
-        continue;
-      }
-      if (!result.isEmpty()) {
-        result += ", ";
-      }
-      result += s;
-    }
-    return result;
+    Set<String> engines = new HashSet<>(ConfVars.HIVE_EXECUTION_ENGINE.getValidStringValues());
+    engines.remove("mr");
+    String validNonMrEngines = String.join(", ", engines);
+    LOG.debug("Valid non-MapReduce execution engines: {}", validNonMrEngines);
+    return validNonMrEngines;
   }
 
   public static String generateMrDeprecationWarning() {
