@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.metastore;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
+import org.apache.hadoop.hive.metastore.utils.SecurityUtils;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -221,8 +222,9 @@ public class ServletServerBuilder {
       return null;
     }
     final Server server = createServer();
-    // create the connectors
-    final SslContextFactory sslFactory = ServletSecurity.createSslContextFactory(configuration);
+    // create the connectors, TLS client authentication applies to the Thrift endpoints only
+    final SslContextFactory sslFactory =
+        ServletSecurity.createSslContextFactory(configuration, SecurityUtils.ClientAuth.NONE);
     final ServerConnector[] connectors = new ServerConnector[size];
     final ServletContextHandler[] handlers = new ServletContextHandler[size];
     Iterator<Map.Entry<Integer, ServletContextHandler>> it = handlersMap.entrySet().iterator();

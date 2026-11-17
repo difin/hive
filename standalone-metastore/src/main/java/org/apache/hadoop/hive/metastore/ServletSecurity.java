@@ -360,26 +360,24 @@ public class ServletSecurity {
    * Creates an SSL context factory if configuration states so.
    *
    * @param conf the configuration
+   * @param clientAuth the TLS client authentication mode
    * @return null if no ssl in config, an instance otherwise
    * @throws IOException if getting password fails
    */
-  static SslContextFactory createSslContextFactory(Configuration conf) throws IOException {
+  static SslContextFactory createSslContextFactory(Configuration conf, SecurityUtils.ClientAuth clientAuth)
+      throws IOException {
     final boolean useSsl = MetastoreConf.getBoolVar(conf, MetastoreConf.ConfVars.USE_SSL);
     if (!useSsl) {
       return null;
     }
-    final String keyStorePath = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_KEYSTORE_PATH).trim();
-    if (keyStorePath.isEmpty()) {
-      throw new IllegalArgumentException(MetastoreConf.ConfVars.SSL_KEYSTORE_PATH
-          + " Not configured for SSL connection");
-    }
-    final String keyStorePassword =
-        MetastoreConf.getPassword(conf, MetastoreConf.ConfVars.SSL_KEYSTORE_PASSWORD);
-    final String keyStoreType =
-        MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_KEYSTORE_TYPE).trim();
-    final String keyStoreAlgorithm =
-        MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_KEYMANAGERFACTORY_ALGORITHM).trim();
-    final String[] excludedProtocols = MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_PROTOCOL_BLACKLIST).split(",");
+    final SecurityUtils.StoreConfig keyStore = MetastoreConf.getSslServerKeyStore(conf);
+    SslContextFactory.Server factory = new SslContextFactory.Server();
+    factory.setKeyStorePath(keyStore.path());
+    factory.setKeyStorePassword(keyStore.password());
+    factory.setKeyStoreType(keyStore.typeOrDefault());
+    factory.setKeyManagerFactoryAlgorithm(keyStore.keyManagerAlgorithmOrDefault());
+    final String[] excludedProtocols =
+        MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_PROTOCOL_BLACKLIST).split(",");
     if (LOG.isInfoEnabled()) {
       LOG.info("HTTP Server SSL: adding excluded protocols: {}", Arrays.toString(excludedProtocols));
     }
@@ -387,7 +385,6 @@ public class ServletSecurity {
         MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_INCLUDE_PROTOCOLS));
     String[] includeCipherSuites = SecurityUtils.parseIncludeCipherSuites(
         MetastoreConf.getVar(conf, MetastoreConf.ConfVars.SSL_INCLUDE_CIPHERSUITES));
-    SslContextFactory factory = new SslContextFactory.Server();
     if (includeProtocols.length > 0) {
       factory.setIncludeProtocols(includeProtocols);
     }
@@ -396,14 +393,22 @@ public class ServletSecurity {
       LOG.info("HTTP Server SSL: SslContextFactory.getExcludeProtocols = {}",
           Arrays.toString(factory.getExcludeProtocols()));
     }
-    factory.setKeyStorePath(keyStorePath);
-    factory.setKeyStorePassword(keyStorePassword);
-    factory.setKeyStoreType(keyStoreType.isEmpty() ? KeyStore.getDefaultType() : keyStoreType);
-    factory.setKeyManagerFactoryAlgorithm(keyStoreAlgorithm.isEmpty() ?
-        KeyManagerFactory.getDefaultAlgorithm() : keyStoreAlgorithm);
     if (includeCipherSuites.length > 0) {
       factory.setIncludeCipherSuites(includeCipherSuites);
     }
+    if (clientAuth != SecurityUtils.ClientAuth.NONE) {
+      final SecurityUtils.StoreConfig trustStore = MetastoreConf.getSslServerTrustStore(conf);
+      factory.setTrustStorePath(trustStore.path());
+      factory.setTrustStorePassword(trustStore.password());
+      factory.setTrustStoreType(trustStore.typeOrDefault());
+      factory.setTrustManagerFactoryAlgorithm(trustStore.trustManagerAlgorithmOrDefault());
+      if (clientAuth == SecurityUtils.ClientAuth.NEED) {
+        factory.setNeedClientAuth(true);
+      } else {
+        factory.setWantClientAuth(true);
+      }
+    }
+    LOG.info("HTTP Server SSL: client authentication: {}", clientAuth);
     return factory;
   }
 
