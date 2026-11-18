@@ -92,7 +92,7 @@
     <commons-exec.version>1.1</commons-exec.version>
     <commons-io.version>2.18.0</commons-io.version>
     <commons-logging.version>1.4.0</commons-logging.version>
-    <zstd-jni.version>1.5.7-2</zstd-jni.version>
+    <zstd-jni.version>1.5.7-26</zstd-jni.version>
     <commons-pool2.version>2.11.1</commons-pool2.version>
     <commons-lang3.version>3.18.0</commons-lang3.version>
     <commons-math3.version>3.6.1</commons-math3.version>
