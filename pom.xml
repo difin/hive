@@ -192,7 +192,7 @@
     <jsr305.version>3.0.2</jsr305.version>
     <gson.version>2.9.0</gson.version>
     <re2j.version>1.2</re2j.version>
-    <bcprov-jdk18on.version>1.85</bcprov-jdk18on.version>
+    <bcprov-jdk18on.version>1.87</bcprov-jdk18on.version>
     <rs-api.version>2.0.1</rs-api.version>
     <janino.version>3.1.12</janino.version>
     <datasketches.version>2.0.0</datasketches.version>
