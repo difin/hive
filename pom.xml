@@ -71,7 +71,7 @@
     <accumulo.version>1.7.0.7.2.11.0-233</accumulo.version>
     <activemq.version>5.16.3</activemq.version>
     <aircompressor.version>2.0.3</aircompressor.version>
-    <ant.version>1.10.12</ant.version>
+    <ant.version>1.10.18</ant.version>
     <antlr.version>3.5.2</antlr.version>
     <!-- Make sure to sync it with standalone-metastore/pom.xml -->
     <antlr4.version>4.9.3</antlr4.version>

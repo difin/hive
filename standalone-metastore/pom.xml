@@ -699,6 +699,33 @@
             <groupId>org.springframework.ldap</groupId>
             <artifactId>spring-ldap-core</artifactId>
             <version>${spring.ldap.version}</version>
+            <exclusions>
+                <!-- spring-ldap-core 3.3.8 pins micrometer 1.14.14; use ${micrometer.version} instead -->
+                <exclusion>
+                    <groupId>io.micrometer</groupId>
+                    <artifactId>micrometer-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.micrometer</groupId>
+                    <artifactId>micrometer-commons</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.micrometer</groupId>
+                    <artifactId>micrometer-observation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-observation</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

@@ -347,6 +347,32 @@
       <groupId>org.springframework.ldap</groupId>
       <artifactId>spring-ldap-core</artifactId>
       <version>${spring.ldap.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>io.micrometer</groupId>
+          <artifactId>micrometer-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.micrometer</groupId>
+          <artifactId>micrometer-commons</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>io.micrometer</groupId>
+          <artifactId>micrometer-observation</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-commons</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-observation</artifactId>
     </dependency>
     <!-- Add Spring-tx and Spring-beans explicitly to override the versions coming from spring-ldap-core 2.4.4 -->
     <dependency>
