@@ -27,7 +27,7 @@
   <properties>
     <hive.path.to.root>..</hive.path.to.root>
     <reflections.version>0.10.2.redhat-00001</reflections.version>
-    <atlas.version>2.4.0.7.3.5.0-SNAPSHOT</atlas.version>
+    <atlas.version>2.5.0.7.3.5.0-SNAPSHOT</atlas.version>
     <commons-configuration.version>2.15.1</commons-configuration.version>
   </properties>
 

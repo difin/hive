@@ -28,7 +28,7 @@
     <docker.ubi7.minimal.version>7.8-328</docker.ubi7.minimal.version>
     <hive.path.to.root>..</hive.path.to.root>
     <hive.jdbc.driver.jar>apache-hive-${project.version}-jdbc.jar</hive.jdbc.driver.jar>
-    <atlas.version>2.4.0.7.3.5.0-SNAPSHOT</atlas.version>
+    <atlas.version>2.5.0.7.3.5.0-SNAPSHOT</atlas.version>
     <oozie.version>5.1.0.7.3.5.0-SNAPSHOT</oozie.version>
     <ranger.version>2.9.0.7.3.5.0-SNAPSHOT</ranger.version>
     <solr.version>8.11.2.7.3.5.0-SNAPSHOT</solr.version>
