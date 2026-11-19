@@ -93,6 +93,10 @@ public class AlterTableCompactOperation extends DDLOperation<AlterTableCompactDe
     
     List<Partition> partitions = getPartitions(table);
 
+    if (desc.getPartitionSpec() != null && !partitions.isEmpty() && table.getStorageHandler() != null) {
+      table.getStorageHandler().validateCompactionPartition(table, partitions.get(0).getName());
+    }
+
     if (partitions.isEmpty()) {
       CompactionResponse compactionResponse = compact(table, null);
       parseCompactionResponse(compactionResponse, table, null);
