@@ -179,6 +179,7 @@ public class BaseHiveIcebergMetaHook implements HiveMetaHook {
 
     Schema schema = schema(tableProperties, hmsTable, identifierFields, request.getDefaultConstraints());
     schema.columns().forEach(column -> validateUnknownType(column.name(), column.type()));
+    validateHasWritableColumn(schema);
     PartitionSpec spec = spec(conf, schema, hmsTable);
     IcebergTableUtil.validateNoUnknownTypePartitioning(spec);
 
@@ -461,6 +462,19 @@ public class BaseHiveIcebergMetaHook implements HiveMetaHook {
    * fields that have at least one sibling of another type. Lists, maps and all-UNKNOWN structs would have no
    * physical representation left.
    */
+  /**
+   * UNKNOWN values are omitted from data files. A table whose columns are all UNKNOWN has an empty file schema and
+   * cannot be written reliably (for example, Parquet rejects an empty message type).
+   */
+  static void validateHasWritableColumn(Schema schema) {
+    Preconditions.checkArgument(hasWritableColumn(schema),
+        "Table schema is not supported: a table must have at least one column that is not of type unknown");
+  }
+
+  static boolean hasWritableColumn(Schema schema) {
+    return schema.columns().stream().anyMatch(column -> !isUnknown(column.type()));
+  }
+
   static void validateUnknownType(String columnPath, Type type) {
     switch (type.typeId()) {
       case STRUCT -> {
