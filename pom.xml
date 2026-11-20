@@ -1377,6 +1377,16 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Manage every Spring artifact, including transitive spring-context,
+           spring-expression and spring-aop, from spring.version (Seal version
+           set by CDPD). The explicit entries below keep their exclusions. -->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-framework-bom</artifactId>
+        <version>${spring.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-jdbc</artifactId>

@@ -134,5 +134,25 @@
       <artifactId>spring-context-support</artifactId>
       <version>${spring.version}</version>
     </dependency>
+    <!-- Declared explicitly (versions from the root pom / spring-framework-bom)
+         so hcatalog and its consumers (e.g. dlm, oozie) get the Seal-remediated
+         spring-context, spring-expression, spring-beans and spring-core instead
+         of the plain 5.3.39 versions spring-context-support pulls in. -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-expression</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+    </dependency>
   </dependencies>
 </project>
