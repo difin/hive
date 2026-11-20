@@ -92,6 +92,7 @@
     <javolution.version>5.5.1</javolution.version>
     <jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
     <jetty.version>9.4.58.v20250814+safest-until-20261028T000000Z</jetty.version>
+    <jetty-security.version>9.4.58.v20250814+sp1p1</jetty-security.version>
     <jexl.version>3.3</jexl.version>
     <junit.version>4.13.2.redhat-00001</junit.version>
     <junit.jupiter.version>5.11.2</junit.jupiter.version>
@@ -316,6 +317,11 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
             <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-security</artifactId>
+            <version>${jetty-security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
