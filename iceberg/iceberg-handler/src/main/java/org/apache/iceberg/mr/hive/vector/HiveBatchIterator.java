@@ -62,7 +62,6 @@ public final class HiveBatchIterator implements CloseableIterator<HiveBatchConte
     this.partitionColIndices = partitionColIndices;
     this.partitionValues = partitionValues;
     this.idToConstant = idToConstant;
-    RowLineageUtils.initializeRowLineageColumns(vrbCtx, batch);
   }
 
   @Override
@@ -75,6 +74,8 @@ public final class HiveBatchIterator implements CloseableIterator<HiveBatchConte
     if (!advanced) {
       try {
 
+        // Arm lineage columns before each batch: if row 0 is still the -1 placeholder, the column was not in the file.
+        RowLineageUtils.initializeRowLineageColumns(vrbCtx, batch);
         if (!recordReader.next(key, batch)) {
           batch.size = 0;
         }
@@ -136,13 +137,14 @@ public final class HiveBatchIterator implements CloseableIterator<HiveBatchConte
               LongColumnVector rowIdLcv = (LongColumnVector) batch.cols[idx];
               Object firstRowIdObj = idToConstant.get(MetadataColumns.ROW_ID.fieldId());
               if (firstRowIdObj == null) {
+                // If firstRowId is missing, nothing to assign so keep ROW__LINEAGE__ID as NULL.
                 rowIdLcv.noNulls = false;
                 rowIdLcv.isNull[0] = true;
                 rowIdLcv.isRepeating = true;
                 break;
               }
-              // If vector[0] is still -1, the reader didn't find the column in the file.
-              if (rowIdLcv.vector[0] == -1L) {
+              if (rowIdLcv.noNulls && rowIdLcv.vector[0] == -1L) {
+                // If the placeholder -1 is still present, then the column is not in the file
                 for (int i = 0; i < batch.size; i++) {
                   rowIdLcv.vector[i] = (Long) firstRowIdObj + rowOffset + i;
                 }
@@ -163,14 +165,17 @@ public final class HiveBatchIterator implements CloseableIterator<HiveBatchConte
               LongColumnVector lusnLcv = (LongColumnVector) batch.cols[idx];
               Object fileSeqObj = idToConstant.get(MetadataColumns.LAST_UPDATED_SEQUENCE_NUMBER.fieldId());
               if (fileSeqObj == null) {
+              // When Iceberg's file scan has no fileSequenceNumber (null), there is no default for
+              // LAST__UPDATED__SEQUENCE__NUMBER; leave the column as NULL instead of synthesizing a value.
                 lusnLcv.noNulls = false;
                 lusnLcv.isNull[0] = true;
                 lusnLcv.isRepeating = true;
                 break;
               }
 
-              // If vector[0] is still -1, apply the file-level sequence number to the whole batch.
-              if (lusnLcv.vector[0] == -1L) {
+              if (lusnLcv.noNulls && lusnLcv.vector[0] == -1L) {
+                // -1 at row 0 means the storage reader did not read this column from the file; use the same
+                // fileSequenceNumber (from the scan task) for every row in this batch.
                 for (int i = 0; i < batch.size; i++) {
                   lusnLcv.vector[i] = (Long) fileSeqObj;
                 }
