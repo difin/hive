@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -12,9 +11,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.hive</groupId>
@@ -89,7 +86,7 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-http</artifactId>
-      <version>${jetty.version}</version>
+      <version>9.4.58.v20250814+safest-until-20261028T000000Z</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -385,10 +382,9 @@
                 <phase>package</phase>
                 <configuration>
                   <target>
-                    <property name="compile.classpath" refid="maven.runtime.classpath"/>
-                    <taskdef name="templategen" classname="org.apache.hadoop.hive.ant.GenHiveTemplate"
-                             classpath="${compile.classpath}"/>
-                    <templategen templateFile="${basedir}/../conf/hive-default.xml.template"/>
+                    <property name="compile.classpath" refid="maven.runtime.classpath" />
+                    <taskdef name="templategen" classname="org.apache.hadoop.hive.ant.GenHiveTemplate" classpath="${compile.classpath}" />
+                    <templategen templateFile="${basedir}/../conf/hive-default.xml.template" />
                   </target>
                 </configuration>
                 <goals>
@@ -434,10 +430,10 @@
             <configuration>
               <target>
                 <exec executable="bash" failonerror="true">
-                  <arg value="${basedir}/src/scripts/saveVersion.sh"/>
-                  <arg value="${project.version}"/>
-                  <arg value="${hive.version.shortname}"/>
-                  <arg value="${basedir}/src"/>
+                  <arg value="${basedir}/src/scripts/saveVersion.sh" />
+                  <arg value="${project.version}" />
+                  <arg value="${hive.version.shortname}" />
+                  <arg value="${basedir}/src" />
                 </exec>
               </target>
             </configuration>
