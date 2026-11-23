@@ -333,12 +333,14 @@ public class HiveConnection implements java.sql.Connection {
     sessConfMap = connParams.getSessionVars();
     setupLoginTimeout();
     if (isKerberosAuthMode()) {
-      // Ensure UserGroupInformation includes any authorized Kerberos principals.
-      LOG.debug("Configuring Kerberos mode");
-      Configuration config = new Configuration();
-      config.set("hadoop.security.authentication", "Kerberos");
+      if (!UserGroupInformation.isSecurityEnabled()) {
+        // Ensure UserGroupInformation includes any authorized Kerberos principals.
+        LOG.debug("Configuring Kerberos mode");
+        Configuration config = new Configuration();
+        config.set("hadoop.security.authentication", "Kerberos");
 
-      UserGroupInformation.setConfiguration(config);
+        UserGroupInformation.setConfiguration(config);
+      }
 
       if (isEnableCanonicalHostnameCheck()) {
         host = Utils.getCanonicalHostName(connParams.getHost());
