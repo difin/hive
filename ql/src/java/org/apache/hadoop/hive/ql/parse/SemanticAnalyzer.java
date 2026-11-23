@@ -272,7 +272,6 @@ import org.apache.hadoop.hive.ql.plan.ptf.OrderExpressionDef;
 import org.apache.hadoop.hive.ql.plan.ptf.PTFExpressionDef;
 import org.apache.hadoop.hive.ql.plan.ptf.PartitionedTableFunctionDef;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject;
-import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject.HivePrivObjectActionType;
 import org.apache.hadoop.hive.ql.security.authorization.plugin.HivePrivilegeObject.HivePrivilegeObjectType;
 import org.apache.hadoop.hive.ql.session.SessionState;
 import org.apache.hadoop.hive.ql.session.SessionState.ResourceType;
@@ -13097,9 +13096,14 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
             List<String> colNames = new ArrayList<>();
             extractColumnInfos(table, colNames, new ArrayList<>());
 
-            basicInfos.put(new HivePrivilegeObject(HivePrivilegeObjectType.TABLE_OR_VIEW,
-                table.getCatName(), table.getDbName(), table.getTableName(), null, colNames,
-                HivePrivObjectActionType.OTHER, null, null, table.getOwner(), table.getOwnerType()), null);
+            basicInfos.put(HivePrivilegeObject.builder(HivePrivilegeObjectType.TABLE_OR_VIEW)
+                .catName(table.getCatName())
+                .dbName(table.getDbName())
+                .objectName(table.getTableName())
+                .columns(colNames)
+                .ownerName(table.getOwner())
+                .ownerType(table.getOwnerType())
+                .build(), null);
           }
         } else {
           List<String> colNames;
@@ -13115,9 +13119,14 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
             extractColumnInfos(table, colNames, colTypes);
           }
 
-          basicInfos.put(new HivePrivilegeObject(HivePrivilegeObjectType.TABLE_OR_VIEW, table.getCatName(),
-                  table.getDbName(), table.getTableName(), null, colNames,
-                  HivePrivObjectActionType.OTHER, null, null, table.getOwner(), table.getOwnerType()),
+          basicInfos.put(HivePrivilegeObject.builder(HivePrivilegeObjectType.TABLE_OR_VIEW)
+                  .catName(table.getCatName())
+                  .dbName(table.getDbName())
+                  .objectName(table.getTableName())
+                  .columns(colNames)
+                  .ownerName(table.getOwner())
+                  .ownerType(table.getOwnerType())
+                  .build(),
               new MaskAndFilterInfo(colTypes, additionalTabInfo.toString(), alias, astNode, table.isView(), table.isNonNative()));
         }
       }

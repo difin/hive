@@ -101,7 +101,7 @@ public class GetFunctionsOperation extends MetadataOperation {
       }
       // authorize this call on the schema objects
       List<HivePrivilegeObject> privObjs = HivePrivilegeObjectUtils
-          .getHivePrivDbObjects(catalogName, matchingDbs);
+          .getHivePrivDbObjects(DEFAULT_HIVE_CATALOG, matchingDbs);
       String cmdStr = "catalog : " + catalogName + ", schemaPattern : " + schemaName;
       authorizeMetaGets(HiveOperationType.GET_FUNCTIONS, privObjs, cmdStr);
     }
