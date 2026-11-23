@@ -72,7 +72,6 @@ public class CompactionEvaluator extends CommonPartitionEvaluator {
     );
     this.table = table;
     this.ci = ci;
-    addFiles();
   }
 
   public boolean isEligibleForCompaction() {
