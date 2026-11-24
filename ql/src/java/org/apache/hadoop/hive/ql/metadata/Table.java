@@ -269,7 +269,7 @@ public class Table implements Serializable {
     if (getCols().isEmpty()) {
       throw new HiveException("at least one column must be specified for the table");
     }
-    validateColumns(getCols(), getPartCols(), DDLUtils.isIcebergTable(this));
+    validateColumns(getCols(), getPartCols(), DDLUtils.isIcebergTable(this), isView());
 
     if (!isView()) {
       if (null == getDeserializer(false)) {
@@ -1135,6 +1135,11 @@ public class Table implements Serializable {
 
   public static void validateColumns(List<FieldSchema> columns, List<FieldSchema> partCols, boolean icebergTable)
       throws HiveException {
+    validateColumns(columns, partCols, icebergTable, false);
+  }
+
+  private static void validateColumns(List<FieldSchema> columns, List<FieldSchema> partCols, boolean icebergTable,
+      boolean view) throws HiveException {
     Set<String> colNames = new HashSet<>();
     for (FieldSchema col: columns) {
       String colName = normalize(col.getName());
@@ -1142,7 +1147,9 @@ public class Table implements Serializable {
         throw new HiveException("Duplicate column name " + colName
             + " in the table definition.");
       }
-      if (!icebergTable && isUnsupportedInNonIceberg(col.getType())) {
+      // a virtual view stores no data, so it may expose UNKNOWN columns of the underlying Iceberg table
+      boolean allowedInView = view && UNKNOWN_TYPE_NAME.equalsIgnoreCase(col.getType());
+      if (!icebergTable && !allowedInView && isUnsupportedInNonIceberg(col.getType())) {
         throw new HiveException(
             "Column name " + colName + " cannot be of type '" + col.getType() + "' as it is not supported in "
                 + "non-Iceberg tables.");

@@ -24,6 +24,7 @@ import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.StructColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorExpressionDescriptor;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
+import org.apache.hadoop.hive.ql.exec.vector.VoidColumnVector;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 
 /**
@@ -65,6 +66,14 @@ public class VectorUDFStructField extends VectorExpression {
     boolean[] outputIsNull = outV.isNull;
 
     outV.reset();
+
+    // a void field (e.g. an Iceberg unknown field) is always NULL and has no values to copy
+    if (outV instanceof VoidColumnVector) {
+      outV.isRepeating = true;
+      outV.isNull[0] = true;
+      outV.noNulls = false;
+      return;
+    }
 
     if (structColumnVector.isRepeating) {
       if (structColumnVector.noNulls || !structColumnVector.isNull[0]) {

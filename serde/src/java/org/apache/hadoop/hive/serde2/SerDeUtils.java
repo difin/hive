@@ -391,6 +391,10 @@ public final class SerDeUtils {
       }
       break;
     }
+    case UNKNOWN: {
+      sb.append(nullStr);
+      break;
+    }
     default:
       throw new RuntimeException("Unknown type in ObjectInspector!");
     }
@@ -503,6 +507,9 @@ public final class SerDeUtils {
         return hasAnyNullObject(uoi.getField(o),
             uoi.getObjectInspectors().get(uoi.getTag(o)));
       }
+    }
+    case UNKNOWN: {
+      return true;
     }
     default:
       throw new RuntimeException("Unknown type in ObjectInspector!");
