@@ -35,6 +35,7 @@
 
   <properties>
     <hive.path.to.root>../..</hive.path.to.root>
+    <jline.version>3.30.16</jline.version>
   </properties>
 
   <dependencies>
@@ -133,9 +134,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>jline</groupId>
+      <groupId>org.jline</groupId>
       <artifactId>jline</artifactId>
-      <version>0.9.94</version>
+      <version>${jline.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -1671,7 +1671,7 @@ public class TestHplSqlViaBeeLine {
     List<String> copy = new ArrayList<>(argList);
     copy.add("-f");
     copy.add(scriptFile.getAbsolutePath());
-    String output = testCommandLineScript(copy, null, outStream);
+    String output = testCommandLineScript(copy, outStream);
     scriptFile.delete();
     return output;
   }

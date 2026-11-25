@@ -133,7 +133,8 @@
     <jetty.version>9.4.58.v20250814+safest-until-20261028T000000Z</jetty.version>
     <jetty-security.version>9.4.58.v20250814+sp1p1</jetty-security.version>
     <jersey.version>2.47</jersey.version>
-    <jline.version>2.14.6</jline.version>
+    <jansi.version>2.4.0</jansi.version>
+    <jline.version>3.30.16</jline.version>
     <jms.version>2.0.2</jms.version>
     <joda.version>2.9.9</joda.version>
     <jodd.version>6.0.0</jodd.version>
@@ -438,7 +439,7 @@
         <version>${javolution.version}</version>
       </dependency>
       <dependency>
-        <groupId>jline</groupId>
+        <groupId>org.jline</groupId>
         <artifactId>jline</artifactId>
         <version>${jline.version}</version>
       </dependency>
@@ -1408,6 +1409,11 @@
             <artifactId>spring-jcl</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.fusesource.jansi</groupId>
+        <artifactId>jansi</artifactId>
+        <version>${jansi.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
